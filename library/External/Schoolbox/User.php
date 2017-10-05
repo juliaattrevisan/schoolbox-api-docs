@@ -35,7 +35,6 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param array $synergyIds
      *
      * @return array
@@ -77,7 +76,6 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param int $externalUserId
      *
      * @return array
@@ -125,7 +123,6 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param int $externalUserId
      *
      * @return array
@@ -173,7 +170,6 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param $externalUserId
      *
      * @return array
@@ -226,7 +222,6 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param User $user
      *
      * @return array
@@ -285,7 +280,6 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param int $externalUserId
      *
      * @return array
@@ -310,7 +304,6 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param string $boarderValue
      *
      * @return string
@@ -330,7 +323,6 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param int $externalUserId
      *
      * @return bool|string
@@ -348,7 +340,6 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param int $externalUserId
      *
      * @return int
@@ -360,7 +351,6 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param int $externalUserId
      *
      * @return string
@@ -374,7 +364,6 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @return array
      */
     public function getStaffContactListExtended()
@@ -384,7 +373,6 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param int $staffID
      *
      * @return array
@@ -396,7 +384,6 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param int $houseId
      */
     public function getHousemasterByHouseId($houseID)
@@ -406,7 +393,6 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param array $externalUserIds
      */
     public function getHousemasterEmails($externalUserIds)
@@ -417,7 +403,6 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @return array
      */
     public function getStudentForms()
@@ -427,7 +412,6 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param int $externalUserId
      *
      * @return array
@@ -439,7 +423,6 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param int $externalUserId
      *
      * @return array
@@ -451,7 +434,6 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @return string
      */
     public function getEmail($externalUserId)
@@ -461,7 +443,6 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @return array
      */
     public function getStudentUserAccountInfo()
@@ -471,7 +452,6 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @return array
      */
     public function getParentUserAccountInfo()
@@ -490,7 +470,6 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param int $externalUserId
      */
     public function getStaff($externalUserId)
@@ -499,7 +478,6 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param string $yearlevel
      * @param string $name
      * @param string $boardingStatus

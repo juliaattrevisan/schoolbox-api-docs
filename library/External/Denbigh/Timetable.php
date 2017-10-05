@@ -38,7 +38,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
      */
     public function __construct()
     {
-        $this->userMapper = UserMapper::getInstance();
+        $this->userMapper   = UserMapper::getInstance();
         $this->configMapper = ConfigMapper::getInstance();
 
         /** @noinspection PhpDeprecationInspection */
@@ -49,57 +49,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Check if specified user ID belongs to a staff member, cache result for repeat calls
-     *
-     * @param int $userId Schoolbox User ID
-     *
-     * @return bool
-     */
-    private function isStaff($userId) {
-        try {
-            if (!isset($this->userCache[$userId])) {
-                $this->userStaffCache[$userId] = $this->userMapper->findById($userId)->getRole()->isStaff();
-            }
-        }
-        /** @noinspection PhpRedundantCatchClauseInspection */
-        catch (MapperException $e) {
-            $this->userStaffCache[$userId] = false;
-        }
-
-        return $this->userStaffCache[$userId];
-    }
-
-    /**
      * {@inheritDoc}
-     *
-     * @param string $externalUserId
-     * @param Campus $campus
-     * @param int    $day
-     * @param null   $date
-     *
-     * @return bool|mixed
-     */
-    public function getTimetableDefinition($externalUserId, Campus $campus, $day = 0, $date = null)
-    {
-        return $this->getTimetableDefinitionFromDatabase($this->internalDatabase, $campus);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param Campus $campus
-     * @param int    $date
-     *
-     * @return bool|int
-     */
-    public function getDayNumber(Campus $campus, $date = 0)
-    {
-        return $this->getDayNumberFromDatabase($this->internalDatabase, $campus, $date);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
      * @param int $dayNumber
      *
      * @return string
@@ -111,7 +61,6 @@ class External_Denbigh_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param Campus $campus
      * @param int    $now
      * @param User   $user
@@ -125,7 +74,6 @@ class External_Denbigh_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param int    $externalUserId
      * @param int    $userId
      * @param Campus $campus
@@ -215,7 +163,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
                     ? ''
                     : date($this->configMapper->get('date_time'), strtotime($lesson['endTime']));
 
-            if (isset($periodList[$period]['day'][$day]) && 
+            if (isset($periodList[$period]['day'][$day]) &&
                 !isset($periodList[$period]['day'][$day][$lesson['ClassCode']])) {
                 $periodList[$period]['day'][$day][$lesson['ClassCode']] = [
                     'description' => $lesson['subjectName'],
@@ -230,7 +178,63 @@ class External_Denbigh_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
+     * @param string $externalUserId
+     * @param Campus $campus
+     * @param int    $day
+     * @param null   $date
      *
+     * @return bool|mixed
+     */
+    public function getTimetableDefinition($externalUserId, Campus $campus, $day = 0, $date = null)
+    {
+        return $this->getTimetableDefinitionFromDatabase($this->internalDatabase, $campus);
+    }
+
+    /**
+     * Check if specified user ID belongs to a staff member, cache result for repeat calls
+     *
+     * @param int $userId Schoolbox User ID
+     *
+     * @return bool
+     */
+    private function isStaff($userId)
+    {
+        try {
+            if (!isset($this->userCache[$userId])) {
+                $this->userStaffCache[$userId] = $this->userMapper->findById($userId)->getRole()->isStaff();
+            }
+        } /** @noinspection PhpRedundantCatchClauseInspection */
+        catch (MapperException $e) {
+            $this->userStaffCache[$userId] = false;
+        }
+
+        return $this->userStaffCache[$userId];
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param int                 $externalUserId
+     * @param int                 $userId
+     * @param Campus              $campus
+     * @param Alaress_Date_Format $date
+     *
+     * @return mixed
+     */
+    public function getTimetableForDate($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date)
+    {
+        return $this->getDayTimetable(
+            $externalUserId,
+            $userId,
+            $campus,
+            $this->getDayNumber(
+                $campus,
+                $date->getUnixTimeStamp()
+            )
+        );
+    }
+
+    /**
+     * {@inheritDoc}
      * @param int    $externalUserId
      * @param int    $userId
      * @param Campus $campus
@@ -325,7 +329,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             if (isset($periodList[$period]) && !isset($periodList[$period]['class'][$lesson['ClassCode']])
             ) {
                 $periodList[$period]['class'][$lesson['ClassCode']] = array_merge(
-                    $periodList[$period], 
+                    $periodList[$period],
                     [
                         'description' => $lesson['subjectName'],
                         'code'        => $lesson['classCode'],
@@ -340,30 +344,18 @@ class External_Denbigh_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
+     * @param Campus $campus
+     * @param int    $date
      *
-     * @param int                 $externalUserId
-     * @param int                 $userId
-     * @param Campus              $campus
-     * @param Alaress_Date_Format $date
-     *
-     * @return mixed
+     * @return bool|int
      */
-    public function getTimetableForDate($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date)
+    public function getDayNumber(Campus $campus, $date = 0)
     {
-        return $this->getDayTimetable(
-            $externalUserId,
-            $userId,
-            $campus,
-            $this->getDayNumber(
-                $campus,
-                $date->getUnixTimeStamp()
-            )
-        );
+        return $this->getDayNumberFromDatabase($this->internalDatabase, $campus, $date);
     }
 
     /**
      * {@inheritDoc}
-     *
      * @param array|string $roomCodes
      *
      * @return array

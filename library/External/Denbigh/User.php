@@ -33,14 +33,13 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param array $externalIds
      *
      * @return array
      */
     public function getParentEmails($externalIds)
     {
-        $id_list = implode(',', array_map('intval', $externalIds));
+        $id_list   = implode(',', array_map('intval', $externalIds));
         $parentIds = array_filter(explode(',', $id_list));
 
         if (count($parentIds) == 0) {
@@ -74,7 +73,6 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param int $houseId
      *
      * @return array
@@ -95,7 +93,6 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param int $externalId
      *
      * @return array
@@ -173,7 +170,6 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param int $externalId
      *
      * @return array
@@ -270,7 +266,6 @@ class External_Denbigh_User implements External_UserInterface
             $adaption['StudentEmergencyName'] =
                 "{$student['EmergencyContact1']} " .
                 "({$student['EmergencyRelationship1']})";
-
         }
 
         return $adaption;
@@ -278,7 +273,6 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param int $externalId
      *
      * @return array
@@ -324,7 +318,6 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param string $externalId
      *
      * @return mixed
@@ -389,7 +382,6 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param null|int $externalId
      *
      * @return int
@@ -401,7 +393,6 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param null|int $externalId
      *
      * @return string
@@ -413,7 +404,6 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param User $user
      *
      * @return array
@@ -430,8 +420,8 @@ class External_Denbigh_User implements External_UserInterface
             /** @noinspection SqlDialectInspection */
             return $this->externalDatabase->executeQuery(
                 "
-                    SELECT      cl.classCode as code, 
-                                co.subjectName as name
+                    SELECT      cl.classCode AS code, 
+                                co.subjectName AS name
                     FROM        People p
                     RIGHT JOIN  Staff s ON s.peopleDenbighID = p.denbighID
                     RIGHT JOIN  Classes cl ON cl.staffCode = s.staffCode
@@ -446,8 +436,8 @@ class External_Denbigh_User implements External_UserInterface
             /** @noinspection SqlDialectInspection */
             return $this->externalDatabase->executeQuery(
                 "
-                        SELECT      cl.classCode as code, 
-                                    co.subjectName as name
+                        SELECT      cl.classCode AS code, 
+                                    co.subjectName AS name
                         FROM        People p
                         RIGHT JOIN  Enrolments e ON e.studentID = p.denbighID
                         RIGHT JOIN  Classes cl ON cl.classCode = e.classCode
@@ -466,7 +456,6 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param int $externalId
      *
      * @return array
@@ -476,7 +465,7 @@ class External_Denbigh_User implements External_UserInterface
         /** @noinspection SqlDialectInspection */
         return $this->externalDatabase->executeQuery(
             "
-                SELECT    s.peopleDenbighID as RelatedID
+                SELECT    s.peopleDenbighID AS RelatedID
                 FROM      People pe
                 LEFT JOIN Parents pa ON pa.peopleDenbighID = pe.denbighID
                 LEFT JOIN Students s ON s.familyDenbighID = pa.familyDenbighID
@@ -488,7 +477,6 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param int $externalId
      *
      * @return bool|string
@@ -506,7 +494,6 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @return array
      */
     public function getStudentUserAccountInfo()
@@ -530,7 +517,6 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @return mixed
      */
     public function getParentUserAccountInfo()
@@ -559,7 +545,6 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @return array
      */
     public function getStaffUserAccountInfo()
@@ -581,7 +566,6 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param $boarderValue
      *
      * @return string
@@ -605,7 +589,6 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @return array
      */
     public function getStaffContactListExtended()
@@ -615,7 +598,6 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param int $externalId
      *
      * @return array
@@ -627,7 +609,6 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @return array
      */
     public function getStudentForms()
@@ -637,7 +618,6 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param array $externalIds
      *
      * @return array
@@ -649,7 +629,6 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param int $externalId
      *
      * @return string
@@ -661,7 +640,6 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param int $externalId
      */
     public function getParentSync($externalId)
@@ -671,7 +649,6 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param string $yearlevel
      * @param string $name
      * @param string $boardingStatus

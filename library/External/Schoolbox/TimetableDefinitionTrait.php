@@ -12,46 +12,6 @@ trait External_Schoolbox_TimetableDefinitionTrait
 {
     /**
      * {@inheritDoc}
-     *
-     * @param IConnector $database
-     * @param Campus     $campus
-     *
-     * @return array
-     */
-    public function getTimetableDefinitionFromDatabase(IConnector $database, \Schoolbox\Campus $campus)
-    {
-        $timetableQuery = $database->executeQuery(
-            "
-                SELECT    tc.start,
-                          tc.reset,
-                          tc.finish,
-                          tc.start_day,
-                          ty.title,
-                          ty.cycle_length,
-                          ty.day_length,
-                          ty.regular
-                FROM      timetable_campus tc
-                LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
-                WHERE     tc.campus_id = :campusId
-                AND       tc.start <= DATE(NOW())
-                AND       tc.finish >= DATE(NOW())
-            ",
-            ['campusId' => $campus->getId()]
-        );
-
-        if ($definition = $timetableQuery->fetch()) {
-            $definition['dayCount']    = $definition['cycle_length'];
-            $definition['periodCount'] = $definition['day_length'];
-
-            return $definition;
-        }
-
-        return [];
-    }
-
-    /**
-     * {@inheritDoc}
-     *
      * @param IConnector $database
      * @param Campus     $campus
      * @param int        $date
@@ -90,5 +50,43 @@ trait External_Schoolbox_TimetableDefinitionTrait
         }
 
         return $currentDay;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param IConnector $database
+     * @param Campus     $campus
+     *
+     * @return array
+     */
+    public function getTimetableDefinitionFromDatabase(IConnector $database, \Schoolbox\Campus $campus)
+    {
+        $timetableQuery = $database->executeQuery(
+            "
+                SELECT    tc.start,
+                          tc.reset,
+                          tc.finish,
+                          tc.start_day,
+                          ty.title,
+                          ty.cycle_length,
+                          ty.day_length,
+                          ty.regular
+                FROM      timetable_campus tc
+                LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
+                WHERE     tc.campus_id = :campusId
+                AND       tc.start <= DATE(NOW())
+                AND       tc.finish >= DATE(NOW())
+            ",
+            ['campusId' => $campus->getId()]
+        );
+
+        if ($definition = $timetableQuery->fetch()) {
+            $definition['dayCount']    = $definition['cycle_length'];
+            $definition['periodCount'] = $definition['day_length'];
+
+            return $definition;
+        }
+
+        return [];
     }
 }

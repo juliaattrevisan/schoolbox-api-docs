@@ -29,7 +29,6 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param string $externalUserId
      * @param Campus $campus
      * @param int    $day
@@ -67,7 +66,6 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
-     *
      * @param Campus $campus
      * @param int    $day
      *
@@ -117,24 +115,6 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
-     *
-     * @param Campus $campus
-     * @param int    $date
-     *
-     * @return bool|int
-     */
-    public function getDayNumber(Campus $campus, $date = 0)
-    {
-        return $this->getDayNumberFromDatabase(
-            $this->internalDatabase,
-            $campus,
-            $date
-        );
-    }
-
-    /**
-     * {@inheritDoc}
-     *
      * @param int $dayNumber
      *
      * @return string
@@ -146,43 +126,6 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
-     *
-     * @param int $userId
-     *
-     * @return array
-     */
-    protected function getClassUsers($userId)
-    {
-        // Get classes for which this user is involved, or is a teacher.
-        $query = "
-
-            SELECT      c.name, 
-                        c.code, 
-                        c.description,
-                        cp.period_id, 
-                        cp.room, 
-                        cp.teacher_id,
-                        u.synergy_id, 
-                        u.title, 
-                        u.firstname, 
-                        u.lastname
-            FROM        class c
-            LEFT JOIN   class_user cl ON c.id = cl.class_id
-            LEFT JOIN   class_period cp ON c.id = cp.class_id
-            LEFT JOIN   user u ON cp.teacher_id = u.id
-            WHERE       cp.teacher_id = :userId OR 
-                        cl.user_id = :userId2
-        ";
-
-        return $this->internalDatabase->executeQuery($query, [
-            'userId' => $userId,
-            'userId2' => $userId
-        ])->fetchAll();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
      * @param Campus    $campus
      * @param int       $now
      * @param null|User $user
@@ -233,7 +176,22 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
+     * @param Campus $campus
+     * @param int    $date
      *
+     * @return bool|int
+     */
+    public function getDayNumber(Campus $campus, $date = 0)
+    {
+        return $this->getDayNumberFromDatabase(
+            $this->internalDatabase,
+            $campus,
+            $date
+        );
+    }
+
+    /**
+     * {@inheritDoc}
      * @param int    $externalUserId
      * @param int    $userId
      * @param Campus $campus
@@ -247,7 +205,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         }
 
         $periodList = $this->getPeriodList($campus, 0);
-        $classList = $this->getClassUsers($userId);
+        $classList  = $this->getClassUsers($userId);
 
         $timetableDefinition = $this->getTimetableDefinitionFromDatabase($this->internalDatabase, $campus);
         $dayCount            = $timetableDefinition['dayCount'];
@@ -301,7 +259,63 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
+     * @param int $userId
      *
+     * @return array
+     */
+    protected function getClassUsers($userId)
+    {
+        // Get classes for which this user is involved, or is a teacher.
+        $query = "
+
+            SELECT      c.name, 
+                        c.code, 
+                        c.description,
+                        cp.period_id, 
+                        cp.room, 
+                        cp.teacher_id,
+                        u.synergy_id, 
+                        u.title, 
+                        u.firstname, 
+                        u.lastname
+            FROM        class c
+            LEFT JOIN   class_user cl ON c.id = cl.class_id
+            LEFT JOIN   class_period cp ON c.id = cp.class_id
+            LEFT JOIN   user u ON cp.teacher_id = u.id
+            WHERE       cp.teacher_id = :userId OR 
+                        cl.user_id = :userId2
+        ";
+
+        return $this->internalDatabase->executeQuery($query, [
+            'userId'  => $userId,
+            'userId2' => $userId,
+        ])->fetchAll();
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param int                 $externalUserId
+     * @param int                 $userId
+     * @param Campus              $campus
+     * @param Alaress_Date_Format $date
+     *
+     * @return mixed
+     */
+    public function getTimetableForDate($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date)
+    {
+        return $this->getDayTimetable(
+            $externalUserId,
+            $userId,
+            $campus,
+            $this->getDayNumber(
+                $campus,
+                $date->getUnixTimeStamp()
+            )
+        );
+    }
+
+    /**
+     * {@inheritDoc}
      * @param int    $externalUserId
      * @param int    $userId
      * @param Campus $campus
@@ -316,7 +330,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         }
 
         $periodList = $this->getPeriodList($campus, $dayNumber);
-        $classList = $this->getClassUsers($userId);
+        $classList  = $this->getClassUsers($userId);
 
         $periodListAdaption = [];
 
@@ -364,30 +378,6 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
-     *
-     * @param int                 $externalUserId
-     * @param int                 $userId
-     * @param Campus              $campus
-     * @param Alaress_Date_Format $date
-     *
-     * @return mixed
-     */
-    public function getTimetableForDate($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date)
-    {
-        return $this->getDayTimetable(
-            $externalUserId,
-            $userId,
-            $campus,
-            $this->getDayNumber(
-                $campus,
-                $date->getUnixTimeStamp()
-            )
-        );
-    }
-
-    /**
-     * {@inheritDoc}
-     *
      * @param array|string $roomCodes
      *
      * @return array

@@ -28,7 +28,44 @@ class External_Schoolbox_Class implements External_ClassInterface
 
     /**
      * {@inheritDoc}
+     * @param string $classCode
      *
+     * @return array
+     */
+    public function getStudents($classCode)
+    {
+        $studentIterator = $this->getClassIterator($classCode, Role::STUDENT);
+
+        if (!$studentIterator instanceof IIterator) {
+            return [];
+        }
+
+        $studentListAdaption = [];
+        $found               = [];
+
+        foreach ($studentIterator as $student) {
+            $studentExternalId = $student['synergy_id'];
+
+            if (!array_key_exists($studentExternalId, $found)) {
+                $studentListAdaption[] = [
+                    'synergy_id'              => $studentExternalId,
+                    'lastname'                => $student['lastname'],
+                    'firstname'               => $student['firstname'],
+                    'yearlevel'               => $student['year'],
+                    'house'                   => $student['house'],
+                    'StudentMedicalAlert'     => '',
+                    'StudentSpecialNeedsFlag' => '',
+                ];
+
+                $found[$studentExternalId] = true;
+            }
+        }
+
+        return $studentListAdaption;
+    }
+
+    /**
+     * {@inheritDoc}
      * @param string $classCodes
      * @param string $type Const indicating type of user (e.g. Group::STUDENT_GROUP_TYPE)
      *
@@ -72,7 +109,35 @@ class External_Schoolbox_Class implements External_ClassInterface
 
     /**
      * {@inheritDoc}
+     * @param string $classCode
      *
+     * @return array
+     */
+    public function getTeacherName($classCode)
+    {
+        $teachers = [];
+
+        $classIterator = $this->getClassIterator($classCode, Role::STAFF);
+
+        if ($classIterator instanceof IIterator) {
+            foreach ($classIterator as $teacher) {
+                $teachers[] = $teacher['synergy_id'];
+            }
+        }
+
+        $teacherIterator = $this->getTeacherIterator($classCode);
+
+        if ($teacherIterator instanceof IIterator) {
+            foreach ($teacherIterator as $teacher) {
+                $teachers[] = $teacher['synergy_id'];
+            }
+        }
+
+        return array_unique($teachers);
+    }
+
+    /**
+     * {@inheritDoc}
      * @param string $classCodes
      *
      * @return IIterator
@@ -106,74 +171,5 @@ class External_Schoolbox_Class implements External_ClassInterface
 		    ",
             $predicate["bindings"]
         )->executeIterator();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param string $classCode
-     *
-     * @return array
-     */
-    public function getStudents($classCode)
-    {
-        $studentIterator = $this->getClassIterator($classCode, Role::STUDENT);
-
-        if (!$studentIterator instanceof IIterator) {
-            return [];
-        }
-
-        $studentListAdaption = [];
-        $found               = [];
-
-        foreach ($studentIterator as $student) {
-            $studentExternalId = $student['synergy_id'];
-
-            if (!array_key_exists($studentExternalId, $found)) {
-                $studentListAdaption[] = [
-                    'synergy_id'              => $studentExternalId,
-                    'lastname'                => $student['lastname'],
-                    'firstname'               => $student['firstname'],
-                    'yearlevel'               => $student['year'],
-                    'house'                   => $student['house'],
-                    'StudentMedicalAlert'     => '',
-                    'StudentSpecialNeedsFlag' => '',
-                ];
-
-                $found[$studentExternalId] = true;
-            }
-        }
-
-        return $studentListAdaption;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param string $classCode
-     *
-     * @return array
-     */
-    public function getTeacherName($classCode)
-    {
-        $teachers = [];
-
-        $classIterator = $this->getClassIterator($classCode, Role::STAFF);
-
-        if ($classIterator instanceof IIterator) {
-            foreach ($classIterator as $teacher) {
-                $teachers[] = $teacher['synergy_id'];
-            }
-        }
-
-        $teacherIterator = $this->getTeacherIterator($classCode);
-
-        if ($teacherIterator instanceof IIterator) {
-            foreach ($teacherIterator as $teacher) {
-                $teachers[] = $teacher['synergy_id'];
-            }
-        }
-
-        return array_unique($teachers);
     }
 }
