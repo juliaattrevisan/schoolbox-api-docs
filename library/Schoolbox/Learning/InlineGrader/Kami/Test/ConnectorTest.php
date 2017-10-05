@@ -403,6 +403,79 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
                     json_encode(["errors" => ["Unknown Error"],])
                 ),
             ],
+            'No Name' => [
+                'response' => new Response(
+                    200,
+                    [],
+                    json_encode([
+                        "document_identifier" => "2kmcksmndlkansdlk",
+                        "file_status"         => "done",
+                        "file_error_message"  => null,
+                        "created_at"          => "2015-09-22T23:22:12.798Z",
+                    ])
+                ),
+            ],
+            'No ID' => [
+                'response' => new Response(
+                    200,
+                    [],
+                    json_encode([
+                        "name"                => "Blah Document",
+                        "file_status"         => "done",
+                        "file_error_message"  => null,
+                        "created_at"          => "2015-09-22T23:22:12.798Z",
+                    ])
+                ),
+            ],
+            'No Status' => [
+                'response' => new Response(
+                    200,
+                    [],
+                    json_encode([
+                        "name"                => "Blah Document",
+                        "document_identifier" => "2kmcksmndlkansdlk",
+                        "file_error_message"  => null,
+                        "created_at"          => "2015-09-22T23:22:12.798Z",
+                    ])
+                ),
+            ],
+            'No Error' => [
+                'response' => new Response(
+                    200,
+                    [],
+                    json_encode([
+                        "name"                => "Blah Document",
+                        "document_identifier" => "2kmcksmndlkansdlk",
+                        "file_status"         => "done",
+                        "created_at"          => "2015-09-22T23:22:12.798Z",
+                    ])
+                ),
+            ],
+            'No Created' => [
+                'response' => new Response(
+                    200,
+                    [],
+                    json_encode([
+                        "name"                => "Blah Document",
+                        "document_identifier" => "2kmcksmndlkansdlk",
+                        "file_status"         => "done",
+                        "file_error_message"  => null,
+                    ])
+                ),
+            ],
+            'Bad Created Format' => [
+                'response' => new Response(
+                    200,
+                    [],
+                    json_encode([
+                        "name"                => "Blah Document",
+                        "document_identifier" => "2kmcksmndlkansdlk",
+                        "file_status"         => "done",
+                        "file_error_message"  => null,
+                        "created_at"          => "not a date",
+                    ])
+                ),
+            ],
         ];
     }
 
