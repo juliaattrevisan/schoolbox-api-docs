@@ -1118,7 +1118,7 @@ class Leave_Controller extends Controller
             throw new ApplicationException\NotFound('User not found');
         }
         try {
-            if(($house instanceof HouseResidential) ) {
+            if($house instanceof HouseResidential) {
                 $house = $this->getHouseMapper()->findById($house->getId());
             }
             else {
