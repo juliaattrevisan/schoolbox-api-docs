@@ -167,6 +167,21 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
 
 
     /**
+     * Test getting a document when Kami's not enabled
+     *
+     * @dataProvider providerDisabledConnector
+     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\EmptyApiKeyException
+     *
+     * @param IConfigLoader $configLoader
+     */
+    public function testGetDocumentNotEnabled(IConfigLoader $configLoader): void
+    {
+        $connector = new Connector($configLoader, new Client());
+        $connector->getDocument('asdfghjkl');
+    }
+
+
+    /**
      * Test not finding a document from the Mock API.
      *
      * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound
