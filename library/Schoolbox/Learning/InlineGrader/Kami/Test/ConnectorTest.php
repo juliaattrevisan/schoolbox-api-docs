@@ -204,7 +204,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
     public function providerGetDocument(): array
     {
         return [
-            'Document' => [
+            'Document 1' => [
                 'name'               => 'Blah Document',
                 'documentIdentifier' => '2kmcksmndlkansdlk',
                 'fileStatus'         => 'done',
@@ -218,6 +218,24 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
                         "document_identifier" => "2kmcksmndlkansdlk",
                         "file_status"         => "done",
                         "file_error_message"  => null,
+                        "created_at"          => "2015-09-22T23:22:12.798Z",
+                    ])
+                ),
+            ],
+            'Document 2' => [
+                'name'               => 'video.mov',
+                'documentIdentifier' => 'qwertyuiop',
+                'fileStatus'         => 'error',
+                'fileErrorMessage'   => 'Bad Mimetype',
+                'createdAt'          => new Alaress_Date_Format('2015-09-22 23:22:12', Alaress_Date_Format::DATABASE_FORMAT),
+                'response'           => new Response(
+                    200,
+                    [],
+                    json_encode([
+                        "name"                => "video.mov",
+                        "document_identifier" => "qwertyuiop",
+                        "file_status"         => "error",
+                        "file_error_message"  => 'Bad Mimetype',
                         "created_at"          => "2015-09-22T23:22:12.798Z",
                     ])
                 ),
