@@ -65,6 +65,21 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
 
 
     /**
+     * Test for whether Kami is online, if it's disabled.
+     * (Obviously, it's not online!)
+     *
+     * @dataProvider providerDisabledConnector
+     *
+     * @param IConfigLoader $configLoader
+     */
+    public function testOnlineDisabled(IConfigLoader $configLoader): void
+    {
+        $connector = new Connector($configLoader, new Client());
+        $this->assertFalse($connector->isOnline());
+    }
+
+
+    /**
      * Test for whether Kami is online, if Kami is unreachable.
      * (Obviously, it's not online!)
      */
