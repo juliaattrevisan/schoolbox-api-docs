@@ -122,36 +122,6 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
      */
     public function testListDocuments(int $expectedCount, array $expectedNames, ResponseInterface $response): void
     {
-        // Silently ignore any bad documents
-        $response = new Response(
-            200,
-            [],
-            json_encode([
-                'documents' => [
-                    [
-                        "name"                => "Blah Document 1",
-                        "document_identifier" => "111",
-                        "file_status"         => "done",
-                        "file_error_message"  => null,
-                        "created_at"          => "2015-09-22T23:22:12.798Z",
-                    ],
-                    [
-                        "name"                => "Blah Document 2",
-                        "document_identifier" => "222",
-                        "file_status"         => "processing",
-                        "file_error_message"  => null,
-                        "created_at"          => "2015-09-22T23:22:12.798Z",
-                    ],
-                    [
-                        "name"                => "Blah Document 3",
-                        "document_identifier" => "333",
-                        "file_status"         => "error",
-                        "file_error_message"  => 'No error',
-                        "created_at"          => "2015-09-22T23:22:12.798Z",
-                    ],
-                ],
-            ])
-        );
         $mockClient = $this->getMockBuilder(Client::class)->getMock();
         $mockClient
             ->method('send')
@@ -583,6 +553,38 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
                                 "document_identifier" => "111",
                                 "file_status"         => "done",
                                 "file_error_message"  => null,
+                                "created_at"          => "2015-09-22T23:22:12.798Z",
+                            ],
+                            [
+                                "name"                => "Blah Document 2",
+                                "document_identifier" => "222",
+                                "file_status"         => "unknown",
+                                "file_error_message"  => "bad status",
+                                "created_at"          => "2015-09-22T23:22:12.798Z",
+                            ],
+                            [
+                                "name"                => "Blah Document 3",
+                                "document_identifier" => "333",
+                                "file_status"         => "error",
+                                "file_error_message"  => 'Bad date',
+                                "created_at"          => "2015",
+                            ],
+                        ],
+                    ])
+                ),
+            ],
+            'All bad' => [
+                'expectedCount' => 0,
+                'expectedNames' => [],
+                'response' => new Response(
+                    200,
+                    [],
+                    json_encode([
+                        'documents' => [
+                            [
+                                "name"                => "Blah Document 1",
+                                "file_status"         => "done",
+                                "file_error_message"  => "Missing ID",
                                 "created_at"          => "2015-09-22T23:22:12.798Z",
                             ],
                             [
