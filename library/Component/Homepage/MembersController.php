@@ -201,9 +201,8 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                                 $this->parse('photo_block', 'photo');
                             }
                         }
-
-                        //Hide Staff Photo
-                        if($user->getRole()->isStaff()) {
+                        else if($user->getRole()->isStaff()) {
+                            //Hide Staff Photo
                             if ($staffPhotoVisibility == 2 && $viewer->getRole()->isStudent()) {
                                 $this->setVar('photo_block', '');
                             } elseif ($staffPhotoVisibility == 1 && !$viewer->getRole()->isStaff()) {
@@ -212,6 +211,10 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                                 $this->parse('photo_block', 'photo');
                             }
                         }
+                        else {
+                            $this->parse('photo_block', 'photo');
+                        }
+
 
                         $this->parse('person_block', 'person', true);
                     }

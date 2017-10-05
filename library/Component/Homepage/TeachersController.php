@@ -149,6 +149,9 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                                     $this->parse('photo_block', 'photo');
                                 }
                             }
+                            else {
+                                $this->parse('photo_block', 'photo');
+                            }
 
                             $this->parse('person_block', 'person', true);
 

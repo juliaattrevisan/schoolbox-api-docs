@@ -179,8 +179,8 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                             ]);
                         }
 
-                        //Hide Student Photo
                         if($user->getRole()->isStudent()) {
+                            //Hide Student Photo
                             if ($viewer->getRole()->isStudent() && $studentPhotoHidden) {
                                 $this->setVar('photo_block', '');
                             } elseif ($viewer->getRole()->isParent() && !$viewer->isParentOf($user->loadParents())) {
@@ -189,9 +189,9 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                                 $this->parse('photo_block', 'photo');
                             }
                         }
+                        else if($user->getRole()->isStaff()) {
+                            //Hide Staff Photo
 
-                        //Hide Staff Photo
-                        if($user->getRole()->isStaff()) {
                             if ($staffPhotoVisibility == 2 && $viewer->getRole()->isStudent()) {
                                 $this->setVar('photo_block', '');
                             } elseif ($staffPhotoVisibility == 1 && !$viewer->getRole()->isStaff()) {
@@ -199,6 +199,9 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                             } else {
                                 $this->parse('photo_block', 'photo');
                             }
+                        }
+                        else {
+                            $this->parse('photo_block', 'photo');
                         }
 
                         $this->parse('person_block', 'person', true);
