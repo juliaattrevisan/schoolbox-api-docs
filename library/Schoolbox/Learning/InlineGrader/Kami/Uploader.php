@@ -120,7 +120,7 @@ class Uploader
     /**
      * Attempts to upload all Kami documents
      *
-     * @param bool $retryFailed If true, upload 'failed', otherwise upload 'pending'
+     * @param bool $retryFailed If true, upload 'failed', otherwise upload 'queued'
      * @param int  $batchSize   When fetching from the DB, break into batches to avoid OOM
      * @param int  $maxSkips    Successive failures may indicate an API problem.
      * @return UploadResults
@@ -297,12 +297,12 @@ class Uploader
     private function getKamiCount(bool $retryFailed): int
     {
         $pb = $this->kamiMapper->getPredicateBuilder();
-        $pb->equals('status', $retryFailed ? Model::STATUS_FAILED : Model::STATUS_PENDING);
+        $pb->equals('status', $retryFailed ? Model::STATUS_FAILED : Model::STATUS_QUEUED);
         $kamiCount = $this->kamiMapper->countByPredicates($pb);
         if ($retryFailed) {
             $this->log->notice(sprintf("Retrying %d '%s' uploads", $kamiCount, Model::STATUS_FAILED));
         } else {
-            $this->log->notice(sprintf("Uploading %d '%s' documents", $kamiCount, Model::STATUS_PENDING));
+            $this->log->notice(sprintf("Uploading %d '%s' documents", $kamiCount, Model::STATUS_QUEUED));
         }
         return $kamiCount;
     }
@@ -376,7 +376,7 @@ class Uploader
     private function getKamiModels(int $offset, int $batchSize, bool $retryFailed): GenericCollection
     {
         $pb = $this->kamiMapper->getPredicateBuilder();
-        $pb->equals('status', $retryFailed ? Model::STATUS_FAILED : Model::STATUS_PENDING);
+        $pb->equals('status', $retryFailed ? Model::STATUS_FAILED : Model::STATUS_QUEUED);
         // FIFO - get oldest updated. This also ensures permanent failures are pushed to back of queue.
         $options = [
             'order'  => ['updated_at' => 'ASC'],

@@ -1,5 +1,5 @@
 -- Create table to store the state of Kami upload.
--- A row would be inserted as soon as the uploader attempts to upload.
+-- A row would be inserted as soon as a document is queued for upload
 -- The kami fields would be populated with the Kami API response.
 -- The timestamps are standard schoolbox timestamps.
 -- Use UNIQUE to prevent multiple rows for any single submission file.
@@ -8,7 +8,7 @@ CREATE TABLE `student_submission_file_kami` (
   `id` INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `student_submission_file_id` INT(11) UNSIGNED NOT NULL,
   `kami_document_id` CHAR(32) NULL,
-  `status` ENUM ('pending', 'uploading', 'failed', 'processing', 'done', 'error') NOT NULL,
+  `status` ENUM ('queued', 'uploading', 'failed', 'processing', 'done', 'error') NOT NULL,
   `error_message` VARCHAR(2048) NULL,
   `kami_created_at` DATETIME NULL,
   `created_at` DATETIME NOT NULL,

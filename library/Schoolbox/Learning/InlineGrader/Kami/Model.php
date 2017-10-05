@@ -19,7 +19,7 @@ use Alaress_Date_Format;
 class Model implements ISoftDeletable
 {
 
-    const STATUS_PENDING = 'pending';        // Initial state. Inserted when we save a eligible submission file
+    const STATUS_QUEUED = 'queued';          // Initial state. Inserted when we save a eligible submission file
     const STATUS_UPLOADING = 'uploading';    // As soon as we attempt to upload it. Transient state.
     const STATUS_FAILED = 'failed';          // Unable to be uploaded to Kami. May be permanent or transient
     const STATUS_PROCESSING = 'processing';  // Accepted by Kami. Transient state.
@@ -155,18 +155,18 @@ class Model implements ISoftDeletable
     /**
      * @return bool
      */
-    public function isStatusPending(): bool
+    public function isStatusQueued(): bool
     {
-        return self::STATUS_PENDING === $this->status;
+        return self::STATUS_QUEUED === $this->status;
     }
 
 
     /**
      * @return $this|self
      */
-    public function setStatusPending(): self
+    public function setStatusQueued(): self
     {
-        return $this->setStatus(self::STATUS_PENDING);
+        return $this->setStatus(self::STATUS_QUEUED);
     }
 
 

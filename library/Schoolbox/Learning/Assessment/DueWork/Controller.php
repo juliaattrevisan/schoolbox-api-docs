@@ -1054,6 +1054,7 @@ class Controller extends Assessment\Controller
      *
      * @param Collection|SubmissionFile[] $files
      * @return GenericCollection|Kami\Model[]
+     * @throws \PDOException
      * @throws \LogicException If files have not yet been saved
      */
     private function enqueueKamiUploads(Collection $files): GenericCollection
@@ -1096,7 +1097,7 @@ class Controller extends Assessment\Controller
             // File is eligible, and not yet queued.
             $kamiModel = $this->kamiMapper->createModel()
                                           ->setStudentSubmissionFile($file)
-                                          ->setStatusPending();
+                                          ->setStatusQueued();
             $this->kamiMapper->save($kamiModel);
             $kamiModels[$kamiModel->getId()] = $kamiModel;
         }
