@@ -159,8 +159,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                             if ($this->isVisibleToCurrentUser($video)) {
                                 $this->defaultVideo = $video;
                             } else {
-                                $this->$defaultVideo = $this->findFirstVisibleVideoIn($this->outputList);
-                                // TODO handle null default video
+                                $this->defaultVideo = $this->findFirstVisibleVideoIn($this->outputList);
                             }
                         }
                     } catch (\Schoolbox\Mapper\Exception $e) {
