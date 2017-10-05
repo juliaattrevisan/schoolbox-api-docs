@@ -159,7 +159,10 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($name, $document->getName());
         $this->assertEquals($fileStatus, $document->getFileStatus());
         $this->assertEquals($fileErrorMessage, $document->getFileErrorMessage());
-        $this->assertEquals($createdAt->getDatabaseDate(), $document->getCreatedAt()->getDatabaseDate());
+        $this->assertEquals(
+            $createdAt->getUsingFormat(Alaress_Date_Format::FORMAT_DATETIME_UTC),
+            $document->getCreatedAt()->getUsingFormat(Alaress_Date_Format::FORMAT_DATETIME_UTC)
+        );
     }
 
 
@@ -210,7 +213,10 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
                 'documentIdentifier' => '2kmcksmndlkansdlk',
                 'fileStatus'         => 'done',
                 'fileErrorMessage'   => null,
-                'createdAt'          => new Alaress_Date_Format('2015-09-22 23:22:12', Alaress_Date_Format::DATABASE_FORMAT),
+                'createdAt'          => new Alaress_Date_Format(
+                    '2015-09-22T23:22:12.798Z',
+                    Alaress_Date_Format::FORMAT_DATETIME_UTC
+                ),
                 'response'           => new Response(
                     200,
                     [],
@@ -229,7 +235,10 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
                 'documentIdentifier' => '1234567890',
                 'fileStatus'         => 'processing',
                 'fileErrorMessage'   => null,
-                'createdAt'          => new Alaress_Date_Format('2017-12-31 23:59:59', Alaress_Date_Format::DATABASE_FORMAT),
+                'createdAt'          => new Alaress_Date_Format(
+                    '2017-12-31T23:59:59.999Z',
+                    Alaress_Date_Format::FORMAT_DATETIME_UTC
+                ),
                 'response'           => new Response(
                     200,
                     [],
@@ -248,7 +257,10 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
                 'documentIdentifier' => 'qwertyuiop',
                 'fileStatus'         => 'error',
                 'fileErrorMessage'   => 'Bad Mimetype',
-                'createdAt'          => new Alaress_Date_Format('2015-09-22 23:22:12', Alaress_Date_Format::DATABASE_FORMAT),
+                'createdAt'          => new Alaress_Date_Format(
+                    '2015-09-22T23:22:12.798Z',
+                    Alaress_Date_Format::FORMAT_DATETIME_UTC
+                ),
                 'response'           => new Response(
                     200,
                     [],
@@ -267,7 +279,10 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
                 'documentIdentifier' => 'asdfghjkl',
                 'fileStatus'         => 'unknown',
                 'fileErrorMessage'   => 'Bad Status',
-                'createdAt'          => new Alaress_Date_Format('2015-09-22 23:22:12', Alaress_Date_Format::DATABASE_FORMAT),
+                'createdAt'          => new Alaress_Date_Format(
+                    '2015-09-22T23:22:12.798Z',
+                    Alaress_Date_Format::FORMAT_DATETIME_UTC
+                ),
                 'response'           => new Response(
                     200,
                     [],
