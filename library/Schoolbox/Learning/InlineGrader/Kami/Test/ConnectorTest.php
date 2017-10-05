@@ -129,15 +129,33 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Test getting a document from the Mock API
+     *
+     * @dataProvider providerGetDocument
+     *
+     * @param string            $name
+     * @param string            $documentIdentifier
+     * @param string            $fileStatus
+     * @param null|string       $fileErrorMessage
+     * @param ResponseInterface $response A mocked response from Kami
      */
-    public function testGetDocument(): void
-    {
-        $connector = new MockConnector(new Client());
+    public function testGetDocument(
+        string $name,
+        string $documentIdentifier,
+        string $fileStatus,
+        ?string $fileErrorMessage,
+        ResponseInterface $response
+    ): void {
+        $mockClient = $this->getMockBuilder(Client::class)->getMock();
+        $mockClient
+            ->method('send')
+            ->willReturn($response);
+
+        $connector = new MockConnector($mockClient);
         $document  = $connector->getDocument('someRandomDocId');
-        $this->assertEquals('2kmcksmndlkansdlk', $document->getId());
-        $this->assertEquals('Blah Document', $document->getName());
-        $this->assertEquals('done', $document->getFileStatus());
-        $this->assertNull($document->getFileErrorMessage());
+        $this->assertEquals($documentIdentifier, $document->getId());
+        $this->assertEquals($name, $document->getName());
+        $this->assertEquals($fileStatus, $document->getFileStatus());
+        $this->assertEquals($fileErrorMessage, $document->getFileErrorMessage());
     }
 
 
@@ -175,6 +193,39 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
         return [
             'Online' => [true, new Response(404, [], json_encode(['errors' => ['Record Not Found']]))],
             'Bad key' => [false, new Response(401, [], json_encode(['errors' => ['Authorization Failed']]))],
+        ];
+    }
+
+
+    public function providerGetDocument(): array
+    {
+        return [
+            'Document' => [
+                'name'               => 'Blah Document',
+                'documentIdentifier' => '2kmcksmndlkansdlk',
+                'fileStatus'         => 'done',
+                'fileErrorMessage'   => null,
+                'response'           => new Response(
+                    200,
+                    [],
+                    json_encode([
+                        "name"                => "Blah Document",
+                        "document_identifier" => "2kmcksmndlkansdlk",
+                        "file_status"         => "done",
+                        "file_error_message"  => null,
+                        "created_at"          => "2015-09-22T23:22:12.798Z",
+                    ])
+                ),
+                // Name, ID, other status stuff
+//                'createdAt'
+            ],
+//            'Bad JSON' => [
+//                'response' => new Response(
+//                    200,
+//                    [],
+//                    'LOL'
+//                )
+//            ],
         ];
     }
 
