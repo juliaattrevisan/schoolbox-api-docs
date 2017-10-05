@@ -247,9 +247,7 @@
                                     </li>
                                 {% endif %}
                             {% endblock buttons_dueWork %}
-                        {% endif %}
 
-                        {% if showButtons %}
                             {% block buttons_grades %}
                                 {% if (not session.user.getRole().isParent()) or (not config.restrict_parent_grades) %}
                                     <li>
@@ -258,36 +256,33 @@
                                     </li>
                                 {% endif %}
                             {% endblock buttons_grades %}
-                        {% endif %}
 
-                        {% if eportfolioAuth %}
-                            {% block buttons_eportfolio %}
-                                <li>
-                                    <a href="/eportfolio/{{ user.getId() }}/profile"
-                                       class="icon-eportfolio">ePortfolio</a>
-                                </li>
-                            {% endblock buttons_eportfolio %}
-                        {% endif %}
 
-                        {% if showButtons and showPastoral %}
-                            {% if isStaff or isParentOfStudent %}
-                                <li>
-                                    <a href="{{ routeLookup('pastoral.getStudent', {studentId: user.id}) }}"
-                                       class="icon-pastoral">{{ locale.pastoralCare.proper }}</a>
-                                </li>
+                            {% if eportfolioAuth %}
+                                {% block buttons_eportfolio %}
+                                    <li>
+                                        <a href="/eportfolio/{{ user.getId() }}/profile"
+                                           class="icon-eportfolio">ePortfolio</a>
+                                    </li>
+                                {% endblock buttons_eportfolio %}
                             {% endif %}
-                        {% endif %}
 
-                        {% if showButtons %}
+                            {% if showPastoral %}
+                                {% if isStaff or isParentOfStudent %}
+                                    <li>
+                                        <a href="{{ routeLookup('pastoral.getStudent', {studentId: user.id}) }}"
+                                           class="icon-pastoral">{{ locale.pastoralCare.proper }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+
                             {% block buttons_calendar %}
                                 <li>
                                     <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
                                        class="icon-calendar">{TPL_LOCAL_CALENDAR_PC}</a>
                                 </li>
                             {% endblock buttons_calendar %}
-                        {% endif %}
 
-                        {% if showButtons %}
                             {% if showClasses %}
                                 {% block buttons_timetable %}
                                     <li>
@@ -296,9 +291,7 @@
                                     </li>
                                 {% endblock buttons_timetable %}
                             {% endif %}
-                        {% endif %}
 
-                        {% if showButtons %}
                             {% block buttons_boarderLeave %}
                                 {% if config.boarder_leave_enabled and user.getResidentialHouse().getId() %}
                                     <li>
@@ -307,9 +300,7 @@
                                     </li>
                                 {% endif %}
                             {% endblock buttons_boarderLeave %}
-                        {% endif %}
 
-                        {% if showButtons %}
                             {% block buttons_pastoralCare %}
                                 {% if isStaff and config.external_type == 'synergetic' and config.external_staff_portal %}
                                     <li>
@@ -319,9 +310,7 @@
                                     </li>
                                 {% endif %}
                             {% endblock buttons_pastoralCare %}
-                        {% endif %}
 
-                        {% if showButtons %}
                             {% block buttons_documents %}
                                 {% if config.external_document_report_enabled %}
                                     {% set routeAcademicReports = routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id}) %}
@@ -332,23 +321,19 @@
                                     {% endif %}
                                 {% endif %}
                             {% endblock buttons_documents %}
-                        {% endif %}
 
-                        {% if showButtons %}
                             {% block buttons_email_all_staff %}
                                 {% if config.email_all_staff %}
                                     <li>
                                         <a class="icon-email" id="email-all-staff">Email All Staff</a>
                                         <form id="email-all-form" action="/mail/createMail.php">
                                             <input name="cc" value="{{ allTeacherEmails }}" type="hidden">
-                                            <input name="replyto" value="cc@cc.com" type="hidden">
+                                            <input name="replyto" value="{{ session.user.getEmail() }}" type="hidden">
                                         </form>
                                     </li>
                                 {% endif %}
                             {% endblock  buttons_email_all_staff  %}
-                        {% endif %}
 
-                        {% if showButtons %}
                             {% block buttons_miscellaneous %}
                             {% endblock buttons_miscellaneous %}
                         {% endif %}
