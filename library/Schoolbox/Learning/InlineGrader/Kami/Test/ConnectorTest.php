@@ -232,23 +232,15 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
 
 
     /**
-     * Test getting a document from the Mock API, if the response code is bad.
+     * Test getting a document from the Mock API, if the response is bad.
      *
+     * @dataProvider providerGetDocumentBadResponse
      * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException
+     *
+     * @param ResponseInterface $response
      */
-    public function testGetDocumentBadResponseCode(): void
+    public function testGetDocumentBadResponse(ResponseInterface $response): void
     {
-        $response = new Response(
-            400,
-            [],
-            json_encode([
-                "name"                => "Blah Document",
-                "document_identifier" => "2kmcksmndlkansdlk",
-                "file_status"         => "done",
-                "file_error_message"  => null,
-                "created_at"          => "2015-09-22T23:22:12.798Z",
-            ])
-        );
         $mockClient = $this->getMockBuilder(Client::class)->getMock();
         $mockClient
             ->method('send')
@@ -382,6 +374,33 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
                         "file_error_message"  => 'Bad Mimetype',
                         "created_at"          => "2015-09-22T23:22:12.798Z",
                     ])
+                ),
+            ],
+        ];
+    }
+
+
+    public function providerGetDocumentBadResponse(): array
+    {
+        return [
+            'Bad Response Code' => [
+                'response' => new Response(
+                    400,
+                    [],
+                    json_encode([
+                        "name"                => "Blah Document",
+                        "document_identifier" => "2kmcksmndlkansdlk",
+                        "file_status"         => "done",
+                        "file_error_message"  => null,
+                        "created_at"          => "2015-09-22T23:22:12.798Z",
+                    ])
+                ),
+            ],
+            'Unknown Error' => [
+                'response' => new Response(
+                    400,
+                    [],
+                    json_encode(["errors" => ["Unknown Error"],])
                 ),
             ],
         ];
