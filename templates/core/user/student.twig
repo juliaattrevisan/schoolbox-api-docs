@@ -96,10 +96,10 @@
 
                                 {% if showEmail %}
                                     {% block details_email %}
-                                        {% if user.getEmail() %}
+                                        {% if user.email() %}
                                             <dt class="small-12 medium-3">Email:</dt>
                                             <dd class="small-12 medium-9">
-                                                <a href="{{ session.mailhandle }}{{ user.getEmail() }}">{{ user.getEmail() }}</a>
+                                                <a href="{{ session.mailhandle }}{{ user.email() }}">{{ user.email() }}</a>
                                             </dd>
                                         {% endif %}
                                     {% endblock details_email %}
@@ -124,7 +124,7 @@
                                                 <dt class="small-12 medium-3">Class Teacher:</dt>
                                                 <dd class="small-12 medium-9">
                                                     {% if formTeacher.getId() %}
-                                                        <a href="{{ session.mailhandle }}{{ formTeacher.getEmail() }}">{{ formTeacher.formatName() }}</a>
+                                                        <a href="{{ session.mailhandle }}{{ formTeacher.email() }}">{{ formTeacher.formatName() }}</a>
                                                     {% else %}
                                                         {{ formTeacher.formatName() }}
                                                     {% endif %}
@@ -146,7 +146,7 @@
                                                 <dt class="small-12 medium-3">Tutor:</dt>
                                                 <dd class="small-12 medium-9">
                                                     {% if tutorTeacher.getId() %}
-                                                        <a href="{{ session.mailhandle }}{{ tutorTeacher.getEmail() }}">{{ tutorTeacher.formatName() }}</a>
+                                                        <a href="{{ session.mailhandle }}{{ tutorTeacher.email() }}">{{ tutorTeacher.formatName() }}</a>
                                                     {% else %}
                                                         {{ tutorTeacher.formatName() }}
                                                     {% endif %}
@@ -160,7 +160,7 @@
                                         {#<dt class="no-margin small-6 medium-3">Year Coordinator:</dt>#}
                                         {#<dd class="no-margin small-6 medium-9">#}
                                         {#{% if coordTeacher.getId() %}#}
-                                        {#<a href="{{ session.mailhandle }}{{ coordTeacher.getEmail() }}">{{ coordTeacher.formatName() }}</a>#}
+                                        {#<a href="{{ session.mailhandle }}{{ coordTeacher.email() }}">{{ coordTeacher.formatName() }}</a>#}
                                         {#{% else %}#}
                                         {#{{ coordTeacher.formatName() }}#}
                                         {#{% endif %}#}
@@ -190,7 +190,7 @@
                                                 <dt class="small-12 medium-3">Head of House:</dt>
                                                 <dd class="small-12 medium-9">
                                                     {% if hohTeacher.getId() %}
-                                                        <a href="{{ session.mailhandle }}{{ hohTeacher.getEmail() }}">{{ hohTeacher.formatName() }}</a>
+                                                        <a href="{{ session.mailhandle }}{{ hohTeacher.email() }}">{{ hohTeacher.formatName() }}</a>
                                                     {% else %}
                                                         {{ hohTeacher.formatName() }}
                                                     {% endif %}
@@ -328,7 +328,7 @@
                                         <a class="icon-email" id="email-all-staff">Email All Staff</a>
                                         <form id="email-all-form" action="/mail/createMail.php">
                                             <input name="cc" value="{{ allTeacherEmails }}" type="hidden">
-                                            <input name="replyto" value="{{ session.user.getEmail() }}" type="hidden">
+                                            <input name="replyto" value="{{ session.user.email() }}" type="hidden">
                                         </form>
                                     </li>
                                 {% endif %}
@@ -547,7 +547,7 @@
                                                 </div>
                                             </li>
                                             {% for teacher in subject.teachers %}
-                                                {% set teacherEmails = teacherEmails ~ teacher.getEmail() ~ ',' %}
+                                                {% set teacherEmails = teacherEmails ~ teacher.email() ~ ',' %}
                                                 <li class="actions-small-1">
                                                     <div class="list-item">
                                                         <div class="card small-12">
@@ -566,7 +566,7 @@
                                                     </div>
                                                     <nav>
                                                         {% if not teacher.email is empty %}
-                                                            <a class="icon-email" href="{{ session.mailhandle }}{{ teacher.getEmail() }}" title="Email {{ teacher.getEmail() }}"></a>
+                                                            <a class="icon-email" href="{{ session.mailhandle }}{{ teacher.email() }}" title="Email {{ teacher.email() }}"></a>
                                                         {% endif %}
                                                     </nav>
                                                 </li>
@@ -580,7 +580,7 @@
                                             <form action="/mail/createMail.php" method="post">
                                                 <div class="row">
                                                     <div class="small-12 columns">
-                                                        <input type="hidden" name="replyto" value="{{ session.user.getEmail() }}"/>
+                                                        <input type="hidden" name="replyto" value="{{ session.user.email() }}"/>
                                                         <input type="hidden" name="bcc" value="{{ teacherEmails }}"/>
                                                         <button type="submit" class="button">Email All {{ group }} Teachers</button>
                                                     </div>
