@@ -440,7 +440,7 @@ class Connector implements IConnector
     {
         try {
             return json_decode($response->getContents());
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException|\TypeError $e) {
             throw new Exception\ResponseDecodeException(
                 $e->getMessage(),
                 $e->getCode()

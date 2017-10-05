@@ -167,6 +167,28 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
 
 
     /**
+     * Test not finding a document from the Mock API.
+     *
+     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound
+     */
+    public function testGetDocumentNotFound(): void
+    {
+        $response = new Response(
+            404,
+            [],
+            json_encode(["errors" => ["Record Not Found"],])
+        );
+        $mockClient = $this->getMockBuilder(Client::class)->getMock();
+        $mockClient
+            ->method('send')
+            ->willReturn($response);
+
+        $connector = new MockConnector($mockClient);
+        $connector->getDocument('asdfghjkl');
+    }
+
+
+    /**
      * Test getting a document from the Mock API, if its status is bad.
      *
      * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\InvalidStatusException
@@ -191,6 +213,52 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
 
         $connector = new MockConnector($mockClient);
         $connector->getDocument('asdfghjkl');
+    }
+
+
+    /**
+     * Test getting a document from the Mock API, if the response code is bad.
+     *
+     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException
+     */
+    public function testGetDocumentBadResponseCode(): void
+    {
+        $response = new Response(
+            400,
+            [],
+            json_encode([
+                "name"                => "Blah Document",
+                "document_identifier" => "2kmcksmndlkansdlk",
+                "file_status"         => "done",
+                "file_error_message"  => null,
+                "created_at"          => "2015-09-22T23:22:12.798Z",
+            ])
+        );
+        $mockClient = $this->getMockBuilder(Client::class)->getMock();
+        $mockClient
+            ->method('send')
+            ->willReturn($response);
+
+        $connector = new MockConnector($mockClient);
+        $connector->getDocument('2kmcksmndlkansdlk');
+    }
+
+
+    /**
+     * Test getting a document from the Mock API, if the response body is bad.
+     *
+     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\ResponseDecodeException
+     */
+    public function testGetDocumentBadResponseBody(): void
+    {
+        $response = new Response(200, [], 'LOL');
+        $mockClient = $this->getMockBuilder(Client::class)->getMock();
+        $mockClient
+            ->method('send')
+            ->willReturn($response);
+
+        $connector = new MockConnector($mockClient);
+        $connector->getDocument('2kmcksmndlkansdlk');
     }
 
 
@@ -301,13 +369,6 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
                     ])
                 ),
             ],
-//            'Bad JSON' => [
-//                'response' => new Response(
-//                    200,
-//                    [],
-//                    'LOL'
-//                )
-//            ],
         ];
     }
 
