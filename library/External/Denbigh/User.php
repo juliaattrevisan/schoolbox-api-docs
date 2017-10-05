@@ -390,7 +390,7 @@ class External_Denbigh_User implements External_UserInterface
      */
     public function getCurrentSemester($externalId = null)
     {
-        return date('m') < 6 ? 1 : 2;
+        return date('m') < 6 ? '1' : '2';
     }
 
     /**
