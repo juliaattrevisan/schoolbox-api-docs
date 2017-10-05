@@ -24,8 +24,10 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('DocMan', [
     'verbose' => [false, false, false],
 ]);
 
+$lock = new Alaress_Lock('plagscan_migrator.lock');
+
 try {
-    $kernel->run(function ($di, $loop, $log, $opts) {
+    $kernel->run(function ($di, $loop, $log, $opts) use ($lock) {
         /** @noinspection PhpUndefinedClassInspection */
         /**
          * @var Injector        $di
@@ -41,8 +43,6 @@ try {
         // kill it) depending on what it was
 
         pcntl_signal(SIGCHLD, SIG_DFL);
-
-        $lock = new Alaress_Lock('plagscan_migrator.lock');
 
         if (!$lock->acquire()) {
             $log->critical("Document migration already in process");
@@ -87,10 +87,11 @@ try {
             }
         }
 
-        $lock->release();
     });
 } catch (Exception $e) {
     $log->critical('Exception Error: ' . $e->getMessage());
+} finally {
+    $lock->release();
 }
 
 /**
