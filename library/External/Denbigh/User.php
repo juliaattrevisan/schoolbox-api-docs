@@ -386,7 +386,7 @@ class External_Denbigh_User implements External_UserInterface
      * {@inheritDoc}
      * @param null|string $externalId
      *
-     * @return int
+     * @return string
      */
     public function getCurrentSemester($externalId = null)
     {
