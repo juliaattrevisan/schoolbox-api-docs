@@ -333,12 +333,12 @@ if (is_array($items)) {
 
         /* The usual stuff
          */
-        $fullname = $userHandler->formatName($article);
+        $fullname = Scrub::text($userHandler->formatName($article));
         $postDate = new Alaress_Date_Format($article['post_datetime'], 'U');
 
         $output = array(
             'NEWS_ID' => $article['item_id'],
-            'NEWS_TITLE' => $article['item_heading'],
+            'NEWS_TITLE' => Scrub::text($article['item_heading']),
             'POSTER' => $fullname,
             'POSTER_ID' => $article['uid'],
             'POSTER_EXTERNAL_ID' => $article['synid'],
