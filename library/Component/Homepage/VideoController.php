@@ -47,7 +47,8 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
      *
      * @return \Schoolbox\Video\ResourceVideo|null
      */
-    private function findFirstVisibleVideoIn($videoList) {
+    private function findFirstVisibleVideoIn($videoList)
+    {
         foreach ($videoList as $video) {
             if ($this->isVisibleToCurrentUser($video)) {
                 return $video;
@@ -131,8 +132,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
          */
         if ($this->outputList->count() == 0) {
             $this->buildEmptyState();
-        }
-        else {
+        } else {
             $this->setBlock('has_video', 'source_folder_deleted', 'source_folder_deleted_block');
             $this->setBlock('has_video', 'source_folder_exists', 'source_folder_exists_block');
             $this->setBlock('source_folder_exists', 'default_video', 'default_video_block');
@@ -203,10 +203,8 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 
                 if (count($this->outputList) >= 1) {
                     foreach ($this->outputList as $video) {
-
                         // Display the list of videos if the user has permission to view them.
                         if ($this->isVisibleToCurrentUser($video)) {
-
                             /* Apply values only if you can see them
                              */
                             $this->setVar([
@@ -281,8 +279,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                 ]);
 
                 $this->buildEmptyState();
-            }
-            else {
+            } else {
                 $this->parse('has_video_block', 'has_video');
             }
         }
