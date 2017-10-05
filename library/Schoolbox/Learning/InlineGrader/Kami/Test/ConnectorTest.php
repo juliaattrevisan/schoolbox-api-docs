@@ -568,6 +568,41 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
                     ])
                 ),
             ],
+            'Most bad' => [
+                'expectedCount' => 1,
+                'expectedNames' => [
+                    '111' => 'Blah Document 1',
+                ],
+                'response' => new Response(
+                    200,
+                    [],
+                    json_encode([
+                        'documents' => [
+                            [
+                                "name"                => "Blah Document 1",
+                                "document_identifier" => "111",
+                                "file_status"         => "done",
+                                "file_error_message"  => null,
+                                "created_at"          => "2015-09-22T23:22:12.798Z",
+                            ],
+                            [
+                                "name"                => "Blah Document 2",
+                                "document_identifier" => "222",
+                                "file_status"         => "unknown",
+                                "file_error_message"  => "bad status",
+                                "created_at"          => "2015-09-22T23:22:12.798Z",
+                            ],
+                            [
+                                "name"                => "Blah Document 3",
+                                "document_identifier" => "333",
+                                "file_status"         => "error",
+                                "file_error_message"  => 'Bad date',
+                                "created_at"          => "2015",
+                            ],
+                        ],
+                    ])
+                ),
+            ],
         ];
     }
 
