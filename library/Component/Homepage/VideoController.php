@@ -41,6 +41,22 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
     }
 
     /**
+     * Return the first visible video in a list, or null if no visible videos.
+     *
+     * @param \Schoolbox\Collection(array()) $videoList
+     *
+     * @return \Schoolbox\Video\ResourceVideo|null
+     */
+    private function findFirstVisibleVideoIn($videoList) {
+        foreach ($videoList as $video) {
+            if ($this->isVisibleToCurrentUser($video)) {
+                return $video;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Renders the data into the SitePage. Presentation logic.
      *
      * @param String $templateHandle
@@ -132,7 +148,12 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                     try {
                         $video = $videoResourceMapper->findByFileId($this->getConfig('video'));
                         if ($video->isComplete() && $video->getFile()->getFolder()->getId() == $this->getSource()->getId()) {
-                            $this->defaultVideo = $video;
+                            if ($this->isVisibleToCurrentUser($video)) {
+                                $this->defaultVideo = $video;
+                            } else {
+                                $this->$defaultVideo = $this->findFirstVisibleVideoIn($this->outputList);
+                                // TODO handle null default video
+                            }
                         }
                     } catch (\Schoolbox\Mapper\Exception $e) {
                         // passthru: figure out which video later
