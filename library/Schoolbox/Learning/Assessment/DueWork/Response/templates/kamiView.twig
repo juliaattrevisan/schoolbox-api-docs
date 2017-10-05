@@ -48,12 +48,12 @@
         </section>
         {% else %}
             <div class="empty-state">
-                {% if kami.statusPending%}
+                {% if kami.statusQueued%}
                     <i class="icon-time-value"></i>
-                    <p>Upload pending. Please refresh your browser in a few minutes.</p>
+                    <p>Queued for upload. Please refresh your browser in a few minutes.</p>
                 {% elseif kami.isStatusUploading %}
                     <i class="icon-upload"></i>
-                    <p>Upload in progress. Please refresh your browser in a few minutes.</p>
+                    <p>Uploading to Kami. Please refresh your browser in a few minutes.</p>
                 {% elseif kami.isStatusProcessing %}
                     <i class="icon-refresh"></i>
                     <p>Document is being processed. Please refresh your browser in a few seconds</p>
