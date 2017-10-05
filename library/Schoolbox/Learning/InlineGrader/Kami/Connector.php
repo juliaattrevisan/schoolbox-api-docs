@@ -466,15 +466,29 @@ class Connector implements IConnector
      * @param stdClass $obj
      * @return Document
      * @throws Exception\InvalidStatusException if document's status is invalid
+     * @throws Exception\ResponseDecodeException if $obj doesn't contain required fields
      */
     private function buildDocument(stdClass $obj): Document
     {
+        // All these fields must exist in order to create this doc
+        $properties = ['document_identifier', 'name', 'file_status', 'file_error_message', 'created_at'];
+        foreach ($properties as $property) {
+            if (!property_exists($obj, $property)) {
+                throw new Exception\ResponseDecodeException("Required property {$property} not found");
+            }
+        }
+        // And date must be UTC
+        try {
+            $createdDate = new Alaress_Date_Format($obj->created_at, Alaress_Date_Format::FORMAT_DATETIME_UTC);
+        } catch (\InvalidArgumentException $e) {
+            throw new Exception\ResponseDecodeException("Property created_at is not able to be parsed as a date");
+        }
         return new Document(
             $obj->document_identifier,
             $obj->name,
             $obj->file_status,
             $obj->file_error_message,
-            new Alaress_Date_Format($obj->created_at, Alaress_Date_Format::FORMAT_DATETIME_UTC)
+            $createdDate
         );
     }
 
