@@ -1,0 +1,31 @@
+{% extends 'schoolmail.twig' %}
+{% block content %}
+    <table cellpadding="0" cellspacing="0" border="0" align="center" width="100%">
+        <tr>{{ fn.spacer(config.fqdn, 16, 0) }}</tr>
+        <tr>
+            <td width="640">
+                <p>Dear {{ user.firstName }},</p>
+            </td>
+        </tr>
+        <tr>{{ fn.spacer(config.fqdn, 8, 0) }}</tr>
+        <tr>
+            <td width="640">
+                <p>
+                    This is a friendly email to let you know that your username to access
+                    <a href="http://{{ config.fqdn|e('html_attr') }}/">Schoolbox Help</a> has been updated.
+                </p>
+                <p>Your new username is <strong>{{ user.username }}</strong>.</p>
+                <p>Don't worry, your password has not been changed.</p>
+            </td>
+        </tr>
+        <tr>{{ fn.spacer(config.fqdn, 8, 0) }}</tr>
+        <tr>
+            <td width="640">
+                <p>
+                    <a href="http://{{ config.fqdn|e('html_attr') }}/">Click here to access Schoolbox Help now!</a>
+                </p>
+            </td>
+        </tr>
+        <tr>{{ fn.spacer(config.fqdn, 16, 0, 2) }}</tr>
+    </table>
+{% endblock %}
