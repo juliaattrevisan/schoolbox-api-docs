@@ -50,7 +50,7 @@ if ($_POST['heading']) {
 	}
 
     // If a blank heading is given, throw a tantrum
-    if (empty(trim($_POST['heading']))) {
+    if (strlen(trim($_POST['heading'])) < 1) {
         error(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
 
