@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\InlineGrader\Kami;
 
 use Alaress_Date_Format;
+use Schoolbox\Learning\InlineGrader\Kami\Exception\InvalidStatusException;
 
 /**
  * Represents a kami document.
@@ -46,6 +47,7 @@ class Document
      * @param string              $fileStatus
      * @param null|string         $fileErrorMessage
      * @param Alaress_Date_Format $createdAt
+     * @throws InvalidStatusException if document's status is not recognised
      */
     public function __construct(
         string $id,
@@ -59,6 +61,22 @@ class Document
         $this->fileStatus       = $fileStatus;
         $this->fileErrorMessage = $fileErrorMessage;
         $this->createdAt        = $createdAt;
+        $this->validateStatus();
+    }
+
+
+    /**
+     * Validates status of document.
+     *
+     * @return bool
+     * @throws InvalidStatusException if document's status is not recognised
+     */
+    private function validateStatus(): bool
+    {
+        if (!($this->isProcessing() || $this->isDone() || $this->isError())) {
+            throw new InvalidStatusException("{$this->getFileStatus()} is not a valid document status");
+        }
+        return true;
     }
 
 

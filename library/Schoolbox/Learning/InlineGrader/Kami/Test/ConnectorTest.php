@@ -154,7 +154,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
             ->willReturn($response);
 
         $connector = new MockConnector($mockClient);
-        $document  = $connector->getDocument('someRandomDocId');
+        $document  = $connector->getDocument($documentIdentifier);
         $this->assertEquals($documentIdentifier, $document->getId());
         $this->assertEquals($name, $document->getName());
         $this->assertEquals($fileStatus, $document->getFileStatus());
@@ -163,6 +163,34 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
             $createdAt->getUsingFormat(Alaress_Date_Format::FORMAT_DATETIME_UTC),
             $document->getCreatedAt()->getUsingFormat(Alaress_Date_Format::FORMAT_DATETIME_UTC)
         );
+    }
+
+
+    /**
+     * Test getting a document from the Mock API, if its status is bad.
+     *
+     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\InvalidStatusException
+     */
+    public function testGetDocumentInvalidStatus(): void
+    {
+        $response = new Response(
+            200,
+            [],
+            json_encode([
+                "name"                => "document.docx",
+                "document_identifier" => "asdfghjkl",
+                "file_status"         => "unknown",
+                "file_error_message"  => 'Bad Status',
+                "created_at"          => "2015-09-22T23:22:12.798Z",
+            ])
+        );
+        $mockClient = $this->getMockBuilder(Client::class)->getMock();
+        $mockClient
+            ->method('send')
+            ->willReturn($response);
+
+        $connector = new MockConnector($mockClient);
+        $connector->getDocument('asdfghjkl');
     }
 
 
@@ -269,28 +297,6 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
                         "document_identifier" => "qwertyuiop",
                         "file_status"         => "error",
                         "file_error_message"  => 'Bad Mimetype',
-                        "created_at"          => "2015-09-22T23:22:12.798Z",
-                    ])
-                ),
-            ],
-            // Bad Status: this should fail
-            'Bad Status' => [
-                'name'               => 'document.docx',
-                'documentIdentifier' => 'asdfghjkl',
-                'fileStatus'         => 'unknown',
-                'fileErrorMessage'   => 'Bad Status',
-                'createdAt'          => new Alaress_Date_Format(
-                    '2015-09-22T23:22:12.798Z',
-                    Alaress_Date_Format::FORMAT_DATETIME_UTC
-                ),
-                'response'           => new Response(
-                    200,
-                    [],
-                    json_encode([
-                        "name"                => "document.docx",
-                        "document_identifier" => "asdfghjkl",
-                        "file_status"         => "unknown",
-                        "file_error_message"  => 'Bad Status',
                         "created_at"          => "2015-09-22T23:22:12.798Z",
                     ])
                 ),
