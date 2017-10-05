@@ -112,6 +112,8 @@ class Connector implements IConnector
      * @return Document
      * @throws Exception\EmptyApiKeyException If no Kami API key configured
      * @throws Exception\ResponseDecodeException If cannot decode the Kami response
+     * @throws Exception\ApiException if response doesn't contain required fields
+     * @throws Exception\InvalidStatusException if response status is invalid
      */
     public function uploadDocument(IStorage $storage): Document
     {
@@ -139,7 +141,11 @@ class Connector implements IConnector
 
 
     /**
-     * Get a list of all documents uploaded to Kami
+     * Get a list of all documents uploaded to Kami.
+     *
+     * Any documents that don't pass parsing are ignored, instead of raising
+     * an exception; I don't want to crash the entire list just because one
+     * document failed to parse.
      *
      * @return GenericCollection|Document[]
      * @throws Exception\EmptyApiKeyException If API key not configured
@@ -157,7 +163,12 @@ class Connector implements IConnector
 
         /** @var \stdClass[] $decoded */
         foreach ($decoded as $obj) {
-            $document                      = $this->buildDocument($obj);
+            try {
+                $document = $this->buildDocument($obj);
+            } catch (Exception\ApiException|Exception\InvalidStatusException $e) {
+                // This document failed to parse: nothing to do but...
+                continue;
+            }
             $documents[$document->getId()] = $document;
         }
         return $documents;
