@@ -297,6 +297,28 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
     }
 
 
+    /**
+     * Test deleting a document that wasn't found
+     *
+     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound
+     */
+    public function testDeleteDocumentNotFound(): void
+    {
+        $response = new Response(
+            404,
+            [],
+            json_encode(["errors" => ["Record Not Found"],])
+        );
+        $mockClient = $this->getMockBuilder(Client::class)->getMock();
+        $mockClient
+            ->method('send')
+            ->willReturn($response);
+
+        $connector = new MockConnector($mockClient);
+        $connector->deleteDocument('asdfghjkl');
+    }
+
+
     public function providerDisabledConnector(): array
     {
         return [
