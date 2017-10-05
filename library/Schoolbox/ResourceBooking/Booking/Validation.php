@@ -47,10 +47,10 @@ class Validation {
     private $termMapper;
 
     public function __construct(
-        User $user = null,
-        BookingMapper $bookingMapper = null,
+        User $user,
+        BookingMapper $bookingMapper,
 //        ResourceMapper $resourceMapper,
-        TermMapper $termMapper = null
+        TermMapper $termMapper
     )
     {
 
@@ -504,7 +504,7 @@ class Validation {
      *
      * @return array
      */
-    protected function validateCurrentTermRestriction(DateTime $endDate, Term\Model $currentTerm)
+    public function validateCurrentTermRestriction(DateTime $endDate, Term\Model $currentTerm)
     {
         $errors = [];
 
