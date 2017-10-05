@@ -277,7 +277,7 @@ class External_Denbigh_User implements External_UserInterface
      *
      * @return array
      */
-    function getStaff($externalId)
+    public function getStaff($externalId)
     {
         /** @noinspection SqlDialectInspection */
         $staff = $this->externalDatabase->executeQuery(
@@ -386,7 +386,7 @@ class External_Denbigh_User implements External_UserInterface
      *
      * @return int
      */
-    function getCurrentSemester($externalId = null)
+    public function getCurrentSemester($externalId = null)
     {
         return date('m') < 6 ? 1 : 2;
     }
@@ -408,7 +408,7 @@ class External_Denbigh_User implements External_UserInterface
      *
      * @return array
      */
-    function getSubjectList(User $user)
+    public function getSubjectList(User $user)
     {
         $externalId = $user->getExternalId();
 
@@ -460,7 +460,7 @@ class External_Denbigh_User implements External_UserInterface
      *
      * @return array
      */
-    function getEnrolledStudents($externalId)
+    public function getEnrolledStudents($externalId)
     {
         /** @noinspection SqlDialectInspection */
         return $this->externalDatabase->executeQuery(
