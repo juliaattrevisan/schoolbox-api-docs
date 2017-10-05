@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\InlineGrader\Kami\Test;
 
+use Alaress_Date_Format;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request;
@@ -132,17 +133,19 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider providerGetDocument
      *
-     * @param string            $name
-     * @param string            $documentIdentifier
-     * @param string            $fileStatus
-     * @param null|string       $fileErrorMessage
-     * @param ResponseInterface $response A mocked response from Kami
+     * @param string              $name
+     * @param string              $documentIdentifier
+     * @param string              $fileStatus
+     * @param null|string         $fileErrorMessage
+     * @param Alaress_Date_Format $createdAt
+     * @param ResponseInterface   $response
      */
     public function testGetDocument(
         string $name,
         string $documentIdentifier,
         string $fileStatus,
         ?string $fileErrorMessage,
+        Alaress_Date_Format $createdAt,
         ResponseInterface $response
     ): void {
         $mockClient = $this->getMockBuilder(Client::class)->getMock();
@@ -156,6 +159,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($name, $document->getName());
         $this->assertEquals($fileStatus, $document->getFileStatus());
         $this->assertEquals($fileErrorMessage, $document->getFileErrorMessage());
+        $this->assertEquals($createdAt->getDatabaseDate(), $document->getCreatedAt()->getDatabaseDate());
     }
 
 
@@ -205,6 +209,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
                 'documentIdentifier' => '2kmcksmndlkansdlk',
                 'fileStatus'         => 'done',
                 'fileErrorMessage'   => null,
+                'createdAt'          => new Alaress_Date_Format('2015-09-22 23:22:12', Alaress_Date_Format::DATABASE_FORMAT),
                 'response'           => new Response(
                     200,
                     [],
@@ -216,8 +221,6 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
                         "created_at"          => "2015-09-22T23:22:12.798Z",
                     ])
                 ),
-                // Name, ID, other status stuff
-//                'createdAt'
             ],
 //            'Bad JSON' => [
 //                'response' => new Response(
