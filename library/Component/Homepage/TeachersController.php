@@ -88,6 +88,7 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                 'empty_state_block' => '',
                 'has_thumbnail_block' => '',
                 'photo_block' => '',
+                'person_block' => '',
             ]);
 
             $displayOptions = array(
