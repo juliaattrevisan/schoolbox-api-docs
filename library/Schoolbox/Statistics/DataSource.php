@@ -186,8 +186,11 @@ class DataSource
             /** @var \Schoolbox\Resource\Folder\Log\Model $record */
             $record = $this->folderLogMapper->hydrate($row, 'hl');
             $record->setUser($this->folderLogMapper->hydrateJoin($row, 'user', 'u'));
-            $record->getUser()->setRole($this->folderLogMapper->hydrateJoin($row, 'user.role', 'ur'));
-            $records->add($record);
+            $user = $record->getUser();
+            if (! is_null($user)) {
+                $record->getUser()->setRole($this->folderLogMapper->hydrateJoin($row, 'user.role', 'ur'));
+                $records->add($record);
+            }
         }
 
         return $records;
