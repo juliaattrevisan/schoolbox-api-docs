@@ -207,8 +207,6 @@ class User implements JsonSerializable, ISoftDeletable
         $this->setConfigLoader(new ConfigLoader());
         $this->setLinkedUser(new Collection(array()));
         $this->setRole(new Role());
-        $this->setSchoolHouse(new House());
-        $this->setResidentialHouse(new HouseResidential());
     }
 
     /**

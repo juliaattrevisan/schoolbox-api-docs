@@ -439,19 +439,16 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
     /**
      * Get a user's house name
      *
-     * @return mixed
+     * @return string
      */
     private function getUserHouse()
     {
-
-        $houseName = '';
-        try {
-            $house = HouseMapper::getInstance()->findById($this->user->getSchoolHouse()->getId());
-            $houseName = $house->getHouse();
-        } catch (Schoolbox\Mapper\Exception $e) {
+        if($this->user->getSchoolHouse() instanceof House) {
+            return $this->user->getSchoolHouse()->getHouse();
         }
-
-        return $houseName;
+        else {
+            return '';
+        }
     }
 
     /**
