@@ -65,16 +65,16 @@ class External_Denbigh_Timetable implements External_TimetableInterface
      * @param int    $now
      * @param User   $user
      *
-     * @return int
+     * @return array
      */
     public function getPeriodNumber(Campus $campus, $now = 0, $user = null)
     {
-        return 0;
+        return [];
     }
 
     /**
      * {@inheritDoc}
-     * @param int    $externalUserId
+     * @param string $externalUserId
      * @param int    $userId
      * @param Campus $campus
      *
@@ -213,7 +213,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
-     * @param int                 $externalUserId
+     * @param string              $externalUserId
      * @param int                 $userId
      * @param Campus              $campus
      * @param Alaress_Date_Format $date
@@ -235,7 +235,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
-     * @param int    $externalUserId
+     * @param string $externalUserId
      * @param int    $userId
      * @param Campus $campus
      * @param int    $dayNumber
@@ -344,8 +344,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
-     * @param Campus $campus
-     * @param int    $date
+     * @param Campus     $campus
+     * @param int|string $date
      *
      * @return bool|int
      */

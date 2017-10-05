@@ -29,7 +29,7 @@ class Base extends BaseStatement
      * @param IBroker $broker Database broker that this query belongs to
      * @param string  $sql    SQL query string to be executed
      */
-    function __construct($broker, $sql)
+    public function __construct($broker, $sql)
     {
         $this->broker = $broker;
         $this->sql    = $sql;

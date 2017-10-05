@@ -388,7 +388,7 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getHousemasterByHouseId($houseID)
     {
-        return false;
+        return '';
     }
 
     /**

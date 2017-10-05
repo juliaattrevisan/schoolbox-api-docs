@@ -85,7 +85,8 @@ class External_Denbigh_User implements External_UserInterface
 			    SELECT    Houses.housemaster_id
 			    FROM      Houses
 			    WHERE     Houses.id = :houseId
-		    ", $houseId
+		    ",
+            ['houseId' => $houseId]
         )->fetch();
 
         return isset($house['housemaster_id']) ? $house['housemaster_id'] : null;
@@ -325,7 +326,8 @@ class External_Denbigh_User implements External_UserInterface
     public function getStudentContactList($externalId)
     {
         /** @noinspection SqlDialectInspection */
-        $contactIterator = $this->externalDatabase->executeQueryIterator("
+        $contactIterator = $this->externalDatabase->executeQueryIterator(
+            "
                 SELECT        pe_p.denbighID, 
                               pe_p.surname, 
                               pe_p.given_names, 
@@ -382,7 +384,7 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     * @param null|int $externalId
+     * @param null|string $externalId
      *
      * @return int
      */

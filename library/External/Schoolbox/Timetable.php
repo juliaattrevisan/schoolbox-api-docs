@@ -177,7 +177,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
     /**
      * {@inheritDoc}
      * @param Campus $campus
-     * @param int    $date
+     * @param int|string    $date
      *
      * @return bool|int
      */
