@@ -250,9 +250,41 @@
                         stack = [stack[0], stack[1], excess + ' ' + settings.dictItemOthers];
                     }
 
+                    // All stack items must be HTML-escaped
+                    stack = stack.map(escapeHtmlChars);
+
                     string = string.replace(':'+token, b + stack.join(_b + ', ' + b) + _b);
                 });
                 return string.replaceLast(_b + ',', b + ' ' + settings.dictItemAnd);
+            }
+
+
+            /**
+             * Entity map for escapeHtmlChars
+             */
+            var entityMap = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;',
+                '/': '&#x2F;',
+                '`': '&#x60;',
+                '=': '&#x3D;'
+            };
+
+
+            /**
+             * HTML-escapes text.
+             *
+             * @private
+             * @param {string} text
+             * @returns {string} escaped text
+             */
+            function escapeHtmlChars(text) {
+                return String(text).replace(/[&<>"'`=\/]/g, function fromEntityMap (s) {
+                    return entityMap[s];
+                });
             }
 
 
