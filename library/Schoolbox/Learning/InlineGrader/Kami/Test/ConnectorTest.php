@@ -204,7 +204,8 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
     public function providerGetDocument(): array
     {
         return [
-            'Document 1' => [
+            // An ordinary document
+            'Done' => [
                 'name'               => 'Blah Document',
                 'documentIdentifier' => '2kmcksmndlkansdlk',
                 'fileStatus'         => 'done',
@@ -222,7 +223,27 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
                     ])
                 ),
             ],
-            'Document 2' => [
+            // Document still processing
+            'Processing' => [
+                'name'               => 'image.jpg',
+                'documentIdentifier' => '1234567890',
+                'fileStatus'         => 'processing',
+                'fileErrorMessage'   => null,
+                'createdAt'          => new Alaress_Date_Format('2017-12-31 23:59:59', Alaress_Date_Format::DATABASE_FORMAT),
+                'response'           => new Response(
+                    200,
+                    [],
+                    json_encode([
+                        'name'                => 'image.jpg',
+                        "document_identifier" => "1234567890",
+                        "file_status"         => 'processing',
+                        "file_error_message"  => null,
+                        "created_at"          => "2017-12-31T23:59:59.999Z",
+                    ])
+                ),
+            ],
+            // An erroneous document - still retrieved
+            'Error' => [
                 'name'               => 'video.mov',
                 'documentIdentifier' => 'qwertyuiop',
                 'fileStatus'         => 'error',
@@ -236,6 +257,25 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
                         "document_identifier" => "qwertyuiop",
                         "file_status"         => "error",
                         "file_error_message"  => 'Bad Mimetype',
+                        "created_at"          => "2015-09-22T23:22:12.798Z",
+                    ])
+                ),
+            ],
+            // Bad Status: this should fail
+            'Bad Status' => [
+                'name'               => 'document.docx',
+                'documentIdentifier' => 'asdfghjkl',
+                'fileStatus'         => 'unknown',
+                'fileErrorMessage'   => 'Bad Status',
+                'createdAt'          => new Alaress_Date_Format('2015-09-22 23:22:12', Alaress_Date_Format::DATABASE_FORMAT),
+                'response'           => new Response(
+                    200,
+                    [],
+                    json_encode([
+                        "name"                => "document.docx",
+                        "document_identifier" => "asdfghjkl",
+                        "file_status"         => "unknown",
+                        "file_error_message"  => 'Bad Status',
                         "created_at"          => "2015-09-22T23:22:12.798Z",
                     ])
                 ),
