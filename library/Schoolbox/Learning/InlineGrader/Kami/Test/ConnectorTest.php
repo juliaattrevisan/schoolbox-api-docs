@@ -289,11 +289,20 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Test deleting a document from the Mock API
+     *
+     * @dataProvider providerDeleteDocument
+     *
+     * @param ResponseInterface $response
      */
-    public function testDeleteDocument(): void
+    public function testDeleteDocument(ResponseInterface $response): void
     {
-        $connector = new MockConnector(new Client());
-        $this->assertTrue($connector->deleteDocument('2kmcksmndlkansdlk'));
+        $mockClient = $this->getMockBuilder(Client::class)->getMock();
+        $mockClient
+            ->method('send')
+            ->willReturn($response);
+
+        $connector = new MockConnector($mockClient);
+        $this->assertTrue($connector->deleteDocument('asdfghjkl'));
     }
 
 
@@ -309,6 +318,26 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
             [],
             json_encode(["errors" => ["Record Not Found"],])
         );
+        $mockClient = $this->getMockBuilder(Client::class)->getMock();
+        $mockClient
+            ->method('send')
+            ->willReturn($response);
+
+        $connector = new MockConnector($mockClient);
+        $connector->deleteDocument('asdfghjkl');
+    }
+
+
+    /**
+     * Test deleting a document from the Mock API, if the response is bad.
+     *
+     * @dataProvider providerDeleteDocumentBadResponse
+     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException
+     *
+     * @param ResponseInterface $response
+     */
+    public function testDeleteDocumentBadResponse(ResponseInterface $response): void
+    {
         $mockClient = $this->getMockBuilder(Client::class)->getMock();
         $mockClient
             ->method('send')
@@ -625,6 +654,40 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
                             ],
                         ],
                     ])
+                ),
+            ],
+        ];
+    }
+
+
+    public function providerDeleteDocument(): array
+    {
+        return [
+            '200' => [
+                'response' => new Response(200),
+            ],
+            '204' => [
+                'response' => new Response(204),
+            ],
+        ];
+    }
+
+
+    public function providerDeleteDocumentBadResponse(): array
+    {
+        return [
+            'Bad Response Code' => [
+                'response' => new Response(
+                    400,
+                    [],
+                    json_encode(["errors" => ["Nothing Error"],])
+                ),
+            ],
+            'Unknown Error' => [
+                'response' => new Response(
+                    400,
+                    [],
+                    json_encode(["errors" => ["Unknown Error"],])
                 ),
             ],
         ];
