@@ -87,7 +87,7 @@
                                 <a class="icon-modify" href="/news/homepage/{{ item.id }}" title="Modify News"></a>
                             </nav>
                         {% endif %}
-                        <article>{{ item.body | raw }}</article>
+                        <article>{{ item.body | purify }}</article>
                     </li>
                 {% endfor %}
 
