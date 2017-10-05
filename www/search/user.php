@@ -338,35 +338,32 @@ function renderStudent(
             break;
     }
 
-    $allTeacherEmails;
-
     foreach ($subjects as $subject) {
         foreach ($subject as $class) {
             /** @var \Schoolbox\User $teacher */
             foreach ($class["teachers"] as $teacher) {
-                if(empty($allTeacherEmails)) {
-                    $allTeacherEmails = $teacher->getEmail();
-                } else {
-                    $allTeacherEmails = $allTeacherEmails.",".$teacher->getEmail();
-                }
+                $emails[] = $teacher->getEmail();
             }
         }
     }
     if ($formTeacher instanceof User) {
-        $allTeacherEmailsString = $allTeacherEmailsString.",".$formTeacher->getEmail();
+        $emails[] = $formTeacher->getEmail();
     }
     if ($tutorTeacher instanceof User) {
-        $allTeacherEmailsString = $allTeacherEmailsString.",".$tutorTeacher->getEmail();
+        $emails[] = $tutorTeacher->getEmail();
     }
     if ($hohTeacher instanceof User) {
-        $allTeacherEmailsString = $allTeacherEmailsString.",".$hohTeacher->getEmail();
+        $emails[] = $hohTeacher->getEmail();
     }
     if ($coordTeacher instanceof User) {
-        $allTeacherEmailsString = $allTeacherEmailsString.",".$coordTeacher->getEmail();
+        $emails[] = $coordTeacher->getEmail();
     }
     if ($studentCoach instanceof User) {
-        $allTeacherEmailsString = $allTeacherEmailsString.",".$studentCoach->getEmail();
+        $emails[] = $studentCoach->getEmail();
     }
+
+    $allTeacherEmails = implode(',', array_filter($emails));
+    
 
     $page->setVar(
         'OUTPUT',
