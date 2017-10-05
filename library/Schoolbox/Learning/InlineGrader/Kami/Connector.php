@@ -174,6 +174,7 @@ class Connector implements IConnector
      * @throws Exception\ApiException If cannot fetch a document for reasons other than simply not existing.
      * @throws \InvalidArgumentException If cannot convert the request or response to a string
      * @throws Exception\NotFound If document does not exist in Kami
+     * @throws Exception\InvalidStatusException if document's status is invalid
      */
     public function getDocument(string $documentId): Document
     {
@@ -464,6 +465,7 @@ class Connector implements IConnector
     /**
      * @param stdClass $obj
      * @return Document
+     * @throws Exception\InvalidStatusException if document's status is invalid
      */
     private function buildDocument(stdClass $obj): Document
     {
