@@ -446,9 +446,8 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         if($this->user->getSchoolHouse() instanceof House) {
             return $this->user->getSchoolHouse()->getHouse();
         }
-        else {
-            return '';
-        }
+
+        return '';
     }
 
     /**
