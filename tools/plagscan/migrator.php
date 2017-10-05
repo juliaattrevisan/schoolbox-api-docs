@@ -26,6 +26,7 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('DocMan', [
 
 try {
     $kernel->run(function ($di, $loop, $log, $opts) {
+        /** @noinspection PhpUndefinedClassInspection */
         /**
          * @var Injector        $di
          * @var LoopInterface   $loop
@@ -34,6 +35,10 @@ try {
          */
 
         $log->debug("Plagscan HTML-OTFS Document Migrator");
+
+        // Detect if a child process (SIGCHLD) fails to respond, if it does throw the process over to the
+        // default kernel signal handler (SIG_DFL) which will take the appropriate default action (ignore it,
+        // kill it) depending on what it was
 
         pcntl_signal(SIGCHLD, SIG_DFL);
 
