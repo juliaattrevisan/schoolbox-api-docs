@@ -113,8 +113,14 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Test listing against the mock API
+     *
+     * @dataProvider providerListDocuments
+     *
+     * @param int               $expectedCount
+     * @param array             $expectedNames
+     * @param ResponseInterface $response
      */
-    public function testListDocuments(): void
+    public function testListDocuments(int $expectedCount, array $expectedNames, ResponseInterface $response): void
     {
         // Silently ignore any bad documents
         $response = new Response(
@@ -154,10 +160,19 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
         $connector = new MockConnector($mockClient);
         $documents = $connector->listDocuments();
 
-        $this->assertCount(3, $documents);
-        $this->assertEquals('Blah Document 1', $documents['111']->getName());
-        $this->assertEquals('Blah Document 2', $documents['222']->getName());
-        $this->assertEquals('Blah Document 3', $documents['333']->getName());
+        $this->assertCount($expectedCount, $documents);
+        foreach ($expectedNames as $documentId => $expectedName) {
+            $this->assertEquals(
+                $expectedName,
+                $documents[$documentId]->getName(),
+                sprintf(
+                    'Document "%s" expected name "%s" does not match actual "%s"',
+                    $documentId,
+                    $expectedName,
+                    $documents[$documentId]->getName()
+                )
+            );
+        }
     }
 
 
@@ -506,6 +521,50 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
                         "file_status"         => "done",
                         "file_error_message"  => null,
                         "created_at"          => "not a date",
+                    ])
+                ),
+            ],
+        ];
+    }
+
+
+    public function providerListDocuments(): array
+    {
+        return [
+            'All good' => [
+                'expectedCount' => 3,
+                'expectedNames' => [
+                    '111' => 'Blah Document 1',
+                    '222' => 'Blah Document 2',
+                    '333' => 'Blah Document 3',
+                ],
+                'response' => new Response(
+                    200,
+                    [],
+                    json_encode([
+                        'documents' => [
+                            [
+                                "name"                => "Blah Document 1",
+                                "document_identifier" => "111",
+                                "file_status"         => "done",
+                                "file_error_message"  => null,
+                                "created_at"          => "2015-09-22T23:22:12.798Z",
+                            ],
+                            [
+                                "name"                => "Blah Document 2",
+                                "document_identifier" => "222",
+                                "file_status"         => "processing",
+                                "file_error_message"  => null,
+                                "created_at"          => "2015-09-22T23:22:12.798Z",
+                            ],
+                            [
+                                "name"                => "Blah Document 3",
+                                "document_identifier" => "333",
+                                "file_status"         => "error",
+                                "file_error_message"  => 'No error',
+                                "created_at"          => "2015-09-22T23:22:12.798Z",
+                            ],
+                        ],
                     ])
                 ),
             ],
