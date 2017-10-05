@@ -357,9 +357,8 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      *
      * @return void
      * @throws InvalidArgumentException if no $inputDateFormat was set and $dateTime
-     *                                  is a string
-     * @throws RuntimeException         if $dateTime is a string and it can't be
-     *                                  parsed in $inputDateFormat
+     *                                  is a string, or if $dateTime is a string and
+     *                                  it can't be parsed in $inputDateFormat
      */
     public function setFromFormat(
         $dateTime,
