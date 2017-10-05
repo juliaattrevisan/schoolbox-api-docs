@@ -150,7 +150,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     $connector = $dryRun ? new Kami\MockConnector($client) : new Kami\Connector($config, $client);
 
     if(!$connector->isEnabled()) {
-        $log->warning('Kami has not been disabled by puppet for this instance. Aborting');
+        $log->warning('Kami has not been enabled by puppet for this instance. Aborting');
         exit(0);
     }
 
