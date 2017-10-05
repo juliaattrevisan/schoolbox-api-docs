@@ -175,5 +175,5 @@ function sb_tempnam($prefix = '', $dir = '')
 function open_fd_count()
 {
     $pid = getmypid();
-    return (int)`lsof -ap $pid | wc -l`;
+    return (int)`lsof -b -ap $pid | wc -l`;
 }
