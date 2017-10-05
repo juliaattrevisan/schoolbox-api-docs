@@ -30,9 +30,15 @@ abstract class Leave_Kings_Notice_Parent_Abstract extends Leave_Notice_Abstract_
 
         // Housemaster - I can only really work with one
         $accessMapper = new UserAccessMapper();
+
+        $houseId = null;
+        if($this->getRequest()->getUser()->getResidentialHouse() instanceof HouseResidential) {
+            $houseId = $this->getRequest()->getUser()->getResidentialHouse()->getId();
+        }
+
         foreach ($accessMapper->findUsersForService(
             UserAccess::SERVICE_HOUSEMASTER,
-            $this->getRequest()->getUser()->getResidentialHouse()->getId(),
+            $houseId,
             UserAccess::ACCESS_FULL
         ) as $housemaster) {
             $housemasterName  = $housemaster->formatName();

@@ -69,10 +69,10 @@ class User implements JsonSerializable, ISoftDeletable
     /** @var string */
     private $year;
 
-    /** @var House */
+    /** @var null|House */
     private $schoolHouse;
 
-    /** @var HouseResidential */
+    /** @var null|HouseResidential */
     private $residentialHouse;
 
     /** @var Collection|self[] */
@@ -207,8 +207,6 @@ class User implements JsonSerializable, ISoftDeletable
         $this->setConfigLoader(new ConfigLoader());
         $this->setLinkedUser(new Collection(array()));
         $this->setRole(new Role());
-        $this->setSchoolHouse(new House());
-        $this->setResidentialHouse(new HouseResidential());
     }
 
     /**
@@ -674,7 +672,7 @@ class User implements JsonSerializable, ISoftDeletable
 
 
     /**
-     * @param House $schoolHouse
+     * @param null|House $schoolHouse
      * @return self
      */
     public function setSchoolHouse($schoolHouse)
@@ -685,7 +683,7 @@ class User implements JsonSerializable, ISoftDeletable
 
 
     /**
-     * @return House
+     * @return null|House
      */
     public function getSchoolHouse()
     {

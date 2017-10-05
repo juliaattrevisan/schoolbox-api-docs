@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @method HouseResidential createModel($idValue = null)
+ */
 class HouseResidentialMapper extends Schoolbox\Mapper {
 	protected $table = 'luResidentialHouse';
 

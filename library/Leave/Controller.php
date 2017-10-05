@@ -404,7 +404,7 @@ class Leave_Controller extends Controller
         } elseif ($this->getGroup()->isParent()) {
             $studentBoarders = array();
             foreach($_SESSION['children'] as $child){
-                if($this->getUserMapper()->findById($child['id'])->getResidentialHouse()->getId() > 0){
+                if($this->getUserMapper()->findById($child['id'])->getResidentialHouse() instanceof HouseResidential){
                     $studentBoarders[] = $child;
                 }
             }
@@ -443,14 +443,14 @@ class Leave_Controller extends Controller
         }
 
         // Are they a boarder?
-        if($user->getResidentialHouse()->getId() > 0) {
+        if($user->getResidentialHouse() instanceof HouseResidential) {
             return true;
         }
 
         // Are they a parent of a boarder?
         if(is_array($_SESSION['children'])){
             foreach($_SESSION['children'] as $child){
-                if($this->userMapper->findById($child['id'])->getResidentialHouse()->getId() > 0) {
+                if($this->userMapper->findById($child['id'])->getResidentialHouse() instanceof HouseResidential) {
                     return true;
                 }
             }
@@ -667,7 +667,13 @@ class Leave_Controller extends Controller
             throw new ApplicationException\NotFound('User not found');
         }
         try {
-            $house = $this->getHouseMapper()->findById($user->getResidentialHouse()->getId());
+            if ($user->getResidentialHouse() instanceof HouseResidential) {
+                $houseId = $user->getResidentialHouse()->getId();
+                $house = $this->getHouseMapper()->findById($houseId);
+            }
+            else {
+                throw new ApplicationException\NotFound('User\'s house not found');
+            }
         } catch (Schoolbox\Mapper\Exception $e) {
             throw new ApplicationException\NotFound('User\'s house not found');
         }
@@ -722,7 +728,7 @@ class Leave_Controller extends Controller
         /* What is the next/previous pending request?
          */
         $nextRequest = $this->getRequestMapper()->findNextPendingByHouseId(
-            $request->getId(), $user->getResidentialHouse()->getId()
+            $request->getId(), $houseId
         );
 
         if ($nextRequest) {
@@ -736,7 +742,7 @@ class Leave_Controller extends Controller
         }
 
         $previousRequest = $this->getRequestMapper()->findPreviousPendingByHouseId(
-            $request->getId(), $user->getResidentialHouse()->getId()
+            $request->getId(), $houseId
         );
 
         if ($previousRequest) {
@@ -771,7 +777,13 @@ class Leave_Controller extends Controller
             throw new ApplicationException\NotFound('User not found');
         }
         try {
-            $house = $this->getHouseMapper()->findById($user->getResidentialHouse()->getId());
+            if ($user->getResidentialHouse() instanceof HouseResidential) {
+                $houseId = $user->getResidentialHouse()->getId();
+                $house = $this->getHouseMapper()->findById($houseId);
+            }
+            else {
+                throw new ApplicationException\NotFound('User\'s house not found');
+            }
         } catch (Schoolbox\Mapper\Exception $e) {
             throw new ApplicationException\NotFound('User\'s house not found');
         }
@@ -834,7 +846,12 @@ class Leave_Controller extends Controller
             throw new ApplicationException\NotFound('Request not found');
         }
 
-        if (!$this->hasApprovePermission($request->getUser()->getResidentialHouse()->getId())) {
+        $houseId = null;
+        if($request->getUser()->getResidentialHouse() instanceof HouseResidential) {
+            $houseId = $request->getUser()->getResidentialHouse()->getId();
+        }
+
+        if (!$this->hasApprovePermission($houseId)) {
             error(Error\Mapper::ERROR_PERM_PAGE_VIEW);
         }
 
@@ -1096,14 +1113,23 @@ class Leave_Controller extends Controller
     {
         try {
             $user = $this->getUserMapper()->findById($userId);
+            $house = $user->getResidentialHouse();
         } catch (Schoolbox\Mapper\Exception $e) {
             throw new ApplicationException\NotFound('User not found');
         }
         try {
-            $house = $this->getHouseMapper()->findById($user->getResidentialHouse()->getId());
+            if($house instanceof HouseResidential) {
+                $house = $this->getHouseMapper()->findById($house->getId());
+            }
+            else {
+                throw new ApplicationException\NotFound('User not found');
+            }
         } catch (Schoolbox\Mapper\Exception $e) {
-            throw new ApplicationException\NotFound('User\'s house not found');
+            throw new ApplicationException\NotFound('User not found');
         }
+
+
+
         $requestList = $this->getRequestMapper()->findAllByUserId($user->getId());
 
         return array(
@@ -1122,7 +1148,13 @@ class Leave_Controller extends Controller
     {
         /** @var Schoolbox\User $user */
         $user = $data['user'];
-        if ($this->hasViewPermission($user->getId(), $user->getResidentialHouse()->getId())) {
+        $houseId = null;
+
+        if($user->getResidentialHouse() instanceof HouseResidential) {
+            $houseId = $user->getResidentialHouse()->getId();
+        }
+
+        if ($this->hasViewPermission($user->getId(), $houseId)) {
             /** @var Leave_Request[] $requestList */
             $requestList = $data['requestList'];
             $allRows = array();
@@ -1301,14 +1333,15 @@ class Leave_Controller extends Controller
          */
         try {
             $user = $this->getUserMapper()->findById($data['user']['id']);
+            $house = $user->getResidentialHouse();
         } catch (Schoolbox\Mapper\Exception $e) {
             throw new ApplicationException\NotFound('User not found');
         }
-        try {
-            $house = $this->getHouseMapper()->findById($user->getResidentialHouse()->getId());
-        } catch (Schoolbox\Mapper\Exception $e) {
+
+        if(!($house instanceof HouseResidential) ) {
             throw new ApplicationException\NotFound('User\'s house not found');
         }
+
         if (!$this->hasApprovePermission($house->getId())) {
             error(Error\Mapper::ERROR_PERM_PAGE_VIEW);
         }
@@ -1364,7 +1397,12 @@ class Leave_Controller extends Controller
 
         /* Iterate through options
          */
-        if ($this->hasApprovePermission($request->getUser()->getResidentialHouse()->getId())) {
+        $houseId = null;
+        if($request->getUser()->getResidentialHouse() instanceof HouseResidential) {
+            $houseId = $request->getUser()->getResidentialHouse()->getId();
+        }
+
+        if ($this->hasApprovePermission($houseId)) {
             foreach ($request->getConfirmedByMap() as $value => $label) {
                 if ($request->getConfirmedBy() == $value) {
                     $selected = 'checked=\'checked\'';
