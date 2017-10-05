@@ -14,13 +14,6 @@ use Schoolbox\User;
 /** @noinspection PhpUndefinedClassInspection */
 class External_Denbigh_User implements External_UserInterface
 {
-
-    /** @var Group $group */
-    private $group;
-
-    /** @var IConnector $internalDatabase */
-    private $internalDatabase;
-
     /** @var IConnector $externalDatabase */
     private $externalDatabase;
 
@@ -32,35 +25,32 @@ class External_Denbigh_User implements External_UserInterface
      */
     public function __construct()
     {
-        $this->group        = new Group;
         $this->configMapper = ConfigMapper::getInstance();
-
-        /** @noinspection PhpDeprecationInspection */
-        $this->internalDatabase = DatabaseFactory::getInstanceInternal();
 
         /** @noinspection PhpDeprecationInspection */
         $this->externalDatabase = DatabaseFactory::getInstanceExternal();
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @param array $externalIds
      *
      * @return array
      */
     public function getParentEmails($externalIds)
     {
-        $emailList = [];
-
         $id_list = implode(',', array_map('intval', $externalIds));
+        $parentIds = array_filter(explode(',', $id_list));
 
-        if (empty($id_list)) {
-            return $emailList;
+        if (count($parentIds) == 0) {
+            return [];
         }
 
-        $predicate = PredicateBuilder::getArrayBindings(explode(',', $id_list), 'externalId');
+        $predicate = PredicateBuilder::getArrayBindings($parentIds, 'externalId');
 
         /** @noinspection SqlDialectInspection */
-        $parentIterator = $this->externalDatabase->executeQuery(
+        $parentIterator = $this->externalDatabase->executeQueryIterator(
             "
                 SELECT        Family.email
                 FROM          Schoolbox_Students
@@ -69,6 +59,8 @@ class External_Denbigh_User implements External_UserInterface
             ",
             $predicate["bindings"]
         );
+
+        $emailList = [];
 
         foreach ($parentIterator as $parent) {
             $emailList = array_merge(
@@ -81,7 +73,7 @@ class External_Denbigh_User implements External_UserInterface
     }
 
     /**
-     * Gets a housemaster by a house id
+     * {@inheritDoc}
      *
      * @param int $houseId
      *
@@ -90,18 +82,20 @@ class External_Denbigh_User implements External_UserInterface
     public function getHousemasterByHouseId($houseId)
     {
         /** @noinspection SqlDialectInspection */
-        $houseQuery = $this->externalDatabase->executeQuery(
+        $house = $this->externalDatabase->executeQuery(
             "
-			SELECT Houses.housemaster_id
-			FROM Houses
-			WHERE Houses.id = :houseId
-		", $houseId
-        );
+			    SELECT    Houses.housemaster_id
+			    FROM      Houses
+			    WHERE     Houses.id = :houseId
+		    ", $houseId
+        )->fetch();
 
-        return $houseQuery->fetch()['housemaster_id'];
+        return isset($house['housemaster_id']) ? $house['housemaster_id'] : null;
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @param int $externalId
      *
      * @return array
@@ -109,29 +103,33 @@ class External_Denbigh_User implements External_UserInterface
     public function getParent($externalId)
     {
         /** @noinspection SqlDialectInspection */
-        $parentQuery = $this->externalDatabase->executeQuery("
-            SELECT      pe.denbighID, 
-                        pe.surname, 
-                        pe.given_names, 
-                        pe.preferred_name, 
-                        pe.title, 
-                        pe.gender, 
-                        pe.dateOfBirth,
-                        pa.relationship, 
-                        a.telephoneHome
-            FROM        People
-            LEFT JOIN   Parents ON Parents.peopleDenbighID = People.denbighID
-            LEFT JOIN   Parents pa ON pa.familyDenbighID = Parents.familyDenbighID
-            LEFT JOIN   People pe ON pe.denbighID = pa.peopleDenbighID
-            LEFT JOIN   Addresses a ON a.familyDenbighID = pa.familyDenbighID AND a.addressType = 'Residential Address'
-            WHERE       People.denbighID = :externalId
-            ORDER BY    a.telephoneHome IS NOT NULL DESC,
-                        a.addressDenbighID DESC,
-                        pe.denbighID = :externalId2 DESC
-        ", [
-            'externalId'  => $externalId,
-            'externalId2' => $externalId,
-        ]);
+        $parentQuery = $this->externalDatabase->executeQuery(
+            "
+                SELECT      pe.denbighID, 
+                            pe.surname, 
+                            pe.given_names, 
+                            pe.preferred_name, 
+                            pe.title, 
+                            pe.gender, 
+                            pe.dateOfBirth,
+                            pa.relationship, 
+                            a.telephoneHome
+                FROM        People
+                LEFT JOIN   Parents ON Parents.peopleDenbighID = People.denbighID
+                LEFT JOIN   Parents pa ON pa.familyDenbighID = Parents.familyDenbighID
+                LEFT JOIN   People pe ON pe.denbighID = pa.peopleDenbighID
+                LEFT JOIN   Addresses a ON a.familyDenbighID = pa.familyDenbighID AND 
+                            a.addressType = 'Residential Address'
+                WHERE       People.denbighID = :externalId
+                ORDER BY    a.telephoneHome IS NOT NULL DESC,
+                            a.addressDenbighID DESC,
+                            pe.denbighID = :externalId2 DESC
+            ",
+            [
+                'externalId'  => $externalId,
+                'externalId2' => $externalId,
+            ]
+        );
 
         $parentList = $parentQuery->fetchAll();
 
@@ -162,8 +160,6 @@ class External_Denbigh_User implements External_UserInterface
             $adaption['DirectoryIncludeFlag'] = '';
         }
 
-        // Don't update spouse if user[1] is somehow same user as user[0]
-        // (this could happen for sole parent who has multiple addresses)
         if (!empty($parentList[1]) && $parentList[1]['denbighID'] != $externalId) {
             $adaption['SpouseID']                   = $parentList[1]['denbighID'];
             $adaption['SpouseTitle']                = $parentList[1]['title'];
@@ -176,6 +172,8 @@ class External_Denbigh_User implements External_UserInterface
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @param int $externalId
      *
      * @return array
@@ -214,7 +212,8 @@ class External_Denbigh_User implements External_UserInterface
                 LEFT JOIN   Parents pa ON pa.familyDenbighID = stu.familyDenbighID
                 LEFT JOIN   People pe_pa ON pe_pa.denbighID = pa.peopleDenbighID
                 LEFT JOIN   Family fa ON stu.familyDenbighID = fa.familyDenbighID
-                WHERE       pe.denbighID = :externalId LIMIT 1
+                WHERE       pe.denbighID = :externalId 
+                LIMIT       1
             ",
             ['externalId' => $externalId]
         );
@@ -256,20 +255,30 @@ class External_Denbigh_User implements External_UserInterface
             $adaption['StudentSurname']           = $student['surname'];
             $adaption['StudentBirthDate']         = $student['dateOfBirth'];
             $adaption['TeacherTutorID']           = $student['tutor_denbighID'];
-            $adaption['StudentTutorName']         = "{$student['tutor_title']} {$student['tutor_preferred_name']} {$student['tutor_surname']}";
             $adaption['StudentTutorDescription']  = $student['tutorGroup'];
             $adaption['StudentHouseDescription']  = $student['house'];
             $adaption['StudentYearLevel']         = $student['academicYear'];
-            $adaption['StudentEmergencyName']     = "{$student['EmergencyContact1']} ({$student['EmergencyRelationship1']})";
             $adaption['StudentEmergencyPhone']    = $student['EmergencyPhone1'];
             $adaption['StudentEmergencyPhoneAlt'] = $student['EmergencyEmail1'];
             $adaption['StudentBoarder']           = $student['boardingStatus'];
+
+            $adaption['StudentTutorName'] =
+                "{$student['tutor_title']} " .
+                "{$student['tutor_preferred_name']} " .
+                "{$student['tutor_surname']}";
+
+            $adaption['StudentEmergencyName'] =
+                "{$student['EmergencyContact1']} " .
+                "({$student['EmergencyRelationship1']})";
+
         }
 
         return $adaption;
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @param int $externalId
      *
      * @return array
@@ -277,7 +286,7 @@ class External_Denbigh_User implements External_UserInterface
     function getStaff($externalId)
     {
         /** @noinspection SqlDialectInspection */
-        $staffQuery = $this->externalDatabase->executeQuery(
+        $staff = $this->externalDatabase->executeQuery(
             "
                 SELECT    p.denbighID, 
                           p.surname, 
@@ -292,9 +301,7 @@ class External_Denbigh_User implements External_UserInterface
                 WHERE     p.denbighID = :externalId
 		    ",
             ['externalId' => $externalId]
-        );
-
-        $staff = $staffQuery->fetch();
+        )->fetch();
 
         $adaption = [
             'SchoolStaffCode'          => '',
@@ -316,7 +323,7 @@ class External_Denbigh_User implements External_UserInterface
     }
 
     /**
-     * Get a list of student contacts (parents) and their contact information
+     * {@inheritDoc}
      *
      * @param string $externalId
      *
@@ -340,7 +347,8 @@ class External_Denbigh_User implements External_UserInterface
                               a.telephoneHome
                 FROM          People pe_s
                 LEFT JOIN     Students s ON s.peopleDenbighID = pe_s.denbighID
-                LEFT JOIN     Parents pa_p ON pa_p.familyDenbighID = s.familyDenbighID AND pa_p.type != 'Non Resident'
+                LEFT JOIN     Parents pa_p ON pa_p.familyDenbighID = s.familyDenbighID AND 
+                              pa_p.type != 'Non Resident'
                 LEFT JOIN     People pe_p ON pe_p.denbighID = pa_p.peopleDenbighID
                 LEFT JOIN     Addresses a ON a.familyDenbighID = s.familyDenbighID
                 WHERE         pe_s.denbighID = :externalId
@@ -352,7 +360,7 @@ class External_Denbigh_User implements External_UserInterface
         $contactAdaptionList = [];
 
         foreach ($contactIterator as $contact) {
-            $contactAdaption = [
+            $contactAdaptionList[] = [
                 'StudentContactID'               => $contact['denbighID'],
                 'StudentContactTitle'            => $contact['title'],
                 'StudentContactPreferred'        => $contact['preferred_name'],
@@ -374,14 +382,14 @@ class External_Denbigh_User implements External_UserInterface
                 'StudentContactSpouseDefaultEma' => '',
                 'StudentContactType'             => 'SC1',
             ];
-
-            $contactAdaptionList[] = $contactAdaption;
         }
 
         return $contactAdaptionList;
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @param null|int $externalId
      *
      * @return int
@@ -392,6 +400,8 @@ class External_Denbigh_User implements External_UserInterface
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @param null|int $externalId
      *
      * @return string
@@ -402,7 +412,7 @@ class External_Denbigh_User implements External_UserInterface
     }
 
     /**
-     * Get a list of subjects and their types
+     * {@inheritDoc}
      *
      * @param User $user
      *
@@ -455,6 +465,8 @@ class External_Denbigh_User implements External_UserInterface
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @param int $externalId
      *
      * @return array
@@ -464,17 +476,19 @@ class External_Denbigh_User implements External_UserInterface
         /** @noinspection SqlDialectInspection */
         return $this->externalDatabase->executeQuery(
             "
-                SELECT s.peopleDenbighID as RelatedID
-                FROM People pe
+                SELECT    s.peopleDenbighID as RelatedID
+                FROM      People pe
                 LEFT JOIN Parents pa ON pa.peopleDenbighID = pe.denbighID
                 LEFT JOIN Students s ON s.familyDenbighID = pa.familyDenbighID
-                WHERE pe.denbighID = :externalId
+                WHERE     pe.denbighID = :externalId
             ",
             ['externalId' => $externalId]
         )->fetchAll();
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @param int $externalId
      *
      * @return bool|string
@@ -491,6 +505,8 @@ class External_Denbigh_User implements External_UserInterface
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @return array
      */
     public function getStudentUserAccountInfo()
@@ -513,6 +529,8 @@ class External_Denbigh_User implements External_UserInterface
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @return mixed
      */
     public function getParentUserAccountInfo()
@@ -540,7 +558,7 @@ class External_Denbigh_User implements External_UserInterface
     }
 
     /**
-     * Gets all Staff account info from Denbigh
+     * {@inheritDoc}
      *
      * @return array
      */
@@ -562,8 +580,7 @@ class External_Denbigh_User implements External_UserInterface
     }
 
     /**
-     * Determine the boarder type based on a value
-     * Returns a human-readable string
+     * {@inheritDoc}
      *
      * @param $boarderValue
      *
@@ -581,13 +598,14 @@ class External_Denbigh_User implements External_UserInterface
 
         if (isset($boarders[$boarderValue])) {
             return $boarders[$boarderValue];
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
+     *
      * @return array
      */
     public function getStaffContactListExtended()
@@ -596,7 +614,7 @@ class External_Denbigh_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param int $externalId
      *
@@ -608,7 +626,8 @@ class External_Denbigh_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
+     *
      * @return array
      */
     public function getStudentForms()
@@ -617,7 +636,7 @@ class External_Denbigh_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param array $externalIds
      *
@@ -629,7 +648,7 @@ class External_Denbigh_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param int $externalId
      *
@@ -641,7 +660,7 @@ class External_Denbigh_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param int $externalId
      */
@@ -651,7 +670,7 @@ class External_Denbigh_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param string $yearlevel
      * @param string $name

@@ -12,9 +12,6 @@ use Schoolbox\Database\Factory as DatabaseFactory;
 /** @noinspection PhpUndefinedClassInspection */
 class External_Denbigh_Class implements External_ClassInterface
 {
-    /** @var IConnector $internalDatabase */
-    private $internalDatabase;
-
     /** @var IConnector $externalDatabase */
     private $externalDatabase;
 
@@ -24,14 +21,11 @@ class External_Denbigh_Class implements External_ClassInterface
     public function __construct()
     {
         /** @noinspection PhpDeprecationInspection */
-        $this->internalDatabase = DatabaseFactory::getInstanceInternal();
-
-        /** @noinspection PhpDeprecationInspection */
         $this->externalDatabase = DatabaseFactory::getInstanceExternal();
     }
 
     /**
-     * Return a bastardized array of student details in a class
+     * {@inheritDoc}
      *
      * @param string $classCode CSV list of class codes to find students in
      *
@@ -39,17 +33,22 @@ class External_Denbigh_Class implements External_ClassInterface
      */
     public function getStudents($classCode)
     {
-        $students = [];
+        $classCodes = array_filter(explode(',', $classCode));
 
-        if (!$classCode) {
+        if (count($classCodes) == 0) {
             return [];
         }
 
-        $predicate = PredicateBuilder::getArrayBindings(explode(',', $classCode), 'classCode');
+        $predicate = PredicateBuilder::getArrayBindings($classCodes, 'classCode');
 
         /** @noinspection SqlDialectInspection */
-        $studentIterator = $this->externalDatabase->executeQueryIterator("
-                SELECT      p.denbighID, p.surname, p.preferred_name, s.academicYear, s.house
+        $studentIterator = $this->externalDatabase->executeQueryIterator(
+            "
+                SELECT      p.denbighID, 
+                            p.surname, 
+                            p.preferred_name, 
+                            s.academicYear, 
+                            s.house
                 FROM        Classes c
                 LEFT JOIN   Enrolments e ON e.classCode = c.classCode
                 LEFT JOIN   Students s ON s.peopleDenbighID = e.studentID
@@ -60,6 +59,8 @@ class External_Denbigh_Class implements External_ClassInterface
             ",
             $predicate["bindings"]
         );
+
+        $students = [];
 
         foreach ($studentIterator as $student) {
             $students[] = [
@@ -77,7 +78,7 @@ class External_Denbigh_Class implements External_ClassInterface
     }
 
     /**
-     * Get an array containing Teacher IDs (not names as the function suggests)
+     * {@inheritDoc}
      *
      * @param string $classCode CSV list of class codes to find staff in
      *
@@ -85,14 +86,17 @@ class External_Denbigh_Class implements External_ClassInterface
      */
     public function getTeacherName($classCode)
     {
-        if (!$classCode) {
+        $classCodes = array_filter(explode(',', $classCode));
+
+        if (count($classCodes) == 0) {
             return [];
         }
 
-        $predicate = PredicateBuilder::getArrayBindings(explode(',', $classCode), 'classCode');
+        $predicate = PredicateBuilder::getArrayBindings($classCodes, 'classCode');
 
         /** @noinspection SqlDialectInspection */
-        $queryStaff = $this->externalDatabase->executeQuery("
+        return $this->externalDatabase->executeQuery(
+            "
                 SELECT      p.denbighID
                 FROM        Classes c
                 LEFT JOIN   Staff s ON s.staffCode = c.staffCode
@@ -100,8 +104,6 @@ class External_Denbigh_Class implements External_ClassInterface
                 WHERE       c.ClassCode IN ({$predicate["placeholders"]})
 		    ",
             $predicate["bindings"]
-        );
-
-        return $queryStaff->fetchColumnArray(0);
+        )->fetchColumnArray(0);
     }
 }

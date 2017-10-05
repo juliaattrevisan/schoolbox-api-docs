@@ -11,6 +11,8 @@ use Schoolbox\Database\Factory as DatabaseFactory;
 class External_Schoolbox_Ping implements External_PingInterface
 {
     /**
+     * {@inheritDoc}
+     *
      * @return bool
      */
     public function isResponsive()
@@ -26,6 +28,8 @@ class External_Schoolbox_Ping implements External_PingInterface
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @return string
      */
     public function getVersion()

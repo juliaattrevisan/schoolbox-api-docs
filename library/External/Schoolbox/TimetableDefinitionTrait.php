@@ -11,6 +11,8 @@ use Schoolbox\Campus as Campus;
 trait External_Schoolbox_TimetableDefinitionTrait
 {
     /**
+     * {@inheritDoc}
+     *
      * @param IConnector $database
      * @param Campus     $campus
      *
@@ -34,7 +36,7 @@ trait External_Schoolbox_TimetableDefinitionTrait
                 AND       tc.start <= DATE(NOW())
                 AND       tc.finish >= DATE(NOW())
             ",
-            [':campusId' => $campus->getId()]
+            ['campusId' => $campus->getId()]
         );
 
         if ($definition = $timetableQuery->fetch()) {
@@ -48,6 +50,8 @@ trait External_Schoolbox_TimetableDefinitionTrait
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @param IConnector $database
      * @param Campus     $campus
      * @param int        $date

@@ -10,14 +10,13 @@ use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Campus as Campus;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Database\Factory as DatabaseFactory;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\UserMapper;
 
 /** @noinspection PhpUndefinedClassInspection */
 class External_Denbigh_Timetable implements External_TimetableInterface
 {
     use External_Schoolbox_TimetableDefinitionTrait;
-
-    /** @var Group $group */
-    private $group;
 
     /** @var IConnector $internalDatabase */
     private $internalDatabase;
@@ -28,12 +27,18 @@ class External_Denbigh_Timetable implements External_TimetableInterface
     /** @var ConfigMapper $configMapper */
     private $configMapper;
 
+    /** @var UserMapper $userMapper */
+    private $userMapper;
+
+    /** @var array|bool[] $userCache */
+    private $userStaffCache = [];
+
     /**
      * External_Denbigh_Class constructor.
      */
     public function __construct()
     {
-        $this->group        = new Group;
+        $this->userMapper = UserMapper::getInstance();
         $this->configMapper = ConfigMapper::getInstance();
 
         /** @noinspection PhpDeprecationInspection */
@@ -44,6 +49,29 @@ class External_Denbigh_Timetable implements External_TimetableInterface
     }
 
     /**
+     * Check if specified user ID belongs to a staff member, cache result for repeat calls
+     *
+     * @param int $userId Schoolbox User ID
+     *
+     * @return bool
+     */
+    private function isStaff($userId) {
+        try {
+            if (!isset($this->userCache[$userId])) {
+                $this->userStaffCache[$userId] = $this->userMapper->findById($userId)->getRole()->isStaff();
+            }
+        }
+        /** @noinspection PhpRedundantCatchClauseInspection */
+        catch (MapperException $e) {
+            $this->userStaffCache[$userId] = false;
+        }
+
+        return $this->userStaffCache[$userId];
+    }
+
+    /**
+     * {@inheritDoc}
+     *
      * @param string $externalUserId
      * @param Campus $campus
      * @param int    $day
@@ -57,6 +85,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @param Campus $campus
      * @param int    $date
      *
@@ -68,7 +98,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Does nothing useful
+     * {@inheritDoc}
      *
      * @param int $dayNumber
      *
@@ -76,11 +106,11 @@ class External_Denbigh_Timetable implements External_TimetableInterface
      */
     public function getDayName($dayNumber)
     {
-        return 'Day ' . $dayNumber;
+        return "Day {$dayNumber}";
     }
 
     /**
-     * Does nothing useful
+     * {@inheritDoc}
      *
      * @param Campus $campus
      * @param int    $now
@@ -94,6 +124,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @param int    $externalUserId
      * @param int    $userId
      * @param Campus $campus
@@ -123,36 +155,50 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             ];
         }
 
-        if ($this->group->isStaff($userId)) {
+        if ($this->isStaff($userId)) {
             /** @noinspection SqlDialectInspection */
             $queryTimetable = $this->externalDatabase->prepareQuery(
                 "
-                                SELECT l.day, l.period, startTime, endTime, l.classCode, l.staffCode, l.room, co.subjectName
-                                FROM People p
-                                RIGHT JOIN Staff s ON s.peopleDenbighID = p.denbighID
-                                RIGHT JOIN Lessons l ON l.staffCode = s.staffCode
-                                RIGHT JOIN Classes cl ON cl.classCode = l.classCode
-                                RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
-                                WHERE p.denbighID = :externalUserId
-                            "
+                    SELECT      l.day, 
+                                l.period, 
+                                startTime, 
+                                endTime, 
+                                l.classCode, 
+                                l.staffCode, 
+                                l.room, 
+                                co.subjectName
+                    FROM        People p
+                    RIGHT JOIN  Staff s ON s.peopleDenbighID = p.denbighID
+                    RIGHT JOIN  Lessons l ON l.staffCode = s.staffCode
+                    RIGHT JOIN  Classes cl ON cl.classCode = l.classCode
+                    RIGHT JOIN  Courses co ON co.courseCode = cl.courseCode
+                    WHERE       p.denbighID = :externalUserId
+                "
             );
         } else {
             /** @noinspection SqlDialectInspection */
             $queryTimetable = $this->externalDatabase->prepareQuery(
                 "
-                                SELECT l.day, l.period, startTime, endTime, l.classCode, l.staffCode, l.room, co.subjectName
-                                FROM People p
-                                RIGHT JOIN Enrolments e ON e.studentID = p.denbighID
-                                RIGHT JOIN Lessons l ON l.classCode = e.classCode
-                                RIGHT JOIN Classes cl ON cl.classCode = l.classCode
-                                RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
-                                WHERE p.denbighID = :externalUserId
-                            "
+                    SELECT      l.day, 
+                                l.period, 
+                                startTime, 
+                                endTime, 
+                                l.classCode, 
+                                l.staffCode, 
+                                l.room, 
+                                co.subjectName
+                    FROM        People p
+                    RIGHT JOIN  Enrolments e ON e.studentID = p.denbighID
+                    RIGHT JOIN  Lessons l ON l.classCode = e.classCode
+                    RIGHT JOIN  Classes cl ON cl.classCode = l.classCode
+                    RIGHT JOIN  Courses co ON co.courseCode = cl.courseCode
+                    WHERE       p.denbighID = :externalUserId
+                "
             );
         }
 
         $lessonIterator = $queryTimetable->executeIterator([
-            ':externalUserId' => $externalUserId,
+            'externalUserId' => $externalUserId,
         ]);
 
         foreach ($lessonIterator as $lesson) {
@@ -169,8 +215,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface
                     ? ''
                     : date($this->configMapper->get('date_time'), strtotime($lesson['endTime']));
 
-            if (isset($periodList[$period]['day'][$day])
-                && !isset($periodList[$period]['day'][$day][$lesson['ClassCode']])) {
+            if (isset($periodList[$period]['day'][$day]) && 
+                !isset($periodList[$period]['day'][$day][$lesson['ClassCode']])) {
                 $periodList[$period]['day'][$day][$lesson['ClassCode']] = [
                     'description' => $lesson['subjectName'],
                     'code'        => $lesson['classCode'],
@@ -183,6 +229,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @param int    $externalUserId
      * @param int    $userId
      * @param Campus $campus
@@ -212,39 +260,53 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             ];
         }
 
-        if ($this->group->isStaff($userId)) {
+        if ($this->isStaff($userId)) {
             /** @noinspection SqlDialectInspection */
             $queryTimetable = $this->externalDatabase->prepareQuery(
                 "
-                                SELECT l.day, l.period, startTime, endTime, l.classCode, l.staffCode, l.room, co.subjectName
-                                FROM People p
-                                RIGHT JOIN Staff s ON s.peopleDenbighID = p.denbighID
-                                RIGHT JOIN Lessons l ON l.staffCode = s.staffCode
-                                RIGHT JOIN Classes cl ON cl.classCode = l.classCode
-                                RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
-                                WHERE p.denbighID = :externalUserId
-                                    AND l.day = :dayNumber
-                            "
+                    SELECT      l.day, 
+                                l.period, 
+                                startTime, 
+                                endTime, 
+                                l.classCode, 
+                                l.staffCode, 
+                                l.room, 
+                                co.subjectName
+                    FROM        People p
+                    RIGHT JOIN  Staff s ON s.peopleDenbighID = p.denbighID
+                    RIGHT JOIN  Lessons l ON l.staffCode = s.staffCode
+                    RIGHT JOIN  Classes cl ON cl.classCode = l.classCode
+                    RIGHT JOIN  Courses co ON co.courseCode = cl.courseCode
+                    WHERE       p.denbighID = :externalUserId AND
+                                l.day = :dayNumber
+                "
             );
         } else {
             /** @noinspection SqlDialectInspection */
             $queryTimetable = $this->externalDatabase->prepareQuery(
                 "
-                                SELECT l.day, l.period, startTime, endTime, l.classCode, l.staffCode, l.room, co.subjectName
-                                FROM People p
-                                RIGHT JOIN Enrolments e ON e.studentID = p.denbighID
-                                RIGHT JOIN Lessons l ON l.classCode = e.classCode
-                                RIGHT JOIN Classes cl ON cl.classCode = l.classCode
-                                RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
-                                WHERE p.denbighID = :externalUserId
-                                    AND l.day = :dayNumber
-                            "
+                    SELECT      l.day, 
+                                l.period, 
+                                startTime, 
+                                endTime, 
+                                l.classCode, 
+                                l.staffCode, 
+                                l.room, 
+                                co.subjectName
+                    FROM        People p
+                    RIGHT JOIN  Enrolments e ON e.studentID = p.denbighID
+                    RIGHT JOIN  Lessons l ON l.classCode = e.classCode
+                    RIGHT JOIN  Classes cl ON cl.classCode = l.classCode
+                    RIGHT JOIN  Courses co ON co.courseCode = cl.courseCode
+                    WHERE       p.denbighID = :externalUserId AND
+                                l.day = :dayNumber
+                "
             );
         }
 
         $lessonIterator = $queryTimetable->executeIterator([
-            ':externalUserId' => $externalUserId,
-            ':dayNumber'      => $dayNumber,
+            'externalUserId' => $externalUserId,
+            'dayNumber'      => $dayNumber,
         ]);
 
         foreach ($lessonIterator as $lesson) {
@@ -262,11 +324,14 @@ class External_Denbigh_Timetable implements External_TimetableInterface
 
             if (isset($periodList[$period]) && !isset($periodList[$period]['class'][$lesson['ClassCode']])
             ) {
-                $periodList[$period]['class'][$lesson['ClassCode']] = array_merge($periodList[$period], [
-                    'description' => $lesson['subjectName'],
-                    'code'        => $lesson['classCode'],
-                    'room'        => $lesson['room'],
-                ]);
+                $periodList[$period]['class'][$lesson['ClassCode']] = array_merge(
+                    $periodList[$period], 
+                    [
+                        'description' => $lesson['subjectName'],
+                        'code'        => $lesson['classCode'],
+                        'room'        => $lesson['room'],
+                    ]
+                );
             }
         }
 
@@ -274,6 +339,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @param int                 $externalUserId
      * @param int                 $userId
      * @param Campus              $campus
@@ -295,6 +362,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @param array|string $roomCodes
      *
      * @return array
@@ -306,11 +375,13 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         }
 
         /** @noinspection SqlDialectInspection */
-        $queryCampus = $this->internalDatabase->executeQuery("
-            SELECT    ext_timetable_code 
-            FROM      luCampus 
-            LIMIT     1
-        ");
+        $queryCampus = $this->internalDatabase->executeQuery(
+            "
+              SELECT    ext_timetable_code 
+              FROM      luCampus 
+              LIMIT     1
+            "
+        );
 
         if ($queryCampus->rowCount() == 0) {
             return [];
@@ -325,7 +396,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         $predicate = PredicateBuilder::getArrayBindings($roomCodes, 'roomCode');
 
         /** @noinspection SqlDialectInspection */
-        return $this->externalDatabase->executeQuery("
+        return $this->externalDatabase->executeQuery(
+            "
                 SELECT      l.day AS DayNumber, 
                             l.period AS PeriodNumber, 
                             startTime AS PeriodStart, 
@@ -342,7 +414,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             ",
             array_merge(
                 $predicate["bindings"],
-                [':timetableGroup' => $timetableGroup]
+                ['timetableGroup' => $timetableGroup]
             )
         )->fetchAll();
     }

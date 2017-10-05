@@ -34,7 +34,7 @@ class External_Schoolbox_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param array $synergyIds
      *
@@ -64,7 +64,7 @@ class External_Schoolbox_User implements External_UserInterface
             ",
             array_merge(
                 $predicate['bindings'],
-                [':relation_type' => self::RELATION_TYPE_PARENT]
+                ['relation_type' => self::RELATION_TYPE_PARENT]
             )
         );
 
@@ -76,7 +76,7 @@ class External_Schoolbox_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param int $externalUserId
      *
@@ -119,12 +119,12 @@ class External_Schoolbox_User implements External_UserInterface
                 WHERE     user.synergy_id = :externalUserId
                 AND       `user`.deleted_at IS NULL
             ",
-            [':externalUserId' => $externalUserId]
+            ['externalUserId' => $externalUserId]
         )->fetch();
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param int $externalUserId
      *
@@ -167,12 +167,12 @@ class External_Schoolbox_User implements External_UserInterface
                 WHERE       child.synergy_id = :externalUserId AND 
                             child.deleted_at IS NULL
             ",
-            [':externalUserId' => $externalUserId]
+            ['externalUserId' => $externalUserId]
         )->fetchAll();
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param $externalUserId
      *
@@ -225,7 +225,7 @@ class External_Schoolbox_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param User $user
      *
@@ -239,7 +239,7 @@ class External_Schoolbox_User implements External_UserInterface
             return [];
         }
 
-        $params = [':externalUserId' => $externalId];
+        $params = ['externalUserId' => $externalId];
 
         $classQuery = $this->internalDatabase->executeQuery(
             "
@@ -284,7 +284,7 @@ class External_Schoolbox_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param int $externalUserId
      *
@@ -302,14 +302,14 @@ class External_Schoolbox_User implements External_UserInterface
                             ur.relation_type = :relationType
             ",
             [
-                ':externalUserId' => $externalUserId,
-                ':relationType'   => self::RELATION_TYPE_PARENT,
+                'externalUserId' => $externalUserId,
+                'relationType'   => self::RELATION_TYPE_PARENT,
             ]
         )->fetchAll();
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param string $boarderValue
      *
@@ -329,7 +329,7 @@ class External_Schoolbox_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param int $externalUserId
      *
@@ -347,7 +347,7 @@ class External_Schoolbox_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param int $externalUserId
      *
@@ -359,7 +359,7 @@ class External_Schoolbox_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param int $externalUserId
      *
@@ -373,7 +373,8 @@ class External_Schoolbox_User implements External_UserInterface
     // Useless functions
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
+     *
      * @return array
      */
     public function getStaffContactListExtended()
@@ -382,7 +383,7 @@ class External_Schoolbox_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param int $staffID
      *
@@ -394,7 +395,7 @@ class External_Schoolbox_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param int $houseId
      */
@@ -404,17 +405,19 @@ class External_Schoolbox_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param array $externalUserIds
      */
     public function getHousemasterEmails($externalUserIds)
     {
+        /** @noinspection PhpUnusedParameterInspection */
         return [];
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
+     *
      * @return array
      */
     public function getStudentForms()
@@ -423,7 +426,7 @@ class External_Schoolbox_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param int $externalUserId
      *
@@ -435,7 +438,7 @@ class External_Schoolbox_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param int $externalUserId
      *
@@ -447,7 +450,8 @@ class External_Schoolbox_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
+     *
      * @return string
      */
     public function getEmail($externalUserId)
@@ -456,7 +460,8 @@ class External_Schoolbox_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
+     *
      * @return array
      */
     public function getStudentUserAccountInfo()
@@ -465,7 +470,8 @@ class External_Schoolbox_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
+     *
      * @return array
      */
     public function getParentUserAccountInfo()
@@ -474,7 +480,7 @@ class External_Schoolbox_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      * @return array
      */
     public function getStaffUserAccountInfo()
@@ -483,7 +489,7 @@ class External_Schoolbox_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param int $externalUserId
      */
@@ -492,7 +498,7 @@ class External_Schoolbox_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param string $yearlevel
      * @param string $name

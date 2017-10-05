@@ -6,10 +6,10 @@
  */
 
 use Alaress\Database\Connector\IConnector;
-use Alaress\Database\Statement\Query\IQuery;
+use Alaress\Database\Iterator\IIterator;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Database\Factory as DatabaseFactory;
+use Schoolbox\Role;
 
 class External_Schoolbox_Class implements External_ClassInterface
 {
@@ -17,26 +17,24 @@ class External_Schoolbox_Class implements External_ClassInterface
     /** @var IConnector $internalDatabase */
     private $internalDatabase;
 
-    /** @var ConfigMapper $configMapper */
-    private $configMapper;
-
     /**
      * External_Schoolbox_User constructor.
      */
     public function __construct()
     {
-        $this->configMapper = ConfigMapper::getInstance();
-
         /** @noinspection PhpDeprecationInspection */
         $this->internalDatabase = DatabaseFactory::getInstanceInternal();
     }
 
     /**
-     * @param string $classCodes
+     * {@inheritDoc}
      *
-     * @return IQuery
+     * @param string $classCodes
+     * @param string $type Const indicating type of user (e.g. Group::STUDENT_GROUP_TYPE)
+     *
+     * @return IIterator
      */
-    protected function getClassQuery($classCodes)
+    protected function getClassIterator($classCodes, $type)
     {
         $codes = array_filter(explode(',', $classCodes));
 
@@ -65,16 +63,21 @@ class External_Schoolbox_Class implements External_ClassInterface
                 ORDER BY      u.lastname, 
                               u.firstname
 		    ",
-            $predicate["bindings"]
-        );
+            array_merge(
+                $predicate["bindings"],
+                ['type' => $type]
+            )
+        )->executeIterator();
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @param string $classCodes
      *
-     * @return IQuery
+     * @return IIterator
      */
-    protected function getTeacherQuery($classCodes)
+    protected function getTeacherIterator($classCodes)
     {
         $codes = array_filter(explode(',', $classCodes));
 
@@ -98,27 +101,27 @@ class External_Schoolbox_Class implements External_ClassInterface
 			    INNER JOIN  user u ON u.id = cp.teacher_id
 			    WHERE       c.code IN ({$predicate["parameters"]}) AND 
 			                u.deleted_at IS NULL
-			    ORDER BY    u.lastname, u.firstname
+			    ORDER BY    u.lastname, 
+			                u.firstname
 		    ",
             $predicate["bindings"]
-        );
+        )->executeIterator();
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @param string $classCode
      *
      * @return array
      */
     public function getStudents($classCode)
     {
-        $studentQuery = $this->getClassQuery($classCode);
+        $studentIterator = $this->getClassIterator($classCode, Role::STUDENT);
 
-        if (!$studentQuery instanceof IQuery) {
+        if (!$studentIterator instanceof IIterator) {
             return [];
         }
-
-        $studentQuery->bindInputs([':type', Group::STUDENT_GROUP_TYPE]);
-        $studentIterator = $studentQuery->executeIterator();
 
         $studentListAdaption = [];
         $found               = [];
@@ -145,6 +148,8 @@ class External_Schoolbox_Class implements External_ClassInterface
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @param string $classCode
      *
      * @return array
@@ -153,22 +158,17 @@ class External_Schoolbox_Class implements External_ClassInterface
     {
         $teachers = [];
 
-        $teacherQuery = $this->getClassQuery($classCode);
+        $classIterator = $this->getClassIterator($classCode, Role::STAFF);
 
-        if ($teacherQuery instanceof IQuery) {
-            $teacherQuery->bindInputs([':type', Group::STAFF_GROUP_TYPE]);
-            $teacherIterator = $teacherQuery->executeIterator();
-
-            foreach ($teacherIterator as $teacher) {
+        if ($classIterator instanceof IIterator) {
+            foreach ($classIterator as $teacher) {
                 $teachers[] = $teacher['synergy_id'];
             }
         }
 
-        $teacherQuery = $this->getTeacherQuery($classCode);
+        $teacherIterator = $this->getTeacherIterator($classCode);
 
-        if ($teacherQuery instanceof IQuery) {
-            $teacherIterator = $teacherQuery->executeIterator();
-
+        if ($teacherIterator instanceof IIterator) {
             foreach ($teacherIterator as $teacher) {
                 $teachers[] = $teacher['synergy_id'];
             }

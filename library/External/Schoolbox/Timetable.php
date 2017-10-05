@@ -6,9 +6,8 @@
  */
 
 use Alaress\Database\Connector\IConnector;
-use Alaress\Database\Statement\Query\IQuery;
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Campus;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Database\Factory as DatabaseFactory;
 use Schoolbox\User;
 
@@ -19,22 +18,17 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
     /** @var IConnector $internalDatabase */
     private $internalDatabase;
 
-    /** @var ConfigMapper $configMapper */
-    private $configMapper;
-
     /**
      * External_Schoolbox_User constructor.
      */
     public function __construct()
     {
-        $this->configMapper = ConfigMapper::getInstance();
-
         /** @noinspection PhpDeprecationInspection */
         $this->internalDatabase = DatabaseFactory::getInstanceInternal();
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param string $externalUserId
      * @param Campus $campus
@@ -49,7 +43,6 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
         $timetableDefinition = $this->getTimetableDefinitionFromDatabase($this->internalDatabase, $campus);
 
-        /* Must get at least one day */
         if ($day == 0) {
             $day = 1;
         }
@@ -73,7 +66,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param Campus $campus
      * @param int    $day
@@ -104,26 +97,26 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
         $query .= "ORDER BY tp.day, tp.sequence";
 
-        $periodStatement = $this->internalDatabase->prepareQuery($query);
-
         if ($day > 0) {
-            $periodStatement->execute([
-                ':campusId' => $campus->getId(),
-                ':day'      => $day,
-            ]);
-        } else {
-            $periodStatement->execute([
-                ':campusId' => $campus->getId(),
-            ]);
+            return $this->internalDatabase->executeQuery(
+                $query,
+                [
+                    'campusId' => $campus->getId(),
+                    'day'      => $day,
+                ]
+            )->fetchAll();
         }
 
-        $periodList = $periodStatement->fetchAll();
-
-        return $periodList;
+        return $this->internalDatabase->executeQuery(
+            $query,
+            [
+                'campusId' => $campus->getId(),
+            ]
+        )->fetchAll();
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param Campus $campus
      * @param int    $date
@@ -132,11 +125,15 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
      */
     public function getDayNumber(Campus $campus, $date = 0)
     {
-        return $this->getDayNumberFromDatabase($this->internalDatabase, $campus, $date);
+        return $this->getDayNumberFromDatabase(
+            $this->internalDatabase,
+            $campus,
+            $date
+        );
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param int $dayNumber
      *
@@ -144,15 +141,17 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
      */
     public function getDayName($dayNumber)
     {
-        return 'Day ' . $dayNumber;
+        return "Day {$dayNumber}";
     }
 
     /**
-     * Gets a statement for fetching a user's classes.
+     * {@inheritDoc}
      *
-     * @return IQuery
+     * @param int $userId
+     *
+     * @return array
      */
-    protected function getClassUserStatement()
+    protected function getClassUsers($userId)
     {
         // Get classes for which this user is involved, or is a teacher.
         $query = "
@@ -172,14 +171,17 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             LEFT JOIN   class_period cp ON c.id = cp.class_id
             LEFT JOIN   user u ON cp.teacher_id = u.id
             WHERE       cp.teacher_id = :userId OR 
-                        cl.user_id = :userId
+                        cl.user_id = :userId2
         ";
 
-        return $this->internalDatabase->prepareQuery($query);
+        return $this->internalDatabase->executeQuery($query, [
+            'userId' => $userId,
+            'userId2' => $userId
+        ])->fetchAll();
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param Campus    $campus
      * @param int       $now
@@ -211,9 +213,9 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                 AND         tp.day = :dayNumber
             ",
             [
-                ':campusId'  => $campus->getId(),
-                ':now'       => $now,
-                ':dayNumber' => $dayNumber,
+                'campusId'  => $campus->getId(),
+                'now'       => $now,
+                'dayNumber' => $dayNumber,
             ]
         );
 
@@ -230,7 +232,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param int    $externalUserId
      * @param int    $userId
@@ -245,11 +247,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         }
 
         $periodList = $this->getPeriodList($campus, 0);
-
-        $classStatement = $this->getClassUserStatement();
-        $classStatement->execute([':userId' => $userId]);
-
-        $classList = $classStatement->fetchAll();
+        $classList = $this->getClassUsers($userId);
 
         $timetableDefinition = $this->getTimetableDefinitionFromDatabase($this->internalDatabase, $campus);
         $dayCount            = $timetableDefinition['dayCount'];
@@ -302,7 +300,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      *
      * @param int    $externalUserId
      * @param int    $userId
@@ -318,11 +316,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         }
 
         $periodList = $this->getPeriodList($campus, $dayNumber);
-
-        $classStatement = $this->getClassUserStatement();
-        $classStatement->execute([':userId' => $userId]);
-
-        $classList = $classStatement->fetchAll();
+        $classList = $this->getClassUsers($userId);
 
         $periodListAdaption = [];
 
@@ -369,9 +363,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Return a user's timetable for a specific date
-     * Depending on the role for $userId (staff or student) this summons the respective
-     * method to spawn associated timetable
+     * {@inheritDoc}
      *
      * @param int                 $externalUserId
      * @param int                 $userId
@@ -394,9 +386,9 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Gets the timetable for the given room.
+     * {@inheritDoc}
      *
-     * @param  array|string $roomCodes
+     * @param array|string $roomCodes
      *
      * @return array
      */
@@ -410,6 +402,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
             return $result;
         }
+
+        $predicate = PredicateBuilder::getArrayBindings($roomCodes, 'roomCode');
 
         $statement = $this->internalDatabase->executeQuery(
             "
@@ -435,11 +429,14 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                 INNER JOIN  class ON class_period.class_id = class.id
                 WHERE       timetable_campus.start <= DATE(NOW()) AND
                             timetable_campus.finish >= DATE(NOW()) AND
-                            class_period.room = :room
+                            class_period.room IN ({$predicate["placeholders"]})
                 ORDER BY    timetable_period.day ASC,
                             timetable_period.sequence ASC
             ",
-            ['room' => $roomCodes]
+            array_merge(
+                $predicate["bindings"],
+                ['room' => $roomCodes]
+            )
         );
 
         return $statement->fetchAll();

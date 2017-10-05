@@ -27,23 +27,28 @@ class Base extends BaseStatement
      * Database statement constructor
      *
      * @param IBroker $broker Database broker that this query belongs to
-     * @param string $sql SQL query string to be executed
+     * @param string  $sql    SQL query string to be executed
      */
-    function __construct($broker, $sql) {
+    function __construct($broker, $sql)
+    {
         $this->broker = $broker;
-        $this->sql = $sql;
+        $this->sql    = $sql;
     }
 
     /**
      * @inheritdoc
      */
-    public function getSql() {
+    public function getSql()
+    {
         return $this->sql;
     }
 
     /**
      * Bind array of input values. This doesn't bind to the PDO statement, just stores the intention in an array.
+     *
      * @param array $values
+     *
+     * @return self
      */
     public function bindInputs($values = [])
     {
@@ -52,7 +57,6 @@ class Base extends BaseStatement
         }
 
         foreach ($values as $key => $value) {
-
             // Numeric keys (for non-named parameters, i.e. ?) need to be mangled here.
             // * PDOStatement::execute($params) expects a 0-indexed array
             // * PDOStatement::bindValue($param, $value) expects $param to be 1-indexed
@@ -94,10 +98,9 @@ class Base extends BaseStatement
             // queries, which breaks if you don't specify the type as PDO::PARAM_INT
 
             if (is_array($value)) {
-
                 $this->parameters['input'][$key] = [
-                    'value' => $value['value'],
-                    'type' => isset($value['type']) ? $this->getDataType($value, $value['type']) : null,
+                    'value'  => $value['value'],
+                    'type'   => isset($value['type']) ? $this->getDataType($value, $value['type']) : null,
                     'length' => isset($value['length']) ?
 
                         // Parameters length was specified, use it
@@ -106,14 +109,12 @@ class Base extends BaseStatement
 
                         // Length was not specified, if the parameter is a string, use its length- otherwise pass NULL
 
-                        $this->getDataType($value, $value['type']) == PDO::PARAM_STR ? strlen($value['value']) : null
+                        $this->getDataType($value, $value['type']) == PDO::PARAM_STR ? strlen($value['value']) : null,
                 ];
-
             } else {
-
                 $this->parameters['input'][$key] = [
-                    'value' => $value,
-                    'type' => $this->getDataType($value),
+                    'value'  => $value,
+                    'type'   => $this->getDataType($value),
                     'length' => isset($value['length']) ?
 
                         // Parameters length was specified, use it
@@ -122,10 +123,12 @@ class Base extends BaseStatement
 
                         // Length was not specified, if the parameter is a string, use its length- otherwise pass NULL
 
-                        $this->getDataType($value) == PDO::PARAM_STR ? strlen($value) : null
+                        $this->getDataType($value) == PDO::PARAM_STR ? strlen($value) : null,
                 ];
             }
         }
+        
+        return $this;
     }
 
     /**
