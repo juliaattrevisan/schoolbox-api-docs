@@ -161,7 +161,7 @@ if (is_array($items)) {
 
             /* The usual stuff
              */
-            $fullname = $userHandler->formatName($article);
+            $fullname = Scrub::text($userHandler->formatName($article));
             $owner = "<a href=\"/search/user/{$article['uid']}\">$fullname</a>";
 
             $formatter = new TextFormatter();
@@ -172,13 +172,13 @@ if (is_array($items)) {
                 'NEWS_ID' => $article['item_id'],
                 'NEWS_URL' => '/news/item/' . $article['item_id'],
                 'NEWS_MODIFY_URL' => '/news/modify/'.$article['item_id'],
-                'NEWS_TITLE' => $article['item_heading'],
+                'NEWS_TITLE' => Scrub::text($article['item_heading']),
                 'POSTER' => $owner,
                 'DATETIME' => $postDate->getLong(),
                 'NEWS_SHORT' => empty($article['item_blurb'])
                     ? '<p>'.TextFormatter::cutSentence(Scrub::html2text($article['item_body']), 300).'</p>'
                     : Scrub::html($article['item_blurb']),
-                'NEWS_IMAGE' => $article['item_image'],
+                'NEWS_IMAGE' => Scrub::text($article['item_image']),
                 'ON_OFF'         => ++$j % 2 ? 'dark' : ''
             );
             $this->setVar($output);
