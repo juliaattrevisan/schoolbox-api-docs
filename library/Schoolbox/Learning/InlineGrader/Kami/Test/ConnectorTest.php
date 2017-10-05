@@ -107,7 +107,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
          * * mock route returns array of documents, prod route returns object with
          *   single key 'documents', which is array of documents
          */
-        $this->assertTrue(true);
+        $this->markTestIncomplete('Document list is currently broken');
 //        $documents = $connector->listDocuments();
     }
 
