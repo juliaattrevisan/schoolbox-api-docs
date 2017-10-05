@@ -16,13 +16,10 @@ use HouseResidentialMapper;
 use Monolog\Logger;
 use Schoolbox\Application\Exception\NotFound as ExceptionNotFound;
 use Schoolbox\Campus;
-use Schoolbox\CampusCollection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Collection;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Notif\Notifactory;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Alert\RedisPublisher;
@@ -31,6 +28,8 @@ use Schoolbox\UserMapper;
 use Schoolbox\User\Title\Mapper as UserTitleMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\CampusMapper;
+use House;
+use HouseResidential;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User\Log\Mapper as UserLogMapper;
 use Schoolbox\CMS\Log\Mapper as CMSLogMapper;
@@ -416,6 +415,22 @@ class Controller extends Base
             $user->setEnabled(isset($post['account_enabled']));
         }
 
+        if(!empty($post['house'])) {
+            $house = new House();
+            $house->setId($post['house']);
+        }
+        else {
+            $house = null;
+        }
+
+        if(!empty($post['residential_house'])) {
+            $resHouse = new HouseResidential();
+            $resHouse->setId($post['residential_house']);
+        }
+        else {
+            $resHouse = null;
+        }
+
         $user->setTitle($post['title']);
         $user->setFirstname($post['firstname']);
         $user->setLastname($post['lastname']);
@@ -424,8 +439,8 @@ class Controller extends Base
         $user->setPositionTitle($post['position_title']);
         $user->setAltEmail($post['alt_email']);
         $user->setYear($post['year'] == '' ? null : $post['year']);
-        $user->setSchoolHouse($post['house'] == '' ? null : (new House())->setId($post['house']));
-        $user->setResidentialHouse($post['residential_house'] == '' ? null : (new HouseResidential())->setId( $post['residential_house']));
+        $user->setSchoolHouse($house);
+        $user->setResidentialHouse($resHouse);
         $user->setEportfolioEnable(!empty($post['eportfolio']));
         $user->setHideContacts(!empty($post['hide_contacts']));
         $user->setHideTimetable(!empty($post['hide_timetable']));
