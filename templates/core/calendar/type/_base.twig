@@ -74,7 +74,7 @@
                 {% endif %}
                 {% if event.isEditable %}
                     <a class="button icon-modify" href="/calendar/modify.php?eventID={{ event.eventId }}{{ returnStr }}">Modify</a>
-                    <a class="button icon-delete" id="delete{{ event.eventId }}">Delete</a>
+                    <a class="button icon-delete" id="delete-event-{{ event.eventId }}">Delete</a>
                 {% endif %}
             </div>
             {% endblock eventBubbleButtons %}
