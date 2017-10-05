@@ -1,22 +1,28 @@
 <?php
-
 /**
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2015, Alaress Pty Ltd
+ * @author    Damian Sloane <damian.sloane@alaress.com.au>
+ * @copyright Copyright 2017, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
 
+use Schoolbox\Database\Factory as DatabaseFactory;
+
+/** @noinspection PhpUndefinedClassInspection */
 class External_Schoolbox_Ping implements External_PingInterface
 {
     /**
-     * Connects to Schoolbox database in the same manner that the other classes
-     * would, and returns whether the database is responsive.
-     *
      * @return bool
      */
     public function isResponsive()
     {
-        return Database::getInstance()->isConnected();
+        try {
+            /** @noinspection PhpDeprecationInspection */
+            DatabaseFactory::getInstanceInternal();
+        } catch (Exception $e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

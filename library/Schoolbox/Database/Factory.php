@@ -24,8 +24,15 @@ class Factory
     protected static $connectorExternal;
 
     /**
-     * Retrieves static instance of external database connection
+     * TODO: Once we've got DI accessible everywhere this is currently used this should no longer required
      *
+     * @deprecated
+     * @return IConnector
+     */
+    protected static $connectorInternal;
+
+    /**
+     * Retrieves static instance of external database connection (used in External connectors)
      * TODO: Once we've got DI accessible everywhere this is currently used this should no longer required
      *
      * @deprecated
@@ -34,9 +41,9 @@ class Factory
     public static function getInstanceExternal()
     {
         if (!isset(self::$connectorExternal)) {
-            $config = ConfigMapper::getInstance();
-            $factory = new DatabaseFactory();
-            $database = $factory->createMssql();
+            $config   = ConfigMapper::getInstance();
+            $factory  = new DatabaseFactory();
+            $database = $factory->createMysql();
 
             // This will throw an exception on error
 
@@ -56,6 +63,36 @@ class Factory
     }
 
     /**
+     * Retrieves static instance of internal database connection (used in Denbigh)
+     * TODO: Once we've got DI accessible everywhere this is currently used this should no longer required
+     *
+     * @deprecated
+     * @return IConnector
+     */
+    public static function getInstanceInternal()
+    {
+        if (!isset(self::$connectorInternal)) {
+            $factory  = new DatabaseFactory();
+            $database = $factory->createMysql();
+
+            // This will throw an exception on error
+
+            $database->connect(
+                SQL_host,
+                SQL_db,
+                SQL_user,
+                SQL_passwd
+            );
+
+            // So only cache the instance on success
+
+            self::$connectorInternal = $database;
+        }
+
+        return self::$connectorInternal;
+    }
+
+    /**
      * Factory Constructor
      *
      * @param DatabaseFactory $factory
@@ -67,6 +104,7 @@ class Factory
 
     /**
      * Retrieve a connection to Schoolbox database
+     *
      * @return IConnector
      */
     public function getInternalDatabase()
@@ -78,6 +116,7 @@ class Factory
         }
 
         $connectorInternal->setTimezone($this->fetchTimezone($connectorInternal));
+
         return $connectorInternal;
     }
 
@@ -85,12 +124,12 @@ class Factory
      * Retrieve an appropriate external database connection based on the 'external_type' set in Schoolbox configuration
      *
      * @param IConfigLoader $config Schoolbox configuration
+     *
      * @return IConnector Return the external connector appropriate for the SIS
      */
     public function getExternalDatabase($config)
     {
         switch ($config['external_type']) {
-
             // Microsoft SQL Server
 
             case 'tass':
@@ -140,6 +179,7 @@ class Factory
      * Fetch the timezone from the database we are connecting to
      *
      * @param IConnector $connectorInternal
+     *
      * @return string Timezone
      */
     private function fetchTimezone(IConnector $connectorInternal)
@@ -147,6 +187,7 @@ class Factory
         $statement = $connectorInternal->prepareQuery("SELECT `value` FROM `config` WHERE name LIKE 'date_timezone'");
         $statement->execute();
         $result = $statement->fetchColumn();
+
         return $result;
     }
 }

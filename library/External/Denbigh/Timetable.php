@@ -1,95 +1,131 @@
 <?php
+/**
+ * @author    Damian Sloane <damian.sloane@alaress.com.au>
+ * @copyright Copyright 2017, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
 
-/************************************************************
- *                                                           *
- *        Copyright (c) 2013 Alaress Pty Ltd                *
- *                                                           *
- *    This file provides access to Denbigh timetable info        *
- *                                                           *
- ************************************************************/
+use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
+use Schoolbox\Campus as Campus;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Database\Factory as DatabaseFactory;
+
+/** @noinspection PhpUndefinedClassInspection */
 class External_Denbigh_Timetable implements External_TimetableInterface
 {
     use External_Schoolbox_TimetableDefinitionTrait;
 
-    private $internalDatabase;
-
-    private $externalDatabase;
-
+    /** @var Group $group */
     private $group;
 
-    public function __construct()
-    {
-        /* Set internal database */
-        $this->setInternalDatabase(Database::getInstance());
+    /** @var IConnector $internalDatabase */
+    private $internalDatabase;
 
-        /* Establish connection to external database */
-        $database = new Database();
+    /** @var IConnector $externalDatabase */
+    private $externalDatabase;
 
-        $hostName = Config::get('external_db_host');
-        $databaseName = Config::get('external_db_db');
-        $username = Config::get('external_db_user');
-        $password = Config::get('external_db_passwd');
-
-        $database->connect("mysql:host=$hostName;dbname=$databaseName", $username, $password, array('throw' => true));
-
-        $this->setExternalDatabase($database);
-
-        $this->setGroup(new Group);
-    }
-
-    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null)
-    {
-        return $this->getTimetableDefinitionFromDatabase($this->getInternalDatabase(), $campus);
-    }
-
-    public function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
-    {
-        return $this->getDayNumberFromDatabase($this->getInternalDatabase(), $campus, $date);
-    }
-
+    /** @var ConfigMapper $configMapper */
+    private $configMapper;
 
     /**
-     * Returns the day name
+     * External_Denbigh_Class constructor.
+     */
+    public function __construct()
+    {
+        $this->group        = new Group;
+        $this->configMapper = ConfigMapper::getInstance();
+
+        /** @noinspection PhpDeprecationInspection */
+        $this->internalDatabase = DatabaseFactory::getInstanceInternal();
+
+        /** @noinspection PhpDeprecationInspection */
+        $this->externalDatabase = DatabaseFactory::getInstanceExternal();
+    }
+
+    /**
+     * @param string $externalUserId
+     * @param Campus $campus
+     * @param int    $day
+     * @param null   $date
      *
-     * @param $dayNumber
-     * @return String
+     * @return bool|mixed
+     */
+    public function getTimetableDefinition($externalUserId, Campus $campus, $day = 0, $date = null)
+    {
+        return $this->getTimetableDefinitionFromDatabase($this->internalDatabase, $campus);
+    }
+
+    /**
+     * @param Campus $campus
+     * @param int    $date
+     *
+     * @return bool|int
+     */
+    public function getDayNumber(Campus $campus, $date = 0)
+    {
+        return $this->getDayNumberFromDatabase($this->internalDatabase, $campus, $date);
+    }
+
+    /**
+     * Does nothing useful
+     *
+     * @param int $dayNumber
+     *
+     * @return string
      */
     public function getDayName($dayNumber)
     {
         return 'Day ' . $dayNumber;
     }
 
-    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
+    /**
+     * Does nothing useful
+     *
+     * @param Campus $campus
+     * @param int    $now
+     * @param User   $user
+     *
+     * @return int
+     */
+    public function getPeriodNumber(Campus $campus, $now = 0, $user = null)
     {
         return 0;
     }
 
-    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
+    /**
+     * @param int    $externalUserId
+     * @param int    $userId
+     * @param Campus $campus
+     *
+     * @return array
+     */
+    public function getFullTimetable($externalUserId, $userId, Campus $campus)
     {
         if (empty($externalUserId)) {
-            return array();
-        }
-        /* Setup skeleton timetable */
-        if (!$definition = $this->getTimetableDefinition($externalUserId, $campus)) {
-            return false;
+            return [];
         }
 
-        $periodList = array();
+        if (!$definition = $this->getTimetableDefinition($externalUserId, $campus)) {
+            return [];
+        }
+
+        $periodList = [];
 
         for ($i = 1; $i <= $definition['periodCount']; $i++) {
-            $periodList[$i] = array(
+            $periodList[$i] = [
                 'periodNumber'   => $i,
                 'periodName'     => "Period $i",
                 'periodStart'    => '',
                 'periodEnd'      => '',
                 'periodSequence' => '1',
-                'day'            => array_fill(1, $definition['dayCount'], array()),
-            );
+                'day'            => array_fill(1, $definition['dayCount'], []),
+            ];
         }
 
-        /* Fill timetable */
-        if ($this->getGroup()->isStaff($userId)) {
-            $statement = $this->getExternalDatabase()->prepare(
+        if ($this->group->isStaff($userId)) {
+            /** @noinspection SqlDialectInspection */
+            $queryTimetable = $this->externalDatabase->prepareQuery(
                 "
                                 SELECT l.day, l.period, startTime, endTime, l.classCode, l.staffCode, l.room, co.subjectName
                                 FROM People p
@@ -101,7 +137,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface
                             "
             );
         } else {
-            $statement = $this->getExternalDatabase()->prepare(
+            /** @noinspection SqlDialectInspection */
+            $queryTimetable = $this->externalDatabase->prepareQuery(
                 "
                                 SELECT l.day, l.period, startTime, endTime, l.classCode, l.staffCode, l.room, co.subjectName
                                 FROM People p
@@ -114,109 +151,31 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             );
         }
 
-        $statement->bindParam(':externalUserId', $externalUserId, PDO::PARAM_INT);
-        $statement->execute();
+        $lessonIterator = $queryTimetable->executeIterator([
+            ':externalUserId' => $externalUserId,
+        ]);
 
-        $lessonList = $statement->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($lessonIterator as $lesson) {
+            $period = $lesson['period'];
+            $day    = $lesson['day'];
 
-        if (!empty($lessonList)) {
-            foreach ($lessonList as $lesson) {
-                $period = $lesson['period'];
-                $day = $lesson['day'];
-                $periodList[$period]['periodStart'] = $lesson['startTime'] == '' ? '' : date(Cfg::get('date_time'), strtotime($lesson['startTime']));
-                $periodList[$period]['periodEnd'] = $lesson['endTime'] == '' ? '' : date(Cfg::get('date_time'), strtotime($lesson['endTime']));
+            $periodList[$period]['periodStart'] =
+                $lesson['startTime'] == ''
+                    ? ''
+                    : date($this->configMapper->get('date_time'), strtotime($lesson['startTime']));
 
-                if (isset($periodList[$period]['day'][$day])
-                    && !isset($periodList[$period]['day'][$day][$lesson['ClassCode']])) {
-                    $periodList[$period]['day'][$day][$lesson['ClassCode']] = array(
-                        'description' => $lesson['subjectName'],
-                        'code'        => $lesson['classCode'],
-                        'room'        => $lesson['room']
-                    );
-                }
+            $periodList[$period]['periodEnd'] =
+                $lesson['endTime'] == ''
+                    ? ''
+                    : date($this->configMapper->get('date_time'), strtotime($lesson['endTime']));
 
-            }
-        }
-
-        return $periodList;
-    }
-
-    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
-    {
-        if (empty($externalUserId)) {
-            return array();
-        }
-        /* Setup skeleton timetable */
-        if (!$definition = $this->getTimetableDefinition($externalUserId, $campus)) {
-            return false;
-        }
-
-        $periodList = array();
-
-        for ($i = 1; $i <= $definition['periodCount']; $i++) {
-            $periodList[$i] = array(
-                'periodNumber'   => $i,
-                'periodName'     => "Period $i",
-                'periodStart'    => '',
-                'periodEnd'      => '',
-                'periodSequence' => '1',
-            );
-        }
-
-        /* Fill timetable */
-        if ($this->getGroup()->isStaff($userId)) {
-            $statement = $this->getExternalDatabase()->prepare(
-                "
-                                SELECT l.day, l.period, startTime, endTime, l.classCode, l.staffCode, l.room, co.subjectName
-                                FROM People p
-                                RIGHT JOIN Staff s ON s.peopleDenbighID = p.denbighID
-                                RIGHT JOIN Lessons l ON l.staffCode = s.staffCode
-                                RIGHT JOIN Classes cl ON cl.classCode = l.classCode
-                                RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
-                                WHERE p.denbighID = :externalUserId
-                                    AND l.day = :dayNumber
-                            "
-            );
-        } else {
-            $statement = $this->getExternalDatabase()->prepare(
-                "
-                                SELECT l.day, l.period, startTime, endTime, l.classCode, l.staffCode, l.room, co.subjectName
-                                FROM People p
-                                RIGHT JOIN Enrolments e ON e.studentID = p.denbighID
-                                RIGHT JOIN Lessons l ON l.classCode = e.classCode
-                                RIGHT JOIN Classes cl ON cl.classCode = l.classCode
-                                RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
-                                WHERE p.denbighID = :externalUserId
-                                    AND l.day = :dayNumber
-                            "
-            );
-        }
-
-        $statement->bindParam(':externalUserId', $externalUserId);
-        $statement->bindParam(':dayNumber', $dayNumber, PDO::PARAM_INT);
-        $statement->execute();
-
-        $lessonList = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-        if (!empty($lessonList)) {
-            foreach ($lessonList as $lesson) {
-                $period = $lesson['period'];
-                $periodList[$period]['periodStart'] = $lesson['startTime'] == '' ? '' : date(Cfg::get('date_time'), strtotime($lesson['startTime']));
-                $periodList[$period]['periodEnd'] = $lesson['endTime'] == '' ? '' : date(Cfg::get('date_time'), strtotime($lesson['endTime']));
-
-                if (isset($periodList[$period])
-                    && !isset($periodList[$period]['class'][$lesson['ClassCode']])
-                ) {
-                    $periodList[$period]['class'][$lesson['ClassCode']] = array_merge(
-                        $periodList[$period],
-                        array(
-                            'description' => $lesson['subjectName'],
-                            'code'        => $lesson['classCode'],
-                            'room'        => $lesson['room']
-                        )
-                    );
-                }
-
+            if (isset($periodList[$period]['day'][$day])
+                && !isset($periodList[$period]['day'][$day][$lesson['ClassCode']])) {
+                $periodList[$period]['day'][$day][$lesson['ClassCode']] = [
+                    'description' => $lesson['subjectName'],
+                    'code'        => $lesson['classCode'],
+                    'room'        => $lesson['room'],
+                ];
             }
         }
 
@@ -224,32 +183,120 @@ class External_Denbigh_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Return a user's timetable for a specific date
+     * @param int    $externalUserId
+     * @param int    $userId
+     * @param Campus $campus
+     * @param int    $dayNumber
      *
-     * Depending on the role for $userId (staff or student) this summons the respective
-     * method to spawn associated timetable
-     *
-     *
-     * @param $externalUserId
-     * @param $userId
-     * @param Schoolbox\Campus $campus
+     * @return array
+     */
+    public function getDayTimetable($externalUserId, $userId, Campus $campus, $dayNumber)
+    {
+        $periodList = [];
+
+        if (empty($externalUserId)) {
+            return $periodList;
+        }
+
+        if (!$definition = $this->getTimetableDefinition($externalUserId, $campus)) {
+            return $periodList;
+        }
+
+        for ($i = 1; $i <= $definition['periodCount']; $i++) {
+            $periodList[$i] = [
+                'periodNumber'   => $i,
+                'periodName'     => "Period $i",
+                'periodStart'    => '',
+                'periodEnd'      => '',
+                'periodSequence' => '1',
+            ];
+        }
+
+        if ($this->group->isStaff($userId)) {
+            /** @noinspection SqlDialectInspection */
+            $queryTimetable = $this->externalDatabase->prepareQuery(
+                "
+                                SELECT l.day, l.period, startTime, endTime, l.classCode, l.staffCode, l.room, co.subjectName
+                                FROM People p
+                                RIGHT JOIN Staff s ON s.peopleDenbighID = p.denbighID
+                                RIGHT JOIN Lessons l ON l.staffCode = s.staffCode
+                                RIGHT JOIN Classes cl ON cl.classCode = l.classCode
+                                RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
+                                WHERE p.denbighID = :externalUserId
+                                    AND l.day = :dayNumber
+                            "
+            );
+        } else {
+            /** @noinspection SqlDialectInspection */
+            $queryTimetable = $this->externalDatabase->prepareQuery(
+                "
+                                SELECT l.day, l.period, startTime, endTime, l.classCode, l.staffCode, l.room, co.subjectName
+                                FROM People p
+                                RIGHT JOIN Enrolments e ON e.studentID = p.denbighID
+                                RIGHT JOIN Lessons l ON l.classCode = e.classCode
+                                RIGHT JOIN Classes cl ON cl.classCode = l.classCode
+                                RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
+                                WHERE p.denbighID = :externalUserId
+                                    AND l.day = :dayNumber
+                            "
+            );
+        }
+
+        $lessonIterator = $queryTimetable->executeIterator([
+            ':externalUserId' => $externalUserId,
+            ':dayNumber'      => $dayNumber,
+        ]);
+
+        foreach ($lessonIterator as $lesson) {
+            $period = $lesson['period'];
+
+            $periodList[$period]['periodStart'] =
+                $lesson['startTime'] == ''
+                    ? ''
+                    : date($this->configMapper->get('date_time'), strtotime($lesson['startTime']));
+
+            $periodList[$period]['periodEnd'] =
+                $lesson['endTime'] == ''
+                    ? ''
+                    : date($this->configMapper->get('date_time'), strtotime($lesson['endTime']));
+
+            if (isset($periodList[$period]) && !isset($periodList[$period]['class'][$lesson['ClassCode']])
+            ) {
+                $periodList[$period]['class'][$lesson['ClassCode']] = array_merge($periodList[$period], [
+                    'description' => $lesson['subjectName'],
+                    'code'        => $lesson['classCode'],
+                    'room'        => $lesson['room'],
+                ]);
+            }
+        }
+
+        return $periodList;
+    }
+
+    /**
+     * @param int                 $externalUserId
+     * @param int                 $userId
+     * @param Campus              $campus
      * @param Alaress_Date_Format $date
+     *
      * @return mixed
      */
-    public function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date)
+    public function getTimetableForDate($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date)
     {
-        return $this->getDayTimetable($externalUserId, $userId, $campus, $this->getDayNumber($campus, $date->getUnixTimeStamp()));
+        return $this->getDayTimetable(
+            $externalUserId,
+            $userId,
+            $campus,
+            $this->getDayNumber(
+                $campus,
+                $date->getUnixTimeStamp()
+            )
+        );
     }
 
     /**
-     * This method cannot be implemented for Denbigh, because its timetable
-     * definition has no concept of the start and end time of periods.
+     * @param array|string $roomCodes
      *
-     * If it did, it would work around the following peculiarities:
-     * * Timetable def is in the internal Schoolbox database
-     * * Timetable def doesn't ignore campuses, but Edumate doesn't have them
-     *
-     * @param  array|string $roomCodes
      * @return array
      */
     public function getRoomTimetable($roomCodes)
@@ -258,91 +305,45 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             return [];
         }
 
-        // Get the first timetable group, that's the best I can do
-        // (because Denbigh lessons don't have a campus)
-        $campusQuery = $this->getInternalDatabase()->query('SELECT ext_timetable_code FROM luCampus LIMIT 1');
-        if ($campusQuery->rowCount() == 0) {
+        /** @noinspection SqlDialectInspection */
+        $queryCampus = $this->internalDatabase->executeQuery("
+            SELECT    ext_timetable_code 
+            FROM      luCampus 
+            LIMIT     1
+        ");
+
+        if ($queryCampus->rowCount() == 0) {
             return [];
         }
-        $timetableGroup = $campusQuery->fetchColumn();
 
-        $query = "SELECT l.day AS DayNumber, 
-                        l.period AS PeriodNumber, 
-                        startTime AS PeriodStart, 
-                        endTime AS PeriodEnd, 
-                        l.classCode AS ClassCode, 
-                        l.staffCode AS StaffID, 
-                        l.room AS RoomCode, 
-                        co.subjectName AS Description,
-                        :timetableGroup AS TimetableGroup
-                        FROM Lessons l 
-                        RIGHT JOIN Classes cl ON cl.classCode = l.classCode
-                        RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
-                        WHERE l.room IN (:rooms)";
+        $timetableGroup = $queryCampus->fetchColumn();
 
-        $query = strtr(
-            $query,
-            array(
-                ':timetableGroup' => $this->externalDatabase->quote($timetableGroup),
-                ':rooms'          => implode(',', array_map([$this->externalDatabase, 'quote'], $roomCodes)),
+        if (!is_array($roomCodes)) {
+            $roomCodes = [$roomCodes];
+        }
+
+        $predicate = PredicateBuilder::getArrayBindings($roomCodes, 'roomCode');
+
+        /** @noinspection SqlDialectInspection */
+        return $this->externalDatabase->executeQuery("
+                SELECT      l.day AS DayNumber, 
+                            l.period AS PeriodNumber, 
+                            startTime AS PeriodStart, 
+                            endTime AS PeriodEnd, 
+                            l.classCode AS ClassCode, 
+                            l.staffCode AS StaffID, 
+                            l.room AS RoomCode, 
+                            co.subjectName AS Description,
+                            :timetableGroup AS TimetableGroup
+                FROM        Lessons l 
+                RIGHT JOIN  Classes cl ON cl.classCode = l.classCode
+                RIGHT JOIN  Courses co ON co.courseCode = cl.courseCode
+                WHERE       l.room IN ({$predicate["placeholders"]})
+            ",
+            array_merge(
+                $predicate["bindings"],
+                [':timetableGroup' => $timetableGroup]
             )
-        );
-
-        $statement = $this->getExternalDatabase()->prepare($query);
-        $statement->execute();
-
-
-        return $statement->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    /**
-     * @param Database $database
-     * @return void
-     */
-    private function setInternalDatabase(Database $internalDatabase)
-    {
-        $this->internalDatabase = $internalDatabase;
-    }
-
-    /**
-     * @return Database
-     */
-    private function getInternalDatabase()
-    {
-        return $this->internalDatabase;
-    }
-
-    /**
-     * @param Database $database
-     * @return void
-     */
-    private function setExternalDatabase(Database $externalDatabase)
-    {
-        $this->externalDatabase = $externalDatabase;
-    }
-
-    /**
-     * @return Database
-     */
-    private function getExternalDatabase()
-    {
-        return $this->externalDatabase;
-    }
-
-    /**
-     * @param Group $group
-     * @return void
-     */
-    private function setGroup(Group $group)
-    {
-        $this->group = $group;
-    }
-
-    /**
-     * @return Group
-     */
-    private function getGroup()
-    {
-        return $this->group;
+        )->fetchAll();
     }
 }

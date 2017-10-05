@@ -1,170 +1,179 @@
 <?php
-/************************************************************
- *														   *
- *		 Copyright (c) 2013 Alaress Pty Ltd 				*
- *														   *
- *	This file provides access to Denbigh class info		    *
- *														   *
- ************************************************************/
+/**
+ * @author    Damian Sloane <damian.sloane@alaress.com.au>
+ * @copyright Copyright 2017, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
 
-class External_Schoolbox_Class implements External_ClassInterface {
+use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Statement\Query\IQuery;
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Database\Factory as DatabaseFactory;
 
-	protected $database;
+class External_Schoolbox_Class implements External_ClassInterface
+{
 
-	public function __construct () {
-		$this->setdatabase( Database::getInstance() );
-	}
+    /** @var IConnector $internalDatabase */
+    private $internalDatabase;
+
+    /** @var ConfigMapper $configMapper */
+    private $configMapper;
 
     /**
-	 * Gets a query for fetching a class's users out of the class_user table.
-	 *
-	 * This table should be used only to store students, but some schools use
-	 * it to store teachers as well.
-	 *
-	 * @param  string       $class_code
-	 * @return PDOStatement A statement: it requires a :type bound parameter for
-	 *                      determining whether it should fetch students
-	 *                      (Group::STUDENT_GROUP_TYPE) or teachers
-	 *                      (Group::STAFF_GROUP_TYPE)
-	 */
-	protected function getClassQuery($class_code) {
-		$codes = explode(',', $class_code);
-		if (empty($codes)) {
-			return false;
-		}
-		$statement = $this->getDatabase()->prepare("
-			SELECT u.id, u.synergy_id, u.title, u.firstname, u.lastname, u.year, u.house
-			FROM class c
-			LEFT JOIN class_user cu ON cu.class_id = c.id
-			LEFT JOIN user u ON u.id = cu.user_id
-			LEFT JOIN groups g ON g.id = u.group_id
-			WHERE c.code IN ({$this->getCodeParams($codes)}) AND g.group_type = :type AND u.deleted_at IS NULL
-			ORDER BY u.lastname, u.firstname
-		");
-		return $this->bindCodes($statement, $codes);
-	}
+     * External_Schoolbox_User constructor.
+     */
+    public function __construct()
+    {
+        $this->configMapper = ConfigMapper::getInstance();
 
-	/**
-	 * Gets the query used to fetch a class's teachers out of the class_period
-	 * table.
-	 *
-	 * Teachers shouldn't be stored in the class_user table, they should be
-	 * stored here so that a single class can be taught by different teachers
-	 * on different periods.
-	 *
-	 * @param  string       $class_code
-	 * @return PDOStatement The statement for retrieving teachers
-	 */
-	protected function getTeacherQuery($class_code) {
-		$codes = explode(',', $class_code);
-		if (empty($codes)) {
-			return false;
-		}
-		$statement = $this->getDatabase()->prepare("
-			SELECT u.id, u.synergy_id, u.title, u.firstname, u.lastname, u.year, u.house
-			FROM class c
-			LEFT JOIN class_period cp ON c.id = cp.class_id
-			INNER JOIN user u ON u.id = cp.teacher_id
-			WHERE c.code IN ({$this->getCodeParams($codes)}) AND u.deleted_at IS NULL
-			ORDER BY u.lastname, u.firstname
-		");
-		return $this->bindCodes($statement, $codes);
-	}
+        /** @noinspection PhpDeprecationInspection */
+        $this->internalDatabase = DatabaseFactory::getInstanceInternal();
+    }
 
-	/**
-	 * Gets list of codes as a string that can be put into the IN part of a
-	 * statement. The string contains bound parameters.
-	 *
-	 * @param  array  $codes
-	 * @return string
-	 */
-	protected function getCodeParams($codes) {
-		$query_parts = array();
-		foreach ($codes as $i => $code) {
-			$query_parts[] = ':code'.$i;
-		}
-		return implode(',', $query_parts);
-	}
+    /**
+     * @param string $classCodes
+     *
+     * @return IQuery
+     */
+    protected function getClassQuery($classCodes)
+    {
+        $codes = array_filter(explode(',', $classCodes));
 
-	/**
-	 * Binds code parameters to a statement from getClassQuery() or
-	 * getTeacherQuery().
-	 *
-	 * @param  PDOStatement $statement
-	 * @param  array        $codes     A list of class codes.
-	 * @return PDOStatement
-	 */
-	protected function bindCodes(PDOStatement $statement, $codes) {
-		foreach ($codes as $i => $code) {
-			$statement->bindValue(':code'.$i, $code);
-		}
-		return $statement;
-	}
+        if (empty($codes)) {
+            return null;
+        }
 
-	public function getStudents($classCode) {
-		$statement = $this->getClassQuery($classCode);
-		if (!$statement) {
-			return array();
-		}
-		$statement->bindValue(':type', Group::STUDENT_GROUP_TYPE);
-		$statement->execute();
-		$studentListAdaption = array();
-		$student_id_list = array();
-		foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $student) {
-			// Make sure student isn't in list already.
-			$student_sid = $student['synergy_id'];
-			if (!array_key_exists($student_sid, $student_id_list)) {
-				$student_id_list[$student_sid] = true;
-				$studentListAdaption[] = array(
-					'synergy_id' => $student['synergy_id'],
-					'lastname' => $student['lastname'],
-					'firstname' => $student['firstname'],
-					'yearlevel' => $student['year'],
-					'house' => $student['house'],
-					'StudentMedicalAlert' => '',
-					'StudentSpecialNeedsFlag' => '',
-				);
-			}
-		}
+        $predicate = PredicateBuilder::getArrayBindings($codes, 'classCode');
 
-		return $studentListAdaption;
-	}
+        return $this->internalDatabase->prepareQuery(
+            "
+                SELECT        u.id, 
+                              u.synergy_id, 
+                              u.title, 
+                              u.firstname, 
+                              u.lastname, 
+                              u.year, 
+                              u.house
+                FROM          class c
+                LEFT JOIN     class_user cu ON cu.class_id = c.id
+                LEFT JOIN     user u ON u.id = cu.user_id
+                LEFT JOIN     groups g ON g.id = u.group_id
+                WHERE         c.code IN ({$predicate["placeholders"]}) AND 
+                              g.group_type = :type AND 
+                              u.deleted_at IS NULL
+                ORDER BY      u.lastname, 
+                              u.firstname
+		    ",
+            $predicate["bindings"]
+        );
+    }
 
-	public function getTeacherName($classCode) {
-		$teacher_id_list = array();
+    /**
+     * @param string $classCodes
+     *
+     * @return IQuery
+     */
+    protected function getTeacherQuery($classCodes)
+    {
+        $codes = array_filter(explode(',', $classCodes));
 
-		// Retrieve all staff type users from class_user table
-		if ($statement = $this->getClassQuery($classCode)) {
-			$statement->bindValue(':type', Group::STAFF_GROUP_TYPE);
-			$statement->execute();
-			foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
-				$teacher_id_list[] = $row['synergy_id'];
-			}
-		}
+        if (empty($codes)) {
+            return null;
+        }
 
-		// Retrieve teachers out of class_period table
-		if ($statement = $this->getTeacherQuery($classCode)) {
-			$statement->execute();
-			foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
-				$teacher_id_list[] = $row['synergy_id'];
-			}
-		}
+        $predicate = PredicateBuilder::getArrayBindings($codes, 'classCode');
 
-		return array_unique($teacher_id_list);
-	}
+        return $this->internalDatabase->prepareQuery(
+            "
+			    SELECT      u.id, 
+			                u.synergy_id, 
+			                u.title, 
+			                u.firstname, 
+			                u.lastname, 
+			                u.year, 
+			                u.house
+			    FROM        class c
+			    LEFT JOIN   class_period cp ON c.id = cp.class_id
+			    INNER JOIN  user u ON u.id = cp.teacher_id
+			    WHERE       c.code IN ({$predicate["parameters"]}) AND 
+			                u.deleted_at IS NULL
+			    ORDER BY    u.lastname, u.firstname
+		    ",
+            $predicate["bindings"]
+        );
+    }
 
-	/**
-	 * @param Database $database
-	 * @return void
-	 */
-	private function setDatabase (Database $database) {
-		$this->database = $database;
-	}
+    /**
+     * @param string $classCode
+     *
+     * @return array
+     */
+    public function getStudents($classCode)
+    {
+        $studentQuery = $this->getClassQuery($classCode);
 
-	/**
-	 * @return Database
-	 */
-	private function getDatabase () {
-		return $this->database;
-	}
+        if (!$studentQuery instanceof IQuery) {
+            return [];
+        }
+
+        $studentQuery->bindInputs([':type', Group::STUDENT_GROUP_TYPE]);
+        $studentIterator = $studentQuery->executeIterator();
+
+        $studentListAdaption = [];
+        $found               = [];
+
+        foreach ($studentIterator as $student) {
+            $studentExternalId = $student['synergy_id'];
+
+            if (!array_key_exists($studentExternalId, $found)) {
+                $studentListAdaption[] = [
+                    'synergy_id'              => $studentExternalId,
+                    'lastname'                => $student['lastname'],
+                    'firstname'               => $student['firstname'],
+                    'yearlevel'               => $student['year'],
+                    'house'                   => $student['house'],
+                    'StudentMedicalAlert'     => '',
+                    'StudentSpecialNeedsFlag' => '',
+                ];
+
+                $found[$studentExternalId] = true;
+            }
+        }
+
+        return $studentListAdaption;
+    }
+
+    /**
+     * @param string $classCode
+     *
+     * @return array
+     */
+    public function getTeacherName($classCode)
+    {
+        $teachers = [];
+
+        $teacherQuery = $this->getClassQuery($classCode);
+
+        if ($teacherQuery instanceof IQuery) {
+            $teacherQuery->bindInputs([':type', Group::STAFF_GROUP_TYPE]);
+            $teacherIterator = $teacherQuery->executeIterator();
+
+            foreach ($teacherIterator as $teacher) {
+                $teachers[] = $teacher['synergy_id'];
+            }
+        }
+
+        $teacherQuery = $this->getTeacherQuery($classCode);
+
+        if ($teacherQuery instanceof IQuery) {
+            $teacherIterator = $teacherQuery->executeIterator();
+
+            foreach ($teacherIterator as $teacher) {
+                $teachers[] = $teacher['synergy_id'];
+            }
+        }
+
+        return array_unique($teachers);
+    }
 }
