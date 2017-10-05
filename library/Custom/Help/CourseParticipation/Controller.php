@@ -15,6 +15,7 @@ use Schoolbox\Permission\SiteAccess;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\UserMapper;
 
 
 class Controller extends Base
@@ -97,33 +98,15 @@ class Controller extends Base
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        $requestTimestamp = new Alaress_Date_Format($rq->query->get('ts', 0), 'U');
-
-        $deltaTimestamp = abs(Alaress_Date_Format::now()->diffInSeconds($requestTimestamp));
-
-        // permit a window of +/- 10 seconds to guard against replay
-        if ($deltaTimestamp > 10) {
-            $this->sendGenericStatus(400);
-            return;
-        }
+        $requestTimestamp = new Alaress_Date_Format($rq->query->get('ts', 0), Alaress_Date_Format::TIMESTAMP);
 
         $authDigest = $rq->query->get('token', '');
 
-        try {
-            $privateKey = $this->tokenMapper->findById($schoolCode)->getAccessToken();
-        } catch (Mapper\Exception $e) {
-            $this->sendGenericStatus(401);
-            return;
-        }
+        $responseCode = $this->getResponseCode($schoolCode, $requestTimestamp, $authDigest);
 
-        $expectedToken = $this->computeAccessToken(
-            $requestTimestamp,
-            $schoolCode,
-            $privateKey
-        );
-
-        if ($expectedToken !== $authDigest) {
-            $this->sendGenericStatus(403);
+        if ($responseCode !== 200) {
+            // if the request didn't pass the gauntlet, bounce the request
+            $this->sendGenericStatus($responseCode);
             return;
         }
 
@@ -152,11 +135,88 @@ class Controller extends Base
             $payload[] = [
                 'folderName'   => $course->getName(),
                 'folderId'     => $course->getId(),
-                'participants' => $participants
+                'participants' => array_filter($participants)
             ];
         }
 
         $rs->content->set($this->buildJsonOutput($payload));
+    }
+
+
+    /**
+     * @api   /api/course-participation/{schoolCode}/users
+     * @level 170
+     *
+     * @param string $schoolCode
+     * @throws \Schoolbox\Mapper\DefinitionException
+     */
+    public function getUsersBySchool($schoolCode)
+    {
+        $rq = $this->getRequest();
+        $rs = $this->getResponse();
+
+        $requestTimestamp = new Alaress_Date_Format($rq->query->get('ts', 0), Alaress_Date_Format::TIMESTAMP);
+
+        $authDigest = $rq->query->get('token', '');
+
+        $responseCode = $this->getResponseCode($schoolCode, $requestTimestamp, $authDigest);
+
+        if ($responseCode !== 200) {
+            // if the request didn't pass the gauntlet, bounce the request
+            $this->sendGenericStatus($responseCode);
+            return;
+        }
+
+        // show the list of users for this school
+        /** @var UserMapper $userMapper */
+        $userMapper = $this->userAccessMapper->getJoinMapper('user');
+
+        // filter to the list of users whose external IDs are prefixed with the given school code
+        $predicate = $userMapper->getPredicateBuilder()->like('synergy_id', "{$schoolCode}.%");
+
+        // we only need the external ID itself, so bypass object hydration
+        $externalIds = $userMapper->findScalarByPredicates('synergy_id', $predicate);
+
+        $unprefixed = array_map(function ($id) use ($schoolCode) {
+            return str_replace("{$schoolCode}.", '', $id);
+        }, $externalIds);
+
+        $rs->content->set($this->buildJsonOutput($unprefixed));
+    }
+
+
+    /**
+     * @param string              $schoolCode
+     * @param Alaress_Date_Format $requestTimestamp
+     * @param string              $authDigest
+     * @return int
+     */
+    private function getResponseCode($schoolCode, Alaress_Date_Format $requestTimestamp, $authDigest)
+    {
+        $deltaTimestamp = abs(Alaress_Date_Format::now()->diffInSeconds($requestTimestamp));
+
+        // permit a window of +/- 10 seconds to guard against replay
+        if ($deltaTimestamp > 10) {
+            return 400;
+        }
+
+        try {
+            $privateKey = $this->tokenMapper->findById($schoolCode)->getAccessToken();
+        } catch (Mapper\Exception $e) {
+            return 401;
+        }
+
+        $expectedToken = $this->computeAccessToken(
+            $requestTimestamp,
+            $schoolCode,
+            $privateKey
+        );
+
+        if ($expectedToken !== $authDigest) {
+            return 403;
+        }
+
+        return 200;
     }
 
 
