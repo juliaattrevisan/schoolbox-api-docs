@@ -367,7 +367,12 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             $evAttempt = new Assess_Attempt();
             $total = (float)$evAttempt->getTotalMarks($feedback->getQuiz()->getId(), $feedback->getId());
             $actual = (float)$evAttempt->getMarksForAttempt($feedback->getId());
-            $mark = ($actual / $total) * 100;
+            if($total > 0) {
+                $mark = ($actual / $total) * 100;
+            }
+            else {
+                $mark = 0;
+            }
             $comment = '';
 
         } else {
