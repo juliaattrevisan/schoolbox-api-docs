@@ -1,0 +1,1 @@
+ALTER TABLE assess MODIFY title VARCHAR(255);
