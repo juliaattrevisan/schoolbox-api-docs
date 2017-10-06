@@ -250,12 +250,13 @@ class Controller extends BaseController
         return $result;
     }
 
+
     /**
      * Download a csv of assessment results for Accellerus
      *
-     * @api GET /learning/export/assessment/csv
+     * @api   GET /learning/export/assessment/csv
      * @level 160
-     *
+     * @throws \Aura\Di\Exception\ServiceNotFound If unable to get internal database service
      */
     public function getCSV()
     {
