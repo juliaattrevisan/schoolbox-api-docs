@@ -351,6 +351,7 @@ interface IAssessable extends ISoftDeletable
 
     /**
      * Does this student have a mark for the assessment.
+     * (Will return TRUE even if just a comment is given)
      *
      * This includes marks given by the teacher, and
      * self-assessed marks for a task (even if self-assessed as 'Incomplete')
