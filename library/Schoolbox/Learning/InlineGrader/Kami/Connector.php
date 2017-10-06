@@ -485,12 +485,8 @@ class Connector implements IConnector
     private function buildDocument(stdClass $obj): Document
     {
         // All these fields must exist in order to create this doc
-        $properties = ['document_identifier', 'name', 'file_status', 'file_error_message', 'created_at'];
-        foreach ($properties as $property) {
-            if (!property_exists($obj, $property)) {
-                throw new Exception\ApiException("Required property {$property} not found");
-            }
-        }
+        $this->assertProperties($obj, ['document_identifier', 'name', 'file_status', 'file_error_message', 'created_at']);
+
         // And date must be UTC
         try {
             $createdDate = new Alaress_Date_Format($obj->created_at, Alaress_Date_Format::FORMAT_DATETIME_UTC);
@@ -555,9 +551,8 @@ class Connector implements IConnector
     private function buildViewSession(stdClass $obj): Session
     {
         // view_session_key and session_expiry are optional, viewer_url is not
-        if (!property_exists($obj, 'viewer_url')) {
-            throw new Exception\ApiException("Required property viewer_url not found");
-        }
+        $this->assertProperties($obj, ['viewer_url',]);
+
         $sessionKey = property_exists($obj, 'view_session_key') ? $obj->view_session_key : '';
 
         if (property_exists($obj, 'session_expiry')) {
@@ -583,12 +578,7 @@ class Connector implements IConnector
      */
     private function buildExport(stdClass $obj): Export
     {
-        $properties = ['id', 'status'];
-        foreach ($properties as $property) {
-            if (!property_exists($obj, $property)) {
-                throw new Exception\ApiException("Required property {$property} not found");
-            }
-        }
+        $this->assertProperties($obj, ['id', 'status',]);
         return new Export(
             $obj->id,
             $obj->status,
@@ -622,5 +612,31 @@ class Connector implements IConnector
             RequestOptions::HTTP_ERRORS => false,
             'base_uri'                  => static::BASE_URI,
         ];
+    }
+
+
+    /**
+     * Assert that all properties in $properties exist in $obj
+     *
+     * @param stdClass $obj
+     * @param array    $properties
+     * @throws Exception\ApiException if not all do
+     */
+    private function assertProperties(stdClass $obj, array $properties): void
+    {
+        $missingProperties = array_filter(
+            $properties,
+            function ($property) use ($obj) {
+                return !property_exists($obj, $property);
+            }
+        );
+        if (!empty($missingProperties)) {
+            throw new Exception\ApiException(
+                sprintf(
+                    "Required properties (%s) not found",
+                    implode(', ', $missingProperties)
+                )
+            );
+        }
     }
 }
