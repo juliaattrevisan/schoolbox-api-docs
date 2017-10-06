@@ -77,7 +77,7 @@ var calendar = {
 		$(window.self.options.removeConfig).click(function() {
 			window.id = $(this).attr('id').toString().replace(/remove_/, '');
             $(this).confirmDialog({
-                text: 'Are you sure you want to delete this Event?',
+                text: 'Are you sure you want to delete this source?',
                 confirmEvent: function() {
                     var data = {
                         id: window.id
