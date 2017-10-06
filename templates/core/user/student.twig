@@ -323,9 +323,9 @@
                             {% endblock buttons_documents %}
 
                             {% block buttons_email_all_staff %}
-                                {% if config.email_all_staff %}
+                                {% if isStaff and config.email_all_staff %}
                                     <li>
-                                        <a class="icon-email" id="email-all-staff">Email All Staff</a>
+                                        <a class="icon-email" id="email-all-staff" title="Includes all teachers, year coordinator, head of house, tutor and coach.">Email All Teachers</a>
                                         <form id="email-all-form" action="/mail/createMail.php" class="hide">
                                             <input name="cc" value="{{ allTeacherEmails }}" type="hidden">
                                             <input name="replyto" value="{{ session.user.email }}" type="hidden">

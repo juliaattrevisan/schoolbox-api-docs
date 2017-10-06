@@ -1,2 +1,2 @@
 INSERT INTO `config`
-VALUES (null, "email_all_staff", "0", "Email All Staff", "Enables 'Email All Staff' button from student profile", 3, "", 15, true, false, true);
+VALUES (null, "email_all_staff", "0", "Enable 'Email All Teachers' button on student profile", "Allows staff to easily email all related staff for a student, including teachers, year coordinator, head of house, tutor and coach.", 3, "", 15, true, false, true);
