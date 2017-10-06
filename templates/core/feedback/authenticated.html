@@ -1,29 +1,31 @@
 <!-- BEGIN custom_head -->
-<script language="JavaScript" type="text/javascript">
-$(function () {
-
-	$('#feedbackForm').submit(function ($event) {
-
-		var message = '', form = $(this);
-		if ($('#name').val() == '')
-			message += 'Please enter your name.\n';
-		
-		if ($('#email').val() == '')
-			message += 'Please enter your email address.\n';
-		
-        if ($('#message').val() == '')
-            message += 'Please enter a message.\n';
-
-        if ($('#recaptcha_response_field').val() == '')
-            message += 'Please enter the two corresponding words for the human checker.\n';
-
-		if (message != '') {
-			alert(message);
-            return false;
-        }
-	});
-
-});
+<script>
+    $(function () {
+        $(function() {
+            $('#feedbackForm').alaressValidate({
+                rules: {
+                    name: {
+                        required: true
+                    },
+                    email: {
+                        required: true
+                    },
+                    message: {
+                        required: true
+                    },
+                    recaptcha_response_field: {
+                        required: true
+                    }
+                },
+                messages: {
+                    name:  'Please enter your name.',
+                    email: 'Please enter your email address.',
+                    message:   'Please enter a message.',
+                    recaptcha_response_field: 'Please enter the two corresponding words for the human checker.'
+                }
+            });
+        });
+    });
 </script>
 <!-- END custom_head -->
 
