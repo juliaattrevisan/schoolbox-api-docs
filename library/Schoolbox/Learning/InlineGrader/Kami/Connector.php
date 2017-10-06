@@ -546,16 +546,27 @@ class Connector implements IConnector
      *
      * @param stdClass $obj
      * @return Session
+     * @throws Exception\ApiException if $obj doesn't contain required field viewer_url
+     *                                if $obj->session_expiry exists but isn't parseable
      */
     private function buildViewSession(stdClass $obj): Session
     {
-        return new Session(
-            $obj->view_session_key,
-            $obj->viewer_url,
-            $obj->session_expiry
-                ? new Alaress_Date_Format($obj->session_expiry, Alaress_Date_Format::FORMAT_DATETIME_UTC)
-                : new Alaress_Date_NullDate()
-        );
+        // view_session_key and session_expiry are optional, viewer_url is not
+        if (!property_exists($obj, 'viewer_url')) {
+            throw new Exception\ApiException("Required property viewer_url not found");
+        }
+        $sessionKey = property_exists($obj, 'view_session_key') ? $obj->view_session_key : '';
+
+        if (property_exists($obj, 'session_expiry')) {
+            try {
+                $sessionExpiry = new Alaress_Date_Format($obj->session_expiry, Alaress_Date_Format::FORMAT_DATETIME_UTC);
+            } catch (\InvalidArgumentException $e) {
+                throw new Exception\ApiException("Property session_expiry is not able to be parsed as a date");
+            }
+        } else {
+            $sessionExpiry = new Alaress_Date_NullDate();
+        }
+        return new Session($sessionKey, $obj->viewer_url, $sessionExpiry);
     }
 
 
