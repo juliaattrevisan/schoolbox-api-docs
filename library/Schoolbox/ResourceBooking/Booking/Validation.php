@@ -398,7 +398,7 @@ class Validation {
      *
      * @return array
      */
-    protected function validateTooLong(Item\Model $resource, DateTime $startDate, DateTime $endDate)
+    public function validateTooLong(Item\Model $resource, DateTime $startDate, DateTime $endDate)
     {
         $errors = [];
         // End date after latest possible end (Only if there is an actual max time)

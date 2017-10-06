@@ -58,39 +58,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Data provider for testValidateTooShort
-     *
-     * @return array
-     */
-    public function provider_validateTooShort() {
-        return [
-            ['2017-01-01T00:00:00','2017-01-01T01:00:00', 0],
-            ['2017-01-01T00:00:00','2017-01-01T00:01:00', 1],
-        ];
-    }
-
-    /**
-     * @covers Schoolbox\ResourceBooking\Booking\Validation::validateTooShort
-     *
-     * @dataProvider provider_validateTooShort
-     *
-     * @param string $startDate
-     * @param string $endDate
-     * @param int $expected
-     */
-    public function testValidateTooShort($startDate, $endDate, $expected)
-    {
-        $resource = new Item\Model();
-        $interval = Interval::createFromDateInterval(new DateInterval('PT1H'));
-        $resource->setMinReservationTime($interval);
-
-        $validation = $this->createValidation();
-        $errors = $validation->validateTooShort($resource, new DateTime($startDate), new DateTime($endDate));
-        $this->assertCount($expected, $errors);
-    }
-
-    /**
-     * Data provider for testValidateTooShort
+     * Data provider for testValidatePastTime
      *
      * @return array
      */
@@ -151,6 +119,70 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Data provider for testValidateTooShort
+     *
+     * @return array
+     */
+    public function provider_validateTooShort() {
+        return [
+            ['2017-01-01T00:00:00','2017-01-01T01:00:00', 'PT1H', 0],
+            ['2017-01-01T00:00:00','2017-01-01T00:01:00', 'PT1H', 1],
+        ];
+    }
+
+    /**
+     * @covers Schoolbox\ResourceBooking\Booking\Validation::validateTooShort
+     *
+     * @dataProvider provider_validateTooShort
+     *
+     * @param string $startDate
+     * @param string $endDate
+     * @param string $minReservation
+     * @param int $expected
+     */
+    public function testValidateTooShort($startDate, $endDate, $minReservation, $expected)
+    {
+        $resource = new Item\Model();
+        $resource->setMinReservationTime(Interval::createFromDateInterval(new DateInterval($minReservation)));
+
+        $validation = $this->createValidation();
+        $errors = $validation->validateTooShort($resource, new DateTime($startDate), new DateTime($endDate));
+        $this->assertCount($expected, $errors);
+    }
+
+    /**
+     * Data provider for testValidateTooLong
+     *
+     * @return array
+     */
+    public function provider_validateTooLong() {
+        return [
+            ['2017-01-01T00:00:00','2017-01-01T01:00:00', 'PT1H', 0],
+            ['2017-01-01T00:00:00','2017-01-01T02:01:00', 'PT1H', 1],
+        ];
+    }
+
+    /**
+     * @covers Schoolbox\ResourceBooking\Booking\Validation::validateTooLong
+     *
+     * @dataProvider provider_validateTooLong
+     *
+     * @param string $startDate
+     * @param string $endDate
+     * @param string $maxReservation
+     * @param int $expected
+     */
+    public function testValidateTooLong($startDate, $endDate, $maxReservation, $expected)
+    {
+        $resource = new Item\Model();
+        $resource->setMaxReservationTime(Interval::createFromDateInterval(new DateInterval($maxReservation)));
+
+        $validation = $this->createValidation();
+        $errors = $validation->validateTooLong($resource, new DateTime($startDate), new DateTime($endDate));
+        $this->assertCount($expected, $errors);
+    }
+
+    /**
      * Data provider for testValidateCurrentTermRestriction
      *
      * @return array
@@ -161,6 +193,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
             ['2020-12-31T00:00:00', '2020-06-30', 1],
         ];
     }
+
     /**
      * @covers Schoolbox\ResourceBooking\Booking\Validation::validateCurrentTermRestriction
      *
@@ -170,7 +203,6 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
      * @param string $termEndDate
      * @param int $expected
      */
-
     public function testValidateCurrentTermRestriction($endDate, $termEndDate, $expected)
     {
         $validation = $this->createValidation();
