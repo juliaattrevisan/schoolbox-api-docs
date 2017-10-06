@@ -423,6 +423,23 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
 
 
     /**
+     * Test creating an export for a document that wasn't found
+     *
+     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound
+     */
+    public function testCreateInlineExportNotFound(): void
+    {
+        $response = new Response(
+            404,
+            [],
+            json_encode(["errors" => ["Record Not Found"],])
+        );
+        $connector = new MockConnector($this->getMockClient($response));
+        $connector->createInlineExport('asdfghjkl');
+    }
+
+
+    /**
      * Test create annotated export
      *
      * @dataProvider providerGetExport
@@ -448,6 +465,23 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($status, $export->getStatus());
         $this->assertEquals($fileUrl, $export->getFileUrl());
         $this->assertEquals($errorType, $export->getErrorType());
+    }
+
+
+    /**
+     * Test creating an export for a document that wasn't found
+     *
+     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound
+     */
+    public function testCreateAnnotatedExportNotFound(): void
+    {
+        $response = new Response(
+            404,
+            [],
+            json_encode(["errors" => ["Record Not Found"],])
+        );
+        $connector = new MockConnector($this->getMockClient($response));
+        $connector->createAnnotatedExport('asdfghjkl');
     }
 
 
