@@ -338,6 +338,8 @@ function renderStudent(
             break;
     }
 
+    $emails = [];
+
     foreach ($subjects as $subject) {
         foreach ($subject as $class) {
             /** @var \Schoolbox\User $teacher */
