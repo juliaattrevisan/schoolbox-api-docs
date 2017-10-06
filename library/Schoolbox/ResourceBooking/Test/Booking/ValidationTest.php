@@ -13,6 +13,7 @@ use DateInterval;
 use Alaress\Date\Interval;
 use Schoolbox\User;
 use Schoolbox\ResourceBooking\Item;
+use Schoolbox\ResourceBooking\Booking;
 use Schoolbox\ResourceBooking\Booking\Validation;
 use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -22,24 +23,41 @@ use Schoolbox\Assessment\Term\Model as Term;
 class ValidationTest extends \PHPUnit_Framework_TestCase
 {
 
-//    public function testValidateBeforeTime()
-//    {
-//        $validation = new Validation();
-//        $startDate = new DateTime('2017-01-01T00:00:00');
-//        $endDate = new DateTime('2017-01-01T00:00:10');
-//        $errors = $validation->validateBeforeTime($startDate, $endDate);
-//        $this->assertCount(0, $errors);
-//    }
-//
-//    public function testValidateBeforeTimeError()
-//    {
-//        $validation = new Validation();
-//        $startDate = new DateTime('2017-01-01T00:00:10');
-//        $endDate = new DateTime('2017-01-01T00:00:00');
-//        $errors = $validation->validateBeforeTime($startDate, $endDate);
-//        $this->assertCount(1, $errors);
-//    }
-//
+    private function createValidation()
+    {
+
+        return new Validation(new User(), new BookingMapper(), new TermMapper());
+
+    }
+
+    /**
+     * Data provider for testValidateBeforeTime
+     *
+     * @return array
+     */
+    public function provider_testStartEnd() {
+        return [
+            ['2017-01-01T00:00:00','2017-01-01T00:00:10', 0],
+            ['2017-01-01T00:00:10','2017-01-01T00:00:00', 1],
+        ];
+    }
+
+    /**
+     * @covers Schoolbox\ResourceBooking\Booking\Validation::validateBeforeTime
+     *
+     * @dataProvider provider_testStartEnd
+     *
+     * @param string $startDate
+     * @param string $endDate
+     * @param int $expected
+     */
+    public function testValidateBeforeTime($startDate, $endDate, $expected)
+    {
+        $validation = $this->createValidation();
+        $errors = $validation->validateBeforeTime(new DateTime($startDate), new DateTime($endDate));
+        $this->assertCount($expected, $errors);
+    }
+
 //    public function testValidateTooShort()
 //    {
 //        $resource = new Item\Model();
@@ -136,11 +154,5 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
 
     }
 
-    private function createValidation()
-    {
-
-        return new Validation(new User(), new BookingMapper(), new TermMapper());
-
-    }
 
 }
