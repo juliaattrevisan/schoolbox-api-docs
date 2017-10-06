@@ -663,6 +663,13 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
                     json_encode(["errors" => ["Unknown Error"],])
                 ),
             ],
+            'No Errors' => [
+                'response' => new Response(
+                    404,
+                    [],
+                    json_encode(["nothing" => ["Unknown Error"],])
+                ),
+            ],
             'No Name' => [
                 'response' => new Response(
                     200,
