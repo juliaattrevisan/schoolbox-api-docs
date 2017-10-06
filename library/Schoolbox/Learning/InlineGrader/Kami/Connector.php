@@ -578,9 +578,17 @@ class Connector implements IConnector
      *
      * @param stdClass $obj
      * @return Export
+     * @throws Exception\ApiException if $obj doesn't contain required fields id and status
+     * @throws Exception\InvalidStatusException if export's status is invalid
      */
     private function buildExport(stdClass $obj): Export
     {
+        $properties = ['id', 'status'];
+        foreach ($properties as $property) {
+            if (!property_exists($obj, $property)) {
+                throw new Exception\ApiException("Required property {$property} not found");
+            }
+        }
         return new Export(
             $obj->id,
             $obj->status,
