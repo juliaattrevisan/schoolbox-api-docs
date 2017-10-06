@@ -27,33 +27,7 @@
 
     <link rel="stylesheet" type="text/css" href="/css/{SITE_LOCATION}/chrome-foundation.css?v={SITE_VERSION}" />
     <script type="text/javascript" src="/javascript/components/schoolbox.min.js?v={SITE_VERSION}"></script>
-    <script>
-        $(function() {
-            $('#feedbackForm').alaressValidate({
-                rules: {
-                    name: {
-                        required: true
-                    },
-                    email: {
-                        required: true,
-                        email: true
-                    },
-                    message: {
-                        required: true
-                    },
-                    recaptcha_response_field: {
-                        required: true
-                    }
-                },
-                messages: {
-                    name:  'Please enter your name.',
-                    email: 'Please enter a valid email address.',
-                    message:   'Please enter a message.',
-                    recaptcha_response_field: 'Please enter the two corresponding words for the human checker.'
-                }
-            });
-        });
-    </script>
+    <script src="/javascript/shared/feedback/validation.js"></script>
 </head>
 <body>
     <!-- The Schoolbox Hybrid Bar -->

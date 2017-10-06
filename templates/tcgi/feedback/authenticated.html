@@ -1,27 +1,5 @@
 <!-- BEGIN custom_head -->
-<script>
-    $(function() {
-        $('#feedbackForm').alaressValidate({
-            rules: {
-                name: {
-                    required: true
-                },
-                email: {
-                    required: true,
-                    email: true
-                },
-                message: {
-                    required: true
-                }
-            },
-            messages: {
-                name:  'Please enter your name.',
-                email: 'Please enter a valid email address.',
-                message:   'Please enter a message.'
-            }
-        });
-    });
-</script>
+<script src="/javascript/shared/feedback/validation.js"></script>
 <!-- END custom_head -->
 
 <div class="row">
