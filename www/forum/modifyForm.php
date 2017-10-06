@@ -191,7 +191,11 @@ else if (is_numeric($_GET['deleteThread'])) {
 		error(19);
 	}
 
+
 	$forumHandler->delete($thread->getId());
+
+	//Also delete the posts
+    PostMapper::getInstance()->deleteByColumn("threadID", $_GET['deleteThread']);
 
 	SitePage::localRedir('/forum/' . $thread->getCategory()->getId());
 }
@@ -215,6 +219,9 @@ else if (is_array($_POST['deleteThreads'])) {
             $categoryID = $thread->getCategory()->getId();
 
             ThreadMapper::getInstance()->delete($thread);
+
+            //Also delete the posts
+            PostMapper::getInstance()->deleteByColumn("threadID", $threadID);
         } catch (Exception $e) { }
 	}
 
