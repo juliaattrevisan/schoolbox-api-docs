@@ -391,6 +391,28 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
 
 
     /**
+     * Test getting a view session for a document that wasn't found
+     *
+     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound
+     */
+    public function testViewSessionNotFound(): void
+    {
+        $response = new Response(
+            404,
+            [],
+            json_encode(["errors" => ["Record Not Found"],])
+        );
+        $mockClient = $this->getMockBuilder(Client::class)->getMock();
+        $mockClient
+            ->method('send')
+            ->willReturn($response);
+
+        $connector = new MockConnector($mockClient);
+        $connector->viewSession('asdfghjkl', new User());
+    }
+
+
+    /**
      * Test bad response from view session request
      *
      * @dataProvider providerViewSessionBadResponse
