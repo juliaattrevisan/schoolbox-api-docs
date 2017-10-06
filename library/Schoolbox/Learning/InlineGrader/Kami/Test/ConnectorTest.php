@@ -410,6 +410,21 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
     }
 
 
+    /**
+     * Test exporting a document from the Mock API, if the response is bad.
+     *
+     * @dataProvider providerGetExportBadResponse
+     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException
+     *
+     * @param ResponseInterface $response
+     */
+    public function testGetExportBadResponse(ResponseInterface $response): void
+    {
+        $connector = new MockConnector($this->getMockClient($response));
+        $connector->getExport('asdfghjkl');
+    }
+
+
     public function providerDisabledConnector(): array
     {
         return [
@@ -906,6 +921,41 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+
+    public function providerGetExportBadResponse(): array
+    {
+        return [
+            'Unknown Error' => [
+                'response' => new Response(
+                    400,
+                    [],
+                    json_encode(["errors" => ["Unknown Error"],])
+                ),
+            ],
+            'No ID' => [
+                'response' => new Response(
+                    200,
+                    [],
+                    json_encode([
+                        "status"     => "error",
+                        "file_url"   => null,
+                        "error_type" => 'Bad document type',
+                    ])
+                ),
+            ],
+            'No Status' => [
+                'response' => new Response(
+                    200,
+                    [],
+                    json_encode([
+                        "id"         => "ccsd",
+                        "file_url"   => null,
+                        "error_type" => 'Bad document type',
+                    ])
+                ),
+            ],
+        ];
+    }
 
 
     private function getMockStorage()
