@@ -50,19 +50,6 @@
                 });
             });
         }
-
-        /**
-         * Custom behaviour when clicking delete
-         */
-        function setupDelete() {
-            config.deleteButton.click(function(event) {
-                event.preventDefault();
-
-                if (confirm('Are you sure you want to delete this Collab Doc?')) {
-                    window.location.href = $(this).attr('href');
-                }
-            });
-        }
     }
 }(jQuery));
 

@@ -73,8 +73,8 @@
                     {% endif %}
                 {% endif %}
                 {% if event.isEditable %}
-                <a class="button icon-modify" href="/calendar/modify.php?eventID={{ event.eventId }}{{ returnStr }}">Modify</a>
-                <a class="button icon-delete" href="/calendar/modifyForm.php?action=Delete&id={{ event.eventId }}{{  returnStr }}" onclick="return(confirm('Are you sure you wish to delete this event?'))">Delete</a>
+                    <a class="button icon-modify" href="/calendar/modify.php?eventID={{ event.eventId }}{{ returnStr }}">Modify</a>
+                    <a class="button icon-delete" id="delete-event-{{ event.eventId }}">Delete</a>
                 {% endif %}
             </div>
             {% endblock eventBubbleButtons %}
@@ -83,3 +83,17 @@
         <a class="close-reveal-modal">&#215;</a>
     </div>
 </li>
+
+<script type="text/javascript">
+    $(function() {
+        $('#delete-event-{{ event.eventId }}').on('click', function () {
+            $('[data-reveal]').hide();
+            $(this).confirmDialog({
+                text: 'Are you sure you wish to delete this event?',
+                confirmEvent: function() {
+                    window.location.href = "/calendar/modifyForm.php?action=Delete&id={{ event.eventId }}{{ returnStr | raw }}";
+                }
+            });
+        });
+    });
+</script>

@@ -73,25 +73,21 @@ var calendar = {
 	 * Set up Remove behaviours
 	 */
 	initRemove: function() {
-		var self = this;
+		window.self = this;
+		$(window.self.options.removeConfig).click(function() {
+			window.id = $(this).attr('id').toString().replace(/remove_/, '');
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this source?',
+                confirmEvent: function() {
+                    var data = {
+                        id: window.id
+                    };
 
-		$(self.options.removeConfig).click(function() {
-			var id = $(this).attr('id').toString().replace(/remove_/, '');
-
-			if (confirm('Are you sure you want to remove this configuration option?')) {
-
-				/* Ajax remove this config option
-				 */
-				var data = {
-					id: id
-				};
-
-				$.post(self.options.removeUri, data, function(responseText) {
-					self.refresh();
-				});
-			}
-
-			return false;
+                    $.post(window.self.options.removeUri, data, function (responseText) {
+                        window.self.refresh();
+                    });
+                }
+            });
 		});
 	}
 }
