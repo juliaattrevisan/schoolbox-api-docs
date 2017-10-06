@@ -84,7 +84,18 @@
                                      </script>
 
                                     <input type="hidden" name="pollID" value="{POLL_ID}"/>
-                                    <input type="hidden" name="categoryID" value="{ID}"/>
+                                        <input type="hidden" name="categoryID" value="{ID}"/>
+                                    <section>
+                                        <fieldset class="radiolist">
+                                            <!-- BEGIN poll_options -->
+                                            <input type="radio" name="vote" data-poll-option
+                                                   id="component{COMPONENT_INSTANCE_ID}-poll{POLL_ID}-option-{POLL_OPTION_INDEX}"
+                                                   value="{POLL_OPTION_INDEX}"/>
+                                            <label for="component{COMPONENT_INSTANCE_ID}-poll{POLL_ID}-option-{POLL_OPTION_INDEX}"
+                                                   class="radio-label">{POLL_OPTION}</label>
+                                            <!-- END poll_options -->
+                                        </fieldset>
+                                    </section>
                                     <input type="submit" value="Vote" data-poll-validate="{COMPONENT_INSTANCE_ID}"/>
                                 </form>
                             </div>
