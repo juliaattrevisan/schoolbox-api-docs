@@ -517,6 +517,28 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
     }
 
 
+    /**
+     * Test exporting a document from the Mock API, if its status is bad.
+     *
+     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\InvalidStatusException
+     */
+    public function testGetExportInvalidStatus(): void
+    {
+        $response = new Response(
+            200,
+            [],
+            json_encode([
+                "id"         => "ccsd",
+                "status"     => "invalid",
+                "file_url"   => null,
+                "error_type" => null,
+            ])
+        );
+        $connector = new MockConnector($this->getMockClient($response));
+        $connector->getExport('asdfghjkl');
+    }
+
+
     public function providerDisabledConnector(): array
     {
         return [
