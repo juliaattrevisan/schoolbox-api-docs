@@ -394,6 +394,64 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
 
 
     /**
+     * Test create inline export
+     *
+     * @dataProvider providerGetExport
+     *
+     * @param string            $documentIdentifier
+     * @param string            $status
+     * @param null|string       $fileUrl
+     * @param null|string       $errorType
+     * @param ResponseInterface $response
+     */
+    public function testCreateInlineExport(
+        string $documentIdentifier,
+        string $status,
+        ?string $fileUrl,
+        ?string $errorType,
+        ResponseInterface $response
+    ): void
+    {
+        $connector = new MockConnector($this->getMockClient($response));
+        $export    = $connector->createInlineExport($documentIdentifier);
+
+        $this->assertEquals($documentIdentifier, $export->getId());
+        $this->assertEquals($status, $export->getStatus());
+        $this->assertEquals($fileUrl, $export->getFileUrl());
+        $this->assertEquals($errorType, $export->getErrorType());
+    }
+
+
+    /**
+     * Test create annotated export
+     *
+     * @dataProvider providerGetExport
+     *
+     * @param string            $documentIdentifier
+     * @param string            $status
+     * @param null|string       $fileUrl
+     * @param null|string       $errorType
+     * @param ResponseInterface $response
+     */
+    public function testCreateAnnotatedExport(
+        string $documentIdentifier,
+        string $status,
+        ?string $fileUrl,
+        ?string $errorType,
+        ResponseInterface $response
+    ): void
+    {
+        $connector = new MockConnector($this->getMockClient($response));
+        $export    = $connector->createAnnotatedExport($documentIdentifier);
+
+        $this->assertEquals($documentIdentifier, $export->getId());
+        $this->assertEquals($status, $export->getStatus());
+        $this->assertEquals($fileUrl, $export->getFileUrl());
+        $this->assertEquals($errorType, $export->getErrorType());
+    }
+
+
+    /**
      * Test get export of a document that wasn't found
      *
      * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound
