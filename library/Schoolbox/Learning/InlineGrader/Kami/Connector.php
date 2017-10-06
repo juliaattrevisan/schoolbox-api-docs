@@ -165,7 +165,7 @@ class Connector implements IConnector
         foreach ($decoded as $obj) {
             try {
                 $document = $this->buildDocument($obj);
-            } catch (Exception\ApiException|Exception\InvalidStatusException $e) {
+            } catch (Exception\IKamiException $e) {
                 // This document failed to parse: nothing to do but...
                 continue;
             }
