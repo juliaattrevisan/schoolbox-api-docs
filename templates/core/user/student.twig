@@ -1,7 +1,7 @@
 {# Permissions #}
-{% set isSuperuser = session.user.isSuperUser() %}
-{% set isStaff = isSuperuser or session.user.getRole().isStaff() %}
-{% set isSelf = session.user.getId() == user.getId() %}
+{% set isSuperuser = session.user.superUser %}
+{% set isStaff = isSuperuser or session.user.role.staff %}
+{% set isSelf = session.user.id == user.id %}
 
 {# medical: if allowed in config, and user is staff or parent of this child #}
 {% set showMedicalAlert = not config.protect_medicalspecial_profile and isStaff %}
@@ -10,7 +10,7 @@
 {# details: su, staff, self, parent or relation #}
 {% set showDetails = isStaff or isSelf or isParentOfStudent or isRelatedToStudent %}
 {# emails: students may view other student's emails #}
-{% set showEmail = showDetails or session.user.getRole().isStudent() %}
+{% set showEmail = showDetails or session.user.role.student %}
 
 {% set showButtons = showDetails %}
 {# contacts: su, staff or parent #}
@@ -33,7 +33,7 @@
 <div class="actions-small-{{ isSuperuser ? 1 : 0 }} row">
     <div class="list-item">
         <div class="small-12 column">
-            <h1>{{ user.formatName() }}</h1>
+            <h1>{{ user.formatName }}</h1>
         </div>
     </div>
     <nav>
@@ -49,7 +49,7 @@
             <div class="profile content">
                 <div class="row no-margin">
                     <div class="small-12 medium-3 columns no-pad">
-                        <img class="full-width" src="/portrait.php?userId={{ user.getExternalId() }}&amp;size=constrain200"/>
+                        <img class="full-width" src="/portrait.php?userId={{ user.externalId }}&amp;size=constrain200"/>
                     </div>
 
                     <div class="small-12 medium-9 columns no-pad">
@@ -90,16 +90,16 @@
                                 {% if showTitle %}
                                     <dt class="small-12 medium-3">Position Title:</dt>
                                     <dd class="small-12 medium-9">
-                                        {{ user.getPositionTitle() }}
+                                        {{ user.positionTitle }}
                                     </dd>
                                 {% endif %}
 
                                 {% if showEmail %}
                                     {% block details_email %}
-                                        {% if user.email() %}
+                                        {% if user.email %}
                                             <dt class="small-12 medium-3">Email:</dt>
                                             <dd class="small-12 medium-9">
-                                                <a href="{{ session.mailhandle }}{{ user.email() }}">{{ user.email() }}</a>
+                                                <a href="{{ session.mailhandle }}{{ user.email }}">{{ user.email }}</a>
                                             </dd>
                                         {% endif %}
                                     {% endblock details_email %}
@@ -108,7 +108,7 @@
                                 {% if showDetails %}
                                     {% block details_studentId %}
                                         <dt class="small-12 medium-3">Student ID:</dt>
-                                        <dd class="small-12 medium-9">{{ user.getExternalId() }}</dd>
+                                        <dd class="small-12 medium-9">{{ user.externalId }}</dd>
                                     {% endblock details_studentId %}
 
                                     {% block details_dob %}
@@ -123,10 +123,10 @@
                                             {% if formTeacher %}
                                                 <dt class="small-12 medium-3">Class Teacher:</dt>
                                                 <dd class="small-12 medium-9">
-                                                    {% if formTeacher.getId() %}
-                                                        <a href="{{ session.mailhandle }}{{ formTeacher.email() }}">{{ formTeacher.formatName() }}</a>
+                                                    {% if formTeacher.id %}
+                                                        <a href="{{ session.mailhandle }}{{ formTeacher.email }}">{{ formTeacher.formatName }}</a>
                                                     {% else %}
-                                                        {{ formTeacher.formatName() }}
+                                                        {{ formTeacher.formatName }}
                                                     {% endif %}
                                                 </dd>
                                             {% endif %}
@@ -145,10 +145,10 @@
                                             {% if tutorTeacher %}
                                                 <dt class="small-12 medium-3">Tutor:</dt>
                                                 <dd class="small-12 medium-9">
-                                                    {% if tutorTeacher.getId() %}
-                                                        <a href="{{ session.mailhandle }}{{ tutorTeacher.email() }}">{{ tutorTeacher.formatName() }}</a>
+                                                    {% if tutorTeacher.id %}
+                                                        <a href="{{ session.mailhandle }}{{ tutorTeacher.email }}">{{ tutorTeacher.formatName }}</a>
                                                     {% else %}
-                                                        {{ tutorTeacher.formatName() }}
+                                                        {{ tutorTeacher.formatName }}
                                                     {% endif %}
                                                 </dd>
                                             {% endif %}
@@ -159,10 +159,10 @@
                                         {#{% if coordTeacher %}#}
                                         {#<dt class="no-margin small-6 medium-3">Year Coordinator:</dt>#}
                                         {#<dd class="no-margin small-6 medium-9">#}
-                                        {#{% if coordTeacher.getId() %}#}
-                                        {#<a href="{{ session.mailhandle }}{{ coordTeacher.email() }}">{{ coordTeacher.formatName() }}</a>#}
+                                        {#{% if coordTeacher.id %}#}
+                                        {#<a href="{{ session.mailhandle }}{{ coordTeacher.email }}">{{ coordTeacher.formatName }}</a>#}
                                         {#{% else %}#}
-                                        {#{{ coordTeacher.formatName() }}#}
+                                        {#{{ coordTeacher.formatName }}#}
                                         {#{% endif %}#}
                                         {#</dd>#}
                                         {#{% endif %}#}
@@ -189,10 +189,10 @@
                                             {% if hohTeacher %}
                                                 <dt class="small-12 medium-3">Head of House:</dt>
                                                 <dd class="small-12 medium-9">
-                                                    {% if hohTeacher.getId() %}
-                                                        <a href="{{ session.mailhandle }}{{ hohTeacher.email() }}">{{ hohTeacher.formatName() }}</a>
+                                                    {% if hohTeacher.id %}
+                                                        <a href="{{ session.mailhandle }}{{ hohTeacher.email }}">{{ hohTeacher.formatName }}</a>
                                                     {% else %}
-                                                        {{ hohTeacher.formatName() }}
+                                                        {{ hohTeacher.formatName }}
                                                     {% endif %}
                                                 </dd>
                                             {% endif %}
@@ -240,18 +240,18 @@
                     {% block buttons %}
                         {% if showButtons %}
                             {% block buttons_dueWork %}
-                                {% if (not session.user.getRole().isParent()) or (not config.restrict_parent_duework_access) %}
+                                {% if (not session.user.role.parent) or (not config.restrict_parent_duework_access) %}
                                     <li>
-                                        <a href="/learning/due/{{ user.getId() }}"
+                                        <a href="/learning/due/{{ user.id }}"
                                            class="icon-due-work">{{ locale.dueWork.proper }}</a>
                                     </li>
                                 {% endif %}
                             {% endblock buttons_dueWork %}
 
                             {% block buttons_grades %}
-                                {% if (not session.user.getRole().isParent()) or (not config.restrict_parent_grades) %}
+                                {% if (not session.user.role.parent) or (not config.restrict_parent_grades) %}
                                     <li>
-                                        <a href="/learning/grades/{{ user.getId() }}"
+                                        <a href="/learning/grades/{{ user.id }}"
                                            class="icon-tick">{{ locale.grades.properPlural }}</a>
                                     </li>
                                 {% endif %}
@@ -261,7 +261,7 @@
                             {% if eportfolioAuth %}
                                 {% block buttons_eportfolio %}
                                     <li>
-                                        <a href="/eportfolio/{{ user.getId() }}/profile"
+                                        <a href="/eportfolio/{{ user.id }}/profile"
                                            class="icon-eportfolio">ePortfolio</a>
                                     </li>
                                 {% endblock buttons_eportfolio %}
@@ -278,7 +278,7 @@
 
                             {% block buttons_calendar %}
                                 <li>
-                                    <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
+                                    <a href='/calendar/full/{{ now.urlDate }}/{{ user.id }}'
                                        class="icon-calendar">{TPL_LOCAL_CALENDAR_PC}</a>
                                 </li>
                             {% endblock buttons_calendar %}
@@ -286,16 +286,16 @@
                             {% if showClasses %}
                                 {% block buttons_timetable %}
                                     <li>
-                                        <a href="/timetable/{{ user.getId() }}"
+                                        <a href="/timetable/{{ user.id }}"
                                            class="icon-timetable">Timetable</a>
                                     </li>
                                 {% endblock buttons_timetable %}
                             {% endif %}
 
                             {% block buttons_boarderLeave %}
-                                {% if config.boarder_leave_enabled and user.getResidentialHouse().getId() %}
+                                {% if config.boarder_leave_enabled and user.residentialHouse.id %}
                                     <li>
-                                        <a href="/modules/leave/student/{{ user.getId() }}"
+                                        <a href="/modules/leave/student/{{ user.id }}"
                                            class="icon-boarder-leave">Boarder Leave</a>
                                     </li>
                                 {% endif %}
@@ -304,7 +304,7 @@
                             {% block buttons_pastoralCare %}
                                 {% if isStaff and config.external_type == 'synergetic' and config.external_staff_portal %}
                                     <li>
-                                        <a href="{{ config.external_staff_portal }}/stud.aspx?id={{ user.getExternalId() }}"
+                                        <a href="{{ config.external_staff_portal }}/stud.aspx?id={{ user.externalId }}"
                                            class="icon-synergetic"
                                            target="_blank">Synweb</a>
                                     </li>
@@ -328,7 +328,7 @@
                                         <a class="icon-email" id="email-all-staff">Email All Staff</a>
                                         <form id="email-all-form" action="/mail/createMail.php" class="hide">
                                             <input name="cc" value="{{ allTeacherEmails }}" type="hidden">
-                                            <input name="replyto" value="{{ session.user.email() }}" type="hidden">
+                                            <input name="replyto" value="{{ session.user.email }}" type="hidden">
                                         </form>
                                     </li>
                                 {% endif %}
@@ -373,7 +373,7 @@
                                                 <div class="list-item">
                                                     <div class="card small-12">
                                                         {% if contact.main %}
-                                                            <a href="/search/user/{{ contact.main.getId() }}">
+                                                            <a href="/search/user/{{ contact.main.id }}">
                                                                 <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64" />
                                                                 <h3>{{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}</h3>
                                                             </a>
@@ -407,7 +407,7 @@
                                                         <div class="card small-12">
                                                             {# need to know user's schoolbox info here #}
                                                             {% if contact.spouse %}
-                                                                <a href="/search/user/{{ contact.spouse.getId() }}">
+                                                                <a href="/search/user/{{ contact.spouse.id }}">
                                                                     <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
                                                                     <h3>{{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}</h3>
                                                                 </a>
@@ -533,7 +533,7 @@
                                             <li class="subject-group">
                                                 <div class="list-item">
                                                     <div class="card small-12">
-                                                        {% if subject.folder.getId() and subject.perms >= constant('\\Schoolbox\\Permission\\Access\\UserAccess::ACCESS_READ') %}
+                                                        {% if subject.folder.id and subject.perms >= constant('\\Schoolbox\\Permission\\Access\\UserAccess::ACCESS_READ') %}
                                                             <a href="/homepage/code/{{ subject.code|e('url')|e('url')|e('url') }}">
                                                                 <span class="icon-home size-32 "></span>
                                                                 <h3>{{ subject.name }}</h3>
@@ -547,17 +547,17 @@
                                                 </div>
                                             </li>
                                             {% for teacher in subject.teachers %}
-                                                {% set teacherEmails = teacherEmails ~ teacher.email() ~ ',' %}
+                                                {% set teacherEmails = teacherEmails ~ teacher.email ~ ',' %}
                                                 <li class="actions-small-1">
                                                     <div class="list-item">
                                                         <div class="card small-12">
-                                                            <a href="/search/user/{{ teacher.getId() }}">
-                                                                <img src="/portrait.php?userId={{ teacher.getExternalId()|e('url') }}&amp;size=square64" />
-                                                                <h3>{{ teacher.formatName() }}</h3>
+                                                            <a href="/search/user/{{ teacher.id }}">
+                                                                <img src="/portrait.php?userId={{ teacher.externalId|e('url') }}&amp;size=square64" />
+                                                                <h3>{{ teacher.formatName }}</h3>
                                                             </a>
                                                             <p class="meta">
                                                                 {% if teacher.positionTitle is empty %}
-                                                                    {{ teacher.getRole().getName() }}
+                                                                    {{ teacher.role.name }}
                                                                 {% else %}
                                                                     {{ teacher.positionTitle }}
                                                                 {% endif %}
@@ -566,7 +566,7 @@
                                                     </div>
                                                     <nav>
                                                         {% if not teacher.email is empty %}
-                                                            <a class="icon-email" href="{{ session.mailhandle }}{{ teacher.email() }}" title="Email {{ teacher.email() }}"></a>
+                                                            <a class="icon-email" href="{{ session.mailhandle }}{{ teacher.email }}" title="Email {{ teacher.email }}"></a>
                                                         {% endif %}
                                                     </nav>
                                                 </li>
@@ -574,13 +574,13 @@
                                         {% endfor %}
                                     </ul>
                                 </div>
-                                {% if session.user.getRole().isStaff() and config.mail_enable  %}
+                                {% if session.user.role.staff and config.mail_enable %}
                                     <div class="component-action">
                                         <section>
                                             <form action="/mail/createMail.php" method="post">
                                                 <div class="row">
                                                     <div class="small-12 columns">
-                                                        <input type="hidden" name="replyto" value="{{ session.user.email() }}"/>
+                                                        <input type="hidden" name="replyto" value="{{ session.user.email }}"/>
                                                         <input type="hidden" name="bcc" value="{{ teacherEmails }}"/>
                                                         <button type="submit" class="button">Email All {{ group }} Teachers</button>
                                                     </div>
@@ -622,13 +622,13 @@
                                             <li class="actions-small-1">
                                                 <div class="list-item">
                                                     <div class="card small-12">
-                                                        <a href="/search/user/{{ group.owner.getId() }}">
-                                                            <img src="/portrait.php?userId={{ group.owner.getExternalId() }}&amp;size=square64" />
-                                                            <h3>{{ group.owner.formatName() }}</h3>
+                                                        <a href="/search/user/{{ group.owner.id }}">
+                                                            <img src="/portrait.php?userId={{ group.owner.externalId }}&amp;size=square64" />
+                                                            <h3>{{ group.owner.formatName }}</h3>
                                                         </a>
                                                         <p class="meta">
                                                             {% if group.owner.positionTitle is empty %}
-                                                                {{ group.owner.getRole().getName() }}
+                                                                {{ group.owner.role.name }}
                                                             {% else %}
                                                                 {{ group.owner.positionTitle }}
                                                             {% endif %}
