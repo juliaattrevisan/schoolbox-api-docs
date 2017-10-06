@@ -28,30 +28,29 @@
     <link rel="stylesheet" type="text/css" href="/css/{SITE_LOCATION}/chrome-foundation.css?v={SITE_VERSION}" />
     <script type="text/javascript" src="/javascript/components/schoolbox.min.js?v={SITE_VERSION}"></script>
     <script>
-        $(function () {
-            $(function() {
-                $('#feedbackForm').alaressValidate({
-                    rules: {
-                        name: {
-                            required: true
-                        },
-                        email: {
-                            required: true
-                        },
-                        message: {
-                            required: true
-                        },
-                        recaptcha_response_field: {
-                            required: true
-                        }
+        $(function() {
+            $('#feedbackForm').alaressValidate({
+                rules: {
+                    name: {
+                        required: true
                     },
-                    messages: {
-                        name:  'Please enter your name.',
-                        email: 'Please enter your email address.',
-                        message:   'Please enter a message.',
-                        recaptcha_response_field: 'Please enter the two corresponding words for the human checker.'
+                    email: {
+                        required: true,
+                        email: true
+                    },
+                    message: {
+                        required: true
+                    },
+                    recaptcha_response_field: {
+                        required: true
                     }
-                });
+                },
+                messages: {
+                    name:  'Please enter your name.',
+                    email: 'Please enter a valid email address.',
+                    message:   'Please enter a message.',
+                    recaptcha_response_field: 'Please enter the two corresponding words for the human checker.'
+                }
             });
         });
     </script>
@@ -86,7 +85,7 @@
 
                                     <label>
                                         Email
-                                        <input type="text" name="email" id="email" size="35"  value="{EMAIL}" />
+                                        <input type="email" name="email" id="email" size="35"  value="{EMAIL}" />
                                     </label>
 
                                     <label>
