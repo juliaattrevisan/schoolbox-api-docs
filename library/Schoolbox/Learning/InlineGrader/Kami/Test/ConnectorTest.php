@@ -56,12 +56,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
      */
     public function testOnline(bool $expected, ResponseInterface $response): void
     {
-        $mockClient = $this->getMockBuilder(Client::class)->getMock();
-        $mockClient
-            ->method('send')
-            ->willReturn($response);
-
-        $connector = new MockConnector($mockClient);
+        $connector = new MockConnector($this->getMockClient($response));
         $this->assertEquals($expected, $connector->isOnline());
     }
 
@@ -123,12 +118,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
      */
     public function testListDocuments(int $expectedCount, array $expectedNames, ResponseInterface $response): void
     {
-        $mockClient = $this->getMockBuilder(Client::class)->getMock();
-        $mockClient
-            ->method('send')
-            ->willReturn($response);
-
-        $connector = new MockConnector($mockClient);
+        $connector = new MockConnector($this->getMockClient($response));
         $documents = $connector->listDocuments();
 
         $this->assertCount($expectedCount, $documents);
@@ -167,12 +157,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
         Alaress_Date_Format $createdAt,
         ResponseInterface $response
     ): void {
-        $mockClient = $this->getMockBuilder(Client::class)->getMock();
-        $mockClient
-            ->method('send')
-            ->willReturn($response);
-
-        $connector = new MockConnector($mockClient);
+        $connector = new MockConnector($this->getMockClient($response));
         $document  = $connector->getDocument($documentIdentifier);
         $this->assertEquals($documentIdentifier, $document->getId());
         $this->assertEquals($name, $document->getName());
@@ -212,12 +197,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
             [],
             json_encode(["errors" => ["Record Not Found"],])
         );
-        $mockClient = $this->getMockBuilder(Client::class)->getMock();
-        $mockClient
-            ->method('send')
-            ->willReturn($response);
-
-        $connector = new MockConnector($mockClient);
+        $connector = new MockConnector($this->getMockClient($response));
         $connector->getDocument('asdfghjkl');
     }
 
@@ -240,12 +220,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
                 "created_at"          => "2015-09-22T23:22:12.798Z",
             ])
         );
-        $mockClient = $this->getMockBuilder(Client::class)->getMock();
-        $mockClient
-            ->method('send')
-            ->willReturn($response);
-
-        $connector = new MockConnector($mockClient);
+        $connector = new MockConnector($this->getMockClient($response));
         $connector->getDocument('asdfghjkl');
     }
 
@@ -260,12 +235,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetDocumentBadResponse(ResponseInterface $response): void
     {
-        $mockClient = $this->getMockBuilder(Client::class)->getMock();
-        $mockClient
-            ->method('send')
-            ->willReturn($response);
-
-        $connector = new MockConnector($mockClient);
+        $connector = new MockConnector($this->getMockClient($response));
         $connector->getDocument('2kmcksmndlkansdlk');
     }
 
@@ -277,13 +247,8 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetDocumentBadResponseBody(): void
     {
-        $response = new Response(200, [], 'LOL');
-        $mockClient = $this->getMockBuilder(Client::class)->getMock();
-        $mockClient
-            ->method('send')
-            ->willReturn($response);
-
-        $connector = new MockConnector($mockClient);
+        $response  = new Response(200, [], 'LOL');
+        $connector = new MockConnector($this->getMockClient($response));
         $connector->getDocument('2kmcksmndlkansdlk');
     }
 
@@ -297,12 +262,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
      */
     public function testDeleteDocument(ResponseInterface $response): void
     {
-        $mockClient = $this->getMockBuilder(Client::class)->getMock();
-        $mockClient
-            ->method('send')
-            ->willReturn($response);
-
-        $connector = new MockConnector($mockClient);
+        $connector = new MockConnector($this->getMockClient($response));
         $this->assertTrue($connector->deleteDocument('asdfghjkl'));
     }
 
@@ -319,12 +279,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
             [],
             json_encode(["errors" => ["Record Not Found"],])
         );
-        $mockClient = $this->getMockBuilder(Client::class)->getMock();
-        $mockClient
-            ->method('send')
-            ->willReturn($response);
-
-        $connector = new MockConnector($mockClient);
+        $connector = new MockConnector($this->getMockClient($response));
         $connector->deleteDocument('asdfghjkl');
     }
 
@@ -339,12 +294,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
      */
     public function testDeleteDocumentBadResponse(ResponseInterface $response): void
     {
-        $mockClient = $this->getMockBuilder(Client::class)->getMock();
-        $mockClient
-            ->method('send')
-            ->willReturn($response);
-
-        $connector = new MockConnector($mockClient);
+        $connector = new MockConnector($this->getMockClient($response));
         $connector->deleteDocument('asdfghjkl');
     }
 
@@ -366,16 +316,8 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
         ResponseInterface $response
     ): void
     {
-        $mockClient = $this->getMockBuilder(Client::class)->getMock();
-        $mockClient
-            ->method('send')
-            ->willReturn($response);
-
-        $connector = new MockConnector($mockClient);
-        $session = $connector->viewSession(
-            '2kmcksmndlkansdlk',
-            new User()
-        );
+        $connector = new MockConnector($this->getMockClient($response));
+        $session   = $connector->viewSession('2kmcksmndlkansdlk', new User());
 
         $this->assertEquals($viewerUrl, $session->getViewerUrl());
         $this->assertEquals($viewSessionKey, $session->getViewSessionKey());
@@ -402,12 +344,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
             [],
             json_encode(["errors" => ["Record Not Found"],])
         );
-        $mockClient = $this->getMockBuilder(Client::class)->getMock();
-        $mockClient
-            ->method('send')
-            ->willReturn($response);
-
-        $connector = new MockConnector($mockClient);
+        $connector = new MockConnector($this->getMockClient($response));
         $connector->viewSession('asdfghjkl', new User());
     }
 
@@ -422,12 +359,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
      */
     public function testViewSessionBadResponse(ResponseInterface $response): void
     {
-        $mockClient = $this->getMockBuilder(Client::class)->getMock();
-        $mockClient
-            ->method('send')
-            ->willReturn($response);
-
-        $connector = new MockConnector($mockClient);
+        $connector = new MockConnector($this->getMockClient($response));
         $connector->viewSession('asdfghjkl', new User());
     }
 
@@ -884,5 +816,23 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
         $storage->setFilename('filename');
         $storage->setExtension('ext');
         return $storage;
+    }
+
+
+    /**
+     * Helper function for getting a mock client
+     *
+     * Mock clients will always have one pre-built response.
+     *
+     * @param ResponseInterface $response
+     * @return Client
+     */
+    private function getMockClient(ResponseInterface $response): Client
+    {
+        $mockClient = $this->getMockBuilder(Client::class)->getMock();
+        $mockClient
+            ->method('send')
+            ->willReturn($response);
+        return $mockClient;
     }
 }
