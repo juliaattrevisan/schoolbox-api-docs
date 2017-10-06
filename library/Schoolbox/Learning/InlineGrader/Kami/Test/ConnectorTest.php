@@ -364,6 +364,35 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
     }
 
 
+    /**
+     * Test get of an export
+     *
+     * @dataProvider providerGetExport
+     *
+     * @param string            $documentIdentifier
+     * @param string            $status
+     * @param null|string       $fileUrl
+     * @param null|string       $errorType
+     * @param ResponseInterface $response
+     */
+    public function testGetExport(
+        string $documentIdentifier,
+        string $status,
+        ?string $fileUrl,
+        ?string $errorType,
+        ResponseInterface $response
+    ): void
+    {
+        $connector = new MockConnector($this->getMockClient($response));
+        $export    = $connector->getExport($documentIdentifier);
+
+        $this->assertEquals($documentIdentifier, $export->getId());
+        $this->assertEquals($status, $export->getStatus());
+        $this->assertEquals($fileUrl, $export->getFileUrl());
+        $this->assertEquals($errorType, $export->getErrorType());
+    }
+
+
     public function providerDisabledConnector(): array
     {
         return [
@@ -801,6 +830,65 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
             ],
         ];
     }
+
+
+    public function providerGetExport(): array
+    {
+        return [
+            // An ordinary document
+            'Done' => [
+                'documentIdentifier' => 'ccsd',
+                'status'             => 'done',
+                'fileUrl'            => 'https://embed.kamihq.com/web/download.html?document_identifier=ccsd',
+                'errorType'          => null,
+                'response'           => new Response(
+                    200,
+                    [],
+                    json_encode([
+                        "id"         => "ccsd",
+                        "status"     => "done",
+                        "file_url"   => "https://embed.kamihq.com/web/download.html?document_identifier=ccsd",
+                        "error_type" => null,
+                    ])
+                ),
+            ],
+            // Pending
+            'Pending' => [
+                'documentIdentifier' => 'ccsd',
+                'status'             => 'pending',
+                'fileUrl'            => null,
+                'errorType'          => null,
+                'response'           => new Response(
+                    200,
+                    [],
+                    json_encode([
+                        "id"         => "ccsd",
+                        "status"     => "pending",
+                        "file_url"   => null,
+                        "error_type" => null,
+                    ])
+                ),
+            ],
+            // An erroneous document - still retrieved
+            'Error' => [
+                'documentIdentifier' => 'ccsd',
+                'status'             => 'error',
+                'fileUrl'            => null,
+                'errorType'          => 'Bad document type',
+                'response'           => new Response(
+                    200,
+                    [],
+                    json_encode([
+                        "id"         => "ccsd",
+                        "status"     => "error",
+                        "file_url"   => null,
+                        "error_type" => 'Bad document type',
+                    ])
+                ),
+            ],
+        ];
+    }
+
 
 
     private function getMockStorage()
