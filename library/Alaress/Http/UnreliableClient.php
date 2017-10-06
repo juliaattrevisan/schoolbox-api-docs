@@ -8,11 +8,10 @@ declare(strict_types=1);
 
 namespace Alaress\Http;
 
+use Alaress\Random;
 use GuzzleHttp\Client;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Schoolbox\Learning\InlineGrader\Kami\Exception\SimulatedNetworkFailureException;
-use Alaress\Random;
 
 class UnreliableClient extends Client
 {
