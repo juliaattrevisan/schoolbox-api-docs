@@ -198,10 +198,18 @@ EOTC Events become visible to certain parties based on the event's current statu
 
 On the calendar and in the export, in accordance with the aforementioned styling convention:
 - EOTC Events are only visible when the module is available and when the calendar subscription is on. See *1. Schoolbox Installation* 
-- EOTC Events are always visible for Superusers and EOTC Administrators.
-- EOTC Events are always visible to Teachers In Charge (TIC).
+- EOTC Events are visible to Superusers and EOTC Administrators.
+- EOTC Events are visible to its creator.
+- EOTC Events are visible to Teachers In Charge (TIC).
 - EOTC Events are visible to any staff member in the same campus as the event itself.
-- EOTC Events are visible to any other attendee only when in Approved Status.
+- EOTC Events are visible to Staff Attendees.
+- EOTC Events are visible to Student Attendees only when in Approved Status.
+- EOTC Events are visible to the selected Campus and Role combination only when in Approved Status.  
+
+#### 12.1.1 Roles
+The Role checkbox indicates which Roles can view the event. If you don't select any roles, the event will be hidden from anyone who isn't somehow involved in it as per the list of conditions in *12.1 Visibility*.
+
+Otherwise the Role checkbox selection works in conjunction with a campus checkbox selection. This should be interpreted as "Make this EOTC Event visible to people in the selected Role(s) and also in the selected Campus(es)".
 
 ### 12.2 Exporting Events as Vcal
 You can export EOTC Events like any other. What you see on the calendar is what you'll get in the export; the EOTC Connector doesn't have any idiosyncratic hard-coded logic. Therefore, if you want to export a list of particular EOTC Events, you need to set up a faux user who can see these events, and have this user Export to csv or url.
