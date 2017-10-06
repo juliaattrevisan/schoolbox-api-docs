@@ -17,10 +17,16 @@ if (Cfg::get('mail_enable') == 1) {
     // Parse out list of emails passed
     // The name needs to be included in both the ID and value
     $replytoList = array();
+    $ccList      = array();
     $bccList     = array();
     foreach (Mailer::parseAddressString($_REQUEST['replyto']) as $email => $name) {
         $replytoList[] = Mailer::buildAddress($email, $name);
     }
+
+    foreach (Mailer::parseAddressString($_REQUEST['cc']) as $email => $name) {
+        $ccList[] = Mailer::buildAddress($email, $name);
+    }
+
     if($_REQUEST['bcc']) {
         foreach (Mailer::parseAddressString($_REQUEST['bcc']) as $email => $name) {
             $bccList[] = Mailer::buildAddress($email, $name);
@@ -37,6 +43,7 @@ if (Cfg::get('mail_enable') == 1) {
         'SUBJECT' => $_REQUEST['subject'] ? Scrub::text($_REQUEST['subject']) : '',
         'BODY'    => '',
         'REPLYTO' => json_encode($replytoList),
+        'CC'      => json_encode($ccList),
         'BCC'     => json_encode($bccList),
     );
 

@@ -338,6 +338,35 @@ function renderStudent(
             break;
     }
 
+    $emails = [];
+
+    foreach ($subjects as $subject) {
+        foreach ($subject as $class) {
+            /** @var \Schoolbox\User $teacher */
+            foreach ($class["teachers"] as $teacher) {
+                $emails[] = $teacher->getEmail();
+            }
+        }
+    }
+    if ($formTeacher instanceof User) {
+        $emails[] = $formTeacher->getEmail();
+    }
+    if ($tutorTeacher instanceof User) {
+        $emails[] = $tutorTeacher->getEmail();
+    }
+    if ($hohTeacher instanceof User) {
+        $emails[] = $hohTeacher->getEmail();
+    }
+    if ($coordTeacher instanceof User) {
+        $emails[] = $coordTeacher->getEmail();
+    }
+    if ($studentCoach instanceof User) {
+        $emails[] = $studentCoach->getEmail();
+    }
+
+    $allTeacherEmails = implode(',', array_filter($emails));
+    
+
     $page->setVar(
         'OUTPUT',
         $page->getTwig()->render(
@@ -363,6 +392,7 @@ function renderStudent(
                 'isParentOfStudent'  => $isParentOfStudent,
                 'isRelatedToStudent' => $isRelatedToStudent,
                 'isPrimaryCarer'     => $isPrimaryCarer,
+                'allTeacherEmails'   => $allTeacherEmails,
             ]
         )
     );
