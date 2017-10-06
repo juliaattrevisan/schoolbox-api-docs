@@ -390,6 +390,26 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
     }
 
 
+    /**
+     * Test bad response from view session request
+     *
+     * @dataProvider providerViewSessionBadResponse
+     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException
+     *
+     * @param ResponseInterface $response
+     */
+    public function testViewSessionBadResponse(ResponseInterface $response): void
+    {
+        $mockClient = $this->getMockBuilder(Client::class)->getMock();
+        $mockClient
+            ->method('send')
+            ->willReturn($response);
+
+        $connector = new MockConnector($mockClient);
+        $connector->viewSession('asdfghjkl', new User());
+    }
+
+
     public function providerDisabledConnector(): array
     {
         return [
@@ -794,6 +814,34 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
                     [],
                     json_encode([
                         'viewer_url' => 'https://embed.kamihq.com/web/viewer.html?document_identifier=ccsd',
+                    ])
+                ),
+            ],
+        ];
+    }
+
+
+    public function providerViewSessionBadResponse(): array
+    {
+        return [
+            'No URL' => [
+                new Response(
+                    200,
+                    [],
+                    json_encode([
+                        'session_expiry'   => '2015-09-22T23:22:12.798Z',
+                        'view_session_key' => '12345',
+                    ])
+                ),
+            ],
+            'Bad Expiry' => [
+                new Response(
+                    200,
+                    [],
+                    json_encode([
+                        'session_expiry'   => '2015',
+                        'viewer_url'       => 'https://embed.kamihq.com/web/viewer.html?document_identifier=ccsd',
+                        'view_session_key' => '12345',
                     ])
                 ),
             ],
