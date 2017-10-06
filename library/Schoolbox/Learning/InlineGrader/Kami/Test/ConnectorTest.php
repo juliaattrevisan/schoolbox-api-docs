@@ -19,6 +19,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\InlineGrader\Kami\Connector;
 use Schoolbox\Learning\InlineGrader\Kami\MockConnector;
 use Schoolbox\Resource\Storage;
+use Schoolbox\User;
 
 class ConnectorTest extends \PHPUnit_Framework_TestCase
 {
@@ -345,6 +346,47 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
 
         $connector = new MockConnector($mockClient);
         $connector->deleteDocument('asdfghjkl');
+    }
+
+
+    /**
+     * Test creation of a view session
+     *
+     * @dataProvider providerViewSession
+     *
+     * @param string                   $viewerUrl
+     * @param string                   $viewSessionKey
+     * @param Alaress_Date_Format|null $sessionExpiry
+     * @param ResponseInterface        $response
+     */
+    public function testViewSession(
+        string $viewerUrl,
+        string $viewSessionKey,
+        ?Alaress_Date_Format $sessionExpiry,
+        ResponseInterface $response
+    ): void
+    {
+        $mockClient = $this->getMockBuilder(Client::class)->getMock();
+        $mockClient
+            ->method('send')
+            ->willReturn($response);
+
+        $connector = new MockConnector($mockClient);
+        $session = $connector->viewSession(
+            '2kmcksmndlkansdlk',
+            new User()
+        );
+
+        $this->assertEquals($viewerUrl, $session->getViewerUrl());
+        $this->assertEquals($viewSessionKey, $session->getViewSessionKey());
+        if (isset($sessionExpiry)) {
+            $this->assertEquals(
+                $sessionExpiry->getUsingFormat(Alaress_Date_Format::FORMAT_DATETIME_UTC),
+                $session->getExpiry()->getUsingFormat(Alaress_Date_Format::FORMAT_DATETIME_UTC)
+            );
+        } else {
+            $this->assertTrue($session->getExpiry()->isNull());
+        }
     }
 
 
@@ -688,6 +730,71 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
                     400,
                     [],
                     json_encode(["errors" => ["Unknown Error"],])
+                ),
+            ],
+        ];
+    }
+
+
+    public function providerViewSession(): array
+    {
+        return [
+            'All' => [
+                'viewerUrl'      => 'https://embed.kamihq.com/web/viewer.html?document_identifier=2kmcks',
+                'viewSessionKey' => '12345',
+                'sessionExpiry'  => new Alaress_Date_Format(
+                    '2015-09-22T23:22:12.798Z',
+                    Alaress_Date_Format::FORMAT_DATETIME_UTC
+                ),
+                'response'       => new Response(
+                    200,
+                    [],
+                    json_encode([
+                        'session_expiry'   => '2015-09-22T23:22:12.798Z',
+                        'view_session_key' => '12345',
+                        'viewer_url'       => 'https://embed.kamihq.com/web/viewer.html?document_identifier=2kmcks',
+                    ])
+                ),
+            ],
+            'No Expiry' => [
+                'viewerUrl'      => 'https://embed.kamihq.com/web/viewer.html?document_identifier=3245',
+                'viewSessionKey' => '54321',
+                'sessionExpiry'  => null,
+                'response'       => new Response(
+                    200,
+                    [],
+                    json_encode([
+                        'view_session_key' => '54321',
+                        'viewer_url'       => 'https://embed.kamihq.com/web/viewer.html?document_identifier=3245',
+                    ])
+                ),
+            ],
+            'No Key' => [
+                'viewerUrl'      => 'https://embed.kamihq.com/web/viewer.html?document_identifier=dter',
+                'viewSessionKey' => '',
+                'sessionExpiry'  => new Alaress_Date_Format(
+                    '2015-09-22T23:22:12.798Z',
+                    Alaress_Date_Format::FORMAT_DATETIME_UTC
+                ),
+                'response'       => new Response(
+                    200,
+                    [],
+                    json_encode([
+                        'session_expiry' => '2015-09-22T23:22:12.798Z',
+                        'viewer_url'     => 'https://embed.kamihq.com/web/viewer.html?document_identifier=dter',
+                    ])
+                ),
+            ],
+            'URL only' => [
+                'viewerUrl'      => 'https://embed.kamihq.com/web/viewer.html?document_identifier=ccsd',
+                'viewSessionKey' => '',
+                'sessionExpiry'  => null,
+                'response'       => new Response(
+                    200,
+                    [],
+                    json_encode([
+                        'viewer_url' => 'https://embed.kamihq.com/web/viewer.html?document_identifier=ccsd',
+                    ])
                 ),
             ],
         ];
