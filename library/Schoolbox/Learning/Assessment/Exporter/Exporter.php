@@ -147,6 +147,7 @@ class Exporter
         $filters       = [
             AssessmentFilters\AssessmentType\Definition::class           => [
                 AssessmentFilters\AssessmentType\Definition::KEY_DUE_WORK => AssessmentFilters\AssessmentType\Definition::KEY_DUE_WORK,
+                AssessmentFilters\AssessmentType\Definition::KEY_PROJECT  => AssessmentFilters\AssessmentType\Definition::KEY_PROJECT,
             ],
             AssessmentFilters\NullableContext\UnitSpec\Definition::class => [],
             AssessmentFilters\NullableContext\Project\Definition::class  => [],
