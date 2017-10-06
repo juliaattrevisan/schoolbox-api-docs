@@ -86,7 +86,7 @@
 
 <script type="text/javascript">
     $(function() {
-        $('#delete{{ event.eventId }}').on('click', function () {
+        $('#delete-event-{{ event.eventId }}').on('click', function () {
             $('[data-reveal]').hide();
             $(this).confirmDialog({
                 text: 'Are you sure you wish to delete this event?',
