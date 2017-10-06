@@ -343,6 +343,9 @@ class Connector implements IConnector
         $this->assertEnabled();
         $request  = new Request('GET', self::BASE_URI . "embed/exports/$exportId");
         $response = $this->client->send($request, $this->getOptions());
+        if ($this->isValidNotFound($response)) {
+            throw new Exception\NotFound("Kami Document not found. Id: $exportId", $request, $response);
+        }
         return $this->buildExport($this->decodeResponseContent($response->getBody()));
     }
 

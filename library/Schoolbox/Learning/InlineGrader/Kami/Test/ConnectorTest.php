@@ -393,6 +393,23 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
     }
 
 
+    /**
+     * Test get export of a document that wasn't found
+     *
+     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound
+     */
+    public function testGetExportNotFound(): void
+    {
+        $response = new Response(
+            404,
+            [],
+            json_encode(["errors" => ["Record Not Found"],])
+        );
+        $connector = new MockConnector($this->getMockClient($response));
+        $connector->getExport('asdfghjkl');
+    }
+
+
     public function providerDisabledConnector(): array
     {
         return [
