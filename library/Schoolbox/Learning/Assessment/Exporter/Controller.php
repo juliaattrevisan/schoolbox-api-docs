@@ -6,6 +6,7 @@
  */
 namespace Schoolbox\Learning\Assessment\Exporter;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -260,8 +261,10 @@ class Controller extends BaseController
     {
         // Generate an updated csv
         $filename = sb_tempnam();
-        $file = fopen($filename, 'w');
-        $exporter = new Exporter($this->getDi()->get('databaseInternal'));
+        $file = fopen($filename, 'wb');
+        /** @var IConnector $database */
+        $database = $this->getDi()->get('databaseInternal');
+        $exporter = new Exporter($database);
         $exporter->generate($file);
         fclose($file);
 
