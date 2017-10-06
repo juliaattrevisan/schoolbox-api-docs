@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\InlineGrader\Kami;
 
+use Schoolbox\Learning\InlineGrader\Kami\Exception\InvalidStatusException;
+
 /**
  * Represents the status of a requested export.
  *
@@ -51,6 +53,7 @@ class Export
      * @param string      $status
      * @param null|string $fileUrl
      * @param null|string $errorType
+     * @throws InvalidStatusException if export's status is not recognised
      */
     public function __construct(string $id, string $status, ?string $fileUrl, ?string $errorType)
     {
@@ -58,6 +61,22 @@ class Export
         $this->status    = $status;
         $this->fileUrl   = $fileUrl;
         $this->errorType = $errorType;
+        $this->validateStatus();
+    }
+
+
+    /**
+     * Validates status of export.
+     *
+     * @return bool
+     * @throws InvalidStatusException if export's status is not recognised
+     */
+    private function validateStatus(): bool
+    {
+        if (!($this->isStatusPending() || $this->isStatusDone() || $this->isStatusError())) {
+            throw new InvalidStatusException("{$this->getStatus()} is not a valid export status");
+        }
+        return true;
     }
 
 
