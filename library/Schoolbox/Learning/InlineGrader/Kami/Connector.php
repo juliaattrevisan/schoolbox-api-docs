@@ -176,10 +176,10 @@ class Connector implements IConnector
 
 
     /**
-     * Return the specified document from Kami if it exists there. Null otherwise.
+     * Return the specified document from Kami if it exists there. Otherwise throws an exception.
      *
      * @param string $documentId
-     * @return null|Document
+     * @return Document
      * @throws Exception\EmptyApiKeyException If API key not configured
      * @throws Exception\ResponseDecodeException If unable to decode a server response
      * @throws Exception\ApiException If cannot fetch a document for reasons other than simply not existing.
