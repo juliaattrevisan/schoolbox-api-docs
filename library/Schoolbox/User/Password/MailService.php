@@ -17,7 +17,6 @@ use Schoolbox\UserMapper;
 use Swift_RfcComplianceException;
 use Swift_SwiftException;
 
-
 /**
  * Class MailService
  *
@@ -55,8 +54,12 @@ class MailService
      * @param UserMapper       $userMapper
      * @param TwigEmailFactory $mailFactory
      */
-    public function __construct(IConfigLoader $config, Reset\Mapper $resetMapper, UserMapper $userMapper, TwigEmailFactory $mailFactory)
-    {
+    public function __construct(
+        IConfigLoader $config,
+        Reset\Mapper $resetMapper,
+        UserMapper $userMapper,
+        TwigEmailFactory $mailFactory
+    ) {
         $this->config = $config;
         $this->mailFactory = $mailFactory;
         $this->userMapper = $userMapper;
@@ -157,8 +160,13 @@ class MailService
      * @throws PDOException                 if the attempt to save the Reset object fails
      * @return bool[]                       array of successes/failures, indexed by address, ie. [ email => success ]
      */
-    private function sendResetToUsers(array $users, $remoteAddress, $canResetTemplate, $canNotResetTemplate, $subject = null)
-    {
+    private function sendResetToUsers(
+        array $users,
+        $remoteAddress,
+        $canResetTemplate,
+        $canNotResetTemplate,
+        $subject = null
+    ) {
         $sent = [];
 
         if (empty($users)) {
@@ -172,8 +180,6 @@ class MailService
 
         foreach ($users as $user) {
             // Make sure the user is allowed to reset password based on their role
-            $reset = null;
-
             if ($user->getRole()->getCanChangePassword()) {
                 $reset = $this->resetMapper->createModel()->setIp($remoteAddress);
 
@@ -192,7 +198,7 @@ class MailService
             } else {
                 // Password reset not allowed
                 $sent[$user->getEmail()] = $this->sendResetWithTemplate(
-                    $reset,
+                    $this->resetMapper->createModel()->setUser($user),
                     $canNotResetTemplate,
                     $subject,
                     $fromAddress,
@@ -240,7 +246,6 @@ class MailService
             $email->sendToBlackhole();
             // technically this email "sent"
             return true;
-
         } catch (Swift_SwiftException $e) {
             return false;
         }

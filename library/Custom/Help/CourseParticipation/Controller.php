@@ -25,7 +25,6 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
-
 class Controller extends Base
 {
     const PARTICIPANT_ROLE_NAME = 'School Staff';
@@ -124,7 +123,8 @@ class Controller extends Base
 
         $now = Alaress_Date_Format::now();
 
-        $uri = $post['host'] . $this->getRouteIfAuthorized('helpCourseParticipation.postUserRegistrations', [ 'schoolCode' => $school ]);
+        $route = 'helpCourseParticipation.postUserRegistrations';
+        $uri = $post['host'] . $this->getRouteIfAuthorized($route, [ 'schoolCode' => $school ]);
 
         $c = new Client();
 
@@ -152,8 +152,6 @@ class Controller extends Base
             $this->getResponse()->content->set($content);
             $this->getResponse()->headers->set('Content-Type', 'text/html');
         }
-
-
     }
 
 
@@ -300,7 +298,6 @@ class Controller extends Base
         $failedUsers = [];
 
         foreach ($post['user'] as $userData) {
-
             if (!$this->userPayloadIsValid($userData)) {
                 $failedUsers[] = $userData;
                 continue;
@@ -332,7 +329,7 @@ class Controller extends Base
                 ;
 
                 // no previous username
-                $oldUsername = null;
+                $oldUsername = '';
             }
 
             // update user object
@@ -367,7 +364,6 @@ class Controller extends Base
             } catch (UnexpectedValueException $e) {
                 // duplicate username
                 $failedUsers[] = $userData;
-
             }
         }
 
@@ -381,7 +377,6 @@ class Controller extends Base
             $this->sendGenericStatus(204);
             $rs->content->set($this->buildJsonOutput(null));
         }
-
     }
 
 
