@@ -30,7 +30,8 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
      */
     public function testDisabled(IConfigLoader $configLoader): void
     {
-        $connector = new Connector($configLoader, new Client());
+        // This method must not hit Kami API
+        $connector = new Connector($configLoader, $this->getMockClientWithConnectException());
         $this->assertFalse($connector->isEnabled());
     }
 
@@ -41,7 +42,8 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
      */
     public function testEnabled(IConfigLoader $configLoader): void
     {
-        $connector = new Connector($configLoader, new Client());
+        // This method must not hit Kami API
+        $connector = new Connector($configLoader, $this->getMockClientWithConnectException());
         $this->assertTrue($connector->isEnabled());
     }
 
@@ -71,7 +73,8 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
      */
     public function testOnlineDisabled(IConfigLoader $configLoader): void
     {
-        $connector = new Connector($configLoader, new Client());
+        // This method must not hit Kami API
+        $connector = new Connector($configLoader, $this->getMockClientWithConnectException());
         $this->assertFalse($connector->isOnline());
     }
 
@@ -82,12 +85,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
      */
     public function testOnlineUnreachable(): void
     {
-        $mockClient = $this->getMockBuilder(Client::class)->getMock();
-        $mockClient
-            ->method('send')
-            ->willThrowException(new ConnectException('Destination unreachable', new Request('GET', 'kami.com')));
-
-        $connector = new MockConnector($mockClient);
+        $connector = new MockConnector($this->getMockClientWithConnectException());
         $this->assertFalse($connector->isOnline());
     }
 
@@ -266,7 +264,8 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetDocumentNotEnabled(IConfigLoader $configLoader): void
     {
-        $connector = new Connector($configLoader, new Client());
+        // This method must not hit Kami API
+        $connector = new Connector($configLoader, $this->getMockClientWithConnectException());
         $connector->getDocument('asdfghjkl');
     }
 
@@ -1219,6 +1218,25 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
         $mockClient
             ->method('send')
             ->willReturn($response);
+        return $mockClient;
+    }
+
+
+    /**
+     * Helper function for getting a mock client that throws an exception.
+     *
+     * For testing, this is always a destination unreachable exception.
+     *
+     * @return Client
+     */
+    private function getMockClientWithConnectException(): Client
+    {
+        $mockClient = $this->getMockBuilder(Client::class)->getMock();
+        $mockClient
+            ->method('send')
+            ->willThrowException(
+                new ConnectException('Destination unreachable', new Request('GET', 'kami.com'))
+            );
         return $mockClient;
     }
 }
