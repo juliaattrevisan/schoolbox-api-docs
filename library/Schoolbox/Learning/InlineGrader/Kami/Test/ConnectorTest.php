@@ -95,10 +95,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
     /**
      * Test uploading a document from the Mock API.
      *
-     * This uses the same data provider as getDocument, as it returns documents
-     * in the same format.
-     *
-     * @dataProvider providerGetDocument
+     * @dataProvider providerUpload
      *
      * @param string              $name
      * @param string              $documentIdentifier
@@ -658,74 +655,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
 
     public function providerGetDocument(): array
     {
-        return [
-            // An ordinary document
-            'Done' => [
-                'name'               => 'Blah Document',
-                'documentIdentifier' => '2kmcksmndlkansdlk',
-                'fileStatus'         => 'done',
-                'fileErrorMessage'   => null,
-                'createdAt'          => new Alaress_Date_Format(
-                    '2015-09-22T23:22:12.798Z',
-                    Alaress_Date_Format::FORMAT_DATETIME_UTC
-                ),
-                'response'           => new Response(
-                    200,
-                    [],
-                    json_encode([
-                        "name"                => "Blah Document",
-                        "document_identifier" => "2kmcksmndlkansdlk",
-                        "file_status"         => "done",
-                        "file_error_message"  => null,
-                        "created_at"          => "2015-09-22T23:22:12.798Z",
-                    ])
-                ),
-            ],
-            // Document still processing
-            'Processing' => [
-                'name'               => 'image.jpg',
-                'documentIdentifier' => '1234567890',
-                'fileStatus'         => 'processing',
-                'fileErrorMessage'   => null,
-                'createdAt'          => new Alaress_Date_Format(
-                    '2017-12-31T23:59:59.999Z',
-                    Alaress_Date_Format::FORMAT_DATETIME_UTC
-                ),
-                'response'           => new Response(
-                    200,
-                    [],
-                    json_encode([
-                        'name'                => 'image.jpg',
-                        "document_identifier" => "1234567890",
-                        "file_status"         => 'processing',
-                        "file_error_message"  => null,
-                        "created_at"          => "2017-12-31T23:59:59.999Z",
-                    ])
-                ),
-            ],
-            // An erroneous document - still retrieved
-            'Error' => [
-                'name'               => 'video.mov',
-                'documentIdentifier' => 'qwertyuiop',
-                'fileStatus'         => 'error',
-                'fileErrorMessage'   => 'Bad Mimetype',
-                'createdAt'          => new Alaress_Date_Format(
-                    '2015-09-22T23:22:12.798Z',
-                    Alaress_Date_Format::FORMAT_DATETIME_UTC
-                ),
-                'response'           => new Response(
-                    200,
-                    [],
-                    json_encode([
-                        "name"                => "video.mov",
-                        "document_identifier" => "qwertyuiop",
-                        "file_status"         => "error",
-                        "file_error_message"  => 'Bad Mimetype',
-                        "created_at"          => "2015-09-22T23:22:12.798Z",
-                    ])
-                ),
-            ],
-        ];
+        return $this->providerDocument(200);
     }
 
 
@@ -829,6 +759,85 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
                         "file_status"         => "done",
                         "file_error_message"  => null,
                         "created_at"          => "not a date",
+                    ])
+                ),
+            ],
+        ];
+    }
+
+
+    public function providerUpload(): array
+    {
+        return $this->providerDocument(201);
+    }
+
+
+    private function providerDocument(int $statusCode): array
+    {
+        return [
+            // An ordinary document
+            'Done' => [
+                'name'               => 'Blah Document',
+                'documentIdentifier' => '2kmcksmndlkansdlk',
+                'fileStatus'         => 'done',
+                'fileErrorMessage'   => null,
+                'createdAt'          => new Alaress_Date_Format(
+                    '2015-09-22T23:22:12.798Z',
+                    Alaress_Date_Format::FORMAT_DATETIME_UTC
+                ),
+                'response'           => new Response(
+                    $statusCode,
+                    [],
+                    json_encode([
+                        "name"                => "Blah Document",
+                        "document_identifier" => "2kmcksmndlkansdlk",
+                        "file_status"         => "done",
+                        "file_error_message"  => null,
+                        "created_at"          => "2015-09-22T23:22:12.798Z",
+                    ])
+                ),
+            ],
+            // Document still processing
+            'Processing' => [
+                'name'               => 'image.jpg',
+                'documentIdentifier' => '1234567890',
+                'fileStatus'         => 'processing',
+                'fileErrorMessage'   => null,
+                'createdAt'          => new Alaress_Date_Format(
+                    '2017-12-31T23:59:59.999Z',
+                    Alaress_Date_Format::FORMAT_DATETIME_UTC
+                ),
+                'response'           => new Response(
+                    $statusCode,
+                    [],
+                    json_encode([
+                        'name'                => 'image.jpg',
+                        "document_identifier" => "1234567890",
+                        "file_status"         => 'processing',
+                        "file_error_message"  => null,
+                        "created_at"          => "2017-12-31T23:59:59.999Z",
+                    ])
+                ),
+            ],
+            // An erroneous document - still retrieved
+            'Error' => [
+                'name'               => 'video.mov',
+                'documentIdentifier' => 'qwertyuiop',
+                'fileStatus'         => 'error',
+                'fileErrorMessage'   => 'Bad Mimetype',
+                'createdAt'          => new Alaress_Date_Format(
+                    '2015-09-22T23:22:12.798Z',
+                    Alaress_Date_Format::FORMAT_DATETIME_UTC
+                ),
+                'response'           => new Response(
+                    $statusCode,
+                    [],
+                    json_encode([
+                        "name"                => "video.mov",
+                        "document_identifier" => "qwertyuiop",
+                        "file_status"         => "error",
+                        "file_error_message"  => 'Bad Mimetype',
+                        "created_at"          => "2015-09-22T23:22:12.798Z",
                     ])
                 ),
             ],
