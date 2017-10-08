@@ -106,7 +106,8 @@ class MailService
             [ $user ],
             '0.0.0.0',
             'userPasswordReset/welcome/reset.twig',
-            'userPasswordReset/welcome/userNotAllowedReset.twig'
+            'userPasswordReset/welcome/userNotAllowedReset.twig',
+            'Welcome to ' . $this->config->get('title')
         );
     }
 
@@ -119,10 +120,11 @@ class MailService
      * @param string $remoteAddress
      * @param string $canResetTemplate
      * @param string $canNotResetTemplate
+     * @param string $subject
      * @throws PDOException                 if the attempt to save the Reset object fails
      * @return bool[]                       array of successes/failures, indexed by address, ie. [ email => success ]
      */
-    private function sendResetToUsers(array $users, $remoteAddress, $canResetTemplate, $canNotResetTemplate)
+    private function sendResetToUsers(array $users, $remoteAddress, $canResetTemplate, $canNotResetTemplate, $subject = null)
     {
         $sent = [];
 
@@ -131,7 +133,7 @@ class MailService
             return $sent;
         }
 
-        $subject     = $this->config->get('title') . ' Password Reset';
+        $subject     = $subject ?: $this->config->get('title') . ' Password Reset';
         $fromAddress = $this->config->get('password_change_email_from');
         $fromName    = $this->config->get('mail_from_name');
 
