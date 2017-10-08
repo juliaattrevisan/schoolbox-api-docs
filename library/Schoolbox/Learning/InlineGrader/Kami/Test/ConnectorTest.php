@@ -93,30 +93,36 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
 
 
     /**
-     * Test uploads against the mock API
+     * Test uploading a document from the Mock API.
+     *
+     * This uses the same data provider as getDocument, as it returns documents
+     * in the same format.
+     *
+     * @dataProvider providerGetDocument
+     *
+     * @param string              $name
+     * @param string              $documentIdentifier
+     * @param string              $fileStatus
+     * @param null|string         $fileErrorMessage
+     * @param Alaress_Date_Format $createdAt
+     * @param ResponseInterface   $response
      */
-    public function testUpload(): void
-    {
-        $response = new Response(
-            200,
-            [],
-            json_encode([
-                "name"                => "Blah Document",
-                "document_identifier" => "2kmcksmndlkansdlk",
-                "file_status"         => "processing",
-                "file_error_message"  => null,
-                "created_at"          => "2015-09-22T23:22:12.798Z",
-            ])
-        );
+    public function testUpload(
+        string $name,
+        string $documentIdentifier,
+        string $fileStatus,
+        ?string $fileErrorMessage,
+        Alaress_Date_Format $createdAt,
+        ResponseInterface $response
+    ): void {
         $connector = new MockConnector($this->getMockClient($response));
         $document  = $connector->uploadDocument($this->getMockStorage());
-
-        $this->assertEquals('2kmcksmndlkansdlk', $document->getId());
-        $this->assertEquals('Blah Document', $document->getName());
-        $this->assertEquals('processing', $document->getFileStatus());
-        $this->assertNull($document->getFileErrorMessage());
+        $this->assertEquals($documentIdentifier, $document->getId());
+        $this->assertEquals($name, $document->getName());
+        $this->assertEquals($fileStatus, $document->getFileStatus());
+        $this->assertEquals($fileErrorMessage, $document->getFileErrorMessage());
         $this->assertEquals(
-            "2015-09-22T23:22:12.798000Z",
+            $createdAt->getUsingFormat(Alaress_Date_Format::FORMAT_DATETIME_UTC),
             $document->getCreatedAt()->getUsingFormat(Alaress_Date_Format::FORMAT_DATETIME_UTC)
         );
     }
