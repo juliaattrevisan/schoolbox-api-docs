@@ -150,7 +150,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
     public function testUploadInvalidStatus(): void
     {
         $response = new Response(
-            200,
+            201,
             [],
             json_encode([
                 "name"                => "document.docx",
@@ -187,7 +187,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
      */
     public function testUploadBadResponseBody(): void
     {
-        $response  = new Response(200, [], 'LOL');
+        $response  = new Response(201, [], 'LOL');
         $connector = new MockConnector($this->getMockClient($response));
         $connector->uploadDocument($this->getMockStorage());
     }
