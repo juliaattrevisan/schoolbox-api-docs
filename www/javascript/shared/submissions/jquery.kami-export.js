@@ -23,40 +23,51 @@
      * @constructor
      */
     function KamiExport(element, options) {
-        kamiExport        = this;
-        this.element      = $(element);
-        this.options      = $.extend(true, {}, defaults, options);
+        kamiExport         = this;
+        kamiExport.element = $(element);
+        kamiExport.options = $.extend(true, {}, defaults, options);
 
         // validate a couple things
         if (!options || !options.toast) {
             throw "'toast option is required and must be a jQuery object'";
         }
 
+        // Set up the link with a random token
+        updateDownloadToken(kamiExport.element);
+
         // install listeners
-        this.element.on('click', function (event) {
+        kamiExport.element.on('click', function (event) {
             // We need to prevent multiple clicks on the download button. But we cannot do an async request
             // as the browser blocks async file downloads.
             // @see https://stackoverflow.com/questions/1106377/detect-when-browser-receives-file-download
             var $downloadButton = $(this);
-
-            // First click? (Performed by user)
-            if(!$downloadButton.is('[token]')){
-                var token = generateRandomToken(10);
-                $downloadButton.attr('token', token);
-                $downloadButton.attr('href', $downloadButton.attr('href') + '?token=' + token);
-                event.preventDefault();
-                $downloadButton.get(0).click();
-                kamiExport.options.toast.toastActivate({text: 'Requesting export...'});
-                event.preventDefault();
-            }
-
-            // Second click? (Performed by javascript)
-            // Prevent user generating multiple exports
             $downloadButton.attr('disabled', true);
-            // Check for download
+            kamiExport.options.toast.toastActivate({text: 'Requesting export...'});
             checkDownloadFinished($downloadButton, $downloadButton.attr('token'), 1000, 0, kamiExport.options.timeout);
-            // Permit the browser to perform a normal synchronous download
         });
+    }
+
+    /**
+     * Appends a new download token. Overwriting if it already exists
+     *
+     * @param {jQuery} $downloadButton
+     */
+    function updateDownloadToken($downloadButton) {
+        removeDownloadToken($downloadButton);
+        var token = generateRandomToken(10);
+        $downloadButton.attr('token', token);
+        $downloadButton.attr('href', $downloadButton.attr('href') + '?token=' + token);
+    }
+
+    /**
+     * Removes the download token from the link, and the data attribute from the DOM element
+     *
+     * @param {jQuery} $downloadButton
+     */
+    function removeDownloadToken($downloadButton){
+        $downloadButton.removeAttr('token');
+        // strip the token from the URL, and the '?' char if no other args remain
+        $downloadButton.attr('href', $downloadButton.attr('href').replace(/token=\d+&*/, '').replace(/\?$/, ''));
     }
 
 
@@ -113,9 +124,7 @@
     function stopPolling($downloadButton) {
         deleteCookie(cookieNameToken);
         deleteCookie(cookieNameStatus);
-        $downloadButton.removeAttr('token');
-        // strip the token from the URL, and the '?' char if no other args remain
-        $downloadButton.attr('href', $downloadButton.attr('href').replace(/token=\d+&*/, '').replace(/\?$/, ''));
+        updateDownloadToken($downloadButton);
         $downloadButton.attr('disabled', false);
     }
 
