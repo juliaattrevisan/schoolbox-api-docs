@@ -129,6 +129,74 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
 
 
     /**
+     * Test not finding a document from the Mock API after I upload it.
+     *
+     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound
+     */
+    public function testUploadNotFound(): void
+    {
+        $response = new Response(
+            404,
+            [],
+            json_encode(["errors" => ["Record Not Found"],])
+        );
+        $connector = new MockConnector($this->getMockClient($response));
+        $connector->uploadDocument($this->getMockStorage());
+    }
+
+
+    /**
+     * Test upload of a document from the Mock API, and then do something if its status is bad.
+     *
+     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\InvalidStatusException
+     */
+    public function testUploadInvalidStatus(): void
+    {
+        $response = new Response(
+            200,
+            [],
+            json_encode([
+                "name"                => "document.docx",
+                "document_identifier" => "asdfghjkl",
+                "file_status"         => "unknown",
+                "file_error_message"  => 'Bad Status',
+                "created_at"          => "2015-09-22T23:22:12.798Z",
+            ])
+        );
+        $connector = new MockConnector($this->getMockClient($response));
+        $connector->uploadDocument($this->getMockStorage());
+    }
+
+
+    /**
+     * Test upload of a document from the Mock API, if the response is bad.
+     *
+     * @dataProvider providerGetDocumentBadResponse
+     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException
+     *
+     * @param ResponseInterface $response
+     */
+    public function testUploadBadResponse(ResponseInterface $response): void
+    {
+        $connector = new MockConnector($this->getMockClient($response));
+        $connector->uploadDocument($this->getMockStorage());
+    }
+
+
+    /**
+     * Test upload of a document from the Mock API, if the response body is bad.
+     *
+     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\ResponseDecodeException
+     */
+    public function testUploadBadResponseBody(): void
+    {
+        $response  = new Response(200, [], 'LOL');
+        $connector = new MockConnector($this->getMockClient($response));
+        $connector->uploadDocument($this->getMockStorage());
+    }
+
+
+    /**
      * Test listing against the mock API
      *
      * @dataProvider providerListDocuments
