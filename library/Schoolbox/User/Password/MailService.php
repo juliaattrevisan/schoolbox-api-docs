@@ -115,6 +115,7 @@ class MailService
     /**
      * @param User   $user
      * @param string $oldUsername
+     * @retur bool                whether or not the email successfully sent
      */
     public function sendUsernameChangeEmailToUser(User $user, $oldUsername)
     {
@@ -135,12 +136,12 @@ class MailService
         ]);
 
         try {
-            $email->send([
+            return $email->send([
                 'name'  => $user->formatName(),
                 'email' => $user->getEmail()
             ]);
         } catch (Swift_SwiftException $e) {
-            // noop
+            return false;
         }
     }
 
