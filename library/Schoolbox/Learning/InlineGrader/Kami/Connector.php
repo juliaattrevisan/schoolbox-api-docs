@@ -110,10 +110,12 @@ class Connector implements IConnector
      *
      * @param IStorage $storage
      * @return Document
+     * @throws \InvalidArgumentException If cannot convert the request or response to a string
      * @throws Exception\EmptyApiKeyException If no Kami API key configured
      * @throws Exception\ResponseDecodeException If cannot decode the Kami response
      * @throws Exception\ApiException if response doesn't contain required fields
      * @throws Exception\InvalidStatusException if response status is invalid
+     * @throws Exception\NotFound If document somehow does not exist in Kami after being uploaded
      */
     public function uploadDocument(IStorage $storage): Document
     {
@@ -135,8 +137,17 @@ class Connector implements IConnector
         ];
         $request  = new Request('POST', $this->getPathUploadDocument());
         $response = $this->client->send($request, $this->getOptions($options));
-        $decoded  = $this->decodeResponseContent($response->getBody());
-        return $this->buildDocument($decoded);
+
+        if (201 === $response->getStatusCode()) {
+            $decoded = $this->decodeResponseContent($response->getBody());
+            return $this->buildDocument($decoded);
+        }
+
+        // Bad response, but not a simple 'not found'?
+        if (!$this->isValidNotFound($response)) {
+            $this->generateApiException($request, $response);
+        }
+        throw new Exception\NotFound("Kami Document not uploaded", $request, $response);
     }
 
 
