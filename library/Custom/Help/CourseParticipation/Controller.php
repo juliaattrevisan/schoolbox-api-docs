@@ -16,7 +16,6 @@ use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Psr7\Response;
 use PDOException;
 use Schoolbox\CampusMapper;
-use Schoolbox\Mail\TwigEmailFactory;
 use Schoolbox\Permission\SiteAccess;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -24,7 +23,6 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Swift_SwiftException;
 use UnexpectedValueException;
 
 
@@ -62,30 +60,24 @@ class Controller extends Base
      */
     private $passwordMailService;
 
-    /** @var TwigEmailFactory */
-    private $mailFactory;
-
     /**
      * @param UserAccessMapper          $userAccessMapper
      * @param SiteAccess\Mapper         $tokenMapper
      * @param Folder\Mapper             $folderMapper
      * @param User\Password\MailService $mailService
-     * @param TwigEmailFactory          $mailFactory
      * @throws Mapper\DefinitionException
      */
     public function __construct(
         UserAccessMapper $userAccessMapper,
         SiteAccess\Mapper $tokenMapper,
         Folder\Mapper $folderMapper,
-        User\Password\MailService $mailService,
-        TwigEmailFactory $mailFactory
+        User\Password\MailService $mailService
     ) {
         $this->userAccessMapper = $userAccessMapper;
         $this->tokenMapper      = $tokenMapper;
         $this->folderMapper     = $folderMapper;
         $this->codeMapper       = $folderMapper->getJoinMapper('codes');
         $this->passwordMailService = $mailService;
-        $this->mailFactory      = $mailFactory;
     }
 
 

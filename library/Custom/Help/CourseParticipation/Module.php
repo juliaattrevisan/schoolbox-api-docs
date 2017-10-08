@@ -97,7 +97,6 @@ class Module extends Alaress\Module\Module
             'tokenMapper'      => $mapperFactory->getLazy(SiteAccess\Mapper::class),
             'folderMapper'     => $mapperFactory->getLazy(Folder\Mapper::class),
             'mailService'      => $injector->lazyNew(MailService::class),
-            'mailFactory'      => $injector->lazyNew(TwigEmailFactory::class)
         ];
     }
 
