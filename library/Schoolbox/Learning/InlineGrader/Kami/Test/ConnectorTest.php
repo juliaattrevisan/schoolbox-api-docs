@@ -168,7 +168,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
     /**
      * Test upload of a document from the Mock API, if the response is bad.
      *
-     * @dataProvider providerGetDocumentBadResponse
+     * @dataProvider providerUploadBadResponse
      * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException
      *
      * @param ResponseInterface $response
@@ -661,114 +661,19 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
 
     public function providerGetDocumentBadResponse(): array
     {
-        return [
-            'Bad Response Code' => [
-                'response' => new Response(
-                    400,
-                    [],
-                    json_encode([
-                        "name"                => "Blah Document",
-                        "document_identifier" => "2kmcksmndlkansdlk",
-                        "file_status"         => "done",
-                        "file_error_message"  => null,
-                        "created_at"          => "2015-09-22T23:22:12.798Z",
-                    ])
-                ),
-            ],
-            'Unknown Error' => [
-                'response' => new Response(
-                    400,
-                    [],
-                    json_encode(["errors" => ["Unknown Error"],])
-                ),
-            ],
-            'No Errors' => [
-                'response' => new Response(
-                    404,
-                    [],
-                    json_encode(["nothing" => ["Unknown Error"],])
-                ),
-            ],
-            'No Name' => [
-                'response' => new Response(
-                    200,
-                    [],
-                    json_encode([
-                        "document_identifier" => "2kmcksmndlkansdlk",
-                        "file_status"         => "done",
-                        "file_error_message"  => null,
-                        "created_at"          => "2015-09-22T23:22:12.798Z",
-                    ])
-                ),
-            ],
-            'No ID' => [
-                'response' => new Response(
-                    200,
-                    [],
-                    json_encode([
-                        "name"                => "Blah Document",
-                        "file_status"         => "done",
-                        "file_error_message"  => null,
-                        "created_at"          => "2015-09-22T23:22:12.798Z",
-                    ])
-                ),
-            ],
-            'No Status' => [
-                'response' => new Response(
-                    200,
-                    [],
-                    json_encode([
-                        "name"                => "Blah Document",
-                        "document_identifier" => "2kmcksmndlkansdlk",
-                        "file_error_message"  => null,
-                        "created_at"          => "2015-09-22T23:22:12.798Z",
-                    ])
-                ),
-            ],
-            'No Error' => [
-                'response' => new Response(
-                    200,
-                    [],
-                    json_encode([
-                        "name"                => "Blah Document",
-                        "document_identifier" => "2kmcksmndlkansdlk",
-                        "file_status"         => "done",
-                        "created_at"          => "2015-09-22T23:22:12.798Z",
-                    ])
-                ),
-            ],
-            'No Created' => [
-                'response' => new Response(
-                    200,
-                    [],
-                    json_encode([
-                        "name"                => "Blah Document",
-                        "document_identifier" => "2kmcksmndlkansdlk",
-                        "file_status"         => "done",
-                        "file_error_message"  => null,
-                    ])
-                ),
-            ],
-            'Bad Created Format' => [
-                'response' => new Response(
-                    200,
-                    [],
-                    json_encode([
-                        "name"                => "Blah Document",
-                        "document_identifier" => "2kmcksmndlkansdlk",
-                        "file_status"         => "done",
-                        "file_error_message"  => null,
-                        "created_at"          => "not a date",
-                    ])
-                ),
-            ],
-        ];
+        return $this->providerBadResponse(200);
     }
 
 
     public function providerUpload(): array
     {
         return $this->providerDocument(201);
+    }
+
+
+    public function providerUploadBadResponse(): array
+    {
+        return $this->providerBadResponse(201);
     }
 
 
@@ -838,6 +743,113 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
                         "file_status"         => "error",
                         "file_error_message"  => 'Bad Mimetype',
                         "created_at"          => "2015-09-22T23:22:12.798Z",
+                    ])
+                ),
+            ],
+        ];
+    }
+
+
+    private function providerBadResponse(int $validStatusCode): array
+    {
+        return [
+            'Bad Response Code' => [
+                'response' => new Response(
+                    400,
+                    [],
+                    json_encode([
+                        "name"                => "Blah Document",
+                        "document_identifier" => "2kmcksmndlkansdlk",
+                        "file_status"         => "done",
+                        "file_error_message"  => null,
+                        "created_at"          => "2015-09-22T23:22:12.798Z",
+                    ])
+                ),
+            ],
+            'Unknown Error' => [
+                'response' => new Response(
+                    400,
+                    [],
+                    json_encode(["errors" => ["Unknown Error"],])
+                ),
+            ],
+            'No Errors' => [
+                'response' => new Response(
+                    404,
+                    [],
+                    json_encode(["nothing" => ["Unknown Error"],])
+                ),
+            ],
+            'No Name' => [
+                'response' => new Response(
+                    $validStatusCode,
+                    [],
+                    json_encode([
+                        "document_identifier" => "2kmcksmndlkansdlk",
+                        "file_status"         => "done",
+                        "file_error_message"  => null,
+                        "created_at"          => "2015-09-22T23:22:12.798Z",
+                    ])
+                ),
+            ],
+            'No ID' => [
+                'response' => new Response(
+                    $validStatusCode,
+                    [],
+                    json_encode([
+                        "name"                => "Blah Document",
+                        "file_status"         => "done",
+                        "file_error_message"  => null,
+                        "created_at"          => "2015-09-22T23:22:12.798Z",
+                    ])
+                ),
+            ],
+            'No Status' => [
+                'response' => new Response(
+                    $validStatusCode,
+                    [],
+                    json_encode([
+                        "name"                => "Blah Document",
+                        "document_identifier" => "2kmcksmndlkansdlk",
+                        "file_error_message"  => null,
+                        "created_at"          => "2015-09-22T23:22:12.798Z",
+                    ])
+                ),
+            ],
+            'No Error' => [
+                'response' => new Response(
+                    $validStatusCode,
+                    [],
+                    json_encode([
+                        "name"                => "Blah Document",
+                        "document_identifier" => "2kmcksmndlkansdlk",
+                        "file_status"         => "done",
+                        "created_at"          => "2015-09-22T23:22:12.798Z",
+                    ])
+                ),
+            ],
+            'No Created' => [
+                'response' => new Response(
+                    $validStatusCode,
+                    [],
+                    json_encode([
+                        "name"                => "Blah Document",
+                        "document_identifier" => "2kmcksmndlkansdlk",
+                        "file_status"         => "done",
+                        "file_error_message"  => null,
+                    ])
+                ),
+            ],
+            'Bad Created Format' => [
+                'response' => new Response(
+                    $validStatusCode,
+                    [],
+                    json_encode([
+                        "name"                => "Blah Document",
+                        "document_identifier" => "2kmcksmndlkansdlk",
+                        "file_status"         => "done",
+                        "file_error_message"  => null,
+                        "created_at"          => "not a date",
                     ])
                 ),
             ],
