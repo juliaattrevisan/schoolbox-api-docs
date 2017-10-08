@@ -344,6 +344,7 @@ class Controller extends Base
                 ->setAltEmail($userData['email'])
                 ->setEnabled(true)
                 ->setExternalId($externalId)
+                ->setLocalEmail(false) // use alt-email in ALL cases always
             ;
 
             try {
