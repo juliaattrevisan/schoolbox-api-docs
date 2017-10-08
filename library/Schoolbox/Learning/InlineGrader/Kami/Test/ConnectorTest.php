@@ -97,13 +97,28 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
      */
     public function testUpload(): void
     {
-        $connector = new MockConnector(new Client());
+        $response = new Response(
+            200,
+            [],
+            json_encode([
+                "name"                => "Blah Document",
+                "document_identifier" => "2kmcksmndlkansdlk",
+                "file_status"         => "processing",
+                "file_error_message"  => null,
+                "created_at"          => "2015-09-22T23:22:12.798Z",
+            ])
+        );
+        $connector = new MockConnector($this->getMockClient($response));
         $document  = $connector->uploadDocument($this->getMockStorage());
 
         $this->assertEquals('2kmcksmndlkansdlk', $document->getId());
         $this->assertEquals('Blah Document', $document->getName());
         $this->assertEquals('processing', $document->getFileStatus());
         $this->assertNull($document->getFileErrorMessage());
+        $this->assertEquals(
+            "2015-09-22T23:22:12.798000Z",
+            $document->getCreatedAt()->getUsingFormat(Alaress_Date_Format::FORMAT_DATETIME_UTC)
+        );
     }
 
 
