@@ -361,30 +361,7 @@ class Controller extends Base
                   // existing user
                     if ($user->getUsername() !== $oldUsername) {
                         // send existing-user email ("your username has changed")
-                        $subject     = $this->getConfigLoader()->get('title') . ' Username Change';
-                        $fromAddress = $this->getConfigLoader()->get('password_change_email_from');
-                        $fromName    = $this->getConfigLoader()->get('mail_from_name');
-
-                        $email = $this->mailFactory->build(
-                            'userPasswordReset/welcome/usernameChange.twig',
-                            $subject
-                        );
-
-                        $email->setFrom($fromAddress, $fromName);
-
-                        $email->setContext([
-                            'user'        => $user,
-                            'oldUsername' => $oldUsername
-                        ]);
-
-                        try {
-                            $email->send([
-                                'name'  => $user->formatName(),
-                                'email' => $user->getEmail()
-                            ]);
-                        } catch (Swift_SwiftException $e) {
-                            // noop
-                        }
+                        $this->passwordMailService->sendUsernameChangeEmailToUser($user, $oldUsername);
                     }
                 } else {
                     // new user: send new-user email ("welcome and here's how to set your password")

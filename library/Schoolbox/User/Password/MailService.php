@@ -113,6 +113,38 @@ class MailService
 
 
     /**
+     * @param User   $user
+     * @param string $oldUsername
+     */
+    public function sendUsernameChangeEmailToUser(User $user, $oldUsername)
+    {
+        $subject     = $this->config->get('title') . ' Username Change';
+        $fromAddress = $this->config->get('password_change_email_from');
+        $fromName    = $this->config->get('mail_from_name');
+
+        $email = $this->mailFactory->build(
+            'userPasswordReset/welcome/usernameChange.twig',
+            $subject
+        );
+
+        $email->setFrom($fromAddress, $fromName);
+
+        $email->setContext([
+            'user'        => $user,
+            'oldUsername' => $oldUsername
+        ]);
+
+        try {
+            $email->send([
+                'name'  => $user->formatName(),
+                'email' => $user->getEmail()
+            ]);
+        } catch (Swift_SwiftException $e) {
+            // noop
+        }
+    }
+
+    /**
      * Send an email to the list of users given with one of the given templates (depending on whether that
      * user is or isn't allowed to change their email address)
      *
