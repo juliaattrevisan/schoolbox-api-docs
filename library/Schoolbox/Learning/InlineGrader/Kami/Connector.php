@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\InlineGrader\Kami;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\RequestOptions;
@@ -92,8 +93,12 @@ class Connector implements IConnector
         if (!$this->isEnabled()) {
             return false;
         }
-        $request  = new Request('GET', $this->getPathGetDocument('FAKE_DOC_ID'));
-        $response = $this->client->send($request, $this->getOptions());
+        $request = new Request('GET', $this->getPathGetDocument('FAKE_DOC_ID'));
+        try {
+            $response = $this->client->send($request, $this->getOptions());
+        } catch (GuzzleException $e) {
+            return false;
+        }
         return $this->isValidNotFound($response);
     }
 
@@ -105,8 +110,12 @@ class Connector implements IConnector
      *
      * @param IStorage $storage
      * @return Document
+     * @throws \InvalidArgumentException If cannot convert the request or response to a string
      * @throws Exception\EmptyApiKeyException If no Kami API key configured
      * @throws Exception\ResponseDecodeException If cannot decode the Kami response
+     * @throws Exception\ApiException if response doesn't contain required fields
+     * @throws Exception\InvalidStatusException if response status is invalid
+     * @throws Exception\NotFound If document somehow does not exist in Kami after being uploaded
      */
     public function uploadDocument(IStorage $storage): Document
     {
@@ -128,13 +137,26 @@ class Connector implements IConnector
         ];
         $request  = new Request('POST', $this->getPathUploadDocument());
         $response = $this->client->send($request, $this->getOptions($options));
-        $decoded  = $this->decodeResponseContent($response->getBody());
-        return $this->buildDocument($decoded);
+
+        if (201 === $response->getStatusCode()) {
+            $decoded = $this->decodeResponseContent($response->getBody());
+            return $this->buildDocument($decoded);
+        }
+
+        // Bad response, but not a simple 'not found'?
+        if (!$this->isValidNotFound($response)) {
+            $this->generateApiException($request, $response);
+        }
+        throw new Exception\NotFound("Kami Document not uploaded", $request, $response);
     }
 
 
     /**
-     * Get a list of all documents uploaded to Kami
+     * Get a list of all documents uploaded to Kami.
+     *
+     * Any documents that don't pass parsing are ignored, instead of raising
+     * an exception; I don't want to crash the entire list just because one
+     * document failed to parse.
      *
      * @return GenericCollection|Document[]
      * @throws Exception\EmptyApiKeyException If API key not configured
@@ -152,7 +174,12 @@ class Connector implements IConnector
 
         /** @var \stdClass[] $decoded */
         foreach ($decoded as $obj) {
-            $document                      = $this->buildDocument($obj);
+            try {
+                $document = $this->buildDocument($obj);
+            } catch (Exception\IKamiException $e) {
+                // This document failed to parse: nothing to do but...
+                continue;
+            }
             $documents[$document->getId()] = $document;
         }
         return $documents;
@@ -160,15 +187,16 @@ class Connector implements IConnector
 
 
     /**
-     * Return the specified document from Kami if it exists there. Null otherwise.
+     * Return the specified document from Kami if it exists there. Otherwise throws an exception.
      *
      * @param string $documentId
-     * @return null|Document
+     * @return Document
      * @throws Exception\EmptyApiKeyException If API key not configured
      * @throws Exception\ResponseDecodeException If unable to decode a server response
      * @throws Exception\ApiException If cannot fetch a document for reasons other than simply not existing.
      * @throws \InvalidArgumentException If cannot convert the request or response to a string
      * @throws Exception\NotFound If document does not exist in Kami
+     * @throws Exception\InvalidStatusException if document's status is invalid
      */
     public function getDocument(string $documentId): Document
     {
@@ -193,7 +221,7 @@ class Connector implements IConnector
      * Delete an uploaded document. This will remove the file from Kami's cloud storage.
      *
      * @param string $documentId
-     * @return bool Whether a mutation occurred. (will return false if doc not found)
+     * @return bool Whether a mutation occurred. (will always return true, if it fails expect an exception)
      * @throws Exception\EmptyApiKeyException If API key not configured
      * @throws Exception\ResponseDecodeException If unable to decode a server response
      * @throws Exception\ApiException If cannot fetch a document for reasons other than simply not existing.
@@ -326,6 +354,9 @@ class Connector implements IConnector
         $this->assertEnabled();
         $request  = new Request('GET', self::BASE_URI . "embed/exports/$exportId");
         $response = $this->client->send($request, $this->getOptions());
+        if ($this->isValidNotFound($response)) {
+            throw new Exception\NotFound("Kami Document not found. Id: $exportId", $request, $response);
+        }
         return $this->buildExport($this->decodeResponseContent($response->getBody()));
     }
 
@@ -434,7 +465,7 @@ class Connector implements IConnector
     {
         try {
             return json_decode($response->getContents());
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException|\TypeError $e) {
             throw new Exception\ResponseDecodeException(
                 $e->getMessage(),
                 $e->getCode()
@@ -459,15 +490,26 @@ class Connector implements IConnector
     /**
      * @param stdClass $obj
      * @return Document
+     * @throws Exception\InvalidStatusException if document's status is invalid
+     * @throws Exception\ApiException if $obj doesn't contain required fields
      */
     private function buildDocument(stdClass $obj): Document
     {
+        // All these fields must exist in order to create this doc
+        $this->assertProperties($obj, ['document_identifier', 'name', 'file_status', 'file_error_message', 'created_at']);
+
+        // And date must be UTC
+        try {
+            $createdDate = new Alaress_Date_Format($obj->created_at, Alaress_Date_Format::FORMAT_DATETIME_UTC);
+        } catch (\InvalidArgumentException $e) {
+            throw new Exception\ApiException("Property created_at is not able to be parsed as a date");
+        }
         return new Document(
             $obj->document_identifier,
             $obj->name,
             $obj->file_status,
             $obj->file_error_message,
-            new Alaress_Date_Format($obj->created_at, Alaress_Date_Format::FORMAT_DATETIME_UTC)
+            $createdDate
         );
     }
 
@@ -514,16 +556,26 @@ class Connector implements IConnector
      *
      * @param stdClass $obj
      * @return Session
+     * @throws Exception\ApiException if $obj doesn't contain required field viewer_url
+     *                                if $obj->session_expiry exists but isn't parseable
      */
     private function buildViewSession(stdClass $obj): Session
     {
-        return new Session(
-            $obj->view_session_key,
-            $obj->viewer_url,
-            $obj->session_expiry
-                ? new Alaress_Date_Format($obj->session_expiry, Alaress_Date_Format::FORMAT_DATETIME_UTC)
-                : new Alaress_Date_NullDate()
-        );
+        // view_session_key and session_expiry are optional, viewer_url is not
+        $this->assertProperties($obj, ['viewer_url',]);
+
+        $sessionKey = property_exists($obj, 'view_session_key') ? $obj->view_session_key : '';
+
+        if (property_exists($obj, 'session_expiry')) {
+            try {
+                $sessionExpiry = new Alaress_Date_Format($obj->session_expiry, Alaress_Date_Format::FORMAT_DATETIME_UTC);
+            } catch (\InvalidArgumentException $e) {
+                throw new Exception\ApiException("Property session_expiry is not able to be parsed as a date");
+            }
+        } else {
+            $sessionExpiry = new Alaress_Date_NullDate();
+        }
+        return new Session($sessionKey, $obj->viewer_url, $sessionExpiry);
     }
 
 
@@ -532,9 +584,12 @@ class Connector implements IConnector
      *
      * @param stdClass $obj
      * @return Export
+     * @throws Exception\ApiException if $obj doesn't contain required fields id and status
+     * @throws Exception\InvalidStatusException if export's status is invalid
      */
     private function buildExport(stdClass $obj): Export
     {
+        $this->assertProperties($obj, ['id', 'status',]);
         return new Export(
             $obj->id,
             $obj->status,
@@ -568,5 +623,31 @@ class Connector implements IConnector
             RequestOptions::HTTP_ERRORS => false,
             'base_uri'                  => static::BASE_URI,
         ];
+    }
+
+
+    /**
+     * Assert that all properties in $properties exist in $obj
+     *
+     * @param stdClass $obj
+     * @param array    $properties
+     * @throws Exception\ApiException if not all do
+     */
+    private function assertProperties(stdClass $obj, array $properties): void
+    {
+        $missingProperties = array_filter(
+            $properties,
+            function ($property) use ($obj) {
+                return !property_exists($obj, $property);
+            }
+        );
+        if (!empty($missingProperties)) {
+            throw new Exception\ApiException(
+                sprintf(
+                    "Required properties (%s) not found",
+                    implode(', ', $missingProperties)
+                )
+            );
+        }
     }
 }

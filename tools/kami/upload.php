@@ -9,6 +9,7 @@
  */
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Http\UnreliableClient;
 use Alaress\Jitter\Jitter;
 use Aura\Di;
 use Psr\Log\LoggerInterface;
@@ -145,7 +146,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     $kamiMapper    = $mapperFactory->get(Kami\Mapper::class);
     $client        = $failureRate === 0.0
         ? new GuzzleHttp\Client()
-        : new Kami\Test\UnreliableClient($failureRate, new Random\FloatGenerator());
+        : new UnreliableClient($failureRate, new Random\FloatGenerator());
 
     $connector = $dryRun ? new Kami\MockConnector($client) : new Kami\Connector($config, $client);
 

@@ -6,9 +6,10 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\InlineGrader\Kami\Exception;
+namespace Alaress\Http;
 
 use GuzzleHttp\Exception\ClientException;
+use Schoolbox\Learning\InlineGrader\Kami\Exception\IKamiException;
 
 class SimulatedNetworkFailureException extends ClientException implements IKamiException
 {
