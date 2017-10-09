@@ -109,12 +109,12 @@
             </div>
 
             {% for namespace in config %}
-                <h3 class="subheader">Receive {{ namespace.label }} messages when&hellip;</h3>
+                <h3 class="subheader">Receive {{ locale.translateSentence(namespace.label) }} messages when&hellip;</h3>
                 <section>
                     <ul class='permission-list' data-roles data-digest-settings>
                         {% for source in namespace.sources %}
                             <li>
-                                <label class="content">&hellip;{{ source.description }}.</label>
+                                <label class="content">&hellip;{{ locale.translateSentence(source.description) }}.</label>
                                 <div class="actions-small-6" data-source="{{ source.id }}">
                                     <nav>
                                         {% include '@messages/options.twig' with { mode: 'p', role: source } %}
