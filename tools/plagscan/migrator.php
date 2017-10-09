@@ -161,7 +161,7 @@ function migrateHtml(PlagscanDocumentMapper $plagscanMapper, PlagscanDocumentMig
         if ($migration->getStorage()->getSize() == strlen($document->getHtml())) {
             // Blank out the document content if the move was successful
 
-            //$document->setHtml(null);
+            $document->setHtml(null);
             $plagscanMapper->save($document);
 
             return RESULT_SUCCESS;
