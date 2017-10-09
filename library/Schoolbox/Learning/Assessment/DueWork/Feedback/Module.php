@@ -88,7 +88,7 @@ class Module extends BaseModule
          */
         $preloadAssessable = function ($params) {
             return [
-                'assessable' => $this->preloadAssessable($params['assessmentId']),
+                'assessment' => $this->preloadAssessable($params['assessmentId']),
             ];
         };
 
