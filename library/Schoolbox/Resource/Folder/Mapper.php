@@ -306,7 +306,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     public function refreshNotificationRedirects(Model $folder, $previous = null)
     {
         /** @noinspection NotOptimalIfConditionsInspection */
-        if (($previous && $folder->getInherit() === $previous->getInherit()) || $folder->getInherit()) {
+        if (($previous && $folder->getInherit() !== $previous->getInherit()) || $folder->getInherit()) {
             // inheritance has changed, OR the folder is new AND inheritance is enabled
 
             // TODO desingleton these
