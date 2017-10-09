@@ -21,14 +21,10 @@
                 error.insertAfter($(element).closest('section'));
             },
             submitHandler: function($form) {
-
                 $(this).confirmDialog({
                     text: 'Are you sure you want to delete the selected attempts?',
                     confirmEvent: function() {
                         $form.submit();
-                    },
-                    cancelEvent: function() {
-                        return false;
                     }
                 });
             }
