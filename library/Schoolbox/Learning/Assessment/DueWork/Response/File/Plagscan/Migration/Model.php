@@ -25,9 +25,6 @@ class Model implements IStorage, ISoftDeletable
     use DeletedAtDate;
     use StorableTrait;
 
-    /** @var int $plagscanDocumentId */
-    protected $plagscanDocumentId;
-
     /** @var PlagscanDocument $plagscanDocument */
     protected $plagscanDocument;
 
@@ -52,26 +49,6 @@ class Model implements IStorage, ISoftDeletable
     }
 
     // Getters/Setters
-
-    /**
-     * @return int
-     */
-    public function getPlagscanDocumentId()
-    {
-        return $this->plagscanDocumentId;
-    }
-
-    /**
-     * @param int $plagscanDocumentId
-     *
-     * @return self|$this
-     */
-    public function setPlagscanDocumentId($plagscanDocumentId)
-    {
-        $this->plagscanDocumentId = $plagscanDocumentId;
-
-        return $this;
-    }
 
     /**
      * @return PlagscanDocument
