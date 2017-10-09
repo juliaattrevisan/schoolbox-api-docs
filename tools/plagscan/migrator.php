@@ -13,14 +13,14 @@ use Aura\Di\Container as Injector;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanDocumentMapper;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Migration\Mapper as PlagscanDocumentMigrationMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as PlagscanDocument;
-use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\IStorage;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
-const RESULT_FAILED           = 0;
-const RESULT_SUCCESS          = 1;
-const RESULT_SKIPPED_FAILED   = 2;
-const RESULT_SKIPPED_MIGRATED = 3;
+const RESULT_FAILED      = 0;
+const RESULT_SUCCESS     = 1;
+const RESULT_FAILED_SIZE = 2;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
@@ -57,15 +57,13 @@ try {
         if (!$lock->acquire()) {
             $log->critical("Document migration already in process");
         } else {
-            $plagscanMapper = PlagscanDocumentMapper::getInstance();
+            $plagscanMapper                  = PlagscanDocumentMapper::getInstance();
+            $plagscanDocumentMigrationMapper = PlagscanDocumentMigrationMapper::getInstance();
 
             $predicateBuilder = $plagscanMapper->getPredicateBuilder();
+            $predicatePending = $predicateBuilder->notNull('html');
 
-            $predicatePending = $predicateBuilder
-                ->notNull('html')
-                ->isNull('storage_migrated_at');
-
-            // Retrieve all unprocessed documents with HTML
+            // Retrieve all documents with HTML
 
             $documents = $plagscanMapper->findByPredicates($predicatePending)->getIterator();
 
@@ -76,29 +74,28 @@ try {
 
             /** @var PlagscanDocument $document */
             foreach ($documents as $document) {
+                if ($document->getPlagscanDocumentMigration()->isMigrated()) {
+                    $log->debug('Skipping previously migrated document');
+                    continue;
+                }
+
+                if ($document->getPlagscanDocumentMigration()->getStorageFailedAt() instanceof Alaress_Date_NullDate && !$opts['retry']) {
+                    $log->debug('Skipping failed document');
+                    $skipped++;
+                }
+
                 $log->info("Migrating #{$document->getId()}: Plagscan ID {$document->getPlagscanId()}");
-                $result = migrateHtml($plagscanMapper, $document, $opts['retry']);
+                $result = migrateHtml($plagscanMapper, $plagscanDocumentMigrationMapper, $document);
 
                 if ($result == RESULT_SUCCESS) {
                     $bytesTotal += strlen($document->getHtml());
                     $success++;
-                } else {
-                    switch ($result) {
-                        case RESULT_FAILED:
-                            $log->error('Document migration failed');
-                            $failed++;
-                            break;
-
-                        case RESULT_SKIPPED_FAILED:
-                            $log->debug('Skipping failed document');
-                            $skipped++;
-                            break;
-
-                        case RESULT_SKIPPED_MIGRATED:
-                            $log->debug('Skipping previously migrated document');
-                            $skipped++;
-                            break;
-                    }
+                } elseif ($result == RESULT_FAILED) {
+                    $log->error('Document migration failed');
+                    $failed++;
+                } elseif ($result == RESULT_FAILED_SIZE) {
+                    $log->error('Uploaded storage object size mismatch');
+                    $failed++;
                 }
             }
 
@@ -118,7 +115,14 @@ try {
         }
     });
 } catch (Exception $e) {
-    $log->critical('Exception Error: ' . $e->getMessage(), [$e]);
+    echo "\nFatal Exception Error:\n";
+
+    do {
+        echo "\n{$e->getMessage()}";
+        $e = $e->getPrevious();
+    } while ($e instanceof \Exception);
+
+    echo "\n\n";
 } finally {
     $lock->release();
 }
@@ -126,38 +130,21 @@ try {
 /**
  * Migrate the HTML contents from `plagscan_document` table into OTFS storage
  *
- * @param PlagscanDocumentMapper $plagscanMapper The plagscan document mapper
- * @param PlagscanDocument       $document       The Plagscan document to be migrated
- * @param bool                   $retry          Flag used to determine if failed documents should be reattempted
+ * @param PlagscanDocumentMapper          $plagscanMapper                  The plagscan document mapper
+ * @param PlagscanDocumentMigrationMapper $plagscanDocumentMigrationMapper The plagscan document migration mapper
+ * @param PlagscanDocument                $document                        The Plagscan document to be migrated
  *
  * @return int
  */
-function migrateHtml(PlagscanDocumentMapper $plagscanMapper, PlagscanDocument $document, bool $retry = false): int
+function migrateHtml(PlagscanDocumentMapper $plagscanMapper, PlagscanDocumentMigrationMapper $plagscanDocumentMigrationMapper, PlagscanDocument $document): int
 {
-    // If the document had already failed, and we aren't retrying failed documents, fail again.
-
-    if (!$document->getStorageFailedAt() instanceof Alaress_Date_NullDate && !$retry) {
-        return RESULT_SKIPPED_FAILED;
-    }
-
-    // Shortcut if the document has already been migrated
-
-    if ($document->isMigrated()) {
-        return RESULT_SKIPPED_MIGRATED;
-    }
-
-    // If the document does not have HTML mark it as migrated so we don't attempt again
-
-    if (!$document->hasHtml()) {
-        $document->setStorageMigratedAt(Alaress_Date_Format::now());
-        $plagscanMapper->save($document);
-
-        return RESULT_SUCCESS;
-    }
-
     // Otherwise save the HTML content into an OTFS storage object
 
     $storageMapper = StorageMapper::getInstance();
+
+    // Grab the migration object
+
+    $migration = $document->getPlagscanDocumentMigration();
 
     // Create temporary file to hold the HTML
 
@@ -166,18 +153,30 @@ function migrateHtml(PlagscanDocumentMapper $plagscanMapper, PlagscanDocument $d
     if ($storageObject instanceof IStorage) {
         // Uploading to storage succeeded
 
-        $document->setStorage($storageObject);
-        $document->setHtml(null);
-        $document->setStorageMigratedAt(Alaress_Date_Format::now());
-        $plagscanMapper->save($document);
+        $migration->setStorage($storageObject);
+        $migration->setStorageMigratedAt(Alaress_Date_Format::now());
 
-        return RESULT_SUCCESS;
+        $plagscanDocumentMigrationMapper->save($migration);
+
+        if ($migration->getStorage()->getSize() == strlen($document->getHtml())) {
+            // Blank out the document content if the move was successful
+
+            //$document->setHtml(null);
+            $plagscanMapper->save($document);
+
+            return RESULT_SUCCESS;
+        } else {
+            $migration->setStorageFailedAt(Alaress_Date_Format::now());
+            $plagscanDocumentMigrationMapper->save($migration);
+
+            return RESULT_FAILED_SIZE;
+        }
     }
 
     // Uploading to storage failed
 
-    $document->setStorageFailedAt(Alaress_Date_Format::now());
-    $plagscanMapper->save($document);
+    $migration->setStorageFailedAt(Alaress_Date_Format::now());
+    $plagscanDocumentMigrationMapper->save($migration);
 
     return RESULT_FAILED;
 }

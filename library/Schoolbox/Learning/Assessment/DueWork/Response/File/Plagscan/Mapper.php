@@ -11,21 +11,15 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
-use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 use PDOStatement;
 use Schoolbox\Collection;
-use Schoolbox\File\Exception as FileException;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3\Connector;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
-use Schoolbox\Resource\Browser\NodeFactory;
-use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\File\Mimetype;
-use Schoolbox\File\MimetypeMapper;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Migration\Mapper as PlagscanDocumentMigrationMapper;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Migration\Model as PlagscanDocumentMigration;
 
 /**
  * @method Model findOneByColumn($columnName, $columnValue, $order = [], $options = [])
@@ -61,7 +55,7 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function mapping () {
         $this->hasTable('plagscan_document');
-        $this->hasModel(Plagscan::class);
+        $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('student_submission_file_id', self::TYPE_INTEGER);
         $this->uses('plagscan_id', self::TYPE_INTEGER);
@@ -70,16 +64,60 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('html', self::TYPE_STRING);
         $this->uses('interactive_url', self::TYPE_STRING);
         $this->uses('privatised_at', self::TYPE_DATETIME);
-        $this->joins('storage_hash', StorageMapper::class, 'hash', null, null, 'storage', 'storage');
-        $this->uses('storage_migrated_at', self::TYPE_DATETIME);
-        $this->uses('storage_failed_at', self::TYPE_DATETIME);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deletedAt');
+        $this->joinsReverseSingle('plagscan_document_id', PlagscanDocumentMigrationMapper::class, 'plagscanDocumentMigration', 'plagscanDocumentMigration');
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'checkHtmlValue']);
     }
 
+    /**
+     * @inheritdoc
+     */
+    protected function getSelectString()
+    {
+        // TODO: Replace with storage object hydration once migration table is deprecated and merged into this mapper
+
+        return "
+            SELECT      {$this->getColumnString()},
+                        {$this->getJoinColumnString('plagscanDocumentMigration','m')}
+            FROM        {$this->getTable()} 
+            LEFT JOIN   {$this->getJoinSql('plagscanDocumentMigration', '', 'm')}
+        ";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        // Hydrated migration object
+
+        $collection = $this->createCollection();
+
+        foreach ($statement as $row) {
+            /** @var Model $model */
+            $model = $this->hydrate($row);
+
+            // Hydrate plagscan migration object
+
+            /** @var PlagscanDocumentMigration $plagscanDocumentMigration */
+            $plagscanDocumentMigration = $this->hydrateJoin($row, 'plagscanDocumentMigration', 'm');
+
+            if (!$plagscanDocumentMigration instanceof PlagscanDocumentMigration) {
+                $plagscanDocumentMigration = PlagscanDocumentMigrationMapper::getInstance()->createModel(
+                    $row[$this->getIdentifierColumn()]
+                );
+            }
+
+            $model->setPlagscanDocumentMigration($plagscanDocumentMigration);
+
+            $collection->add($model);
+        }
+
+        return $collection;
+    }
 
     /**
      * Pre-save callback to ensure we don't save a model that has
@@ -197,8 +235,8 @@ class Mapper extends \Schoolbox\Mapper
         $plagscan->setPlagscanId(null);
         $plagscan->setStatus(Plagscan::STATUS_QUEUED);
         $plagscan->setStudentSubmissionFileId($file->getId());
-        $plagscan->setCreatedAt(Alaress_Date_Format::now());
-        $plagscan->setUpdatedAt(Alaress_Date_Format::now());
+        $plagscan->setCreatedAt(\Alaress_Date_Format::now());
+        $plagscan->setUpdatedAt(\Alaress_Date_Format::now());
 
         return parent::save($plagscan);
     }
@@ -207,8 +245,10 @@ class Mapper extends \Schoolbox\Mapper
      * Save a Plagscan payload into db
      *
      * @param SubmissionFile $file
-     * @param $filename
-     * @return array
+     * @param                $filename
+     *
+     * @return array|bool|int[]
+     * @throws MapperException
      */
     public function saveNewPlagscan(SubmissionFile $file, $filename)
     {
@@ -250,11 +290,11 @@ class Mapper extends \Schoolbox\Mapper
              */
             $plagscan = $this->createModel();
             $plagscan->setStudentSubmissionFileId($file->getId());
-            $plagscan->setCreatedAt(Alaress_Date_Format::now());
+            $plagscan->setCreatedAt(\Alaress_Date_Format::now());
         }
 
         $plagscan->setStatus(Plagscan::STATUS_QUEUED);
-        $plagscan->setUpdatedAt(Alaress_Date_Format::now());
+        $plagscan->setUpdatedAt(\Alaress_Date_Format::now());
 
         // We save it early so if it fails we at least have a record
         parent::save($plagscan);
@@ -320,6 +360,7 @@ class Mapper extends \Schoolbox\Mapper
      *
      * @param int $studentSubmissionFileId
      * @return Collection
+     * @throws MapperException
      */
     public function findPreviousIncarnationsOf($studentSubmissionFileId)
     {
@@ -384,7 +425,8 @@ class Mapper extends \Schoolbox\Mapper
     }
 
     /**
-     * Privatise a particular plagscan id in both our db and in plagscan's
+     * Privatise a particular plagscan id
+     * in both our db and in plagscan's
      *
      * @param Plagscan $plagscan
      *
@@ -398,7 +440,7 @@ class Mapper extends \Schoolbox\Mapper
              */
             $this->getConnector()->privatise($plagscan->getPlagscanId());
 
-            $plagscan->setPrivatisedAt(Alaress_Date_Format::now());
+            $plagscan->setPrivatisedAt(\Alaress_Date_Format::now());
             $this->save($plagscan);
         }
         catch (\RuntimeException $e) {
@@ -410,62 +452,6 @@ class Mapper extends \Schoolbox\Mapper
              * but can't do much to stop it if plagscan screws us
              */
         }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getSelectString()
-    {
-        $storageMapper = $this->getJoinMapper('storage');
-
-        return "
-            SELECT      {$this->getColumnString()},
-                        {$this->getJoinColumnString('storage', 's')},
-                        {$storageMapper->getJoinColumnString('allowedFileExtension', 'mime')}
-            FROM        {$this->getTable()} 
-            LEFT JOIN  {$this->getJoinSql('storage', '', 's', true)}
-            LEFT JOIN   {$storageMapper->getJoinSql('allowedFileExtension', 's', 'mime')}
-        ";
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function hydrateSelect(PDOStatement $statement)
-    {
-        // Return attachments fully hydrated by default
-
-        $collection = $this->createCollection();
-
-        /** @var MimetypeMapper $mimeMapper */
-        $mimeMapper = $this->getJoinMapper('storage')->getJoinMapper('allowedFileExtension');
-
-        foreach ($statement as $row) {
-            $model = $this->hydrate($row);
-
-            // Hydrate storage object
-
-            /** @var Storage $storage */
-            $storage = $this->hydrateJoin($row, 'storage', 's');
-
-            if ($storage instanceof Storage) {
-                // Hydrate a mime type if we can find one
-
-                /** @var Mimetype $mime */
-                $mime = $mimeMapper->hydrate($row, 'mime');
-
-                if ($mime instanceof Mimetype) {
-                    $storage->setMimetype($mime);
-                }
-
-                $model->setStorage($storage);
-            }
-
-            $collection->add($model);
-        }
-
-        return $collection;
     }
 
     /* Getters/Setters
