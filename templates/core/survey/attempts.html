@@ -20,14 +20,15 @@
                 // insert the error after the section containing the table
                 error.insertAfter($(element).closest('section'));
             },
-            submitHandler: function() {
-                e.preventDefault();
-                var $deleteForm = $(this);
+            submitHandler: function($form) {
 
                 $(this).confirmDialog({
                     text: 'Are you sure you want to delete the selected attempts?',
                     confirmEvent: function() {
-                        $deleteForm.submit();
+                        $form.submit();
+                    },
+                    cancelEvent: function() {
+                        return false;
                     }
                 });
             }
