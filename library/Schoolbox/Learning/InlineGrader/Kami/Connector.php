@@ -138,7 +138,7 @@ class Connector implements IConnector
         $request  = new Request('POST', $this->getPathUploadDocument());
         $response = $this->client->send($request, $this->getOptions($options));
 
-        if (201 === $response->getStatusCode()) {
+        if ($this->isSuccessful($response)) {
             $decoded = $this->decodeResponseContent($response->getBody());
             return $this->buildDocument($decoded);
         }
@@ -204,7 +204,7 @@ class Connector implements IConnector
         $request  = new Request('GET', $this->getPathGetDocument($documentId));
         $response = $this->client->send($request, $this->getOptions());
 
-        if (200 === $response->getStatusCode()) {
+        if ($this->isSuccessful($response)) {
             $decoded = $this->decodeResponseContent($response->getBody());
             return $this->buildDocument($decoded);
         }
@@ -238,8 +238,8 @@ class Connector implements IConnector
         if ($this->isValidNotFound($response)) {
             throw new Exception\NotFound("Kami Document not found. Id: $documentId", $request, $response);
         }
-        // TODO confirm with Kami. The docs state 200, but testing indicates 204 from prod Kami API
-        if (!in_array($response->getStatusCode(), [200, 204], true)) {
+
+        if (!$this->isSuccessful($response)) {
             $this->generateApiException($request, $response);
         }
         return true;
@@ -511,6 +511,28 @@ class Connector implements IConnector
             $obj->file_error_message,
             $createdDate
         );
+    }
+
+
+    /**
+     * Does this response have a success (2xx) status code?
+     *
+     * For now, we assume that Kami will not return an informational (1xx) or
+     * redirect (3xx) status.
+     *
+     * @param ResponseInterface $response
+     * @return bool
+     */
+    private function isSuccessful(ResponseInterface $response): bool
+    {
+        $statusCode = $response->getStatusCode();
+        if ($statusCode < 200) {
+            return false;
+        }
+        if ($statusCode >= 300) {
+            return false;
+        }
+        return true;
     }
 
 
