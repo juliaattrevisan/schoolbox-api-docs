@@ -712,13 +712,20 @@ class Group extends DeprecatedModel
                         else {
                             $folder = $folderMapper->findByCode($currentSubject['code']);
                         }
+
+                        /** @var $folder Schoolbox\Resource\Folder\Model  */
+                        $template = null;
+                        if($folder->getHomepage() instanceof  \Schoolbox\Resource\HomepageConfig ) {
+                            $template = $folder->getHomepage()->getTemplate()->getId();
+                        }
+
                         $allFolders[$folder->getId()] = array(
                             'id' => $folder->getId(),
                             'name' => $folder->getName(),
                             'parent' => $folder->getParent()->getId(),
                             'deleted_at' => $folder->getDeletedAt(),
                             'code' => $folder->getCodeString(),
-                            'template' => $folder->getHomepage()->getTemplate()->getId(),
+                            'template' => $template,
                         );
                     } catch (MapperException $e) {
                     }
