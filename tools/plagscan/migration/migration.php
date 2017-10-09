@@ -10,11 +10,15 @@
 /*
 
 for (every migrated plagscan document as migratedDocument) {
-    // find the corresponding plagscan_document record by plagscan_id
+    if (migratedDocument has html) {
 
-    // update the plagscan_document model with the storage hash contained in migratedDocument
+        // find the corresponding plagscan_document record by plagscan_id in migratedDocument
 
-    // save the plagscan_document record again ensuring that html is empty
+        // update the plagscan_document model with the storage hash contained in migratedDocument
+
+        // save the plagscan_document record again ensuring that html is empty
+
+    }
 }
 
  */
