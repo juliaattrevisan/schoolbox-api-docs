@@ -11,8 +11,10 @@
  * @idea_stolen_from Matt Day <matt.day@alaress.com.au>
  */
 
+use Schoolbox\File\Exception as FileException;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3\ReportTransactor as PlagscanReportTransactor;
 
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -81,15 +83,23 @@ foreach ($allDocuments as $currentDocument) {
                  * be available before the others etc.)
                  */
                 if (strlen($interactiveReportUrl) && strlen($reportContents) && strlen($score)) {
-                    $currentDocument->setPlagscanId($currentDocument->getPlagscanId());
-                    $currentDocument->setStatus(Plagscan::STATUS_COMPLETE);
-                    $currentDocument->setScore($score);
-                    $currentDocument->setHtml($reportContents);
-                    $currentDocument->setInteractiveUrl($interactiveReportUrl);
-                    $currentDocument->setUpdatedAt(\Alaress_Date_Format::now());
-                    $mapper->save($currentDocument);
+                    try {
+                        $plagscanReport = (new PlagscanReportTransactor($currentDocument->getPlagscanId(), $reportContents))->save();
 
-                    $numUpdated++;
+                        $currentDocument->setPlagscanId($currentDocument->getPlagscanId());
+                        $currentDocument->setStatus(Plagscan::STATUS_COMPLETE);
+                        $currentDocument->setScore($score);
+                        $currentDocument->setStorage($plagscanReport);
+                        $currentDocument->setInteractiveUrl($interactiveReportUrl);
+                        $currentDocument->setUpdatedAt(\Alaress_Date_Format::now());
+                        $mapper->save($currentDocument);
+                        $numUpdated++;
+                    }
+                    catch (FileException $e) {
+                        /* Die critically until the plagscan report can be saved
+                         */
+                        $log->critical("{$prefix}: could not save plagscan report file to storage");
+                    }
                 } else {
                     $log->warning("{$prefix}: all report pieces (score, mode 6 and 7 reports) not yet ready");
                 }
