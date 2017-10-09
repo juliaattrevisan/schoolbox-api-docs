@@ -112,10 +112,11 @@ class RegistryMapper extends Mapper
             /** @var Service $service */
             $service = $this->hydrateJoin($r, 'service', 's');
 
-            /** @var IStorage $cert */
-            $cert = $this->getJoinMapper('service')->hydrateJoin($r, 'cert', 'cert');
-
-            $service->setCertificate($cert);
+            if ($service instanceof Service) {
+                /** @var IStorage $cert */
+                $cert = $this->getJoinMapper('service')->hydrateJoin($r, 'cert', 'cert');
+                $service->setCertificate($cert);
+            }
 
             /** @var User $user */
             $user = $this->hydrateJoin($r, 'user_id', 'u');

@@ -131,7 +131,9 @@ class ServiceManager implements IServiceManager
             $srv = $registration->getService();
 
             // by-reference for convenience
-            $p =& $registrations[$srv->getProviderName()][$srv->getAppIdentifier()];
+            if($srv instanceof Service) {
+                $p =& $registrations[$srv->getProviderName()][$srv->getAppIdentifier()];
+            }
 
             if (empty($p)) {
                 $p['service'] = $srv;
