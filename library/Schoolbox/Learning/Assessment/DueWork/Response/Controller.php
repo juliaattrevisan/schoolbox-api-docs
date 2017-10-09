@@ -502,8 +502,11 @@ class Controller extends Base
      */
     public function getPlagscanReportContents(Plagscan $plagscan)
     {
+        /* Assume all files were migrated successfully so load the html
+         * contentes from the storage instance
+         */
         $data = [
-            'html' => $plagscan->getHtml(),
+            'html' => $plagscan->getStorage()->read(),
         ];
 
         $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningDueWorkResponse/plagscan/contents.twig', $data));
@@ -519,7 +522,6 @@ class Controller extends Base
     {
         return $this->errorMapper;
     }
-
 
 
     /**
