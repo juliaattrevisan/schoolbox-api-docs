@@ -27,7 +27,7 @@
                 {% if user.enabled %}
                     <a href="{{ routeLookup('user.impersonate', {userId: user.id}) }}" class="icon-staff-students" title="Login as user">Impersonate</a>
                 {% else %}
-                    <a class="icon-staff-students menu_disabled" title="Account Disabled">Impersonate</a>
+                    <a class="icon-staff-students menu_disabled" title="Account disabled">Impersonate</a>
                 {% endif %}
             </li>
             <li><a href="/search/user/{{ user.id }}" class="icon-eye">View Profile</a></li>

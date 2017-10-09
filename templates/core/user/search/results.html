@@ -24,9 +24,17 @@
 					</nav>
 					<!-- Dropdown -->
 					<ul class="f-dropdown" data-dropdown-content="" id="overflowUser-{CURRENT_TAB}-{USER_SEARCH_ID}">
+
 						<!-- BEGIN modify -->
-						<li><a href="/adminv2/user/{USER_SEARCH_ID}/modify" class="icon-modify" title="Modify User">Modify</a></li>
-						<li><a href="/user/switch/{USER_SEARCH_ID}" class="icon-staff-students" title="Log in as user">Impersonate</a></li>
+							<li><a href="/adminv2/user/{USER_SEARCH_ID}/modify" class="icon-modify" title="Modify User">Modify</a></li>
+
+							<!-- BEGIN modify_enabled -->
+								<li><a href="/user/switch/{USER_SEARCH_ID}" class="icon-staff-students" title="Log in as user">Impersonate</a></li>
+							<!-- END modify_enabled -->
+
+							<!-- BEGIN modify_disabled -->
+							<li><a class="icon-staff-students menu_disabled" title="Account disabled">Impersonate</a></li>
+							<!-- END modify_disabled -->
 
 						<!-- END modify -->
 
