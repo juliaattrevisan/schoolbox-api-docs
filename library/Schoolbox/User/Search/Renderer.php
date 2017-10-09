@@ -53,6 +53,8 @@ class Renderer extends Handler
             $this->getPage()->setBlock('user', 'pastoral', 'pastoral_block');
             $this->getPage()->setBlock('user', 'eportfolio', 'eportfolio_block');
             $this->getPage()->setBlock('user', 'modify', 'modify_block');
+            $this->getPage()->setBlock('modify', 'modify_enabled', 'modify_enabled_block');
+            $this->getPage()->setBlock('modify', 'modify_disabled', 'modify_disabled_block');
             $this->getPage()->setBlock('user', 'position_title', 'position_title_block');
             $this->getPage()->setBlock('user', 'normal_title', 'normal_title_block');
             $this->getPage()->setBlock('user', 'boarder_leave', 'boarder_leave_block');
@@ -154,6 +156,14 @@ class Renderer extends Handler
                 if (!$_SESSION['user']->isSuperuser()) {
                     $this->getPage()->setVar('modify_block');
                 } else {
+                    if ($user['enabled']) {
+                        $this->getPage()->parse('modify_enabled_block', 'modify_enabled');
+                        $this->getPage()->setVar('modify_disabled_block');
+                    } else {
+                        $this->getPage()->parse('modify_disabled_block', 'modify_disabled');
+                        $this->getPage()->setVar('modify_enabled_block');
+                    }
+
                     $this->getPage()->parse('modify_block', 'modify');
                 }
 
