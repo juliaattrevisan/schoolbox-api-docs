@@ -12,10 +12,10 @@
 use Aura\Di\Container as Injector;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use Schoolbox\File\Exception as FileException;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanDocumentMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as PlagscanDocument;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\IStorage;
 
 const RESULT_FAILED           = 0;
 const RESULT_SUCCESS          = 1;
@@ -83,7 +83,6 @@ try {
                     $bytesTotal += strlen($document->getHtml());
                     $success++;
                 } else {
-
                     switch ($result) {
                         case RESULT_FAILED:
                             $log->error('Document migration failed');
@@ -162,30 +161,22 @@ function migrateHtml(PlagscanDocumentMapper $plagscanMapper, PlagscanDocument $d
 
     // Create temporary file to hold the HTML
 
-    $filename = "plagscan-{$document->getPlagscanId()}.html";
-    $file     = tmpfile();
-    $metadata = stream_get_meta_data($file);
-    fwrite($file, $document->getHtml());
-    fseek($file, 0);
+    $storageObject = $storageMapper->acceptStream("plagscan-{$document->getPlagscanId()}.html", $document->getHtml());
 
-    try {
-        $storageObject = $storageMapper->accept($filename, $metadata["uri"]);
-
+    if ($storageObject instanceof IStorage) {
         // Uploading to storage succeeded
 
         $document->setStorage($storageObject);
         $document->setStorageMigratedAt(Alaress_Date_Format::now());
         $plagscanMapper->save($document);
-        fclose($file);
 
         return RESULT_SUCCESS;
-    } catch (FileException $e) {
-        // Uploading to storage failed
-
-        $document->setStorageFailedAt(Alaress_Date_Format::now());
-        $plagscanMapper->save($document);
-        fclose($file);
-
-        return RESULT_FAILED;
     }
+
+    // Uploading to storage failed
+
+    $document->setStorageFailedAt(Alaress_Date_Format::now());
+    $plagscanMapper->save($document);
+
+    return RESULT_FAILED;
 }
