@@ -54,7 +54,11 @@ class Model extends AbstractCourse
      */
     public function getTitle()
     {
-        return $this->getFolder()->getName();
+        if($this->getFolder() != null) {
+            return $this->getFolder()->getName();
+        } else {
+            return '';
+        }
     }
 
     /* Getters / Setters
