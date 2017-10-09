@@ -23,7 +23,12 @@
             <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
         </nav>
         <ul id="header-options" class="f-dropdown" data-dropdown-content>
-            <li><a href="{% if user.enabled %}{{ routeLookup('user.impersonate', {userId: user.id}) }}{% else %}#{% endif %}" class="icon-staff-students" title="{% if user.enabled %}Login as user{% else %}Account Disabled{% endif %}">Impersonate</a>
+            <li>
+                {% if user.enabled %}
+                    <a href="{{ routeLookup('user.impersonate', {userId: user.id}) }}" class="icon-staff-students" title="Login as user">Impersonate</a>
+                {% else %}
+                    <a class="icon-staff-students menu_disabled" title="Account Disabled">Impersonate</a>
+                {% endif %}
             </li>
             <li><a href="/search/user/{{ user.id }}" class="icon-eye">View Profile</a></li>
             <li><a class="icon-delete" title="Delete User" data-delete data-action="{{ routeLookup('adminUser.postDeleteUser', {userId: user.id}) }}">Delete User</a></li>
