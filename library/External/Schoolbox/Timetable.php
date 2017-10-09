@@ -384,13 +384,11 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
      */
     public function getRoomTimetable($roomCodes)
     {
-        if (is_array($roomCodes)) {
-            $result = [];
-            foreach ($roomCodes as $roomCode) {
-                $result = array_merge($result, $this->getRoomTimetable($roomCode));
-            }
-
-            return $result;
+        if (!is_array($roomCodes)) {
+            $roomCodes = [$roomCodes];
+        }
+        if (empty($roomCodes)) {
+            return [];
         }
 
         $predicate = PredicateBuilder::getArrayBindings($roomCodes, 'roomCode');
@@ -423,10 +421,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                 ORDER BY    timetable_period.day ASC,
                             timetable_period.sequence ASC
             ",
-            array_merge(
-                $predicate["bindings"],
-                ['room' => $roomCodes]
-            )
+            $predicate["bindings"]
         );
 
         return $statement->fetchAll();
