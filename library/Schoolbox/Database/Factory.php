@@ -44,7 +44,7 @@ class Factory
             $config  = ConfigMapper::getInstance();
             $factory = new DatabaseFactory();
 
-            switch ($config['external_type']) {
+            switch ($config->get('external_type')) {
                 // Microsoft SQL Server
 
                 case 'tass':
