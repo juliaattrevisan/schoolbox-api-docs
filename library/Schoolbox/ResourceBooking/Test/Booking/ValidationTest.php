@@ -34,6 +34,14 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
 //                             ->getMock();
     }
 
+    private function getUser()
+    {
+        $user = new User();
+        $user->setId('123');
+
+        return $user;
+    }
+
     /**
      * Data provider for testValidateBeforeTime
      *
@@ -221,11 +229,11 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Data provider for testValidateForConflicts
+     * Data provider for testSimpleValidateForConflicts
      *
      * @return array
      */
-    public function provider_validateForConflicts() {
+    public function provider_simpleValidateForConflicts() {
         return [
             ['2020-12-31T00:00:00',
              '2020-12-31T00:00:00',
@@ -245,20 +253,20 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers \Schoolbox\ResourceBooking\Booking\Validation::validateForConflicts
      *
-     * @dataProvider provider_validateForConflicts
+     * @dataProvider provider_simpleValidateForConflicts
      *
      * @param string $startDate
      * @param string $endDate
-     * @param array $collection
-     * @param int $expected
+     * @param array  $resourceBookings
+     * @param int    $expected
      */
-    public function testValidateForConflicts($startDate, $endDate, $collection, $expected)
+    public function testSimpleValidateForConflicts($startDate, $endDate, $resourceBookings, $expected)
     {
 
         $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
         $mockMapper
             ->method('findForResource')
-            ->willReturn($collection);
+            ->willReturn($resourceBookings);
 
         $validation = new Validation(new User(), $mockMapper, new TermMapper());
 
@@ -266,6 +274,97 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
         $resource->setId(123);
 
         $errors = $validation->validateForConflicts($resource, new DateTime($startDate), new DateTime($endDate));
+        $this->assertCount($expected, $errors);
+    }
+
+    /**
+     * Data provider for testRoomValidateForConflicts
+     *
+     * @return array
+     */
+    public function provider_roomValidateForConflicts() {
+        return [
+            [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                [],
+                'abc1',
+                [1,2,3],
+                1
+            ],
+            [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                [],
+                'abc1',
+                [1],
+                1
+            ],
+            [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                [],
+                'abc1',
+                [],
+                0
+            ],
+            [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                [1,2,3],
+                'abc1',
+                [],
+                1
+            ],
+            [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                [],
+                '',
+                [],
+                0
+            ],
+        ];
+    }
+
+    /**
+     * @covers \Schoolbox\ResourceBooking\Booking\Validation::validateForConflicts
+     *
+     * @dataProvider provider_roomValidateForConflicts
+     *
+     * @param string $startDate
+     * @param string $endDate
+     * @param array  $resourceBookings
+     * @param int    $expected
+     */
+    public function testRoomValidateForConflicts(
+        $startDate,
+        $endDate,
+        $resourceBookings,
+        $roomCode,
+        $events,
+        $expected
+    )
+    {
+        $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
+        $mockMapper
+            ->method('findForResource')
+            ->willReturn($resourceBookings);
+
+        $mockValidation = $this->getMockBuilder(Validation::Class)
+            ->setConstructorArgs([new User(), $mockMapper, new TermMapper()])
+            ->setMethods(['getTimetableRoomEvents'])
+            ->getMock();
+        $mockValidation
+            ->method('getTimetableRoomEvents')
+            ->willReturn($events);
+
+        $resource = new Item\Model();
+        $resource->setId(123);
+        $resource->setRoomCode($roomCode);
+
+        $errors = $mockValidation->validateForConflicts($resource, new DateTime($startDate), new DateTime($endDate));
+
         $this->assertCount($expected, $errors);
     }
 

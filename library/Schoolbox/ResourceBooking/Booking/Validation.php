@@ -20,6 +20,7 @@ use Schoolbox\ResourceBooking\Booking\Status;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Aura\Web\Request;
+use Calendar_Api_EventType_Timetable_Room as TimetableRoom;
 
 class Validation {
 
@@ -45,6 +46,10 @@ class Validation {
     /** @var TermMapper */
 
     private $termMapper;
+
+    /** @var TimetableRoom */
+
+    private $timetableRoom;
 
     public function __construct(
         User $user,
@@ -174,7 +179,7 @@ class Validation {
 
                     $errors = array_merge_recursive(
                         $errors,
-                        $this->validateForConflicts($thisResource, $thisStart, $thisEnd, $this->getBookingMapper())
+                        $this->validateForConflicts($thisResource, $thisStart, $thisEnd)
                     );
                 }
 
@@ -198,7 +203,7 @@ class Validation {
 
                     $errors = array_merge_recursive(
                         $errors,
-                        $this->validateForConflicts($thisResource, $thisStart, $thisEnd, $this->getBookingMapper(), $thisBooking)
+                        $this->validateForConflicts($thisResource, $thisStart, $thisEnd, $thisBooking)
                     );
                 }
             }
@@ -318,6 +323,15 @@ class Validation {
         return $dateParts;
     }
 
+
+    /**
+     * @return Term\Model
+     */
+    public function getCurrentTerm()
+    {
+        return $this->getTermMapper()->findForToday();
+    }
+
     /**
      * Get all bookings for a resource in a window
      *
@@ -329,13 +343,38 @@ class Validation {
      */
     private function getConflictingBookings(Item\Model $resource, DateTime $startDate, DateTime $endDate)
     {
+
         return $this->getBookingMapper()->findForResource(
             $resource->getId(),
             $startDate->getTimestamp() + 1,
             $endDate->getTimestamp() - 1,
             [Status\Model::STATUS_APPROVED]
         );
+
     }
+
+    /**
+     * Get all events for a room in specified period
+     *
+     * @param int $roomId
+     * @param DateTime $startDate
+     * @param DateTime $endDate
+     *
+     * @return \Calendar\Event\Collection
+     */
+    protected function getTimetableRoomEvents($roomId, DateTime $startDate, DateTime $endDate)
+    {
+
+        $timetableRoom = new TimetableRoom($this->getUser(), [], $roomId);
+
+        return $timetableRoom->getEvents($startDate->getTimestamp() + 1, $endDate->getTimestamp() - 1);
+
+    }
+
+    /**
+     * Validation Methods
+     *
+     */
 
     public function validateBeforeTime(DateTime $startDate, DateTime $endDate)
     {
@@ -460,7 +499,6 @@ class Validation {
 
         $conflictingBookings = $this->getConflictingBookings($resource, $startDate, $endDate);
 
-
         // Conflicting bookings could include the existing booking.
         // Remove it, because a booking can't conflict with itself!
         // Also remove any items in the same series, because bookings can't
@@ -493,23 +531,19 @@ class Validation {
         if (count($conflictingBookings)) {
             $errors['start_datetime'][] = 'conflict';
         }
-        //TODO uncomment
-//        elseif (strlen($roomCode = $resource->getRoomCode()) > 0) {
-//            // Check if there's a timetabled class here, too.
-//            $roomSource = new \Calendar_Api_EventType_Timetable_Room(
-//                $this->getUser(),
-//                [],
-//                [$roomCode => $resource->getId()]
-//            );
-//    //            $roomSource->setRoomCodes($roomCode);
-//            $roomEvents = $roomSource->getEvents(
-//                $startDate->getTimestamp() + 1,
-//                $endDate->getTimestamp() - 1
-//            );
-//            if (count($roomEvents)) {
-//                $errors['start_datetime'][] = 'timetabled_class';
-//            }
-//        }
+        elseif (strlen($roomCode = $resource->getRoomCode()) > 0) {
+
+            // Check if there's a timetabled class here, too.
+            $roomEvents = $this->getTimetableRoomEvents(
+                $resource->getRoomCode(),
+                $startDate,
+                $endDate
+            );
+
+            if (count($roomEvents)) {
+                $errors['start_datetime'][] = 'timetabled_class';
+            }
+        }
 
         return $errors;
     }
@@ -612,14 +646,6 @@ class Validation {
         $this->termMapper = $termMapper;
 
         return $this;
-    }
-
-    /**
-     * @return Term\Model
-     */
-    public function getCurrentTerm()
-    {
-        return $this->getTermMapper()->findForToday();
     }
 
 }
