@@ -9,6 +9,7 @@
 namespace Alaress\Async\Notification\Cloud;
 
 
+use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Notification;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
@@ -91,8 +92,15 @@ abstract class AbstractService implements ServiceInterface
      */
     public function send(array $tokens, array $data, $unreadCount = 0)
     {
+        $payload = $data[0];
+
+        if (!is_string($payload)) {
+            $this->getLog()->error('Got non-string payload: ' . serialize($payload));
+            return false;
+        }
+
         // it's like reconstituting orange juice... it's just not right *sigh*
-        $n = new Notification([ unserialize($data[0]) ]);
+        $n = new Notification([ unserialize($payload, [ Instance::class ]) ]);
 
         $id = $n->getId();
 
