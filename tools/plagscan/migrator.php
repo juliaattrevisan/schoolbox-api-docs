@@ -93,10 +93,10 @@ try {
                     $bytesTotal += strlen($document->getHtml());
                     $success++;
                 } elseif ($result == RESULT_FAILED) {
-                    $log->error('Document migration failed');
+                    $log->error("Document migration failed: Plagscan ID {$document->getId()}");
                     $failed++;
                 } elseif ($result == RESULT_FAILED_SIZE) {
-                    $log->error('Uploaded storage object size mismatch');
+                    $log->error("Uploaded storage object size mismatch: Plagscan ID {$document->getId()}");
                     $failed++;
                 }
             }
@@ -117,6 +117,9 @@ try {
         }
     });
 } catch (Exception $e) {
+
+    // Logger isn't available here, just echoing out the exception
+
     echo "\nFatal Exception Error:\n";
 
     do {
