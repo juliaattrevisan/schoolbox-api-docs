@@ -732,7 +732,8 @@ class External_Liss_Server
                 'invalidType' => 0,
                 'unknownFolder' => 0,
                 'unknownUser' => 0,
-                'total' => 0
+                'unknownUserIds' => [],
+                'total' => 0,
             ];
 
             $total = count($allEvents);
@@ -819,7 +820,14 @@ class External_Liss_Server
                                 $event->getTitle(), $currentEvent['edvalGuid'], $currentExternalId
                             ));
 
+                            /* Number of occurrences of an unknown user
+                             */
                             $skipCount['unknownUser']++;
+
+                            /* Uniqueified list of unknown user ids
+                             * This count is not necessarily the same as unknownUser count
+                             */
+                            $skipCount['unknownUserIds'][$currentExternalId] = $currentExternalId;
                         }
                     }
                 }
@@ -834,7 +842,19 @@ class External_Liss_Server
             $log->info("Skipped (no type): {$skipCount['noType']}/{$skipCount['total']}");
             $log->info("Skipped (invalid type): {$skipCount['invalidType']}/{$skipCount['total']}");
             $log->info("Skipped (unknown folder): {$skipCount['unknownFolder']}/{$skipCount['total']}");
-            $log->info("Unknown users: {$skipCount['unknownUser']}");
+            $log->info("Unknown user assignations: {$skipCount['unknownUser']}");
+
+            /* A list of all the unknown user ids
+             */
+            $unknownUserIds = array_filter($skipCount['unknownUserIds']);
+
+            if (count($unknownUserIds)) {
+                asort($unknownUserIds);
+
+                $unknownUserIds = implode(', ', $unknownUserIds);
+
+                $log->info("Unknown user ids: {$unknownUserIds}");
+            }
 
             return self::generateResponse('Daily Data Imported');
         }
