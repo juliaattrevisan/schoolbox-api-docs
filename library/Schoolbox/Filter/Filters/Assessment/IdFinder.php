@@ -898,9 +898,9 @@ class IdFinder extends Filter\AbstractIdFinder
             return true;
         }
 
-        // Did call explicitly request assessments due in some year/s, but no years supplied?
+        // Did caller explicitly request assessments due in some year/s, but no years supplied?
         $yearsDue = $completeFilters[YearDue\Definition::class];
-        if ($yearsDue instanceOf Collection && !$yearsDue->count()) {
+        if ($yearsDue instanceof Collection && !$yearsDue->count()) {
             // All assessments are due in some year
             return true;
         }

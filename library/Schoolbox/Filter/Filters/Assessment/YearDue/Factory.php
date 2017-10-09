@@ -13,7 +13,7 @@ use Schoolbox\User;
 use Schoolbox\Filter;
 
 /**
- * A factory for building 'WeightingType' filter objects
+ * A factory for building 'YearDue' filter objects
  */
 class Factory extends AbstractFactory
 {

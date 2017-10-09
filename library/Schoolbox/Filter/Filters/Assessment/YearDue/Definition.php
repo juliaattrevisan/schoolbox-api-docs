@@ -62,7 +62,7 @@ class Definition extends Filter\AbstractDefinition
      */
     public function getInitialAvailability($customAbstractKey, Filter\Page\Model $pageFilter)
     {
-        // by default, all WeightingTypes are available
+        // by default, all YearsDue are available
         return true;
     }
 
