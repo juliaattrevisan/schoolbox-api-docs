@@ -41,9 +41,46 @@ class Factory
     public static function getInstanceExternal()
     {
         if (!isset(self::$connectorExternal)) {
-            $config   = ConfigMapper::getInstance();
-            $factory  = new DatabaseFactory();
-            $database = $factory->createMysql();
+            $config  = ConfigMapper::getInstance();
+            $factory = new DatabaseFactory();
+
+            switch ($config['external_type']) {
+                // Microsoft SQL Server
+
+                case 'tass':
+                case 'synergetic':
+                case 'schoolpro':
+                case 'pcschools':
+                case 'maze':
+                case 'isams':
+                case 'doublefirst':
+                case 'humanedge':
+                case 'schooledge':
+
+                    $database = $factory->createMssql();
+                    break;
+
+                // MySQL
+
+                case 'schoolbox':
+                    return self::getInstanceInternal();
+                    break;
+
+                case 'denbigh':
+                    $database = $factory->createMysql();
+                    break;
+
+                // IBM DB2
+
+                case 'edumate':
+
+                    $database = $factory->createDb2();
+                    break;
+
+                default:
+                    throw new DatabaseException("Unknown external database type.");
+                    break;
+            };
 
             // This will throw an exception on error
 
