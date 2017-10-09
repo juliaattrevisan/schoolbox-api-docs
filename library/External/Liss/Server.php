@@ -727,7 +727,13 @@ class External_Liss_Server
             /* Now do it in a way that makes sense
              * Map everything together and persist it to the db
              */
-            $skipCount = 0;
+            $skipCount = [
+                'noType' => 0,
+                'invalidType' => 0,
+                'unknownFolder' => 0,
+                'total' => 0
+            ];
+
             $total = count($allEvents);
 
             foreach ($allEvents as $currentEvent) {
@@ -735,7 +741,8 @@ class External_Liss_Server
                  */
                 if (!strlen($currentEvent['type'])) {
                     $log->info("Skipping {$currentEvent['className']} ({$currentEvent['edvalGuid']}): no type");
-                    $skipCount++;
+                    $skipCount['noType']++;
+                    $skipCount['total']++;
 
                     continue;
                 }
@@ -744,7 +751,8 @@ class External_Liss_Server
                  */
                 if (in_array($currentEvent['type'], $exclusions)) {
                     $log->info("Skipping {$currentEvent['className']} ({$currentEvent['edvalGuid']}): has excluded type {$currentEvent['type']}");
-                    $skipCount++;
+                    $skipCount['invalidType']++;
+                    $skipCount['total']++;
 
                     continue;
                 }
@@ -778,7 +786,9 @@ class External_Liss_Server
                         $log->info(sprintf('Skipping %s (%s): cannot find corresponding Schoolbox folder for %s',
                             $event->getTitle(), $currentEvent['edvalGuid'], $currentEvent['classCode'])
                         );
-                        $skipCount++;
+
+                        $skipCount['unknownFolder']++;
+                        $skipCount['total']++;
 
                         continue;
                     }
@@ -814,11 +824,13 @@ class External_Liss_Server
 
             /* Log diagnostics
              */
-            $processed = $total-$skipCount;
+            $processed = $total-$skipCount['total'];
 
-            $log->info("Total events: {$total}");
-            $log->info("Processed: {$processed}");
-            $log->info("Skipped: {$skipCount}");
+            $log->info("Total Processed: {$processed}/{$total}");
+            $log->info("Total Skipped: {$skipCount['total']}/{$total}");
+            $log->info("Skipped (no type): {$skipCount['noType']}/{$skipCount['total']}");
+            $log->info("Skipped (invalid type): {$skipCount['invalidType']}/{$skipCount['total']}");
+            $log->info("Skipped (unknown folder): {$skipCount['unknownFolder']}/{$skipCount['total']}");
 
             return self::generateResponse('Daily Data Imported');
         }
