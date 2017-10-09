@@ -11,6 +11,7 @@ namespace Schoolbox\ResourceBooking\Test;
 use DateTime;
 use DateInterval;
 use Alaress\Date\Interval;
+use Jenssegers\Date\Date;
 use Schoolbox\User;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\ResourceBooking\Booking\Validation;
@@ -26,7 +27,11 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
     {
 
         return new Validation(new User(), new BookingMapper(), new TermMapper());
-
+//        return $this->getMock( '\Schoolbox\ResourceBooking\Booking\Validation', [], [new User(), new BookingMapper(), new TermMapper()]);
+//        return $this->getMockBuilder(Validation::class)
+//                             ->setConstructorArgs([new User(), new BookingMapper(), new TermMapper()])
+//                             ->setMethods(null)
+//                             ->getMock();
     }
 
     /**
@@ -42,7 +47,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Schoolbox\ResourceBooking\Booking\Validation::validateBeforeTime
+     * @covers \Schoolbox\ResourceBooking\Booking\Validation::validateBeforeTime
      *
      * @dataProvider provider_validateBeforeTime
      *
@@ -70,7 +75,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Schoolbox\ResourceBooking\Booking\Validation::validatePastTime
+     * @covers \Schoolbox\ResourceBooking\Booking\Validation::validatePastTime
      *
      * @dataProvider provider_validatePastTime
      *
@@ -97,7 +102,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
         ];
     }
     /**
-     * @covers Schoolbox\ResourceBooking\Booking\Validation::validateLeadTime
+     * @covers \Schoolbox\ResourceBooking\Booking\Validation::validateLeadTime
      *
      * @dataProvider provider_validateLeadTime
      *
@@ -131,7 +136,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Schoolbox\ResourceBooking\Booking\Validation::validateTooShort
+     * @covers \Schoolbox\ResourceBooking\Booking\Validation::validateTooShort
      *
      * @dataProvider provider_validateTooShort
      *
@@ -163,7 +168,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Schoolbox\ResourceBooking\Booking\Validation::validateTooLong
+     * @covers \Schoolbox\ResourceBooking\Booking\Validation::validateTooLong
      *
      * @dataProvider provider_validateTooLong
      *
@@ -195,7 +200,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Schoolbox\ResourceBooking\Booking\Validation::validateCurrentTermRestriction
+     * @covers \Schoolbox\ResourceBooking\Booking\Validation::validateCurrentTermRestriction
      *
      * @dataProvider provider_validateCurrentTermRestriction
      *
@@ -213,6 +218,55 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
         $errors = $validation->validateCurrentTermRestriction(new DateTime($endDate), $term);
         $this->assertCount($expected, $errors);
 
+    }
+
+    /**
+     * Data provider for testValidateForConflicts
+     *
+     * @return array
+     */
+    public function provider_validateForConflicts() {
+        return [
+            ['2020-12-31T00:00:00',
+             '2020-12-31T00:00:00',
+             [1,2,3],
+             1],
+            ['2020-12-31T00:00:00',
+             '2020-12-31T00:00:00',
+             [1],
+             1],
+            ['2020-12-31T00:00:00',
+             '2020-12-31T00:00:00',
+             [],
+             0],
+        ];
+    }
+
+    /**
+     * @covers \Schoolbox\ResourceBooking\Booking\Validation::validateForConflicts
+     *
+     * @dataProvider provider_validateForConflicts
+     *
+     * @param string $startDate
+     * @param string $endDate
+     * @param array $collection
+     * @param int $expected
+     */
+    public function testValidateForConflicts($startDate, $endDate, $collection, $expected)
+    {
+
+        $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
+        $mockMapper
+            ->method('findForResource')
+            ->willReturn($collection);
+
+        $validation = new Validation(new User(), $mockMapper, new TermMapper());
+
+        $resource = new Item\Model();
+        $resource->setId(123);
+
+        $errors = $validation->validateForConflicts($resource, new DateTime($startDate), new DateTime($endDate));
+        $this->assertCount($expected, $errors);
     }
 
 }
