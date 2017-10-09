@@ -12,8 +12,8 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
-use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Resource\File\StorableTrait;
 use Schoolbox\Resource\Storage\IStorage;
 
@@ -24,71 +24,40 @@ class Model implements IStorage, ISoftDeletable
     use DeletedAtDate;
     use StorableTrait;
 
-    /**
-     * Documents that are queued to be uploaded to plagscan servers
-     */
+    /** Documents that are queued to be uploaded to plagscan servers */
     const STATUS_QUEUED = 1;
 
-    /**
-     * Documents that have been uploaded to plagscan but have not yet finished being analysed and thus provided a result
-     */
+    /**  Documents that have been uploaded to plagscan but have not yet finished being analysed and thus provided a result */
     const STATUS_PROCESSING = 2;
 
-    /**
-     * Plagscan completed, with results
-     */
+    /** Plagscan completed, with results */
     const STATUS_COMPLETE = 3;
 
-    /**
-     * Documents that have returned errors from plagscan, for example deleted or cannot be analysed
-     */
+    /** Documents that have returned errors from plagscan, for example deleted or cannot be analysed */
     const STATUS_UNSCANNABLE = -1;
 
-    /**
-     * @var int
-     */
+    /** @var int $id */
     protected $id;
 
-    /**
-     * Some id used by the third-party Plagscan
-     *
-     * @var int
-     */
+    /** @var $plagscanId int Some id used by the third-party Plagscan */
     protected $plagscanId;
 
-    /**
-     * @var int
-     */
+    /** @var int $status */
     protected $status;
 
-    /**
-     * @var float
-     */
+    /** @var float $score */
     protected $score;
 
-    /**
-     * The html contents of the old Mode 6 Report that was in Plagscan < v3.0
-     * We cache this anyway in case the interactive report url is unavailable
-     *
-     * @var string
-     */
+    /** @var string $html HTML document contents */
     protected $html;
 
-    /**
-     * A url to the Mode 7 Interactive Report that was introduced in Plagscan v3.0
-     *
-     * @var string
-     */
+    /** @var string $interactiveUrl A url to the Mode 7 Interactive Report that was introduced in Plagscan v3.0 */
     protected $interactiveUrl;
 
-    /**
-     * @var int
-     */
+    /** @var int $studentSubmissionFileId */
     protected $studentSubmissionFileId;
 
-    /**
-     * @var Alaress_Date_Format
-     */
+    /** @var Alaress_Date_Format $privatisedAt */
     protected $privatisedAt;
 
     /** @var Alaress_Date_Format $storageMigratedAt */
@@ -97,14 +66,12 @@ class Model implements IStorage, ISoftDeletable
     /** @var Alaress_Date_Format $storageFailedAt */
     protected $storageFailedAt;
 
-    /** @var string $storageHash */
-    protected $storageHash;
-
     /**
      * Figure out the url to the plagscan report
      *
      * @param $requestScheme
      * @param $host
+     *
      * @return string
      */
     public function getUrl($requestScheme, $host)
@@ -161,154 +128,6 @@ class Model implements IStorage, ISoftDeletable
         return $this->getStatus() == self::STATUS_UNSCANNABLE || $this->getStatus() == null;
     }
 
-    /* Getters/Setters
-     */
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @param int $id
-     * @return self
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getPlagscanId()
-    {
-        return $this->plagscanId;
-    }
-
-    /**
-     * @param int $plagscanId
-     * @return $this
-     */
-    public function setPlagscanId($plagscanId)
-    {
-        $this->plagscanId = $plagscanId;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getStatus()
-    {
-        return $this->status;
-    }
-
-    /**
-     * @param int $status
-     * @return self
-     */
-    public function setStatus($status)
-    {
-        $this->status = $status;
-        return $this;
-    }
-
-    /**
-     * @return float
-     */
-    public function getScore()
-    {
-        return $this->score;
-    }
-
-    /**
-     * @param float $score
-     * @return self
-     */
-    public function setScore($score)
-    {
-        $this->score = $score;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getHtml()
-    {
-        return $this->html;
-    }
-
-    /**
-     * @param string $html
-     * @return self
-     */
-    public function setHtml($html)
-    {
-        $this->html = $html;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getInteractiveUrl()
-    {
-        return $this->interactiveUrl;
-    }
-
-    /**
-     * @param string $interactiveUrl
-     * @return $this
-     */
-    public function setInteractiveUrl($interactiveUrl)
-    {
-        $this->interactiveUrl = $interactiveUrl;
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getStudentSubmissionFileId()
-    {
-        return $this->studentSubmissionFileId;
-    }
-
-    /**
-     * @param mixed $studentSubmissionFileId
-     * @return $this
-     */
-    public function setStudentSubmissionFileId($studentSubmissionFileId)
-    {
-        $this->studentSubmissionFileId = $studentSubmissionFileId;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getPrivatisedAt()
-    {
-        return $this->privatisedAt;
-    }
-
-    /**
-     * @param Alaress_Date_Format $privatisedAt
-     *
-     * @return $this
-     */
-    public function setPrivatisedAt($privatisedAt)
-    {
-        $this->privatisedAt = $privatisedAt;
-        return $this;
-    }
-
     /**
      * Return boolean flag indicating if the document has HTML content
      *
@@ -335,6 +154,168 @@ class Model implements IStorage, ISoftDeletable
         return !empty($this->getStorage()->getHash()) && !empty($this->getStorageMigratedAt());
     }
 
+    // Getters/Setters
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return self|$this
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPlagscanId()
+    {
+        return $this->plagscanId;
+    }
+
+    /**
+     * @param int $plagscanId
+     *
+     * @return self|$this
+     */
+    public function setPlagscanId($plagscanId)
+    {
+        $this->plagscanId = $plagscanId;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param int $status
+     *
+     * @return self
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getScore()
+    {
+        return $this->score;
+    }
+
+    /**
+     * @param float $score
+     *
+     * @return self|$this
+     */
+    public function setScore($score)
+    {
+        $this->score = $score;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHtml()
+    {
+        return $this->html;
+    }
+
+    /**
+     * @param string $html
+     *
+     * @return self|$this
+     */
+    public function setHtml($html)
+    {
+        $this->html = $html;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInteractiveUrl()
+    {
+        return $this->interactiveUrl;
+    }
+
+    /**
+     * @param string $interactiveUrl
+     *
+     * @return self|$this
+     */
+    public function setInteractiveUrl($interactiveUrl)
+    {
+        $this->interactiveUrl = $interactiveUrl;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getStudentSubmissionFileId()
+    {
+        return $this->studentSubmissionFileId;
+    }
+
+    /**
+     * @param mixed $studentSubmissionFileId
+     *
+     * @return self|$this
+     */
+    public function setStudentSubmissionFileId($studentSubmissionFileId)
+    {
+        $this->studentSubmissionFileId = $studentSubmissionFileId;
+
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getPrivatisedAt()
+    {
+        return $this->privatisedAt;
+    }
+
+    /**
+     * @param Alaress_Date_Format $privatisedAt
+     *
+     * @return self|$this
+     */
+    public function setPrivatisedAt($privatisedAt)
+    {
+        $this->privatisedAt = $privatisedAt;
+
+        return $this;
+    }
+
     /**
      * @return Alaress_Date_Format
      */
@@ -346,11 +327,12 @@ class Model implements IStorage, ISoftDeletable
     /**
      * @param Alaress_Date_Format $storageMigratedAt
      *
-     * @return $this
+     * @return self|$this
      */
     public function setStorageMigratedAt($storageMigratedAt)
     {
         $this->storageMigratedAt = $storageMigratedAt;
+
         return $this;
     }
 
@@ -365,11 +347,12 @@ class Model implements IStorage, ISoftDeletable
     /**
      * @param Alaress_Date_Format $storageFailedAt
      *
-     * @return $this
+     * @return self|$this
      */
     public function setStorageFailedAt($storageFailedAt)
     {
         $this->storageFailedAt = $storageFailedAt;
+
         return $this;
     }
 }
