@@ -84,22 +84,22 @@ class External_Schoolbox_Class implements External_ClassInterface
         return $this->internalDatabase->prepareQuery(
             "
                 SELECT        u.id, 
-                              u.synergy_id, 
+                              u.synergy_id,
                               u.title, 
-                              u.firstname, 
-                              u.lastname, 
-                              u.year, 
+                              u.firstname,
+                              u.lastname,
+                              u.year,
                               u.house
                 FROM          class c
                 LEFT JOIN     class_user cu ON cu.class_id = c.id
                 LEFT JOIN     user u ON u.id = cu.user_id
                 LEFT JOIN     groups g ON g.id = u.group_id
-                WHERE         c.code IN ({$predicate["placeholders"]}) AND 
-                              g.group_type = :type AND 
+                WHERE         c.code IN ({$predicate["placeholders"]}) AND
+                              g.group_type = :type AND
                               u.deleted_at IS NULL
-                ORDER BY      u.lastname, 
+                ORDER BY      u.lastname,
                               u.firstname
-		    ",
+            ",
             array_merge(
                 $predicate["bindings"],
                 ['type' => $type]
@@ -154,21 +154,21 @@ class External_Schoolbox_Class implements External_ClassInterface
 
         return $this->internalDatabase->prepareQuery(
             "
-			    SELECT      u.id, 
-			                u.synergy_id, 
-			                u.title, 
-			                u.firstname, 
-			                u.lastname, 
-			                u.year, 
-			                u.house
-			    FROM        class c
-			    LEFT JOIN   class_period cp ON c.id = cp.class_id
-			    INNER JOIN  user u ON u.id = cp.teacher_id
-			    WHERE       c.code IN ({$predicate["parameters"]}) AND 
-			                u.deleted_at IS NULL
-			    ORDER BY    u.lastname, 
-			                u.firstname
-		    ",
+                SELECT      u.id,
+                            u.synergy_id,
+                            u.title,
+                            u.firstname,
+                            u.lastname,
+                            u.year,
+                            u.house
+                FROM        class c
+                LEFT JOIN   class_period cp ON c.id = cp.class_id
+                INNER JOIN  user u ON u.id = cp.teacher_id
+                WHERE       c.code IN ({$predicate["placeholders"]}) AND
+                            u.deleted_at IS NULL
+                ORDER BY    u.lastname,
+                            u.firstname
+            ",
             $predicate["bindings"]
         )->executeIterator();
     }
