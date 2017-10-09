@@ -248,7 +248,7 @@ class External_Schoolbox_User implements External_UserInterface
                 ORDER BY    c.code ASC, c.name ASC
             ",
             $params
-        )->fetchAll();
+        );
 
         $classList = $classQuery->fetchAll();
 
