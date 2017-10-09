@@ -75,16 +75,18 @@ try {
             /** @var PlagscanDocument $document */
             foreach ($documents as $document) {
                 if ($document->getPlagscanDocumentMigration()->isMigrated()) {
-                    $log->debug('Skipping previously migrated document');
+                    $log->debug("Skipping previously migrated document: Plagscan ID {$document->getId()}");
                     continue;
                 }
 
-                if ($document->getPlagscanDocumentMigration()->getStorageFailedAt() instanceof Alaress_Date_NullDate && !$opts['retry']) {
-                    $log->debug('Skipping failed document');
+                if (!$document->getPlagscanDocumentMigration()->getStorageFailedAt() instanceof Alaress_Date_NullDate && !$opts['retry']) {
+                    $log->debug("Skipping failed document: Plagscan ID {$document->getId()}");
                     $skipped++;
+                    continue;
                 }
 
-                $log->info("Migrating #{$document->getId()}: Plagscan ID {$document->getPlagscanId()}");
+                $log->info("Migrating #{$document->getId()}: Plagscan ID {$document->getId()}");
+
                 $result = migrateHtml($plagscanMapper, $plagscanDocumentMigrationMapper, $document);
 
                 if ($result == RESULT_SUCCESS) {
@@ -161,7 +163,7 @@ function migrateHtml(PlagscanDocumentMapper $plagscanMapper, PlagscanDocumentMig
         if ($migration->getStorage()->getSize() == strlen($document->getHtml())) {
             // Blank out the document content if the move was successful
 
-            $document->setHtml(null);
+            //$document->setHtml(null);
             $plagscanMapper->save($document);
 
             return RESULT_SUCCESS;
