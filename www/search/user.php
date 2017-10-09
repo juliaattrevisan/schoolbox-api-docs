@@ -349,7 +349,6 @@ function renderStudent(
         }
     }
     if ($formTeacher instanceof Schoolbox\User) {
-        $var = "what";
         $emails[] = $formTeacher->getEmail();
     }
     if ($tutorTeacher instanceof Schoolbox\User) {
