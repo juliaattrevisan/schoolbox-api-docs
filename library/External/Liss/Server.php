@@ -731,6 +731,7 @@ class External_Liss_Server
                 'noType' => 0,
                 'invalidType' => 0,
                 'unknownFolder' => 0,
+                'unknownUser' => 0,
                 'total' => 0
             ];
 
@@ -817,6 +818,8 @@ class External_Liss_Server
                             $log->info(sprintf('Skipping %s (%s) for user %s: no Schoolbox account found',
                                 $event->getTitle(), $currentEvent['edvalGuid'], $currentExternalId
                             ));
+
+                            $skipCount['unknownUser']++;
                         }
                     }
                 }
@@ -831,6 +834,7 @@ class External_Liss_Server
             $log->info("Skipped (no type): {$skipCount['noType']}/{$skipCount['total']}");
             $log->info("Skipped (invalid type): {$skipCount['invalidType']}/{$skipCount['total']}");
             $log->info("Skipped (unknown folder): {$skipCount['unknownFolder']}/{$skipCount['total']}");
+            $log->info("Unknown users: {$skipCount['unknownUser']}");
 
             return self::generateResponse('Daily Data Imported');
         }
