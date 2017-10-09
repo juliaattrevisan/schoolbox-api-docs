@@ -265,10 +265,12 @@ class Mapper extends BaseMapper
                     $results[$resultsKey] = $result;
 
                     // Figure out if this result if for the home or away team
-                    if ($matches[$matchId]->getHomeTeam()->getId() == $result->getTeam()->getId()) {
+                    if ($matches[$matchId]->getHomeTeam() != null &&
+                        $matches[$matchId]->getHomeTeam()->getId() == $result->getTeam()->getId()) {
                         $matches[$matchId]->setHomeTeamResult($result);
                     } else {
-                        if ($matches[$matchId]->getAwayTeam()->getId() == $result->getTeam()->getId()) {
+                        if ($matches[$matchId]->getAwayTeam() != null &&
+                            $matches[$matchId]->getAwayTeam()->getId() == $result->getTeam()->getId()) {
                             $matches[$matchId]->setAwayTeamResult($result);
                         } else {
                             // This result doesn't belong to either team.
