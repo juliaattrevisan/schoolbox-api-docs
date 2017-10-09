@@ -675,6 +675,10 @@ class External_Liss_Server
         $folderMapper = FolderMapper::getInstance();
         $userMapper = UserMapper::getInstance();
 
+        /* These event types are ignored
+         */
+        $exclusions = ['Duty', 'Study', 'RollClass'];
+
         /* Owner set in config
          */
         try {
@@ -731,6 +735,15 @@ class External_Liss_Server
                  */
                 if (!strlen($currentEvent['type'])) {
                     $log->info("Skipping {$currentEvent['className']} ({$currentEvent['edvalGuid']}): no type");
+                    $skipCount++;
+
+                    continue;
+                }
+
+                /* Skip events that have a particular type
+                 */
+                if (in_array($currentEvent['type'], $exclusions)) {
+                    $log->info("Skipping {$currentEvent['className']} ({$currentEvent['edvalGuid']}): has excluded type {$currentEvent['type']}");
                     $skipCount++;
 
                     continue;
