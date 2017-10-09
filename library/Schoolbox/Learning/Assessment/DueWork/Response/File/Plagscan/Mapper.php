@@ -55,7 +55,7 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function mapping () {
         $this->hasTable('plagscan_document');
-        $this->hasModel(Model::class);
+        $this->hasModel(Plagscan::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('student_submission_file_id', self::TYPE_INTEGER);
         $this->uses('plagscan_id', self::TYPE_INTEGER);
