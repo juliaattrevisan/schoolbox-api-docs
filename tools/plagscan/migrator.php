@@ -167,6 +167,7 @@ function migrateHtml(PlagscanDocumentMapper $plagscanMapper, PlagscanDocument $d
         // Uploading to storage succeeded
 
         $document->setStorage($storageObject);
+        $document->setHtml(null);
         $document->setStorageMigratedAt(Alaress_Date_Format::now());
         $plagscanMapper->save($document);
 
