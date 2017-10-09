@@ -215,13 +215,6 @@ class External_Liss_Server
     {
         $log = self::log();
 
-        /* Requires schoolbox connector
-         */
-        if (!self::isSchoolboxConnector()) {
-            $log->info(self::WRONG_CONNECTOR_MESSAGE);
-            return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
-        }
-
         $log->info("getRooms: unable to process request, not implemented");
 
         return self::generateResponse('got rooms');
