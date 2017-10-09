@@ -21,6 +21,32 @@
                 <code>INSERT INTO site_access VALUES ('my_code', sha1('my_code'));</code>
             </p>
         </section>
+        <form method="post" action="{{ routeLookup('helpCourseParticipation.postApiTest') }}">
+            <section>
+                <fieldset class="content">
+                    <legend>Register a User</legend>
+                    <div class="small-12 columns">
+                        <p>
+                            If you attempt to POST against a server other than yourself, you'll need to make sure
+                            that the school code and secret match on both servers.
+                        </p>
+                        <label>Server to POST
+                            <input type="text" value="192.168.36.10" name="host" />
+                        </label>
+                        <label>School Code
+                            <input type="text" name="schoolCode" value="" />
+                        </label>
+                        {% for field in fields %}
+                            <label>{{ field | capitalize }}
+                                <input type="text" name="user[0][{{ field }}]" value="" />
+                            </label>
+                        {% endfor %}
+
+                    </div>
+                </fieldset>
+            </section>
+            <input type="submit" value="Register User" />
+        </form>
 {% else %}
         <div class="empty-state">
             <i class="icon-info"></i>

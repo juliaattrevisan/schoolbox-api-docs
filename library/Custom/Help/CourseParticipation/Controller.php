@@ -10,16 +10,30 @@ namespace Custom\Help\CourseParticipation;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
+use Aura\Di\Exception\ServiceNotFound;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Psr7\Response;
+use PDOException;
+use Schoolbox\CampusMapper;
 use Schoolbox\Permission\SiteAccess;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\RoleMapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
-
+use UnexpectedValueException;
 
 class Controller extends Base
 {
+    const PARTICIPANT_ROLE_NAME = 'School Staff';
+    const PARTICIPANT_CAMPUS    = 1;
+
+    const REQUIRED_USER_FIELDS = [
+        'id', 'email', 'title', 'firstname', 'lastname'
+    ];
+
     /**
      * @var UserAccessMapper
      */
@@ -40,30 +54,37 @@ class Controller extends Base
      */
     private $codeMapper;
 
+    /**
+     * @var User\Password\MailService
+     */
+    private $passwordMailService;
 
     /**
-     * @param UserAccessMapper $userAccessMapper
-     * @param SiteAccess\Mapper     $tokenMapper
-     * @param Folder\Mapper    $folderMapper
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @param UserAccessMapper          $userAccessMapper
+     * @param SiteAccess\Mapper         $tokenMapper
+     * @param Folder\Mapper             $folderMapper
+     * @param User\Password\MailService $mailService
+     * @throws Mapper\DefinitionException
      */
     public function __construct(
         UserAccessMapper $userAccessMapper,
         SiteAccess\Mapper $tokenMapper,
-        Folder\Mapper $folderMapper
+        Folder\Mapper $folderMapper,
+        User\Password\MailService $mailService
     ) {
         $this->userAccessMapper = $userAccessMapper;
         $this->tokenMapper      = $tokenMapper;
         $this->folderMapper     = $folderMapper;
         $this->codeMapper       = $folderMapper->getJoinMapper('codes');
+        $this->passwordMailService = $mailService;
     }
 
 
     /**
-     * @api   /api/course-participation/apitest
+     * @api   GET /api/course-participation/apitest
      * @level 170
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws ServiceNotFound
      */
     public function getApiTest()
     {
@@ -75,7 +96,8 @@ class Controller extends Base
         $data = [
             'codes'  => $codes,
             'ts'     => $now->getUnixTimeStamp(),
-            'hashes' => []
+            'hashes' => [],
+            'fields' => self::REQUIRED_USER_FIELDS
         ];
 
         foreach ($codes as $code) {
@@ -86,12 +108,59 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@helpCourseParticipation/apitest.twig', $data));
     }
 
+
+    /**
+     * @api   POST /api/course-participation/apitest
+     * @level 170
+     */
+    public function postApiTest()
+    {
+        $post = $this->getRequest()->post->getArrayCopy();
+
+        $school = $post['schoolCode'];
+
+        $code = $this->tokenMapper->findById($school);
+
+        $now = Alaress_Date_Format::now();
+
+        $route = 'helpCourseParticipation.postUserRegistrations';
+        $uri = $post['host'] . $this->getRouteIfAuthorized($route, [ 'schoolCode' => $school ]);
+
+        $c = new Client();
+
+        unset($post['schoolCode'], $post['host']);
+
+        try {
+            $c->post($uri, [
+                'query' => [
+                    'ts'    => $now->getUnixTimeStamp(),
+                    'token' => $this->computeAccessToken($now, $school, $code->getAccessToken())
+                ],
+                'form_params' => $post
+            ]);
+
+            $this->getResponse()->redirect->afterPost(
+                $this->getRouteIfAuthorized('helpCourseParticipation.getApiTest')
+            );
+
+        } catch (BadResponseException $e) {
+            $response = $e->getResponse();
+
+            $content = $this->buildFileOutputFromString($response->getBody()->getContents());
+
+            $this->getResponse()->status->set($response->getStatusCode());
+            $this->getResponse()->content->set($content);
+            $this->getResponse()->headers->set('Content-Type', 'text/html');
+        }
+    }
+
+
     /**
      * @param string $schoolCode
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws ServiceNotFound
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
+     * @throws Mapper\DefinitionException
      */
     public function getFolderAccessBySchool($schoolCode)
     {
@@ -144,11 +213,11 @@ class Controller extends Base
 
 
     /**
-     * @api   /api/course-participation/{schoolCode}/users
+     * @api   GET /api/course-participation/{schoolCode}/users
      * @level 170
      *
      * @param string $schoolCode
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws Mapper\DefinitionException
      */
     public function getUsersBySchool($schoolCode)
     {
@@ -168,20 +237,163 @@ class Controller extends Base
         }
 
         // show the list of users for this school
-        /** @var UserMapper $userMapper */
-        $userMapper = $this->userAccessMapper->getJoinMapper('user');
-
         // filter to the list of users whose external IDs are prefixed with the given school code
-        $predicate = $userMapper->getPredicateBuilder()->like('synergy_id', "{$schoolCode}.%");
+        $predicate = $this->getUserMapper()->getPredicateBuilder()->like('synergy_id', "{$schoolCode}.%");
 
         // we only need the external ID itself, so bypass object hydration
-        $externalIds = $userMapper->findScalarByPredicates('synergy_id', $predicate);
+        $externalIds = $this->getUserMapper()->findScalarByPredicates('synergy_id', $predicate);
 
         $unprefixed = array_map(function ($id) use ($schoolCode) {
             return str_replace("{$schoolCode}.", '', $id);
         }, $externalIds);
 
         $rs->content->set($this->buildJsonOutput($unprefixed));
+    }
+
+
+    /**
+     * @api   POST /api/course-participation/{schoolCode}/users
+     * @level 170
+     *
+     * @param string $schoolCode
+     * @throws Mapper\DefinitionException
+     * @throws PDOException
+     */
+    public function postUserRegistrations($schoolCode)
+    {
+        $rq = $this->getRequest();
+        $rs = $this->getResponse();
+
+        try {
+            $participantRole     = $this->getRoleMapper()->findOneByColumn('name', self::PARTICIPANT_ROLE_NAME);
+            $participantCampuses = $this->getCampusMapper()->findByColumn('id', self::PARTICIPANT_CAMPUS);
+
+        } catch (Mapper\Exception $e) {
+            // if this role doesn't exist, that's *bad* bad
+            $this->sendGenericStatus(500);
+            return;
+        }
+
+        $requestTimestamp = new Alaress_Date_Format($rq->query->get('ts', 0), 'U');
+
+        $authDigest = $rq->query->get('token', '');
+
+        $responseCode = $this->getResponseCode($schoolCode, $requestTimestamp, $authDigest);
+
+        if ($responseCode !== 200) {
+            // if the request didn't pass the gauntlet, bounce the request
+            $this->sendGenericStatus($responseCode);
+            return;
+        }
+
+        // process the payload
+        $post = $rq->post;
+
+        if (empty($post['user'])) {
+            // empty payload: do nothing
+            $this->sendGenericStatus(400);
+            return;
+        }
+
+        $failedUsers = [];
+
+        foreach ($post['user'] as $userData) {
+            if (!$this->userPayloadIsValid($userData)) {
+                $failedUsers[] = $userData;
+                continue;
+            }
+
+            // user uniqueness is looked up by external ID
+            $externalId = "{$schoolCode}.{$userData['id']}";
+
+            try {
+                $user = $this->getUserMapper()->findOneByColumn('synergy_id', $externalId);
+
+                // cache the old value
+                $oldUsername = $user->getUsername();
+
+            } catch (Mapper\Exception\Deleted $e) {
+                // user exists, but is deleted; consider this a fail case
+                $failedUsers[] = $userData;
+                continue;
+
+            } catch (Mapper\Exception $e) {
+                // user does not exist; create the model
+                $user = $this->getUserMapper()->createModel()
+                    ->setRole($participantRole)
+                    ->setCampusCollection($participantCampuses)
+                    ->setLocalEmail(false)
+                    ->setWebmail(false)
+                    ->setUseInternalMail(false)
+                    ->setEportfolioEnable(false)
+                ;
+
+                // no previous username
+                $oldUsername = '';
+            }
+
+            // update user object
+            $user
+                ->setUsername($userData['email']) // yes, email -> username is on purpose
+                ->setTitle($userData['title'])
+                ->setFirstname($userData['firstname'])
+                ->setLastname($userData['lastname'])
+                ->setAltEmail($userData['email'])
+                ->setEnabled(true)
+                ->setExternalId($externalId)
+                ->setLocalEmail(false) // use alt-email in ALL cases always
+            ;
+
+            try {
+                $this->getUserMapper()->save($user);
+
+                if ($oldUsername) {
+                  // existing user
+                    if ($user->getUsername() !== $oldUsername) {
+                        // send existing-user email ("your username has changed")
+                        $this->passwordMailService->sendUsernameChangeEmailToUser($user, $oldUsername);
+                    }
+                } else {
+                    // new user: send new-user email ("welcome and here's how to set your password")
+                    $this->passwordMailService->sendWelcomeEmailToUser($user);
+                }
+            } catch (Mapper\Exception $e) {
+                // the user failed to save; is fail case
+                $failedUsers[] = $userData;
+
+            } catch (UnexpectedValueException $e) {
+                // duplicate username
+                $failedUsers[] = $userData;
+            }
+        }
+
+        if (count($failedUsers)) {
+            // just blame the client :P
+            $this->sendGenericStatus(400);
+            $rs->content->set($this->buildJsonOutput($failedUsers));
+
+        } else {
+            // everything went fine, nothing to respond with
+            $this->sendGenericStatus(204);
+            $rs->content->set($this->buildJsonOutput(null));
+        }
+    }
+
+
+    /**
+     * @param array $userData
+     * @return bool
+     */
+    private function userPayloadIsValid(array $userData)
+    {
+        // check all the necessary data is present
+        foreach (self::REQUIRED_USER_FIELDS as $required) {
+            if (!array_key_exists($required, $userData) || empty(trim($userData[$required]))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 
@@ -244,4 +456,33 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildJsonOutput($r->getReasonPhrase()));
     }
 
+
+    /**
+     * @return UserMapper|Mapper
+     * @throws Mapper\DefinitionException
+     */
+    private function getUserMapper()
+    {
+        return $this->userAccessMapper->getJoinMapper('user');
+    }
+
+
+    /**
+     * @return RoleMapper|Mapper
+     * @throws Mapper\DefinitionException
+     */
+    private function getRoleMapper()
+    {
+        return $this->getUserMapper()->getJoinMapper('role');
+    }
+
+
+    /**
+     * @return CampusMapper|Mapper
+     * @throws Mapper\DefinitionException
+     */
+    private function getCampusMapper()
+    {
+        return $this->getUserMapper()->getJoinMapper('userCampus');
+    }
 }

@@ -11,6 +11,7 @@ namespace Schoolbox;
 
 /**
  * @method Role hydrate(array $row, $alias = '', $callback = null)
+ * @method Role findOneByColumn($columnName, $columnValue, $order = [], $options = [])
  */
 class RoleMapper extends Mapper
 {

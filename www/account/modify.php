@@ -1,5 +1,7 @@
 <?php
-/* This allows users to change their own passwords
+/**
+ * This allows users to change their own passwords
+ * @deprecated this has been replaced by Schoolbox\User\Password\Reset\Controller
  */
 $this->setFile(TEMPLATE_content, 'account/modify.html');
 $this->setBlock(TEMPLATE_content, 'success', 'success_block');
