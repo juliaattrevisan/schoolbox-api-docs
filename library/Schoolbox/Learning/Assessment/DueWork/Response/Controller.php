@@ -503,7 +503,7 @@ class Controller extends Base
     public function getPlagscanReportContents(Plagscan $plagscan)
     {
         /* Assume all files were migrated successfully so load the html
-         * contentes from the storage instance
+         * contents from the storage instance
          */
         $data = [
             'html' => $plagscan->getStorage()->read(),
