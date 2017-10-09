@@ -348,19 +348,19 @@ function renderStudent(
             }
         }
     }
-    if ($formTeacher instanceof User) {
+    if ($formTeacher instanceof Schoolbox\User) {
         $emails[] = $formTeacher->getEmail();
     }
-    if ($tutorTeacher instanceof User) {
+    if ($tutorTeacher instanceof Schoolbox\User) {
         $emails[] = $tutorTeacher->getEmail();
     }
-    if ($hohTeacher instanceof User) {
+    if ($hohTeacher instanceof Schoolbox\User) {
         $emails[] = $hohTeacher->getEmail();
     }
-    if ($coordTeacher instanceof User) {
+    if ($coordTeacher instanceof Schoolbox\User) {
         $emails[] = $coordTeacher->getEmail();
     }
-    if ($studentCoach instanceof User) {
+    if ($studentCoach instanceof Schoolbox\User) {
         $emails[] = $studentCoach->getEmail();
     }
 
@@ -402,7 +402,7 @@ function renderStudent(
 if (is_numeric($this->arg[0])) {
     $this->setTitle('Address Book');
 
-    $userHandler  = new User();
+    $userHandler  = new \User();
     $groupHandler = new Group();
 
     $user = $userHandler->getByID($this->arg[0]);
