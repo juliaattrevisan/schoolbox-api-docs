@@ -75,6 +75,7 @@ try {
                 $documents = $plagscanMapper
                     ->findByPredicates($predicatePending, [
                         'limit' => $limit,
+                        'deleted' => true
                     ])
                     ->getIterator();
 
