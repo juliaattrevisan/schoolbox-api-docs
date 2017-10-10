@@ -60,46 +60,50 @@ try {
             $plagscanMapper                  = PlagscanDocumentMapper::getInstance();
             $plagscanDocumentMigrationMapper = PlagscanDocumentMigrationMapper::getInstance();
 
-            $predicateBuilder = $plagscanMapper->getPredicateBuilder();
-            $predicatePending = $predicateBuilder->notNull('html');
-
-            // Retrieve all documents with HTML
-
-            $documents = $plagscanMapper->findByPredicates($predicatePending)->getIterator();
-
             $skipped    = 0;
             $failed     = 0;
             $success    = 0;
             $bytesTotal = 0;
+            $limit      = 5;
 
-            /** @var PlagscanDocument $document */
-            foreach ($documents as $document) {
-                if ($document->getPlagscanDocumentMigration()->isMigrated()) {
-                    $log->debug("Skipping previously migrated document: Plagscan ID {$document->getId()}");
-                    continue;
+            do {
+                // Retrieve all documents with HTML
+
+                $predicateBuilder = $plagscanMapper->getPredicateBuilder();
+                $predicatePending = $predicateBuilder->notNull('html');
+
+                $documents = $plagscanMapper
+                    ->findByPredicates($predicatePending, [
+                        'limit' => $limit,
+                    ])
+                    ->getIterator();
+
+                /** @var PlagscanDocument $document */
+                foreach ($documents as $document) {
+                    if ((!$document->getPlagscanDocumentMigration()->getStorageFailedAt() instanceof Alaress_Date_NullDate &&
+                            !$document->getPlagscanDocumentMigration() != null
+                        ) && !$opts['retry']) {
+                        $log->debug("Skipping failed document: Plagscan ID {$document->getId()}");
+                        $skipped++;
+                        continue;
+                    }
+
+                    $log->info("Migrating #{$document->getId()}: Plagscan ID {$document->getId()}");
+
+                    $result = migrateHtml($plagscanMapper, $plagscanDocumentMigrationMapper, $document);
+
+                    if ($result == RESULT_SUCCESS) {
+                        $bytesTotal += strlen($document->getHtml());
+                        $success++;
+                    } elseif ($result == RESULT_FAILED) {
+                        $log->error("Document migration failed: Plagscan ID {$document->getId()}");
+                        $failed++;
+                    } elseif ($result == RESULT_FAILED_SIZE) {
+                        $log->error("Uploaded storage object size mismatch: Plagscan ID {$document->getId()}");
+                        $failed++;
+                    }
                 }
-
-                if (!$document->getPlagscanDocumentMigration()->getStorageFailedAt() instanceof Alaress_Date_NullDate && !$opts['retry']) {
-                    $log->debug("Skipping failed document: Plagscan ID {$document->getId()}");
-                    $skipped++;
-                    continue;
-                }
-
-                $log->info("Migrating #{$document->getId()}: Plagscan ID {$document->getId()}");
-
-                $result = migrateHtml($plagscanMapper, $plagscanDocumentMigrationMapper, $document);
-
-                if ($result == RESULT_SUCCESS) {
-                    $bytesTotal += strlen($document->getHtml());
-                    $success++;
-                } elseif ($result == RESULT_FAILED) {
-                    $log->error("Document migration failed: Plagscan ID {$document->getId()}");
-                    $failed++;
-                } elseif ($result == RESULT_FAILED_SIZE) {
-                    $log->error("Uploaded storage object size mismatch: Plagscan ID {$document->getId()}");
-                    $failed++;
-                }
-            }
+            } while (iterator_count($documents) == $limit);
 
             if ($failed === 0 && $success === 0 && $skipped === 0) {
                 $log->info("Nothing to migrate");
@@ -117,7 +121,6 @@ try {
         }
     });
 } catch (Exception $e) {
-
     // Logger isn't available here, just echoing out the exception
 
     echo "\nFatal Exception Error:\n";
