@@ -80,6 +80,7 @@ class IdFinder extends Filter\AbstractIdFinder
         $termsClose     = $completeFilters[TermFilter\Close\Definition::class];
         $weightings     = $completeFilters[WeightingType\Definition::class];
         $workTypeIds    = $completeFilters[WorkTypeFilter\Definition::class];
+        $yearsDue       = $completeFilters[YearDue\Definition::class];
 
         list($aTypeJoin, $aTypeWhere)               = $this->getClauseAType($aTypes);
         list($temporalWhere, $temporalParams)       = $this->getClauseTemporalState($temporalStates);
@@ -87,6 +88,7 @@ class IdFinder extends Filter\AbstractIdFinder
         list($termCJoin, $termCWhere, $termCParams) = $this->getClauseTerm($termsClose, self::DATE_COL_CLS);
         list($weightingWhere, $weightingParams)     = $this->getClauseWeighting($weightings);
         list($workTypeWhere,  $workTypeParams)      = $this->getClauseWorkType($workTypeIds);
+        list($yearDueWhere, $yearDueParams)         = $this->getClauseYear($yearsDue, self::DATE_COL_DUE);
         list($deletedWhere)                         = $this->getClauseDeleted($deleted);
 
         // Merge all the params
@@ -100,7 +102,8 @@ class IdFinder extends Filter\AbstractIdFinder
             $termDParams,
             $termCParams,
             $weightingParams,
-            $workTypeParams
+            $workTypeParams,
+            $yearDueParams
         );
 
         $subQueries = [];
@@ -108,8 +111,8 @@ class IdFinder extends Filter\AbstractIdFinder
             $subQueries[] = "
                 SELECT a.id, 0 AS 'case' FROM `assessment` a
                 {$aTypeJoin} {$termDJoin} {$termCJoin}
-                WHERE {$deletedWhere}
-                AND {$temporalWhere} AND {$termDWhere} AND {$termCWhere} AND {$weightingWhere} AND {$workTypeWhere}
+                WHERE {$deletedWhere} AND {$temporalWhere} AND {$termDWhere} AND {$termCWhere} AND {$weightingWhere}
+                AND {$workTypeWhere} AND {$yearDueWhere}
                 ";
         } else {
             if ($this->subQueryFolder($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)) {
@@ -118,8 +121,8 @@ class IdFinder extends Filter\AbstractIdFinder
                     SELECT a.id, 1 AS 'case' FROM `assessment` a
                     JOIN assessment_folder af ON af.assessment_id = a.id
                     {$folderJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
-                    WHERE {$deletedWhere} AND {$folderWhere}
-                    AND {$aTypeWhere} AND {$temporalWhere} AND {$termDWhere} AND {$termCWhere} AND {$weightingWhere} AND {$workTypeWhere}
+                    WHERE {$deletedWhere} AND {$folderWhere} AND {$aTypeWhere} AND {$temporalWhere} AND {$termDWhere}
+                    AND {$termCWhere} AND {$weightingWhere} AND {$workTypeWhere} AND {$yearDueWhere}
                     ";
             }
             if ($this->subQueryProjectFolder($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)) {
@@ -130,8 +133,8 @@ class IdFinder extends Filter\AbstractIdFinder
                     JOIN project p             ON ap.project_id     = p.id
                     JOIN assessment_folder paf ON paf.assessment_id = p.assessment_id
                     {$folderJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
-                    WHERE {$deletedWhere} AND {$folderWhere} AND {$projectWhere}
-                    AND {$aTypeWhere} AND {$temporalWhere} AND {$termDWhere} AND {$termCWhere} AND {$weightingWhere} AND {$workTypeWhere}
+                    WHERE {$deletedWhere} AND {$folderWhere} AND {$projectWhere} AND {$aTypeWhere} AND {$temporalWhere}
+                    AND {$termDWhere} AND {$termCWhere} AND {$weightingWhere} AND {$workTypeWhere} AND {$yearDueWhere}
                     ";
             }
             if ($this->subQueryUnitImpl($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)) {
@@ -145,7 +148,8 @@ class IdFinder extends Filter\AbstractIdFinder
                     JOIN course_unit_implementation ui             ON aui.course_unit_implementation_id = ui.id
                     {$uImpSpcJoin} {$folderJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
                     WHERE {$deletedWhere} AND {$uImpSpcWhere} AND {$folderWhere} AND {$unitImplWhere}
-                    AND {$aTypeWhere} AND {$temporalWhere} AND {$termDWhere} AND {$termCWhere} AND {$weightingWhere} AND {$workTypeWhere}
+                    AND {$aTypeWhere} AND {$temporalWhere} AND {$termDWhere} AND {$termCWhere}
+                    AND {$weightingWhere} AND {$workTypeWhere} AND {$yearDueWhere}
                     
                     ";
             }
@@ -162,7 +166,8 @@ class IdFinder extends Filter\AbstractIdFinder
                     JOIN course_unit_implementation ui             ON aui.course_unit_implementation_id = ui.id
                     {$uImpSpcJoin} {$folderJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
                     WHERE {$deletedWhere} AND {$uImpSpcWhere} AND {$folderWhere} AND {$projectWhere} AND {$unitImplWhere}
-                    AND {$aTypeWhere} AND {$temporalWhere} AND {$termDWhere} AND {$termCWhere} AND {$weightingWhere} AND {$workTypeWhere}
+                    AND {$aTypeWhere} AND {$temporalWhere} AND {$termDWhere} AND {$termCWhere}
+                    AND {$weightingWhere} AND {$workTypeWhere} AND {$yearDueWhere}
                     ";
             }
             if ($this->subQueryUnitSpec($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)) {
@@ -173,7 +178,8 @@ class IdFinder extends Filter\AbstractIdFinder
                     JOIN course_unit_specification us ON aus.course_unit_specification_id = us.id
                     {$folderJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
                     WHERE {$deletedWhere} AND {$folderWhere} AND {$unitSpecWhere}
-                    AND {$aTypeWhere} AND {$temporalWhere} AND {$termDWhere} AND {$termCWhere} AND {$weightingWhere} AND {$workTypeWhere}
+                    AND {$aTypeWhere} AND {$temporalWhere} AND {$termDWhere} AND {$termCWhere}
+                    AND {$weightingWhere} AND {$workTypeWhere} AND {$yearDueWhere}
                     ";
             }
             if ($this->subQueryProjectUnitSpec($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)) {
@@ -186,7 +192,8 @@ class IdFinder extends Filter\AbstractIdFinder
                     JOIN course_unit_specification us              ON aus.course_unit_specification_id = us.id
                     {$folderJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
                     WHERE {$deletedWhere} AND {$folderWhere} AND {$projectWhere} AND {$unitSpecWhere}
-                    AND {$aTypeWhere} AND {$temporalWhere} AND {$termDWhere} AND {$termCWhere} AND {$weightingWhere} AND {$workTypeWhere}
+                    AND {$aTypeWhere} AND {$temporalWhere} AND {$termDWhere} AND {$termCWhere}
+                    AND {$weightingWhere} AND {$workTypeWhere} AND {$yearDueWhere}
                     ";
             }
         }
@@ -540,7 +547,7 @@ class IdFinder extends Filter\AbstractIdFinder
         }
 
         if (!in_array($dateColumn, [self::DATE_COL_DUE, self::DATE_COL_CLS], true)) {
-            throw new Filter\BrokenFilterException('Term', "Unrecognised dataColumn: $dateColumn");
+            throw new Filter\BrokenFilterException('Term', "Unrecognised dateColumn: $dateColumn");
         }
 
         // Term alias
@@ -556,6 +563,30 @@ class IdFinder extends Filter\AbstractIdFinder
         $builder->equals("$t.id", $termIds->getAll());
 
         return [$joinClause, implode(' AND ', $builder->getWhere()), $builder->getParams() ];
+    }
+
+
+    /**
+     * Get query fragments dependent on 'YearDue' filter
+     *
+     * @param Collection|int[] $years      (can also be NULL, but storm doesn't like that type-hint)
+     * @param string           $dateColumn ['due_date'|'close_date']
+     * @return string[]
+     * @throws Filter\BrokenFilterException If filter cannot be constructed
+     * @throws \InvalidArgumentException If no filter name injected when building a BrokenFilterException
+     */
+    private function getClauseYear(?Collection $years, $dateColumn)
+    {
+        // Is this filter being applied ?
+        if (null === $years) {
+            return ['TRUE', []];
+        }
+
+        if (!in_array($dateColumn, [self::DATE_COL_DUE, self::DATE_COL_CLS], true)) {
+            throw new Filter\BrokenFilterException('YearDue', "Unrecognised dateColumn: $dateColumn");
+        }
+
+        return ["YEAR(a.$dateColumn) IN (" . implode(',', $years->getAll()) . ')', []];
     }
 
 
@@ -864,6 +895,13 @@ class IdFinder extends Filter\AbstractIdFinder
         $weightingType = $completeFilters[WeightingType\Definition::class];
         if ($weightingType instanceOf Collection && !$weightingType->count()) {
             // All assessments have a weighting type
+            return true;
+        }
+
+        // Did caller explicitly request assessments due in some year/s, but no years supplied?
+        $yearsDue = $completeFilters[YearDue\Definition::class];
+        if ($yearsDue instanceof Collection && !$yearsDue->count()) {
+            // All assessments are due in some year
             return true;
         }
 

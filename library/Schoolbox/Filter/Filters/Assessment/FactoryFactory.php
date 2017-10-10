@@ -101,6 +101,8 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                 return $this->buildFactory(NullableContext\UnitImpl\Factory::class, [
                     'unitImplMapper' => $this->getMapperFactory()->get(UnitImpl\Mapper::class),
                 ]);
+            case YearDue\Definition::class:
+                return $this->buildFactory(YearDue\Factory::class);
         }
         throw new \InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
     }
