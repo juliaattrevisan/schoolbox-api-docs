@@ -24,6 +24,9 @@ use Schoolbox\TagCloud;
 use Schoolbox\Resource;
 use Alaress_Byte_Format;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Component_InstanceMapper;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
+use Schoolbox\Video;
 
 class ISoftDeletableTest extends PHPUnit_Framework_TestCase
 {
@@ -123,6 +126,12 @@ class ISoftDeletableTest extends PHPUnit_Framework_TestCase
             SubjectMapper::class   => true,
             TagCloud\Mapper::class => true,
             RubricMapper::class    => true,
+
+            // Should be tested, but requires out-of-scope change, see SA-4936
+            Component_InstanceMapper::class => true,
+            Plagscan\Mapper::class          => true,
+            Video\QueueMapper::class        => true,
+            Video\ResourceVideo::class      => true,
         ];
 
         if (!preg_match('/Mapper$/', $className)) {
