@@ -1,144 +1,137 @@
 <?php
+/**
+ * @author    Damian Sloane <damian.sloane@alaress.com.au>
+ * @copyright Copyright 2017, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
 
-/*************************************************************
- *                                                           *
- *        Copyright (c) 2013 Alaress Pty Ltd                 *
- *                                                           *
- *    This file provides access to Schoolbox user info       *
- *                                                           *
- ************************************************************/
+use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Database\Factory as DatabaseFactory;
+use Schoolbox\User;
 
 class External_Schoolbox_User implements External_UserInterface
 {
+    /** User relationship types */
     const RELATION_TYPE_PARENT = 1;
 
-    private $database;
+    /** @var IConnector $internalDatabase */
+    private $internalDatabase;
 
+    /** @var ConfigMapper $configMapper */
+    private $configMapper;
+
+    /**
+     * External_Schoolbox_User constructor.
+     */
     public function __construct()
     {
-        $this->setdatabase(Database::getInstance());
-    }
+        $this->configMapper = ConfigMapper::getInstance();
 
-    public function getParent($externalUserId)
-    {
-
-    }
-
-
-    public function getParentSync($externalUserId)
-    {
-
+        /** @noinspection PhpDeprecationInspection */
+        $this->internalDatabase = DatabaseFactory::getInstanceInternal();
     }
 
     /**
-     * Get all the parents of the $synergyIds
-     *
+     * {@inheritDoc}
      * @param array $synergyIds
      *
      * @return array
      */
     public function getParentEmails($synergyIds)
     {
-        $emailList = array();
-        $id_list   = [];
-        foreach ($synergyIds as $id) {
-            if (strlen($id)) {
-                $id_list[] = $this->getDatabase()->quote($id);
-            }
-        };
+        $emailList = [];
+        $id_list   = array_filter((array)$synergyIds);
+
         if (empty($id_list)) {
-            return array();
+            return [];
         }
-        $id_list = implode(',', $id_list);
-        $statement = $this->getDatabase()->prepare(
+
+        $predicate = PredicateBuilder::getArrayBindings($id_list, 'contactId');
+
+        $parentIterator = $this->internalDatabase->executeQueryIterator(
             "
-            SELECT
-                parent.synergy_id AS StudentContactID,
-                parent.alt_email AS StudentContactEmail
-            FROM `user`
-            INNER JOIN user_relation ON user.id = user_relation.relation_id
-            INNER JOIN `user` parent ON parent.id = user_relation.user_id AND parent.deleted_at IS NULL
-            WHERE user.synergy_id IN ($id_list)
-            AND user_relation.relation_type = :relation_type
-            AND `user`.deleted_at IS NULL
-        "
+                SELECT      parent.synergy_id AS StudentContactID,
+                            parent.alt_email AS StudentContactEmail
+                FROM        `user`
+                INNER JOIN  user_relation ON user.id = user_relation.relation_id
+                INNER JOIN  `user` parent ON parent.id = user_relation.user_id AND parent.deleted_at IS NULL
+                WHERE       user.synergy_id IN ({$predicate["placeholders"]}) AND
+                            user_relation.relation_type = :relation_type AND
+                            `user`.deleted_at IS NULL
+            ",
+            array_merge(
+                $predicate['bindings'],
+                ['relation_type' => self::RELATION_TYPE_PARENT]
+            )
         );
-        $statement->execute(array(':relation_type' => self::RELATION_TYPE_PARENT));
-        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $emailList[$row['StudentContactID']] = $row['StudentContactEmail'];
+
+        foreach ($parentIterator as $parent) {
+            $emailList[$parent['StudentContactID']] = $parent['StudentContactEmail'];
         }
+
         return $emailList;
     }
 
     /**
-     * Get a student by id
-     *
-     * @param $externalUserId
+     * {@inheritDoc}
+     * @param int $externalUserId
      *
      * @return array
      */
     public function getStudent($externalUserId)
     {
-        $statement = $this->getDatabase()->prepare(
+        return $this->internalDatabase->executeQuery(
             "
-                        SELECT
-                            user.id AS StudentID,
-                            user.firstname AS StudentGiven1,
-                            user.lastname AS StudentSurname,
-                            UNIX_TIMESTAMP(dob) AS StudentBirthDate,
-                            '' AS StudentTutorName,
-                            '' AS StudentHeadOfHouse,
-                            '' AS HeadOfHouseID,
-                            '' AS StudentFormStaffName,
-                            '' AS StudentTutorDescription,
-                            '' AS TeacherFormID,
-                            '' AS StudentForm,
-                            '' AS TeacherTutorID,
-                            '' AS StudentTutor,
-                            '' AS FormDescription,
-                            '' AS StudentHouseDescription,
-                            user_profile.house AS StudentHouse,
-                            level AS StudentYearLevel,
-                            '' AS StudentLockerBook,
-                            '' AS StudentEmergencyName,
-                            '' AS StudentEmergencyPhone,
-                            '' AS StudentEmergencyPhoneAlt,
-                            '' AS StudentMedicalAlert,
-                            '' AS StudentSpecialNeedsFlag,
-                            '' AS StudentStudiesCode,
-                            '' AS AlertMessage,
-                            '' AS StudentBoarder,
-                            '' AS Comment,
-                            0 AS countIndividualEducationPlans
-                        FROM `user`
-                        LEFT JOIN user_profile ON user.id = user_profile.user_id
-                        WHERE user.synergy_id = :externalUserId
-                        AND `user`.deleted_at IS NULL
-                    "
-        );
-        $statement->execute(
-            array(
-                ':externalUserId' => $externalUserId
-            )
-        );
-        return $statement->fetch(PDO::FETCH_ASSOC);
+                SELECT    user.id AS StudentID,
+                          user.firstname AS StudentGiven1,
+                          user.lastname AS StudentSurname,
+                          UNIX_TIMESTAMP(dob) AS StudentBirthDate,
+                          '' AS StudentTutorName,
+                          '' AS StudentHeadOfHouse,
+                          '' AS HeadOfHouseID,
+                          '' AS StudentFormStaffName,
+                          '' AS StudentTutorDescription,
+                          '' AS TeacherFormID,
+                          '' AS StudentForm,
+                          '' AS TeacherTutorID,
+                          '' AS StudentTutor,
+                          '' AS FormDescription,
+                          '' AS StudentHouseDescription,
+                          user_profile.house AS StudentHouse,
+                          level AS StudentYearLevel,
+                          '' AS StudentLockerBook,
+                          '' AS StudentEmergencyName,
+                          '' AS StudentEmergencyPhone,
+                          '' AS StudentEmergencyPhoneAlt,
+                          '' AS StudentMedicalAlert,
+                          '' AS StudentSpecialNeedsFlag,
+                          '' AS StudentStudiesCode,
+                          '' AS AlertMessage,
+                          '' AS StudentBoarder,
+                          '' AS Comment,
+                          0 AS countIndividualEducationPlans
+                FROM      `user`
+                LEFT JOIN user_profile ON user.id = user_profile.user_id
+                WHERE     user.synergy_id = :externalUserId
+                AND       `user`.deleted_at IS NULL
+            ",
+            ['externalUserId' => $externalUserId]
+        )->fetch();
     }
 
     /**
-     * Get details for a student's contacts
-     *
+     * {@inheritDoc}
      * @param string $externalUserId
      *
      * @return array
      */
     public function getStudentContactList($externalUserId)
     {
-        // Updated query:
-        // no longer relies on user_profile being populated to fetch parent ID
-        $statement = $this->getDatabase()->prepare(
+        return $this->internalDatabase->executeQuery(
             "
-                        SELECT
-                            parent.synergy_id AS StudentContactID,
+                SELECT      parent.synergy_id AS StudentContactID,
                             parent.title AS StudentContactTitle,
                             parent.firstname AS StudentContactPreferred,
                             parent.lastname AS StudentContactSurname,
@@ -164,98 +157,76 @@ class External_Schoolbox_User implements External_UserInterface
                             pp.guardian2HomePhone AS StudentContactSpousePhoneActual,
                             pp.guardian2MobilePhone AS StudentContactSpouseMobilePhone,
                             pp.guardian2WorkPhone AS StudentContactSpouseOccupPhone
-                        FROM `user` child
-                        INNER JOIN user_relation ur ON child.id = ur.relation_id
-                        INNER JOIN `user` parent ON ur.user_id = parent.id AND parent.deleted_at IS NULL
-                        LEFT JOIN user_profile pp ON `parent`.id = pp.user_id
-                        WHERE child.synergy_id = :externalUserId AND child.deleted_at IS NULL
-                    "
-        );
-        $statement->execute(
-            array(
-                ':externalUserId' => $externalUserId
-            )
-        );
-        return $statement->fetchAll(PDO::FETCH_ASSOC);
+                FROM        `user` child
+                INNER JOIN  user_relation ur ON child.id = ur.relation_id
+                INNER JOIN  `user` parent ON ur.user_id = parent.id AND parent.deleted_at IS NULL
+                LEFT JOIN   user_profile pp ON `parent`.id = pp.user_id
+                WHERE       child.synergy_id = :externalUserId AND 
+                            child.deleted_at IS NULL
+            ",
+            ['externalUserId' => $externalUserId]
+        )->fetchAll();
     }
-
-    public function getStaff($externalUserId)
-    {
-    }
-
-    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
-    {
-
-    }
-
 
     /**
-     * Alex's weird usage
-     *
+     * {@inheritDoc}
      * @param $externalUserId
      *
      * @return array
      */
     public function getLeaveStudentContactList($externalUserId)
     {
-        $statement           = $this->getDatabase()->query(
+        $contactAdaptionList = [];
+
+        $iterateContacts = $this->internalDatabase->executeQueryIterator(
             "
-                SELECT u.*
-                FROM user_relation ur
-                LEFT JOIN `user` u ON u.id = ur.user_id AND u.deleted_at IS NULL
-                WHERE ur.relation_id = {$externalUserId}
-                  AND ur.relation_type = " . External_Schoolbox_User::RELATION_TYPE_PARENT . "
-            "
+                SELECT      u.*
+                FROM        user_relation ur
+                LEFT JOIN   `user` u ON u.id = ur.user_id AND u.deleted_at IS NULL
+                WHERE       ur.relation_id = :externalUserId
+                AND         ur.relation_type = :typeParent
+            ",
+            [
+                'externalUserId' => $externalUserId,
+                'typeParent'     => External_Schoolbox_User::RELATION_TYPE_PARENT,
+            ]
         );
-        $contactList         = $statement->fetchAll(PDO::FETCH_ASSOC);
-        $contactAdaptionList = array();
-        if (!empty($contactList)) {
-            foreach ($contactList as $contact) {
-                $contactAdaption       = array(
-                    'StudentContactID'               => $contact['id'],
-                    'StudentContactTitle'            => $contact['title'],
-                    'StudentContactPreferred'        => $contact['firstname'],
-                    'StudentContactSurname'          => $contact['lastname'],
-                    'StudentContactDefaultEmail'     => $contact['alt_email'],
-                    'StudentContactAddress1'         => '',
-                    'StudentContactSuburb'           => '',
-                    'StudentContactPostCode'         => '',
-                    'StudentContactState'            => '',
-                    'StudentContactPhoneActual'      => '',
-                    'StudentContactMobilePhone'      => '',
-                    'StudentContactOccupPhone'       => '',
-                    'StudentContactSpouseID'         => '',
-                    'StudentContactSpouseTitle'      => '',
-                    'StudentContactSpousePreferred'  => '',
-                    'StudentContactSpouseSurname'    => '',
-                    'StudentContactSpouseMobilePhon' => '',
-                    'StudentContactSpouseOccupPhone' => '',
-                    'StudentContactSpouseDefaultEma' => '',
-                    'StudentContactType'             => 'SC1',
-                );
-                $contactAdaptionList[] = $contactAdaption;
-            }
+
+        foreach ($iterateContacts as $contact) {
+            $contactAdaptionList[] = [
+                'StudentContactID'               => $contact['id'],
+                'StudentContactTitle'            => $contact['title'],
+                'StudentContactPreferred'        => $contact['firstname'],
+                'StudentContactSurname'          => $contact['lastname'],
+                'StudentContactDefaultEmail'     => $contact['alt_email'],
+                'StudentContactAddress1'         => '',
+                'StudentContactSuburb'           => '',
+                'StudentContactPostCode'         => '',
+                'StudentContactState'            => '',
+                'StudentContactPhoneActual'      => '',
+                'StudentContactMobilePhone'      => '',
+                'StudentContactOccupPhone'       => '',
+                'StudentContactSpouseID'         => '',
+                'StudentContactSpouseTitle'      => '',
+                'StudentContactSpousePreferred'  => '',
+                'StudentContactSpouseSurname'    => '',
+                'StudentContactSpouseMobilePhon' => '',
+                'StudentContactSpouseOccupPhone' => '',
+                'StudentContactSpouseDefaultEma' => '',
+                'StudentContactType'             => 'SC1',
+            ];
         }
+
         return $contactAdaptionList;
     }
 
-    public function getCurrentSemester($externalUserId = null)
-    {
-        return date('m') < 6 ? 1 : 2;
-    }
-
-    public function getCurrentYear($externalUserId = null)
-    {
-        return date('Y');
-    }
-
     /**
-     *
-     *
+     * {@inheritDoc}
      * @param User $user
+     *
      * @return array
      */
-    public function getSubjectList(\Schoolbox\User $user)
+    public function getSubjectList(User $user)
     {
         $externalId = $user->getExternalId();
 
@@ -263,180 +234,261 @@ class External_Schoolbox_User implements External_UserInterface
             return [];
         }
 
-        $params = array(':externalUserId' => $externalId,);
-        // Subjects this user is a student in
-        $statement = $this->getDatabase()->prepare(
-            "
-                        SELECT c.name, c.code
-                        FROM user u
-                        INNER JOIN class_user cu ON cu.user_id = u.id
-                        INNER JOIN class c ON c.id = cu.class_id
-                        WHERE u.synergy_id = :externalUserId
-                        AND u.deleted_at IS NULL
-                        ORDER BY c.code ASC, c.name ASC
-                    "
-        );
-        $statement->execute($params);
-        $classList = $statement->fetchAll(PDO::FETCH_ASSOC);
-        // Subjects this user is a teacher in
-        $statement = $this->getDatabase()->prepare(
-            "
-                        SELECT c.name, c.code
-                        FROM user u
-                        INNER JOIN class_period cp ON cp.teacher_id = u.id
-                        INNER JOIN class c ON c.id = cp.class_id
-                        WHERE u.synergy_id = :externalUserId
-                        AND u.deleted_at IS NULL
-                        ORDER BY c.code ASC, c.name ASC
-                    "
-        );
-        $statement->execute($params);
-        $classList = array_merge($classList, $statement->fetchAll(PDO::FETCH_ASSOC));
-        return array_values(array_unique($classList, SORT_REGULAR));
-    }
+        $params = ['externalUserId' => $externalId];
 
-    public function getEnrolledStudents($externalUserId)
-    {
-        $statement = $this->getDatabase()->prepare(
+        $classQuery = $this->internalDatabase->executeQuery(
             "
-                              SELECT c.synergy_id AS RelatedID
-                              FROM user_relation ur
-                              INNER JOIN user p ON p.id = ur.user_id AND p.deleted_at IS NULL
-                              INNER JOIN user c ON c.id = ur.relation_id AND c.deleted_at IS NULL
-                              WHERE p.synergy_id = :externalUserId
-                                AND ur.relation_type = :relationType
-                          "
+                SELECT      c.name, 
+                            c.code
+                FROM        user u
+                INNER JOIN  class_user cu ON cu.user_id = u.id
+                INNER JOIN  class c ON c.id = cu.class_id
+                WHERE       u.synergy_id = :externalUserId
+                AND         u.deleted_at IS NULL
+                ORDER BY    c.code ASC, c.name ASC
+            ",
+            $params
         );
-        $statement->execute(
-            array(
-                ':externalUserId' => $externalUserId,
-                ':relationType'   => self::RELATION_TYPE_PARENT
+
+        $classList = $classQuery->fetchAll();
+
+        $subjectQuery = $this->internalDatabase->executeQuery(
+            "
+                SELECT      c.name,
+                            c.code
+                FROM        user u
+                INNER JOIN  class_period cp ON cp.teacher_id = u.id
+                INNER JOIN  class c ON c.id = cp.class_id
+                WHERE       u.synergy_id = :externalUserId
+                AND         u.deleted_at IS NULL
+                ORDER BY    c.code ASC, 
+                            c.name ASC
+            ",
+            $params
+        );
+
+        return array_values(
+            array_unique(
+                array_merge(
+                    $classList,
+                    $subjectQuery->fetchAll()
+                ),
+                SORT_REGULAR
             )
         );
-        $childList = $statement->fetchAll(PDO::FETCH_ASSOC);
-        return $childList;
-    }
-
-    public function getEmail($externalUserId)
-    {
-
-    }
-
-    public function getStudentUserAccountInfo()
-    {
-
-    }
-
-    public function getParentUserAccountInfo()
-    {
-    }
-
-    public function getStaffUserAccountInfo()
-    {
-
     }
 
     /**
-     * Determine the boarder type based on a value
-     * Returns a human-readable string
+     * {@inheritDoc}
+     * @param int $externalUserId
      *
-     * @param $boarderValue
+     * @return array
+     */
+    public function getEnrolledStudents($externalUserId)
+    {
+        return $this->internalDatabase->executeQuery(
+            "
+                SELECT      c.synergy_id AS RelatedID
+                FROM        user_relation ur
+                INNER JOIN  user p ON p.id = ur.user_id AND p.deleted_at IS NULL
+                INNER JOIN  user c ON c.id = ur.relation_id AND c.deleted_at IS NULL
+                WHERE       p.synergy_id = :externalUserId AND
+                            ur.relation_type = :relationType
+            ",
+            [
+                'externalUserId' => $externalUserId,
+                'relationType'   => self::RELATION_TYPE_PARENT,
+            ]
+        )->fetchAll();
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param string $boarderValue
      *
      * @return string
      */
     public function determineBoarderType($boarderValue)
     {
-        $boarders = array('B', 'W');
+        $boarders = ['B', 'W'];
+
         if (!strlen($boarderValue)) {
             return '';
         } elseif (in_array($boarderValue, $boarders)) {
             return 'Boarder';
         }
+
         return 'Day';
     }
 
     /**
-     * Returns a local path to the user's portrait
+     * {@inheritDoc}
+     * @param int $externalUserId
      *
-     * @param Integer $externalUserId
-     *
-     * @return Bool|String
+     * @return bool|string
      */
     public function getPortrait($externalUserId)
     {
-
-        $portraitPath = realpath(Config::get('portrait_dir')) . "/$externalUserId.jpg";
+        $portraitPath = realpath($this->configMapper->get('portrait_dir')) . "/{$externalUserId}.jpg";
 
         if (is_readable($portraitPath)) {
             return $portraitPath;
-        } else {
-            return false;
         }
-    }
 
-    /**
-     * Get contact list for staff directory
-     *
-     * @return array
-     */
-    public function getStaffContactListExtended()
-    {
-        // TODO: Implement getStaffContactListExtended() method.
-        return array();
-    }
-
-    /**
-     * List of campuses a staff member is involved in based on timetable
-     *
-     * @param int $staffID
-     * @return array|bool
-     */
-    public function getCampusFromTimetable($staffID)
-    {
-        return array();
-    }
-
-
-    /**
-     * @param Database $database
-     *
-     * @return void
-     */
-    private function setDatabase(Database $database)
-    {
-        $this->database = $database;
-    }
-
-    /**
-     * @return Database
-     */
-    private function getDatabase()
-    {
-        return $this->database;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getHousemasterByHouseId($houseID)
-    {
         return false;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
+     * @param int $externalUserId
+     *
+     * @return int
      */
-    public function getHousemasterEmails($externalUserIds)
+    public function getCurrentSemester($externalUserId = null)
+    {
+        return date('m') < 6 ? 1 : 2;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param int $externalUserId
+     *
+     * @return string
+     */
+    public function getCurrentYear($externalUserId = null)
+    {
+        return date('Y');
+    }
+
+    // Useless functions
+
+    /**
+     * {@inheritDoc}
+     * @return array
+     */
+    public function getStaffContactListExtended()
     {
         return [];
     }
 
     /**
-     * Not yet implemented for this connector
+     * {@inheritDoc}
+     * @param int $staffID
      *
      * @return array
      */
+    public function getCampusFromTimetable($staffID)
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param int $houseId
+     */
+    public function getHousemasterByHouseId($houseID)
+    {
+        return '';
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param array $externalUserIds
+     */
+    public function getHousemasterEmails($externalUserIds)
+    {
+        /** @noinspection PhpUnusedParameterInspection */
+        return [];
+    }
+
+    /**
+     * {@inheritDoc}
+     * @return array
+     */
     public function getStudentForms()
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param int $externalUserId
+     *
+     * @return array
+     */
+    public function getParent($externalUserId)
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param int $externalUserId
+     *
+     * @return array
+     */
+    public function getParentSync($externalUserId)
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritDoc}
+     * @return string
+     */
+    public function getEmail($externalUserId)
+    {
+        return '';
+    }
+
+    /**
+     * {@inheritDoc}
+     * @return array
+     */
+    public function getStudentUserAccountInfo()
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritDoc}
+     * @return array
+     */
+    public function getParentUserAccountInfo()
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritDoc}
+     * @return array
+     */
+    public function getStaffUserAccountInfo()
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param int $externalUserId
+     *
+     * @return array
+     */
+    public function getStaff($externalUserId)
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param string $yearlevel
+     * @param string $name
+     * @param string $boardingStatus
+     * @param string $form
+     *
+     * @return array
+     */
+    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
     {
         return [];
     }

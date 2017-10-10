@@ -16,7 +16,10 @@ interface IQuery extends IStatement
 {
     /**
      * Bind array of input values. This doesn't bind to the PDO statement, just stores the intention in an array.
+     *
      * @param array $values
+     *
+     * @return self
      */
     public function bindInputs($values = []);
 }

@@ -1,148 +1,107 @@
 <?php
-/************************************************************
- *														   *
- *		 Copyright (c) 2013 Alaress Pty Ltd				    *
- *														   *
- *	This file provides access to Denbigh class info		    *
- *														   *
- ************************************************************/
+/**
+ * @author    Anyone Foolish Enough To Claim It <everyone@alaress.com.au>
+ * @copyright Copyright 2017, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
 
-class External_Denbigh_Class implements External_ClassInterface {
+use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
+use Schoolbox\Database\Factory as DatabaseFactory;
 
-	private $internalDatabase;
+/** @noinspection PhpUndefinedClassInspection */
+class External_Denbigh_Class implements External_ClassInterface
+{
+    /** @var IConnector $externalDatabase */
+    private $externalDatabase;
 
-	private $externalDatabase;
+    /**
+     * External_Denbigh_Class constructor.
+     */
+    public function __construct()
+    {
+        /** @noinspection PhpDeprecationInspection */
+        $this->externalDatabase = DatabaseFactory::getInstanceExternal();
+    }
 
-	public function __construct () {
-		/* Set internal database */
-		$this->setInternalDatabase( Database::getInstance() );
+    /**
+     * {@inheritDoc}
+     * @param string $classCode CSV list of class codes to find students in
+     *
+     * @return array
+     */
+    public function getStudents($classCode)
+    {
+        $classCodes = array_filter(explode(',', $classCode));
 
-		/* Establish connection to external database */
-		$database = new Database();
-
-		$hostName = Config::get('external_db_host');
-		$databaseName = Config::get('external_db_db');
-		$username = Config::get('external_db_user');
-		$password = Config::get('external_db_passwd');
-
-		$database->connect("mysql:host=$hostName;dbname=$databaseName", $username, $password, array('throw' => true));
-
-		$this->setExternalDatabase($database);
-	}
-
-	public function getStudents ($classCode) {
-
-        if(!$classCode) {
-            /* Dont bother if you got no code */
-            return false;
+        if (count($classCodes) == 0) {
+            return [];
         }
 
-        $classQuery = '(';
+        $predicate = PredicateBuilder::getArrayBindings($classCodes, 'classCode');
 
-        $subCodeArray = explode(',', $classCode);
-        foreach ($subCodeArray as $code) {
-                $classQuery .= "c.classCode = ".$this->getExternalDatabase()->quote($code)." OR ";
+        /** @noinspection SqlDialectInspection */
+        $studentIterator = $this->externalDatabase->executeQueryIterator(
+            "
+                SELECT      p.denbighID, 
+                            p.surname, 
+                            p.preferred_name, 
+                            s.academicYear, 
+                            s.house
+                FROM        Classes c
+                LEFT JOIN   Enrolments e ON e.classCode = c.classCode
+                LEFT JOIN   Students s ON s.peopleDenbighID = e.studentID
+                LEFT JOIN   People p ON p.denbighID = s.peopleDenbighID
+                WHERE       c.classCode IN ({$predicate["placeholders"]})
+                GROUP BY    denbighID
+                ORDER BY    p.surname ASC
+            ",
+            $predicate["bindings"]
+        );
+
+        $students = [];
+
+        foreach ($studentIterator as $student) {
+            $students[] = [
+                'synergy_id'              => $student['denbighID'],
+                'lastname'                => $student['surname'],
+                'firstname'               => $student['preferred_name'],
+                'yearlevel'               => $student['academicYear'],
+                'house'                   => $student['house'],
+                'StudentMedicalAlert'     => '',
+                'StudentSpecialNeedsFlag' => '',
+            ];
         }
 
-        $classQuery = substr($classQuery, 0, -3) . ')';
+        return $students;
+    }
 
-		/* Note that Classes table will have multiple records for the same
-		 * Class if there are multiple teachers in it; this will cause the
-		 * left join to include duplicate records for students too.
-		 *
-		 * Group by denbighID to uniqify the student list.
-		 */
-        $statement = $this->getExternalDatabase()->query("
-            SELECT p.denbighID, p.surname, p.preferred_name, s.academicYear, s.house
-            FROM Classes c
-            LEFT JOIN Enrolments e ON e.classCode = c.classCode
-            LEFT JOIN Students s ON s.peopleDenbighID = e.studentID
-            LEFT JOIN People p ON p.denbighID = s.peopleDenbighID
-            WHERE $classQuery
-            GROUP BY denbighID
-            ORDER BY p.surname ASC
-        ");
+    /**
+     * {@inheritDoc}
+     * @param string $classCode CSV list of class codes to find staff in
+     *
+     * @return array
+     */
+    public function getTeacherName($classCode)
+    {
+        $classCodes = array_filter(explode(',', $classCode));
 
-
-        $studentList = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-        $studentAdaptionList = array();
-
-        if ( !empty($studentList) ) {
-            foreach ( $studentList as $student ) {
-                $studentAdaption = array(
-                    'synergy_id' => $student['denbighID'],
-                    'lastname' => $student['surname'],
-                    'firstname' => $student['preferred_name'],
-                    'yearlevel' => $student['academicYear'],
-                    'house' => $student['house'],
-                    'StudentMedicalAlert' => '',
-                    'StudentSpecialNeedsFlag' => '',
-                );
-
-                $studentAdaptionList[] = $studentAdaption;
-            }
-        }
-        return $studentAdaptionList;
-	}
-
-	public function getTeacherName ($classCode) {
-
-        if(!$classCode) {
-            /* Dont bother if you got no code */
-            return false;
+        if (count($classCodes) == 0) {
+            return [];
         }
 
-        $classQuery = '(';
+        $predicate = PredicateBuilder::getArrayBindings($classCodes, 'classCode');
 
-        $subCodeArray = explode(',', $classCode);
-        foreach ($subCodeArray as $code) {
-            $classQuery .= "c.classCode = ".$this->getExternalDatabase()->quote($code)." OR ";
-        }
-
-        $classQuery = substr($classQuery, 0, -3) . ')';
-
-		$statement = $this->getExternalDatabase()->query("
-			SELECT p.denbighID
-			FROM Classes c
-			LEFT JOIN Staff s ON s.staffCode = c.staffCode
-			LEFT JOIN People p ON p.denbighID = s.peopleDenbighID
-			WHERE $classQuery
-		");
-
-		while($teacher = $statement->fetch(PDO::FETCH_NUM)) {
-			$teacherList[] = $teacher[0];
-		}
-		return $teacherList;
-	}
-	
-	/**
-	 * @param Database $database
-	 * @return void
-	 */
-	private function setInternalDatabase (Database $internalDatabase) {
-		$this->internalDatabase = $internalDatabase;
-	}
-
-	/**
-	 * @return Database
-	 */
-	private function getInternalDatabase () {
-		return $this->internalDatabase;
-	}
-
-	/**
-	 * @param Database $database
-	 * @return void
-	 */
-	private function setExternalDatabase (Database $externalDatabase) {
-		$this->externalDatabase = $externalDatabase;
-	}
-
-	/**
-	 * @return Database
-	 */
-	private function getExternalDatabase () {
-		return $this->externalDatabase;
-	}
+        /** @noinspection SqlDialectInspection */
+        return $this->externalDatabase->executeQuery(
+            "
+                SELECT DISTINCT p.denbighID
+                FROM            Classes c
+                LEFT JOIN       Staff s ON s.staffCode = c.staffCode
+                LEFT JOIN       People p ON p.denbighID = s.peopleDenbighID
+                WHERE           c.ClassCode IN ({$predicate["placeholders"]})
+		    ",
+            $predicate["bindings"]
+        )->fetchColumnArray(0);
+    }
 }

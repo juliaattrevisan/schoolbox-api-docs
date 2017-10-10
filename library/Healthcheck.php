@@ -27,7 +27,7 @@ class Healthcheck
 
     /** @var IConnector */
     private $connector;
-    
+
     /** @var IConnector[] $secondaryConnectors Array of secondary database connectors */
     private $secondaryConnectors = [];
 
@@ -96,12 +96,15 @@ class Healthcheck
 
         if ($transactionsSupported) {
 
-            $this->log .= str_pad(str_pad("METHOD", 15) . "DATABASE OBJECT", 50) . "TEST RESULT\n";
-            $this->log .= "------------------------------------------------------------------------------------------------------------------\n";
-
             $testFunctionName = "{$this->externalType}Test";
 
-            $this->$testFunctionName();
+            if (method_exists($this, $testFunctionName)) {
+                $this->log .= str_pad(str_pad("METHOD", 15) . "DATABASE OBJECT", 50) . "TEST RESULT\n";
+                $this->log .= "------------------------------------------------------------------------------------------------------------------\n";
+                $this->$testFunctionName();
+            } else {
+                $this->errors[] = "Sorry, no health check is currently available for this external connector.";
+            }
         }
 
         // Rollback any transactions we were able to start so we don't end up inserting anything into the SIS
@@ -122,7 +125,7 @@ class Healthcheck
         // Return the results
 
         return [
-            'log' => trim($this->log) . "\n",
+            'log' => trim($this->log),
             'errors' => $this->errors,
             'externalType' => $this->externalType
         ];
@@ -366,7 +369,7 @@ class Healthcheck
         $this->selectTest($tables);
 
         $procedures = [
-             'spSelTimetable',
+            'spSelTimetable',
         ];
 
         $this->procedureTest($procedures);
@@ -507,7 +510,7 @@ class Healthcheck
             'sbGetStudentContact',
             'sbGetPortraitLastUpdated',
             'sbGetPortraitFile',
-            ];
+        ];
         $this->procedureTest($procedures);
     }
 
