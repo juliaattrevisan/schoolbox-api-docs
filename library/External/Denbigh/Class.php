@@ -95,11 +95,11 @@ class External_Denbigh_Class implements External_ClassInterface
         /** @noinspection SqlDialectInspection */
         return $this->externalDatabase->executeQuery(
             "
-                SELECT      p.denbighID
-                FROM        Classes c
-                LEFT JOIN   Staff s ON s.staffCode = c.staffCode
-                LEFT JOIN   People p ON p.denbighID = s.peopleDenbighID
-                WHERE       c.ClassCode IN ({$predicate["placeholders"]})
+                SELECT DISTINCT p.denbighID
+                FROM            Classes c
+                LEFT JOIN       Staff s ON s.staffCode = c.staffCode
+                LEFT JOIN       People p ON p.denbighID = s.peopleDenbighID
+                WHERE           c.ClassCode IN ({$predicate["placeholders"]})
 		    ",
             $predicate["bindings"]
         )->fetchColumnArray(0);
