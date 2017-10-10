@@ -1766,7 +1766,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * @return null|array
      */
-    public function getCreatedMap()
+    protected function getCreatedMap()
     {
         return $this->createdMap;
     }
@@ -1775,7 +1775,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param null|array $createdMap
      * @return $this
      */
-    public function setCreatedMap(array $createdMap = null)
+    protected function setCreatedMap(array $createdMap = null)
     {
         $this->createdMap = $createdMap;
         return $this;
@@ -1784,7 +1784,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * @return null|array
      */
-    public function getUpdatedMap()
+    protected function getUpdatedMap()
     {
         return $this->updatedMap;
     }
@@ -1793,7 +1793,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param null|array $updatedMap
      * @return $this
      */
-    public function setUpdatedMap(array $updatedMap = null)
+    protected function setUpdatedMap(array $updatedMap = null)
     {
         $this->updatedMap = $updatedMap;
         return $this;
