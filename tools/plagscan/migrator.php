@@ -9,12 +9,10 @@
  * @link        http://www.alaress.com.au
  */
 
+use Alaress\Database\Connector\IConnector;
 use Aura\Di\Container as Injector;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanDocumentMapper;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Migration\Mapper as PlagscanDocumentMigrationMapper;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as PlagscanDocument;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
@@ -27,7 +25,7 @@ spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $options = getopt("v::r::", ['verbose::', 'retry::']);
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Plagscan', [
+$kernel = new Schoolbox\Application\Daemon\Kernel('Plagscan Document Migration', [
     'verbose' => isset($options['v']) || isset($options['verbose']) ? [false, false, false] : null,
     'retry'   => isset($options['r']) || isset($options['retry']) ? true : false,
 ]);
@@ -35,13 +33,16 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Plagscan', [
 $lock = new Alaress_Lock('plagscan_migrator.lock');
 
 try {
-    $kernel->run(function ($di, $loop, $log, $opts) use ($lock) {
+    /** @var IConnector $database */
+    $database = $kernel->getDependencyInjector()->get('databaseInternal');
+
+    $kernel->run(function ($di, $loop, $log, $opts) use ($lock, $database) {
         /** @noinspection PhpUndefinedClassInspection */
         /**
          * @var Injector        $di
          * @var LoopInterface   $loop
-         * @var LoggerInterface $log
          * @var array           $opts
+         * @var LoggerInterface $log
          */
 
         // Indicate retry state
@@ -55,56 +56,98 @@ try {
         pcntl_signal(SIGCHLD, SIG_DFL);
 
         if (!$lock->acquire()) {
+            // Make sure we aren't locked
+
             $log->critical("Document migration already in process");
         } else {
-            $plagscanMapper                  = PlagscanDocumentMapper::getInstance();
-            $plagscanDocumentMigrationMapper = PlagscanDocumentMigrationMapper::getInstance();
-
             $skipped    = 0;
             $failed     = 0;
             $success    = 0;
             $bytesTotal = 0;
-            $limit      = 5;
+            $limit      = 50;
+            $count      = 0;
+
+            // Get a count of how many documents we need to action
+
+            $countDocuments = $database->executeQuery(
+                "
+                    SELECT    COUNT(*) 
+                    FROM        `plagscan_document` `p`
+                    LEFT JOIN   `plagscan_document_migration` `m` ON 
+                                `p`.`id` = `m`.`plagscan_document_id`  
+                    WHERE       `p`.`id` NOT IN 
+                                (
+                                    SELECT    `m`.`plagscan_document_id`
+                                    FROM      `plagscan_document_migration` `m` 
+                                    WHERE     `m`.`storage_migrated_at` IS NOT NULL
+                                ) AND 
+                                `p`.`html` IS NOT NULL AND    
+                                TRIM(`p`.`html`) <> '' 
+                "
+            )->fetchColumn();
+
+            $log->info("{$countDocuments} documents pending migration");
 
             do {
-                // Retrieve all documents with HTML
+                $documents = $database->executeQueryIterator(
+                    "
+                        SELECT      `p`.`id`,
+                                    `p`.`html`,
+                                    `m`.* 
+                        FROM        `plagscan_document` `p`
+                        LEFT JOIN   `plagscan_document_migration` `m` ON 
+                                    `p`.`id` = `m`.`plagscan_document_id`  
+                        WHERE       `p`.`id` NOT IN 
+                                    (
+                                        SELECT    `m`.`plagscan_document_id`
+                                        FROM      `plagscan_document_migration` `m` 
+                                        WHERE     `m`.`storage_migrated_at` IS NOT NULL
+                                    ) AND 
+                                    `p`.`html` IS NOT NULL AND    
+                                    TRIM(`p`.`html`) <> ''
+                        LIMIT       :limit
+                    ",
+                    [
+                        'limit'  => $limit
+                    ]
+                );
 
-                $predicateBuilder = $plagscanMapper->getPredicateBuilder();
-                $predicatePending = $predicateBuilder->notNull('html');
+                // Wrap each batch of migrations in a transaction in case something goes foobar
 
-                $documents = $plagscanMapper
-                    ->findByPredicates($predicatePending, [
-                        'limit' => $limit,
-                        'deleted' => true
-                    ])
-                    ->getIterator();
+                $database->beginTransaction();
 
-                /** @var PlagscanDocument $document */
+                /** @var array $document */
                 foreach ($documents as $document) {
-                    if ((!$document->getPlagscanDocumentMigration()->getStorageFailedAt() instanceof Alaress_Date_NullDate &&
-                            !$document->getPlagscanDocumentMigration() != null
-                        ) && !$opts['retry']) {
-                        $log->debug("Skipping failed document: Plagscan ID {$document->getId()}");
+                    if (!empty($document['storage_failed_at']) && !$opts['retry']) {
+                        $log->debug("Skipping failed document: Plagscan ID {$document["id"]}");
                         $skipped++;
                         continue;
                     }
 
-                    $log->info("Migrating #{$document->getId()}: Plagscan ID {$document->getId()}");
-
-                    $result = migrateHtml($plagscanMapper, $plagscanDocumentMigrationMapper, $document);
+                    $result = migrateHtml($database, $document);
 
                     if ($result == RESULT_SUCCESS) {
-                        $bytesTotal += strlen($document->getHtml());
+                        $bytesTotal += strlen($document["html"]);
                         $success++;
                     } elseif ($result == RESULT_FAILED) {
-                        $log->error("Document migration failed: Plagscan ID {$document->getId()}");
+                        $log->error("Document migration failed: Plagscan ID {$document["id"]}");
                         $failed++;
                     } elseif ($result == RESULT_FAILED_SIZE) {
-                        $log->error("Uploaded storage object size mismatch: Plagscan ID {$document->getId()}");
+                        $log->error("Uploaded storage object size mismatch: Plagscan ID {$document["id"]}");
                         $failed++;
                     }
+
+                    $count++;
                 }
-            } while (iterator_count($documents) == $limit);
+
+                $database->commit();
+
+                // Display a progress indicator between each batch
+
+                $percentage = number_format($count / $countDocuments * 100, 2);
+                $megabytes = number_format($bytesTotal / 1024 / 1024, 2);
+                $log->info("Migrating {$count}/{$countDocuments}: {$megabytes}MB Migrated {$percentage}%");
+            } while ($count < $countDocuments);
 
             if ($failed === 0 && $success === 0 && $skipped === 0) {
                 $log->info("Nothing to migrate");
@@ -122,6 +165,10 @@ try {
         }
     });
 } catch (Exception $e) {
+    // Something went wrong, rollback current transaction
+
+    $database->rollback();
+
     // Logger isn't available here, just echoing out the exception
 
     echo "\nFatal Exception Error:\n";
@@ -129,7 +176,7 @@ try {
     do {
         echo "\n{$e->getMessage()}";
         $e = $e->getPrevious();
-    } while ($e instanceof \Exception);
+    } while ($e instanceof Exception);
 
     echo "\n\n";
 } finally {
@@ -139,53 +186,167 @@ try {
 /**
  * Migrate the HTML contents from `plagscan_document` table into OTFS storage
  *
- * @param PlagscanDocumentMapper          $plagscanMapper                  The plagscan document mapper
- * @param PlagscanDocumentMigrationMapper $plagscanDocumentMigrationMapper The plagscan document migration mapper
- * @param PlagscanDocument                $document                        The Plagscan document to be migrated
+ * @param IConnector $database
+ * @param array      $document
  *
  * @return int
  */
-function migrateHtml(PlagscanDocumentMapper $plagscanMapper, PlagscanDocumentMigrationMapper $plagscanDocumentMigrationMapper, PlagscanDocument $document): int
+function migrateHtml(IConnector $database, array $document): int
 {
+    /** @var string $now */
+    $now = Alaress_Date_Format::now()->toIso8601String();
+
     // Otherwise save the HTML content into an OTFS storage object
 
     $storageMapper = StorageMapper::getInstance();
 
-    // Grab the migration object
-
-    $migration = $document->getPlagscanDocumentMigration();
-
     // Create temporary file to hold the HTML
 
-    $storageObject = $storageMapper->acceptStream("plagscan-{$document->getPlagscanId()}.html", $document->getHtml());
+    $storageObject = $storageMapper->acceptStream("plagscan-{$document["id"]}.html", $document["html"]);
 
     if ($storageObject instanceof IStorage) {
         // Uploading to storage succeeded
 
-        $migration->setStorage($storageObject);
-        $migration->setStorageMigratedAt(Alaress_Date_Format::now());
+        if ($storageObject->getSize() == strlen($document["html"]) &&
+            md5($storageObject->read()) == md5($document["html"])) {
+            // Create/update migration record
 
-        $plagscanDocumentMigrationMapper->save($migration);
+            if (empty($document["plagscan_document_id"])) {
+                // Create migration record
 
-        if ($migration->getStorage()->getSize() == strlen($document->getHtml())) {
+                $database->executeQuery(
+                    "
+                        INSERT IGNORE INTO `plagscan_document_migration` (
+                          `plagscan_document_id`, 
+                          `storage_hash`, 
+                          `storage_migrated_at`, 
+                          `storage_failed_at`, 
+                          `created_at`, 
+                          `updated_at`, 
+                          `deleted_at`
+                        ) VALUES (
+                          :plagscanDocumentId, 
+                          :storageHash, 
+                          :storageMigratedAt, 
+                          :storageFailedAt, 
+                          :createdAt, 
+                          :updatedAt, 
+                          :deletedAt
+                        )
+                    ",
+                    [
+                        'plagscanDocumentId' => $document["id"],
+                        'storageHash'        => $storageObject->getHash(),
+                        'storageMigratedAt'  => $now,
+                        'storageFailedAt'    => null,
+                        'createdAt'          => $now,
+                        'updatedAt'          => $now,
+                        'deletedAt'          => null,
+                    ]
+                );
+            } else {
+                // Update existing migration record
+
+                $database->executeQuery(
+                    "
+                        UPDATE plagscan_document_migration SET
+                            storage_hash = :storageHash, 
+                            storage_migrated_at = :storageMigratedAt, 
+                            updated_at = :updatedAt
+                        WHERE plagscan_document_id = :plagscanDocumentId
+                    ",
+                    [
+                        'storageHash'        => $storageObject->getHash(),
+                        'storageMigratedAt'  => $now,
+                        'updatedAt'          => $now,
+                        'plagscanDocumentId' => $document["id"],
+                    ]
+                );
+            }
+
             // Blank out the document content if the move was successful
 
-            $document->setHtml(null);
-            $plagscanMapper->save($document);
+            $database->executeQuery(
+                "
+                    UPDATE  `plagscan_document` 
+                    SET     `html` = NULL,
+                            `updated_at` = :updatedAt 
+                    WHERE   `id` = :id
+                ",
+                [
+                    'updatedAt' => $now,
+                    'id'        => $document["id"],
+                ]
+            );
 
             return RESULT_SUCCESS;
         } else {
-            $migration->setStorageFailedAt(Alaress_Date_Format::now());
-            $plagscanDocumentMigrationMapper->save($migration);
+            // Migration failed due to size mismatch
+
+            if (empty($document["plagscan_document_id"])) {
+                // Insert new migration record
+
+                $database->executeQuery(
+                    "
+                        INSERT IGNORE INTO `plagscan_document_migration`
+                        (
+                            `plagscan_document_id`, 
+                            `storage_failed_at`, 
+                            `created_at`, 
+                            `updated_at`
+                        ) 
+                        VALUES
+                        (
+                            :plagscanDocumentId, 
+                            :storageFailedAt, 
+                            :createdAt, 
+                            :updatedAt
+                        ) 
+                    ",
+                    [
+                        'plagscanDocumentId' => $document["id"],
+                        'storageFailedAt'    => $now,
+                        'createdAt'          => $now,
+                        'updatedAt'          => $now,
+                    ]
+                );
+            } else {
+                // Update existing migration record
+
+                $database->executeQuery(
+                    "
+                        UPDATE    `plagscan_document_migration`
+                        SET       `storage_failed_at` = :storageFailedAt,
+                                  `updated_at` = :updatedAt
+                        WHERE     `id` = :id
+                    ",
+                    [
+                        'storageFailedAt' => $now,
+                        'updatedAt'       => $now,
+                        'id'              => $document["id"],
+                    ]
+                );
+            }
 
             return RESULT_FAILED_SIZE;
         }
     }
 
-    // Uploading to storage failed
+    // Uploading to storage failed for some other reason
 
-    $migration->setStorageFailedAt(Alaress_Date_Format::now());
-    $plagscanDocumentMigrationMapper->save($migration);
+    $database->executeQuery(
+        "
+            UPDATE    `plagscan_document_migration` 
+            SET       `storage_failed_at` = :storageFailedAt,
+                      `updated_at` = :updatedAt
+            WHERE     `id` = :id
+        ",
+        [
+            'storageFailedAt' => $now,
+            'updatedAt'       => $now,
+            'id'              => $document["id"],
+        ]
+    );
 
     return RESULT_FAILED;
 }
