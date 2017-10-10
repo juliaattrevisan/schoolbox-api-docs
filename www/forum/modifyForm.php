@@ -191,10 +191,7 @@ else if (is_numeric($_GET['deleteThread'])) {
 		error(19);
 	}
 
-	$forumHandler->delete($thread->getId());
-
-	//Also delete the posts
-    PostMapper::getInstance()->deleteByColumn("threadID", $_GET['deleteThread']);
+    ThreadMapper::getInstance()->delete($thread);
 
 	SitePage::localRedir('/forum/' . $thread->getCategory()->getId());
 }
