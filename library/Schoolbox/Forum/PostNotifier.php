@@ -195,8 +195,13 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         /** @var Post $post */
         $post     = $this->hydrate($post);
         $envelope = new Envelope();
-        $bob      = $this->newBuilder($post, $poster, ':user posted in :thread in :folder', self::TRIGGER_FOLLOWED)
-                         ->addFilter('roletype', array($roletype));
+
+        try {
+            $bob      = $this->newBuilder($post, $poster, ':user posted in :thread in :folder', self::TRIGGER_FOLLOWED)
+                             ->addFilter('roletype', array($roletype));
+        } catch (Mapper\Exception $e) {
+            return $envelope;
+        }
 
         /** @var Post $parent */
         $quotedId = 0;
@@ -231,8 +236,12 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         /** @var Post $post */
         $post     = $this->hydrate($post);
         $envelope = new Envelope();
-        $bob      = $this->newBuilder($post, $poster, ':user replied to your post in :thread in :folder', self::TRIGGER_MENTIONED, true)
-                         ->addFilter('roletype', array($roletype));
+        try {
+            $bob      = $this->newBuilder($post, $poster, ':user replied to your post in :thread in :folder', self::TRIGGER_MENTIONED, true)
+                             ->addFilter('roletype', array($roletype));
+        } catch (Mapper\Exception $e) {
+            return $envelope;
+        }
 
         $parent = $post->getParent();
         if ($parent instanceof Post) {
