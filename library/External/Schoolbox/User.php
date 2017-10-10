@@ -42,7 +42,7 @@ class External_Schoolbox_User implements External_UserInterface
     public function getParentEmails($synergyIds)
     {
         $emailList = [];
-        $id_list   = array_filter($synergyIds);
+        $id_list   = array_filter((array)$synergyIds);
 
         if (empty($id_list)) {
             return [];
