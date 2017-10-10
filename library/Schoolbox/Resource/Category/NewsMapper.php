@@ -251,40 +251,6 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
 		return $c;
 	}
 
-	/**
-	 * @param $id
-	 * @return News
-	 */
-	public function findById($id) {
-
-		$stmt = $this->database->prepare("
-			SELECT
-				{$this->getColumnString('n')},
-				{$this->getJoinColumnString('folder', 'c')},
-				{$this->getJoinColumnString('owner', 'u')}
-			FROM
-				`{$this->getTable()}` `n`
-				INNER JOIN {$this->getJoinSql('folder', 'n', 'c')}
-				INNER JOIN {$this->getJoinSql('owner', 'n', 'u', true)}
-			WHERE
-				`n`.`deleted` = FALSE
-				AND `n`.`id` = :id
-		");
-
-		$stmt->execute(array(
-			'id' => $id
-		));
-
-		$r = $stmt->fetch(PDO::FETCH_ASSOC);
-
-		/** @var News $news */
-		$news = $this->hydrate($r, 'n');
-		$news->setOwner($this->hydrateJoin($r, 'owner', 'u'));
-		$news->setCategory($this->hydrateJoin($r, 'folder', 'c'));
-
-		return $news;
-	}
-
 
     /**
      * Checks if there's any archived news items in a folder
