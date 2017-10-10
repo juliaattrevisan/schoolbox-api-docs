@@ -219,8 +219,6 @@ else if (is_array($_POST['deleteThreads'])) {
 
             ThreadMapper::getInstance()->delete($thread);
 
-            //Also delete the posts
-            PostMapper::getInstance()->deleteByColumn("threadID", $threadID);
         } catch (Exception $e) { }
 	}
 

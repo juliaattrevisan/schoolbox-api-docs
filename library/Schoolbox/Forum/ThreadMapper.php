@@ -119,7 +119,18 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface {
             'other_key' => 'postID'
         ));
 
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'postDelete'));
     }
+
+    /**
+     * On delete of this item, delete all associated posts
+     *
+     */
+    public function postDelete(Thread $thread)
+    {
+        PostMapper::getInstance()->deleteByColumn("threadID", $thread->getId());
+    }
+
 
 
     /**
