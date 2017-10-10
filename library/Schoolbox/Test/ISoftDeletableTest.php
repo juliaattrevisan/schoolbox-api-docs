@@ -92,10 +92,14 @@ class ISoftDeletableTest extends PHPUnit_Framework_TestCase
             // Special case for resource mappers that depend on the storage mapper
             if ($mapper instanceof Resource\AbstractFileMapper) {
                 /** @noinspection PhpParamsInspection */
-                $mapper->setStorageMapper(new class
+                $mapper->setStorageMapper(new class extends Resource\Storage\Mapper
                 {
 
-                    public function createModel(): Resource\Storage\Model
+                    /**
+                     * @param int $idValue
+                     * @return Resource\Storage\Model
+                     */
+                    public function createModel($idValue = null): Resource\Storage\Model
                     {
                         return new Resource\Storage\Model();
                     }
@@ -166,7 +170,9 @@ class ISoftDeletableTest extends PHPUnit_Framework_TestCase
     private function loadAllMapperClasses(): void
     {
         // Attempt to load and therefore parse every single PHP class in /library
-        foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator(__DIR__ . '/../../../library/', RecursiveDirectoryIterator::SKIP_DOTS)) as $item) {
+        foreach (new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator(__DIR__ . '/../../../library/', RecursiveDirectoryIterator::SKIP_DOTS)
+        ) as $item) {
             /** @var SplFileInfo $item */
             if (!$item->isFile()) {
                 continue;

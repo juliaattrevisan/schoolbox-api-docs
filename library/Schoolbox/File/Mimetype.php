@@ -16,7 +16,8 @@ use Schoolbox\ISoftDeletable;
  * Class Mimetype
  * @package Schoolbox\File
  */
-class Mimetype implements ISoftDeletable {
+class Mimetype implements ISoftDeletable
+{
 
 	/**
 	 * Allowed File id

@@ -151,7 +151,7 @@ class Wiki implements ISoftDeletable
      *
      * @return bool
      */
-	public function isDeleted()
+    public function isDeleted()
     {
         return $this->deleted;
     }

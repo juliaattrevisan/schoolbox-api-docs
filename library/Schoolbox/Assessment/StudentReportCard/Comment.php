@@ -14,7 +14,8 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
-class Comment implements ISoftDeletable {
+class Comment implements ISoftDeletable
+{
 
 	/** @var int $id */
 	protected $id;
