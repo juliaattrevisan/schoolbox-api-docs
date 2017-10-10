@@ -59,15 +59,7 @@
                 },
                 'heading': {
                     required: true,
-                    normalizer: function (value) {
-                        /* Trim the value of the `field` element before
-                         * validating. This trims only the value passed
-                         * to the attached validators, not the value of
-                         * the element itself.
-                         * See: https://jqueryvalidation.org/normalizer/
-                         */
-                        return $.trim(value);
-                    }
+                    requiredNotBlank: true
                 }
             }
         });
