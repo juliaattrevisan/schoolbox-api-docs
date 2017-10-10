@@ -353,23 +353,34 @@ class Mapper extends \Schoolbox\Mapper
              * Probably don't need to do this, but I want to be sure
              * given I have to curl this id to plagscan.com every time
              */
-            /* TODO - temp hack. Remove ASAP when HTML is migrated to files
-             * At this point, the cached version is already in existence because it was hydrated along with the
-             * student submission files. That version has its HTML blanked out, which will prevent it being re-saved.
-             * We therefore get a fresh copy from the DB here. The alternative is to do a subsequent update() instead
-             * of save(), but that also has issues. Or we could override hydrate(), but that is a bit too far IMO.
-             *
-             * @see SA-746 + SA-4174
-             */
-            $this->disableCache();
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
                 $plagscanDocuments->setOffset($row['plagscan_id'], $this->hydrate($row));
             }
-            $this->enableCache();
         }
 
         return $plagscanDocuments;
     }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function hydrate(array $row, $alias = '', $callback = null)
+    {
+        /* TODO - temp hack. Remove ASAP when HTML is migrated to files
+         * Due to OOM errors, the student submission mapper blanks out the HTML of plagscan docs when
+         * they are loaded as joins onto files. Due to the cache, this means that plagscan docs can be
+         * similarly affected when later loaded via this mapper. Need to turn off caching completely for
+         * plagscan docs to ensure we can still save them.
+         *
+         * @see SA-746 + SA-4174
+         */
+        $this->disableCache();
+        $model = parent::hydrate($row, $alias, $callback);
+        $this->enableCache();
+        return $model;
+    }
+
 
     /**
      * Privatise a particular plagscan id
