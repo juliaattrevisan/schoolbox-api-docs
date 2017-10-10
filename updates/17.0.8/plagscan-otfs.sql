@@ -8,3 +8,7 @@ CREATE TABLE plagscan_document_migration
   updated_at DATETIME NULL,
   deleted_at DATETIME NULL
 );
+
+ALTER TABLE plagscan_document
+  ADD CONSTRAINT fk_plagscan_document_migration_id
+FOREIGN KEY (id) REFERENCES plagscan_document_migration (plagscan_document_id);
