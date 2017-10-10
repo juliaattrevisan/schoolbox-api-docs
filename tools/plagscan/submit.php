@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This script will take plagscan documents in an error state and attempt to resubmit them to
- * plagscan so they can be reprocessed.  Use this if you have lots of files in the -1 state.
+ * This script will take plagscan documents in an queued state and attempt to transmit them to
+ * plagscan so they can be processed.  Use this if you have lots of files in the queued state.
  *
  * @author           James Leckie <jleckie@alaress.com.au>
  * @copyright        Copyright 2015, Alaress Pty Ltd
@@ -31,13 +31,13 @@ if (!$mapper->getConnector()) {
 }
 
 /** @var Plagscan $currentDocument */
-$allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_UNSCANNABLE, [
+$allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_QUEUED, [
     'order' => [
         'student_submission_file_id' => 'ASC',
     ],
 ]);
 
-$log->info("Plagscan now re-processing {$allDocuments->count()} documents");
+$log->info("Plagscan now re-transmitting {$allDocuments->count()} documents");
 
 $numUpdated = 0;
 
@@ -73,23 +73,27 @@ foreach ($allDocuments as $currentDocument) {
 
             /* Transmit the new file
              */
-            $plagscanId = $mapper->getConnector()->transmit($studentSubmissionFile, $filename);
+            try {
+                $plagscanId = $mapper->getConnector()->transmit($studentSubmissionFile, $filename);
 
-            /* Update the db with this new plagscan id
-             */
-            if ($plagscanId) {
-                $log->info("{$prefix}: queueing student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}");
+                /* Update the db with this new plagscan id */
+                if ($plagscanId) {
+                    $log->info("{$prefix}: transmission successful, document set to processing state:  {$currentDocument->getStudentSubmissionFileId()}");
 
-                $currentDocument->setPlagscanId($plagscanId);
-                $currentDocument->setStatus(Plagscan::STATUS_QUEUED);
-                $currentDocument->setUpdatedAt(\Alaress_Date_Format::now());
-                $mapper->save($currentDocument);
+                    $currentDocument->setPlagscanId($plagscanId);
+                    $currentDocument->setStatus(Plagscan::STATUS_PROCESSING);
+                    $currentDocument->setUpdatedAt(\Alaress_Date_Format::now());
+                    $mapper->save($currentDocument);
 
-                $log->info("{$prefix}: set to pending status");
-                $numUpdated++;
-            } else {
-                $log->warning("{$prefix}: transmission did not return a plagscanId for submission file {$currentDocument->getStudentSubmissionFileId()}");
+                    $numUpdated++;
+                } else {
+                    $log->warning("{$prefix}: transmission did not return a plagscanId for submission file {$currentDocument->getStudentSubmissionFileId()}");
+                }
             }
+            catch (Exception $e) {
+                $log->error($e->getMessage());
+            }
+
         } else {
             $log->warning("{$prefix}: unknown join criteria for file/assessment/user");
         }
@@ -122,7 +126,7 @@ foreach ($allDocuments as $currentDocument) {
     }
 }
 
-$log->info("Plagscan transmission completed. {$numUpdated} document(s) were resent and queued");
+$log->info("Plagscan transmission completed. {$numUpdated} document(s) were sent to plagscan and are pending processing");
 
 /* Also tell me how many died
  */

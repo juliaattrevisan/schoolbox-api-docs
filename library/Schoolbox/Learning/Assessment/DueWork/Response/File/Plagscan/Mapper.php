@@ -183,7 +183,7 @@ class Mapper extends \Schoolbox\Mapper
         /** @var Plagscan $plagscan */
         $plagscan = $this->createModel();
         $plagscan->setPlagscanId(null);
-        $plagscan->setStatus(Plagscan::STATUS_UNSCANNABLE);
+        $plagscan->setStatus(Plagscan::STATUS_QUEUED);
         $plagscan->setStudentSubmissionFileId($file->getId());
         $plagscan->setCreatedAt(\Alaress_Date_Format::now());
         $plagscan->setUpdatedAt(\Alaress_Date_Format::now());
@@ -222,22 +222,11 @@ class Mapper extends \Schoolbox\Mapper
             $this->privatise($currentPlagscan);
         }
 
-        /* Send it to plag
-         */
-        $plagscanId = $this->getConnector()->transmit($file, $filename);
-
-        /* Plagscan death
-         */
-        if (empty($plagscanId)) {
-            return [];
-        }
-
         /* Update stubble record
          *
          * This should help prevent multiple-plagscan-per-file scenario, which
          * initiates dupe files in Inline Grader and Submission History
          */
-
         /** @var Plagscan $plagscan */
         try {
             $plagscan = $this->findOneByColumn('student_submission_file_id', $file->getId(), ['cache' => false]);
@@ -252,11 +241,27 @@ class Mapper extends \Schoolbox\Mapper
             $plagscan->setCreatedAt(\Alaress_Date_Format::now());
         }
 
-        $plagscan->setPlagscanId($plagscanId);
         $plagscan->setStatus(Plagscan::STATUS_QUEUED);
         $plagscan->setUpdatedAt(\Alaress_Date_Format::now());
 
+        // We save it early so if it fails we at least have a record
+        parent::save($plagscan);
+
+        /* Send it to plag
+         */
+        $plagscanId = $this->getConnector()->transmit($file, $filename);
+
+        /* Plagscan death
+         */
+        if (empty($plagscanId)) {
+            return [];
+        }
+
+        $plagscan->setPlagscanId($plagscanId);
+        $plagscan->setStatus(Plagscan::STATUS_PROCESSING);
+
         return parent::save($plagscan);
+
     }
 
     /**

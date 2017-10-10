@@ -44,7 +44,7 @@ if ($reRetrieveMode) {
  */
 else {
     $log->info("Scanner running in scan mode");
-    $allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_QUEUED);
+    $allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_PROCESSING);
 }
 
 $log->info("Plagscan now processing {$allDocuments->count()} documents");
