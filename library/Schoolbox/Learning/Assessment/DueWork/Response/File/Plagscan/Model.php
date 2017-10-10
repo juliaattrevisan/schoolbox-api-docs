@@ -14,16 +14,12 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
-use Schoolbox\Resource\File\StorableTrait;
-use Schoolbox\Resource\Storage\IStorage;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Migration\Model as PlagscanDocumentMigration;
 
-class Model implements IStorage, ISoftDeletable
+class Model implements ISoftDeletable
 {
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
-    use StorableTrait;
 
     /** Documents that are queued to be uploaded to plagscan servers */
     const STATUS_QUEUED = 1;
@@ -60,9 +56,6 @@ class Model implements IStorage, ISoftDeletable
 
     /** @var Alaress_Date_Format $privatisedAt */
     protected $privatisedAt;
-
-    /** @var PlagscanDocumentMigration $plagscanDocumentMigration */
-    protected $plagscanDocumentMigration;
     
     /**
      * Figure out the url to the plagscan report
@@ -287,64 +280,4 @@ class Model implements IStorage, ISoftDeletable
 
         return $this;
     }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getStorageMigratedAt()
-    {
-        return $this->storageMigratedAt;
-    }
-
-    /**
-     * @param Alaress_Date_Format $storageMigratedAt
-     *
-     * @return self|$this
-     */
-    public function setStorageMigratedAt($storageMigratedAt)
-    {
-        $this->storageMigratedAt = $storageMigratedAt;
-
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getStorageFailedAt()
-    {
-        return $this->storageFailedAt;
-    }
-
-    /**
-     * @param Alaress_Date_Format $storageFailedAt
-     *
-     * @return self|$this
-     */
-    public function setStorageFailedAt($storageFailedAt)
-    {
-        $this->storageFailedAt = $storageFailedAt;
-
-        return $this;
-    }
-
-    /**
-     * @return PlagscanDocumentMigration
-     */
-    public function getPlagscanDocumentMigration()
-    {
-        return $this->plagscanDocumentMigration;
-    }
-
-    /**
-     * @param PlagscanDocumentMigration $plagscanDocumentMigration
-     *
-     * @return self|$this
-     */
-    public function setPlagscanDocumentMigration($plagscanDocumentMigration)
-    {
-        $this->plagscanDocumentMigration = $plagscanDocumentMigration;
-
-        return $this;
-    }    
 }
