@@ -17,6 +17,7 @@ use Schoolbox\ResourceBooking\Item\Mapper as ResourceMapper;
 use Schoolbox\ResourceBooking\Booking\Model as Booking;
 use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
 use Schoolbox\ResourceBooking\Booking\Status;
+use Schoolbox\ResourceBooking\Booking\Series;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Aura\Web\Request;
@@ -69,13 +70,14 @@ class Validation {
     /**
      * Attempts to validate the creation or update of a booking from post data.
      *
-     * @param  Item\Model   $resource
-     * @param  Booking    $existingBooking If provided, this is the booking that
-     *                                     is being updated.
-     *                                     Leave it out of conflict checks.
-     * @param  Request\Values      $postData
+     * @param  Item\Model     $resource
+     * @param  Booking        $existingBooking If provided, this is the booking that
+     *                                         is being updated.
+     *                                         Leave it out of conflict checks.
+     * @param  Request\Values $postData
      *
      * @return array
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function validateBookingFromPostData(
         Item\Model $resource,
@@ -164,7 +166,8 @@ class Validation {
 
             if ($isNewBooking) {
                 // Validate related and recurrent bookings of a new booking
-                $dateParts = $this->getNewBookingSeries($resource, $startDate, $endDate, $postData);
+                $series = new Series($this->getBookingMapper());
+                $dateParts = $series->getNewBookingSeries($resource, $startDate, $endDate, $postData);
                 foreach ($dateParts as $check) {
                     /** @var Resource $thisResource */
                     list($thisResource, $thisStart, $thisEnd) = $check;
@@ -189,7 +192,8 @@ class Validation {
                 // Work with a fresh copy of the booking, because it can get
                 // messed with.
 
-                foreach ($this->getExistingSeries($existingBooking, $startDate, $endDate) as $check) {
+                $series = new Series($this->getBookingMapper());
+                foreach ($series->getExistingSeries($existingBooking, $startDate, $endDate, $postData) as $check) {
                     /** @var Resource $thisResource */
                     list($thisResource, $thisStart, $thisEnd, $thisBooking) = $check;
 
@@ -212,115 +216,6 @@ class Validation {
 
         return $errors;
 
-    }
-
-    /**
-     * Get all recursive booking dates
-     *
-     * @param Item\Model   $resource
-     * @param DateTime   $startDate
-     * @param DateTime   $endDate
-     * @param Request\Values      $postData
-     *
-     * @return array
-     */
-    protected function getNewBookingSeries(
-        Item\Model $resource,
-        DateTime $startDate,
-        DateTime $endDate,
-        Request\Values $postData
-    )
-    {
-        $dateParts = [];
-        $series = [];
-
-        // Get all booking dates for the current resource
-        if ($postData['repeat_until']) {
-            try {
-                $repeatUntil = Alaress_Date_Format::newLocalShort(
-                    $postData['repeat_until']
-                );
-            } catch (\Exception $e) {
-                $repeatUntil = null;
-            }
-            if ($repeatUntil instanceof Alaress_Date_Format) {
-                $series = $this->getRecurrencePeriod(
-                    $startDate,
-                    $postData['repeat'],
-                    $repeatUntil->getDateTimeObject(),
-                    $postData['timetable']['campus']
-                );
-            }
-            $difference = $startDate->diff($endDate);
-            foreach ($series as $occurenceStart) {
-                $occurenceEnd = clone $occurenceStart;
-                $occurenceEnd->add($difference);
-                // Check all of $occurenceStart and $occurenceEnd
-                $dateParts[] = [$resource, $occurenceStart, $occurenceEnd];
-            }
-        }
-        else {
-            $dateParts[] = [$resource, $startDate, $endDate];
-        }
-
-        // Get all booking dates for all the related resources
-        $relatedItems = [];
-        foreach ($postData['related_item'] ?: [] as $relatedItem) {
-            if ($relatedItem['resource_id']) {
-                $relatedItems[$relatedItem['resource_id']] = $relatedItem;
-            }
-        }
-        foreach ($resource->getRelatedResourceList() as $relatedResource) {
-            if (array_key_exists($relatedResource->getId(), $relatedItems)) {
-                if (!empty($series)) {
-                    foreach ($series as $occurenceStart) {
-                        $occurenceEnd = clone $occurenceStart;
-                        $occurenceEnd->add($difference);
-                        $dateParts[] = [$relatedResource, $occurenceStart, $occurenceEnd];
-                    }
-                }
-                else {
-                    $dateParts[] = [$relatedResource, $startDate, $endDate];
-                }
-            }
-        }
-
-        return $dateParts;
-    }
-
-    /**
-     * Get all related booking dates
-     *
-     * @param Booking  $existingBooking
-     * @param DateTime $startDate
-     * @param DateTime $endDate
-     *
-     * @return array
-     * @throws MapperException
-     */
-    protected function getExistingSeries(Booking $existingBooking, DateTime $startDate, DateTime $endDate)
-    {
-        $isTimeChanged = false;
-        $series        = $this->getUpdatedSeries(
-            $this->bookingMapper->findById($existingBooking->getId()),
-            $startDate,
-            $endDate,
-            $this->getRelatedItemsFromForm(),
-            $this->request->post['efficacy'],
-            $isTimeChanged
-        );
-
-        $dateParts = [];
-        foreach ($series as $thisBooking) {
-            if (!($thisBooking->isDeleted())) {
-                $dateParts[] = [$thisBooking->getResource(),
-                                $thisBooking->getEvent()->getStartDateTime()->getDateTimeObject(),
-                                $thisBooking->getEvent()->getEndDateTime()->getDateTimeObject(),
-                                $thisBooking];
-            }
-        }
-
-        return $dateParts;
     }
 
 

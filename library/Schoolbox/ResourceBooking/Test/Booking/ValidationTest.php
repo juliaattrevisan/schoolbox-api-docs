@@ -14,6 +14,7 @@ use Alaress\Date\Interval;
 use Jenssegers\Date\Date;
 use Schoolbox\User;
 use Schoolbox\ResourceBooking\Item;
+use Schoolbox\ResourceBooking\Booking;
 use Schoolbox\ResourceBooking\Booking\Validation;
 use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -364,6 +365,71 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
         $resource->setRoomCode($roomCode);
 
         $errors = $mockValidation->validateForConflicts($resource, new DateTime($startDate), new DateTime($endDate));
+
+        $this->assertCount($expected, $errors);
+    }
+
+    /**
+     * @covers \Schoolbox\ResourceBooking\Booking\Validation::validateForConflicts
+     *
+     * @dataProvider provider_roomValidateForConflicts
+     *
+     * @param string $startDate
+     * @param string $endDate
+     * @param array  $resourceBookings
+     * @param int    $expected
+     */
+    public function testSeriesValidateForConflicts(
+        $startDate,
+        $endDate,
+        $resourceBookings,
+        $roomCode,
+        $events,
+        $expected
+    )
+    {
+        $seriesEvents =
+            [
+                [
+                    'id' => 1,
+                    'name' => 'event1'
+                ],
+                [
+                    'id' => 3,
+                    'name' => 'event2'
+                ],
+                [
+                    'id' => 5,
+                    'name' => 'event3'
+                ]
+            ];
+
+        $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
+        $mockMapper
+            ->method('findForResource')
+            ->willReturn($resourceBookings);
+
+        $mockExistingBooking = $this->getMockBuilder(Booking\Model::class)
+                                    ->setMethods(['setId'])
+                                    ->getMock();
+        $mockExistingBooking
+            ->method('getEvents')
+            ->willReturn($seriesEvents);
+        $mockExistingBooking->setId('5');
+
+        $mockValidation = $this->getMockBuilder(Validation::Class)
+                               ->setConstructorArgs([new User(), $mockMapper, new TermMapper()])
+                               ->setMethods(['getTimetableRoomEvents'])
+                               ->getMock();
+        $mockValidation
+            ->method('getTimetableRoomEvents')
+            ->willReturn($events);
+
+        $resource = new Item\Model();
+        $resource->setId(123);
+        $resource->setRoomCode($roomCode);
+
+        $errors = $mockValidation->validateForConflicts($resource, new DateTime($startDate), new DateTime($endDate), $mockExistingBooking);
 
         $this->assertCount($expected, $errors);
     }
