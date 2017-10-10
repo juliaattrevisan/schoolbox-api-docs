@@ -54,8 +54,8 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
     {
         // If current user can't view component's source, only display the
         // component if the user has context WRITE+ permission
-        if(!$this->isSourceRenderable()){
-            return $this->hasContextWriteAccess();
+        if (!$this->isSourceRenderable() && !$this->hasContextWriteAccess()) {
+            return false;
         }
 
         $this->setLayout($this->delegate->fetchLayout($this));
