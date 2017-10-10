@@ -43,6 +43,9 @@ class Notifier extends ResourceNotifier
      */
     public function notifyCreated($roletype, $file, $effector, $diff = null)
     {
+        if (!$file->getFolder() instanceof Folder\Model) {
+            return new Envelope();
+        }
         $category = $this->folderMapper->findById($file->getFolder()->getId());
 
         return $this->notify(
@@ -65,7 +68,11 @@ class Notifier extends ResourceNotifier
      */
     public function notifyDeleted($roletype, $file, $effector, $diff = null)
     {
+        if (!$file->getFolder() instanceof Folder\Model) {
+            return new Envelope();
+        }
         $category = $this->folderMapper->findById($file->getFolder()->getId());
+
         // abstract this so far it doesn't even make sense any more
         return $this->notify(
             LogMapper::KIND_FILE,
