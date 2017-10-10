@@ -206,9 +206,10 @@
     <div class="small-12 columns">
         <h1>{HEADING} - {PAGE_TITLE}</h1>
     </div>
+    <!-- BEGIN edit_page -->
     <nav>
         <form method="post" action="/eportfolio/configForm.php" class="no-margin">
-            <!-- BEGIN edit_page -->
+
             <span data-tab>
                 <span class="tab-title" data-show-empty>
                     <a class="icon-add" href="#eportfolio-page-controls-tab-1" title="Add components" data-tab-activator></a>
@@ -223,11 +224,11 @@
                     <a class="icon-delete" title="Delete this page" data-interaction="delete"></a>
                 </span>
             </span>
-            <!-- END edit_page -->
             <input type="hidden" name="page_id" value="{PAGE_ID}" />
             <input type="hidden" name="deletePage" value="true" />
         </form>
     </nav>
+    <!-- END edit_page -->
 </div>
 
 <!-- BEGIN customise_page -->
