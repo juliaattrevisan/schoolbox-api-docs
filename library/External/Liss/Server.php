@@ -675,6 +675,10 @@ class External_Liss_Server
         $folderMapper = FolderMapper::getInstance();
         $userMapper = UserMapper::getInstance();
 
+        /* These event types are ignored
+         */
+        $exclusions = ['Duty', 'Study', 'RollClass'];
+
         /* Owner set in config
          */
         try {
@@ -723,7 +727,15 @@ class External_Liss_Server
             /* Now do it in a way that makes sense
              * Map everything together and persist it to the db
              */
-            $skipCount = 0;
+            $skipCount = [
+                'noType' => 0,
+                'invalidType' => 0,
+                'unknownFolder' => 0,
+                'unknownUser' => 0,
+                'unknownUserIds' => [],
+                'total' => 0,
+            ];
+
             $total = count($allEvents);
 
             foreach ($allEvents as $currentEvent) {
@@ -731,7 +743,18 @@ class External_Liss_Server
                  */
                 if (!strlen($currentEvent['type'])) {
                     $log->info("Skipping {$currentEvent['className']} ({$currentEvent['edvalGuid']}): no type");
-                    $skipCount++;
+                    $skipCount['noType']++;
+                    $skipCount['total']++;
+
+                    continue;
+                }
+
+                /* Skip events that have a particular type
+                 */
+                if (in_array($currentEvent['type'], $exclusions)) {
+                    $log->info("Skipping {$currentEvent['className']} ({$currentEvent['edvalGuid']}): has excluded type {$currentEvent['type']}");
+                    $skipCount['invalidType']++;
+                    $skipCount['total']++;
 
                     continue;
                 }
@@ -765,7 +788,9 @@ class External_Liss_Server
                         $log->info(sprintf('Skipping %s (%s): cannot find corresponding Schoolbox folder for %s',
                             $event->getTitle(), $currentEvent['edvalGuid'], $currentEvent['classCode'])
                         );
-                        $skipCount++;
+
+                        $skipCount['unknownFolder']++;
+                        $skipCount['total']++;
 
                         continue;
                     }
@@ -794,6 +819,15 @@ class External_Liss_Server
                             $log->info(sprintf('Skipping %s (%s) for user %s: no Schoolbox account found',
                                 $event->getTitle(), $currentEvent['edvalGuid'], $currentExternalId
                             ));
+
+                            /* Number of occurrences of an unknown user
+                             */
+                            $skipCount['unknownUser']++;
+
+                            /* Uniqueified list of unknown user ids
+                             * This count is not necessarily the same as unknownUser count
+                             */
+                            $skipCount['unknownUserIds'][$currentExternalId] = $currentExternalId;
                         }
                     }
                 }
@@ -801,11 +835,26 @@ class External_Liss_Server
 
             /* Log diagnostics
              */
-            $processed = $total-$skipCount;
+            $processed = $total-$skipCount['total'];
 
-            $log->info("Total events: {$total}");
-            $log->info("Processed: {$processed}");
-            $log->info("Skipped: {$skipCount}");
+            $log->info("Total Processed: {$processed}/{$total}");
+            $log->info("Total Skipped: {$skipCount['total']}/{$total}");
+            $log->info("Skipped (no type): {$skipCount['noType']}/{$skipCount['total']}");
+            $log->info("Skipped (invalid type): {$skipCount['invalidType']}/{$skipCount['total']}");
+            $log->info("Skipped (unknown folder): {$skipCount['unknownFolder']}/{$skipCount['total']}");
+            $log->info("Unknown user assignations: {$skipCount['unknownUser']}");
+
+            /* A list of all the unknown user ids
+             */
+            $unknownUserIds = array_filter($skipCount['unknownUserIds']);
+
+            if (count($unknownUserIds)) {
+                asort($unknownUserIds);
+
+                $unknownUserIds = implode(', ', $unknownUserIds);
+
+                $log->info("Unknown user ids: {$unknownUserIds}");
+            }
 
             return self::generateResponse('Daily Data Imported');
         }
