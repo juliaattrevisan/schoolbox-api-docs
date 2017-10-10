@@ -363,7 +363,11 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
-     * @inheritdoc
+     * @param array    $row
+     * @param string   $alias
+     * @param callable $callback
+     * @return null|Model
+     * @throws MapperException
      */
     public function hydrate(array $row, $alias = '', $callback = null)
     {
@@ -376,6 +380,7 @@ class Mapper extends \Schoolbox\Mapper
          * @see SA-746 + SA-4174
          */
         $this->disableCache();
+        /** @var null|Model $model */
         $model = parent::hydrate($row, $alias, $callback);
         $this->enableCache();
         return $model;
