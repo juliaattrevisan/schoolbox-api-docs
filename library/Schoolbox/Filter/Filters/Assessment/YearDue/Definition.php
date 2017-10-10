@@ -9,7 +9,6 @@ namespace Schoolbox\Filter\Filters\Assessment\YearDue;
 
 use Schoolbox\Filter;
 
-
 /**
  * Available options:
  */
@@ -39,7 +38,8 @@ class Definition extends Filter\AbstractDefinition
 
 
     /**
-     * @inheritdoc
+     * @param string $key
+     * @return string
      */
     public function getLabel($key)
     {
@@ -48,7 +48,10 @@ class Definition extends Filter\AbstractDefinition
 
 
     /**
-     * @inheritdoc
+     * @param string $key The option's abstract key
+     * @param string $page
+     * @param string $roleType
+     * @return bool
      */
     protected function getInitialSelectedState($key, $page, $roleType)
     {
@@ -58,7 +61,9 @@ class Definition extends Filter\AbstractDefinition
 
 
     /**
-     * @inheritdoc
+     * @param string            $customAbstractKey
+     * @param Filter\Page\Model $pageFilter
+     * @return bool
      */
     public function getInitialAvailability($customAbstractKey, Filter\Page\Model $pageFilter)
     {

@@ -10,15 +10,16 @@ namespace Schoolbox\Filter\Filters\Assessment\YearDue;
 use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractKeyConverter;
 
-
 /**
  * Converts between YearDue concrete keys and YearDue strings
  */
 class KeyConverter extends AbstractKeyConverter
 {
+
     /**
-     * @inheritdoc
-     * @return string
+     * @param string $key
+     * @return mixed
+     * @throws \InvalidArgumentException
      */
     protected function getItem($key)
     {
@@ -37,7 +38,8 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
-     * @inheritdoc
+     * @param string $key A concrete key
+     * @throws \InvalidArgumentException If key is not numeric
      */
     protected function assertValidKey($key)
     {
@@ -45,5 +47,4 @@ class KeyConverter extends AbstractKeyConverter
             throw new \InvalidArgumentException('YearDue Key is invalid: ' . $key);
         }
     }
-
 }
