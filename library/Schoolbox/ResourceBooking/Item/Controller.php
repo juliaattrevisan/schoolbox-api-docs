@@ -17,6 +17,7 @@ use Schoolbox\Collection;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\RoleMapper;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 
@@ -37,6 +38,10 @@ class Controller extends Base
      * @var RoleMapper
      */
     protected $roleMapper;
+
+    /** @var TermMapper */
+
+    private $termMapper;
 
     /**
      * @var IUrlPaginator
@@ -186,12 +191,13 @@ class Controller extends Base
             array(
                 'template' => '@resourceItem/read.twig',
                 'data'     => array(
-                    'item'     => $item,
-                    'calendar' => array(
-                        'date' => $calendarDate->format('Y-m-d'),
-                        'view' => $this->request->query['view'] ?: 'week',
-                    ),
-                    'token' => $_SESSION['key']
+                    'item'        => $item,
+                    'currentTerm' => $this->getTermMapper()->findForToday(),
+                    'calendar'    => array(
+                                        'date' => $calendarDate->format('Y-m-d'),
+                                        'view' => $this->request->query['view'] ?: 'week',
+                                    ),
+                    'token'      => $_SESSION['key']
                 ),
             )
         );
@@ -434,6 +440,26 @@ class Controller extends Base
     public function getUserMapper()
     {
         return $this->userMapper;
+    }
+
+    /**
+     * @return TermMapper
+     */
+    public function getTermMapper()
+    {
+        return $this->termMapper;
+    }
+
+    /**
+     * @param  TermMapper $termMapper
+     *
+     * @return $this
+     */
+    public function setTermMapper($termMapper)
+    {
+        $this->termMapper = $termMapper;
+
+        return $this;
     }
 
     /**
