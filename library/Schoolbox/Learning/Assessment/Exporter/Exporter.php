@@ -10,88 +10,69 @@
 namespace Schoolbox\Learning\Assessment\Exporter;
 
 use Alaress\Csv\Writer AS CsvWriter;
-use Alaress\Database\Connector\IConnector;
+use Schoolbox\Filter\BrokenFilterException;
+use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
+use Schoolbox\Filter\Filters\Assessment\AssessmentType;
+use Schoolbox\Filter\Filters\Assessment\NullableContext;
+use Schoolbox\Filter\Filters\Assessment\YearDue;
+use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Resource\Folder;
+use InvalidArgumentException;
 
 class Exporter
 {
+
     /**
-     * @var IConnector
+     * @var AssessmentFilters\IdFinder
      */
-    private $database;
+    private $idFinder;
+
+    /** @var Assessment\MapperProxy */
+    private $assessmentDataSource;
+
 
     /**
      * Exporter constructor.
-     * @param IConnector $database
+     *
+     * @param AssessmentFilters\IdFinder $idFinder
+     * @param Assessment\MapperProxy     $assessmentDataSource
      */
-    public function __construct(IConnector $database)
+    public function __construct(AssessmentFilters\IdFinder $idFinder, Assessment\MapperProxy $assessmentDataSource)
     {
-        $this->database = $database;
+        $this->idFinder             = $idFinder;
+        $this->assessmentDataSource = $assessmentDataSource;
     }
+
 
     /**
      * Generate a csv of assessment result data in a specific format for Accelerus importing
      *
      * @param resource $file
      * @return resource
+     * @throws InvalidArgumentException If any filter keys not recognised
+     * @throws BrokenFilterException If a injected filter is unable to be processed
      */
     public function generate($file)
     {
-        $query = "
-            SELECT          u.synergy_id,
-                            sr.mark,
-                            sb.name,
-                            folder_code.code,
-                            lu_work_type.name AS type_name
-            FROM            submission_return AS sr
-            INNER JOIN      submission_box AS sb ON
-                            sb.id = sr.box_id
-            INNER JOIN      assessment a ON
-                            sb.assessment_id = a.id
-            LEFT JOIN       assessment_folder AS af ON 
-                            af.assessment_id = a.id
-            LEFT JOIN       assessment_course_unit_implementation AS acui ON 
-                            acui.assessment_id = a.id
-            LEFT JOIN       course_unit_implementation AS cui ON 
-                            cui.id = acui.course_unit_implementation_id
-            LEFT JOIN       course_implementation AS ci ON 
-                            ci.id = cui.course_implementation_id
-            INNER JOIN      folder ON 
-                            folder.id = af.folder_id OR folder.id = ci.folder_id
-            INNER JOIN      folder_code ON
-                            folder_code.folder_id = folder.id
-            INNER JOIN      `user` AS u ON 
-                            sr.owner = u.id
-            LEFT JOIN       lu_work_type ON
-                            lu_work_type.id = a.work_type_id
-            WHERE           YEAR(sr.created_at) = :currentYear
-                            AND sr.id =
-                            (
-                                SELECT    id 
-                                FROM      submission_return sr2 
-                                WHERE     sr.owner = sr2.owner AND 
-                                          sr.box_id = sr2.box_id AND
-                                          sr2.deleted_at IS NULL AND              -- Only want undeleted records
-                                          sr2.published_at IS NOT NULL AND        -- Only want published returns
-                                          sr2.mark <> ''                          -- Only want returns with a mark
-                                ORDER BY  sr2.published_at DESC                   -- Order by result publication date
-                                LIMIT     1                                       -- Only want the most recent published return  
-                            )
-            ORDER BY        folder_code.code
-        ";
-
-        $resultSet = $this->database->executeQueryIterator($query, ['currentYear' => date('Y')]);
+        $assessments = $this->findAssessments();
 
         $headings = [
             'student code',
             'class code',
             'assessment title',
             'assessment item code',
-            'result'
+            'result',
         ];
 
         $data = [];
 
-        foreach ($resultSet as $result) {
+        foreach ($assessments as $assessment) {
+            $assessmentTitle = $assessment->getTitle();
+            $workType        = $assessment->getWorkType();
+            /** @var Folder\Code\Model $folderCode */
+            $folderCode = $assessment->getBaseContext()->getFolder()->getCodes()->first();
 
             /*
              * Check if there are square brackets inside the submission box name, if so - pull the contents from
@@ -100,33 +81,101 @@ class Exporter
              * Note: the square bracket check will be phased out when we have moved De La Salle's assessment codes
              * from inside the title to assessment types.
              */
-            $openBracketPos = strpos($result['name'], '[');
-            $closeBracketPos = strrpos($result['name'], ']');
+            $openBracketPos  = strpos($assessmentTitle, '[');
+            $closeBracketPos = strrpos($assessmentTitle, ']');
             if ($openBracketPos !== false && $closeBracketPos !== false) {
-                $codeLength = $closeBracketPos - $openBracketPos;
-                $assessmentCode = substr($result['name'], $openBracketPos + 1, $codeLength - 1);
+                $codeLength     = $closeBracketPos - $openBracketPos;
+                $assessmentCode = substr($assessmentTitle, $openBracketPos + 1, $codeLength - 1);
             } else {
-                $assessmentCode = trim($result['type_name']);
+                $assessmentCode = $workType ? trim($workType->getName()) : '';
             }
 
-            // Strip percent sign from mark
-            $mark = str_replace('%', '', $result['mark']);
+            foreach ($assessment->getAllParticipants() as $participant) {
+                $mark = $participant->getHumanReadableMark(true);
+                if (!$mark) {
+                    continue;
+                }
 
-            // If this is a total mark, only show the actual mark (without '/ [total]')
-            list($mark) = explode(' / ', $mark);
+                // Strip percent sign from mark
+                $mark = str_replace('%', '', $participant->getHumanReadableMark(true));
 
-            $data[] = [
-                $headings[0] => $result['synergy_id'],
-                $headings[1] => $result['code'],
-                $headings[2] => $result['name'],
-                $headings[3] => $assessmentCode,
-                $headings[4] => $mark
-            ];
+                // If this is a total mark, only show the actual mark (without '/ [total]')
+                [$mark] = explode(' / ', $mark);
+
+                $data[] = [
+                    $headings[0] => $participant->getUser()->getExternalId(),
+                    $headings[1] => $folderCode->getCode(),
+                    $headings[2] => $assessmentTitle,
+                    $headings[3] => $assessmentCode,
+                    $headings[4] => $mark,
+                ];
+            }
         }
 
         $writer = new CsvWriter($file, $data);
         $writer->write();
 
         return $file;
+    }
+
+
+    /**
+     * Find all relevant assessments for the export report:
+     * * DueWork + Project
+     * * Not in a UnitSpec
+     * * Not in a Project
+     * * Due in current year
+     *
+     * @return GenericCollection|IAssessable[]
+     * @throws InvalidArgumentException If any filter keys not recognised
+     * @throws BrokenFilterException If a injected filter is unable to be processed
+     */
+    private function findAssessments()
+    {
+        $currentYear = date('Y');
+        $filters     = [
+            AssessmentType\Definition::class           => [
+                AssessmentType\Definition::KEY_DUE_WORK => AssessmentType\Definition::KEY_DUE_WORK,
+                AssessmentType\Definition::KEY_PROJECT  => AssessmentType\Definition::KEY_PROJECT,
+            ],
+            NullableContext\UnitSpec\Definition::class => [],
+            NullableContext\Project\Definition::class  => [],
+            YearDue\Definition::class                  => [$currentYear => $currentYear],
+        ];
+        $ids           = $this->idFinder->findIdsByFilters($filters);
+        $assessments   = $this->assessmentDataSource->findAllByIds($ids);
+
+
+        // Filter out assessments that belong to folders without a folder code
+        $classAssessments = $assessments->filter(function (IAssessable $assessment) {
+            return $assessment->getBaseContext()->getFolder()->getCodes()->count() > 0;
+        });
+
+        // Load participation
+        $classAssessments = $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($classAssessments);
+
+        // Filter out assessments without results
+        $filteredAssessments = $classAssessments->filter(function (IAssessable $assessment) {
+            foreach ($assessment->getAllParticipants() as $participant) {
+                // Only real marks (not feedback with just a comment)
+                if ($participant->getHumanReadableMark(true)) {
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        // Order assessments by folder code
+        $sortFunction = function (IAssessable $left, IAssessable $right) {
+            /**
+             * @var Folder\Code\Model $leftFolderCode
+             * @var Folder\Code\Model $rightFolderCode
+             */
+            $leftFolderCode  = $left->getBaseContext()->getFolder()->getCodes()->first();
+            $rightFolderCode = $right->getBaseContext()->getFolder()->getCodes()->first();
+            return strcmp($leftFolderCode->getCode(), $rightFolderCode->getCode());
+        };
+
+        return $filteredAssessments->sortByCallback($sortFunction, true);
     }
 }

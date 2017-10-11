@@ -7,19 +7,19 @@
 namespace Schoolbox\Learning\Assessment\Exporter;
 
 use Alaress\Web\Controller\Base as BaseController;
-use Schoolbox\GenericCollection;
+use Schoolbox\Filter\BrokenFilterException;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Learning\Assessment\Quiz\Model as QuizAssessable;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Replicator;
+use Schoolbox\Filter\Filters\Assessment as AssessmentFilter;
+use InvalidArgumentException;
 
 /**
  * Controller for assessment export actions.
@@ -45,24 +45,31 @@ class Controller extends BaseController
     /** @var Replicator */
     private $replicator;
 
+    /** @var AssessmentFilter\IdFinder */
+    private $assessmentIdFinder;
+
+
     /**
      * Constructor
      *
-     * @param Access                   $access
-     * @param AssessmentDataSource     $assessmentDataSource
-     * @param UnitImplementationMapper $unitImplementationMapper
-     * @param Replicator               $replicator
+     * @param Access                    $access
+     * @param AssessmentDataSource      $assessmentDataSource
+     * @param UnitImplementationMapper  $unitImplementationMapper
+     * @param Replicator                $replicator
+     * @param AssessmentFilter\IdFinder $assessmentIdFinder
      */
     public function __construct(
         Access $access,
         AssessmentDataSource $assessmentDataSource,
         UnitImplementationMapper $unitImplementationMapper,
-        Replicator $replicator
+        Replicator $replicator,
+        AssessmentFilter\IdFinder $assessmentIdFinder
     ) {
         $this->access                   = $access;
         $this->assessmentDataSource     = $assessmentDataSource;
         $this->unitImplementationMapper = $unitImplementationMapper;
         $this->replicator               = $replicator;
+        $this->assessmentIdFinder       = $assessmentIdFinder;
     }
 
     /**
@@ -249,19 +256,21 @@ class Controller extends BaseController
         return $result;
     }
 
+
     /**
      * Download a csv of assessment results for Accellerus
      *
-     * @api GET /learning/export/assessment/csv
+     * @api   GET /learning/export/assessment/csv
      * @level 160
-     *
+     * @throws InvalidArgumentException If any filter keys not recognised
+     * @throws BrokenFilterException If a injected filter is unable to be processed
      */
     public function getCSV()
     {
         // Generate an updated csv
         $filename = sb_tempnam();
-        $file = fopen($filename, 'w');
-        $exporter = new Exporter($this->getDi()->get('databaseInternal'));
+        $file = fopen($filename, 'wb');
+        $exporter = new Exporter($this->assessmentIdFinder, $this->assessmentDataSource);
         $exporter->generate($file);
         fclose($file);
 

@@ -38,6 +38,8 @@ use Schoolbox\Filter\Filters\Assessment\WorkType as WorkTypeFilter;
  * That is the responsibility of IKeyConverter::getSelectedItems().
  * eg, if Weighting filter is specified as both weighted and unweighted, logically we
  * don't need to apply that filter, but that optimisation is NOT done here.
+ *
+ * @method static IdFinder getInstance(\Schoolbox\Filter\Mapper $filterMapper, \Schoolbox\IMapper $mapper)
  */
 class IdFinder extends Filter\AbstractIdFinder
 {

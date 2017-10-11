@@ -7,6 +7,7 @@
 namespace Schoolbox\Learning\Assessment\Exporter;
 
 use Alaress\Module\Module as BaseModule;
+use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
@@ -24,6 +25,8 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Assessment\Replicator;
+use Schoolbox\Filter;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
 /**
  * Module for assessment export options.
@@ -95,8 +98,9 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
+        /** @var Container $injector */
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(
                 Controller::class,
                 [
@@ -107,6 +111,14 @@ class Module extends BaseModule
                         'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
                         'quizMapper'            => $this->getMapperFactory()->getLazy(QuizMapper::class),
                     ]),
+                    'assessmentIdFinder'       => $injector->lazy(function () {
+                        /** @var Filter\Mapper $filterMapper */
+                        $filterMapper = $this->getMapperFactory()->get(Filter\Mapper::class);
+                        return Filter\Filters\Assessment\IdFinder::getInstance(
+                            $filterMapper,
+                            $this->getMapperFactory()->get(Assessment\Mapper::class)
+                        );
+                    }),
                 ]
             )
         );
