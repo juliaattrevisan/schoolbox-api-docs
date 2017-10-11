@@ -11,15 +11,12 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
-use PDOStatement;
-use Schoolbox\Collection;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3\Connector;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
-use Schoolbox\User;
+use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3\Connector;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Migration\Mapper as PlagscanDocumentMigrationMapper;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Migration\Model as PlagscanDocumentMigration;
+use Schoolbox\User;
 
 /**
  * @method Model findOneByColumn($columnName, $columnValue, $order = [], $options = [])
@@ -67,56 +64,8 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deletedAt');
-        $this->joinsReverseSingle('plagscan_document_id', PlagscanDocumentMigrationMapper::class, 'plagscanDocumentMigration', 'plagscanDocumentMigration');
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'checkHtmlValue']);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getSelectString()
-    {
-        // TODO: Replace with storage object hydration once migration table is deprecated and merged into this mapper
-
-        return "
-            SELECT      {$this->getColumnString()},
-                        {$this->getJoinColumnString('plagscanDocumentMigration','m')}
-            FROM        {$this->getTable()} 
-            LEFT JOIN   {$this->getJoinSql('plagscanDocumentMigration', '', 'm')}
-        ";
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function hydrateSelect(PDOStatement $statement)
-    {
-        // Hydrated migration object
-
-        $collection = $this->createCollection();
-
-        foreach ($statement as $row) {
-            /** @var Model $model */
-            $model = $this->hydrate($row);
-
-            // Hydrate plagscan migration object
-
-            /** @var PlagscanDocumentMigration $plagscanDocumentMigration */
-            $plagscanDocumentMigration = $this->hydrateJoin($row, 'plagscanDocumentMigration', 'm');
-
-            if (!$plagscanDocumentMigration instanceof PlagscanDocumentMigration) {
-                $plagscanDocumentMigration = PlagscanDocumentMigrationMapper::getInstance()->createModel(
-                    $row[$this->getIdentifierColumn()]
-                );
-            }
-
-            $model->setPlagscanDocumentMigration($plagscanDocumentMigration);
-
-            $collection->add($model);
-        }
-
-        return $collection;
     }
 
     /**
