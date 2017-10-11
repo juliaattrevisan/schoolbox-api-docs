@@ -64,9 +64,9 @@ class Module extends BaseModule
             // User must have write access to the folder the assessment is in
                 new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function ($params) {
                     /** @var IAssessable $assessmentId */
-                    $assessable = $params['assessable'];
+                    $assessable = $params['assessment'];
                     if ($assessable instanceof IAssessable) {
-                        return $assessable->getContext()->getId();
+                        return $assessable->getContext()->getFolder()->getId();
                     }
                     throw new Forbidden('User does not have homepage access');
                 }, Access::getInstance()),
