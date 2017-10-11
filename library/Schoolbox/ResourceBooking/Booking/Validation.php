@@ -225,52 +225,27 @@ class Validation {
 
     }
 
-
     /**
-     * @return Term\Model
+     * Validates the status change for this booking
+     *
+     * @param Model $booking
+     * @param int   $status
+     *
+     * @return array If not empty, this contains the errors for this change.
      */
-    public function getCurrentTerm()
+    public function validateChangeStatus(Model $booking, $status)
     {
-        return $this->getTermMapper()->findForToday();
-    }
-
-    /**
-     * Get all bookings for a resource in a window
-     *
-     * @param Item\Model
-     * @param DateTime $startDate
-     * @param DateTime $endDate
-     *
-     * @return array
-     */
-    private function getConflictingBookings(Item\Model $resource, DateTime $startDate, DateTime $endDate)
-    {
-
-        return $this->getBookingMapper()->findForResource(
-            $resource->getId(),
-            $startDate->getTimestamp() + 1,
-            $endDate->getTimestamp() - 1,
-            [Status\Model::STATUS_APPROVED]
-        );
-
-    }
-
-    /**
-     * Get all events for a room in specified period
-     *
-     * @param int $roomId
-     * @param DateTime $startDate
-     * @param DateTime $endDate
-     *
-     * @return \Calendar\Event\Collection
-     */
-    protected function getTimetableRoomEvents($roomId, DateTime $startDate, DateTime $endDate)
-    {
-
-        $timetableRoom = new TimetableRoom($this->getUser(), [], $roomId);
-
-        return $timetableRoom->getEvents($startDate->getTimestamp() + 1, $endDate->getTimestamp() - 1);
-
+        switch ($status) {
+            case Status\Model::STATUS_APPROVED:
+                return $this->validateForConflicts(
+                    $booking->getResource(),
+                    $booking->getEvent()->getStartDateTime()->getDateTimeObject(),
+                    $booking->getEvent()->getEndDateTime()->getDateTimeObject(),
+                    $booking
+                );
+            default:
+                return [];
+        }
     }
 
     /**
@@ -468,6 +443,54 @@ class Validation {
         }
 
         return $errors;
+    }
+
+    /**
+     * @return Term\Model
+     */
+    public function getCurrentTerm()
+    {
+        return $this->getTermMapper()->findForToday();
+    }
+
+    /**
+     * Get all bookings for a resource in a window
+     *
+     * @param Item\Model
+     * @param DateTime $startDate
+     * @param DateTime $endDate
+     *
+     * @return array
+     */
+
+    private function getConflictingBookings(Item\Model $resource, DateTime $startDate, DateTime $endDate)
+    {
+
+        return $this->getBookingMapper()->findForResource(
+            $resource->getId(),
+            $startDate->getTimestamp() + 1,
+            $endDate->getTimestamp() - 1,
+            [Status\Model::STATUS_APPROVED]
+        );
+
+    }
+
+    /**
+     * Get all events for a room in specified period
+     *
+     * @param int $roomId
+     * @param DateTime $startDate
+     * @param DateTime $endDate
+     *
+     * @return \Calendar\Event\Collection
+     */
+    protected function getTimetableRoomEvents($roomId, DateTime $startDate, DateTime $endDate)
+    {
+
+        $timetableRoom = new TimetableRoom($this->getUser(), [], $roomId);
+
+        return $timetableRoom->getEvents($startDate->getTimestamp() + 1, $endDate->getTimestamp() - 1);
+
     }
 
     /**

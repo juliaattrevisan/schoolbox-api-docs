@@ -268,7 +268,7 @@ class Controller extends Base
             $item
                 ->setName($this->request->post['name'])
                 ->setNotes($this->request->post['notes']);
-            $bookingSeries = new Series($this->getBookingMapper());
+            $bookingSeries = new Series($this->getBookingMapper(), $this->getStatusMapper());
             $series = $bookingSeries->getUpdatedSeries(
                 $item,
                 Alaress_Date_Format::newLocal($this->getRequest()->post['startDate'])->getDateTimeObject(),
@@ -670,29 +670,6 @@ class Controller extends Base
     }
 
     /**
-     * Validates the status change for this booking
-     *
-     * @param Model $booking
-     * @param int   $status
-     *
-     * @return array If not empty, this contains the errors for this change.
-     */
-    protected function validateChangeStatus(Model $booking, $status)
-    {
-        switch ($status) {
-            case Status\Model::STATUS_APPROVED:
-                return $this->validateForConflicts(
-                    $booking->getResource(),
-                    $booking->getEvent()->getStartDateTime()->getDateTimeObject(),
-                    $booking->getEvent()->getEndDateTime()->getDateTimeObject(),
-                    $booking
-                );
-            default:
-                return [];
-        }
-    }
-
-    /**
      * Attempts to changes status of booking. Also attempts to change any
      * related bookings, if series efficacy is
      * set.
@@ -707,11 +684,12 @@ class Controller extends Base
         $collection  = new Collection();
         $currentUser = $this->getUser();
 
+        $validation = new Validation($this->getUser(), $this->getBookingMapper(), $this->getStatusMapper(), $this->getTermMapper());
         // validate this booking
         $booking
             ->setStatus($this->getStatusMapper()->createModel($status))
             ->setReviewer($currentUser);
-        $errors = $this->validateChangeStatus($booking, $status);
+        $errors = $validation->validateChangeStatus($booking, $status);
         $collection->add($booking);
 
         // Validate the series (if there is one)
@@ -723,7 +701,7 @@ class Controller extends Base
                     ->setReviewer($currentUser);
                 $errors = array_merge_recursive(
                     $errors,
-                    $this->validateChangeStatus($relatedBooking, $status)
+                    $validation->validateChangeStatus($relatedBooking, $status)
                 );
                 $collection->add($relatedBooking);
             }
