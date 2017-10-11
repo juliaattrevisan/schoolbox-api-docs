@@ -205,7 +205,7 @@ $next = $current < count($prevNext) - 1 ? $prevNext[$current + 1] : null;
 // output previous
 if ($prev) {
     $this->setVar('PREVIOUS_ARTICLE_ID', $prev[0]);
-    $this->setVar('PREVIOUS_ARTICLE_TITLE', $prev[1]);
+    $this->setVar('PREVIOUS_ARTICLE_TITLE', Scrub::text($prev[1]));
     $this->parse('previous_article_block', 'previous_article', false);
 } else {
     $this->setVar('previous_article_block', '');
@@ -214,7 +214,7 @@ if ($prev) {
 // output next
 if ($next) {
     $this->setVar('NEXT_ARTICLE_ID', $next[0]);
-    $this->setVar('NEXT_ARTICLE_TITLE', $next[1]);
+    $this->setVar('NEXT_ARTICLE_TITLE', Scrub::text($next[1]));
     $this->parse('next_article_block', 'next_article', false);
 } else {
     $this->setVar('next_article_block', '');
