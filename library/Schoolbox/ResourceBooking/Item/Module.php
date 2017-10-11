@@ -18,6 +18,7 @@ use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Twig_Loader_Chain;
 use Schoolbox\Permission\Access\UserAccess;
 
@@ -89,6 +90,8 @@ class Module extends BaseModule
             = $this->getMapperFactory()->getLazy(UserMapper::class);
         $injector->setters[Controller::class]['setRoleMapper']
             = $this->getMapperFactory()->getLazy(RoleMapper::class);
+        $injector->setters[Controller::class]['setTermMapper']
+            = $this->getMapperFactory()->getLazy(TermMapper::class);
         // Paginator needs the count per page and amount set.
         $injector->setters[Controller::class]['setPaginator']
             = $injector->lazyNew(
