@@ -67,7 +67,6 @@ $(function() {
     });
 
     $.validator.addMethod('mailHasRecipient', function(value, element) {
-        console.log("testting");
         if ($("#to").val() || $("#cc").val() || $("#bcc").val()) {
             return true;
         }
