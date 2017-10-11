@@ -1,0 +1,1 @@
+UPDATE config SET type_id = (SELECT id FROM lu_config_type WHERE type = '3rd Party Services') WHERE name like 'pto_%';
