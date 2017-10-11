@@ -115,7 +115,8 @@ class Module extends BaseModule
                         /** @var Filter\Mapper $filterMapper */
                         $filterMapper = $this->getMapperFactory()->get(Filter\Mapper::class);
                         return Filter\Filters\Assessment\IdFinder::getInstance(
-                            $filterMapper, $this->getMapperFactory()->get(Assessment\Mapper::class)
+                            $filterMapper,
+                            $this->getMapperFactory()->get(Assessment\Mapper::class)
                         );
                     }),
                 ]

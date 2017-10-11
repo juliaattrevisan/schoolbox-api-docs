@@ -12,6 +12,9 @@ namespace Schoolbox\Learning\Assessment\Exporter;
 use Alaress\Csv\Writer AS CsvWriter;
 use Schoolbox\Filter\BrokenFilterException;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
+use Schoolbox\Filter\Filters\Assessment\AssessmentType;
+use Schoolbox\Filter\Filters\Assessment\NullableContext;
+use Schoolbox\Filter\Filters\Assessment\YearDue;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -131,13 +134,13 @@ class Exporter
     {
         $currentYear = date('Y');
         $filters     = [
-            AssessmentFilters\AssessmentType\Definition::class           => [
-                AssessmentFilters\AssessmentType\Definition::KEY_DUE_WORK => AssessmentFilters\AssessmentType\Definition::KEY_DUE_WORK,
-                AssessmentFilters\AssessmentType\Definition::KEY_PROJECT  => AssessmentFilters\AssessmentType\Definition::KEY_PROJECT,
+            AssessmentType\Definition::class           => [
+                AssessmentType\Definition::KEY_DUE_WORK => AssessmentType\Definition::KEY_DUE_WORK,
+                AssessmentType\Definition::KEY_PROJECT  => AssessmentType\Definition::KEY_PROJECT,
             ],
-            AssessmentFilters\NullableContext\UnitSpec\Definition::class => [],
-            AssessmentFilters\NullableContext\Project\Definition::class  => [],
-            AssessmentFilters\YearDue\Definition::class                  => [$currentYear => $currentYear],
+            NullableContext\UnitSpec\Definition::class => [],
+            NullableContext\Project\Definition::class  => [],
+            YearDue\Definition::class                  => [$currentYear => $currentYear],
         ];
         $ids           = $this->idFinder->findIdsByFilters($filters);
         $assessments   = $this->assessmentDataSource->findAllByIds($ids);
