@@ -15,7 +15,6 @@ use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Assessment\Term;
 use Schoolbox\Resource\Folder;
 use InvalidArgumentException;
 
@@ -30,25 +29,17 @@ class Exporter
     /** @var Assessment\MapperProxy */
     private $assessmentDataSource;
 
-    /** @var Term\Mapper */
-    private $termMapper;
-
 
     /**
      * Exporter constructor.
      *
      * @param AssessmentFilters\IdFinder $idFinder
      * @param Assessment\MapperProxy     $assessmentDataSource
-     * @param Term\Mapper                $termMapper
      */
-    public function __construct(
-        AssessmentFilters\IdFinder $idFinder,
-        Assessment\MapperProxy $assessmentDataSource,
-        Term\Mapper $termMapper
-    ) {
+    public function __construct(AssessmentFilters\IdFinder $idFinder, Assessment\MapperProxy $assessmentDataSource)
+    {
         $this->idFinder             = $idFinder;
         $this->assessmentDataSource = $assessmentDataSource;
-        $this->termMapper           = $termMapper;
     }
 
 
@@ -126,11 +117,11 @@ class Exporter
 
 
     /**
-     * Find all relevant assessments for the export report
+     * Find all relevant assessments for the export report:
      * * DueWork + Project
      * * Not in a UnitSpec
      * * Not in a Project
-     * * Due in current term
+     * * Due in current year
      *
      * @return GenericCollection|IAssessable[]
      * @throws InvalidArgumentException If any filter keys not recognised
@@ -138,20 +129,15 @@ class Exporter
      */
     private function findAssessments()
     {
-        $currentTerm = $this->termMapper->findForToday();
-        if (!$currentTerm || !$currentTerm->getId()) {
-            return $this->assessmentDataSource->createCollection();
-        }
-
-        $currentTermId = $currentTerm->getId();
-        $filters       = [
+        $currentYear = date('Y');
+        $filters     = [
             AssessmentFilters\AssessmentType\Definition::class           => [
                 AssessmentFilters\AssessmentType\Definition::KEY_DUE_WORK => AssessmentFilters\AssessmentType\Definition::KEY_DUE_WORK,
                 AssessmentFilters\AssessmentType\Definition::KEY_PROJECT  => AssessmentFilters\AssessmentType\Definition::KEY_PROJECT,
             ],
             AssessmentFilters\NullableContext\UnitSpec\Definition::class => [],
             AssessmentFilters\NullableContext\Project\Definition::class  => [],
-            AssessmentFilters\Term\Due\Definition::class                 => [$currentTermId => $currentTermId],
+            AssessmentFilters\YearDue\Definition::class                  => [$currentYear => $currentYear],
         ];
         $ids           = $this->idFinder->findIdsByFilters($filters);
         $assessments   = $this->assessmentDataSource->findAllByIds($ids);

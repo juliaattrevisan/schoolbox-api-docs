@@ -27,7 +27,6 @@ use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Filter;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
-use Schoolbox\Assessment\Term;
 
 /**
  * Module for assessment export options.
@@ -119,7 +118,6 @@ class Module extends BaseModule
                             $filterMapper, $this->getMapperFactory()->get(Assessment\Mapper::class)
                         );
                     }),
-                    'termMapper'               => $this->getMapperFactory()->getLazy(Term\Mapper::class),
                 ]
             )
         );

@@ -19,7 +19,6 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilter;
-use Schoolbox\Assessment\Term;
 use InvalidArgumentException;
 
 /**
@@ -49,8 +48,6 @@ class Controller extends BaseController
     /** @var AssessmentFilter\IdFinder */
     private $assessmentIdFinder;
 
-    /** @var Term\Mapper */
-    private $termMapper;
 
     /**
      * Constructor
@@ -60,22 +57,19 @@ class Controller extends BaseController
      * @param UnitImplementationMapper  $unitImplementationMapper
      * @param Replicator                $replicator
      * @param AssessmentFilter\IdFinder $assessmentIdFinder
-     * @param Term\Mapper               $termMapper
      */
     public function __construct(
         Access $access,
         AssessmentDataSource $assessmentDataSource,
         UnitImplementationMapper $unitImplementationMapper,
         Replicator $replicator,
-        AssessmentFilter\IdFinder $assessmentIdFinder,
-        Term\Mapper $termMapper
+        AssessmentFilter\IdFinder $assessmentIdFinder
     ) {
         $this->access                   = $access;
         $this->assessmentDataSource     = $assessmentDataSource;
         $this->unitImplementationMapper = $unitImplementationMapper;
         $this->replicator               = $replicator;
         $this->assessmentIdFinder       = $assessmentIdFinder;
-        $this->termMapper               = $termMapper;
     }
 
     /**
@@ -276,7 +270,7 @@ class Controller extends BaseController
         // Generate an updated csv
         $filename = sb_tempnam();
         $file = fopen($filename, 'wb');
-        $exporter = new Exporter($this->assessmentIdFinder, $this->assessmentDataSource, $this->termMapper);
+        $exporter = new Exporter($this->assessmentIdFinder, $this->assessmentDataSource);
         $exporter->generate($file);
         fclose($file);
 
