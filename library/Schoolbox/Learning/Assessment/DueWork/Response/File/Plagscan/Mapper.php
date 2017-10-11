@@ -58,6 +58,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('plagscan_id', self::TYPE_INTEGER);
         $this->uses('status', self::TYPE_INTEGER);
         $this->uses('score', self::TYPE_STRING);
+        $this->uses('storage_hash', self::TYPE_STRING);
         $this->uses('html', self::TYPE_STRING);
         $this->uses('interactive_url', self::TYPE_STRING);
         $this->uses('privatised_at', self::TYPE_DATETIME);
