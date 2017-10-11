@@ -112,11 +112,15 @@ class RegistryMapper extends Mapper
             /** @var Service $service */
             $service = $this->hydrateJoin($r, 'service', 's');
 
-            if ($service instanceof Service) {
-                /** @var IStorage $cert */
-                $cert = $this->getJoinMapper('service')->hydrateJoin($r, 'cert', 'cert');
-                $service->setCertificate($cert);
+            if (!$service instanceof Service) {
+                // if the query failed to hydrate a Service, do not return the registration
+                // a registration without a service a) is invalid, and b) will explode.
+                continue;
             }
+
+            /** @var IStorage $cert */
+            $cert = $this->getJoinMapper('service')->hydrateJoin($r, 'cert', 'cert');
+            $service->setCertificate($cert);
 
             /** @var User $user */
             $user = $this->hydrateJoin($r, 'user_id', 'u');
