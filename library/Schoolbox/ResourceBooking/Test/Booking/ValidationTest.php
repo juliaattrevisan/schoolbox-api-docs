@@ -12,13 +12,16 @@ use DateTime;
 use DateInterval;
 use Alaress\Date\Interval;
 use Jenssegers\Date\Date;
+use Schoolbox\Collection;
 use Schoolbox\User;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\ResourceBooking\Booking;
 use Schoolbox\ResourceBooking\Booking\Validation;
 use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
+use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\Calendar\Event;
 
 
 class ValidationTest extends \PHPUnit_Framework_TestCase
@@ -27,7 +30,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
     private function createValidation()
     {
 
-        return new Validation(new User(), new BookingMapper(), new TermMapper());
+        return new Validation(new User(), new BookingMapper(), new StatusMapper(), new TermMapper());
 //        return $this->getMock( '\Schoolbox\ResourceBooking\Booking\Validation', [], [new User(), new BookingMapper(), new TermMapper()]);
 //        return $this->getMockBuilder(Validation::class)
 //                             ->setConstructorArgs([new User(), new BookingMapper(), new TermMapper()])
@@ -269,7 +272,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
             ->method('findForResource')
             ->willReturn($resourceBookings);
 
-        $validation = new Validation(new User(), $mockMapper, new TermMapper());
+        $validation = new Validation(new User(), $mockMapper, new StatusMapper(), new TermMapper());
 
         $resource = new Item\Model();
         $resource->setId(123);
@@ -353,7 +356,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
             ->willReturn($resourceBookings);
 
         $mockValidation = $this->getMockBuilder(Validation::Class)
-            ->setConstructorArgs([new User(), $mockMapper, new TermMapper()])
+            ->setConstructorArgs([new User(), $mockMapper, new StatusMapper(), new TermMapper()])
             ->setMethods(['getTimetableRoomEvents'])
             ->getMock();
         $mockValidation
@@ -370,9 +373,172 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Data provider for testSeriesValidateForConflicts
+     *
+     * @return array
+     */
+    public function provider_seriesValidateForConflicts() {
+
+        // Single booking event
+        $existingBookingEvent1 = (new Event())
+            ->setId(111);
+
+        // Recursive booking event
+        $existingBookingEvent2 = (new Event())
+            ->setId(111)
+            ->setSeriesId(22);
+
+        // Conflicting bookings, same Series as $existingBookingEvent2
+        $conflictingBookings1 = (new Collection())
+            ->add(
+                (new Booking\Model())
+                    ->setId(11)
+                    ->setEvent(
+                        (new Event())
+                            ->setId(201)
+                            ->setSeriesId(22)
+                    )
+                )
+            ->add(
+                (new Booking\Model())
+                    ->setId(12)
+                    ->setEvent(
+                        (new Event())
+                            ->setId(202)
+                            ->setSeriesId(22)
+                    )
+            )
+            ->add(
+                (new Booking\Model())
+                    ->setId(13)
+                    ->setEvent(
+                        (new Event())
+                            ->setId(203)
+                            ->setSeriesId(22)
+                    )
+            );
+
+        // Conflicting bookings, some other Series
+        $conflictingBookings2= (new Collection())
+            ->add(
+                (new Booking\Model())
+                    ->setId(11)
+                    ->setEvent(
+                        (new Event())
+                            ->setId(201)
+                            ->setSeriesId(33)
+                    )
+            )
+            ->add(
+                (new Booking\Model())
+                    ->setId(12)
+                    ->setEvent(
+                        (new Event())
+                            ->setId(202)
+                            ->setSeriesId(33)
+                    )
+            )
+            ->add(
+                (new Booking\Model())
+                    ->setId(13)
+                    ->setEvent(
+                        (new Event())
+                            ->setId(203)
+                            ->setSeriesId(33)
+                    )
+            );
+
+        // No conflicting bookings
+        $conflictingBookings3 = (new Collection());
+
+        // Conflicting bookings, same Id as existing booking
+        $conflictingBookings4 = (new Collection())
+            ->add(
+                (new Booking\Model())
+                    ->setId(1)
+                    ->setEvent(
+                        (new Event())
+                            ->setId(201)
+                    )
+            );
+
+        // Conflicting bookings, same Id as existing booking
+        $conflictingBookings5 = (new Collection())
+            ->add(
+                (new Booking\Model())
+                    ->setId(2)
+                    ->setEvent(
+                        (new Event())
+                            ->setId(202)
+                    )
+            );
+
+
+        return [
+            [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                $existingBookingEvent1,
+                $conflictingBookings1,
+                1,
+            ],
+            [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                $existingBookingEvent1,
+                $conflictingBookings2,
+                1,
+            ],
+            [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                $existingBookingEvent1,
+                $conflictingBookings3,
+                0,
+            ],
+            [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                $existingBookingEvent2,
+                $conflictingBookings1,
+                0,
+            ],
+            [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                $existingBookingEvent2,
+                $conflictingBookings2,
+                1
+            ],
+            [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                $existingBookingEvent2,
+                $conflictingBookings3,
+                0
+            ],
+            [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                $existingBookingEvent1,
+                $conflictingBookings4,
+                0
+            ],
+            [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                $existingBookingEvent1,
+                $conflictingBookings5,
+                1
+            ],
+
+        ];
+    }
+
+    /**
      * @covers \Schoolbox\ResourceBooking\Booking\Validation::validateForConflicts
      *
-     * @dataProvider provider_roomValidateForConflicts
+     * @dataProvider provider_seriesValidateForConflicts
      *
      * @param string $startDate
      * @param string $endDate
@@ -382,52 +548,30 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
     public function testSeriesValidateForConflicts(
         $startDate,
         $endDate,
-        $resourceBookings,
-        $roomCode,
-        $events,
+        $existingBookingEvent,
+        $conflictingBookings,
         $expected
     )
     {
-        $seriesEvents =
-            [
-                [
-                    'id' => 1,
-                    'name' => 'event1'
-                ],
-                [
-                    'id' => 3,
-                    'name' => 'event2'
-                ],
-                [
-                    'id' => 5,
-                    'name' => 'event3'
-                ]
-            ];
 
         $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
         $mockMapper
             ->method('findForResource')
-            ->willReturn($resourceBookings);
+            ->willReturn($conflictingBookings);
 
         $mockExistingBooking = $this->getMockBuilder(Booking\Model::class)
-                                    ->setMethods(['setId'])
+                                    ->setMethods(null)
                                     ->getMock();
-        $mockExistingBooking
-            ->method('getEvents')
-            ->willReturn($seriesEvents);
-        $mockExistingBooking->setId('5');
+        $mockExistingBooking->setId(1);
+        $mockExistingBooking->setEvent($existingBookingEvent);
 
         $mockValidation = $this->getMockBuilder(Validation::Class)
-                               ->setConstructorArgs([new User(), $mockMapper, new TermMapper()])
+                               ->setConstructorArgs([new User(), $mockMapper, new StatusMapper(), new TermMapper()])
                                ->setMethods(['getTimetableRoomEvents'])
                                ->getMock();
-        $mockValidation
-            ->method('getTimetableRoomEvents')
-            ->willReturn($events);
 
         $resource = new Item\Model();
         $resource->setId(123);
-        $resource->setRoomCode($roomCode);
 
         $errors = $mockValidation->validateForConflicts($resource, new DateTime($startDate), new DateTime($endDate), $mockExistingBooking);
 

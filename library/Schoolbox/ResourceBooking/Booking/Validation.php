@@ -385,16 +385,19 @@ class Validation {
         // long it overlaps the next item in series!), but I'm not going to
         // worry about those.
         if ($existingBooking instanceof Model) {
+//            var_dump($existingBooking);
+
             $existingId = $existingBooking->getId();
             if ($existingId) {
-                $existingSeries      = $existingBooking->getEvent()->getSeriesId();
+                $existingSeriesId      = $existingBooking->getEvent()->getSeriesId();
+
                 $conflictingBookings = $conflictingBookings->filter(
-                    function ($item) use ($existingId, $existingSeries) {
+                    function ($item) use ($existingId, $existingSeriesId) {
                         /** @var Model $item */
                         if ($item->getId() == $existingId) {
                             return false;
                         }
-                        if (!empty($existingSeries) && $item->getEvent()->getSeriesId() == $existingSeries) {
+                        if (!empty($existingSeriesId) && $item->getEvent()->getSeriesId() == $existingSeriesId) {
                             return false;
                         }
 
@@ -460,7 +463,7 @@ class Validation {
      * @param DateTime $startDate
      * @param DateTime $endDate
      *
-     * @return array
+     * @return Collection|Model[]
      */
 
     private function getConflictingBookings(Item\Model $resource, DateTime $startDate, DateTime $endDate)
