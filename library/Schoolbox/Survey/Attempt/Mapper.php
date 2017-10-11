@@ -21,7 +21,6 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
         $this->uses('attempt_id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
         $this->joins('assess_id', SurveyMapper::class, 'id', null, null, 'survey', 'survey');
-        $this->uses('deleted_at', self::TYPE_DATETIME);
-        $this->hasSoftDeleteDateField('deleted_at');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 }

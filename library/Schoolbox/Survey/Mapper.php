@@ -40,8 +40,7 @@ class Mapper extends BaseMapper
         $this->uses('anonymous_result', self::TYPE_BOOLEAN);
         $this->uses('finish', self::TYPE_DATETIME);
         $this->uses('created_at', self::TYPE_DATETIME);
-        $this->uses('deleted_at', self::TYPE_DATETIME);
-        $this->hasSoftDeleteDateField('deleted_at');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->hasJoin(
             'assess_attempts',

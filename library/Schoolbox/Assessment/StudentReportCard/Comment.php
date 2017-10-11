@@ -10,10 +10,12 @@
 namespace Schoolbox\Assessment\StudentReportCard;
 
 
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
-class Comment {
+class Comment implements ISoftDeletable
+{
 
 	/** @var int $id */
 	protected $id;

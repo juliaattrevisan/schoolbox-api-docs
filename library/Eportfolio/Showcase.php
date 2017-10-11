@@ -10,7 +10,12 @@
 
 namespace Eportfolio;
 
-class Showcase {
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+
+class Showcase implements ISoftDeletable
+{
+    use DeletedAtDate;
 
 	/**
 	 * The showcase item id
@@ -46,13 +51,6 @@ class Showcase {
 	 * @var \Alaress_Date_Format
 	 */
 	private $updated_at;
-
-	/**
-	 * When the Showcased Work item was softdeleted
-     *
-	 * @var \Alaress_Date_Format
-	 */
-	private $deleted_at;
 
 	/* Getters/Setters
 	 */
@@ -127,24 +125,6 @@ class Showcase {
      */
 	public function getCreatedAt() {
 		return $this->created_at;
-	}
-
-	/**
-	 * Set deleted at
-	 *
-	 * @param \Alaress_Date_Format
-	 */
-	public function setDeletedAt($deleted_at) {
-		$this->deleted_at = $deleted_at;
-	}
-
-    /**
-     * Get deleted at
-     *
-     * @return \Alaress_Date_Format
-     */
-	public function getDeletedAt() {
-		return $this->deleted_at;
 	}
 
 	/**

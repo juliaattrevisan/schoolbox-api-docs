@@ -56,7 +56,7 @@ class Model implements ISoftDeletable
 
     /** @var Alaress_Date_Format $privatisedAt */
     protected $privatisedAt;
-    
+
     /**
      * Figure out the url to the plagscan report
      *

@@ -35,5 +35,6 @@ class Mapper extends BaseMapper
         $this->uses('mark', self::TYPE_DECIMAL);
         $this->uses('automarked_already', self::TYPE_BOOL_ENUM, null, 'autoMarked');
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 }

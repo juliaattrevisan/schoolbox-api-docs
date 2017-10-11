@@ -12,13 +12,14 @@
 namespace Schoolbox\Survey;
 
 use Schoolbox\Collection;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DataModel\Model as Assessment;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\Folder\Model as Folder;
 
-class Model
+class Model implements ISoftDeletable
 {
     use Id;
     use CreatedAtDate;
