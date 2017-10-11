@@ -31,21 +31,12 @@
             })
 
         jQuery.validator.addMethod("hasAudience", function(value, element) {
-
-            //Campus or Role must be paired with each other
-            if ($("input[name='campus[]']:checked").length > 0 || $("input[name='group[]']:checked").length > 0) {
-                if ($("input[name='campus[]']:checked").length > 0 && $("input[name='group[]']:checked").length > 0) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-
-            //Or we have users in our selectize
             var userCount = $('#addUser')[0].selectize.items.length;
 
-            if (userCount > 0) {
-               return true;
+            // If campus and role selected (must be paired)
+            // or specific users selected...
+            if ( ($("input[name='campus[]']:checked").length > 0 && $("input[name='group[]']:checked").length > 0) || userCount > 0) {
+                return true;
             }
 
            return false;
