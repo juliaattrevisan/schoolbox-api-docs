@@ -247,16 +247,6 @@
 
     }, 'This field is required');
 
-    $.validator.addMethod('mailHasRecipient', function(value, element) {
-        console.log(element);
-        var toField = $(element).getElementById("#to");
-        var ccField = $(element).getElementById("#cc");
-        var bccField = $(element).getElementById("#bcc");
-        if (toField || ccField || bccField) {
-            console.log("inside the true block");
-            return false;
-        }
-        return false;
-    }, 'A valid recipient must be provided')
+
 
 }(jQuery));

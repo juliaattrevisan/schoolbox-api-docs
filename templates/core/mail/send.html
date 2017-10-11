@@ -66,9 +66,23 @@ $(function() {
         });
     });
 
+    $.validator.addMethod('mailHasRecipient', function(value, element) {
+        console.log("testting");
+        if ($("#to").val() || $("#cc").val() || $("#bcc").val()) {
+            return true;
+        }
+        return false;
+    }, 'A valid recipient must be provided')
+
     $('#mailForm').alaressValidate({
         ignore: ':hidden:not([class~=selectized]),:hidden > .selectized, .selectize-control .selectize-input input',
-        mailHasRecipient: true
+        rules: {
+            to: {
+                mailHasRecipient: true
+            }
+        }
+
+
     });
 });
 </script>
