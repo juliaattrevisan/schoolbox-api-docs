@@ -13,9 +13,10 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\Collection;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3\Connector;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
 
 /**
@@ -58,7 +59,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('plagscan_id', self::TYPE_INTEGER);
         $this->uses('status', self::TYPE_INTEGER);
         $this->uses('score', self::TYPE_STRING);
-        $this->uses('storage_hash', self::TYPE_STRING);
+        $this->joins('storage_hash', StorageMapper::class, 'storage_hash', null, null, 'storage');
         $this->uses('html', self::TYPE_STRING);
         $this->uses('interactive_url', self::TYPE_STRING);
         $this->uses('privatised_at', self::TYPE_DATETIME);
@@ -263,7 +264,6 @@ class Mapper extends \Schoolbox\Mapper
         $plagscan->setStatus(Plagscan::STATUS_PROCESSING);
 
         return parent::save($plagscan);
-
     }
 
     /**
