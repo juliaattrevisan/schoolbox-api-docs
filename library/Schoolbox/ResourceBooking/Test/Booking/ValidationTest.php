@@ -238,19 +238,48 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
      * @return array
      */
     public function provider_simpleValidateForConflicts() {
+
+        $conflictingBookings1 = (new Collection())
+            ->add(
+                (new Booking\Model())
+                    ->setId(11)
+            )
+            ->add(
+                (new Booking\Model())
+                    ->setId(12)
+            )
+            ->add(
+                (new Booking\Model())
+                    ->setId(13)
+            );
+
+        $conflictingBookings2 = (new Collection())
+            ->add(
+                (new Booking\Model())
+                    ->setId(11)
+            );
+
+        $conflictingBookings3 = (new Collection());
+
         return [
-            ['2020-12-31T00:00:00',
-             '2020-12-31T00:00:00',
-             [1,2,3],
-             1],
-            ['2020-12-31T00:00:00',
-             '2020-12-31T00:00:00',
-             [1],
-             1],
-            ['2020-12-31T00:00:00',
-             '2020-12-31T00:00:00',
-             [],
-             0],
+            [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                $conflictingBookings1,
+                1
+            ],
+            [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                $conflictingBookings2,
+                1
+            ],
+            [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                $conflictingBookings3,
+                0
+            ],
         ];
     }
 
@@ -261,16 +290,16 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
      *
      * @param string $startDate
      * @param string $endDate
-     * @param array  $resourceBookings
+     * @param Collection  $conflictingBookings
      * @param int    $expected
      */
-    public function testSimpleValidateForConflicts($startDate, $endDate, $resourceBookings, $expected)
+    public function testSimpleValidateForConflicts($startDate, $endDate, $conflictingBookings, $expected)
     {
 
         $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
         $mockMapper
             ->method('findForResource')
-            ->willReturn($resourceBookings);
+            ->willReturn($conflictingBookings);
 
         $validation = new Validation(new User(), $mockMapper, new StatusMapper(), new TermMapper());
 
@@ -287,45 +316,98 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
      * @return array
      */
     public function provider_roomValidateForConflicts() {
+
+        $conflictingBookings3 = (new Collection())
+            ->add(
+                (new Booking\Model())
+                    ->setId(11)
+            )
+            ->add(
+                (new Booking\Model())
+                    ->setId(12)
+            )
+            ->add(
+                (new Booking\Model())
+                    ->setId(13)
+            );
+
+        $conflictingBookings1 = (new Collection())
+            ->add(
+                (new Booking\Model())
+                    ->setId(11)
+            );
+
+        $conflictingBookings0 = (new Collection());
+
+        $roomEvents3 = (new Collection())
+            ->add(
+                (new Event())
+                ->setId(111)
+            )
+            ->add(
+                 (new Event())
+                 ->setId(112)
+            )
+            ->add(
+                (new Event())
+                    ->setId(113)
+            );
+
+        $roomEvents1 = (new Collection())
+            ->add(
+                (new Event())
+                    ->setId(111)
+            );
+
+        $roomEvents0 = (new Collection());
+
         return [
             [
                 '2020-12-31T00:00:00',
                 '2020-12-31T00:00:00',
-                [],
+                $conflictingBookings0,
                 'abc1',
-                [1,2,3],
+                $roomEvents3,
                 1
             ],
             [
                 '2020-12-31T00:00:00',
                 '2020-12-31T00:00:00',
-                [],
+                $conflictingBookings0,
                 'abc1',
-                [1],
+                $roomEvents1,
                 1
             ],
             [
                 '2020-12-31T00:00:00',
                 '2020-12-31T00:00:00',
-                [],
+                $conflictingBookings0,
                 'abc1',
-                [],
+                $roomEvents0,
                 0
             ],
             [
                 '2020-12-31T00:00:00',
                 '2020-12-31T00:00:00',
-                [1,2,3],
+                $conflictingBookings3,
                 'abc1',
-                [],
+                $roomEvents0,
                 1
             ],
             [
                 '2020-12-31T00:00:00',
                 '2020-12-31T00:00:00',
-                [],
+                $conflictingBookings1,
+                'abc1',
+                $roomEvents0,
+                1
+            ],
+            [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                $conflictingBookings0,
                 '',
-                [],
+                $roomEvents0,
                 0
             ],
         ];
@@ -338,22 +420,24 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
      *
      * @param string $startDate
      * @param string $endDate
-     * @param array  $resourceBookings
+     * @param array  $conflictiongBookings
+     * @param string $roomCode
+     * @param Collection $roomEvents
      * @param int    $expected
      */
     public function testRoomValidateForConflicts(
         $startDate,
         $endDate,
-        $resourceBookings,
+        $conflictingBookings,
         $roomCode,
-        $events,
+        $roomEvents,
         $expected
     )
     {
         $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
         $mockMapper
             ->method('findForResource')
-            ->willReturn($resourceBookings);
+            ->willReturn($conflictingBookings);
 
         $mockValidation = $this->getMockBuilder(Validation::Class)
             ->setConstructorArgs([new User(), $mockMapper, new StatusMapper(), new TermMapper()])
@@ -361,7 +445,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $mockValidation
             ->method('getTimetableRoomEvents')
-            ->willReturn($events);
+            ->willReturn($roomEvents);
 
         $resource = new Item\Model();
         $resource->setId(123);
@@ -380,16 +464,16 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
     public function provider_seriesValidateForConflicts() {
 
         // Single booking event
-        $existingBookingEvent1 = (new Event())
+        $existingBookingEvent = (new Event())
             ->setId(111);
 
         // Recursive booking event
-        $existingBookingEvent2 = (new Event())
+        $existingBookingEventInSeries = (new Event())
             ->setId(111)
             ->setSeriesId(22);
 
         // Conflicting bookings, same Series as $existingBookingEvent2
-        $conflictingBookings1 = (new Collection())
+        $conflictingBookingsSameSeries3 = (new Collection())
             ->add(
                 (new Booking\Model())
                     ->setId(11)
@@ -419,7 +503,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
             );
 
         // Conflicting bookings, some other Series
-        $conflictingBookings2= (new Collection())
+        $conflictingBookingsOtherSeries3 = (new Collection())
             ->add(
                 (new Booking\Model())
                     ->setId(11)
@@ -449,10 +533,10 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
             );
 
         // No conflicting bookings
-        $conflictingBookings3 = (new Collection());
+        $conflictingBookings0 = (new Collection());
 
         // Conflicting bookings, same Id as existing booking
-        $conflictingBookings4 = (new Collection())
+        $conflictingBookings1 = (new Collection())
             ->add(
                 (new Booking\Model())
                     ->setId(1)
@@ -463,7 +547,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
             );
 
         // Conflicting bookings, same Id as existing booking
-        $conflictingBookings5 = (new Collection())
+        $conflictingBookingsSameId1 = (new Collection())
             ->add(
                 (new Booking\Model())
                     ->setId(2)
@@ -473,62 +557,61 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
                     )
             );
 
-
         return [
             [
                 '2020-12-31T00:00:00',
                 '2020-12-31T00:00:00',
-                $existingBookingEvent1,
-                $conflictingBookings1,
+                $existingBookingEvent,
+                $conflictingBookingsSameSeries3,
                 1,
             ],
             [
                 '2020-12-31T00:00:00',
                 '2020-12-31T00:00:00',
-                $existingBookingEvent1,
-                $conflictingBookings2,
+                $existingBookingEvent,
+                $conflictingBookingsOtherSeries3,
                 1,
             ],
             [
                 '2020-12-31T00:00:00',
                 '2020-12-31T00:00:00',
-                $existingBookingEvent1,
-                $conflictingBookings3,
+                $existingBookingEvent,
+                $conflictingBookings0,
                 0,
             ],
             [
                 '2020-12-31T00:00:00',
                 '2020-12-31T00:00:00',
-                $existingBookingEvent2,
-                $conflictingBookings1,
+                $existingBookingEventInSeries,
+                $conflictingBookingsSameSeries3,
                 0,
             ],
             [
                 '2020-12-31T00:00:00',
                 '2020-12-31T00:00:00',
-                $existingBookingEvent2,
-                $conflictingBookings2,
+                $existingBookingEventInSeries,
+                $conflictingBookingsOtherSeries3,
                 1
             ],
             [
                 '2020-12-31T00:00:00',
                 '2020-12-31T00:00:00',
-                $existingBookingEvent2,
-                $conflictingBookings3,
+                $existingBookingEventInSeries,
+                $conflictingBookings0,
                 0
             ],
             [
                 '2020-12-31T00:00:00',
                 '2020-12-31T00:00:00',
-                $existingBookingEvent1,
-                $conflictingBookings4,
+                $existingBookingEvent,
+                $conflictingBookings1,
                 0
             ],
             [
                 '2020-12-31T00:00:00',
                 '2020-12-31T00:00:00',
-                $existingBookingEvent1,
-                $conflictingBookings5,
+                $existingBookingEvent,
+                $conflictingBookingsSameId1,
                 1
             ],
 
@@ -542,7 +625,8 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
      *
      * @param string $startDate
      * @param string $endDate
-     * @param array  $resourceBookings
+     * @param Event  $existingBookingEvent
+     * @param Collection $conflictingBookings
      * @param int    $expected
      */
     public function testSeriesValidateForConflicts(
