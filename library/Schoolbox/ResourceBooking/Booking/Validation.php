@@ -17,6 +17,7 @@ use Schoolbox\ResourceBooking\Item\Mapper as ResourceMapper;
 use Schoolbox\ResourceBooking\Booking\Model as Booking;
 use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
 use Schoolbox\ResourceBooking\Booking\Status;
+use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 use Schoolbox\ResourceBooking\Booking\Series;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -48,6 +49,10 @@ class Validation {
 
     private $termMapper;
 
+    /** @var StatusMapper */
+
+    private $statusMapper;
+
     /** @var TimetableRoom */
 
     private $timetableRoom;
@@ -56,6 +61,7 @@ class Validation {
         User $user,
         BookingMapper $bookingMapper,
 //        ResourceMapper $resourceMapper,
+        StatusMapper $statusMapper,
         TermMapper $termMapper
     )
     {
@@ -63,6 +69,7 @@ class Validation {
         $this->setUser($user);
         $this->setBookingMapper($bookingMapper);
 //        $this->setResourceMapper($resourceMapper);
+        $this->setStatusMapper($statusMapper);
         $this->setTermMapper($termMapper);
 
     }
@@ -166,7 +173,7 @@ class Validation {
 
             if ($isNewBooking) {
                 // Validate related and recurrent bookings of a new booking
-                $series = new Series($this->getBookingMapper());
+                $series = new Series($this->getBookingMapper(), $this->getStatusMapper());
                 $dateParts = $series->getNewBookingSeries($resource, $startDate, $endDate, $postData);
                 foreach ($dateParts as $check) {
                     /** @var Resource $thisResource */
@@ -192,7 +199,7 @@ class Validation {
                 // Work with a fresh copy of the booking, because it can get
                 // messed with.
 
-                $series = new Series($this->getBookingMapper());
+                $series = new Series($this->getBookingMapper(), $this->getStatusMapper());
                 foreach ($series->getExistingSeries($existingBooking, $startDate, $endDate, $postData) as $check) {
                     /** @var Resource $thisResource */
                     list($thisResource, $thisStart, $thisEnd, $thisBooking) = $check;
@@ -519,6 +526,26 @@ class Validation {
     public function setResourceMapper($resourceMapper)
     {
         $this->resourceMapper = $resourceMapper;
+
+        return $this;
+    }
+
+    /**
+     * @return StatusMapper
+     */
+    public function getStatusMapper()
+    {
+        return $this->statusMapper;
+    }
+
+    /**
+     * @param  StatusMapper $statusMapper
+     *
+     * @return $this
+     */
+    public function setStatusMapper($statusMapper)
+    {
+        $this->statusMapper = $statusMapper;
 
         return $this;
     }
