@@ -4,6 +4,7 @@
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
 use Alaress\Authorizer\Failure\Forbidden;
@@ -11,34 +12,39 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
+use InvalidArgumentException;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Learning\Assessment;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackDataSource;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
+use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
-use \Twig_Loader_Chain;
-use Schoolbox\Assessment\Term;
+use Twig_Loader_Chain;
 
 class Module extends BaseModule
 {
-    /**
-     * @inheritdoc
-     */
+    /** @var string $basename */
     protected $basename = 'learningDueWorkFeedback';
-
 
     /**
      * Hook method for setting up routes via self::register()
      *
      * @return void
      * @throws Forbidden If user authenticated but lacks perms for request
-     * @throws \InvalidArgumentException If assessment's due date is null
+     * @throws InvalidArgumentException If assessment's due date is null
      */
     protected function registerRoutes()
     {
-        // rules
+        // Rules
+
         $canGiveFeedbackFromParticipant = new Rule\Any(
             new Rule\IsSuperuser(),
             new Rule\All(
@@ -52,25 +58,80 @@ class Module extends BaseModule
             )
         );
 
+        $canGiveFeedbackForAssessment = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\All(
+            // User must have write access to the folder the assessment is in
+                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function ($params) {
+                    /** @var IAssessable $assessmentId */
+                    $assessable = $params['assessment'];
+                    if ($assessable instanceof IAssessable) {
+                        return $assessable->getContext()->getFolder()->getId();
+                    }
+                    throw new Forbidden('User does not have homepage access');
+                }, Access::getInstance()),
+                new IsInteractionUnLocked(new Assessment\LockedChecker($this->getTermMapper()))
+            )
+        );
+
         $canDeleteFeedback = new Rule\IsSuperuser();
 
-        // preloads
+        // Preloads
+
+        /**
+         * @param $params
+         *
+         * @return array
+         * @throws MapperException
+         * @throws MapperException\Deleted
+         * @throws \Aura\Di\Exception\ServiceNotFound
+         */
+        $preloadAssessable = function ($params) {
+            return [
+                'assessment' => $this->preloadAssessable($params['assessmentId']),
+            ];
+        };
+
+        /**
+         * @param $params
+         *
+         * @return array
+         * @throws MapperException
+         * @throws MapperException\Deleted
+         * @throws \Aura\Di\Exception\ServiceNotFound
+         */
         $preloadParticipant = function ($params) {
             return [
-                'participant' => $this->preloadParticipant($params['assessmentId'], $params['studentId'])
+                'participant' => $this->preloadParticipant($params['assessmentId'], $params['studentId']),
             ];
         };
 
+        /**
+         * @param $params
+         *
+         * @return array
+         * @throws MapperException
+         * @throws MapperException\Deleted
+         * @throws \Aura\Di\Exception\ServiceNotFound
+         */
         $preloadFeedback = function ($params) {
             return [
-                'feedback' => $this->preloadFeedback($params['assessmentId'], $params['feedbackId'])
+                'feedback' => $this->preloadFeedback($params['assessmentId'], $params['feedbackId']),
             ];
         };
 
+        /**
+         * @param $params
+         *
+         * @return array
+         * @throws MapperException
+         * @throws MapperException\Deleted
+         * @throws \Aura\Di\Exception\ServiceNotFound
+         */
         $preloadParticipantAndResponse = function ($params) {
             return [
                 'participant' => $this->preloadParticipant($params['assessmentId'], $params['studentId']),
-                'response' => $this->preloadResponse($params['assessmentId'], $params['responseId'])
+                'response'    => $this->preloadResponse($params['assessmentId'], $params['responseId']),
             ];
         };
 
@@ -78,24 +139,51 @@ class Module extends BaseModule
         $participantRoute = $assessmentRoute . '/{studentId:\d+}';
         $feedbackRoute    = 'feedback/{feedbackId:\d+}';
 
-        $this->register('POST',   "/$participantRoute/feedback",              'postParticipantFeedback',  $canGiveFeedbackFromParticipant, $preloadParticipant); // p
-        $this->register('POST',   "/$participantRoute{/responseId}/feedback", 'postResponseFeedback',     $canGiveFeedbackFromParticipant, $preloadParticipantAndResponse); // p
-        $this->register('DELETE', "/$assessmentRoute/$feedbackRoute",         'deleteAssessmentFeedback', $canDeleteFeedback,              $preloadFeedback); // f
-    }
+        $this->register(
+            'POST',
+            "/{$participantRoute}/feedback",
+            'postParticipantFeedback',
+            $canGiveFeedbackFromParticipant,
+            $preloadParticipant
+        );
 
+        $this->register(
+            'POST',
+            "/{$participantRoute}{/responseId}/feedback",
+            'postResponseFeedback',
+            $canGiveFeedbackFromParticipant,
+            $preloadParticipantAndResponse
+        );
+
+        $this->register(
+            'DELETE',
+            "/{$assessmentRoute}/$feedbackRoute",
+            'deleteAssessmentFeedback',
+            $canDeleteFeedback,
+            $preloadFeedback
+        );
+
+        $this->register(
+            'POST',
+            "/{$assessmentRoute}/feedbacks",
+            'postParticipantFeedbacks',
+            $canGiveFeedbackForAssessment,
+            $preloadAssessable
+        );
+    }
 
     /**
      * @inheritdoc
+     *
+     * @param Twig_Loader_Chain $templateLoader
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
-
     /**
      * Override with any steps required for a controller and its routes
-     *
      * You should use this method to initialize any mappers or other objects
      * which the controller needs, but are too heavy to initialize at module
      * init time.
@@ -105,24 +193,32 @@ class Module extends BaseModule
     protected function preInitControllerDependencies(ContainerInterface $injector)
     {
         $injector->params[Controller::class] = [
-            'feedbackDataSource' => $injector->lazyGet('feedbackDataSource')
+            'feedbackDataSource'    => $injector->lazyGet('feedbackDataSource'),
+            'participantDataSource' => $injector->lazyGet('participantDataSource'),
+            'assessmentDataSource'  => $injector->lazyGet('assessmentDataSource'),
+            'userMapper'            => $this->getMapperFactory()->get(UserMapper::class),
+            'responseDataSource'    => $injector->lazyGet('responseDataSource'),
         ];
     }
 
-
     /**
      * @inheritdoc
+     *
+     * @param ContainerInterface $injector
      */
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
 
-
     /**
      * @param $assessmentId
      * @param $studentId
+     *
      * @return Participant
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     protected function preloadParticipant($assessmentId, $studentId)
     {
@@ -135,10 +231,26 @@ class Module extends BaseModule
     }
 
     /**
-     * @param $assessmentId
+     * @param int $assessmentId
+     *
+     * @return IAssessable
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    protected function preloadAssessable($assessmentId)
+    {
+        return $this->getAssessmentDataSource()->findById($assessmentId);
+    }
+
+    /**
+     * @param int $assessmentId
      * @param int $responseId
-     * @return Assessment\IResponse
-     * @throws \Schoolbox\Mapper\Exception
+     *
+     * @return mixed|Assessment\IResponse
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     protected function preloadResponse($assessmentId, $responseId)
     {
@@ -146,21 +258,25 @@ class Module extends BaseModule
             $this->getAssessmentDataSource()->findById($assessmentId)
         );
 
-        // TODO migrate this to DataSource
-        foreach ($responses as $r) {
-            if ($r->getId() == $responseId) {
-                return $r;
+        // TODO: Migrate this to DataSource
+
+        foreach ($responses as $responseCurrent) {
+            if ($responseCurrent->getId() == $responseId) {
+                return $responseCurrent;
             }
         }
 
-        throw new Mapper\Exception("Response '$responseId' not found for assessment '$assessmentId'.");
+        throw new MapperException("Response '{$responseId}' not found for assessment '{$assessmentId}'.");
     }
 
     /**
      * @param int $assessmentId
      * @param int $feedbackId
+     *
      * @return Assessment\IFeedback
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     protected function preloadFeedback($assessmentId, $feedbackId)
     {
@@ -168,14 +284,15 @@ class Module extends BaseModule
             $this->getAssessmentDataSource()->findById($assessmentId)
         );
 
-        // TODO migrate this to DataSource
-        foreach ($feedbacks as $f) {
-            if ($f->getId() == $feedbackId) {
-                return $f;
+        // TODO: Migrate this to DataSource
+
+        foreach ($feedbacks as $feedbackCurrent) {
+            if ($feedbackCurrent->getId() == $feedbackId) {
+                return $feedbackCurrent;
             }
         }
 
-        throw new Mapper\Exception("Feedback '$feedbackId' not found for assessment '$assessmentId'.");
+        throw new MapperException("Feedback '{$feedbackId}' not found for assessment '{$assessmentId}'.");
     }
 
     /**
@@ -187,16 +304,17 @@ class Module extends BaseModule
     }
 
     /**
-     * @return Mapper|Term\Mapper
-     * @throws \InvalidArgumentException If unable to find mapper class
+     * @return Mapper|TermMapper
+     * @throws InvalidArgumentException If unable to find mapper class
      */
     private function getTermMapper()
     {
-        return $this->getMapperFactory()->get(Term\Mapper::class);
+        return $this->getMapperFactory()->get(TermMapper::class);
     }
 
     /**
-     * @return object|Assessment\DataModel\MapperProxy
+     * @return object|AssessmentDataSource
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getAssessmentDataSource()
     {
@@ -204,7 +322,8 @@ class Module extends BaseModule
     }
 
     /**
-     * @return object|Participant\DataSource
+     * @return object|ParticipantDataSource
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getParticipantDataSource()
     {
@@ -212,7 +331,8 @@ class Module extends BaseModule
     }
 
     /**
-     * @return object|Assessment\Response\DataSource
+     * @return object|ResponseDataSource
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getResponseDataSource()
     {
@@ -220,7 +340,8 @@ class Module extends BaseModule
     }
 
     /**
-     * @return object|Assessment\Feedback\DataSource
+     * @return object|FeedbackDataSource
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getFeedbackDataSource()
     {
