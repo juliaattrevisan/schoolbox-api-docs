@@ -141,13 +141,18 @@ class Exporter
         ];
         $ids           = $this->idFinder->findIdsByFilters($filters);
         $assessments   = $this->assessmentDataSource->findAllByIds($ids);
-        $assessments   = $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessments);
 
-        // Filter out assessments without results, or no folder code
-        $filteredAssessments = $assessments->filter(function (IAssessable $assessment) {
-            if (!$assessment->getBaseContext()->getFolder()->getCodes()->count()) {
-                return false;
-            }
+
+        // Filter out assessments that belong to folders without a folder code
+        $classAssessments = $assessments->filter(function (IAssessable $assessment) {
+            return $assessment->getBaseContext()->getFolder()->getCodes()->count() > 0;
+        });
+
+        // Load participation
+        $classAssessments = $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($classAssessments);
+
+        // Filter out assessments without results
+        $filteredAssessments = $classAssessments->filter(function (IAssessable $assessment) {
             foreach ($assessment->getAllParticipants() as $participant) {
                 // Only real marks (not feedback with just a comment)
                 if ($participant->getHumanReadableMark(true)) {
