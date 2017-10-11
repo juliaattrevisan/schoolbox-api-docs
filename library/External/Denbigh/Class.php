@@ -102,6 +102,6 @@ class External_Denbigh_Class implements External_ClassInterface
                 WHERE           c.ClassCode IN ({$predicate["placeholders"]})
 		    ",
             $predicate["bindings"]
-        )->fetchColumnArray(0);
+        )->fetchColumnArray('denbighID');
     }
 }
