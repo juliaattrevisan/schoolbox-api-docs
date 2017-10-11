@@ -10,5 +10,5 @@ ALTER TABLE `plagscan_document` ADD COLUMN `storage_hash` VARCHAR(255) NULL AFTE
 --
 -- Can be done cheaply like this, hopefully, so I don't need to use mappers/models
 UPDATE plagscan_document p
-LEFT JOIN plagscan_document_migration m ON p.id = m.plagscan_document_id
+LEFT JOIN plagscan_document_migration m ON p.id = m.plagscan_document_record_id
 SET p.`storage_hash` = m.`storage_hash`;
