@@ -70,7 +70,7 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments = array())
         }
     }
 
-    //fix qoute escapes
+    //fix quote escapes
     if (get_magic_quotes_gpc())
     {
         $message = stripslashes($message);
@@ -135,9 +135,12 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments = array())
     }
 }
 
+// As long as there is a recipient in at least one of these fields,
+// we can send the email
+$hasRecipient = (isset($_POST['to']) && $_POST['to']) || (isset($_POST['bcc']) && $_POST['bcc']) || (isset($_POST['cc']) && $_POST['cc']);
 
 //if form has been submitted
-if(isset($_POST['to']) && $_POST['to'] && Cfg::get('mail_enable'))
+if(hasRecipient && Cfg::get('mail_enable'))
 {
     $attachments = isset($_POST['attachment']) ? $_POST['attachment'] : array();
 
