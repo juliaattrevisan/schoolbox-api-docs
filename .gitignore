@@ -40,4 +40,3 @@ post-provision.sh
 .idea/
 browscap.ini
 .*.lock
-tools/plagscan/plagscan_migrator.lock

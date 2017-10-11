@@ -30,9 +30,12 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Plagscan Document Migration',
     'retry'   => isset($options['r']) || isset($options['retry']) ? true : false,
 ]);
 
-$lock = new Alaress_Lock('plagscan_migrator.lock');
-
 try {
+    /** @var IConfigLoader $config */
+    $config = $kernel->getDependencyInjector()->get('config');
+
+    $lock = new Alaress_Lock($config->get('stream_dir') . '/.plagscan_migrator.lock');
+
     /** @var IConnector $database */
     $database = $kernel->getDependencyInjector()->get('databaseInternal');
 
