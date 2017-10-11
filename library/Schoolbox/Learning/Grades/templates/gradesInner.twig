@@ -54,18 +54,19 @@
                         {% if participant %}
                             {% set folder = assessment.baseContext.folder %}
                             <li class="actions-small-1">
-                                <div class="list-item clearfix content">
+                                <div class="list-item content">
                                     <div class="row">
-                                        <div class="small-12 large-5 card column xl">
+                                        <div class="small-12 large-6 card column xl">
                                             <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}{{ returnUrlSuffix }}">
                                                 <h3>{{ assessment.title }}</h3>
                                             </a>
-                                            <p class="meta">
-                                                {{ assessment.typeName }}
+                                            <p>
+                                                <span class="meta">{{ assessment.typeName }}</span><span class="pipe meta">{{ dueDate.dueDate(assessment, student) }}</span>
                                             </p>
+                                            {% include '@learningAssessment/fragments/statusLine.twig' with { assessable: assessment, student: student} only %}
                                         </div>
 
-                                        <div class="small-12 large-4 columns">
+                                        <div class="small-12 large-6 columns">
                                             {% if assessment.isFeedbackVisibleToUser(USER) %}
 
                                                 {% if assessment is task %}
@@ -83,14 +84,6 @@
                                                     <p class="comment">{{ feedback.comment | nl2br  }}</p>
                                                 {% endif %}
                                             {% endif %}
-
-                                        </div>
-
-                                        <div class="small-12 large-3 columns">
-
-                                            {{ dueDate.dueDate(assessment, student) }} <br />
-                                            {% include '@learningAssessment/fragments/statusLine.twig' with { assessable: assessment, student: student} only %}
-
                                         </div>
                                     </div>
                                 </div>
