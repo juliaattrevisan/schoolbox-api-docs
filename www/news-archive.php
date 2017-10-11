@@ -81,7 +81,11 @@ $filter = array(
 );
 
 // set an appropriate title based on news context
-$title = $this->getVar('TPL_LOCAL_NEWS_PC') . ($archive ? ' Archive' : '');
+
+/** @var \Schoolbox\L10n\RosettaStone $l10n */
+$l10n = $this->getDi()->get('l10n');
+
+$title = $l10n->translate("news", false, true) . ($archive ? ' Archive' : '');
 $this->setTitle($title);
 $this->setVar('PAGE_TITLE', $title);
 

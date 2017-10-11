@@ -47,9 +47,10 @@ if (is_numeric($this->arg[1])) {
     $page = 1;
 }
 
-$this->setTitle($this->getVar('TPL_LOCAL_NEWS_PC'));
-$this->setVar('PAGE_TITLE', $this->getVar('TPL_LOCAL_NEWS_PC'));
+/** @var \Schoolbox\L10n\RosettaStone $l10n */
+$l10n = $this->getDi()->get('l10n');
 
+$this->setTitle($l10n->translate("news", false, true));
 
 // display add news button if user is allowed to
 if (($permission = $groupHandler->getPermission(0)) >= WRITE_ACCESS) {
