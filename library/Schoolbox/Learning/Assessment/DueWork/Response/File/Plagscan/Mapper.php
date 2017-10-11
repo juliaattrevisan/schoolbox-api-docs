@@ -11,12 +11,12 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
-use Schoolbox\Collection;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3\Connector;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
-use Schoolbox\User;
+use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3\Connector;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\User;
 
 /**
  * @method Model findOneByColumn($columnName, $columnValue, $order = [], $options = [])
@@ -35,7 +35,7 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * An instance of the Plagscan Connector
      * which is where files end up
-     * 
+     *
      * @var Connector
      */
     private $connector;
@@ -67,7 +67,6 @@ class Mapper extends \Schoolbox\Mapper
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'checkHtmlValue']);
     }
-
 
     /**
      * Pre-save callback to ensure we don't save a model that has
@@ -195,8 +194,10 @@ class Mapper extends \Schoolbox\Mapper
      * Save a Plagscan payload into db
      *
      * @param SubmissionFile $file
-     * @param $filename
-     * @return array
+     * @param                $filename
+     *
+     * @return array|bool|int[]
+     * @throws MapperException
      */
     public function saveNewPlagscan(SubmissionFile $file, $filename)
     {
@@ -308,6 +309,7 @@ class Mapper extends \Schoolbox\Mapper
      *
      * @param int $studentSubmissionFileId
      * @return Collection
+     * @throws MapperException
      */
     public function findPreviousIncarnationsOf($studentSubmissionFileId)
     {
