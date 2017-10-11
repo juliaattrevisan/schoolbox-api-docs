@@ -249,10 +249,10 @@
 
     /* Check if a required field is blank/contains only whitespace */
     $.validator.addMethod('requiredNotBlank', function(value) {
-        if (empty($.trim(value))) {
-            return false;
+        if (($.trim(value)).length) {
+            return true;
         }
-        return true;
+        return false;
     }, 'This field cannot be blank')
 
 }(jQuery));
