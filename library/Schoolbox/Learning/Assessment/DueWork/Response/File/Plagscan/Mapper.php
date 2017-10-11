@@ -13,11 +13,15 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\Collection;
+use Schoolbox\File\Mimetype;
+use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3\Connector;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
+
 
 /**
  * @method Model findOneByColumn($columnName, $columnValue, $order = [], $options = [])
@@ -59,7 +63,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('plagscan_id', self::TYPE_INTEGER);
         $this->uses('status', self::TYPE_INTEGER);
         $this->uses('score', self::TYPE_STRING);
-        $this->joins('storage_hash', StorageMapper::class, 'storage_hash', null, null, 'storage');
+        $this->joins('storage_hash', StorageMapper::class, 'hash', null, null, 'storage', 'storage');
         $this->uses('html', self::TYPE_STRING);
         $this->uses('interactive_url', self::TYPE_STRING);
         $this->uses('privatised_at', self::TYPE_DATETIME);
@@ -68,6 +72,50 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'checkHtmlValue']);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getSelectString()
+    {
+        $storageMapper = $this->getJoinMapper('storage');
+
+        return "
+            SELECT      {$this->getColumnString()},
+                        {$this->getJoinColumnString('storage', 's')}
+            FROM        {$this->getTable()} 
+            LEFT JOIN   {$this->getJoinSql('storage', '', 's', true)}
+            LEFT JOIN   {$storageMapper->getJoinSql('allowedFileExtension', 's', 'mime')}
+        ";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function hydrateSelect(\PDOStatement $statement)
+    {
+        // Return attachments fully hydrated by default
+        $collection = $this->createCollection();
+        /** @var MimetypeMapper $mimeMapper */
+        $mimeMapper = $this->getJoinMapper('storage')->getJoinMapper('allowedFileExtension');
+        foreach ($statement as $row) {
+            $model = $this->hydrate($row);
+            // Hydrate storage object
+            /** @var Storage $storage */
+            $storage = $this->hydrateJoin($row, 'storage', 's');
+            if ($storage instanceof Storage) {
+                // Hydrate a mime type if we can find one
+                /** @var Mimetype $mime */
+                $mime = $mimeMapper->hydrate($row, 'mime');
+                if ($mime instanceof Mimetype) {
+                    $storage->setMimetype($mime);
+                }
+                $model->setStorage($storage);
+            }
+            $collection->add($model);
+        }
+        return $collection;
     }
 
     /**
