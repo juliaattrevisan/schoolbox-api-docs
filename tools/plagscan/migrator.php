@@ -77,10 +77,10 @@ try {
                     SELECT    COUNT(*) 
                     FROM        `plagscan_document` `p`
                     LEFT JOIN   `plagscan_document_migration` `m` ON 
-                                `p`.`id` = `m`.`plagscan_document_id`  
+                                `p`.`id` = `m`.`plagscan_document_record_id`  
                     WHERE       `p`.`id` NOT IN 
                                 (
-                                    SELECT    `m`.`plagscan_document_id`
+                                    SELECT    `m`.`plagscan_document_record_id`
                                     FROM      `plagscan_document_migration` `m` 
                                     WHERE     `m`.`storage_migrated_at` IS NOT NULL
                                 ) AND 
@@ -99,10 +99,10 @@ try {
                                     `m`.* 
                         FROM        `plagscan_document` `p`
                         LEFT JOIN   `plagscan_document_migration` `m` ON 
-                                    `p`.`id` = `m`.`plagscan_document_id`  
+                                    `p`.`id` = `m`.`plagscan_document_record_id`  
                         WHERE       `p`.`id` NOT IN 
                                     (
-                                        SELECT    `m`.`plagscan_document_id`
+                                        SELECT    `m`.`plagscan_document_record_id`
                                         FROM      `plagscan_document_migration` `m` 
                                         WHERE     `m`.`storage_migrated_at` IS NOT NULL
                                     ) AND 
@@ -122,7 +122,7 @@ try {
                 /** @var array $document */
                 foreach ($documents as $document) {
                     if (!empty($document['storage_failed_at']) && !$opts['retry']) {
-                        $log->debug("Skipping failed document: Plagscan ID {$document["id"]}");
+                        $log->debug("Skipping failed document when migrating `plagscan_document`.`id` {$document["id"]}");
                         $skipped++;
                         continue;
                     }
@@ -133,10 +133,10 @@ try {
                         $bytesTotal += strlen($document["html"]);
                         $success++;
                     } elseif ($result == RESULT_FAILED) {
-                        $log->error("Document migration failed: Plagscan ID {$document["id"]}");
+                        $log->error("Document migration failed when migrating `plagscan_document`.`id` {$document["id"]}");
                         $failed++;
                     } elseif ($result == RESULT_FAILED_SIZE) {
-                        $log->error("Uploaded storage object size mismatch: Plagscan ID {$document["id"]}");
+                        $log->error("Uploaded storage object size mismatch when migrating `plagscan_document`.`id` {$document["id"]}");
                         $failed++;
                     }
 
@@ -147,9 +147,11 @@ try {
 
                 // Display a progress indicator between each batch
 
-                $percentage = number_format($count / $countDocuments * 100, 2);
-                $megabytes = number_format($bytesTotal / 1024 / 1024, 2);
-                $log->info("Migrating {$count}/{$countDocuments}: {$megabytes}MB Migrated {$percentage}%");
+                if ($countDocuments > 0) {
+                    $percentage = number_format($count / $countDocuments * 100, 2);
+                    $megabytes  = number_format($bytesTotal / 1024 / 1024, 2);
+                    $log->info("Migrating {$count}/{$countDocuments}: {$megabytes}MB Migrated {$percentage}%");
+                }
             } while ($count < $countDocuments);
 
             if ($failed === 0 && $success === 0 && $skipped === 0) {
@@ -214,13 +216,13 @@ function migrateHtml(IConnector $database, array $document): int
             md5($storageObject->read()) == md5($document["html"])) {
             // Create/update migration record
 
-            if (empty($document["plagscan_document_id"])) {
+            if (empty($document["plagscan_document_record_id"])) {
                 // Create migration record
 
                 $database->executeQuery(
                     "
                         INSERT IGNORE INTO `plagscan_document_migration` (
-                          `plagscan_document_id`, 
+                          `plagscan_document_record_id`, 
                           `storage_hash`, 
                           `storage_migrated_at`, 
                           `storage_failed_at`, 
@@ -256,7 +258,7 @@ function migrateHtml(IConnector $database, array $document): int
                             storage_hash = :storageHash, 
                             storage_migrated_at = :storageMigratedAt, 
                             updated_at = :updatedAt
-                        WHERE plagscan_document_id = :plagscanDocumentId
+                        WHERE plagscan_document_record_id = :plagscanDocumentId
                     ",
                     [
                         'storageHash'        => $storageObject->getHash(),
@@ -286,14 +288,14 @@ function migrateHtml(IConnector $database, array $document): int
         } else {
             // Migration failed due to size mismatch
 
-            if (empty($document["plagscan_document_id"])) {
+            if (empty($document["plagscan_document_record_id"])) {
                 // Insert new migration record
 
                 $database->executeQuery(
                     "
                         INSERT IGNORE INTO `plagscan_document_migration`
                         (
-                            `plagscan_document_id`, 
+                            `plagscan_document_record_id`, 
                             `storage_failed_at`, 
                             `created_at`, 
                             `updated_at`

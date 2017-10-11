@@ -1,6 +1,6 @@
 CREATE TABLE plagscan_document_migration
 (
-  plagscan_document_id INT PRIMARY KEY NOT NULL,
+  plagscan_document_record_id INT(10) UNSIGNED PRIMARY KEY NOT NULL,
   storage_hash VARCHAR(40) CHARACTER SET ASCII NULL,
   storage_migrated_at DATETIME NULL,
   storage_failed_at DATETIME NULL,
@@ -9,6 +9,6 @@ CREATE TABLE plagscan_document_migration
   deleted_at DATETIME NULL
 );
 
-ALTER TABLE plagscan_document
-  ADD CONSTRAINT fk_plagscan_document_migration_id
-FOREIGN KEY (id) REFERENCES plagscan_document_migration (plagscan_document_id);
+ALTER TABLE plagscan_document_migration
+  ADD CONSTRAINT plagscan_document_migration_plagscan_document_id_fk
+FOREIGN KEY (plagscan_document_record_id) REFERENCES plagscan_document (id);

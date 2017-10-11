@@ -27,7 +27,7 @@ class Mapper extends BaseMapper
     {
         $this->hasTable('plagscan_document_migration');
         $this->hasModel(Model::class);
-        $this->joins('plagscan_document_id', PlagscanDocumentMapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'plagscanDocument', 'plagscanDocument');
+        $this->joins('plagscan_document_record_id', PlagscanDocumentMapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'plagscanDocument', 'plagscanDocument');
         $this->joins('storage_hash', StorageMapper::class, 'hash', null, null, 'storage', 'storage');
         $this->uses('storage_migrated_at', self::TYPE_DATETIME);
         $this->uses('storage_failed_at', self::TYPE_DATETIME);
