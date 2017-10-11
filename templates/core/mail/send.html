@@ -67,7 +67,8 @@ $(function() {
     });
 
     $('#mailForm').alaressValidate({
-        ignore: ':hidden:not([class~=selectized]),:hidden > .selectized, .selectize-control .selectize-input input'
+        ignore: ':hidden:not([class~=selectized]),:hidden > .selectized, .selectize-control .selectize-input input',
+        mailHasRecipient: true
     });
 });
 </script>

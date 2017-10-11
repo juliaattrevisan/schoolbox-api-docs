@@ -11,6 +11,7 @@ use Alaress\Mail\AttachmentStream;
 //outputs form to get users mail details and processes the information
 
 require_once __DIR__."/../../library/Bootstrap.php";
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 $page = new SitePage();
 
@@ -140,7 +141,7 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments = array())
 $hasRecipient = (isset($_POST['to']) && $_POST['to']) || (isset($_POST['bcc']) && $_POST['bcc']) || (isset($_POST['cc']) && $_POST['cc']);
 
 //if form has been submitted
-if(hasRecipient && Cfg::get('mail_enable'))
+if($hasRecipient && Cfg::get('mail_enable'))
 {
     $attachments = isset($_POST['attachment']) ? $_POST['attachment'] : array();
 
@@ -150,5 +151,5 @@ if(hasRecipient && Cfg::get('mail_enable'))
 }
 else
 {
-    SitePage::localRedir('/mail/createMail.php');
+    error(ErrorMapper::ERROR_INFORMATION_MISSING);
 }
