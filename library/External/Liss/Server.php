@@ -742,7 +742,7 @@ class External_Liss_Server
                 /* Skip events that don't have a type
                  */
                 if (!strlen($currentEvent['type'])) {
-                    $log->info("Skipping event \"{$currentEvent['className']}\" with guid \"{$currentEvent['edvalGuid']}\": no type");
+                    $log->warning("Skipping event \"{$currentEvent['className']}\" with guid \"{$currentEvent['edvalGuid']}\": no type");
                     $skipCount['noType']++;
                     $skipCount['total']++;
 
@@ -752,7 +752,7 @@ class External_Liss_Server
                 /* Skip events that have a particular type
                  */
                 if (in_array($currentEvent['type'], $exclusions)) {
-                    $log->info("Skipping event \"{$currentEvent['className']}\" with guid \"{$currentEvent['edvalGuid']}\": has excluded type \"{$currentEvent['type']}\"");
+                    $log->warning("Skipping event \"{$currentEvent['className']}\" with guid \"{$currentEvent['edvalGuid']}\": has excluded type \"{$currentEvent['type']}\"");
                     $skipCount['invalidType']++;
                     $skipCount['total']++;
 
@@ -785,7 +785,7 @@ class External_Liss_Server
                     try {
                         $folder = $folderMapper->findByCode($currentEvent['classCode']);
                     } catch (MapperException $e) {
-                        $log->info(sprintf('Skipping event \"%s\" with guid \"%s\": cannot find corresponding Schoolbox folder for classCode \"%s\"',
+                        $log->warning(sprintf('Skipping event \"%s\" with guid \"%s\": cannot find corresponding Schoolbox folder for classCode \"%s\"',
                             $event->getTitle(), $currentEvent['edvalGuid'], $currentEvent['classCode'])
                         );
 
@@ -816,7 +816,7 @@ class External_Liss_Server
                             $eventRelations->savePersonalRelation($event);
                             $helper->saveEventSource($event, $currentEvent['edvalGuid']);
                         } catch (MapperException $e) {
-                            $log->info(sprintf('Skipping event \"%s\" with guid \"%s\" for user \"%s\": no Schoolbox account found for external id \"%s\"',
+                            $log->warning(sprintf('Skipping event \"%s\" with guid \"%s\" for user \"%s\": no Schoolbox account found for external id \"%s\"',
                                 $event->getTitle(), $currentEvent['edvalGuid'], $currentExternalId, $currentExternalId
                             ));
 
