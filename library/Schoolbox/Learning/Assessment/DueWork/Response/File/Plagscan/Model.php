@@ -12,11 +12,14 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
-use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Resource\Storage\IStorage;
+use Schoolbox\Resource\File\StorableTrait;
 
-class Model implements ISoftDeletable
+class Model implements IStorage, ISoftDeletable
 {
+    use StorableTrait;
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
@@ -119,7 +122,8 @@ class Model implements ISoftDeletable
         return $this->getStatus() == self::STATUS_UNSCANNABLE || $this->getStatus() == null;
     }
 
-    // Getters/Setters
+    /* Getters/Setters
+     */
 
     /**
      * @return int

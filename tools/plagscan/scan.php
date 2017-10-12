@@ -11,9 +11,11 @@
  * @idea_stolen_from Matt Day <matt.day@alaress.com.au>
  */
 
+use Schoolbox\File\Exception as FileException;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
-
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3\ReportTransactor as PlagscanReportTransactor;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
@@ -21,6 +23,7 @@ $kernel = new \Schoolbox\Application\Daemon\Kernel('Plagscan Scanner', ['level' 
 $log = $kernel->logger();
 
 $mapper = PlagscanMapper::getInstance();
+$storageMapper = StorageMapper::getInstance();
 
 if (!$mapper->getConnector()) {
 
@@ -35,14 +38,17 @@ $log->info("Plagscan is now choosing modes and options");
 $opts = getopt('', ['re-retrieve']);
 $reRetrieveMode = isset($opts['re-retrieve']);
 
-/* Re-scan plagscan records
- */
 if ($reRetrieveMode) {
+
+    /* Re-scan plagscan records
+     */
     $log->info("Scanner running in re-retrieve mode");
     $allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_COMPLETE);
-} /* Scan currently-pending plagscan records
- */
+}
 else {
+
+    /* Scan currently-pending plagscan records
+     */
     $log->info("Scanner running in scan mode");
     $allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_PROCESSING);
 }
@@ -81,15 +87,23 @@ foreach ($allDocuments as $currentDocument) {
                  * be available before the others etc.)
                  */
                 if (strlen($interactiveReportUrl) && strlen($reportContents) && strlen($score)) {
-                    $currentDocument->setPlagscanId($currentDocument->getPlagscanId());
-                    $currentDocument->setStatus(Plagscan::STATUS_COMPLETE);
-                    $currentDocument->setScore($score);
-                    $currentDocument->setHtml($reportContents);
-                    $currentDocument->setInteractiveUrl($interactiveReportUrl);
-                    $currentDocument->setUpdatedAt(\Alaress_Date_Format::now());
-                    $mapper->save($currentDocument);
+                    try {
+                        $plagscanReport = (new PlagscanReportTransactor($currentDocument->getPlagscanId(), $reportContents, $storageMapper))->save();
 
-                    $numUpdated++;
+                        $currentDocument->setPlagscanId($currentDocument->getPlagscanId());
+                        $currentDocument->setStatus(Plagscan::STATUS_COMPLETE);
+                        $currentDocument->setScore($score);
+                        $currentDocument->setStorage($plagscanReport);
+                        $currentDocument->setInteractiveUrl($interactiveReportUrl);
+                        $currentDocument->setUpdatedAt(\Alaress_Date_Format::now());
+                        $mapper->save($currentDocument);
+                        $numUpdated++;
+                    }
+                    catch (FileException $e) {
+                        /* Die critically until the plagscan report can be saved
+                         */
+                        $log->critical("{$prefix}: could not save plagscan report file to storage", [$e]);
+                    }
                 } else {
                     $log->warning("{$prefix}: all report pieces (score, mode 6 and 7 reports) not yet ready");
                 }
