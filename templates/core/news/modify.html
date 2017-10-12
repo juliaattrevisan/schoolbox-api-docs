@@ -43,14 +43,6 @@
 
         }, "You must select an audience (role and campus, and/or individual users)");
 
-        /* Check if the news item has either a blurb or article content */
-        jQuery.validator.addMethod("hasContent", function(value, element) {
-            if ($.trim($("#body").val()).length || $.trim($("#blurb").val()).length) {
-                return true;
-            }
-            return false;
-        }, "You must supply article or blurb content")
-
         $('#newsForm').alaressValidate({
             rules: {
                 'audience': {
@@ -60,8 +52,15 @@
                     requiredNotBlank: true
                 },
                 'body': {
-                    hasContent: true
+                    ckeRequired: {
+                        depends: function(element) {
+                            return $.trim(CKEDITOR.instances["blurb"].getData().length > 0);
+                        }
+                    }
                 }
+            },
+            messages: {
+                'body': 'You must supply article or blurb content'
             }
         });
 
