@@ -1,6 +1,9 @@
 -- Add a storage hash column which references the file in which the html is stored
 -- This has to be re-migrated into plagscan_document separately
-ALTER TABLE `plagscan_document` ADD COLUMN `storage_hash` VARCHAR(255) NULL AFTER `score`;
+ALTER TABLE `plagscan_document` ADD COLUMN `storage_hash` VARCHAR(100) CHARSET ASCII NULL AFTER `score`;
+
+-- Foreigner key
+ALTER TABLE `plagscan_document` ADD CONSTRAINT `fk_storage_hash_storage_hash` FOREIGN KEY (`storage_hash`) REFERENCES `storage`(`hash`);
 
 -- Migrate the data from the migration results back to the plagscan_document table
 --
