@@ -31,16 +31,23 @@ class ReportTransactor
      */
     private $reportContents;
 
+    /**
+     * @var StorageMapper
+     */
+    private $storageMapper;
+
 
     /**
      * Report constructor.
-     * @param $plagscanId
-     * @param $reportContents
+     * @param int           $plagscanId
+     * @param string        $reportContents
+     * @param StorageMapper $storageMapper
      */
-    public function __construct($plagscanId, $reportContents)
+    public function __construct($plagscanId, $reportContents, StorageMapper $storageMapper)
     {
         $this->setPlagscanId($plagscanId);
         $this->setReportContents($reportContents);
+        $this->setStorageMapper($storageMapper);
     }
 
 
@@ -54,7 +61,7 @@ class ReportTransactor
     {
         $filename = $this->generateFilename($this->getPlagscanId());
 
-        return StorageMapper::getInstance()->acceptStream($filename, $this->getReportContents());
+        return $this->getStorageMapper()->acceptStream($filename, $this->getReportContents());
     }
 
 
@@ -106,6 +113,26 @@ class ReportTransactor
     private function setReportContents($reportContents)
     {
         $this->reportContents = $reportContents;
+        return $this;
+    }
+
+
+    /**
+     * @return StorageMapper
+     */
+    public function getStorageMapper(): StorageMapper
+    {
+        return $this->storageMapper;
+    }
+
+
+    /**
+     * @param StorageMapper $storageMapper
+     * @return $this
+     */
+    public function setStorageMapper(StorageMapper $storageMapper)
+    {
+        $this->storageMapper = $storageMapper;
         return $this;
     }
 }

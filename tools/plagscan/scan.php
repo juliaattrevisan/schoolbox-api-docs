@@ -15,7 +15,7 @@ use Schoolbox\File\Exception as FileException;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3\ReportTransactor as PlagscanReportTransactor;
-
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
@@ -23,6 +23,7 @@ $kernel = new \Schoolbox\Application\Daemon\Kernel('Plagscan Scanner', ['level' 
 $log = $kernel->logger();
 
 $mapper = PlagscanMapper::getInstance();
+$storageMapper = StorageMapper::getInstance();
 
 if (!$mapper->getConnector()) {
 
@@ -37,14 +38,17 @@ $log->info("Plagscan is now choosing modes and options");
 $opts = getopt('', ['re-retrieve']);
 $reRetrieveMode = isset($opts['re-retrieve']);
 
-/* Re-scan plagscan records
- */
 if ($reRetrieveMode) {
+
+    /* Re-scan plagscan records
+     */
     $log->info("Scanner running in re-retrieve mode");
     $allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_COMPLETE);
-} /* Scan currently-pending plagscan records
- */
+}
 else {
+
+    /* Scan currently-pending plagscan records
+     */
     $log->info("Scanner running in scan mode");
     $allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_PROCESSING);
 }
@@ -84,7 +88,7 @@ foreach ($allDocuments as $currentDocument) {
                  */
                 if (strlen($interactiveReportUrl) && strlen($reportContents) && strlen($score)) {
                     try {
-                        $plagscanReport = (new PlagscanReportTransactor($currentDocument->getPlagscanId(), $reportContents))->save();
+                        $plagscanReport = (new PlagscanReportTransactor($currentDocument->getPlagscanId(), $reportContents, $storageMapper))->save();
 
                         $currentDocument->setPlagscanId($currentDocument->getPlagscanId());
                         $currentDocument->setStatus(Plagscan::STATUS_COMPLETE);
