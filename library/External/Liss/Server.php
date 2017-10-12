@@ -51,6 +51,7 @@ use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 
@@ -804,39 +805,35 @@ class External_Liss_Server
                 $event->setEndDateTime($currentEvent['endDateTime']);
 
                 /* Decide between homepage events and personal events
-                 * Determine which one based on the presence/content of classCode
+                 * Determine which one based on the existence of a schoolbox folder that
+                 * contains the classCode value
                  *
                  * We don't do Campus events in Edval (no way to identify)
+                 *
+                 * saveEventSource() throws mapper exceptions, so I don't want that affecting
+                 * the outcome of this decision
                  */
-                if (strlen($currentEvent['classCode'])) {
-                    /* Skip if we can't find a corresponding folder
+                try {
+                    $folder = $folderMapper->findByCode($currentEvent['classCode']);
+                }
+                catch (MapperException $e) {
+                    $folder = null;
+                }
+
+                if ($folder instanceof Folder) {
+
+                    /* Homepage event
                      */
-                    try {
-                        $folder = $folderMapper->findByCode($currentEvent['classCode']);
-                    } catch (MapperException $e) {
-                        $log->warning(sprintf("Skipping event \"%s\" with guid \"%s\": cannot find corresponding Schoolbox folder for classCode \"%s\"",
-                            $event->getTitle(), $currentEvent['edvalGuid'], $currentEvent['classCode'])
-                        );
-
-                        if ($includePayloadInLogging) {
-                            $log->warning("Payload for guid \"{$currentEvent['edvalGuid']}\": " . json_encode($currentEvent));
-                            $log->warning('');
-                        }
-
-                        $skipCount['unknownFolder']++;
-                        $skipCount['total']++;
-
-                        continue;
-                    }
-
                     $event->setAccess(Event::ACCESS_GROUP);
                     $eventMapper->save($event);
 
                     $eventRelations->saveFolderRelation($event, [$folder->getId()]);
                     $helper->saveEventSource($event, $currentEvent['edvalGuid']);
-
                     $log->info(sprintf("Processed homepage event \"%s\" with guid \"%s\"", $event->getTitle(), $currentEvent['edvalGuid']));
                 } else {
+
+                    /* Personal event
+                     */
                     $event->setAccess(Event::ACCESS_PERSONAL);
 
                     /* Teachers and Students can be treated synonymously
