@@ -61,6 +61,7 @@ class Mapper extends BaseMapper
         foreach ($statement as $row) {
             $model = $this->hydrate($row);
             if($model == null) {
+                // This is because of a weird optional bi-directional join in TagCloud::findForTag
                 $model = $this->createModel();
             }
 
