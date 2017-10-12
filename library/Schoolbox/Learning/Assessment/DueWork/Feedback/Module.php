@@ -28,6 +28,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
 use Twig_Loader_Chain;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 class Module extends BaseModule
 {
@@ -198,6 +199,7 @@ class Module extends BaseModule
             'assessmentDataSource'  => $injector->lazyGet('assessmentDataSource'),
             'userMapper'            => $this->getMapperFactory()->get(UserMapper::class),
             'responseDataSource'    => $injector->lazyGet('responseDataSource'),
+            'rubricMarkMapper'      => $this->getMapperFactory()->get(Rubric\MarkMapper::class),
         ];
     }
 

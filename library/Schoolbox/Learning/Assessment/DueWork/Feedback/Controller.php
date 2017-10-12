@@ -17,7 +17,7 @@ use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\MarkMapper as RubricMarkMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -41,6 +41,9 @@ class Controller extends Base
     /** @var UserMapper */
     protected $userMapper;
 
+    /** @var Rubric\MarkMapper */
+    private $rubricMarkMapper;
+
     /**
      * Controller constructor.
      *
@@ -49,19 +52,22 @@ class Controller extends Base
      * @param AssessmentDataSource $assessmentDataSource
      * @param ResponseDataSource $responseDataSource
      * @param UserMapper $userMapper
+     * @param Rubric\MarkMapper $rubricMarkMapper
      */
     public function __construct(
         IFeedbackDataSource $feedbackDataSource,
         ParticipantDataSource $participantDataSource,
         AssessmentDataSource $assessmentDataSource,
         ResponseDataSource $responseDataSource,
-        UserMapper $userMapper
+        UserMapper $userMapper,
+        Rubric\MarkMapper $rubricMarkMapper
     ) {
         $this->feedbackDataSource = $feedbackDataSource;
         $this->participantDataSource = $participantDataSource;
         $this->assessmentDataSource = $assessmentDataSource;
         $this->responseDataSource = $responseDataSource;
         $this->userMapper = $userMapper;
+        $this->rubricMarkMapper = $rubricMarkMapper;
     }
 
     /**
@@ -192,7 +198,7 @@ class Controller extends Base
         }
         // Else did we just publish draft marks via the status page?
         elseif(!$isDraft){
-            RubricMarkMapper::getInstance()->publishDraftMarks($participant->getUser(), $dueWork);
+            $this->rubricMarkMapper->publishDraftMarks($participant->getUser(), $dueWork);
         }
     }
 
