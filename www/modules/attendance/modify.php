@@ -26,10 +26,10 @@ function parseDateTimeString($input)
         return '';
     }
 
-    if (preg_match('/((?:[0-2])?[0-9]:[0-5][0-9]):[0-5][0-9](?:\.|:)000(AM|PM)?/i', $input, $matches)) {
-        array_shift($matches);
-        $parts = implode('', $matches);
-        return date('g:ia', strtotime($parts));
+    $timestamp = strtotime($input);
+
+    if (!empty($timestamp)) {
+        return date("g:ia", $timestamp);
     }
 
     error(ErrorMapper::ERROR_DATE_FORMAT);
