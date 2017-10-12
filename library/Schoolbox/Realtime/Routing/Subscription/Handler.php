@@ -74,7 +74,7 @@ class Handler implements IConsumer, EventListener
     public function onMessage($instance, IResolver $resolver, ?array $context)
     {
         try {
-            $this->handleMessage($instance);
+            $this->handleMessage($instance, $context);
             $resolver->acknowledge();
             return;
 
@@ -125,12 +125,16 @@ class Handler implements IConsumer, EventListener
 
     /**
      * @param Instance $instance
+     * @param array    $topics
      * @throws InvalidArgumentException
      */
-    private function handleMessage(Instance $instance)
+    private function handleMessage(Instance $instance, array $topics = null)
     {
+        // if topics are explicitly given, use those rather than what you find in the instance
+        $topics = $topics ?: $instance->getTopics();
+
         // typically there's only 1, but the possibility of more
-        foreach ($instance->getTopics() as $topic) {
+        foreach ($topics as $topic) {
             try {
                 $userIds = $this->resolver->getSubscribedUserIds($topic);
 

@@ -77,17 +77,26 @@ abstract class Broker implements IBroker
 
                 $resolve = new Resolver($resolver);
 
+                try {
+                    [ $key, $context ] = json_decode($frame->body, true);
+
+                } catch (\Throwable $e) {
+                    // if the JSON decode fails, fall back to assuming frame.body == key
+                    $key     = $frame->body;
+                    $context = null;
+                }
+
                 // payload from STOMP is a key for collecting a redis payload
-                if (!$this->redis->exists($frame->body)) {
-                    $consumer->onException(new PayloadMissingException($frame->body, $resolve));
+                if (!$this->redis->exists($key)) {
+                    $consumer->onException(new PayloadMissingException($key, $resolve));
                     return;
                 }
 
-                $gzip    = $this->redis->get($frame->body);
+                $gzip    = $this->redis->get($key);
                 $serial  = gzuncompress($gzip);
                 $payload = unserialize($serial);
 
-                $consumer->onMessage($payload, $resolve);
+                $consumer->onMessage($payload, $resolve, $context);
             });
 
         } catch (\Exception $e) {
@@ -114,8 +123,10 @@ abstract class Broker implements IBroker
         // drop the data into redis...
         $this->redis->set($storageKey, $gzip);
 
+        $amqpPayload = $context ? json_encode([ $storageKey, $context ]) : $storageKey;
+
         // ...then advise AMQP to pick it up (on the default exchange)
-        $this->amqp->publish($storageKey, $routingKey, [ 'exchange' => $exchange ]);
+        $this->amqp->publish($amqpPayload, $routingKey, [ 'exchange' => $exchange ]);
     }
 
 
