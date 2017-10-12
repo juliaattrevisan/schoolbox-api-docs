@@ -78,6 +78,13 @@ class HardLinks extends DbCheck
 
             "SELECT hash FROM ups_log
              WHERE hash IS NOT NULL",
+
+            /* Preserve all plagscan records that have extant student_submission_file records
+             */
+            "SELECT plagscan_document.`storage_hash`
+            FROM plagscan_document
+            INNER JOIN student_submission_file ON student_submission_file.`id` = plagscan_document.`student_submission_file_id`
+            WHERE student_submission_file.`deleted_at` IS NULL",
         ];
 
         return sprintf("`hash` NOT IN (%s)", implode(' UNION ', $queries));
