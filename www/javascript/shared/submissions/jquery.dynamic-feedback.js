@@ -70,8 +70,10 @@
                  */
                 publishText: 'Publish',
 
-                // Callbacks to execute upon successful completion of Draft and Publish actions
+                // Callbacks to execute upon initiation and successful completion of Draft and Publish actions
+                onPreDraftCallback: $.noop,
                 onDraftCallback: $.noop,
+                onPrePublishCallback: $.noop,
                 onPublishCallback: $.noop
             };
 
@@ -132,6 +134,9 @@
                 // Publish submits everything
                 var formData = $form.serializeArray();
                 formData.push({name: 'publish', value: 1});
+
+                config.onPrePublishCallback($participant.data('participant'), formData);
+
                 $.ajax($form.attr('action'), {
                     dataType: 'json',
                     data:  formData,
@@ -234,6 +239,8 @@
             $(config.formSaveLabel).toastActivate({
                 text: 'Autosaving...'
             });
+
+            config.onPreDraftCallback($participant.data('participant'), data);
 
             $.ajax($form.attr('action'), data)
                 .done(function (response) {
