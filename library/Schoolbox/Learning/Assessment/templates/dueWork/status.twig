@@ -214,15 +214,17 @@
 
     {% set buttons %}
         {%- spaceless %}
-            {% if pAckReceipt %}<a class="button" data-sobo title="Acknowledge receipt of student submission"
-                                   href="{{ pAckReceipt }}">Mark as Submitted</a>{% endif %}
-            <span class="button disabled" data-draft="drafted"
-                  title="You can discard this draft from the Grading Overview screen">
-                {% if isDraftFeedback %}Saved as Draft{% endif %}
-            </span>
-            {% if not readonly %}<a class="button" data-draft="publish"
-                                    {% if not feedback or feedback.published %}style="display:none;"{% endif %}>
-                    Publish</a>{% endif %}
+            {% if pAckReceipt %}
+                {% set soboTitle = 'Acknowledge receipt of student submission' %}
+                <a class="button" data-sobo title="{{ soboTitle }}" href="{{ pAckReceipt }}">Mark as Submitted</a>
+            {% endif %}
+            {% set draftSaveTitle = 'You can discard this draft from the Grading Overview screen' %}
+            {% set draftSaveHtml = isDraftFeedback ? 'Saved as Draft' : '' %}
+            <span class="button disabled" data-draft="drafted" title="{{ draftSaveTitle }}">{{ draftSaveHtml }}</span>
+            {% if not readonly %}
+                {% set publishStyle = not feedback or feedback.published ? 'display:none;' : '' %}
+                <a class="button" data-draft="publish" style="{{ publishStyle }}">Publish</a>
+            {% endif %}
         {% endspaceless -%}
     {% endset %}
 
