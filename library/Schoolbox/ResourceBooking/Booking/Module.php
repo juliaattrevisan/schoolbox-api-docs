@@ -106,7 +106,7 @@ class Module extends BaseModule
         // booking can be cancelled by a moderator, or the owner of the booking.
         $isOwnerRule = new Auth\UserOwnsBooking();
         $isOwnerRule->setMapper($this->getMapper());
-        $bookingEditRule = new Rule\Any($baseManageRule, $isOwnerRule);
+        $bookingEditRule = new Rule\Any($baseManageRule, $isOwnerRule, $isItemModeratorRule);
 
         $this
             ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
