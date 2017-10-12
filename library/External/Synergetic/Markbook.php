@@ -20,9 +20,9 @@ use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
-use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\UserMapper;
 
 class External_Synergetic_Markbook implements External_MarkbookInterface
@@ -321,11 +321,15 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             $weight = $assessment->getAssessment()->getWeight();
         }
 
+        // DB-level limits:
+        // Heading: 255 chars
+        // HdgAbbrev1, HdgAbbrev2: 10 chars
+        // WeightingFactor: 0-9999
         return [
-            'Heading' => $assessment->getName(),
-            'HdgAbbrev1' => mb_substr($assessment->getName(), 0, 10, 'UTF-8'),
-            'HdgAbbrev2' => $this->getMarkbookIdentifier($assessment),
-            'WeightingFactor' => $weight,
+            'Heading'         => mb_substr($assessment->getName(), 0, 255, 'UTF-8'),
+            'HdgAbbrev1'      => mb_substr($assessment->getName(), 0, 10, 'UTF-8'),
+            'HdgAbbrev2'      => $this->getMarkbookIdentifier($assessment),
+            'WeightingFactor' => max(0, min($weight, 9999)),
         ];
     }
 
