@@ -309,16 +309,24 @@
         {% autoescape 'js' %}
             <script type="text/javascript">
                 $(function () {
+                    var $massPublishButton = $('[data-mass="publish"]');
                     $.fn.dynamicFeedback({
                         statusIncomplete: '{{ statusIncomplete }}',
                         statusPending: '{{ statusPending }}',
                         statusReviewed: '{{ statusReviewed }}',
+                        onPreDraftCallback: function(){
+                            $massPublishButton.attr('disabled', 'disabled');
+                        },
                         onDraftCallback: function (userId, isSuccess, message, feedbackId) {
                             var $actionBar = $('[data-participant=' + userId + '] [data-action-bar]'),
                                 $publishButton = $actionBar.find('[data-draft=publish]');
                             $publishButton.attr('data-draft-id', feedbackId);
                             $actionBar.attr('data-mass-publish', '');
                             $actionBar.removeAttr('data-mass-submit');
+                            $massPublishButton.removeAttr('disabled');
+                        },
+                        onPrePublishCallback: function(){
+                            $massPublishButton.attr('disabled', 'disabled');
                         },
                         onPublishCallback: function (userId) {
                             var $actionBar = $('[data-participant=' + userId + '] [data-action-bar]'),
@@ -331,7 +339,8 @@
                                 done: function () {
                                     $ackButton.remove();
                                 }
-                            })
+                            });
+                            $massPublishButton.removeAttr('disabled');
                         }
                     });
 
