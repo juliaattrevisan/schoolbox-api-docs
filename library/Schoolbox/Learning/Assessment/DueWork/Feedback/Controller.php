@@ -10,6 +10,7 @@ use Alaress\Web\Controller\Base;
 use Aura\Web\Request\Values as RequestValues;
 use PDOException;
 use RangeException;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IFeedback;
@@ -22,6 +23,7 @@ use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSourc
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
+use Alaress_Date_Format;
 
 class Controller extends Base
 {
@@ -44,6 +46,9 @@ class Controller extends Base
     /** @var Rubric\MarkMapper */
     private $rubricMarkMapper;
 
+    /** @var ReturnedWorkMapper */
+    private $returnedWorkMapper;
+
     /**
      * Controller constructor.
      *
@@ -53,6 +58,7 @@ class Controller extends Base
      * @param ResponseDataSource $responseDataSource
      * @param UserMapper $userMapper
      * @param Rubric\MarkMapper $rubricMarkMapper
+     * @param ReturnedWorkMapper $returnedWorkMapper
      */
     public function __construct(
         IFeedbackDataSource $feedbackDataSource,
@@ -60,7 +66,8 @@ class Controller extends Base
         AssessmentDataSource $assessmentDataSource,
         ResponseDataSource $responseDataSource,
         UserMapper $userMapper,
-        Rubric\MarkMapper $rubricMarkMapper
+        Rubric\MarkMapper $rubricMarkMapper,
+        ReturnedWorkMapper $returnedWorkMapper
     ) {
         $this->feedbackDataSource = $feedbackDataSource;
         $this->participantDataSource = $participantDataSource;
@@ -68,6 +75,7 @@ class Controller extends Base
         $this->responseDataSource = $responseDataSource;
         $this->userMapper = $userMapper;
         $this->rubricMarkMapper = $rubricMarkMapper;
+        $this->returnedWorkMapper = $returnedWorkMapper;
     }
 
     /**
@@ -110,64 +118,42 @@ class Controller extends Base
      * @param DueWork\Model $assessment
      * @api   POST /learning/assessments/{assessmentId}/feedbacks
      * @level 170
-     * @throws MapperException
-     * @throws MapperException\Deleted
-     * @throws \Alaress\Web\Controller\Exception
-     * @throws \UnexpectedValueException
+     *
      */
     public function postParticipantFeedbacks(DueWork\Model $assessment)
     {
+        /** @var int[] $draftFeedbackIds */
+        $draftFeedbackIds = $this->getRequest()->post->get('drafts', []);
+        $now              = Alaress_Date_Format::now();
         $results = [];
 
-        $post = $this->getRequest()->post->getArrayCopy();
+        foreach ($draftFeedbackIds as $draftFeedbackId) {
+            $submissionReturn = $this->returnedWorkMapper->findById($draftFeedbackId);
+            $submissionReturn->setPublishedAt($now);
 
-        foreach ($post['feedback'] as $feedback) {
-            $student = $this->userMapper->findById($feedback['studentId']);
-            $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
-            $participant = $assessment->getParticipant($student);
-            $response = $this->responseDataSource->findForAssessment($assessment, $student);
-            $mostRecentFeedback = $participant->findMostRecentFeedback();
+            try{
+                $this->returnedWorkMapper->save($submissionReturn);
+                $publishSuccess = true;
+            } catch (PDOException $e){
+                $publishSuccess = false;
+            }
 
-            $formData = [
-                'response' => $response
+            $rubricSuccess = null;
+            $countRubricMarks = 0;
+            if($publishSuccess){
+                try{
+                    $countRubricMarks = $this->rubricMarkMapper->publishDraftMarks($submissionReturn->getOwner(), $assessment);
+                    $rubricSuccess = true;
+                } catch (PDOException $e){
+                    $rubricSuccess = false;
+                }
+            }
+
+            $results[$draftFeedbackId] = [
+                'publishSuccess'   => $publishSuccess,
+                'rubricSuccess'    => $rubricSuccess,
+                'countRubricMarks' => $countRubricMarks,
             ];
-
-            foreach ($feedback['formData'] as $data) {
-                $formData[$data['name']] = $data['value'];
-            }
-
-            try {
-                $feedback = $this->processFeedback($participant, $mostRecentFeedback, $formData);
-                $this->processRubric($participant, $formData);
-
-                $results[] = [
-                    'id'                => $feedback->getId(),
-                    'participantId'     => $participant->getUser()->getId(),
-                    'success'           => true,
-                    'submittedLate'     => $assessment->isOverdue() || $assessment->isPastClose()
-                ];
-            }
-            catch (RangeException $e) {
-                $results[] = [
-                    'participantId'     => $participant->getUser()->getId(),
-                    'success'           => false,
-                    'message'           => 'Invalid mark provided for ' . $participant->getUser()->getFullName() . ". "
-                ];
-            }
-            catch (MapperException $e) {
-                $results[] = [
-                    'participantId'     => $participant->getUser()->getId(),
-                    'success'           => false,
-                    'message'           => 'Invalid mark provided for ' . $participant->getUser()->getFullName() . ". "
-                ];
-            }
-            catch (PDOException $e) {
-                $results[] = [
-                    'participantId'     => $participant->getUser()->getId(),
-                    'success'           => false,
-                    'message'           => 'Unable to save results for ' . $participant->getUser()->getFullName() . ". "
-                ];
-            }
         }
 
         $this->getResponse()->content->set(

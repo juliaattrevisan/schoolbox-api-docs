@@ -351,72 +351,64 @@
                         userSelector: '[data-mass-publish]',
                         userList: $userList,
                         onSubmit: function (toPublish) {
-                            var feedback = [];
-                            var buttons = [];
-                            var $toast = $('[data-save-draft]');
+                            var draftFeedbackIds = [],
+                                $actionBars      = [],
+                                $toast = $('[data-save-draft]');
 
                             $toast.toastActivate({text: 'Publishing drafts...'});
 
                             {# Iterate through each publish button #}
                             toPublish.each(function () {
-                                var $button = $(this),
-                                    buttonText = $button.html(),
-                                    $actionBar = $button.closest('[data-action-bar]'),
-                                    $participant = $actionBar.closest('[data-participant]'),
-                                    $form = $participant.find('[data-feedback-form]');
+                                var $actionBar      = $(this),
+                                    $publishButton  = $actionBar.find('[data-draft=publish]'),
+                                    draftFeedbackId = $publishButton.attr('data-draft-id');
 
-                                buttons[$participant.attr('data-participant')] = {
-                                    '$button': $button,
-                                    'buttonText': buttonText,
-                                    '$actionBar': $actionBar,
-                                    '$participant': $participant
-                                };
-
-                                {# Throw the necessary data into an array so we can submit in a single AJAX request #}
-
-                                var formData = $form.serializeArray();
-
-                                formData.push({
-                                    name: 'publish',
-                                    value: '1'
-                                });
-
-                                feedback.push({
-                                    assessmentId: '{{ assessment.id }}',
-                                    studentId: $participant.attr('data-participant'),
-                                    formData: formData
-                                });
+                                $publishButton.html('Publishing...');
+                                $publishButton.attr('disabled', 'disabled');
+                                draftFeedbackIds.push(draftFeedbackId);
+                                $actionBars[draftFeedbackId] = $actionBar;
                             });
 
                             $.post('{{ routeLookup('learningDueWorkFeedback.postParticipantFeedbacks', {assessmentId: assessment.id}) }}', {
-                                'feedback': feedback
+                                'drafts': draftFeedbackIds
                             }).done(function (response) {
-                                var toastError = '';
-                                response.forEach(function (feedback) {
-                                    var button = buttons[feedback.participantId];
 
-                                    if (feedback.success) {
-                                        {# Remove the publish button on success #}
-                                        draftPublishSuccess(button.$button, button.$actionBar);
-                                    } else {
-                                        {# On error concatenate all of the error messages #}
-                                        draftPublishFailure(button.$button, button.buttonText);
-                                        toastError += feedback.message;
+                                var feedbackErrors = false,
+                                    rubricErrors   = false;
+
+                                for (var feedbackId in response) {
+                                    if (response.hasOwnProperty(feedbackId)) {
+                                        var result           = response[feedbackId],
+                                            isPublishSuccess = result['publishSuccess'],
+                                            isRubricSuccess  = result['rubricSuccess'],
+                                            $actionBar       = $actionBars[feedbackId],
+                                            $publishButton   = $actionBar.find('[data-draft=publish]');
+
+                                        feedbackErrors = feedbackErrors || !isPublishSuccess;
+                                        rubricErrors   = rubricErrors || !isRubricSuccess;
+
+                                        $publishButton.html('Publish');
+                                        $publishButton.removeAttr('disabled');
+
+                                        if(isPublishSuccess){
+                                            draftPublishSuccess($actionBar, $publishButton);
+                                        }
                                     }
-                                });
+                                }
 
                                 {# Update the toast depending on error/success #}
-                                if (toastError !== '') {
-                                    $toast.toastTimeout({text: toastError, css: 'alert'});
+                                if (feedbackErrors) {
+                                    $toast.toastTimeout({text: 'Unable to publish all drafts', css: 'alert'});
+                                } else if (rubricErrors) {
+                                    $toast.toastTimeout({text: 'Publish all drafts, but failed to publish rubric marks', css: 'alert'});
                                 } else {
                                     $toast.toastTimeout({text: 'Published all drafts', css: 'success'});
                                 }
-
                             })
-                                .fail(function (response) {
-                                    {# Something went wrong, display an error toast#}
-                                    $toast.toastTimeout({text: response, css: 'alert'});
-                                });
+                            .fail(function () {
+                                {# Something went wrong, display an error toast#}
+                                $toast.toastTimeout({text: 'Unable to publish draft feedbacks.', css: 'alert'});
+                            });
                         }
                     });
 
@@ -530,30 +522,32 @@
                     /**
                      * Handle a draft submission success
                      *
-                     * @param {jQuery} $button
                      * @param {jQuery} $actionBar
+                     * @param {jQuery} $publishButton
                      */
-                    function draftPublishSuccess($button, $actionBar) {
-                        $button.fadeOut({
+                    function draftPublishSuccess($actionBar, $publishButton) {
+                        var $soboButton    = $actionBar.find('[data-sobo]'),
+                            $draftedSpan   = $actionBar.find('[data-draft=drafted]'),
+                            $extraMeta     = $actionBar.find('[data-feedback-attach-info]'),
+                            $feedbackButtons = $draftedSpan.add($publishButton);
+
+                        $actionBar.removeAttr('data-mass-publish');
+                        $actionBar.removeAttr('data-mass-submit');
+
+                        // Cannot sobo an acknowledgment once published feedback exists
+                        $soboButton.fadeOut({
                             done: function () {
-                                if (!$actionBar.is('[data-mass-publish]')) {
-                                    $actionBar.slideUp();
-                                }
-                                $button.remove();
+                                $soboButton.remove();
                             }
                         });
-                        $actionBar.removeAttr('data-mass-submit');
-                    }
 
-                    /**
-                     * Handle a draft submission failure
-                     *
-                     * @param {jQuery} $button
-                     * @param {string} buttonText
-                     */
-                    function draftPublishFailure($button, buttonText) {
-                        $button.html(buttonText);
-                        $button.removeAttr('disabled');
+                        // Hide the feedback buttons
+                        $feedbackButtons.fadeOut();
+
+                        // Slide up if no meta to display
+                        if(!$extraMeta.length){
+                            $actionBar.slideUp();
+                        }
                     }
                 });
             </script>
