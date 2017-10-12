@@ -83,7 +83,8 @@ class Mapper extends \Schoolbox\Mapper
 
         return "
             SELECT      {$this->getColumnString()},
-                        {$this->getJoinColumnString('storage', 's')}
+                        {$this->getJoinColumnString('storage', 's')},
+                        {$storageMapper->getJoinColumnString('allowedFileExtension', 'mime')}
             FROM        {$this->getTable()} 
             LEFT JOIN   {$this->getJoinSql('storage', '', 's', true)}
             LEFT JOIN   {$storageMapper->getJoinSql('allowedFileExtension', 's', 'mime')}
@@ -97,17 +98,22 @@ class Mapper extends \Schoolbox\Mapper
     {
         // Return attachments fully hydrated by default
         $collection = $this->createCollection();
+
         /** @var MimetypeMapper $mimeMapper */
         $mimeMapper = $this->getJoinMapper('storage')->getJoinMapper('allowedFileExtension');
+
         foreach ($statement as $row) {
             $model = $this->hydrate($row);
+
             // Hydrate storage object
             /** @var Storage $storage */
             $storage = $this->hydrateJoin($row, 'storage', 's');
+
             if ($storage instanceof Storage) {
                 // Hydrate a mime type if we can find one
                 /** @var Mimetype $mime */
                 $mime = $mimeMapper->hydrate($row, 'mime');
+
                 if ($mime instanceof Mimetype) {
                     $storage->setMimetype($mime);
                 }
@@ -115,6 +121,7 @@ class Mapper extends \Schoolbox\Mapper
             }
             $collection->add($model);
         }
+
         return $collection;
     }
 
