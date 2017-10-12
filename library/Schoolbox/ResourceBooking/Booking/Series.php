@@ -143,7 +143,7 @@ class Series
 
         $dateParts = [];
         foreach ($series as $thisBooking) {
-            if (!($thisBooking->isDeleted())) {
+            if (!$thisBooking->isDeleted()) {
                 $dateParts[] = [
                     $thisBooking->getResource(),
                     $thisBooking->getEvent()->getStartDateTime()->getDateTimeObject(),
@@ -167,6 +167,7 @@ class Series
      * @param bool     &    $isTimeChanged Were any bookings changed?
      *
      * @return Collection|Model[]
+     * @throws MapperException
      */
     public function getUpdatedSeries(
         Model $item,
@@ -226,6 +227,7 @@ class Series
             // Set up bookings for related items
             $existingRelatedBookings = $this->getBookingMapper()->findRelatedBookings($booking->getId());
             foreach ($booking->getResource()->getRelatedResourceList() as $relatedResource) {
+                /** @var Booking $relatedBooking */
                 $relatedBooking = null;
                 foreach ($existingRelatedBookings as $existing) {
                     if ($existing->getResource()->getId() == $relatedResource->getId()) {

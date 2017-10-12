@@ -11,7 +11,6 @@ namespace Schoolbox\ResourceBooking\Test;
 use DateTime;
 use DateInterval;
 use Alaress\Date\Interval;
-use Jenssegers\Date\Date;
 use Schoolbox\Collection;
 use Schoolbox\User;
 use Schoolbox\ResourceBooking\Item;
@@ -259,7 +258,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
                     ->setId(11)
             );
 
-        $conflictingBookings3 = (new Collection());
+        $conflictingBookings3 = new Collection();
 
         return [
             [
@@ -301,6 +300,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
             ->method('findForResource')
             ->willReturn($conflictingBookings);
 
+        /** @var BookingMapper $mockMapper */
         $validation = new Validation(new User(), $mockMapper, new StatusMapper(), new TermMapper());
 
         $resource = new Item\Model();
@@ -337,7 +337,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
                     ->setId(11)
             );
 
-        $conflictingBookings0 = (new Collection());
+        $conflictingBookings0 = new Collection();
 
         $roomEvents3 = (new Collection())
             ->add(
@@ -420,7 +420,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
      *
      * @param string $startDate
      * @param string $endDate
-     * @param array  $conflictiongBookings
+     * @param Collection  $conflictingBookings
      * @param string $roomCode
      * @param Collection $roomEvents
      * @param int    $expected
@@ -451,6 +451,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
         $resource->setId(123);
         $resource->setRoomCode($roomCode);
 
+        /** @var Validation $mockValidation */
         $errors = $mockValidation->validateForConflicts($resource, new DateTime($startDate), new DateTime($endDate));
 
         $this->assertCount($expected, $errors);
@@ -533,7 +534,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
             );
 
         // No conflicting bookings
-        $conflictingBookings0 = (new Collection());
+        $conflictingBookings0 = new Collection();
 
         // Conflicting bookings, same Id as existing booking
         $conflictingBookings1 = (new Collection())
@@ -646,6 +647,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
         $mockExistingBooking = $this->getMockBuilder(Booking\Model::class)
                                     ->setMethods(null)
                                     ->getMock();
+        /** @var Booking\Model $mockExistingBooking */
         $mockExistingBooking->setId(1);
         $mockExistingBooking->setEvent($existingBookingEvent);
 
@@ -657,6 +659,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
         $resource = new Item\Model();
         $resource->setId(123);
 
+        /** @var Validation $mockValidation */
         $errors = $mockValidation->validateForConflicts($resource, new DateTime($startDate), new DateTime($endDate), $mockExistingBooking);
 
         $this->assertCount($expected, $errors);

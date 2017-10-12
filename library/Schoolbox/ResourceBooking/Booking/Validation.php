@@ -18,7 +18,6 @@ use Schoolbox\ResourceBooking\Booking\Model as Booking;
 use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
 use Schoolbox\ResourceBooking\Booking\Status;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
-use Schoolbox\ResourceBooking\Booking\Series;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Aura\Web\Request;
@@ -34,6 +33,11 @@ class Validation {
      *
      * @return array
      */
+
+    /**
+     * @var User
+     */
+    private $user;
 
     /**
      * @var BookingMapper
@@ -53,14 +57,9 @@ class Validation {
 
     private $statusMapper;
 
-    /** @var TimetableRoom */
-
-    private $timetableRoom;
-
     public function __construct(
         User $user,
         BookingMapper $bookingMapper,
-//        ResourceMapper $resourceMapper,
         StatusMapper $statusMapper,
         TermMapper $termMapper
     )
@@ -68,7 +67,6 @@ class Validation {
 
         $this->setUser($user);
         $this->setBookingMapper($bookingMapper);
-//        $this->setResourceMapper($resourceMapper);
         $this->setStatusMapper($statusMapper);
         $this->setTermMapper($termMapper);
 
@@ -251,8 +249,11 @@ class Validation {
     /**
      * Validation Methods
      *
+     * @param DateTime $startDate
+     * @param DateTime $endDate
+     *
+     * @return array
      */
-
     public function validateBeforeTime(DateTime $startDate, DateTime $endDate)
     {
         $errors = [];
@@ -274,7 +275,7 @@ class Validation {
     public function validatePastTime(DateTime $startDate)
     {
         $errors = [];
-        $now    = (new DateTime());
+        $now    = new DateTime();
         $startDate->format('Y-m-d H:i');
 
         if ($startDate->format('Y-m-d H:i') < $now->format('Y-m-d H:i')) {
@@ -397,6 +398,11 @@ class Validation {
                 $existingSeriesId      = $existingBooking->getEvent()->getSeriesId();
 
                 $conflictingBookings = $conflictingBookings->filter(
+                /**
+                 * @param $item
+                 *
+                 * @return bool
+                 */
                     function ($item) use ($existingId, $existingSeriesId) {
                         /** @var Model $item */
                         if ($item->getId() == $existingId) {
@@ -455,6 +461,7 @@ class Validation {
 
     /**
      * @return Term\Model
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function getCurrentTerm()
     {
@@ -464,11 +471,12 @@ class Validation {
     /**
      * Get all bookings for a resource in a window
      *
-     * @param Item\Model
-     * @param DateTime $startDate
-     * @param DateTime $endDate
+     * @param Item\Model $resource
+     * @param DateTime   $startDate
+     * @param DateTime   $endDate
      *
      * @return Collection|Model[]
+     * @internal param $ Item\Model
      */
 
     private function getConflictingBookings(Item\Model $resource, DateTime $startDate, DateTime $endDate)
