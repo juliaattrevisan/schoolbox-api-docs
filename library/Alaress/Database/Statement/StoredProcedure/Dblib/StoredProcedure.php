@@ -26,6 +26,25 @@ use PDO;
 class StoredProcedure extends Base
 {
     /**
+     * DBLib demands that the current rowset be fully iterated before moving to
+     * the next rowset, otherwise the below error gets thrown:
+     *
+     * `General error: PDO_DBLIB: dbresults() returned FAIL`
+     *
+     * Iterate transparently in this implementation, instead of shoehorning in
+     * `fetch()` loops whenever we use `nextRowset()`.
+     *
+     * @return bool
+     */
+    public function nextRowset()
+    {
+        while ($this->fetch() !== false) {
+            continue;
+        }
+        return parent::nextRowset();
+    }
+
+    /**
      * Execute query, and account for output and return vars by extracting them
      * from the last rowset.
      *
