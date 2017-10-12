@@ -97,10 +97,11 @@ abstract class Broker implements IBroker
 
 
     /**
-     * @param mixed  $serializable anything that can be serialized
+     * @param mixed $serializable anything that can be serialized
+     * @param array $context
      * @return void
      */
-    public function publish($serializable)
+    public function publish($serializable, array $context = null)
     {
         $serial = serialize($serializable);
         $gzip   = gzcompress($serial, 9);

@@ -65,12 +65,13 @@ class Handler implements IConsumer, EventListener
     /**
      * Handle a message sent from a broker to which you've subscribed
      *
-     * @param Instance  $instance
-     * @param IResolver $resolver
+     * @param Instance   $instance
+     * @param IResolver  $resolver
+     * @param array|null $context
      * @throws DuplicateResolutionException
      * @return void
      */
-    public function onMessage($instance, IResolver $resolver)
+    public function onMessage($instance, IResolver $resolver, ?array $context)
     {
         try {
             $this->handleMessage($instance);

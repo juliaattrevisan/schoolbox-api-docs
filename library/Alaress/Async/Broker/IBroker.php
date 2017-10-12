@@ -35,8 +35,9 @@ interface IBroker
      * Publish the given payload to this broker's queue.
      *
      * @param mixed  $serializable
+     * @param array  $context
      * @return void
      */
-    public function publish($serializable);
+    public function publish($serializable, array $context = []);
 
 }
