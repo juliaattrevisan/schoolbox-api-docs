@@ -238,8 +238,7 @@
     $.validator.addMethod('ckeRequired', function(value, element) {
 
         var textboxId = $(element).attr('id');
-
-        if (CKEDITOR.instances[textboxId].getData().length > 0) {
+        if ($.trim($(CKEDITOR.instances[textboxId].getData()).text()).length > 0) {
             return true;
         }
 
