@@ -733,6 +733,7 @@ class External_Liss_Server
              * Map everything together and persist it to the db
              */
             $skipCount = [
+                'noClassCode' => 0,
                 'noType' => 0,
                 'invalidType' => 0,
                 'unknownFolder' => 0,
@@ -771,6 +772,17 @@ class External_Liss_Server
                     }
 
                     $skipCount['invalidType']++;
+                    $skipCount['total']++;
+
+                    continue;
+                }
+
+                /* Skip events that don't have any classCode value
+                 * This supposedly never happens, but I don't trust
+                 */
+                if (!strlen(trim($currentEvent['classCode']))) {
+                    $log->warning("Skipping {$currentEvent['className']} ({$currentEvent['edvalGuid']}): no class codes provided");
+                    $skipCount['noClassCode']++;
                     $skipCount['total']++;
 
                     continue;
@@ -870,6 +882,7 @@ class External_Liss_Server
 
             $log->info("Total Processed: {$processed}/{$total}");
             $log->info("Total Skipped: {$skipCount['total']}/{$total}");
+            $log->info("Skipped (no class code): {$skipCount['noClassCode']}/{$skipCount['total']}");
             $log->info("Skipped (no type): {$skipCount['noType']}/{$skipCount['total']}");
             $log->info("Skipped (invalid type): {$skipCount['invalidType']}/{$skipCount['total']}");
             $log->info("Skipped (unknown folder): {$skipCount['unknownFolder']}/{$skipCount['total']}");
