@@ -77,7 +77,7 @@ class Mobile implements QueueInterface
      */
     public function push(Instance $instance)
     {
-        $this->cloudManager->push($this->userId, [ $instance->jsonSerialize() ]);
+        $this->cloudManager->push($this->userId, $instance);
     }
 
 

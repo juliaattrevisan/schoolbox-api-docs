@@ -11,6 +11,7 @@ namespace Schoolbox\MobileApp;
 
 use Alaress\Async\Notification\Cloud;
 use Alaress\Async\Notification\Cloud\ServiceInterface;
+use Alaress\Async\Notification\Instance\Instance;
 use InvalidArgumentException;
 use OutOfBoundsException;
 use Psr\Log\LoggerInterface;
@@ -50,10 +51,10 @@ class ServiceManager implements IServiceManager
 
 
     /**
-     * @param int   $userId
-     * @param array $data
+     * @param int      $userId
+     * @param Instance $instance
      */
-    public function push($userId, $data)
+    public function push($userId, Instance $instance)
     {
         $registrations = $this->registryMapper->countByColumn('user_id', $userId);
 
@@ -79,7 +80,7 @@ class ServiceManager implements IServiceManager
                 $service->setLog($this->log);
 
                 try {
-                    $this->pushToService($service, $tokens, $data, $unreadCount);
+                    $this->pushToService($service, $tokens, $instance, $unreadCount);
 
                 } catch (InvalidArgumentException $e) {
                     // service not available
@@ -93,17 +94,17 @@ class ServiceManager implements IServiceManager
     /**
      * @param ServiceInterface $service
      * @param array            $tokens
-     * @param array            $data
+     * @param Instance         $instance
      * @param int              $unreadCount
      */
-    protected function pushToService(ServiceInterface $service, $tokens, $data, $unreadCount = 0)
+    protected function pushToService(ServiceInterface $service, $tokens, Instance $instance, $unreadCount = 0)
     {
         $provider = $service->getProviderName();
         $appId    = $service->getAppIdentifier();
 
         try {
             $this->log->info(sprintf('Sending data to %d device%s on "%s" (%s)', count($tokens), count($tokens) === 1 ? '' : 's', $appId, $provider));
-            $service->send($tokens, $data, $unreadCount);
+            $service->send($tokens, $instance, $unreadCount);
 
         } catch (OutOfBoundsException $e) {
             // bad API key, which will require a daemon restart, so remove this service from use
