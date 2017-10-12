@@ -70,7 +70,7 @@ class Mapper extends BaseMapper
             $model->setOwner($owner);
 
             /** @var Pastoral $pastoral */
-            $pastoral = $this->hydrateJoin($row, 'pastoral', 'o');
+            $pastoral = $this->hydrateJoin($row, 'pastoral', 'p');
             $model->setPastoral($pastoral);
 
             $collection->add($model);
