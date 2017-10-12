@@ -152,7 +152,7 @@ class WorkerProcess extends AbstractProcess
         }
         
         if (is_array($callback) && isset($callback[0]) && $callback[0] instanceof AbstractModuleNotifier) {
-            $callback[0]->enableLogging($this->notif, $this->log);
+            $callback[0]->enableLogging($this->log, true);
         }
 
         $this->log->debug('Executing ' . $this->callable2string($callback));
