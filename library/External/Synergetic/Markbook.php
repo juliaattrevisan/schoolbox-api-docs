@@ -101,7 +101,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     private function getMarkbookIdentifier(Activity $assessment)
     {
-        return ($assessment->isAssessment() ? self::ASSESSMENT_PREFIX : self::SUBMISSION_PREFIX) . $assessment->getId();
+        // This column is limited to 10 characters
+        $id = ($assessment->isAssessment() ? self::ASSESSMENT_PREFIX : self::SUBMISSION_PREFIX) . $assessment->getId();
+        return mb_substr($id, 0, 10, 'UTF-8');
     }
 
     /**
