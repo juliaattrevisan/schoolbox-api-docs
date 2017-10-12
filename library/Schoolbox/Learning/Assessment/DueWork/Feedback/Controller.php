@@ -101,10 +101,15 @@ class Controller extends Base
      *
      * This is a dueWork-only route
      *
-     * @api   POST /learning/assessments/feedbacks
-     * @level 165
+     * @param DueWork\Model $assessment
+     * @api   POST /learning/assessments/{assessmentId}/feedbacks
+     * @level 170
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws \Alaress\Web\Controller\Exception
+     * @throws \UnexpectedValueException
      */
-    public function postParticipantFeedbacks()
+    public function postParticipantFeedbacks(DueWork\Model $assessment)
     {
         $results = [];
 
@@ -112,7 +117,6 @@ class Controller extends Base
 
         foreach ($post['feedback'] as $feedback) {
             $student = $this->userMapper->findById($feedback['studentId']);
-            $assessment = $this->assessmentDataSource->findById($feedback['assessmentId']);
             $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
             $participant = $assessment->getParticipant($student);
             $response = $this->responseDataSource->findForAssessment($assessment, $student);
