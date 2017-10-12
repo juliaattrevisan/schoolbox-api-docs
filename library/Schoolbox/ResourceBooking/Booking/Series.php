@@ -70,7 +70,7 @@ class Series
                 $repeatUntil = null;
             }
             if ($repeatUntil instanceof Alaress_Date_Format) {
-                $recurrence = new Recurrence();
+                $recurrence = new Recurrence(new \External_Timetable());
                 $series     = $recurrence->getRecurrencePeriod(
                     $startDate,
                     $postData['repeat'],

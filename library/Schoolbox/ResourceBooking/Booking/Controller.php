@@ -419,7 +419,7 @@ class Controller extends Base
      * @param Collection|Model[] $bookingList
      * @param string             $recurrenceRule
      * @param DateTime           $repeatUntil
-     * @param int                $campus
+     * @param int                $campusId
      *
      * @return Collection
      */
@@ -427,14 +427,15 @@ class Controller extends Base
         Collection $bookingList,
         $recurrenceRule,
         DateTime $repeatUntil,
-        $campus
+        $campusId
     ) {
         $newList = new Collection();
+        $campus = $this->getCampusMapper()->findById(1);
         foreach ($bookingList as $booking) {
             $event     = $booking->getEvent();
             $eventList = new Collection();
             if ($repeatUntil instanceof DateTime) {
-                $recurrence = new Recurrence();
+                $recurrence = new Recurrence(new External_Timetable());
                 $period = $recurrence->getRecurrencePeriod(
                     $event->getStartDateTime()->getDateTimeObject(),
                     $recurrenceRule,

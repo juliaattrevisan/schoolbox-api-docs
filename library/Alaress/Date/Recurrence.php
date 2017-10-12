@@ -10,9 +10,27 @@ namespace Alaress\Date;
 use DateTime;
 use DateInterval;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Campus;
+use External_Timetable;
 
 class Recurrence
 {
+
+    /**
+     * @var External_Timetable
+     */
+    protected $externalTimetableHandler;
+
+
+    public function __construct(
+        External_Timetable $externalTimetableHandler
+    )
+    {
+
+        $this->setExternalTimetableHandler($externalTimetableHandler);
+
+    }
+
     /**
      * Creates a DatePeriod or other traversable list of DateTime objects that
      * corresponds to a list of event recurrences.
@@ -24,7 +42,7 @@ class Recurrence
      *                                 Anything else is treated as a single
      *                                 event.
      * @param DateTime $repeatUntil    The day to expand this event to.
-     * @param int      $campus         The campus to use when determining when a
+     * @param Campus      $campus      The campus to use when determining when a
      *                                 timetable day recurs.
      *
      * @return DateTime[]
@@ -33,7 +51,7 @@ class Recurrence
         DateTime $startTime,
         $recurrenceRule,
         DateTime $repeatUntil,
-        $campus
+        $campus = null
     ) {
         switch ($recurrenceRule) {
             case 'daily':
@@ -67,9 +85,6 @@ class Recurrence
             case 'timetable':
                 try {
                     /** @var Campus $campus */
-                    $campus = $this->getCampusMapper()->findById(
-                        $this->getRequest()->post['timetable']['campus']
-                    );
                     $period = new \External_TimetableDatePeriod(
                         $startTime,
                         $repeatUntil->modify('+1 day'),
@@ -86,6 +101,26 @@ class Recurrence
         }
 
         return $period;
+    }
+
+    /**
+     * @param  External_Timetable $externalTimetableHandler
+     *
+     * @return $this
+     */
+    public function setExternalTimetableHandler($externalTimetableHandler)
+    {
+        $this->externalTimetableHandler = $externalTimetableHandler;
+
+        return $this;
+    }
+
+    /**
+     * @return External_Timetable
+     */
+    public function getExternalTimetableHandler()
+    {
+        return $this->externalTimetableHandler;
     }
 
 }
