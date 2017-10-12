@@ -392,6 +392,7 @@ class Healthcheck
             'luFileType',
             'luForm',
             'luHouse',
+            'luReportResultType',
             'luTutor',
             'luYearLevel',
             'Relationships',
