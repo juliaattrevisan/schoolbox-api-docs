@@ -23,7 +23,6 @@ use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\MessageList\IListFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -32,9 +31,6 @@ use Schoolbox\User;
 
 class WorkerProcess extends AbstractProcess
 {
-
-    /** @var Notif */
-    protected $notif;
 
     /** @var IListFactory */
     private $factory;
@@ -46,12 +42,10 @@ class WorkerProcess extends AbstractProcess
      * @param PipeWriter                $writer
      * @param DispatchStrategyInterface $strat
      * @param IListFactory              $factory
-     * @param Notif                     $notif
      */
-    public function __construct($loop, $log, $writer, $strat, IListFactory $factory, $notif)
+    public function __construct($loop, $log, $writer, $strat, IListFactory $factory)
     {
         parent::__construct($loop, $log, $writer, $strat);
-        $this->notif   = $notif;
         $this->factory = $factory;
     }
 
