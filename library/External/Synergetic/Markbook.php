@@ -159,14 +159,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         // Hydrate result type
 
-        if (!empty($assessment->getType())) {
-            $workType = WorkTypeMapper::getInstance()->findById($assessment->getType());
-            $resultType = $workType->getExternalResultType();
-        }
-
-        if (empty($resultType)) {
-            $resultType = 'OGRaw';
-        }
+        $resultType = $this->getResultType($assessment);
 
         /** @var FolderCode $classCode */
         foreach ($folder->getCodes() as $classCode) {
@@ -683,5 +676,39 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         ];
         $statement = $this->getConnector()->prepareQuery($sql, $bindings);
         return $statement->execute();
+    }
+
+    /**
+     * Determine what result type this assessment should have.
+     *
+     * @param Activity $assessment
+     * @return string
+     */
+    private function getResultType(Activity $assessment)
+    {
+        $defaultType = 'OGRaw';
+
+        // Does this assessment have a work type with an external result type?
+        if (!empty($assessment->getType())) {
+            $workType   = WorkTypeMapper::getInstance()->findById($assessment->getType());
+            $resultType = $workType->getExternalResultType();
+        }
+
+        // We know OGRaw is in the DB, and if it's not there's bigger problems
+        if (empty($resultType)) {
+            return $defaultType;
+        }
+
+        // Validate the result type is actually in the DB
+        $sql = "
+            SELECT COUNT(*)
+            FROM   luReportResultType
+            WHERE  Code = :resultType
+        ";
+        $count = $this->getConnector()->executeQuery($sql, ['resultType' => $resultType,])->fetchColumn();
+        if ($count > 0) {
+            return $resultType;
+        }
+        return $defaultType;
     }
 }
