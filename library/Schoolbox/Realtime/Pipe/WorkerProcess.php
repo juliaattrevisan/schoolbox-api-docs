@@ -26,7 +26,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Realtime\MessageList\IListFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\Notification\Envelope;
-use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
+use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 use Schoolbox\User;
 
 class WorkerProcess extends AbstractProcess
@@ -181,12 +181,12 @@ class WorkerProcess extends AbstractProcess
 
     /**
      * @param callable $callback
-     * @return AbstractModuleNotifier
+     * @return ModuleNotifierInterface
      * @throws InvalidArgumentException
      */
     private function getNotifier(callable $callback)
     {
-        if (is_array($callback) && isset($callback[0]) && $callback[0] instanceof AbstractModuleNotifier) {
+        if (is_array($callback) && isset($callback[0]) && $callback[0] instanceof ModuleNotifierInterface) {
             return $callback[0];
         }
 
