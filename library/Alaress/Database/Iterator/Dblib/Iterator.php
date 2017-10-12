@@ -24,11 +24,18 @@ class Iterator extends Base implements IIterator
     }
 
     /**
+     * DBLib demands that the current rowset be fully iterated before moving to
+     * the next rowset, otherwise the below error gets thrown:
+     *
+     * `General error: PDO_DBLIB: dbresults() returned FAIL`
+     *
+     * Iterate transparently in this implementation, instead of shoehorning in
+     * `fetch()` loops whenever we use `nextRowset()`.
+     *
      * @return bool
      */
     public function nextRowset()
     {
-        // Drain this iterator
         while ($this->valid()) {
             $this->next();
         }
