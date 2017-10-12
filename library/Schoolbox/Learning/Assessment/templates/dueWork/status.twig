@@ -222,8 +222,11 @@
             {% set draftSaveHtml = isDraftFeedback ? 'Saved as Draft' : '' %}
             <span class="button disabled" data-draft="drafted" title="{{ draftSaveTitle }}">{{ draftSaveHtml }}</span>
             {% if not readonly %}
-                {% set publishStyle = not feedback or feedback.published ? 'display:none;' : '' %}
-                <a class="button" data-draft="publish" style="{{ publishStyle }}">Publish</a>
+                <a  class="button"
+                    data-draft="publish"
+                    {% if not feedback or feedback.published %}style="display:none;"{% endif %}
+                    {% if isDraftFeedback %}data-draft-id="{{ feedback.id }}"{% endif %}
+                >Publish</a>
             {% endif %}
         {% endspaceless -%}
     {% endset %}
@@ -310,14 +313,18 @@
                         statusIncomplete: '{{ statusIncomplete }}',
                         statusPending: '{{ statusPending }}',
                         statusReviewed: '{{ statusReviewed }}',
-                        onDraftCallback: function (userId) {
-                            var $actionBar = $('[data-participant=' + userId + '] [data-action-bar]');
+                        onDraftCallback: function (userId, isSuccess, message, feedbackId) {
+                            var $actionBar = $('[data-participant=' + userId + '] [data-action-bar]'),
+                                $publishButton = $actionBar.find('[data-draft=publish]');
+                            $publishButton.attr('data-draft-id', feedbackId);
                             $actionBar.attr('data-mass-publish', '');
                             $actionBar.removeAttr('data-mass-submit');
                         },
                         onPublishCallback: function (userId) {
                             var $actionBar = $('[data-participant=' + userId + '] [data-action-bar]'),
-                                $ackButton = $actionBar.find('[data-sobo]');
+                                $ackButton = $actionBar.find('[data-sobo]'),
+                                $publishButton = $actionBar.find('[data-draft=publish]');
+                            $publishButton.removeAttr('data-draft-id');
                             $actionBar.removeAttr('data-mass-publish');
                             $actionBar.removeAttr('data-mass-submit');
                             $ackButton.fadeOut({
