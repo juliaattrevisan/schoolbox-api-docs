@@ -146,13 +146,14 @@ class WorkerProcess extends AbstractProcess
      */
     protected function publish($callback, $model, $user, $diff)
     {
-
         if (!is_callable($callback)) {
             throw new RuntimeException('Unable to execute callback, got ' . json_encode($callback));
         }
-        
-        if (is_array($callback) && isset($callback[0]) && $callback[0] instanceof AbstractModuleNotifier) {
-            $callback[0]->enableLogging($this->log, true);
+
+        try {
+            $this->getNotifier($callback)->enableLogging($this->log, true);
+        } catch (InvalidArgumentException $e) {
+            // ignore this
         }
 
         $this->log->debug('Executing ' . $this->callable2string($callback));
@@ -181,6 +182,21 @@ class WorkerProcess extends AbstractProcess
             "Async publish response must be an instance of Alaress\\Async\\Notification\\InstanceBundle; got "
             . (is_object($return) ? get_class($return) : gettype($return))
         );
+    }
+
+
+    /**
+     * @param callable $callback
+     * @return AbstractModuleNotifier
+     * @throws InvalidArgumentException
+     */
+    private function getNotifier(callable $callback)
+    {
+        if (is_array($callback) && isset($callback[0]) && $callback[0] instanceof AbstractModuleNotifier) {
+            return $callback[0];
+        }
+
+        throw new InvalidArgumentException('Callback is not a notifier');
     }
 
 
