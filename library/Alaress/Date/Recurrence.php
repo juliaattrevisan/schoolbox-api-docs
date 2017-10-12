@@ -7,8 +7,11 @@
 
 namespace Alaress\Date;
 
+use DatePeriod;
 use DateTime;
 use DateInterval;
+use External_TimetableDatePeriod;
+use InvalidArgumentException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Campus;
 use External_Timetable;
@@ -22,13 +25,12 @@ class Recurrence
     protected $externalTimetableHandler;
 
 
-    public function __construct(
-        External_Timetable $externalTimetableHandler
-    )
+    /**
+     * @param External_Timetable $externalTimetableHandler
+     */
+    public function __construct(External_Timetable $externalTimetableHandler)
     {
-
         $this->setExternalTimetableHandler($externalTimetableHandler);
-
     }
 
     /**
@@ -44,7 +46,7 @@ class Recurrence
      * @param DateTime $repeatUntil    The day to expand this event to.
      * @param Campus      $campus      The campus to use when determining when a
      *                                 timetable day recurs.
-     *
+     * @throws InvalidArgumentException
      * @return DateTime[]
      */
     public function getRecurrencePeriod(
@@ -55,28 +57,28 @@ class Recurrence
     ) {
         switch ($recurrenceRule) {
             case 'daily':
-                $period = new \DatePeriod(
+                $period = new DatePeriod(
                     $startTime,
                     DateInterval::createFromDateString('+1 day'),
                     $repeatUntil->modify('+1 day')
                 );
                 break;
             case 'weekly':
-                $period = new \DatePeriod(
+                $period = new DatePeriod(
                     $startTime,
                     DateInterval::createFromDateString('+1 week'),
                     $repeatUntil->modify('+1 day')
                 );
                 break;
             case 'fortnightly':
-                $period = new \DatePeriod(
+                $period = new DatePeriod(
                     $startTime,
                     DateInterval::createFromDateString('+2 weeks'),
                     $repeatUntil->modify('+1 day')
                 );
                 break;
             case 'monthly':
-                $period = new \DatePeriod(
+                $period = new DatePeriod(
                     $startTime,
                     DateInterval::createFromDateString('+1 month'),
                     $repeatUntil->modify('+1 day')
@@ -84,8 +86,7 @@ class Recurrence
                 break;
             case 'timetable':
                 try {
-                    /** @var Campus $campus */
-                    $period = new \External_TimetableDatePeriod(
+                    $period = new External_TimetableDatePeriod(
                         $startTime,
                         $repeatUntil->modify('+1 day'),
                         $this->getExternalTimetableHandler(),
@@ -122,5 +123,4 @@ class Recurrence
     {
         return $this->externalTimetableHandler;
     }
-
 }

@@ -12,6 +12,7 @@ use Alaress\Date\Interval;
 use Alaress_Date_Format;
 use Alaress\Date\Recurrence;
 use Aura\Web\Request;
+use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\ResourceBooking\Item;
@@ -33,10 +34,12 @@ class Series
      */
     protected $statusMapper;
 
-    public function __construct(
-        BookingMapper $bookingMapper,
-        StatusMapper $statusMapper
-    ) {
+    /**
+     * @param Mapper       $bookingMapper
+     * @param StatusMapper $statusMapper
+     */
+    public function __construct(BookingMapper $bookingMapper, StatusMapper $statusMapper)
+    {
         $this->setBookingMapper($bookingMapper);
         $this->setStatusMapper($statusMapper);
     }
@@ -48,7 +51,7 @@ class Series
      * @param DateTime       $startDate
      * @param DateTime       $endDate
      * @param Request\Values $postData
-     *
+     * @throws InvalidArgumentException
      * @return array
      */
     public function getNewBookingSeries(
@@ -98,7 +101,7 @@ class Series
         }
         foreach ($resource->getRelatedResourceList() as $relatedResource) {
             if (array_key_exists($relatedResource->getId(), $relatedItems)) {
-                if (!empty($series)) {
+                if (isset($difference)) {
                     foreach ($series as $occurenceStart) {
                         $occurenceEnd = clone $occurenceStart;
                         $occurenceEnd->add($difference);
@@ -119,7 +122,7 @@ class Series
      * @param Booking  $existingBooking
      * @param DateTime $startDate
      * @param DateTime $endDate
-     *
+     * @param iterable $postData
      * @return array
      * @throws MapperException
      */
@@ -244,7 +247,9 @@ class Series
                         // Has the booking time changed?
                         // That invalidates existing bookings
                         if ($isTimeChanged) {
-                            $relatedBooking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING));
+                            $relatedBooking->setStatus(
+                                $this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING)
+                            );
                         }
                     } else {
                         // create
@@ -259,7 +264,9 @@ class Series
 
                     // Open resource: automatically confirm
                     if ($relatedResource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
-                        $relatedBooking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
+                        $relatedBooking->setStatus(
+                            $this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED)
+                        );
                     }
                 } elseif ($relatedBooking instanceof Model) {
                     // delete or don't add. Maybe mark as deleted?

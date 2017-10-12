@@ -10,6 +10,7 @@ namespace Schoolbox\ResourceBooking\Booking;
 use DateTime;
 use Alaress_Date_Format;
 use Alaress\Date\Interval;
+use InvalidArgumentException;
 use Schoolbox\User;
 use Schoolbox\Collection;
 use Schoolbox\ResourceBooking\Item;
@@ -23,16 +24,8 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Aura\Web\Request;
 use Calendar_Api_EventType_Timetable_Room as TimetableRoom;
 
-class Validation {
-
-    /**
-     * Validate start before end
-     *
-     * @param DateTime $startDate
-     * @param DateTime $endDate
-     *
-     * @return array
-     */
+class Validation
+{
 
     /**
      * @var User
@@ -50,27 +43,30 @@ class Validation {
     private $resourceMapper;
 
     /** @var TermMapper */
-
     private $termMapper;
 
     /** @var StatusMapper */
-
     private $statusMapper;
 
+
+    /**
+     * @param User         $user
+     * @param Mapper       $bookingMapper
+     * @param StatusMapper $statusMapper
+     * @param TermMapper   $termMapper
+     */
     public function __construct(
         User $user,
         BookingMapper $bookingMapper,
         StatusMapper $statusMapper,
         TermMapper $termMapper
-    )
-    {
-
+    ) {
         $this->setUser($user);
         $this->setBookingMapper($bookingMapper);
         $this->setStatusMapper($statusMapper);
         $this->setTermMapper($termMapper);
-
     }
+
 
     /**
      * Attempts to validate the creation or update of a booking from post data.
@@ -80,17 +76,15 @@ class Validation {
      *                                         is being updated.
      *                                         Leave it out of conflict checks.
      * @param  Request\Values $postData
-     *
-     * @return array
+     * @throws InvalidArgumentException
      * @throws \Schoolbox\Mapper\Exception
+     * @return array
      */
     public function validateBookingFromPostData(
         Item\Model $resource,
         Booking $existingBooking = null,
         Request\Values $postData
-    )
-    {
-
+    ) {
         // Check:
         // Beginning and end of booking are valid datetime
         // (These checks can't be overridden.)
@@ -110,6 +104,7 @@ class Validation {
         } catch (\Exception $e) {
             $errors['start_datetime'][] = 'invalid';
         }
+
         try {
             $endDate = Alaress_Date_Format::newLocal($postData['endDate'])->getDateTimeObject();
         } catch (\Exception $e) {
@@ -130,9 +125,8 @@ class Validation {
         // New booking
         if (!($existingBooking instanceof Booking)) {
             $isNewBooking = true;
-        } // Updated booking
-        else {
-
+        } else {
+            // Updated booking
             // Get the date and time changes from original booking
             $startDelta = Interval::createFromDateTimeDifference(
                 clone $existingBooking->getEvent()->getStartDateTime()->getDateTimeObject(),
@@ -148,7 +142,6 @@ class Validation {
 
         // Validate any new booking or existing booking if dates have been modified
         if ($isNewBooking || $isTimeChanged) {
-
             $errors = array_merge_recursive(
                 $errors,
                 $this->validatePastTime($startDate)
@@ -174,7 +167,7 @@ class Validation {
                 $series = new Series($this->getBookingMapper(), $this->getStatusMapper());
                 $dateParts = $series->getNewBookingSeries($resource, $startDate, $endDate, $postData);
                 foreach ($dateParts as $check) {
-                    /** @var Resource $thisResource */
+                    /** @var Item\Model $thisResource */
                     list($thisResource, $thisStart, $thisEnd) = $check;
 
                     // Validate for matching the current term
@@ -190,16 +183,15 @@ class Validation {
                         $this->validateForConflicts($thisResource, $thisStart, $thisEnd)
                     );
                 }
-
             } else {
                 // Validating an existing booking?
                 // Check each item in the series, adjusting its dates.
                 // Work with a fresh copy of the booking, because it can get
                 // messed with.
-
                 $series = new Series($this->getBookingMapper(), $this->getStatusMapper());
+
                 foreach ($series->getExistingSeries($existingBooking, $startDate, $endDate, $postData) as $check) {
-                    /** @var Resource $thisResource */
+                    /** @var Item\Model $thisResource */
                     list($thisResource, $thisStart, $thisEnd, $thisBooking) = $check;
 
                     // Validate for matching the current term
@@ -216,11 +208,9 @@ class Validation {
                     );
                 }
             }
-
         }
 
         return $errors;
-
     }
 
     /**
@@ -279,7 +269,6 @@ class Validation {
         $startDate->format('Y-m-d H:i');
 
         if ($startDate->format('Y-m-d H:i') < $now->format('Y-m-d H:i')) {
-
             $errors['start_datetime'][] = 'in_past';
         }
 
@@ -476,12 +465,10 @@ class Validation {
      * @param DateTime   $endDate
      *
      * @return Collection|Model[]
-     * @internal param $ Item\Model
      */
 
     private function getConflictingBookings(Item\Model $resource, DateTime $startDate, DateTime $endDate)
     {
-
         return $this->getBookingMapper()->findForResource(
             $resource->getId(),
             $startDate->getTimestamp() + 1,
@@ -502,11 +489,9 @@ class Validation {
      */
     protected function getTimetableRoomEvents($roomId, DateTime $startDate, DateTime $endDate)
     {
-
         $timetableRoom = new TimetableRoom($this->getUser(), [], $roomId);
 
         return $timetableRoom->getEvents($startDate->getTimestamp() + 1, $endDate->getTimestamp() - 1);
-
     }
 
     /**
@@ -608,5 +593,4 @@ class Validation {
 
         return $this;
     }
-
 }

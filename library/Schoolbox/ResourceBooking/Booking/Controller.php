@@ -16,7 +16,6 @@ use Alaress\Date\Recurrence;
 use DateTime;
 use External_Timetable;
 use Schoolbox\Calendar;
-use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\External\TimetableArrayExporter;
@@ -26,7 +25,6 @@ use Calendar\Event\Collection\Renderer;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 use Schoolbox\ResourceBooking\Booking\Status;
-use Schoolbox\ResourceBooking\Booking\Validation;
 
 class Controller extends Base
 {
@@ -158,11 +156,15 @@ class Controller extends Base
     public function createBooking(Item\Model $item)
     {
         $bookingList = null;
-        $errors = [];
 
         // Validate this item.
         $code   = 200;
-        $validation = new Validation($this->getUser(), $this->getBookingMapper(), $this->getStatusMapper(), $this->getTermMapper());
+        $validation = new Validation(
+            $this->getUser(),
+            $this->getBookingMapper(),
+            $this->getStatusMapper(),
+            $this->getTermMapper()
+        );
         $errors = $validation->validateBookingFromPostData($item, null, $this->getRequest()->post);
         if (empty($errors)) {
             // Get the event that all bookings are based off of.
@@ -260,7 +262,12 @@ class Controller extends Base
 
         // Perform validation, but leave this booking out of calculations.
         $code   = 200;
-        $validation = new Validation($this->getUser(), $this->getBookingMapper(), $this->getStatusMapper(), $this->getTermMapper());
+        $validation = new Validation(
+            $this->getUser(),
+            $this->getBookingMapper(),
+            $this->getStatusMapper(),
+            $this->getTermMapper()
+        );
         $errors = $validation->validateBookingFromPostData($item->getResource(), $item, $this->getRequest()->post);
 
         if (empty($errors)) {
@@ -685,7 +692,12 @@ class Controller extends Base
         $collection  = new Collection();
         $currentUser = $this->getUser();
 
-        $validation = new Validation($this->getUser(), $this->getBookingMapper(), $this->getStatusMapper(), $this->getTermMapper());
+        $validation = new Validation(
+            $this->getUser(),
+            $this->getBookingMapper(),
+            $this->getStatusMapper(),
+            $this->getTermMapper()
+        );
         // validate this booking
         $booking
             ->setStatus($this->getStatusMapper()->createModel($status))
