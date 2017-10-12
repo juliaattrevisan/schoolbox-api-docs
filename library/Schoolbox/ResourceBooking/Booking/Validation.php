@@ -153,11 +153,6 @@ class Validation {
 
             $errors = array_merge_recursive(
                 $errors,
-                $this->validateLeadTime($resource, $startDate)
-            );
-
-            $errors = array_merge_recursive(
-                $errors,
                 $this->validatePastTime($startDate)
             );
 
@@ -169,6 +164,11 @@ class Validation {
             $errors = array_merge_recursive(
                 $errors,
                 $this->validateTooLong($resource, $startDate, $endDate)
+            );
+
+            $errors = array_merge_recursive(
+                $errors,
+                $this->validateLeadTime($resource, $startDate)
             );
 
             if ($isNewBooking) {
@@ -256,6 +256,7 @@ class Validation {
     public function validateBeforeTime(DateTime $startDate, DateTime $endDate)
     {
         $errors = [];
+
         if ($startDate > $endDate) {
             $errors['end_datetime'][] = 'before_start';
         }
@@ -273,8 +274,11 @@ class Validation {
     public function validatePastTime(DateTime $startDate)
     {
         $errors = [];
-        $now    = new DateTime();
-        if ($startDate < $now) {
+        $now    = (new DateTime());
+        $startDate->format('Y-m-d H:i');
+
+        if ($startDate->format('Y-m-d H:i') < $now->format('Y-m-d H:i')) {
+
             $errors['start_datetime'][] = 'in_past';
         }
 
@@ -294,7 +298,8 @@ class Validation {
         $errors = [];
         $earliest = new DateTime();
         $earliest->add($resource->getMinLeadTime()->getAsDateInterval());
-        if ($startDate < $earliest) {
+
+        if ($startDate->format('Y-m-d H:i') < $earliest->format('Y-m-d H:i')) {
             $errors['start_datetime'][] = 'too_early';
         }
 

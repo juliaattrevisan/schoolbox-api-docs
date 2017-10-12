@@ -31,19 +31,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
     {
 
         return new Validation(new User(), new BookingMapper(), new StatusMapper(), new TermMapper());
-//        return $this->getMock( '\Schoolbox\ResourceBooking\Booking\Validation', [], [new User(), new BookingMapper(), new TermMapper()]);
-//        return $this->getMockBuilder(Validation::class)
-//                             ->setConstructorArgs([new User(), new BookingMapper(), new TermMapper()])
-//                             ->setMethods(null)
-//                             ->getMock();
-    }
 
-    private function getUser()
-    {
-        $user = new User();
-        $user->setId('123');
-
-        return $user;
     }
 
     /**
@@ -55,6 +43,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
         return [
             ['2017-01-01T00:00:00','2017-01-01T00:00:10', 0],
             ['2017-01-01T00:00:10','2017-01-01T00:00:00', 1],
+            ['2017-01-01T00:00:10','2017-01-01T00:00:10', 0],
         ];
     }
 
@@ -83,6 +72,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
         return [
             ['2027-01-01T00:00:00', 0],
             ['2016-01-01T00:00:00', 1],
+            ['now', 0],
         ];
     }
 
@@ -111,6 +101,9 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
         return [
             ['PT1H', 'PT2H', 0],
             ['PT1H', 'PT30M', 1],
+            ['PT1H', 'PT0H', 1],
+            ['PT0H', 'PT2H', 0],
+            ['PT0M', 'PT0M', 0],
         ];
     }
     /**
