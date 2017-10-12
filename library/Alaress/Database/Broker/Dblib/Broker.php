@@ -14,7 +14,7 @@ use Alaress\Database\Broker\Base;
 use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Iterator\Dblib\Iterator;
 use Alaress\Database\Quoter\Dblib\Quoter as DblibQuoter;
-use Alaress\Database\Statement\FunctionCall\Base as FunctionCall;
+use Alaress\Database\Statement\FunctionCall\Dblib\FunctionCall;
 use Alaress\Database\Statement\StoredProcedure\Dblib\StoredProcedure;
 use PDO;
 
