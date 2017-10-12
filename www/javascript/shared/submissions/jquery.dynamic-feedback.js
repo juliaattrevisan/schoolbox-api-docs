@@ -136,7 +136,7 @@
                     dataType: 'json',
                     data:  formData,
                     type: 'post'
-                }).done(function () {
+                }).done(function (response) {
 
                     // Have we inserted feedback meta message into action bar ?
                     if ($actionBar.find('[data-feedback-attach-info]').length) {
@@ -168,7 +168,12 @@
                     $actionBar.attr('data-published', '');
 
                     toast.call($participant, 'Feedback published', true, false);
-                    config.onPublishCallback($participant.data('participant'));
+                    config.onPublishCallback(
+                        $participant.data('participant'),
+                        response.success,
+                        response.message,
+                        response.id
+                    );
 
                 }).fail(function (xhr) {
                     toast.call($participant, xhr.responseText, false, false);
@@ -231,7 +236,7 @@
             });
 
             $.ajax($form.attr('action'), data)
-                .done(function () {
+                .done(function (response) {
                     toast.call($participant, 'Draft saved', true, true);
 
                     // Show the action bar and buttons
@@ -246,7 +251,12 @@
                         $actionBar.removeAttr('data-published');
                     }
 
-                    config.onDraftCallback($participant.data('participant'));
+                    config.onDraftCallback(
+                        $participant.data('participant'),
+                        response.success,
+                        response.message,
+                        response.id
+                    );
                 })
                 .fail(function (xhr) {
                     toast.call($participant, xhr.responseText, false, false);
