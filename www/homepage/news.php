@@ -3,6 +3,7 @@
 use Schoolbox\Resource\Category\NewsMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Error\Mapper;
 
 $groupHandler = new Group;
 $newsHandler = new CategoryNews;
@@ -10,10 +11,13 @@ $userHandler = new User();
 
 $categoryMapper = new FolderMapper();
 
+
 $this->setFile(TEMPLATE_content, "homepage/news.html");
 $this->setBlock(TEMPLATE_content, "submit_news", "submit_news_block");
 $this->setBlock(TEMPLATE_content, "news", "news_block");
 $this->setBlock('news', "can_modify", "can_modify_block");
+
+
 
 $this->setVar(array(
     'can_modify_block' => ''
@@ -23,6 +27,10 @@ try {
     $category = $categoryMapper->findById($this->arg[0]);
 } catch (\Exception $e) {
     $this->error(2);
+}
+
+if($groupHandler->getPermission($category->getId()) < READ_ACCESS) {
+    error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
 }
 
 $output = array('CATEGORY_NAME'	=> Scrub::text($category->getName()),
