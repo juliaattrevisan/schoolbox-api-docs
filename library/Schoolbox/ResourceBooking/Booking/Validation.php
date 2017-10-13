@@ -27,6 +27,7 @@ use Calendar_Api_EventType_Timetable_Room as TimetableRoom;
 
 class Validation
 {
+    const ERROR_INVALID = 'invalid';
     const ERROR_BEFORE_START = 'before_start';
     const ERROR_IN_PAST = 'in_past';
     const ERROR_TOO_EARLY = 'too_early';
@@ -121,13 +122,13 @@ class Validation
         try {
             $startDate = Alaress_Date_Format::newLocal($postData['startDate'])->getDateTimeObject();
         } catch (\Exception $e) {
-            $errors['start_datetime'][] = 'invalid';
+            $errors['start_datetime'][] = self::ERROR_INVALID;
         }
 
         try {
             $endDate = Alaress_Date_Format::newLocal($postData['endDate'])->getDateTimeObject();
         } catch (\Exception $e) {
-            $errors['end_datetime'][] = 'invalid';
+            $errors['end_datetime'][] = self::ERROR_INVALID;
         }
 
         // Having a power to override doesn't make you a God. Start comes always before End.
