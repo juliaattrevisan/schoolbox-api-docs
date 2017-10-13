@@ -675,6 +675,11 @@ class External_Liss_Server
         $folderMapper = FolderMapper::getInstance();
         $userMapper = UserMapper::getInstance();
 
+        /* Put the json_encoded payload into a separate log message
+         * just in case the log message itself is inconclusive -_-
+         */
+        $includePayloadInLogging = false;
+
         /* These event types are ignored
          */
         $exclusions = ['Duty', 'Study', 'RollClass'];
@@ -742,7 +747,13 @@ class External_Liss_Server
                 /* Skip events that don't have a type
                  */
                 if (!strlen($currentEvent['type'])) {
-                    $log->info("Skipping {$currentEvent['className']} ({$currentEvent['edvalGuid']}): no type");
+                    $log->warning("Skipping event \"{$currentEvent['className']}\" with guid \"{$currentEvent['edvalGuid']}\": no type");
+
+                    if ($includePayloadInLogging) {
+                        $log->warning("Payload for guid \"{$currentEvent['edvalGuid']}\": " . json_encode($currentEvent));
+                        $log->warning('');
+                    }
+
                     $skipCount['noType']++;
                     $skipCount['total']++;
 
@@ -752,7 +763,13 @@ class External_Liss_Server
                 /* Skip events that have a particular type
                  */
                 if (in_array($currentEvent['type'], $exclusions)) {
-                    $log->info("Skipping {$currentEvent['className']} ({$currentEvent['edvalGuid']}): has excluded type {$currentEvent['type']}");
+                    $log->warning("Skipping event \"{$currentEvent['className']}\" with guid \"{$currentEvent['edvalGuid']}\": has excluded type \"{$currentEvent['type']}\"");
+
+                    if ($includePayloadInLogging) {
+                        $log->warning("Payload for guid \"{$currentEvent['edvalGuid']}\": " . json_encode($currentEvent));
+                        $log->warning('');
+                    }
+
                     $skipCount['invalidType']++;
                     $skipCount['total']++;
 
@@ -785,9 +802,14 @@ class External_Liss_Server
                     try {
                         $folder = $folderMapper->findByCode($currentEvent['classCode']);
                     } catch (MapperException $e) {
-                        $log->info(sprintf('Skipping %s (%s): cannot find corresponding Schoolbox folder for %s',
+                        $log->warning(sprintf("Skipping event \"%s\" with guid \"%s\": cannot find corresponding Schoolbox folder for classCode \"%s\"",
                             $event->getTitle(), $currentEvent['edvalGuid'], $currentEvent['classCode'])
                         );
+
+                        if ($includePayloadInLogging) {
+                            $log->warning("Payload for guid \"{$currentEvent['edvalGuid']}\": " . json_encode($currentEvent));
+                            $log->warning('');
+                        }
 
                         $skipCount['unknownFolder']++;
                         $skipCount['total']++;
@@ -800,6 +822,8 @@ class External_Liss_Server
 
                     $eventRelations->saveFolderRelation($event, [$folder->getId()]);
                     $helper->saveEventSource($event, $currentEvent['edvalGuid']);
+
+                    $log->info(sprintf("Processed homepage event \"%s\" with guid \"%s\"", $event->getTitle(), $currentEvent['edvalGuid']));
                 } else {
                     $event->setAccess(Event::ACCESS_PERSONAL);
 
@@ -815,10 +839,17 @@ class External_Liss_Server
 
                             $eventRelations->savePersonalRelation($event);
                             $helper->saveEventSource($event, $currentEvent['edvalGuid']);
+
+                            $log->info(sprintf("Processed personal event \"%s\" with guid \"%s\" for user \"{$currentExternalId}\"", $event->getTitle(), $currentEvent['edvalGuid']), $currentExternalId);
                         } catch (MapperException $e) {
-                            $log->info(sprintf('Skipping %s (%s) for user %s: no Schoolbox account found',
-                                $event->getTitle(), $currentEvent['edvalGuid'], $currentExternalId
+                            $log->warning(sprintf("Skipping event \"%s\" with guid \"%s\" for user \"%s\": no Schoolbox account found for external id \"%s\"",
+                                $event->getTitle(), $currentEvent['edvalGuid'], $currentExternalId, $currentExternalId
                             ));
+
+                            if ($includePayloadInLogging) {
+                                $log->warning("Payload for guid \"{$currentEvent['edvalGuid']}\": " . json_encode($currentEvent));
+                                $log->warning('');
+                            }
 
                             /* Number of occurrences of an unknown user
                              */
