@@ -499,15 +499,16 @@ class Validation
     /**
      * Get all events for a room in specified period
      *
-     * @param string $roomId
+     * @param string $roomCode
      * @param DateTime $startDate
      * @param DateTime $endDate
      *
      * @return \Calendar\Event\Collection
      */
-    protected function getTimetableRoomEvents($roomId, DateTime $startDate, DateTime $endDate)
+    protected function getTimetableRoomEvents($roomCode, DateTime $startDate, DateTime $endDate)
     {
-        $timetableRoom = new TimetableRoom($this->getUser(), [], [$roomId]);
+        // Using  [$roomCode => true] to make Calendar_Api_EventType_Timetable_Room::getEvents happy
+        $timetableRoom = new TimetableRoom($this->getUser(), [], [$roomCode => true]);
 
         return $timetableRoom->getEvents($startDate->getTimestamp() + 1, $endDate->getTimestamp() - 1);
     }
