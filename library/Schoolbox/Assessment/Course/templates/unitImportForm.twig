@@ -16,11 +16,17 @@
 
 <script>
     $(function() {
-        $('[data-warn-removal]').change(function(e) {
-            if ($(e.target).prop('checked')) {
-                $('#unit-warn-removal').addClass('hide');
-            } else {
-                $('#unit-warn-removal').removeClass('hide');
+        $('[data-warn-removal]').click(function(e) {
+            if (!$(e.target).prop('checked')) {
+                event.preventDefault();
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to remove this unit? ' +
+                            'Doing so will delete all associated activities and marks from the markbook.',
+                    confirmEvent: function() {
+                        // Uncheck
+                        $(e.target).prop("checked", false);
+                    }
+                });
             }
         });
     });
@@ -112,10 +118,6 @@
 
     <div class="small-12 column">
         <div class="row" data-mage-submitrow>
-            <div class="small-12 medium-8 column">
-                <p class="alert alert-box icon-alert" data-mage-error></p>
-                <p class="warning alert-box icon-alert hide" id="unit-warn-removal">Warning! Removal of existing {{ locale.unit.plural }} will also remove all associated activities.</p>
-            </div>
             <div class="small-12 medium-4 column">
                 <input type="submit" name="part-unit-select" value="Next" data-mage-next="part-assessments-select" data-mage-working="Working..." formaction="{{ routeLookup('courseImport.postUnits') }}" />
             </div>
