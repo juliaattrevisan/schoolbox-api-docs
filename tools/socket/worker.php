@@ -48,11 +48,8 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
 
     $listFactory = new ListFactory(INSTANCE_ID, $redis);
 
-    /** @var Notif $notif */
-    $notif = $di->get('notif');
-
     // create a new worker; we don't need to store the instance, it'll be held within the loop
-    new \Schoolbox\Realtime\Pipe\WorkerProcess($loop, $log, $writer, $strat, $listFactory, $notif);
+    new \Schoolbox\Realtime\Pipe\WorkerProcess($loop, $log, $writer, $strat, $listFactory);
 });
 
 // yup. that's all you need to do.
