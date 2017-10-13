@@ -26,6 +26,14 @@ use Calendar_Api_EventType_Timetable_Room as TimetableRoom;
 
 class Validation
 {
+    const ERROR_BEFORE_START = 'before_start';
+    const ERROR_IN_PAST = 'in_past';
+    const ERROR_TOO_EARLY = 'too_early';
+    const ERROR_TOO_SHORT = 'too_short';
+    const ERROR_TOO_LONG = 'too_long';
+    const ERROR_CONFLICT = 'conflict';
+    const ERROR_TIMETABLE_CLASS = 'timetabled_class';
+    const ERROR_CURRENT_TERM = 'current_term';
 
     /**
      * @var User
@@ -249,7 +257,7 @@ class Validation
         $errors = [];
 
         if ($startDate > $endDate) {
-            $errors['end_datetime'][] = 'before_start';
+            $errors['end_datetime'][] = self::ERROR_BEFORE_START;
         }
 
         return $errors;
@@ -269,7 +277,7 @@ class Validation
         $startDate->format('Y-m-d H:i');
 
         if ($startDate->format('Y-m-d H:i') < $now->format('Y-m-d H:i')) {
-            $errors['start_datetime'][] = 'in_past';
+            $errors['start_datetime'][] = self::ERROR_IN_PAST;
         }
 
         return $errors;
@@ -290,7 +298,7 @@ class Validation
         $earliest->add($resource->getMinLeadTime()->getAsDateInterval());
 
         if ($startDate->format('Y-m-d H:i') < $earliest->format('Y-m-d H:i')) {
-            $errors['start_datetime'][] = 'too_early';
+            $errors['start_datetime'][] = self::ERROR_TOO_EARLY;
         }
 
         return $errors;
@@ -313,7 +321,7 @@ class Validation
 
         $earliestEnd->add($resource->getMinReservationTime()->getAsDateInterval());
         if ($endDate < $earliestEnd) {
-            $errors['end_datetime'][] = 'too_short';
+            $errors['end_datetime'][] = self::ERROR_TOO_SHORT;
         }
 
         return $errors;
@@ -336,7 +344,7 @@ class Validation
             $latestEnd = clone $startDate;
             $latestEnd->add($resource->getMaxReservationTime()->getAsDateInterval());
             if ($endDate > $latestEnd) {
-                $errors['end_datetime'][] = 'too_long';
+                $errors['end_datetime'][] = self::ERROR_TOO_LONG;
             }
         }
 
@@ -409,7 +417,7 @@ class Validation
 
         // Anything still in list of conflicts? We have a conflict
         if (count($conflictingBookings)) {
-            $errors['start_datetime'][] = 'conflict';
+            $errors['start_datetime'][] = self::ERROR_CONFLICT;
         }
         elseif (strlen($roomCode = $resource->getRoomCode()) > 0) {
 
@@ -421,7 +429,7 @@ class Validation
             );
 
             if (count($roomEvents)) {
-                $errors['start_datetime'][] = 'timetabled_class';
+                $errors['start_datetime'][] = self::ERROR_TIMETABLE_CLASS;
             }
         }
 
