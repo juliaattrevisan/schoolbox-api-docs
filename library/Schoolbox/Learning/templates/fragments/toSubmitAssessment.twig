@@ -84,7 +84,7 @@
                 <div class="row">
                     <div class="small-12 columns">
                         <input type="hidden" name="subject" value="Overdue - {{ assessment.title }}"/>
-                        <input type="hidden" name="replyto" value="{{ viewee.email }}"/>
+                        <input type="hidden" name="replyto" value="&quot;{{assessment.baseContext.folder.title}}&quot;<{{USER.email}}>"/>
                         <input data-email-students type="hidden" name="bcc" value="{{ studentsToEmail|join(',') }}"/>
                         <button type="submit" class="button icon-email">Email all</button>
                     </div>

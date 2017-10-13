@@ -66,8 +66,22 @@ $(function() {
         });
     });
 
+    $.validator.addMethod('mailHasRecipient', function(value, element) {
+        if ($("#to").val() || $("#cc").val() || $("#bcc").val()) {
+            return true;
+        }
+        return false;
+    }, 'A valid recipient must be provided')
+
     $('#mailForm').alaressValidate({
-        ignore: ':hidden:not([class~=selectized]),:hidden > .selectized, .selectize-control .selectize-input input'
+        ignore: ':hidden:not([class~=selectized]),:hidden > .selectized, .selectize-control .selectize-input input',
+        rules: {
+            to: {
+                mailHasRecipient: true
+            }
+        }
+
+
     });
 });
 </script>
@@ -81,7 +95,7 @@ $(function() {
                 <fieldset class="content">
                     <div class="small-10 large-11 columns">
                         <label>To
-                            <input name="to" id="to" required />
+                            <input name="to" id="to"/>
                         </label>
                     </div>
                     <div class="small-2 large-1 columns">
