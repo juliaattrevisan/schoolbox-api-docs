@@ -60,14 +60,17 @@ class Mapper extends BaseMapper
         $collection = $this->createCollection();
         foreach ($statement as $row) {
             $model = $this->hydrate($row);
-            if (isset($row['u.id'])) {
-                $user = $this->hydrateJoin($row, 'user', 'u');
-                if ($user instanceof User) {
-                    $model->setUser($user);
-                    $role = $this->hydrateJoin($row, 'user.role', 'ur');
-                    if ($role instanceof Role) {
-                        $user->setRole($role);
-                    }
+            if($model == null) {
+                // This is because of a weird optional bi-directional join in TagCloud::findForTag
+                $model = $this->createModel();
+            }
+
+            $user = $this->hydrateJoin($row, 'user', 'u');
+            if ($user instanceof User) {
+                $model->setUser($user);
+                $role = $this->hydrateJoin($row, 'user.role', 'ur');
+                if ($role instanceof Role) {
+                    $user->setRole($role);
                 }
             }
             $collection->add($model);
