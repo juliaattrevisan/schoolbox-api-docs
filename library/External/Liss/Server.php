@@ -737,7 +737,6 @@ class External_Liss_Server
                 'noClassCode' => 0,
                 'noType' => 0,
                 'invalidType' => 0,
-                'unknownFolder' => 0,
                 'unknownUser' => 0,
                 'unknownUserIds' => [],
                 'total' => 0,
@@ -882,7 +881,6 @@ class External_Liss_Server
             $log->info("Skipped (no class code): {$skipCount['noClassCode']}/{$skipCount['total']}");
             $log->info("Skipped (no type): {$skipCount['noType']}/{$skipCount['total']}");
             $log->info("Skipped (invalid type): {$skipCount['invalidType']}/{$skipCount['total']}");
-            $log->info("Skipped (unknown folder): {$skipCount['unknownFolder']}/{$skipCount['total']}");
             $log->info("Unknown user assignations: {$skipCount['unknownUser']}");
 
             /* A list of all the unknown user ids
