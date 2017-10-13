@@ -481,7 +481,7 @@ class Validation
     /**
      * Get all events for a room in specified period
      *
-     * @param int $roomId
+     * @param string $roomId
      * @param DateTime $startDate
      * @param DateTime $endDate
      *
@@ -489,7 +489,7 @@ class Validation
      */
     protected function getTimetableRoomEvents($roomId, DateTime $startDate, DateTime $endDate)
     {
-        $timetableRoom = new TimetableRoom($this->getUser(), [], $roomId);
+        $timetableRoom = new TimetableRoom($this->getUser(), [], [$roomId]);
 
         return $timetableRoom->getEvents($startDate->getTimestamp() + 1, $endDate->getTimestamp() - 1);
     }

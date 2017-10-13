@@ -437,7 +437,7 @@ class Controller extends Base
         $campusId
     ) {
         $newList = new Collection();
-        $campus = $this->getCampusMapper()->findById(1);
+        $campus = $this->getCampusMapper()->findById($campusId);
         foreach ($bookingList as $booking) {
             $event     = $booking->getEvent();
             $eventList = new Collection();

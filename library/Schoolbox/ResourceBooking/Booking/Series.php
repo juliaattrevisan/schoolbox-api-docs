@@ -14,6 +14,7 @@ use Alaress\Date\Recurrence;
 use Aura\Web\Request;
 use InvalidArgumentException;
 use Schoolbox\Collection;
+use External_Timetable as ExternalTimetable;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\ResourceBooking\Booking\Model as Booking;
@@ -35,13 +36,20 @@ class Series
     protected $statusMapper;
 
     /**
+     * @var ExternalTimetable
+     */
+    protected $externalTimetable;
+
+    /**
      * @param Mapper       $bookingMapper
      * @param StatusMapper $statusMapper
      */
-    public function __construct(BookingMapper $bookingMapper, StatusMapper $statusMapper)
+    public function __construct(BookingMapper $bookingMapper, StatusMapper $statusMapper, ExternalTimetable $externalTimetable)
     {
         $this->setBookingMapper($bookingMapper);
         $this->setStatusMapper($statusMapper);
+        $this->setExternalTimetable($externalTimetable);
+
     }
 
     /**
@@ -73,7 +81,7 @@ class Series
                 $repeatUntil = null;
             }
             if ($repeatUntil instanceof Alaress_Date_Format) {
-                $recurrence = new Recurrence(new \External_Timetable());
+                $recurrence = new Recurrence($this->getExternalTimetable());
                 $series     = $recurrence->getRecurrencePeriod(
                     $startDate,
                     $postData['repeat'],
@@ -253,7 +261,7 @@ class Series
                         }
                     } else {
                         // create
-                        $relatedBooking = new Model();
+                        $relatedBooking = $this->getBookingMapper()->createModel();
                         $relatedBooking
                             ->setResource($relatedResource)
                             ->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING));
@@ -321,5 +329,21 @@ class Series
         $this->statusMapper = $statusMapper;
 
         return $this;
+    }
+
+    /**
+     * @return ExternalTimetable
+     */
+    public function getExternalTimetable()
+    {
+        return $this->externalTimetable;
+    }
+
+    /**
+     * @param ExternalTimetable $externalTimetable
+     */
+    public function setExternalTimetable($externalTimetable)
+    {
+        $this->externalTimetable = $externalTimetable;
     }
 }
