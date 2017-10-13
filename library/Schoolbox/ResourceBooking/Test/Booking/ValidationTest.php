@@ -13,6 +13,7 @@ use DateInterval;
 use Alaress\Date\Interval;
 use Schoolbox\Collection;
 use Schoolbox\User;
+use External_Timetable;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\ResourceBooking\Booking;
 use Schoolbox\ResourceBooking\Booking\Validation;
@@ -29,7 +30,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
     private function createValidation()
     {
 
-        return new Validation(new User(), new BookingMapper(), new StatusMapper(), new TermMapper());
+        return new Validation(new User(), new BookingMapper(), new StatusMapper(), new TermMapper(), new External_Timetable());
 
     }
 
@@ -301,7 +302,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
             ->willReturn($conflictingBookings);
 
         /** @var BookingMapper $mockMapper */
-        $validation = new Validation(new User(), $mockMapper, new StatusMapper(), new TermMapper());
+        $validation = new Validation(new User(), $mockMapper, new StatusMapper(), new TermMapper(), new External_Timetable());
 
         $resource = new Item\Model();
         $resource->setId(123);
@@ -440,7 +441,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
             ->willReturn($conflictingBookings);
 
         $mockValidation = $this->getMockBuilder(Validation::Class)
-            ->setConstructorArgs([new User(), $mockMapper, new StatusMapper(), new TermMapper()])
+            ->setConstructorArgs([new User(), $mockMapper, new StatusMapper(), new TermMapper(), new External_Timetable()])
             ->setMethods(['getTimetableRoomEvents'])
             ->getMock();
         $mockValidation

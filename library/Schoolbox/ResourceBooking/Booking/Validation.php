@@ -11,6 +11,7 @@ use DateTime;
 use Alaress_Date_Format;
 use Alaress\Date\Interval;
 use InvalidArgumentException;
+use External_Timetable;
 use Schoolbox\User;
 use Schoolbox\Collection;
 use Schoolbox\ResourceBooking\Item;
@@ -50,12 +51,20 @@ class Validation
      */
     private $resourceMapper;
 
-    /** @var TermMapper */
+    /**
+     * @var TermMapper
+     */
     private $termMapper;
 
-    /** @var StatusMapper */
+    /**
+     * @var StatusMapper
+     */
     private $statusMapper;
 
+    /**
+     * @var External_Timetable
+     */
+    private $externalTimetableHandler;
 
     /**
      * @param User         $user
@@ -67,12 +76,14 @@ class Validation
         User $user,
         BookingMapper $bookingMapper,
         StatusMapper $statusMapper,
-        TermMapper $termMapper
+        TermMapper $termMapper,
+        External_Timetable $externalTimetableHandler
     ) {
         $this->setUser($user);
         $this->setBookingMapper($bookingMapper);
         $this->setStatusMapper($statusMapper);
         $this->setTermMapper($termMapper);
+        $this->setExternalTimetableHandler($externalTimetableHandler);
     }
 
 
@@ -172,7 +183,7 @@ class Validation
 
             if ($isNewBooking) {
                 // Validate related and recurrent bookings of a new booking
-                $series = new Series($this->getBookingMapper(), $this->getStatusMapper());
+                $series = new Series($this->getBookingMapper(), $this->getStatusMapper(), $this->getExternalTimetableHandler());
                 $dateParts = $series->getNewBookingSeries($resource, $startDate, $endDate, $postData);
                 foreach ($dateParts as $check) {
                     /** @var Item\Model $thisResource */
@@ -196,7 +207,7 @@ class Validation
                 // Check each item in the series, adjusting its dates.
                 // Work with a fresh copy of the booking, because it can get
                 // messed with.
-                $series = new Series($this->getBookingMapper(), $this->getStatusMapper());
+                $series = new Series($this->getBookingMapper(), $this->getStatusMapper(), $this->getExternalTimetableHandler());
 
                 foreach ($series->getExistingSeries($existingBooking, $startDate, $endDate, $postData) as $check) {
                     /** @var Item\Model $thisResource */
@@ -388,7 +399,6 @@ class Validation
         // long it overlaps the next item in series!), but I'm not going to
         // worry about those.
         if ($existingBooking instanceof Model) {
-//            var_dump($existingBooking);
 
             $existingId = $existingBooking->getId();
             if ($existingId) {
@@ -600,5 +610,21 @@ class Validation
         $this->termMapper = $termMapper;
 
         return $this;
+    }
+
+    /**
+     * @return External_Timetable
+     */
+    public function getExternalTimetableHandler()
+    {
+        return $this->externalTimetableHandler;
+    }
+
+    /**
+     * @param External_Timetable $externalTimetableHandler
+     */
+    public function setExternalTimetableHandler($externalTimetableHandler)
+    {
+        $this->externalTimetableHandler = $externalTimetableHandler;
     }
 }

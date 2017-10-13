@@ -14,7 +14,7 @@ use Alaress\Date\Recurrence;
 use Aura\Web\Request;
 use InvalidArgumentException;
 use Schoolbox\Collection;
-use External_Timetable as ExternalTimetable;
+use External_Timetable;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\ResourceBooking\Booking\Model as Booking;
@@ -36,19 +36,19 @@ class Series
     protected $statusMapper;
 
     /**
-     * @var ExternalTimetable
+     * @var External_Timetable
      */
-    protected $externalTimetable;
+    protected $externalTimetableHandler;
 
     /**
      * @param Mapper       $bookingMapper
      * @param StatusMapper $statusMapper
      */
-    public function __construct(BookingMapper $bookingMapper, StatusMapper $statusMapper, ExternalTimetable $externalTimetable)
+    public function __construct(BookingMapper $bookingMapper, StatusMapper $statusMapper, External_Timetable $externalTimetableHandler)
     {
         $this->setBookingMapper($bookingMapper);
         $this->setStatusMapper($statusMapper);
-        $this->setExternalTimetable($externalTimetable);
+        $this->setExternalTimetableHandler($externalTimetableHandler);
 
     }
 
@@ -81,7 +81,7 @@ class Series
                 $repeatUntil = null;
             }
             if ($repeatUntil instanceof Alaress_Date_Format) {
-                $recurrence = new Recurrence($this->getExternalTimetable());
+                $recurrence = new Recurrence($this->getExternalTimetableHandler());
                 $series     = $recurrence->getRecurrencePeriod(
                     $startDate,
                     $postData['repeat'],
@@ -332,18 +332,18 @@ class Series
     }
 
     /**
-     * @return ExternalTimetable
+     * @return External_Timetable
      */
-    public function getExternalTimetable()
+    public function getExternalTimetableHandler()
     {
-        return $this->externalTimetable;
+        return $this->externalTimetableHandler;
     }
 
     /**
-     * @param ExternalTimetable $externalTimetable
+     * @param External_Timetable $externalTimetableHandler
      */
-    public function setExternalTimetable($externalTimetable)
+    public function setExternalTimetableHandler($externalTimetableHandler)
     {
-        $this->externalTimetable = $externalTimetable;
+        $this->externalTimetableHandler = $externalTimetableHandler;
     }
 }

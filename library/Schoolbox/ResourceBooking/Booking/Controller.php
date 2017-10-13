@@ -163,7 +163,8 @@ class Controller extends Base
             $this->getUser(),
             $this->getBookingMapper(),
             $this->getStatusMapper(),
-            $this->getTermMapper()
+            $this->getTermMapper(),
+            $this->getExternalTimetableHandler()
         );
         $errors = $validation->validateBookingFromPostData($item, null, $this->getRequest()->post);
         if (empty($errors)) {
@@ -266,7 +267,8 @@ class Controller extends Base
             $this->getUser(),
             $this->getBookingMapper(),
             $this->getStatusMapper(),
-            $this->getTermMapper()
+            $this->getTermMapper(),
+            $this->getExternalTimetableHandler()
         );
         $errors = $validation->validateBookingFromPostData($item->getResource(), $item, $this->getRequest()->post);
 
@@ -275,7 +277,7 @@ class Controller extends Base
             $item
                 ->setName($this->request->post['name'])
                 ->setNotes($this->request->post['notes']);
-            $bookingSeries = new Series($this->getBookingMapper(), $this->getStatusMapper());
+            $bookingSeries = new Series($this->getBookingMapper(), $this->getStatusMapper(), $this->getExternalTimetableHandler());
             $series = $bookingSeries->getUpdatedSeries(
                 $item,
                 Alaress_Date_Format::newLocal($this->getRequest()->post['startDate'])->getDateTimeObject(),
@@ -672,7 +674,7 @@ class Controller extends Base
      */
     protected function getCampusList()
     {
-        $listGenerator = new TimetableArrayExporter($this->externalTimetableHandler);
+        $listGenerator = new TimetableArrayExporter($this->getExternalTimetableHandler());
 
         return $listGenerator->export($this->getUser());
     }
@@ -696,7 +698,8 @@ class Controller extends Base
             $this->getUser(),
             $this->getBookingMapper(),
             $this->getStatusMapper(),
-            $this->getTermMapper()
+            $this->getTermMapper(),
+            $this->getExternalTimetableHandler()
         );
         // validate this booking
         $booking
