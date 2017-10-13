@@ -27,10 +27,44 @@ use Schoolbox\Calendar\Event;
 class ValidationTest extends \PHPUnit_Framework_TestCase
 {
 
-    private function createValidation()
+    /**
+     * @param $user
+     * @param $bookingMapper
+     * @param $termMapper
+     *
+     * @return Validation
+     */
+    private function createValidation($user = null, $bookingMapper = null, $statusMapper = null, $termMapper = null)
     {
 
-        return new Validation(new User(), new BookingMapper(), new StatusMapper(), new TermMapper(), new External_Timetable());
+        if(!$user) {
+            $user = new User;
+        }
+
+        if (!$bookingMapper) {
+            $bookingMapper = new BookingMapper();
+        }
+
+        if(!$statusMapper) {
+            $statusMapper = new StatusMapper();
+        }
+
+        if(!$termMapper) {
+            $termMapper = new TermMapper();
+        }
+
+        $externalTimetable = $this->getMockBuilder(External_Timetable::Class)
+                                  ->setMethods(['__construct'])
+                                  ->disableOriginalConstructor()
+                                  ->getMock();
+
+        /** @var External_Timetable $externalTimetable */
+        $mockValidation = $this->getMockBuilder(Validation::Class)
+                               ->setConstructorArgs([$user, $bookingMapper, $statusMapper, $termMapper, $externalTimetable])
+                               ->setMethods(['getTimetableRoomEvents']) // we need this to be a stub
+                               ->getMock();
+
+        return $mockValidation;
 
     }
 
@@ -302,7 +336,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
             ->willReturn($conflictingBookings);
 
         /** @var BookingMapper $mockMapper */
-        $validation = new Validation(new User(), $mockMapper, new StatusMapper(), new TermMapper(), new External_Timetable());
+        $validation = $this->createValidation(new User(), $mockMapper, new StatusMapper(), new TermMapper());
 
         $resource = new Item\Model();
         $resource->setId(123);
@@ -440,10 +474,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
             ->method('findForResource')
             ->willReturn($conflictingBookings);
 
-        $mockValidation = $this->getMockBuilder(Validation::Class)
-            ->setConstructorArgs([new User(), $mockMapper, new StatusMapper(), new TermMapper(), new External_Timetable()])
-            ->setMethods(['getTimetableRoomEvents'])
-            ->getMock();
+        $mockValidation = $this->createValidation(new User(), $mockMapper, new StatusMapper(), new TermMapper());
         $mockValidation
             ->method('getTimetableRoomEvents')
             ->willReturn($roomEvents);
@@ -639,7 +670,6 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
         $expected
     )
     {
-
         $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
         $mockMapper
             ->method('findForResource')
@@ -652,10 +682,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
         $mockExistingBooking->setId(1);
         $mockExistingBooking->setEvent($existingBookingEvent);
 
-        $mockValidation = $this->getMockBuilder(Validation::Class)
-                               ->setConstructorArgs([new User(), $mockMapper, new StatusMapper(), new TermMapper()])
-                               ->setMethods(['getTimetableRoomEvents'])
-                               ->getMock();
+        $mockValidation = $this->createValidation(new User(), $mockMapper, new StatusMapper(), new TermMapper());
 
         $resource = new Item\Model();
         $resource->setId(123);

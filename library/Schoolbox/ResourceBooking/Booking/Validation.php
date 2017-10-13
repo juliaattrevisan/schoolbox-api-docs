@@ -47,6 +47,11 @@ class Validation
     private $bookingMapper;
 
     /**
+     * @var StatusMapper
+     */
+    private $statusMapper;
+
+    /**
      * @var ResourceMapper
      */
     private $resourceMapper;
@@ -55,11 +60,6 @@ class Validation
      * @var TermMapper
      */
     private $termMapper;
-
-    /**
-     * @var StatusMapper
-     */
-    private $statusMapper;
 
     /**
      * @var External_Timetable
