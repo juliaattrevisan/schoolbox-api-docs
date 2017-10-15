@@ -39,6 +39,9 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
         if (!parent::loadTemplate($templateHandle, 'folderList')) {
             return false;
         }
+        if(!$this->isSourceRenderable()) {
+            return $this->renderSourceUnavailableTwig($templateHandle);
+        }
 
         $this->parseConfig();
 

@@ -73,6 +73,9 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         if (!parent::loadTemplate($templateHandle, 'fileList')) {
             return false;
         }
+        if(!$this->isSourceRenderable()) {
+            return $this->renderSourceUnavailableTwig($templateHandle);
+        }
 
         /* Need title injected here
              */

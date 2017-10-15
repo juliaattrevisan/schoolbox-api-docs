@@ -66,6 +66,9 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
         if (!parent::loadTemplate($templateHandle, 'audio')) {
             return false;
         }
+        if(!$this->isSourceRenderable()) {
+            return $this->renderSourceUnavailableTwig($templateHandle);
+        }
 
         $this->parseConfig();
 

@@ -49,6 +49,9 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
         if (!parent::loadTemplate($templateHandle, 'forumList')) {
             return false;
         }
+        if(!$this->isSourceRenderable()) {
+            return $this->renderSourceUnavailableTwig($templateHandle);
+        }
 
         $this->parseConfig();
 

@@ -72,6 +72,9 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         if (!parent::loadTemplate($templateHandle, 'textBox')) {
             return false;
         }
+        if(!$this->isSourceRenderable()) {
+            return $this->renderSourceUnavailableTwig($templateHandle);
+        }
 
         $this->parseConfig();
 

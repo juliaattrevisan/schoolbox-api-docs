@@ -53,6 +53,9 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         if (!parent::loadTemplate($templateHandle, 'linkList')) {
             return false;
         }
+        if(!$this->isSourceRenderable()) {
+           return $this->renderSourceUnavailableTwig($templateHandle);
+        }
 
         $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
 

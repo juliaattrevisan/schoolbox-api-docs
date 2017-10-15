@@ -43,6 +43,9 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
         if (!parent::loadTemplate($templateHandle, 'wiki')) {
             return false;
         }
+        if(!$this->isSourceRenderable()) {
+            return $this->renderSourceUnavailableTwig($templateHandle);
+        }
 
         /* Need title injected here
          */
