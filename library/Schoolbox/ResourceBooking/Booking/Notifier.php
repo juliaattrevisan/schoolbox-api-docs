@@ -126,6 +126,8 @@ class Notifier extends AbstractModuleNotifier
         /** @var Model $object */
         try {
             $object = $this->mapper->findById($object->getId());
+            $resourceMapper = $this->mapper->getJoinMapper('resource');
+            $object->setResource($resourceMapper->findById($object->getResource()->getId()));
         } catch (DeletedException $e) {
             $object = $e->getDeletedObject();
             $event  = 'cancelled';
