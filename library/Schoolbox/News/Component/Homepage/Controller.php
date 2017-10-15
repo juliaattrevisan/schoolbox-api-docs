@@ -54,6 +54,9 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
+        if(!$this->isSourceRenderable()) {
+            return $this->renderSourceUnavailableTwig($templateHandle);
+        }
         return $this->renderTwigTemplate(
             $templateHandle,
             '@newsHomepage/component.twig',

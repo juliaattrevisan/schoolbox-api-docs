@@ -3,6 +3,7 @@
 use Schoolbox\Resource\Category\NewsMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Error\Mapper;
 
 $groupHandler = new Group;
 $newsHandler = new CategoryNews;
@@ -23,6 +24,10 @@ try {
     $category = $categoryMapper->findById($this->arg[0]);
 } catch (\Exception $e) {
     $this->error(2);
+}
+
+if($groupHandler->getPermission($category->getId()) < READ_ACCESS) {
+    error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
 }
 
 $output = array('CATEGORY_NAME'	=> Scrub::text($category->getName()),
