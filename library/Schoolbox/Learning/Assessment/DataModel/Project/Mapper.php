@@ -37,7 +37,7 @@ class Mapper extends BaseMapper
         $this->joins('mark_type_id', MarkTypeMapper::class, 'mark_type_id', null, null, 'markType');
         $this->joins('assessment_id', AssessmentMapper::class, 'id', null, null, 'assessmentModel', 'assessment');
         $this->joins('grade_group_id', GradeGroupMapper::class, 'id', null, null, 'gradeGroup', 'grade_group');
-        $this->uses('deleted_at', self::TYPE_TIMESTAMP, self::COLUMN_SOFTDELETE);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteAssessables']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreAssessables']);
