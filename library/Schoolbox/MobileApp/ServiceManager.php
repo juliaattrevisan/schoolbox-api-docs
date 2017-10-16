@@ -167,6 +167,11 @@ class ServiceManager implements IServiceManager
         if (empty($this->serviceCache[$provider][$identifier])) {
             $key = $service->getKey();
 
+            if ($this->shouldUseTestService()) {
+                // ignore the provider from the DB and just use the mock
+                return new Cloud\Test\TestService(Schoolbox\Notif\Notifactory::create(Schoolbox\Notif\Notif::TOPIC_ADMIN), $this->registryMapper, $identifier);
+            }
+
             switch ($provider) {
                 case Registry::PROVIDER_APPLE:
 
@@ -248,4 +253,22 @@ class ServiceManager implements IServiceManager
         return sys_get_temp_dir() . "/{$fileHash}.pem";
     }
 
+
+    /**
+     * @return bool
+     */
+    private function shouldUseTestService()
+    {
+        // use test service in vagrant always
+        if ($this->serverInstance->isVagrant()) {
+            return true;
+        }
+
+        // use test service in dev servers if NOT a sandbox
+        if ($this->serverInstance->isDevelopment() && !$this->serverInstance->isSandbox()) {
+            return true;
+        }
+
+        return false;
+    }
 }
