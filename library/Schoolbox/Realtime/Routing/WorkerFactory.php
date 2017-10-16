@@ -12,6 +12,7 @@ use Alaress\WorkerCrew\Worker\PipeWriter;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use Schoolbox;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mail\CoreContext;
 use Schoolbox\Mail\TwigEmailFactory;
@@ -45,6 +46,9 @@ class WorkerFactory
     /** @var ClientInterface */
     private $client;
 
+    /** @var Schoolbox\Instance */
+    private $instance;
+
 
     /**
      * @param IConfigLoader         $conf
@@ -53,6 +57,7 @@ class WorkerFactory
      * @param RegistryMapper        $registryMapper
      * @param UserMapper            $userMapper
      * @param RoutePermissionMapper $routePermMapper
+     * @param \Schoolbox\Instance   $instance
      */
     public function __construct(
         IConfigLoader $conf,
@@ -60,7 +65,8 @@ class WorkerFactory
         ClientInterface $client,
         RegistryMapper $registryMapper,
         UserMapper $userMapper,
-        RoutePermissionMapper $routePermMapper
+        RoutePermissionMapper $routePermMapper,
+        Schoolbox\Instance $instance
     ) {
         $this->conf = $conf;
         $this->log = $log;
@@ -68,6 +74,7 @@ class WorkerFactory
         $this->registryMapper = $registryMapper;
         $this->userMapper = $userMapper;
         $this->routePermMapper = $routePermMapper;
+        $this->instance = $instance;
     }
 
 
@@ -79,7 +86,7 @@ class WorkerFactory
     public function build(LoopInterface $loop, $instanceId)
     {
         // set list factory dependencies
-        $cloudManager = new MobileApp\ServiceManager($this->log, $this->registryMapper);
+        $cloudManager = new MobileApp\ServiceManager($this->log, $this->registryMapper, $this->instance);
 
         // factory for configuring instant emails
         $twigFactory = new TwigEmailFactory(new CoreContext($this->conf), $this->log);

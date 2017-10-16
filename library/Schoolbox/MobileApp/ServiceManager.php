@@ -16,6 +16,7 @@ use InvalidArgumentException;
 use OutOfBoundsException;
 use Psr\Log\LoggerInterface;
 use RangeException;
+use Schoolbox;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
@@ -38,15 +39,20 @@ class ServiceManager implements IServiceManager
     /** @var LoggerInterface */
     protected $log;
 
+    /** @var Schoolbox\Instance */
+    protected $serverInstance;
+
 
     /**
-     * @param RegistryMapper     $registryMapper
      * @param LoggerInterface    $log
+     * @param RegistryMapper     $registryMapper
+     * @param Schoolbox\Instance $serverInstance
      */
-    public function __construct(LoggerInterface $log, RegistryMapper $registryMapper)
+    public function __construct(LoggerInterface $log, RegistryMapper $registryMapper, Schoolbox\Instance $serverInstance)
     {
         $this->registryMapper = $registryMapper;
         $this->log = $log;
+        $this->serverInstance = $serverInstance;
     }
 
 

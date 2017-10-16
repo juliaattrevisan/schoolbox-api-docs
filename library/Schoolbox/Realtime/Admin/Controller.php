@@ -455,7 +455,11 @@ class Controller extends BaseController
 
         $log = new Logger($write, $write, \Monolog\Logger::DEBUG, [], true);
 
-        $cloudManager = new MobileApp\ServiceManager($log, MobileApp\RegistryMapper::getInstance());
+        $cloudManager = new MobileApp\ServiceManager(
+            $log,
+            MobileApp\RegistryMapper::getInstance(),
+            $this->getDi()->get('instance')
+        );
 
         // just grab... anything
         $redis = Redis::getClientInstance();
