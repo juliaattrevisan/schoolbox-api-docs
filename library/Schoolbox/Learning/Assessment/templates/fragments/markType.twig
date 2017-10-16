@@ -82,13 +82,23 @@
     </div>
 
     <div class="small-12 medium-6 columns" style="display:none;" data-grading-scheme>
-        <label>
-            {{ locale.grading.proper }} Scheme
-            <select name="gradingScheme">
+        <label for="gradingScheme">{{ locale.grading.proper }} Scheme</label>
+        <div class="input-group">
+            <select name="gradingScheme" id="gradingScheme">
                 {% for scheme in allGradeSchemes %}
                     <option value="{{ scheme.id }}"{% if scheme.id == assessment.gradeGroup.id %} selected{% endif %}>{{ scheme.name }}</option>
                 {% endfor %}
             </select>
-        </label>
+            <button type="button" class="button" data-reveal-id="gradeScale">Show Grade Scale</button>
+        </div>
     </div>
+</div>
+
+{# 'Show grade scale' modal #}
+<div data-reveal class="reveal-modal" id="gradeScale" role="dialog" aria-hidden="true" aria-labelledby="gradeScaleTitle" aria-describedby="gradeScaleDesc">
+    <h2 id="gradeScaleTitle">{# placeholder for scheme name via ajax #}</h2>
+    <div id="gradeScaleDesc">{# placeholder for grade scale via ajax #}</div>
+    <a class="close-reveal-modal" aria-label="Close">
+        <span aria-hidden="true">&#215;</span>
+    </a>
 </div>
