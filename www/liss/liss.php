@@ -11,4 +11,12 @@
 require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
 $liss = new External_Liss_Server();
-$liss->start();
+
+$log = External_Liss_Server::log();
+
+try {
+    $liss->start();
+}
+catch (Throwable $e) {
+    $log->critical("Internal Error: {$e->getMessage()}");
+}
