@@ -472,7 +472,7 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
+    public function getStudentContactListExtended($yearLevel, $name, $boardingStatus, $form)
     {
         // We have to dynamically bind filter parameters here based on the users input
 
