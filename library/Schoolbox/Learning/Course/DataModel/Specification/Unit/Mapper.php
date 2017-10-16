@@ -75,7 +75,7 @@ class Mapper extends AbstractUnitMapper
     public function restoreFolder(Model $unitSpec)
     {
         /** @var FolderMapper $folderMapper */
-        $folderMapper = $this->getJoinMapper('folder_id');
+        $folderMapper = $this->getJoinMapper('folder');
         $folder = $folderMapper->findByColumn('id', $unitSpec->getFolder()->getId(), ['deleted' => true]);
         $folderMapper->restoreSoftDeleted($folder);
         return true;
