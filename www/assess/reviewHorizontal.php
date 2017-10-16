@@ -18,6 +18,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 
 $factory = new Assess_Factory();
 $assessHandler = new Assess_Main();
@@ -121,6 +122,11 @@ if (!isset($this->arg[1])) {
  */
 else if ($this->arg[1] == 'finalise') {
 	$attemptHandler->finaliseAllLatestAttempts($assess['assess_id']);
+
+	//Save all the marks
+    $attemptMapper = QuizAttemptMapper::getInstance();
+    $allAttempts = $attemptMapper->findByColumn("assess_id", $assess['assess_id']);
+    $attemptMapper->save($allAttempts);
 
 	$this->localRedir("/learning/assessments/{$assess['assessment_id']}/status");
 }
