@@ -45,7 +45,7 @@ class TaskMapper extends Schoolbox\Mapper
         ]);
 
         // This column is duplicate of assessment.deleted_at, but is required to ensure soft-deletion on this table.
-        $this->uses('deleted_at', self::TYPE_TIMESTAMP, self::COLUMN_SOFTDELETE);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCompletions']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreCompletions']);
