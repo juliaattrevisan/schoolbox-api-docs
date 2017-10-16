@@ -20,54 +20,54 @@ $(function() {
     // Some of these should be made into local rules.
     $.validator.addMethod(
         'remote.invalidStart',
-        getValidatorRemoteMethod('invalid', 'start_datetime'),
+        getValidatorRemoteMethod('{{ validationErrors.invalid }}', '{{ validationData.start }}'),
         'Please enter a valid date.'
     );
     $.validator.addMethod(
         'remote.conflict',
-        getValidatorRemoteMethod('conflict', 'start_datetime'),
+        getValidatorRemoteMethod('{{ validationErrors.conflict }}', '{{ validationData.start }}'),
         'This item has already been booked for this time.'
     );
     $.validator.addMethod(
         'remote.timetabledClass',
-        getValidatorRemoteMethod('timetabled_class', 'start_datetime'),
+        getValidatorRemoteMethod('{{ validationErrors.timetabledClass }}', '{{ validationData.start }}'),
         'This room is already timetabled for this time.'
     );
     $.validator.addMethod(
         'remote.inPast',
-        getValidatorRemoteMethod('in_past', 'start_datetime'),
+        getValidatorRemoteMethod('{{ validationErrors.inPast }}', '{{ validationData.start }}'),
         'Items may not be booked for the past.'
     );
     $.validator.addMethod(
         'remote.tooEarly',
-        getValidatorRemoteMethod('too_early', 'start_datetime'),
+        getValidatorRemoteMethod('{{ validationErrors.tooEarly }}', '{{ validationData.start }}'),
         'This item must be booked at least ' + {{ include('sub/interval.twig', {interval: item.resource.minLeadTime})|json_encode|raw }} + ' in advance.'
     );
 
     // Remote rules for end date
     $.validator.addMethod(
         'remote.invalidEnd',
-        getValidatorRemoteMethod('invalid', 'end_datetime'),
+        getValidatorRemoteMethod('{{ validationErrors.invalid }}', '{{ validationData.end }}'),
         'Please enter a valid date.'
     );
     $.validator.addMethod(
         'remote.beforeStart',
-        getValidatorRemoteMethod('before_start', 'end_datetime'),
+        getValidatorRemoteMethod('{{ validationErrors.beforeStart }}', '{{ validationData.end }}'),
         'The booking start time must be before the end time.'
     );
     $.validator.addMethod(
         'remote.tooShort',
-        getValidatorRemoteMethod('too_short', 'end_datetime'),
+        getValidatorRemoteMethod('{{ validationErrors.tooShort }}', '{{ validationData.end }}'),
         'This item must be booked for at least ' + {{ include('sub/interval.twig', {interval: item.resource.minReservationTime})|json_encode|raw }} + '.'
     );
     $.validator.addMethod(
         'remote.tooLong',
-        getValidatorRemoteMethod('too_long', 'end_datetime'),
+        getValidatorRemoteMethod('{{ validationErrors.tooLong }}', '{{ validationData.end }}'),
         'This item may not be booked for more than ' + {{ include('sub/interval.twig', {interval: item.resource.maxReservationTime})|json_encode|raw }} + '.'
     );
     $.validator.addMethod(
         'remote.currentTerm',
-        getValidatorRemoteMethod('current_term', 'end_datetime'),
+        getValidatorRemoteMethod('{{ validationErrors.currentTerm }}', '{{ validationData.end }}'),
         'This item may not be booked outside of the current term.'
     );
 
@@ -102,9 +102,9 @@ $(function() {
             dialogs.foundation('reveal', 'close');
             callback();
         })
-        .on('click', '[data-efficacy="series"]', function(e) {
+        .on('click', '[data-efficacy="{{ efficacySeries }}"]', function(e) {
             e.preventDefault();
-            efficacyInput.val('series');
+            efficacyInput.val('{{ efficacySeries }}');
             dialogs.foundation('reveal', 'close');
             callback();
         })
@@ -394,11 +394,9 @@ $(function() {
                             <select name="repeat" id="repeatUntilSelect">
                                 <option value="">Single Booking</option>
                                 <optgroup label="Recurring">
-                                    <option value="daily">Daily</option>
-                                    <option value="weekly">Weekly</option>
-                                    <option value="fortnightly">Fortnightly</option>
-                                    <option value="monthly">Monthly</option>
-                                    <option value="timetable">Timetable Based</option>
+                                    {% for key, value in recurrence %}
+                                        <option value="{{ key }}">{{ value }}</option>
+                                    {% endfor %}
                                 </optgroup>
                             </select>
                         </label>
@@ -554,7 +552,7 @@ $(function() {
     </article>
     <ul class="flex-list buttons">
         <li><a href="#" class="button" data-efficacy="self">Only this booking</a></li>
-        <li><a href="#" class="button" data-efficacy="series">All bookings in the series</a></li>
+        <li><a href="#" class="button" data-efficacy="{{ efficacySeries }}">All bookings in the series</a></li>
         <li><a href="#" class="button" data-interaction="close">Cancel</a></li>
     </ul>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>

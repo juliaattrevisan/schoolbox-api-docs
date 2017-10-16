@@ -138,12 +138,35 @@ class Controller extends Base
             [
                 'template' => '@resourceBooking/book.twig',
                 'data'     => [
-                    'item'          => $item,
-                    'select'        => 'radio',
-                    'campusList'    => $this->getCampusList(),
-                    'callbackUrl'   => $this->getRequest()->query['callbackUrl'],
-                    'allowOverride' => $item->getResource()->canUserModerateThisItem($this->getUser()),
+                    'item'              => $item,
+                    'select'            => 'radio',
+                    'campusList'        => $this->getCampusList(),
+                    'callbackUrl'       => $this->getRequest()->query['callbackUrl'],
+                    'allowOverride'     => $item->getResource()->canUserModerateThisItem($this->getUser()),
                     'currentTerm'       => $this->getTermMapper()->findForToday(),
+                    'validationData'    => [
+                                            'start' => Validation::START_DATETIME,
+                                            'end' => Validation::END_DATETIME,
+                                            ],
+                    'validationErrors'  => [
+                                            'invalid' => Validation::ERROR_INVALID,
+                                            'beforeStart' => Validation::ERROR_BEFORE_START,
+                                            'inPast' => Validation::ERROR_IN_PAST,
+                                            'tooEarly' => Validation::ERROR_TOO_EARLY,
+                                            'tooShort' => Validation::ERROR_TOO_SHORT,
+                                            'tooLong' => Validation::ERROR_TOO_LONG,
+                                            'conflict' => Validation::ERROR_CONFLICT,
+                                            'timetableClass' => Validation::ERROR_TIMETABLE_CLASS,
+                                            'currentTerm' => Validation::ERROR_CURRENT_TERM,
+                                            ],
+                    'recurrence'        => [
+                                            Recurrence::RECURRENCE_DAILY => 'Daily',
+                                            Recurrence::RECURRENCE_WEEKLY => 'Weekly',
+                                            Recurrence::RECURRENCE_FORTNIGHTLY => 'Fortnightly',
+                                            Recurrence::RECURRENCE_MONTHLY => 'Monthly',
+                                            Recurrence::RECURRENCE_TIMETABLE => 'Timetable Based'
+                                        ],
+                    'efficacySeries'    => EventRecurrenceMapper::EFFICACY_SERIES,
                 ],
             ]
         );
