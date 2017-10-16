@@ -22,11 +22,12 @@ interface IConsumer
     /**
      * Handle a message sent from a broker to which you've subscribed
      *
-     * @param mixed     $payload
-     * @param IResolver $resolver
+     * @param mixed      $payload
+     * @param IResolver  $resolver
+     * @param array|null $context
      * @return void
      */
-    public function onMessage($payload, IResolver $resolver);
+    public function onMessage($payload, IResolver $resolver, ?array $context);
 
 
     /**

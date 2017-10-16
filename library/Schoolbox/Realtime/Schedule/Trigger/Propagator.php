@@ -83,7 +83,7 @@ class Propagator implements IPropagator
         $redisKey = $this->toRedis($event, "{$namespace}e");
 
         foreach ($this->splitter->generateTriggers($event) as $trigger) {
-            $this->broker->publish($trigger, $namespace);
+            $this->broker->publish($trigger, [ $namespace ]);
         }
 
         return $redisKey;

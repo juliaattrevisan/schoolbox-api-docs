@@ -163,11 +163,12 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
      *
      * @param TriggerInterface $trigger
      * @param IResolver        $resolver
+     * @param array|null       $context
      * @throws DuplicateResolutionException
      * @throws PDOException
      * @return void
      */
-    public function onMessage($trigger, IResolver $resolver)
+    public function onMessage($trigger, IResolver $resolver, ?array $context)
     {
         $this->log->info("Received trigger to schedule: {$trigger->getIdString()}", [ 'char' => '>' ]);
 
