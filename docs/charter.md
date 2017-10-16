@@ -124,7 +124,7 @@ Coalesce data from Discovery into a usable state, such as personas, empathy maps
 ### Ceremonies
 
 * Showcase **Last day of sprint 3:00pm** 
-* Retrospective **First day of the sprint 10:00am** 
+* Retrospective **First day of the next sprint 10:30am** 
 * Sprint planning **First day of the sprint 11:00am**
 * Standup **11:50am daily** 
     * Be transparent about status (green, yellow, red)
