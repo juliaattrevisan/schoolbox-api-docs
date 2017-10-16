@@ -137,7 +137,6 @@ class Series
      */
     public function getExistingSeries(Booking $existingBooking, DateTime $startDate, DateTime $endDate, $postData)
     {
-        $isTimeChanged = false;
         $relatedItems  = [];
         foreach ($postData['related_item'] ?: [] as $relatedItem) {
             if ($relatedItem['resource_id']) {
@@ -149,8 +148,7 @@ class Series
             $startDate,
             $endDate,
             $relatedItems,
-            $postData['efficacy'],
-            $isTimeChanged
+            $postData['efficacy']
         );
 
         $dateParts = [];
@@ -176,7 +174,6 @@ class Series
      * @param DateTime $endDate
      * @param array    $relatedItems
      * @param string   $efficacy
-     * @param bool     &    $isTimeChanged Were any bookings changed?
      *
      * @return Collection|Model[]
      * @throws MapperException
@@ -186,8 +183,7 @@ class Series
         DateTime $startDate,
         DateTime $endDate,
         array $relatedItems,
-        $efficacy,
-        &$isTimeChanged
+        $efficacy
     ) {
         // Get the date and time changes.
         $startDelta = Interval::createFromDateTimeDifference(

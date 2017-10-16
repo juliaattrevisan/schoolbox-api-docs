@@ -274,7 +274,6 @@ class Controller extends Base
         $errors = $validation->validateBookingFromPostData($item->getResource(), $item, $this->getRequest()->post);
 
         if (empty($errors)) {
-            $isTimeChanged = false;
             $item
                 ->setName($this->request->post['name'])
                 ->setNotes($this->request->post['notes']);
@@ -284,8 +283,7 @@ class Controller extends Base
                 Alaress_Date_Format::newLocal($this->getRequest()->post['startDate'])->getDateTimeObject(),
                 Alaress_Date_Format::newLocal($this->getRequest()->post['endDate'])->getDateTimeObject(),
                 $this->getRelatedItemsFromForm(),
-                $this->request->post['efficacy'],
-                $isTimeChanged
+                $this->request->post['efficacy']
             );
 
             // Get the date and time changes from original booking
