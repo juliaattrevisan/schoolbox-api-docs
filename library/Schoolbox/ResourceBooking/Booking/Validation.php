@@ -27,6 +27,9 @@ use Calendar_Api_EventType_Timetable_Room as TimetableRoom;
 
 class Validation
 {
+
+    const START_DATETIME = 'start_datetime';
+    const END_DATETIME = 'end_datetime';
     const ERROR_INVALID = 'invalid';
     const ERROR_BEFORE_START = 'before_start';
     const ERROR_IN_PAST = 'in_past';
@@ -122,13 +125,13 @@ class Validation
         try {
             $startDate = Alaress_Date_Format::newLocal($postData['startDate'])->getDateTimeObject();
         } catch (\Exception $e) {
-            $errors['start_datetime'][] = self::ERROR_INVALID;
+            $errors[self::START_DATETIME][] = self::ERROR_INVALID;
         }
 
         try {
             $endDate = Alaress_Date_Format::newLocal($postData['endDate'])->getDateTimeObject();
         } catch (\Exception $e) {
-            $errors['end_datetime'][] = self::ERROR_INVALID;
+            $errors[self::END_DATETIME][] = self::ERROR_INVALID;
         }
 
         // Having a power to override doesn't make you a God. Start comes always before End.
@@ -269,7 +272,7 @@ class Validation
         $errors = [];
 
         if ($startDate > $endDate) {
-            $errors['end_datetime'][] = self::ERROR_BEFORE_START;
+            $errors[self::END_DATETIME][] = self::ERROR_BEFORE_START;
         }
 
         return $errors;
@@ -289,7 +292,7 @@ class Validation
         $startDate->format('Y-m-d H:i');
 
         if ($startDate->format('Y-m-d H:i') < $now->format('Y-m-d H:i')) {
-            $errors['start_datetime'][] = self::ERROR_IN_PAST;
+            $errors[self::START_DATETIME][] = self::ERROR_IN_PAST;
         }
 
         return $errors;
@@ -310,7 +313,7 @@ class Validation
         $earliest->add($resource->getMinLeadTime()->getAsDateInterval());
 
         if ($startDate->format('Y-m-d H:i') < $earliest->format('Y-m-d H:i')) {
-            $errors['start_datetime'][] = self::ERROR_TOO_EARLY;
+            $errors[self::START_DATETIME][] = self::ERROR_TOO_EARLY;
         }
 
         return $errors;
@@ -333,7 +336,7 @@ class Validation
 
         $earliestEnd->add($resource->getMinReservationTime()->getAsDateInterval());
         if ($endDate < $earliestEnd) {
-            $errors['end_datetime'][] = self::ERROR_TOO_SHORT;
+            $errors[self::END_DATETIME][] = self::ERROR_TOO_SHORT;
         }
 
         return $errors;
@@ -356,7 +359,7 @@ class Validation
             $latestEnd = clone $startDate;
             $latestEnd->add($resource->getMaxReservationTime()->getAsDateInterval());
             if ($endDate > $latestEnd) {
-                $errors['end_datetime'][] = self::ERROR_TOO_LONG;
+                $errors[self::END_DATETIME][] = self::ERROR_TOO_LONG;
             }
         }
 
@@ -428,7 +431,7 @@ class Validation
 
         // Anything still in list of conflicts? We have a conflict
         if (count($conflictingBookings)) {
-            $errors['start_datetime'][] = self::ERROR_CONFLICT;
+            $errors[self::START_DATETIME][] = self::ERROR_CONFLICT;
         }
         elseif (strlen($roomCode = $resource->getRoomCode()) > 0) {
 
@@ -440,7 +443,7 @@ class Validation
             );
 
             if (count($roomEvents)) {
-                $errors['start_datetime'][] = self::ERROR_TIMETABLE_CLASS;
+                $errors[self::START_DATETIME][] = self::ERROR_TIMETABLE_CLASS;
             }
         }
 
@@ -461,7 +464,7 @@ class Validation
 
         $currentTermFinishDate = $currentTerm->getDisplayFinish()->getDateTimeObject();
         if ($endDate > $currentTermFinishDate) {
-            $errors['end_datetime'][] = 'current_term';
+            $errors[self::END_DATETIME][] = self::ERROR_CURRENT_TERM;
         }
 
         return $errors;

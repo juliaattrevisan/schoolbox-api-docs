@@ -25,6 +25,7 @@ use Calendar\Event\Collection\Renderer;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 use Schoolbox\ResourceBooking\Booking\Status;
+use Schoolbox\Calendar\EventRecurrenceMapper;
 
 class Controller extends Base
 {
@@ -816,8 +817,8 @@ class Controller extends Base
      */
     protected function getSeriesBookings(Model $booking)
     {
-        if ($this->getRequest()->query['efficacy'] === 'series'
-            || $this->getRequest()->post['efficacy'] === 'series'
+        if ($this->getRequest()->query['efficacy'] === EventRecurrenceMapper::EFFICACY_SERIES
+            || $this->getRequest()->post['efficacy'] === EventRecurrenceMapper::EFFICACY_SERIES
         ) {
             if ($seriesId = $booking->getEvent()->getSeriesId()) {
                 return $this->getBookingMapper()->findSeriesBookings($booking->getId(), $seriesId);

@@ -19,6 +19,12 @@ use External_Timetable;
 class Recurrence
 {
 
+    const RECURRENCE_DAILY = 'daily';
+    const RECURRENCE_WEEKLY = 'weekly';
+    const RECURRENCE_FORTNIGHTLY = 'fortnightly';
+    const RECURRENCE_MONTHLY = 'monthly';
+    const RECURRENCE_TIMETABLE = 'timetable';
+
     /**
      * @var External_Timetable
      */
@@ -53,38 +59,38 @@ class Recurrence
         DateTime $startTime,
         $recurrenceRule,
         DateTime $repeatUntil,
-        $campus = null
+        Campus $campus = null
     ) {
         switch ($recurrenceRule) {
-            case 'daily':
+            case self::RECURRENCE_DAILY:
                 $period = new DatePeriod(
                     $startTime,
                     DateInterval::createFromDateString('+1 day'),
                     $repeatUntil->modify('+1 day')
                 );
                 break;
-            case 'weekly':
+            case self::RECURRENCE_WEEKLY:
                 $period = new DatePeriod(
                     $startTime,
                     DateInterval::createFromDateString('+1 week'),
                     $repeatUntil->modify('+1 day')
                 );
                 break;
-            case 'fortnightly':
+            case self::RECURRENCE_FORTNIGHTLY:
                 $period = new DatePeriod(
                     $startTime,
                     DateInterval::createFromDateString('+2 weeks'),
                     $repeatUntil->modify('+1 day')
                 );
                 break;
-            case 'monthly':
+            case self::RECURRENCE_MONTHLY:
                 $period = new DatePeriod(
                     $startTime,
                     DateInterval::createFromDateString('+1 month'),
                     $repeatUntil->modify('+1 day')
                 );
                 break;
-            case 'timetable':
+            case self::RECURRENCE_TIMETABLE:
                 try {
                     $period = new External_TimetableDatePeriod(
                         $startTime,

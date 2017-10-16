@@ -21,6 +21,7 @@ use Schoolbox\ResourceBooking\Booking\Model as Booking;
 use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
 use Schoolbox\ResourceBooking\Booking\Status;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
+use Schoolbox\Calendar\EventRecurrenceMapper;
 
 class Series
 {
@@ -102,7 +103,7 @@ class Series
 
         // Get all booking dates for all the related resources
         $relatedItems = [];
-        foreach ($postData['related_item'] ?: [] as $relatedItem) {
+        foreach ($postData['related_item'] ?? [] as $relatedItem) {
             if ($relatedItem['resource_id']) {
                 $relatedItems[$relatedItem['resource_id']] = $relatedItem;
             }
@@ -201,7 +202,7 @@ class Series
         $isTimeChanged = $startDelta->getSecondTotal() !== 0 || $endDelta->getSecondTotal() !== 0;
 
         /** @var Collection|Model[] $series */
-        if ($efficacy === 'series') {
+        if ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES) {
             // Load whole series
             $series = $this->getBookingMapper()->findSeriesBookings(
                 $item->getId(),
