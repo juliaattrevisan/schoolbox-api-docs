@@ -8,14 +8,17 @@
 
 namespace Schoolbox\MobileApp;
 
+use Alaress\Async\Notification\Instance\Instance;
+
+
 interface IServiceManager
 {
 
     /**
-     * @param int $userId
-     * @param array $data
+     * @param int      $userId
+     * @param Instance $instance
      * @return void
      */
-    public function push($userId, $data);
+    public function push($userId, Instance $instance);
 
 }

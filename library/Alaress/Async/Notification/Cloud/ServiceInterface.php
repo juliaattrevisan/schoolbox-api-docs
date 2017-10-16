@@ -10,6 +10,7 @@
 namespace Alaress\Async\Notification\Cloud;
 
 
+use Alaress\Async\Notification\Instance\Instance;
 use Psr\Log\LoggerInterface;
 
 interface ServiceInterface
@@ -29,11 +30,11 @@ interface ServiceInterface
 
     /**
      * @param array $tokens
-     * @param array $data
+     * @param Instance $instance
      * @param int   $unreadCount
      * @return bool
      */
-    public function send(array $tokens, array $data, $unreadCount = 0);
+    public function send(array $tokens, Instance $instance, $unreadCount = 0);
 
 
     /**
