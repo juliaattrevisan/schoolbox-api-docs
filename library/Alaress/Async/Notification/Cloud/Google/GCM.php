@@ -82,6 +82,7 @@ class GCM extends AbstractService
             'body'         => $title,
             'vibrate'      => true,
             'click_action' => 'MainActivity',
+            'image'        => 'www/img/hi-res-icon.png'
         ];
 
         $apiUri  = self::GCM_API_URI;
