@@ -100,6 +100,11 @@ class ExternalEvents extends Base implements IExternalEvents
             /* Get parent events via product code PIAPDC
              */
             $allEvents[] = "(
+                {$selectQuery}
+                INNER JOIN eventtype et ON et.event_id = ec.event_id AND prod_code = 'PIAPDC'
+                {$catdefsQuery} 
+                WHERE 
+                {$whereQuery}
             )";
         }
 
