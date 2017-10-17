@@ -105,8 +105,13 @@ class ExternalEvents extends Base implements IExternalEvents
 
         /* Get all the other public events
          */
-//        $allEvents[] = "(
-//        )";
+        $allEvents[] = "(
+            {$selectQuery}
+            INNER JOIN eventtype et ON et.event_id = ec.event_id AND prod_code = 'PUBPDC'
+            {$catdefsQuery} 
+            WHERE 
+            {$whereQuery}
+        )";
 
         /* Collate them into one mega union
          */
