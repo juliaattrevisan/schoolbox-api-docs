@@ -11,6 +11,7 @@ namespace Custom\Help\CourseParticipation;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Aura\Di\Exception\ServiceNotFound;
+use Aura\Web\Request\Values;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Psr7\Response;
@@ -183,18 +184,9 @@ class Controller extends Base
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        $requestTimestamp = new Alaress_Date_Format($rq->query->get('ts', 0), Alaress_Date_Format::TIMESTAMP);
-
-        $authDigest = $rq->query->get('token', '');
-
-        $responseCode = $this->getResponseCode($schoolCode, $requestTimestamp, $authDigest);
-
-        if ($responseCode !== 200) {
-            // if the request didn't pass the gauntlet, bounce the request
-            $this->sendGenericStatus($responseCode);
+        if ($this->isInvalidAuth($rq->query, $schoolCode)) {
             return;
         }
-
 
         // ok, if you're here, you can see the thing.
         try {
@@ -236,15 +228,7 @@ class Controller extends Base
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        $requestTimestamp = new Alaress_Date_Format($rq->query->get('ts', 0), 'U');
-
-        $authDigest = $rq->query->get('token', '');
-
-        $responseCode = $this->getResponseCode($schoolCode, $requestTimestamp, $authDigest);
-
-        if ($responseCode !== 200) {
-            // if the request didn't pass the gauntlet, bounce the request
-            $this->sendGenericStatus($responseCode);
+        if ($this->isInvalidAuth($rq->query, $schoolCode)) {
             return;
         }
 
@@ -327,15 +311,7 @@ class Controller extends Base
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        $requestTimestamp = new Alaress_Date_Format($rq->query->get('ts', 0), Alaress_Date_Format::TIMESTAMP);
-
-        $authDigest = $rq->query->get('token', '');
-
-        $responseCode = $this->getResponseCode($schoolCode, $requestTimestamp, $authDigest);
-
-        if ($responseCode !== 200) {
-            // if the request didn't pass the gauntlet, bounce the request
-            $this->sendGenericStatus($responseCode);
+        if ($this->isInvalidAuth($rq->query, $schoolCode)) {
             return;
         }
 
@@ -377,15 +353,7 @@ class Controller extends Base
             return;
         }
 
-        $requestTimestamp = new Alaress_Date_Format($rq->query->get('ts', 0), 'U');
-
-        $authDigest = $rq->query->get('token', '');
-
-        $responseCode = $this->getResponseCode($schoolCode, $requestTimestamp, $authDigest);
-
-        if ($responseCode !== 200) {
-            // if the request didn't pass the gauntlet, bounce the request
-            $this->sendGenericStatus($responseCode);
+        if ($this->isInvalidAuth($rq->query, $schoolCode)) {
             return;
         }
 
@@ -515,6 +483,29 @@ class Controller extends Base
         // obtain all direct descendants of this folder
         // the scope of implementation is immediate children only, rather than attempting to gather all descendants
         return $this->folderMapper->findByParentId($folder->getId());
+    }
+
+
+    /**
+     * @param Values $query
+     * @param string $schoolCode
+     * @return bool
+     */
+    private function isInvalidAuth(Values $query, $schoolCode)
+    {
+        $requestTimestamp = new Alaress_Date_Format($query->get('ts', 0), Alaress_Date_Format::TIMESTAMP);
+
+        $authDigest = $query->get('token', '');
+
+        $responseCode = $this->getResponseCode($schoolCode, $requestTimestamp, $authDigest);
+
+        if ($responseCode === 200) {
+            return false;
+        }
+
+        // if the request didn't pass the gauntlet, bounce the request
+        $this->sendGenericStatus($responseCode);
+        return true;
     }
 
 
