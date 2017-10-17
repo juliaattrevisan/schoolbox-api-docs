@@ -86,7 +86,6 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
             $defaultEventType = self::DEFAULT_EVENTTYPE_ID;
         }
 
-
         foreach ($externalEvents as $externalEvent) {
             $event = new Event();
             $event->setEventId($externalEvent['id']);
@@ -100,10 +99,11 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
              *
              * If THAT option didn't exist (i.e. deleted after chosen) then just default to DEFAULT_EVENTTYPE_ID
              */
-            if (strlen(trim($externalEvent['type']))) {
-
+            try {
+                $eventType = EventTypeMapper::getInstance()->findOneByColumn('eventType', $externalEvent['type'])->getId();
+                $event->setType($eventType);
             }
-            else {
+            catch (MapperException $e) {
                 $event->setType($defaultEventType);
             }
 
