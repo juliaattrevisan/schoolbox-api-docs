@@ -106,12 +106,13 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
 
             /* TODO: Connector-specific event type mapping
              *
-             *  If $externalEvent['type'] is empty, use the calendar configuration value that we chose in admin
+             * If $externalEvent['type'] is empty, use the calendar configuration value that we chose in admin
              *
              * Otherwise assume $externalEvent['type'] to be the truth and try to match its value to a luEventType,
              * defaulting to the first luEventType if one cannot be found
              */
             if (strlen(trim($externalEvent['type']))) {
+
             }
             else {
                 $event->setType($defaultEventType);
