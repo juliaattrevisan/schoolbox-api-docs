@@ -54,7 +54,7 @@
                 'body': {
                     ckeRequired: {
                         depends: function(element) {
-                            return $.trim(CKEDITOR.instances["blurb"].getData()).length > 0;
+                            return $.trim($(CKEDITOR.instances["blurb"].getData()).text()).length < 1;
                         }
                     }
                 }
