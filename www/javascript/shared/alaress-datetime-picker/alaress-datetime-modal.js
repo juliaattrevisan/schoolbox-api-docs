@@ -296,7 +296,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                     }
 
                     optionsHtml += '<div class="adtp-tt-week ' + hideClass + '" data-adtp-tt-cycle="' + cycle + '" data-cycle-start="' + startDate.format(momentFormats.databaseShort) + '" data-cycle-end="' + endDate.format(momentFormats.databaseShort) + '" data-parent-campus="' + campus + '" data-parent-term="' + selectedTerm + '">';
-                    optionsHtml += '<div class="adtp-tt-week-number"><span class="adtp-tt-week-bold">Week</span> ' + cycle + '</div>';
+                    optionsHtml += '<div class="adtp-tt-week-number"><span class="adtp-tt-week-bold">Cycle</span> ' + cycle + '</div>';
                     optionsHtml += '<div class="adtp-tt-week-date">' + startDate.format('MMM D') + ' - ' + endDate.format('MMM D') + '</div>';
                     optionsHtml += '</div>';
 
