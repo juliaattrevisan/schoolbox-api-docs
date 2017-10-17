@@ -370,7 +370,6 @@ class Controller extends Base
         } else {
             // everything went fine, nothing to respond with
             $this->sendGenericStatus(204);
-            $rs->content->set($this->buildJsonOutput(null));
         }
     }
 
@@ -467,7 +466,10 @@ class Controller extends Base
         $r = new Response($code);
 
         $this->getResponse()->status->set($r->getStatusCode());
-        $this->getResponse()->content->set($this->buildJsonOutput($r->getReasonPhrase()));
+
+        $content = $code === 204 ? null : $this->buildJsonOutput($r->getReasonPhrase());
+
+        $this->getResponse()->content->set($content);
     }
 
 
