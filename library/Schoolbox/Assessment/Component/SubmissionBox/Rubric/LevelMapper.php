@@ -56,7 +56,7 @@ class LevelMapper extends Mapper
             SELECT {$this->getColumnString()},
                    {$this->getJoinColumnString('box', 'b')}
             FROM {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('box', null, 'b')}
+            INNER JOIN {$this->getJoinSql('box', null, 'b', true)}
         ";
     }
 

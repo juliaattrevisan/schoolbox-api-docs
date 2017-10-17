@@ -54,6 +54,7 @@ use \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile as ReturnedWorkFile;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\LinkMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 
 require_once __DIR__ . '/../library/Bootstrap.php';
@@ -188,6 +189,7 @@ class RecursiveUndeleter
         SubmissionBoxMapper::class      => [
             SubmissionMapper::class   => 'student_submission.box_id',
             ReturnedWorkMapper::class => 'submission_return.box_id',
+            Rubric\LevelMapper::class => 'rubric_level.box_id',
         ],
         TaskMapper::class               => [
             Task\CompletionMapper::class,
@@ -208,6 +210,7 @@ class RecursiveUndeleter
         ReturnedWorkMapper::class       => [
             ReturnedWorkFile\Mapper::class,
         ],
+        Rubric\LevelMapper::class       => [],
         QuizQuestion\Mapper::class      => [
             QuizSolution\Mapper::class => 'assess_answer.question_id',
         ],
