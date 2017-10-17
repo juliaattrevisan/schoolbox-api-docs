@@ -75,21 +75,13 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
          * Maintain a lookup of possible luEventTypes in schoolbox
          *
          * We keep this so we can map a connector-specific event type to one in schoolbox somehere,
-         * defaulting to 1 if none can be found
+         * defaulting to the one chosen in admin if none can be found
+         *
+         * If the one chosen in admin couldn't be found, just default to 1
          */
 
 
-        /* Assign event colours
-         */
-        $eventColor = null;
 
-        try {
-            /** @var EventType $eventTypeObject */
-            $eventTypeObject = $this->getEventTypeMapper()->findById($eventType);
-            $eventColor      = $eventTypeObject->getColor();
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            // noop
-        }
 
         foreach ($externalEvents as $externalEvent) {
 
@@ -134,7 +126,15 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
             $event->setAuthorId($externalEvent['owner']);
             $event->setAuthorName($owner->formatName());
 
-            $event->setColour($eventColor);
+            /* Assign event colours - rely on cache, sorry :/
+             */
+            try {
+                /** @var EventType $eventTypeObject */
+                $eventTypeObject = $this->getEventTypeMapper()->findById($event->getType());
+                $event->setColour($eventTypeObject->getColor());
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $event->setColour(null);
+            }
 
             $event->setConnectorId($this->getConnectorId());
 
