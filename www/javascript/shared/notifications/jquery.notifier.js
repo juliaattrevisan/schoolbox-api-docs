@@ -137,12 +137,12 @@
                 }
 
                 toInsert.sort(function(a,b) {
-                    // always sort read before unread (we'll iterate descending)
+                    // always sort unread before read
                     if (a.status !== b.status) {
-                        return a.status === settings.itemUnread ? 1 : -1;
+                        return a.status === settings.itemUnread ? -1 : 1;
                     }
-                    // sort ascending by timestamp (we'll iterate descending)
-                    return (a.timestamp == b.timestamp ? 0 : (a.timestamp < b.timestamp ? -1 : 1));
+                    // sort descending by timestamp
+                    return (a.timestamp == b.timestamp ? 0 : (a.timestamp < b.timestamp ? 1 : -1));
                 });
 
                 var i;
@@ -154,7 +154,7 @@
                     unreadTotal = 0;
                 if(toInsert.length > 0) {
                     // append the list of messages
-                    for(i = toInsert.length - 1; i >= 0; --i) {
+                    for (i = 0; i < toInsert.length; --i) {
 
                         total++;
                         if (toInsert[i].status === settings.itemUnread) {
