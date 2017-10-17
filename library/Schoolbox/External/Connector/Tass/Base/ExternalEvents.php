@@ -24,7 +24,9 @@ class ExternalEvents extends Base implements IExternalEvents
         $start = new Alaress_Date_Format($startDate, Alaress_Date_Format::TIMESTAMP);
         $end = new Alaress_Date_Format($endDate, Alaress_Date_Format::TIMESTAMP);
 
-        $query = "
+        /* Get personal events for $user - it doesn't matter which role this user is
+         */
+        $allEvents[] = "(
             select  ec.event_id as id,
                     ec.entry_code as owner,
                     ec.event_name as comment,
@@ -51,7 +53,40 @@ class ExternalEvents extends Base implements IExternalEvents
                             ELSE ec.start_date 
                         END >= :endTime 
                     )
-        ";
+        )";
+
+        /* Get role-specific set of events
+         */
+        if ($user->getRole()->isStudent()) {
+
+            /* Get student events via product code TSCPDC
+             */
+            $allEvents[] = "(
+            )";
+        }
+        elseif ($user->getRole()->isStaff()) {
+
+            /* Get staff events via product code TIAPDC
+             */
+            $allEvents[] = "(
+            )";
+        }
+        elseif ($user->getRole()->isParent()) {
+
+            /* Get parent events via product code PIAPDC
+             */
+            $allEvents[] = "(
+            )";
+        }
+
+        /* Get all the other public events
+         */
+        $allEvents[] = "(
+        )";
+
+        /* Collate them into one mega union
+         */
+        $query = implode(' UNION ', $allEvents);
 
         return $this->databaseExternal->executeQueryIterator($query, [
             'externalId' => $user->getExternalId(),
