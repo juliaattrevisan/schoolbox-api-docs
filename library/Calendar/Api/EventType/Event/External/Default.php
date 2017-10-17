@@ -142,7 +142,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
                 /** @var EventType $eventTypeObject */
                 $eventTypeObject = $this->getEventTypeMapper()->findById($event->getType());
                 $event->setColour($eventTypeObject->getColor());
-            } catch (\Schoolbox\Mapper\Exception $e) {
+            } catch (MapperException $e) {
                 $event->setColour(null);
             }
 
