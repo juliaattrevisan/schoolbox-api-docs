@@ -22,19 +22,28 @@ use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Calendar\Event;
+use Schoolbox\CampusMapper;
 
 
 class ValidationTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
-     * @param $user
-     * @param $bookingMapper
-     * @param $termMapper
+     * @param User|null             $user
+     * @param BookingMapper|null    $bookingMapper
+     * @param StatusMapper|null     $statusMapper
+     * @param TermMapper|null       $termMapper
+     * @param CampusMapper|null     $campusMapper
      *
      * @return Validation
      */
-    private function createValidation($user = null, $bookingMapper = null, $statusMapper = null, $termMapper = null)
+    private function createValidation(
+        $user = null,
+        $bookingMapper = null,
+        $statusMapper = null,
+        $termMapper = null,
+        $campusMapper = null
+    )
     {
 
         if(!$user) {
@@ -45,14 +54,19 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
             $bookingMapper = new BookingMapper();
         }
 
-        if(!$statusMapper) {
+        if (!$statusMapper) {
             $statusMapper = new StatusMapper();
         }
 
-        if(!$termMapper) {
+        if (!$termMapper) {
             $termMapper = new TermMapper();
         }
 
+        if (!$campusMapper) {
+            $campusMapper = new CampusMapper();
+        }
+
+        // Stub external timetable, don't allow it to use it ist own constractor
         $externalTimetable = $this->getMockBuilder(External_Timetable::Class)
                                   ->setMethods(['__construct'])
                                   ->disableOriginalConstructor()
@@ -60,7 +74,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
 
         /** @var External_Timetable $externalTimetable */
         $mockValidation = $this->getMockBuilder(Validation::Class)
-                               ->setConstructorArgs([$user, $bookingMapper, $statusMapper, $termMapper, $externalTimetable])
+                               ->setConstructorArgs([$user, $bookingMapper, $statusMapper, $termMapper, $externalTimetable, $campusMapper])
                                ->setMethods(['getTimetableRoomEvents']) // we need this to be a stub
                                ->getMock();
 
