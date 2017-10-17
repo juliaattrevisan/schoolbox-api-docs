@@ -93,6 +93,11 @@ class ExternalEvents extends Base implements IExternalEvents
             /* Get staff events via product code TIAPDC
              */
             $allEvents[] = "(
+                {$selectQuery}
+                INNER JOIN eventtype et ON et.event_id = ec.event_id AND prod_code = 'TIAPDC'
+                {$catdefsQuery} 
+                WHERE 
+                {$whereQuery}
             )";
         }
         elseif ($user->getRole()->isParent()) {
