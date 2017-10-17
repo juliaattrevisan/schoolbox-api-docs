@@ -68,14 +68,14 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
             return $stack;
         }
 
-        // Figure out event type
+        // Figure out default event type
         try {
             /** @var Calendar_Api_Config_Record $config */
             $config        = $this->loadConnectorConfiguration();
             $decodedConfig = $config->decodeConfig();
-            $eventType     = $decodedConfig->getLuEventType();
+            $defaultEventType     = $decodedConfig->getLuEventType();
         } catch (\Schoolbox\Mapper\Exception $e) {
-            $eventType = self::DEFAULT_EVENTTYPE_ID;
+            $defaultEventType = self::DEFAULT_EVENTTYPE_ID;
         }
 
         /* TODO: Connector-specific event type mapping
@@ -103,9 +103,11 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
              * Otherwise assume $externalEvent['type'] to be the truth and try to match its value to a luEventType,
              * defaulting to the first luEventType if one cannot be found
              */
-
-
-            $event->setType($eventType);
+            if (strlen(trim($externalEvent['type']))) {
+            }
+            else {
+                $event->setType($defaultEventType);
+            }
 
             $event->setTitle($externalEvent['title']);
             $event->setIsEditable(false);
