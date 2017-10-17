@@ -137,6 +137,10 @@
                 }
 
                 toInsert.sort(function(a,b) {
+                    // always sort read before unread (we'll iterate descending)
+                    if (a.status !== b.status) {
+                        return a.status === settings.itemUnread ? 1 : -1;
+                    }
                     // sort ascending by timestamp (we'll iterate descending)
                     return (a.timestamp == b.timestamp ? 0 : (a.timestamp < b.timestamp ? -1 : 1));
                 });
