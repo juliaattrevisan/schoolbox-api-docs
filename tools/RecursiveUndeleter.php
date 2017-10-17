@@ -224,6 +224,9 @@ class RecursiveUndeleter
         ReturnedWorkFile\Mapper::class  => [],
         Rubric\DescriptorMapper::class  => [],
         Plagscan\Mapper::class          => [],
+        Rubric\CriterionMapper::class   => [
+            Rubric\DescriptorMapper::class => 'rubric_descriptor.criterion_id',
+        ]
     ];
 
 

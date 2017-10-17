@@ -36,7 +36,22 @@ class CriterionMapper extends Schoolbox\Mapper {
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyUniqueness']);
+        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteDescriptors']);
     }
+
+
+    /**
+     * Soft-delete callback to delete any descriptors for this criterion
+     *
+     * @param Criterion $criterion
+     * @return bool
+     */
+    public function softDeleteDescriptors(Criterion $criterion)
+    {
+        DescriptorMapper::getInstance()->deleteByColumn('criterion_id', $criterion->getId());
+        return true;
+    }
+
 
     /**
      * Clones rubric criteria from one category to another.
