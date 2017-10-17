@@ -127,24 +127,6 @@ class ExternalEvents extends Base implements IExternalEvents
          */
         $query = implode(' UNION ', $allEvents);
 
-        $test = $this->databaseExternal->executeQueryIterator($query, [
-            'externalId' => $user->getExternalId(),
-            'startTime' => $start->getDatabase(),
-            'endTime' => $end->getDatabase()
-        ]);
-
-        foreach($test as $row) {
-            print_r($row);
-        }
-
-//        $test = $this->databaseExternal->executeQueryIterator("SELECT TOP 100 * FROM eventcatdefs");
-//
-//        foreach($test as $row) {
-//            print_r($row);
-//        }
-
-//        die();
-
         return $this->databaseExternal->executeQueryIterator($query, [
             'externalId' => $user->getExternalId(),
             'startTime' => $start->getDatabase(),
