@@ -149,8 +149,6 @@
 
                 var footerText = '';
 
-                var listItems = [];
-
                 // Show a max of 100 msgs
                 var total = 0,
                     unreadTotal = 0;
