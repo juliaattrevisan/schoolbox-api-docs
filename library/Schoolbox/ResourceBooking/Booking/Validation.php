@@ -22,6 +22,8 @@ use Schoolbox\ResourceBooking\Booking\Status;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Campus;
+use Schoolbox\CampusMapper;
 use Aura\Web\Request;
 use Calendar_Api_EventType_Timetable_Room as TimetableRoom;
 
@@ -71,6 +73,11 @@ class Validation
     private $externalTimetableHandler;
 
     /**
+     * @var CampusMapper
+     */
+    private $campusMapper;
+
+    /**
      * @param User         $user
      * @param Mapper       $bookingMapper
      * @param StatusMapper $statusMapper
@@ -81,13 +88,15 @@ class Validation
         BookingMapper $bookingMapper,
         StatusMapper $statusMapper,
         TermMapper $termMapper,
-        External_Timetable $externalTimetableHandler
+        External_Timetable $externalTimetableHandler,
+        CampusMapper $campusMapper
     ) {
         $this->setUser($user);
         $this->setBookingMapper($bookingMapper);
         $this->setStatusMapper($statusMapper);
         $this->setTermMapper($termMapper);
         $this->setExternalTimetableHandler($externalTimetableHandler);
+        $this->setCampusMapper($campusMapper);
     }
 
 
@@ -106,7 +115,7 @@ class Validation
     public function validateBookingFromPostData(
         Item\Model $resource,
         Booking $existingBooking = null,
-        Request\Values $postData
+        $postData
     ) {
         // Check:
         // Beginning and end of booking are valid datetime
@@ -162,7 +171,6 @@ class Validation
 
             $isTimeChanged = $startDelta->getSecondTotal() !== 0 || $endDelta->getSecondTotal() !== 0;
         }
-
         // Validate any new booking or existing booking if dates have been modified
         if ($isNewBooking || $isTimeChanged) {
             $errors = array_merge_recursive(
@@ -188,7 +196,19 @@ class Validation
             if ($isNewBooking) {
                 // Validate related and recurrent bookings of a new booking
                 $series = new Series($this->getBookingMapper(), $this->getStatusMapper(), $this->getExternalTimetableHandler());
-                $dateParts = $series->getNewBookingSeries($resource, $startDate, $endDate, $postData);
+                if ($postData['timetable']['campus'] > 0) {
+                    $campus = $this->getCampusMapper()->findById($postData['timetable']['campus']);
+                }
+                /** @var Campus $campus */
+                $dateParts = $series->getNewBookingSeries(
+                    $resource,
+                    $startDate,
+                    $endDate,
+                    $postData['repeat_until'],
+                    $postData['related_item'],
+                    $postData['repeat'],
+                    $campus
+                );
                 foreach ($dateParts as $check) {
                     /** @var Item\Model $thisResource */
                     list($thisResource, $thisStart, $thisEnd) = $check;
@@ -213,7 +233,13 @@ class Validation
                 // messed with.
                 $series = new Series($this->getBookingMapper(), $this->getStatusMapper(), $this->getExternalTimetableHandler());
 
-                foreach ($series->getExistingSeries($existingBooking, $startDate, $endDate, $postData) as $check) {
+                foreach ($series->getExistingSeries(
+                    $existingBooking,
+                    $startDate,
+                    $endDate,
+                    $postData['related_item'],
+                    $postData['efficacy']
+                ) as $check) {
                     /** @var Item\Model $thisResource */
                     list($thisResource, $thisStart, $thisEnd, $thisBooking) = $check;
 
@@ -631,5 +657,21 @@ class Validation
     public function setExternalTimetableHandler($externalTimetableHandler)
     {
         $this->externalTimetableHandler = $externalTimetableHandler;
+    }
+
+    /**
+     * @return CampusMapper
+     */
+    public function getCampusMapper()
+    {
+        return $this->campusMapper;
+    }
+
+    /**
+     * @param CampusMapper $campusMapper
+     */
+    public function setCampusMapper($campusMapper)
+    {
+        $this->campusMapper = $campusMapper;
     }
 }

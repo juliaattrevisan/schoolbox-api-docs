@@ -188,7 +188,8 @@ class Controller extends Base
             $this->getBookingMapper(),
             $this->getStatusMapper(),
             $this->getTermMapper(),
-            $this->getExternalTimetableHandler()
+            $this->getExternalTimetableHandler(),
+            $this->getCampusMapper()
         );
         $errors = $validation->validateBookingFromPostData($item, null, $this->getRequest()->post);
         if (empty($errors)) {
@@ -292,7 +293,8 @@ class Controller extends Base
             $this->getBookingMapper(),
             $this->getStatusMapper(),
             $this->getTermMapper(),
-            $this->getExternalTimetableHandler()
+            $this->getExternalTimetableHandler(),
+            $this->getCampusMapper()
         );
         $errors = $validation->validateBookingFromPostData($item->getResource(), $item, $this->getRequest()->post);
 
@@ -458,10 +460,12 @@ class Controller extends Base
         Collection $bookingList,
         $recurrenceRule,
         DateTime $repeatUntil,
-        $campusId
+        $campusId = null
     ) {
         $newList = new Collection();
-        $campus = $this->getCampusMapper()->findById($campusId);
+        if ($campusId) {
+            $campus = $this->getCampusMapper()->findById($campusId);
+        }
         foreach ($bookingList as $booking) {
             $event     = $booking->getEvent();
             $eventList = new Collection();
@@ -721,7 +725,8 @@ class Controller extends Base
             $this->getBookingMapper(),
             $this->getStatusMapper(),
             $this->getTermMapper(),
-            $this->getExternalTimetableHandler()
+            $this->getExternalTimetableHandler(),
+            $this->getCampusMapper()
         );
         // validate this booking
         $booking

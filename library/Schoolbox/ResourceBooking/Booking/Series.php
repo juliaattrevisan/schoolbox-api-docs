@@ -15,6 +15,7 @@ use Aura\Web\Request;
 use InvalidArgumentException;
 use Schoolbox\Collection;
 use External_Timetable;
+use Schoolbox\Campus;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\ResourceBooking\Booking\Model as Booking;
@@ -56,38 +57,44 @@ class Series
     /**
      * Get all recursive booking dates
      *
-     * @param Item\Model     $resource
-     * @param DateTime       $startDate
-     * @param DateTime       $endDate
-     * @param Request\Values $postData
-     * @throws InvalidArgumentException
+     * @param Item\Model  $resource
+     * @param DateTime    $startDate
+     * @param DateTime    $endDate
+     * @param String|null        $repeatUntil
+     * @param String|null        $related
+     * @param String|null        $repeat
+     * @param Campus|null $campus
+     *
      * @return array
      */
     public function getNewBookingSeries(
         Item\Model $resource,
         DateTime $startDate,
         DateTime $endDate,
-        Request\Values $postData
+        $repeatUntil = null,
+        $related = null,
+        $repeat = null,
+        Campus $campus = null
     ) {
         $dateParts = [];
         $series    = [];
 
         // Get all booking dates for the current resource
-        if ($postData['repeat_until']) {
+        if ($repeatUntil) {
             try {
-                $repeatUntil = Alaress_Date_Format::newLocalShort(
-                    $postData['repeat_until']
+                $repeatUntilDate = Alaress_Date_Format::newLocalShort(
+                    $repeatUntil
                 );
             } catch (\Exception $e) {
-                $repeatUntil = null;
+                $repeatUntilDate = null;
             }
-            if ($repeatUntil instanceof Alaress_Date_Format) {
+            if ($repeatUntilDate instanceof Alaress_Date_Format) {
                 $recurrence = new Recurrence($this->getExternalTimetableHandler());
                 $series     = $recurrence->getRecurrencePeriod(
                     $startDate,
-                    $postData['repeat'],
-                    $repeatUntil->getDateTimeObject(),
-                    $postData['timetable']['campus']
+                    $repeat,
+                    $repeatUntilDate->getDateTimeObject(),
+                    $campus
                 );
             }
             $difference = $startDate->diff($endDate);
@@ -103,7 +110,7 @@ class Series
 
         // Get all booking dates for all the related resources
         $relatedItems = [];
-        foreach ($postData['related_item'] ?? [] as $relatedItem) {
+        foreach ($related ?? [] as $relatedItem) {
             if ($relatedItem['resource_id']) {
                 $relatedItems[$relatedItem['resource_id']] = $relatedItem;
             }
@@ -131,14 +138,21 @@ class Series
      * @param Booking  $existingBooking
      * @param DateTime $startDate
      * @param DateTime $endDate
-     * @param iterable $postData
+     * @param String $related
+     * @param String $efficacy
      * @return array
      * @throws MapperException
      */
-    public function getExistingSeries(Booking $existingBooking, DateTime $startDate, DateTime $endDate, $postData)
+    public function getExistingSeries(
+        Booking $existingBooking,
+        DateTime $startDate,
+        DateTime $endDate,
+        $related = null,
+        $efficacy = null
+    )
     {
         $relatedItems  = [];
-        foreach ($postData['related_item'] ?: [] as $relatedItem) {
+        foreach ($related ?: [] as $relatedItem) {
             if ($relatedItem['resource_id']) {
                 $relatedItems[$relatedItem['resource_id']] = $relatedItem;
             }
@@ -148,7 +162,7 @@ class Series
             $startDate,
             $endDate,
             $relatedItems,
-            $postData['efficacy']
+            $efficacy
         );
 
         $dateParts = [];
