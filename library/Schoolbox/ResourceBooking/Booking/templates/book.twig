@@ -176,18 +176,18 @@ $(function() {
                 datepickerDate: true,
                 'remote.invalidStart': true,
                 'remote.inPast': true,
-                'remote.tooEarly': true,
                 'remote.conflict': true,
-                'remote.timetabledClass': true
+                'remote.timetabledClass': true,
+                'remote.tooEarly': true
             },
             'endDate': {
                 required: true,
                 datepickerDate: true,
                 'remote.invalidEnd': true,
                 'remote.beforeStart': true,
+                'remote.currentTerm': true,
                 'remote.tooShort': true,
-                'remote.tooLong': true,
-                'remote.currentTerm': true
+                'remote.tooLong': true
             },
             'repeat_until': {
                 datepickerDate: {
