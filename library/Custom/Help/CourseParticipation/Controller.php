@@ -16,10 +16,12 @@ use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Psr7\Response;
 use PDOException;
 use Schoolbox\CampusMapper;
+use Schoolbox\Collection;
 use Schoolbox\Permission\SiteAccess;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -182,9 +184,7 @@ class Controller extends Base
 
         // ok, if you're here, you can see the thing.
         try {
-            $folder = $this->folderMapper->findById(
-                $this->codeMapper->findOneByColumn('code', $schoolCode)->getFolder()->getId()
-            );
+            $courses = $this->getCoursesBySchool($schoolCode);
 
         } catch (Mapper\Exception $e) {
             $this->sendGenericStatus(404);
@@ -192,11 +192,6 @@ class Controller extends Base
         }
 
         $payload = [];
-
-        // obtain all direct descendants of this folder
-        // the scope of implementation is immediate children only, rather than attempting to gather all descendants
-        $courses = $this->folderMapper->findByParentId($folder->getId());
-
 
         foreach ($courses as $course) {
             $participants = $this->userAccessMapper->findUsersInCategory($course)->getColumnValues('email');
@@ -394,6 +389,25 @@ class Controller extends Base
         }
 
         return true;
+    }
+
+
+    /**
+     * @param string $schoolCode
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
+     * @return Collection|IFolder[]
+     */
+    private function getCoursesBySchool($schoolCode)
+    {
+        // ok, if you're here, you can see the thing.
+        $folder = $this->folderMapper->findById(
+            $this->codeMapper->findOneByColumn('code', $schoolCode)->getFolder()->getId()
+        );
+
+        // obtain all direct descendants of this folder
+        // the scope of implementation is immediate children only, rather than attempting to gather all descendants
+        return $this->folderMapper->findByParentId($folder->getId());
     }
 
 
