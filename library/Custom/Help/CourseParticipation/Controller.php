@@ -17,6 +17,7 @@ use GuzzleHttp\Psr7\Response;
 use PDOException;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\SiteAccess;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -204,6 +205,100 @@ class Controller extends Base
         }
 
         $rs->content->set($this->buildJsonOutput($payload));
+    }
+
+
+    /**
+     * @api   POST /api/course-participation/{schoolCode}/courses
+     * @level 170
+     *
+     * @param string $schoolCode
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
+     * @throws \Aura\Web\Exception\InvalidStatusCode
+     */
+    public function postFolderAccessBySchool($schoolCode)
+    {
+        $rq = $this->getRequest();
+        $rs = $this->getResponse();
+
+        $requestTimestamp = new Alaress_Date_Format($rq->query->get('ts', 0), 'U');
+
+        $authDigest = $rq->query->get('token', '');
+
+        $responseCode = $this->getResponseCode($schoolCode, $requestTimestamp, $authDigest);
+
+        if ($responseCode !== 200) {
+            // if the request didn't pass the gauntlet, bounce the request
+            $this->sendGenericStatus($responseCode);
+            return;
+        }
+
+        $post = $rq->post;
+
+        if (empty($post['course'])) {
+            // empty payload: do nothing
+            $this->sendGenericStatus(400);
+            return;
+        }
+
+        $courses   = $this->getCoursesBySchool($schoolCode);
+        $courseIds = $courses->getColumnValues('id');
+
+        $failures = [];
+
+        /*
+         * Business rule: POST payload is expected to contain a data struct that provides:
+         *   - for a particular folder ID
+         *       - a list of email addresses to enrol into that folder
+         *       - a list of email addresses to unenrol from that folder
+         */
+
+        foreach ($post['course'] as $folderId => $enrolments) {
+            if (!in_array($folderId, $courseIds)) {
+                /*
+                 * Business rule: A request that specifies folder IDs that do not belong to the school given returns 403
+                 */
+                $this->sendGenericStatus(403);
+                return;
+            }
+
+            foreach ($enrolments as $emailAddress => $enrol) {
+                try {
+                    $user = $this->getUserMapper()->findOneByColumn('username', $emailAddress);
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $failures[] = $emailAddress;
+                    continue;
+                }
+
+                if ($enrol) {
+                    // add this user to this folder
+                    $this->userAccessMapper->create(
+                        $this->userAccessMapper->createModel()
+                            ->setUser($user)
+                            ->setAccessLevel(UserAccess::ACCESS_READ)
+                            ->setService(UserAccess::SERVICE_HOMEPAGE)
+                            ->setServiceIdentifier($folderId)
+                    );
+                } else {
+                    // remove this user from this folder
+                    $this->userAccessMapper->deleteByColumnList([
+                        'uid' => $user->getId(),
+                        'service' => UserAccess::SERVICE_HOMEPAGE,
+                        'sid' => $folderId,
+                    ]);
+                }
+            }
+        }
+
+        if ($failures) {
+            $rs->status->setCode(207);
+            $rs->content->set($this->buildJsonOutput($failures));
+            return;
+        }
+
+        $this->sendGenericStatus(204);
     }
 
 
