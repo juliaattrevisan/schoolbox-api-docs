@@ -13,6 +13,7 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
@@ -28,6 +29,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
 use Twig_Loader_Chain;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 class Module extends BaseModule
 {
@@ -198,6 +200,8 @@ class Module extends BaseModule
             'assessmentDataSource'  => $injector->lazyGet('assessmentDataSource'),
             'userMapper'            => $this->getMapperFactory()->get(UserMapper::class),
             'responseDataSource'    => $injector->lazyGet('responseDataSource'),
+            'rubricMarkMapper'      => $this->getMapperFactory()->get(Rubric\MarkMapper::class),
+            'returnedWorkMapper'    => $this->getMapperFactory()->get(ReturnedWorkMapper::class),
         ];
     }
 

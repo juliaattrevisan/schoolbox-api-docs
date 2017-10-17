@@ -10,6 +10,7 @@ use Alaress\Web\Controller\Base;
 use Aura\Web\Request\Values as RequestValues;
 use PDOException;
 use RangeException;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IFeedback;
@@ -17,11 +18,12 @@ use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\MarkMapper as RubricMarkMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
+use Alaress_Date_Format;
 
 class Controller extends Base
 {
@@ -41,6 +43,12 @@ class Controller extends Base
     /** @var UserMapper */
     protected $userMapper;
 
+    /** @var Rubric\MarkMapper */
+    private $rubricMarkMapper;
+
+    /** @var ReturnedWorkMapper */
+    private $returnedWorkMapper;
+
     /**
      * Controller constructor.
      *
@@ -49,19 +57,25 @@ class Controller extends Base
      * @param AssessmentDataSource $assessmentDataSource
      * @param ResponseDataSource $responseDataSource
      * @param UserMapper $userMapper
+     * @param Rubric\MarkMapper $rubricMarkMapper
+     * @param ReturnedWorkMapper $returnedWorkMapper
      */
     public function __construct(
         IFeedbackDataSource $feedbackDataSource,
         ParticipantDataSource $participantDataSource,
         AssessmentDataSource $assessmentDataSource,
         ResponseDataSource $responseDataSource,
-        UserMapper $userMapper
+        UserMapper $userMapper,
+        Rubric\MarkMapper $rubricMarkMapper,
+        ReturnedWorkMapper $returnedWorkMapper
     ) {
         $this->feedbackDataSource = $feedbackDataSource;
         $this->participantDataSource = $participantDataSource;
         $this->assessmentDataSource = $assessmentDataSource;
         $this->responseDataSource = $responseDataSource;
         $this->userMapper = $userMapper;
+        $this->rubricMarkMapper = $rubricMarkMapper;
+        $this->returnedWorkMapper = $returnedWorkMapper;
     }
 
     /**
@@ -101,63 +115,49 @@ class Controller extends Base
      *
      * This is a dueWork-only route
      *
-     * @api   POST /learning/assessments/feedbacks
-     * @level 165
+     * @param DueWork\Model $assessment
+     * @api   POST /learning/assessments/{assessmentId}/feedbacks
+     * @level 170
+     *
      */
-    public function postParticipantFeedbacks()
+    public function postParticipantFeedbacks(DueWork\Model $assessment)
     {
+        /** @var int[] $draftFeedbackIds */
+        $draftFeedbackIds = $this->getRequest()->post->get('drafts', []);
+        $now              = Alaress_Date_Format::now();
         $results = [];
 
-        $post = $this->getRequest()->post->getArrayCopy();
+        foreach ($draftFeedbackIds as $draftFeedbackId) {
+            // Verify that this return is for this assessment
+            $submissionReturn = $this->returnedWorkMapper->findById($draftFeedbackId);
+            $publishSuccess   = false;
+            $rubricSuccess    = null;
+            $countRubricMarks = 0;
+            if ($submissionReturn->getSubmissionBox()->getAssessmentModel()->getId() === $assessment->getId()) {
+                $submissionReturn->setPublishedAt($now);
 
-        foreach ($post['feedback'] as $feedback) {
-            $student = $this->userMapper->findById($feedback['studentId']);
-            $assessment = $this->assessmentDataSource->findById($feedback['assessmentId']);
-            $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
-            $participant = $assessment->getParticipant($student);
-            $response = $this->responseDataSource->findForAssessment($assessment, $student);
-            $mostRecentFeedback = $participant->findMostRecentFeedback();
+                try{
+                    $this->returnedWorkMapper->save($submissionReturn);
+                    $publishSuccess = true;
+                } catch (PDOException $e){
+                    $publishSuccess = false;
+                }
 
-            $formData = [
-                'response' => $response
+                if($publishSuccess){
+                    try{
+                        $countRubricMarks = $this->rubricMarkMapper->publishDraftMarks($submissionReturn->getOwner(), $assessment);
+                        $rubricSuccess = true;
+                    } catch (PDOException $e){
+                        $rubricSuccess = false;
+                    }
+                }
+            }
+
+            $results[$draftFeedbackId] = [
+                'publishSuccess'   => $publishSuccess,
+                'rubricSuccess'    => $rubricSuccess,
+                'countRubricMarks' => $countRubricMarks,
             ];
-
-            foreach ($feedback['formData'] as $data) {
-                $formData[$data['name']] = $data['value'];
-            }
-
-            try {
-                $feedback = $this->processFeedback($participant, $mostRecentFeedback, $formData);
-                $this->processRubric($participant, $formData);
-
-                $results[] = [
-                    'id'                => $feedback->getId(),
-                    'participantId'     => $participant->getUser()->getId(),
-                    'success'           => true,
-                    'submittedLate'     => $assessment->isOverdue() || $assessment->isPastClose()
-                ];
-            }
-            catch (RangeException $e) {
-                $results[] = [
-                    'participantId'     => $participant->getUser()->getId(),
-                    'success'           => false,
-                    'message'           => 'Invalid mark provided for ' . $participant->getUser()->getFullName() . ". "
-                ];
-            }
-            catch (MapperException $e) {
-                $results[] = [
-                    'participantId'     => $participant->getUser()->getId(),
-                    'success'           => false,
-                    'message'           => 'Invalid mark provided for ' . $participant->getUser()->getFullName() . ". "
-                ];
-            }
-            catch (PDOException $e) {
-                $results[] = [
-                    'participantId'     => $participant->getUser()->getId(),
-                    'success'           => false,
-                    'message'           => 'Unable to save results for ' . $participant->getUser()->getFullName() . ". "
-                ];
-            }
         }
 
         $this->getResponse()->content->set(
@@ -188,7 +188,7 @@ class Controller extends Base
         }
         // Else did we just publish draft marks via the status page?
         elseif(!$isDraft){
-            RubricMarkMapper::getInstance()->publishDraftMarks($participant->getUser(), $dueWork);
+            $this->rubricMarkMapper->publishDraftMarks($participant->getUser(), $dueWork);
         }
     }
 

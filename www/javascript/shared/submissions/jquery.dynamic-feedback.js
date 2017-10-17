@@ -70,8 +70,10 @@
                  */
                 publishText: 'Publish',
 
-                // Callbacks to execute upon successful completion of Draft and Publish actions
+                // Callbacks to execute upon initiation and successful completion of Draft and Publish actions
+                onPreDraftCallback: $.noop,
                 onDraftCallback: $.noop,
+                onPrePublishCallback: $.noop,
                 onPublishCallback: $.noop
             };
 
@@ -132,11 +134,14 @@
                 // Publish submits everything
                 var formData = $form.serializeArray();
                 formData.push({name: 'publish', value: 1});
+
+                config.onPrePublishCallback($participant.data('participant'), formData);
+
                 $.ajax($form.attr('action'), {
                     dataType: 'json',
                     data:  formData,
                     type: 'post'
-                }).done(function () {
+                }).done(function (response) {
 
                     // Have we inserted feedback meta message into action bar ?
                     if ($actionBar.find('[data-feedback-attach-info]').length) {
@@ -168,7 +173,12 @@
                     $actionBar.attr('data-published', '');
 
                     toast.call($participant, 'Feedback published', true, false);
-                    config.onPublishCallback($participant.data('participant'));
+                    config.onPublishCallback(
+                        $participant.data('participant'),
+                        response.success,
+                        response.message,
+                        response.id
+                    );
 
                 }).fail(function (xhr) {
                     toast.call($participant, xhr.responseText, false, false);
@@ -230,8 +240,10 @@
                 text: 'Autosaving...'
             });
 
+            config.onPreDraftCallback($participant.data('participant'), data);
+
             $.ajax($form.attr('action'), data)
-                .done(function () {
+                .done(function (response) {
                     toast.call($participant, 'Draft saved', true, true);
 
                     // Show the action bar and buttons
@@ -246,7 +258,12 @@
                         $actionBar.removeAttr('data-published');
                     }
 
-                    config.onDraftCallback($participant.data('participant'));
+                    config.onDraftCallback(
+                        $participant.data('participant'),
+                        response.success,
+                        response.message,
+                        response.id
+                    );
                 })
                 .fail(function (xhr) {
                     toast.call($participant, xhr.responseText, false, false);
