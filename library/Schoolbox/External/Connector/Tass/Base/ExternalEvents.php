@@ -62,6 +62,34 @@ class ExternalEvents extends Base implements IExternalEvents
             /* Get student events via product code TSCPDC
              */
             $allEvents[] = "(
+                SELECT
+                    ec.event_id AS id,
+                    ec.entry_code AS owner,
+                    ec.event_name AS comment,
+                    ec.room_code AS room,
+                    CASE 
+                        WHEN ec.start_time IS NOT NULL THEN ec.start_date + ec.start_time 
+                        ELSE ec.start_date 
+                    END as start,
+                    CASE 
+                        WHEN ec.end_time IS NOT NULL THEN ec.end_date + ec.end_time 
+                        ELSE ec.end_date 
+                    END AS finish,
+                    ec.campus_code AS location,
+                    '' AS team
+                FROM eventcalendar ec
+                WHERE 
+                    ec.entry_code = :externalId AND 
+                    NOT (
+                        CASE 
+                            WHEN ec.end_time IS NOT NULL THEN ec.end_date + ec.end_time 
+                            ELSE ec.end_date 
+                        END < :startTime OR
+                        CASE 
+                            WHEN ec.start_time IS NOT NULL THEN ec.start_date + ec.start_time 
+                            ELSE ec.start_date 
+                        END >= :endTime 
+                    )
             )";
         }
         elseif ($user->getRole()->isStaff()) {
@@ -87,6 +115,28 @@ class ExternalEvents extends Base implements IExternalEvents
         /* Collate them into one mega union
          */
         $query = implode(' UNION ', $allEvents);
+
+        /* Explore the db
+         */
+//        $test = $this->databaseExternal->executeQueryIterator("SELECT TOP 10 * FROM eventcalendar");
+//
+//        foreach($test as $row) {
+//            print_r($row);
+//        }
+
+        $test = $this->databaseExternal->executeQueryIterator("SELECT TOP 100 * FROM eventcatdefs");
+
+        foreach($test as $row) {
+            print_r($row);
+        }
+
+//        $test = $this->databaseExternal->executeQueryIterator("SELECT TOP 100 * FROM eventtype");
+//
+//        foreach($test as $row) {
+//            print_r($row);
+//        }
+
+        die();
 
         return $this->databaseExternal->executeQueryIterator($query, [
             'externalId' => $user->getExternalId(),
