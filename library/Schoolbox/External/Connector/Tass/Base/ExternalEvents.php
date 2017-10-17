@@ -140,7 +140,7 @@ class ExternalEvents extends Base implements IExternalEvents
 //            print_r($row);
 //        }
 
-        die();
+//        die();
 
         return $this->databaseExternal->executeQueryIterator($query, [
             'externalId' => $user->getExternalId(),

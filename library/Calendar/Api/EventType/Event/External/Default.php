@@ -86,30 +86,19 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
             $defaultEventType = self::DEFAULT_EVENTTYPE_ID;
         }
 
-        /* TODO: Connector-specific event type mapping
-         *
-         * Maintain a lookup of possible luEventTypes in schoolbox
-         *
-         * We keep this so we can map a connector-specific event type to one in schoolbox somehere,
-         * defaulting to the one chosen in admin if none can be found
-         *
-         * If the one chosen in admin couldn't be found, just default to 1
-         */
-
-
-
 
         foreach ($externalEvents as $externalEvent) {
-
             $event = new Event();
             $event->setEventId($externalEvent['id']);
 
-            /* TODO: Connector-specific event type mapping
+            /* Connector-specific event type mapping
              *
-             * If $externalEvent['type'] is empty, use the calendar configuration value that we chose in admin
+             * Assume $externalEvent['type'] to be the truth and try to match its value to a luEventType
              *
-             * Otherwise assume $externalEvent['type'] to be the truth and try to match its value to a luEventType,
-             * defaulting to the first luEventType if one cannot be found
+             * If $externalEvent['type'] is empty or cannot be found, use the calendar configuration value that we
+             * chose in admin
+             *
+             * If THAT option didn't exist (i.e. deleted after chosen) then just default to DEFAULT_EVENTTYPE_ID
              */
             if (strlen(trim($externalEvent['type']))) {
 
