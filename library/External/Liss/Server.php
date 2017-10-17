@@ -828,7 +828,7 @@ class External_Liss_Server
 
                     $eventRelations->saveFolderRelation($event, [$folder->getId()]);
                     $helper->saveEventSource($event, $currentEvent['edvalGuid']);
-                    $log->info(sprintf("Processed homepage event \"%s\" with guid \"%s\"", $event->getTitle(), $currentEvent['edvalGuid']));
+                    $log->info(sprintf("Processed homepage event \"%s\" with guid \"%s\", %s - %s", $event->getTitle(), $currentEvent['edvalGuid'], $event->getStartDateTime()->getDatabase(), $event->getEndDateTime()->getDatabase()));
                 } else {
 
                     /* Personal event
@@ -849,7 +849,7 @@ class External_Liss_Server
                             $eventRelations->savePersonalRelation($event);
                             $helper->saveEventSource($event, $currentEvent['edvalGuid']);
 
-                            $log->info(sprintf("Processed personal event \"%s\" with guid \"%s\" for user \"%s\"", $event->getTitle(), $currentEvent['edvalGuid'], $currentExternalId, $currentExternalId));
+                            $log->info(sprintf("Processed personal event \"%s\" with guid \"%s\" for user \"%s\", %s - %s", $event->getTitle(), $currentEvent['edvalGuid'], $currentExternalId, $event->getStartDateTime()->getDatabase(), $event->getEndDateTime()->getDatabase()));
                         } catch (MapperException $e) {
                             $log->warning(sprintf("Skipping event \"%s\" with guid \"%s\" for user \"%s\": no Schoolbox account found for external id \"%s\"",
                                 $event->getTitle(), $currentEvent['edvalGuid'], $currentExternalId, $currentExternalId
