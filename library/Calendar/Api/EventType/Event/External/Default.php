@@ -17,6 +17,13 @@ use \Schoolbox\External\Connector\IExternalEvents;
 class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventType_Abstract {
 
     /**
+     * Default id for an event type that was chosen in admin, but doesn't exist anymore
+     *
+     * @var int
+     */
+    const DEFAULT_EVENTTYPE_ID = 1;
+
+    /**
      * An external event handler instance
      *
      * @var Calendar
@@ -67,7 +74,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
             $decodedConfig = $config->decodeConfig();
             $eventType     = $decodedConfig->getLuEventType();
         } catch (\Schoolbox\Mapper\Exception $e) {
-            $eventType = 1;
+            $eventType = self::DEFAULT_EVENTTYPE_ID;
         }
 
         /* TODO: Connector-specific event type mapping
