@@ -842,6 +842,7 @@ class External_Liss_Server
                     foreach ($combined as $currentExternalId) {
                         try {
                             $user = $userMapper->findByExternalId($currentExternalId);
+                            $event->setId(null);
                             $event->setOwner($user);
                             $eventMapper->save($event);
 
