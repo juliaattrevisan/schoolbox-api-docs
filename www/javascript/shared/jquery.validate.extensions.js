@@ -248,7 +248,15 @@
     }, 'This field is required');
 
     /* Check if a required field is blank/contains only whitespace */
-    $.validator.addMethod('requiredNotBlank', function(value) {
+    $.validator.addMethod('requiredNotBlank', function(value, element) {
+        /**
+         * Call the Required method first, which displays an error message
+         * only if field is completely blank (no whitespace or other chars).
+         * We are doing this in order to display a different error message
+         * depending on whether the field contains any chars or not.
+         */
+        jQuery.validator.methods.required.call(this, value, element);
+
         if (($.trim(value)).length) {
             return true;
         }
