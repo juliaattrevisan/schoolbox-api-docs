@@ -17,7 +17,7 @@ use Schoolbox\Resource\File\StorableTrait;
 use Schoolbox\User;
 
 /**
- * A single file within a student's submission to a due work.
+ * A single file within a teacher's feedback to a due work.
  */
 class Model implements IFile, ISoftDeletable
 {
