@@ -44,6 +44,7 @@
             // internal configuration
 
             itemUnread:       'unread',
+            itemMaxDisplayed: 100,
             itemTimeFormat:   'LLLL',
             itemTextEmphasis: 'b',
 
@@ -148,8 +149,7 @@
 
                 // Show a max of 100 msgs
                 var total = 0,
-                    unreadTotal = 0,
-                    max = 100;
+                    unreadTotal = 0;
                 if(toInsert.length > 0) {
                     // append the list of messages
                     for(i = toInsert.length - 1; i >= 0; --i) {
@@ -160,7 +160,7 @@
                         }
 
                         // Keep summating totals, but don't render them
-                        if (total >= max) {
+                        if (total > settings.itemMaxDisplayed) {
                             continue;
                         }
 
@@ -189,8 +189,8 @@
                 if (unreadTotal === 0) {
                     unreadTotalLabel = '';
                 }
-                if (unreadTotalLabel > max) {
-                    unreadTotalLabel = (String)(max) + '+';
+                if (unreadTotalLabel > settings.itemMaxDisplayed) {
+                    unreadTotalLabel = (String)(settings.itemMaxDisplayed) + '+';
                 }
                 $(settings.counter).html(unreadTotalLabel);
 
