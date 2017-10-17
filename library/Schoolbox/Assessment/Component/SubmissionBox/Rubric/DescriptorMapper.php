@@ -50,8 +50,8 @@ class DescriptorMapper extends Schoolbox\Mapper {
                     {$this->getJoinColumnString('level', 'l')},
                     {$this->getJoinColumnString('criterion', 'c')}
             FROM {$this->getTable()}
-            JOIN {$this->getJoinSql('level', '', 'l')}
-            JOIN {$this->getJoinSql('criterion', '', 'c')}
+            INNER JOIN {$this->getJoinSql('level', '', 'l', true)}
+            INNER JOIN {$this->getJoinSql('criterion', '', 'c', true)}
         ";
     }
 
