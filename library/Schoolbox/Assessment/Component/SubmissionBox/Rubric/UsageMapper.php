@@ -18,6 +18,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
  *
  * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
  * @method Usage createModel($idValue = null)
+ * @method Usage[]|Schoolbox\GenericCollection findByColumn($columnName, $columnValue, $options = [])
  */
 class UsageMapper extends Schoolbox\Mapper {
 

@@ -10,7 +10,9 @@
 
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -60,6 +62,8 @@ foreach ($criteria as $group) {
 /* @var $criterionMapper CriterionMapper */
 $criterionMapper = CriterionMapper::getInstance();
 
+// Which submission boxes have criteria deleted? We will need to ensure we don't leave in an invalid state.
+$affectedSubmissionBoxes = SubmissionBoxMapper::getInstance()->createCollection();
 
 //work out the diff and delete unnecessary criteria
 $found = array_keys($data);
@@ -74,12 +78,19 @@ $criterionCollection = $criterionMapper->findByColumnList(
 foreach ($criterionCollection as $crit) {
     if (!in_array($crit->getID(), $found)) {
         try {
+            $usages = UsageMapper::getInstance()->findByColumn('criterion_id', $crit->getId());
             $criterionMapper->delete($crit);
+            foreach($usages as $usage){
+                $box = $usage->getSubmissionBox();
+                $affectedSubmissionBoxes[$box->getId()] = $box;
+            }
         } catch (Exception $e) {
             die('Criteria not found');
         }
     }
 }
+// Ensure that deletion of a criterion, and its descriptors, does not result in empty levels.
+RubricMapper::getInstance()->deleteEmptyLevels($affectedSubmissionBoxes->keys());
 
 
 // iterate through list of provided criteria changes

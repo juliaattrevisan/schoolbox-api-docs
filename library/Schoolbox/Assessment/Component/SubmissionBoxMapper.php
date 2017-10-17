@@ -30,6 +30,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
  *
  * @package Schoolbox\Assessment\Component
  * @method SubmissionBox[]|GenericCollection findByColumn($columnName, $columnValue, $options = array())
+ * @method SubmissionBox[]|GenericCollection createCollection($contents = [])
  * @method SubmissionBox hydrate(array $row, $alias = '', $callback = null)
  * @method Collection|SubmissionBox[] findByColumnList($columnList, $options = [])
  * @method SubmissionBox findOneByColumn($columnName, $columnValue, $order = [], $options = [])
