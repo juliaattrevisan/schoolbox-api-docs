@@ -32,6 +32,7 @@ class ExternalEvents extends Base implements IExternalEvents
                     ec.entry_code as owner,
                     ec.event_name as comment,
                     ec.room_code as room,
+                    '' as type,
                     case 
                         when ec.start_time is not null then ec.start_date + ec.start_time 
                         else ec.start_date 
@@ -72,6 +73,7 @@ class ExternalEvents extends Base implements IExternalEvents
                     ec.entry_code AS owner,
                     ec.event_name AS comment,
                     ec.room_code AS room,
+                    '' as type,
                     CASE 
                         WHEN ec.start_time IS NOT NULL THEN ec.start_date + ec.start_time 
                         ELSE ec.start_date 
@@ -84,6 +86,7 @@ class ExternalEvents extends Base implements IExternalEvents
                     '' AS team
                 FROM eventcalendar ec
                 INNER JOIN eventtype et ON et.event_id = ec.event_id AND prod_code = 'TSCPDC'
+                INN
                 WHERE 
                     NOT (
                         CASE 
@@ -132,15 +135,14 @@ class ExternalEvents extends Base implements IExternalEvents
         foreach($test as $row) {
             print_r($row);
         }
-die();
-//        $test = $this->databaseExternal->executeQueryIterator("SELECT TOP 100 * FROM eventtype");
-//
-//        foreach($test as $row) {
-//            print_r($row);
-//        }
-//
-//        print_r($query);
-//        die();
+
+        $test = $this->databaseExternal->executeQueryIterator("SELECT TOP 100 * FROM eventcatdefs");
+
+        foreach($test as $row) {
+            print_r($row);
+        }
+
+        die();
 
         return $this->databaseExternal->executeQueryIterator($query, [
             'externalId' => $user->getExternalId(),

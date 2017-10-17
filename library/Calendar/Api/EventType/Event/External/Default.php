@@ -70,7 +70,19 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
             $eventType = 1;
         }
 
+        /* TODO: Connector-specific event type mapping
+         *
+         * Maintain a lookup of possible luEventTypes in schoolbox
+         *
+         * We keep this so we can map a connector-specific event type to one in schoolbox somehere,
+         * defaulting to 1 if none can be found
+         */
+
+
+        /* Assign event colours
+         */
         $eventColor = null;
+
         try {
             /** @var EventType $eventTypeObject */
             $eventTypeObject = $this->getEventTypeMapper()->findById($eventType);
@@ -83,7 +95,18 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
 
             $event = new Event();
             $event->setEventId($externalEvent['id']);
+
+            /* TODO: Connector-specific event type mapping
+             *
+             *  If $externalEvent['type'] is empty, use the calendar configuration value that we chose in admin
+             *
+             * Otherwise assume $externalEvent['type'] to be the truth and try to match its value to a luEventType,
+             * defaulting to the first luEventType if one cannot be found
+             */
+
+
             $event->setType($eventType);
+
             $event->setTitle($externalEvent['title']);
             $event->setIsEditable(false);
             $event->setStartTime(new Alaress_Date_Format($externalEvent['start'], 'Y-m-d H:i:s'));
