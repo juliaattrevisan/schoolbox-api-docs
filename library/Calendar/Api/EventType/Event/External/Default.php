@@ -121,11 +121,11 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
              */
             $event->setTitle($externalEvent['title']);
             $event->setIsEditable(false);
-            $event->setStartTime(new Alaress_Date_Format($externalEvent['start'], 'Y-m-d H:i:s'));
-            $event->setEndTime(new Alaress_Date_Format($externalEvent['finish'], 'Y-m-d H:i:s'));
+            $event->setStartTime(new Alaress_Date_Format($externalEvent['start'], Alaress_Date_Format::DATABASE_FORMAT));
+            $event->setEndTime(new Alaress_Date_Format($externalEvent['finish'], Alaress_Date_Format::DATABASE_FORMAT));
 
             // Publish date is not available in Synergetic Staff Scheduler, but may be available elsewhere
-            $event->setPublishDate(empty($externalEvent['publish']) ? '' : new Alaress_Date_Format($externalEvent['finish'], 'Y-m-d H:i:s'));
+            $event->setPublishDate(empty($externalEvent['publish']) ? '' : new Alaress_Date_Format($externalEvent['finish'], Alaress_Date_Format::DATABASE_FORMAT));
 
             //Where is the best place to format this? TODO
             $eventDetail = '';
