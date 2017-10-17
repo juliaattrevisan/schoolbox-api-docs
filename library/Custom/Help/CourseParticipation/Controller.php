@@ -113,6 +113,19 @@ class Controller extends Base
 
 
     /**
+     * @param $schoolCode
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
+     */
+    public function refreshToken($schoolCode)
+    {
+        $code = $this->tokenMapper->findById($schoolCode);
+        $token = $this->computeAccessToken(Alaress_Date_Format::now(), $schoolCode, $code->getAccessToken());
+
+        $this->getResponse()->content->set($this->buildJsonOutput($token));
+    }
+
+    /**
      * @api   POST /api/course-participation/apitest
      * @level 170
      */
