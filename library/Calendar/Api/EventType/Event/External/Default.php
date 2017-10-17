@@ -48,13 +48,14 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
         $this->setEventTypeMapper(EventTypeMapper::getInstance());
     }
 
+
     /**
      * Get events from this data source
      *
      * @param int $startTimestamp
      * @param int $endTimestamp
-     *
-     * @return \Calendar\Event\Collection
+     * @return Collection
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function getEvents($startTimestamp, $endTimestamp) {
 
