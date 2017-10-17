@@ -32,7 +32,7 @@ class ExternalEvents extends Base implements IExternalEvents
                 ec.entry_code AS owner,
                 ec.event_name AS comment,
                 ec.room_code AS room,
-                '' AS type,
+                ecd.cat_desc as type,
                 CASE 
                     WHEN ec.start_time IS NOT NULL THEN ec.start_date + ec.start_time 
                     ELSE ec.start_date 
