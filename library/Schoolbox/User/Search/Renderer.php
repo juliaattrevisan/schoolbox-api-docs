@@ -58,6 +58,7 @@ class Renderer extends Handler
             $this->getPage()->setBlock('user', 'position_title', 'position_title_block');
             $this->getPage()->setBlock('user', 'normal_title', 'normal_title_block');
             $this->getPage()->setBlock('user', 'boarder_leave', 'boarder_leave_block');
+            $this->getPage()->setBlock('user', 'academic_reports', 'academic_reports_block');
             $this->getPage()->setBlock('user', 'user_calendar', 'user_calendar_block');
 
             $this->getPage()->setVar(array(
@@ -95,6 +96,14 @@ class Renderer extends Handler
                 } else {
                     $this->getPage()->parse('due_work_block', 'due_work');
                 }
+
+                if (!Config::get('external_document_report_enabled')) {
+                    $this->getPage()->setVar('academic_reports_block', '');
+                } elseif (!$groupHandler->isStudent($user['id']) || !$groupHandler->isStaff() || !$groupHandler->isParentOfChild($user['id'])) {
+                    $this->getPage()->setVar('academic_reports_block', '');
+                } else {
+                    $this->getPage()->parse('academic_reports_block', 'academic_reports');
+                }                
 
                 if ($groupHandler->isParent() && Config::get('restrict_parent_grades')) {
                     $this->getPage()->setVar('grades_button_block', '');
