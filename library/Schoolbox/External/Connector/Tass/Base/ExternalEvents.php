@@ -10,7 +10,6 @@
 namespace Schoolbox\External\Connector\Tass\Base;
 
 use Alaress_Date_Format;
-use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\External\Connector\IExternalEvents;
 use Schoolbox\External\Connector\Base;
 use Schoolbox\User;
@@ -59,10 +58,6 @@ class ExternalEvents extends Base implements IExternalEvents
                     END >= :endTime 
                 )
         )";
-
-        /* Known lookups
-         */
-        $validEventTypes = array_filter(EventTypeMapper::getInstance()->findDistinct('eventType'));
 
         /* Get role-specific set of events
          */
