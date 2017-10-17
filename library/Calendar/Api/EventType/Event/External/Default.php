@@ -13,6 +13,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Calendar\EventType;
 use \Schoolbox\External\Connector\IExternalEvents;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventType_Abstract {
 
@@ -78,10 +79,10 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
         // Figure out default event type
         try {
             /** @var Calendar_Api_Config_Record $config */
-            $config        = $this->loadConnectorConfiguration();
+            $config = $this->loadConnectorConfiguration();
             $decodedConfig = $config->decodeConfig();
-            $defaultEventType     = $decodedConfig->getLuEventType();
-        } catch (\Schoolbox\Mapper\Exception $e) {
+            $defaultEventType = $decodedConfig->getLuEventType();
+        } catch (MapperException $e) {
             $defaultEventType = self::DEFAULT_EVENTTYPE_ID;
         }
 
