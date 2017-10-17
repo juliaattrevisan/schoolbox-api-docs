@@ -210,7 +210,9 @@ class RecursiveUndeleter
         ReturnedWorkMapper::class       => [
             ReturnedWorkFile\Mapper::class,
         ],
-        Rubric\LevelMapper::class       => [],
+        Rubric\LevelMapper::class       => [
+            Rubric\DescriptorMapper::class => 'rubric_descriptor.level_id',
+        ],
         QuizQuestion\Mapper::class      => [
             QuizSolution\Mapper::class => 'assess_answer.question_id',
         ],
@@ -220,6 +222,7 @@ class RecursiveUndeleter
             Plagscan\Mapper::class,
         ],
         ReturnedWorkFile\Mapper::class  => [],
+        Rubric\DescriptorMapper::class  => [],
         Plagscan\Mapper::class          => [],
     ];
 
