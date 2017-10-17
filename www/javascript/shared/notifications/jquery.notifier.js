@@ -144,9 +144,25 @@
 
                 var footerText = '';
 
+                var listItems = [];
+
+                // Show a max of 100 msgs
+                var total = 0,
+                    unreadTotal = 0,
+                    max = 100;
                 if(toInsert.length > 0) {
                     // append the list of messages
                     for(i = toInsert.length - 1; i >= 0; --i) {
+
+                        total++;
+                        if (toInsert[i].status === settings.itemUnread) {
+                            unreadTotal++;
+                        }
+
+                        // Keep summating totals, but don't render them
+                        if (total >= max) {
+                            continue;
+                        }
 
                         var li = settings.tpl.clone();
 
@@ -165,12 +181,18 @@
                 $(settings.content).replaceWith(content)/*.foundation('equalizer')*/;
 
                 // update the counter (duplicate selector intentional)
-                var unreadTotal = $(settings.content).find('[data-status="' + settings.itemUnread + '"]').length;
+                // var unreadTotal = $(settings.content).find('[data-status="' + settings.itemUnread + '"]').length;
 
                 // set the counter
                 $('[data-' + settings.counterUnread + ']').attr('data-' + settings.counterUnread, unreadTotal);
-
-                $(settings.counter).html(unreadTotal ? unreadTotal : '');
+                var unreadTotalLabel = unreadTotal;
+                if (unreadTotal === 0) {
+                    unreadTotalLabel = '';
+                }
+                if (unreadTotalLabel > max) {
+                    unreadTotalLabel = (String)(max) + '+';
+                }
+                $(settings.counter).html(unreadTotalLabel);
 
                 $.ajax({
                     accepts  : 'application/json',
