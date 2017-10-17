@@ -14,16 +14,17 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Error;
 
 require_once __DIR__ . '/../../library/Bootstrap.php';
 
 // this is a script and not to be SitePage'd
 if (isset($this)) {
-    error(4);
+    error(Error\Mapper::ERROR_EMAIL_NOT_RETRIEVED);
 }
 
 if (!(is_array($_POST['crits']) && count($_POST['crits']) && is_numeric($_POST['categoryID']))) {
-    error(4);
+    error(Error\Mapper::ERROR_EMAIL_NOT_RETRIEVED);
 }
 
 $criteria = $_POST['crits'];
@@ -36,7 +37,7 @@ $page = new SitePage();
 
 $userAccess = new Access();
 if (!($_SESSION['user']->isSuperuser() || $userAccess->getFolderAccess($_SESSION['user'], $folderId) >= UserAccess::ACCESS_WRITE)) {
-    error(6);
+    error(Error\Mapper::ERROR_PERM_CATEGORY_WRITE);
 }
 
 // get category details
