@@ -55,6 +55,9 @@ class ExternalEvents extends Base implements IExternalEvents
                     )
         )";
 
+        /* Known lookups
+         */
+
         /* Get role-specific set of events
          */
         if ($user->getRole()->isStudent()) {
@@ -78,8 +81,8 @@ class ExternalEvents extends Base implements IExternalEvents
                     ec.campus_code AS location,
                     '' AS team
                 FROM eventcalendar ec
+                INNER JOIN eventtype et ON et.event_id = ec.event_id AND prod_code = 'TSCPDC'
                 WHERE 
-                    ec.entry_code = :externalId AND 
                     NOT (
                         CASE 
                             WHEN ec.end_time IS NOT NULL THEN ec.end_date + ec.end_time 
@@ -109,8 +112,8 @@ class ExternalEvents extends Base implements IExternalEvents
 
         /* Get all the other public events
          */
-        $allEvents[] = "(
-        )";
+//        $allEvents[] = "(
+//        )";
 
         /* Collate them into one mega union
          */
@@ -118,25 +121,24 @@ class ExternalEvents extends Base implements IExternalEvents
 
         /* Explore the db
          */
-//        $test = $this->databaseExternal->executeQueryIterator("SELECT TOP 10 * FROM eventcalendar");
-//
-//        foreach($test as $row) {
-//            print_r($row);
-//        }
-
-        $test = $this->databaseExternal->executeQueryIterator("SELECT TOP 100 * FROM eventcatdefs");
+        $test = $this->databaseExternal->executeQueryIterator($query, [
+            'externalId' => $user->getExternalId(),
+            'startTime' => $start->getDatabase(),
+            'endTime' => $end->getDatabase()
+        ]);
 
         foreach($test as $row) {
             print_r($row);
         }
-
+die();
 //        $test = $this->databaseExternal->executeQueryIterator("SELECT TOP 100 * FROM eventtype");
 //
 //        foreach($test as $row) {
 //            print_r($row);
 //        }
-
-        die();
+//
+//        print_r($query);
+//        die();
 
         return $this->databaseExternal->executeQueryIterator($query, [
             'externalId' => $user->getExternalId(),
