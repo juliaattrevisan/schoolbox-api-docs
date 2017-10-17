@@ -14,6 +14,7 @@ use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Instance;
 use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Routing;
@@ -50,6 +51,9 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     /** @var IConfigLoader $config */
     $config = $di->get('config');
 
+    /** @var Instance $instance */
+    $instance = $di->get('instance');
+
     /** @var RegistryMapper $registryMapper */
     $registryMapper = $di->get('mapperFactory')->get(RegistryMapper::class);
 
@@ -59,7 +63,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     /** @var RoutePermissionMapper $routePermMapper */
     $routePermMapper = $di->get('mapperFactory')->get(RoutePermissionMapper::class);
 
-    (new Routing\WorkerFactory($config, $log, $client, $registryMapper, $userMapper, $routePermMapper))
+    (new Routing\WorkerFactory($config, $log, $client, $registryMapper, $userMapper, $routePermMapper, $instance))
         ->build($loop, INSTANCE_ID);
 
 });

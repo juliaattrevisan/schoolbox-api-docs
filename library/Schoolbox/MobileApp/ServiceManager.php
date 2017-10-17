@@ -16,6 +16,7 @@ use InvalidArgumentException;
 use OutOfBoundsException;
 use Psr\Log\LoggerInterface;
 use RangeException;
+use Schoolbox;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
@@ -38,15 +39,20 @@ class ServiceManager implements IServiceManager
     /** @var LoggerInterface */
     protected $log;
 
+    /** @var Schoolbox\Instance */
+    protected $serverInstance;
+
 
     /**
-     * @param RegistryMapper     $registryMapper
      * @param LoggerInterface    $log
+     * @param RegistryMapper     $registryMapper
+     * @param Schoolbox\Instance $serverInstance
      */
-    public function __construct(LoggerInterface $log, RegistryMapper $registryMapper)
+    public function __construct(LoggerInterface $log, RegistryMapper $registryMapper, Schoolbox\Instance $serverInstance)
     {
         $this->registryMapper = $registryMapper;
         $this->log = $log;
+        $this->serverInstance = $serverInstance;
     }
 
 
@@ -161,6 +167,11 @@ class ServiceManager implements IServiceManager
         if (empty($this->serviceCache[$provider][$identifier])) {
             $key = $service->getKey();
 
+            if ($this->shouldUseTestService()) {
+                // ignore the provider from the DB and just use the mock
+                return new Cloud\Test\TestService(Schoolbox\Notif\Notifactory::create(Schoolbox\Notif\Notif::TOPIC_ADMIN), $this->registryMapper, $identifier);
+            }
+
             switch ($provider) {
                 case Registry::PROVIDER_APPLE:
 
@@ -242,4 +253,22 @@ class ServiceManager implements IServiceManager
         return sys_get_temp_dir() . "/{$fileHash}.pem";
     }
 
+
+    /**
+     * @return bool
+     */
+    private function shouldUseTestService()
+    {
+        // use test service in vagrant always
+        if ($this->serverInstance->isVagrant()) {
+            return true;
+        }
+
+        // use test service in dev servers if NOT a sandbox
+        if ($this->serverInstance->isDevelopment() && !$this->serverInstance->isSandbox()) {
+            return true;
+        }
+
+        return false;
+    }
 }

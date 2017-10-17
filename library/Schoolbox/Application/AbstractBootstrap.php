@@ -29,6 +29,7 @@ use GuzzleHttp;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Collection;
 use Schoolbox\External\Connector\ICommunityPortal;
+use Schoolbox\Instance;
 use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
@@ -139,6 +140,20 @@ abstract class AbstractBootstrap implements BootstrapInterface
 
         $di->set('amqp', $di->lazy(function () {
             return Connector::getInstance();
+        }));
+
+        $di->set('instance', $di->lazy(function () use ($di) {
+            /** @var IConfigLoader $conf */
+            $conf = $di->get('config');
+            return new Instance(
+                INSTANCE_ID,
+                $conf->get('site_location'),
+                $conf->get('site_hostname'),
+                $conf->get('site_domain'),
+                $conf->get('site_version'),
+                $conf->get('site_type'),
+                $conf->get('site_school_code')
+            );
         }));
 
         // install mapper DI
