@@ -111,7 +111,7 @@
                     <option value="{{ scheme.id }}"{% if scheme.id == assessment.gradeGroup.id %} selected{% endif %}>{{ scheme.name }}</option>
                 {% endfor %}
             </select>
-            <button type="button" class="button" data-reveal-id="gradeScale">Show Grade Scale</button>
+            <button type="button" class="button" data-reveal-id="gradeScale">Show {{ locale.grades.proper }} Scale</button>
         </div>
     </div>
 </div>
