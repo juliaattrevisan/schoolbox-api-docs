@@ -9,11 +9,11 @@ use Alaress\Database\Iterator\IIterator;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\External\Event;
 use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\Calendar\EventType;
+use Schoolbox\External\Connector\IExternalEvents;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Calendar\EventType;
-use \Schoolbox\External\Connector\IExternalEvents;
-use Schoolbox\Mapper\Exception as MapperException;
 
 class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventType_Abstract {
 
