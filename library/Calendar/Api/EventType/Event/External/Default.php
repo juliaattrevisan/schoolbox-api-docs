@@ -63,7 +63,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      * @param int $startTimestamp
      * @param int $endTimestamp
      * @return Collection
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     public function getEvents($startTimestamp, $endTimestamp) {
 
@@ -94,8 +94,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
              *
              * Assume $externalEvent['type'] to be the truth and try to match its value to a luEventType
              *
-             * If $externalEvent['type'] is empty or cannot be found, use the calendar configuration value that we
-             * chose in admin
+             * If $externalEvent['type'] cannot be found, use the calendar configuration value that we chose in admin
              *
              * If THAT option didn't exist (i.e. deleted after chosen) then just default to DEFAULT_EVENTTYPE_ID
              */
