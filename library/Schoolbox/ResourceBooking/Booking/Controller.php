@@ -156,7 +156,7 @@ class Controller extends Base
                                             'tooShort' => Validation::ERROR_TOO_SHORT,
                                             'tooLong' => Validation::ERROR_TOO_LONG,
                                             'conflict' => Validation::ERROR_CONFLICT,
-                                            'timetableClass' => Validation::ERROR_TIMETABLE_CLASS,
+                                            'timetabledClass' => Validation::ERROR_TIMETABLED_CLASS,
                                             'currentTerm' => Validation::ERROR_CURRENT_TERM,
                                             ],
                     'recurrence'        => [

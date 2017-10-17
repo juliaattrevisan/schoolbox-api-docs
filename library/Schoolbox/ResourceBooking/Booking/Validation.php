@@ -39,7 +39,7 @@ class Validation
     const ERROR_TOO_SHORT = 'too_short';
     const ERROR_TOO_LONG = 'too_long';
     const ERROR_CONFLICT = 'conflict';
-    const ERROR_TIMETABLE_CLASS = 'timetabled_class';
+    const ERROR_TIMETABLED_CLASS = 'timetabled_class';
     const ERROR_CURRENT_TERM = 'current_term';
 
     /**
@@ -469,7 +469,7 @@ class Validation
             );
 
             if (count($roomEvents)) {
-                $errors[self::START_DATETIME][] = self::ERROR_TIMETABLE_CLASS;
+                $errors[self::START_DATETIME][] = self::ERROR_TIMETABLED_CLASS;
             }
         }
 
