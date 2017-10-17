@@ -128,24 +128,28 @@ class Controller extends Base
         $results = [];
 
         foreach ($draftFeedbackIds as $draftFeedbackId) {
+            // Verify that this return is for this assessment
             $submissionReturn = $this->returnedWorkMapper->findById($draftFeedbackId);
-            $submissionReturn->setPublishedAt($now);
-
-            try{
-                $this->returnedWorkMapper->save($submissionReturn);
-                $publishSuccess = true;
-            } catch (PDOException $e){
-                $publishSuccess = false;
-            }
-
-            $rubricSuccess = null;
+            $publishSuccess   = false;
+            $rubricSuccess    = null;
             $countRubricMarks = 0;
-            if($publishSuccess){
+            if ($submissionReturn->getSubmissionBox()->getAssessmentModel()->getId() === $assessment->getId()) {
+                $submissionReturn->setPublishedAt($now);
+
                 try{
-                    $countRubricMarks = $this->rubricMarkMapper->publishDraftMarks($submissionReturn->getOwner(), $assessment);
-                    $rubricSuccess = true;
+                    $this->returnedWorkMapper->save($submissionReturn);
+                    $publishSuccess = true;
                 } catch (PDOException $e){
-                    $rubricSuccess = false;
+                    $publishSuccess = false;
+                }
+
+                if($publishSuccess){
+                    try{
+                        $countRubricMarks = $this->rubricMarkMapper->publishDraftMarks($submissionReturn->getOwner(), $assessment);
+                        $rubricSuccess = true;
+                    } catch (PDOException $e){
+                        $rubricSuccess = false;
+                    }
                 }
             }
 
