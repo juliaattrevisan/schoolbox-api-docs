@@ -40,7 +40,7 @@ class ExternalEvents extends Base implements IExternalEvents
                     ec.campus_code as location,
                     '' as team
             from    eventcalendar ec
-            where   ec.entry_code = :staffExternalId AND NOT
+            where   ec.entry_code = :externalId AND NOT
                     (
                         CASE 
                             WHEN ec.end_time IS NOT NULL THEN ec.end_date + ec.end_time 
@@ -54,7 +54,7 @@ class ExternalEvents extends Base implements IExternalEvents
         ";
 
         return $this->databaseExternal->executeQueryIterator($query, [
-            'staffExternalId' => $user->getExternalId(),
+            'externalId' => $user->getExternalId(),
             'startTime' => $start->getDatabase(),
             'endTime' => $end->getDatabase()
         ]);
