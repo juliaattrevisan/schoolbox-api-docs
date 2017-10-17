@@ -24,9 +24,9 @@ class ExternalEvents extends Base implements IExternalEvents
         $start = new Alaress_Date_Format($startDate, Alaress_Date_Format::TIMESTAMP);
         $end = new Alaress_Date_Format($endDate, Alaress_Date_Format::TIMESTAMP);
 
-        /* Get personal events for $user - it doesn't matter which role this user is
+        /* Anatomy of a query
          */
-        $allEvents[] = "(
+        $selectQuery = "
             SELECT  
                 ec.event_id AS id,
                 ec.entry_code AS owner,
@@ -44,19 +44,34 @@ class ExternalEvents extends Base implements IExternalEvents
                 ec.campus_code AS location,
                 '' AS team
             FROM eventcalendar ec
-            LEFT JOIN eventcatdefs ecd ON ec.cat_num = ecd.cat_num 
+        ";
+
+        $catdefsQuery = "
+            LEFT JOIN eventcatdefs ecd ON ec.cat_num = ecd.cat_num
+        ";
+
+        $whereQuery = "
+            NOT (
+                CASE 
+                    WHEN ec.end_time IS NOT NULL THEN ec.end_date + ec.end_time 
+                    ELSE ec.end_date 
+                END < :startTime OR
+                CASE 
+                    WHEN ec.start_time IS NOT NULL THEN ec.start_date + ec.start_time 
+                    ELSE ec.start_date 
+                END >= :endTime 
+            )
+        ";
+
+        /* Get personal events for $user - it doesn't matter which role this user is
+         */
+        $allEvents[] = "(
+            {$selectQuery}
+            {$catdefsQuery}
             WHERE 
-                ec.entry_code = :externalId AND 
-                NOT (
-                    CASE 
-                        WHEN ec.end_time IS NOT NULL THEN ec.end_date + ec.end_time 
-                        ELSE ec.end_date 
-                    END < :startTime OR
-                    CASE 
-                        WHEN ec.start_time IS NOT NULL THEN ec.start_date + ec.start_time 
-                        ELSE ec.start_date 
-                    END >= :endTime 
-                )
+                ec.entry_code = :externalId AND
+                {$whereQuery}
+                
         )";
 
         /* Get role-specific set of events
@@ -66,36 +81,11 @@ class ExternalEvents extends Base implements IExternalEvents
             /* Get student events via product code TSCPDC
              */
             $allEvents[] = "(
-                SELECT
-                    ec.event_id AS id,
-                    ec.entry_code AS owner,
-                    ec.event_name AS comment,
-                    ec.room_code AS room,
-                    ecd.cat_desc as type,
-                    CASE 
-                        WHEN ec.start_time IS NOT NULL THEN ec.start_date + ec.start_time 
-                        ELSE ec.start_date 
-                    END as start,
-                    CASE 
-                        WHEN ec.end_time IS NOT NULL THEN ec.end_date + ec.end_time 
-                        ELSE ec.end_date 
-                    END AS finish,
-                    ec.campus_code AS location,
-                    '' AS team
-                FROM eventcalendar ec
+                {$selectQuery}
                 INNER JOIN eventtype et ON et.event_id = ec.event_id AND prod_code = 'TSCPDC'
-                LEFT JOIN eventcatdefs ecd ON ec.cat_num = ecd.cat_num 
+                {$catdefsQuery} 
                 WHERE 
-                    NOT (
-                        CASE 
-                            WHEN ec.end_time IS NOT NULL THEN ec.end_date + ec.end_time 
-                            ELSE ec.end_date 
-                        END < :startTime OR
-                        CASE 
-                            WHEN ec.start_time IS NOT NULL THEN ec.start_date + ec.start_time 
-                            ELSE ec.start_date 
-                        END >= :endTime 
-                    )
+                {$whereQuery}
             )";
         }
         elseif ($user->getRole()->isStaff()) {
