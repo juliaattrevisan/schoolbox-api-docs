@@ -369,7 +369,7 @@
                                     <ul class="information-list">
                                         {% for contact in contacts %}
                                             {% if contact.StudentContactTitle or contact.StudentContactPreferred %}
-                                                <li class="actions-small-1">
+                                                <li class="small-12">
                                                     <div class="list-item">
                                                         <div class="card small-12">
                                                             {% if contact.main %}
@@ -384,102 +384,101 @@
                                                             <p class="meta">{{ contact.StudentContactRelation }}</p>
                                                         </div>
                                                     </div>
-
-                                                <li class="small-1">
-                                                    <div class="card small-12">
-                                                        <span class="icon-home size-32"></span>
-                                                        {% if contact.StudentContactAddress1 or contact.StudentContactAddress2 or contact.StudentContactAddress3 %}
-                                                            <p>{{ contact.StudentContactAddress1 }}</p>
-                                                            <p>{{ contact.StudentContactAddress2 }}</p>
-                                                            <p>{{ contact.StudentContactAddress3 }}</p>
-                                                            <p>{{ contact.StudentContactSuburb }},</p>
-                                                            <p>{{ contact.StudentContactState }} {{ contact.StudentContactPostCode }}</p>
-                                                        {% endif %}
+                                                </li>
+                                                <li class="small-12">
+                                                    <div class="list-item">
+                                                        <div class="card small-12">
+                                                            <span class="icon-home size-32"></span>
+                                                            {% if contact.StudentContactAddress1 or contact.StudentContactAddress2 or contact.StudentContactAddress3 %}
+                                                                <p>{{ contact.StudentContactAddress1 }}</p>
+                                                                <p>{{ contact.StudentContactAddress2 }}</p>
+                                                                <p>{{ contact.StudentContactAddress3 }}</p>
+                                                                <p>{{ contact.StudentContactSuburb }},</p>
+                                                                <p>{{ contact.StudentContactState }} {{ contact.StudentContactPostCode }}</p>
+                                                            {% endif %}
+                                                        </div>
                                                     </div>
-                                                    {% if contact.StudentContactSpouseTitle or contact.StudentContactSpousePreferred %}
-                                                            <div class="list-item">
-                                                                <div class="card small-12">
-                                                                    {# need to know user's schoolbox info here #}
-                                                                    {% if contact.spouse %}
-                                                                        <a href="/search/user/{{ contact.spouse.id }}">
-                                                                            <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
-                                                                            <h3>{{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}</h3>
-                                                                        </a>
-                                                                    {% else %}
-                                                                        <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
-                                                                        <h3>{{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}</h3>
-                                                                    {% endif %}
-                                                                    <p class="meta">{{ contact.StudentContactSpouseRelation }}</p>
-                                                                </div>
-                                                            </div>
-
+                                                </li>
+                                                <li class="small-12">
+                                                    <div class="list-item">
                                                         <div class="card small-12">
                                                             <dl class="profile">
+                                                                {%  if contact.StudentContactPhoneActual %}
+                                                                    <dt class="small-12">Home Phone:</dt>
+                                                                    <dd class="small-12">
+                                                                        <a href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}">{{ contact.StudentContactPhoneActual }}</a>
+                                                                    </dd>
+                                                                {%  endif %}
 
-                                                                {% if contact.StudentContactSpouseMobilePhone %}
+                                                                {% if contact.StudentContactMobilePhone %}
                                                                     <dt class="small-12">Mobile Phone:</dt>
                                                                     <dd class="small-12">
-                                                                        <a href="tel:{{ contact.StudentContactSpouseMobilePhone }}" title="Call {{ contact.StudentContactSpouseMobilePhone }}">{{ contact.StudentContactSpouseMobilePhone }}</a>
+                                                                        <a href="tel:{{ contact.StudentContactMobilePhone }}" title="Call {{ contact.StudentContactMobilePhone }}">{{ contact.StudentContactMobilePhone }}</a>
                                                                     </dd>
                                                                 {% endif %}
 
-                                                                {% if contact.StudentContactSpouseOccupPhone %}
+                                                                {% if contact.StudentContactOccupPhone %}
                                                                     <dt class="small-12">Work Phone:</dt>
                                                                     <dd class="small-12">
-                                                                        <a href="tel:{{ contact.StudentContactSpouseOccupPhone }}" title="Call {{ contact.StudentContactSpouseOccupPhone }}">{{ contact.StudentContactSpouseOccupPhone }}</a>
+                                                                        <a href="tel:{{ contact.StudentContactOccupPhone }}" title="Call {{ contact.StudentContactOccupPhone }}">{{ contact.StudentContactOccupPhone }}</a>
                                                                     </dd>
                                                                 {% endif %}
 
-                                                                {% if contact.StudentContactSpouseDefaultEmail %}
+                                                                {% if contact.StudentContactDefaultEmail %}
                                                                     <dt class="small-12">Email:</dt>
                                                                     <dd class="small-12">
-                                                                        <a href="{{ session.mailhandle }}{{ contact.StudentContactSpouseDefaultEmail }}">{{ contact.StudentContactSpouseDefaultEmail }}</a>
+                                                                        <a href="{{ session.mailhandle }}{{ contact.StudentContactDefaultEmail }}">{{ contact.StudentContactDefaultEmail }}</a>
                                                                     </dd>
                                                                 {% endif %}
-
                                                             </dl>
                                                         </div>
+                                                    </div>
+                                                </li>
+                                                {% if (contact.StudentContactSpouseTitle or contact.StudentContactSpousePreferred) and contact.spouse %}
+                                                    <!-- TODO need to find out if current contact is spouse -->
+                                                    <li class="small-12">
+                                                        <div class="list-item">
+                                                            <div class="card small-12">
+                                                                <a href="/search/user/{{ contact.spouse.id }}">
+                                                                    <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
+                                                                    <h3>{{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}</h3>
+                                                                </a>
 
-                                                    {% else %}
-
+                                                                <p class="meta">{{ contact.StudentContactSpouseRelation }}</p>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="small-12">
                                                         <div class="list-item">
                                                             <div class="card small-12">
                                                                 <dl class="profile">
-
-                                                                    {%  if contact.StudentContactPhoneActual %}
-                                                                        <dt class="small-12">Home Phone:</dt>
-                                                                        <dd class="small-12">
-                                                                            <a href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}">{{ contact.StudentContactPhoneActual }}</a>
-                                                                        </dd>
-                                                                    {%  endif %}
-
-                                                                    {% if contact.StudentContactMobilePhone %}
+                                                                    {% if contact.StudentContactSpouseMobilePhone %}
                                                                         <dt class="small-12">Mobile Phone:</dt>
                                                                         <dd class="small-12">
-                                                                            <a href="tel:{{ contact.StudentContactMobilePhone }}" title="Call {{ contact.StudentContactMobilePhone }}">{{ contact.StudentContactMobilePhone }}</a>
+                                                                            <a href="tel:{{ contact.StudentContactSpouseMobilePhone }}" title="Call {{ contact.StudentContactSpouseMobilePhone }}">{{ contact.StudentContactSpouseMobilePhone }}</a>
                                                                         </dd>
                                                                     {% endif %}
 
-                                                                    {% if contact.StudentContactOccupPhone %}
+                                                                    {% if contact.StudentContactSpouseOccupPhone %}
                                                                         <dt class="small-12">Work Phone:</dt>
                                                                         <dd class="small-12">
-                                                                            <a href="tel:{{ contact.StudentContactOccupPhone }}" title="Call {{ contact.StudentContactOccupPhone }}">{{ contact.StudentContactOccupPhone }}</a>
+                                                                            <a href="tel:{{ contact.StudentContactSpouseOccupPhone }}" title="Call {{ contact.StudentContactSpouseOccupPhone }}">{{ contact.StudentContactSpouseOccupPhone }}</a>
                                                                         </dd>
                                                                     {% endif %}
 
-                                                                    {% if contact.StudentContactDefaultEmail %}
+                                                                    {% if contact.StudentContactSpouseDefaultEmail %}
                                                                         <dt class="small-12">Email:</dt>
                                                                         <dd class="small-12">
-                                                                            <a href="{{ session.mailhandle }}{{ contact.StudentContactDefaultEmail }}">{{ contact.StudentContactDefaultEmail }}</a>
+                                                                            <a href="{{ session.mailhandle }}{{ contact.StudentContactSpouseDefaultEmail }}">{{ contact.StudentContactSpouseDefaultEmail }}</a>
                                                                         </dd>
                                                                     {% endif %}
-
                                                                 </dl>
                                                             </div>
                                                         </div>
-                                                    {% endif %}
-
+                                                    </li>
                                                 {% endif %}
+
+                                            {% endif %}
 
                                         {% endfor %}
                                     </ul>
