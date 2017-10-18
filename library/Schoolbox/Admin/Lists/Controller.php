@@ -476,11 +476,6 @@ class Controller extends Base
                         'nullable'  => true,
                         'width'     => 2,
                     ],
-                    'isDefaultForNewSubmissions' => [
-                        'caption'   => 'Default for new submissions?',
-                        'radio'     => '1',
-                        'width'     => 2,
-                    ]
                 ]
             ],
             'component-definition'  => [
