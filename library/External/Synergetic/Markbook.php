@@ -44,6 +44,12 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     const NO_MARK_GIVEN = -1;
 
     /**
+     * @const Character encoding for fields within this database.
+     *        Required when converting field values from Schoolbox to Synergetic.
+     */
+    const CHARACTER_ENCODING = 'ASCII';
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -103,7 +109,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     {
         // This column is limited to 10 characters
         $id = ($assessment->isAssessment() ? self::ASSESSMENT_PREFIX : self::SUBMISSION_PREFIX) . $assessment->getId();
-        return mb_substr($id, 0, 10, 'UTF-8');
+        return $this->truncateForDatabase($id, 10);
     }
 
     /**
@@ -321,8 +327,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         // HdgAbbrev1, HdgAbbrev2: 10 chars
         // WeightingFactor: 0-9999
         return [
-            'Heading'         => mb_substr($assessment->getName(), 0, 255, 'UTF-8'),
-            'HdgAbbrev1'      => mb_substr($assessment->getName(), 0, 10, 'UTF-8'),
+            'Heading'         => $this->truncateForDatabase($assessment->getName(), 255),
+            'HdgAbbrev1'      => $this->truncateForDatabase($assessment->getName(), 10),
             'HdgAbbrev2'      => $this->getMarkbookIdentifier($assessment),
             'WeightingFactor' => max(0, min($weight, 9999)),
         ];
@@ -710,5 +716,17 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return $resultType;
         }
         return $defaultType;
+    }
+
+    /**
+     * Performs truncation + encoding gymnastics required for database inserts.
+     *
+     * @param string $string
+     * @param int    $length
+     * @return string
+     */
+    private function truncateForDatabase($string, $length)
+    {
+        return mb_substr(mb_convert_encoding($string, self::CHARACTER_ENCODING), 0, $length, self::CHARACTER_ENCODING);
     }
 }
