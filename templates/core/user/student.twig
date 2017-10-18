@@ -368,35 +368,35 @@
                                 <div class="content no-pad">
                                     <ul class="information-list">
                                         {% for contact in contacts %}
-                                        {% if contact.StudentContactTitle or contact.StudentContactPreferred %}
-                                        <li class="actions-small-1">
-                                                <div class="list-item">
-                                                    <div class="card small-12">
-                                                        {% if contact.main %}
-                                                            <a href="/search/user/{{ contact.main.id }}">
+                                            {% if contact.StudentContactTitle or contact.StudentContactPreferred %}
+                                                <li class="actions-small-1">
+                                                    <div class="list-item">
+                                                        <div class="card small-12">
+                                                            {% if contact.main %}
+                                                                <a href="/search/user/{{ contact.main.id }}">
+                                                                    <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64" />
+                                                                    <h3>{{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}</h3>
+                                                                </a>
+                                                            {% else %}
                                                                 <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64" />
                                                                 <h3>{{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}</h3>
-                                                            </a>
-                                                        {% else %}
-                                                            <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64" />
-                                                            <h3>{{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}</h3>
-                                                        {% endif %}
-                                                        <p class="meta">{{ contact.StudentContactRelation }}</p>
+                                                            {% endif %}
+                                                            <p class="meta">{{ contact.StudentContactRelation }}</p>
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                                <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{{ loop.index }}">
-                                                    {% if contact.StudentContactDefaultEmail and contact.StudentContactUseEmail != 'N' %}
-                                                        <li><a class="icon-email" href="{{ session.mailhandle }}{{ contact.StudentContactDefaultEmail }}">{{ contact.StudentContactDefaultEmail }}</a></li>
-                                                    {% endif %}
-                                                    {% if contact.StudentContactMobilePhone %}
-                                                        <li><a class="icon-mobile" href="tel:{{ contact.StudentContactMobilePhone }}">{{ contact.StudentContactMobilePhone }}</a></li>
-                                                    {% endif %}
-                                                    {% if contact.StudentContactOccupPhone %}
-                                                        <li><a class="icon-mobile" href="tel:{{ contact.StudentContactOccupPhone }}">{{ contact.StudentContactOccupPhone }}</a></li>
-                                                    {% endif %}
-                                                </ul>
-                                            </li>
+                                                    <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{{ loop.index }}">
+                                                        {% if contact.StudentContactDefaultEmail and contact.StudentContactUseEmail != 'N' %}
+                                                            <li><a class="icon-email" href="{{ session.mailhandle }}{{ contact.StudentContactDefaultEmail }}">{{ contact.StudentContactDefaultEmail }}</a></li>
+                                                        {% endif %}
+                                                        {% if contact.StudentContactMobilePhone %}
+                                                            <li><a class="icon-mobile" href="tel:{{ contact.StudentContactMobilePhone }}">{{ contact.StudentContactMobilePhone }}</a></li>
+                                                        {% endif %}
+                                                        {% if contact.StudentContactOccupPhone %}
+                                                            <li><a class="icon-mobile" href="tel:{{ contact.StudentContactOccupPhone }}">{{ contact.StudentContactOccupPhone }}</a></li>
+                                                        {% endif %}
+                                                    </ul>
+                                                </li>
                                             {% endif %}
                                             {# is there a spouse? #}
                                             {% if contact.StudentContactSpouseTitle or contact.StudentContactSpousePreferred %}
@@ -433,6 +433,7 @@
                                                 </li>
                                             {% endif %}
 
+                                            <!-- TODO this block is only rendering for the first user in contacts -->
                                             <li class="actions-small-1">
                                                 <div class="list-item">
                                                     <div class="card small-12">
