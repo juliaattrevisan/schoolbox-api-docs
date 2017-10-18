@@ -158,6 +158,7 @@ class RecursiveUndeleter
             CourseImpl\Mapper::class,
             File\Mapper::class => 'category',
             LinkMapper::class  => 'category',
+            Assessment\Mapper::class => 'v_f.folder_id'
         ],
         FolderCode\Mapper::class        => [],
         CourseSpec\Mapper::class        => [
