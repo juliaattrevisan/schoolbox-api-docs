@@ -191,7 +191,8 @@ th, td{
 .input-group{
 	@include flex;
 	align-items: flex-start;
-	input{
+	input,
+	select {
 		flex: 0 auto;
 		& + .button{
 			flex: 1 0 auto;

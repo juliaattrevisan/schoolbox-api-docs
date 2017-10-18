@@ -29,6 +29,9 @@
          */
         function showGradingScheme() {
             $gradeSchemeDiv.show();
+
+            // Populate the grade scale modal with the default scheme selected
+            populateScaleModal();
         }
 
         /**
@@ -58,6 +61,25 @@
 
         // Initiate
         $markTypeDropdown.trigger('change');
+
+        // Populate the grade scale modal on scheme change
+        $('#gradingScheme').change(populateScaleModal);
+
+        /**
+         * Put a title and grade scale into a modal based on the currently selected scheme
+         */
+        function populateScaleModal() {
+            var $schemeSelect = $('#gradingScheme'),
+                schemeName = $schemeSelect.find(':selected').text(),
+                schemeId = $schemeSelect.val(),
+                schemeTemplate = $('[data-grading-scale=' + schemeId +']').html();
+
+            // Populate the modal title with scheme name
+            $('#gradeScaleTitle').text(schemeName);
+
+            // Populate the modal body with the scheme table
+            $('#gradeScaleDesc').html(schemeTemplate);
+        }
     });
 </script>
 
@@ -82,13 +104,50 @@
     </div>
 
     <div class="small-12 medium-6 columns" style="display:none;" data-grading-scheme>
-        <label>
-            {{ locale.grading.proper }} Scheme
-            <select name="gradingScheme">
+        <label for="gradingScheme">{{ locale.grading.proper }} Scheme</label>
+        <div class="input-group">
+            <select name="gradingScheme" id="gradingScheme">
                 {% for scheme in allGradeSchemes %}
                     <option value="{{ scheme.id }}"{% if scheme.id == assessment.gradeGroup.id %} selected{% endif %}>{{ scheme.name }}</option>
                 {% endfor %}
             </select>
-        </label>
+            <button type="button" class="button" data-reveal-id="gradeScale">Show {{ locale.grades.proper }} Scale</button>
+        </div>
     </div>
 </div>
+
+{# 'Show grade scale' modal #}
+<div data-reveal class="reveal-modal" id="gradeScale" role="dialog" aria-hidden="true" aria-labelledby="gradeScaleTitle" aria-describedby="gradeScaleDesc">
+    <h2 id="gradeScaleTitle">{# placeholder for scheme name via js #}</h2>
+    <div id="gradeScaleDesc">{# placeholder for grade scale via js #}</div>
+    <a class="close-reveal-modal" aria-label="Close">
+        <span aria-hidden="true">&#215;</span>
+    </a>
+</div>
+
+{# Store a template for each grade scheme, with a table of its grade levels.
+ # These will be used to populate the modal above.
+ #}
+{% for scheme in allGradeSchemes %}
+    <script type="text/template" data-grading-scale="{{ scheme.id }}">
+        <div class="scrollable">
+            <table>
+                <tbody>
+                    {% for gradeLevel in scheme.gradeLevels %}
+                        <tr>
+                            <td>
+                                {{ gradeLevel.lowerBound }}{% spaceless %}
+                                {% if loop.index == loop.length %}
+                                    +
+                                {% else %}
+                                    -{{ scheme.gradeLevels[loop.index].lowerBound - 1 }}
+                                {% endif %}
+                            {% endspaceless %}</td>
+                            <td>{{ gradeLevel.caption }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </script>
+{% endfor %}
