@@ -183,13 +183,13 @@ class RecursiveUndeleter
             Assessment\Mapper::class => 'v_ui.course_unit_implementation_id',
         ],
         Quiz\Mapper::class              => [
-            QuizSection\Mapper::class => 'assess_section.assess_id',
-            QuizAttempt\Mapper::class => 'assess_attempt.assess_id',
+            QuizSection\Mapper::class => 'assess_id',
+            QuizAttempt\Mapper::class => 'assess_id',
         ],
         SubmissionBoxMapper::class      => [
-            SubmissionMapper::class   => 'student_submission.box_id',
-            ReturnedWorkMapper::class => 'submission_return.box_id',
-            Rubric\LevelMapper::class => 'rubric_level.box_id',
+            SubmissionMapper::class   => 'box_id',
+            ReturnedWorkMapper::class => 'box_id',
+            Rubric\LevelMapper::class => 'box_id',
         ],
         TaskMapper::class               => [
             Task\CompletionMapper::class,
@@ -199,10 +199,10 @@ class RecursiveUndeleter
             Assessment\Mapper::class => 'v_pa.project_id',
         ],
         QuizSection\Mapper::class       => [
-            QuizQuestion\Mapper::class => 'assess_question.section_id',
+            QuizQuestion\Mapper::class => 'section_id',
         ],
         QuizAttempt\Mapper::class       => [
-            QuizAnswer\Mapper::class => 'assess_response.attempt_id',
+            QuizAnswer\Mapper::class => 'attempt_id',
         ],
         SubmissionMapper::class         => [
             SubmissionBoxFile\Mapper::class,
@@ -214,7 +214,7 @@ class RecursiveUndeleter
             Rubric\DescriptorMapper::class => 'rubric_descriptor.level_id',
         ],
         QuizQuestion\Mapper::class      => [
-            QuizSolution\Mapper::class => 'assess_answer.question_id',
+            QuizSolution\Mapper::class => 'question_id',
         ],
         QuizAnswer\Mapper::class        => [],
         QuizSolution\Mapper::class      => [],
