@@ -31,7 +31,8 @@ class ExternalEvents extends Base implements IExternalEvents
             SELECT  
                 ec.event_id AS id,
                 ec.entry_code AS owner,
-                ec.event_name AS comment,
+                ec.event_name AS title,
+                ec.event_desc AS comment,
                 ec.room_code AS room,
                 ecd.cat_desc as type,
                 CASE 
