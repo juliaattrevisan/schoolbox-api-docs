@@ -198,26 +198,20 @@ class Controller extends Base
 
         // ok, if you're here, you can see the thing.
         try {
-            $courses = $this->getCoursesBySchool($schoolCode);
-
+            $rs->content->set(
+                $this->buildJsonOutput(
+                    (new Handler(
+                        $this->userAccessMapper,
+                        $this->tokenMapper,
+                        $this->folderMapper,
+                        $this->passwordMailService
+                    ))->getFolderAccessBySchool($schoolCode)
+                )
+            );
         } catch (Mapper\Exception $e) {
             $this->sendGenericStatus(404);
             return;
         }
-
-        $payload = [];
-
-        foreach ($courses as $course) {
-            $participants = $this->userAccessMapper->findUsersInCategory($course)->getColumnValues('email');
-
-            $payload[] = [
-                'folderName'   => $course->getName(),
-                'folderId'     => $course->getId(),
-                'participants' => array_filter($participants)
-            ];
-        }
-
-        $rs->content->set($this->buildJsonOutput($payload));
     }
 
 
@@ -323,18 +317,16 @@ class Controller extends Base
             return;
         }
 
-        // show the list of users for this school
-        // filter to the list of users whose external IDs are prefixed with the given school code
-        $predicate = $this->getUserMapper()->getPredicateBuilder()->like('synergy_id', "{$schoolCode}.%");
-
-        // we only need the external ID itself, so bypass object hydration
-        $externalIds = $this->getUserMapper()->findScalarByPredicates('synergy_id', $predicate);
-
-        $unprefixed = array_map(function ($id) use ($schoolCode) {
-            return str_replace("{$schoolCode}.", '', $id);
-        }, $externalIds);
-
-        $rs->content->set($this->buildJsonOutput($unprefixed));
+        $rs->content->set(
+            $this->buildJsonOutput(
+                (new Handler(
+                    $this->userAccessMapper,
+                    $this->tokenMapper,
+                    $this->folderMapper,
+                    $this->passwordMailService
+                ))->getUsersBySchool($schoolCode)
+            )
+        );
     }
 
 
