@@ -385,55 +385,63 @@
                                                         </div>
                                                     </div>
                                                 </li>
+
                                                 <li class="small-12">
-                                                    <div class="list-item">
-                                                        <div class="card small-12">
-                                                            <span class="icon-home size-32"></span>
-                                                            {% if contact.StudentContactAddress1 or contact.StudentContactAddress2 or contact.StudentContactAddress3 %}
-                                                                <p>{{ contact.StudentContactAddress1 }}</p>
-                                                                <p>{{ contact.StudentContactAddress2 }}</p>
-                                                                <p>{{ contact.StudentContactAddress3 }}</p>
-                                                                <p>{{ contact.StudentContactSuburb }},</p>
-                                                                <p>{{ contact.StudentContactState }} {{ contact.StudentContactPostCode }}</p>
-                                                            {% endif %}
-                                                        </div>
-                                                    </div>
-                                                </li>
+                                                    <dl class="accordion" data-accordion="">
+                                                        <dd class="accordion-navigation active">
+                                                            <a href="#panel1" aria-expanded="true">Contact details</a>
+                                                            <div id="panel1" class="content active">
 
-                                                {%  if contact.StudentContactPhoneActual or contact.StudentContactMobilePhone or contact.StudentContactOccupPhone or contact.StudentContactDefaultEmail %}
-                                                    <li class="small-12">
-                                                        <div class="list-item">
-                                                            <div class="content small-12">
-                                                                {% if contact.StudentContactPhoneActual %}
-                                                                    <div class="row">
-                                                                        <div class="column small-12 medium-5"><strong>Home Phone:</strong></div>
-                                                                        <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}">{{ contact.StudentContactPhoneActual }}</a></div>
+                                                                <div class="list-item">
+                                                                    <div class="card small-12">
+                                                                        <span class="icon-home size-32"></span>
+                                                                        {% if contact.StudentContactAddress1 or contact.StudentContactAddress2 or contact.StudentContactAddress3 %}
+                                                                            <p>{{ contact.StudentContactAddress1 }}</p>
+                                                                            <p>{{ contact.StudentContactAddress2 }}</p>
+                                                                            <p>{{ contact.StudentContactAddress3 }}</p>
+                                                                            <p>{{ contact.StudentContactSuburb }},</p>
+                                                                            <p>{{ contact.StudentContactState }} {{ contact.StudentContactPostCode }}</p>
+                                                                        {% endif %}
                                                                     </div>
-                                                                {%  endif %}
+                                                                </div>
 
-                                                                {% if contact.StudentContactMobilePhone %}
-                                                                    <div class="row">
-                                                                        <div class="column small-12 medium-5"><strong>Mobile Phone: </strong></div>
-                                                                        <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactMobilePhone }}" title="Call {{ contact.StudentContactMobilePhone }}">{{ contact.StudentContactMobilePhone }}</a></div>
-                                                                    </div>
-                                                                {% endif %}
+                                                                {% if contact.StudentContactPhoneActual or contact.StudentContactMobilePhone or contact.StudentContactOccupPhone or contact.StudentContactDefaultEmail %}
+                                                                <div class="list-item">
+                                                                    <div class="content small-12">
+                                                                        {% if contact.StudentContactPhoneActual %}
+                                                                            <div class="row">
+                                                                                <div class="column small-12 medium-5"><strong>Home Phone:</strong></div>
+                                                                                <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}">{{ contact.StudentContactPhoneActual }}</a></div>
+                                                                            </div>
+                                                                        {%  endif %}
 
-                                                                {% if contact.StudentContactOccupPhone %}
-                                                                    <div class="row">
-                                                                        <div class="column small-12 medium-5"><strong>Work Phone: </strong></div>
-                                                                        <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactOccupPhone }}" title="Call {{ contact.StudentContactOccupPhone }}">{{ contact.StudentContactOccupPhone }}</a></div>
-                                                                    </div>
-                                                                {% endif %}
+                                                                        {% if contact.StudentContactMobilePhone %}
+                                                                            <div class="row">
+                                                                                <div class="column small-12 medium-5"><strong>Mobile Phone: </strong></div>
+                                                                                <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactMobilePhone }}" title="Call {{ contact.StudentContactMobilePhone }}">{{ contact.StudentContactMobilePhone }}</a></div>
+                                                                            </div>
+                                                                        {% endif %}
 
-                                                                {% if contact.StudentContactDefaultEmail %}
-                                                                    <div class="row">
-                                                                        <div class="column small-12 medium-5"><strong>Email: </strong></div>
-                                                                        <div class="column small-12 medium-7"><a href="{{ session.mailhandle }}{{ contact.StudentContactDefaultEmail }}">{{ contact.StudentContactDefaultEmail }}</a></div>
+                                                                        {% if contact.StudentContactOccupPhone %}
+                                                                            <div class="row">
+                                                                                <div class="column small-12 medium-5"><strong>Work Phone: </strong></div>
+                                                                                <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactOccupPhone }}" title="Call {{ contact.StudentContactOccupPhone }}">{{ contact.StudentContactOccupPhone }}</a></div>
+                                                                            </div>
+                                                                        {% endif %}
+
+                                                                        {% if contact.StudentContactDefaultEmail %}
+                                                                            <div class="row">
+                                                                                <div class="column small-12 medium-5"><strong>Email: </strong></div>
+                                                                                <div class="column small-12 medium-7"><a href="{{ session.mailhandle }}{{ contact.StudentContactDefaultEmail }}">{{ contact.StudentContactDefaultEmail }}</a></div>
+                                                                            </div>
+                                                                        {% endif %}
                                                                     </div>
-                                                                {% endif %}
+                                                                </div>
+
                                                             </div>
-                                                        </div>
-                                                    </li>
+                                                        </dd>
+                                                    </dl>
+                                                </li>
                                                 {% endif %}
 
                                                 {% if (contact.StudentContactSpouseTitle or contact.StudentContactSpousePreferred) and contact.spouse %}
