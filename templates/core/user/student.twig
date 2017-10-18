@@ -389,6 +389,7 @@
                                                 <li class="small-12">
                                                     <dl class="accordion" data-accordion="">
                                                         <dd class="accordion-navigation active">
+                                                            <!-- TODO dynamic id -->
                                                             <a href="#panel1" aria-expanded="true">Contact details</a>
                                                             <div id="panel1" class="content active">
 
@@ -460,30 +461,40 @@
                                                     </li>
                                                     {% if contact.StudentContactSpousePhoneActual or contact.StudentContactSpouseMobilePhone or contact.StudentContactSpouseOccupPhone or contact.StudentContactSpouseDefaultEmail %}
                                                         <li class="small-12">
-                                                            <div class="list-item">
-                                                                <div class="content small-12">
-                                                                        {% if contact.StudentContactSpouseMobilePhone %}
-                                                                            <div class="row">
-                                                                                <div class="column small-12 medium-5"><strong>Mobile Phone: </strong></div>
-                                                                                <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactSpouseMobilePhone }}" title="Call {{ contact.StudentContactSpouseMobilePhone }}">{{ contact.StudentContactSpouseMobilePhone }}</a></div>
-                                                                            </div>
-                                                                        {% endif %}
+                                                            <dl class="accordion" data-accordion="">
+                                                                <dd class="accordion-navigation">
+                                                                    <!-- TODO dynamic id -->
+                                                                    <a href="#panel2" aria-expanded="false">Contact details</a>
+                                                                    <div id="panel2" class="content">
 
-                                                                        {% if contact.StudentContactSpouseOccupPhone %}
-                                                                            <div class="row">
-                                                                                <div class="column small-12 medium-5"><strong>Work Phone: </strong></div>
-                                                                                <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactSpouseOccupPhone }}" title="Call {{ contact.StudentContactSpouseOccupPhone }}">{{ contact.StudentContactSpouseOccupPhone }}</a></div>
-                                                                            </div>
-                                                                        {% endif %}
+                                                                        <div class="list-item">
+                                                                            <div class="content small-12">
+                                                                                    {% if contact.StudentContactSpouseMobilePhone %}
+                                                                                        <div class="row">
+                                                                                            <div class="column small-12 medium-5"><strong>Mobile Phone: </strong></div>
+                                                                                            <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactSpouseMobilePhone }}" title="Call {{ contact.StudentContactSpouseMobilePhone }}">{{ contact.StudentContactSpouseMobilePhone }}</a></div>
+                                                                                        </div>
+                                                                                    {% endif %}
 
-                                                                        {% if contact.StudentContactSpouseDefaultEmail %}
-                                                                            <div class="row">
-                                                                                <div class="column small-12 medium-5"><strong>Email: </strong></div>
-                                                                                    <div class="column small-12 medium-7"><a href="{{ session.mailhandle }}{{ contact.StudentContactSpouseDefaultEmail }}">{{ contact.StudentContactSpouseDefaultEmail }}</a></div>
+                                                                                    {% if contact.StudentContactSpouseOccupPhone %}
+                                                                                        <div class="row">
+                                                                                            <div class="column small-12 medium-5"><strong>Work Phone: </strong></div>
+                                                                                            <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactSpouseOccupPhone }}" title="Call {{ contact.StudentContactSpouseOccupPhone }}">{{ contact.StudentContactSpouseOccupPhone }}</a></div>
+                                                                                        </div>
+                                                                                    {% endif %}
+
+                                                                                    {% if contact.StudentContactSpouseDefaultEmail %}
+                                                                                        <div class="row">
+                                                                                            <div class="column small-12 medium-5"><strong>Email: </strong></div>
+                                                                                                <div class="column small-12 medium-7"><a href="{{ session.mailhandle }}{{ contact.StudentContactSpouseDefaultEmail }}">{{ contact.StudentContactSpouseDefaultEmail }}</a></div>
+                                                                                        </div>
+                                                                                    {% endif %}
                                                                             </div>
-                                                                        {% endif %}
-                                                                </div>
-                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+                                                                </dd>
+                                                            </dl>
                                                         </li>
                                                     {% endif %}
                                                 {% endif %}
