@@ -623,10 +623,14 @@
                 e.preventDefault();
                 e.stopPropagation();
 
+                // Mark all messages unread, regardless of whether or not they are shown in DOM
                 var unreads = [];
-                $(settings.content).find('[data-status="' + settings.itemUnread + '"]').each(function() {
-                    unreads.push(this.id.substr(2));
-                });
+                for (var id in messages) {
+                    var message = messages[id];
+                    if (message.status === settings.itemUnread) {
+                        unreads.push(id);
+                    }
+                }
 
                 send({ack : unreads});
                 return false;
