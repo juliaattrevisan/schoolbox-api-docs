@@ -44,6 +44,7 @@ class RoleCloner
 
         // and now onto copying the relevant data
         $this->cloneSideNav($source, $destination);
+        $this->cloneTopNav($source, $destination);
         $this->cloneDashboard($source, $destination);
         $this->cloneCategoryPermissions($source, $destination);
         $this->cloneSchoolNewsPermissions($source, $destination);
@@ -69,6 +70,24 @@ class RoleCloner
             ]);
     }
 
+    /**
+     * @param Role $source
+     * @param Role $destination
+     */
+    protected function cloneTopNav(Role $source, Role $destination)
+    {
+        $this->clonePerms("
+            DELETE FROM `menu_top_role` WHERE `role_id` = ?
+        ", "
+            INSERT INTO `menu_top_role` (menu_top_id, role_id)
+            SELECT menu_top_id, :dest
+            FROM `menu_top_role`
+            WHERE `role_id` = :src
+        ", [
+            'src'  => $source->getId(),
+            'dest' => $destination->getId()
+        ]);
+    }
     /**
      * @param Role $source
      * @param Role $destination
