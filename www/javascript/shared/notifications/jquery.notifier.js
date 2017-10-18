@@ -121,8 +121,6 @@
 
                 if(settings.debug) { console.log('Updating DOM'); }
 
-                var dom = $(self);
-
                 // do the following on every DOM update request
 
                 // replicate the list and delete its contents
@@ -136,12 +134,8 @@
                     toInsert.push(messages[id]);
                 }
 
+                // sort descending by timestamp
                 toInsert.sort(function(a,b) {
-                    // always sort unread before read
-                    if (a.status !== b.status) {
-                        return a.status === settings.itemUnread ? -1 : 1;
-                    }
-                    // sort descending by timestamp
                     return (a.timestamp == b.timestamp ? 0 : (a.timestamp < b.timestamp ? 1 : -1));
                 });
 
