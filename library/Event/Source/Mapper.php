@@ -71,6 +71,7 @@ class Mapper extends BaseMapper
         $eventIds = $this->findEventIdsUsingSource($sourceName);
 
         if (count($eventIds)) {
+
             /* Delete relations
              */
             PersonalMapper::getInstance()->deleteByColumn('event_id', $eventIds);
@@ -92,7 +93,7 @@ class Mapper extends BaseMapper
              */
             $query = "
                 DELETE FROM `event` 
-                WHERE `event`.id IN (:eventIds)
+                WHERE FIND_IN_SET(id, :eventIds)
             ";
 
             $statement = $this->database->prepare($query);
