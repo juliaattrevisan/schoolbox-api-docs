@@ -399,41 +399,46 @@
                                                         </div>
                                                     </div>
                                                 </li>
-                                                <li class="small-12">
-                                                    <div class="list-item">
-                                                        <div class="card small-12">
-                                                            <dl class="profile">
-                                                                {%  if contact.StudentContactPhoneActual %}
-                                                                    <dt class="small-12">Home Phone:</dt>
-                                                                    <dd class="small-12">
-                                                                        <a href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}">{{ contact.StudentContactPhoneActual }}</a>
-                                                                    </dd>
-                                                                {%  endif %}
 
-                                                                {% if contact.StudentContactMobilePhone %}
-                                                                    <dt class="small-12">Mobile Phone:</dt>
-                                                                    <dd class="small-12">
-                                                                        <a href="tel:{{ contact.StudentContactMobilePhone }}" title="Call {{ contact.StudentContactMobilePhone }}">{{ contact.StudentContactMobilePhone }}</a>
-                                                                    </dd>
-                                                                {% endif %}
+                                                {%  if contact.StudentContactPhoneActual or contact.StudentContactMobilePhone or contact.StudentContactOccupPhone or contact.StudentContactDefaultEmail %}
+                                                    <li class="small-12">
+                                                        <div class="list-item">
+                                                                <div class="card small-12">
+                                                                    <dl class="profile">
+                                                                        {%  if contact.StudentContactPhoneActual %}
+                                                                            <dt class="small-12">Home Phone:</dt>
+                                                                            <dd class="small-12">
+                                                                                <a href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}">{{ contact.StudentContactPhoneActual }}</a>
+                                                                            </dd>
+                                                                        {%  endif %}
 
-                                                                {% if contact.StudentContactOccupPhone %}
-                                                                    <dt class="small-12">Work Phone:</dt>
-                                                                    <dd class="small-12">
-                                                                        <a href="tel:{{ contact.StudentContactOccupPhone }}" title="Call {{ contact.StudentContactOccupPhone }}">{{ contact.StudentContactOccupPhone }}</a>
-                                                                    </dd>
-                                                                {% endif %}
+                                                                        {% if contact.StudentContactMobilePhone %}
+                                                                            <dt class="small-12">Mobile Phone:</dt>
+                                                                            <dd class="small-12">
+                                                                                <a href="tel:{{ contact.StudentContactMobilePhone }}" title="Call {{ contact.StudentContactMobilePhone }}">{{ contact.StudentContactMobilePhone }}</a>
+                                                                            </dd>
+                                                                        {% endif %}
 
-                                                                {% if contact.StudentContactDefaultEmail %}
-                                                                    <dt class="small-12">Email:</dt>
-                                                                    <dd class="small-12">
-                                                                        <a href="{{ session.mailhandle }}{{ contact.StudentContactDefaultEmail }}">{{ contact.StudentContactDefaultEmail }}</a>
-                                                                    </dd>
-                                                                {% endif %}
-                                                            </dl>
+                                                                        {% if contact.StudentContactOccupPhone %}
+                                                                            <dt class="small-12">Work Phone:</dt>
+                                                                            <dd class="small-12">
+                                                                                <a href="tel:{{ contact.StudentContactOccupPhone }}" title="Call {{ contact.StudentContactOccupPhone }}">{{ contact.StudentContactOccupPhone }}</a>
+                                                                            </dd>
+                                                                        {% endif %}
+
+                                                                        {% if contact.StudentContactDefaultEmail %}
+                                                                            <dt class="small-12">Email:</dt>
+                                                                            <dd class="small-12">
+                                                                                <a href="{{ session.mailhandle }}{{ contact.StudentContactDefaultEmail }}">{{ contact.StudentContactDefaultEmail }}</a>
+                                                                            </dd>
+                                                                        {% endif %}
+                                                                    </dl>
+                                                                </div>
+
                                                         </div>
-                                                    </div>
-                                                </li>
+                                                    </li>
+                                                {% endif %}
+
                                                 {% if (contact.StudentContactSpouseTitle or contact.StudentContactSpousePreferred) and contact.spouse %}
                                                     <!-- TODO need to find out if current contact is spouse -->
                                                     <li class="small-12">
@@ -448,34 +453,36 @@
                                                             </div>
                                                         </div>
                                                     </li>
-                                                    <li class="small-12">
-                                                        <div class="list-item">
-                                                            <div class="card small-12">
-                                                                <dl class="profile">
-                                                                    {% if contact.StudentContactSpouseMobilePhone %}
-                                                                        <dt class="small-12">Mobile Phone:</dt>
-                                                                        <dd class="small-12">
-                                                                            <a href="tel:{{ contact.StudentContactSpouseMobilePhone }}" title="Call {{ contact.StudentContactSpouseMobilePhone }}">{{ contact.StudentContactSpouseMobilePhone }}</a>
-                                                                        </dd>
-                                                                    {% endif %}
+                                                    {% if contact.StudentContactSpousePhoneActual or contact.StudentContactSpouseMobilePhone or contact.StudentContactSpouseOccupPhone or contact.StudentContactSpouseDefaultEmail %}
+                                                        <li class="small-12">
+                                                            <div class="list-item">
+                                                                <div class="card small-12">
+                                                                    <dl class="profile">
+                                                                        {% if contact.StudentContactSpouseMobilePhone %}
+                                                                            <dt class="small-12">Mobile Phone:</dt>
+                                                                            <dd class="small-12">
+                                                                                <a href="tel:{{ contact.StudentContactSpouseMobilePhone }}" title="Call {{ contact.StudentContactSpouseMobilePhone }}">{{ contact.StudentContactSpouseMobilePhone }}</a>
+                                                                            </dd>
+                                                                        {% endif %}
 
-                                                                    {% if contact.StudentContactSpouseOccupPhone %}
-                                                                        <dt class="small-12">Work Phone:</dt>
-                                                                        <dd class="small-12">
-                                                                            <a href="tel:{{ contact.StudentContactSpouseOccupPhone }}" title="Call {{ contact.StudentContactSpouseOccupPhone }}">{{ contact.StudentContactSpouseOccupPhone }}</a>
-                                                                        </dd>
-                                                                    {% endif %}
+                                                                        {% if contact.StudentContactSpouseOccupPhone %}
+                                                                            <dt class="small-12">Work Phone:</dt>
+                                                                            <dd class="small-12">
+                                                                                <a href="tel:{{ contact.StudentContactSpouseOccupPhone }}" title="Call {{ contact.StudentContactSpouseOccupPhone }}">{{ contact.StudentContactSpouseOccupPhone }}</a>
+                                                                            </dd>
+                                                                        {% endif %}
 
-                                                                    {% if contact.StudentContactSpouseDefaultEmail %}
-                                                                        <dt class="small-12">Email:</dt>
-                                                                        <dd class="small-12">
-                                                                            <a href="{{ session.mailhandle }}{{ contact.StudentContactSpouseDefaultEmail }}">{{ contact.StudentContactSpouseDefaultEmail }}</a>
-                                                                        </dd>
-                                                                    {% endif %}
-                                                                </dl>
+                                                                        {% if contact.StudentContactSpouseDefaultEmail %}
+                                                                            <dt class="small-12">Email:</dt>
+                                                                            <dd class="small-12">
+                                                                                <a href="{{ session.mailhandle }}{{ contact.StudentContactSpouseDefaultEmail }}">{{ contact.StudentContactSpouseDefaultEmail }}</a>
+                                                                            </dd>
+                                                                        {% endif %}
+                                                                    </dl>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    </li>
+                                                        </li>
+                                                    {% endif %}
                                                 {% endif %}
 
                                             {% endif %}
