@@ -24,6 +24,8 @@ $this->setBlock(TEMPLATE_content, 'msg_enabled_followth', 'msg_enabled_followth_
 
 $this->setBlock(TEMPLATE_content, 'mail_all', 'mail_all_block');
 $this->setBlock(TEMPLATE_content, 'mail_all_form', 'mail_all_form_block');
+$this->setBlock(TEMPLATE_content, 'mail_all_parents', 'mail_all_parents_block');
+$this->setBlock(TEMPLATE_content, 'mail_all_parents_form', 'mail_all_parents_form_block');
 
 $this->setBlock(TEMPLATE_content, "authorisation", "authorisation_block");
 $this->setBlock("authorisation", "waiting", "waiting_block");
@@ -148,13 +150,14 @@ if (is_numeric($this->arg[0])) {
     }
 
     $memberList   = $groupHandler->getMemberList($category->getId());
-    //
+
     // Keep list of everyone to email
-    $all_emails   = array();
+    $all_emails = [];
+    $all_parent_emails = [];
     $email_object = new Email();
     if (is_array($memberList)) {
         foreach ($memberList as $member) {
-            //
+
             // Don't email yourself
             if ($member['uid'] != $_SESSION['id']) {
                 $all_emails[] = $email_object->formatEmailFromArray($member);
@@ -241,21 +244,34 @@ if (is_numeric($this->arg[0])) {
         $this->setVar('member_block', '');
     }
 
-    //
-    // Set up the email all block (PHPLib sucks)
-    if (!empty($all_emails) && \Cfg::get('mail_enable')) {
-        $this->setVar(array(
-            'REPLYTO'  => $email_object->formatEmailFromArray($_SESSION),
-            'EMAILALL' => implode(',', $all_emails),
-        ));
-        $this->parse('mail_all_block', 'mail_all');
-        $this->parse('mail_all_form_block', 'mail_all_form');
-    } else {
-        $this->setVar([
-        	'mail_all_block' => '',
-        	'mail_all_form_block' => '',
-        ]);
-    }
+
+    // Set up the email blocks (PHPLib sucks)
+	$this->setVar([
+		'mail_all_block' => '',
+		'mail_all_form_block' => '',
+		'mail_all_parents_block' => '',
+		'mail_all_parents_form_block' => '',
+	]);
+
+	if (\Cfg::get('mail_enable')) {
+		if (!empty($all_emails)) {
+			$this->setVar(array(
+				'REPLYTO'  => $email_object->formatEmailFromArray($_SESSION),
+				'EMAILALL' => implode(',', $all_emails),
+			));
+			$this->parse('mail_all_block', 'mail_all');
+			$this->parse('mail_all_form_block', 'mail_all_form');
+		}
+
+		if (!empty($all_parent_emails)) {
+			$this->setVar(array(
+				'REPLYTO'  => $email_object->formatEmailFromArray($_SESSION),
+				'EMAILALLPARENTS' => implode(',', $all_parent_emails),
+			));
+			$this->parse('mail_all_parents_block', 'mail_all_parents');
+			$this->parse('mail_all_parents_form_block', 'mail_all_parents_form');
+		}
+	}
 
     $waitingList = $groupHandler->getWaitingList($category->getId());
     if (is_array($waitingList)) {

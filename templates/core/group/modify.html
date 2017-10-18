@@ -224,6 +224,11 @@
             event.preventDefault();
             $('#emailAll').submit();
         });
+
+        $('#emailAllParents').click(function(event) {
+            event.preventDefault();
+            $('#emailAllParentsForm').submit();
+        });
     });
 </script>
 <!-- END custom_head -->
@@ -241,6 +246,9 @@
         <!-- BEGIN mail_all -->
         <li><a href="#" class="icon-email" id="emailAllGroup">Email Group Members</a></li>
         <!-- END mail_all -->
+        <!-- BEGIN mail_all_parents -->
+        <li><a href="#" class="icon-staff" id="emailAllParents">Email Group Parents</a></li>
+        <!-- END mail_all_parents -->
         <li><a href="/group/modifyForm.php?disband=1&categoryID={CATEGORY_ID}" class="icon-delete" data-action="disband">Disband Group</a></li>
     </ul>
 
@@ -250,6 +258,12 @@
         <input type="hidden" name="bcc" value="{EMAILALL}"/>
     </form>
     <!-- END mail_all_form -->
+    <!-- BEGIN mail_all_parents_form -->
+    <form action="/mail/createMail.php" method="post" id="emailAllParentsForm">
+        <input type="hidden" name="replyto" value="&quot;{CATEGORY_NAME}&quot; &lt;{REPLYTO}&gt;"/>
+        <input type="hidden" name="bcc" value="{EMAILALLPARENTS}"/>
+    </form>
+    <!-- END mail_all_parents_form -->
 
 </div>
 
