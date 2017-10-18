@@ -375,10 +375,18 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         return true;
     }
 
+    /**
+     * Pre soft-delete callback to soft-delete the Assessments, created inside this Folder
+     *
+     * @param Model $folder
+     *
+     * @return bool
+     * @throws MapperException
+     */
     public function softDeleteAssessments(Model $folder)
     {
         $assessmentMapper = AssessmentMapper::getInstance();
-        $assessments = $assessmentMapper->findByColumn('v_f.folder_id', $folder->getId(), ['deleted' => true]);
+        $assessments = $assessmentMapper->findByColumn('v_f.folder_id', $folder->getId());
         $assessmentMapper->delete($assessments);
         return true;
     }
