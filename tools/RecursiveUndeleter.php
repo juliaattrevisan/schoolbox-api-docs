@@ -49,7 +49,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project;
 use Schoolbox\Assessment\Course\Task;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile as SubmissionBoxFile;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile as StudentSubmissionFile;
 use \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile as ReturnedWorkFile;
 use Schoolbox\Resource\File;
@@ -205,7 +205,7 @@ class RecursiveUndeleter
             QuizAnswer\Mapper::class => 'attempt_id',
         ],
         SubmissionMapper::class         => [
-            SubmissionBoxFile\Mapper::class,
+            StudentSubmissionFile\Mapper::class,
         ],
         ReturnedWorkMapper::class       => [
             ReturnedWorkFile\Mapper::class,
@@ -218,7 +218,7 @@ class RecursiveUndeleter
         ],
         QuizAnswer\Mapper::class        => [],
         QuizSolution\Mapper::class      => [],
-        SubmissionBoxFile\Mapper::class => [
+        StudentSubmissionFile\Mapper::class => [
             Plagscan\Mapper::class,
         ],
         ReturnedWorkFile\Mapper::class  => [],
