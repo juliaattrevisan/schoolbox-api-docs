@@ -388,9 +388,9 @@
 
                                                 <li class="small-12">
                                                     <dl class="accordion" data-accordion="">
-                                                        <dd class="accordion-navigation active">
-                                                            <a href="#panel{{ loop.index }}" aria-expanded="true">Contact details</a>
-                                                            <div id="panel{{ loop.index }}" class="content active">
+                                                        <dd class="accordion-navigation">
+                                                            <a href="#panel{{ loop.index }}" aria-expanded="false">Contact details</a>
+                                                            <div id="panel{{ loop.index }}" class="content">
 
                                                                 <div class="list-item">
                                                                     <div class="card small-12">
@@ -437,12 +437,12 @@
                                                                         {% endif %}
                                                                     </div>
                                                                 </div>
+                                                                {% endif %}
 
                                                             </div>
                                                         </dd>
                                                     </dl>
                                                 </li>
-                                                {% endif %}
 
                                                 {% if (contact.StudentContactSpouseTitle or contact.StudentContactSpousePreferred) and contact.spouse %}
                                                     <li class="small-12">
