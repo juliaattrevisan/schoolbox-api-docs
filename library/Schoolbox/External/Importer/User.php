@@ -15,7 +15,6 @@ use HouseResidential as HouseResidentialModel;
 use Schoolbox\Campus as CampusModel;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
-use Schoolbox\External\Importer\User\Result;
 use Schoolbox\External\UserProfile as UserProfileModel;
 use Schoolbox\External\UserProfileMapper;
 use Schoolbox\External\UserRelation as UserRelationModel;
@@ -259,7 +258,7 @@ class User extends AbstractImporter
         $this->userHydrators[] = new User\Hydrator\Lookup('Residential House', 'setResidentialHouse', $this->residentialHouseList);
 
         // User Profile hydrators
-        $this->userProfileHydrators[] = new UserProfile\Hydrator\Date('Date of Birth', 'setDob');
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Date('Date of Birth', 'setDob', $this);
         $this->userProfileHydrators[] = new UserProfile\Hydrator\Field('Year', 'setLevel');
         // Join these fields together
         $this->userProfileHydrators[] = new UserProfile\Hydrator\MultiField(['Title', 'First Name', 'Surname'], 'setGuardian1Name');
@@ -441,7 +440,13 @@ class User extends AbstractImporter
     protected function hydrateUserProfile($row, UserProfileModel $userProfile)
     {
         foreach ($this->userProfileHydrators as $hydrator) {
-            $userProfile = $hydrator->hydrate($row, $userProfile);
+            try {
+                $userProfile = $hydrator->hydrate($row, $userProfile);
+            }
+            catch (\UnexpectedValueException $e) {
+                $this->log->warning($e->getMessage());
+                continue;
+            }
         }
         return $userProfile;
     }
