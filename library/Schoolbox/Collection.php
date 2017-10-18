@@ -305,15 +305,15 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      */
 
     /**
-     * Gets the name of the get method for this field.
+     * Gets the name of the get method for this property.
      *
-     * @param string $field The field name to retrieve.
+     * @param string $property The property name to retrieve.
      *
      * @return string
      */
-    protected function getGetMethodName($field)
+    protected function getGetMethodName($property)
     {
-        return 'get' . ucfirst($field);
+        return 'get' . ucfirst($property);
     }
 
     /**
@@ -357,20 +357,34 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
-     * Gets values for the given column in the collection.
+     * Gets values for the given model *property* in the collection.
      *
-     * @param string $column
+     * TODO WARNING - Method is misnamed, this actually inspects the model 'property', not 'column'.
      *
+     * @param string $property
      * @return array
+     * @deprecated 17.5 Use 'getPropertyValues' instead. Retained for backwards comparability
+     * @todo Remove 18.0
      */
-    public function getColumnValues($column)
+    public function getColumnValues($property)
     {
-        $parts = array();
-        $method_name = $this->getGetMethodName($column);
+        return $this->getPropertyValues($property);
+    }
+
+    /**
+     * Gets values for the given model property in the collection.
+     *
+     * @param string $property
+     * @return mixed[]
+     */
+    public function getPropertyValues($property)
+    {
+        $parts = [];
+        $methodName = $this->getGetMethodName($property);
         foreach ($this as $item) {
-            $method = array($item, $method_name);
+            $method = [$item, $methodName];
             if (is_callable($method)) {
-                $parts[] = call_user_func($method);
+                $parts[] = $method();
             }
         }
         return $parts;
