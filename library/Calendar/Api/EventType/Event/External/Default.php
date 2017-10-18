@@ -132,7 +132,15 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
             $event->setEventType(self::EXTERNAL_EVENT_TYPE);
             $event->setAllday(false);
 
-            $owner = UserMapper::getInstance()->findByExternalId($externalEvent['owner']);
+            /* If you can't find this user by external id, assume unknown
+             */
+            try {
+                $owner = UserMapper::getInstance()->findByExternalId($externalEvent['owner']);
+            }
+            catch (MapperException $e) {
+                $owner = UserMapper::getInstance()->getUnknownUser();
+            }
+
             $event->setAuthorId($externalEvent['owner']);
             $event->setAuthorName($owner->formatName());
 
