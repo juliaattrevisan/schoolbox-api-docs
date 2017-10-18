@@ -82,7 +82,10 @@ class ExternalEvents extends Base implements IExternalEvents
              */
             $allEvents[] = "(
                 {$selectQuery}
-                INNER JOIN eventtype et ON et.event_id = ec.event_id AND prod_code = 'TSCPDC'
+                INNER JOIN eventtype et 
+                    ON et.event_id = ec.event_id 
+                    AND ec.cmpy_code = et.cmpy_code
+                    AND prod_code = 'TSCPDC'
                 {$catdefsQuery} 
                 WHERE 
                 {$whereQuery}
@@ -94,7 +97,10 @@ class ExternalEvents extends Base implements IExternalEvents
              */
             $allEvents[] = "(
                 {$selectQuery}
-                INNER JOIN eventtype et ON et.event_id = ec.event_id AND prod_code = 'TIAPDC'
+                INNER JOIN eventtype et 
+                    ON et.event_id = ec.event_id 
+                    AND ec.cmpy_code = et.cmpy_code
+                    AND prod_code = 'TIAPDC'
                 {$catdefsQuery} 
                 WHERE 
                 {$whereQuery}
@@ -106,7 +112,10 @@ class ExternalEvents extends Base implements IExternalEvents
              */
             $allEvents[] = "(
                 {$selectQuery}
-                INNER JOIN eventtype et ON et.event_id = ec.event_id AND prod_code = 'PIAPDC'
+                INNER JOIN eventtype et 
+                    ON et.event_id = ec.event_id 
+                    AND ec.cmpy_code = et.cmpy_code
+                    AND prod_code = 'PIAPDC'
                 {$catdefsQuery} 
                 WHERE 
                 {$whereQuery}
@@ -117,7 +126,10 @@ class ExternalEvents extends Base implements IExternalEvents
          */
         $allEvents[] = "(
             {$selectQuery}
-            INNER JOIN eventtype et ON et.event_id = ec.event_id AND prod_code = 'PUBPDC'
+                INNER JOIN eventtype et 
+                    ON et.event_id = ec.event_id 
+                    AND ec.cmpy_code = et.cmpy_code
+                    AND prod_code = 'PUBPDC'
             {$catdefsQuery} 
             WHERE 
             {$whereQuery}
