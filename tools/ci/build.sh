@@ -24,6 +24,17 @@ fi
 
 echo "Branch: $branch";
 
+if [ -f .git/ref ];
+then
+    buildcommit=`cat .git/ref`;
+    echo "{\"build_commit\":\"$buildcommit\"}" > version.json;
+else
+    echo "Unable to determine build commit";
+    ls -1 .git/;
+fi
+echo "Build commit: $buildcommit";
+cat version.json;
+
 
 if [ ! -f ../vendor-php-artifact/"$branch"-vendor-php.tar.gz ];
 then
