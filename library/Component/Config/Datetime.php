@@ -32,6 +32,9 @@ class Component_Config_Datetime extends Component_Config_Abstract
         return $dateObject->getDatabase();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {
         if (!empty($configValue)) {
