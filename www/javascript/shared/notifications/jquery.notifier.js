@@ -633,7 +633,6 @@
                 }
 
                 send({ack : unreads});
-                return false;
             });
 
             // listen for alert open/close; we bind globally, but ignore anything not relevant to us
