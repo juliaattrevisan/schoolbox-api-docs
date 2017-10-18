@@ -169,9 +169,6 @@
                 if (unreadTotal === 0) {
                     unreadTotalLabel = '';
                 }
-                if (unreadTotalLabel > settings.itemMaxDisplayed) {
-                    unreadTotalLabel = (String)(settings.itemMaxDisplayed) + '+';
-                }
                 $(settings.counter).html(unreadTotalLabel);
 
                 $.ajax({
