@@ -29,11 +29,10 @@ class Document extends Base implements IDocument
 
     /**
      * Constructor
-     *
      * Performs normal setup stuff, and also determines which schema to use
      * based on database version.
      *
-     * @param IConfigLoader $config
+     * @param IConfigLoader    $config
      * @param IConnector|array $databaseExternal
      */
     public function __construct(IConfigLoader $config, $databaseExternal)
@@ -56,6 +55,7 @@ class Document extends Base implements IDocument
         if ($externalPing->getVersion() == "68") {
             return "media";
         }
+
         return "SynergyOneMedia.dbo";
     }
 
@@ -63,6 +63,7 @@ class Document extends Base implements IDocument
      * @inheritdoc
      *
      * @param User $student
+     *
      * @return array
      */
     public function getAcademicReportsForStudent(User $student)
@@ -100,7 +101,7 @@ class Document extends Base implements IDocument
             $query .= ' AND sra.CreatedDate >= :date1';
 
             $params = array_merge($params, [
-                'date1' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+                'date1' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT),
             ]);
         }
 
@@ -127,7 +128,7 @@ class Document extends Base implements IDocument
                 $query .= ' AND d.SourceDate >= :date2 ';
 
                 $params = array_merge($params, [
-                    'date2' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+                    'date2' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT),
                 ]);
             }
 
@@ -186,7 +187,7 @@ class Document extends Base implements IDocument
                     $query .= ' AND d.SourceDate >= :date3 ';
 
                     $params = array_merge($params, [
-                        'date2' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+                        'date2' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT),
                     ]);
                 }
 
@@ -203,44 +204,32 @@ class Document extends Base implements IDocument
                 // There was no access to the 'pvDocumentReferences' views. Fail silently without adding the SQL
                 // that references this table.
             }
-
         }
 
         $query .= "
-            ORDER BY    FileYear DESC, 
-                        CreatedDate DESC
+            ORDER BY CreatedDate DESC
         ";
 
         // Get all documents for the student
 
-        $iterator = $this->databaseExternal->executeQueryIterator($query, $params);
+        $documentsQuery = $this->databaseExternal->executeQuery($query, $params);
+        $documents = $documentsQuery->fetchAll();
 
-        // Return the results in an array in the format that is required by the historical code we are using
-
-        $reports = [];
-
-        foreach ($iterator as $row) {
-            $reportId    = $row['ID'];
-            $year        = $row['FileYear'];
-            $description = $row['Description'];
-            $source      = $row['Source'];
-
-            $reports[$year][$reportId] = [
-                'description' => $description,
-                'date'        => Alaress_Date_Format::newDatabaseDate($row['CreatedDate']),
-                'source'      => $source
-            ];
+        foreach ($documents as &$document) {
+            $document["CreatedDateRelative"] = Alaress_Date_Format::newDatabaseDate($document["CreatedDate"])->getRelativeTime();
+            $document["CreatedDate"] = Alaress_Date_Format::newDatabaseDate($document["CreatedDate"])->getLong();
         }
 
-        return $reports;
+        return $documents;
     }
 
     /**
      * @inheritdoc
      *
-     * @param User $student
+     * @param User   $student
      * @param string $documentId
      * @param string $source
+     *
      * @return array
      */
     public function downloadAcademicReportForStudent(User $student, $documentId, $source)
@@ -253,7 +242,7 @@ class Document extends Base implements IDocument
 
         $params = [
             'id'         => $student->getExternalId(),
-            'documentId' => $documentId
+            'documentId' => $documentId,
         ];
 
         // Create query to get the document from the database
@@ -289,12 +278,11 @@ class Document extends Base implements IDocument
                 $query .= ' AND d.SourceDate >= :date';
 
                 $params = array_merge($params, [
-                    'date' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+                    'date' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT),
                 ]);
             }
 
             // Check this document is in one of the classifications in config
-
 
             $query .= " AND d.ClassificationCode IN ({$bindings['placeholders']})";
 
@@ -305,7 +293,6 @@ class Document extends Base implements IDocument
                     $bindings['bindings']
                 )
             );
-
         } elseif ($source == 'StudentReportsArchive') {
             // Loading from school reports archive table
 
@@ -330,10 +317,9 @@ class Document extends Base implements IDocument
                 $query .= ' AND sra.CreatedDate >= :date ';
 
                 $params = array_merge($params, [
-                    'date' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+                    'date' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT),
                 ]);
             }
-
         } else {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
         }
@@ -362,6 +348,7 @@ class Document extends Base implements IDocument
      * Builds placeholders and bindings for document classifications.
      *
      * @param string $suffix Suffix for bindings
+     *
      * @return array Empty if there's no document classifications.
      *               Otherwise:
      *               bindings:     the parameters to bind to a query
@@ -376,6 +363,7 @@ class Document extends Base implements IDocument
         if (count($classificationCodes) > 0) {
             return PredicateBuilder::getArrayBindings($classificationCodes, 'classificationCode' . $suffix);
         }
+
         return [];
     }
 }

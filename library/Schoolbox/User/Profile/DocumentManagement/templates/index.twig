@@ -1,8 +1,8 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 
 {{ bread.crumbs(
-[ student.formatName, "/search/user/" ~ student.id ],
-[ 'Academic Reports' ]
+    [ student.formatName, "/search/user/" ~ student.id ],
+    [ 'Academic Reports' ]
 ) }}
 
 <div class="row">
@@ -14,28 +14,22 @@
         {% for year, yearReports in reports %}
             <div class="small-12 island">
                 <h2 class="subheader">{{ year }}</h2>
-
                 <section>
                     <ul class="information-list">
-
                         {% for reportId, reportData in yearReports %}
                             <li class="actions-small-1">
                                 <div class="list-item">
                                     <div class="compact card small-12">
-
                                         <a href="{{ routeLookupIfAuthorized('profileDocumentManagement.getDownload', {studentId: student.id, documentId: reportId, source: reportData.source}) }}">
                                             <img src="/images/mime/application-pdf.svg" class="mime">
                                             <h3>{{ reportData.description }}</h3>
                                         </a>
                                     </div>
-
                                 </div>
                             </li>
                         {% endfor %}
-
                     </ul>
                 </section>
-
             </div>
         {% endfor %}
     {% else %}
