@@ -44,6 +44,11 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
     protected $eventTypeMapper;
 
     /**
+     * @var UserMapper
+     */
+    protected $userMapper;
+
+    /**
      * Constructor
      *
      * @param User $user
@@ -54,6 +59,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
         $this->setUser($user);
         $this->externalEvents = $externalEvents;
         $this->setEventTypeMapper(EventTypeMapper::getInstance());
+        $this->setUserMapper(UserMapper::getInstance());
     }
 
 
@@ -135,10 +141,10 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
             /* If you can't find this user by external id, assume unknown
              */
             try {
-                $owner = UserMapper::getInstance()->findByExternalId($externalEvent['owner']);
+                $owner = $this->getUserMapper()->findByExternalId($externalEvent['owner']);
             }
             catch (MapperException $e) {
-                $owner = UserMapper::getInstance()->getUnknownUser();
+                $owner = $this->getUserMapper()->getUnknownUser();
             }
 
             $event->setAuthorId($externalEvent['owner']);
@@ -197,5 +203,25 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      */
     public function getEventTypeMapper() {
         return $this->eventTypeMapper;
+    }
+
+
+    /**
+     * @return UserMapper
+     */
+    private function getUserMapper(): UserMapper
+    {
+        return $this->userMapper;
+    }
+
+
+    /**
+     * @param UserMapper $userMapper
+     * @return $this
+     */
+    private function setUserMapper(UserMapper $userMapper)
+    {
+        $this->userMapper = $userMapper;
+        return $this;
     }
 }
