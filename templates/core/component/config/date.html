@@ -1,8 +1,10 @@
 <script type="text/javascript">
     $(function() {
-        $('#component{COMPONENT_INSTANCE_ID}-countdownDate').datepicker({
-            constrainInput: true
-        });
+        $('#component{COMPONENT_INSTANCE_ID}-countdownDate').alaressDateTimePicker();
     });
 </script>
-<input id='component{COMPONENT_INSTANCE_ID}-countdownDate' name='date' type='text' value='{COMPONENT_CONFIG_DATE}'/>
+<input id='component{COMPONENT_INSTANCE_ID}-countdownDate'
+       name='date'
+       type='text'
+       value='{COMPONENT_CONFIG_DATE}'
+/>
