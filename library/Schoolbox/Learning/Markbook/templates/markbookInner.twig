@@ -166,8 +166,7 @@
                                 {% else %}
                                     {% set normalisedMark = participant.normalisedMark(false) %}
                                     {% set label = participant.hasSubmittedResponse and not participant.hasPublishedFeedback
-                                        ? (pendingLabel ?: "Pending")
-                                        : participant.humanReadableMark(true) | default('–')
+                                        ? "Pending" : participant.humanReadableMark(true) | default('–')
                                     %}
                                     <a class="{{ urgency.marks(normalisedMark) }}"
                                        href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"

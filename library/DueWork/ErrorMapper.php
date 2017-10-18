@@ -19,7 +19,6 @@ class DueWork_ErrorMapper extends Schoolbox\Mapper {
         $this->uses('code', self::TYPE_STRING);
         $this->uses('display_as', self::TYPE_STRING);
         $this->uses('normalise_as', self::TYPE_DECIMAL);
-        $this->uses('is_default_for_new_submissions', self::TYPE_BOOLEAN);
 	}
 
 	/**
@@ -31,20 +30,6 @@ class DueWork_ErrorMapper extends Schoolbox\Mapper {
 		return parent::findByColumn('code', $code);
 	}
 
-    /**
-     * Gets the default state for new submissions.
-     *
-     * @return DueWork_Error
-     * @throws Schoolbox\Mapper\Exception if none was found
-     */
-    public function findDefaultForNewSubmissions()
-    {
-        return $this->findOneByColumn(
-            'is_default_for_new_submissions',
-            true,
-            array('id' => 'asc')
-        );
-    }
 
 	public function listDisplayValues() {
 		$errs = $this->findAll();
