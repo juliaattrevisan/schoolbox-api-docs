@@ -8,6 +8,7 @@
 namespace Schoolbox\External\Connector\Synergetic\Base;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Alaress_Date_Format;
 use DateTime;
@@ -139,6 +140,70 @@ class Document extends Base implements IDocument
                     $bindings['bindings']
                 )
             );
+
+            try {
+                // Check if we have permission to the `pvDocumentReferences` view. This will fail into the exception
+                // block and stop us from adding the query and breaking the feature if permission to this table is
+                // not available.
+
+                // TODO: Remove external query to check for access once all schools have added the appropriate permission
+
+                $this->databaseExternal->executeQuery("SELECT 1 FROM {$this->schema}.pvDocumentReferences");
+
+                // If that query worked we can assume they have updated their DB permissions and use this extra source
+
+                $bindings = $this->buildBindingsForClassifications('pvd');
+
+                $query .= "
+                    UNION
+                    
+                    SELECT      d.tDocumentsSeq AS ID,
+                                d.Description,
+                                COALESCE(
+                                    (
+                                        SELECT TOP 1 FileYear
+                                        FROM FileSemesters
+                                        WHERE d.SourceDate 
+                                        BETWEEN StartDate AND EndDate
+                                    ), YEAR(d.SourceDate)
+                                ) AS FileYear,
+                                (
+                                    SELECT TOP 1 FileSemester
+                                    FROM FileSemesters
+                                    WHERE d.SourceDate 
+                                    BETWEEN StartDate AND EndDate
+                                ) AS FileSemester,
+                                CONVERT(VARCHAR(20), SourceDate, 20) as CreatedDate,
+                                'tDocuments' AS Source
+                    FROM        {$this->schema}.pvDocumentReferences dr
+                    INNER JOIN  {$this->schema}.tDocuments d ON d.tDocumentsSeq = dr.tDocumentsSeq
+                    WHERE       dr.ID = :id3
+                ";
+
+                $params['id3'] = $student->getExternalId();
+
+                if ($date !== false) {
+                    $query .= ' AND d.SourceDate >= :date3 ';
+
+                    $params = array_merge($params, [
+                        'date2' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+                    ]);
+                }
+
+                $query .= "AND d.ClassificationCode IN ({$bindings['placeholders']})";
+
+                $params = array_merge(
+                    $params,
+                    array_map(
+                        'trim',
+                        $bindings['bindings']
+                    )
+                );
+            } catch (AlaressDatabaseException $e) {
+                // There was no access to the 'pvDocumentReferences' views. Fail silently without adding the SQL
+                // that references this table.
+            }
+
         }
 
         $query .= "
@@ -296,19 +361,20 @@ class Document extends Base implements IDocument
     /**
      * Builds placeholders and bindings for document classifications.
      *
+     * @param string $suffix Suffix for bindings
      * @return array Empty if there's no document classifications.
      *               Otherwise:
      *               bindings:     the parameters to bind to a query
      *               placeholders: the IN part of a query
      */
-    private function buildBindingsForClassifications()
+    private function buildBindingsForClassifications($suffix = '')
     {
         $classificationCodes = array_filter(
             explode(",", trim($this->config->get('external_document_docman_categories')))
         );
 
         if (count($classificationCodes) > 0) {
-            return PredicateBuilder::getArrayBindings($classificationCodes, 'classificationCode');
+            return PredicateBuilder::getArrayBindings($classificationCodes, 'classificationCode' . $suffix);
         }
         return [];
     }
