@@ -378,7 +378,7 @@
 
                                                     <!-- Expander -->
                                                     <div class="list-item">
-                                                        <div class="expander icon-down-arrow" data-collapser="collap-{{ i }}"></div>
+                                                        <div class="expander icon-down-arrow" data-collapser="collap-contact-{{ i }}"></div>
                                                         <div class="card small-12">
                                                             {% if contact.main %}
                                                                 <a href="/search/user/{{ contact.main.id }}">
@@ -394,7 +394,7 @@
                                                     </div>
 
                                                     <!-- Collapsable content -->
-                                                    <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-{{ i }}">
+                                                    <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-contact-{{ i }}">
                                                         <div class="list-item">
                                                             <div class="card no-pad small-12">
                                                                 <span class="icon-home size-32"></span>
@@ -450,7 +450,7 @@
 
                                                         <!-- Expander -->
                                                         <div class="list-item">
-                                                            <div class="expander icon-down-arrow" data-collapser="collap-{{ loop.index }}"></div>
+                                                            <div class="expander icon-down-arrow" data-collapser="collap-spouse-{{ loop.index }}"></div>
                                                             <div class="card small-12">
                                                                 <a href="/search/user/{{ contact.spouse.id }}">
                                                                     <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
@@ -466,9 +466,9 @@
                                                         <li class="small-12">
 
                                                             <!-- Collapsable content -->
-                                                            <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-{{ loop.index }}">
+                                                            <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-spouse-{{ loop.index }}">
                                                                 <div class="list-item">
-                                                                    <div class="content small-12">
+                                                                    <div class="small-12">
                                                                         {% if contact.StudentContactSpouseMobilePhone %}
                                                                             <div class="row">
                                                                                 <div class="column small-12 medium-5"><strong>Mobile Phone: </strong></div>
@@ -528,14 +528,14 @@
                                                     <li>
                                                         <!-- Expander -->
                                                         <div>
-                                                            <div class="expander icon-down-arrow" data-collapser="collap-{{ i }}"></div>
+                                                            <div class="expander icon-down-arrow" data-collapser="collap-emergency-{{ i }}"></div>
                                                             <div class="content small-12">
                                                                 {{ externalUser["StudentEmergency#{index}Name"] }}
                                                             </div>
                                                         </div>
 
                                                         <!-- Collapseable content -->
-                                                        <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-{{ i }}">
+                                                        <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-emergency-{{ i }}">
                                                             <div class="row">
                                                                 <div class="column small-12 medium-5"><strong>Primary Phone: </strong></div>
                                                                 <div class="column small-12 medium-7">
