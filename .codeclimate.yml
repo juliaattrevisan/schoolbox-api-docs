@@ -1,14 +1,15 @@
 exclude_paths:
 - "vendor/"
-- "tests/"
+- "**/tests/**/*"
 - "test/"
-- "Test/"
+- "**/Test/**/*"
 - "javascript/components/"
 - "node_modules/"
 - "sql/"
 - "updates/"
 - "debian/"
 - "www/"
+- "!www/css/**/*"
 - "tools/"
 
 engines:
@@ -20,6 +21,11 @@ engines:
       - php:
   phpcodesniffer:
     enabled: true
+    checks:
+      Squiz WhiteSpace ControlStructureSpacing SpacingAfterOpen:
+        enabled: false
+      Generic Files LineLength TooLong:
+        enabled: false
   phan:
     enabled: true
     config:
@@ -30,7 +36,7 @@ engines:
     enabled: false
     config:
       file_extensions: "php"
-      rulesets: "unusedcode,naming"
+      rulesets: "cleancode"
   scss-lint:
     enabled: true
 ratings:
