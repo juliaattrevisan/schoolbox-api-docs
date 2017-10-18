@@ -530,24 +530,43 @@
                                                                 <span class="icon-alert"></span>
                                                                 {{ externalUser["StudentEmergency#{index}Name"] }}
                                                             </div>
+
                                                         </div>
-                                                        <nav>
-                                                            <a href="#" class="icon-more" data-dropdown="row-options-emergency-{{ i }}" title="Actions"></a>
-                                                        </nav>
-                                                        <ul class="f-dropdown" data-dropdown-content id="row-options-emergency-{{ i }}">
-                                                            <li class="full-width">
-                                                                <a class="icon-mobile" href="tel:{{ externalUser["StudentEmergency#{index}Phone"] }}">
-                                                                    {{ externalUser["StudentEmergency#{index}Phone"] }}
-                                                                </a>
-                                                            </li>
-                                                            {% if externalUser["StudentEmergency#{index}PhoneAlt"] is not empty %}
-                                                                <li class="full-width">
-                                                                    <a class="icon-mobile" href="tel:{{ externalUser["StudentEmergency#{index}PhoneAlt"] }}">
-                                                                        {{ externalUser["StudentEmergency#{index}PhoneAlt"] }}
-                                                                    </a>
-                                                                </li>
-                                                            {% endif %}
-                                                        </ul>
+                                                    </li>
+                                                    <li class="small-12">
+                                                        <dl class="accordion" data-accordion="">
+                                                            <dd class="accordion-navigation">
+                                                                <a href="#panel-emergency{{ loop.index }}" aria-expanded="false">Contact details</a>
+                                                                <div id="panel-emergency{{ loop.index }}" class="content">
+
+                                                                    <div class="list-item">
+                                                                        <div class="small-12">
+                                                                            <div class="row">
+                                                                                <div class="column small-12 medium-5"><strong>Primary Phone: </strong></div>
+                                                                                <div class="column small-12 medium-7">
+                                                                                    <a href="tel:{{ externalUser["StudentEmergency#{index}Phone"] }}">
+                                                                                        {{ externalUser["StudentEmergency#{index}Phone"] }}
+                                                                                    </a>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="list-item">
+                                                                        <div class="small-12">
+                                                                            <div class="row">
+                                                                                <div class="column small-12 medium-5"><strong>Alternate Phone: </strong></div>
+                                                                                <div class="column small-12 medium-7">
+                                                                                    <a href="tel:{{ externalUser["StudentEmergency#{index}PhoneAlt"] }}">
+                                                                                        {{ externalUser["StudentEmergency#{index}PhoneAlt"] }}
+                                                                                    </a>
+                                                                                </div>
+                                                                            </div>
+
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </dd>
+                                                        </dl>
                                                     </li>
                                                 {% endif %}
                                             {% endfor %}
