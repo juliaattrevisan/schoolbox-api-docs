@@ -220,7 +220,7 @@
                 });
 
         // Adds page to my links
-        $('#emailAllGroup').click( function (event) {
+        $('#emailAllGroup').click(function(event) {
             event.preventDefault();
             $('#emailAll').submit();
         });
@@ -244,11 +244,12 @@
         <li><a href="/group/modifyForm.php?disband=1&categoryID={CATEGORY_ID}" class="icon-delete" data-action="disband">Disband Group</a></li>
     </ul>
 
-    <!-- hidden email form -->
+    <!-- BEGIN mail_all_form -->
     <form action="/mail/createMail.php" method="post" id="emailAll">
         <input type="hidden" name="replyto" value="&quot;{CATEGORY_NAME}&quot; &lt;{REPLYTO}&gt;"/>
         <input type="hidden" name="bcc" value="{EMAILALL}"/>
     </form>
+    <!-- END mail_all_form -->
 
 </div>
 

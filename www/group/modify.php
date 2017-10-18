@@ -23,6 +23,7 @@ $this->setBlock(TEMPLATE_content, 'msg_enabled', 'msg_enabled_block');
 $this->setBlock(TEMPLATE_content, 'msg_enabled_followth', 'msg_enabled_followth_block');
 
 $this->setBlock(TEMPLATE_content, 'mail_all', 'mail_all_block');
+$this->setBlock(TEMPLATE_content, 'mail_all_form', 'mail_all_form_block');
 
 $this->setBlock(TEMPLATE_content, "authorisation", "authorisation_block");
 $this->setBlock("authorisation", "waiting", "waiting_block");
@@ -248,8 +249,12 @@ if (is_numeric($this->arg[0])) {
             'EMAILALL' => implode(',', $all_emails),
         ));
         $this->parse('mail_all_block', 'mail_all');
+        $this->parse('mail_all_form_block', 'mail_all_form');
     } else {
-        $this->setVar('mail_all_block', '');
+        $this->setVar([
+        	'mail_all_block' => '',
+        	'mail_all_form_block' => '',
+        ]);
     }
 
     $waitingList = $groupHandler->getWaitingList($category->getId());
