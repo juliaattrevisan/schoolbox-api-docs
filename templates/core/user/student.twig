@@ -453,21 +453,28 @@
                                                 <div class="list-item">
                                                     <div class="card small-12">
                                                         <dl class="profile">
-                                                                <!-- TODO conditionals here for missing or private numbers -->
+
+                                                            {%  if contact.StudentContactPhoneActual %}
                                                             <dt class="small-12">Home Phone:</dt>
                                                             <dd class="small-12">
                                                                 <a href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}">{{ contact.StudentContactPhoneActual }}</a>
                                                             </dd>
+                                                            {%  endif %}
 
+                                                            {% if contact.StudentContactMobilePhone %}
                                                             <dt class="small-12">Mobile Phone:</dt>
                                                             <dd class="small-12">
                                                                 <a href="tel:{{ contact.StudentContactMobilePhone }}" title="Call {{ contact.StudentContactMobilePhone }}">{{ contact.StudentContactMobilePhone }}</a>
                                                             </dd>
+                                                            {% endif %}
 
+                                                            {% if contact.StudentContactDefaultEmail %}
                                                             <dt class="small-12">Email:</dt>
                                                             <dd class="small-12">
                                                                 <a href="{{ session.mailhandle }}{{ contact.StudentContactDefaultEmail }}">{{ contact.StudentContactDefaultEmail }}</a>
                                                             </dd>
+                                                            {% endif %}
+
                                                         </dl>
                                                     </div>
                                                 </div>
