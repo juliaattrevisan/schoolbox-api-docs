@@ -181,6 +181,42 @@ class Controller extends Base
 
 
     /**
+     * @api   GET /api/course-participation/ecc
+     * @level 170
+     *
+     * @param string $schoolCode
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
+     */
+    public function getApiTestEnrolmentTable($schoolCode)
+    {
+        $rq = $this->getRequest();
+        $rs = $this->getResponse();
+
+        if ($this->isInvalidAuth($rq->query, $schoolCode)) {
+            return;
+        }
+
+        $h = new Handler(
+            $this->userAccessMapper,
+            $this->tokenMapper,
+            $this->folderMapper,
+            $this->passwordMailService
+        );
+
+        $registeredUsers = $h->getUsersBySchool($schoolCode);
+
+        $enrolments = $h->getFolderAccessBySchool($schoolCode);
+
+        $rs->content->set($this->buildUnthemedHtmlOutput('@helpCourseParticipation/apitest-usertable.twig', [
+            'courses' => $enrolments,
+            'users'   => $registeredUsers
+        ]));
+    }
+
+
+    /**
      * @param string $schoolCode
      * @throws ServiceNotFound
      * @throws Mapper\Exception
