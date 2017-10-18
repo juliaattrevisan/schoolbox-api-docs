@@ -33,6 +33,10 @@ class DueWork_ErrorMapper extends Schoolbox\Mapper
     }
 
 
+    /**
+     * Returns an list of the options
+     * @return array
+     */
     public function listDisplayValues()
     {
         $errs = $this->findAll();
