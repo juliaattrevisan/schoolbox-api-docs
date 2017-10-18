@@ -1,98 +1,107 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
-class DueWork_Error {
+class DueWork_Error
+{
 
-	/**
-	 * @var int
-	 */
-	protected $id;
+    /**
+     * @var int
+     */
+    protected $id;
 
-	/**
-	 * @var string
-	 */
+    /**
+     * @var string
+     */
     protected $code;
 
-	/**
-	 * @var string
-	 */
+    /**
+     * @var string
+     */
     protected $displayAs;
 
-	/**
-	 * @var float
-	 */
+    /**
+     * @var float
+     */
     protected $normaliseAs;
 
-	/**
-	 * @param  string $code
-	 *
-	 * @return $this
-	 */
-	public function setCode($code) {
-		$this->code = $code;
-		return $this;
-	}
+    /**
+     * @param  string $code
+     *
+     * @return $this
+     */
+    public function setCode($code)
+    {
+        $this->code = $code;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getCode() {
-		return $this->code;
-	}
+    /**
+     * @return string
+     */
+    public function getCode()
+    {
+        return $this->code;
+    }
 
-	/**
-	 * @param  string $displayAs
-	 *
-	 * @return $this
-	 */
-	public function setDisplayAs($displayAs) {
-		$this->displayAs = $displayAs;
-		return $this;
-	}
+    /**
+     * @param  string $displayAs
+     *
+     * @return $this
+     */
+    public function setDisplayAs($displayAs)
+    {
+        $this->displayAs = $displayAs;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getDisplayAs() {
-		return $this->displayAs;
-	}
+    /**
+     * @return string
+     */
+    public function getDisplayAs()
+    {
+        return $this->displayAs;
+    }
 
-	/**
-	 * @param  int $id
-	 *
-	 * @return $this
-	 */
-	public function setId($id) {
-		$this->id = $id;
-		return $this;
-	}
+    /**
+     * @param  int $id
+     *
+     * @return $this
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	/**
-	 * @param  float $normaliseAs
-	 *
-	 * @return $this
-	 */
-	public function setNormaliseAs($normaliseAs) {
-		$this->normaliseAs = $normaliseAs;
-		return $this;
-	}
+    /**
+     * @param  float $normaliseAs
+     *
+     * @return $this
+     */
+    public function setNormaliseAs($normaliseAs)
+    {
+        $this->normaliseAs = $normaliseAs;
+        return $this;
+    }
 
-	/**
-	 * @return float
-	 */
-	public function getNormaliseAs() {
-		return $this->normaliseAs;
-	}
+    /**
+     * @return float
+     */
+    public function getNormaliseAs()
+    {
+        return $this->normaliseAs;
+    }
 }
