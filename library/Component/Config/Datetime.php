@@ -39,6 +39,8 @@ class Component_Config_Datetime extends Component_Config_Abstract
     {
         if (!empty($configValue)) {
             try {
+                // Use datetime format:
+                // otherwise fall back to date and reset missing time fields
                 $date = new Alaress_Date_Format(
                     $configValue,
                     [Alaress_Date_Format::DATABASE_FORMAT, Alaress_Date_Format::DATABASE_DATE_FORMAT.'|']
