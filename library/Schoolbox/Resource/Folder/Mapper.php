@@ -31,6 +31,7 @@ use Schoolbox\Resource\AbstractFolderMapper;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
+use \Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
@@ -207,6 +208,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCourseSpecification']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteUnitSpecification']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCourseImplementations']);
+        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteAssessments']);
 
         $this->ancestry = new Ancestry($this);
     }
@@ -370,6 +372,14 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $unitSpecMapper = $this->getJoinMapper('unit_specification');
         $unitSpec = $unitSpecMapper->findByColumn('folder_id', $folder->getId(), ['deleted' => true]);
         $unitSpecMapper->delete($unitSpec);
+        return true;
+    }
+
+    public function softDeleteAssessments(Model $folder)
+    {
+        $assessmentMapper = AssessmentMapper::getInstance();
+        $assessments = $assessmentMapper->findByColumn('v_f.folder_id', $folder->getId(), ['deleted' => true]);
+        $assessmentMapper->delete($assessments);
         return true;
     }
 
