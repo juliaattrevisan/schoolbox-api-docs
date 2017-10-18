@@ -16,6 +16,27 @@ use Schoolbox\User;
 
 class ExternalEvents extends Base implements IExternalEvents
 {
+
+    /**
+     * Student product code
+     */
+    const STUDENT_PRODUCT_CODE = 'TSCPDC';
+
+    /**
+     * Staff product code
+     */
+    const STAFF_PRODUCT_CODE = 'TIAPDC';
+
+    /**
+     * Parent product code
+     */
+    const PARENT_PRODUCT_CODE = 'PIAPDC';
+
+    /**
+     * Public product code
+     */
+    const PUBLIC_PRODUCT_CODE = 'PUBPDC';
+
     /**
      * Build a query to get events for a given $productCode
      * If $productCode is null, obtain personal events instead
@@ -106,27 +127,16 @@ class ExternalEvents extends Base implements IExternalEvents
         /* Get role-specific set of events
          */
         if ($user->getRole()->isStudent()) {
-
-            /* Get student events via product code TSCPDC
-             */
-            $allEvents[] = $this->buildQueryForProductCode('TSCPDC');
+            $allEvents[] = $this->buildQueryForProductCode(self::STUDENT_PRODUCT_CODE);
         }
         elseif ($user->getRole()->isStaff()) {
-
-            /* Get staff events via product code TIAPDC
-             */
-            $allEvents[] = $this->buildQueryForProductCode('TIAPDC');
+            $allEvents[] = $this->buildQueryForProductCode(self::STAFF_PRODUCT_CODE);
         }
         elseif ($user->getRole()->isParent()) {
-
-            /* Get parent events via product code PIAPDC
-             */
-            $allEvents[] = $this->buildQueryForProductCode('PIAPDC');
+            $allEvents[] = $this->buildQueryForProductCode(self::PARENT_PRODUCT_CODE);
         }
 
-        /* Get all the other public events in PUBPDC
-         */
-        $allEvents[] = $this->buildQueryForProductCode('PUBPDC');
+        $allEvents[] = $this->buildQueryForProductCode(self::PUBLIC_PRODUCT_CODE);
 
         /* Collate them into one mega union
          */
