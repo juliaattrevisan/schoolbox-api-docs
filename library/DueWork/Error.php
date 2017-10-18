@@ -28,11 +28,6 @@ class DueWork_Error {
 	 */
     protected $normaliseAs;
 
-    /**
-     * @var bool
-     */
-    protected $isDefaultForNewSubmissions;
-
 	/**
 	 * @param  string $code
 	 *
@@ -100,23 +95,4 @@ class DueWork_Error {
 	public function getNormaliseAs() {
 		return $this->normaliseAs;
 	}
-
-    /**
-     * @return boolean
-     */
-    public function getIsDefaultForNewSubmissions()
-    {
-        return $this->isDefaultForNewSubmissions;
-    }
-
-    /**
-     * @param  boolean $isDefaultForNewSubmissions
-     *
-     * @return $this
-     */
-    public function setIsDefaultForNewSubmissions($isDefaultForNewSubmissions)
-    {
-        $this->isDefaultForNewSubmissions = $isDefaultForNewSubmissions;
-        return $this;
-    }
 }
