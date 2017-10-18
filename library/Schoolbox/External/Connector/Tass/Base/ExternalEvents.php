@@ -17,12 +17,13 @@ use Schoolbox\User;
 class ExternalEvents extends Base implements IExternalEvents
 {
     /**
-     * @inheritdoc
+     * Build a query to get events for a given $productCode
+     * If $productCode is null, obtain personal events instead
+     *
+     * @param $productCode
+     * @return string
      */
-    public function getExternalEvents(User $user, $startDate, $endDate)
-    {
-        $start = new Alaress_Date_Format($startDate, Alaress_Date_Format::TIMESTAMP);
-        $end = new Alaress_Date_Format($endDate, Alaress_Date_Format::TIMESTAMP);
+    private function buildQueryForProductCode($productCode) {
 
         /* Anatomy of a query
          */
@@ -63,16 +64,43 @@ class ExternalEvents extends Base implements IExternalEvents
             )
         ";
 
+        /* Personal Events
+         */
+        if ($productCode == null) {
+            return "(
+                {$selectQuery}
+                {$catdefsQuery}
+                WHERE 
+                    ec.entry_code = :externalId AND
+                    {$whereQuery}
+            )";
+        }
+
+        /* Other events for a particular productCode
+         */
+        return "(
+                {$selectQuery}
+                INNER JOIN eventtype et 
+                    ON et.event_id = ec.event_id 
+                    AND ec.cmpy_code = et.cmpy_code
+                    AND prod_code = '{$productCode}'
+                {$catdefsQuery} 
+                WHERE 
+                {$whereQuery}
+            )";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getExternalEvents(User $user, $startDate, $endDate)
+    {
+        $start = new Alaress_Date_Format($startDate, Alaress_Date_Format::TIMESTAMP);
+        $end = new Alaress_Date_Format($endDate, Alaress_Date_Format::TIMESTAMP);
+
         /* Get personal events for $user - it doesn't matter which role this user is
          */
-        $allEvents[] = "(
-            {$selectQuery}
-            {$catdefsQuery}
-            WHERE 
-                ec.entry_code = :externalId AND
-                {$whereQuery}
-                
-        )";
+        $allEvents[] = $this->buildQueryForProductCode(null);
 
         /* Get role-specific set of events
          */
@@ -80,60 +108,24 @@ class ExternalEvents extends Base implements IExternalEvents
 
             /* Get student events via product code TSCPDC
              */
-            $allEvents[] = "(
-                {$selectQuery}
-                INNER JOIN eventtype et 
-                    ON et.event_id = ec.event_id 
-                    AND ec.cmpy_code = et.cmpy_code
-                    AND prod_code = 'TSCPDC'
-                {$catdefsQuery} 
-                WHERE 
-                {$whereQuery}
-            )";
+            $allEvents[] = $this->buildQueryForProductCode('TSCPDC');
         }
         elseif ($user->getRole()->isStaff()) {
 
             /* Get staff events via product code TIAPDC
              */
-            $allEvents[] = "(
-                {$selectQuery}
-                INNER JOIN eventtype et 
-                    ON et.event_id = ec.event_id 
-                    AND ec.cmpy_code = et.cmpy_code
-                    AND prod_code = 'TIAPDC'
-                {$catdefsQuery} 
-                WHERE 
-                {$whereQuery}
-            )";
+            $allEvents[] = $this->buildQueryForProductCode('TIAPDC');
         }
         elseif ($user->getRole()->isParent()) {
 
             /* Get parent events via product code PIAPDC
              */
-            $allEvents[] = "(
-                {$selectQuery}
-                INNER JOIN eventtype et 
-                    ON et.event_id = ec.event_id 
-                    AND ec.cmpy_code = et.cmpy_code
-                    AND prod_code = 'PIAPDC'
-                {$catdefsQuery} 
-                WHERE 
-                {$whereQuery}
-            )";
+            $allEvents[] = $this->buildQueryForProductCode('PIAPDC');
         }
 
-        /* Get all the other public events
+        /* Get all the other public events in PUBPDC
          */
-        $allEvents[] = "(
-            {$selectQuery}
-                INNER JOIN eventtype et 
-                    ON et.event_id = ec.event_id 
-                    AND ec.cmpy_code = et.cmpy_code
-                    AND prod_code = 'PUBPDC'
-            {$catdefsQuery} 
-            WHERE 
-            {$whereQuery}
-        )";
+        $allEvents[] = $this->buildQueryForProductCode('PUBPDC');
 
         /* Collate them into one mega union
          */
