@@ -93,6 +93,9 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         if (!parent::loadTemplate($templateHandle, 'video')) {
             return false;
         }
+        if(!$this->isSourceRenderable()) {
+            return $this->renderSourceUnavailableTwig($templateHandle);
+        }
 
         /* Need title injected here
          */

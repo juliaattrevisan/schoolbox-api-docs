@@ -20,6 +20,9 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         if (!parent::loadTemplate($templateHandle, 'scroller')) {
             return false;
         }
+        if(!$this->isSourceRenderable()) {
+            return $this->renderSourceUnavailableTwig($templateHandle);
+        }
 
         $this->parseConfig();
 

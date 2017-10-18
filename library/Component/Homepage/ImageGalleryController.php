@@ -45,6 +45,9 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
         if (!parent::loadTemplate($templateHandle, 'imageGallery')) {
             return false;
         }
+        if(!$this->isSourceRenderable()) {
+            return $this->renderSourceUnavailableTwig($templateHandle);
+        }
 
         $this->parseConfig();
 

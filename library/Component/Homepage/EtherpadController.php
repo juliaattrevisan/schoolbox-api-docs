@@ -54,6 +54,9 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
         if (!parent::loadTemplate($templateHandle, 'etherpad')) {
             return false;
         }
+        if(!$this->isSourceRenderable()) {
+            return $this->renderSourceUnavailableTwig($templateHandle);
+        }
 
         $this->parseConfig();
 
