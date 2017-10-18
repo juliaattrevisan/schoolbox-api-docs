@@ -56,7 +56,17 @@ class RoleCloner
      */
     protected function cloneSideNav(Role $source, Role $destination)
     {
-        $this->permClone($source, $destination, 'sideMenuGroup', [ 'id', ':dest' ]);
+        $this->clonePerms("
+            DELETE FROM `menu_side_role` WHERE `role_id` = ?
+        ", "
+            INSERT INTO `menu_side_role` (menu_side_id, role_id)
+            SELECT menu_side_id, :dest
+            FROM `menu_side_role`
+            WHERE `role_id` = :src
+        ", [
+                'src'  => $source->getId(),
+                'dest' => $destination->getId()
+            ]);
     }
 
     /**
