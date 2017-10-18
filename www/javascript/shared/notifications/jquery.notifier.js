@@ -145,33 +145,19 @@
                     return (a.timestamp == b.timestamp ? 0 : (a.timestamp < b.timestamp ? 1 : -1));
                 });
 
-                var i;
-
                 var footerText = '';
 
-                // Show a max of 100 msgs
-                var total = 0,
-                    unreadTotal = 0;
-                if(toInsert.length > 0) {
+                // Show a max of settings.itemMaxDisplayed messages
+                toInsert.slice(0, settings.itemMaxDisplayed).forEach(function(item) {
                     // append the list of messages
-                    for (i = 0; i < toInsert.length; --i) {
+                    var li = settings.tpl.clone();
 
-                        total++;
-                        if (toInsert[i].status === settings.itemUnread) {
-                            unreadTotal++;
-                        }
+                    applyMessageData(li, item);
 
-                        // Keep summating totals, but don't render them
-                        if (total > settings.itemMaxDisplayed) {
-                            continue;
-                        }
+                    content.append(li);
+                });
 
-                        var li = settings.tpl.clone();
-
-                        applyMessageData(li, toInsert[i]);
-
-                        content.append(li);
-                    }
+                if (toInsert.length > 0) {
                     footerText = settings.dictFooterSeeAll;
                 }
                 else {
@@ -182,10 +168,8 @@
                 $(settings.list).find(settings.footer).html(footerText);
                 $(settings.content).replaceWith(content)/*.foundation('equalizer')*/;
 
-                // update the counter (duplicate selector intentional)
-                // var unreadTotal = $(settings.content).find('[data-status="' + settings.itemUnread + '"]').length;
-
                 // set the counter
+                var unreadTotal = toInsert.filter(function(a) { return a.status === settings.itemUnread; }).length;
                 $('[data-' + settings.counterUnread + ']').attr('data-' + settings.counterUnread, unreadTotal);
                 var unreadTotalLabel = unreadTotal;
                 if (unreadTotal === 0) {
