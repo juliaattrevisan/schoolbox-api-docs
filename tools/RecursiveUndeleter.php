@@ -183,8 +183,8 @@ class RecursiveUndeleter
             Assessment\Mapper::class => 'v_ui.course_unit_implementation_id',
         ],
         Quiz\Mapper::class              => [
-            QuizSection\Mapper::class,
-            QuizAttempt\Mapper::class,
+            QuizSection\Mapper::class => 'assess_section.assess_id',
+            QuizAttempt\Mapper::class => 'assess_attempt.assess_id',
         ],
         SubmissionBoxMapper::class      => [
             SubmissionMapper::class   => 'student_submission.box_id',
@@ -1057,11 +1057,15 @@ EXAMPLES:
         $this->checkRegistry($mapperClass);
 
         $childMappers = self::$softDeleteRegistry[$mapperClass];
-        $parentIds    = $deletedParentModels->getColumnValues($parentMapper->getIdentifierColumn());
+        $parentIds    = $deletedParentModels->getPropertyValues($parentMapper->getIdentifierProperty());
         $this->logger->info(sprintf("Finding children of mapper '%s' with ids %s", $mapperClass, $this->getIdString($parentIds)));
 
         // For each child entity of this parent entity
         foreach($childMappers as $key => $val) {
+            /**
+             * @var IMapper $childMapper
+             * @var string  $foreignKeyColumn
+             */
             list($childMapper, $foreignKeyColumn) = $this->getMapperClassAndForeignKeyFromRegistryPair($parentMapper, $key, $val);
             $mapperClass = get_class($childMapper);
             $this->logger->info(sprintf("Fetching children from mapper '%s'", $mapperClass));
@@ -1079,7 +1083,8 @@ EXAMPLES:
                 continue;
             }
 
-            $childModelIds = $deletedChildModels->getColumnValues($childModelIdentifier);
+            $this->logger->info(sprintf("Child mapper identifier column '%s'", $childModelIdentifier));
+            $childModelIds = $deletedChildModels->getPropertyValues($childMapper->getIdentifierProperty());
             $this->logger->debug(sprintf('Child model IDs: %s', $this->getIdString($childModelIds)));
 
             if(0 === count($childModelIds)) {
