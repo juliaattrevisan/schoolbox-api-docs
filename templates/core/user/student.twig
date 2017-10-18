@@ -389,9 +389,8 @@
                                                 <li class="small-12">
                                                     <dl class="accordion" data-accordion="">
                                                         <dd class="accordion-navigation active">
-                                                            <!-- TODO dynamic id -->
-                                                            <a href="#panel1" aria-expanded="true">Contact details</a>
-                                                            <div id="panel1" class="content active">
+                                                            <a href="#panel{{ loop.index }}" aria-expanded="true">Contact details</a>
+                                                            <div id="panel{{ loop.index }}" class="content active">
 
                                                                 <div class="list-item">
                                                                     <div class="card small-12">
@@ -446,7 +445,6 @@
                                                 {% endif %}
 
                                                 {% if (contact.StudentContactSpouseTitle or contact.StudentContactSpousePreferred) and contact.spouse %}
-                                                    <!-- TODO need to find out if current contact is spouse -->
                                                     <li class="small-12">
                                                         <div class="list-item">
                                                             <div class="card small-12">
@@ -463,9 +461,8 @@
                                                         <li class="small-12">
                                                             <dl class="accordion" data-accordion="">
                                                                 <dd class="accordion-navigation">
-                                                                    <!-- TODO dynamic id -->
-                                                                    <a href="#panel2" aria-expanded="false">Contact details</a>
-                                                                    <div id="panel2" class="content">
+                                                                    <a href="#panel-spouse{{ loop.index }}" aria-expanded="false">Contact details</a>
+                                                                    <div id="panel-spouse{{ loop.index }}" class="content">
 
                                                                         <div class="list-item">
                                                                             <div class="content small-12">
