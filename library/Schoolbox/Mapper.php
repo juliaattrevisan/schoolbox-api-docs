@@ -2381,17 +2381,45 @@ abstract class Mapper implements IMapper, Serializable
     public function findScalarByPredicates($column, Builder $pb, array $options = [])
     {
         try {
-            $selection = implode('.', array_map(function ($v) {
-                return $this->database->quoteIdentifier($v);
-            }, [ $this->getTable(), $column ]));
-
-            $stmt = $this->selectScalarByPredicates($selection, $pb, $options);
-
-            return $stmt->fetchAll(PDO::FETCH_COLUMN);
-
+            return $this->selectColumnsByPredicates([ $column ], $pb, $options)->fetchAll(PDO::FETCH_COLUMN);
         } catch (UnderflowException $e) {
             return [];
         }
+    }
+
+
+    /**
+     * @param string[] $columnList
+     * @param Builder  $pb
+     * @param array    $options
+     * @return array
+     */
+    public function findColumnsByPredicates($columnList, Builder $pb, array $options = [])
+    {
+        try {
+            return $this->selectColumnsByPredicates($columnList, $pb, $options)->fetchAll(PDO::FETCH_ASSOC);
+        } catch (UnderflowException $e) {
+            return [];
+        }
+    }
+
+
+    /**
+     * @param string[] $columnList
+     * @param Builder  $pb
+     * @param array    $options
+     * @return PDOStatement
+     * @throws UnderflowException
+     */
+    private function selectColumnsByPredicates($columnList, Builder $pb, array $options = [])
+    {
+        $selection = implode(', ', array_map(function ($column) {
+            return implode('.', array_map(function ($v) {
+                return $this->database->quoteIdentifier($v);
+            }, [ $this->getTable(), $column ]));
+        }, $columnList));
+
+        return $this->selectScalarByPredicates($selection, $pb, $options);
     }
 
 
