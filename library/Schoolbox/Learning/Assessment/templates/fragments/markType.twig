@@ -139,7 +139,7 @@
                                 {{ gradeLevel.lowerBound }}{% spaceless %}
                                 {% if loop.index == loop.length %}
                                     +
-                                {% else %}
+                                {% elseif scheme.gradeLevels[loop.index].lowerBound - 1 > gradeLevel.lowerBound %}
                                     -{{ scheme.gradeLevels[loop.index].lowerBound - 1 }}
                                 {% endif %}
                             {% endspaceless %}</td>
