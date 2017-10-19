@@ -68,7 +68,8 @@
         "mpratt/embera": "~1.8.6",
         "nesbot/carbon": "~1.22.1",
         "league/flysystem-ziparchive": "^1.0",
-        "phpoffice/phpexcel": "dev-master"
+        "phpoffice/phpexcel": "dev-master",
+        "roave/security-advisories": "dev-master"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",
