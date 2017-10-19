@@ -76,7 +76,7 @@ class External_Doublefirst_User implements External_UserInterface
              */
 
             $cacheTime = @filemtime($photoPath);
-            $modifiedTime = strtotime($photo['ModifiedDate']);
+            $modifiedTime = strtotime($photo['LastUpdated']);
 
             if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
                 $query = "
@@ -115,7 +115,7 @@ class External_Doublefirst_User implements External_UserInterface
                  */
 
                 $cacheTime = @filemtime($photoPath);
-                $modifiedTime = strtotime($photo['ModifiedDate']);
+                $modifiedTime = strtotime($photo['LastUpdated']);
 
                 if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
                     $query = "
