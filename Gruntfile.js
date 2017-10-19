@@ -11,6 +11,13 @@ module.exports = function(grunt) {
             },
             install: {}
         },
+        sass: { // Only used for development, skipping the skin build process and no minify
+            dist: {
+                files: {
+                    'www/css/demo/chrome-foundation.css': 'www/css/foundation/chrome-foundation.scss'
+                }
+            }
+        },
         uglify: {
             options: {
                 banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'//,
@@ -187,7 +194,7 @@ module.exports = function(grunt) {
             },
             css: {
                 files: ['www/css/**/*.scss', '!www/css/foundation/utils/*.scss'],
-                tasks: 'build.css',
+                tasks: 'sass',
                 options: {
                     interrupt: true
                 }
@@ -198,9 +205,10 @@ module.exports = function(grunt) {
     require('jit-grunt')(grunt, {bower: 'grunt-bower-task'});
 
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-sass');
 
     // Build tasks
-    grunt.registerTask('build.js',   ['uglify']);
+    grunt.registerTask('build.js', 'uglify');
     grunt.registerTask('build.css', 'Builds SASS stylesheet (through tools/skin/builder.php)', function() {
         // Run sass build
         var result = shell.exec('php ./tools/skin/builder.php --force');
