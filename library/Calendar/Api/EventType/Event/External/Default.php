@@ -107,8 +107,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
             try {
                 $eventType = $this->getEventTypeMapper()->findOneByColumn('eventType', $externalEvent['type'])->getId();
                 $event->setType($eventType);
-            }
-            catch (MapperException $e) {
+            } catch (MapperException $e) {
                 $event->setType($defaultEventType);
             }
 
@@ -120,7 +119,13 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
             $event->setEndTime(new Alaress_Date_Format($externalEvent['finish'], Alaress_Date_Format::DATABASE_FORMAT));
 
             // Publish date is not available in Synergetic Staff Scheduler, but may be available elsewhere
-            $event->setPublishDate(empty($externalEvent['publish']) ? '' : new Alaress_Date_Format($externalEvent['finish'], Alaress_Date_Format::DATABASE_FORMAT));
+            if (empty($externalEvent['publish'])) {
+                $publishDate = '';
+            } else {
+                $publishDate = new Alaress_Date_Format($externalEvent['finish'], Alaress_Date_Format::DATABASE_FORMAT);
+            }
+
+            $event->setPublishDate($publishDate);
 
             //Where is the best place to format this? TODO
             $eventDetail = '';
@@ -133,7 +138,17 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
             if(strlen($eventDetail) > 0) {
                 $event->setDetail('<p>'.$eventDetail.'</p>');
             }
-            $event->setLocation(strlen($externalEvent['location']) > 0 ? $externalEvent['location'] : $externalEvent['room']);
+
+            /* Determine event location
+             */
+            if (strlen($externalEvent['location'])) {
+                $location = $externalEvent['location'];
+            }
+            else {
+                $location = $externalEvent['room'];
+            }
+
+            $event->setLocation($location);
 
             $event->setEventType(self::EXTERNAL_EVENT_TYPE);
             $event->setAllday(false);
@@ -142,8 +157,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
              */
             try {
                 $owner = $this->getUserMapper()->findByExternalId($externalEvent['owner']);
-            }
-            catch (MapperException $e) {
+            } catch (MapperException $e) {
                 $owner = $this->getUserMapper()->getUnknownUser();
             }
 
@@ -178,10 +192,12 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
         return '';
     }
 
+
     /**
      * Helper method for loading this event type's calendar connector config.
-     *
      * @return Calendar_Api_Config_Record|object
+     * @throws MapperException
+     * @throws MapperException\Deleted
      */
     public function loadConnectorConfiguration() {
         return Calendar_Api_Config_Mapper::getInstance()->findById(

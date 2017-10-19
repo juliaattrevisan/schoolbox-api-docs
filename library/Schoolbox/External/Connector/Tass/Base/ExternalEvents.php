@@ -44,8 +44,8 @@ class ExternalEvents extends Base implements IExternalEvents
      * @param $productCode
      * @return string
      */
-    private function buildQueryForProductCode($productCode) {
-
+    private function buildQueryForProductCode($productCode)
+    {
         /* Anatomy of a query
          */
         $selectQuery = "
@@ -128,11 +128,9 @@ class ExternalEvents extends Base implements IExternalEvents
          */
         if ($user->getRole()->isStudent()) {
             $allEvents[] = $this->buildQueryForProductCode(self::STUDENT_PRODUCT_CODE);
-        }
-        elseif ($user->getRole()->isStaff()) {
+        } elseif ($user->getRole()->isStaff()) {
             $allEvents[] = $this->buildQueryForProductCode(self::STAFF_PRODUCT_CODE);
-        }
-        elseif ($user->getRole()->isParent()) {
+        } elseif ($user->getRole()->isParent()) {
             $allEvents[] = $this->buildQueryForProductCode(self::PARENT_PRODUCT_CODE);
         }
 
