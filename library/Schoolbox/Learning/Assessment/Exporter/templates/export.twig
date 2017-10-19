@@ -89,6 +89,51 @@
                                         {% endif %}
                                     </p>
                                 </div>
+
+                                <div class="list-item">
+                                    <div class="small-12 medium-6 large-3 columns">
+                                        <label for="publish_date-{{ implementation.unit.id }}">Publish</label>
+                                        <input id="publish_date-{{ implementation.unit.id }}"
+                                               name="unit[implementation.unit.id][publish_date]"
+                                               type="text"
+                                               value="{{ implementation.unit.openDate.localShort }}"
+                                               data-datepicker
+                                               data-datepicker-buttontext=""
+                                               data-datesync-enddate="#due_date-{{ implementation.unit.id }}" />
+                                    </div>
+                                    <div class="small-12 medium-6 large-3 columns">
+                                        <label for="open_date-{{ implementation.unit.id }}">Open</label>
+                                        <input id="open_date-{{ implementation.unit.id }}"
+                                               name="unit[{{ implementation.unit.id }}][open_date]"
+                                               type="text"
+                                               value="{{ implementation.unit.openDate.localShort }}"
+                                               data-datepicker
+                                               data-datepicker-buttontext=""
+                                               data-datesync-startdate="#publish_date-{{ implementation.unit.id }}"
+                                               data-datesync-enddate="#due_date-{{ implementation.unit.id }}" />
+                                    </div>
+                                    <div class="small-12 medium-6 large-3 columns">
+                                        <label for="due_date-{{ implementation.unit.id }}">Due</label>
+                                        <input id="due_date-{{ implementation.unit.id }}"
+                                               name="unit[{{ implementation.unit.id }}][due_date]"
+                                               type="text"
+                                               value="{{ implementation.unit.dueDate.localShort }}"
+                                               data-datepicker
+                                               data-datepicker-buttontext=""
+                                               data-datesync-startdate="#open_date-{{ implementation.unit.id }}"
+                                               data-datesync-endtdate="#close_date-{{ implementation.unit.id }}" />
+                                    </div>
+                                    <div class="small-12 medium-6 large-3 columns">
+                                        <label for="close_date-{{ implementation.unit.id }}">Close</label>
+                                        <input id="close_date-{{ implementation.unit.id }}"
+                                               name="unit[{{ implementation.unit.id }}][close_date]"
+                                               type="text"
+                                               value="{{ implementation.unit.dueDate.localShort }}"
+                                               data-datepicker
+                                               data-datepicker-buttontext=""
+                                               data-datesync-startdate="#due_date-{{ implementation.unit.id }}" />
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     {% endfor %}

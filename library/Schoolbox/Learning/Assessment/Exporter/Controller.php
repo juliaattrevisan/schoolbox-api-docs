@@ -7,6 +7,7 @@
 namespace Schoolbox\Learning\Assessment\Exporter;
 
 use Alaress\Web\Controller\Base as BaseController;
+use Schoolbox\File\Exception;
 use Schoolbox\Filter\BrokenFilterException;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
@@ -20,6 +21,7 @@ use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilter;
 use InvalidArgumentException;
+use Alaress_Date_Format;
 
 /**
  * Controller for assessment export actions.
@@ -134,7 +136,14 @@ class Controller extends BaseController
                     return;
                 }
 
-                $this->exportToNewContext($assessmentSpec, $unitImpl);
+                $dates = [
+                    'publish' => $this->getRequest()->post->get('unit['.$unitImpl->getId().'][publish_date]', []),
+                    'open' => $this->getRequest()->post->get('unit['.$unitImpl->getId().'][open_date]', []),
+                    'due' => $this->getRequest()->post->get('unit['.$unitImpl->getId().'][due_date]', []),
+                    'close' => $this->getRequest()->post->get('unit['.$unitImpl->getId().'][close_date]', []),
+                ];
+
+                $this->exportToNewContext($assessmentSpec, $unitImpl, $dates);
             }
         }
 
@@ -166,24 +175,40 @@ class Controller extends BaseController
      * @param AssessmentContext $context
      * @return IAssessable
      */
-    protected function exportToNewContext(IAssessable $assessmentSpec, AssessmentContext $context)
+    protected function exportToNewContext(IAssessable $assessmentSpec, AssessmentContext $context, $dates = null)
     {
+        if (is_array($dates)) {
+            foreach ($dates as $field => $value) {
+                $$field = null;
+                try {
+                    $$field = new Alaress_Date_Format($value);
+                } catch (Exception $e) {
+                    // baaaang
+                }
+            }
+        }
+
         if($context instanceof UnitImplementation){
-            $start = $context->getOpenDate();
-            $end   = $context->getDueDate();
+            $publishDate = $publish ?? $context->getOpenDate();
+            $openDate = $open ?? $context->getOpenDate();
+            $dueDate = $due ?? $context->getDueDate();
+            $closeDate = $close ?? $context->getDueDate();
         } elseif($context instanceof Project){
-            $start = $context->getPublishAt();
-            $end   = $context->getDueAt();
+            $publishDate = $publish ?? $context->getOpenAt();
+            $openDate = $publish ?? $context->getOpenAt();
+            $dueDate   = $due ?? $context->getDueAt();
+            $closeDate   = $due ?? $context->getDueAt();
+
         } else {
             throw new \DomainException('Invalid context: ' . get_class($context));
         }
 
         // Set sensible defaults for dates
         $assessmentSpec
-            ->setPublishAt($start)
-            ->setOpenAt($start)
-            ->setDueAt($end)
-            ->setCloseAt($end);
+            ->setPublishAt($publishDate)
+            ->setOpenAt($openDate)
+            ->setDueAt($dueDate)
+            ->setCloseAt($closeDate);
 
         // Replicate !
         $assessmentImpl = $this->replicator->replicateInNewContext($assessmentSpec, $context, $this->getUser());
