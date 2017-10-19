@@ -79,7 +79,6 @@ class Document extends Base implements IDocument
             SELECT      sral.StudentReportsArchiveSeq as ID,
                         sral.Description,
                         sral.FileYear,
-                        sral.FileSemester,
                         CONVERT(VARCHAR(20), sra.CreatedDate, 20) AS CreatedDate,
                         'StudentReportsArchive' AS Source
             FROM        {$this->schema}.StudentReportsArchiveLink sral
@@ -110,27 +109,15 @@ class Document extends Base implements IDocument
         if (!empty($bindings)) {
             $query .= "
                 UNION
-                
-                SELECT  d.tDocumentsSeq as ID,
+
+                SELECT  d.tDocumentsSeq AS ID,
                         d.Description,
-                        COALESCE(
-                            (
-                                SELECT TOP 1 FileYear 
-                                FROM FileSemesters 
-                                WHERE d.SourceDate BETWEEN StartDate AND EndDate
-                            ), YEAR(d.SourceDate)
-                        ) AS FileYear,
-                        (
-                            SELECT TOP 1 FileSemester 
-                            FROM FileSemesters 
-                            WHERE d.SourceDate 
-                            BETWEEN StartDate AND EndDate
-                        ) AS FileSemester,
+                        YEAR(d.SourceDate) AS FileYear,
                         CONVERT(VARCHAR(20), d.SourceDate, 20) as CreatedDate,
                         'tDocuments' AS Source
                 FROM    {$this->schema}.tDocuments d
                 JOIN    {$this->schema}.DocumentReferences dr ON dr.DocumentReferencesSeq = d.tDocumentsSeq
-                WHERE   dr.ID = :id2 
+                WHERE   dr.ID = :id2
             ";
 
             $params['id2'] = $student->getExternalId();
@@ -156,7 +143,6 @@ class Document extends Base implements IDocument
 
         $query .= "
             ORDER BY    FileYear DESC, 
-                        FileSemester DESC, 
                         CreatedDate DESC
         ";
 
@@ -171,11 +157,10 @@ class Document extends Base implements IDocument
         foreach ($iterator as $row) {
             $reportId    = $row['ID'];
             $year        = $row['FileYear'];
-            $semester    = $row['FileSemester'];
             $description = $row['Description'];
             $source      = $row['Source'];
 
-            $reports[$year][$semester][$reportId] = [
+            $reports[$year][$reportId] = [
                 'description' => $description,
                 'date'        => Alaress_Date_Format::newDatabaseDate($row['CreatedDate']),
                 'source'      => $source
