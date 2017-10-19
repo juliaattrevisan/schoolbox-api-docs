@@ -521,8 +521,6 @@ fi
 echo "Restoring database '$sourcedb'";
 ## Restore specified database
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < $sourcedb;
-## Fix Collation
-$instdir/tools/schema/collation.sh;
 
 # Move data files to correct location if restoring from backup
 if [ "$sourceloc" = '[B]' ];
