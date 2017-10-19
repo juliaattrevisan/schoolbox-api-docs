@@ -11,28 +11,28 @@
     </div>
 
     {% if reports|length %}
-        {% for year, semesters in reports %}
-            {% for semester, reports in semesters %}
-                <div class="small-12 island">
+        {% for year, yearReports in reports %}
+            <div class="small-12 island">
                 <h2 class="subheader">{{ year }}</h2>
-                <section>
-                <ul class="action-list">
-                {% for reportId, report in reports %}
-                    <li class="actions-small-1">
-                        <div class="list-item">
-                            <div class="compact card small-12">
-                                <a href="{{ routeLookupIfAuthorized('profileDocumentManagement.getDownload', {studentId: student.id, documentId: reportId, source: report.source}) }}">
-                                    <img src="/images/mime/application-pdf.svg" class="mime">
-                                    <h3>{{ report.description }}</h3>
-                                </a>
-                            </div>
-                        </div>
-                    </li>
+
+                {% for reportId in yearReports %}
+                    <section>
+                        <ul class="action-list">
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="compact card small-12">
+                                        <a href="{{ routeLookupIfAuthorized('profileDocumentManagement.getDownload', {studentId: student.id, documentId: reportId, source: reportId.source}) }}">
+                                            <img src="/images/mime/application-pdf.svg" class="mime">
+                                            <h3>{{ reportId.description }}</h3>
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </section>
                 {% endfor %}
-                </ul>
-                </section>
-                </div>
-            {% endfor %}
+
+            </div>
         {% endfor %}
     {% else %}
         <div class="small-12 island">
