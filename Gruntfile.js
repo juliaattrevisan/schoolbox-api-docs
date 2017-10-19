@@ -155,7 +155,7 @@ module.exports = function(grunt) {
                 dest: 'www/javascript/components/<%= pkg.name %>.min.js'
             },
             masonry: {
-                src:  [
+                src: [
                     // Colour handling
                     'www/javascript/components/spectrum/spectrum.js',
 
@@ -166,7 +166,7 @@ module.exports = function(grunt) {
                 dest: 'www/javascript/components/<%= pkg.name %>-masonry.min.js'
             },
             fullcalendar: {
-                src:  [
+                src: [
                     // System for displaying calendars and associated popups
                     'www/javascript/components/fullcalendar/dist/fullcalendar.js',
                     'www/javascript/shared/calendar/jquery.fullcalendar.js'
@@ -176,14 +176,32 @@ module.exports = function(grunt) {
         },
         clean: {
             js: ['www/javascript/components/schoolbox*.min.js*']
+        },
+        watch: {
+            scripts: {
+                files: ['www/javascript/**/*.js', '!www/javascript/components/*'],
+                tasks: 'build.js',
+                options: {
+                    interrupt: true
+                }
+            },
+            css: {
+                files: ['www/css/**/*.scss', '!www/css/foundation/utils/*.scss'],
+                tasks: 'build.css',
+                options: {
+                    interrupt: true
+                }
+            }
         }
     });
 
     require('jit-grunt')(grunt, {bower: 'grunt-bower-task'});
 
+    grunt.loadNpmTasks('grunt-contrib-watch');
+
     // Build tasks
     grunt.registerTask('build.js',   ['uglify']);
-    grunt.registerTask('sass', 'Builds SASS stylesheet (through tools/skin/builder.php)', function() {
+    grunt.registerTask('build.css', 'Builds SASS stylesheet (through tools/skin/builder.php)', function() {
         // Run sass build
         var result = shell.exec('php ./tools/skin/builder.php --force');
         if (result.code === 0) {
