@@ -61,6 +61,7 @@ if ($this->arg[0] == 'new') {
         'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
         'PARENT_ID' => $parent['id'],
         "COMPONENT_INSTANCE_ID" => $publishComponent,
+        "USER_ID" => $userId
     );
 
     $this->setVar($output);
