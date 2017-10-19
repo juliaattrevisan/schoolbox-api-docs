@@ -2,6 +2,22 @@
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
 {#{{ bread.crumbsArray(breadcrumbs) }}#}
+<script type="text/javascript">
+    $(function() {
+
+        $('#importForm').find('[data-select-all-group]').change(function () {
+            var unit = $(this).attr('data-unit-id');
+            if(this.checked) {
+                $('#unit-' + unit + '-dates').removeAttr('hidden');
+            }
+            else {
+                $('#unit-' + unit + '-dates').attr('hidden', true);
+            }
+        });
+
+    });
+</script>
+
 
 <div class="row">
     <div class="small-12 columns">
@@ -50,13 +66,12 @@
                     {% for implementation in implementations %}
                         <tr>
                             <td>
-                                <input name="unitImplementation[{{ implementation.unit.id }}]" type="hidden" value="0" />
                                 <input type="checkbox"
                                        id="import-{{ implementation.unit.id }}"
-                                       name="unitImplementation[{{ implementation.unit.id }}]"
                                        value="1"
                                        {% if not implementation.allowed %}disabled{% endif %}
-                                       data-select-all-group="unit-implementation" />
+                                       data-select-all-group="unit-implementation"
+                                       data-unit-id="{{ implementation.unit.id }}" />
                                 <label for="import-{{ implementation.unit.id }}" class="checkbox-label"></label>
                             </td>
                             <td>
@@ -90,7 +105,7 @@
                                     </p>
                                 </div>
 
-                                <div class="list-item">
+                                <div class="list-item" id="unit-{{ implementation.unit.id }}-dates" hidden>
                                     <div class="small-12 medium-6 large-3 columns">
                                         <label for="publish_date-{{ implementation.unit.id }}">Publish</label>
                                         <input id="publish_date-{{ implementation.unit.id }}"

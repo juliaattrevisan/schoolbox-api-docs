@@ -180,10 +180,12 @@ class Controller extends BaseController
         if (is_array($dates)) {
             foreach ($dates as $field => $value) {
                 $$field = null;
-                try {
-                    $$field = new Alaress_Date_Format($value);
-                } catch (Exception $e) {
-                    // baaaang
+                if ($value) {
+                    try {
+                        $$field = new Alaress_Date_Format($value);
+                    } catch (Exception $e) {
+                        // baaaang
+                    }
                 }
             }
         }
