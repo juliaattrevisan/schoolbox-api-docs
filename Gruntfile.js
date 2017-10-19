@@ -235,6 +235,10 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-contrib-concat');
 
+    // Dev tasks
+    grunt.registerTask('js', 'concat');
+    grunt.registerTask('dev', ['bower', 'concat', 'sass']);
+
     // Build tasks
     grunt.registerTask('build.js', 'uglify');
     grunt.registerTask('build.css', 'Builds SASS stylesheet (through tools/skin/builder.php)', function() {
@@ -246,6 +250,6 @@ module.exports = function(grunt) {
             grunt.fail.warn("Skin may not have been built successfully! (error code: "+String(result.code)+')');
         }
     });
-    grunt.registerTask('build',      ['bower', 'build.js', 'sass']);
-    grunt.registerTask('default',    ['build']);
+    grunt.registerTask('build',      ['bower', 'build.js', 'build.css']);
+    grunt.registerTask('default',    'build');
 };
