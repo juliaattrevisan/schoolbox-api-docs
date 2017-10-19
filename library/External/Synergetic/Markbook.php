@@ -719,7 +719,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     }
 
     /**
-     * Performs truncation + encoding gymnastics required for database inserts.
+     * Performs truncation required for database inserts.
+     *
+     * No encoding conversion is required: the database connection is able to
+     * save characters if they're part of whatever the column's code page is,
+     * otherwise it just saves a ? (which unrecognised chars convert to anyway)
      *
      * @param string $string
      * @param int    $length
@@ -727,6 +731,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     private function truncateForDatabase($string, $length)
     {
-        return mb_substr(mb_convert_encoding($string, self::CHARACTER_ENCODING), 0, $length, self::CHARACTER_ENCODING);
+        return mb_substr($string, 0, $length, self::CHARACTER_ENCODING);
     }
 }
