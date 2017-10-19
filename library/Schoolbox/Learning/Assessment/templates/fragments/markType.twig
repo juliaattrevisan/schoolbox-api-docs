@@ -138,7 +138,7 @@
                         <tr>
                             <td>
                                 {{ gradeLevel.lowerBound }}{% spaceless %}
-                                {% if loop.index0 == 0 %}
+                                {% if loop.index0 == 0 and gradeLevel.lowerBound != 100 %}
                                     +
                                 {% elseif gradeLevelsReversed[loop.index0 - 1].lowerBound - 1 > gradeLevel.lowerBound %}
                                     -{{ gradeLevelsReversed[loop.index0 - 1].lowerBound - 1 }}
