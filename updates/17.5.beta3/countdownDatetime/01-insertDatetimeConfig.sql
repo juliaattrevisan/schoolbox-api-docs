@@ -8,5 +8,5 @@ INSERT INTO component_config_definition (
   (SELECT id FROM component_definition WHERE class='Component_Homepage_CountdownController' LIMIT 1),
   'datetime',
   '',
-  'Countdown Time'
+  'Date'
 );
