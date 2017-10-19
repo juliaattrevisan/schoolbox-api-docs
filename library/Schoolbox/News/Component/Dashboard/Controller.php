@@ -117,7 +117,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
                     /* Used for sorting articles in All tab
                      */
-                    'datetime' => $itemCurrent['item_datetime_posted'],
+                    'datetime' => $itemCurrent['item_datetime_published'],
 
                     'uid' => $itemCurrent['uid'],
                     'image' => $itemCurrent['item_image'],
@@ -139,7 +139,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
             }
         }
 
-        /* Order by datetime posted (most recent first)
+        /* Order by datetime published (most recent first)
          * and trim away the fat
          */
         $newsAll->sortByCallback(function($a, $b) {
