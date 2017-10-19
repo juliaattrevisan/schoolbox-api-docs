@@ -37,6 +37,43 @@ class DescriptorMapper extends Schoolbox\Mapper {
         $this->uses('value', self::TYPE_DECIMAL);
         $this->uses('description', self::TYPE_STRING);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreRubricLevel']);
+    }
+
+
+    /**
+     * Ensure that if we restore a descriptor, its level does not remain deleted.
+     *
+     * This is required because deletion of a criterion may have triggered deletion
+     * of the last descriptor in a level. If we restore that criterion, it will restore
+     * the descriptor, which should restore the level.
+     *
+     * If the descriptor was not the last descriptor deleted in some level, it does
+     * no harm to restore its level.
+     *
+     * Note that this restoration is outside the scope of the RecursiveUndeleter as this is
+     * not a simple deletion-cascade from parent to child, rather it is from a child to parent.
+     *
+     * @param Descriptor $descriptor
+     * @return bool
+     * @throws Schoolbox\Mapper\DefinitionException
+     */
+    public function restoreRubricLevel(Descriptor $descriptor)
+    {
+        /** @var LevelMapper $levelMapper */
+        $levelMapper = $this->getJoinMapper('level');
+
+        try {
+            // Ensure dates are hydrated (not always guaranteed)
+            $level = $levelMapper->findById($descriptor->getLevel()->getId());
+        } catch (Schoolbox\Mapper\Exception\Deleted $e) {
+            $level = $e->getDeletedObject();
+        }
+        if ($level->isDeleted()) {
+            $this->getJoinMapper('level')->restoreSoftDeleted($level);
+        }
+        return true;
     }
 
 
@@ -50,8 +87,8 @@ class DescriptorMapper extends Schoolbox\Mapper {
                     {$this->getJoinColumnString('level', 'l')},
                     {$this->getJoinColumnString('criterion', 'c')}
             FROM {$this->getTable()}
-            JOIN {$this->getJoinSql('level', '', 'l')}
-            JOIN {$this->getJoinSql('criterion', '', 'c')}
+            INNER JOIN {$this->getJoinSql('level', '', 'l', true)}
+            INNER JOIN {$this->getJoinSql('criterion', '', 'c', true)}
         ";
     }
 

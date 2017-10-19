@@ -10,20 +10,23 @@
 
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Error;
 
 require_once __DIR__ . '/../../library/Bootstrap.php';
 
 // this is a script and not to be SitePage'd
 if (isset($this)) {
-    error(4);
+    error(Error\Mapper::ERROR_EMAIL_NOT_RETRIEVED);
 }
 
 if (!(is_array($_POST['crits']) && count($_POST['crits']) && is_numeric($_POST['categoryID']))) {
-    error(4);
+    error(Error\Mapper::ERROR_EMAIL_NOT_RETRIEVED);
 }
 
 $criteria = $_POST['crits'];
@@ -36,7 +39,7 @@ $page = new SitePage();
 
 $userAccess = new Access();
 if (!($_SESSION['user']->isSuperuser() || $userAccess->getFolderAccess($_SESSION['user'], $folderId) >= UserAccess::ACCESS_WRITE)) {
-    error(6);
+    error(Error\Mapper::ERROR_PERM_CATEGORY_WRITE);
 }
 
 // get category details
@@ -59,6 +62,8 @@ foreach ($criteria as $group) {
 /* @var $criterionMapper CriterionMapper */
 $criterionMapper = CriterionMapper::getInstance();
 
+// Which submission boxes have criteria deleted? We will need to ensure we don't leave in an invalid state.
+$affectedSubmissionBoxes = SubmissionBoxMapper::getInstance()->createCollection();
 
 //work out the diff and delete unnecessary criteria
 $found = array_keys($data);
@@ -73,12 +78,19 @@ $criterionCollection = $criterionMapper->findByColumnList(
 foreach ($criterionCollection as $crit) {
     if (!in_array($crit->getID(), $found)) {
         try {
+            $usages = UsageMapper::getInstance()->findByColumn('criterion_id', $crit->getId());
             $criterionMapper->delete($crit);
+            foreach($usages as $usage){
+                $box = $usage->getSubmissionBox();
+                $affectedSubmissionBoxes[$box->getId()] = $box;
+            }
         } catch (Exception $e) {
             die('Criteria not found');
         }
     }
 }
+// Ensure that deletion of a criterion, and its descriptors, does not result in empty levels.
+RubricMapper::getInstance()->deleteEmptyLevels($affectedSubmissionBoxes->keys());
 
 
 // iterate through list of provided criteria changes

@@ -23,12 +23,14 @@ use Eportfolio\ShowcaseMapper;
 use Schoolbox\User;
 use External_Markbook;
 use Schoolbox\GenericCollection;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 /**
  * Class SubmissionBoxMapper
  *
  * @package Schoolbox\Assessment\Component
  * @method SubmissionBox[]|GenericCollection findByColumn($columnName, $columnValue, $options = array())
+ * @method SubmissionBox[]|GenericCollection createCollection($contents = [])
  * @method SubmissionBox hydrate(array $row, $alias = '', $callback = null)
  * @method Collection|SubmissionBox[] findByColumnList($columnList, $options = [])
  * @method SubmissionBox findOneByColumn($columnName, $columnValue, $order = [], $options = [])
@@ -100,6 +102,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 
 
         // SoftDelete/Restore weak entities
+        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteRubricLevels']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteSubmissions'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteReturns'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteShowcase'));
@@ -119,6 +122,19 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
     {
         /** @var SubmissionBox $model */
         return parent::createModel($idValue)->setAssessmentModel($this->getJoinMapper('assessmentModel')->createModel());
+    }
+
+
+    /**
+     * Soft-delete callback to delete any rubric levels on this submission box
+     *
+     * @param SubmissionBox $dueWork
+     * @return bool
+     */
+    public function softDeleteRubricLevels(SubmissionBox $dueWork)
+    {
+        Rubric\LevelMapper::getInstance()->deleteByColumn('box_id', $dueWork->getId());
+        return true;
     }
 
 

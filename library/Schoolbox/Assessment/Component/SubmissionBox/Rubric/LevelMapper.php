@@ -44,6 +44,21 @@ class LevelMapper extends Mapper
 
         $this->joins('box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox', 'box');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteDescriptors']);
+    }
+
+
+    /**
+     * Soft-delete callback to delete any descriptors for this level
+     *
+     * @param Level $level
+     * @return bool
+     */
+    public function softDeleteDescriptors(Level $level)
+    {
+        DescriptorMapper::getInstance()->deleteByColumn('level_id', $level->getId());
+        return true;
     }
 
 
@@ -56,7 +71,7 @@ class LevelMapper extends Mapper
             SELECT {$this->getColumnString()},
                    {$this->getJoinColumnString('box', 'b')}
             FROM {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('box', null, 'b')}
+            INNER JOIN {$this->getJoinSql('box', null, 'b', true)}
         ";
     }
 

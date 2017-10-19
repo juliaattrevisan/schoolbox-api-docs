@@ -781,6 +781,41 @@ class RubricMapper
         $this->tidyUp(DescriptorMapper::getInstance(), ['level_id' => $levelIds], $descIds);
     }
 
+
+    /**
+     * Soft-delete any rubric levels used by the specified submission boxes if they
+     * no longer contain any non-deleted descriptors.
+     *
+     * Returns the count of levels soft-deleted.
+     *
+     * @param int[] $submissionBoxIds
+     * @return int
+     */
+    public function deleteEmptyLevels(array $submissionBoxIds)
+    {
+        if (!count($submissionBoxIds)) {
+            return 0;
+        }
+
+        $levelMapper       = LevelMapper::getInstance();
+        $pb                = $levelMapper->getPredicateBuilder()->equals('rl.box_id', $submissionBoxIds);
+        $boxIdPlaceholders = $pb->getWhere()[0];
+
+        $query = "
+            SELECT rl.id FROM rubric_level rl
+            LEFT JOIN (SELECT id, level_id FROM rubric_descriptor WHERE deleted_at IS NULL) rd ON rd.level_id = rl.id
+            WHERE rd.id IS NULL
+            AND rl.deleted_at IS NULL
+            AND {$boxIdPlaceholders};
+        ";
+
+        $statement = $this->database->query($query, $pb->getParams());
+        $levelIds  = $statement->fetchAll(PDO::FETCH_COLUMN);
+
+        return $levelMapper->deleteByColumn($levelMapper->getIdentifierColumn(), $levelIds);
+    }
+
+
     /**
      * Invalidates selected student marks if already given for this rubric and the rubric has changed.
      *
