@@ -6,7 +6,8 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Resource\Group;
-use Schoolbox\UserMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 
 $this->setFile(TEMPLATE_content, 'group/modify.html');
 $this->setBlock(TEMPLATE_content, 'groupOwner', 'groupOwner_block');
@@ -39,6 +40,8 @@ $categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
 
 if (is_numeric($this->arg[0])) {
     $userHandler = new User();
+	$userAccessMapper = new UserAccessMapper;
+	$roleAccessMapper = new RoleAccessMapper;
 
     try {
         $category = $categoryMapper->findByID($this->arg[0]);
@@ -112,7 +115,6 @@ if (is_numeric($this->arg[0])) {
 
     /* Find folder owner (full access users)
      */
-    $userAccessMapper = new \Schoolbox\Permission\Access\UserAccessMapper();
     try {
         $folderOwner = $userAccessMapper->findOneByColumnList(
             array(
@@ -150,109 +152,108 @@ if (is_numeric($this->arg[0])) {
         $this->parse('msg_enabled_followth_block', 'msg_enabled_followth');
     }
 
-    $memberList   = $groupHandler->getMemberList($category->getId());
+    $memberList = $userAccessMapper->findUsersInCategory($category);
 
     // Keep list of everyone to email
     $all_emails = [];
     $all_parent_emails = [];
     $email_object = new Email();
-    if (is_array($memberList)) {
+    if ($memberList->count()) {
         foreach ($memberList as $member) {
+	        $memberAccess = $userAccessMapper->getAccess($member, $category->getId());
+	        $memberMayOwn = $roleAccessMapper->roleMayOwnFolders($member->getRole());
 
-        	// Hopefully this is temporary :D
-        	$user = UserMapper::getInstance()->findById($member['uid']);
+	        if ($memberAccess->getAccessLevel() != UserAccess::ACCESS_FULL) {
 
-            // Don't email yourself
-            if ($member['uid'] != $_SESSION['id']) {
-                $all_emails[] = $email_object->formatEmailFromArray($member);
-            }
+		        // Don't email yourself
+	            if ($member->getId() != $_SESSION['id']) {
+		            $all_emails[] = $member->getEmail();
+	            }
 
-            // Store parent emails
-	        if ($user->getRole()->getType() == Schoolbox\Role::PARENT) {
-		        $all_parent_emails[] = $email_object->formatEmailFromArray($member);
-	        } elseif ($user->getRole()->getType() == Schoolbox\Role::STUDENT) {
-		        $parents = $user->loadParents()->getParents();
-		        foreach ($parents as $parent) {
-			        if (strlen($parent->getEmail())) {
-				        $all_parent_emails[] = $parent->getEmail();
+	            // Store parent emails
+		        if ($member->getRole()->getType() == Schoolbox\Role::PARENT) {
+			        $all_parent_emails[] = $member->getEmail();
+		        } elseif ($member->getRole()->getType() == Schoolbox\Role::STUDENT) {
+			        $parents = $member->loadParents()->getParents();
+			        foreach ($parents as $parent) {
+				        if (strlen($parent->getEmail())) {
+					        $all_parent_emails[] = $parent->getEmail();
+				        }
 			        }
 		        }
-	        }
 
-            $search = array(
-                'user_id'        => array(0, $member['uid']),
-                'msg_route_key'  => "service.1.{$category->getId()}",
-                'delivery'       => RoutePermission::MUTE
-            );
+				$following = !RerouteOverrideMapper::getInstance()->isRouteMuted(
+					"service.1.{$category->getId()}",
+					$member->getId()
+				);
 
-            $following = !RerouteOverrideMapper::getInstance()->isRouteMuted(
-                "service.1.{$category->getId()}",
-                $member['uid']
-            );
+	            $userLevel = 'icon-close';
+	            $userIcon  = 'None';
+	            switch ($memberAccess->getAccessLevel()) {
+		            case UserAccess::ACCESS_READ:
+			            $userLevel = 'Read Access';
+			            $userIcon  = 'icon-view';
+			            break;
+		            case UserAccess::ACCESS_WRITE:
+			            $userLevel = 'Write Access';
+			            $userIcon  = 'icon-modify';
+			            break;
+		            case UserAccess::ACCESS_FULL:
+			            $userLevel = 'Group Admin';
+			            $userIcon  = 'icon-favourite';
+			            break;
+		            default:
+			            break;
+	            }
+	            $output = array(
+		            'USER_NAME'           => $member->getFullName(),
+		            'MEMBER_USER_ID'      => $member->getId(),
+		            'USER_EXTERNAL_ID'    => Scrub::text($member->getExternalId()),
+		            'GROUP_CHECKED'       => $memberAccess->getAccessLevel() > 1 ? 'checked=\'checked\'' : '',
+		            'READ_SELECTED'       => $memberAccess->getAccessLevel() == UserAccess::ACCESS_READ ? 'selected'
+			            : '',
+		            'WRITE_SELECTED'      => $memberAccess->getAccessLevel() == UserAccess::ACCESS_WRITE ? 'selected'
+			            : '',
+		            'READ_CHECKED'        => $memberAccess->getAccessLevel() == UserAccess::ACCESS_READ ? 'checked'
+			            : '',
+		            'WRITE_CHECKED'       => $memberAccess->getAccessLevel() == UserAccess::ACCESS_WRITE ? 'checked'
+			            : '',
+		            'USER_FOLLOWING'      => $following ? 'Yes' : 'No',
+		            'USER_FOLLOWING_ICON' => $following ? 'icon-tick' : 'icon-mute',
+		            // Stylage
+		            'ADMIN_ALLOWED'       => $memberMayOwn ? '' : 'disabled',
+		            'USER_LEVEL'          => $userLevel,
+		            'USER_ICON'           => $userIcon,
+	            );
 
-            $userLevel = 'icon-close';
-            $userIcon  = 'None';
-            switch ($member['type']) {
-                case UserAccess::ACCESS_READ:
-                    $userLevel = 'Read Access';
-                    $userIcon  = 'icon-view';
-                    break;
-                case UserAccess::ACCESS_WRITE:
-                    $userLevel = 'Write Access';
-                    $userIcon  = 'icon-modify';
-                    break;
-                case UserAccess::ACCESS_FULL:
-                    $userLevel = 'Group Admin';
-                    $userIcon  = 'icon-favourite';
-                    break;
-                default:
-                    break;
+	            $this->setVar($output);
+
+	            if (count($memberList) > 100) {
+		            $this->setVar(array('show_photo_block' => ''));
+	            } else {
+		            $this->parse('show_photo_block', 'show_photo');
+	            }
+
+	            $this->setVar(array(
+		            'make_owner_block'             => '',
+		            'msg_enabled_userfollow_block' => '',
+		            'msg_enabled_usermute_block'   => '',
+	            ));
+
+	            if ($memberMayOwn) {
+		            $this->parse('make_owner_block', 'make_owner');
+	            }
+
+	            if ($messagingEnabled) {
+		            if ($following) {
+			            $this->parse('msg_enabled_userfollow_block', 'msg_enabled_userfollow');
+		            } else {
+			            $this->parse('msg_enabled_usermute_block', 'msg_enabled_usermute');
+		            }
+	            }
+
+	            $this->parse('member_block', 'member', true);
             }
-            $output = array(
-                'USER_NAME'           => $userHandler->formatName($member),
-                'USER_JAVA'           => addslashes($userHandler->formatName($member)),
-                'MEMBER_USER_ID'      => $member['uid'],
-                'USER_EXTERNAL_ID'    => Scrub::text($member['synergy_id']),
-                'GROUP_CHECKED'       => $member['type'] > 1 ? 'checked=\'checked\'' : '',
-                'READ_SELECTED'       => $member['type'] == UserAccess::ACCESS_READ ? 'selected' : '',
-                'WRITE_SELECTED'      => $member['type'] == UserAccess::ACCESS_WRITE ? 'selected' : '',
-                'READ_CHECKED'        => $member['type'] == UserAccess::ACCESS_READ ? 'checked' : '',
-                'WRITE_CHECKED'       => $member['type'] == UserAccess::ACCESS_WRITE ? 'checked' : '',
-                'USER_FOLLOWING'      => $following ? 'Yes' : 'No',
-                'USER_FOLLOWING_ICON' => $following ? 'icon-tick' : 'icon-mute',
-                // Stylage
-                'ADMIN_ALLOWED'       => $groupHandler->allowOwner($member['uid']) ? '' : 'disabled',
-                'USER_LEVEL'          => $userLevel,
-                'USER_ICON'           => $userIcon,
-            );
-
-            $this->setVar($output);
-
-            if (count($memberList) > 100) {
-                $this->setVar(array('show_photo_block' => ''));
-            } else {
-                $this->parse('show_photo_block', 'show_photo');
-            }
-
-            $this->setVar(array(
-                'make_owner_block'             => '',
-                'msg_enabled_userfollow_block' => '',
-                'msg_enabled_usermute_block'   => '',
-            ));
-
-            if ($groupHandler->allowOwner($member['uid'])) {
-                $this->parse('make_owner_block', 'make_owner');
-            }
-
-            if ($messagingEnabled) {
-                if ($following) {
-                    $this->parse('msg_enabled_userfollow_block', 'msg_enabled_userfollow');
-                } else {
-                    $this->parse('msg_enabled_usermute_block', 'msg_enabled_usermute');
-                }
-            }
-
-            $this->parse('member_block', 'member', true);
         }
 
         $this->parse('hide_no_members_block', 'hide_no_members', true);
