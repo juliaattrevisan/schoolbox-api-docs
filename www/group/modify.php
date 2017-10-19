@@ -6,6 +6,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Resource\Group;
+use Schoolbox\UserMapper;
 
 $this->setFile(TEMPLATE_content, 'group/modify.html');
 $this->setBlock(TEMPLATE_content, 'groupOwner', 'groupOwner_block');
@@ -158,10 +159,25 @@ if (is_numeric($this->arg[0])) {
     if (is_array($memberList)) {
         foreach ($memberList as $member) {
 
+        	// Hopefully this is temporary :D
+        	$user = UserMapper::getInstance()->findById($member['uid']);
+
             // Don't email yourself
             if ($member['uid'] != $_SESSION['id']) {
                 $all_emails[] = $email_object->formatEmailFromArray($member);
             }
+
+            // Store parent emails
+	        if ($user->getRole()->getType() == Schoolbox\Role::PARENT) {
+		        $all_parent_emails[] = $email_object->formatEmailFromArray($member);
+	        } elseif ($user->getRole()->getType() == Schoolbox\Role::STUDENT) {
+		        $parents = $user->loadParents()->getParents();
+		        foreach ($parents as $parent) {
+			        if (strlen($parent->getEmail())) {
+				        $all_parent_emails[] = $parent->getEmail();
+			        }
+		        }
+	        }
 
             $search = array(
                 'user_id'        => array(0, $member['uid']),
