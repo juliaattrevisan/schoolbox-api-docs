@@ -345,6 +345,8 @@ class Healthcheck
             'persondefs',
             'studcommrules',
             'eventcalendar',
+            'eventcatdefs',
+            'eventtype'
         ];
         $this->selectTest($tables);
     }
