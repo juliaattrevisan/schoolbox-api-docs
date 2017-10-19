@@ -15,15 +15,15 @@
             <div class="small-12 island">
                 <h2 class="subheader">{{ year }}</h2>
 
-                {% for reportId in yearReports %}
+                {% for reportId, reportData in yearReports %}
                     <section>
                         <ul class="action-list">
                             <li class="actions-small-1">
                                 <div class="list-item">
                                     <div class="compact card small-12">
-                                        <a href="{{ routeLookupIfAuthorized('profileDocumentManagement.getDownload', {studentId: student.id, documentId: reportId, source: reportId.source}) }}">
+                                        <a href="{{ routeLookupIfAuthorized('profileDocumentManagement.getDownload', {studentId: student.id, documentId: reportId, source: reportData.source}) }}">
                                             <img src="/images/mime/application-pdf.svg" class="mime">
-                                            <h3>{{ reportId.description }}</h3>
+                                            <h3>{{ reportData.description }}</h3>
                                         </a>
                                     </div>
                                 </div>
