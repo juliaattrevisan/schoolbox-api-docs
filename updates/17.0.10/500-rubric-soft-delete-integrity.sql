@@ -30,7 +30,7 @@ WHERE rd.deleted_at IS NULL
 UPDATE rubric_descriptor rd
   JOIN rubric_criterion rc ON rc.id = rd.criterion_id
   JOIN rubric_level rl ON rl.id = rd.level_id
-SET rd.deleted_at = IF(rl.deleted_at < rc.deleted_at, rl.deleted_at, rc.deleted_at)
+SET rd.deleted_at = LEAST(rl.deleted_at, rc.deleted_at)
 WHERE rd.deleted_at IS NULL
   AND rl.deleted_at IS NOT NULL
   AND rc.deleted_at IS NOT NULL;
