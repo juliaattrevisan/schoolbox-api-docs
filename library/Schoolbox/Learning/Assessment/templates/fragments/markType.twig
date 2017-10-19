@@ -129,18 +129,19 @@
  # These will be used to populate the modal above.
  #}
 {% for scheme in allGradeSchemes %}
+    {% set gradeLevelsReversed = scheme.gradeLevels|reverse %}
     <script type="text/template" data-grading-scale="{{ scheme.id }}">
         <div class="scrollable">
             <table>
                 <tbody>
-                    {% for gradeLevel in scheme.gradeLevels %}
+                    {% for gradeLevel in gradeLevelsReversed %}
                         <tr>
                             <td>
                                 {{ gradeLevel.lowerBound }}{% spaceless %}
-                                {% if loop.index == loop.length %}
+                                {% if loop.index0 == 0 %}
                                     +
-                                {% elseif scheme.gradeLevels[loop.index].lowerBound - 1 > gradeLevel.lowerBound %}
-                                    -{{ scheme.gradeLevels[loop.index].lowerBound - 1 }}
+                                {% elseif gradeLevelsReversed[loop.index0 - 1].lowerBound - 1 > gradeLevel.lowerBound %}
+                                    -{{ gradeLevelsReversed[loop.index0 - 1].lowerBound - 1 }}
                                 {% endif %}
                             {% endspaceless %}</td>
                             <td>{{ gradeLevel.caption }}</td>
