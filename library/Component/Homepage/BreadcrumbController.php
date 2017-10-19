@@ -21,31 +21,25 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
             return false;
         }
 
-
-
         $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
         $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
         $this->parseConfig();
 
-        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && $this->getConfig('compactMode')) {
-            /* Remove headers */
-            $this->setVar('CONFIGURATION', '');
-            $this->setBlock('source_folder_exists', 'header', 'header_block');
-            $this->setBlock('source_folder_exists', 'dashboard_header', 'dashboard_header_block');
-            $this->setVar('header_block', '');
-            $this->setVar('dashboard_header_block', '');
-        }
-
         if(!$this->isSourceRenderable()) {
             return $this->renderSourceUnavailable();
         } else {
-            $this->setVar('source_folder_deleted_block', '');
-
-
-
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && $this->getConfig('compactMode')) {
+                /* Remove headers */
+                $this->setVar('CONFIGURATION', '');
+                $this->setBlock('source_folder_exists', 'header', 'header_block');
+                $this->setBlock('source_folder_exists', 'dashboard_header', 'dashboard_header_block');
+                $this->setVar('header_block', '');
+                $this->setVar('dashboard_header_block', '');
+            }
 
             $this->setBlock('source_folder_exists', 'category_breadcrumb', 'category_breadcrumb_block');
             $this->setVar('category_breadcrumb_block', '');
+            $this->setVar('source_folder_deleted_block', '');
 
             foreach ($this->getFolderMapper()->findParents($this->getSource(), null, true) as $parent) {
                 /** @var Folder $parent */
