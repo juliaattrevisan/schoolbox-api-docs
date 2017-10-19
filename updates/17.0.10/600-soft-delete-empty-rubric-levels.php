@@ -76,7 +76,7 @@ $kernel->run(function (
 
         foreach ($levelIds as $levelId) {
             $selectLastDescriptorDeletionQuery->execute(['level_id' => $levelId]);
-            $lastDeletionDate = $selectLastDescriptorDeletionQuery->fetchAll(PDO::FETCH_ASSOC)[0]['max_deleted_at'];
+            $lastDeletionDate = $selectLastDescriptorDeletionQuery->fetchColumn();
 
             if ($lastDeletionDate) {
                 $log->debug("Last descriptor deleted at '$lastDeletionDate'");
