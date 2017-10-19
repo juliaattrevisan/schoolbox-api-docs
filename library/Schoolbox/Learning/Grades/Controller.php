@@ -324,7 +324,7 @@ class Controller extends Base
                                                         ->get('display_grade_graph'));
 
         // Only show the "send to showcase" trophy button to teachers and students, not parents
-        $canSeeShowcaseButton = $this->access->isInstructor($this->getUser(), $subject) || $this->access->isLearner($this->getUser(), $subject);
+        $canSeeShowcaseButton = $this->getUser()->getRole()->isStaff() || $this->getUser()->getRole()->isStudent();
 
         // Let markbook calculate the statistics
         $filteredMarkbook = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
