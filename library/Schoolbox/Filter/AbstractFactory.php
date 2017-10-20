@@ -7,7 +7,6 @@
 
 namespace Schoolbox\Filter;
 
-
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 

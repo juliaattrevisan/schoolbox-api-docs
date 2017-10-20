@@ -132,7 +132,7 @@ class BaseComponent implements IComponent
         $isUserConfigurable  = $this->pageFilter->getUserConfigurable();
 
         foreach ($abstractOptions as $option) {
-            if($isUserConfigurable && !$option->getAvailable()){
+            if ($isUserConfigurable && !$option->getAvailable()) {
                 continue;
             }
             $key                       = $option->getKey();

@@ -59,7 +59,7 @@ class Factory extends FolderFilter\Factory
         $options = $pageFilter->getOptions();
         $folders = $this->getFolderMapper()->createCollection();
 
-        if(!$viewee){
+        if (!$viewee) {
             throw new \InvalidArgumentException('$viewee cannot be null for StudentInteraction filter');
         }
 
