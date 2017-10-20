@@ -256,6 +256,11 @@ EOL;
 		    // iiiiignore.
             return;
         }
+        if (strpos($errStr, 'gzuncompress(): data error') === 0) {
+            // ignore this too;
+            // it's a symptom of a compressed string I can do nothing with
+            return;
+        }
 		if(strpos($errStr, 'Undefined index') === 0) {
             $this->logger()->error("$errStr in $errFile:$errLine");
 			return;
