@@ -27,12 +27,12 @@ echo "Validating checksums";
 checksum=`sha1sum composer.lock`;
 if [ "$checksum" != "`cat ../vendor/composer.lock.checksum`" ];
 then
-	echo "Vendor checksum does not match";
+	echo "Vendor checksum does not match. Expected '$checksum' Got: '`cat ../vendor/composer.lock.checksum`'";
 	exit 1;
 fi
 if [ "$checksum" != "`cat vendor/composer.lock.checksum`" ];
 then
-	echo "Vendor dev checksum does not match";
+	echo "Vendor dev checksum does not match. Expected '$checksum' Got: '`cat vendor/composer.lock.checksum`'";
 	exit 1;
 fi
 
