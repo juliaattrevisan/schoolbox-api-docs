@@ -607,6 +607,43 @@ class Healthcheck
     }
 
     /** @noinspection PhpUnusedPrivateMethodInspection */
+    private function doublefirstTest() {
+        $tables = [
+            'AttendancePeriods',
+            'PeriodNames',
+            'AttendanceBreaks',
+            'AttendancePeriodStructure',
+            'TimetableParameters',
+            'PupilSubjects',
+            'YearGroupSubjectDivision',
+            'TimetableClassRoom',
+            'TimetableMatrix',
+            'TimetableMaster',
+            'TimeTableClassStaff',
+            'StaffPersonalDetails',
+            'V_PupilBasicInformation',
+            'SchoolSiteBlock',
+            'SchoolSiteBlockRooms',
+            'BatchMaster',
+            'SubjectMaster',
+            'VLPupilDetails',
+            'PupilPhoto',
+            'VLContact',
+            'VLContactAddress',
+            'ContactEmailInformation',
+            'VLContactTelephone',
+            'ContactTelephoneInformation',
+            'LookupDetails',
+            'PupilCareAuthority',
+            'PupilMedicalInformation',
+            'CurrentStaff',
+            'StaffTelephones',
+        ];
+
+        $this->selectTest($tables);
+    }
+
+    /** @noinspection PhpUnusedPrivateMethodInspection */
     private function isamsCheckTables()
     {
         $list[] = 'V_Class';
