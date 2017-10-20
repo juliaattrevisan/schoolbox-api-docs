@@ -742,6 +742,12 @@ class External_Liss_Server
                 'total' => 0,
             ];
 
+            /* Number of event records created
+             */
+            $instancesCreated = 0;
+            $instancesHomepageCreated = 0;
+            $instancesPersonalCreated = 0;
+
             $total = count($allEvents);
 
             foreach ($allEvents as $currentEvent) {
@@ -828,7 +834,9 @@ class External_Liss_Server
 
                     $eventRelations->saveFolderRelation($event, [$folder->getId()]);
                     $helper->saveEventSource($event, $currentEvent['edvalGuid']);
-                    $log->info(sprintf("Processed homepage event \"%s\" with guid \"%s\"", $event->getTitle(), $currentEvent['edvalGuid']));
+                    $log->info(sprintf("Processed homepage event \"%s\" with guid \"%s\", %s - %s", $event->getTitle(), $currentEvent['edvalGuid'], $event->getStartDateTime()->getDatabase(), $event->getEndDateTime()->getDatabase()));
+
+                    $instancesHomepageCreated++;
                 } else {
 
                     /* Personal event
@@ -842,13 +850,16 @@ class External_Liss_Server
                     foreach ($combined as $currentExternalId) {
                         try {
                             $user = $userMapper->findByExternalId($currentExternalId);
+                            $event->setId(null);
                             $event->setOwner($user);
                             $eventMapper->save($event);
 
                             $eventRelations->savePersonalRelation($event);
                             $helper->saveEventSource($event, $currentEvent['edvalGuid']);
 
-                            $log->info(sprintf("Processed personal event \"%s\" with guid \"%s\" for user \"{$currentExternalId}\"", $event->getTitle(), $currentEvent['edvalGuid']), $currentExternalId);
+                            $log->info(sprintf("Processed personal event \"%s\" with guid \"%s\" for user \"%s\", %s - %s", $event->getTitle(), $currentEvent['edvalGuid'], $currentExternalId, $event->getStartDateTime()->getDatabase(), $event->getEndDateTime()->getDatabase()));
+
+                            $instancesPersonalCreated++;
                         } catch (MapperException $e) {
                             $log->warning(sprintf("Skipping event \"%s\" with guid \"%s\" for user \"%s\": no Schoolbox account found for external id \"%s\"",
                                 $event->getTitle(), $currentEvent['edvalGuid'], $currentExternalId, $currentExternalId
@@ -894,6 +905,17 @@ class External_Liss_Server
 
                 $log->info("Unknown user ids: {$unknownUserIds}");
             }
+
+            $log->info("----------------------------------------------");
+
+            /* Number of instances created
+             */
+            $totalInstances = $instancesPersonalCreated + $instancesHomepageCreated;
+
+            $log->info("Event Instances Spawned: {$totalInstances}. This should match event_source record count for this source.");
+            $log->info("Personal Instances: {$instancesPersonalCreated}");
+            $log->info("Homepage Instances: {$instancesHomepageCreated}");
+            $log->info('');
 
             return self::generateResponse('Daily Data Imported');
         }
