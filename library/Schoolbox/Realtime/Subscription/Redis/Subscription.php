@@ -139,9 +139,19 @@ class Subscription implements ISubscription
      */
     public function getUnread()
     {
-        return array_map(function ($messageKey) {
-            return unserialize(gzuncompress($this->syncClient->get($messageKey)));
-        }, $this->syncClient->sMembers($this->getSetIdentifier()));
+        return array_map(
+            function ($messageKey) {
+                try {
+                    return unserialize(
+                        gzuncompress('b.'.$this->syncClient->get($messageKey)),
+                        ['allowed_classes' => [Instance::class,],]
+                    );
+                } catch (\ErrorException $e) {
+                    return false;
+                }
+            },
+            $this->syncClient->sMembers($this->getSetIdentifier())
+        );
     }
 
 }
