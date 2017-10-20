@@ -35,7 +35,10 @@ class NotificationBundle {
 	 */
 	public function appendInstances($instances) {
 		foreach($instances as $instance) {
-			$this->appendInstance($instance);
+		    if ($instance instanceof Instance) {
+                $this->appendInstance($instance);
+            }
+            // TODO log non-instances
 		}
 		return $this;
 	}
@@ -46,7 +49,7 @@ class NotificationBundle {
      * @throws InvalidArgumentException
      * @return $this
      */
-	public function appendInstance($instance) {
+	public function appendInstance(Instance $instance) {
 		$hash = $instance->getBaseHash();
 
 		if(isset($this->notifications[$hash])) {
