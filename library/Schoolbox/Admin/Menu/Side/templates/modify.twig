@@ -25,7 +25,7 @@
                 ignore: ':disabled',
                 rules: {
                     'title': {required: true},
-                    'url': {required: true, isURL: true}
+                    'url': {isURL: true}
                 },
                 messages: {
                     'title': {required: 'You must enter a title before you can proceed.'},
@@ -88,7 +88,7 @@
                             Destination URL
                         </label>
                         <div class="input-group">
-                            <input name="url" required type="text" size="40" maxlength="2048" placeholder="Destination URL" value="{{ item.url }}">
+                            <input name="url" type="text" size="40" maxlength="2048" placeholder="Destination URL" value="{{ item.url }}">
                             <a href="#" class="button icon-folder" data-role="openResourceBrowser">Browse {{ resource }}</a>
                         </div>
                     </div>
