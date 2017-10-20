@@ -7,7 +7,7 @@
 
         $('#importForm').find('[data-select-all-group]').change(function () {
             var unit = $(this).attr('data-unit-id');
-            if(this.checked) {
+            if (this.checked && $(this).attr('disabled') === undefined) {
                 $('#unit-' + unit + '-dates').removeAttr('hidden');
             }
             else {
@@ -18,15 +18,13 @@
     });
 </script>
 
-
 <div class="row">
-    <div class="small-12 columns">
+    <div class="small-12 island">
         <h1>Export {{ assessment.typeName }}: {{ assessment.title }}</h1>
     </div>
 </div>
 
 <div class="row">
-
     {% if implementations|length == 0 %}
         <div class="small-12 island">
             <div class = "empty-state">
@@ -34,7 +32,6 @@
                 <p>There are no open classes that currently use this {{ locale.unit }}.</p>
             </div>
         </div>
-
     {% else %}
         <div class="small-12 island">
 
@@ -60,19 +57,18 @@
                     <ul class="information-list card-selectable">
                     {% for implementation in implementations %}
                         <li>
-                            <div class="small-12 column">
-
-                                    <div class="selector">
-                                    <input type="checkbox"
-                                           id="import-{{ implementation.unit.id }}"
-                                           name="unitImplementation[{{ implementation.unit.id }}]"
-                                           value="1"
-                                           {% if not implementation.allowed %}disabled{% endif %}
-                                           data-select-all-group="unit-implementation"
-                                           data-unit-id="{{ implementation.unit.id }}" />
-                                    <label for="import-{{ implementation.unit.id }}" class="checkbox-label"></label>
-                                    </div>
-                                    <div class="card small-12">
+                            <div class="small-12 columns">
+                                <div class="selector">
+                                <input type="checkbox"
+                                       id="import-{{ implementation.unit.id }}"
+                                       name="unitImplementation[{{ implementation.unit.id }}]"
+                                       value="1"
+                                       {% if not implementation.allowed %}disabled{% endif %}
+                                       data-select-all-group="unit-implementation"
+                                       data-unit-id="{{ implementation.unit.id }}" />
+                                <label for="import-{{ implementation.unit.id }}" class="checkbox-label"></label>
+                                </div>
+                                <div class="card small-12">
                                     <a href="/homepage/{{ implementation.unit.course.folder.id }}">
                                         <span class="size-32 icon-home"></span>
                                         <h3>{{ implementation.unit.course.folder.title }}</h3>
@@ -101,58 +97,57 @@
                                         {% endif %}
                                     </p>
                                 </div>
-
-                                <div class="list-item" id="unit-{{ implementation.unit.id }}-dates" hidden>
-                                    <div class="small-12 medium-6 large-3 columns">
-                                        <label for="publish_date-{{ implementation.unit.id }}">Publish</label>
-                                        <input id="publish_date-{{ implementation.unit.id }}"
-                                               name="unit[implementation.unit.id][publish_date]"
-                                               type="text"
-                                               value="{{ implementation.unit.openDate.localShort }}"
-                                               data-datepicker
-                                               data-datepicker-time
-                                               data-datepicker-format="datetime"
-                                               data-datepicker-buttontext=""
-                                               data-datesync-enddate="#due_date-{{ implementation.unit.id }}" />
-                                    </div>
-                                    <div class="small-12 medium-6 large-3 columns">
-                                        <label for="open_date-{{ implementation.unit.id }}">Open</label>
-                                        <input id="open_date-{{ implementation.unit.id }}"
-                                               name="unit[{{ implementation.unit.id }}][open_date]"
-                                               type="text"
-                                               value="{{ implementation.unit.openDate.localShort }}"
-                                               data-datepicker
-                                               data-datepicker-time
-                                               data-datepicker-format="datetime"
-                                               data-datepicker-buttontext=""
-                                               data-datesync-startdate="#publish_date-{{ implementation.unit.id }}"
-                                               data-datesync-enddate="#due_date-{{ implementation.unit.id }}" />
-                                    </div>
-                                    <div class="small-12 medium-6 large-3 columns">
-                                        <label for="due_date-{{ implementation.unit.id }}">Due</label>
-                                        <input id="due_date-{{ implementation.unit.id }}"
-                                               name="unit[{{ implementation.unit.id }}][due_date]"
-                                               type="text"
-                                               value="{{ implementation.unit.dueDate.localShort }}"
-                                               data-datepicker
-                                               data-datepicker-time
-                                               data-datepicker-format="datetime"
-                                               data-datepicker-buttontext=""
-                                               data-datesync-startdate="#open_date-{{ implementation.unit.id }}"
-                                               data-datesync-endtdate="#close_date-{{ implementation.unit.id }}" />
-                                    </div>
-                                    <div class="small-12 medium-6 large-3 columns">
-                                        <label for="close_date-{{ implementation.unit.id }}">Close</label>
-                                        <input id="close_date-{{ implementation.unit.id }}"
-                                               name="unit[{{ implementation.unit.id }}][close_date]"
-                                               type="text"
-                                               value="{{ implementation.unit.dueDate.localShort }}"
-                                               data-datepicker
-                                               data-datepicker-time
-                                               data-datepicker-format="datetime"
-                                               data-datepicker-buttontext=""
-                                               data-datesync-startdate="#due_date-{{ implementation.unit.id }}" />
-                                    </div>
+                            </div>
+                            <div class="list-item" id="unit-{{ implementation.unit.id }}-dates" hidden>
+                                <div class="small-12 medium-6 large-3 columns">
+                                    <label for="publish_date-{{ implementation.unit.id }}">Publish</label>
+                                    <input id="publish_date-{{ implementation.unit.id }}"
+                                           name="unit[implementation.unit.id][publish_date]"
+                                           type="text"
+                                           value="{{ implementation.unit.openDate.localShort }}"
+                                           data-datepicker
+                                           data-datepicker-time
+                                           data-datepicker-format="datetime"
+                                           data-datepicker-buttontext=""
+                                           data-datesync-enddate="#due_date-{{ implementation.unit.id }}" />
+                                </div>
+                                <div class="small-12 medium-6 large-3 columns">
+                                    <label for="open_date-{{ implementation.unit.id }}">Open</label>
+                                    <input id="open_date-{{ implementation.unit.id }}"
+                                           name="unit[{{ implementation.unit.id }}][open_date]"
+                                           type="text"
+                                           value="{{ implementation.unit.openDate.localShort }}"
+                                           data-datepicker
+                                           data-datepicker-time
+                                           data-datepicker-format="datetime"
+                                           data-datepicker-buttontext=""
+                                           data-datesync-startdate="#publish_date-{{ implementation.unit.id }}"
+                                           data-datesync-enddate="#due_date-{{ implementation.unit.id }}" />
+                                </div>
+                                <div class="small-12 medium-6 large-3 columns">
+                                    <label for="due_date-{{ implementation.unit.id }}">Due</label>
+                                    <input id="due_date-{{ implementation.unit.id }}"
+                                           name="unit[{{ implementation.unit.id }}][due_date]"
+                                           type="text"
+                                           value="{{ implementation.unit.dueDate.localShort }}"
+                                           data-datepicker
+                                           data-datepicker-time
+                                           data-datepicker-format="datetime"
+                                           data-datepicker-buttontext=""
+                                           data-datesync-startdate="#open_date-{{ implementation.unit.id }}"
+                                           data-datesync-endtdate="#close_date-{{ implementation.unit.id }}" />
+                                </div>
+                                <div class="small-12 medium-6 large-3 columns">
+                                    <label for="close_date-{{ implementation.unit.id }}">Close</label>
+                                    <input id="close_date-{{ implementation.unit.id }}"
+                                           name="unit[{{ implementation.unit.id }}][close_date]"
+                                           type="text"
+                                           value="{{ implementation.unit.dueDate.localShort }}"
+                                           data-datepicker
+                                           data-datepicker-time
+                                           data-datepicker-format="datetime"
+                                           data-datepicker-buttontext=""
+                                           data-datesync-startdate="#due_date-{{ implementation.unit.id }}" />
                                 </div>
                             </div>
                         </li>
