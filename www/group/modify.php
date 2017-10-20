@@ -1,6 +1,5 @@
 <?php
 
-
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
@@ -21,7 +20,6 @@ $this->setBlock('member', 'msg_enabled_userfollow', 'msg_enabled_userfollow_bloc
 $this->setBlock('member', 'msg_enabled_usermute', 'msg_enabled_usermute_block');
 
 $this->setBlock(TEMPLATE_content, 'msg_enabled', 'msg_enabled_block');
-
 $this->setBlock(TEMPLATE_content, 'msg_enabled_followth', 'msg_enabled_followth_block');
 
 $this->setBlock(TEMPLATE_content, 'mail_all', 'mail_all_block');
@@ -35,13 +33,13 @@ $this->setBlock("authorisation", "waiting", "waiting_block");
 $this->setTitle('Modify User Group');
 $this->setTab('resources');
 
-$groupHandler = new \Group(HOMEPAGE_SERVICE);
+$groupHandler   = new \Group(HOMEPAGE_SERVICE);
 $categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
 
 if (is_numeric($this->arg[0])) {
-    $userHandler = new User();
-	$userAccessMapper = new UserAccessMapper;
-	$roleAccessMapper = new RoleAccessMapper;
+    $userHandler      = new User();
+    $userAccessMapper = new UserAccessMapper;
+    $roleAccessMapper = new RoleAccessMapper;
 
     try {
         $category = $categoryMapper->findByID($this->arg[0]);
@@ -55,45 +53,48 @@ if (is_numeric($this->arg[0])) {
     }
 
     $this->setVar(
-        array(
+        [
             'hide_no_members_block'         => '',
             'groupOwner_block'              => '',
             'groupUnmanaged_block'          => '',
             'msg_enabled_followth_block'    => '',
             'msg_enabled_followadmin_block' => '',
-            'msg_enabled_block'             => ''
-        )
+            'msg_enabled_block'             => '',
+        ]
     );
 
-    $output = array('CATEGORY_NAME'		=> Scrub::text($category->getName()),
-                    'CATEGORY_ID'		=> $category->getId(),
-                    'GROUP_TYPE_1'		=> '',
-                    'GROUP_TYPE_2'		=> '',
-                    'GROUP_TYPE_3'		=> '',
-                    );
+    $output = [
+        'CATEGORY_NAME' => Scrub::text($category->getName()),
+        'CATEGORY_ID'   => $category->getId(),
+        'GROUP_TYPE_1'  => '',
+        'GROUP_TYPE_2'  => '',
+        'GROUP_TYPE_3'  => '',
+    ];
 
     if ($category->getGroup() instanceof Group) {
-        $output['GROUP_TYPE_' . $category->getGroup()->getType()] = 'checked="checked"';
+        $output['GROUP_TYPE_' . $category->getGroup()
+                                         ->getType()] = 'checked="checked"';
     }
 
     $this->setVar($output);
 
-    $search = array(
-        'user_id'        => 0,
-        'msg_route_key'  => "service.1.{$category->getId()}",
-        'delivery'       => RoutePermission::MUTE
-    );
+    $search = [
+        'user_id'       => 0,
+        'msg_route_key' => "service.1.{$category->getId()}",
+        'delivery'      => RoutePermission::MUTE,
+    ];
 
     /* Group Messaging
      */
-    $groupMessagesEnabled = !RerouteOverrideMapper::getInstance()->isRouteMuted(
-        "service.1.{$category->getId()}"
-    );
+    $groupMessagesEnabled = !RerouteOverrideMapper::getInstance()
+                                                  ->isRouteMuted(
+                                                      "service.1.{$category->getId()}"
+                                                  );
 
-    $output = array(
+    $output = [
         'MSG_ENABLED_CHECKED'      => '',
-        'MSG_FORCE_FOLLOW_CHECKED' => ''
-    );
+        'MSG_FORCE_FOLLOW_CHECKED' => '',
+    ];
 
     if ($groupMessagesEnabled) {
         $output['MSG_ENABLED_CHECKED'] = 'checked="checked"';
@@ -115,7 +116,8 @@ if (is_numeric($this->arg[0])) {
 
     /* Messaging Enabled
      */
-    $messagingEnabled = ConfigMapper::getInstance()->get('messaging_enabled');
+    $messagingEnabled = ConfigMapper::getInstance()
+                                    ->get('messaging_enabled');
 
     if ($messagingEnabled) {
         $this->parse('msg_enabled_block', 'msg_enabled');
@@ -124,113 +126,117 @@ if (is_numeric($this->arg[0])) {
 
     // Get collection of group members (including admin)
     $memberList = $userAccessMapper->findUsersInCategory($category);
-	$hasMembers = false;
-	$hasAdmin = false;
+    $hasMembers = false;
+    $hasAdmin   = false;
 
     // Keep list of everyone to email
-    $all_emails = [];
+    $all_emails        = [];
     $all_parent_emails = [];
-    $email_object = new Email();
+    $email_object      = new Email();
 
     foreach ($memberList as $member) {
         $memberAccess = $userAccessMapper->getAccess($member, $category->getId());
         $memberMayOwn = $roleAccessMapper->roleMayOwnFolders($member->getRole());
 
-		// Store member email for 'email group members' button
-	    if ($member->getId() != $_SESSION['id']) { // Don't email yourself
-		    $all_emails[] = $member->getEmail();
-	    }
+        // Store member email for 'email group members' button
+        if ($member->getId() != $_SESSION['id']) { // Don't email yourself
+            $all_emails[] = $member->getEmail();
+        }
 
-	    // Store parent emails for 'email group parents' button
-	    if ($member->getRole()->getType() == Schoolbox\Role::PARENT) {
-		    $all_parent_emails[] = $member->getEmail();
-	    } elseif ($member->getRole()->getType() == Schoolbox\Role::STUDENT) {
-		    $parents = $member->loadParents()->getParents();
-		    foreach ($parents as $parent) {
-			    if (strlen($parent->getEmail())) {
-				    $all_parent_emails[] = $parent->getEmail();
-			    }
-		    }
-	    }
+        // Store parent emails for 'email group parents' button
+        if ($member->getRole()
+                   ->getType() == Schoolbox\Role::PARENT) {
+            $all_parent_emails[] = $member->getEmail();
+        } elseif ($member->getRole()
+                         ->getType() == Schoolbox\Role::STUDENT) {
+            $parents = $member->loadParents()
+                              ->getParents();
+            foreach ($parents as $parent) {
+                if (strlen($parent->getEmail())) {
+                    $all_parent_emails[] = $parent->getEmail();
+                }
+            }
+        }
 
         if ($memberAccess->getAccessLevel() == UserAccess::ACCESS_FULL) {
-	        $this->setVar([
-		        'GROUP_OWNER'       => Scrub::text($member->formatName()),
-		        'OWNER_ID'          => Scrub::text($member->getId()),
-		        'OWNER_EXTERNAL_ID' => Scrub::text($member->getExternalId())
-	        ]);
-	        $hasAdmin = true;
+            $this->setVar([
+                'GROUP_OWNER'       => Scrub::text($member->formatName()),
+                'OWNER_ID'          => Scrub::text($member->getId()),
+                'OWNER_EXTERNAL_ID' => Scrub::text($member->getExternalId()),
+            ]);
+            $hasAdmin = true;
         } else {
-	        $hasMembers = true;
+            $hasMembers = true;
 
-			$following = !RerouteOverrideMapper::getInstance()->isRouteMuted(
-				"service.1.{$category->getId()}",
-				$member->getId()
-			);
+            $following = !RerouteOverrideMapper::getInstance()
+                                               ->isRouteMuted(
+                                                   "service.1.{$category->getId()}",
+                                                   $member->getId()
+                                               );
 
             $userLevel = 'icon-close';
             $userIcon  = 'None';
             switch ($memberAccess->getAccessLevel()) {
-	            case UserAccess::ACCESS_READ:
-		            $userLevel = 'Read Access';
-		            $userIcon  = 'icon-view';
-		            break;
-	            case UserAccess::ACCESS_WRITE:
-		            $userLevel = 'Write Access';
-		            $userIcon  = 'icon-modify';
-		            break;
-	            case UserAccess::ACCESS_FULL:
-		            $userLevel = 'Group Admin';
-		            $userIcon  = 'icon-favourite';
-		            break;
-	            default:
-		            break;
+                case UserAccess::ACCESS_READ:
+                    $userLevel = 'Read Access';
+                    $userIcon  = 'icon-view';
+                    break;
+                case UserAccess::ACCESS_WRITE:
+                    $userLevel = 'Write Access';
+                    $userIcon  = 'icon-modify';
+                    break;
+                case UserAccess::ACCESS_FULL:
+                    $userLevel = 'Group Admin';
+                    $userIcon  = 'icon-favourite';
+                    break;
+                default:
+                    break;
             }
-            $output = array(
-	            'USER_NAME'           => $member->getFullName(),
-	            'MEMBER_USER_ID'      => $member->getId(),
-	            'USER_EXTERNAL_ID'    => Scrub::text($member->getExternalId()),
-	            'GROUP_CHECKED'       => $memberAccess->getAccessLevel() > 1 ? 'checked=\'checked\'' : '',
-	            'READ_SELECTED'       => $memberAccess->getAccessLevel() == UserAccess::ACCESS_READ ? 'selected'
-		            : '',
-	            'WRITE_SELECTED'      => $memberAccess->getAccessLevel() == UserAccess::ACCESS_WRITE ? 'selected'
-		            : '',
-	            'READ_CHECKED'        => $memberAccess->getAccessLevel() == UserAccess::ACCESS_READ ? 'checked'
-		            : '',
-	            'WRITE_CHECKED'       => $memberAccess->getAccessLevel() == UserAccess::ACCESS_WRITE ? 'checked'
-		            : '',
-	            'USER_FOLLOWING'      => $following ? 'Yes' : 'No',
-	            'USER_FOLLOWING_ICON' => $following ? 'icon-tick' : 'icon-mute',
-	            // Stylage
-	            'ADMIN_ALLOWED'       => $memberMayOwn ? '' : 'disabled',
-	            'USER_LEVEL'          => $userLevel,
-	            'USER_ICON'           => $userIcon,
-            );
+            $output = [
+                'USER_NAME'           => $member->getFullName(),
+                'MEMBER_USER_ID'      => $member->getId(),
+                'USER_EXTERNAL_ID'    => Scrub::text($member->getExternalId()),
+                'GROUP_CHECKED'       => $memberAccess->getAccessLevel() > 1 ? 'checked=\'checked\'' : '',
+                'READ_SELECTED'       => $memberAccess->getAccessLevel() == UserAccess::ACCESS_READ ? 'selected'
+                    : '',
+                'WRITE_SELECTED'      => $memberAccess->getAccessLevel() == UserAccess::ACCESS_WRITE ? 'selected'
+                    : '',
+                'READ_CHECKED'        => $memberAccess->getAccessLevel() == UserAccess::ACCESS_READ ? 'checked'
+                    : '',
+                'WRITE_CHECKED'       => $memberAccess->getAccessLevel() == UserAccess::ACCESS_WRITE ? 'checked'
+                    : '',
+                'USER_FOLLOWING'      => $following ? 'Yes' : 'No',
+                'USER_FOLLOWING_ICON' => $following ? 'icon-tick' : 'icon-mute',
+                // Stylage
+                'ADMIN_ALLOWED'       => $memberMayOwn ? '' : 'disabled',
+                'USER_LEVEL'          => $userLevel,
+                'USER_ICON'           => $userIcon,
+            ];
 
             $this->setVar($output);
 
             if (count($memberList) > 100) {
-	            $this->setVar(array('show_photo_block' => ''));
+                $this->setVar(['show_photo_block' => '']);
             } else {
-	            $this->parse('show_photo_block', 'show_photo');
+                $this->parse('show_photo_block', 'show_photo');
             }
 
-            $this->setVar(array(
-	            'make_owner_block'             => '',
-	            'msg_enabled_userfollow_block' => '',
-	            'msg_enabled_usermute_block'   => '',
-            ));
+            $this->setVar([
+                'make_owner_block'             => '',
+                'msg_enabled_userfollow_block' => '',
+                'msg_enabled_usermute_block'   => '',
+            ]);
 
             if ($memberMayOwn) {
-	            $this->parse('make_owner_block', 'make_owner');
+                $this->parse('make_owner_block', 'make_owner');
             }
 
             if ($messagingEnabled) {
-	            if ($following) {
-		            $this->parse('msg_enabled_userfollow_block', 'msg_enabled_userfollow');
-	            } else {
-		            $this->parse('msg_enabled_usermute_block', 'msg_enabled_usermute');
-	            }
+                if ($following) {
+                    $this->parse('msg_enabled_userfollow_block', 'msg_enabled_userfollow');
+                } else {
+                    $this->parse('msg_enabled_usermute_block', 'msg_enabled_usermute');
+                }
             }
 
             $this->parse('member_block', 'member', true);
@@ -238,54 +244,54 @@ if (is_numeric($this->arg[0])) {
     }
 
     if ($hasAdmin) {
-	    $this->parse('msg_enabled_followadmin_block', 'msg_enabled_followadmin');
-	    $this->parse('groupOwner_block', 'groupOwner');
+        $this->parse('msg_enabled_followadmin_block', 'msg_enabled_followadmin');
+        $this->parse('groupOwner_block', 'groupOwner');
     } else {
-	    $this->parse('groupUnmanaged_block', 'groupUnmanaged');
+        $this->parse('groupUnmanaged_block', 'groupUnmanaged');
     }
 
     if ($hasMembers) {
-	    $this->parse('hide_no_members_block', 'hide_no_members', true);
+        $this->parse('hide_no_members_block', 'hide_no_members', true);
     } else {
-	    $this->setVar('member_block', '');
+        $this->setVar('member_block', '');
     }
 
     // Set up the email blocks (PHPLib sucks)
-	$this->setVar([
-		'mail_all_block' => '',
-		'mail_all_form_block' => '',
-		'mail_all_parents_block' => '',
-		'mail_all_parents_form_block' => '',
-	]);
+    $this->setVar([
+        'mail_all_block'              => '',
+        'mail_all_form_block'         => '',
+        'mail_all_parents_block'      => '',
+        'mail_all_parents_form_block' => '',
+    ]);
 
-	if (\Cfg::get('mail_enable')) {
-		if (!empty($all_emails)) {
-			$this->setVar(array(
-				'REPLYTO'  => $email_object->formatEmailFromArray($_SESSION),
-				'EMAILALL' => implode(',', $all_emails),
-			));
-			$this->parse('mail_all_block', 'mail_all');
-			$this->parse('mail_all_form_block', 'mail_all_form');
-		}
+    if (\Cfg::get('mail_enable')) {
+        if (!empty($all_emails)) {
+            $this->setVar([
+                'REPLYTO'  => $email_object->formatEmailFromArray($_SESSION),
+                'EMAILALL' => implode(',', $all_emails),
+            ]);
+            $this->parse('mail_all_block', 'mail_all');
+            $this->parse('mail_all_form_block', 'mail_all_form');
+        }
 
-		if (!empty($all_parent_emails)) {
-			$this->setVar(array(
-				'REPLYTO'  => $email_object->formatEmailFromArray($_SESSION),
-				'EMAILALLPARENTS' => implode(',', $all_parent_emails),
-			));
-			$this->parse('mail_all_parents_block', 'mail_all_parents');
-			$this->parse('mail_all_parents_form_block', 'mail_all_parents_form');
-		}
-	}
+        if (!empty($all_parent_emails)) {
+            $this->setVar([
+                'REPLYTO'         => $email_object->formatEmailFromArray($_SESSION),
+                'EMAILALLPARENTS' => implode(',', $all_parent_emails),
+            ]);
+            $this->parse('mail_all_parents_block', 'mail_all_parents');
+            $this->parse('mail_all_parents_form_block', 'mail_all_parents_form');
+        }
+    }
 
     $waitingList = $groupHandler->getWaitingList($category->getId());
     if (is_array($waitingList)) {
         foreach ($waitingList as $waiting) {
-            $output = array(
+            $output = [
                 'WAITING_NAME'        => $userHandler->formatName($waiting),
                 'WAITING_ID'          => $waiting['uid'],
                 'WAITING_EXTERNAL_ID' => Scrub::text($waiting['synergy_id']),
-            );
+            ];
             $this->setVar($output);
             $this->parse("waiting_block", "waiting", true);
         }
@@ -300,21 +306,21 @@ if (is_numeric($this->arg[0])) {
 	 * could lose control
 	 */
     $this->setVar([
-        'MAKEADMIN_SUPER' => isset($_SESSION['su']) ? $_SESSION['su'] : 0
+        'MAKEADMIN_SUPER' => isset($_SESSION['su']) ? $_SESSION['su'] : 0,
     ]);
 
     $trail = new \Schoolbox\Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
-            'text' => $category->getName(),
-            'href' => "/homepage/{$category->getId()}",
+            'text'  => $category->getName(),
+            'href'  => "/homepage/{$category->getId()}",
             'class' => '',
         ],
         [
-            'text' => 'Manage Group',
-            'href' => '',
+            'text'  => 'Manage Group',
+            'href'  => '',
             'class' => 'active',
-        ]
+        ],
     ]);
 } else {
     error(2);
