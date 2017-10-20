@@ -89,9 +89,9 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
      */
     public function provider_validateBeforeTime() {
         return [
-            ['2017-01-01T00:00:00','2017-01-01T00:00:10', 0],
-            ['2017-01-01T00:00:10','2017-01-01T00:00:00', 1],
-            ['2017-01-01T00:00:10','2017-01-01T00:00:10', 0],
+            'start before end'      => ['2017-01-01T00:00:00','2017-01-01T00:00:10', 0],
+            'end before start'      => ['2017-01-01T00:00:10','2017-01-01T00:00:00', 1],
+            'same start and end'    => ['2017-01-01T00:00:10','2017-01-01T00:00:10', 0],
         ];
     }
 
@@ -118,9 +118,9 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
      */
     public function provider_validatePastTime() {
         return [
-            ['2027-01-01T00:00:00', 0],
-            ['2016-01-01T00:00:00', 1],
-            ['now', 0],
+            'Date in future'    => ['2027-01-01T00:00:00', 0],
+            'Date in past'      => ['2016-01-01T00:00:00', 1],
+            'Date is Now'       => ['now', 0],
         ];
     }
 
@@ -147,11 +147,11 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
      */
     public function provider_validateLeadTime() {
         return [
-            ['PT1H', 'PT2H', 0],
-            ['PT1H', 'PT30M', 1],
-            ['PT1H', 'PT0H', 1],
-            ['PT0H', 'PT2H', 0],
-            ['PT0M', 'PT0M', 0],
+            '1h lead time, booked 2h before'    => ['PT1H', 'PT2H', 0],
+            '1h lead time, booked 30m before'   => ['PT1H', 'PT30M', 1],
+            '1h lead time, booked immediately'  => ['PT1H', 'PT0H', 1],
+            'no lead time, booked 2h before'    => ['PT0H', 'PT2H', 0],
+            'no lead time, booked immediately'  => ['PT0M', 'PT0M', 0],
         ];
     }
     /**
@@ -183,12 +183,12 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
      */
     public function provider_validateTooShort() {
         return [
-            ['2017-01-01T00:00:00','2017-01-01T01:00:00', 'PT1H', 0],
-            ['2017-01-01T00:00:00','2017-01-01T00:01:00', 'PT1H', 1],
-            ['2017-01-01T00:00:00','2017-01-01T01:00:00', 'PT0H', 0],
-            ['2017-01-01T00:00:00','2017-01-01T00:01:00', 'PT0H', 0],
-            ['now','now', 'PT1H', 1],
-            ['now','now', 'PT0H', 0],
+            '1h min reservation, booked for 1h'             => ['2017-01-01T00:00:00','2017-01-01T01:00:00', 'PT1H', 0],
+            '1h min reservation, booked for 1m'             => ['2017-01-01T00:00:00','2017-01-01T00:01:00', 'PT1H', 1],
+            'no min reservation, booked for 1h'             => ['2017-01-01T00:00:00','2017-01-01T01:00:00', 'PT0H', 0],
+            'no min reservation, booked for 1m'             => ['2017-01-01T00:00:00','2017-01-01T00:01:00', 'PT0H', 0],
+            '1h min reservation, booked form Now to Now'    => ['now','now', 'PT1H', 1],
+            'no min reservation, booked form Now to Now'    => ['now','now', 'PT0H', 0],
         ];
     }
 
@@ -219,11 +219,11 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
      */
     public function provider_validateTooLong() {
         return [
-            ['2017-01-01T00:00:00','2017-01-01T01:00:00', 'PT1H', 0],
-            ['2017-01-01T00:00:00','2017-01-01T02:01:00', 'PT1H', 1],
-            ['2017-01-01T00:00:00','2017-01-01T02:00:00', 'PT2H', 0],
-            ['2017-01-01T00:00:00','2017-01-01T02:01:00', 'PT0H', 0],
-            ['now','now', 'PT1H', 0],
+            '1h max reservation, booked for 1h'             => ['2017-01-01T00:00:00','2017-01-01T01:00:00', 'PT1H', 0],
+            '1h max reservation, booked for 2h'             => ['2017-01-01T00:00:00','2017-01-01T02:00:00', 'PT1H', 1],
+            '1h max reservation, booked for 1h 1m'          => ['2017-01-01T00:00:00','2017-01-01T01:01:00', 'PT1H', 1],
+            'no max reservation, booked for 1h'             => ['2017-01-01T00:00:00','2017-01-01T01:00:00', 'PT0H', 0],
+            'no max reservation, booked from Now to Now'    => ['now','now', 'PT1H', 0],
         ];
     }
 
@@ -254,8 +254,8 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
      */
     public function provider_validateCurrentTermRestriction() {
         return [
-            ['2020-12-31T00:00:00', '2020-12-31', 0],
-            ['2020-12-31T00:00:00', '2020-06-30', 1],
+            'booked within the term'    => ['2020-12-31T00:00:00', '2020-12-31', 0],
+            'booked outside the term'    => ['2020-12-31T00:00:00', '2020-06-30', 1],
         ];
     }
 
@@ -287,7 +287,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
      */
     public function provider_simpleValidateForConflicts() {
 
-        $conflictingBookings1 = (new Collection())
+        $conflictingBookings3 = (new Collection())
             ->add(
                 (new Booking\Model())
                     ->setId(11)
@@ -301,33 +301,18 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
                     ->setId(13)
             );
 
-        $conflictingBookings2 = (new Collection())
+        $conflictingBookings1 = (new Collection())
             ->add(
                 (new Booking\Model())
                     ->setId(11)
             );
 
-        $conflictingBookings3 = new Collection();
+        $conflictingBookings0 = new Collection();
 
         return [
-            [
-                '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
-                $conflictingBookings1,
-                1
-            ],
-            [
-                '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
-                $conflictingBookings2,
-                1
-            ],
-            [
-                '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
-                $conflictingBookings3,
-                0
-            ],
+            '3 conflicting bookings'    => ['2020-12-31T00:00:00', '2020-12-31T00:00:00', $conflictingBookings3, 1],
+            '1 conflicting booking'     => ['2020-12-31T00:00:00', '2020-12-31T00:00:00', $conflictingBookings1, 1],
+            'no conflicting booking'    => ['2020-12-31T00:00:00', '2020-12-31T00:00:00', $conflictingBookings0, 0],
         ];
     }
 
@@ -408,57 +393,57 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
                     ->setId(111)
             );
 
-        $roomEvents0 = (new Collection());
+        $roomEvents0 = new Collection();
 
         return [
-            [
-                '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
-                $conflictingBookings0,
-                'abc1',
-                $roomEvents3,
-                1
-            ],
-            [
-                '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
-                $conflictingBookings0,
-                'abc1',
-                $roomEvents1,
-                1
-            ],
-            [
-                '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
-                $conflictingBookings0,
-                'abc1',
-                $roomEvents0,
-                0
-            ],
-            [
-                '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
-                $conflictingBookings3,
-                'abc1',
-                $roomEvents0,
-                1
-            ],
-            [
-                '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
-                $conflictingBookings1,
-                'abc1',
-                $roomEvents0,
-                1
-            ],
-            [
-                '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
-                $conflictingBookings0,
-                '',
-                $roomEvents0,
-                0
-            ],
+            'No conflicting bookings, 3 timetable events' =>    [
+                                                                    '2020-12-31T00:00:00',
+                                                                    '2020-12-31T00:00:00',
+                                                                    $conflictingBookings0,
+                                                                    'abc1',
+                                                                    $roomEvents3,
+                                                                    1
+                                                                ],
+            'No conflicting bookings, 1 timetable event' =>     [
+                                                                    '2020-12-31T00:00:00',
+                                                                    '2020-12-31T00:00:00',
+                                                                    $conflictingBookings0,
+                                                                    'abc1',
+                                                                    $roomEvents1,
+                                                                    1
+                                                                ],
+            'No conflicting bookings, no timetable events' =>   [
+                                                                    '2020-12-31T00:00:00',
+                                                                    '2020-12-31T00:00:00',
+                                                                    $conflictingBookings0,
+                                                                    'abc1',
+                                                                    $roomEvents0,
+                                                                    0
+                                                                ],
+            '3 conflicting bookings, no timetable events' =>    [
+                                                                    '2020-12-31T00:00:00',
+                                                                    '2020-12-31T00:00:00',
+                                                                    $conflictingBookings3,
+                                                                    'abc1',
+                                                                    $roomEvents0,
+                                                                    1
+                                                                ],
+            '1 conflicting booking, no timetable events' =>     [
+                                                                    '2020-12-31T00:00:00',
+                                                                    '2020-12-31T00:00:00',
+                                                                    $conflictingBookings1,
+                                                                    'abc1',
+                                                                    $roomEvents0,
+                                                                    1
+                                                                ],
+            'no conflicting booking, no timetable events' =>    [
+                                                                    '2020-12-31T00:00:00',
+                                                                    '2020-12-31T00:00:00',
+                                                                    $conflictingBookings0,
+                                                                    '',
+                                                                    $roomEvents0,
+                                                                    0
+                                                                ],
         ];
     }
 
@@ -510,42 +495,50 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
      */
     public function provider_seriesValidateForConflicts() {
 
-        // Single booking event
-        $existingBookingEvent = (new Event())
-            ->setId(111);
+        // Single booking
+        $existingBooking = (new Booking\Model())
+                    ->setId(1)
+                    ->setEvent(
+                        (new Event())
+                            ->setId(101)
+                    );
 
-        // Recursive booking event
-        $existingBookingEventInSeries = (new Event())
-            ->setId(111)
-            ->setSeriesId(22);
+        // Recursive booking
+        $existingBookingEventInSeries = (new Booking\Model())
+                    ->setId(1)
+                    ->setEvent(
+                        (new Event())
+                            ->setId(101)
+                            ->setSeriesId(10)
+                    );
 
-        // Conflicting bookings, same Series as $existingBookingEvent2
+        // Conflicting bookings, same Series as $existingBooking
         $conflictingBookingsSameSeries3 = (new Collection())
             ->add(
                 (new Booking\Model())
-                    ->setId(11)
+                    ->setId(2)
                     ->setEvent(
                         (new Event())
-                            ->setId(201)
-                            ->setSeriesId(22)
+                            ->setId(102)
+                            ->setSeriesId(10)
                     )
                 )
             ->add(
                 (new Booking\Model())
-                    ->setId(12)
+                    ->setId(3)
                     ->setEvent(
                         (new Event())
-                            ->setId(202)
-                            ->setSeriesId(22)
+                            ->setId(103)
+                            ->setSeriesId(10)
                     )
             )
             ->add(
                 (new Booking\Model())
-                    ->setId(13)
+                    ->setId(4)
                     ->setEvent(
                         (new Event())
-                            ->setId(203)
-                            ->setSeriesId(22)
+                            ->setId(104)
+                            ->setSeriesId(10)
                     )
             );
 
@@ -556,8 +549,8 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
                     ->setId(11)
                     ->setEvent(
                         (new Event())
-                            ->setId(201)
-                            ->setSeriesId(33)
+                            ->setId(111)
+                            ->setSeriesId(20)
                     )
             )
             ->add(
@@ -565,8 +558,8 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
                     ->setId(12)
                     ->setEvent(
                         (new Event())
-                            ->setId(202)
-                            ->setSeriesId(33)
+                            ->setId(112)
+                            ->setSeriesId(20)
                     )
             )
             ->add(
@@ -574,8 +567,8 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
                     ->setId(13)
                     ->setEvent(
                         (new Event())
-                            ->setId(203)
-                            ->setSeriesId(33)
+                            ->setId(113)
+                            ->setSeriesId(20)
                     )
             );
 
@@ -586,82 +579,74 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
         $conflictingBookings1 = (new Collection())
             ->add(
                 (new Booking\Model())
-                    ->setId(1)
+                    ->setId(21)
                     ->setEvent(
                         (new Event())
-                            ->setId(201)
+                            ->setId(221)
                     )
             );
 
-        // Conflicting bookings, same Id as existing booking
-        $conflictingBookingsSameId1 = (new Collection())
+        // Conflicting bookings, different Id
+        $conflictingBookingsSameId = (new Collection())
             ->add(
                 (new Booking\Model())
-                    ->setId(2)
+                    ->setId(1)
                     ->setEvent(
                         (new Event())
-                            ->setId(202)
+                            ->setId(101)
                     )
             );
 
         return [
-            [
-                '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
-                $existingBookingEvent,
-                $conflictingBookingsSameSeries3,
-                1,
-            ],
-            [
-                '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
-                $existingBookingEvent,
-                $conflictingBookingsOtherSeries3,
-                1,
-            ],
-            [
-                '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
-                $existingBookingEvent,
-                $conflictingBookings0,
-                0,
-            ],
-            [
-                '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
-                $existingBookingEventInSeries,
-                $conflictingBookingsSameSeries3,
-                0,
-            ],
-            [
-                '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
-                $existingBookingEventInSeries,
-                $conflictingBookingsOtherSeries3,
-                1
-            ],
-            [
-                '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
-                $existingBookingEventInSeries,
-                $conflictingBookings0,
-                0
-            ],
-            [
-                '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
-                $existingBookingEvent,
-                $conflictingBookings1,
-                0
-            ],
-            [
-                '2020-12-31T00:00:00',
-                '2020-12-31T00:00:00',
-                $existingBookingEvent,
-                $conflictingBookingsSameId1,
-                1
-            ],
-
+            'booking conflicts with other booking series'           => [
+                                                                        '2020-12-31T00:00:00',
+                                                                        '2020-12-31T00:00:00',
+                                                                        $existingBooking,
+                                                                        $conflictingBookingsOtherSeries3,
+                                                                        1,
+                                                                    ],
+            'no conflicting bookings'                               => [
+                                                                        '2020-12-31T00:00:00',
+                                                                        '2020-12-31T00:00:00',
+                                                                        $existingBooking,
+                                                                        $conflictingBookings0,
+                                                                        0,
+                                                                    ],
+            'booking in series does not conflict with its series'   => [
+                                                                        '2020-12-31T00:00:00',
+                                                                        '2020-12-31T00:00:00',
+                                                                        $existingBookingEventInSeries,
+                                                                        $conflictingBookingsSameSeries3,
+                                                                        0,
+                                                                    ],
+            'booking in series conflicts with other series'         => [
+                                                                        '2020-12-31T00:00:00',
+                                                                        '2020-12-31T00:00:00',
+                                                                        $existingBookingEventInSeries,
+                                                                        $conflictingBookingsOtherSeries3,
+                                                                        1
+                                                                    ],
+            'booking in series does not conflict with anything'     => [
+                                                                        '2020-12-31T00:00:00',
+                                                                        '2020-12-31T00:00:00',
+                                                                        $existingBookingEventInSeries,
+                                                                        $conflictingBookings0,
+                                                                        0
+                                                                    ],
+            'booking conflicts with another booking'                => [
+                                                                        '2020-12-31T00:00:00',
+                                                                        '2020-12-31T00:00:00',
+                                                                        $existingBooking,
+                                                                        $conflictingBookings1,
+                                                                        1
+                                                                    ],
+            'booking does not conflict with itself'                 => [
+                                                                        '2020-12-31T00:00:00',
+                                                                        '2020-12-31T00:00:00',
+                                                                        $existingBooking,
+                                                                        $conflictingBookingsSameId,
+                                                                        0
+                                                                    ],
         ];
     }
 
@@ -672,14 +657,14 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
      *
      * @param string $startDate
      * @param string $endDate
-     * @param Event  $existingBookingEvent
+     * @param Booking\Model $existingBooking
      * @param Collection $conflictingBookings
      * @param int    $expected
      */
     public function testSeriesValidateForConflicts(
         $startDate,
         $endDate,
-        $existingBookingEvent,
+        $existingBooking,
         $conflictingBookings,
         $expected
     )
@@ -689,20 +674,13 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
             ->method('findForResource')
             ->willReturn($conflictingBookings);
 
-        $mockExistingBooking = $this->getMockBuilder(Booking\Model::class)
-                                    ->setMethods(null)
-                                    ->getMock();
-        /** @var Booking\Model $mockExistingBooking */
-        $mockExistingBooking->setId(1);
-        $mockExistingBooking->setEvent($existingBookingEvent);
-
         $mockValidation = $this->createValidation(new User(), $mockMapper, new StatusMapper(), new TermMapper());
 
         $resource = new Item\Model();
         $resource->setId(123);
 
         /** @var Validation $mockValidation */
-        $errors = $mockValidation->validateForConflicts($resource, new DateTime($startDate), new DateTime($endDate), $mockExistingBooking);
+        $errors = $mockValidation->validateForConflicts($resource, new DateTime($startDate), new DateTime($endDate), $existingBooking);
 
         $this->assertCount($expected, $errors);
     }
