@@ -7,6 +7,7 @@ use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Resource\Group;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 $this->setFile(TEMPLATE_content, 'group/modify.html');
 $this->setBlock(TEMPLATE_content, 'groupOwner', 'groupOwner_block');
@@ -33,13 +34,12 @@ $this->setBlock("authorisation", "waiting", "waiting_block");
 $this->setTitle('Modify User Group');
 $this->setTab('resources');
 
-$groupHandler   = new \Group(HOMEPAGE_SERVICE);
-$categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
-
 if (is_numeric($this->arg[0])) {
     $userHandler      = new User();
-    $userAccessMapper = new UserAccessMapper;
-    $roleAccessMapper = new RoleAccessMapper;
+    $groupHandler     = new \Group(HOMEPAGE_SERVICE);
+    $userAccessMapper = UserAccessMapper::getInstance();
+    $roleAccessMapper = RoleAccessMapper::getInstance();
+    $categoryMapper   = FolderMapper::getInstance();
 
     try {
         $category = $categoryMapper->findByID($this->arg[0]);
