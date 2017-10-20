@@ -24,6 +24,7 @@
             // When the select all changes, update the checkboxes this is a select all for
             selectAll.on('change.selectAll', function() {
                 checkboxes.prop('checked', selectAll.prop('checked'));
+                checkboxes.trigger('change');
             });
 
             // When this changes, update its select all?
