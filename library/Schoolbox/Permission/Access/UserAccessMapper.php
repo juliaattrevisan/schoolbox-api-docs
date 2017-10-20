@@ -321,14 +321,18 @@ class UserAccessMapper extends Mapper
     ) {
         // union 3 sources: userAccess, and if synergy, external class and external user
 
+	    $userRoleMapper = $this->getJoinMapper('user.role');
+
         // acquire users from internal access definition
         $query = "
             SELECT
-                {$this->getJoinColumnString('user', 'u')}
+                {$this->getJoinColumnString('user', 'u')},
+                {$userRoleMapper->getColumnString('ur')}
             FROM
                 `{$this->table}` ua
                 INNER JOIN {$this->getJoinSql('user', 'ua', 'u')}
                 LEFT JOIN groups g on u.group_id = g.id
+               	LEFT JOIN {$this->getJoinSql('user.role','u', 'ur')}
             WHERE ua.service = :service
             AND ua.sid = :serviceId
         ";
@@ -354,6 +358,7 @@ class UserAccessMapper extends Mapper
             // add the user represented by this row to the collection
             $userCollection->add(
                 $this->hydrateJoin($r, 'user', 'u')
+	                    ->setRole($userRoleMapper->hydrate($r, 'ur'))
             );
         }
 
