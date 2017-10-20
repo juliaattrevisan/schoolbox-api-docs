@@ -323,6 +323,9 @@ class Controller extends Base
             || ($viewee->getDisplayGradeGraph() && $this->getConfigLoader()
                                                         ->get('display_grade_graph'));
 
+        // Only show the "send to showcase" trophy button to teachers and students, not parents
+        $canSeeShowcaseButton = $this->getUser()->getRole()->isStaff() || $this->getUser()->getRole()->isStudent();
+
         // Let markbook calculate the statistics
         $filteredMarkbook = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
 
@@ -336,6 +339,7 @@ class Controller extends Base
                 'student'            => $viewee,
                 'markbook'           => $filteredMarkbook,
                 'canSeeGraph'        => $canSeeGraph,
+                'canSeeShowcaseButton' => $canSeeShowcaseButton,
                 'graph'              => $graph,
                 'longitudinalRubric' => $longitudinalRubric,
                 'returnUrlSuffix'    => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']),
