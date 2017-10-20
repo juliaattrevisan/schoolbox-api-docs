@@ -144,7 +144,7 @@ class Subscription implements ISubscription
                 function ($messageKey) {
                     try {
                         return unserialize(
-                            gzuncompress('b.'.$this->syncClient->get($messageKey)),
+                            gzuncompress($this->syncClient->get($messageKey)),
                             ['allowed_classes' => [Instance::class,],]
                         );
                     } catch (\ErrorException $e) {
