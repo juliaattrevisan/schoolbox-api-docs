@@ -13,6 +13,12 @@
             else {
                 $('#unit-' + unit + '-dates').attr('hidden', true);
             }
+            if($('#importForm input[data-select-all-group]:checked:not(:disabled)').length) {
+                $('#importForm input[type=submit]').removeAttr('disabled');
+            }
+            else {
+                $('#importForm input[type=submit]').attr('disabled', true);
+            }
         });
 
     });
@@ -154,7 +160,7 @@
                     {% endfor %}
                     </ul>
                 </section>
-                <input type="submit" class='expand' value="Export to selected classes" />
+                <input type="submit" class='expand' disabled value="Export to selected classes" />
             </form>
         </div>
     {% endif %}
