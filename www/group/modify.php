@@ -275,6 +275,7 @@ if (is_numeric($this->arg[0])) {
         }
 
         if (!empty($all_parent_emails)) {
+            $all_parent_emails = array_unique($all_parent_emails);
             $this->setVar([
                 'REPLYTO'         => $email_object->formatEmailFromArray($_SESSION),
                 'EMAILALLPARENTS' => implode(',', $all_parent_emails),
