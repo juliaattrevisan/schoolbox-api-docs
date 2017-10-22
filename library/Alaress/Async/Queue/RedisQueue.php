@@ -12,6 +12,7 @@ namespace Alaress\Async\Queue;
 
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\NotificationBundle;
+use ErrorException;
 use InvalidArgumentException;
 use Predis\ClientInterface;
 
@@ -198,7 +199,11 @@ abstract class RedisQueue implements QueueInterface
      */
     private function inflate($data)
     {
-        $unserial = unserialize(gzuncompress($data));
+        try {
+            $unserial = unserialize(gzuncompress($data), ['allowed_classes' => [Instance::class,],]);
+        } catch (ErrorException $e) {
+            $unserial = false;
+        }
         if (!$unserial instanceof Instance) {
             throw new InvalidArgumentException('Could not inflate and unserialize payload');
         }
