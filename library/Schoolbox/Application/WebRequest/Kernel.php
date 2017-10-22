@@ -13,8 +13,10 @@ use Alaress\Authorizer\Failure\Base;
 use Alaress\Authorizer\Failure\Forbidden;
 use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Failure\Unauthorized;
+use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Web\Output\OutputInterface;
 use Aura\Router\Route;
+use Monolog\Logger;
 use ReflectionMethod;
 use RuntimeException;
 use Schoolbox\Application\Exception\NotFound;
@@ -174,6 +176,16 @@ class Kernel extends \Alaress\Application\Kernel
                     $name   = $parameter->getName();
                     $args[] = (array_key_exists($name, $params)) ? $params[$name] : null;
                 }
+
+                // Log this to messages
+                // TODO put this in a better place
+                if (INSTANCE_ID === 'vagrantx') {
+                    DebugBar::getInstance()['messages']->log(
+                        Logger::INFO,
+                        sprintf('%s::%s', $method->class, $method->name)
+                    );
+                }
+
                 $method->invokeArgs($controller, $args);
                 $response = $controller->getResponse();
             } catch (Unauthenticated $e) {
