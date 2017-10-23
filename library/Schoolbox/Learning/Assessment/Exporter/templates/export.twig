@@ -29,7 +29,6 @@
         <h1>Export {{ assessment.typeName }}: {{ assessment.title }}</h1>
     </div>
 </div>
-
 <div class="row">
     {% if implementations|length == 0 %}
         <div class="small-12 island">
@@ -104,57 +103,21 @@
                                     </p>
                                 </div>
                             </div>
+
+                            {% if assessment is quiz %}
+                                {% set dates = ['publish', 'open', 'due', 'close'] %}
+                            {% else %}
+                                {% set dates = ['publish', 'due'] %}
+                            {% endif %}
+
                             <div class="list-item" id="unit-{{ implementation.unit.id }}-dates" hidden>
-                                <div class="small-12 medium-6 large-3 columns">
-                                    <label for="publishDate-{{ implementation.unit.id }}">Publish</label>
-                                    <input id="publishDate-{{ implementation.unit.id }}"
-                                           name="unit[implementation.unit.id][publish]"
-                                           type="text"
-                                           value="{{ implementation.unit.openDate.local }}"
-                                           data-datepicker
-                                           data-datepicker-time
-                                           data-datepicker-format="datetime"
-                                           data-datepicker-buttontext=""
-                                           data-datesync-enddate="#openDate-{{ implementation.unit.id }}" />
-                                </div>
-                                <div class="small-12 medium-6 large-3 columns">
-                                    <label for="openDate-{{ implementation.unit.id }}">Open</label>
-                                    <input id="openDate-{{ implementation.unit.id }}"
-                                           name="unit[{{ implementation.unit.id }}][open]"
-                                           type="text"
-                                           value="{{ implementation.unit.openDate.local }}"
-                                           data-datepicker
-                                           data-datepicker-time
-                                           data-datepicker-format="datetime"
-                                           data-datepicker-buttontext=""
-                                           data-datesync-startdate="#publishDate-{{ implementation.unit.id }}"
-                                           data-datesync-enddate="#dueDate-{{ implementation.unit.id }}" />
-                                </div>
-                                <div class="small-12 medium-6 large-3 columns">
-                                    <label for="dueDate-{{ implementation.unit.id }}">Due</label>
-                                    <input id="dueDate-{{ implementation.unit.id }}"
-                                           name="unit[{{ implementation.unit.id }}][due]"
-                                           type="text"
-                                           value="{{ implementation.unit.dueDate.local }}"
-                                           data-datepicker
-                                           data-datepicker-time
-                                           data-datepicker-format="datetime"
-                                           data-datepicker-buttontext=""
-                                           data-datesync-startdate="#openDate-{{ implementation.unit.id }}"
-                                           data-datesync-enddate="#closeDate-{{ implementation.unit.id }}" />
-                                </div>
-                                <div class="small-12 medium-6 large-3 columns">
-                                    <label for="closeDate-{{ implementation.unit.id }}">Close</label>
-                                    <input id="closeDate-{{ implementation.unit.id }}"
-                                           name="unit[{{ implementation.unit.id }}][close]"
-                                           type="text"
-                                           value="{{ implementation.unit.dueDate.local }}"
-                                           data-datepicker
-                                           data-datepicker-time
-                                           data-datepicker-format="datetime"
-                                           data-datepicker-buttontext=""
-                                           data-datesync-startdate="#dueDate-{{ implementation.unit.id }}" />
-                                </div>
+                                {% for date in dates %}
+                                    {% include '@learningAssessmentExporter/date.twig' with {
+                                        dateType: date,
+                                        unitImplementation: implementation.unit,
+                                        assessment: assessment
+                                    } %}
+                                {% endfor %}
                             </div>
                         </li>
                     {% endfor %}

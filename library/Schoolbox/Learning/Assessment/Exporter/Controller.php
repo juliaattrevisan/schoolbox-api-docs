@@ -147,8 +147,6 @@ class Controller extends BaseController
             }
         }
 
-
-
         // Decode the return URL, if it was set
         $encodedReturnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL, '');
         if ($encodedReturnUrl) {
