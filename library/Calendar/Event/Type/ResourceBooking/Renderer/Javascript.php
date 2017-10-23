@@ -102,7 +102,7 @@ class Javascript extends Base
                 $reviewHref .= '?date='.urlencode($relatedBooking->getEvent()->getStartDateTime()->getURLDate());
             }
             $relatedBookings[] = [
-                'title' => $relatedBooking->getResource()->getName(),
+                'title' => \Scrub::text($relatedBooking->getResource()->getName()),
                 'item'    => array(
                     'id'   => $relatedBooking->getResource()->getId(),
                     'name' => $relatedBooking->getResource()->getName(),
@@ -132,7 +132,7 @@ class Javascript extends Base
         $detail = $this->getEvent()->getDetail();
         $event  = array(
             'resourceId' => $booking->getResource()->getId(),
-            'title' => $this->getEvent()->getTitle(),
+            'title' => \Scrub::text($this->getEvent()->getTitle()),
             'start' => $start,
             'end' => $end,
 
@@ -193,6 +193,6 @@ class Javascript extends Base
             )
         );
 
-        return json_encode($event).',';
+        return json_encode($event,JSON_PARTIAL_OUTPUT_ON_ERROR).',';
     }
 }

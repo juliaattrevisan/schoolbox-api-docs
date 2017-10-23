@@ -71,7 +71,7 @@ class Javascript extends Base
 
             $event = array(
                 'resourceId'=> $this->event->getResourceId(),
-                'title'     => $this->event->getTitle(),
+                'title'     => \Scrub::text($this->event->getTitle()),
                 'start'     => $start,
                 'end'       => $end,
 
@@ -127,7 +127,7 @@ class Javascript extends Base
                 )
             );
 
-            return json_encode($event) . ',';
+            return json_encode($event,JSON_PARTIAL_OUTPUT_ON_ERROR) . ',';
         } else {
             return '';
         }

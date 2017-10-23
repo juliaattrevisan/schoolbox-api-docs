@@ -69,7 +69,7 @@ class Javascript extends Base
             );
         }
         $event = array(
-            'title'     => $this->getEvent()->getTitle(),
+            'title'     => \Scrub::text($this->getEvent()->getTitle()),
             'start'     => $start,
             'end'       => "",
             /* Whether you can edit this event or not
@@ -122,6 +122,6 @@ class Javascript extends Base
             $event['resourceId'] = $this->getEvent()->getResourceId();
         }
 
-        return json_encode($event).',';
+        return json_encode($event, JSON_PARTIAL_OUTPUT_ON_ERROR).',';
     }
 }
