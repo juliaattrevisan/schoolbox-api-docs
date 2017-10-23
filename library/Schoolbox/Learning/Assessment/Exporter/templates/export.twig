@@ -106,54 +106,54 @@
                             </div>
                             <div class="list-item" id="unit-{{ implementation.unit.id }}-dates" hidden>
                                 <div class="small-12 medium-6 large-3 columns">
-                                    <label for="publish_date-{{ implementation.unit.id }}">Publish</label>
-                                    <input id="publish_date-{{ implementation.unit.id }}"
-                                           name="unit[implementation.unit.id][publish_date]"
+                                    <label for="publishDate-{{ implementation.unit.id }}">Publish</label>
+                                    <input id="publishDate-{{ implementation.unit.id }}"
+                                           name="unit[implementation.unit.id][publish]"
                                            type="text"
-                                           value="{{ implementation.unit.openDate.localShort }}"
+                                           value="{{ implementation.unit.openDate.local }}"
                                            data-datepicker
                                            data-datepicker-time
                                            data-datepicker-format="datetime"
                                            data-datepicker-buttontext=""
-                                           data-datesync-enddate="#due_date-{{ implementation.unit.id }}" />
+                                           data-datesync-enddate="#openDate-{{ implementation.unit.id }}" />
                                 </div>
                                 <div class="small-12 medium-6 large-3 columns">
-                                    <label for="open_date-{{ implementation.unit.id }}">Open</label>
-                                    <input id="open_date-{{ implementation.unit.id }}"
-                                           name="unit[{{ implementation.unit.id }}][open_date]"
+                                    <label for="openDate-{{ implementation.unit.id }}">Open</label>
+                                    <input id="openDate-{{ implementation.unit.id }}"
+                                           name="unit[{{ implementation.unit.id }}][open]"
                                            type="text"
-                                           value="{{ implementation.unit.openDate.localShort }}"
+                                           value="{{ implementation.unit.openDate.local }}"
                                            data-datepicker
                                            data-datepicker-time
                                            data-datepicker-format="datetime"
                                            data-datepicker-buttontext=""
-                                           data-datesync-startdate="#publish_date-{{ implementation.unit.id }}"
-                                           data-datesync-enddate="#due_date-{{ implementation.unit.id }}" />
+                                           data-datesync-startdate="#publishDate-{{ implementation.unit.id }}"
+                                           data-datesync-enddate="#dueDate-{{ implementation.unit.id }}" />
                                 </div>
                                 <div class="small-12 medium-6 large-3 columns">
-                                    <label for="due_date-{{ implementation.unit.id }}">Due</label>
-                                    <input id="due_date-{{ implementation.unit.id }}"
-                                           name="unit[{{ implementation.unit.id }}][due_date]"
+                                    <label for="dueDate-{{ implementation.unit.id }}">Due</label>
+                                    <input id="dueDate-{{ implementation.unit.id }}"
+                                           name="unit[{{ implementation.unit.id }}][due]"
                                            type="text"
-                                           value="{{ implementation.unit.dueDate.localShort }}"
+                                           value="{{ implementation.unit.dueDate.local }}"
                                            data-datepicker
                                            data-datepicker-time
                                            data-datepicker-format="datetime"
                                            data-datepicker-buttontext=""
-                                           data-datesync-startdate="#open_date-{{ implementation.unit.id }}"
-                                           data-datesync-endtdate="#close_date-{{ implementation.unit.id }}" />
+                                           data-datesync-startdate="#openDate-{{ implementation.unit.id }}"
+                                           data-datesync-enddate="#closeDate-{{ implementation.unit.id }}" />
                                 </div>
                                 <div class="small-12 medium-6 large-3 columns">
-                                    <label for="close_date-{{ implementation.unit.id }}">Close</label>
-                                    <input id="close_date-{{ implementation.unit.id }}"
-                                           name="unit[{{ implementation.unit.id }}][close_date]"
+                                    <label for="closeDate-{{ implementation.unit.id }}">Close</label>
+                                    <input id="closeDate-{{ implementation.unit.id }}"
+                                           name="unit[{{ implementation.unit.id }}][close]"
                                            type="text"
-                                           value="{{ implementation.unit.dueDate.localShort }}"
+                                           value="{{ implementation.unit.dueDate.local }}"
                                            data-datepicker
                                            data-datepicker-time
                                            data-datepicker-format="datetime"
                                            data-datepicker-buttontext=""
-                                           data-datesync-startdate="#due_date-{{ implementation.unit.id }}" />
+                                           data-datesync-startdate="#dueDate-{{ implementation.unit.id }}" />
                                 </div>
                             </div>
                         </li>

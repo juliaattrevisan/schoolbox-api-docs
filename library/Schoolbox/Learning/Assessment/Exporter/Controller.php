@@ -137,10 +137,10 @@ class Controller extends BaseController
                 }
 
                 $dates = [
-                    'publish' => $this->getRequest()->post->get('unit['.$unitImpl->getId().'][publish_date]', []),
-                    'open' => $this->getRequest()->post->get('unit['.$unitImpl->getId().'][open_date]', []),
-                    'due' => $this->getRequest()->post->get('unit['.$unitImpl->getId().'][due_date]', []),
-                    'close' => $this->getRequest()->post->get('unit['.$unitImpl->getId().'][close_date]', []),
+                    'publish' => $this->getRequest()->post->get('unit['.$unitImpl->getId().'][publish]', []),
+                    'open' => $this->getRequest()->post->get('unit['.$unitImpl->getId().'][open]', []),
+                    'due' => $this->getRequest()->post->get('unit['.$unitImpl->getId().'][due]', []),
+                    'close' => $this->getRequest()->post->get('unit['.$unitImpl->getId().'][close]', []),
                 ];
 
                 $this->exportToNewContext($assessmentSpec, $unitImpl, $dates);
