@@ -53,7 +53,7 @@ class Assess_Export_Xml extends Evaluation_Export_Xml
 
         $this->getPage()->setVar([
             'ASSESS_TITLE'             => Scrub::text($quiz->getTitle()),
-            'ASSESS_WORKTYPE'          => !is_null($quiz->getWorkType()) ? Scrub::text($quiz->getWorkType()->getName()) : "None",
+            'ASSESS_WORKTYPE'          => !is_null($quiz->getWorkType()) ? Scrub::text($quiz->getWorkType()->getName()) : "",
             'ASSESS_DESCRIPTION'       => Scrub::html($quiz->getDescription()),
             'ASSESS_PUBLISH'           => $quiz->getPublishDate()->getDatabase(),
             'ASSESS_OPEN'              => $quiz->getOpenDate()->getDatabase(),
