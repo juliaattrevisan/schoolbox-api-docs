@@ -9,7 +9,6 @@ namespace Schoolbox\Learning\Personalised\Participant;
 
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\User;
 
@@ -28,7 +27,7 @@ class Model
     /**
      * The assessment for which the date has been personalised.
      *
-     * @var IAssessable
+     * @var DataModel\Model
      */
     protected $assessment;
 
@@ -54,7 +53,7 @@ class Model
     protected $dueDate;
 
     /**
-     * @return IAssessable|DataModel\Model
+     * @return DataModel\Model
      */
     public function getAssessment()
     {
@@ -62,10 +61,10 @@ class Model
     }
 
     /**
-     * @param IAssessable|DataModel\Model $assessment
+     * @param DataModel\Model $assessment
      * @return static
      */
-    public function setAssessment($assessment)
+    public function setAssessment(DataModel\Model $assessment)
     {
         $this->assessment = $assessment;
         return $this;
