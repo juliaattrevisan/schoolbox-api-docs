@@ -9,6 +9,7 @@
 namespace Schoolbox\Realtime\Subscription\Redis;
 
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\Parameter\Param;
 use InvalidArgumentException;
 use Redis;
 use Schoolbox\Realtime\Subscription\ISubscription;
@@ -145,7 +146,7 @@ class Subscription implements ISubscription
                     try {
                         return unserialize(
                             gzuncompress($this->syncClient->get($messageKey)),
-                            ['allowed_classes' => [Instance::class,],]
+                            ['allowed_classes' => [Instance::class, Param::class,],]
                         );
                     } catch (\ErrorException $e) {
                         return false;

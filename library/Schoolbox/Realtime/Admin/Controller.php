@@ -10,6 +10,7 @@
 namespace Schoolbox\Realtime\Admin;
 
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Lumberjack\Logger;
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Collection;
@@ -479,7 +480,7 @@ class Controller extends BaseController
 
                 $cloudManager->push(
                     $user->getId(),
-                    unserialize(gzuncompress($data), ['allowed_classes' => [Instance::class,],])
+                    unserialize(gzuncompress($data), ['allowed_classes' => [Instance::class, Param::class,],])
                 );
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $log->warning("Failed to retrieve user $userId: {$e->getMessage()}", [ $e ]);
