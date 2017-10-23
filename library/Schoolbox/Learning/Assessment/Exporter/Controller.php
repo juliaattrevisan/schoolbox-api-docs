@@ -117,6 +117,7 @@ class Controller extends BaseController
     public function postExport(IAssessable $assessmentSpec)
     {
         $importedImplementations = $this->getRequest()->post->get('unitImplementation', []);
+        $importedImplementationDates =  $this->getRequest()->post->get('unit', []);
 
         foreach ($this->retrieveUnitImplementationsForSpecification($assessmentSpec) as $unitImplData) {
             /** @var UnitImplementation $unitImpl */
@@ -136,12 +137,7 @@ class Controller extends BaseController
                     return;
                 }
 
-                $dates = [
-                    'publish' => $this->getRequest()->post->get('unit['.$unitImpl->getId().'][publish]', []),
-                    'open' => $this->getRequest()->post->get('unit['.$unitImpl->getId().'][open]', []),
-                    'due' => $this->getRequest()->post->get('unit['.$unitImpl->getId().'][due]', []),
-                    'close' => $this->getRequest()->post->get('unit['.$unitImpl->getId().'][close]', []),
-                ];
+                $dates = $importedImplementationDates[$unitImpl->getId()];
 
                 $this->exportToNewContext($assessmentSpec, $unitImpl, $dates);
             }
@@ -180,7 +176,7 @@ class Controller extends BaseController
                 $$field = null;
                 if ($value) {
                     try {
-                        $$field = new Alaress_Date_Format($value);
+                        $$field = Alaress_Date_Format::newLocal($value);
                     } catch (Exception $e) {
                         // baaaang
                     }
