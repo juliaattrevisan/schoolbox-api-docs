@@ -34,13 +34,13 @@ class Controller extends Base
     public function getIndex(User $student)
     {
         // And render this thing out
-
+        $reports = $this->externalDocument->getAcademicReportsForStudent($student);
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@profileDocumentManagement/index.twig',
                 [
                     'student' => $student,
-                    'reports' => $this->externalDocument->getAcademicReportsForStudent($student)
+                    'reports' => $reports,
                 ],
                 'Academic Reports for '.$student->formatName()
             )
