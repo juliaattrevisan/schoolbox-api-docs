@@ -44,6 +44,7 @@
             // internal configuration
 
             itemUnread:       'unread',
+            itemMaxDisplayed: 100,
             itemTimeFormat:   'LLLL',
             itemTextEmphasis: 'b',
 
@@ -120,8 +121,6 @@
 
                 if(settings.debug) { console.log('Updating DOM'); }
 
-                var dom = $(self);
-
                 // do the following on every DOM update request
 
                 // replicate the list and delete its contents
@@ -135,25 +134,24 @@
                     toInsert.push(messages[id]);
                 }
 
+                // sort descending by timestamp
                 toInsert.sort(function(a,b) {
-                    // sort ascending by timestamp (we'll iterate descending)
-                    return (a.timestamp == b.timestamp ? 0 : (a.timestamp < b.timestamp ? -1 : 1));
+                    return (a.timestamp == b.timestamp ? 0 : (a.timestamp < b.timestamp ? 1 : -1));
                 });
-
-                var i;
 
                 var footerText = '';
 
-                if(toInsert.length > 0) {
+                // Show a max of settings.itemMaxDisplayed messages
+                toInsert.slice(0, settings.itemMaxDisplayed).forEach(function(item) {
                     // append the list of messages
-                    for(i = toInsert.length - 1; i >= 0; --i) {
+                    var li = settings.tpl.clone();
 
-                        var li = settings.tpl.clone();
+                    applyMessageData(li, item);
 
-                        applyMessageData(li, toInsert[i]);
+                    content.append(li);
+                });
 
-                        content.append(li);
-                    }
+                if (toInsert.length > 0) {
                     footerText = settings.dictFooterSeeAll;
                 }
                 else {
@@ -164,13 +162,14 @@
                 $(settings.list).find(settings.footer).html(footerText);
                 $(settings.content).replaceWith(content)/*.foundation('equalizer')*/;
 
-                // update the counter (duplicate selector intentional)
-                var unreadTotal = $(settings.content).find('[data-status="' + settings.itemUnread + '"]').length;
-
                 // set the counter
+                var unreadTotal = toInsert.filter(function(a) { return a.status === settings.itemUnread; }).length;
                 $('[data-' + settings.counterUnread + ']').attr('data-' + settings.counterUnread, unreadTotal);
-
-                $(settings.counter).html(unreadTotal ? unreadTotal : '');
+                var unreadTotalLabel = unreadTotal;
+                if (unreadTotal === 0) {
+                    unreadTotalLabel = '';
+                }
+                $(settings.counter).html(unreadTotalLabel);
 
                 $.ajax({
                     accepts  : 'application/json',
@@ -621,13 +620,16 @@
                 e.preventDefault();
                 e.stopPropagation();
 
+                // Mark all messages unread, regardless of whether or not they are shown in DOM
                 var unreads = [];
-                $(settings.content).find('[data-status="' + settings.itemUnread + '"]').each(function() {
-                    unreads.push(this.id.substr(2));
-                });
+                for (var id in messages) {
+                    var message = messages[id];
+                    if (message.status === settings.itemUnread) {
+                        unreads.push(id);
+                    }
+                }
 
                 send({ack : unreads});
-                return false;
             });
 
             // listen for alert open/close; we bind globally, but ignore anything not relevant to us
