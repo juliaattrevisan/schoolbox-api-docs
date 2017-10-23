@@ -171,14 +171,6 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                 $editing = false;
 
                 if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE && $this->getSitePage()->arg[2] == $this->getInstance()->getId()) {
-
-                    // Force content to show (when component is set to collapsed by default)
-                    $this->setVar([
-                        'CONFIG_COLLAPSED_ICON' => 'icon-up-arrow',
-                        'CONFIG_COLLAPSED_CLASS' => '',
-                        'CONFIG_COLLAPSED_STATE' => 'uncollapsed',
-                    ]);
-
                     if ($this->getSitePage()->arg[1] == 'textBoxModify') {
                         $editing = true;
                         $this->setVar([
@@ -193,6 +185,16 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                             'TEXTBOX_CATEGORY_ID' => $this->getSource()->getId(),
                         ]);
                     }
+
+                    if ($editing) {
+                        // Force content to show (when component is set to collapsed by default)
+                        $this->setVar([
+                            'CONFIG_COLLAPSED_ICON' => 'icon-up-arrow',
+                            'CONFIG_COLLAPSED_CLASS' => '',
+                            'CONFIG_COLLAPSED_STATE' => 'uncollapsed',
+                        ]);
+                    }
+
                     $this->parse('text_editable_block', 'text_editable');
                 } else {
                     // modify links
