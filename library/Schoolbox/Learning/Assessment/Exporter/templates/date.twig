@@ -1,7 +1,7 @@
-{%  if assessment is quiz %}
-    {% set large = 3 %}
-{% else %}
+{%  if (assessment is project or assessment is task) %}
     {% set large = 6 %}
+{% else %}
+    {% set large = 3 %}
 {% endif %}
 
 {% if dateType == 'publish' %}
