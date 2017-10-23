@@ -144,8 +144,12 @@ class Subscription implements ISubscription
             array_map(
                 function ($messageKey) {
                     try {
+                        $data = $this->syncClient->get($messageKey);
+                        if (!$data) {
+                            return false;
+                        }
                         return unserialize(
-                            gzuncompress($this->syncClient->get($messageKey)),
+                            gzuncompress($data),
                             ['allowed_classes' => [Instance::class, Param::class,],]
                         );
                     } catch (\ErrorException $e) {
