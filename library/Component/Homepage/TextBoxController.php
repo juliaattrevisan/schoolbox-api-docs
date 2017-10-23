@@ -183,6 +183,11 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                             'TEXTBOX_BODY' => '',
                             'TEXTBOX_ID' => '',
                             'TEXTBOX_CATEGORY_ID' => $this->getSource()->getId(),
+
+                            // Force content to show (when component is set to collapsed by default)
+                            'CONFIG_COLLAPSED_ICON' => 'icon-up-arrow',
+                            'CONFIG_COLLAPSED_CLASS' => '',
+                            'CONFIG_COLLAPSED_STATE' => 'uncollapsed',
                         ]);
                     }
                     $this->parse('text_editable_block', 'text_editable');
