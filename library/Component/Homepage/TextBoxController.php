@@ -205,12 +205,6 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                 $this->parse('source_folder_exists_block', 'source_folder_exists');
             }
 
-            /* Need title injected here
-             */
-            if ($editing) {
-                $this->getConfig()['collapse'] = false;
-            }
-
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && $this->getConfig('compactMode')) {
                 /* Remove headers */
                 $this->setVar('CONFIGURATION', '');
