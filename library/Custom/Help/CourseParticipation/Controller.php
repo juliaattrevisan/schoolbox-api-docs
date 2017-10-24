@@ -303,7 +303,7 @@ class Controller extends Base
                 try {
                     $user = $this->getUserMapper()->findOneByColumn('username', $emailAddress);
                 } catch (\Schoolbox\Mapper\Exception $e) {
-                    $failures[] = $emailAddress;
+                    $failures[$emailAddress] = true;
                     continue;
                 }
 
@@ -329,7 +329,7 @@ class Controller extends Base
 
         if ($failures) {
             $rs->status->setCode(207);
-            $rs->content->set($this->buildJsonOutput($failures));
+            $rs->content->set($this->buildJsonOutput(array_keys($failures)));
             return;
         }
 
