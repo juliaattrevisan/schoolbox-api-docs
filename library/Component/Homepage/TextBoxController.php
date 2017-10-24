@@ -81,10 +81,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
 
         $textBoxContent = Scrub::text($this->getTextbox()->getBody());
 
-        if (
-            $this->getSitePage()->arg[2] != $this->getInstance()->getId() and
-            (empty($this->getTextbox()->getId()) or empty($textBoxContent))
-        ) {
+        if ($this->getSitePage()->arg[2] != $this->getInstance()->getId() && (empty($this->getTextbox()->getId()) || empty($textBoxContent))) {
 
             $this->setBlock('empty_state', 'empty_custom', 'empty_custom_block');
             $this->setBlock('empty_state', 'empty_read_only', 'empty_read_only_block');
@@ -202,19 +199,21 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                 $this->parse('source_folder_exists_block', 'source_folder_exists');
             }
 
-            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && $this->getConfig('compactMode')) {
-                /* Remove headers */
-                $this->setVar('CONFIGURATION', '');
-                $this->setBlock($templateHandle, 'header', 'header_block');
-                $this->setBlock($templateHandle, 'dashboard_header', 'dashboard_header_block');
-                $this->setVar('header_block', '');
-                $this->setVar('dashboard_header_block', '');
-            }
 
             $this->parse('textbox_form_block', 'textbox_form');
         }
-        
+
         $this->parseConfig();
+
+        /* Hide Headings From Readonly Users
+         */
+        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && $this->getConfig('compactMode')) {
+            $this->setVar('CONFIGURATION', '');
+            $this->setBlock($templateHandle, 'header', 'header_block');
+            $this->setBlock($templateHandle, 'dashboard_header', 'dashboard_header_block');
+            $this->setVar('header_block', '');
+            $this->setVar('dashboard_header_block', '');
+        }
 
         return true; // everything went according to plan
     }
