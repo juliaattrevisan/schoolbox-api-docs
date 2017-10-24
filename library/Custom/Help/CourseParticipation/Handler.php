@@ -164,13 +164,4 @@ class Handler
         return $this->getUserMapper()->getJoinMapper('role');
     }
 
-
-    /**
-     * @return CampusMapper|Mapper
-     * @throws Mapper\DefinitionException
-     */
-    private function getCampusMapper()
-    {
-        return $this->getUserMapper()->getJoinMapper('userCampus');
-    }
 }
