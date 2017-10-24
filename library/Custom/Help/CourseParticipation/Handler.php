@@ -8,11 +8,8 @@
 
 namespace Custom\Help\CourseParticipation;
 
-use Alaress_Date_Format;
-use PDOException;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\SiteAccess;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -21,7 +18,6 @@ use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use UnexpectedValueException;
 
 class Handler
 {
