@@ -165,7 +165,8 @@ class Controller extends Base
                                             Recurrence::RECURRENCE_FORTNIGHTLY => 'Fortnightly',
                                             Recurrence::RECURRENCE_MONTHLY => 'Monthly',
                                             Recurrence::RECURRENCE_TIMETABLE => 'Timetable Based'
-                                        ],
+                                            ],
+                    'efficacySelf'      => EventRecurrenceMapper::EFFICACY_SELF,
                     'efficacySeries'    => EventRecurrenceMapper::EFFICACY_SERIES,
                 ],
             ]
@@ -688,6 +689,8 @@ class Controller extends Base
                     'campusList'        => $this->getCampusList(),
                     'cancelCallbackUrl' => $this->session->getHistory(),
                     'currentTerm'       => $this->getTermMapper()->findForToday(),
+                    'efficacySelf'      => EventRecurrenceMapper::EFFICACY_SELF,
+                    'efficacySeries'    => EventRecurrenceMapper::EFFICACY_SERIES,
                 ],
             ]
         );
