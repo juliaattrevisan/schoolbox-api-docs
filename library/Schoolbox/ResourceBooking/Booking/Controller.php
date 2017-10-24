@@ -165,7 +165,8 @@ class Controller extends Base
                                             Recurrence::RECURRENCE_FORTNIGHTLY => 'Fortnightly',
                                             Recurrence::RECURRENCE_MONTHLY => 'Monthly',
                                             Recurrence::RECURRENCE_TIMETABLE => 'Timetable Based'
-                                        ],
+                                            ],
+                    'efficacySelf'      => EventRecurrenceMapper::EFFICACY_SELF,
                     'efficacySeries'    => EventRecurrenceMapper::EFFICACY_SERIES,
                 ],
             ]
@@ -337,7 +338,7 @@ class Controller extends Base
                 $moderationId = $booking->getResource()->getModerationType()->getId();
                 $statusId     = $booking->getStatus()->getId();
 
-                if ($moderationId == (Item\ModerationType\Model::TYPE_MODERATED || Item\ModerationType\Model::TYPE_MANAGED) &&
+                if (($moderationId == Item\ModerationType\Model::TYPE_MODERATED || $moderationId == Item\ModerationType\Model::TYPE_MANAGED) &&
                     $statusId == Status\Model::STATUS_APPROVED &&
                     $isTimeChanged) {
                     $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING));
@@ -688,6 +689,8 @@ class Controller extends Base
                     'campusList'        => $this->getCampusList(),
                     'cancelCallbackUrl' => $this->session->getHistory(),
                     'currentTerm'       => $this->getTermMapper()->findForToday(),
+                    'efficacySelf'      => EventRecurrenceMapper::EFFICACY_SELF,
+                    'efficacySeries'    => EventRecurrenceMapper::EFFICACY_SERIES,
                 ],
             ]
         );

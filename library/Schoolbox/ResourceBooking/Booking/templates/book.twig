@@ -3,6 +3,7 @@
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 <script type="text/javascript" src="/javascript/components/jquery-validation/dist/additional-methods.js"></script>
 <script type="text/javascript">
+
 $(function() {
     // A global variable
     var momentFormat = dateDisplayFormats.momentJs;
@@ -96,9 +97,9 @@ $(function() {
     var cancelDialog = $('#dialog-bulk-cancel');
     var dialogs      = $().add(updateDialog).add(cancelDialog);
     dialogs
-        .on('click', '[data-efficacy="self"]', function(e) {
+        .on('click', '[data-efficacy="{{ efficacySelf }}"]', function(e) {
             e.preventDefault();
-            efficacyInput.val('self');
+            efficacyInput.val('{{ efficacySelf }}');
             dialogs.foundation('reveal', 'close');
             callback();
         })
@@ -337,7 +338,7 @@ $(function() {
             <input type="hidden" name="callbackUrl" value="{{ callbackUrl }}" />
 
             {# Inputs for editing bookings in a series #}
-            <input type="hidden" name="efficacy" value="self" />
+            <input type="hidden" name="efficacy" value="{{ efficacySelf }}" />
 
             {# Input for determining which action to run #}
             <input type="hidden" name="action" />
@@ -551,7 +552,7 @@ $(function() {
         </ul>
     </article>
     <ul class="flex-list buttons">
-        <li><a href="#" class="button" data-efficacy="self">Only this booking</a></li>
+        <li><a href="#" class="button" data-efficacy="{{ efficacySelf }}">Only this booking</a></li>
         <li><a href="#" class="button" data-efficacy="{{ efficacySeries }}">All bookings in the series</a></li>
         <li><a href="#" class="button" data-interaction="close">Cancel</a></li>
     </ul>
