@@ -4,6 +4,7 @@
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\Exporter;
 
 use Alaress\Web\Controller\Base as BaseController;
@@ -28,6 +29,7 @@ use Alaress_Date_Format;
  */
 class Controller extends BaseController
 {
+
     /**
      * @var Access
      */
@@ -43,13 +45,11 @@ class Controller extends BaseController
      */
     private $unitImplementationMapper;
 
-
     /** @var Replicator */
     private $replicator;
 
     /** @var AssessmentFilter\IdFinder */
     private $assessmentIdFinder;
-
 
     /**
      * Constructor
@@ -86,8 +86,9 @@ class Controller extends BaseController
      * GET vars:
      * * returnUrl: a URL to return to once done
      *
-     * @api GET /learning/export/assessment/:assessmentId
+     * @api   GET /learning/export/assessment/:assessmentId
      * @level 165
+     *
      * @param IAssessable $assessmentSpec
      */
     public function getExportForm(IAssessable $assessmentSpec)
@@ -106,18 +107,20 @@ class Controller extends BaseController
     /**
      * Processes the export assessment request.
      *
-     * @api POST /learning/export/assessment/:assessmentId
+     * @api   POST /learning/export/assessment/:assessmentId
      * @level 165
+     *
      * @param IAssessable $assessmentSpec
-     * @var string $_GET['returnUrl']            a URL to return to once done
-     * @var int[] $_POST['unitImplementation']   unit implementations to push this into.
+     *
+     * @var string        $_GET  ['returnUrl']            a URL to return to once done
+     * @var int[]         $_POST ['unitImplementation']   unit implementations to push this into.
      *                                           key:   unit implementation id
      *                                           value: true/false
      */
     public function postExport(IAssessable $assessmentSpec)
     {
-        $importedImplementations = $this->getRequest()->post->get('unitImplementation', []);
-        $importedImplementationDates =  $this->getRequest()->post->get('unit', []);
+        $importedImplementations     = $this->getRequest()->post->get('unitImplementation', []);
+        $importedImplementationDates = $this->getRequest()->post->get('unit', []);
 
         foreach ($this->retrieveUnitImplementationsForSpecification($assessmentSpec) as $unitImplData) {
             /** @var UnitImplementation $unitImpl */
@@ -134,12 +137,13 @@ class Controller extends BaseController
                 if (!$unitImplData['allowed']) {
                     // banhammer
                     $this->sendError('You do not have permission to write to the selected class', [], 403);
+
                     return;
                 }
 
-                $dates = $importedImplementationDates[$unitImpl->getId()];
+                $dates             = $importedImplementationDates[$unitImpl->getId()];
                 $expectedDateTypes = ['publish', 'open', 'due', 'close'];
-                $datesObjects = [];
+                $datesObjects      = [];
 
                 if (is_array($dates)) {
                     foreach ($expectedDateTypes as $dateType) {
@@ -175,7 +179,7 @@ class Controller extends BaseController
 
         // Redir back to the return URL (if set) or the course page if not
         if ($this->getRequest()->isXhr()) {
-            $this->getResponse()->content->set($this->buildJsonOutput([ Redirect::RETURN_URL => $returnUrl ]));
+            $this->getResponse()->content->set($this->buildJsonOutput([Redirect::RETURN_URL => $returnUrl]));
         } else {
             $this->getResponse()->redirect->afterPost($returnUrl);
         }
@@ -184,39 +188,37 @@ class Controller extends BaseController
     /**
      * Recursively export an AssessmentSpec to a new context
      *
-     * @param IAssessable                   $assessmentSpec
-     * @param AssessmentContext             $context
-     * @param Alaress_Date_Format|null      $publishDate
-     * @param Alaress_Date_Format|null      $openDate
-     * @param Alaress_Date_Format|null      $dueDate
-     * @param Alaress_Date_Format|null      $closeDate
+     * @param IAssessable              $assessmentSpec
+     * @param AssessmentContext        $context
+     * @param Alaress_Date_Format|null $publishDate
+     * @param Alaress_Date_Format|null $openDate
+     * @param Alaress_Date_Format|null $dueDate
+     * @param Alaress_Date_Format|null $closeDate
      *
      * @return IAssessable
      * @throws \Schoolbox\Mapper\Exception
      * @internal param null $dates
      *
      */
-    protected function exportToNewContext (
+    protected function exportToNewContext(
         IAssessable $assessmentSpec,
         AssessmentContext $context,
         Alaress_Date_Format $publishDate = null,
         Alaress_Date_Format $openDate = null,
         Alaress_Date_Format $dueDate = null,
         Alaress_Date_Format $closeDate = null
-    )
-    {
+    ) {
 
         if ($context instanceof UnitImplementation) {
             $publishDate = $publishDate ?? $context->getOpenDate();
-            $openDate = $openDate ?? $context->getOpenDate();
-            $dueDate = $dueDate ?? $context->getDueDate();
-            $closeDate = $closeDate ?? $context->getDueDate();
+            $openDate    = $openDate ?? $context->getOpenDate();
+            $dueDate     = $dueDate ?? $context->getDueDate();
+            $closeDate   = $closeDate ?? $context->getDueDate();
         } elseif ($context instanceof Project) {
             $publishDate = $publishDate ?? $context->getOpenAt();
-            $openDate = $openDate ?? $context->getOpenAt();
-            $dueDate = $dueDate ?? $context->getDueAt();
-            $closeDate = $closeDate ?? $context->getDueAt();
-
+            $openDate    = $openDate ?? $context->getOpenAt();
+            $dueDate     = $dueDate ?? $context->getDueAt();
+            $closeDate   = $closeDate ?? $context->getDueAt();
         } else {
             throw new \DomainException('Invalid context: ' . get_class($context));
         }
@@ -232,9 +234,9 @@ class Controller extends BaseController
         $assessmentImpl = $this->replicator->replicateInNewContext($assessmentSpec, $context, $this->getUser());
 
         // Recursive case
-        if($assessmentSpec instanceof Project){
+        if ($assessmentSpec instanceof Project) {
             /** @var Project $assessmentImpl */
-            foreach($assessmentSpec->getAssessables() as $subAssessmentSpec){
+            foreach ($assessmentSpec->getAssessables() as $subAssessmentSpec) {
                 $subAssessmentImpl = $this->exportToNewContext($subAssessmentSpec, $assessmentImpl);
                 $assessmentImpl->getAssessables()->add($subAssessmentImpl);
             }
@@ -247,6 +249,7 @@ class Controller extends BaseController
      * Helper method: retrieves unit implementations for a spec assessment
      *
      * @param IAssessable $assessment
+     *
      * @return array[] unit:     The unit implementation that this assessment's spec uses
      *                 allowed:  Is the current user allowed to import this?
      *                 imported: Is this assessment already imported?
@@ -275,7 +278,7 @@ class Controller extends BaseController
                 $this->getUser(),
                 $unitImplementation->getCourse()->getFolder()->getId()
             );
-            $isAllowed = $accessLevel >= UserAccess::ACCESS_WRITE;
+            $isAllowed   = $accessLevel >= UserAccess::ACCESS_WRITE;
 
             // Is $assessable imported into this unit yet?
             $isAlreadyImported = false;
@@ -299,7 +302,6 @@ class Controller extends BaseController
         return $result;
     }
 
-
     /**
      * Download a csv of assessment results for Accellerus
      *
@@ -312,18 +314,18 @@ class Controller extends BaseController
     {
         // Generate an updated csv
         $filename = sb_tempnam();
-        $file = fopen($filename, 'wb');
+        $file     = fopen($filename, 'wb');
         $exporter = new Exporter($this->assessmentIdFinder, $this->assessmentDataSource);
         $exporter->generate($file);
         fclose($file);
 
-        $now = date('Y-m-d-H-i-s');
+        $now         = date('Y-m-d-H-i-s');
         $newFilename = "results-{$now}.csv";
 
         // Force download/
         if (file_exists($filename)) {
 
-            $headers  = $this->getResponse()->headers;
+            $headers = $this->getResponse()->headers;
 
             // per header
             $headers->set('Content-Description', 'File Transfer');
@@ -338,11 +340,13 @@ class Controller extends BaseController
             $this->getResponse()->content->set([
                 'format'     => 'file',
                 'file'       => $filename,
-                'postOutput' => [function () use ($filename) {
-                    /* Delete the temp file
-                     */
-                    unlink($filename);
-                }]
+                'postOutput' => [
+                    function () use ($filename) {
+                        /* Delete the temp file
+                         */
+                        unlink($filename);
+                    },
+                ],
             ]);
         }
     }
