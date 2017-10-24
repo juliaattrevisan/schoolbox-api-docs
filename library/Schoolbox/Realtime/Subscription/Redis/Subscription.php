@@ -9,6 +9,7 @@
 namespace Schoolbox\Realtime\Subscription\Redis;
 
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\Parameter\Param;
 use InvalidArgumentException;
 use Redis;
 use Schoolbox\Realtime\Subscription\ISubscription;
@@ -139,9 +140,28 @@ class Subscription implements ISubscription
      */
     public function getUnread()
     {
-        return array_map(function ($messageKey) {
-            return unserialize(gzuncompress($this->syncClient->get($messageKey)));
-        }, $this->syncClient->sMembers($this->getSetIdentifier()));
+        return array_filter(
+            array_map(
+                function ($messageKey) {
+                    try {
+                        $data = $this->syncClient->get($messageKey);
+                        if (!$data) {
+                            return false;
+                        }
+                        return unserialize(
+                            gzuncompress($data),
+                            ['allowed_classes' => [Instance::class, Param::class,],]
+                        );
+                    } catch (\ErrorException $e) {
+                        return false;
+                    }
+                },
+                $this->syncClient->sMembers($this->getSetIdentifier())
+            ),
+            function ($item) {
+                return $item instanceof Instance;
+            }
+        );
     }
 
 }
