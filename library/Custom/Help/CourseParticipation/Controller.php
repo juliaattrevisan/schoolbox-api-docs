@@ -117,7 +117,7 @@ class Controller extends Base
      * @api   GET /api/course-participation/{schoolCode:\w+}/token
      * @level 170
      *
-     * @param $schoolCode
+     * @param string $schoolCode
      * @throws Mapper\Exception
      * @throws Mapper\Exception\Deleted
      */
