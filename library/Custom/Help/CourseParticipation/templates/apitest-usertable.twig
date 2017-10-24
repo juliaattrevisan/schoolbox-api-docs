@@ -1,0 +1,26 @@
+<table>
+    <thead>
+    <tr>
+        <th>&nbsp;</th>
+        {% for course in courses %}
+            <th>{{ course.folderName }}</th>
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+        {% for userId, username in users %}
+            <tr>
+                <th>{{ username }}</th>
+                {% for course in courses %}
+                    {% set enrolled = username in course.participants %}
+                    {% set name %}course[{{ course.folderId }}][{{ username }}]{% endset %}
+                    <td>
+                        <input type="hidden" name="course[{{ course.folderId }}][{{ username }}]" value="0" />
+                        <input id="{{ course.folderId }}-{{ userId }}" type="checkbox" name="course[{{ course.folderId }}][{{ username }}]" value="1"{% if enrolled %} checked{% endif %} />
+                        <label for="{{ course.folderId }}-{{ userId }}" class="checkbox-label"></label>
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

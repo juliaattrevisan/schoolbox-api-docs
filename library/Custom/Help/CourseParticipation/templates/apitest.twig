@@ -21,16 +21,16 @@
                 <code>INSERT INTO site_access VALUES ('my_code', sha1('my_code'));</code>
             </p>
         </section>
+        <div class="alert-box warning">
+            If you attempt to make requests against a server other than yourself, you'll need to make sure
+            that the school code and secret match on both servers.
+        </div>
         <form method="post" action="{{ routeLookup('helpCourseParticipation.postApiTest') }}">
             <section>
                 <fieldset class="content">
                     <legend>Register a User</legend>
                     <div class="small-12 columns">
-                        <p>
-                            If you attempt to POST against a server other than yourself, you'll need to make sure
-                            that the school code and secret match on both servers.
-                        </p>
-                        <label>Server to POST
+                        <label>Server
                             <input type="text" value="192.168.36.10" name="host" />
                         </label>
                         <label>School Code
@@ -47,6 +47,36 @@
             </section>
             <input type="submit" value="Register User" />
         </form>
+        <form method="post" action="#" id="enrolment-form">
+            <section>
+                <fieldset class="content">
+                    <legend>Enrol or Unenrol Users</legend>
+                    <div class="small-12 columns">
+                        <fieldset id="host">
+                            <label>Server
+                                <input id="enrolment-host-name" type="text" value="192.168.36.10" name="host" />
+                            </label>
+                            <div class="long switch">
+                                <input id="enrolment-host-https" type="checkbox" value="1" />
+                                <label for="enrolment-host-https">
+                                    <span>HTTPS</span>
+                                    <span>HTTP</span>
+                                </label>
+                            </div>
+                        </fieldset>
+
+                        <div id="user-list">
+                            <p>Load users for:</p>
+                            {% for code in codes %}
+                                <button data-load-users value="{{ code.siteSchoolCode }}">{{ code.siteSchoolCode }}</button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </fieldset>
+            </section>
+            <input id="submit-enrolment" type="submit" value="Update Enrolments" class="hide" />
+        </form>
+
 {% else %}
         <div class="empty-state">
             <i class="icon-info"></i>
@@ -58,3 +88,90 @@
 {% endif %}
     </div>
 </div>
+<script>
+    $(function () {
+        var tokenGetRoute      = "{{ routeLookup('helpCourseParticipation.refreshToken') }}";
+        var enrolmentGetRoute  = "{{ routeLookup('helpCourseParticipation.getApiTestEnrolmentTable') }}";
+        var enrolmentPostRoute = "{{ routeLookup('helpCourseParticipation.postFolderAccessBySchool') }}";
+
+        var $submit   = $('#submit-enrolment');
+        var $ul       = $('#user-list');
+        var $host     = $('#host');
+        var $hostname = $('#enrolment-host-name');
+        var $scheme   = $('#enrolment-host-https');
+        var $form     = $('#enrolment-form');
+
+        $form.on('submit', function (e) {
+            e.preventDefault();
+
+            var schoolCode = $form.data('schoolCode');
+
+            var data = $(this).serialize();
+
+            fetch(getServer() + tokenGetRoute, schoolCode).done(function (auth) {
+                $.ajax($form.attr('action') + '?' + $.param(auth), {
+                    method: $form.attr('method'),
+                    data: data
+                }).done(function () {
+                    loadEnrolments(schoolCode);
+                }).fail(function (xhr, status, reason) {
+                    console.log(reason);
+                });
+            });
+        });
+
+        $ul.on('click', '[data-load-users]', function (e) {
+            e.preventDefault();
+            loadEnrolments($(this).val());
+        });
+
+        function loadEnrolments(schoolCode)
+        {
+            var host   = $hostname.val();
+            var server = getServer();
+
+            $host.attr('disabled', true);
+
+            $ul.html('<p>Getting a fresh token for ' + schoolCode + ' from ' + host + '&hellip;</p>');
+
+            fetch(server + tokenGetRoute, schoolCode).done(function (auth) {
+                $ul.html('<p>Getting enrolment data for ' + schoolCode + ' from ' + host + '&hellip;</p>');
+
+                fetch(server + enrolmentGetRoute, schoolCode, auth).done(function (tableHtml) {
+                    $ul.html(tableHtml);
+
+                    $submit.removeClass('hide');
+
+                    $form.attr('action', server + enrolmentPostRoute.replace('{schoolCode}', schoolCode));
+                    $form.attr('data-school-code', schoolCode);
+
+                }).fail(function (xhr, status, reason) {
+                    $ul.html('<p>Enrolment fetch failed: '+reason+'. <button data-load-users value="' + schoolCode + '">Try again</button></p>');
+                    $host.attr('disabled', false);
+                });
+
+            }).fail(function (xhr, status, reason) {
+                $ul.html('<p>Token fetch failed: '+reason+'. <button data-load-users value="' + schoolCode + '">Try again</button></p>');
+                $host.attr('disabled', false);
+            });
+        }
+
+
+        function fetch(route, schoolCode, data) {
+            if (schoolCode === undefined) {
+                throw "School code is undefined";
+            }
+
+            return $.get(route.replace('{schoolCode}', schoolCode), data);
+        }
+
+
+        function getServer() {
+            var host   = $hostname.val();
+            var scheme = $scheme.prop('checked') ? 'https://' : 'http://';
+
+            return scheme + host;
+        }
+
+    });
+</script>

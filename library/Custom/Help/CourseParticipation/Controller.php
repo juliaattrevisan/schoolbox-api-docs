@@ -11,15 +11,19 @@ namespace Custom\Help\CourseParticipation;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Aura\Di\Exception\ServiceNotFound;
+use Aura\Web\Request\Values;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Psr7\Response;
 use PDOException;
 use Schoolbox\CampusMapper;
+use Schoolbox\Collection;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\SiteAccess;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -110,6 +114,27 @@ class Controller extends Base
 
 
     /**
+     * @api   GET /api/course-participation/{schoolCode:\w+}/token
+     * @level 170
+     *
+     * @param string $schoolCode
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
+     */
+    public function refreshToken($schoolCode)
+    {
+        $now = Alaress_Date_Format::now();
+
+        $code = $this->tokenMapper->findById($schoolCode);
+        $token = $this->computeAccessToken($now, $schoolCode, $code->getAccessToken());
+
+        $this->getResponse()->content->set($this->buildJsonOutput([
+            'ts'    => $now->getUnixTimeStamp(),
+            'token' => $token
+        ]));
+    }
+
+    /**
      * @api   POST /api/course-participation/apitest
      * @level 170
      */
@@ -156,6 +181,42 @@ class Controller extends Base
 
 
     /**
+     * @api   GET /api/course-participation/ecc
+     * @level 170
+     *
+     * @param string $schoolCode
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
+     */
+    public function getApiTestEnrolmentTable($schoolCode)
+    {
+        $rq = $this->getRequest();
+        $rs = $this->getResponse();
+
+        if ($this->isInvalidAuth($rq->query, $schoolCode)) {
+            return;
+        }
+
+        $h = new Handler(
+            $this->userAccessMapper,
+            $this->tokenMapper,
+            $this->folderMapper,
+            $this->passwordMailService
+        );
+
+        $registeredUsers = $h->getUsersBySchool($schoolCode);
+
+        $enrolments = $h->getFolderAccessBySchool($schoolCode);
+
+        $rs->content->set($this->buildUnthemedHtmlOutput('@helpCourseParticipation/apitest-usertable.twig', [
+            'courses' => $enrolments,
+            'users'   => $registeredUsers
+        ]));
+    }
+
+
+    /**
      * @param string $schoolCode
      * @throws ServiceNotFound
      * @throws Mapper\Exception
@@ -167,48 +228,112 @@ class Controller extends Base
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        $requestTimestamp = new Alaress_Date_Format($rq->query->get('ts', 0), Alaress_Date_Format::TIMESTAMP);
-
-        $authDigest = $rq->query->get('token', '');
-
-        $responseCode = $this->getResponseCode($schoolCode, $requestTimestamp, $authDigest);
-
-        if ($responseCode !== 200) {
-            // if the request didn't pass the gauntlet, bounce the request
-            $this->sendGenericStatus($responseCode);
+        if ($this->isInvalidAuth($rq->query, $schoolCode)) {
             return;
         }
 
-
         // ok, if you're here, you can see the thing.
         try {
-            $folder = $this->folderMapper->findById(
-                $this->codeMapper->findOneByColumn('code', $schoolCode)->getFolder()->getId()
+            $rs->content->set(
+                $this->buildJsonOutput(
+                    (new Handler(
+                        $this->userAccessMapper,
+                        $this->tokenMapper,
+                        $this->folderMapper,
+                        $this->passwordMailService
+                    ))->getFolderAccessBySchool($schoolCode)
+                )
             );
-
         } catch (Mapper\Exception $e) {
             $this->sendGenericStatus(404);
             return;
         }
-
-        $payload = [];
-
-        // obtain all direct descendants of this folder
-        // the scope of implementation is immediate children only, rather than attempting to gather all descendants
-        $courses = $this->folderMapper->findByParentId($folder->getId());
+    }
 
 
-        foreach ($courses as $course) {
-            $participants = $this->userAccessMapper->findUsersInCategory($course)->getColumnValues('email');
+    /**
+     * @api   POST /api/course-participation/{schoolCode}/courses
+     * @level 170
+     *
+     * @param string $schoolCode
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
+     * @throws \Aura\Web\Exception\InvalidStatusCode
+     */
+    public function postFolderAccessBySchool($schoolCode)
+    {
+        $rq = $this->getRequest();
+        $rs = $this->getResponse();
 
-            $payload[] = [
-                'folderName'   => $course->getName(),
-                'folderId'     => $course->getId(),
-                'participants' => array_filter($participants)
-            ];
+        if ($this->isInvalidAuth($rq->query, $schoolCode)) {
+            return;
         }
 
-        $rs->content->set($this->buildJsonOutput($payload));
+        $post = $rq->post;
+
+        if (empty($post['course'])) {
+            // empty payload: do nothing
+            $this->sendGenericStatus(400);
+            return;
+        }
+
+        $courses   = $this->getCoursesBySchool($schoolCode);
+        $courseIds = $courses->getColumnValues('id');
+
+        $failures = [];
+
+        /*
+         * Business rule: POST payload is expected to contain a data struct that provides:
+         *   - for a particular folder ID
+         *       - a list of email addresses to enrol into that folder
+         *       - a list of email addresses to unenrol from that folder
+         */
+
+        foreach ($post['course'] as $folderId => $enrolments) {
+            if (!in_array($folderId, $courseIds)) {
+                /*
+                 * Business rule: A request that specifies folder IDs that do not belong to the school given returns 403
+                 */
+                $this->sendGenericStatus(403);
+                return;
+            }
+
+            foreach ($enrolments as $emailAddress => $enrol) {
+                try {
+                    $user = $this->getUserMapper()->findOneByColumn('username', $emailAddress);
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $failures[$emailAddress] = true;
+                    continue;
+                }
+
+                if ($enrol) {
+                    // add this user to this folder
+                    $this->userAccessMapper->create(
+                        $this->userAccessMapper->createModel()
+                            ->setUser($user)
+                            ->setAccessLevel(UserAccess::ACCESS_READ)
+                            ->setService(UserAccess::SERVICE_HOMEPAGE)
+                            ->setServiceIdentifier($folderId)
+                    );
+                } else {
+                    // remove this user from this folder
+                    $this->userAccessMapper->deleteByColumnList([
+                        'uid' => $user->getId(),
+                        'service' => UserAccess::SERVICE_HOMEPAGE,
+                        'sid' => $folderId,
+                    ]);
+                }
+            }
+        }
+
+        if ($failures) {
+            $rs->status->setCode(207);
+            $rs->content->set($this->buildJsonOutput(array_keys($failures)));
+            return;
+        }
+
+        $this->sendGenericStatus(204);
     }
 
 
@@ -224,30 +349,20 @@ class Controller extends Base
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        $requestTimestamp = new Alaress_Date_Format($rq->query->get('ts', 0), Alaress_Date_Format::TIMESTAMP);
-
-        $authDigest = $rq->query->get('token', '');
-
-        $responseCode = $this->getResponseCode($schoolCode, $requestTimestamp, $authDigest);
-
-        if ($responseCode !== 200) {
-            // if the request didn't pass the gauntlet, bounce the request
-            $this->sendGenericStatus($responseCode);
+        if ($this->isInvalidAuth($rq->query, $schoolCode)) {
             return;
         }
 
-        // show the list of users for this school
-        // filter to the list of users whose external IDs are prefixed with the given school code
-        $predicate = $this->getUserMapper()->getPredicateBuilder()->like('synergy_id', "{$schoolCode}.%");
-
-        // we only need the external ID itself, so bypass object hydration
-        $externalIds = $this->getUserMapper()->findScalarByPredicates('synergy_id', $predicate);
-
-        $unprefixed = array_map(function ($id) use ($schoolCode) {
-            return str_replace("{$schoolCode}.", '', $id);
-        }, $externalIds);
-
-        $rs->content->set($this->buildJsonOutput($unprefixed));
+        $rs->content->set(
+            $this->buildJsonOutput(
+                (new Handler(
+                    $this->userAccessMapper,
+                    $this->tokenMapper,
+                    $this->folderMapper,
+                    $this->passwordMailService
+                ))->getUsersBySchool($schoolCode)
+            )
+        );
     }
 
 
@@ -274,15 +389,7 @@ class Controller extends Base
             return;
         }
 
-        $requestTimestamp = new Alaress_Date_Format($rq->query->get('ts', 0), 'U');
-
-        $authDigest = $rq->query->get('token', '');
-
-        $responseCode = $this->getResponseCode($schoolCode, $requestTimestamp, $authDigest);
-
-        if ($responseCode !== 200) {
-            // if the request didn't pass the gauntlet, bounce the request
-            $this->sendGenericStatus($responseCode);
+        if ($this->isInvalidAuth($rq->query, $schoolCode)) {
             return;
         }
 
@@ -375,7 +482,6 @@ class Controller extends Base
         } else {
             // everything went fine, nothing to respond with
             $this->sendGenericStatus(204);
-            $rs->content->set($this->buildJsonOutput(null));
         }
     }
 
@@ -393,6 +499,48 @@ class Controller extends Base
             }
         }
 
+        return true;
+    }
+
+
+    /**
+     * @param string $schoolCode
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
+     * @return Collection|IFolder[]
+     */
+    private function getCoursesBySchool($schoolCode)
+    {
+        // ok, if you're here, you can see the thing.
+        $folder = $this->folderMapper->findById(
+            $this->codeMapper->findOneByColumn('code', $schoolCode)->getFolder()->getId()
+        );
+
+        // obtain all direct descendants of this folder
+        // the scope of implementation is immediate children only, rather than attempting to gather all descendants
+        return $this->folderMapper->findByParentId($folder->getId());
+    }
+
+
+    /**
+     * @param Values $query
+     * @param string $schoolCode
+     * @return bool
+     */
+    private function isInvalidAuth(Values $query, $schoolCode)
+    {
+        $requestTimestamp = new Alaress_Date_Format($query->get('ts', 0), Alaress_Date_Format::TIMESTAMP);
+
+        $authDigest = $query->get('token', '');
+
+        $responseCode = $this->getResponseCode($schoolCode, $requestTimestamp, $authDigest);
+
+        if ($responseCode === 200) {
+            return false;
+        }
+
+        // if the request didn't pass the gauntlet, bounce the request
+        $this->sendGenericStatus($responseCode);
         return true;
     }
 
@@ -453,7 +601,10 @@ class Controller extends Base
         $r = new Response($code);
 
         $this->getResponse()->status->set($r->getStatusCode());
-        $this->getResponse()->content->set($this->buildJsonOutput($r->getReasonPhrase()));
+
+        $content = $code === 204 ? null : $this->buildJsonOutput($r->getReasonPhrase());
+
+        $this->getResponse()->content->set($content);
     }
 
 

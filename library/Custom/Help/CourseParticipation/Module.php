@@ -43,7 +43,11 @@ class Module extends Alaress\Module\Module
 
         $this->register('GET', '/apitest', 'getApiTest', $alaressOnly);
         $this->register('POST', '/apitest', 'postApiTest', $alaressOnly);
+        $this->register('GET', '/{schoolCode:\w+}/token', 'refreshToken', $alaressOnly);
+        $this->register('GET', '/{schoolCode:\w+}', 'getApiTestEnrolmentTable', $alaressOnly);
+
         $this->register('GET', '/{schoolCode:\w+}/courses', 'getFolderAccessBySchool');
+        $this->register('POST', '/{schoolCode:\w+}/courses', 'postFolderAccessBySchool');
         $this->register('GET', '/{schoolCode:\w+}/users', 'getUsersBySchool');
         $this->register('POST', '/{schoolCode:\w+}/users', 'postUserRegistrations');
     }
