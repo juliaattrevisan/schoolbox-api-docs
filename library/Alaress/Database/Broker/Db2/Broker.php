@@ -11,7 +11,6 @@
 namespace Alaress\Database\Broker\Db2;
 
 use Alaress\Database\Broker\Base;
-use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Exception;
 use Alaress\Database\Iterator\Db2\Iterator;
 use Alaress\Database\Quoter\Db2\Quoter as Db2Quoter;
@@ -21,7 +20,7 @@ use Alaress\Database\Wrapper\Db2\PDO;
 use Alaress\DebugBar\Instance as DebugBar;
 use DebugBar\DataCollector\DataCollectorInterface;
 
-class Broker extends Base implements IBroker
+class Broker extends Base
 {
     // These return DB2 specific statement objects
 

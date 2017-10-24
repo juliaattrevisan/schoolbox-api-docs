@@ -10,10 +10,9 @@
 
 namespace Alaress\Database\Iterator\Dblib;
 
-use Alaress\Database\Iterator\IIterator;
 use Alaress\Database\Iterator\Base;
 
-class Iterator extends Base implements IIterator
+class Iterator extends Base
 {
     /**
      * @inheritdoc
