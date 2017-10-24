@@ -396,13 +396,25 @@
                                                     <!-- Collapsable content -->
                                                     <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-contact-{{ i }}">
                                                         <div class="list-item">
-                                                            <div class="card no-pad small-12">
-                                                                <span class="icon-home size-32"></span>
+                                                            <div class="small-12">
                                                                 {% if contact.StudentContactAddress1 or contact.StudentContactAddress2 or contact.StudentContactAddress3 %}
-                                                                    <p>{{ contact.StudentContactAddress1 }}</p>
-                                                                    <p>{{ contact.StudentContactAddress2 }}</p>
-                                                                    <p>{{ contact.StudentContactAddress3 }}</p>
-                                                                    <p>{{ contact.StudentContactSuburb }}, {{ contact.StudentContactState }} {{ contact.StudentContactPostCode }}</p>
+                                                                    <div class="row">
+                                                                        <div class="column small-12 medium-5"><strong>Address:</strong></div>
+                                                                        <div class="column small-12 medium-7">
+                                                                            <p>
+                                                                                {% if contact.StudentContactAddress1 %}
+                                                                                    {{ contact.StudentContactAddress1 }}<br/>
+                                                                                {% endif %}
+                                                                                {% if contact.StudentContactAddress2 %}
+                                                                                    {{ contact.StudentContactAddress2 }}<br/>
+                                                                                {% endif %}
+                                                                                {% if contact.StudentContactAddress3 %}
+                                                                                    {{ contact.StudentContactAddress3 }}<br/>
+                                                                                {% endif %}
+                                                                                {{ contact.StudentContactSuburb }}, {{ contact.StudentContactState }} {{ contact.StudentContactPostCode }}
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
                                                                 {% endif %}
                                                             </div>
                                                         </div>
