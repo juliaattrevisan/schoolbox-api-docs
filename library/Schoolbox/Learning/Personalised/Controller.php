@@ -9,10 +9,9 @@ namespace Schoolbox\Learning\Personalised;
 
 use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\DataModel\Translator as AssessmentTranslator;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -39,20 +38,28 @@ class Controller extends Base
     protected $participantMapper;
 
     /**
+     * @var AssessmentTranslator
+     */
+    protected $assessmentTranslator;
+
+    /**
      * Constructor
      *
      * @param FolderMapper         $folderMapper
      * @param AssessmentDataSource $assessmentDataSource
      * @param Participant\Mapper   $participantMapper
+     * @param AssessmentTranslator $assessmentTranslator
      */
     public function __construct(
         FolderMapper $folderMapper,
         AssessmentDataSource $assessmentDataSource,
-        Participant\Mapper $participantMapper
+        Participant\Mapper $participantMapper,
+        AssessmentTranslator $assessmentTranslator
     ) {
         $this->folderMapper         = $folderMapper;
         $this->assessmentDataSource = $assessmentDataSource;
         $this->participantMapper    = $participantMapper;
+        $this->assessmentTranslator = $assessmentTranslator;
     }
 
     /**
@@ -260,7 +267,7 @@ class Controller extends Base
 
         // All is valid - save the participation
         $participant = $this->participantMapper->createModel()
-            ->setAssessment($assessment)
+            ->setAssessment($this->assessmentTranslator->translateToDataModel($assessment)->getAssessmentModel())
             ->setStudent($student)
             // Set open and due of participation to start/end of day,
             // as that's how an assessment's dates should be if imported

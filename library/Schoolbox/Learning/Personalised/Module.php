@@ -97,6 +97,7 @@ class Module extends BaseModule
                     'folderMapper'         => $this->getMapperFactory()->getLazy(FolderMapper::class),
                     'assessmentDataSource' => $injector->lazyGet('assessmentDataSource'),
                     'participantMapper'    => $this->getParticipantMapper(),
+                    'assessmentTranslator' => $injector->lazyGet('assessmentTranslator'),
                 ]
             )
         );
