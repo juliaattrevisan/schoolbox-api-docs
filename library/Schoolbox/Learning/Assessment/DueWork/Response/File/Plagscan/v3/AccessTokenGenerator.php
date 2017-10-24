@@ -13,6 +13,7 @@
  */
 
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3;
+
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Client;
 
@@ -73,28 +74,27 @@ class AccessTokenGenerator
     public function generate()
     {
         // Check if the token is cached and return that, otherwise generate a new one and cace
-        if(!empty($accessToken = $this->getAccessToken())) {
+        if (!empty($accessToken = $this->getAccessToken())) {
             return $accessToken;
         }
 
         $postData = [
-            'grant_type' => 'client_credentials',
-            'client_id' => $this->getClientId(),
-            'client_secret' => $this->getApiKey()
+            'grant_type'    => 'client_credentials',
+            'client_id'     => $this->getClientId(),
+            'client_secret' => $this->getApiKey(),
         ];
 
         $client = new Client([
-            "base_uri" => $this->getApiUrl(),
-            "timeout" => 2.0,
-            "http_errors" => false
+            "base_uri"    => $this->getApiUrl(),
+            "timeout"     => 2.0,
+            "http_errors" => false,
         ]);
 
         try {
             $response = $client->post('token', [
-                'form_params' => $postData
+                'form_params' => $postData,
             ]);
-        }
-        catch (TransferException $e) {
+        } catch (TransferException $e) {
             throw new \RuntimeException('Error: Plagscan unavailable. Could not generate access token.');
         }
 
@@ -121,7 +121,8 @@ class AccessTokenGenerator
      *
      * @param $accessToken
      */
-    private function setAccessToken($accessToken) {
+    private function setAccessToken($accessToken)
+    {
         $this->accessToken = $accessToken;
         $this->accessTokenTime = time();
     }
@@ -131,9 +132,10 @@ class AccessTokenGenerator
      *
      * @return string
      */
-    private function getAccessToken() {
-        if(!empty($this->accessToken)) {
-            if (time() < ($this->accessTokenTime + $this->accessTokenExpiry) ) {
+    private function getAccessToken()
+    {
+        if (!empty($this->accessToken)) {
+            if (time() < ($this->accessTokenTime + $this->accessTokenExpiry)) {
                 return $this->accessToken;
             }
         }
