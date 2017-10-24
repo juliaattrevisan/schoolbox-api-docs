@@ -9,12 +9,27 @@ use Alaress\Database\Iterator\IIterator;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\External\Event;
 use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\Calendar\EventType;
+use Schoolbox\External\Connector\IExternalEvents;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Calendar\EventType;
-use \Schoolbox\External\Connector\IExternalEvents;
 
 class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventType_Abstract {
+
+    /**
+     * Default id for an event type that was chosen in admin, but doesn't exist anymore
+     *
+     * @var int
+     */
+    const DEFAULT_EVENTTYPE_ID = 1;
+
+    /**
+     * A string to indicate the source from which this event emerged
+     *
+     * @var string
+     */
+    const EXTERNAL_EVENT_TYPE = 'external';
 
     /**
      * An external event handler instance
@@ -29,6 +44,11 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
     protected $eventTypeMapper;
 
     /**
+     * @var UserMapper
+     */
+    protected $userMapper;
+
+    /**
      * Constructor
      *
      * @param User $user
@@ -39,15 +59,17 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
         $this->setUser($user);
         $this->externalEvents = $externalEvents;
         $this->setEventTypeMapper(EventTypeMapper::getInstance());
+        $this->setUserMapper(UserMapper::getInstance());
     }
+
 
     /**
      * Get events from this data source
      *
      * @param int $startTimestamp
      * @param int $endTimestamp
-     *
-     * @return \Calendar\Event\Collection
+     * @return Collection
+     * @throws MapperException
      */
     public function getEvents($startTimestamp, $endTimestamp) {
 
@@ -60,36 +82,50 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
             return $stack;
         }
 
-        // Figure out event type
+        // Figure out default event type
         try {
             /** @var Calendar_Api_Config_Record $config */
-            $config        = $this->loadConnectorConfiguration();
+            $config = $this->loadConnectorConfiguration();
             $decodedConfig = $config->decodeConfig();
-            $eventType     = $decodedConfig->getLuEventType();
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            $eventType = 1;
-        }
-
-        $eventColor = null;
-        try {
-            /** @var EventType $eventTypeObject */
-            $eventTypeObject = $this->getEventTypeMapper()->findById($eventType);
-            $eventColor      = $eventTypeObject->getColor();
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            // noop
+            $defaultEventType = $decodedConfig->getLuEventType();
+        } catch (MapperException $e) {
+            $defaultEventType = self::DEFAULT_EVENTTYPE_ID;
         }
 
         foreach ($externalEvents as $externalEvent) {
-
             $event = new Event();
             $event->setEventId($externalEvent['id']);
-            $event->setType($eventType);
+
+            /* Connector-specific event type mapping
+             *
+             * Assume $externalEvent['type'] to be the truth and try to match its value to a luEventType
+             *
+             * If $externalEvent['type'] cannot be found, use the calendar configuration value that we chose in admin
+             *
+             * If THAT option didn't exist (i.e. deleted after chosen) then just default to DEFAULT_EVENTTYPE_ID
+             */
+            try {
+                $eventType = $this->getEventTypeMapper()->findOneByColumn('eventType', $externalEvent['type'])->getId();
+                $event->setType($eventType);
+            } catch (MapperException $e) {
+                $event->setType($defaultEventType);
+            }
+
+            /* All other event details
+             */
             $event->setTitle($externalEvent['title']);
             $event->setIsEditable(false);
-            $event->setStartTime(new Alaress_Date_Format($externalEvent['start'], 'Y-m-d H:i:s'));
-            $event->setEndTime(new Alaress_Date_Format($externalEvent['finish'], 'Y-m-d H:i:s'));
+            $event->setStartTime(new Alaress_Date_Format($externalEvent['start'], Alaress_Date_Format::DATABASE_FORMAT));
+            $event->setEndTime(new Alaress_Date_Format($externalEvent['finish'], Alaress_Date_Format::DATABASE_FORMAT));
+
             // Publish date is not available in Synergetic Staff Scheduler, but may be available elsewhere
-            $event->setPublishDate(empty($externalEvent['publish']) ? '' : new Alaress_Date_Format($externalEvent['finish'], 'Y-m-d H:i:s'));
+            if (empty($externalEvent['publish'])) {
+                $publishDate = '';
+            } else {
+                $publishDate = new Alaress_Date_Format($externalEvent['finish'], Alaress_Date_Format::DATABASE_FORMAT);
+            }
+
+            $event->setPublishDate($publishDate);
 
             //Where is the best place to format this? TODO
             $eventDetail = '';
@@ -102,16 +138,41 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
             if(strlen($eventDetail) > 0) {
                 $event->setDetail('<p>'.$eventDetail.'</p>');
             }
-            $event->setLocation(strlen($externalEvent['location']) > 0 ? $externalEvent['location'] : $externalEvent['room']);
 
-            $event->setEventType('external');
+            /* Determine event location
+             */
+            if (strlen($externalEvent['location'])) {
+                $location = $externalEvent['location'];
+            }
+            else {
+                $location = $externalEvent['room'];
+            }
+
+            $event->setLocation($location);
+
+            $event->setEventType(self::EXTERNAL_EVENT_TYPE);
             $event->setAllday(false);
 
-            $owner = UserMapper::getInstance()->findByExternalId($externalEvent['owner']);
+            /* If you can't find this user by external id, assume unknown
+             */
+            try {
+                $owner = $this->getUserMapper()->findByExternalId($externalEvent['owner']);
+            } catch (MapperException $e) {
+                $owner = $this->getUserMapper()->getUnknownUser();
+            }
+
             $event->setAuthorId($externalEvent['owner']);
             $event->setAuthorName($owner->formatName());
 
-            $event->setColour($eventColor);
+            /* Assign event colours - rely on cache, sorry :/
+             */
+            try {
+                /** @var EventType $eventTypeObject */
+                $eventTypeObject = $this->getEventTypeMapper()->findById($event->getType());
+                $event->setColour($eventTypeObject->getColor());
+            } catch (MapperException $e) {
+                $event->setColour(null);
+            }
 
             $event->setConnectorId($this->getConnectorId());
 
@@ -131,10 +192,12 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
         return '';
     }
 
+
     /**
      * Helper method for loading this event type's calendar connector config.
-     *
      * @return Calendar_Api_Config_Record|object
+     * @throws MapperException
+     * @throws MapperException\Deleted
      */
     public function loadConnectorConfiguration() {
         return Calendar_Api_Config_Mapper::getInstance()->findById(
@@ -156,5 +219,25 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      */
     public function getEventTypeMapper() {
         return $this->eventTypeMapper;
+    }
+
+
+    /**
+     * @return UserMapper
+     */
+    private function getUserMapper(): UserMapper
+    {
+        return $this->userMapper;
+    }
+
+
+    /**
+     * @param UserMapper $userMapper
+     * @return $this
+     */
+    private function setUserMapper(UserMapper $userMapper)
+    {
+        $this->userMapper = $userMapper;
+        return $this;
     }
 }
