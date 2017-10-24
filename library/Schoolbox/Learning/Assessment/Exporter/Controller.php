@@ -138,8 +138,27 @@ class Controller extends BaseController
                 }
 
                 $dates = $importedImplementationDates[$unitImpl->getId()];
+                $expectedDateTypes = ['publish', 'open', 'due', 'close'];
+                $datesObjects = [];
 
-                $this->exportToNewContext($assessmentSpec, $unitImpl, $dates);
+                if (is_array($dates)) {
+                    foreach ($expectedDateTypes as $dateType) {
+                        try {
+                            $datesObjects[$dateType] = Alaress_Date_Format::newLocal($dates[$dateType]);
+                        } catch (Exception $e) {
+                            // banhammer
+                        }
+                    }
+                }
+
+                $this->exportToNewContext(
+                    $assessmentSpec,
+                    $unitImpl,
+                    $datesObjects['publish'],
+                    $datesObjects['open'],
+                    $datesObjects['due'],
+                    $datesObjects['close']
+                );
             }
         }
 
@@ -165,47 +184,38 @@ class Controller extends BaseController
     /**
      * Recursively export an AssessmentSpec to a new context
      *
-     * @param IAssessable       $assessmentSpec
-     * @param AssessmentContext $context
-     * @param null              $dates
+     * @param IAssessable                   $assessmentSpec
+     * @param AssessmentContext             $context
+     * @param Alaress_Date_Format|null      $publishDate
+     * @param Alaress_Date_Format|null      $openDate
+     * @param Alaress_Date_Format|null      $dueDate
+     * @param Alaress_Date_Format|null      $closeDate
      *
      * @return IAssessable
      * @throws \Schoolbox\Mapper\Exception
+     * @internal param null $dates
+     *
      */
     protected function exportToNewContext (
         IAssessable $assessmentSpec,
         AssessmentContext $context,
-        $dates = null
+        Alaress_Date_Format $publishDate = null,
+        Alaress_Date_Format $openDate = null,
+        Alaress_Date_Format $dueDate = null,
+        Alaress_Date_Format $closeDate = null
     )
     {
 
-        $publish = null;
-        $open = null;
-        $due = null;
-        $close = null;
-
-        if (is_array($dates)) {
-            foreach ($dates as $field => $value) {
-                if ($value) {
-                    try {
-                        $$field = Alaress_Date_Format::newLocal($value);
-                    } catch (Exception $e) {
-                        // baaaang
-                    }
-                }
-            }
-        }
-
         if ($context instanceof UnitImplementation) {
-            $publishDate = $publish ?? $context->getOpenDate();
-            $openDate = $open ?? $context->getOpenDate();
-            $dueDate = $due ?? $context->getDueDate();
-            $closeDate = $close ?? $context->getDueDate();
+            $publishDate = $publishDate ?? $context->getOpenDate();
+            $openDate = $openDate ?? $context->getOpenDate();
+            $dueDate = $dueDate ?? $context->getDueDate();
+            $closeDate = $closeDate ?? $context->getDueDate();
         } elseif ($context instanceof Project) {
-            $publishDate = $publish ?? $context->getOpenAt();
-            $openDate = $publish ?? $context->getOpenAt();
-            $dueDate   = $due ?? $context->getDueAt();
-            $closeDate   = $due ?? $context->getDueAt();
+            $publishDate = $publishDate ?? $context->getOpenAt();
+            $openDate = $openDate ?? $context->getOpenAt();
+            $dueDate = $dueDate ?? $context->getDueAt();
+            $closeDate = $closeDate ?? $context->getDueAt();
 
         } else {
             throw new \DomainException('Invalid context: ' . get_class($context));
