@@ -338,7 +338,7 @@ class Controller extends Base
                 $moderationId = $booking->getResource()->getModerationType()->getId();
                 $statusId     = $booking->getStatus()->getId();
 
-                if ($moderationId == (Item\ModerationType\Model::TYPE_MODERATED || Item\ModerationType\Model::TYPE_MANAGED) &&
+                if (($moderationId == Item\ModerationType\Model::TYPE_MODERATED || $moderationId == Item\ModerationType\Model::TYPE_MANAGED) &&
                     $statusId == Status\Model::STATUS_APPROVED &&
                     $isTimeChanged) {
                     $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING));
