@@ -76,8 +76,6 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             return $this->renderSourceUnavailableTwig($templateHandle);
         }
 
-        $this->parseConfig();
-
         $this->setBlock($templateHandle, 'textbox_form', 'textbox_form_block');
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
@@ -189,7 +187,6 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                     if ($editing) {
                         // Force content to show (when component is set to collapsed by default)
                         $this->setConfigValue('collapse', 0);
-                        $this->parseConfig();
                     }
 
                     $this->parse('text_editable_block', 'text_editable');
@@ -216,7 +213,8 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
 
             $this->parse('textbox_form_block', 'textbox_form');
         }
-
+        
+        $this->parseConfig();
 
         return true; // everything went according to plan
     }
