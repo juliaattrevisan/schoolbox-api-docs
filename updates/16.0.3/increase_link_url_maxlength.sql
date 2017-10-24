@@ -1,1 +1,0 @@
-ALTER TABLE `link` MODIFY `url` VARCHAR(2048);

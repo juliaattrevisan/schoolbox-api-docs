@@ -1,1 +1,0 @@
-ALTER TABLE `tile` CHANGE `link` `link` VARCHAR(2000) CHARSET utf8 COLLATE utf8_general_ci NOT NULL;
