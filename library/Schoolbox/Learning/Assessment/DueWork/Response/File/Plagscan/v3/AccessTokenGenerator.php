@@ -13,6 +13,7 @@
  */
 
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3;
+
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Client;
 
@@ -28,6 +29,25 @@ class AccessTokenGenerator
      * @var string
      */
     private $apiKey = '';
+
+
+    /**
+     * Cached value of access token so we only request it once per execution
+     * @var string
+     */
+    private $accessToken;
+
+    /**
+     * The time an access token is valid before it is reset
+     * @var int
+     */
+    private $accessTokenExpiry = 3600;
+
+    /**
+     * The time the last access token was fetched
+     * @var
+     */
+    private $accessTokenTime;
 
     /**
      * Api url where stuff is sent
@@ -49,34 +69,32 @@ class AccessTokenGenerator
     }
 
     /**
-     * Generate an Access Token
+     * Generate an Access Token, may use a cached version if one exists that has not expired
      */
     public function generate()
     {
-
-        /* TODO: Cache plagscanAccessToken here. If it is about to expire, regenerate; otherwise reuse
-         * At the moment access token is respawned every time which isn't always necessary. To respawn
-         * an access token, a curl request must be sent to plag
-         */
+        // Check if the token is cached and return that, otherwise generate a new one and cace
+        if (!empty($accessToken = $this->getAccessToken())) {
+            return $accessToken;
+        }
 
         $postData = [
-            'grant_type' => 'client_credentials',
-            'client_id' => $this->getClientId(),
-            'client_secret' => $this->getApiKey()
+            'grant_type'    => 'client_credentials',
+            'client_id'     => $this->getClientId(),
+            'client_secret' => $this->getApiKey(),
         ];
 
         $client = new Client([
-            "base_uri" => $this->getApiUrl(),
-            "timeout" => 2.0,
-            "http_errors" => false
+            "base_uri"    => $this->getApiUrl(),
+            "timeout"     => 2.0,
+            "http_errors" => false,
         ]);
 
         try {
             $response = $client->post('token', [
-                'form_params' => $postData
+                'form_params' => $postData,
             ]);
-        }
-        catch (TransferException $e) {
+        } catch (TransferException $e) {
             throw new \RuntimeException('Error: Plagscan unavailable. Could not generate access token.');
         }
 
@@ -85,6 +103,7 @@ class AccessTokenGenerator
         $content = json_decode($response->getBody());
 
         if ($response->getStatusCode() == 200) {
+            $this->setAccessToken($content->access_token);
             return $content->access_token;
         }
 
@@ -96,6 +115,32 @@ class AccessTokenGenerator
 
     /* Getters/Setters
      */
+
+    /**
+     * Set the access token
+     *
+     * @param $accessToken
+     */
+    private function setAccessToken($accessToken)
+    {
+        $this->accessToken = $accessToken;
+        $this->accessTokenTime = time();
+    }
+
+    /**
+     * Gets access token if it has not yet expired
+     *
+     * @return string
+     */
+    private function getAccessToken()
+    {
+        if (!empty($this->accessToken)) {
+            if (time() < ($this->accessTokenTime + $this->accessTokenExpiry)) {
+                return $this->accessToken;
+            }
+        }
+        return '';
+    }
 
     /**
      * @return string
@@ -139,15 +184,5 @@ class AccessTokenGenerator
     private function getApiUrl()
     {
         return $this->apiUrl;
-    }
-
-    /**
-     * @param string $apiUrl
-     * @return $this
-     */
-    private function setApiUrl($apiUrl)
-    {
-        $this->apiUrl = $apiUrl;
-        return $this;
     }
 }
