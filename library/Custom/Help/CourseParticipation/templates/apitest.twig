@@ -147,10 +147,12 @@
 
                 }).fail(function (xhr, status, reason) {
                     $ul.html('<p>Enrolment fetch failed: '+reason+'. <button data-load-users value="' + schoolCode + '">Try again</button></p>');
+                    $host.attr('disabled', false);
                 });
 
             }).fail(function (xhr, status, reason) {
                 $ul.html('<p>Token fetch failed: '+reason+'. <button data-load-users value="' + schoolCode + '">Try again</button></p>');
+                $host.attr('disabled', false);
             });
         }
 
