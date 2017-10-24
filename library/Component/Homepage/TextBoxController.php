@@ -188,11 +188,8 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
 
                     if ($editing) {
                         // Force content to show (when component is set to collapsed by default)
-                        $this->setVar([
-                            'CONFIG_COLLAPSED_ICON' => 'icon-up-arrow',
-                            'CONFIG_COLLAPSED_CLASS' => '',
-                            'CONFIG_COLLAPSED_STATE' => 'uncollapsed',
-                        ]);
+                        $this->setConfigValue('collapse', 0);
+                        $this->parseConfig();
                     }
 
                     $this->parse('text_editable_block', 'text_editable');
