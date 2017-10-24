@@ -25,7 +25,7 @@
             If you attempt to make requests against a server other than yourself, you'll need to make sure
             that the school code and secret match on both servers.
         </div>
-        <form method="post" action="{{ routeLookup('helpCourseParticipation.postApiTest', { routeName: 'postUserRegistrations' }) }}">
+        <form method="post" action="{{ routeLookup('helpCourseParticipation.postApiTest') }}">
             <section>
                 <fieldset class="content">
                     <legend>Register a User</legend>
