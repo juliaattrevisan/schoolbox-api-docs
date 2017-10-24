@@ -165,15 +165,27 @@ class Controller extends BaseController
     /**
      * Recursively export an AssessmentSpec to a new context
      *
-     * @param IAssessable $assessmentSpec
+     * @param IAssessable       $assessmentSpec
      * @param AssessmentContext $context
+     * @param null              $dates
+     *
      * @return IAssessable
+     * @throws \Schoolbox\Mapper\Exception
      */
-    protected function exportToNewContext(IAssessable $assessmentSpec, AssessmentContext $context, $dates = null)
+    protected function exportToNewContext (
+        IAssessable $assessmentSpec,
+        AssessmentContext $context,
+        $dates = null
+    )
     {
+
+        $publish = null;
+        $open = null;
+        $due = null;
+        $close = null;
+
         if (is_array($dates)) {
             foreach ($dates as $field => $value) {
-                $$field = null;
                 if ($value) {
                     try {
                         $$field = Alaress_Date_Format::newLocal($value);
@@ -184,12 +196,12 @@ class Controller extends BaseController
             }
         }
 
-        if($context instanceof UnitImplementation){
+        if ($context instanceof UnitImplementation) {
             $publishDate = $publish ?? $context->getOpenDate();
             $openDate = $open ?? $context->getOpenDate();
             $dueDate = $due ?? $context->getDueDate();
             $closeDate = $close ?? $context->getDueDate();
-        } elseif($context instanceof Project){
+        } elseif ($context instanceof Project) {
             $publishDate = $publish ?? $context->getOpenAt();
             $openDate = $publish ?? $context->getOpenAt();
             $dueDate   = $due ?? $context->getDueAt();

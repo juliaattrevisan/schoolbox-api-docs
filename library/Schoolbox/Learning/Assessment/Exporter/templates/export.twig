@@ -74,10 +74,11 @@
                                 <label for="import-{{ implementation.unit.id }}" class="checkbox-label"></label>
                                 </div>
                                 <div class="card small-12">
-                                    <a href="/homepage/{{ implementation.unit.course.folder.id }}">
-                                        <span class="size-32 icon-home"></span>
-                                        <h3>{{ implementation.unit.course.folder.title }}</h3>
-                                    </a>
+                                    <span class="size-32 icon-home"></span>
+                                    <h3><a href="/homepage/{{ implementation.unit.course.folder.id }}">
+                                        {{ implementation.unit.course.folder.title }}
+                                        </a>
+                                    </h3>
                                     <p class="meta">
                                         {% spaceless %}
                                         <time title="{{ implementation.unit.openDate.short }}"
