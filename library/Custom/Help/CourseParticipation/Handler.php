@@ -8,13 +8,11 @@
 
 namespace Custom\Help\CourseParticipation;
 
-use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Permission\SiteAccess;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -130,7 +128,7 @@ class Handler
      * @param string $schoolCode
      * @throws Mapper\Exception
      * @throws Mapper\Exception\Deleted
-     * @return Collection|IFolder[]
+     * @return Collection|Folder\Model[]
      */
     private function getCoursesBySchool($schoolCode)
     {
