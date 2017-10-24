@@ -6,6 +6,7 @@
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+
 namespace Calendar\Event\Type\Day\Renderer;
 
 class Javascript extends Base
@@ -70,31 +71,31 @@ class Javascript extends Base
             $classes = $this->getEvent()->getEventClasses();
 
             $event = array(
-                'resourceId'=> $this->event->getResourceId(),
-                'title'     => \Scrub::text($this->event->getTitle()),
-                'start'     => $start,
-                'end'       => $end,
+                'resourceId' => $this->event->getResourceId(),
+                'title'      => \Scrub::text($this->event->getTitle()),
+                'start'      => $start,
+                'end'        => $end,
 
                 /* Whether you can edit this event or not
                  */
-                'editable'  => $this->event->isEditable(),
+                'editable'   => $this->event->isEditable(),
 
                 /* Whether it's an all-day event or not
                  * If allDay is true, then you can't resize it
                  */
-                'allDay'    => $all_day,
+                'allDay'     => $all_day,
 
                 /* Colour of the event
                  */
-                'color'     => $this->event->getColour(),
+                'color'      => $this->event->getColour(),
 
                 /* Campus slug so you can filter events
                  */
-                'className' => $classes,
+                'className'  => $classes,
 
                 /* Extra data that the Event Object doesn't directly support
                  */
-                'data'      => array(
+                'data'       => array(
                     'meta'       => array(
                         'eventId'     => $this->event->getEventId(),
                         'time'        => $this->event->getTime(),
@@ -113,7 +114,7 @@ class Javascript extends Base
                         'category' => array(
                             'id'   => $this->event->getCategoryId(),
                             'name' => $this->event->getCategoryName(),
-                        )
+                        ),
                     ),
                     'styles'     => array(
                         'visible' => $cssClass,
@@ -123,11 +124,11 @@ class Javascript extends Base
                         'status'        => $hasStatus,
                         'requestButton' => $hasAttendanceRequestButton,
                         'listButton'    => $hasListButton,
-                    )
-                )
+                    ),
+                ),
             );
 
-            return json_encode($event,JSON_PARTIAL_OUTPUT_ON_ERROR) . ',';
+            return json_encode($event, JSON_PARTIAL_OUTPUT_ON_ERROR) . ',';
         } else {
             return '';
         }

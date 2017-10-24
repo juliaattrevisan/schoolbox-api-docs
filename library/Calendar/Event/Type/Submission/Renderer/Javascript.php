@@ -9,6 +9,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
 namespace Calendar\Event\Type\Submission\Renderer;
 
 use \Scrub;
@@ -28,13 +29,13 @@ class Javascript extends Base
      */
     public function render()
     {
-        if(!$this->isVisible()){
+        if (!$this->isVisible()) {
             return '';
         }
 
         /* Congeal all that stuff
          */
-        $start   = $this->getEvent()->getStartTime()->getDatabaseDate();
+        $start = $this->getEvent()->getStartTime()->getDatabaseDate();
         $all_day = $this->getEvent()->getAllday();
         if (!$all_day) {
             $start .= ' ' . $this->getEvent()->getStartTime()->getDatabaseTime();
@@ -48,7 +49,7 @@ class Javascript extends Base
             ]
         );
 
-        if($this->getUser()->getRole()->isStaff()){
+        if ($this->getUser()->getRole()->isStaff()) {
             $moreDetailsLink = $this->getRouteIfAuthorized(
                 'learningAssessment.getAssessment',
                 [
@@ -56,15 +57,14 @@ class Javascript extends Base
                     'assessmentId' => $this->getEvent()->getEventId(),
                 ]
             );
-        }
-        else {
+        } else {
             $moreDetailsLink = $this->getRouteIfAuthorized(
                 'learningAssessment.getSummary',
                 [
                     'assessment'   => $this->getEvent()->getAssessment(),
                     'assessmentId' => $this->getEvent()->getEventId(),
-                    'studentId' => $this->getUser()->getId(),
-                    'student' => $this->getUser(),
+                    'studentId'    => $this->getUser()->getId(),
+                    'student'      => $this->getUser(),
                 ]
             );
         }
@@ -111,17 +111,17 @@ class Javascript extends Base
                     'requestButton' => false,
                     'listButton'    => false,
                 ),
-                'custom' => array(
-                    'modifyLink' => $modifyLink,
+                'custom'     => array(
+                    'modifyLink'      => $modifyLink,
                     'moreDetailsLink' => $moreDetailsLink,
-                )
-            )
+                ),
+            ),
         );
 
         if ($this->getEvent()->getResourceId()) {
             $event['resourceId'] = $this->getEvent()->getResourceId();
         }
 
-        return json_encode($event, JSON_PARTIAL_OUTPUT_ON_ERROR).',';
+        return json_encode($event, JSON_PARTIAL_OUTPUT_ON_ERROR) . ',';
     }
 }

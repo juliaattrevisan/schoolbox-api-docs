@@ -26,7 +26,7 @@ class Javascript extends Base
     {
         // Resource bookings are never all day events.
         $start = $this->getEvent()->getStartTime()->getDatabase();
-        $end   = $this->getEvent()->getEndTime()->getDatabase();
+        $end = $this->getEvent()->getEndTime()->getDatabase();
 
         // Putting any class other than "personal", "group" or "type{whatever}"
         // prevents this object from rendering, so add classes later.
@@ -44,7 +44,7 @@ class Javascript extends Base
 
         // Show booking butonyes I have permission to view
         /** @var Booking\Model $booking */
-        $booking        = $this->getEvent()->getBooking();
+        $booking = $this->getEvent()->getBooking();
         $bookingButtons = array();
 
         // Modify butonye
@@ -99,16 +99,16 @@ class Javascript extends Base
                 ['id' => $relatedBooking->getResource()->getId()]
             );
             if ($reviewHref) {
-                $reviewHref .= '?date='.urlencode($relatedBooking->getEvent()->getStartDateTime()->getURLDate());
+                $reviewHref .= '?date=' . urlencode($relatedBooking->getEvent()->getStartDateTime()->getURLDate());
             }
             $relatedBookings[] = [
-                'title' => \Scrub::text($relatedBooking->getResource()->getName()),
-                'item'    => array(
+                'title'  => \Scrub::text($relatedBooking->getResource()->getName()),
+                'item'   => array(
                     'id'   => $relatedBooking->getResource()->getId(),
                     'name' => $relatedBooking->getResource()->getName(),
                 ),
-                'status'  => $relatedBooking->getStatus()->jsonSerialize(),
-                'href'    => $reviewHref,
+                'status' => $relatedBooking->getStatus()->jsonSerialize(),
+                'href'   => $reviewHref,
             ];
         }
 
@@ -130,69 +130,69 @@ class Javascript extends Base
         // if either are there.
 
         $detail = $this->getEvent()->getDetail();
-        $event  = array(
+        $event = array(
             'resourceId' => $booking->getResource()->getId(),
-            'title' => \Scrub::text($this->getEvent()->getTitle()),
-            'start' => $start,
-            'end' => $end,
+            'title'      => \Scrub::text($this->getEvent()->getTitle()),
+            'start'      => $start,
+            'end'        => $end,
 
             /* Whether you can edit this event or not
              */
-            'editable' => false,
+            'editable'   => false,
 
             /* Whether it's an all-day event or not
              * If allDay is true, then you can't resize it
              */
-            'allDay' => false,
+            'allDay'     => false,
 
             /* Colour of the event
              */
-            'color' => $this->getEvent()->getColour(),
+            'color'      => $this->getEvent()->getColour(),
 
             /* Campus slug so you can filter events
              */
-            'className' => $classes,
+            'className'  => $classes,
 
             /* Extra data that the Event Object doesn't directly support
              */
-            'data' => array(
-                'meta' => array(
-                    'eventId' => $this->getEvent()->getEventId(),
-                    'time' => $this->getEvent()->getTime(),
-                    'detail' => Scrub::html($detail),
-                    'location' =>  $this->getEvent()->getLocation(),
+            'data'       => array(
+                'meta'       => array(
+                    'eventId'     => $this->getEvent()->getEventId(),
+                    'time'        => $this->getEvent()->getTime(),
+                    'detail'      => Scrub::html($detail),
+                    'location'    => $this->getEvent()->getLocation(),
                     'eventTypeId' => $this->getEvent()->getType(),
-                    'eventType' => 'type' . $this->getEvent()->getType(),
-                    'type' => $this->getEvent()->getEventType(),
-                    'author' => $this->getEvent()->getAuthorName(),
-                    'authorId' => $this->getEvent()->getAuthorId(),
-                    'level' => $this->getEvent()->getEventClasses(),
-                    'completed' => $this->getEvent()->getCompleted(),
-                    'seriesId' => $this->getEvent()->getBooking()->getEvent()->getSeriesId(),
+                    'eventType'   => 'type' . $this->getEvent()->getType(),
+                    'type'        => $this->getEvent()->getEventType(),
+                    'author'      => $this->getEvent()->getAuthorName(),
+                    'authorId'    => $this->getEvent()->getAuthorId(),
+                    'level'       => $this->getEvent()->getEventClasses(),
+                    'completed'   => $this->getEvent()->getCompleted(),
+                    'seriesId'    => $this->getEvent()->getBooking()->getEvent()->getSeriesId(),
                 ),
-                'links' => array(),
-                'styles' => array(
+                'links'      => array(),
+                'styles'     => array(
                     'visible' => '',
                 ),
                 'attendance' => array(
-                    'icon' => false,
-                    'status' => false,
+                    'icon'          => false,
+                    'status'        => false,
                     'requestButton' => false,
-                    'listButton' => false,
+                    'listButton'    => false,
                 ),
-                'booking' => array(
-                    'item'    => array(
+                'booking'    => array(
+                    'item'     => array(
                         'id'   => $this->getEvent()->getBooking()->getResource()->getId(),
                         'name' => $this->getEvent()->getBooking()->getResource()->getName(),
                     ),
-                    'status'  => $this->getEvent()->getBooking()->getStatus()->jsonSerialize(),
-                    'buttons' => $bookingButtons,
+                    'status'   => $this->getEvent()->getBooking()->getStatus()->jsonSerialize(),
+                    'buttons'  => $bookingButtons,
                     'reviewer' => $reviewerRender,
-                    'related' => $relatedBookings,
+                    'related'  => $relatedBookings,
                 ),
-            )
+            ),
         );
 
-        return json_encode($event,JSON_PARTIAL_OUTPUT_ON_ERROR).',';
+        return json_encode($event, JSON_PARTIAL_OUTPUT_ON_ERROR) . ',';
     }
 }

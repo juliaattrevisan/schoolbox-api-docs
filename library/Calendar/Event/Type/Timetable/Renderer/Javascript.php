@@ -6,6 +6,7 @@
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+
 namespace Calendar\Event\Type\Timetable\Renderer;
 
 class Javascript extends Base
@@ -22,13 +23,12 @@ class Javascript extends Base
             $hasAttendanceRequestButton = false;
 
             /* Output list button */
-            if($this->showAttendanceLink()) {
+            if ($this->showAttendanceLink()) {
                 $encodedClass = urlencode(urlencode(urlencode($this->event->getCode())));
                 $classLink = $this->event->getCampus() ? $this->event->getCampus() . '/' . $encodedClass : '0/' . $encodedClass;
 
                 $hasListButton = "<a class='button icon-class-list' href='/modules/attendance/modify/{$classLink}/{$this->event->getStartTime()->getDatabaseDate()}/{$this->event->getPeriod()}/{$this->event->getTimetableCode()}' title='Mark Attendance'>Attendance</a>";
-            }
-            else {
+            } else {
                 $hasListButton = false;
             }
 
@@ -94,21 +94,21 @@ class Javascript extends Base
                         'category' => array(
                             'id'   => $this->event->getCategoryId(),
                             'name' => $this->event->getCategoryName(),
-                        )
+                        ),
                     ),
                     'styles'     => array(
-                        'visible' => $cssClass,
+                        'visible' => '',
                     ),
                     'attendance' => array(
                         'icon'          => $hasIcon,
                         'status'        => $hasStatus,
-                        'listButton' => $hasListButton,
-                        'requestButton'    => $hasAttendanceRequestButton,
-                    )
-                )
+                        'listButton'    => $hasListButton,
+                        'requestButton' => $hasAttendanceRequestButton,
+                    ),
+                ),
             );
 
-            return json_encode($event,JSON_PARTIAL_OUTPUT_ON_ERROR) . ',';
+            return json_encode($event, JSON_PARTIAL_OUTPUT_ON_ERROR) . ',';
         }
     }
 

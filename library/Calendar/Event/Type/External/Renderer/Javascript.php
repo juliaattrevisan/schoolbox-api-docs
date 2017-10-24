@@ -6,6 +6,7 @@
  * @copyright Copyright 2017, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+
 namespace Calendar\Event\Type\External\Renderer;
 
 class Javascript extends Base
@@ -83,11 +84,11 @@ class Javascript extends Base
                         'status'        => $hasStatus,
                         'listButton'    => $hasListButton,
                         'requestButton' => $hasAttendanceRequestButton,
-                    )
-                )
+                    ),
+                ),
             );
 
-            return json_encode($event,JSON_PARTIAL_OUTPUT_ON_ERROR) . ',';
+            return json_encode($event, JSON_PARTIAL_OUTPUT_ON_ERROR) . ',';
         }
     }
 
