@@ -1,8 +1,8 @@
 
 -- This creates a copy of the myFile in the student directory
 INSERT INTO myFile
-SELECT null, mf.parent, ep.uid, mf.realname, mf.submitted, mf.description, mf.published, mf.hash, mf.deleted_at
-FROM schoolbox.eportfolio_component_filelist_item ecfi
+SELECT null, 0, ep.uid, mf.realname, mf.submitted, mf.description, mf.published, mf.hash, mf.deleted_at
+FROM eportfolio_component_filelist_item ecfi
 join eportfolio_page ep on ep.page_id = ecfi.page_id
 join myFile mf on mf.id = ecfi.file_id where ep.uid != mf.owner;
 
