@@ -135,10 +135,9 @@ if (count($criterionCollection)) {
                     $this->setVar(
                         'CRITERION_ASSESSMENT_HREF',
                         $this->routeLookup(
-                            'learningAssessment.getSummary',
+                            'learningAssessment.getAssessment',
                             [
-                                'assessmentId' => $assessment['id'],
-                                'studentId' => $_SESSION['user']->getId(),
+                                'assessmentId' => $assessment['id']
                             ]
                         )
                     );
