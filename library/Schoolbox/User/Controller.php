@@ -72,8 +72,9 @@ class Controller extends Base
      * Return a json array of parent emails from a folder
      * This will include parents directly in the group, and parents of students in the group
      *
-     * Known inconsistency: we're using SIS emails for the parents of students in the group, and Schoolbox emails for the parents directly in the group
-     * This is for performance reasons, avoiding calling loadParents() on every student
+     * Known inconsistency: this will return user emails from the SIS for parents of students in the group,
+     * and Schoolbox emails for the parents directly in the group
+     * This is intended functionality based on our standard of using the SIS when we only know the student, and using Schoolbox when we know the parent
      *
      * @param FolderModel $folder
      */
