@@ -9,9 +9,9 @@
 
 
 namespace Schoolbox\Resource;
+use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
-
 use \PDO;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\User;
@@ -22,38 +22,60 @@ use \Schoolbox\User;
  * @package Schoolbox\Resource
  * @method Group createModel($idValue = null)
  * @method Group hydrate(array $row, $alias = '', $callback = null)
+ * @method Group[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
  */
 class GroupMapper extends Mapper {
 
     protected function mapping() {
         $this->hasModel(Group::class);
         $this->hasTable('userGroups');
-        $this->hasMap(array(
-                'column'     => 'cid',
-                'property'   => 'category',
-                'type'       => self::TYPE_INTEGER,
-                'identifier' => true
-            ));
-        $this->hasMap(array(
-                'column'     => 'type',
-                'property'   => 'type',
-                'type'       => self::TYPE_INTEGER,
-            ));
-        $this->hasMap(array(
-            'column'   => 'force_follow',
-            'property' => 'forceFollow',
-            'type'     => self::TYPE_BOOLEAN
-        ));
-
-        $this->hasJoin(
-            'folder',
-            array(
-                'mapper'    => FolderMapper::class,
-                'this_key'  => 'cid',
-                'other_key' => 'id',
-            )
-        );
+        $this->uses('type', self::TYPE_INTEGER);
+        $this->uses('force_follow', self::TYPE_BOOLEAN);
+        $this->joins('cid', FolderMapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'category', 'folder');
     }
+
+
+    /**
+     * @inheritDoc
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT  {$this->getColumnString()},
+                    {$this->getJoinColumnString('folder', 'f')}
+        ";
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    protected function getFromString()
+    {
+        return "
+            FROM {$this->table}
+            INNER JOIN {$this->getJoinSql('folder', '', 'f')}
+        ";
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        /** @var FolderMapper $folderMapper */
+        $folderMapper = $this->getJoinMapper('folder');
+        $groups       = $this->createCollection();
+        foreach ($statement as $row) {
+            $group = $this->hydrate($row)->setCategory($folderMapper->hydrate($row, 'f'));
+            $groups[$group->getCategory()->getId()] = $group;
+        }
+        return $groups;
+    }
+
+
+
 
     /**
      * Find all folders matching a certain name,

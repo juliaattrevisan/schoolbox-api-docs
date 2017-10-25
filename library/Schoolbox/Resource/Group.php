@@ -26,9 +26,9 @@ class Group {
     protected $type;
 
     /**
-     * @var int
+     * @var Folder\Model
      */
-    protected $category;
+    protected $folder;
 
     /** @var bool */
     protected $forceFollow;
@@ -95,21 +95,21 @@ class Group {
 
 
     /**
-     * @param Int $category
+     * @param Folder\Model $folder
      * @return $this
      */
-    public function setCategory($category)
+    public function setCategory($folder)
     {
-        $this->category = $category;
+        $this->folder = $folder;
         return $this;
     }
 
     /**
-     * @return int
+     * @return Folder\Model
      */
     public function getCategory()
     {
-        return $this->category;
+        return $this->folder;
     }
 
 

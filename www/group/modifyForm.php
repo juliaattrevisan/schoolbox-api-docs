@@ -62,7 +62,8 @@ if (is_numeric($_POST['type']) || is_array($_POST['msg'])) {
         $group = $groupMapper->createModel();
         // yes, group category doesn't map to an actual category.
         // no, I'm not fixing it right now, but will at least check it exists.
-        $group->setCategory($categoryId);
+        $folder = $catMapper->findById($categoryId);
+        $group->setCategory($folder);
 //        try {
 //            $catMapper->findById($categoryId);
 //            $group->setCategory($categoryId);
@@ -83,7 +84,7 @@ if (is_numeric($_POST['type']) || is_array($_POST['msg'])) {
         // prime the global suppressor!
         $override = new RerouteOverride();
         $override->setUser($userMapper->createModel()->setId(0)); // ID 0 = global
-        $override->setRouteKey('service.1.' . $group->getCategory());
+        $override->setRouteKey('service.1.' . $group->getCategory()->getId());
         $override->setDelivery([ 'MU' ]);
 
         if ($_POST['msg']['enabled']) {
