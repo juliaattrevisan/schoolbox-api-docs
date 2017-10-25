@@ -472,10 +472,7 @@
                                                             </div>
                                                         </div>
 
-                                                    </li>
-                                                    {% if contact.StudentContactSpousePhoneActual or contact.StudentContactSpouseMobilePhone or contact.StudentContactSpouseOccupPhone or contact.StudentContactSpouseDefaultEmail %}
-                                                        <li class="small-12">
-
+                                                        {% if contact.StudentContactSpousePhoneActual or contact.StudentContactSpouseMobilePhone or contact.StudentContactSpouseOccupPhone or contact.StudentContactSpouseDefaultEmail %}
                                                             <!-- Collapsable content -->
                                                             <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-spouse-{{ loop.index }}">
                                                                 <div class="list-item">
@@ -503,9 +500,9 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-
-                                                        </li>
-                                                    {% endif %}
+                                                        {% endif %}
+                                                        
+                                                    </li>
                                                 {% endif %}
 
                                             {% endif %}
