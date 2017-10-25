@@ -225,10 +225,48 @@
             $('#emailAll').submit();
         });
 
-        $('#emailAllParents').click(function(event) {
+
+        /**
+         * Request a set of parent email addresses via ajax and populate the bcc field on the hidden 'email all parents' form
+         */
+        function populateParentEmails(event) {
             event.preventDefault();
-            $('#emailAllParentsForm').submit();
-        });
+            var $link = event.data.link;
+
+            // Disable the link
+            $link.addClass('menu_disabled').off('click', populateParentEmails);
+
+            // Given the dropdown will disappear on click, show some toast to show the user this is working.
+            var $toast = $('#emailParentsToast');
+            $toast.toastActivate({text: 'Working...'});
+
+            // Get a list of parent emails via ajax
+            $.get('/user/parentEmails/folder/{CATEGORY_ID}', function(parentEmails) {
+
+                if (parentEmails.length) {
+                    // Join the email array into a comma separated string, then add to the form
+                    var emailCSV = parentEmails.join(',');
+                    $('#emailAllParentsBcc').val(emailCSV);
+
+                    // Submit the form
+                    $('#emailAllParentsForm').submit();
+                } else {
+                    // Let the user know there's no addresses to email via toast
+                    $toast.toastTimeout({text: 'No parent email addresses found in this group.', css: 'alert'});
+                }
+
+            }, 'json').fail(function() {
+
+                // Something went wrong, fail toast
+                $toast.toastTimeout({text: 'Something went wrong. Please try again.', css: 'alert'});
+
+                // Re-enable the link
+                $link.removeClass('menu_disabled').on('click', {link: $link}, populateParentEmails);
+            });
+        }
+
+        $('#emailAllParents').on('click', {link: $(this)}, populateParentEmails);
+
     });
 </script>
 <!-- END custom_head -->
@@ -246,9 +284,7 @@
         <!-- BEGIN mail_all -->
         <li><a href="#" class="icon-email" id="emailAllGroup">Email Group Members</a></li>
         <!-- END mail_all -->
-        <!-- BEGIN mail_all_parents -->
         <li><a href="#" class="icon-staff" id="emailAllParents">Email Group Parents</a></li>
-        <!-- END mail_all_parents -->
         <li><a href="/group/modifyForm.php?disband=1&categoryID={CATEGORY_ID}" class="icon-delete" data-action="disband">Disband Group</a></li>
     </ul>
 
@@ -261,7 +297,7 @@
     <!-- BEGIN mail_all_parents_form -->
     <form action="/mail/createMail.php" method="post" id="emailAllParentsForm">
         <input type="hidden" name="replyto" value="&quot;{CATEGORY_NAME}&quot; &lt;{REPLYTO}&gt;" />
-        <input type="hidden" name="bcc" value="{EMAILALLPARENTS}" />
+        <input type="hidden" name="bcc" value="" id="emailAllParentsBcc" />
     </form>
     <!-- END mail_all_parents_form -->
 
@@ -539,6 +575,7 @@
 
                 <!-- universal toast -->
                 <div id='save-label' class="toast" data-alert data-relation="save-label"></div>
+                <div id='emailParentsToast' class="toast"></div>
             </div>
         </section>
     </div>
