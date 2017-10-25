@@ -1,1 +1,0 @@
-ALTER TABLE `poll` ADD COLUMN `created_by` INT NULL AFTER `frequency`;

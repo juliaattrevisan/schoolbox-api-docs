@@ -1,1 +1,0 @@
-ALTER TABLE `pastoral_comment` ADD `external_id` INT NULL;

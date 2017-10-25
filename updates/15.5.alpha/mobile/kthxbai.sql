@@ -1,1 +1,0 @@
-DELETE FROM `config` WHERE `name` IN ('mobile_enabled', 'mobile_application_cache_enabled');

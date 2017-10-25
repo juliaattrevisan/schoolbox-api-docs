@@ -1,1 +1,0 @@
-ALTER TABLE `sideMenu` MODIFY `url` VARCHAR(2048);

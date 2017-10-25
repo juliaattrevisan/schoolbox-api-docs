@@ -1,1 +1,0 @@
-ALTER TABLE `category` ADD inherit TINYINT DEFAULT 0 NULL;

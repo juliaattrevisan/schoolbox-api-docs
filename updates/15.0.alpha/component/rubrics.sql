@@ -1,1 +1,0 @@
-UPDATE `component_definition` SET `name` = 'Course Criteria' , `description` = 'View and edit the criteria for this subject or course.' WHERE `class` = 'Component_Homepage_RubricController';
