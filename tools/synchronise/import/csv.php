@@ -101,8 +101,9 @@ $logger = new Logger(
 );
 
 if (isset($options['user'])) {
+    // User import does not fill down - the others do
     $logger->info('Starting user import...');
-    $parser = new Importer\User($getReader($options['user'], $logger), $logger, $update);
+    $parser = new Importer\User($getReader($options['user'], $logger)->setFillDown(false), $logger, $update);
     $parser->save();
     $logger->info('User import done!');
 } else {
