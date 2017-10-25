@@ -378,7 +378,7 @@
 
                                                     <!-- Expander -->
                                                     <div class="list-item">
-                                                        <div class="expander icon-down-arrow" data-collapser="collap-contact-{{ i }}"></div>
+                                                        <div class="expander icon-down-arrow" data-collapser="collap-contact-{{ loop.index }}"></div>
                                                         <div class="card small-12">
                                                             {% if contact.main %}
                                                                 <a href="/search/user/{{ contact.main.id }}">
@@ -394,7 +394,7 @@
                                                     </div>
 
                                                     <!-- Collapsable content -->
-                                                    <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-contact-{{ i }}">
+                                                    <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-contact-{{ loop.index }}">
                                                         <div class="list-item">
                                                             <div class="small-12">
                                                                 {% if contact.StudentContactAddress1 or contact.StudentContactAddress2 or contact.StudentContactAddress3 %}
