@@ -7,7 +7,13 @@
             file_browser_category_id : {CATEGORY_ID}
         });
 
-        $('#newsForm').alaressValidate();
+        $('#newsForm').alaressValidate({
+            rules: {
+                'heading': {
+                    requiredNotBlank: true
+                }
+            }
+        });
 
         $('[data-delete]').click(function(event) {
             event.preventDefault();

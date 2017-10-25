@@ -1,5 +1,6 @@
 <?php
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
@@ -48,6 +49,10 @@ if ($_POST['heading']) {
 		$article->setPostDate(new Alaress_Date_Format());
 	}
 
+    // If a blank heading is given, throw a tantrum
+    if (strlen(trim($_POST['heading'])) < 1) {
+        error(ErrorMapper::ERROR_INFORMATION_MISSING);
+    }
 
 	$topic = new \Schoolbox\News\Topic();
 	$topic->setId($_POST['item_topic_id']);
