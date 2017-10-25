@@ -25,6 +25,7 @@ $this->setBlock(TEMPLATE_content, 'msg_enabled_followth', 'msg_enabled_followth_
 
 $this->setBlock(TEMPLATE_content, 'mail_all', 'mail_all_block');
 $this->setBlock(TEMPLATE_content, 'mail_all_form', 'mail_all_form_block');
+$this->setBlock(TEMPLATE_content, 'mail_all_parents', 'mail_all_parents_block');
 $this->setBlock(TEMPLATE_content, 'mail_all_parents_form', 'mail_all_parents_form_block');
 
 $this->setBlock(TEMPLATE_content, "authorisation", "authorisation_block");
@@ -243,11 +244,11 @@ if (is_numeric($this->arg[0])) {
     $this->setVar([
         'mail_all_block'              => '',
         'mail_all_form_block'         => '',
+        'mail_all_parents_block'      => '',
         'mail_all_parents_form_block' => '',
     ]);
 
     if (\Cfg::get('mail_enable')) {
-
         $this->setVar([
             'REPLYTO'  => $email_object->formatEmailFromArray($_SESSION)
         ]);
@@ -261,6 +262,7 @@ if (is_numeric($this->arg[0])) {
         }
 
         // Recipients for this will be generated on click, so show as long as mail is enabled
+        $this->parse('mail_all_parents_block', 'mail_all_parents');
         $this->parse('mail_all_parents_form_block', 'mail_all_parents_form');
     }
 
