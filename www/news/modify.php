@@ -110,7 +110,7 @@ if (is_numeric($this->arg[0])) {
 else {
 	$this->setTitle('Add News');
 
-    $publishedDate = Alaress_Date_Format::now()->startOfDay();
+    $publishedDate = Alaress_Date_Format::now();
 	$expiryDate    = Alaress_Date_Format::now()->modify(Config::get('news_default_expiry'))->endOfDay();
 
 	$output = array(
