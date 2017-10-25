@@ -28,6 +28,11 @@
             $('#email-all-form').submit();
         })
     });
+
+    // Enable Expandables
+    $(function () {
+        $('[data-collapser]').collapsable();
+    });
 </script>
 
 <div class="actions-small-{{ isSuperuser ? 1 : 0 }} row">
@@ -366,92 +371,148 @@
 
                             <section>
                                 <div class="content no-pad">
-                                    <ul class="information-list">
+                                    <ul class="information-list expandable-card">
                                         {% for contact in contacts %}
-                                        {% if contact.StudentContactTitle or contact.StudentContactPreferred %}
-                                        <li class="actions-small-1">
-                                                <div class="list-item">
-                                                    <div class="card small-12">
-                                                        {% if contact.main %}
-                                                            <a href="/search/user/{{ contact.main.id }}">
+                                            {% if contact.StudentContactTitle or contact.StudentContactPreferred %}
+                                                <li class="small-12">
+
+                                                    <!-- Expander -->
+                                                    <div class="list-item">
+                                                        <div class="expander icon-down-arrow" data-collapser="collap-contact-{{ loop.index }}"></div>
+                                                        <div class="card small-12">
+                                                            {% if contact.main %}
+                                                                <a href="/search/user/{{ contact.main.id }}">
+                                                                    <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64" />
+                                                                    <h3>{{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}</h3>
+                                                                </a>
+                                                            {% else %}
                                                                 <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64" />
                                                                 <h3>{{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}</h3>
-                                                            </a>
-                                                        {% else %}
-                                                            <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64" />
-                                                            <h3>{{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}</h3>
-                                                        {% endif %}
-                                                        <p class="meta">{{ contact.StudentContactRelation }}</p>
+                                                            {% endif %}
+                                                            <p class="meta">{{ contact.StudentContactRelation }}</p>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <nav>
-                                                    <a href="#" class="icon-more" data-dropdown="row-options-contact-{{ loop.index }}" title="Actions"></a>
-                                                </nav>
-                                                <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{{ loop.index }}">
-                                                    {% if contact.StudentContactDefaultEmail and contact.StudentContactUseEmail != 'N' %}
-                                                        <li><a class="icon-email" href="{{ session.mailhandle }}{{ contact.StudentContactDefaultEmail }}">{{ contact.StudentContactDefaultEmail }}</a></li>
-                                                    {% endif %}
-                                                    {% if contact.StudentContactMobilePhone %}
-                                                        <li><a class="icon-mobile" href="tel:{{ contact.StudentContactMobilePhone }}">{{ contact.StudentContactMobilePhone }}</a></li>
-                                                    {% endif %}
-                                                    {% if contact.StudentContactOccupPhone %}
-                                                        <li><a class="icon-mobile" href="tel:{{ contact.StudentContactOccupPhone }}">{{ contact.StudentContactOccupPhone }}</a></li>
-                                                    {% endif %}
-                                                </ul>
-                                            </li>
-                                            {% endif %}
-                                            {# is there a spouse? #}
-                                            {% if contact.StudentContactSpouseTitle or contact.StudentContactSpousePreferred %}
-                                                <li class="actions-small-1">
-                                                    <div class="list-item">
-                                                        <div class="card small-12">
-                                                            {# need to know user's schoolbox info here #}
-                                                            {% if contact.spouse %}
+
+                                                    <!-- Collapsable content -->
+                                                    <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-contact-{{ loop.index }}">
+                                                        <div class="list-item">
+                                                            <div class="small-12">
+                                                                {% if contact.StudentContactAddress1 or contact.StudentContactAddress2 or contact.StudentContactAddress3 %}
+                                                                    <div class="row">
+                                                                        <div class="column small-12 medium-5"><strong>Address:</strong></div>
+                                                                        <div class="column small-12 medium-7">
+                                                                            <p>
+                                                                                {% if contact.StudentContactAddress1 %}
+                                                                                    {{ contact.StudentContactAddress1 }}<br/>
+                                                                                {% endif %}
+                                                                                {% if contact.StudentContactAddress2 %}
+                                                                                    {{ contact.StudentContactAddress2 }}<br/>
+                                                                                {% endif %}
+                                                                                {% if contact.StudentContactAddress3 %}
+                                                                                    {{ contact.StudentContactAddress3 }}<br/>
+                                                                                {% endif %}
+                                                                                {{ contact.StudentContactSuburb }}, {{ contact.StudentContactState }} {{ contact.StudentContactPostCode }}
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+
+                                                        {% if contact.StudentContactPhoneActual or contact.StudentContactMobilePhone or contact.StudentContactOccupPhone or contact.StudentContactDefaultEmail %}
+                                                        <div class="list-item">
+                                                            <div class="small-12">
+                                                                {% if contact.StudentContactPhoneActual %}
+                                                                    <div class="row">
+                                                                        <div class="column small-12 medium-5"><strong>Home Phone:</strong></div>
+                                                                        <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}">{{ contact.StudentContactPhoneActual }}</a></div>
+                                                                    </div>
+                                                                {%  endif %}
+
+                                                                {% if contact.StudentContactMobilePhone %}
+                                                                    <div class="row">
+                                                                        <div class="column small-12 medium-5"><strong>Mobile Phone: </strong></div>
+                                                                        <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactMobilePhone }}" title="Call {{ contact.StudentContactMobilePhone }}">{{ contact.StudentContactMobilePhone }}</a></div>
+                                                                    </div>
+                                                                {% endif %}
+
+                                                                {% if contact.StudentContactOccupPhone %}
+                                                                    <div class="row">
+                                                                        <div class="column small-12 medium-5"><strong>Work Phone: </strong></div>
+                                                                        <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactOccupPhone }}" title="Call {{ contact.StudentContactOccupPhone }}">{{ contact.StudentContactOccupPhone }}</a></div>
+                                                                    </div>
+                                                                {% endif %}
+
+                                                                {% if contact.StudentContactDefaultEmail %}
+                                                                    <div class="row">
+                                                                        <div class="column small-12 medium-5"><strong>Email: </strong></div>
+                                                                        <div class="column small-12 medium-7"><a href="{{ session.mailhandle }}{{ contact.StudentContactDefaultEmail }}">{{ contact.StudentContactDefaultEmail }}</a></div>
+                                                                    </div>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                        {% endif %}
+                                                    </div>
+
+                                                </li>
+
+                                                {% if (contact.StudentContactSpouseTitle or contact.StudentContactSpousePreferred) and contact.spouse %}
+                                                    <li class="small-12">
+
+                                                        <!-- Expander -->
+                                                        <div class="list-item">
+                                                            <div class="expander icon-down-arrow" data-collapser="collap-spouse-{{ loop.index }}"></div>
+                                                            <div class="card small-12">
                                                                 <a href="/search/user/{{ contact.spouse.id }}">
                                                                     <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
                                                                     <h3>{{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}</h3>
                                                                 </a>
-                                                            {% else %}
-                                                                <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
-                                                                <h3>{{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}</h3>
-                                                            {% endif %}
-                                                            <p class="meta">{{ contact.StudentContactSpouseRelation }}</p>
+
+                                                                <p class="meta">{{ contact.StudentContactSpouseRelation }}</p>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <nav>
-                                                        <a href="#" class="icon-more" data-dropdown="row-options-contact-{{ contact.StudentContactSpouseID }}" title="Actions"></a>
-                                                    </nav>
-                                                    <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{{ contact.StudentContactSpouseID }}">
-                                                        {% if contact.StudentContactSpouseDefaultEmail and contact.StudentContactSpouseUseEmail != 'N'%}
-                                                            <li><a class="icon-email" href="{{ session.mailhandle }}{{ contact.StudentContactSpouseDefaultEmail }}">{{ contact.StudentContactSpouseDefaultEmail }}</a></li>
+
+                                                        {% if contact.StudentContactSpousePhoneActual or contact.StudentContactSpouseMobilePhone or contact.StudentContactSpouseOccupPhone or contact.StudentContactSpouseDefaultEmail %}
+                                                            <!-- Collapsable content -->
+                                                            <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-spouse-{{ loop.index }}">
+                                                                <div class="list-item">
+                                                                    <div class="small-12">
+                                                                        {% if contact.StudentContactSpouseMobilePhone %}
+                                                                            <div class="row">
+                                                                                <div class="column small-12 medium-5"><strong>Mobile Phone: </strong></div>
+                                                                                <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactSpouseMobilePhone }}" title="Call {{ contact.StudentContactSpouseMobilePhone }}">{{ contact.StudentContactSpouseMobilePhone }}</a></div>
+                                                                            </div>
+                                                                        {% endif %}
+
+                                                                        {% if contact.StudentContactSpouseOccupPhone %}
+                                                                            <div class="row">
+                                                                                <div class="column small-12 medium-5"><strong>Work Phone: </strong></div>
+                                                                                <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactSpouseOccupPhone }}" title="Call {{ contact.StudentContactSpouseOccupPhone }}">{{ contact.StudentContactSpouseOccupPhone }}</a></div>
+                                                                            </div>
+                                                                        {% endif %}
+
+                                                                        {% if contact.StudentContactSpouseDefaultEmail %}
+                                                                            <div class="row">
+                                                                                <div class="column small-12 medium-5"><strong>Email: </strong></div>
+                                                                                    <div class="column small-12 medium-7"><a href="{{ session.mailhandle }}{{ contact.StudentContactSpouseDefaultEmail }}">{{ contact.StudentContactSpouseDefaultEmail }}</a></div>
+                                                                            </div>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        {% else %}
+                                                        <div class="hide" data-collapse-state="collapsed" data-collapsable="collap-spouse-{{ loop.index }}">
+                                                            <div class="empty-state small-12">
+                                                                <p>No contact details found.</p>
+                                                            </div>
+                                                        </div>
                                                         {% endif %}
-                                                        {% if contact.StudentContactSpouseMobilePhone %}
-                                                            <li><a class="icon-mobile" href="tel:{{ contact.StudentContactSpouseMobilePhone }}">{{ contact.StudentContactSpouseMobilePhone }}</a></li>
-                                                        {% endif %}
-                                                        {% if contact.StudentContactSpouseOccupPhone %}
-                                                            <li><a class="icon-mobile" href="tel:{{ contact.StudentContactSpouseOccupPhone }}">{{ contact.StudentContactSpouseOccupPhone }}</a></li>
-                                                        {% endif %}
-                                                    </ul>
-                                                </li>
+                                                        
+                                                    </li>
+                                                {% endif %}
+
                                             {% endif %}
 
-                                            <li class="actions-small-1">
-                                                <div class="list-item">
-                                                    <div class="card small-12">
-                                                        <span class="icon-home size-32"></span>
-                                                        {% if contact.StudentContactAddress1 or contact.StudentContactAddress2 or contact.StudentContactAddress3 %}
-                                                            <p>{{ contact.StudentContactAddress1 }}</p>
-                                                            <p>{{ contact.StudentContactAddress2 }}</p>
-                                                            <p>{{ contact.StudentContactAddress3 }}</p>
-                                                            <p>{{ contact.StudentContactSuburb }},</p>
-                                                            <p>{{ contact.StudentContactState }} {{ contact.StudentContactPostCode }}</p>
-                                                        {% endif %}
-                                                    </div>
-                                                </div>
-                                                <nav>
-                                                    <a class="icon-mobile" href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}"></a>
-                                                </nav>
-                                            </li>
                                         {% endfor %}
                                     </ul>
                                 </div>
@@ -474,34 +535,40 @@
                                 <h2 class="subheader">Emergency Contact Information</h2>
                                 <section>
                                     <div class="content no-pad">
-                                        <ul class="information-list">
+                                        <ul class="information-list expandable-card">
                                             {% for i in 1..3 %}
                                                 {% set index = (i == 1 ? '' : i) %}
                                                 {% if externalUser["StudentEmergency#{index}Name"] %}
-                                                    <li class="actions-small-1 actions-medium-2">
-                                                        <div class="list-item">
-                                                            <div class="card small">
-                                                                <span class="icon-alert"></span>
+                                                    <li>
+                                                        <!-- Expander -->
+                                                        <div>
+                                                            <div class="expander icon-down-arrow" data-collapser="collap-emergency-{{ i }}"></div>
+                                                            <div class="content small-12">
                                                                 {{ externalUser["StudentEmergency#{index}Name"] }}
                                                             </div>
                                                         </div>
-                                                        <nav>
-                                                            <a href="#" class="icon-more" data-dropdown="row-options-emergency-{{ i }}" title="Actions"></a>
-                                                        </nav>
-                                                        <ul class="f-dropdown" data-dropdown-content id="row-options-emergency-{{ i }}">
-                                                            <li class="full-width">
-                                                                <a class="icon-mobile" href="tel:{{ externalUser["StudentEmergency#{index}Phone"] }}">
-                                                                    {{ externalUser["StudentEmergency#{index}Phone"] }}
-                                                                </a>
-                                                            </li>
-                                                            {% if externalUser["StudentEmergency#{index}PhoneAlt"] is not empty %}
-                                                                <li class="full-width">
-                                                                    <a class="icon-mobile" href="tel:{{ externalUser["StudentEmergency#{index}PhoneAlt"] }}">
+
+                                                        <!-- Collapseable content -->
+                                                        <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-emergency-{{ i }}">
+                                                            <div class="row">
+                                                                <div class="column small-12 medium-5"><strong>Primary Phone: </strong></div>
+                                                                <div class="column small-12 medium-7">
+                                                                    <a href="tel:{{ externalUser["StudentEmergency#{index}Phone"] }}">
+                                                                        {{ externalUser["StudentEmergency#{index}Phone"] }}
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="column small-12 medium-5"><strong>Alternate Phone: </strong></div>
+                                                                <div class="column small-12 medium-7">
+                                                                    <a href="tel:{{ externalUser["StudentEmergency#{index}PhoneAlt"] }}">
                                                                         {{ externalUser["StudentEmergency#{index}PhoneAlt"] }}
                                                                     </a>
-                                                                </li>
-                                                            {% endif %}
-                                                        </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
                                                     </li>
                                                 {% endif %}
                                             {% endfor %}

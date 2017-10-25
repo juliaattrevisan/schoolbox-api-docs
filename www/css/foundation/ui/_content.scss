@@ -364,8 +364,9 @@ $container-bg: white !default;
     }
 }
 
-// component-container already has it's own margin-bottom
-.component-container .empty-state {
+// component-container already has it's own margin-bottom,
+// empty states in information lists shouldn't have padding or margin
+.component-container .empty-state, .information-list .empty-state {
     margin-bottom: 0;
 }
 
