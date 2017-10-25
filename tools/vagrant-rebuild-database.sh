@@ -29,7 +29,7 @@ echo "$vag Removing current Schoolbox MySQL database";
 mysql -u root -ptnp879 -e "drop database if exists schoolbox";
 
 echo "$vag Loading Schoolbox MySQL Demo data";
-mysql -u root -ptnp879 -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';";
+mysql -u root -ptnp879 -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';";
 mysql -u root -ptnp879 schoolbox < $cachedir/schoolboxdemo-v6.1.sql
 
 echo "$vag Generating data dir sql fixes";
@@ -50,7 +50,7 @@ rm -f /vagrant/updates/*/scripts_list > /dev/null;
 rm -vR /var/lib/vagrant > /dev/null;
 
 echo "$vag Applying UTF8 schema patch";
-/vagrant/tools/schema/collation.sh schoolbox;
+/vagrant/tools/schema/collation2.sh schoolbox;
 
 # Need to re-enable modules too, because they're off by default
 echo "$vag Enabling modules";
