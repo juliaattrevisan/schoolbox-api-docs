@@ -21,7 +21,9 @@
             <section>
                 <div class="dz-wrap">
                     <!-- BEGIN dropzone -->
-                    <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/myFileForm.php?ajax=1" method="post"></form>
+                    <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/myFileForm.php?ajax=1" method="post">
+                        <input type="hidden" name="user" value="{EPORTFOLIO_PAGE_USER_ID}" />
+                    </form>
                     <ul class="hide" data-dz-template>
                         <li>
                             <div class="card small-12">

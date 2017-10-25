@@ -9,7 +9,9 @@
                 <div class="content">
                     <div class="dz-wrap">
                         <!-- BEGIN dropzone -->
-                        <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/myFileForm.php?ajax=1" method="post" data-accepts="image"></form>
+                        <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/myFileForm.php?ajax=1" method="post" data-accepts="image">
+                            <input type="hidden" name="user" value="{EPORTFOLIO_PAGE_USER_ID}" />
+                        </form>
                         <ul data-dz-template class="hide">
                             <li class="full-width">
                                 <div style="text-align:{IMAGE_ALIGN};">
