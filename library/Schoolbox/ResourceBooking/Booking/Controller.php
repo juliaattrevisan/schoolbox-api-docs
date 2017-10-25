@@ -685,12 +685,27 @@ class Controller extends Base
                 'template' => '@resourceBooking/book.twig',
                 'data'     => [
                     'item'              => $item,
-                    'recurrence'        => $recurrence,
                     'campusList'        => $this->getCampusList(),
                     'cancelCallbackUrl' => $this->session->getHistory(),
                     'currentTerm'       => $this->getTermMapper()->findForToday(),
+                    'validationData'    => [
+                        'start' => Validation::START_DATETIME,
+                        'end' => Validation::END_DATETIME,
+                    ],
+                    'validationErrors'  => [
+                        'invalid' => Validation::ERROR_INVALID,
+                        'beforeStart' => Validation::ERROR_BEFORE_START,
+                        'inPast' => Validation::ERROR_IN_PAST,
+                        'tooEarly' => Validation::ERROR_TOO_EARLY,
+                        'tooShort' => Validation::ERROR_TOO_SHORT,
+                        'tooLong' => Validation::ERROR_TOO_LONG,
+                        'conflict' => Validation::ERROR_CONFLICT,
+                        'timetabledClass' => Validation::ERROR_TIMETABLED_CLASS,
+                        'currentTerm' => Validation::ERROR_CURRENT_TERM,
+                    ],
+                    'recurrence'        => $recurrence,
                     'efficacySelf'      => EventRecurrenceMapper::EFFICACY_SELF,
-                    'efficacySeries'    => EventRecurrenceMapper::EFFICACY_SERIES,
+                    'efficacySeries'    => EventRecurrenceMapper::EFFICACY_SERIES
                 ],
             ]
         );
