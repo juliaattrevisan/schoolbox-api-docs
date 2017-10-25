@@ -18,8 +18,6 @@ use PDOStatement;
 
 class Base extends BaseQuery implements IFunctionCall
 {
-    /** @var IBroker $broker */
-    protected $broker;
 
     /** @var string $name Function name */
     protected $name;
