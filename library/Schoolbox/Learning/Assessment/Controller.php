@@ -252,7 +252,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $perms = $this->getAccess()->getFolderAccess($this->getUser(), $folder->getId());
         /* If you're a staff, get redirected to a Status overview
          */
-        if ($perms >= UserAccess::ACCESS_WRITE) {
+        if( $assessment->isSpecification() && $perms >= UserAccess::ACCESS_READ) {
+            // Preview assessment in specification context
+            $redirect = $this->getRouter()->generate('learningAssessment.getPreview', ['assessmentId' => $assessment->getId()]);
+        }
+        else if ($perms >= UserAccess::ACCESS_WRITE) {
             $redirect = $this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]);
         }
         else if ($assessment->isParticipant($this->getUser())) {
