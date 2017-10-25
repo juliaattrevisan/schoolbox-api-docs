@@ -15,6 +15,12 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\UserMapper;
 use \Schoolbox\User;
 use \Alaress\Authorizer\Failure\Unauthorized;
@@ -22,6 +28,18 @@ use \Alaress\Authorizer\Failure\Unauthorized;
 class Module extends BaseModule
 {
     protected $basename = 'user';
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function registerRoutes()
+    {
+        $folderPermFull = new Rule\HasHomepageAccess(UserAccess::ACCESS_FULL, function(array $params = array(), User $user = null) {
+            return $params['folderId'];
+        }, Access::getInstance());
+
+        $this->register('GET', '/parentEmails/folder/{folderId}', 'getParentEmailsByFolder', $folderPermFull);
+    }
 
     /**
      * {@inheritdoc}
@@ -37,6 +55,9 @@ class Module extends BaseModule
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
+        $folderMapper = $this->getFolderMapper();
+        $errorMapper = $this->getErrorMapper();
+
         $this->addRoutePreload(
             $matcher,
             'impersonate',
@@ -44,6 +65,25 @@ class Module extends BaseModule
                 return array(
                     'user' => $this->getUserMapper()->findById($params['userId']),
                 );
+            }
+        );
+
+        // Convert folderId into Folder object
+        $this->addRoutePreload(
+            $matcher,
+            '.*',
+            function ($params) use ($folderMapper, $errorMapper) {
+
+                if (array_key_exists('folderId', $params)) {
+                    try {
+                        $params['folder'] = $folderMapper->findById($params['folderId']);
+                    }
+                    catch (MapperException $e) {
+                        throw $errorMapper->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+                    }
+                }
+
+                return $params;
             }
         );
     }
@@ -92,5 +132,21 @@ class Module extends BaseModule
     protected function getUserMapper()
     {
         return $this->getMapperFactory()->get(UserMapper::class);
+    }
+
+    /**
+     * @return FolderMapper
+     */
+    public function getFolderMapper()
+    {
+        return $this->getMapperFactory()->get(FolderMapper::class);
+    }
+
+    /**
+     * @return ErrorMapper
+     */
+    public function getErrorMapper()
+    {
+        return $this->getMapperFactory()->get(ErrorMapper::class);
     }
 }
