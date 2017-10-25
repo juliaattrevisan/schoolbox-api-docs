@@ -131,7 +131,6 @@ if (is_numeric($this->arg[0])) {
 
     // Keep list of everyone to email
     $all_emails        = [];
-    $all_parent_emails = [];
     $email_object      = new Email();
 
     foreach ($memberList as $member) {
@@ -141,21 +140,6 @@ if (is_numeric($this->arg[0])) {
         // Store member email for 'email group members' button
         if ($member->getId() != $_SESSION['id']) { // Don't email yourself
             $all_emails[] = $member->getEmail();
-        }
-
-        // Store parent emails for 'email group parents' button
-        if ($member->getRole()
-                   ->getType() == Schoolbox\Role::PARENT) {
-            $all_parent_emails[] = $member->getEmail();
-        } elseif ($member->getRole()
-                         ->getType() == Schoolbox\Role::STUDENT) {
-            $parents = $member->loadParents()
-                              ->getParents();
-            foreach ($parents as $parent) {
-                if (strlen($parent->getEmail())) {
-                    $all_parent_emails[] = $parent->getEmail();
-                }
-            }
         }
 
         if ($memberAccess->getAccessLevel() == UserAccess::ACCESS_FULL) {
@@ -265,24 +249,21 @@ if (is_numeric($this->arg[0])) {
     ]);
 
     if (\Cfg::get('mail_enable')) {
+        $this->setVar([
+            'REPLYTO'  => $email_object->formatEmailFromArray($_SESSION)
+        ]);
+
         if (!empty($all_emails)) {
             $this->setVar([
-                'REPLYTO'  => $email_object->formatEmailFromArray($_SESSION),
                 'EMAILALL' => implode(',', $all_emails),
             ]);
             $this->parse('mail_all_block', 'mail_all');
             $this->parse('mail_all_form_block', 'mail_all_form');
         }
 
-        if (!empty($all_parent_emails)) {
-            $all_parent_emails = array_unique($all_parent_emails);
-            $this->setVar([
-                'REPLYTO'         => $email_object->formatEmailFromArray($_SESSION),
-                'EMAILALLPARENTS' => implode(',', $all_parent_emails),
-            ]);
-            $this->parse('mail_all_parents_block', 'mail_all_parents');
-            $this->parse('mail_all_parents_form_block', 'mail_all_parents_form');
-        }
+        // Recipients for this will be generated on click, so show as long as mail is enabled
+        $this->parse('mail_all_parents_block', 'mail_all_parents');
+        $this->parse('mail_all_parents_form_block', 'mail_all_parents_form');
     }
 
     $waitingList = $groupHandler->getWaitingList($category->getId());
