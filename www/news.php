@@ -166,7 +166,6 @@ if (is_array($items)) {
             $owner = "<a href=\"/search/user/{$article['uid']}\">$fullname</a>";
 
             $formatter = new TextFormatter();
-//            var_dump($article);
 
             $postDate = new Alaress_Date_Format($article['item_datetime_published'], 'Y-m-d H:i:s');
 
