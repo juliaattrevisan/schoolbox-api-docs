@@ -12,3 +12,7 @@
 {% block modifyLink %}
     <a class="button icon-modify" href="/modules/eotc/manage/modify?eventID={{ event.eventId }}{{ returnStr }}">Modify</a>
 {% endblock %}
+
+{% block deleteButton %}
+    {# Currently it's not possible to delete EOTC events so this is blank. #}
+{% endblock %}

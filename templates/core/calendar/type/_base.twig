@@ -76,7 +76,9 @@
                     {% block modifyLink %}
                     <a class="button icon-modify" href="/calendar/modify.php?eventID={{ event.eventId }}{{ returnStr }}">Modify</a>
                     {% endblock %}
+                    {% block deleteButton %}
                     <a class="button icon-delete" id="delete-event-{{ event.eventId }}">Delete</a>
+                    {% endblock %}
                 {% endif %}
             </div>
             {% endblock eventBubbleButtons %}
