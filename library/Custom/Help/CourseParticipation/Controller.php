@@ -125,13 +125,19 @@ class Controller extends Base
     {
         $now = Alaress_Date_Format::now();
 
-        $code = $this->tokenMapper->findById($schoolCode);
-        $token = $this->computeAccessToken($now, $schoolCode, $code->getAccessToken());
+        try {
+            $code = $this->tokenMapper->findById($schoolCode);
+            $token = $this->computeAccessToken($now, $schoolCode, $code->getAccessToken());
 
-        $this->getResponse()->content->set($this->buildJsonOutput([
-            'ts'    => $now->getUnixTimeStamp(),
-            'token' => $token
-        ]));
+            $this->getResponse()->content->set($this->buildJsonOutput([
+                'ts'    => $now->getUnixTimeStamp(),
+                'token' => $token
+            ]));
+
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // bad request
+            $this->sendGenericStatus(400);
+        }
     }
 
     /**
