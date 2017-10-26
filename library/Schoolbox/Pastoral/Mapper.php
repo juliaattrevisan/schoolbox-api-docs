@@ -728,6 +728,9 @@ class Mapper extends BaseMapper
 
         $results = $this->hydrateSelect($statement);
 
+        // Filter out any I can't view
+        $results = $this->filterForUser($results, $user);
+
         // If there are no tags to filter, just return the results now
 
         if ($tags->count() == 0) {
