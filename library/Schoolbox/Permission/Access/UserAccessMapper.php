@@ -331,8 +331,7 @@ class UserAccessMapper extends Mapper
             FROM
                 `{$this->table}` ua
                 INNER JOIN {$this->getJoinSql('user', 'ua', 'u')}
-                LEFT JOIN groups g on u.group_id = g.id
-               	LEFT JOIN {$this->getJoinSql('user.role','u', 'ur')}
+                INNER JOIN {$this->getJoinSql('user.role','u', 'ur', true)}
             WHERE ua.service = :service
             AND ua.sid = :serviceId
         ";
@@ -347,7 +346,7 @@ class UserAccessMapper extends Mapper
             'access'    => $accessType,
         ];
         if (isset($roleType)) {
-            $query .= ' AND g.group_type = :roleType ';
+            $query .= ' AND ur.group_type = :roleType ';
             $params['roleType'] = $roleType;
         }
         $stmt = $this->database->prepare($query);
