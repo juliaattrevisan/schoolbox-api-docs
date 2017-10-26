@@ -141,7 +141,6 @@ class Controller extends Base
                     'item'              => $item,
                     'select'            => 'radio',
                     'campusList'        => $this->getCampusList(),
-                    'campuses'          => $this->campusMapper->findAll(),
                     'callbackUrl'       => $this->getRequest()->query['callbackUrl'],
                     'allowOverride'     => $item->getResource()->canUserModerateThisItem($this->getUser()),
                     'currentTerm'       => $this->getTermMapper()->findForToday(),
