@@ -338,7 +338,7 @@ if (is_array($items)) {
         /* The usual stuff
          */
         $fullname = Scrub::text($userHandler->formatName($article));
-        $postDate = new Alaress_Date_Format($article['post_datetime'], 'U');
+        $postDate = new Alaress_Date_Format($article['item_datetime_published'], Alaress_Date_Format::DATABASE_FORMAT);
 
         $output = array(
             'NEWS_ID' => $article['item_id'],
