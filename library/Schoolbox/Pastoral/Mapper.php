@@ -242,6 +242,39 @@ class Mapper extends BaseMapper
         return $model;
     }
 
+
+    /**
+     * Filter records from the collection if the current user doesn't have access to them.
+     *
+     * If the user is not in the audience and is not the owner, they can't see the record.
+     *
+     * @param Collection|Model[] $records A list of pastoral records
+     * @param User               $user    The user who is trying to view them
+     * @return Collection|Model[]
+     */
+    public function filterForUser(Collection $records, User $user)
+    {
+        return $records->filter(function ($model) use ($user) {
+            if (!$model instanceof Model) {
+                return false;
+            }
+
+            $inAudience = $this->isUserInPastoralService($user);
+
+            if (!$inAudience) {
+                foreach ($model->getAccess() as $access) {
+                    if ($access->hasAccess($user)) {
+                        $inAudience = true;
+                        break;
+                    }
+                }
+            }
+
+            return $inAudience || $model->getOwner()->getId() === $user->getId();
+        });
+    }
+
+
     /**
      * Return any records immediately related to the supplied pastoral record
      *
