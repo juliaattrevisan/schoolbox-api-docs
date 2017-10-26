@@ -49,8 +49,8 @@ $setUserFields = function(User $user, $getValues) use ($roleMapper, $campusMappe
     if (isset($getValues['su'])) {
         $user = $user->setSuperuser((bool)$getValues['su']);
     }
-    if (is_numeric($getValues['database_id'])) {
-        $user = $user->setExternalId($getValues['database_id']=='' ? null : $getValues['database_id']);
+    if (!empty($getValues['database_id'])) {
+        $user = $user->setExternalId($getValues['database_id']);
     }
     if (is_numeric($getValues['year'])) {
         $user = $user->setYear($getValues['year'] == '' ? null : $getValues['year']);
