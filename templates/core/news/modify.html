@@ -49,7 +49,25 @@
                 },
                 'heading': {
                     requiredNotBlank: true
+                },
+                'group[]': {
+                    required: {
+                        depends: function(element) {
+                            return $("[data-select-all-group=campus]:checked").length;
+                        }
+                    }
+                },
+                'campus[]': {
+                    required: {
+                        depends: function(element) {
+                            return $("[data-select-all-group=role]:checked").length;
+                        }
+                    }
                 }
+            },
+            messages: {
+                'group[]': "You must select a role if using campuses",
+                'campus[]': "You must select a campus if using roles"
             }
         });
 
