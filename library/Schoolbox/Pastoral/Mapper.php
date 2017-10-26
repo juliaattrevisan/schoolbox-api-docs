@@ -181,10 +181,10 @@ class Mapper extends BaseMapper
     protected function hydrateRow($row, $hydrateRelatedRecords)
     {
 
-        // This method gets called before checking authorization- so if the session timed out this might be blank
-        if (!$this->getSessionUser() instanceof User) {
-            return false;
-        }
+//        // This method gets called before checking authorization- so if the session timed out this might be blank
+//        if (!$this->getSessionUser() instanceof User) {
+//            return false;
+//        }
 
         /** @var UserMapper $ownerMapper */
         $ownerMapper = $this->getJoinMapper('owner');
@@ -213,21 +213,21 @@ class Mapper extends BaseMapper
         $model->setStudent($studentMapper->hydrate($row, 's')->loadParents()->loadTeachers());
         $model->setAccess($this->getJoinMapper('access')->findByColumn('pastoral_id', $model->getId()));
 
-        // If the user is not in the audience- and is not the owner, they can't see the record
-        $inAudience = $this->isUserInPastoralService($this->getSessionUser());
-
-        if (!$inAudience) {
-            foreach ($model->getAccess() as $access) {
-                if ($access->hasAccess($this->getSessionUser())) {
-                    $inAudience = true;
-                    break;
-                }
-            }
-        }
-
-        if (!$inAudience && $model->getOwner()->getId() !== $this->getSessionUser()->getId()) {
-            return false;
-        }
+//        // If the user is not in the audience- and is not the owner, they can't see the record
+//        $inAudience = $this->isUserInPastoralService($this->getSessionUser());
+//
+//        if (!$inAudience) {
+//            foreach ($model->getAccess() as $access) {
+//                if ($access->hasAccess($this->getSessionUser())) {
+//                    $inAudience = true;
+//                    break;
+//                }
+//            }
+//        }
+//
+//        if (!$inAudience && $model->getOwner()->getId() !== $this->getSessionUser()->getId()) {
+//            return false;
+//        }
 
         $model->setTags(Tag\Mapper::getInstance()->findForRecord($model));
         $model->setComments($this->getJoinMapper('comments')->findByColumn('pastoral_id', $model->getId()));
