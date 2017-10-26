@@ -305,7 +305,7 @@ $(function() {
 
     $('#campusList').hide();
     form.on('change', '#repeatUntilSelect', function(event) {
-        if($('#repeatUntilSelect').val() == "timetable"){
+        if($('#repeatUntilSelect').val() == "timetable" && $('#campusList').find("campus").length > 1){
             $('#campusList').show();
         }
         else{
