@@ -261,6 +261,8 @@ class Controller extends Base
             ]);
         }
 
+        $records = $this->pastoralMapper->filterForUser($records, $this->getUser());
+
         // Limit the number of pastoral records to display on each page of pastoral records
 
         $resultsPerPage = $this->config->get('pastoral_page_size');
@@ -318,7 +320,10 @@ class Controller extends Base
 
         // Retrieve all of the students pastoral records
 
-        $records = $this->pastoralMapper->findLinked($student, $linkedStudent, $get['type']);
+        $records = $this->pastoralMapper->filterForUser(
+            $this->pastoralMapper->findLinked($student, $linkedStudent, $get['type']),
+            $this->getUser()
+        );
 
         // Limit the number of pastoral records to display on each page of pastoral records
 
