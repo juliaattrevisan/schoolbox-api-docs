@@ -73,7 +73,9 @@
                     {% endif %}
                 {% endif %}
                 {% if event.isEditable %}
+                    {% block modifyLink %}
                     <a class="button icon-modify" href="/calendar/modify.php?eventID={{ event.eventId }}{{ returnStr }}">Modify</a>
+                    {% endblock %}
                     <a class="button icon-delete" id="delete-event-{{ event.eventId }}">Delete</a>
                 {% endif %}
             </div>
