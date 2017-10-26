@@ -1,20 +1,20 @@
-{% if dates|length > 2 %}
-    {% set large = 3 %}
-{% else %}
-    {% set large = 6 %}
+{% if dates|length == 4 %}
+    {% set fullSetOfDates = true %}
 {% endif %}
+
+{% set large = (fullSetOfDates) ? 3 : 6 %}
 
 {% if dateType == 'publish' %}
     {% set date = unitImplementation.openDate.local %}
-    {% set endSync = 'open' %}
+    {% set endSync = (fullSetOfDates) ? 'open' : 'due' %}
 {% elseif dateType == 'open' %}
     {% set date = unitImplementation.openDate.local %}
     {% set startSync = 'publish' %}
     {% set endSync = 'due' %}
 {% elseif dateType == 'due' %}
     {% set date = unitImplementation.dueDate.local %}
-    {% set startSync = 'open' %}
-    {% set endSync = 'close' %}
+    {% set startSync = (fullSetOfDates) ? 'open' : 'publish' %}
+    {% set endSync = (fullSetOfDates) ? 'due' : '' %}
 {% else %}
     {% set date = unitImplementation.dueDate.local %}
     {% set startSync = 'due' %}
@@ -31,6 +31,6 @@
            data-datepicker-format="datetime"
            data-datepicker-buttontext=""
            {% if startSync %}data-datesync-startdate="#{{ startSync }}Date-{{ unitImplementation.id }}"{% endif %}
-            {% if endSync %}data-datesync-enddate="#{{ endSync }}Date-{{ unitImplementation.id }}"{% endif %}
+           {% if endSync %}data-datesync-enddate="#{{ endSync }}Date-{{ unitImplementation.id }}"{% endif %}
     />
 </div>
