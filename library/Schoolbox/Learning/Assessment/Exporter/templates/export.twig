@@ -105,10 +105,10 @@
                                     </div>
                                 </div>
 
-                                {% if (assessment is project or assessment is task) %}
-                                    {% set dates = ['publish', 'due'] %}
-                                {% else %}
+                                {% if (assessment is quiz or (assessment is dueWork and not assessment.acceptNone)) %}
                                     {% set dates = ['publish', 'open', 'due', 'close'] %}
+                                {% else %}
+                                    {% set dates = ['publish', 'due'] %}
                                 {% endif %}
 
                                 <div class="list-item" id="unit-{{ implementation.unit.id }}-dates" hidden>

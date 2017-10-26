@@ -1,7 +1,7 @@
-{% if (assessment is project or assessment is task) %}
-    {% set large = 6 %}
-{% else %}
+{% if dates|length > 2 %}
     {% set large = 3 %}
+{% else %}
+    {% set large = 6 %}
 {% endif %}
 
 {% if dateType == 'publish' %}
