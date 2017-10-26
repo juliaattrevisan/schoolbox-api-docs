@@ -1,0 +1,15 @@
+{% extends '@core/user/student.twig' %}
+
+{% block buttons_island %}
+    <ul class='flex-list flex-wrap buttons'>
+        {% block buttons %}
+            {% if showButtons %}
+                {{ parent() }}
+                <li>
+                    <a href="http://synportal.ravenswood.nsw.edu.au/MyDetails.aspx?id=19705&item=medical"
+                       class="icon-info">Medical Details</a>
+                </li>
+            {% endif %}
+        {% endblock buttons %}
+    </ul>
+{% endblock buttons_island %}
