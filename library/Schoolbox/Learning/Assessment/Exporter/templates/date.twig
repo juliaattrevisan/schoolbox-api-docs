@@ -14,7 +14,7 @@
 {% elseif dateType == 'due' %}
     {% set date = unitImplementation.dueDate.local %}
     {% set startSync = (fullSetOfDates) ? 'open' : 'publish' %}
-    {% set endSync = (fullSetOfDates) ? 'due' : '' %}
+    {% set endSync = (fullSetOfDates) ? 'close' : '' %}
 {% else %}
     {% set date = unitImplementation.dueDate.local %}
     {% set startSync = 'due' %}
