@@ -552,6 +552,14 @@ class Controller extends Base
 
 
     /**
+     * Standard token auth for all routes in this controller.
+     *
+     * Business rules:
+     * - Client is required to supply a school code, timestamp, and digest hash.
+     * - If timestamp is more than 10 seconds old: return `400 Bad Request`
+     * - If the school code given does not exist, return `401 Forbidden`
+     * - If the digest hash does not meet expectations based on the other 2 data, return `403 Forbidden`
+     *
      * @param string              $schoolCode
      * @param Alaress_Date_Format $requestTimestamp
      * @param string              $authDigest
