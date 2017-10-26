@@ -195,7 +195,7 @@ class Controller extends Base
             'data' => [
                 'user' => $this->getUser(),
                 'recentStudents' => $this->pastoralAuditMapper->findRecentStudents(),
-                'recentDashboard' => $this->pastoralMapper->findRecentDashboard(),
+                'recentDashboard' => $this->pastoralMapper->findRecentDashboard($this->getUser()),
                 'reportsDashboard'  => $this->pastoralReportMapper->findForUserDashboard($this->getUser()),
                 'groups' => $this->pastoralGroupMemberMapper->findByColumn('user_id', $this->getUser()->getId())
             ]

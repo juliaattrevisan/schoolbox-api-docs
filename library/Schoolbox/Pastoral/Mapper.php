@@ -389,37 +389,21 @@ class Mapper extends BaseMapper
     /**
      * Display the most recent records that are tagged for display on dashboard based on their severity
      *
+     * @param User $user
      * @param int $count Number of recent records to display
      * @return Collection|Model[]
      */
-    public function findRecentDashboard($count = 5)
+    public function findRecentDashboard(User $user, $count = 5)
     {
-        $records = $this->findByColumnList([
-            'sv.dashboard' => 1,
-        ], [
-            'limit' => $count,
-            ['order' => ['created_at' => 'DESC']],
-        ]);
-
-        $displayed = $this->createCollection();
-
-        /** @var Model $record */
-        foreach ($records as $record) {
-            if ($record->getOwner()->getId() == $this->getSessionUser()->getId()) {
-                $displayed->add($record);
-                continue;
-            }
-
-            /** @var Access\Model $access */
-            foreach ($record->getAccess() as $access) {
-                if ($access->hasAccess($this->getSessionUser())) {
-                    $displayed->add($record);
-                    break;
-                }
-            }
-        }
-
-        return $displayed;
+        return $this->filterForUser(
+            $this->findByColumnList([
+                'sv.dashboard' => 1,
+            ], [
+                'limit' => $count,
+                ['order' => ['created_at' => 'DESC']],
+            ]),
+            $user
+        );
     }
 
     /**
