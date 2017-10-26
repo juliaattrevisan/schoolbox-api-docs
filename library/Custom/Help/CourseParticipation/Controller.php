@@ -557,7 +557,7 @@ class Controller extends Base
      * Business rules:
      * - Client is required to supply a school code, timestamp, and digest hash.
      * - If timestamp is more than 10 seconds old: return `400 Bad Request`
-     * - If the school code given does not exist, return `401 Forbidden`
+     * - If the school code given does not exist, return `404 Not Found`
      * - If the digest hash does not meet expectations based on the other 2 data, return `403 Forbidden`
      *
      * @param string              $schoolCode
@@ -577,7 +577,7 @@ class Controller extends Base
         try {
             $privateKey = $this->tokenMapper->findById($schoolCode)->getAccessToken();
         } catch (Mapper\Exception $e) {
-            return 401;
+            return 404;
         }
 
         $expectedToken = $this->computeAccessToken(
