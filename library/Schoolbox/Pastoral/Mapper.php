@@ -496,16 +496,17 @@ class Mapper extends BaseMapper
      * Perform a search of pastoral records (currently searches the heading, body and comments)
      *
      * @param string $search
+     * @param User   $user   The user who is searching
      * @return Collection|Model[]
      */
-    public function getSearchResults($search)
+    public function getSearchResults($search, User $user)
     {
         $search = trim($search);
 
         // Keep an audit trail of searches
         $pastoralAuditMapper = Audit\Mapper::getInstance();
         $auditRecord = $pastoralAuditMapper->createModel();
-        $auditRecord->setUser($this->getSessionUser());
+        $auditRecord->setUser($user);
         $auditRecord->setSearch($search);
 
         $words = [];
@@ -554,7 +555,7 @@ class Mapper extends BaseMapper
             // Retrieve the hydrated records
             $statement->execute(array_merge($pbRecordSearch->getParams(), $pbCommentSearch->getParams()));
 
-            $results = $this->hydrateSelect($statement);
+            $results = $this->filterForUser($this->hydrateSelect($statement), $user);
 
             // Keep a record of all searches performed by users, and what results were displayed
             $searchResults = [];
