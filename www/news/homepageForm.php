@@ -1,11 +1,13 @@
 <?php
 require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 $page = new SitePage;
 $groupHandler = new Group;
 
-if(!($_POST['heading'] && is_numeric($_POST['code']))) {
-	error(2);
+// Non-blank heading and folder ID(?) is required
+if(!(trim($_POST['heading']) && is_numeric($_POST['code']))) {
+	error(ErrorMapper::ERROR_INFORMATION_MISSING);
 }
 
 if(($permission = $groupHandler->getPermission($_POST['code'])) < WRITE_ACCESS) {
