@@ -141,6 +141,7 @@ class Controller extends Base
                     'item'              => $item,
                     'select'            => 'radio',
                     'campusList'        => $this->getCampusList(),
+                    'campuses'          => $this->campusMapper->findAll(),
                     'callbackUrl'       => $this->getRequest()->query['callbackUrl'],
                     'allowOverride'     => $item->getResource()->canUserModerateThisItem($this->getUser()),
                     'currentTerm'       => $this->getTermMapper()->findForToday(),
@@ -215,7 +216,7 @@ class Controller extends Base
                     $bookingList,
                     $this->getRequest()->post['repeat'],
                     Alaress_Date_Format::newLocalShort($this->getRequest()->post['repeat_until'])->getDateTimeObject(),
-                    $this->getRequest()->post['timetable']['campus']
+                    $this->getRequest()->post['campus']
                 );
             } else {
                 // Just save the event by itself.

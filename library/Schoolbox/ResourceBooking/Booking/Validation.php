@@ -196,8 +196,8 @@ class Validation
             if ($isNewBooking) {
                 // Validate related and recurrent bookings of a new booking
                 $series = new Series($this->getBookingMapper(), $this->getStatusMapper(), $this->getExternalTimetableHandler());
-                if ($postData['timetable']['campus'] > 0) {
-                    $campus = $this->getCampusMapper()->findById($postData['timetable']['campus']);
+                if ($postData['campus'] > 0) {
+                    $campus = $this->getCampusMapper()->findById($postData['campus']);
                 }
                 /** @var Campus $campus */
                 $dateParts = $series->getNewBookingSeries(
