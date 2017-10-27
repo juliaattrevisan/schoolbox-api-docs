@@ -23,6 +23,16 @@ class RouteCollector extends DataCollector implements Renderable
     private $route;
 
     /**
+     * Constructor
+     *
+     * @param string $route
+     */
+    public function __construct($route)
+    {
+        $this->route = $route;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function collect()
@@ -34,10 +44,12 @@ class RouteCollector extends DataCollector implements Renderable
      * Sets the route to display.
      *
      * @param string $route
+     * @return $this
      */
     public function setRoute($route)
     {
         $this->route = $route;
+        return $this;
     }
 
     /**

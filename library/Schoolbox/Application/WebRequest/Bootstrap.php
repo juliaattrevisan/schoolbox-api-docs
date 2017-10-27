@@ -90,9 +90,6 @@ class Bootstrap extends AbstractBootstrap {
                 DebugBar::getInstance()->addCollector(new TidewaysCollector());
             }
         }
-
-        // Aura route
-        DebugBar::getInstance()->addCollector(new RouteCollector());
     }
 
 

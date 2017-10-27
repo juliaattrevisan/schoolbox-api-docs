@@ -180,12 +180,9 @@ class Kernel extends \Alaress\Application\Kernel
 
                 // Set the route into the debug bar
                 if (DebugBar::isEnabled()) {
-                    if (DebugBar::getInstance()->hasCollector('route')) {
-                        $routeCollector = DebugBar::getInstance()->getCollector('route');
-                        if ($routeCollector instanceof RouteCollector) {
-                            $routeCollector->setRoute(sprintf('%s::%s', $method->class, $method->name));
-                        }
-                    }
+                    DebugBar::getInstance()->addCollector(
+                        new RouteCollector(sprintf('%s::%s', $method->class, $method->name))
+                    );
                 }
 
                 $method->invokeArgs($controller, $args);
