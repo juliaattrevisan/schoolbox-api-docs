@@ -103,7 +103,7 @@ class External_Doublefirst_Class implements External_ClassInterface
             "
             SELECT DISTINCT tcs.StaffID
             FROM PupilSubjects ps 
-            JOIN TimeTableClassStaff tcs ON tcs.SchoolID = ps.SchoolID AND tcs.YearGroup = ps.YearGroup AND tcs.DivisionID = ps.DivisionID AND tcs.AcademicYear = ps.SchoolYear AND tcs.BatchID = ps.BatchID
+            JOIN TimetableClassStaff tcs ON tcs.SchoolID = ps.SchoolID AND tcs.YearGroup = ps.YearGroup AND tcs.DivisionID = ps.DivisionID AND tcs.AcademicYear = ps.SchoolYear AND tcs.BatchID = ps.BatchID
             JOIN StaffPersonalDetails spd ON spd.StaffID = tcs.StaffID
             
             LEFT JOIN YearGroupSubjectDivision ygsd ON ygsd.DivisionID = tcs.DivisionID AND ygsd.SubjectID = tcs.SubjectID AND ygsd.YearGroup = tcs.YearGroup AND ygsd.AcademicYear = tcs.AcademicYear
