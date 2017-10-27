@@ -8,7 +8,11 @@
  * @version     SVN: $Id$
  */
 
-require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Database;
+use Schoolbox\Engagement;
+
+require_once __DIR__ . '/../../library/Bootstrap.php';
 
 $page = new SitePage;
 $output = array();
@@ -21,10 +25,10 @@ if(!isset($_POST['module'])) {
 switch($_POST['module']) {
     // cases mirror categories listed
     case 'users':
-        $groupHandler = new Group();
-        $summary = $groupHandler->userSummary();
-        $totalUser = 0;
-        $totalLogin = 0;
+        $login         = new Engagement\Login(Database\Factory::getInstanceInternal(), ConfigMapper::getInstance());
+        $summary       = $login->userSummary();
+        $totalUser     = 0;
+        $totalLogin    = 0;
 
         foreach($summary as $group) {
             $output[] = array( 'GROUP_ID'        => $group['id'],
@@ -65,7 +69,6 @@ switch($_POST['module']) {
     default:
         break;
 }
-
 
 // to test how it looks with delay
 // sleep(2);
