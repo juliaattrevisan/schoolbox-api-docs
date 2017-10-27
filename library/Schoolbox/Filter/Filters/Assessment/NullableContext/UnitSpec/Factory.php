@@ -70,8 +70,8 @@ class Factory extends NullableContext\Factory
         User $user,
         Filter\Page\Model $pageFilter,
         GenericCollection $selections,
-        User $viewee = null,
-        GenericCollection $overrides = null
+        ?User $viewee,
+        ?GenericCollection $overrides
     ): Filter\IComponent {
         return new Component($definition, $user, $pageFilter, $overrides ?: $selections, $this->getSelectionMapper());
     }

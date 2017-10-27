@@ -91,17 +91,21 @@ class Factory extends NullableContext\Factory
      * @return Filter\IComponent|Component
      * @throws DefinitionException If unable to find a joined mapper
      * @throws Mapper\Exception If unable to hydrate a row
+     * @throws \InvalidArgumentException If $viewee is null
      */
     public function buildComponent(
         Filter\IDefinition $definition,
         User $user,
         Filter\Page\Model $pageFilter,
         GenericCollection $selections,
-        User $viewee = null,
-        GenericCollection $overrides = null
+        ?User $viewee,
+        ?GenericCollection $overrides
     ): Filter\IComponent {
         $userSelections  = $overrides ?: $selections;
         $selectionMapper = $this->getSelectionMapper();
+        if (null === $viewee) {
+            throw new \InvalidArgumentException('$viewee cannot be null');
+        }
         $projects        = $this->getProjects($pageFilter, $viewee, $overrides);
         return new Component($definition, $user, $pageFilter, $userSelections, $selectionMapper, $projects);
     }

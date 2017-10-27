@@ -46,8 +46,8 @@ abstract class AbstractFactory implements IFactory
         User $user,
         Page\Model $pageFilter,
         GenericCollection $selections,
-        User $viewee = null,
-        GenericCollection $overrides = null
+        ?User $viewee,
+        ?GenericCollection $overrides
     ): IComponent {
         return new BaseComponent($definition, $user, $pageFilter, $overrides ?: $selections, $this->selectionMapper);
     }

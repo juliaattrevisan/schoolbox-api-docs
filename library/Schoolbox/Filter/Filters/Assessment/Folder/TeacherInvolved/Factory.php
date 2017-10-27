@@ -51,8 +51,8 @@ class Factory extends FolderFilter\Factory
         User $user,
         Filter\Page\Model $pageFilter,
         GenericCollection $selections,
-        User $viewee = null,
-        GenericCollection $overrides = null
+        ?User $viewee,
+        ?GenericCollection $overrides
     ): Filter\IComponent {
         if (null === $viewee) {
             throw new \InvalidArgumentException('Viewee cannot be null');

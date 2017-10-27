@@ -7,7 +7,6 @@
 
 namespace Schoolbox\Filter;
 
-use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Filter;
@@ -57,8 +56,8 @@ interface IFactory
         User $user,
         Page\Model $pageFilter,
         GenericCollection $selections,
-        User $viewee = null,
-        GenericCollection $overrides = null
+        ?User $viewee,
+        ?GenericCollection $overrides
     ): IComponent;
 
 
