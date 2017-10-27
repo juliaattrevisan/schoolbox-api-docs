@@ -18,11 +18,26 @@ use DebugBar\DataCollector\Renderable;
 class RouteCollector extends DataCollector implements Renderable
 {
     /**
+     * @var string
+     */
+    private $route;
+
+    /**
      * {@inheritDoc}
      */
     public function collect()
     {
-        return ['route' => "A route"];
+        return ['route' => $this->route];
+    }
+
+    /**
+     * Sets the route to display.
+     *
+     * @param string $route
+     */
+    public function setRoute($route)
+    {
+        $this->route = $route;
     }
 
     /**

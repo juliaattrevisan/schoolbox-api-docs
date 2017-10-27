@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Application\WebRequest;
 
+use Alaress\DebugBar\DataCollector\RouteCollector;
 use Alaress\DebugBar\DataCollector\TidewaysCollector;
 use Alaress\DebugBar\DataCollector\XhprofCollector;
 use Alaress\DebugBar\Instance as DebugBar;
@@ -89,6 +90,9 @@ class Bootstrap extends AbstractBootstrap {
                 DebugBar::getInstance()->addCollector(new TidewaysCollector());
             }
         }
+
+        // Aura route
+        DebugBar::getInstance()->addCollector(new RouteCollector());
     }
 
 
