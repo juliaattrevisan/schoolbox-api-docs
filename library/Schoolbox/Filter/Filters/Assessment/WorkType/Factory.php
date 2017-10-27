@@ -9,8 +9,6 @@ namespace Schoolbox\Filter\Filters\Assessment\WorkType;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\GenericCollection;
-use Schoolbox\User;
 use Schoolbox\Learning\Assessment\WorkType;
 
 
