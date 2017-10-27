@@ -7,9 +7,9 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\YearDue;
 
-use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractFactory;
-use Schoolbox\User;
+use Schoolbox\Filter\IDefinition;
+use Schoolbox\Filter\IKeyConverter;
 use Schoolbox\Filter;
 
 /**
@@ -19,15 +19,31 @@ class Factory extends AbstractFactory
 {
 
     /**
-     * @inheritdoc
+     * Build a filter definition, ready to use in the admin pages
+     *
+     * No dynamic options or user-selections relevant.
+     *
+     * @param Filter\Model $filter
+     * @return IDefinition|Definition
      */
-    protected function buildExtraComponentArgs(
-        User $user,
-        Filter\Page\Model $pageFilter,
-        Filter\IDefinition $definition,
-        Collection $overrides,
-        User $viewee = null
-    ) {
-        return [];
+    public function buildDefinition(Filter\Model $filter): IDefinition
+    {
+        return new Definition(
+            $filter,
+            $this->getOptionMapper(),
+            $this->getDefaultsMapper()
+        );
+    }
+
+
+    /**
+     * Returns a key converter, able to convert between concrete keys and the entities they represent
+     *
+     * @param Filter\Model $filter
+     * @return IKeyConverter|KeyConverter
+     */
+    public function buildKeyConverter(Filter\Model $filter): IKeyConverter
+    {
+        return new KeyConverter($filter);
     }
 }

@@ -22,7 +22,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function getCustomKeys()
+    protected function getCustomKeys(): array
     {
         return [];
     }
@@ -31,7 +31,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public static function getPages()
+    public static function getPages(): array
     {
         return [];
     }
@@ -41,7 +41,7 @@ class Definition extends Filter\AbstractDefinition
      * @param string $key
      * @return string
      */
-    public function getLabel($key)
+    public function getLabel($key): string
     {
         return $key;
     }
@@ -53,7 +53,7 @@ class Definition extends Filter\AbstractDefinition
      * @param string $roleType
      * @return bool
      */
-    protected function getInitialSelectedState($key, $page, $roleType)
+    protected function getInitialSelectedState($key, $page, $roleType): bool
     {
         // No options checked
         return false;
@@ -65,7 +65,7 @@ class Definition extends Filter\AbstractDefinition
      * @param Filter\Page\Model $pageFilter
      * @return bool
      */
-    public function getInitialAvailability($customAbstractKey, Filter\Page\Model $pageFilter)
+    public function getInitialAvailability($customAbstractKey, Filter\Page\Model $pageFilter): bool
     {
         // by default, all YearsDue are available
         return true;
@@ -75,7 +75,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected static function getTemplatesDir()
+    protected static function getTemplatesDir(): string
     {
         return '@filterDefinitions/Assessment/YearDue/templates';
     }
