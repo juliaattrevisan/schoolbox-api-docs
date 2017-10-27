@@ -1,5 +1,6 @@
 <?php
 
+use Schoolbox\Role;
 use \Schoolbox\User as UserModel;
 use \Schoolbox\UserMapper;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -163,7 +164,7 @@ class Group extends DeprecatedModel
      */
     public function getStaffGroupTypeIds()
     {
-        return $this->getGroupTypeIds(Group::STAFF_GROUP_TYPE);
+        return $this->getGroupTypeIds(Role::STAFF);
     }
 
     /**
@@ -173,7 +174,7 @@ class Group extends DeprecatedModel
      */
     public function getParentGroupTypeIds()
     {
-        return $this->getGroupTypeIds(Group::PARENT_GROUP_TYPE);
+        return $this->getGroupTypeIds(Role::PARENT);
     }
 
     /**
@@ -183,7 +184,7 @@ class Group extends DeprecatedModel
      */
     public function getStudentGroupTypeIds()
     {
-        return $this->getGroupTypeIds(Group::STUDENT_GROUP_TYPE);
+        return $this->getGroupTypeIds(Role::STUDENT);
     }
 
     /**
@@ -193,7 +194,7 @@ class Group extends DeprecatedModel
      */
     public function getGuestGroupTypeIds()
     {
-        return $this->getGroupTypeIds(Group::GUEST_GROUP_TYPE);
+        return $this->getGroupTypeIds(Role::GUEST);
     }
 
     function getAllByType($type)
@@ -566,7 +567,7 @@ class Group extends DeprecatedModel
      */
     public function isGuest($userID = 0)
     {
-        return $this->isUserOfType($userID, Group::GUEST_GROUP_TYPE);
+        return $this->isUserOfType($userID, Role::GUEST);
     }
 
     /**
@@ -577,7 +578,7 @@ class Group extends DeprecatedModel
      */
     public function isStudent($userID = 0)
     {
-        return $this->isUserOfType($userID, Group::STUDENT_GROUP_TYPE);
+        return $this->isUserOfType($userID, Role::STUDENT);
     }
 
     /**
@@ -588,7 +589,7 @@ class Group extends DeprecatedModel
      */
     public function isParent($userID = 0)
     {
-        return $this->isUserOfType($userID, Group::PARENT_GROUP_TYPE);
+        return $this->isUserOfType($userID, Role::PARENT);
     }
 
     /**
@@ -599,7 +600,7 @@ class Group extends DeprecatedModel
      */
     public function isStaff($userID = 0)
     {
-        return $this->isUserOfType($userID, Group::STAFF_GROUP_TYPE);
+        return $this->isUserOfType($userID, Role::STAFF);
     }
 
     /**

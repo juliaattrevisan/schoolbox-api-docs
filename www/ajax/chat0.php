@@ -9,6 +9,8 @@
  * 
  */
 
+use Schoolbox\Role;
+
 ini_set('display_errors',1);
 error_reporting(E_ALL & ~E_NOTICE);
 
@@ -95,7 +97,7 @@ else if ($method == 'poll') {
 
                 // no? ok, iterate and find out if any of the users are
                 foreach($users as &$user) {
-                    if($user['group_type'] == Group::STAFF_GROUP_TYPE) {
+                    if($user['group_type'] == Role::STAFF) {
 
                         $msg[] = $user['group_type'];
 

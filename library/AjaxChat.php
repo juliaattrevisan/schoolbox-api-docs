@@ -1,4 +1,7 @@
 <?php
+
+use Schoolbox\Role;
+
 /**
  * Ajax chat class - handles chat messages.
  * Moved from www/ajax/chat.php to here.
@@ -158,7 +161,7 @@ class AjaxChat {
 
                     // no? ok, iterate and find out if any of the users are
                     foreach($users as &$user) {
-                        if($user['group_type'] == Group::STAFF_GROUP_TYPE) {
+                        if($user['group_type'] == Role::STAFF) {
 
                             $msg[] = $user['group_type'];
 

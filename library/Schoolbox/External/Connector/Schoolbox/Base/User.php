@@ -20,6 +20,7 @@ use Schoolbox\External\Normalise\User\Guardian;
 use Schoolbox\External\Normalise\User\Staff;
 use Schoolbox\External\Normalise\User\Student;
 use Schoolbox\External\UserRelation;
+use Schoolbox\Role;
 
 class User extends Base implements IUser
 {
@@ -134,7 +135,7 @@ class User extends Base implements IUser
             WHERE       `user`.`synergy_id` IN ({$externalIdBindings['sql']})
             GROUP BY    `user`.`synergy_id`
         ", array_merge($externalIdBindings['bindings'], [
-            'groupType' => Group::PARENT_GROUP_TYPE,
+            'groupType' => Role::PARENT,
             'guardianType' => UserRelation::RELATION_TYPE_PARENT
         ]));
 
@@ -299,7 +300,7 @@ class User extends Base implements IUser
             GROUP BY    `user`.`synergy_id`
 
         ", array_merge($filterBindings, [
-            'groupType' => Group::STUDENT_GROUP_TYPE,
+            'groupType' => Role::STUDENT,
             'guardianType' => UserRelation::RELATION_TYPE_PARENT
 
         ]));
@@ -381,7 +382,7 @@ class User extends Base implements IUser
             GROUP BY    `user`.`synergy_id`
 
         ", array_merge($externalIdBindings['bindings'], [
-            'groupType' => Group::STUDENT_GROUP_TYPE,
+            'groupType' => Role::STUDENT,
             'guardianType' => UserRelation::RELATION_TYPE_PARENT
 
         ]));
@@ -483,7 +484,7 @@ class User extends Base implements IUser
         ', [
 
             'externalId' => $externalId,
-            'groupType' => Group::STUDENT_GROUP_TYPE,
+            'groupType' => Role::STUDENT,
             'guardianType' => UserRelation::RELATION_TYPE_PARENT
         ]);
 
@@ -545,7 +546,7 @@ class User extends Base implements IUser
             GROUP BY    `user`.`synergy_id`
 
         ", array_merge($externalIdBindings['bindings'], [
-            'groupType' => Group::STAFF_GROUP_TYPE
+            'groupType' => Role::STAFF
         ]));
 
 
@@ -615,7 +616,7 @@ class User extends Base implements IUser
             GROUP BY    `user`.`synergy_id`
 
         ', [
-            'groupType' => Group::STAFF_GROUP_TYPE
+            'groupType' => Role::STAFF
         ]);
 
         $results = new Collection();
