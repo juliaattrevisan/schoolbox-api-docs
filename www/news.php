@@ -167,7 +167,7 @@ if (is_array($items)) {
 
             $formatter = new TextFormatter();
 
-            $postDate = new Alaress_Date_Format($article['item_datetime_published'], 'Y-m-d H:i:s');
+            $postDate = new Alaress_Date_Format($article['item_datetime_published'], Alaress_Date_Format::DATABASE_FORMAT);
 
             $output = array(
                 'NEWS_ID' => $article['item_id'],
