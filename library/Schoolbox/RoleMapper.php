@@ -9,6 +9,8 @@
 
 namespace Schoolbox;
 
+use Alaress\Database\Quoter\IQuoter;
+
 /**
  * @method Role hydrate(array $row, $alias = '', $callback = null)
  * @method Role findOneByColumn($columnName, $columnValue, $order = [], $options = [])
@@ -70,5 +72,17 @@ class RoleMapper extends Mapper
     {
         Pastoral\Access\Mapper::getInstance()->deleteByColumn('role_id', $role->getId());
         return true;
+    }
+
+
+    /**
+     * @param string $name
+     * @param array  $options
+     * @return GenericCollection|Role[]
+     */
+    public function searchByName(string $name, array $options = []): GenericCollection
+    {
+        $escaped = $this->getDatabase()->escapeForLike($name);
+        return $this->findByPredicates($this->getPredicateBuilder()->like('name', "%{$escaped}%"), $options);
     }
 }
