@@ -13,58 +13,59 @@ require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
 $page = new SitePage;
 $output = array();
 
-if(isset($_POST['module'])) {
-    switch($_POST['module']) {
-        // cases mirror categories listed
-        case 'users':
-            $groupHandler = new Group();
-            $summary = $groupHandler->userSummary();
-            $totalUser = 0;
-            $totalLogin = 0;
-
-            foreach($summary as $group) {
-                $output[] = array( 'GROUP_ID'        => $group['id'],
-                                   'GROUP_NAME'      => Scrub::text($group['name']),
-                                   'GROUP_USER'      => $group['total'],
-                                   'GROUP_LOGGED_IN' => $group['logged_in'] );
-                $totalUser += $group['total'];
-                $totalLogin += $group['logged_in'];
-            }
-            $output[] = array(  'GROUP_ID'=>'',
-                                'GROUP_NAME'=>'Total',
-                                'GROUP_USER'=>$totalUser,
-                                'GROUP_LOGGED_IN'=>$totalLogin,);
-
-            break;
-
-        case 'service_www':
-            $context = \Proxy\Server::getInstance()->getContext();
-            if(@file_get_contents('https://repo.schoolbox.com.au/testfile.txt', null, $context)) {
-                $output[] = array('WWW_LIGHT'  => 'success',
-                                  'WWW_STATUS' => 'Available'
-                );
-            } else {
-                $output[] = array('WWW_LIGHT'  => 'alert',
-                                  'WWW_STATUS' => 'Inaccessible');
-            }
-
-            break;
-
-
-            // other cases unimplemented for now
-        case 'storage':
-        case 'memory':
-        case 'service_db':
-        case 'service_email':
-        case 'service_ldap':
-        case 'recent_activity':
-        default:
-            break;
-    }
-} else {
+if(!isset($_POST['module'])) {
     // don't bother returning anything
     die();
 }
+
+switch($_POST['module']) {
+    // cases mirror categories listed
+    case 'users':
+        $groupHandler = new Group();
+        $summary = $groupHandler->userSummary();
+        $totalUser = 0;
+        $totalLogin = 0;
+
+        foreach($summary as $group) {
+            $output[] = array( 'GROUP_ID'        => $group['id'],
+                               'GROUP_NAME'      => Scrub::text($group['name']),
+                               'GROUP_USER'      => $group['total'],
+                               'GROUP_LOGGED_IN' => $group['logged_in'] );
+            $totalUser += $group['total'];
+            $totalLogin += $group['logged_in'];
+        }
+        $output[] = array(  'GROUP_ID'=>'',
+                            'GROUP_NAME'=>'Total',
+                            'GROUP_USER'=>$totalUser,
+                            'GROUP_LOGGED_IN'=>$totalLogin,);
+
+        break;
+
+    case 'service_www':
+        $context = \Proxy\Server::getInstance()->getContext();
+        if(@file_get_contents('https://repo.schoolbox.com.au/testfile.txt', null, $context)) {
+            $output[] = array('WWW_LIGHT'  => 'success',
+                              'WWW_STATUS' => 'Available'
+            );
+        } else {
+            $output[] = array('WWW_LIGHT'  => 'alert',
+                              'WWW_STATUS' => 'Inaccessible');
+        }
+
+        break;
+
+
+        // other cases unimplemented for now
+    case 'storage':
+    case 'memory':
+    case 'service_db':
+    case 'service_email':
+    case 'service_ldap':
+    case 'recent_activity':
+    default:
+        break;
+}
+
 
 // to test how it looks with delay
 // sleep(2);
