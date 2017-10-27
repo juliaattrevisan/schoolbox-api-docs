@@ -637,7 +637,6 @@ class Healthcheck
             "SubjectMaster",
             "TimetableClassRoom",
             "TimetableClassStaff",
-            "TimeTableClassStaff",
             "TimetableMaster",
             "TimetableMatrix",
             "TimetableParameters",
