@@ -122,7 +122,7 @@ $url = new Url($topic['name'], '');
 
 $owner = UserMapper::getInstance()->findByID($article['item_owner']);
 
-$d = new Alaress_Date_Format($article['item_datetime_posted'], Alaress_Date_Format::DATABASE_FORMAT);
+$d = new Alaress_Date_Format($article['item_datetime_published'], Alaress_Date_Format::DATABASE_FORMAT);
 $e = new Alaress_Date_Format($article['item_datetime_expires'], Alaress_Date_Format::DATABASE_FORMAT);
 
 $output = array(
