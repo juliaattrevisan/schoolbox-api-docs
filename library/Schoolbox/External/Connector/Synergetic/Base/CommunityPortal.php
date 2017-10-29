@@ -150,7 +150,7 @@ class CommunityPortal implements ICommunityPortal
                     :externalId,
                     'CP',
                     :password,
-                    NOW(),
+                    GETDATE(),
                     '',
                     NULL,
                     NULL,
