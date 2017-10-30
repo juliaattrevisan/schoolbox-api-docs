@@ -308,7 +308,7 @@ class Controller extends Base
 
 
     /**
-     * ResponseFile Factory might throw exceptions if you're viewing crocodocable files that somehow die
+     * Preview the Response's filetype
      *
      * @param Model          $response
      * @param SubmissionFile $file
