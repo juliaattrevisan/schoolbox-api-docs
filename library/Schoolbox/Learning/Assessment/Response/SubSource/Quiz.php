@@ -38,12 +38,4 @@ class Quiz extends AbstractSubSource
     {
         return $assessment instanceof QuizObject;
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function findByCrocodocId(IAssessable $assessment, $crocodocId)
-    {
-        return null;
-    }
 }
