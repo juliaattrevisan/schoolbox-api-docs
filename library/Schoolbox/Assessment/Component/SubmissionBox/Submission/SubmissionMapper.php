@@ -170,30 +170,6 @@ class SubmissionMapper extends BaseMapper implements FindableCrocodoc
         }
     }
 
-    /**
-     * Find a particular record that contains $crocodocId
-     *
-     * @param $crocodocId
-     * @return Submission|null
-     */
-    public function findByCrocodocId($crocodocId)
-    {
-        try {
-            $submissionFileMapper = $this->getJoinMapper('files');
-
-            /** @var Submission $submission */
-            $submission = $submissionFileMapper->findOneByColumn('uuid', $crocodocId)->getSubmission();
-
-            $existingFiles = $submissionFileMapper->findByColumn('student_submission_id', $submission->getId());
-
-            $submission->setFiles($existingFiles);
-
-            return $submission;
-        }
-        catch (MapperException $e) {
-            return null;
-        }
-    }
 
     /**
      * Soft deletes all Files for the specified Submission
