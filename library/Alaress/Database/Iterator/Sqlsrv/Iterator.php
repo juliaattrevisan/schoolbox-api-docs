@@ -10,12 +10,9 @@
 
 namespace Alaress\Database\Iterator\Sqlsrv;
 
-use Alaress\Database\Iterator\IIterator;
-use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use Alaress\Database\Iterator\Base;
-use PDO;
 
-class Iterator extends Base implements IIterator
+class Iterator extends Base
 {
     /**
      * @inheritdoc

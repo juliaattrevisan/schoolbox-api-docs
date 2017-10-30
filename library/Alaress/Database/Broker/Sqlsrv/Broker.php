@@ -11,7 +11,6 @@
 namespace Alaress\Database\Broker\Sqlsrv;
 
 use Alaress\Database\Broker\Base;
-use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Iterator\Sqlsrv\Iterator;
 use Alaress\Database\Quoter\Sqlsrv\Quoter as SqlsrvQuoter;
 use Alaress\Database\Statement\Query\Sqlsrv\Query;
@@ -19,7 +18,7 @@ use Alaress\Database\Statement\FunctionCall\Sqlsrv\FunctionCall;
 use Alaress\Database\Statement\StoredProcedure\Sqlsrv\StoredProcedure;
 use PDO;
 
-class Broker extends Base implements IBroker
+class Broker extends Base
 {
     // This extends the parent connect function with MSSQL specific connection attributes and
     // post connection queries that need to be executed

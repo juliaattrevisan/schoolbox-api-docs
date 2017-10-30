@@ -11,7 +11,6 @@
 namespace Alaress\Database\Broker\Dblib;
 
 use Alaress\Database\Broker\Base;
-use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Iterator\Dblib\Iterator;
 use Alaress\Database\Quoter\Dblib\Quoter as DblibQuoter;
 use Alaress\Database\Statement\FunctionCall\Dblib\FunctionCall;
@@ -19,7 +18,7 @@ use Alaress\Database\Statement\Query\Dblib\Query;
 use Alaress\Database\Statement\StoredProcedure\Dblib\StoredProcedure;
 use PDO;
 
-class Broker extends Base implements IBroker
+class Broker extends Base
 {
     // This extends the parent connect function with MSSQL specific connection attributes and
     // post connection queries that need to be executed
