@@ -162,30 +162,4 @@ class Mapper extends BaseMapper
 
         return $resultSet;
     }
-
-    /**
-     * Get list of submissions that should be submitted to crocodoc
-     *
-     * @return Collection
-     */
-    public function findPendingCrocodocUpload()
-    {
-        /* Get a list of legal files that crocodoc accepts
-         */
-        $allowedExtensions = "'" . implode("','", ResponseFile::getAllowedFileTypes()) . "'";
-
-        $query = $this->getSelectString();
-
-        $query .= "
-            WHERE uuid IS NULL
-            AND YEAR(submitted_at) = YEAR(NOW())
-            AND ext IN ($allowedExtensions)
-            LIMIT 0,100
-        ";
-
-        $statement = $this->database->prepare($query);
-        $statement->execute();
-
-        return $this->hydrateSelect($statement);
-    }
 }
