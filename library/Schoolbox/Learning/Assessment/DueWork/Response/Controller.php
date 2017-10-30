@@ -98,7 +98,7 @@ class Controller extends Base
      * @param DueWork     $assessment
      * @param Participant $participant
      * @param Model       $response
-     * @throws ApplicationException\Exception Cannot authenticate crocodoc or a curl error between us and crocodoc
+     * @throws ApplicationException\Exception When trying to access a draft Response when you shouldn't
      * @throws ServiceNotFound If unable to locate HTML web Output
      * @throws \Aura\Router\Exception\RouteNotFound If cannot generate a requested route
      * @throws \InvalidArgumentException If assessment due date is null.
