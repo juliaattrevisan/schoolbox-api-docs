@@ -24,7 +24,7 @@ class TestStatement extends AbstractTestStatement
     public function testStoredProcedureIteratorWithOutputParameters()
     {
         // This fails under DBLib
-        $this->setExpectedException(\DomainException::class);
+        $this->expectException(\DomainException::class);
         parent::testStoredProcedureIteratorWithOutputParameters();
     }
 }
