@@ -165,14 +165,14 @@ module.exports = function(grunt) {
             },
             install: {}
         },
-        sass: { // Only used for development, skipping the skin build process and no minify
+        sass: { // Only used for development, skips the skin build process
             dist: {
                 files: {
                     'www/css/demo/chrome-foundation.css': 'www/css/foundation/chrome-foundation.scss'
                 }
             }
         },
-        concat: { // Also only used for development, do not uglify :)
+        concat: { // Concat JS files (used for development)
             options: {
                 separator: ';'
             },
