@@ -87,13 +87,12 @@ class MeridiemTest extends TestCase
     /**
      * @dataProvider getSetInvalid12HourData
      *
-     * @expectedException Warning
-     *
      * @param int    $hour
      * @param string $meridiem
      */
     public function testSetInvalid12Hour($hour, $meridiem)
     {
+        $this->expectException(Warning::class);
         $date = $this->buildDateObject();
         $date->set12Hour($hour, $meridiem);
     }
@@ -202,8 +201,6 @@ class MeridiemTest extends TestCase
     /**
      * @dataProvider getSetInvalid12HourTimeData
      *
-     * @expectedException Warning
-     *
      * @param int    $hour
      * @param int    $minute
      * @param int    $second
@@ -211,6 +208,7 @@ class MeridiemTest extends TestCase
      */
     public function testSetInvalid12HourTime($hour, $minute, $second, $meridiem)
     {
+        $this->expectException(Warning::class);
         $date = $this->buildDateObject();
         $date->set12HourTime($hour, $minute, $second, $meridiem);
     }

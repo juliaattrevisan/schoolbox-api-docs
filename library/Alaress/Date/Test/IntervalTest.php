@@ -244,20 +244,16 @@ class IntervalTest extends TestCase
         $this->assertSame($secondTotal, Interval::createFromDateInterval($interval)->getSecondTotal());
     }
 
-    /**
-     * @expectedException Warning
-     */
     public function testCreateFromDateIntervalWarningOnMonth()
     {
+        $this->expectException(Warning::class);
         $interval = Interval::createFromDateInterval(new DateInterval('P1M'));
         $this->assertSame(30, $interval->getDayTotal());
     }
 
-    /**
-     * @expectedException Warning
-     */
     public function testCreateFromDateIntervalWarningOnYear()
     {
+        $this->expectException(Warning::class);
         $interval = Interval::createFromDateInterval(new DateInterval('P1Y'));
         $this->assertSame(365, $interval->getDayTotal());
     }
