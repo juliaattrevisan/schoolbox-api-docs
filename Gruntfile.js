@@ -241,7 +241,7 @@ module.exports = function(grunt) {
 
     // Build tasks
     grunt.registerTask('build.js', 'uglify');
-    grunt.registerTask('build.css', 'Builds SASS stylesheet (through tools/skin/builder.php)', function() {
+    grunt.registerTask('build.sass', 'Builds SASS stylesheet (through tools/skin/builder.php)', function() {
         // Run sass build
         var result = shell.exec('php ./tools/skin/builder.php --force');
         if (result.code === 0) {
@@ -250,6 +250,6 @@ module.exports = function(grunt) {
             grunt.fail.warn("Skin may not have been built successfully! (error code: "+String(result.code)+')');
         }
     });
-    grunt.registerTask('build',      ['bower', 'build.js', 'build.css']);
+    grunt.registerTask('build',      ['bower', 'build.js', 'build.sass']);
     grunt.registerTask('default',    'build');
 };
