@@ -1,5 +1,8 @@
 {
     "name": "alaress/schoolbox",
+    "config": {
+        "php": "~7.1"
+    },
     "description": "Schoolbox LMS",
     "license": "proprietary",
     "repositories": [
