@@ -58,7 +58,6 @@ class Module extends BaseModule
     protected function registerRoutes()
     {
         $preloadParticipant     = function (array $params) { return $this->preloadParticipant($params); };
-        $preloadResponse        = function (array $params) { return $this->preloadResponseWithFeedback($params); };
         $preloadPlagscanWithAss = function (array $params) { return $this->preloadPlagscanWithAssessment($params); };
         $preloadKami            = function (array $params) { return $this->preloadKami($params); };
 
@@ -78,7 +77,6 @@ class Module extends BaseModule
         $assessmentPattern  = '/assessments/{assessmentId:\d+}';
         $participantPattern = $assessmentPattern . '/{studentId:\d+}';
         $responsePattern    = $assessmentPattern . '/responses/{responseId:\d+}';
-        $feedbackPattern    = $assessmentPattern . '/feedback/{feedbackId:\d+}';
 
         $this->register('DELETE', $responsePattern, 'deleteParticularResponse',  $hasWriteAccess, $preloadParticipant); // a || r
 
