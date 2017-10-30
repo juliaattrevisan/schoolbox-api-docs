@@ -195,7 +195,7 @@ class Controller extends Base
             'data' => [
                 'user' => $this->getUser(),
                 'recentStudents' => $this->pastoralAuditMapper->findRecentStudents(),
-                'recentDashboard' => $this->pastoralMapper->findRecentDashboard(),
+                'recentDashboard' => $this->pastoralMapper->findRecentDashboard($this->getUser()),
                 'reportsDashboard'  => $this->pastoralReportMapper->findForUserDashboard($this->getUser()),
                 'groups' => $this->pastoralGroupMemberMapper->findByColumn('user_id', $this->getUser()->getId())
             ]
@@ -213,7 +213,7 @@ class Controller extends Base
             'template' => '@pastoral/search.twig',
             'data' => [
                 'search' => trim($get['keyword']),
-                'results' => $this->pastoralMapper->getSearchResults($get['keyword']),
+                'results' => $this->pastoralMapper->getSearchResults($get['keyword'], $this->getUser()),
                 'students' => $this->userMapper->findStudents($get['keyword']),
                 'minimumSearchLength' => Results::MIN_SEARCH_LENGTH
             ]
@@ -260,6 +260,8 @@ class Controller extends Base
                 ]
             ]);
         }
+
+        $records = $this->pastoralMapper->filterForUser($records, $this->getUser());
 
         // Limit the number of pastoral records to display on each page of pastoral records
 
@@ -318,7 +320,10 @@ class Controller extends Base
 
         // Retrieve all of the students pastoral records
 
-        $records = $this->pastoralMapper->findLinked($student, $linkedStudent, $get['type']);
+        $records = $this->pastoralMapper->filterForUser(
+            $this->pastoralMapper->findLinked($student, $linkedStudent, $get['type']),
+            $this->getUser()
+        );
 
         // Limit the number of pastoral records to display on each page of pastoral records
 

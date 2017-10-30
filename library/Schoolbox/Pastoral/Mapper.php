@@ -181,10 +181,10 @@ class Mapper extends BaseMapper
     protected function hydrateRow($row, $hydrateRelatedRecords)
     {
 
-        // This method gets called before checking authorization- so if the session timed out this might be blank
-        if (!$this->getSessionUser() instanceof User) {
-            return false;
-        }
+//        // This method gets called before checking authorization- so if the session timed out this might be blank
+//        if (!$this->getSessionUser() instanceof User) {
+//            return false;
+//        }
 
         /** @var UserMapper $ownerMapper */
         $ownerMapper = $this->getJoinMapper('owner');
@@ -213,21 +213,21 @@ class Mapper extends BaseMapper
         $model->setStudent($studentMapper->hydrate($row, 's')->loadParents()->loadTeachers());
         $model->setAccess($this->getJoinMapper('access')->findByColumn('pastoral_id', $model->getId()));
 
-        // If the user is not in the audience- and is not the owner, they can't see the record
-        $inAudience = $this->isUserInPastoralService($this->getSessionUser());
-
-        if (!$inAudience) {
-            foreach ($model->getAccess() as $access) {
-                if ($access->hasAccess($this->getSessionUser())) {
-                    $inAudience = true;
-                    break;
-                }
-            }
-        }
-
-        if (!$inAudience && $model->getOwner()->getId() !== $this->getSessionUser()->getId()) {
-            return false;
-        }
+//        // If the user is not in the audience- and is not the owner, they can't see the record
+//        $inAudience = $this->isUserInPastoralService($this->getSessionUser());
+//
+//        if (!$inAudience) {
+//            foreach ($model->getAccess() as $access) {
+//                if ($access->hasAccess($this->getSessionUser())) {
+//                    $inAudience = true;
+//                    break;
+//                }
+//            }
+//        }
+//
+//        if (!$inAudience && $model->getOwner()->getId() !== $this->getSessionUser()->getId()) {
+//            return false;
+//        }
 
         $model->setTags(Tag\Mapper::getInstance()->findForRecord($model));
         $model->setComments($this->getJoinMapper('comments')->findByColumn('pastoral_id', $model->getId()));
@@ -241,6 +241,39 @@ class Mapper extends BaseMapper
         // Return hydrated model
         return $model;
     }
+
+
+    /**
+     * Filter records from the collection if the current user doesn't have access to them.
+     *
+     * If the user is not in the audience and is not the owner, they can't see the record.
+     *
+     * @param Collection|Model[] $records A list of pastoral records
+     * @param User               $user    The user who is trying to view them
+     * @return Collection|Model[]
+     */
+    public function filterForUser(Collection $records, User $user)
+    {
+        return $records->filter(function ($model) use ($user) {
+            if (!$model instanceof Model) {
+                return false;
+            }
+
+            $inAudience = $this->isUserInPastoralService($user);
+
+            if (!$inAudience) {
+                foreach ($model->getAccess() as $access) {
+                    if ($access->hasAccess($user)) {
+                        $inAudience = true;
+                        break;
+                    }
+                }
+            }
+
+            return $inAudience || $model->getOwner()->getId() === $user->getId();
+        });
+    }
+
 
     /**
      * Return any records immediately related to the supplied pastoral record
@@ -356,37 +389,21 @@ class Mapper extends BaseMapper
     /**
      * Display the most recent records that are tagged for display on dashboard based on their severity
      *
+     * @param User $user
      * @param int $count Number of recent records to display
      * @return Collection|Model[]
      */
-    public function findRecentDashboard($count = 5)
+    public function findRecentDashboard(User $user, $count = 5)
     {
-        $records = $this->findByColumnList([
-            'sv.dashboard' => 1,
-        ], [
-            'limit' => $count,
-            ['order' => ['created_at' => 'DESC']],
-        ]);
-
-        $displayed = $this->createCollection();
-
-        /** @var Model $record */
-        foreach ($records as $record) {
-            if ($record->getOwner()->getId() == $this->getSessionUser()->getId()) {
-                $displayed->add($record);
-                continue;
-            }
-
-            /** @var Access\Model $access */
-            foreach ($record->getAccess() as $access) {
-                if ($access->hasAccess($this->getSessionUser())) {
-                    $displayed->add($record);
-                    break;
-                }
-            }
-        }
-
-        return $displayed;
+        return $this->filterForUser(
+            $this->findByColumnList([
+                'sv.dashboard' => 1,
+            ], [
+                'limit' => $count,
+                ['order' => ['created_at' => 'DESC']],
+            ]),
+            $user
+        );
     }
 
     /**
@@ -463,16 +480,17 @@ class Mapper extends BaseMapper
      * Perform a search of pastoral records (currently searches the heading, body and comments)
      *
      * @param string $search
+     * @param User   $user   The user who is searching
      * @return Collection|Model[]
      */
-    public function getSearchResults($search)
+    public function getSearchResults($search, User $user)
     {
         $search = trim($search);
 
         // Keep an audit trail of searches
         $pastoralAuditMapper = Audit\Mapper::getInstance();
         $auditRecord = $pastoralAuditMapper->createModel();
-        $auditRecord->setUser($this->getSessionUser());
+        $auditRecord->setUser($user);
         $auditRecord->setSearch($search);
 
         $words = [];
@@ -521,7 +539,7 @@ class Mapper extends BaseMapper
             // Retrieve the hydrated records
             $statement->execute(array_merge($pbRecordSearch->getParams(), $pbCommentSearch->getParams()));
 
-            $results = $this->hydrateSelect($statement);
+            $results = $this->filterForUser($this->hydrateSelect($statement), $user);
 
             // Keep a record of all searches performed by users, and what results were displayed
             $searchResults = [];
@@ -709,6 +727,9 @@ class Mapper extends BaseMapper
         // Hydrate records for return
 
         $results = $this->hydrateSelect($statement);
+
+        // Filter out any I can't view
+        $results = $this->filterForUser($results, $user);
 
         // If there are no tags to filter, just return the results now
 
