@@ -218,10 +218,6 @@ Usage:
                             {% if kamiExportRoute %}
                                 <li><a href="{{ kamiExportRoute }}" data-kami-export class="icon-download" title="Download annotated document">Download annotated document</a></li>
                             {% endif %}
-                        {% elseif currentFile.crocodocId and latestFeedback.id %}
-                            <li>
-                                {% include '@learningDueWorkResponse/crocodocLink.twig' with {assessment: assessment, feedback: latestFeedback, file: currentFile, participant: participant, linkText: 'Download annotated document'} only %}
-                            </li>
                         {% endif %}
                         <li>
                             <a href="/storage/fetch.php?hash={{ currentFile.hash }}" class='icon-download' title="Download original">Download original</a>
