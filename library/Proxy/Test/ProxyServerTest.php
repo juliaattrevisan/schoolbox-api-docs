@@ -9,7 +9,7 @@
 
 namespace Proxy\Test;
 
-use PHPUnit_Framework_Error_Warning;
+use PHPUnit\Framework\Error\Warning;
 use PHPUnit\Framework\TestCase;
 
 class ProxyServerTest extends TestCase
@@ -164,7 +164,7 @@ class ProxyServerTest extends TestCase
     /**
      * HTTP connection using an invalid server using streams fails to connect to host
      *
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException Warning
      */
     public function testInvalidServerHttpFopen()
     {
@@ -189,7 +189,7 @@ class ProxyServerTest extends TestCase
     /**
      * HTTPS connection using an invalid server using streams fails to connect to host
      *
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException Warning
      */
     public function testInvalidServerHttpsFopen()
     {
@@ -261,7 +261,7 @@ class ProxyServerTest extends TestCase
     /**
      * Unauthorised proxy HTTP connection using streams returns a 407 code with proxy response
      *
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException Warning
      */
     public function testUnauthorizedHttpFopen()
     {
@@ -285,7 +285,7 @@ class ProxyServerTest extends TestCase
     /**
      * Unauthorised proxy HTTPS connection using streams returns a 407 code with proxy response
      *
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException Warning
      */
     public function testUnauthorizedHttpsFopen()
     {
