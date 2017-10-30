@@ -15,10 +15,20 @@ namespace Alaress\Twig\Loader;
 
 use Alaress\Module\Loader as ModuleLoader;
 use Aura\Di;
+use Twig_Error_Loader;
 use Twig_Loader_Chain;
+use Twig_LoaderInterface;
+use Twig_Source;
 
-class ChainLoader extends Twig_Loader_Chain
+class ChainLoader implements Twig_LoaderInterface
 {
+    /**
+     * Twig loader
+     *
+     * @var Twig_Loader_Chain
+     */
+    protected $twigLoader;
+
     /**
      * Module loader
      *
@@ -36,13 +46,23 @@ class ChainLoader extends Twig_Loader_Chain
     /**
      * Constructor
      *
-     * @param ModuleLoader $moduleLoader
-     * @param array        $loaders
+     * @param ModuleLoader      $moduleLoader
+     * @param Twig_Loader_Chain $twigLoader
      */
-    public function __construct(ModuleLoader $moduleLoader, array $loaders = array())
+    public function __construct(ModuleLoader $moduleLoader, Twig_Loader_Chain $twigLoader)
     {
-        parent::__construct($loaders);
         $this->moduleLoader = $moduleLoader;
+        $this->twigLoader   = $twigLoader;
+    }
+
+    /**
+     * Add a loader
+     *
+     * @param Twig_LoaderInterface $loader
+     */
+    public function addLoader(Twig_LoaderInterface $loader)
+    {
+        $this->twigLoader->addLoader($loader);
     }
 
     /**
@@ -51,7 +71,7 @@ class ChainLoader extends Twig_Loader_Chain
     public function exists($name)
     {
         $this->moduleLoader->loadModule($name);
-        return parent::exists($name);
+        return $this->twigLoader->exists($name);
     }
 
     /**
@@ -60,7 +80,7 @@ class ChainLoader extends Twig_Loader_Chain
     public function getSource($name)
     {
         $this->moduleLoader->loadModule($name);
-        return parent::getSource($name);
+        return $this->twigLoader->getSource($name);
     }
 
     /**
@@ -69,7 +89,7 @@ class ChainLoader extends Twig_Loader_Chain
     public function getCacheKey($name)
     {
         $this->moduleLoader->loadModule($name);
-        return parent::getCacheKey($name);
+        return $this->twigLoader->getCacheKey($name);
     }
 
     /**
@@ -78,6 +98,14 @@ class ChainLoader extends Twig_Loader_Chain
     public function isFresh($name, $time)
     {
         $this->moduleLoader->loadModule($name);
-        return parent::isFresh($name, $time);
+        return $this->twigLoader->isFresh($name, $time);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSourceContext($name)
+    {
+        return $this->twigLoader->getSourceContext($name);
     }
 }
