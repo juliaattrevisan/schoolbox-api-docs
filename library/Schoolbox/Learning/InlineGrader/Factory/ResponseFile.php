@@ -73,7 +73,7 @@ class ResponseFile
      * @throws \PDOException If something went wrong when saving the kami document's status
      * @throws \UnexpectedValueException If unexpected status change is reported from Kami API
      */
-    public function produce(Submission $submission, SubmissionFile $file, User $user): array
+    public function produce(SubmissionFile $file, User $user): array
     {
         $kamiViewSession = $this->getKamiViewSession($file, $user);
 

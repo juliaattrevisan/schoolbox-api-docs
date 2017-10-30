@@ -325,7 +325,7 @@ class Controller extends Base
             return (new Factory\ResponseFile(
                 $this->kamiMapper,
                 $this->kamiConnector
-            ))->produce($response, $file, $this->getUser());
+            ))->produce($file, $this->getUser());
         }
         catch (Kami\Exception\IKamiException $e) {
             // Kami Exceptions
