@@ -36,7 +36,6 @@ class Mapper extends BaseMapper
         $this->joins('submission_return_id', ReturnedWorkMapper::class, 'id', null, null, 'return', 'return');
         $this->joins('hash', StorageMapper::class, 'hash', null, null, 'storage', 'storage');
         $this->uses('realname', self::TYPE_STRING, null, 'filename');
-        $this->uses('uuid', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
