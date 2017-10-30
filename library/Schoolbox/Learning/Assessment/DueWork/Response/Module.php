@@ -170,6 +170,10 @@ class Module extends BaseModule
     /**
      * @param array $params
      * @return array [ assessment, participant, response ]
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \UnexpectedValueException
      */
     private function preloadParticipant(array $params)
     {
@@ -213,9 +217,14 @@ class Module extends BaseModule
         ];
     }
 
+
     /**
      * @param array $params
      * @return array [ response, feedback, file ]
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \UnexpectedValueException
      */
     private function preloadResponseWithFeedback(array $params)
     {
@@ -319,9 +328,14 @@ class Module extends BaseModule
         ];
     }
 
+
     /**
      * @param array $params
      * @return array [ assessment, response, plagscan ]
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \UnexpectedValueException
      */
     private function preloadPlagscanWithAssessment(array $params)
     {
@@ -400,8 +414,8 @@ class Module extends BaseModule
      * @param array $params
      * @return array
      * @throws MapperException\Deleted If the assessment the kami belongs to is deleted
-     * @throws NotFound If the requested Kami Doc has not finished processing
      * @throws OutOfBoundsException
+     * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException If mapper class not found
      * @throws \UnexpectedValueException If the kami files owner is not a participant
      */
@@ -457,30 +471,37 @@ class Module extends BaseModule
 
     /**
      * @return object|IConfigLoader
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     protected function getConfigLoader()
     {
         return $this->injector->get('config');
     }
 
+
     /**
      * @return object|AssessmentMapperProxy
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     protected function getAssessmentMapperProxy()
     {
         return $this->injector->get('assessmentDataSource');
     }
 
+
     /**
      * @return object|ResponseMapperProxy
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     protected function getResponseMapperProxy()
     {
         return $this->injector->get('responseDataSource');
     }
 
+
     /**
      * @return object|FeedbackMapperProxy
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     protected function getFeedbackMapperProxy()
     {
