@@ -162,17 +162,6 @@ class ResponseFile
         ];
     }
 
-    /**
-     * @param SubmissionFile $file
-     * @return bool
-     */
-    private function isCrocodocable(SubmissionFile $file)
-    {
-        $ext = $file->getStorage()->getExtension();
-
-        return strlen(\Cfg::get('crocodoc_api_token')) && in_array($ext, self::getAllowedFileTypes());
-    }
-
 
     /**
      * Fetch a Kami View Session if one is available
