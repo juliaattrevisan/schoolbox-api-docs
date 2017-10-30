@@ -53,18 +53,6 @@ interface IResponseDataSource
     public function findForStudent(User $student);
 
     /**
-     * Find a response that contains $crocodocId.
-     *
-     * Primarily used to rescue once-Associated Feedback when it was inadvertently converted
-     * into a Floating Feedback
-     *
-     * @param IAssessable $assessment
-     * @param $crocodocId
-     * @return IResponse
-     */
-    public function findByCrocodocId(IAssessable $assessment, $crocodocId);
-
-    /**
      * Saves a response.
      *
      * @param IResponse $response
