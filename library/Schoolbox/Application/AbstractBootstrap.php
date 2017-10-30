@@ -385,10 +385,10 @@ abstract class AbstractBootstrap implements BootstrapInterface
 
                     $twig = new Twig_Environment($di->get('templateEngine:loader'), $options);
 
-                    if($this->debugEnabled) {
-                        $twig = new TraceableTwigEnvironment($twig);
-                        DebugBar::getInstance()->addCollector(new TwigCollector($twig));
-                    }
+//                    if($this->debugEnabled) {
+//                        $twig = new TraceableTwigEnvironment($twig);
+//                        DebugBar::getInstance()->addCollector(new TwigCollector($twig));
+//                    }
 
                     $twig->addExtension(new Twig_Extension_Debug());
                     $twig->addExtension(new Twig_Extensions_Extension_Text());
