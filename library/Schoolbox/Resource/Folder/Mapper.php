@@ -959,9 +959,12 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         // Re-load codes into the model,
         // because the above query won't fetch codes for this category that
         // don't match the above where part.
-        $model->setCodes(
-            $this->getJoinMapper('codes')->findByColumn('folder_id', $model->getId())
-        );
+
+        $codeList = $this->getJoinMapper('codes')->findByColumn('folder_id', $model->getId());
+        foreach($codeList as $folderCode) {
+            $model->getCodes()[$folderCode->getCode()] = $folderCode;
+        }
+
         return $model;
     }
 
@@ -1025,7 +1028,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                             });
         foreach ($result as $folder) {
             if (isset($folderCodes[$folder->getId()])) {
-                $folder->setCodes($folderCodes[$folder->getId()]);
+                foreach($folderCodes as $folderCode) {
+                    $folder->getCodes()[$folderCode->getCode()] = $folderCode;
+                }
             }
         }
 
