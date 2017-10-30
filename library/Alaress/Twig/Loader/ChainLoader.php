@@ -1,7 +1,7 @@
 <?php
 /**
  * Custom chain loader for Twig templates.
-
+ *
  * Overrides template methods to first check if the module has been loaded, and
  * then attempt to load it from the dependency injector before checking whether
  * this exists or not.
@@ -14,18 +14,15 @@
 namespace Alaress\Twig\Loader;
 
 use Alaress\Module\Loader as ModuleLoader;
-use Aura\Di;
-use Twig_Error_Loader;
-use Twig_Loader_Chain;
-use Twig_LoaderInterface;
-use Twig_Source;
+use Twig\Loader\ChainLoader as TwigChainLoader;
+use Twig\Loader\LoaderInterface;
 
-class ChainLoader implements Twig_LoaderInterface
+class ChainLoader implements IChainLoader
 {
     /**
      * Twig loader
      *
-     * @var Twig_Loader_Chain
+     * @var TwigChainLoader
      */
     protected $twigLoader;
 
@@ -46,10 +43,10 @@ class ChainLoader implements Twig_LoaderInterface
     /**
      * Constructor
      *
-     * @param ModuleLoader      $moduleLoader
-     * @param Twig_Loader_Chain $twigLoader
+     * @param ModuleLoader    $moduleLoader
+     * @param TwigChainLoader $twigLoader
      */
-    public function __construct(ModuleLoader $moduleLoader, Twig_Loader_Chain $twigLoader)
+    public function __construct(ModuleLoader $moduleLoader, TwigChainLoader $twigLoader)
     {
         $this->moduleLoader = $moduleLoader;
         $this->twigLoader   = $twigLoader;
@@ -58,9 +55,9 @@ class ChainLoader implements Twig_LoaderInterface
     /**
      * Add a loader
      *
-     * @param Twig_LoaderInterface $loader
+     * @param LoaderInterface $loader
      */
-    public function addLoader(Twig_LoaderInterface $loader)
+    public function addLoader(LoaderInterface $loader)
     {
         $this->twigLoader->addLoader($loader);
     }
@@ -74,14 +71,14 @@ class ChainLoader implements Twig_LoaderInterface
         return $this->twigLoader->exists($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getSource($name)
-    {
-        $this->moduleLoader->loadModule($name);
-        return $this->twigLoader->getSource($name);
-    }
+//    /**
+//     * {@inheritdoc}
+//     */
+//    public function getSource($name)
+//    {
+//        $this->moduleLoader->loadModule($name);
+//        return $this->twigLoader->getSource($name);
+//    }
 
     /**
      * {@inheritdoc}
@@ -106,6 +103,7 @@ class ChainLoader implements Twig_LoaderInterface
      */
     public function getSourceContext($name)
     {
+        $this->moduleLoader->loadModule($name);
         return $this->twigLoader->getSourceContext($name);
     }
 }
