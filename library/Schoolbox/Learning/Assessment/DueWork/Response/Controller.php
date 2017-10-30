@@ -161,7 +161,7 @@ class Controller extends Base
             /* This is now conditional depending on the presence of a $response
              */
             'file' => $file,
-            'subfragment' => $file ? $this->getSubFragment($response, $file) : null,
+            'subfragment' => $file ? $this->getSubFragment($file) : null,
 
             /* For saving feedbacks
              */
@@ -310,7 +310,6 @@ class Controller extends Base
     /**
      * Preview the Response's filetype
      *
-     * @param Model          $response
      * @param SubmissionFile $file
      * @return array
      * @throws ApplicationException\Exception If a Kami exception occurs
@@ -319,7 +318,7 @@ class Controller extends Base
      * @throws \PDOException If something went wrong when saving the kami document's status
      * @throws \UnexpectedValueException If unexpected status change is reported from Kami API
      */
-    private function getSubFragment(Model $response, SubmissionFile $file): array
+    private function getSubFragment(SubmissionFile $file): array
     {
         try {
             return (new Factory\ResponseFile(
