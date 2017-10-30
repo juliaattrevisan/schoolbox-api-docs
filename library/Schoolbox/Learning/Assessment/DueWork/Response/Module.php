@@ -79,14 +79,10 @@ class Module extends BaseModule
         $participantPattern = $assessmentPattern . '/{studentId:\d+}';
         $responsePattern    = $assessmentPattern . '/responses/{responseId:\d+}';
         $feedbackPattern    = $assessmentPattern . '/feedback/{feedbackId:\d+}';
-        $crocodocPattern    = $feedbackPattern . '/{crocodocId:[0-9a-f-]+}';
 
         $this->register('DELETE', $responsePattern, 'deleteParticularResponse',  $hasWriteAccess, $preloadParticipant); // a || r
 
         $this->register('GET', $participantPattern . '/responses{/responseId:\d+}', 'getParticularResponse', $hasWriteAccess, $preloadParticipant); // a || r
-
-        $this->register('GET', $crocodocPattern . '/download',  'getCrocodocDownload', $hasKamiAccess, $preloadResponse); // a || r
-        $this->register('GET', $crocodocPattern . '/annotated', 'getCrocodocView',     $hasKamiAccess, $preloadResponse); // a || r
 
         $this->register('GET', $plagscanPattern,             'getPlagscanReport',         $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
         $this->register('GET', $plagscanPattern . '/iframe', 'getPlagscanReportContents', $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
