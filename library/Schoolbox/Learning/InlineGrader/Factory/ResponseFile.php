@@ -4,10 +4,7 @@
  * ResponseFile
  *
  * Figure out what fragment to load into Inline Grader
- * based on the file type, its crocodocableness, etc.
- *
- * A reimplementation of logic contained within the old
- * Crocodoc\Renderer\Factory
+ * based on the file type.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -18,8 +15,6 @@ namespace Schoolbox\Learning\InlineGrader\Factory;
 
 use \Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
-use \Schoolbox\Learning\InlineGrader\Authenticator;
-use \Schoolbox\Learning\InlineGrader\Facade;
 use \Schoolbox\User;
 use \Schoolbox\Video\ResourceVideoMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
@@ -76,7 +71,6 @@ class ResponseFile
      * @throws \InvalidArgumentException If cannot convert Kami request or response to a string
      * @throws \LogicException If attempting to update the status of a kami doc that is not processing.
      * @throws \PDOException If something went wrong when saving the kami document's status
-     * @throws \RangeException If Crocodoc API token is not defined
      * @throws \UnexpectedValueException If unexpected status change is reported from Kami API
      */
     public function produce(Submission $submission, SubmissionFile $file, User $user): array
