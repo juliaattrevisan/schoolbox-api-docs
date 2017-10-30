@@ -19,8 +19,6 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as SubmissionFileMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
