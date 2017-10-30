@@ -12,6 +12,7 @@
 namespace Schoolbox\Test;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
+use Schoolbox\Config\Loader;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -42,7 +43,7 @@ abstract class TestCase extends BaseTestCase
 
         //
         // Set up a mock configuration.
-        $mock_config = $this->getMock(\Schoolbox\Config\Loader::class);
+        $mock_config = $this->createMock(Loader::class);
         $mock_config
             ->expects($this->any())
             ->method('get')

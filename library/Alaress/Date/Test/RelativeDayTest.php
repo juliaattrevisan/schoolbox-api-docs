@@ -11,6 +11,7 @@ namespace Alaress\Date\Test;
 use Alaress_Date_Format;
 use Alaress_Date_Locale_Config;
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Config\Loader;
 
 class RelativeDayTest extends TestCase
 {
@@ -24,7 +25,7 @@ class RelativeDayTest extends TestCase
      */
     public function setup()
     {
-        $mockConfig = $this->getMock('\\Schoolbox\\Config\\Loader');
+        $mockConfig = $this->createMock(Loader::class);
         $mockConfig
             ->expects($this->any())
             ->method('get')

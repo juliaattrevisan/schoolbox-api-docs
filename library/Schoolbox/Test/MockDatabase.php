@@ -29,7 +29,7 @@ class MockDatabase implements IDatabase, IQuoter
     /**
      * The test case, required for creating mocks
      *
-     * @var PHPUnit_Framework_TestCase
+     * @var TestCase
      */
     protected $test_case;
 
@@ -50,9 +50,9 @@ class MockDatabase implements IDatabase, IQuoter
     /**
      * Builds the mock connection, using the test case to build mock statement.
      *
-     * @param PHPUnit_Framework_TestCase $test_case
+     * @param TestCase $test_case
      */
-    public function __construct(PHPUnit_Framework_TestCase $test_case)
+    public function __construct(TestCase $test_case)
     {
         $this->test_case = $test_case;
         $this->resetStatement();
@@ -63,7 +63,7 @@ class MockDatabase implements IDatabase, IQuoter
      */
     public function resetStatement()
     {
-        $this->mock_statement = $this->test_case->getMock(PDOStatement::class);
+        $this->mock_statement = $this->test_case->getMockBuilder(PDOStatement::class)->getMock();
     }
 
     /**

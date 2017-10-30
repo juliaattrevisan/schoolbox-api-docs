@@ -41,8 +41,8 @@ class ModelTest extends TestCase {
 			->setFilename('d.txt')
 			->setIsViewed(false)
 			->setFile('contents');
-		$this->test_mapper = $this->getMock(
-			'\\Schoolbox\\Test\\TestMapper',
+		$this->test_mapper = $this->createMock(
+            TestMapper::class,
 			array('findById', 'findOneByColumn')
 		);
 		$this->test_mapper
