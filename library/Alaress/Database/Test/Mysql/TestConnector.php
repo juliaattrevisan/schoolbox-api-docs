@@ -13,9 +13,9 @@ namespace Alaress\Database\Test\Mysql;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Factory;
 use Database;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class TestConnector extends PHPUnit_Framework_TestCase
+class TestConnector extends TestCase
 {
     /**
      * Ensure we can establish a connection to vagrant Schoolbox database

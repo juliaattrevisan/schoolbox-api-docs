@@ -11,9 +11,9 @@ namespace Alaress\Paginator\Test;
 use Alaress\Paginator\Paginator;
 use Alaress\Paginator\UrlPaginator;
 use Zend\Uri\Uri;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class UrlPaginatorTest extends PHPUnit_Framework_TestCase {
+class UrlPaginatorTest extends TestCase {
 
     /**
      * Simple factory for a test UrlPaginator object.

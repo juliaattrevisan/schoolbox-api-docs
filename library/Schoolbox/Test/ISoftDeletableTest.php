@@ -11,7 +11,7 @@ namespace Schoolbox\Test;
 use League\Flysystem\Adapter\NullAdapter;
 use League\Flysystem\Filesystem;
 use League\Flysystem\MountManager;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
@@ -28,7 +28,7 @@ use Component_InstanceMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 use Schoolbox\Video;
 
-class ISoftDeletableTest extends PHPUnit_Framework_TestCase
+class ISoftDeletableTest extends TestCase
 {
 
     /**

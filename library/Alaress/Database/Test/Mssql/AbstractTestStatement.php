@@ -13,9 +13,9 @@ namespace Alaress\Database\Test\Mssql;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Test\TestConnectorTrait;
 use PDO;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-abstract class AbstractTestStatement extends PHPUnit_Framework_TestCase
+abstract class AbstractTestStatement extends TestCase
 {
     use TestConnectorTrait;
 

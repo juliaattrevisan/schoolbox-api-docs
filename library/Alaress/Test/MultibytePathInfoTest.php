@@ -2,7 +2,7 @@
 
 namespace Alaress\Test;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  *
@@ -11,7 +11,7 @@ use PHPUnit_Framework_TestCase;
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class MultibytePathInfoTest extends PHPUnit_Framework_TestCase
+class MultibytePathInfoTest extends TestCase
 {
 
     /**

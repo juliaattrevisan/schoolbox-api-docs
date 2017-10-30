@@ -10,9 +10,9 @@
 namespace Proxy\Test;
 
 use PHPUnit_Framework_Error_Warning;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class ProxyServerTest extends PHPUnit_Framework_TestCase
+class ProxyServerTest extends TestCase
 {
 
     // default internal Alaress proxy test settings

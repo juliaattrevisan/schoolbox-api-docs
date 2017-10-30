@@ -8,14 +8,14 @@
 namespace Schoolbox\Test;
 
 use LogicException;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Schoolbox\Collection;
 use UnexpectedValueException;
 
 /**
  * Logic tests for various Collection methods
  */
-class CollectionMethodsTest extends PHPUnit_Framework_TestCase
+class CollectionMethodsTest extends TestCase
 {
     /**
      * @dataProvider provider_slice_once

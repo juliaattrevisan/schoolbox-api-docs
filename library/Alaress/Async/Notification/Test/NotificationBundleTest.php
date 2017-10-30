@@ -9,9 +9,9 @@
 
 namespace Alaress\Async\Notification\Test;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class NotificationBundleTest extends PHPUnit_Framework_TestCase
+class NotificationBundleTest extends TestCase
 {
 
     public function testAppendSingleInstance()

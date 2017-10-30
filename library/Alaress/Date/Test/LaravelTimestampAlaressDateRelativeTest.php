@@ -4,9 +4,9 @@ namespace Alaress\Date\Test;
 
 use Alaress\Test\Date\MockDateObject;
 use DateTime;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class LaravelTimestampAlaressDateRelativeTest extends PHPUnit_Framework_TestCase
+class LaravelTimestampAlaressDateRelativeTest extends TestCase
 {
     use MockDateObject;
 

@@ -14,6 +14,7 @@ use Alaress\Date\Interval;
 use Schoolbox\Collection;
 use Schoolbox\User;
 use External_Timetable;
+use PHPUnit\Framework\TestCase;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\ResourceBooking\Booking;
 use Schoolbox\ResourceBooking\Booking\Validation;
@@ -25,7 +26,7 @@ use Schoolbox\Calendar\Event;
 use Schoolbox\CampusMapper;
 
 
-class ValidationTest extends \PHPUnit_Framework_TestCase
+class ValidationTest extends TestCase
 {
 
     /**

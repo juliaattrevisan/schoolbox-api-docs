@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Learning\Assessment\Test;
 
+use PHPUnit\Framework\TestCase;
 use \Schoolbox\Collection;
 use \Schoolbox\User;
 use \Schoolbox\Resource\Storage\Model as Storage;
@@ -25,7 +26,7 @@ use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 
-class DueWorkTest extends \PHPUnit_Framework_TestCase
+class DueWorkTest extends TestCase
 {
     use Defaults;
 

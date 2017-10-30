@@ -15,9 +15,9 @@ use InvalidArgumentException;
 use OutOfBoundsException;
 use PHPUnit_Framework_AssertionFailedError;
 use PHPUnit_Framework_Exception;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class RouterTest extends PHPUnit_Framework_TestCase
+class RouterTest extends TestCase
 {
     /** @var Router */
     private static $testGet;

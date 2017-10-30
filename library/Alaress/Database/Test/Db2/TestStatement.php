@@ -12,12 +12,12 @@ namespace Alaress\Database\Test\Db2;
 
 use Alaress\Database\Test\TestConnectorTrait;
 use PDO;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @requires extension ibm_db2
  */
-class TestStatement extends PHPUnit_Framework_TestCase
+class TestStatement extends TestCase
 {
     use TestConnectorTrait;
 

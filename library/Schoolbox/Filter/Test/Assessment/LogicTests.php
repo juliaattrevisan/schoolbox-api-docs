@@ -7,12 +7,13 @@
 
 namespace Schoolbox\Filter\Test;
 
+use PHPUnit\Framework\TestCase;
 use Schoolbox\Filter;
 use Schoolbox\Collection;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
-class LogicTests extends \PHPUnit_Framework_TestCase
+class LogicTests extends TestCase
 {
     /**
      * @dataProvider provider_doContextFiltersGuaranteeEmptySet

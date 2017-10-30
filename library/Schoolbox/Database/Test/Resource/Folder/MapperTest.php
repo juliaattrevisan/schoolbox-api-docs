@@ -14,7 +14,7 @@ use OverflowException;
 use Schoolbox;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Mapper;
-use PHPUnit_Framework_TestCase as TestCase;
+use PHPUnit\Framework\TestCase as TestCase;
 
 
 /**

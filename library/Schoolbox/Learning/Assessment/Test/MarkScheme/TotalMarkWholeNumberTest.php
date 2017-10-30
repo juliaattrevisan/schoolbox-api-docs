@@ -7,11 +7,12 @@
 
 namespace Schoolbox\Learning\Assessment\Test;
 
+use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
 use \InvalidArgumentException;
 use \RangeException;
 
-class TotalMarkWholeNumberTest extends \PHPUnit_Framework_TestCase
+class TotalMarkWholeNumberTest extends TestCase
 {
 
     /**

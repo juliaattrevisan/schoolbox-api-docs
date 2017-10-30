@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Learning\Assessment\Test;
 
+use PHPUnit\Framework\TestCase;
 use \Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
@@ -18,7 +19,7 @@ use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Timeline\Full as Timeline;
 use \Schoolbox\User;
 
-class TimelineTest extends \PHPUnit_Framework_TestCase
+class TimelineTest extends TestCase
 {
 
     /**

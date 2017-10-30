@@ -13,12 +13,12 @@ namespace Alaress\Database\Test\Db2;
 use Alaress\Database\Factory;
 use Alaress\Database\Test\TestConnectorTrait;
 use Database;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @requires extension ibm_db2
  */
-class TestPostProcessor extends PHPUnit_Framework_TestCase
+class TestPostProcessor extends TestCase
 {
     use TestConnectorTrait;
 

@@ -4,9 +4,9 @@ namespace Alaress\Date\Test;
 
 use Alaress\Test\Date\MockDateObject;
 use InvalidArgumentException;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class InvalidAlaressDateFormatTest extends PHPUnit_Framework_TestCase
+class InvalidAlaressDateFormatTest extends TestCase
 {
 
     use MockDateObject;

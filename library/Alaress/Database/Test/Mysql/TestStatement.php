@@ -12,9 +12,9 @@ namespace Alaress\Database\Test\Mysql;
 
 use Alaress\Database\Test\TestConnectorTrait;
 use PDO;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class TestStatement extends PHPUnit_Framework_TestCase
+class TestStatement extends TestCase
 {
     use TestConnectorTrait;
 

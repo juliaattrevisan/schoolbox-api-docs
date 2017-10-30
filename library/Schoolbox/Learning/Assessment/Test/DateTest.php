@@ -12,6 +12,7 @@
 
 namespace Schoolbox\Learning\Assessment\Test;
 
+use PHPUnit\Framework\TestCase;
 use \Schoolbox\Learning\Assessment\Project as Project;
 use \Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
 use \Schoolbox\Learning\Assessment\Summator\Sum as SummatorSum;
@@ -20,7 +21,7 @@ use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use \Schoolbox\Resource\Folder\Model as FolderModel;
 
-class DateTest extends \PHPUnit_Framework_TestCase
+class DateTest extends TestCase
 {
     private $dateFormat = 'Y-m-d H:i:s';
 

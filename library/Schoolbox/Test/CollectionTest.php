@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Test;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Task\Model as TaskAssessable;
@@ -17,7 +17,7 @@ use Schoolbox\UserMapper;
 /**
  * Test the mapper's getModelAsCollection()
  */
-class CollectionTest extends PHPUnit_Framework_TestCase
+class CollectionTest extends TestCase
 {
     /**
      * @dataProvider provider_Collection

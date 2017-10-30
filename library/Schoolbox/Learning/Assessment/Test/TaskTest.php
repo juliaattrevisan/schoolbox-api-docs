@@ -11,6 +11,7 @@
 
 namespace Schoolbox\Learning\Assessment\Test;
 
+use PHPUnit\Framework\TestCase;
 use \Schoolbox\Collection;
 use \Schoolbox\User;
 
@@ -20,7 +21,7 @@ use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use \Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 
-class TaskTest extends \PHPUnit_Framework_TestCase
+class TaskTest extends TestCase
 {
     use Defaults;
 

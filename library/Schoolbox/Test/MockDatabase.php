@@ -20,7 +20,7 @@ use Alaress\IDatabase;
 use PDO;
 use PDOStatement;
 use PHPUnit_Framework_MockObject_MockObject;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Traversable;
 
 class MockDatabase implements IDatabase, IQuoter

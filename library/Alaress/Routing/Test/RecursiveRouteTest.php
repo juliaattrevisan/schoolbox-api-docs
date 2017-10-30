@@ -11,8 +11,9 @@ namespace Alaress\Routing\Test;
 use Alaress\Routing\Route\RecursiveRoute;
 use Alaress\Routing\Trie;
 use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 
-class RecursiveRouteTest extends \PHPUnit_Framework_TestCase
+class RecursiveRouteTest extends TestCase
 {
     /** @var Trie */
     private static $root;

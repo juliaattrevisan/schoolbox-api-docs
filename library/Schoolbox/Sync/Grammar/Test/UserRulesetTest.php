@@ -13,6 +13,7 @@ namespace Schoolbox\Sync\Grammar\Test;
 use Alaress\Lumberjack\Logger;
 use External_User;
 use Monolog\Logger as Monologger;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Normalise\User\Adapter;
 use Schoolbox\External\Normalise\User\Student as ExternalStudent;
@@ -22,7 +23,7 @@ use Schoolbox\RoleMapper;
 use Schoolbox\Sync;
 use Schoolbox\UserMapper;
 
-class UserRulesetTest extends \PHPUnit_Framework_TestCase
+class UserRulesetTest extends TestCase
 {
 
     /** @var Sync\Grammar\UserRuleset */

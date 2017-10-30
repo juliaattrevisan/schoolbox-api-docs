@@ -6,6 +6,7 @@
  */
 namespace Schoolbox\Learning\Assessment\Test;
 
+use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\Assessment\Summator\Average;
 use Schoolbox\Learning\Assessment\Summator\ISummator;
 use Schoolbox\Learning\Assessment\Summator\Maximum;
@@ -32,7 +33,7 @@ use InvalidArgumentException;
 use DomainException;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 
-class FactoryTest extends \PHPUnit_Framework_TestCase
+class FactoryTest extends TestCase
 {
     /**
      * @dataProvider provider_task_markTypeInvalid

@@ -12,9 +12,9 @@ namespace Alaress\Date\Test;
 use Alaress\Test\Date\MockDateObject;
 use Alaress_Date_Format;
 use DateTimeZone;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class BasicGetSetTest extends PHPUnit_Framework_TestCase
+class BasicGetSetTest extends TestCase
 {
     use MockDateObject;
 

@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Learning\Assessment\Participant\Test;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\Assessment\Participant;
 
 /**
@@ -21,7 +21,7 @@ use Schoolbox\Learning\Assessment\Participant;
  * @see Participant::hasSubmittedResponse()
  * @see Participant::hasPublishedFeedback()
  */
-class DueWorkStatus extends PHPUnit_Framework_TestCase
+class DueWorkStatus extends TestCase
 {
     /**
      * @dataProvider provider_isResponseRequired

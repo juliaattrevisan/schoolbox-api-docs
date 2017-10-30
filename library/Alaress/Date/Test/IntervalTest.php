@@ -12,9 +12,9 @@ namespace Alaress\Date\Test;
 use Alaress\Date\Interval;
 use DateInterval;
 use DateTime;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class IntervalTest extends PHPUnit_Framework_TestCase
+class IntervalTest extends TestCase
 {
 
     /**

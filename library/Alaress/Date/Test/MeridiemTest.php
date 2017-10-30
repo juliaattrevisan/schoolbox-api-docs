@@ -13,9 +13,9 @@ use Alaress\Test\Date\MockDateObject;
 use Alaress_Date_Format;
 use InvalidArgumentException;
 use PHPUnit_Framework_Error_Warning;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class MeridiemTest extends PHPUnit_Framework_TestCase
+class MeridiemTest extends TestCase
 {
     use MockDateObject;
 

@@ -12,13 +12,14 @@ namespace Alaress\Test;
 
 use Alaress\ObjectReader;
 use DomainException;
+use PHPUnit\Framework\TestCase;
 use Schoolbox\Collection;
 use Schoolbox\External\Normalise\User\Common\Campus;
 use Schoolbox\External\Normalise\User\Common\Email;
 use Schoolbox\External\Normalise\User\Student;
 use stdClass;
 
-class ObjectReaderTest extends \PHPUnit_Framework_TestCase
+class ObjectReaderTest extends TestCase
 {
 
     /** @var Student */

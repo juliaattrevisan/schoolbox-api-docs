@@ -15,9 +15,10 @@ use Alaress\Routing\Router;
 use InvalidArgumentException;
 use OutOfBoundsException;
 use OverflowException;
+use PHPUnit\Framework\TestCase;
 use Schoolbox\Realtime\Routing\Subscription\Resolver;
 
-class ResolverTest extends \PHPUnit_Framework_TestCase
+class ResolverTest extends TestCase
 {
     const CLASS_GUEST = 46;
     const CLASS_HOST  = 85;

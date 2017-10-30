@@ -10,8 +10,9 @@ namespace Alaress\Routing\Test;
 
 
 use Alaress\Routing\Trie;
+use PHPUnit\Framework\TestCase;
 
-class TrieTest extends \PHPUnit_Framework_TestCase
+class TrieTest extends TestCase
 {
     /**
      * Abstract away sorting

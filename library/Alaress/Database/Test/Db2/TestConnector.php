@@ -13,12 +13,12 @@ namespace Alaress\Database\Test\Db2;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Factory;
 use Database;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @requires extension ibm_db2
  */
-class TestConnector extends PHPUnit_Framework_TestCase
+class TestConnector extends TestCase
 {
     /**
      * Ensure we can establish a connection to DB2 test database

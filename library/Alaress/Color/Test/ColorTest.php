@@ -10,9 +10,9 @@
 namespace Alaress\Color\Test;
 
 use Alaress\Color\Color;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class ColorTest extends PHPUnit_Framework_TestCase
+class ColorTest extends TestCase
 {
     /**
      * @var Color

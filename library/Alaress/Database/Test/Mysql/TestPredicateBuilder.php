@@ -12,9 +12,9 @@ namespace Alaress\Database\Test\Mysql;
 
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Alaress\Database\Test\TestConnectorTrait;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class TestPredicateBuilder extends PHPUnit_Framework_TestCase
+class TestPredicateBuilder extends TestCase
 {
     use TestConnectorTrait;
 

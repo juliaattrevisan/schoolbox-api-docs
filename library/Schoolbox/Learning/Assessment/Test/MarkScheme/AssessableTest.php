@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning\Assessment\Test\MarkScheme;
 
+use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
@@ -46,7 +47,7 @@ use \InvalidArgumentException;
  * * User activity {None, Response only, Feedback only, Response + Feedback}
  * * publishedOnly {true, false}
  */
-class AssessableTest extends \PHPUnit_Framework_TestCase
+class AssessableTest extends TestCase
 {
     const FAVOR_FLOATING = false;
     /**

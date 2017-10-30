@@ -11,9 +11,9 @@ namespace Alaress\Date\Test;
 
 use Alaress\Test\Date\MockDateObject;
 use Alaress_Date_Format;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class IsAtStartOrEndTest extends PHPUnit_Framework_TestCase
+class IsAtStartOrEndTest extends TestCase
 {
     use MockDateObject;
 

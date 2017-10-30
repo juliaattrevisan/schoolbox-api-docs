@@ -12,9 +12,9 @@ namespace Alaress\Date\Test;
 use Alaress\Test\Date\MockDateObject;
 use Alaress_Date_Format;
 use Alaress_Date_Locale_Config;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class LocaleTest extends PHPUnit_Framework_TestCase
+class LocaleTest extends TestCase
 {
     use MockDateObject;
 
