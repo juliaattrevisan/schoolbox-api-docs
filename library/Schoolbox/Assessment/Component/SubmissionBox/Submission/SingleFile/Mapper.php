@@ -16,7 +16,6 @@ use \Schoolbox\File\Mimetype;
 use \Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
-use \Schoolbox\Learning\InlineGrader\Factory\ResponseFile;
 use Schoolbox\Learning\InlineGrader\Kami;
 
 /**
@@ -49,10 +48,12 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restorePlagScan'));
     }
 
+
     /**
      * Soft deletes any PlagScan for the specified File
      *
      * @param Model $file
+     * @throws BaseMapper\DefinitionException
      */
     public function softDeletePlagScan(Model $file)
     {
@@ -66,6 +67,7 @@ class Mapper extends BaseMapper
      * Restores any PlagScan for the specified File
      *
      * @param Model $file
+     * @throws BaseMapper\DefinitionException
      */
     public function restorePlagScan(Model $file)
     {
@@ -74,8 +76,10 @@ class Mapper extends BaseMapper
         $plagScanMapper->restoreSoftDeleted($plagScans);
     }
 
+
     /**
      * @return string
+     * @throws BaseMapper\DefinitionException
      */
     protected function getSelectString()
     {
@@ -98,11 +102,13 @@ class Mapper extends BaseMapper
         ";
     }
 
+
     /**
      * Include storage and student's submission.
      *
      * @param PDOStatement $statement
-     * @return Collection|Model[]
+     * @return Model[]|Collection
+     * @throws BaseMapper\DefinitionException
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
