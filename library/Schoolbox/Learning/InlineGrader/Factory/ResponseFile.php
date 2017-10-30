@@ -82,6 +82,7 @@ class ResponseFile
     public function produce(Submission $submission, SubmissionFile $file, User $user): array
     {
         $kamiViewSession = $this->getKamiViewSession($file, $user);
+
         if ($kamiViewSession) {
             return [
                 'strategy' => 'kami.twig',
@@ -90,7 +91,6 @@ class ResponseFile
                 ],
             ];
         }
-
 
         /* TODO: Check that file exists and that you can access it
          * If it doesn't exist, 404 File Not Found
@@ -106,6 +106,7 @@ class ResponseFile
                 'strategy' => 'image.twig',
             ];
         }
+
         if ($mimetype->isAudio()) {
             /* Load from the ResourceVideoMapper to get extra stuff
              * about the media file. Bundle it into a struct
@@ -125,6 +126,7 @@ class ResponseFile
                 ]
             ];
         }
+
         if ($mimetype->isVideo()) {
             /* Load from the ResourceVideoMapper to get extra stuff
              * about the media file. Bundle it into a struct
@@ -144,6 +146,7 @@ class ResponseFile
                 ]
             ];
         }
+
         if ($file->getEditableInline()) {
             /* Load purified html into a random div or suchlike
              */
@@ -151,46 +154,12 @@ class ResponseFile
                 'strategy' => 'html.twig'
             ];
         }
-        if ($this->isCrocodocable($file)) {
-            /* Figger out a crocodoc url
-             * \RangeException Use Download File prompt if crocodoc api key is nonexistent on our end
-             * \DomainException Use Download File prompt if crocodoc cannot be authenticated on the crocodoc end
-             */
-            try {
-                $authenticator = new Authenticator();
-            }
-            catch (\RangeException $e) {
-                return [
-                    'strategy' => 'download.twig'
-                ];
-            }
 
-            /* Dock this doc into the crocodoc dock
-             */
-            try {
-                $url = (new Facade($authenticator, $submission, $file, $user))->start();
-
-                return [
-                    'strategy' => 'crocodoc.twig',
-                    'data' => [
-                        'url' => $url
-                    ]
-                ];
-            }
-            catch (\DomainException $e) {
-                return [
-                    'strategy' => 'download.twig'
-                ];
-            }
-        }
-        else {
-
-            /* Download File prompt
-             */
-            return [
-                'strategy' => 'download.twig'
-            ];
-        }
+        /* Download File prompt
+         */
+        return [
+            'strategy' => 'download.twig'
+        ];
     }
 
     /**
