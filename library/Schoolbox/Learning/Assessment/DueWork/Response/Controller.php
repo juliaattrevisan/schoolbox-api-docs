@@ -89,9 +89,8 @@ class Controller extends Base
     /**
      * Get the contents of a particular $response
      *
-     * Show the specified $_GET['hash'] in iframe window if it's a crocodoc-compatible
-     * file; otherwise display html/audio/video/image contents differently, inline with
-     * the dom
+     * Show the specified kami doc in an inline window if available;
+     * otherwise display html/audio/video/image contents differently, inline with the dom
      *
      * I can't call it getResponse() lol wups
      *
