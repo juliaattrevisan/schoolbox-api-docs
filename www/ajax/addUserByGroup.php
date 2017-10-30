@@ -20,7 +20,7 @@ $return        = [];
 if ($_GET['type'] === 'system') {
     /* Add from this role...
      */
-    foreach ($roleMapper->searchByName($_GET['query']) as $role) {
+    foreach ($roleMapper->findByName($_GET['query']) as $role) {
         $return[] = [
             'name' => $role->getName(),
             'id'   => $role->getId(),
