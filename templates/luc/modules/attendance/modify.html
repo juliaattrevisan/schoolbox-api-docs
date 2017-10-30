@@ -1,0 +1,121 @@
+<!-- BEGIN custom_head -->
+<script type='text/javascript' src='/javascript/components/jquery-timepicker-jt/jquery.timepicker.js'></script>
+<script type='text/javascript'>
+	$(function() {
+        $('[data-timepicker]').timepicker({
+            'timeFormat':'g:ia',
+            'scrollDefaultNow': true,
+            'step':5,
+            'minTime': '{ATTENDANCE_START}',
+            'maxTime': '{ATTENDANCE_END}',
+            appendTo: function ($input) {
+                return $input.closest('.timepick');
+            }
+        });
+
+        var absenceCounter = $('[data-attendance-count]');
+        var absenceChecks  = $('[data-attendance-absence]');
+        absenceChecks.on('change', function() {
+            absenceCounter.text(absenceChecks.not(':checked').length);
+        });
+	});
+</script>
+<!-- END custom_head -->
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Student Attendances for {ATTENDANCE_PERIOD_LONG} on day {ATTENDANCE_DAY} - {CLASS_CODE}</h1>
+    </div>
+</div>
+
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h2 class="subheader">{ATTENDANCE_DATE_FORMATTED}</h2>
+        </div>
+    </div>
+    <nav><a href="#" class="icon-overflow" data-dropdown="overflow"></a></nav>
+    <ul class="f-dropdown" data-dropdown-content id="overflow">
+        <li><a href="/subject/classList/{CLASS_CODE}" class="icon-class-list">View Class List</a></li>
+    </ul>
+</div>
+
+
+<div class="row">
+    <div class="small-12 island">
+
+        <form method='post' action='/modules/attendance/modifyForm'>
+            <section>
+                <input name='classCode' type='hidden' value='{CLASS_CODE}' />
+                <input name='attendanceDate' type='hidden' value='{ATTENDANCE_DATE}' />
+                <input name='attendanceDay' type='hidden' value='{ATTENDANCE_DAY}' />
+                <input name='attendancePeriod' type='hidden' value='{ATTENDANCE_PERIOD}' />
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th class="hide">Late Arrival</th>
+                        <th class="hide">Early Departure</th>
+                        <th class="hide">Type</th>
+                        <th class="hide">Reason</th>
+                        <th>Absent</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- BEGIN student -->
+                    <tr class='{ON_OFF}'>
+                        <th scope="row" class="no-pad">
+                            <div class="card wrap-down">
+                                <a href="/search/user/{STUDENT_UID}" title="View Profile">
+                                    <img src="/portrait.php?userId={STUDENT_SYNERGY_ID}&size=square64" />
+                                    {STUDENT_NAME}
+                                </a>
+                                <p class="meta">{STUDENT_ATTENDANCESTRING}</p>
+                                <p class="meta">{STUDENT_NONATTENDREASON}</p>
+                            </div>
+                        </th>
+                        <td class="hide">
+                            <div class="timepick">
+                                <input type='text' maxlength='10' size="8" name='LateArrivalTime[]' data-timepicker value="{STUDENT_ARRIVAL_TIME}" />
+                            </div>
+                        </td>
+                        <td class="hide">
+                            <div class="timepick">
+                                <input type='text' maxlength='10' size="8" name='EarlyDepartureTime[]' data-timepicker value="{STUDENT_DEPT_TIME}" />
+                            </div>
+                        </td>
+                        <td class="hide">
+                            <select name='PossibleAbsenceCode[]'>
+                                <!-- BEGIN absence_options -->
+                                <option value='{ABSENCE_OPTIONS_VALUE}' {ABSENCE_OPTIONS_VALUE_SELECTED}>{ABSENCE_OPTIONS_DESCRIPTION}</option>
+                                <!-- END absence_options -->
+                            </select>
+                        </td>
+                        <td class="hide">
+                            <select name='PossibleReasonCode[]'>
+                                <!-- BEGIN reason_options -->
+                                <option value='{REASON_OPTIONS_VALUE}' {REASON_OPTIONS_VALUE_SELECTED}>{REASON_OPTIONS_DESCRIPTION}</option>
+                                <!-- END reason_options -->
+                            </select>
+                            <input type='text' maxlength='100' name='PossibleReasonDescription[]' value="{STUDENT_REASON_DESCRIPTION}" />
+                        </td>
+                        <td>
+                            <input type="hidden" name="studentID[]" value="{STUDENT_SYNERGY_ID}" />
+                            <input id="attendanceOptions_{STUDENT_SYNERGY_ID}" type="checkbox" name="attending[]" value="{STUDENT_SYNERGY_ID}" {IS_ABSENT} data-attendance-absence />
+                            <label for="attendanceOptions_{STUDENT_SYNERGY_ID}" class="checkbox-label"></label>
+                            <!-- BEGIN student_absent -->
+                            <i class="icon-alert" title="Student is reported absent"></i>
+                            <!-- END student_absent -->
+                        </td>
+                    </tr>
+                    <!-- END student -->
+                    </tbody>
+                </table>
+                <div class="alert-box">
+                    <span data-attendance-count>{ATTENDANCE_COUNT}</span> students attending out of {ATTENDANCE_TOTAL}
+                </div>
+            </section>
+            <input type="submit" value="Submit Attendances" />
+        </form>
+    </div>
+</div>
