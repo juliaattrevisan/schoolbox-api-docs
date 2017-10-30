@@ -92,13 +92,6 @@ class Factory
     private $marksheet = null;
 
     /**
-     * Crocodoc uuid
-     *
-     * @var string
-     */
-    private $uuid = null;
-
-    /**
      * The time differential between using an old ReturnedWork record and spawning
      * a whole new one
      */
@@ -125,7 +118,6 @@ class Factory
      * @param SubmissionBox\Rubric\Rubric $grid
      * @param array                       $attachments
      * @param bool                        $removeUnsetAttachments
-     * @param string                      $uuid
      */
     public function __construct(
         User $user,
@@ -134,8 +126,7 @@ class Factory
         $comment,
         $grid,
         $attachments,
-        $removeUnsetAttachments,
-        $uuid
+        $removeUnsetAttachments
     ) {
         $this->setUser($user);
         $this->setSubmissionBox($submissionBox);
@@ -144,7 +135,6 @@ class Factory
         $this->setRubric($grid);
         $this->setAttachments($attachments);
         $this->setRemoveUnsetAttachments($removeUnsetAttachments);
-        $this->setUuid($uuid);
 
         /* Internally used instances
          */
@@ -264,7 +254,6 @@ class Factory
         $returnedWork->setOwner($this->getUser());
         $returnedWork->setSubmissionBox($this->getSubmissionBox());
         $returnedWork->setCreatedAt(new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
-        $returnedWork->getFiles()->first()->setUuid($this->getUuid());
 
         return $returnedWork;
     }
@@ -481,25 +470,5 @@ class Factory
     private function getErrors()
     {
         return $this->errors;
-    }
-
-    /**
-     * Set uuid
-     *
-     * @param string $uuid
-     */
-    private function setUuid($uuid)
-    {
-        $this->uuid = $uuid;
-    }
-
-    /**
-     * Get uuid
-     *
-     * @return string
-     */
-    private function getUuid()
-    {
-        return $this->uuid;
     }
 }
