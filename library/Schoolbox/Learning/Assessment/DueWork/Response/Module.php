@@ -64,7 +64,7 @@ class Module extends BaseModule
 
         $hasWriteAccess = $this->buildRuleHasWriteAccess();
 
-        $canAccessCrocodoc = $this->buildRuleCanAccessCrocodoc();
+        $hasKamiAccess = $this->buildRuleCanAccessKami();
 
         $hasPlagscanAccess = new Rule\Any(
             $hasWriteAccess,
@@ -85,20 +85,20 @@ class Module extends BaseModule
 
         $this->register('GET', $participantPattern . '/responses{/responseId:\d+}', 'getParticularResponse', $hasWriteAccess, $preloadParticipant); // a || r
 
-        $this->register('GET', $crocodocPattern . '/download',  'getCrocodocDownload', $canAccessCrocodoc, $preloadResponse); // a || r
-        $this->register('GET', $crocodocPattern . '/annotated', 'getCrocodocView',     $canAccessCrocodoc, $preloadResponse); // a || r
+        $this->register('GET', $crocodocPattern . '/download',  'getCrocodocDownload', $hasKamiAccess, $preloadResponse); // a || r
+        $this->register('GET', $crocodocPattern . '/annotated', 'getCrocodocView',     $hasKamiAccess, $preloadResponse); // a || r
 
         $this->register('GET', $plagscanPattern,             'getPlagscanReport',         $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
         $this->register('GET', $plagscanPattern . '/iframe', 'getPlagscanReportContents', $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
 
         // For now, same auth rules as crocodoc.
         $canAccessKami = new Rule\All(
-            $canAccessCrocodoc,
+            $hasKamiAccess,
             new Kami\Authentication\IsEnabled($this->getKamiConnector())
         );
         // Don't attempt to export a kamiDoc if not possible
         $canExportKami = new Rule\All(
-            $canAccessCrocodoc,
+            $hasKamiAccess,
             new Kami\Authentication\IsEnabled($this->getKamiConnector()),
             new Rule\Callback(function (array $params) {
                 $kami = $this->getKamiMapper()->findById($params['kamiId']);
@@ -149,7 +149,7 @@ class Module extends BaseModule
 
     /**
      * Returns an auth rule determining if current user can view/download an
-     * annotated student submission file (aka 'crocodoc').
+     * annotated student submission file (aka 'kami').
      *
      * Permitted if user is either of:
      * * SuperUser,
@@ -159,9 +159,9 @@ class Module extends BaseModule
      *
      * @return Rule\IAuthorizationRule
      * @throws \InvalidArgumentException if any sub-rule is not a IAuthorizationRule
-     * @throws Unauthorized If current user not permitted to access the crocodoc
+     * @throws Unauthorized If current user not permitted to access the kami
      */
-    private function buildRuleCanAccessCrocodoc()
+    private function buildRuleCanAccessKami()
     {
         // And combine - ensuring parent check is last
         return new Rule\Any(
