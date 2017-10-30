@@ -249,7 +249,6 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
             [
                 'id' => 11,
                 'hash' => 's89789d9hw3thsug8923u5',
-                'crocodocId' => 'vjfh-6677=eirj-01928333',
                 'filename' => 'mark this Sir.xlsx',
                 'plagscan' => [
                     'id' => 1234,
@@ -261,7 +260,6 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
             [
                 'id' => 23,
                 'hash' => 'lk5j34kl5jousdio',
-                'crocodocId' => 'vjfh-6677=eirj-01928333',
                 'filename' => 'and this too.docx'
             ],
         ];
@@ -270,7 +268,6 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
             [
                 'id' => 112,
                 'hash' => 'lj23lj2llj5l2jsdkjf90',
-                'crocodocId' => 'j239jf-23mndi9f-1234nns9fh-5nl6i0f',
                 'filename' => 'This is the correct response.txt',
             ],
         ];
@@ -316,7 +313,6 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
                     ->setId($submissionFiles[0]['id'])
                     ->setStorage((new Storage())
                         ->setHash($submissionFiles[0]['hash']))
-                    ->setCrocodocId($submissionFiles[0]['crocodocId'])
                     ->setFilename($submissionFiles[0]['filename'])
                     ->setPlagscan((new DueWorkSubmissionFilePlagscan())
                         ->setId($submissionFiles[0]['plagscan']['id'])
@@ -327,7 +323,6 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
                     ->setId($submissionFiles[1]['id'])
                     ->setStorage((new Storage())
                         ->setHash($submissionFiles[1]['hash']))
-                    ->setCrocodocId($submissionFiles[1]['crocodocId'])
                     ->setFilename($submissionFiles[1]['filename'])))
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
@@ -343,7 +338,6 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
                     ->setId($feedbackFiles[0]['id'])
                     ->setStorage((new Storage())
                         ->setHash($feedbackFiles[0]['hash']))
-                    ->setCrocodocId($feedbackFiles[0]['crocodocId'])
                     ->setFilename($feedbackFiles[0]['filename'])))
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:14:15', \Alaress_Date_Format::DATABASE_FORMAT))
