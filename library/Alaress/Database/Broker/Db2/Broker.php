@@ -42,8 +42,6 @@ class Broker extends Base implements IBroker
         return new Db2Quoter();
     }
 
-    /** @var PDO $pdo The PDO object that does all the real work */
-    protected $pdo;
 
     /**
      * @inheritdoc
