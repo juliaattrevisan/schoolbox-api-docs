@@ -233,12 +233,6 @@ class Full
                     $currentFeedback->getAllFiles()->sortBy('filename', 'asc');
                 }
 
-                /* Mutate collection :/
-                 * This seems pretty deadly, but I kinda have to mutate it anyway
-                 * to display crocodocked files in the Feedback File list
-                 */
-                $currentResponse->setAllFeedback($includedFeedback);
-
                 /* Sort files alphabetically
                  */
                 $currentResponse->getAllFiles()->sortBy('filename', 'asc');
