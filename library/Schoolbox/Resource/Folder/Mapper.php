@@ -959,9 +959,12 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         // Re-load codes into the model,
         // because the above query won't fetch codes for this category that
         // don't match the above where part.
-        $model->setCodes(
-            $this->getJoinMapper('codes')->findByColumn('folder_id', $model->getId())
-        );
+
+        $codeList = $this->getJoinMapper('codes')->findByColumn('folder_id', $model->getId());
+        foreach($codeList as $folderCode) {
+            $model->getCodes()[$folderCode->getCode()] = $folderCode;
+        }
+
         return $model;
     }
 
@@ -1014,22 +1017,22 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $statement = $this->database->prepare($query);
         $statement->execute($params);
 
-        $result = $this->hydrateSelect($statement);
+        $folders = $this->hydrateSelect($statement);
 
         // Reload codes for retrieved folders.
         // The above query will not have fetched any codes that weren't in $subjectList.
-        $folderCodes = $this->getJoinMapper('codes')
-                            ->findByColumn('folder_id', $result->getColumnValues('id'))
+        /** @var GenericCollection[]|FolderCode\Model[][] $foldersCodes */
+        $foldersCodes = $this->getJoinMapper('codes')
+                            ->findByColumn('folder_id', $folders->getColumnValues('id'))
                             ->groupByCallback(function (Code\Model $code) {
                                 return $code->getFolder()->getId();
                             });
-        foreach ($result as $folder) {
-            if (isset($folderCodes[$folder->getId()])) {
-                $folder->setCodes($folderCodes[$folder->getId()]);
+        foreach($foldersCodes as $folderId => $folderCodes){
+            foreach($folderCodes as $code){
+                $folders[$folderId]->getCodes()[$code->getCode()] = $code;
             }
         }
-
-        return $result;
+        return $folders;
     }
 
     /**
