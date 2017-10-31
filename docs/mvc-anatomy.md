@@ -6,13 +6,10 @@ Nw we'll examine these pieces of an Aura module - the Module, Controller, Mapper
 # A Quick Recap
 This is the basic flow of operations from the moment you access a url to seeing output on screen.
 
-1. Module.php performs a regular expression match on the url. The pattern used in the regular expression is a *route* and the route determines:
-   
-   1.1 whether any route-specific permissions prevent the associated Controller from executing
-   
-   1.2 which Controller method should execute
-   
-   1.3 which objects are given to the Controller as params 
+1. Module.php performs a regular expression match on the url. The pattern used in the regular expression is a *route* and ultimately determines:
+   * whether any route-specific permissions prevent the associated Controller from executing
+   * which Controller method should execute
+   * which objects are given to the Controller as params 
    
 2. Controller method executes, using the objects provided by Module
 3. Controller gives data vars to Twig
@@ -57,4 +54,41 @@ $routes = [
 ...and the controller method `getDetailForPlayer()` would give you some kind of information about a player in a particular team that wasin a particular division for a particular sport. This is a fairly non-conflicting hierarchical structure.
 
 > Sometimes you'll need to pass in other parameters to make your controller method do special things, such as passing it one or more dates to filter a data set, etc. This is left to your discretion though it is advisable to make your routes as utilitarian as possible.
+
+## 1.1 Route Permissions
+Controllers are kind of resource-intensive, they cost a bit to start up. To prevent unnecessary controller startup, we do our permissions checks as early as possible. The earliest place we can do it is in Module.php.
+
+There are a number of predefined classes which can be combined in myriad ways to fine-tune your authorisation check. It is useful to provide a synonymous docblock in plain English to reaffirm what's being seen. This example applies a particular set of requirements in order for the `getDetailForPlayer()` method to execute.
+
+```php
+/**
+ * These pages may be accessed by:
+ *
+ * * superusers
+ * * staff
+ * * the child themselves
+ * * the child's parents
+ *
+ * {@inheritdoc}
+ */
+public function initRoutePermissions(Authorizer $authorizer)
+{
+    $ruleRegexp = '(getDetailForPlayer)';
+    $this
+        ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
+        ->addRoutePermission(
+            $authorizer,
+            $ruleRegexp,
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasRole(Role::STAFF),
+                new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'playerId')
+            )
+        );
+}
+```
+
+It is recommended to compose a larger rule from a set of smaller discrete rules, instead of making a giant monolith that is so specific it can't be reused. You can find some elementary authorisation classes in `/library/Alaress/Authorizer/Rule`.
+
+> Tokens in the url are made available in a secret `$params` array that some authorisation classes can utilise. It's not made particularly clear, but if you dig you'll find where it's used. Alternatively you can just accept it just works like this, and simply use it.
 
