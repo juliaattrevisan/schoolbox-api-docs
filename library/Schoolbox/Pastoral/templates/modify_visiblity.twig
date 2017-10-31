@@ -7,13 +7,13 @@
     {# User Roles Access #}
     {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
 
-    <table class="scrollable">
+    <table class="no-margin">
         <thead>
             <tr>
                 <th class="small-5">User Role Visibility</th>
                 <th class="small-2">No Visibility</th>
-                <th class="small-2">Content</th>
-                <th class="small-2">{{ locale.pastoralPrivate.proper }} Content</th>
+                <th class="small-2">General</th>
+                <th class="small-2">{{ locale.pastoralPrivate.proper }}</th>
             </tr>
         </thead>
         <tbody>
@@ -71,13 +71,13 @@
 
     {% if groups | length > 0 %}
 
-        <table class="scrollable">
+        <table class="no-margin">
             <thead>
                 <tr>
                     <th class="small-5">{{ locale.pastoral.proper }} Group Visibility</th>
-                    <th class="small-2">No Visibility</th>
-                    <th class="small-2">Content</th>
-                    <th class="small-2">{{ locale.pastoralPrivate.proper }} Content</th>
+                    <th class="small-2"></th>
+                    <th class="small-2"></th>
+                    <th class="small-2"></th>
                 </tr>
             </thead>
             <tbody>
@@ -168,13 +168,13 @@
             });
         </script>
 
-        <table class="scrollable">
+        <table class="no-margin">
             <thead>
                 <tr>
                     <th class="small-5">Individual User Visibility</th>
-                    <th class="small-2">No Visibility</th>
-                    <th class="small-2">Content</th>
-                    <th class="small-2">{{ locale.pastoralPrivate.proper }} Content</th>
+                    <th class="small-2"></th>
+                    <th class="small-2"></th>
+                    <th class="small-2"></th>
                 </tr>
             </thead>
             <tbody id="userListPermission">
@@ -223,7 +223,11 @@
                 {% endfor %}
             </tbody>
         </table>
-        <button class="submit expand" data-user-search="{{ guid }}">Add Individual User</button>
+        <div class="component-action">
+            <section>
+                <a href="#" data-button="add-row" class="button" data-user-search="{{ guid }}">Add Individual User</a>
+            </section>
+        </div>
     {% endif %}
 
 </section>
