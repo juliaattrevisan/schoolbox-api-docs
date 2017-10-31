@@ -15,6 +15,8 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
+use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
+use Schoolbox\Pastoral\Group\Model as PastoralGroup;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
@@ -71,12 +73,10 @@ class Notifier extends AbstractModuleNotifier
         /** @var PastoralAccessModel $accessModel */
         foreach ($accessModels as $accessModel) {
 
+            // Target to role
             $role = $accessModel->getRole();
-
             if ($role instanceof Role) {
-                // Sending to a role
                 $roleId = $role->getId();
-
                 try {
                     /** @var Role $role */
                     $role = $this->getRoleMapper()->findById($roleId);
@@ -98,15 +98,29 @@ class Notifier extends AbstractModuleNotifier
                 } catch (MapperException $e) {
                     // noop
                 }
-            } else {
+            }
 
-                $user = $accessModel->getUser();
-                if ($user instanceof User) {
-                    try {
-                        $envelope->targetToUser($user->getId(), $message);
-                    } catch (MapperException $e) {
-                        // noop
+            // Target to user
+            $user = $accessModel->getUser();
+            if ($user instanceof User) {
+                try {
+                    $envelope->targetToUser($user->getId(), $message);
+                } catch (MapperException $e) {
+                    // noop
+                }
+            }
+
+            // Target to group
+            /** @var PastoralGroup $group */
+            $group = $accessModel->getGroup();
+            if ($group instanceof PastoralGroup) {
+                try {
+                    $group = $this->getPastoralGroupMapper()->findById($group->getId());
+                    foreach ($group->getMembers() as $member) {
+                        $envelope->targetToUser($member->getUser()->getId(), $message);
                     }
+                } catch (MapperException $e) {
+                    // noop
                 }
             }
         }
@@ -134,6 +148,9 @@ class Notifier extends AbstractModuleNotifier
         }
         if (empty($dependencies["roleMapper"])) {
             $dependencies["roleMapper"] = RoleMapper::getInstance();
+        }
+        if (empty($dependencies["pastoralGroupMapper"])) {
+            $dependencies["pastoralGroupMapper"] = PastoralGroupMapper::getInstance();
         }
 
         parent::loadDependencies($dependencies);
@@ -215,6 +232,11 @@ class Notifier extends AbstractModuleNotifier
     protected $pastoralAccessMapper;
 
     /**
+     * @var PastoralGroupMapper
+     */
+    protected $pastoralGroupMapper;
+
+    /**
      * @return PastoralAccessMapper
      */
     public function getPastoralAccessMapper()
@@ -286,4 +308,21 @@ class Notifier extends AbstractModuleNotifier
         return $this;
     }
 
+    /**
+     * @return PastoralGroupMapper
+     */
+    public function getPastoralGroupMapper()
+    {
+        return $this->pastoralGroupMapper;
+    }
+
+    /**
+     * @param PastoralGroupMapper $pastoralGroupMapper
+     * @return $this
+     */
+    public function setPastoralGroupMapper($pastoralGroupMapper)
+    {
+        $this->pastoralGroupMapper = $pastoralGroupMapper;
+        return $this;
+    }
 }

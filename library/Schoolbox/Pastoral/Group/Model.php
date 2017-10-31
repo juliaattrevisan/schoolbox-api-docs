@@ -72,7 +72,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Collection $members
+     * @param Collection|Member\Model[] $members
      * @return self
      */
     public function setMembers(Collection $members)
@@ -82,7 +82,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Collection
+     * @return Collection|Member\Model[]
      */
     public function getMembers()
     {
