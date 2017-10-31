@@ -1,3 +1,15 @@
+<script type="text/javascript">
+    $(function() {
+        $("#commentForm").alaressValidate({
+            rules: {
+                'commentBody':  {
+                    requiredNotBlank:true
+                }
+            }
+        });
+    });
+</script>
+
 <ul class="breadcrumb">
     <li><a href="/homepage/{{ folder.getId }}" title="Homepage">{{ folder.getName }}</a></li>
     <li class="active"><a href="#">Blog Archive</a></li>
@@ -107,8 +119,8 @@
 
                         {% if isRouteAuthorized('blog.postCommentInsert', { blog: blog }) %}
                         <div class="editPanel socialstream-new-post">
-                            <form method="post" action="{{ routeLookup('blog.postCommentInsert', { id: blog.getId }) }}">
-                                <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
+                            <form id="commentForm" method="post" action="{{ routeLookup('blog.postCommentInsert', { id: blog.getId }) }}">
+                                <textarea name="commentBody" rows="2" cols="100" placeholder="Add your comment"></textarea>
                                 <input type="submit" class="expand" name="comment" value="Add comment"/>
                             </form>
                         </div>

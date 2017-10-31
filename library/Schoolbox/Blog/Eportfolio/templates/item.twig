@@ -97,10 +97,10 @@
 
                     {% if isRouteAuthorized('eportfolioBlog.postCommentInsert', {blog: record, page: page}) %}
                     <li>
-                        <form action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: record.getId}) }}" method="post">
+                        <form id="commentForm" action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: record.getId}) }}" method="post">
                             <input type="hidden" name="pageId" value="{{ page.getPageId }}">
                             <label class="content">
-                                <textarea name="body" class="no-margin" rows="2" cols="100" placeholder="Add your comment"></textarea>
+                                <textarea name="commentBody" class="no-margin" rows="2" cols="100" placeholder="Add your comment"></textarea>
                             </label>
 
                             <input type="submit" class="no-margin" name="comment" value="Add comment"/>

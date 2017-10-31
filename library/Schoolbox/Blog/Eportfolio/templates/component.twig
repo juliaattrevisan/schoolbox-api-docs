@@ -38,6 +38,15 @@
         });
 
         comp.blogCommentary();
+
+        $("#commentForm").alaressValidate({
+            rules: {
+                'commentBody':  {
+                    requiredNotBlank:true
+                }
+            }
+        });
+
     });
 </script>
 
@@ -104,9 +113,9 @@
         {% if isRouteAuthorized('eportfolioBlog.postCommentInsert', {blog: blog, page: page}) %}
             <li class="row hide" id="commentform-{{ blog.getId }}">
                 <div class="editPanel socialstream-new-post">
-                    <form action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: blog.getId}) }}" method="post">
+                    <form id="commentForm" action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: blog.getId}) }}" method="post">
                         <input type="hidden" name="pageId" value="{{ page.getPageId }}">
-                        <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
+                        <textarea name="commentBody" rows="2" cols="100" placeholder="Add your comment"></textarea>
                         <input type="submit" name="comment" value="Add Comment"/>
                     </form>
                 </div>
