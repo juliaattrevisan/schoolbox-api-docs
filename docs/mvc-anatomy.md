@@ -19,6 +19,8 @@ This is the basic flow of operations from the moment you access a url to seeing 
 # 1 Responsibilities of Module
 Modules use the url to determine which controller method should run, whether there are permissions that might prevent a controller from starting and what objects a controller method should operate with.
 
+There are a variety of formats and styles for building a Module. An example of the most recent can be found in `/library/Schoolbox/Learning/Assessment/Module.php` in the form of `$this->register()`. However, this is simply a reorganisation of the original implementation seen here, and also in older locations such as `/library/Schoolbox/ResourceBooking/Booking/Module.php`. The basic principles still apply regardless of the style chosen.
+
 ## 1.1 Determining the Route
 *Routes* are determined by pattern-matching the url to one of the regular expressions listed in `initRoutes()`. This contains a `$routes` key-value array; the `key` is the pattern and the `value` is the Controller method associated with that pattern. Additionally, the type of request is also used to help determine routes; specifically, whether this was a `GET` (a url you type in the browser) or a `POST` (a form submit) request.
 
