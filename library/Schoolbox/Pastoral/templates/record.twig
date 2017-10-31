@@ -16,57 +16,71 @@
 <div class="row actions-small-2">
     <div class="list-item">
         <div class="small-12 island">
-            <h2 class="subheader">
-                {{ record.heading }}
-            </h2>
+            <h2 class="subheader">{{ record.heading }}</h2>
         </div>
     </div>
-
     <nav>
-        <a href="{{ routeLookup('pastoralReportBuilder.getIndex') }}" class="icon-result"
-           title="{{ locale.pastoral.proper }} Report Builder"></a>
+        {% if user.role.isStaff %}
 
-        {# Pastoral moderators can manage pastoral groups #}
+            {% set routeGetGroups = routeLookupIfAuthorized('pastoralManagement.getGroups') %}
+            {% set routeRecordUpdate = routeLookupIfAuthorized('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) %}
+            {% set routeRecordDelete = routeLookupIfAuthorized('pastoral.postRecordDelete', {recordId: record.id}) %}
 
-        {% set routeGetGroups = routeLookupIfAuthorized('pastoralManagement.getGroups') %}
+            <a href="{{ routeLookup('pastoralReportBuilder.getIndex') }}" class="icon-result" title="{{ locale.pastoral.proper }} Report Builder"></a>
 
-        {% if routeGetGroups %}
-            <a href="{{ routeGetGroups }}" class="icon-group" title="Manage {{ locale.pastoral.proper }} Groups"></a>
-        {% endif %}
+            {# Pastoral moderators can manage pastoral groups #}
 
-        {# Display linked student records #}
+            {% if routeGetGroups %}
+                <a href="{{ routeGetGroups }}" class="icon-group" title="Manage {{ locale.pastoral.proper }} Groups"></a>
+            {% endif %}
+
+            {# Display linked student records #}
+
+            {% if linkedStudents | length %}
+                <a href="#" class="icon-link" data-dropdown="linked-students" title="Linked Students"></a>
+            {% endif %}
+
+            {# Delete record #}
+
+            {% if routeRecordDelete %}
+                <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>
+                <script>
+                    $('[data-delete]').click(function (event) {
+                        event.preventDefault();
+
+                        $(this).confirmDialog({
+                            text: 'Are you sure you want to delete this record?',
+                            confirmEvent: function () {
+                                $.post('{{ routeLookup('pastoral.postRecordDelete', {studentId: record.student.id, recordId: record.id }) }}'
+                                ).done(function () {
+                                    window.location.href = '{{ routeLookup('pastoral.getIndex', {studentId: record.student.id}) }}';
+                                });
+                            }
+                        });
+                    });
+                </script>
+            {% endif %}
+
+            {# Modify record #}
+
+            {% if routeRecordUpdate %}
+                <a class="icon-modify no-text" href="{{ routeRecordUpdate }}" title="Modify"></a>
+            {% endif %}
+        </nav>
 
         {% if linkedStudents | length %}
-            <a href="#" class="icon-link" data-dropdown="linked-students" title="Linked Students"></a>
+            <ul class="f-dropdown" data-dropdown-content="" id="linked-students">
+                <li class="separator">Students With Linked Records</li>
+                {% for student in linkedStudents %}
+                    <li>
+                        <a href="{{ routeLookup('pastoral.getStudent', {studentId: student.student_id}) }}" class="icon-user">
+                            {{ student.first_name }} {{ student.last_name }} ({{ student.count }})
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
         {% endif %}
 
-        {# Delete record #}
-
-        {% if record is not empty %}
-            {% if isRouteAuthorized('pastoral.postRecordDelete', {recordId: record.id}) %}
-                <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>
-            {% endif %}
-        {% endif %}
-
-        {# Modify record #}
-
-        {% set modifyRoute = routeLookupIfAuthorized('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) %}
-        {% if modifyRoute %}
-            <a class="icon-modify no-text" href="{{ modifyRoute }}" title="Modify"></a>
-        {% endif %}
-    </nav>
-
-    {% if linkedStudents | length %}
-        <ul class="f-dropdown" data-dropdown-content="" id="linked-students">
-            <li class="separator">Students With Linked Records</li>
-            {% for student in linkedStudents %}
-                <li>
-                    <a href="{{ routeLookup('pastoral.getStudent', {studentId: student.student_id}) }}" class="icon-user">
-                        {{ student.first_name }} {{ student.last_name }} ({{ student.count }})
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
     {% endif %}
 </div>
 
@@ -80,7 +94,17 @@
     </div>
 </div>
 
-{% include '@pastoral/record_body.twig' %}
+{# Private body #}
+
+{% include '@pastoral/record_body.twig' with { recordType: 'private' } %}
+{% include '@pastoral/record_comments.twig' with { comments: commentsPrivate, recordType: 'private' } %}
+
+{# Public body #}
+
+{% include '@pastoral/record_body.twig' with { recordType: 'public' } %}
+{% include '@pastoral/record_comments.twig' with { comments: commentsPublic, recordType: 'public' } %}
+
+{# Only staff can ever see the other information things #}
 
 {% if user.role.isStaff %}
     {% include '@pastoral/record_visibility.twig' %}

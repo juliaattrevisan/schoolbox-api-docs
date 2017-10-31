@@ -417,18 +417,22 @@ class Controller extends Base
 
         $commentsPublic  = $record->getComments()->filterBy('private', false);
         $commentsPrivate = $record->getComments()->filterBy('private', true);
+        $attachmentsPublic  = $record->getAttachments()->filterBy('private', false);
+        $attachmentsPrivate = $record->getAttachments()->filterBy('private', true);
 
         // Lets render this thing
 
         $this->getResponse()->content->set([
             'template' => '@pastoral/record.twig',
             'data'     => [
-                'record'          => $record,
-                'commentsPublic'  => $commentsPublic,
-                'commentsPrivate' => $commentsPrivate,
-                'moderator'       => $moderator,
-                'user'            => $this->getUser(),
-                'showSeverity'    => $this->getConfigLoader()->get('pastoral_severity'),
+                'record'             => $record,
+                'attachmentsPublic'  => $attachmentsPublic,
+                'attachmentsPrivate' => $attachmentsPrivate,
+                'commentsPublic'     => $commentsPublic,
+                'commentsPrivate'    => $commentsPrivate,
+                'moderator'          => $moderator,
+                'user'               => $this->getUser(),
+                'showSeverity'       => $this->getConfigLoader()->get('pastoral_severity'),
             ],
         ]);
     }

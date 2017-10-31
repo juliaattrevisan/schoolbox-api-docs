@@ -1,93 +1,44 @@
-{% import '@pastoral/macros/profile.twig' as profile %}
+{% if recordType == 'public' %}
+    {% set heading = "Content" %}
+    {% set body = record.bodyPublic %}
+    {% set attachments = attachmentsPublic %}
+{% elseif recordType == 'private' %}
+    {% set heading = locale.pastoralPrivate.proper ~ " Content" %}
+    {% set body = record.bodyPrivate %}
+    {% set attachments = attachmentsPrivate %}
+{% endif %}
 
-<div role="tabpanel" aria-hidden="false" class="content active" id="pastoral">
+{% if body is not empty %}
 
-    {# Private/Confidential Body (Only if there is one) #}
-
-    {% if record.bodyPrivate is not empty %}
-        <div class="row">
-            <div class="small-12 island">
-                <h2 class="subheader">{{ locale.pastoralPrivate.proper }} Content</h2>
-                <section class="content">
-                    {{ record.bodyPrivate | purify }}
-                    {% if record.attachments | length %}
-                        {% for attachment in record.attachments if attachment.private %}
-                            <div class="card small-12">
-                                <a href="{{ routeLookup('pastoral.getStudentRecordAttachment', { recordId: record.id, studentId: record.student.id, attachmentId: attachment.id }) }}"
-                                   target="_blank">
-                                    {% if attachment.storage.mimetype.isImage %}
-                                        <img src="/storage/image.php?hash={{ attachment.storage.hash }}&size=square64">
-                                    {% else %}
-                                        <img src="/ajax/mime/{{ attachment.storage.mime }}" alt="Attachment" class="mime {{ attachment.storage.mimetype }}"/>
-                                    {% endif %}
-
-                                    {{ attachment.storage.filename }}
-                                </a>
-                                <p class="meta">{{ attachment.storage.size | bytes }}</p>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                </section>
-            </div>
-        </div>
-
-        {% include '@pastoral/record_comments.twig' with { comments: commentsPrivate, commentType: 'private' } %}
-
-    {% endif %}
-
-    {# Content #}
+    {% import '@pastoral/macros/profile.twig' as profile %}
+    {% set recordRoute = routeLookup('pastoral.getStudentRecordAttachment', { recordId: record.id, studentId: record.student.id, attachmentId: attachment.id }) %}
 
     <div class="row">
         <div class="small-12 island">
-            {% if record.bodyPublic is not empty or record.attachments | length > 0 %}
-                <h2 class="subheader">
-                    Content
-                </h2>
-                <section class="content">
-                    {% if record.bodyPublic is not empty %}
-                        {{ record.bodyPublic | purify }}
-                    {% endif %}
-                    {% if record.attachments | length %}
-                        {% for attachment in record.attachments if not attachment.private %}
-                            <div class="card small-12">
-                                <a href="{{ routeLookup('pastoral.getStudentRecordAttachment', { recordId: record.id, studentId: record.student.id, attachmentId: attachment.id }) }}"
-                                   target="_blank">
-                                    {% if attachment.storage.mimetype.isImage %}
-                                        <img src="/storage/image.php?hash={{ attachment.storage.hash }}&size=square64">
-                                    {% else %}
-                                        <img src="/ajax/mime/{{ attachment.storage.mime }}" alt="Attachment" class="mime {{ attachment.storage.mimetype }}"/>
-                                    {% endif %}
 
-                                    {{ attachment.storage.filename }}
-                                </a>
-                                <p class="meta">{{ attachment.storage.size | bytes }}</p>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                </section>
-            {% elseif record.bodyPrivate is empty %}
-                <h2 class="subheader">
-                    Content
-                </h2>
-                <div class="empty-state">
-                    <i class="icon-edit"></i>
-                    {% set modifyRoute = routeLookupIfAuthorized('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) %}
-                    {% if modifyRoute %}
-                        {% if record.bodyPrivate is not empty %}
-                            <p>There is no publicly visible content recorded on this {{ locale.pastoral.proper }} attachment.</p>
-                        {% else %}
-                            <p>There is no visible content currently recorded on this {{ locale.pastoral.proper }} attachment.</p>
-                        {% endif %}
-                        <p><a href="{{ modifyRoute }}" title="Edit this record">Click here to edit this record and add some content.</a></p>
-                    {% else %}
-                        <p>There is no visible content currently recorded on this {{ locale.pastoral.proper }} attachment.</p>
-                        <p>Please contact {{ record.owner.fullName }} for more information.</p>
-                    {% endif %}
-                </div>
-            {% endif %}
+            {# Display the pastoral body #}
+
+            <h2 class="subheader">{{ heading }}</h2>
+
+            <section class="content">
+                {{ body | purify }}
+                {% if attachments | length %}
+                    {% for attachment in attachments %}
+                        <div class="card small-12">
+                            <a href="{{ recordRoute }}" target="_blank">
+                                {% if attachment.storage.mimetype.isImage %}
+                                    <img src="/storage/image.php?hash={{ attachment.storage.hash }}&size=square64">
+                                {% else %}
+                                    <img src="/ajax/mime/{{ attachment.storage.mime }}" alt="Attachment" class="mime {{ attachment.storage.mimetype }}"/>
+                                {% endif %}
+                                {{ attachment.storage.filename }}
+                            </a>
+                            <p class="meta">{{ attachment.storage.size | bytes }}</p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </section>
         </div>
     </div>
 
-    {% include '@pastoral/record_comments.twig' with { comments: commentsPublic, commentType: 'public' } %}
-
-</div>
+{% endif %}
