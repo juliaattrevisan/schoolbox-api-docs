@@ -53,6 +53,8 @@ $routes = [
 
 ...and the controller method `getDetailForPlayer()` would give you some kind of information about a player in a particular team that wasin a particular division for a particular sport. This is a fairly non-conflicting hierarchical structure.
 
+The controller methods can only appear once. You can't make multiple routes end up in the same controller method.
+
 > Sometimes you'll need to pass in other parameters to make your controller method do special things, such as passing it one or more dates to filter a data set, etc. This is left to your discretion though it is advisable to make your routes as utilitarian as possible.
 
 ## 1.1 Route Permissions
@@ -88,7 +90,47 @@ public function initRoutePermissions(Authorizer $authorizer)
 }
 ```
 
-It is recommended to compose a larger rule from a set of smaller discrete rules, instead of making a giant monolith that is so specific it can't be reused. You can find some elementary authorisation classes in `/library/Alaress/Authorizer/Rule`.
+It is recommended to compose a larger rule from a set of smaller discrete non-contextual rules, instead of making a giant monolith that is so specific it can't be reused or easily redefined. You can find some elementary authorisation classes in `/library/Alaress/Authorizer/Rule`.
 
-> Tokens in the url are made available in a secret `$params` array that some authorisation classes can utilise. It's not made particularly clear, but if you dig you'll find where it's used. Alternatively you can just accept it just works like this, and simply use it.
+> Tokens in the url are made available in a secret `$params` array that some authorisation classes can utilise. It's not made particularly clear, but if you dig you'll find where it's used. Alternatively you can just accept it works like this, and simply use it.
 
+*Don't do it like the following example.* This is bad news bears.
+
+```php
+/**
+ * These pages may be accessed by:
+ *
+ * * superusers
+ * * staff
+ * * the child themselves
+ * * the child's parents
+ *
+ * {@inheritdoc}
+ */
+public function initRoutePermissions(Authorizer $authorizer)
+{
+    $ruleRegexp = '(getDetailForPlayer)';
+    $this
+        ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
+        ->addRoutePermission(
+            $authorizer,
+            $ruleRegexp,
+            new Rule\UsersAccessSportsFixturesPlayerDetailPage('playerId')
+        );
+}
+
+...
+
+/**
+ * authorize method for UsersAccessSportsFixturesPlayerDetailPage
+ * {@inheritdoc}
+ */
+public function authorize(array $params = array(), User $user = null)
+{
+    // massive amounts of low-level logic specific to this authorisation class
+    // that could otherwise have been derived from a combination of pre-existing 
+    // or reusable/smaller authorisation classes
+}
+```
+
+Having said that, it is okay to make macros of common combinations. You can find some in `isStudentOfClass()` and `isTeacherOfClass()` etc.
