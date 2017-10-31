@@ -157,7 +157,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param string $bodyPrivate
+     * @param string|null $bodyPrivate
      *
      * @return self
      */
@@ -169,7 +169,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getBodyPrivate()
     {
@@ -177,7 +177,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param string $bodyPublic
+     * @param string|null $bodyPublic
      *
      * @return self
      */
@@ -189,7 +189,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getBodyPublic()
     {
