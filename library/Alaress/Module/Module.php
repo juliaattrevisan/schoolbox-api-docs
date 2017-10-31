@@ -19,7 +19,8 @@ use Alaress\Web\Router\RouteCollection;
 use LogicException;
 use Schoolbox\MapperFactory;
 use Alaress\Twig\Loader\IChainLoader;
-use Twig_Loader_Filesystem;
+use Twig\Loader\FilesystemLoader;
+use Twig\Error\LoaderError;
 
 class Module {
 
@@ -546,7 +547,7 @@ class Module {
      * Initializes template paths for this module.
      *
      * @param IChainLoader $templateLoader
-     * @throws \Twig_Error_Loader if the directory does not exist
+     * @throws LoaderError if the directory does not exist
      */
     public function initTemplatePaths(IChainLoader $templateLoader) {}
 
@@ -560,7 +561,7 @@ class Module {
      * @param  string            $dir The directory to use as the template path
      * @param  string            $basename
      * @return $this
-     * @throws \Twig_Error_Loader
+     * @throws LoaderError if something happened whilst loading
      */
     protected function addTemplatePath(IChainLoader $templateLoader, $dir, $basename = '')
     {
@@ -569,7 +570,7 @@ class Module {
         $namespace    = $basename ?: $this->basename;
 
         // Set up the loader for this namespace.
-        $loader = new Twig_Loader_Filesystem([]);
+        $loader = new FilesystemLoader([]);
         if (is_dir($overridePath)) {
             // Add the school-specific dir if it's there
             $loader->addPath($overridePath, $namespace);
@@ -580,7 +581,7 @@ class Module {
         // Set up the core loader for this namespace as "$basename:core".
         // This contains only the base path, even if the custom path exists:
         // this allows custom templates to extend a core version of the template.
-        $coreLoader = new Twig_Loader_Filesystem([]);
+        $coreLoader = new FilesystemLoader([]);
         $coreLoader->addPath($basePath, $namespace . ':core');
         $templateLoader->addLoader($coreLoader);
 
