@@ -423,7 +423,11 @@ $(function() {
                             <fieldset class="radiolist" data-equalizer-watch>
                                 <legend>Campus Timetable:</legend>
                                 {% for campus in campusList %}
-                                    <input type="radio" name="campus" value="{{ campus.id }}" id="campus-{{ campus.id }}" checked>
+                                    <input type="radio"
+                                           name="campus"
+                                           value="{{ campus.id }}"
+                                           id="campus-{{ campus.id }}"
+                                           {% if loop.first %}checked{% endif %}>
                                     <label for="campus-{{ campus.id }}">{{ campus.name }}</label>
                                 {% endfor %}
                             </fieldset>
