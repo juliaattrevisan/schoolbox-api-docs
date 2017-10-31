@@ -226,8 +226,8 @@ class Controller extends Base
         $comment->setOwner($this->getUser());
         $comment->setBlog($blog);
         // Comments must not be empty
-        if (trim($this->getRequest()->post["body"])) {
-            $comment->setBody($this->getRequest()->post["body"]);
+        if (trim($this->getRequest()->post["commentBody"])) {
+            $comment->setBody($this->getRequest()->post["commentBody"]);
         } else {
             error(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
