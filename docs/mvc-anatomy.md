@@ -141,4 +141,17 @@ Computing the preloads in Module allows us to exit earlier without incurring the
 
 > Module provides objects for Controllers which then perform operations or analyses on them. When all the necessary pieces can't be provided, either through missing data, insufficient permissions, etc. then exit early. Controllers should be able to assume that they have the minimum amount of data to start
  
- 
+# 2 Responsibilities of Controller 
+The bulk of business logic occurs in the Controller methods. This accepts the items provided by Module (if applicable) and performs operations or analyses on them, preparing the output for twig to render. Controllers are also primarily responsible for handling of error states that can't be foreseen or computed by Module. 
+
+Controller methods aren't easily reusable, except in subclasses; even then, having a whole bunch of logic dumped into Controller methods isn't ideal. These methods should act as "highways" which give you a rapid, higher-level overview of what is going on; it shouldn't be a place where lower-level details are found. This impedes reusability and heightens the chances of copy-paste bugs occurring, or inconsistent behaviours. It's much harder to unit test Controller methods than independent, high-cohesion classes. 
+
+When possible, abstract away all these details into other classes which can then be reused in various ways elsewhere. You should be able to read method names and get a general idea of what is going on without having to interpret every line of code for possible meaning. 
+
+Let's illustrate with an example. 
+
+
+
+
+
+
