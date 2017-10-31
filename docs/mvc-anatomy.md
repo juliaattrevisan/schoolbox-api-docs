@@ -18,3 +18,43 @@ This is the basic flow of operations from the moment you access a url to seeing 
 3. Controller gives data vars to Twig
 4. Twig executes, performing rendering duties on the data provided 
 5. Twig output renders to browser 
+
+# Responsibilities of Module
+Modules use the url to determine which controller method should run, whether there are permissions that might prevent a controller from starting and what objects a controller method should operate with.
+
+## 1 Determining the Route
+*Routes* are determined by pattern-matching the url to one of the regular expressions listed in `initRoutes()`. This contains a `$routes` key-value array; the `key` is the pattern and the `value` is the Controller method associated with that pattern. Additionally, the type of request is also used to help determine routes; specifically, whether this was a `GET` (a url you type in the browser) or a `POST` (a form submit) request.
+
+> GET and POST
+>
+> Note that ajax requests can initiate both types by using `$.get` and `$.post` respectively. These types of requests still follow the same rules.
+
+
+Since it uses pattern-matching to figure out which Controller method runs, it makes a whole lot of sense to choose a url structure that won't be confusing. While there are a number of url structures currently floating around in schoolbox, a generally-preferred approach emerged: 
+
+```php
+/namespace/collection/id_of_item_in_collection/collection/id_of_item_in_collection...
+
+e.g. Player 4 in Team 3 in Division 2 in Sport 1 in the Aura module "fixtures"
+/fixtures/sports/1/divisions/2/teams/3/player/4
+```
+
+As an example:
+
+```php
+$routes = [
+    'GET' => [
+        '/sports/list' => 'getList'
+        '/sports/{sportId}/divisions/{divisionId}/teams/{teamId}/player/{playerId}' => 'getDetailForPlayer'
+    ],
+    'POST' => [
+        '/sports/update' => 'postUpdate',
+        '/sports/delete' => 'postDelete'
+    ]
+];
+```
+
+...and the controller method `getDetailForPlayer()` would give you some kind of information about a player in a particular team that wasin a particular division for a particular sport. This is a fairly non-conflicting hierarchical structure.
+
+> Sometimes you'll need to pass in other parameters to make your controller method do special things, such as passing it one or more dates to filter a data set, etc. This is left to your discretion though it is advisable to make your routes as utilitarian as possible.
+
