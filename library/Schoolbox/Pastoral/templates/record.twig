@@ -25,22 +25,19 @@
             {% set routeGetGroups = routeLookupIfAuthorized('pastoralManagement.getGroups') %}
             {% set routeRecordUpdate = routeLookupIfAuthorized('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) %}
             {% set routeRecordDelete = routeLookupIfAuthorized('pastoral.postRecordDelete', {recordId: record.id}) %}
+            {% set routeReportBuilder = routeLookupIfAuthorized('pastoralReportBuilder.getIndex') %}
 
-            <a href="{{ routeLookup('pastoralReportBuilder.getIndex') }}" class="icon-result" title="{{ locale.pastoral.proper }} Report Builder"></a>
-
-            {# Pastoral moderators can manage pastoral groups #}
+            {% if routeReportBuilder %}
+                <a href="{{ routeReportBuilder }}" class="icon-result" title="{{ locale.pastoral.proper }} Report Builder"></a>
+            {% endif %}
 
             {% if routeGetGroups %}
                 <a href="{{ routeGetGroups }}" class="icon-group" title="Manage {{ locale.pastoral.proper }} Groups"></a>
             {% endif %}
 
-            {# Display linked student records #}
-
             {% if linkedStudents | length %}
                 <a href="#" class="icon-link" data-dropdown="linked-students" title="Linked Students"></a>
             {% endif %}
-
-            {# Delete record #}
 
             {% if routeRecordDelete %}
                 <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>
@@ -60,8 +57,6 @@
                     });
                 </script>
             {% endif %}
-
-            {# Modify record #}
 
             {% if routeRecordUpdate %}
                 <a class="icon-modify no-text" href="{{ routeRecordUpdate }}" title="Modify"></a>

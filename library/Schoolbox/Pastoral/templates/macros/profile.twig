@@ -9,6 +9,8 @@
     #}
     <img src="/portrait.php?userId={{ user.externalId }}&size=square64"
          style="background-color:#c6c6c6;width:64px;height:64px;"
+         height="64"
+         width="64"
          alt="{{ user.fullName }}"
          title="{{ user.fullName }}">
 {%- endmacro %}
@@ -22,6 +24,8 @@
 {% macro imageSquare200(user) -%}
     <img class="full-width"
          src="/portrait.php?userId={{ user.externalId }}&size=constrain200"
+         height="200"
+         width="200"
          alt="{{ user.fullName }}"
          title="{{ user.fullName }}">
 {%- endmacro %}

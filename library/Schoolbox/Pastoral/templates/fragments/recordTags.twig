@@ -1,4 +1,4 @@
-{% if not user.role.isParent %}
+{% if user.role.isStaff %}
 
     {% if record.points != 0 or (record.tags | length) %}
 
