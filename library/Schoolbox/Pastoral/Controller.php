@@ -116,7 +116,7 @@ class Controller extends Base
     private $pastoralReportMapper;
 
     const ATTACHZONE_PRIVATE = 'private';
-    const ATTACHZONE_PUBLIC = 'public';
+    const ATTACHZONE_PUBLIC  = 'public';
 
     /**
      * Constructor
@@ -415,15 +415,20 @@ class Controller extends Base
             }
         }
 
+        $commentsPublic  = $record->getComments()->filterBy('private', false);
+        $commentsPrivate = $record->getComments()->filterBy('private', true);
+
         // Lets render this thing
 
         $this->getResponse()->content->set([
             'template' => '@pastoral/record.twig',
             'data'     => [
-                'record'       => $record,
-                'moderator'    => $moderator,
-                'user'         => $this->getUser(),
-                'showSeverity' => $this->getConfigLoader()->get('pastoral_severity'),
+                'record'          => $record,
+                'commentsPublic'  => $commentsPublic,
+                'commentsPrivate' => $commentsPrivate,
+                'moderator'       => $moderator,
+                'user'            => $this->getUser(),
+                'showSeverity'    => $this->getConfigLoader()->get('pastoral_severity'),
             ],
         ]);
     }
@@ -1095,7 +1100,7 @@ class Controller extends Base
     /**
      * Insert an attach zone into the template
      *
-     * @param string $name Name of attachzone on page
+     * @param string        $name   Name of attachzone on page
      * @param PastoralModel $record Pastoral record from which to load existing attachments
      *
      * @return array

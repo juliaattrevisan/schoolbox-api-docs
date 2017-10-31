@@ -7,36 +7,22 @@
     <div class="row">
         <div class="small-12 island">
             <h2 class="subheader">Comments</h2>
-
-            {# Show all comments for this record #}
-
-            {% if record.comments|length %}
+            {% if comments | length > 0 %}
                 <section>
                     <ul class="action-list">
-                        {% for comment in record.comments %}
+                        {% for comment in comments %}
                             <li class="actions-small-1">
                                 <div class="list-item">
                                     <div class="small-12 card wrap-down">
-                                        {# Comment author photo #}
                                         <a href="{{ profile.link(comment.owner) }}" title="View Profile">
                                             {{ profile.imageSquare64(comment.owner) }}
                                         </a>
-                                        {% if comment.private %}
-                                            <span class="neutral label right">{{ locale.pastoralPrivate.proper }}</span>
-                                        {% endif %}
-
-                                        {# Show comment author #}
                                         <p class="meta">
                                             Posted by <a href="{{ profile.link(comment.owner) }}">{{ comment.owner.fullName }}</a> {{ comment.createdAt.short }}
                                         </p>
-
-                                        {# Show comment body #}
                                         <p>{{ comment.body | purify | nl2br }}</p>
                                     </div>
                                 </div>
-
-                                {# Only the author of the comment, author of the pastoral record, or moderators can delete comments #}
-
                                 {% if isRouteAuthorized('pastoral.postCommentDelete', {'recordId': record.id, 'commentId': comment.id}) %}
                                     <nav>
                                         <a data-delete-comment="{{ comment.id }}" class="icon-delete" href="#" title="Delete Comment"></a>
@@ -55,23 +41,22 @@
                 <section class="content">
                     <form method="post" action="{{ commentRoute }}">
                         <input type="hidden" name="pastoral_id" value="{{ record.id }}"> <input type="hidden" name="student_id" value="{{ record.student.id }}">
-                        <textarea id="comment_body" rows="3" cols="50" name="comment_body" placeholder="Add Comment"></textarea>
+                        <textarea id="comment_body_{{ commentType }}" rows="3" cols="50" name="comment_body" placeholder="Add Comment"></textarea>
                         <div class="right">
-                            {% if record.bodyPrivate is not empty %}
-                                <input type="checkbox" name="comment_private" id="commentPrivate" value="1"/>
-                                <label for="commentPrivate" class="checkbox-label"> Mark As {{ locale.pastoralPrivate.proper }}</label>
+                            {% if commentType == 'private' %}
+                                <input type="hidden" name="comment_private" id="commentPrivate" value="1"/>
                             {% endif %}
                         </div>
 
-                        <input disabled data-post type="submit" class="expand" value="Add Comment">
+                        <input disabled data-post-{{ commentType }} type="submit" class="expand" value="Add Comment">
                     </form>
 
                     <script type="text/javascript">
                         $(function () {
                             // Disable post comment button if there is no comment
 
-                            $('#comment_body').on('change keyup paste', function () {
-                                $('[data-post]').prop('disabled', $('#comment_body').val().trim() === '');
+                            $('#comment_body_{{ commentType }}').on('change keyup paste', function () {
+                                $('[data-post-{{ commentType }}]').prop('disabled', $('#comment_body_{{ commentType }}').val().trim() === '');
                             });
 
                             // Delete pastoral record
@@ -117,6 +102,7 @@
                     </script>
                 </section>
             {% endif %}
+
         </div>
     </div>
 </div>

@@ -30,6 +30,9 @@
                 </section>
             </div>
         </div>
+
+        {% include '@pastoral/record_comments.twig' with { comments: commentsPrivate, commentType: 'private' } %}
+
     {% endif %}
 
     {# Content #}
@@ -84,4 +87,7 @@
             {% endif %}
         </div>
     </div>
+
+    {% include '@pastoral/record_comments.twig' with { comments: commentsPublic, commentType: 'public' } %}
+
 </div>
