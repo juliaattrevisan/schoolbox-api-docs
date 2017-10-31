@@ -19,7 +19,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Role;
 use Twig_Error_Loader;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 
 class Module extends BaseModule
 {
@@ -86,10 +86,10 @@ class Module extends BaseModule
 
 
     /**
-     * @param Twig_Loader_Chain $templateLoader
+     * @param IChainLoader $templateLoader
      * @throws Twig_Error_Loader
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }

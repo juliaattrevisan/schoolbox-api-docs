@@ -18,7 +18,7 @@ use Aura\Router\Router;
 use Schoolbox\Config;
 use Schoolbox\Resource;
 use Schoolbox\UserMapper;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 use Twig_Loader_Filesystem;
 
 abstract class AbstractModule extends BaseModule
@@ -50,10 +50,10 @@ abstract class AbstractModule extends BaseModule
 
 
     /**
-     * @param Twig_Loader_Chain $templateLoader
+     * @param IChainLoader $templateLoader
      * @throws \Twig_Error_Loader
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__.'/templates');
     }

@@ -25,7 +25,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Tile\Component\TileControllerInterface;
 use Schoolbox\Tile\Layout\Mapper as TileLayoutMapper;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Tile\Mapper as TileMapper;
 use Schoolbox\Tile\Controller as TileController;
 
@@ -168,7 +168,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }

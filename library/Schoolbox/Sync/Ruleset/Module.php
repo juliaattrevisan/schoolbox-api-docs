@@ -21,7 +21,7 @@ use Alaress\Web\Router\PathMatcher;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 
 class Module extends BaseModule
 {
@@ -82,7 +82,7 @@ class Module extends BaseModule
      *
      * {@inheritdoc}
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
         $this->addTemplatePath($templateLoader, __DIR__ . '/../Navigator/templates');

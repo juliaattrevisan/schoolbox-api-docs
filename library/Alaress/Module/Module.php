@@ -18,7 +18,7 @@ use Alaress\Web\Router\PathMatcher;
 use Alaress\Web\Router\RouteCollection;
 use LogicException;
 use Schoolbox\MapperFactory;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 use Twig_Loader_Filesystem;
 
 class Module {
@@ -545,10 +545,10 @@ class Module {
     /**
      * Initializes template paths for this module.
      *
-     * @param Twig_Loader_Chain $templateLoader
+     * @param IChainLoader $templateLoader
      * @throws \Twig_Error_Loader if the directory does not exist
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader) {}
+    public function initTemplatePaths(IChainLoader $templateLoader) {}
 
 
     /**
@@ -556,13 +556,13 @@ class Module {
      *
      * Now adds school-specific templates to "$dir/custom/$config[site_location]".
      *
-     * @param  Twig_Loader_Chain $templateLoader
+     * @param  IChainLoader $templateLoader
      * @param  string            $dir The directory to use as the template path
      * @param  string            $basename
      * @return $this
      * @throws \Twig_Error_Loader
      */
-    protected function addTemplatePath(Twig_Loader_Chain $templateLoader, $dir, $basename = '')
+    protected function addTemplatePath(IChainLoader $templateLoader, $dir, $basename = '')
     {
         $basePath     = $dir;
         $overridePath = $basePath . '/custom/' . $this->getConfig()->get('site_location');
@@ -644,7 +644,7 @@ class Module {
     /**
      * Typehinted convenience method for obtaining template loader reference
      *
-     * @return Twig_Loader_Chain
+     * @return IChainLoader
      */
     protected function getTemplateLoader()
     {

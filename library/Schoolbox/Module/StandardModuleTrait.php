@@ -11,7 +11,7 @@ namespace Schoolbox\Module;
 
 use Aura\Di\ContainerInterface;
 use Twig_Error_Loader;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 
 /**
  * Class StandardModuleTrait
@@ -26,12 +26,12 @@ trait StandardModuleTrait
     /**
      * Helper method for adding a template path for this component's basename.
      *
-     * @param  Twig_Loader_Chain $templateLoader
+     * @param  IChainLoader $templateLoader
      * @param  string            $dir The directory to use as the template path
      * @param string             $basename
      * @return $this
      */
-    protected abstract function addTemplatePath(Twig_Loader_Chain $templateLoader, $dir, $basename = '');
+    protected abstract function addTemplatePath(IChainLoader $templateLoader, $dir, $basename = '');
 
 
     /**
@@ -50,10 +50,10 @@ trait StandardModuleTrait
     }
 
     /**
-     * @param Twig_Loader_Chain $templateLoader
+     * @param IChainLoader $templateLoader
      * @throws Twig_Error_Loader
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $replacements = [
             '\\'     => '/',

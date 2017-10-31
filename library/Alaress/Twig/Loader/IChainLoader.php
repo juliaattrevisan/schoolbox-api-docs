@@ -2,7 +2,7 @@
 /**
  * Interface for Twig chain loaders.
  *
- * Implemented so that classes don't have to require `Twig_Loader_Chain`.
+ * Implemented so that classes don't have to require `IChainLoader`.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2017, Alaress Pty Ltd

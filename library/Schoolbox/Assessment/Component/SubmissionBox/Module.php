@@ -19,7 +19,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Role;
 use Twig_Error_Loader;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Module extends BaseModule

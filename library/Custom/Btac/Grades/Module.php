@@ -14,7 +14,7 @@ use Aura\Router\Router;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 
 class Module extends \Schoolbox\Learning\Grades\Module
 {
@@ -119,7 +119,7 @@ class Module extends \Schoolbox\Learning\Grades\Module
     /**
      * @inheritdoc
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         // Use this custom module's templates in preference to external module's
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');

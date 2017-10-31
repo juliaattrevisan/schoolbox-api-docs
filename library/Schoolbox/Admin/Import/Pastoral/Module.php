@@ -15,7 +15,7 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Log\Mapper as LogMapper;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 
 class Module extends BaseModule
 {
@@ -51,7 +51,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader) {
+    public function initTemplatePaths(IChainLoader $templateLoader) {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 

@@ -17,7 +17,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Role;
-use \Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Assessment\Term;
 use Schoolbox\UserMapper;
 use Schoolbox\Error;
@@ -106,7 +106,7 @@ class Module extends BaseModule
      * @inheritdoc
      * @throws \Twig_Error_Loader If template directory not found
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }

@@ -14,7 +14,7 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 use Twig_Loader_Filesystem;
 use Custom\Diocesan\AchievementReport\Controller as AchievementReportController;
 
@@ -139,7 +139,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $loader = new Twig_Loader_Filesystem(array());
         $loader->addPath(__DIR__ . '/SchoolGrades', 'schoolgrades');

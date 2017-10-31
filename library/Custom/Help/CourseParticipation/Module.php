@@ -23,7 +23,7 @@ use Schoolbox\User\Password\MailService;
 use Schoolbox\User\Password\Reset;
 use Schoolbox\UserMapper;
 use Twig_Error_Loader;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 
 
 class Module extends Alaress\Module\Module
@@ -106,10 +106,10 @@ class Module extends Alaress\Module\Module
 
 
     /**
-     * @param Twig_Loader_Chain $templateLoader
+     * @param IChainLoader $templateLoader
      * @throws Twig_Error_Loader
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }

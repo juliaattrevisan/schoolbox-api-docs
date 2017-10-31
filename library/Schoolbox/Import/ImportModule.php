@@ -17,7 +17,7 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 
 /**
  * Module for admin importer.
@@ -60,7 +60,7 @@ class ImportModule extends BaseModule
      *
      * {@inheritdoc}
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates/' . $this->basename);
     }

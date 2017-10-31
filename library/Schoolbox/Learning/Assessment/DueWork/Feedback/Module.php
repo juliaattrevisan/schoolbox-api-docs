@@ -28,7 +28,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 class Module extends BaseModule
@@ -177,9 +177,9 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      *
-     * @param Twig_Loader_Chain $templateLoader
+     * @param IChainLoader $templateLoader
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
