@@ -22,10 +22,7 @@ Modules use the url to determine which controller method should run, whether the
 ## 1.1 Determining the Route
 *Routes* are determined by pattern-matching the url to one of the regular expressions listed in `initRoutes()`. This contains a `$routes` key-value array; the `key` is the pattern and the `value` is the Controller method associated with that pattern. Additionally, the type of request is also used to help determine routes; specifically, whether this was a `GET` (a url you type in the browser) or a `POST` (a form submit) request.
 
-> GET and POST
->
-> Note that ajax requests can initiate both types by using `$.get` and `$.post` respectively. These types of requests still follow the same rules.
-
+Note that ajax requests can initiate both types by using `$.get` and `$.post` respectively. These types of requests still follow the same rules.
 
 Since it uses pattern-matching to figure out which Controller method runs, it makes a whole lot of sense to choose a url structure that won't be confusing. While there are a number of url structures currently floating around in schoolbox, a generally-preferred approach emerged: 
 
@@ -90,9 +87,9 @@ public function initRoutePermissions(Authorizer $authorizer)
 }
 ```
 
-It is recommended to compose a larger rule from a set of smaller discrete non-contextual rules, instead of making a giant monolith that is so specific it can't be reused or easily redefined. You can find some elementary authorisation classes in `/library/Alaress/Authorizer/Rule`.
+> It is recommended to compose a larger rule from a set of smaller discrete non-contextual rules, instead of making a giant monolith that is so specific it can't be reused or easily redefined. You can find some elementary authorisation classes in `/library/Alaress/Authorizer/Rule`.
 
-> Tokens in the url are made available in a secret `$params` array that some authorisation classes can utilise. It's not made particularly clear, but if you dig you'll find where it's used. Alternatively you can just accept it works like this, and simply use it.
+Tokens in the url are made available in a secret `$params` array that some authorisation classes can utilise. It's not made particularly clear, but if you dig you'll find where it's used. Alternatively you can just accept it works like this, and simply use it.
 
 *Don't do it like the following example.* This is bad news bears.
 
@@ -138,7 +135,7 @@ Having said that, it is okay to make macros of common combinations. You can find
 ## 1.3 Preloads
 Route Preloads, or simply Preloads, are pre-computed objects that are given to a Controller. Computing the preloads in Module allows us to exit earlier without incurring the cost of starting up a Controller. This avoids a scenario where Controllers (expensively) start up, only to find out it didn't have everything it needed, and then consequently error out. A lot of logic is involved in checking all these pieces and it clutters up what the Controller method is really designed to do - that is, to operate on data, not check whether it was allowed to start.
 
-Module provides objects for Controllers which then perform operations or analyses on them. When all the necessary pieces can't be provided, either through missing data, insufficient permissions, etc. then exit early.
+> Module provides objects for Controllers which then perform operations or analyses on them. When all the necessary pieces can't be provided, either through missing data, insufficient permissions, etc. then exit early.
 
 
  
