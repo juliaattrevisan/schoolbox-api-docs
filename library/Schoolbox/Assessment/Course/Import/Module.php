@@ -13,10 +13,8 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Learning\Course;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\UserMapper;
 use Twig_Error_Loader;
 use Twig_Loader_Chain;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -24,7 +22,6 @@ use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificat
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
-use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use \Component_DefinitionMapper;
 use \Component_InstanceMapper;
 use \Component_ConfigDefinitionMapper;
@@ -83,37 +80,35 @@ class Module extends \Alaress\Module\Module
         $this->addTemplatePath($templateLoader, __DIR__ . '/../templates');
     }
 
+
     /**
      * Initializes controller classes into the dependency injector.
      *
      * @param ContainerInterface $injector The dependency injection container.
+     * @throws \InvalidArgumentException
      */
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew(Controller::class, [], [
-                'setUnitSpecificationMapper'         => $this->getMapperFactory()->getLazy(UnitSpecificationMapper::class),
-                'setUnitImplementationMapper'        => $this->getMapperFactory()->getLazy(UnitImplementationMapper::class),
-                'setFolderMapper'                    => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                'setCourseSpecificationMapper'       => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
-                'setCourseImplementationMapper'      => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
-                'setComponentDefinitionMapper'       => $this->getMapperFactory()->getLazy(Component_DefinitionMapper::class),
-                'setComponentInstanceMapper'         => $this->getMapperFactory()->getLazy(Component_InstanceMapper::class),
-                'setComponentConfigDefinitionMapper' => $this->getMapperFactory()->getLazy(Component_ConfigDefinitionMapper::class),
-                'setComponentConfigInstanceMapper'   => $this->getMapperFactory()->getLazy(Component_ConfigMapper::class),
-                'setErrorMapper'                     => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-                'setUserAccessMapper'                => $this->getMapperFactory()->getLazy(UserAccessMapper::class), // TODO should not need both Access and UserAccessMapper...
-                'setAccess'                          => $this->getMapperFactory()->getLazy(Access::class), // not a mapper, but has getInstance, so does work
-                'setUserMapper'                      => $this->getMapperFactory()->getLazy(UserMapper::class),
-                'setImportFactory'                   => $injector->lazyNew(ImportFactory::class),
-                'setReplicator'                      => $injector->lazyNew(Replicator::class, [
+            $injector->lazyNew(Controller::class, [
+                'unitSpecificationMapper'         => $this->getMapperFactory()->getLazy(UnitSpecificationMapper::class),
+                'unitImplementationMapper'        => $this->getMapperFactory()->getLazy(UnitImplementationMapper::class),
+                'folderMapper'                    => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                'courseSpecificationMapper'       => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
+                'courseImplementationMapper'      => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
+                'componentInstanceMapper'         => $this->getMapperFactory()->getLazy(Component_InstanceMapper::class),
+                'componentConfigDefinitionMapper' => $this->getMapperFactory()->getLazy(Component_ConfigDefinitionMapper::class),
+                'componentConfigInstanceMapper'   => $this->getMapperFactory()->getLazy(Component_ConfigMapper::class),
+                'errorMapper'                     => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+                'access'                          => $this->getMapperFactory()->getLazy(Access::class), // not a mapper, but has getInstance, so does work
+                'importFactory'                   => $injector->lazyNew(ImportFactory::class),
+                'replicator'                      => $injector->lazyNew(Replicator::class, [
                     'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
                     'quizMapper'            => $this->getMapperFactory()->getLazy(QuizMapper::class),
                     'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricMapper::class),
                 ]),
-                'setAssessmentMapper'                => $this->getMapperFactory()->getLazy(AssessmentMapper::class),
-                'setAssessmentMapperProxy'           => $injector->lazyGet('assessmentDataSource'),
+                'assessmentMapperProxy'           => $injector->lazyGet('assessmentDataSource'),
             ])
         );
 
@@ -161,12 +156,20 @@ class Module extends \Alaress\Module\Module
                 if ($componentDefinition->getClass() !== Outline\Controller::class) {
                     throw new NotFound("Not a Course-Outline component. id: {$params['componentId']}");
                 }
+                if(!$folder){
+                    // No folder?
+                    throw new NotFound('You cannot specify a component without a folder');
+                }
+                if((int)$componentInstance->getIdentifier() !== (int)$folder->getId()){
+                    throw new NotFound('Component does not reside on specified folder');
+                }
+
             }
 
             return [
                 'courseSpec'  => $courseSpec,
                 'targetClass' => $folder,
-                'componentId' => isset($params['componentId']) ? (int)$params['componentId'] : null,
+                'component'   => $componentInstance,
             ];
         };
     }
