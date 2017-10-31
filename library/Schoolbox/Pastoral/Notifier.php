@@ -15,6 +15,8 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
+use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
+use Schoolbox\Pastoral\Group\Model as PastoralGroup;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
@@ -135,6 +137,9 @@ class Notifier extends AbstractModuleNotifier
         if (empty($dependencies["roleMapper"])) {
             $dependencies["roleMapper"] = RoleMapper::getInstance();
         }
+        if (empty($dependencies["pastoralGroupMapper"])) {
+            $dependencies["pastoralGroupMapper"] = PastoralGroupMapper::getInstance();
+        }
 
         parent::loadDependencies($dependencies);
     }
@@ -215,6 +220,11 @@ class Notifier extends AbstractModuleNotifier
     protected $pastoralAccessMapper;
 
     /**
+     * @var PastoralGroupMapper
+     */
+    protected $pastoralGroupMapper;
+
+    /**
      * @return PastoralAccessMapper
      */
     public function getPastoralAccessMapper()
@@ -286,4 +296,21 @@ class Notifier extends AbstractModuleNotifier
         return $this;
     }
 
+    /**
+     * @return PastoralGroupMapper
+     */
+    public function getPastoralGroupMapper()
+    {
+        return $this->pastoralGroupMapper;
+    }
+
+    /**
+     * @param PastoralGroupMapper $pastoralGroupMapper
+     * @return $this
+     */
+    public function setPastoralGroupMapper($pastoralGroupMapper)
+    {
+        $this->pastoralGroupMapper = $pastoralGroupMapper;
+        return $this;
+    }
 }
