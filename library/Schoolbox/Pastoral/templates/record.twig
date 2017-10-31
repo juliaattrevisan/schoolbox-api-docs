@@ -109,5 +109,7 @@
 {% if user.role.isStaff %}
     {% include '@pastoral/record_visibility.twig' %}
     {% include '@pastoral/record_revisions.twig' %}
-    {% include '@pastoral/record_related.twig' %}
+    <div class="row">
+        {% include '@pastoral/record_related.twig' %}
+    </div>
 {% endif %}

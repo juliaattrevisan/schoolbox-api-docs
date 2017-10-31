@@ -11,9 +11,9 @@
         <div class="row">
             <div class="small-12 island">
                 <h2 class="subheader">Comments</h2>
-                
+
                 {% if comments | length > 0 %}
-                    <section>
+                    <section class="no-margin">
                         <ul class="action-list">
                             {% for comment in comments %}
                                 <li class="actions-small-1">
@@ -40,12 +40,11 @@
 
                 <section class="content">
                     <form class="no-margin" method="post" action="{{ commentInsertRoute }}">
-                        {% if recordType == 'private' %}
-                            <input type="hidden" name="comment_private" value="1">
-                        {% endif %}
-                        <input type="hidden" name="pastoral_id" value="{{ record.id }}">
-                        <input type="hidden" name="student_id" value="{{ record.student.id }}">
+                        <input type="hidden" name="pastoral_id" value="{{ record.id }}"> <input type="hidden" name="student_id" value="{{ record.student.id }}">
                         <textarea id="comment-body-{{ recordType }}" rows="3" cols="50" name="comment_body" placeholder="Add Comment"></textarea>
+                        {% if recordType == 'private' %}
+                            <input type="hidden" name="comment_private" value="1"/>
+                        {% endif %}
                         <input disabled data-comment-insert-{{ recordType }} type="submit" class="expand" value="Add Comment">
                     </form>
                 </section>

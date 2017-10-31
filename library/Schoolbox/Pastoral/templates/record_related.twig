@@ -1,7 +1,7 @@
 {% import '@pastoral/macros/profile.twig' as profile %}
 
 {% if record.relatedRecords | length %}
-    <div class="small-12 medium-6 island">
+    <div class="small-12 {% if record.relatedRecords | length %}medium-6{% endif %} island">
         <h2 class="subheader">Other Students Involved</h2>
         <section>
             <ul class="action-list">
