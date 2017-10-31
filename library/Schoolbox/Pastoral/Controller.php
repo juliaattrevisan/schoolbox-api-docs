@@ -19,7 +19,6 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted as MapperDeletedException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
-use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Attachment\Model as PastoralAttachmentModel;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
@@ -197,7 +196,7 @@ class Controller extends Base
             'data'     => [
                 'user'             => $this->getUser(),
                 'recentStudents'   => $this->pastoralAuditMapper->findRecentStudents(),
-                'recentDashboard'  => $this->pastoralMapper->findRecentDashboard(),
+                'recentDashboard'  => $this->pastoralMapper->findRecentDashboard($this->getUser()),
                 'reportsDashboard' => $this->pastoralReportMapper->findForUserDashboard($this->getUser()),
                 'groups'           => $this->pastoralGroupMemberMapper->findByColumn(
                     'user_id',
@@ -218,7 +217,7 @@ class Controller extends Base
             'template' => '@pastoral/search.twig',
             'data'     => [
                 'search'              => trim($get['keyword']),
-                'results'             => $this->pastoralMapper->getSearchResults($get['keyword']),
+                'results'             => $this->pastoralMapper->getSearchResults($get['keyword'], $this->getUser()),
                 'students'            => $this->userMapper->findStudents($get['keyword']),
                 'minimumSearchLength' => Results::MIN_SEARCH_LENGTH,
             ],
@@ -264,7 +263,7 @@ class Controller extends Base
             ]);
         }
 
-        $records = $this->pastoralMapper->filterForUser($records, $this->getUser());
+        $records = $this->pastoralMapper->filterRecordsForUser($records, $this->getUser());
 
         // Limit the number of pastoral records to display on each page of pastoral records
 
@@ -323,7 +322,7 @@ class Controller extends Base
 
         // Retrieve all of the students pastoral records
 
-        $records = $this->pastoralMapper->filterForUser(
+        $records = $this->pastoralMapper->filterRecordsForUser(
             $this->pastoralMapper->findLinked($student, $linkedStudent, $get['type']),
             $this->getUser()
         );
@@ -375,6 +374,8 @@ class Controller extends Base
         if (!$record instanceof Model) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
         }
+
+        $record = $this->pastoralMapper->filterRecordForUser($record, $this->getUser());
 
         // Create an audit record
 

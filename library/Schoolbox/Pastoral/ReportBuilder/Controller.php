@@ -261,7 +261,7 @@ class Controller extends Base
      */
     public function getReportTags($tag)
     {
-        $records = $this->pastoralMapper->filterForUser($this->pastoralMapper->findByTag($tag), $this->getUser());
+        $records = $this->pastoralMapper->filterRecordsForUser($this->pastoralMapper->findByTag($tag), $this->getUser());
 
         // And spit this thing out
 

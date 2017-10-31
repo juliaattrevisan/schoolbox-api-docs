@@ -258,7 +258,7 @@ class Module extends BaseModule
                 }
             }
 
-            // Load student record
+            // Load linked student details
 
             if (array_key_exists('linkedStudentId', $params)) {
                 try {

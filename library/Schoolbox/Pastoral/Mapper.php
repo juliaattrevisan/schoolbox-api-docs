@@ -252,38 +252,89 @@ class Mapper extends BaseMapper
         return $model;
     }
 
+    /**
+     * Filter records from the collection if the current user doesn't have access to them.
+     * If the user is not in the audience and is not the owner, they can't see the record.
+     *
+     * @param Model $record A pastoral record
+     * @param User  $user   The user who is trying to view them
+     *
+     * @return Model|null
+     */
+    public function filterRecordForUser(Model $record, User $user)
+    {
+        if (!$record instanceof Model) {
+            return null;
+        }
+
+        if ($this->isUserInPastoralService($user)) {
+            // Pastoral moderator see all, shortcut out of here
+            return $record;
+        }
+
+        // We need to iterate all access records to see if any of them grants private access
+
+        $hasAccess = false;
+
+        foreach ($record->getAccess() as $access) {
+            if ($access->getAccessLevel($user) == PastoralAccessMapper::ACCESS_PUBLIC) {
+                $hasAccess = true;
+            } elseif ($access->getAccessLevel($user) == PastoralAccessMapper::ACCESS_PRIVATE) {
+                // Found a record with private access, shortcut true return
+                return $record;
+            }
+        }
+
+        if ($hasAccess) {
+            // Only has public access, strip the private body
+            $record->setBodyPrivate(null);
+
+            return $record;
+        }
+
+        return null;
+    }
 
     /**
      * Filter records from the collection if the current user doesn't have access to them.
-     *
      * If the user is not in the audience and is not the owner, they can't see the record.
      *
      * @param Collection|Model[] $records A list of pastoral records
      * @param User               $user    The user who is trying to view them
+     *
      * @return Collection|Model[]
      */
-    public function filterForUser(Collection $records, User $user)
+    public function filterRecordsForUser(Collection $records, User $user)
     {
-        return $records->filter(function ($model) use ($user) {
-            if (!$model instanceof Model) {
-                return false;
+        return $records->filter(function (&$record) use ($user) {
+            /** @var Model $record */
+            if ($this->isUserInPastoralService($user)) {
+                return true;
             }
 
-            $inAudience = $this->isUserInPastoralService($user);
+            // We need to iterate all access records to see if any of them grants private access
 
-            if (!$inAudience) {
-                foreach ($model->getAccess() as $access) {
-                    if ($access->hasAccess($user)) {
-                        $inAudience = true;
-                        break;
-                    }
+            $hasAccess = false;
+
+            foreach ($record->getAccess() as $access) {
+                if ($access->getAccessLevel($user) == PastoralAccessMapper::ACCESS_PUBLIC) {
+                    $hasAccess = true;
+                } elseif ($access->getAccessLevel($user) == PastoralAccessMapper::ACCESS_PRIVATE) {
+                    // Found a record with private access, shortcut true return
+                    return true;
                 }
             }
 
-            return $inAudience || $model->getOwner()->getId() === $user->getId();
+            if ($hasAccess) {
+                // Only has public access, strip the private body
+                $record->setBodyPrivate(null);
+
+                return true;
+            }
+
+            return false;
         });
     }
-
 
     /**
      * Return any records immediately related to the supplied pastoral record
@@ -396,13 +447,13 @@ class Mapper extends BaseMapper
      * Display the most recent records that are tagged for display on dashboard based on their severity
      *
      * @param User $user
-     * @param int $count Number of recent records to display
+     * @param int  $count Number of recent records to display
      *
      * @return Collection|Model[]
      */
     public function findRecentDashboard(User $user, $count = 5)
     {
-        return $this->filterForUser(
+        return $this->filterRecordsForUser(
             $this->findByColumnList([
                 'sv.dashboard' => 1,
             ], [
@@ -489,7 +540,7 @@ class Mapper extends BaseMapper
      * Perform a search of pastoral records (currently searches the heading, body and comments)
      *
      * @param string $search
-     * @param User   $user   The user who is searching
+     * @param User   $user The user who is searching
      *
      * @return Collection|Model[]
      */
@@ -659,7 +710,7 @@ class Mapper extends BaseMapper
                 $pbUserSearch->getParams()
             ));
 
-            $results = $this->filterForUser($this->hydrateSelect($statement), $user);
+            $results = $this->filterRecordsForUser($this->hydrateSelect($statement), $user);
 
             // Keep a record of all searches performed by users, and what results were displayed
             $searchResults = [];
@@ -841,7 +892,7 @@ class Mapper extends BaseMapper
         $results = $this->hydrateSelect($statement);
 
         // Filter out any I can't view
-        $results = $this->filterForUser($results, $user);
+        $results = $this->filterRecordsForUser($results, $user);
 
         // If there are no tags to filter, just return the results now
 
