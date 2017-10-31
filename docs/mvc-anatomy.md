@@ -136,3 +136,11 @@ public function authorize(array $params = array(), User $user = null)
 Having said that, it is okay to make macros of common combinations. You can find some in `isStudentOfClass()` and `isTeacherOfClass()` etc.
 
 ## 1.3 Preloads
+Route Preloads, or simply Preloads, are pre-computed objects that are given to a Controller. Computing the preloads in Module allows us to exit earlier without incurring the cost of starting up a Controller. This avoids a scenario where Controllers (expensively) start up, only to find out it didn't have everything it needed, and then consequently error out. A lot of logic is involved in checking all these pieces and it clutters up what the Controller method is really designed to do - that is, to operate on data, not check whether it was allowed to start.
+
+Module provides objects for Controllers which then perform operations or analyses on them. When all the necessary pieces can't be provided, either through missing data, insufficient permissions, etc. then exit early.
+
+
+ 
+ 
+
