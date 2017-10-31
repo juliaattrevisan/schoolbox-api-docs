@@ -110,57 +110,16 @@ class Controller extends Base\Base
 
 
     /**
-     * This GET is the start of the import process.
-     *
-     * Import a Course into a CourseOutline Component on a Class page
-     *
-     * @api   GET /course/import/{courseSpecId}/class/{classCode}/{componentId}
-     * @level 160
-     *
-     * @param CourseSpecification $courseSpec
-     * @param Folder              $targetClass
-     * @param int                 $componentId The component instance this action was initiated from
-     */
-    public function getImportToComponentForm(CourseSpecification $courseSpec = null, Folder $targetClass, $componentId)
-    {
-        // Clean up URL if logical null $componentId supplied
-        if (!$componentId) {
-            $data = [
-                'courseSpecId' => $courseSpec->getId(),
-                'classCode'    => $targetClass->getId(),
-            ];
-            $location = $this->getRouter()->generate("courseImport.getImportToClassForm", $data);
-            $this->getResponse()->redirect->to($location);
-            return;
-        }
-
-        $this->getImportForm($courseSpec, $targetClass, $componentId);
-    }
-
-    /**
-     * This GET is the start of the import process. Import a Course into a set of Folders (classes)
-     *
-     * @api   GET /course/import/{courseSpecId}/class{/classCode}
-     * @level 160
-     *
-     * @param CourseSpecification $courseSpec
-     * @param Folder|null         $targetClass
-     */
-    public function getImportToClassForm(CourseSpecification $courseSpec = null, Folder $targetClass = null)
-    {
-        $this->getImportForm($courseSpec, $targetClass, null);
-    }
-
-    /**
      * This GET is the start of the import process. Import a Course into a set of Folders (classes)
      *
      * If both a CourseSpec + Folder are specified, populate stages 1 + 2 and jump straight to stage 2.
      *
-     * @param CourseSpecification $courseSpec Will be null if set to '0' in URL
-     * @param Folder|null         $targetClass
-     * @param int|null            $componentId The component instance this action was initiated from
+     * @param null|CourseSpecification $courseSpec  Null if a '0' in URL.
+     * @param null|Folder              $targetClass Null if a '0' in URL.
+     * @param null|int                 $componentId Null if not specified in URL.
+     * @throws \Schoolbox\Application\Exception\Exception
      */
-    protected function getImportForm(CourseSpecification $courseSpec = null, Folder $targetClass = null, $componentId)
+    public function getImport(?CourseSpecification $courseSpec, ?Folder $targetClass, ?int $componentId)
     {
         // Ensure that if present, the component instance is an extant CourseOutline
         $componentInstance = null;
@@ -169,7 +128,7 @@ class Controller extends Base\Base
                 $componentInstance = $this->getComponentInstanceMapper()->findById($componentId);
                 $definitionId = $componentInstance->getDefinitionId();
                 $componentDefinition = $this->getComponentDefinitionMapper()->findById($definitionId);
-                if ($componentDefinition->getClass() != HomepageOutlineComponentController::class) {
+                if ($componentDefinition->getClass() !== HomepageOutlineComponentController::class) {
                     $msg = 'Not a Course-Outline component';
                     throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND, null, $msg);
                 }
@@ -194,7 +153,7 @@ class Controller extends Base\Base
                     'id'   => $targetClass->getId(),
                     'name' => $targetClass->getTitle()
                 ] : [],
-            'ownershipCandidates' => self::IMPORT_STAGE_OWNERSHIPS == $initialStage
+            'ownershipCandidates' => self::IMPORT_STAGE_OWNERSHIPS === $initialStage
                 ? $this->getPossibleOwnerships([$targetClass]) :
                 [],
             'returnUrlName'    => Redirect::RETURN_URL,

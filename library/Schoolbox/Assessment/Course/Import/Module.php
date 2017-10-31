@@ -9,9 +9,9 @@
 namespace Schoolbox\Assessment\Course\Import;
 
 use Aura\Di\ContainerInterface;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Learning\Course;
-use Schoolbox\Learning\Course\Unit;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
@@ -38,27 +38,39 @@ class Module extends \Alaress\Module\Module
     /** @var string */
     protected $basename = 'courseImport';
 
+
     /**
      * @return void
+     * @throws \Schoolbox\Application\Exception\NotFound
+     * @throws \InvalidArgumentException
+     *
      */
-    protected function registerRoutes()
+    protected function registerRoutes(): void
     {
         $staffOnly = $this->getAuthRule('isStaffOrSuper');
 
         $preloadImport = function ($params)
         {
             try{
-                $courseSpec = $this->getCourseSpecificationMapper()->findById($params['courseSpecId']);
+                $courseSpec = $params['courseSpecId']
+                    ? $this->getCourseSpecificationMapper()->findById($params['courseSpecId'])
+                    : null;
             } catch (MapperException $e){
-                // Null is ok, use will be able to select from dropdown
-                $courseSpec = null;
+                throw new NotFound("Course Spec not found. id: {$params['courseSpecId']}");
             }
 
+            try{
+                $folder = $params['folderId']
+                    ? $this->getFolderMapper()->findById($params['folderId'])
+                    : null;
+            } catch (MapperException $e){
+                throw new NotFound("Folder not found. id: {$params['folderId']}");
+            }
 
             return [
                 'courseSpec'  => $courseSpec,
-                'targetClass' => $this->getFolder($params['classCode']),
-                'componentId' => $params['componentId']
+                'targetClass' => $folder,
+                'componentId' => isset($params['componentId']) ? (int)$params['componentId'] : null,
             ];
         };
 
@@ -69,18 +81,18 @@ class Module extends \Alaress\Module\Module
             ];
         };
 
-        $this->register('GET',    '/{courseSpecId:\d+}/class/{classCode}/{componentId}', 'getImportToComponentForm', $staffOnly, $preloadImport);
-        $this->register('GET',    '/{courseSpecId:\d+}/class{/classCode}',               'getImportToClassForm',     $staffOnly, $preloadImport);
-        $this->register('GET',    '/{courseImplId:\d+}/modify',                          'importModify',             $staffOnly, $preloadCourse);
-        $this->register('GET',    '/classes',                                            'searchClasses',            $staffOnly);
-        $this->register('GET',    '/management/{folderId}',                              'getManagement',            $staffOnly);
+        // courseSpecId + folderId required (even if 0), componentId optional
+        $this->register('GET',    '/{courseSpecId:\d+}/folder/{folderId}{/componentId}', 'getImport',       $staffOnly, $preloadImport);
+        $this->register('GET',    '/{courseImplId:\d+}/modify',                          'importModify',    $staffOnly, $preloadCourse);
+        $this->register('GET',    '/classes',                                            'searchClasses',   $staffOnly);
+        $this->register('GET',    '/management/{folderId}',                              'getManagement',   $staffOnly);
 
-        $this->register('POST',   '/classes',                                            'postClasses',              $staffOnly);
-        $this->register('POST',   '/ownership',                                          'postOwnership',            $staffOnly);
-        $this->register('POST',   '/units',                                              'postUnits',                $staffOnly);
-        $this->register('POST',   '/activities',                                         'postAssessments',          $staffOnly);
-        $this->register('DELETE', '/{courseImplId:\d+}',                                 'importDelete',             $staffOnly, $preloadCourse);
-        $this->register('POST',   '/{courseImplId:\d+}/restore',                         'restoreCourse',            $staffOnly, $preloadCourse);
+        $this->register('POST',   '/classes',                                            'postClasses',     $staffOnly);
+        $this->register('POST',   '/ownership',                                          'postOwnership',   $staffOnly);
+        $this->register('POST',   '/units',                                              'postUnits',       $staffOnly);
+        $this->register('POST',   '/activities',                                         'postAssessments', $staffOnly);
+        $this->register('DELETE', '/{courseImplId:\d+}',                                 'importDelete',    $staffOnly, $preloadCourse);
+        $this->register('POST',   '/{courseImplId:\d+}/restore',                         'restoreCourse',   $staffOnly, $preloadCourse);
     }
 
     /**
@@ -150,30 +162,5 @@ class Module extends \Alaress\Module\Module
     protected function getFolderMapper()
     {
         return $this->injector->get('mapperFactory')->get(Folder\Mapper::class);
-    }
-
-
-    /**
-     * @param string $codeOrId
-     * @return Folder\Model
-     */
-    protected function getFolder($codeOrId)
-    {
-        try {
-            try {
-                $targetClass = $this->getFolderMapper()->findByCode($codeOrId);
-            } catch (MapperException $e) {
-                if ($codeOrId) {
-                    $targetClass = $this->getFolderMapper()->findById($codeOrId);
-                } else {
-                    $targetClass = null;
-                }
-            }
-        } catch (MapperException $e) {
-            // null is ok
-            $targetClass = null;
-        }
-
-        return $targetClass;
     }
 }

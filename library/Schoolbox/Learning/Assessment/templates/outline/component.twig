@@ -7,7 +7,7 @@
 
             $component.setupCourseOutline({
                 course_homepage: '{{ course.folder.id }}',
-                import_base_url: '{{ routeLookup('courseImport.getImportToClassForm', { courseSpecId: courseSpecification.id, classCode: courseImplementation.folder.id }) }}',
+                import_base_url: '{{ routeLookup('courseImport.getImport', { courseSpecId: courseSpecification.id, folderId: courseImplementation.folder.id }) }}',
                 readonly:        {{ readOnly ? 'true':'false' }},
                 previewSelector: '[data-plugin=preview]'
             });

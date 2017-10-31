@@ -21,11 +21,11 @@ Usage:
 #}
 {% set collapsePrefix = collapsePrefix ?: 'course' %}
 
-{# Where should the 'Import to Classes' link point ? #}
-{% set importUrl = component.id
-    ? routeLookup('courseImport.getImportToComponentForm', { courseSpecId: courseSpec.id, classCode: folder.id, componentId: component.id })
-    : routeLookup('courseImport.getImportToClassForm', { courseSpecId: courseSpec.id, classCode: folder.id })
-%}
+{% set importUrl = routeLookup('courseImport.getImport', {
+    courseSpecId: courseSpec.id ?: 0,
+    folderId:     folder.id ?: 0,
+    componentId:  component.id ?: 0
+}) %}
 
 {% if encodedReturnUrl | length %}
     {% set importUrl = importUrl ~ '?' ~ returnUrlKey ~ '=' ~ encodedReturnUrl %}
