@@ -306,34 +306,18 @@ class Mapper extends BaseMapper
      */
     public function filterRecordsForUser(Collection $records, User $user)
     {
-        return $records->filter(function (&$record) use ($user) {
-            /** @var Model $record */
-            if ($this->isUserInPastoralService($user)) {
-                return true;
+        $collection = $this->createCollection();
+
+        /** @var Model $record */
+        foreach ($records as $record) {
+            $record = $this->filterRecordForUser($record, $user);
+
+            if ($record instanceof Model) {
+                $collection->add($record);
             }
+        }
 
-            // We need to iterate all access records to see if any of them grants private access
-
-            $hasAccess = false;
-
-            foreach ($record->getAccess() as $access) {
-                if ($access->getAccessLevel($user) == PastoralAccessMapper::ACCESS_PUBLIC) {
-                    $hasAccess = true;
-                } elseif ($access->getAccessLevel($user) == PastoralAccessMapper::ACCESS_PRIVATE) {
-                    // Found a record with private access, shortcut true return
-                    return true;
-                }
-            }
-
-            if ($hasAccess) {
-                // Only has public access, strip the private body
-                $record->setBodyPrivate(null);
-
-                return true;
-            }
-
-            return false;
-        });
+        return $collection;
     }
 
     /**
