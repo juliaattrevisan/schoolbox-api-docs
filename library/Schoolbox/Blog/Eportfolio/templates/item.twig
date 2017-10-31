@@ -20,7 +20,15 @@
                     });
                 }
             });
-        })
+        });
+
+        $("#commentForm").alaressValidate({
+            rules: {
+                'commentBody':  {
+                    requiredNotBlank:true
+                }
+            }
+        });
     });
 </script>
 
