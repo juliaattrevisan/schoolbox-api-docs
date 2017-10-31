@@ -1,0 +1,122 @@
+{% import '@pastoral/macros/profile.twig' as profile %}
+
+{# Parents cannot ever add/view comments or related records. Only staff can view comments/related records #}
+
+<div role="tabpanel" class="content" id="comments">
+
+    <div class="row">
+        <div class="small-12 island">
+            <h2 class="subheader">Comments</h2>
+
+            {# Show all comments for this record #}
+
+            {% if record.comments|length %}
+                <section>
+                    <ul class="action-list">
+                        {% for comment in record.comments %}
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="small-12 card wrap-down">
+                                        {# Comment author photo #}
+                                        <a href="{{ profile.link(comment.owner) }}" title="View Profile">
+                                            {{ profile.imageSquare64(comment.owner) }}
+                                        </a>
+                                        {% if comment.private %}
+                                            <span class="neutral label right">{{ locale.pastoralPrivate.proper }}</span>
+                                        {% endif %}
+
+                                        {# Show comment author #}
+                                        <p class="meta">
+                                            Posted by <a href="{{ profile.link(comment.owner) }}">{{ comment.owner.fullName }}</a> {{ comment.createdAt.short }}
+                                        </p>
+
+                                        {# Show comment body #}
+                                        <p>{{ comment.body | purify | nl2br }}</p>
+                                    </div>
+                                </div>
+
+                                {# Only the author of the comment, author of the pastoral record, or moderators can delete comments #}
+
+                                {% if isRouteAuthorized('pastoral.postCommentDelete', {'recordId': record.id, 'commentId': comment.id}) %}
+                                    <nav>
+                                        <a data-delete-comment="{{ comment.id }}" class="icon-delete" href="#" title="Delete Comment"></a>
+                                    </nav>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            {% endif %}
+
+            {# Show add comment box if you're allowed to participate #}
+
+            {% set commentRoute = routeLookupIfAuthorized('pastoral.postCommentInsert', {'recordId': record.id}) %}
+            {% if commentRoute %}
+                <section class="content">
+                    <form method="post" action="{{ commentRoute }}">
+                        <input type="hidden" name="pastoral_id" value="{{ record.id }}"> <input type="hidden" name="student_id" value="{{ record.student.id }}">
+                        <textarea id="comment_body" rows="3" cols="50" name="comment_body" placeholder="Add Comment"></textarea>
+                        <div class="right">
+                            {% if record.bodyPrivate is not empty %}
+                                <input type="checkbox" name="comment_private" id="commentPrivate" value="1"/>
+                                <label for="commentPrivate" class="checkbox-label"> Mark As {{ locale.pastoralPrivate.proper }}</label>
+                            {% endif %}
+                        </div>
+
+                        <input disabled data-post type="submit" class="expand" value="Add Comment">
+                    </form>
+
+                    <script type="text/javascript">
+                        $(function () {
+                            // Disable post comment button if there is no comment
+
+                            $('#comment_body').on('change keyup paste', function () {
+                                $('[data-post]').prop('disabled', $('#comment_body').val().trim() === '');
+                            });
+
+                            // Delete pastoral record
+
+                            $('[data-delete]').click(function (event) {
+                                event.preventDefault();
+
+                                $(this).confirmDialog({
+                                    text: 'Are you sure you want to delete this record?',
+                                    confirmEvent: function () {
+                                        $.post('{{ routeLookup('pastoral.postRecordDelete', {studentId: record.student.id, recordId: record.id }) }}'
+                                        ).done(function () {
+                                            window.location.href = '{{ routeLookup('pastoral.getIndex', {studentId: record.student.id}) }}';
+                                        });
+                                    }
+                                });
+                            });
+
+                            // Delete comment
+
+                            $('[data-delete-comment]').click(function (event) {
+                                event.preventDefault();
+
+                                deleteCommentRoute = '{{ routeLookup('pastoral.postCommentDelete', {
+                                    'recordId': 'recordId',
+                                    'commentId': 'commentId'
+                                }) }}';
+
+                                $(this).confirmDialog({
+                                    text: 'Are you sure you want to delete this comment?',
+                                    confirmEvent: function () {
+                                        $.post(
+                                            deleteCommentRoute
+                                                .replace(/recordId/g, {{ record.id }})
+                                                .replace(/commentId/g, $(event.target).attr('data-delete-comment'))
+                                        ).success(function () {
+                                            $(event.target).closest('li').remove();
+                                        });
+                                    }
+                                });
+                            });
+                        });
+                    </script>
+                </section>
+            {% endif %}
+        </div>
+    </div>
+</div>

@@ -7,7 +7,7 @@
     {# Container for search results #}
     {# --------------------------------------------------------------------------------------------------------------------------------------------#}
 
-    <div class="row {% if members | length == 0%}hide{% endif %}" id="searchResultsContainerRow">
+    <div class="row {% if members | length == 0 %}hide{% endif %}" id="searchResultsContainerRow">
         <div class="small-12">
             <section id="searchResultsContainer">
                 <ul class="information-list" id="searchResults">
@@ -100,7 +100,7 @@
 </ul>
 
 <script>
-    $(function() {
+    $(function () {
 
         {# Shut storm up with its duplicate selector bitching #}
 
@@ -265,7 +265,7 @@
         {# Trigger AJAX request on keypress in the search box #}
         {# --------------------------------------------------------------------------------------------------------------------------------------------#}
 
-        memberSearch.on('input propertychange paste', function() {
+        memberSearch.on('input propertychange paste', function () {
 
             {# Grab the search text #}
 
@@ -309,7 +309,7 @@
 
                         roleTypeID: 'staff'
 
-                    }).done(function(data) {
+                    }).done(function (data) {
 
                         {# Cache the search results so we don't have to AJAX for them again #}
 
@@ -317,7 +317,7 @@
 
                         updateSearchResults(ajaxCache[searchText.toLowerCase()]);
 
-                    }).error(function() {
+                    }).error(function () {
 
                         {# Something went wrong searching for this, invalidate any previous result so it can be searched for again #}
 
@@ -326,7 +326,7 @@
                         updateSearchResults();
                     });
 
-                {# May want to tweak this value depending on how fast people in the real world type #}
+                    {# May want to tweak this value depending on how fast people in the real world type #}
 
                 }, 250);
 
@@ -374,7 +374,7 @@
 
             {# Wire up delete event so the user can remove the person from the group if they change their mind #}
 
-            $('[data-member-delete]').click(function(e) {
+            $('[data-member-delete]').click(function (e) {
                 e.preventDefault();
                 window.memberDelete($(this));
             });

@@ -35,7 +35,8 @@
                                                 </a>
                                             </h4>
                                             <p class="spaced meta">
-                                                Posted by <a href="{{ profile.link(record.owner) }}">{{ record.owner.fullName }}</a> {{ record.createdAt.short }}
+                                                Posted by <a
+                                                        href="{{ profile.link(record.owner) }}">{{ record.owner.fullName }}</a> {{ record.createdAt.short }}
                                             </p>
                                         </div>
                                     </div>
@@ -50,7 +51,8 @@
                     <div class="empty-state">
                         <i class="icon-pastoral"></i>
                         <p>No {{ locale.pastoral }} records were found that matched your search.</p>
-                        <p>Did you want to try <a href="/search?keyword={{ search }}">searching the whole system?</a>.</p>
+                        <p>Did you want to try <a href="/search?keyword={{ search }}">searching the whole system?</a>.
+                        </p>
                     </div>
 
                 {% endif %}
@@ -88,7 +90,8 @@
             {% else %}
 
                 <div class="alert-box alert">
-                   The search you entered was too short. Your search must be {{ minimumSearchLength }} characters or longer.
+                    The search you entered was too short. Your search must be {{ minimumSearchLength }} characters or
+                    longer.
                 </div>
 
             {% endif %}

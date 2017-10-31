@@ -14,24 +14,75 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
-use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
+use Schoolbox\Pastoral\Access\Model as PastoralAccess;
+use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
+use Schoolbox\Pastoral\Group\Model as PastoralGroup;
+use Schoolbox\Pastoral\Group\Member\Model as PastoralGroupMember;
+use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
-use Schoolbox\RoleMapper;
 use Schoolbox\Role;
-use Schoolbox\UserMapper;
+use Schoolbox\RoleMapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class Notifier extends AbstractModuleNotifier
 {
     const TRIGGER_CREATED = 'created';
     const TRIGGER_UPDATED = 'updated';
 
+    /** @var Mapper */
+    protected $mapper;
+
+    /** @var PastoralAccessMapper $pastoralAccessMapper */
+    protected $pastoralAccessMapper;
+
+    /** @var PastoralGroupMapper $pastoralGroupMapper */
+    protected $pastoralGroupMapper;
+
+    /** @var Mapper $pastoralMapper */
+    protected $pastoralMapper;
+
+    /** @var RoleMapper $roleMapper */
+    protected $roleMapper;
+
+    /** @var UserMapper $userMapper */
+    protected $userMapper;
+
     /**
-     * @param Model $model
+     * @param array $dependencies
+     */
+    public function loadDependencies($dependencies = null)
+    {
+        if (empty($dependencies["pastoralMapper"])) {
+            $dependencies["pastoralMapper"] = PastoralMapper::getInstance();
+        }
+
+        if (empty($dependencies["pastoralAccessMapper"])) {
+            $dependencies["pastoralAccessMapper"] = PastoralAccessMapper::getInstance();
+        }
+
+        if (empty($dependencies["pastoralGroupMapper"])) {
+            $dependencies["pastoralGroupMapper"] = PastoralGroupMapper::getInstance();
+        }
+
+        if (empty($dependencies["roleMapper"])) {
+            $dependencies["roleMapper"] = RoleMapper::getInstance();
+        }
+
+        if (empty($dependencies["userMapper"])) {
+            $dependencies["userMapper"] = UserMapper::getInstance();
+        }
+
+        parent::loadDependencies($dependencies);
+    }
+
+    /**
+     * @param Model  $model
      * @param string $method
+     *
      * @return Envelope
      */
     protected function buildMessage($model, $method)
@@ -40,72 +91,87 @@ class Notifier extends AbstractModuleNotifier
 
         // Get the pastoral record the comment relates to
 
-        $pastoral = $this->getPastoralMapper()->findById($model->getPastoral()->getId());
-        $owner = $this->getUserMapper()->findById($model->getOwner()->getId());
+        /** @var Pastoral $pastoral */
+        $pastoral = $this->pastoralMapper->findById($model->getPastoral()->getId());
+        $owner    = $this->userMapper->findById($model->getOwner()->getId());
 
         // Get the kids teachers
 
-        $student = $this->getUserMapper()->findById($pastoral->getStudent()->getId());
+        $student = $this->userMapper->findById($pastoral->getStudent()->getId());
         $student->loadTeachers();
         $teachers = $student->getTeacherCollection();
 
+        // Create the message
+
+        $timestamp = md5(date("YmdHis"));
+
+        $private = $pastoral->getPrivate() ? "private " : "";
+
         $builder = new Builder();
-        $builder->setTitle("A pastoral comment has been {$method}")
-            ->setIcon("/portrait.php?size=32&userId=" . $owner->getExternalId())
-            ->setHref("/pastoral/" . $pastoral->getStudent()->getId() . "/" . $pastoral->getId() . "?ts=" . md5(date("YmdHis")))
+        $builder->setTitle("A {$private}pastoral comment has been {$method}")
+            ->setIcon("/portrait.php?size=32&userId={$owner->getExternalId()}")
+            ->setHref("/pastoral/student/{$pastoral->getStudent()->getId()}/pastoral/{$pastoral->getId()}?ts={$timestamp}")
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::ERROR)
-            ->addTopic("pastoral_comment." . $model->getId() . ".{$method}");
+            ->addTopic("pastoral_comment.{$model->getId()}.{$method}");
 
         $message = $builder->build();
 
         // Work out who to send the message to
 
-        /** @var Collection|PastoralAccessModel $accessModels */
-        $accessModels = $this->getPastoralAccessMapper()->findByColumn("pastoral_id", $pastoral->getId());
+        /** @var Collection|PastoralAccess[] $accessRecords */
+        $accessRecords = $this->pastoralAccessMapper->findByColumn("pastoral_id", $pastoral->getId());
 
-        /** @var PastoralAccessModel $accessModel */
-        foreach ($accessModels as $accessModel) {
-            $roleId = $accessModel->getRole()->getId();
+        /** @var PastoralAccess $pastoralAccess */
+        foreach ($accessRecords as $pastoralAccess) {
+            $role          = $pastoralAccess->getRole();
+            $pastoralGroup = $pastoralAccess->getGroup();
+            $user          = $pastoralAccess->getUser();
 
-            if (!empty($roleId)) {
-                try {
-                    /** @var Role $role */
-                    $role = $this->getRoleMapper()->findById($roleId);
-
+            try {
+                if ($role instanceof Role) {
                     if ($role->isStaff()) {
-                        /** @var User $teacher */
-                        foreach ($teachers as $teacher) {
-                            if ($teacher->getRole()->getId() == $roleId) {
-                                $envelope->targetToUser($teacher->getId(), $message);
+                        /** @var User $user */
+                        foreach ($teachers as $user) {
+                            if ($user->getRole()->getId() == $role->getId()) {
+                                // Make sure the role can see this comment if it is private
+
+                                if ($pastoralAccess->getPrivate() || !$model->getPrivate()) {
+                                    $envelope->targetToUser($user->getId(), $message);
+                                }
                             }
                         }
                     }
-                } catch (MapperException $e) {
+                } elseif ($pastoralGroup instanceof PastoralGroup) {
+                    // Sending to a pastoral group
+
+                    /** @var PastoralGroup $pastoralGroup */
+                    $pastoralGroup = $this->pastoralGroupMapper->findById($pastoralGroup->getId());
+
+                    /** @var PastoralGroupMember $member */
+                    foreach ($pastoralGroup->getMembers() as $member) {
+                        // Only staff should be in pastoral groups
+
+                        $user = $member->getUser();
+
+                        if ($user->getRole()->isStaff()) {
+                            $envelope->targetToUser($user->getId(), $message);
+                        }
+                    }
+                } elseif ($user instanceof User) {
+                    // Only staff ever have access to pastoral comments
+
+                    if ($user->getRole()->isStaff()) {
+                        $envelope->targetToUser($user->getId(), $message);
+                    }
                 }
-            } else {
-                $envelope->targetToUser($accessModel->getUser()->getId(), $message);
+            } catch (MapperException $e) {
+                // Log an error and move on so we don't break the rest of the notifications
+                $this->log->error("Error: Unable to send pastoral comment {$method} notification. {$e->getMessage()}", [$e]);
             }
         }
 
         return $envelope;
-    }
-
-    /**
-     * @param array $dependencies
-     */
-    public function loadDependencies($dependencies = null)
-    {
-        if (empty($dependencies["pastoralMapper"]))
-            $dependencies["pastoralMapper"] = PastoralMapper::getInstance();
-        if (empty($dependencies["pastoralAccessMapper"]))
-            $dependencies["pastoralAccessMapper"] = PastoralAccessMapper::getInstance();
-        if (empty($dependencies["roleMapper"]))
-            $dependencies["roleMapper"] = RoleMapper::getInstance();
-        if (empty($dependencies["userMapper"]))
-            $dependencies["userMapper"] = UserMapper::getInstance();
-
-        parent::loadDependencies($dependencies);
     }
 
     /**
@@ -132,117 +198,98 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * @param $model
-     * @param $userEffected
+     * @param Model $model
+     * @param User  $effector
      * @param array $diff
+     *
      * @return Envelope
      */
-    public function notifyCreated($model, $userEffected, $diff=[])
+    public function notifyCreated(Model $model, User $effector, $diff = [])
     {
         return $this->buildMessage($model, self::TRIGGER_CREATED);
     }
 
     /**
      * @param Model $model
-     * @param User $userEffected
+     * @param User  $effector
      * @param array $diff
+     *
      * @return Envelope
      */
-    public function notifyUpdated($model, $userEffected, $diff=[])
+    public function notifyUpdated(Model $model, User $effector, $diff = [])
     {
         return $this->buildMessage($model, self::TRIGGER_UPDATED);
     }
 
     /**
      * @param string $label
+     *
      * @return array
      */
     public function retrieveCallbacks($label)
     {
         return [
-            [ $this, "notify" . ucfirst($label) ]
+            [$this, "notify" . ucfirst($label)],
         ];
     }
 
-    // Here be the getters/setter
-
-    /** @var UserMapper $userMapper */
-    protected $userMapper;
-
-    /** @var RoleMapper $roleMapper */
-    protected $roleMapper;
-
-    /** @var PastoralAccessMapper $pastoralAccessMapper */
-    protected $pastoralAccessMapper;
-
-    /** @var PastoralMapper $pastoralMapper */
-    protected $pastoralMapper;
-
     /**
-     * @return PastoralAccessMapper
+     * @param PastoralMapper $pastoralMapper
+     *
+     * @return self|$this
      */
-    public function getPastoralAccessMapper() {
-        return $this->pastoralAccessMapper;
-    }
-
-    /**
-     * @param $pastoralAccessMapper
-     * @return $this
-     */
-    public function setPastoralAccessMapper($pastoralAccessMapper)
-    {
-        $this->pastoralAccessMapper = $pastoralAccessMapper;
-        return $this;
-    }
-
-    /**
-     * @return PastoralMapper
-     */
-    public function getPastoralMapper() {
-        return $this->pastoralMapper;
-    }
-
-    /**
-     * @param PastoralMapper
-     * @return $this
-     */
-    public function setPastoralMapper($pastoralMapper)
+    public function setPastoralMapper(PastoralMapper $pastoralMapper)
     {
         $this->pastoralMapper = $pastoralMapper;
+
         return $this;
     }
 
     /**
-     * @return RoleMapper
+     * @param PastoralAccessMapper $pastoralAccessMapper
+     *
+     * @return self|$this
      */
-    public function getRoleMapper() {
-        return $this->roleMapper;
+    public function setPastoralAccessMapper(PastoralAccessMapper $pastoralAccessMapper)
+    {
+        $this->pastoralAccessMapper = $pastoralAccessMapper;
+
+        return $this;
     }
 
     /**
-     * @param $roleMapper
-     * @return $this
+     * @param PastoralGroupMapper $pastoralGroupMapper
+     *
+     * @return self|$this
      */
-    public function setRoleMapper($roleMapper)
+    public function setPastoralGroupMapper(PastoralGroupMapper $pastoralGroupMapper)
+    {
+        $this->pastoralGroupMapper = $pastoralGroupMapper;
+
+        return $this;
+    }
+
+    /**
+     * @param RoleMapper $roleMapper
+     *
+     * @return self|$this
+     */
+    public function setRoleMapper(RoleMapper $roleMapper)
     {
         $this->roleMapper = $roleMapper;
+
         return $this;
     }
 
     /**
-     * @return UserMapper
+     * @param UserMapper $userMapper
+     *
+     * @return self|$this
      */
-    public function getUserMapper() {
-        return $this->userMapper;
-    }
-
-    /**
-     * @param $userMapper
-     * @return $this
-     */
-    public function setUserMapper($userMapper)
+    public function setUserMapper(UserMapper $userMapper)
     {
         $this->userMapper = $userMapper;
+
         return $this;
     }
 }

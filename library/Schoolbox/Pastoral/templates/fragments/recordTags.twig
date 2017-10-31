@@ -19,7 +19,8 @@
 
         {% if record.tags | length > 0 %}
             {% for tag in record.tags %}
-                <a href="{{ routeLookup('pastoralReportBuilder.getReportTags', {tagId: tag.id}) }}" class="neutral label">
+                <a href="{{ routeLookup('pastoralReportBuilder.getReportTags', {tagId: tag.id}) }}"
+                   class="neutral label">
                     {{ tag.name }}
                 </a>
             {% endfor %}

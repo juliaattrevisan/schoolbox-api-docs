@@ -1,23 +1,21 @@
 <?php
 /**
- *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox\Pastoral\UploadQueue;
 
 use PDOStatement;
 use Schoolbox\GenericCollection;
+use Schoolbox\File\Mimetype;
+use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Model as Storage;
-use Schoolbox\File\Mimetype;
-use Schoolbox\File\MimetypeMapper;
 
 /**
  * @method Model createModel($idValue = null)
@@ -66,9 +64,11 @@ class Mapper extends BaseMapper
         ";
     }
 
-
     /**
+     * @inheritdoc
+     *
      * @param PDOStatement $statement
+     *
      * @return GenericCollection|Model[]
      */
     protected function hydrateSelect(PDOStatement $statement)
@@ -79,7 +79,6 @@ class Mapper extends BaseMapper
         $mimeMapper = $this->getJoinMapper('storage')->getJoinMapper('allowedFileExtension');
 
         foreach ($statement as $row) {
-
             /** @var Model $model */
             $model = $this->hydrate($row);
 
@@ -88,7 +87,6 @@ class Mapper extends BaseMapper
             $model->setPastoral($pastoral);
 
             if (!empty($row['hash'])) {
-
                 /** @var Storage $storage */
                 $storage = $this->hydrateJoin($row, 'storage', 's');
 
@@ -113,15 +111,18 @@ class Mapper extends BaseMapper
     /**
      * @return \Schoolbox\Collection
      */
-    public function getPending() {
+    public function getPending()
+    {
         return $this->findByColumn('status', self::UPLOAD_STATUS_PENDING);
     }
 
     /**
      * @param int $timeout
+     *
      * @return int
      */
-    public function markProcessingAsFailed($timeout) {
+    public function markProcessingAsFailed($timeout)
+    {
         $statement = $this->database->prepare("
             UPDATE {$this->getTable()}
             SET    status = :new_status, message = :message
@@ -130,8 +131,8 @@ class Mapper extends BaseMapper
         ");
         $statement->bindValue('old_status', self::UPLOAD_STATUS_PROCESSING);
         $statement->bindValue('new_status', self::UPLOAD_STATUS_FAILED);
-        $statement->bindValue('message',    sprintf('Timed out - failed to finish processing after %d seconds', $timeout));
-        $statement->bindValue('timeout',    intval($timeout), \PDO::PARAM_INT);
+        $statement->bindValue('message', sprintf('Timed out - failed to finish processing after %d seconds', $timeout));
+        $statement->bindValue('timeout', intval($timeout), \PDO::PARAM_INT);
         $statement->execute();
 
         return $statement->rowCount();

@@ -10,36 +10,42 @@
 namespace Schoolbox\Pastoral;
 
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
 use External_Pastoral;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Collection;
-use Schoolbox\GenericCollection;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Mapper\Exception\Deleted as MapperDeletedException;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Pastoral\Audit\Model as PastoralAudit;
-use Schoolbox\Pastoral\Group\Model as Group;
-use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Mapper\Exception\Deleted as MapperDeletedException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
-use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
-use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Attachment\Model as PastoralAttachmentModel;
+use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
 use Schoolbox\Pastoral\Comment\Model as PastoralComment;
+use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
+use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
+use Schoolbox\Pastoral\Group\Model as PastoralGroup;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as PastoralModel;
-use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
-use Schoolbox\Pastoral\Type\Model as PastoralTypeModel;
-use Schoolbox\Pastoral\Category\Mapper as PastoralCategoryMapper;
-use Schoolbox\Pastoral\Category\Model as PastoralCategoryModel;
+use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
+use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverityModel;
-use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
+use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
+use Schoolbox\Pastoral\SubType\Model as PastoralSubTypeModel;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTagsModel;
+use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
+use Schoolbox\Pastoral\Type\Model as PastoralTypeModel;
+use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Search\Results;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Model as Storage;
@@ -47,13 +53,6 @@ use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Attachment\Zone;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Resource\File\Mapper as FileMapper;
-use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
-use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
-use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
 
 class Controller extends Base
 {
@@ -84,8 +83,8 @@ class Controller extends Base
     /** @var PastoralAuditMapper $pastoralAuditMapper */
     protected $pastoralAuditMapper;
 
-    /** @var PastoralCategoryMapper $pastoralCategoryMapper */
-    protected $pastoralCategoryMapper;
+    /** @var PastoralSubTypeMapper $pastoralSubTypeMapper */
+    protected $pastoralSubTypeMapper;
 
     /** @var PastoralCommentMapper $pastoralCommentMapper */
     protected $pastoralCommentMapper;
@@ -117,29 +116,32 @@ class Controller extends Base
     /** @var PastoralReportMapper $pastoralReportMapper */
     private $pastoralReportMapper;
 
+    const ATTACHZONE_PRIVATE = 'private';
+    const ATTACHZONE_PUBLIC = 'public';
+
     /**
      * Constructor
      *
-     * @param IConfigLoader $config
-     * @param FileMapper $fileMapper
-     * @param Mapper $pastoralMapper
-     * @param UserAccessMapper $userAccessMapper
-     * @param PastoralAuditMapper $pastoralAuditMapper
-     * @param PastoralCategoryMapper $pastoralCategoryMapper
-     * @param PastoralTypeMapper $pastoralTypeMapper
+     * @param IConfigLoader             $config
+     * @param FileMapper                $fileMapper
+     * @param Mapper                    $pastoralMapper
+     * @param UserAccessMapper          $userAccessMapper
+     * @param PastoralAuditMapper       $pastoralAuditMapper
+     * @param PastoralSubTypeMapper     $pastoralSubTypeMapper
+     * @param PastoralTypeMapper        $pastoralTypeMapper
      * @param PastoralUploadQueueMapper $pastoralUploadQueueMapper
-     * @param PastoralSeverityMapper $pastoralSeverityMapper
-     * @param PastoralRevisionMapper $pastoralRevisionMapper
-     * @param PastoralTagMapper $pastoralTagMapper
-     * @param PastoralCommentMapper $pastoralCommentMapper
-     * @param PastoralGroupMapper $pastoralGroupMapper
+     * @param PastoralSeverityMapper    $pastoralSeverityMapper
+     * @param PastoralRevisionMapper    $pastoralRevisionMapper
+     * @param PastoralTagMapper         $pastoralTagMapper
+     * @param PastoralCommentMapper     $pastoralCommentMapper
+     * @param PastoralGroupMapper       $pastoralGroupMapper
      * @param PastoralGroupMemberMapper $pastoralGroupMemberMapper
-     * @param PastoralAttachmentMapper $pastoralAttachmentMapper
-     * @param RoleMapper $roleMapper
-     * @param UserMapper $userMapper
-     * @param PastoralAccessMapper $pastoralAccessMapper
-     * @param ErrorMapper $errorMapper
-     * @param PastoralReportMapper $pastoralReportMapper
+     * @param PastoralAttachmentMapper  $pastoralAttachmentMapper
+     * @param RoleMapper                $roleMapper
+     * @param UserMapper                $userMapper
+     * @param PastoralAccessMapper      $pastoralAccessMapper
+     * @param ErrorMapper               $errorMapper
+     * @param PastoralReportMapper      $pastoralReportMapper
      */
     public function __construct(
         IConfigLoader $config,
@@ -147,7 +149,7 @@ class Controller extends Base
         PastoralMapper $pastoralMapper,
         UserAccessMapper $userAccessMapper,
         PastoralAuditMapper $pastoralAuditMapper,
-        PastoralCategoryMapper $pastoralCategoryMapper,
+        PastoralSubTypeMapper $pastoralSubTypeMapper,
         PastoralTypeMapper $pastoralTypeMapper,
         PastoralUploadQueueMapper $pastoralUploadQueueMapper,
         PastoralSeverityMapper $pastoralSeverityMapper,
@@ -163,26 +165,26 @@ class Controller extends Base
         ErrorMapper $errorMapper,
         PastoralReportMapper $pastoralReportMapper
     ) {
-        $this->config = $config;
-        $this->errorMapper = $errorMapper;
-        $this->fileMapper = $fileMapper;
-        $this->pastoralAuditMapper = $pastoralAuditMapper;
-        $this->pastoralAccessMapper = $pastoralAccessMapper;
-        $this->pastoralGroupMapper = $pastoralGroupMapper;
+        $this->config                    = $config;
+        $this->errorMapper               = $errorMapper;
+        $this->fileMapper                = $fileMapper;
+        $this->pastoralAuditMapper       = $pastoralAuditMapper;
+        $this->pastoralAccessMapper      = $pastoralAccessMapper;
+        $this->pastoralGroupMapper       = $pastoralGroupMapper;
         $this->pastoralGroupMemberMapper = $pastoralGroupMemberMapper;
-        $this->pastoralAttachmentMapper = $pastoralAttachmentMapper;
-        $this->pastoralCategoryMapper = $pastoralCategoryMapper;
-        $this->pastoralCommentMapper = $pastoralCommentMapper;
-        $this->pastoralMapper = $pastoralMapper;
-        $this->pastoralSeverityMapper = $pastoralSeverityMapper;
-        $this->pastoralRevisionMapper = $pastoralRevisionMapper;
-        $this->pastoralTagMapper = $pastoralTagMapper;
-        $this->pastoralTypeMapper = $pastoralTypeMapper;
+        $this->pastoralAttachmentMapper  = $pastoralAttachmentMapper;
+        $this->pastoralSubTypeMapper     = $pastoralSubTypeMapper;
+        $this->pastoralCommentMapper     = $pastoralCommentMapper;
+        $this->pastoralMapper            = $pastoralMapper;
+        $this->pastoralSeverityMapper    = $pastoralSeverityMapper;
+        $this->pastoralRevisionMapper    = $pastoralRevisionMapper;
+        $this->pastoralTagMapper         = $pastoralTagMapper;
+        $this->pastoralTypeMapper        = $pastoralTypeMapper;
         $this->pastoralUploadQueueMapper = $pastoralUploadQueueMapper;
-        $this->roleMapper = $roleMapper;
-        $this->userMapper = $userMapper;
-        $this->userAccessMapper = $userAccessMapper;
-        $this->pastoralReportMapper = $pastoralReportMapper;
+        $this->roleMapper                = $roleMapper;
+        $this->userMapper                = $userMapper;
+        $this->userAccessMapper          = $userAccessMapper;
+        $this->pastoralReportMapper      = $pastoralReportMapper;
     }
 
     /**
@@ -192,13 +194,16 @@ class Controller extends Base
     {
         $this->getResponse()->content->set([
             'template' => '@pastoral/index.twig',
-            'data' => [
-                'user' => $this->getUser(),
-                'recentStudents' => $this->pastoralAuditMapper->findRecentStudents(),
-                'recentDashboard' => $this->pastoralMapper->findRecentDashboard($this->getUser()),
-                'reportsDashboard'  => $this->pastoralReportMapper->findForUserDashboard($this->getUser()),
-                'groups' => $this->pastoralGroupMemberMapper->findByColumn('user_id', $this->getUser()->getId())
-            ]
+            'data'     => [
+                'user'             => $this->getUser(),
+                'recentStudents'   => $this->pastoralAuditMapper->findRecentStudents(),
+                'recentDashboard'  => $this->pastoralMapper->findRecentDashboard(),
+                'reportsDashboard' => $this->pastoralReportMapper->findForUserDashboard($this->getUser()),
+                'groups'           => $this->pastoralGroupMemberMapper->findByColumn(
+                    'user_id',
+                    $this->getUser()->getId()
+                ),
+            ],
         ]);
     }
 
@@ -211,12 +216,12 @@ class Controller extends Base
 
         $this->getResponse()->content->set([
             'template' => '@pastoral/search.twig',
-            'data' => [
-                'search' => trim($get['keyword']),
-                'results' => $this->pastoralMapper->getSearchResults($get['keyword'], $this->getUser()),
-                'students' => $this->userMapper->findStudents($get['keyword']),
-                'minimumSearchLength' => Results::MIN_SEARCH_LENGTH
-            ]
+            'data'     => [
+                'search'              => trim($get['keyword']),
+                'results'             => $this->pastoralMapper->getSearchResults($get['keyword']),
+                'students'            => $this->userMapper->findStudents($get['keyword']),
+                'minimumSearchLength' => Results::MIN_SEARCH_LENGTH,
+            ],
         ]);
     }
 
@@ -224,7 +229,8 @@ class Controller extends Base
      * Display an individual students pastoral records
      *
      * @param User $student
-     * @throws SchoolboxException
+     *
+     * @throws MapperException
      */
     public function getStudent($student)
     {
@@ -238,26 +244,23 @@ class Controller extends Base
         $this->pastoralAuditMapper->save($auditRecord);
 
         if (!is_numeric($get['type'])) {
-
             // Retrieve all of the students pastoral records
 
             $records = $this->pastoralMapper->findByColumn('student_id', $student->getId(), [
                 'order' => [
-                    'created_at' => 'desc'
-                ]
+                    'created_at' => 'desc',
+                ],
             ]);
-
         } else {
-
             // Retrieve results filtered by pastoral type
 
             $records = $this->pastoralMapper->findByColumnList([
                 'student_id' => $student->getId(),
-                'type_id' => $get['type']
+                'type_id'    => $get['type'],
             ], [
                 'order' => [
-                    'created_at' => 'desc'
-                ]
+                    'created_at' => 'desc',
+                ],
             ]);
         }
 
@@ -281,25 +284,25 @@ class Controller extends Base
 
         $this->getResponse()->content->set([
             'template' => '@pastoral/student.twig',
-            'data' => [
-                'user'              => $this->getUser(),
-                'recordCount'       => $records->count(),
-                'records'           => $records->slice(($pageCurrent - 1) * $resultsPerPage, $resultsPerPage),
-                'student'           => $student,
-                'pageCurrent'       => $pageCurrent,
-                'types'             => $this->pastoralTypeMapper->findAll(),
-                'linkedStudents'    => $this->pastoralMapper->getLinkedStudents($student),
-                'typeSelected'      => $get['type']
-            ]
+            'data'     => [
+                'user'           => $this->getUser(),
+                'recordCount'    => $records->count(),
+                'records'        => $records->slice(($pageCurrent - 1) * $resultsPerPage, $resultsPerPage),
+                'student'        => $student,
+                'pageCurrent'    => $pageCurrent,
+                'types'          => $this->pastoralTypeMapper->findAll(),
+                'linkedStudents' => $this->pastoralMapper->getLinkedStudents($student),
+                'typeSelected'   => $get['type'],
+            ],
         ]);
     }
-
 
     /**
      * Display linked records between two students
      *
      * @param User $student
      * @param User $linkedStudent
+     *
      * @throws SchoolboxException
      */
     public function getLinked($student, $linkedStudent)
@@ -335,23 +338,25 @@ class Controller extends Base
 
         if ($pageCurrent > ceil($records->count() / $resultsPerPage)) {
             $pageCurrent = ceil($records->count() / $resultsPerPage);
-        } else if ($pageCurrent < 1) {
-            $pageCurrent = 1;
+        } else {
+            if ($pageCurrent < 1) {
+                $pageCurrent = 1;
+            }
         }
 
         $this->getResponse()->content->set([
             'template' => '@pastoral/linked.twig',
-            'data' => [
-                'user'              => $this->getUser(),
-                'recordCount'       => $records->count(),
-                'records'           => $records->slice(($pageCurrent - 1) * $resultsPerPage, $resultsPerPage),
-                'student'           => $student,
-                'linkedStudent'     => $linkedStudent,
-                'pageCurrent'       => $pageCurrent,
-                'types'             => $this->pastoralTypeMapper->findAll(),
-                'linkedStudents'    => $this->pastoralMapper->getLinkedStudents($student),
-                'typeSelected'      => $get['type']
-            ]
+            'data'     => [
+                'user'           => $this->getUser(),
+                'recordCount'    => $records->count(),
+                'records'        => $records->slice(($pageCurrent - 1) * $resultsPerPage, $resultsPerPage),
+                'student'        => $student,
+                'linkedStudent'  => $linkedStudent,
+                'pageCurrent'    => $pageCurrent,
+                'types'          => $this->pastoralTypeMapper->findAll(),
+                'linkedStudents' => $this->pastoralMapper->getLinkedStudents($student),
+                'typeSelected'   => $get['type'],
+            ],
         ]);
     }
 
@@ -359,12 +364,13 @@ class Controller extends Base
      * Display a single pastoral care record
      *
      * @param Model $record
-     * @param User $student
+     * @param User  $student
+     *
      * @throws SchoolboxException
      */
     public function getStudentRecord($record, $student)
     {
-        // They've manually stuck in an ID number they don't have access to- so the record doesn't get hydrated in the preload
+        // They've manually put an ID number they don't have access to- so the record doesn't get hydrated in preload
 
         if (!$record instanceof Model) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
@@ -380,26 +386,44 @@ class Controller extends Base
 
         // Moderators can wee revision history
 
-        $moderator = $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL);
+        $moderator = $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0;
 
-        if ($moderator->count() > 0) {
+        if ($moderator) {
             $record->setRevisions(
-                $this->pastoralRevisionMapper->findByColumn('root_id', $record->getId(), ['order' => [
-                    'updated_at' => 'desc'
-                ]])
+                $this->pastoralRevisionMapper->findByColumn('root_id', $record->getId(), [
+                    'order' => [
+                        'updated_at' => 'desc',
+                    ],
+                ])
             );
+        }
+
+        // Hydrate group members so we can display them in the visibility section
+
+        foreach ($record->getAccess() as $access) {
+            if ($access->getGroup() instanceof PastoralGroup) {
+                try {
+                    $access->setGroup(
+                        $this->pastoralGroupMapper->findById(
+                            $access->getGroup()->getId()
+                        )
+                    );
+                } catch (MapperException $e) {
+                    // Noop- group no longer exists
+                }
+            }
         }
 
         // Lets render this thing
 
         $this->getResponse()->content->set([
             'template' => '@pastoral/record.twig',
-            'data' => [
-                'record' => $record,
-                'moderator' => $moderator,
-                'user' => $this->getUser(),
-                'showSeverity' => $this->getConfigLoader()->get('pastoral_severity')
-            ]
+            'data'     => [
+                'record'       => $record,
+                'moderator'    => $moderator,
+                'user'         => $this->getUser(),
+                'showSeverity' => $this->getConfigLoader()->get('pastoral_severity'),
+            ],
         ]);
     }
 
@@ -407,6 +431,7 @@ class Controller extends Base
      * Insert pastoral care record
      *
      * @param User $student
+     *
      * @throws SchoolboxException
      */
     public function getStudentRecordInsertForm($student)
@@ -424,6 +449,7 @@ class Controller extends Base
      * Update pastoral care record
      *
      * @param Model $record
+     *
      * @throws SchoolboxException
      */
     public function getStudentRecordUpdateForm($record)
@@ -438,17 +464,18 @@ class Controller extends Base
 
         $this->getResponse()->content->set([
             'template' => '@pastoral/modify.twig',
-            'data' => [
-                'record' => $record,
-                'allowIndividual' => $this->config->get('pastoral_individual_access'),
-                'allowParents' => $this->config->get('pastoral_parent_access'),
-                'types' => $this->pastoralTypeMapper->findAll(['order' => ['name' => 'ASC']]),
-                'categories' => $this->pastoralCategoryMapper->findAll(['order' => ['name' => 'ASC']]),
-                'severities' => $severities,
-                'roles' => $this->roleMapper->findAll(['order' => ['name' => 'ASC']]),
-                'groups' => $this->pastoralGroupMapper->findAll(['name' => ['order' => 'ASC']]),
-                'attachzone' => $this->getAttachZone($record)
-            ]
+            'data'     => [
+                'record'            => $record,
+                'allowIndividual'   => $this->config->get('pastoral_individual_access'),
+                'allowParents'      => $this->config->get('pastoral_parent_access'),
+                'types'             => $this->pastoralTypeMapper->findAll(['order' => ['name' => 'ASC']]),
+                'categories'        => $this->pastoralSubTypeMapper->findAll(['order' => ['name' => 'ASC']]),
+                'severities'        => $severities,
+                'roles'             => $this->roleMapper->findAll(['order' => ['name' => 'ASC']]),
+                'groups'            => $this->pastoralGroupMapper->findAll(['name' => ['order' => 'ASC']]),
+                'attachzonePublic'  => $this->getAttachZone(self::ATTACHZONE_PUBLIC, $record),
+                'attachzonePrivate' => $this->getAttachZone(self::ATTACHZONE_PRIVATE, $record),
+            ],
         ]);
     }
 
@@ -456,6 +483,7 @@ class Controller extends Base
      * Delete a comment from pastoral record
      *
      * @param PastoralComment $comment
+     *
      * @throws SchoolboxException
      */
     public function postCommentDelete($comment)
@@ -474,6 +502,7 @@ class Controller extends Base
      * Add a comment to a pastoral record
      *
      * @throws SchoolboxException
+     * @throws RouteNotFound
      */
     public function postCommentInsert()
     {
@@ -483,16 +512,16 @@ class Controller extends Base
             /** @var Model $record */
             $record = $this->pastoralMapper->findById($post['pastoral_id']);
 
-            if (!empty(trim($post["body"]))) {
-
+            if (!empty(trim($post["comment_body"]))) {
                 // Insert the comment to the internal database
 
                 /** @var PastoralComment $comment */
                 $comment = $this->pastoralCommentMapper->createModel();
 
                 $comment->setPastoral($record);
-                $comment->setBody($post["body"]);
+                $comment->setBody(trim($post["comment_body"]));
                 $comment->setOwner($this->getUser());
+                $comment->setPrivate($post["comment_private"]);
                 $this->pastoralCommentMapper->save($comment);
 
                 // Insert the comment to the external database
@@ -506,7 +535,7 @@ class Controller extends Base
             $this->getResponse()->redirect->afterPost(
                 $this->getrouter()->generate('pastoral.getStudentRecord', [
                     'studentId' => $post['student_id'],
-                    'recordId' => $record->getId()
+                    'recordId'  => $record->getId(),
                 ])
             );
         } catch (MapperException $e) {
@@ -518,8 +547,8 @@ class Controller extends Base
      * Assign tags to a record, spawning them if required, or resurrecting them
      * if these tags once existed
      *
-     * @param Model $record
-     * @param $tagCsv
+     * @param Model  $record
+     * @param string $tagCsv
      */
     private function assignTagsToRecord(Model $record, $tagCsv)
     {
@@ -533,18 +562,14 @@ class Controller extends Base
 
                     /** @var PastoralTagsModel $tag */
                     $tag = $this->pastoralTagMapper->findOneByColumn('name', $tagCurrent, [], ['cache' => false]);
-                }
-                catch (MapperDeletedException $e) {
-
+                } catch (MapperDeletedException $e) {
                     /* Restore this tag to active duty
                      */
                     $tag = $e->getDeletedObject();
 
                     $tag->setDeletedAt(null);
                     $this->pastoralTagMapper->save($tag);
-                }
-                catch (MapperException $e) {
-
+                } catch (MapperException $e) {
                     /* Tag doesn't exist - spawn it, save it, then assign it
                      */
                     $tag = new PastoralTagsModel();
@@ -559,7 +584,10 @@ class Controller extends Base
 
     /**
      * Insert a pastoral care record
+     *
      * @throws SchoolboxException
+     * @throws MapperException
+     * @throws RouteNotFound
      */
     public function postRecordInsert()
     {
@@ -576,7 +604,7 @@ class Controller extends Base
 
         // Make an array of all students this record needs to be created on
 
-        $students = array();
+        $students = [];
 
         // The student the user was currently viewing
 
@@ -615,9 +643,9 @@ class Controller extends Base
                 $type = $this->pastoralTypeMapper->findById($post["typeId"]);
 
                 try {
-                    /** @var PastoralCategoryModel $category */
-                    $category = $this->pastoralCategoryMapper->findById($post["categoryId"]);
-                    $record->setCategory($category);
+                    /** @var PastoralSubTypeModel $subtype */
+                    $subtype = $this->pastoralSubTypeMapper->findById($post["subtypeId"]);
+                    $record->setSubType($subtype);
                 } catch (MapperException $e) {
                     // Noop, this can be blank
                 }
@@ -628,9 +656,7 @@ class Controller extends Base
                     /** @var PastoralSeverityModel $severity */
                     $severity = $this->pastoralSeverityMapper->findById($post["severityId"]);
                 }
-
             } catch (MapperException $e) {
-
                 throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
             }
 
@@ -640,7 +666,8 @@ class Controller extends Base
             $record->setType($type);
             $record->setPoints($post["points"]);
             $record->setSeverity($severity);
-            $record->setBody(trim($post["body"]));
+            $record->setBodyPublic(trim($post["body_public"]));
+            $record->setBodyPrivate(trim($post["body_private"]));
             $record->setOwner($this->getUser());
             $this->pastoralMapper->setSessionData($_SESSION);
             $this->pastoralMapper->save($record);
@@ -653,34 +680,12 @@ class Controller extends Base
                 $parent = $record;
             }
 
-            // Save the authorised users
-
-            if (isset($post["user_id"])) {
-                if (is_array($post["user_id"])) {
-                    foreach ($post["user_id"] as $user_id) {
-
-                        try {
-                            $user = $this->userMapper->findById($user_id);
-                        } catch (MapperException $e) {
-                            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
-                        }
-
-                        $access = $this->pastoralAccessMapper->createModel();
-                        $access->setPastoral($record);
-                        $access->setUser($user);
-                        $this->pastoralAccessMapper->save($access);
-                    }
-                }
-            }
-
-            // Save the tags
-
             $this->assignTagsToRecord($record, $post["tags"]);
 
-            // Save the audiences
+            // Save system role permissions
 
-            foreach ($post["role"] as $role_id => $checked) {
-                if ($checked) {
+            foreach ($post["role"] as $role_id => $permission) {
+                if ($permission != PastoralAccessMapper::ACCESS_NONE) {
                     try {
                         /** @var Role $role */
                         $role = $this->roleMapper->findById($role_id);
@@ -690,39 +695,59 @@ class Controller extends Base
 
                     $access = $this->pastoralAccessMapper->createModel();
                     $access->setPastoral($record);
+                    $access->setPrivate($permission == PastoralAccessMapper::ACCESS_PRIVATE);
                     $access->setRole($role);
                     $this->pastoralAccessMapper->save($access);
                 }
             }
 
-            if (is_array($post["group"])) {
-                foreach ($post["group"] as $group_id => $checked) {
-                    if ($checked) {
-                        try {
-                            /** @var Group $group */
-                            $group = $this->pastoralGroupMapper->findById($group_id);
-                        } catch (MapperException $e) {
-                            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
-                        }
+            // Save pastoral group permissions
 
-                        $access = $this->pastoralAccessMapper->createModel();
-                        $access->setPastoral($record);
-                        $access->setGroup($group);
-                        $this->pastoralAccessMapper->save($access);
+            foreach ($post["group"] as $group_id => $permission) {
+                if ($permission != PastoralAccessMapper::ACCESS_NONE) {
+                    try {
+                        /** @var PastoralGroup $group */
+                        $group = $this->pastoralGroupMapper->findById($group_id);
+                    } catch (MapperException $e) {
+                        throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
                     }
+
+                    $access = $this->pastoralAccessMapper->createModel();
+                    $access->setPastoral($record);
+                    $access->setPrivate($permission == PastoralAccessMapper::ACCESS_PRIVATE);
+                    $access->setGroup($group);
+                    $this->pastoralAccessMapper->save($access);
+                }
+            }
+
+            // Save individual user permissions
+
+            foreach ($post["user"] as $user_id => $permission) {
+                if ($permission != PastoralAccessMapper::ACCESS_NONE) {
+                    try {
+                        /** @var UserMapper $user */
+                        $user = $this->userMapper->findById($user_id);
+                    } catch (MapperException $e) {
+                        throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
+                    }
+
+                    $access = $this->pastoralAccessMapper->createModel();
+                    $access->setPastoral($record);
+                    $access->setPrivate($permission == PastoralAccessMapper::ACCESS_PRIVATE);
+                    $access->setUser($user);
+                    $this->pastoralAccessMapper->save($access);
                 }
             }
 
             // Save record in external database, and set pastoral external_id in Schoolbox database
 
-            $pastoralExternal->createPastoral($record);
+            $pastoralExternal->syncPastoral($record);
         }
 
         $collectorFactory = new CollectorFactory();
 
         /** @var Model $record */
         foreach ($records as $record) {
-
             // Save attachments
 
             if (is_array($post['attachment'])) {
@@ -755,14 +780,16 @@ class Controller extends Base
 
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate('pastoral.getStudent', [
-                'studentId' => $post["student_id"]
+                'studentId' => $post["student_id"],
             ])
         );
     }
 
     /**
      * Update a pastoral care record
-     * @throws SchoolboxException
+     *
+     * @throws MapperException
+     * @throws RouteNotFound
      */
     public function postRecordUpdate()
     {
@@ -795,15 +822,15 @@ class Controller extends Base
         }
 
         try {
-            if ($this->getRequest()->post["categoryId"] != null) {
-                /** @var PastoralCategoryModel $category */
-                $category = $this->pastoralCategoryMapper->findById($this->getRequest()->post["categoryId"]);
+            if ($this->getRequest()->post["subtypeId"] != null) {
+                /** @var PastoralSubTypeModel $subtype */
+                $subtype = $this->pastoralSubTypeMapper->findById($this->getRequest()->post["subtypeId"]);
             } else {
-                $category = null;
+                $subtype = null;
             }
         } catch (MapperException $e) {
             // Can't trust imported data from Synergetic
-            $category = null;
+            $subtype = null;
         }
 
         try {
@@ -821,237 +848,168 @@ class Controller extends Base
         $record->setModifiedBy($this->getUser());
         $record->setHeading(trim($post["heading"]));
         $record->setType($type);
-        $record->setCategory($category);
+        $record->setSubType($subtype);
         $record->setPoints($post["points"]);
         $record->setSeverity($severity);
-        $record->setBody(trim($post["body"]));
+        $record->setBodyPublic(trim($post["body_public"]));
+        $record->setBodyPrivate(trim($post["body_private"]));
         $this->pastoralMapper->setSessionData($_SESSION);
         $this->pastoralMapper->save($record);
 
         // Delete old tags
+
         $this->pastoralTagMapper->deleteForRecord($record);
 
-        // Save the tags
+        // Save new tags
 
         $this->assignTagsToRecord($record, $post["tags"]);
 
-        // Delete user permissions
-        $accessRecords = $record->getAccess();
+        // Delete olds user permissions
 
-        // Load Access
-        $existingAccess = $this->pastoralAccessMapper->findByColumn('pastoral_id', $record->getId());
+        $this->pastoralAccessMapper->deleteByColumnList(['pastoral_id' => $record->getId()]);
 
-        //Filter for individual access
-        $existingAccessIndividual = $existingAccess->filter(function (PastoralAccessModel $access) {
-            return $access->getUser() !== null;
-        });
+        // Save new system role permissions
 
-        //Remove users no longer in the list
-        if (empty($post['user_id'])) {
-            $post['user_id'] = [];
-        }
-        $deleteIds = array_diff($existingAccessIndividual->map(function(PastoralAccessModel $access){
-            return $access->getUser()->getId();
-        })->getAll(), $post['user_id']);
-
-        $this->pastoralAccessMapper->deleteByColumnList(['pastoral_id' => $record->getId(), 'user_id' => $deleteIds]);
-
-        //Add users with de-dupe
-        if (isset($post['user_id'])) {
-            if (is_array($post['user_id'])) {
-                foreach ($post['user_id'] as $user_id) {
-
-                    $found = false;
-
-                    // Check not already have access
-
-                    /** @var PastoralAccessModel $accessCurrent */
-                    foreach ($existingAccess as $accessCurrent) {
-                        if ($accessCurrent->getUser() instanceof User) {
-                            if ($accessCurrent->getUser()->getId() == $user_id) {
-                                $found = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (!$found) {
-                        try {
-                            $user = $this->userMapper->findById($user_id);
-                        } catch (MapperException $e) {
-                            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
-                        }
-
-                        $access = $this->pastoralAccessMapper->createModel();
-                        $access->setPastoral($record);
-                        $access->setUser($user);
-                        $this->pastoralAccessMapper->save($access);
-                    }
-                }
-            }
-        }
-
-        // Update the role based audience
-
-        foreach ($post["role"] as $role_id => $checked) {
-
-            if ($checked) {
-
-                // Add this access if it doesn't already exist
-
-                $found = false;
-
-                /** @var PastoralAccessModel $accessRecord */
-                foreach ($accessRecords as $accessRecord) {
-                    if ($accessRecord->getRole() instanceof Role) {
-                        if ($accessRecord->getRole()->getId() == $role_id) {
-                            $found = true;
-                            break;
-                        }
-                    }
-                }
-
+        foreach ($post["role"] as $role_id => $permission) {
+            if ($permission != PastoralAccessMapper::ACCESS_NONE) {
                 try {
                     /** @var Role $role */
                     $role = $this->roleMapper->findById($role_id);
                 } catch (MapperException $e) {
-                    throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+                    throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
                 }
 
-                if (!$found) {
-                    $access = $this->pastoralAccessMapper->createModel();
-                    $access->setPastoral($record);
-                    $access->setRole($role);
-                    $this->pastoralAccessMapper->save($access);
-                }
-            } else {
-
-                // Delete this access if it exists because its no longer ticked
-
-                $this->pastoralAccessMapper->deleteByColumnList([
-                    'pastoral_id' => $record->getId(),
-                    'role_id' => $role_id
-                ]);
+                $access = $this->pastoralAccessMapper->createModel();
+                $access->setPastoral($record);
+                $access->setPrivate($permission == PastoralAccessMapper::ACCESS_PRIVATE);
+                $access->setRole($role);
+                $this->pastoralAccessMapper->save($access);
             }
         }
 
-        // Update group based permissions
+        // Save new pastoral group permissions
 
-        if (is_array($post["group"])) {
-
-            foreach ($post["group"] as $group_id => $checked) {
-
-                if ($checked) {
-
-                    // Add this access if it doesn't already exist
-
-                    $found = false;
-
-                    /** @var PastoralAccessModel $accessRecord */
-                    foreach ($accessRecords as $accessRecord) {
-                        if ($accessRecord->getGroup() instanceof Group) {
-                            if ($accessRecord->getGroup()->getId() == $group_id) {
-                                $found = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    try {
-                        /** @var Group $group */
-                        $group = $this->pastoralGroupMapper->findById($group_id);
-                    } catch (MapperException $e) {
-                        throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
-                    }
-
-                    if (!$found) {
-                        $access = $this->pastoralAccessMapper->createModel();
-                        $access->setPastoral($record);
-                        $access->setGroup($group);
-                        $this->pastoralAccessMapper->save($access);
-                    }
-
-                } else {
-
-                    // Delete this access if it exists because its no longer ticked
-
-                    $this->pastoralAccessMapper->deleteByColumnList([
-                        'pastoral_id' => $record->getId(),
-                        'group_id' => $group_id
-                    ]);
+        foreach ($post["group"] as $group_id => $permission) {
+            if ($permission != PastoralAccessMapper::ACCESS_NONE) {
+                try {
+                    /** @var PastoralGroup $group */
+                    $group = $this->pastoralGroupMapper->findById($group_id);
+                } catch (MapperException $e) {
+                    throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
                 }
+
+                $access = $this->pastoralAccessMapper->createModel();
+                $access->setPastoral($record);
+                $access->setPrivate($permission == PastoralAccessMapper::ACCESS_PRIVATE);
+                $access->setGroup($group);
+                $this->pastoralAccessMapper->save($access);
+            }
+        }
+
+        // Save new individual user permissions
+
+        foreach ($post["user"] as $user_id => $permission) {
+            if ($permission != PastoralAccessMapper::ACCESS_NONE) {
+                try {
+                    /** @var UserMapper $user */
+                    $user = $this->userMapper->findById($user_id);
+                } catch (MapperException $e) {
+                    throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
+                }
+
+                $access = $this->pastoralAccessMapper->createModel();
+                $access->setPastoral($record);
+                $access->setPrivate($permission == PastoralAccessMapper::ACCESS_PRIVATE);
+                $access->setUser($user);
+                $this->pastoralAccessMapper->save($access);
             }
         }
 
         // Update external record
 
-        if ($record->getExternalId() != "") {
-            $pastoralExternal->updatePastoral($record);
-        } else {
-            $pastoralExternal->createPastoral($record);
-        }
+        $pastoralExternal->syncPastoral($record);
 
         $collectorFactory = new CollectorFactory();
 
+        // Attachments
+
         /** @var Model $record */
         foreach ($records as $record) {
-            // Delete attachments if required
+            // Need to do both public and private attachments
 
-            // Keep track of attachments that aren't deleted so we don't add them again
+            $types = [self::ATTACHZONE_PRIVATE, self::ATTACHZONE_PUBLIC];
 
-            $retainedAttachments = array();
+            foreach ($types as $type) {
+                // Get a boolean true/false to indicate if its public or private
 
-            // Get all attachments associated with this record
+                $isPrivate = $type == self::ATTACHZONE_PRIVATE ? 1 : 0;
 
-            try {
-                $attachments = $this->pastoralAttachmentMapper->findByColumn('pastoral_id', $record->getId());
-            } catch (MapperException $e) {
-                throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
-            }
+                // First thing to do is find out if we need to keep all of the existing attachments on the record
 
-            /** @var PastoralAttachmentModel $attachment */
-            foreach ($attachments as $attachment) {
+                $retainedAttachments = [];
 
-                $foundAttachment = false;
+                // Load all of the existing attachments
 
-                if (is_array($post['attachment'])) {
-                    $attachmentObjects = $collectorFactory->build($post['attachment'])->getAll();
+                try {
+                    $attachments = $this->pastoralAttachmentMapper->findByColumnList([
+                        'pastoral_id' => $record->getId(),
+                        'private'     => $isPrivate,
+                    ]);
+                } catch (MapperException $e) {
+                    throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+                }
 
-                    /** @var Storage $storageObject */
-                    foreach ($attachmentObjects as $storageObject) {
+                // Iterate and check if all of these attachments were passed through with the form data
 
-                        if ($attachment->getStorage()->getHash() == $storageObject->getHash()) {
-                            $foundAttachment = true;
-                            break;
+                /** @var PastoralAttachmentModel $attachment */
+                foreach ($attachments as $attachment) {
+                    $foundAttachment = false;
+
+                    if (!empty($post["{$type}_attachments"])) {
+                        // Annoyingly if there is one file, this is a string- otherwise it is an array
+
+                        if (!is_array($post["{$type}_attachments"])) {
+                            $post["{$type}_attachments"] = [$post["{$type}_attachments"]];
                         }
+
+                        $attachmentObjects = $collectorFactory->build($post["{$type}_attachments"])->getAll();
+
+                        /** @var Storage $storageObject */
+                        foreach ($attachmentObjects as $storageObject) {
+                            if ($attachment->getStorage()->getHash() == $storageObject->getHash()) {
+                                // Found the attachment in both database and form data- we need to keep it
+
+                                $retainedAttachments[] = $attachment->getStorage()->getHash();
+                                $foundAttachment       = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    // If the attachment was not in the form data, remove it from the database
+
+                    if (!$foundAttachment) {
+                        $this->pastoralAttachmentMapper->delete($attachment);
                     }
                 }
 
-                if (!$foundAttachment) {
+                // Save any new attachments
 
-                    // The attachment was found in the database, remove it
+                if (isset($post["{$type}_attachments"])) {
+                    // Annoyingly if there is one file, this is a string- otherwise it is an array
 
-                    $this->pastoralAttachmentMapper->delete($attachment);
+                    if (!is_array($post["{$type}_attachments"])) {
+                        $post["{$type}_attachments"] = [$post["{$type}_attachments"]];
+                    }
 
-                } else {
+                    $attachmentObjects = $collectorFactory->build($post["{$type}_attachments"])->getAll();
 
-                    // We are keeping this attachment
+                    foreach ($attachmentObjects as $storageObject) {
+                        // Only add attachments which don't already exist on the record
 
-                    $retainedAttachments[] = $attachment->getStorage()->getHash();
-                }
-            }
-
-            // Save any new attachments
-
-            if (is_array($post['attachment'])) {
-                $attachmentObjects = $collectorFactory->build($post['attachment'])->getAll();
-
-                foreach ($attachmentObjects as $storageObject) {
-
-                    // Only add attachments which don't already exist on the record
-
-                    if (!in_array($storageObject->getHash(), $retainedAttachments)) {
-                        $this->attachmentSave($record, $storageObject);
+                        if (!in_array($storageObject->getHash(), $retainedAttachments)) {
+                            $this->attachmentSave($record, $storageObject, (bool)$isPrivate);
+                        }
                     }
                 }
             }
@@ -1065,7 +1023,7 @@ class Controller extends Base
 
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate('pastoral.getStudent', [
-                'studentId' => $post["student_id"]
+                'studentId' => $post["student_id"],
             ])
         );
     }
@@ -1073,18 +1031,17 @@ class Controller extends Base
     /**
      * Save pastoral attachements
      *
-     * @var PastoralModel $record
-     * @var IStorage $storageObject
+     * @param PastoralModel $record
+     * @param IStorage      $storageObject
+     * @param bool          $private
      */
-    private function attachmentSave($record, $storageObject)
+    private function attachmentSave($record, $storageObject, $private)
     {
-
         // Only add attachments which don't already exist on the record
 
         // Check if external SIS uploads are enabled
 
         if ($this->config->get("external_pastoral_upload")) {
-
             // Queue file for upload to external SIS
 
             $queue = $this->pastoralUploadQueueMapper->createModel();
@@ -1099,6 +1056,7 @@ class Controller extends Base
         $attachment = $this->pastoralAttachmentMapper->createModel();
         $attachment->setPastoral($record);
         $attachment->setStorage($storageObject);
+        $attachment->setPrivate($private);
         $this->pastoralAttachmentMapper->save($attachment);
     }
 
@@ -1106,7 +1064,8 @@ class Controller extends Base
      * Delete a pastoral care record
      *
      * @param PastoralModel $record
-     * @throws SchoolboxException
+     *
+     * @throws RouteNotFound
      */
     public function postRecordDelete($record)
     {
@@ -1116,7 +1075,7 @@ class Controller extends Base
          * do so in the Controller as here we are acting on a single record.
          * The specific risk is that during import, the system first deletes all
          * schoolbox records that map to a SIS pastoral record. If this logic
-         * is on the mapper, it catastrophically deletes the records in both systems.
+         * is on the mapper, it catastrophical deletes the records in both systems.
          * Having the logic here also aligns with the approach taken for create/update SB => SIS.
          */
         if ($this->pastoralMapper->delete($record)) {
@@ -1127,7 +1086,7 @@ class Controller extends Base
 
         $this->getResponse()->redirect->afterPost(
             $this->getrouter()->generate('pastoral.getStudent', [
-                'studentId' => $studentId
+                'studentId' => $studentId,
             ])
         );
     }
@@ -1135,19 +1094,22 @@ class Controller extends Base
     /**
      * Insert an attach zone into the template
      *
+     * @param string $name Name of attachzone on page
      * @param PastoralModel $record Pastoral record from which to load existing attachments
+     *
      * @return array
      */
-    private function getAttachZone($record = null)
+    private function getAttachZone($name, $record = null)
     {
-        $zone = new Zone('attachment');
+        $zone = new Zone($name);
         $zone
             ->setThumbnailSize(64)
-            ->setModalTitle('Select document')
+            ->setModalTitle('Select attachment')
             ->setAttachmentsLabel('')
-            ->setAttachPrompt('Upload document')
+            ->setAttachPrompt('Upload attachment')
             ->setMimeFilter('*/*')
             ->setReadOnly(false)
+            ->setFileVar("{$name}_attachments")
             ->setMulti(true);
 
         // Attach any existing files
@@ -1156,7 +1118,11 @@ class Controller extends Base
             if ($record->getAttachments() instanceof Collection) {
                 /** @var PastoralAttachmentModel $attachment */
                 foreach ($record->getAttachments() as $attachment) {
-                    $zone->attachFiles(array($attachment->getStorage()->getHash()));
+                    if ($attachment->getPrivate() && $name == self::ATTACHZONE_PRIVATE) {
+                        $zone->attachFiles([$attachment->getStorage()->getHash()]);
+                    } elseif (!$attachment->getPrivate() && $name == self::ATTACHZONE_PUBLIC) {
+                        $zone->attachFiles([$attachment->getStorage()->getHash()]);
+                    }
                 }
             }
         }

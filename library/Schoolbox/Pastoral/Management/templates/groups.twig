@@ -19,6 +19,7 @@
         </div>
     </div>
     <nav>
+        <a href="{{ routeLookup('pastoral.getIndex') }}" class="icon-home" title="{{ locale.pastoralCare.proper }} Dashboard"></a>
         {# Pastoral moderators can manage pastoral groups #}
         {% if isRouteAuthorized('pastoralManagement.getGroupsModify') %}
             <a href="{{ routeLookup('pastoralManagement.getGroupsModify') }}" class="icon-add" title="Add {{ locale.pastoral.proper }} Group"></a>
@@ -40,20 +41,24 @@
                                     </a>
                                     <a href="{{ routeLookup('pastoralManagement.getGroupsModify', {groupId: group.id}) }}">
                                         <h3>
-                                            {{ group.name}}
+                                            {{ group.name }}
                                             {% if group.members | length %}
                                                 ({{ group.members | length }} Member{% if group.members | length %}s{% endif %})
                                             {% endif %}
                                         </h3>
                                     </a>
                                     <p class="meta">
-                                        Created by <a href="{{ profile.link(group.user) }}">{{ group.user.fullName }}</a>
+                                        Created by <a
+                                                href="{{ profile.link(group.user) }}">{{ group.user.fullName }}</a>
                                     </p>
                                 </div>
                             </div>
                             <nav>
-                                <a class="icon-modify no-text" href="{{ routeLookup('pastoralManagement.getGroupsModify', {groupId: group.id}) }}" title="Edit Group"></a>
-                                <a href="#" data-delete="{{ group.id }}" class="icon-delete" title="Delete {{ locale.pastoral.proper }} Group"></a>
+                                <a class="icon-modify no-text"
+                                   href="{{ routeLookup('pastoralManagement.getGroupsModify', {groupId: group.id}) }}"
+                                   title="Edit Group"></a>
+                                <a href="#" data-delete="{{ group.id }}" class="icon-delete"
+                                   title="Delete {{ locale.pastoral.proper }} Group"></a>
                             </nav>
                         </li>
                     {% endfor %}
@@ -64,7 +69,9 @@
                 <i class="icon-group"></i>
                 <p>No {{ locale.pastoral }} groups have been created.</p>
                 {% if isRouteAuthorized('pastoralManagement.getGroupsModify') %}
-                    <p>{{ locale.pastoral.proper }} groups can be used to dynamically audience {{ locale.pastoral }} records. Do you want to <a href="{{ routeLookup('pastoralManagement.getGroupsModify') }}">create a {{ locale.pastoral }} group</a>?</p>
+                    <p>{{ locale.pastoral.proper }} groups can be used to dynamically audience {{ locale.pastoral }}
+                        records. Do you want to <a href="{{ routeLookup('pastoralManagement.getGroupsModify') }}">create
+                            a {{ locale.pastoral }} group</a>?</p>
                 {% endif %}
             </div>
         {% endif %}
@@ -76,8 +83,8 @@
 </form>
 
 <script>
-    $(function() {
-        $('[data-delete]').click(function(e) {
+    $(function () {
+        $('[data-delete]').click(function (e) {
             e.preventDefault();
             var groupId = $(this).attr('data-delete');
             $(this).confirmDialog({
@@ -85,7 +92,7 @@
                 confirmEvent: function () {
                     $.post('{{ routeLookup('pastoralManagement.postGroupsDelete') }}', {
                         id: groupId
-                    }).done(function() {
+                    }).done(function () {
                         $('[data-delete="' + groupId + '"]').closest('li').remove();
                     })
                 }

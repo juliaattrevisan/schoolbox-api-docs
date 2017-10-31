@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -9,14 +8,15 @@
 
 namespace Schoolbox\Pastoral\Tag;
 
+use JsonSerializable;
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
-use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Pastoral\Model as Pastoral;
 
-class Model implements ISoftDeletable, \JsonSerializable
+class Model implements ISoftDeletable, JsonSerializable
 {
     use Id;
     use CreatedAtDate;
@@ -31,33 +31,41 @@ class Model implements ISoftDeletable, \JsonSerializable
 
     /**
      * @param string $name
+     *
      * @return $this
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
+
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
     /**
      * @return Pastoral
      */
-    public function getPastoral() {
+    public function getPastoral()
+    {
         return $this->pastoral;
     }
 
     /**
      * @param $pastoral
+     *
      * @return $this
      */
-    public function setPastoral($pastoral) {
+    public function setPastoral($pastoral)
+    {
         $this->pastoral = $pastoral;
+
         return $this;
     }
 

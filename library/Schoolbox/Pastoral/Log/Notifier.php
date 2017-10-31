@@ -21,16 +21,16 @@ class Notifier extends AbstractModuleNotifier
     const TRIGGER_CREATED = 'created';
 
     /**
-     * @param Model $model
+     * @param Model  $model
      * @param string $method
+     *
      * @return Envelope
      */
     protected function buildMessage($model, $method)
     {
         $envelope = new Envelope();
 
-        if ($model->getResult() == 'Completed')
-        {
+        if ($model->getResult() == 'Completed') {
             // Create the message
 
             $builder = new Builder();
@@ -78,23 +78,25 @@ class Notifier extends AbstractModuleNotifier
 
     /**
      * @param Model $model
-     * @param User $userEffected
+     * @param User  $userEffected
      * @param array $diff
+     *
      * @return Envelope
      */
-    public function notifyCreated($model, $userEffected, $diff=[])
+    public function notifyCreated($model, $userEffected, $diff = [])
     {
         return $this->buildMessage($model, self::TRIGGER_CREATED);
     }
 
     /**
      * @param string $label
+     *
      * @return array
      */
     public function retrieveCallbacks($label)
     {
         return [
-            [ $this, "notify" . ucfirst($label) ]
+            [$this, "notify" . ucfirst($label)],
         ];
     }
 }

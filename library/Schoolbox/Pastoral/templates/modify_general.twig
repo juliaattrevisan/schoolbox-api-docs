@@ -1,0 +1,44 @@
+<input type="hidden" name="id" value="{{ record.id }}"> <input type="hidden" name="student_id" value="{{ student.id }}{{ record.student.id }}">
+<section>
+    <fieldset class="content">
+        <div class="small-12 columns">
+            <label> Title <input a type="text" class="required" name="heading" size="35" maxlength="100" value="{{ record.heading }}"/> </label>
+        </div>
+    </fieldset>
+    <fieldset class="content">
+        <div class="small-12 medium-6 columns">
+            <label> Type <select class="required" name="typeId" id="typeId">
+                    {% for type in types %}
+                        <option {% if type.id == record.type.id %}selected{% endif %}
+                                value="{{ type.id }}">{{ type.name }}</option>
+                    {% endfor %}
+                </select> </label>
+        </div>
+        <div class="small-12 medium-6 columns">
+            <label> Sub-Type <select name="subtypeId" id="subtypeId">
+                    {% for subtype in categories %}
+                        <option class="{{ subtype.pastoralType.id }}" {% if subtype.id == record.subtype.id %}selected{% endif %} value="{{ subtype.id }}">{{ subtype.name }}</option>
+                    {% endfor %}
+                </select> </label>
+        </div>
+        <div class="small-12 medium-6 columns">
+            {% if severities | length %}
+                <label>
+                    {{ locale.severity.proper }}
+                    <select class="required" name="severityId">
+                        {% for severity in severities %}
+                            <option {% if severity.id == record.severity.id %}selected{% endif %} value="{{ severity.id }}">{{ severity.name }}</option>
+                        {% endfor %}
+                    </select> </label>
+            {% endif %}
+        </div>
+        <div class="small-12 medium-6 columns">
+            <label> Points <input type="number" name="points" size="35" maxlength="100" value="{{ record.points }}"/> </label>
+        </div>
+        <div class="small-{% if severities | length %}12{% else %}6{% endif %} columns">
+            <label> Tags
+                <span class="hint has-tip tip-top" data-tooltip title="Multiple tags can be added to aid filtering and reporting. Try to reuse existing tags by searching first. If necessary you may create new tags.">?</span>
+                <input id="tags" name="tags" value="{% for tag in record.tags %}{{ tag.name }},{% endfor %}"> </label>
+        </div>
+    </fieldset>
+</section>

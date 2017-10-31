@@ -70,7 +70,6 @@ class Mapper extends BaseMapper
         $groupIds = [];
 
         if ($model->getGroups()->count() > 0) {
-
             foreach ($model->getGroups() as $group) {
                 $groupIds[] = $group->getId();
             }
@@ -90,11 +89,9 @@ class Mapper extends BaseMapper
 
             $statement = $this->getDatabase()->prepare($sql);
             $statement->execute(array_merge($bindings['bindings'], [
-                'reportId' => $model->getId()
+                'reportId' => $model->getId(),
             ]));
-
         } else {
-
             $statement = $this->getDatabase()->prepare("
                 UPDATE      `pastoral_report_groups`
                 SET         `deleted_at` = NOW() 
@@ -108,7 +105,6 @@ class Mapper extends BaseMapper
         // Insert any new groups
 
         foreach ($groupIds as $groupId) {
-
             $sql = "
                 INSERT INTO `pastoral_report_groups` (
                     report_id, 
@@ -130,7 +126,7 @@ class Mapper extends BaseMapper
                 'reportId'      => $model->getId(),
                 'reportIdCount' => $model->getId(),
                 'groupId'       => $groupId,
-                'groupIdCount'  => $groupId
+                'groupIdCount'  => $groupId,
             ]);
         }
     }
@@ -143,7 +139,6 @@ class Mapper extends BaseMapper
         $collection = $this->createCollection();
 
         foreach ($statement as $row) {
-
             if (empty($row['id'])) {
                 continue;
             }
@@ -207,13 +202,14 @@ class Mapper extends BaseMapper
      * Retreive all report definitions the user has access to
      *
      * @param User $user
+     *
      * @return Collection|\Schoolbox\GenericCollection
      */
     public function findForUser(User $user)
     {
         $userId = $this->getDatabase()->quote($user->getId());
 
-        $groupSql = '';
+        $groupSql         = '';
         $groupsMembership = PastoralGroupMemberMapper::getInstance()->findByColumn('user_id', $user->getId());
 
         $groupIds = [];
@@ -256,7 +252,7 @@ class Mapper extends BaseMapper
 
         $statement = $this->getDatabase()->prepare($sql);
         $statement->execute(array_merge($bindings['bindings'], [
-            'userId' => $user->getId()
+            'userId' => $user->getId(),
         ]));
 
         return $this->hydrateSelect($statement);
@@ -266,13 +262,14 @@ class Mapper extends BaseMapper
      * Retreive all report definitions that should display on users dashboard
      *
      * @param User $user
+     *
      * @return Collection|\Schoolbox\GenericCollection
      */
     public function findForUserDashboard(User $user)
     {
         $userId = $this->getDatabase()->quote($user->getId());
 
-        $groupSql = '';
+        $groupSql         = '';
         $groupsMembership = PastoralGroupMemberMapper::getInstance()->findByColumn('user_id', $user->getId());
 
         $groupIds = [];
@@ -314,7 +311,7 @@ class Mapper extends BaseMapper
 
         $statement = $this->getDatabase()->prepare($sql);
         $statement->execute(array_merge($bindings['bindings'], [
-            'userId' => $user->getId()
+            'userId' => $user->getId(),
         ]));
 
         return $this->hydrateSelect($statement);
@@ -324,7 +321,8 @@ class Mapper extends BaseMapper
      * Helper function to convert CSV filters to a collection of objects
      *
      * @param BaseMapper $mapper
-     * @param string $ids
+     * @param string     $ids
+     *
      * @return Collection
      */
     private function getCollection($mapper, $ids)

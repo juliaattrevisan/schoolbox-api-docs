@@ -9,19 +9,19 @@
 
 namespace Schoolbox\Pastoral\Authorizer\Rule;
 
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\User;
-use Alaress\Authorizer\Failure\Unauthorized;
 
 class IsOwner implements IAuthorizationRule
 {
     /**
      * {@inheritdoc}
      */
-    public function authorize(array $params = array(), User $user = null)
+    public function authorize(array $params = [], User $user = null)
     {
         if (!isset($params['record'])) {
             if (!isset($params['recordId'])) {

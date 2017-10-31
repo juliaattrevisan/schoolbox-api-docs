@@ -1,0 +1,91 @@
+@startuml
+
+skinparam FontName Courier
+
+skinparam activityShape roundBox
+skinparam BackgroundColor #ffffff
+skinparam BorderColor #ffffff
+
+skinparam ActivityFontSize 14
+skinparam ActivityFontName Courier
+skinparam ActivityBackgroundColor #A9DCDF
+skinparam ActivityBorderColor #000000
+
+skinparam ActivityDiamondFontSize 14
+skinparam ActivityDiamondFontName Courier
+skinparam ActivityDiamondBackgroundColor #FEFECE
+skinparam ActivityDiamondBorderColor #000000
+
+skinparam ArrowFontName Courier
+skinparam ArrowFontSize 14
+skinparam ArrowFontColor #000000
+skinparam ArrowColor #000000
+
+skinparam partitionBackgroundColor #fdffe8
+
+start
+
+:request pastoral record;
+
+if (Is the person requesting access\nthe original author of the record?) then (Yes)
+
+    #ADD1B2:Grant Private & Public \nContent Visibility;
+    stop
+
+else (No)
+
+    :Read all access records from\nthe **pastoral_access** access table;
+
+    partition "Check User Access Records" {
+
+        while (Are there more rows to process?) is (Yes)
+
+            :Read next available row;
+
+            if (Does the record contain a\nvalue in **user_id** field?) then (Yes)
+                 if (Does the rule match the user?\n(Does the user ID match?)) then (Yes)
+                    if (Does the record allow\nprivate content access?) then (Yes)
+                        #ADD1B2:Grant Private & Public \nContent Visibility;
+                        stop
+                    else (No)
+                    endif
+                else (No)
+                endif
+
+            elseif (Does the record contain a\nvalue in **role_id** field?) then (Yes)
+
+                if (Does the rule match the user?\n(Is the user in the role?)) then (Yes)
+                    if (Does the record allow\nprivate content access?) then (Yes)
+                        #ADD1B2:Grant Private & Public \nContent Visibility;
+                        stop
+                    else (No)
+                    endif
+                else (No)
+                endif
+
+            elseif (Does the record contain a value\nin **group_id** field?) then (Yes)
+
+                if (Does the rule match the user?\n(Is the user in the group?)) then (Yes)
+                    if (Does the record allow\nprivate content access?) then (Yes)
+                        #ADD1B2:Grant Private & Public \nContent Visibility;
+                        stop
+                    else (No)
+                    endif
+                else (No)
+                endif
+
+
+            else (No)
+            endif
+        endwhile (No)
+    }
+
+    if (Did **any** of the rules in\n**pastoral_access** table\nmatch the user?) then (Yes)
+        #B4A7E5:Grant Public Content\nVisibility Only;
+        stop
+    else (No)
+        #EB937F:User Has No Access\nHide Record From User;
+        stop
+
+endif
+@enduml

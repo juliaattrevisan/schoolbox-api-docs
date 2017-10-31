@@ -12,7 +12,7 @@
 {% endif %}
 
 {{ bread.crumbs(
-[ locale.pastoralCare.proper,              routeLookup('pastoral.getIndex') ],
+[ locale.pastoralCare.proper,   routeLookup('pastoral.getIndex') ],
 [ record.student.fullName,      routeLookup('pastoral.getStudent', {studentId: record.student.id}) ],
 [ record.heading,               routeLookup('pastoral.getStudentRecord', {studentId: record.student.id, recordId: record.id}) ],
 [ pageTitle ]
@@ -35,7 +35,7 @@
                 </div>
             </div>
             {% if record.id is not empty and isRouteAuthorized('pastoral.postDelete', {record: record}) %}
-                <nav>
+                <nav class="hide" id="formPastoralDelete">
                     <a href="#" data-delete class="icon-delete" title="Delete {{ locale.pastoral.proper }} Record"></a>
                 </nav>
             {% endif %}
@@ -43,194 +43,37 @@
     </div>
 </div>
 <div class="row">
-    <div class="small-12 island">
+    <div class="small-12 island" id="formPastoralPreloader">
+        <section class="content">
+            <div class="loader"></div>
+        </section>
+    </div>
+    <div class="small-12 island hide" id="formPastoral">
         <form class="top" id="pastoralForm" method="post" enctype="multipart/form-data" action="{{ saveRoute }}">
-            <input type="hidden" name="id" value="{{ record.id }}">
-            <input type="hidden" name="student_id" value="{{ student.id }}{{ record.student.id }}">
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label>
-                            Title
-                            <input type="text" class="required" name="heading" size="35" maxlength="100" value="{{ record.heading }}"/>
-                        </label>
-                    </div>
-                </fieldset>
-                <fieldset class="content">
-                    <div class="small-12 medium-6 columns">
-                        <label>
-                            Type
-                            <select class="required" name="typeId" id="typeId">
-                                {% for type in types %}
-                                    <option {% if type.id == record.type.id %}selected{% endif %} value="{{ type.id }}">{{ type.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </label>
-                    </div>
-                    <div class="small-12 medium-6 columns">
-                        <label>
-                            Sub-Type
-                            <select name="categoryId" id="categoryId">
-                                {% for category in categories %}
-                                    <option class="{{ category.pastoralType.id }}" {% if category.id == record.category.id %}selected{% endif %}
-                                            value="{{ category.id }}">{{ category.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </label>
-                    </div>
-                    <div class="small-12 medium-6 columns">
-                        {% if severities | length %}
-                            <label>
-                                {{ locale.severity.proper }}
-                                <select class="required" name="severityId">
-                                    {% for severity in severities %}
-                                        <option {% if severity.id == record.severity.id %}selected{% endif %}
-                                                value="{{ severity.id }}">{{ severity.name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </label>
-                        {% endif %}
-                    </div>
-                    <div class="small-12 medium-6 columns">
-                        <label>
-                            Points
-                            <input type="number" name="points" size="35" maxlength="100" value="{{ record.points }}"/>
-                        </label>
-                    </div>
-                    <div class="small-{% if severities | length %}12{% else %}6{% endif %} columns">
-                        <label>
-                            Tags
-                            <span class="hint has-tip tip-top" data-tooltip
-                                  title="Multiple tags can be added to aid filtering and reporting. Try to reuse existing tags by searching first. If necessary you may create new tags.">?</span>
-                            <input id="tags" name="tags" value="{% for tag in record.tags %}{{ tag.name }},{% endfor %}">
-                        </label>
 
-                    </div>
-                </fieldset>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <section>
-                            <textarea id="body" name="body">{{ record.body }}</textarea>
-                            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
-                        </section>
-                    </div>
-                </fieldset>
-            </section>
+            {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+            {# General Stuff #}
+            {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
 
-            <h2 class="subheader">Record Visibility</h2>
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label>
-                            User Roles
-                            <span class="hint has-tip tip-top" data-tooltip
-                                  title="Select the user roles that can view this record.">?</span>
-                            {% for role in roles if not role.isStudent and not role.isGuest %}
-                                {% if allowParents == 1 or not role.isParent %}
-                                    <input type="hidden" name="role[{{ role.id }}]" value="0"/>
-                                    <input {% if role.isParent %}data-role-parent{% endif %} type="checkbox" name="role[{{ role.id }}]"
-                                           id="role[{{ role.id }}]" value="1"
-                                            {% if record.id != '' %}
-                                                {% for access in record.access if access.role.id != '' %}
-                                                    {% if access.role.id == role.id %}
-                                                        checked
-                                                    {% endif %}
-                                                {% endfor %}
-                                            {% endif %}
-                                    />
-                                    <label for="role[{{ role.id }}]"
-                                           class="checkbox-label">{{ role.name }} {% if role.isParent %}of student{% endif %}</label>
-                                {% endif %}
-                            {% endfor %}
-                        </label>
-                    </div>
-                </fieldset>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        {% if groups | length %}
-                            <label>
-                                {{ locale.pastoral.proper }} Groups
-                                <span class="hint has-tip tip-top" data-tooltip
-                                      title="Select the {{ locale.pastoral }} groups that can view this record.">?</span>
-                                {% for group in groups %}
-                                    <input type="hidden" name="group[{{ group.id }}]" value="0"/>
-                                    <input type="checkbox" name="group[{{ group.id }}]"
-                                           id="group[{{ group.id }}]" value="1"
-                                            {% if record.id != '' %}
-                                                {% for access in record.access if access.group.id != '' %}
-                                                    {% if access.group.id == group.id %}
-                                                        checked
-                                                    {% endif %}
-                                                {% endfor %}
-                                            {% endif %}
-                                    />
-                                    <label for="group[{{ group.id }}]" class="checkbox-label">{{ group.name }}</label>
-                                {% endfor %}
-                            </label>
-                        {% else %}
-                            <label>{{ locale.pastoral.proper }} Groups</label>
-                            <p class="meta">
-                                No {{ locale.pastoral }} groups are currently defined, please contact your {{ locale.pastoral }} administrator
-                                to use the {{ locale.pastoral }} group functionality.
-                            </p>
-                        {% endif %}
-                    </div>
-                </fieldset>
-            {% if allowIndividual %}
-                    <fieldset class="content">
-                        <div class="small-12 columns">
-                            <label>
-                                Individual Users
-                                <span class="hint has-tip tip-top" data-tooltip
-                                      title="Select individual users that can view this record.">?</span>
-                                <select id="addUser" name="user_id[]" multiple placeholder="Individual Users"></select>
-                            </label>
-                        </div>
-                    </fieldset>
-                    {% set found = 0 %}
-                    {% for access in record.access if access.user.id != '' %}
-                        {% set found = 1 %}
-                    {% endfor %}
-            {% endif %}
-            {# Show linked pastoral records #}
-            </section>
-            {% if not record.id %}
-            <h2 class="subheader">Include Additional Students</h2>
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label>
-                            Students
-                            <span class="hint has-tip tip-top" data-tooltip title="This will create a duplicate report and add it to the {{ locale.pastoralCare }} area for these students.">?</span>
-                            <select id="addStudent" name="duplicate_id[]" multiple placeholder="Add Students"></select>
-                        </label>
-                        {% if record.relatedRecords | length %}
-                            <label>
-                                Currently Linked Students
-                            </label>
-                            <ul class="action-list">
-                                {% for related in record.relatedRecords %}
-                                    <li class="actions-small-1">
-                                        <div class="list-item">
-                                            <div class="small-12 card wrap-down">
-                                                <a href="{{ profile.link(related.student) }}">{{ profile.imageSquare64(related.student) }}</a>
-                                                <p>
-                                                    <a title="View Record" href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': related.student.id, 'recordId': related.id}) }}">
-                                                        {{ related.heading }}
-                                                    </a>
-                                                </p>
-                                                <p class="spaced meta">{{ related.student.fullName }}</p>
-                                            </div>
-                                        </div>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        {% endif %}
-                    </div>
-                </fieldset>
-            </section>
+            {% include "@pastoral/modify_general.twig" %}
 
-            {% endif %}
+            {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+            {# Record Content #}
+            {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+
+            {% include "@pastoral/modify_content.twig" %}
+
+            {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+            {# Record Visibility #}
+            {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+
+            {% include "@pastoral/modify_visiblity.twig" %}
+
+            {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+            {# Link Record To Other Students #}
+            {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+
+            {% include "@pastoral/modify_linked.twig" %}
 
             <div class="row">
                 <div class="small-12 column">
@@ -276,7 +119,7 @@
                 {% for tag in record.tags %}
 
                 {% set tagName = tag.name | escape('js') %}
-                {'id':'{{ tagName }}','name':'{{ tagName }}'}{% if not loop.last %},{% endif %}
+                {'id': '{{ tagName }}', 'name': '{{ tagName }}'}{% if not loop.last %},{% endif %}
                 {% endfor %}
             ]
         });
@@ -298,22 +141,6 @@
         });
 
         {% endif %}
-
-        $('#addUser').selectizeSelector({
-            multiple: true,
-            ajax: {
-                url: '/ajax/user.php?studentId={{ student.id }}{{ record.student.id }}',
-                type: 'GET',
-                data: {roleTypeID: 'staff{% if allowParents %};parentofstudent{% endif %}'},
-                dataType: 'json'
-            },
-            value: [
-                {% for access in record.access if access.user.id != '' %}
-                    {% set userName = (access.user.fullName ~ ' - ' ~ access.user.role.name ~ ' (' ~ access.user.id ~ ')') | escape('js') %}
-                    {'id':'{{ access.user.id }}','name':'{{ userName }}'},
-                {% endfor %}
-            ]
-        });
 
         $('#addStudent').selectizeSelector({
             multiple: true,
@@ -341,6 +168,16 @@
             });
         });
 
-        $('#categoryId').chained('#typeId');
+        $('#subtypeId').chained('#typeId');
+    });
+</script>
+
+<script>
+    {# The ckeditor popping in during editing the form is insanely annoying, hiding the form until its done its thing #}
+
+    $(window).load(function (e) {
+        $('#formPastoralPreloader').addClass('hide');
+        $('#formPastoral').removeClass('hide');
+        $('#formPastoralDelete').removeClass('hide');
     });
 </script>

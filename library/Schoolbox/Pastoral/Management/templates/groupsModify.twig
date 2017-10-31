@@ -88,12 +88,14 @@
                                 <a href="{{ profile.link(member.user) }}" title="View Profile">
                                     {{ profile.imageSquare64(member.user) }}
                                 </a>
-                                <p><a href="{{ profile.link(member.user) }}" title="View Profile">{{ member.user.fullName }}</a></p>
+                                <p><a href="{{ profile.link(member.user) }}"
+                                      title="View Profile">{{ member.user.fullName }}</a></p>
                                 <p class="meta">{{ member.user.role.name }}</p>
                             </div>
                         </div>
                         <nav>
-                            <a data-member-delete="{{ member.user.id }}" class="icon-delete no-text" href="#" title="Remove Group Member"></a>
+                            <a data-member-delete="{{ member.user.id }}" class="icon-delete no-text" href="#"
+                               title="Remove Group Member"></a>
                         </nav>
                     </li>
                 {% endfor %}
@@ -123,7 +125,7 @@
 
 <script>
 
-    $(function() {
+    $(function () {
 
         {# This is a list of IDs that have been added to the group. This is what ultimately gets sent off to the database #}
 
@@ -148,7 +150,7 @@
         {# Save Changes #}
         {# --------------------------------------------------------------------------------------------------------------------------------------------#}
 
-        $('[data-save]').click(function(e) {
+        $('[data-save]').click(function (e) {
 
             e.preventDefault();
 
@@ -191,7 +193,7 @@
         {# Delete Group #}
         {# --------------------------------------------------------------------------------------------------------------------------------------------#}
 
-        window.memberDelete = function(item) {
+        window.memberDelete = function (item) {
             var memberItem = item.closest('li');
             var memberId = item.attr('data-member-delete');
 
@@ -218,7 +220,7 @@
             });
         };
 
-        $('[data-member-delete]').click(function(e) {
+        $('[data-member-delete]').click(function (e) {
             e.preventDefault();
             window.memberDelete($(this));
         });
@@ -226,15 +228,15 @@
         {# If we were modifying an existing group in the database, add the javascript to allow deletion #}
 
         {% if group is not empty %}
-            $('[data-delete]').click(function(e) {
-                e.preventDefault();
-                $(this).confirmDialog({
-                    text: 'Are you sure you want to delete this group? Their access will be permanently removed from any associated {{ locale.pastoral }} records.',
-                    confirmEvent: function () {
-                        $('#formDelete').submit();
-                    }
-                });
+        $('[data-delete]').click(function (e) {
+            e.preventDefault();
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this group? Their access will be permanently removed from any associated {{ locale.pastoral }} records.',
+                confirmEvent: function () {
+                    $('#formDelete').submit();
+                }
             });
+        });
         {% endif %}
     });
 </script>

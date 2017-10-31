@@ -17,9 +17,9 @@
                             <dt class="small-12 medium-3">Student Name</dt>
                             <dd class="small-12 medium-9">
                                 {% if student.deleted %}
-                                {{ student.fullName }}
+                                    {{ student.fullName }}
                                 {% else %}
-                                <a href="{{ profile.link(student) }}">{{ student.fullName }}</a>
+                                    <a href="{{ profile.link(student) }}">{{ student.fullName }}</a>
                                 {% endif %}
                             </dd>
 
@@ -46,10 +46,10 @@
                                     Students With Linked Records
                                 </dt>
                                 <dd class="small-12 medium-9">
-                                {% for related in relatedStudents %}
-                                    <a href="{{ routeLookup('pastoral.getStudent', {studentId: related.id}) }}">{{ related.fullName }}</a>
-                                    {% if not loop.last %}<br>{% endif %}
-                                {% endfor %}
+                                    {% for related in relatedStudents %}
+                                        <a href="{{ routeLookup('pastoral.getStudent', {studentId: related.id}) }}">{{ related.fullName }}</a>
+                                        {% if not loop.last %}<br>{% endif %}
+                                    {% endfor %}
                                 </dd>
                             {% endif %}
                         </dl>

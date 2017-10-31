@@ -8,14 +8,13 @@
 namespace Schoolbox\Pastoral\Management;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
+use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
+use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
 use Schoolbox\Pastoral\Group\Member\Model as PastoralGroupMember;
 use Schoolbox\Pastoral\Group\Model as PastoralGroup;
 use Schoolbox\Resource\Search\Results;
 use Schoolbox\UserMapper;
-use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
-use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
-use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
 
 class Controller extends Base
 {
@@ -33,9 +32,10 @@ class Controller extends Base
 
     /**
      * Constructor
-     * @param UserMapper $userMapper
-     * @param PastoralAccessMapper $pastoralAccessMapper
-     * @param PastoralGroupMapper $pastoralGroupMapper
+     *
+     * @param UserMapper                $userMapper
+     * @param PastoralAccessMapper      $pastoralAccessMapper
+     * @param PastoralGroupMapper       $pastoralGroupMapper
      * @param PastoralGroupMemberMapper $pastoralGroupMemberMapper
      */
     public function __construct(
@@ -44,12 +44,12 @@ class Controller extends Base
         PastoralGroupMapper $pastoralGroupMapper,
         PastoralGroupMemberMapper $pastoralGroupMemberMapper
     ) {
-        $this->userMapper = $userMapper;
-        $this->pastoralAccessMapper = $pastoralAccessMapper;
-        $this->pastoralGroupMapper = $pastoralGroupMapper;
+        $this->userMapper                = $userMapper;
+        $this->pastoralAccessMapper      = $pastoralAccessMapper;
+        $this->pastoralGroupMapper       = $pastoralGroupMapper;
         $this->pastoralGroupMemberMapper = $pastoralGroupMemberMapper;
     }
-    
+
     /**
      * Display pastoral group management page
      */
@@ -57,9 +57,9 @@ class Controller extends Base
     {
         $this->getResponse()->content->set([
             'template' => '@pastoralManagement/groups.twig',
-            'data' => [
-                'groups' => $this->pastoralGroupMapper->findAll()
-            ]
+            'data'     => [
+                'groups' => $this->pastoralGroupMapper->findAll(),
+            ],
         ]);
     }
 
@@ -72,10 +72,10 @@ class Controller extends Base
     {
         $this->getResponse()->content->set([
             'template' => '@pastoralManagement/groupsModify.twig',
-            'data' => [
-                'group'                     => $group,
-                'minimumSearchLength'       => Results::MIN_SEARCH_LENGTH
-            ]
+            'data'     => [
+                'group'               => $group,
+                'minimumSearchLength' => Results::MIN_SEARCH_LENGTH,
+            ],
         ]);
     }
 
@@ -106,14 +106,11 @@ class Controller extends Base
         /** @var PastoralGroup $group */
 
         if (empty($post['id'])) {
-
             // Creating new group
 
             $group = $this->pastoralGroupMapper->createModel();
             $group->setUser($this->getUser());
-
         } else {
-
             // Updating existing group (or create a new one if its been deleted from under us)
 
             $group = $this->pastoralGroupMapper->findByIdWithFallback($post['id']);
@@ -133,14 +130,12 @@ class Controller extends Base
         $membersToSkip = [];
 
         if (!empty($post['id'])) {
-
             $membersExisting = $this->pastoralGroupMemberMapper->findByColumn('group_id', $group->getId());
 
             // Go through every member in the database
 
             /** @var PastoralGroupMember $memberCurrent */
             foreach ($membersExisting as $memberCurrent) {
-
                 // Store all of the IDs we find in the database so we don't re-add them later
 
                 $membersToSkip[] = $memberCurrent->getuser()->getId();
@@ -154,7 +149,6 @@ class Controller extends Base
                 /** @var int $memberId */
                 foreach ($memberIds as $memberId) {
                     if ($memberCurrent->getUser()->getId() == $memberId) {
-
                         // The user will wants this member
 
                         $deleteMember = false;
@@ -172,13 +166,10 @@ class Controller extends Base
         // Now add people to this group
 
         foreach ($memberIds as $memberId) {
-
             if (!empty($memberId)) {
-
                 // Make sure they weren't already in the database
 
                 if (!in_array($memberId, $membersToSkip)) {
-
                     // Not in the database, add them
 
                     /** @var PastoralGroupMember $pastoralGroupMember */

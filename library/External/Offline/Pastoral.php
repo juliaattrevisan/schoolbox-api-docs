@@ -17,10 +17,7 @@ use Schoolbox\User;
 class External_Offline_Pastoral implements External_PastoralInterface
 {
     /**
-     * Returns the pastoral record if it exists
-     *
-     * @param PastoralModel $pastoral
-     * @return array
+     * {@inheritDoc}
      */
     public function getPastoral(PastoralModel $pastoral)
     {
@@ -29,24 +26,9 @@ class External_Offline_Pastoral implements External_PastoralInterface
     }
 
     /**
-     * Creates a new pastoral record in the external database
-     *
-     * @param PastoralModel $pastoral
-     * @return array
+     * {@inheritDoc}
      */
-    public function createPastoral(PastoralModel $pastoral)
-    {
-        // NOOP
-        return array();
-    }
-
-    /**
-     * Updates an existing pastoral record
-     *
-     * @param PastoralModel $pastoral
-     * @return array
-     */
-    public function updatePastoral(PastoralModel $pastoral)
+    public function syncPastoral(PastoralModel $pastoral)
     {
         // NOOP
         return array();

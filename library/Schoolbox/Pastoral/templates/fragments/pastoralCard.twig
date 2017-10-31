@@ -28,12 +28,14 @@
 {% if record.attachments | length and showBody %}
     {% for attachment in record.attachments %}
         <div class="card small-12">
-            <a href="{{ routeLookup('pastoral.getStudentRecordAttachment', { recordId: record.id, studentId: record.student.id, attachmentId: attachment.id }) }}" target="_blank">
-		        {% if attachment.storage.mimetype.isImage %}
-                    <img src="/storage/image.php?hash={{attachment.storage.hash}}&size=square64">
-		        {% else %}
-                    <img src="/ajax/mime/{{ attachment.storage.mime }}" alt="Attachment" class="mime {{ attachment.storage.mimetype }}"/>
-		        {% endif %}
+            <a href="{{ routeLookup('pastoral.getStudentRecordAttachment', { recordId: record.id, studentId: record.student.id, attachmentId: attachment.id }) }}"
+               target="_blank">
+                {% if attachment.storage.mimetype.isImage %}
+                    <img src="/storage/image.php?hash={{ attachment.storage.hash }}&size=square64">
+                {% else %}
+                    <img src="/ajax/mime/{{ attachment.storage.mime }}" alt="Attachment"
+                         class="mime {{ attachment.storage.mimetype }}"/>
+                {% endif %}
                 {{ attachment.storage.filename }}
             </a>
             <p class="meta">{{ attachment.storage.size | bytes }}</p>

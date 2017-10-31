@@ -8,8 +8,8 @@
 
 namespace Schoolbox\Pastoral\DocumentClassification;
 
-use Schoolbox\ISoftDeletable;
 use JsonSerializable;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 
@@ -26,11 +26,13 @@ class Model implements ISoftDeletable, JsonSerializable
 
     /**
      * @param string $name
+     *
      * @return self
      */
     public function setName($name)
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -44,11 +46,13 @@ class Model implements ISoftDeletable, JsonSerializable
 
     /**
      * @param string $externalCode
+     *
      * @return self
      */
     public function setExternalCode($externalCode)
     {
         $this->externalCode = $externalCode;
+
         return $this;
     }
 
@@ -62,13 +66,14 @@ class Model implements ISoftDeletable, JsonSerializable
 
     /**
      * Specify data which should be serialized to JSON
+     *
      * @return array
      */
     public function jsonSerialize()
     {
-        return array(
-            'id' => $this->getId(),
+        return [
+            'id'   => $this->getId(),
             'name' => $this->getName(),
-        );
+        ];
     }
 }

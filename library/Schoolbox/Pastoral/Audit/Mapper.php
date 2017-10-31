@@ -12,16 +12,19 @@ namespace Schoolbox\Pastoral\Audit;
 
 use PDOStatement;
 use Schoolbox\Collection;
-use Schoolbox\Pastoral\Model as Pastoral;
-use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
+ * Class Mapper
  * @method Model createModel($idValue = null)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ *
+ * @package Schoolbox\Pastoral\Audit*
  */
 class Mapper extends BaseMapper
 {
@@ -70,7 +73,6 @@ class Mapper extends BaseMapper
         $collection = $this->createCollection();
 
         foreach ($statement as $row) {
-
             $model = $this->hydrate($row);
 
             /** @var User $user */
@@ -92,10 +94,12 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Return list of recently viewed students. This is used to display recently viewed students on the pastoral dashboard
+     * Return list of recently viewed students. This is used to display recently viewed students on the pastoral
+     * dashboard
      *
-     * @param int $count Number of records to return
+     * @param int $count  Number of records to return
      * @param int $offset Offset from start of results
+     *
      * @return Collection|User[]
      */
     public function findRecentStudents($count = 5, $offset = 0)
@@ -125,11 +129,10 @@ class Mapper extends BaseMapper
         ");
 
         $statement->execute([
-            'userId' => $this->getSessionUser()->getId()
+            'userId' => $this->getSessionUser()->getId(),
         ]);
 
         foreach ($statement as $row) {
-
             // Hydrate the student and their role for display purposes
 
             $model   = $this->hydrate($row);

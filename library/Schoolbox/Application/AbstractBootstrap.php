@@ -473,6 +473,16 @@ abstract class AbstractBootstrap implements BootstrapInterface
                         )
                     );
 
+                    $twig->addFunction(
+                        new Twig_SimpleFunction(
+                            'getGuid',
+                            function() {
+                                mt_srand((double)microtime() * 10000);
+                                return strtoupper(md5(uniqid((string)rand(), true)));
+                            }
+                        )
+                    );
+
                     $twig->addFunction(new Twig_SimpleFunction('routeLookupIfAuthorized', $di->get('templateEngine:routeLookupIfAuthorized')));
 
                     return $twig;

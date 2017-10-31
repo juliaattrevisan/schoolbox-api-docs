@@ -1,0 +1,86 @@
+{% import '@pastoral/macros/profile.twig' as profile %}
+
+{% if moderator and (record.revisions|length) %}
+
+    {# If you're a moderator and there's revisions to investigate #}
+
+    <div role="tabpanel" class="content" id="revision">
+
+        {# If at least one item was worthy of showing, render revision history #}
+
+        {% if hasItems %}
+            <div class="row">
+                <div class="small-12 island">
+                    <h2 class="subheader">Revision History</h2>
+
+                    <section>
+                        <ul class="information-list expandable-card">
+
+                            {# Only display revisions if they are different from the previous (fields not displayed might have changed and this will confuse users #}
+                            {% set headingPrevious = record.heading %}
+
+                            {% set bodyPreviousPrivate = record.bodyPrivate %}
+                            {% set bodyPreviousPublic = record.bodyPublic %}
+
+                            {% for revision in record.revisions %}
+
+                                {# In the set of revisions, the previous revision is somehow different to the current revision
+                                 # in a meaningful way (heading/body changed). This logic always skips the current record
+                                 #}
+                                {% if ((headingPrevious != revision.heading) or (bodyPreviousPrivate != revision.bodyPrivate) or (bodyPreviousPublic != revision.bodyPublic)) %}
+                                    <li>
+                                        <div>
+                                            <div class="small-12 card">
+                                                <img src="/portrait.php?userId={{ revision.modifiedBy.externalId }}&size=square64">
+                                                <h3>{{ revision.heading }}</h3>
+                                                <p class="meta">
+                                                    Edited by {{ revision.modifiedBy.fullName }} -
+                                                    {% if revision.updatedAt.long is empty %}
+                                                        {{ record.createdAt.long }}
+                                                    {% else %}
+                                                        {{ revision.updatedAt.long }}
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                            <div class="expander icon-down-arrow" data-collapser="collap-{{ loop.index }}"></div>
+                                        </div>
+
+                                        {# Display both private and public bodies in the revision #}
+
+                                        <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="collap-{{ loop.index }}">
+
+                                            {% if revision.bodyPrivate is not empty %}
+                                                <p>
+                                                    {{ revision.bodyPrivate | purify }}
+                                                </p>
+                                                <p class="meta gradient-0">
+                                                    This Content Has Been Marked As {{ locale.pastoralPrivate.proper }}
+                                                </p>
+                                                <hr>
+                                            {% endif %}
+                                            <p>
+                                                {{ revision.bodyPublic | purify }}
+                                            </p>
+                                        </div>
+                                    </li>
+                                {% endif %}
+
+                                {# Remember for next iteration
+                                 #}
+                                {% set headingPrevious = revision.heading %}
+                                {% set bodyPreviousPrivate = revision.bodyPrivate %}
+                                {% set bodyPreviousPublic = revision.bodyPublic %}
+                            {% endfor %}
+                        </ul>
+                        <script type="text/javascript">
+                            $(function () {
+                                $('[data-collapser]').collapsable();
+                            });
+                        </script>
+                    </section>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+{% endif %}

@@ -11,17 +11,16 @@ use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
-use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Pastoral\SubType as PastoralSubType;
+use Schoolbox\Pastoral\Group as PastoralGroup;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\Tag as PastoralTag;
 use Schoolbox\Pastoral\Type as PastoralType;
-use Schoolbox\Pastoral\Category as PastoralCategory;
-use Schoolbox\Pastoral\Group as PastoralGroup;
 use Schoolbox\User;
-use Alaress_Date_NullDate;
 
 class Model implements ISoftDeletable
 {
@@ -32,7 +31,7 @@ class Model implements ISoftDeletable
 
     /** @var bool $dashboard */
     protected $dashboard;
-    
+
     /** @var string $name */
     private $name;
 
@@ -104,7 +103,7 @@ class Model implements ISoftDeletable
     /** @var Collection|User[] $authors */
     private $authors;
 
-    /** @var Collection|PastoralCategory\Model[] $types */
+    /** @var Collection|PastoralSubType\Model[] $types */
     private $types;
 
     /**
@@ -134,124 +133,153 @@ class Model implements ISoftDeletable
 
     /**
      * @param null|PastoralSeverity $value
+     *
      * @return $this
      */
     public function setSeverity(PastoralSeverity $value = null)
     {
         $this->severity = $value;
+
         return $this;
     }
 
     /**
      * @return null|PastoralSeverity
      */
-    public function getSeverity() {
+    public function getSeverity()
+    {
         return $this->severity;
     }
 
     /**
      * @param string $value
+     *
      * @return $this
      */
-    public function setTypesCsv($value) {
+    public function setTypesCsv($value)
+    {
         $this->typesCsv = $value;
+
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getTypesCsv() {
+    public function getTypesCsv()
+    {
         return $this->typesCsv;
     }
 
     /**
      * @param string $value
+     *
      * @return $this
      */
-    public function setAuthorsCsv($value) {
+    public function setAuthorsCsv($value)
+    {
         $this->authorsCsv = $value;
+
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getAuthorsCsv() {
+    public function getAuthorsCsv()
+    {
         return $this->authorsCsv;
     }
 
     /**
      * @param string $value
+     *
      * @return $this
      */
-    public function setStudentsCsv($value) {
+    public function setStudentsCsv($value)
+    {
         $this->studentsCsv = $value;
+
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getStudentsCsv() {
+    public function getStudentsCsv()
+    {
         return $this->studentsCsv;
     }
 
     /**
      * @param string $value
+     *
      * @return $this
      */
-    public function setTagsCsv($value) {
+    public function setTagsCsv($value)
+    {
         $this->tagsCsv = $value;
+
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getTagsCsv() {
+    public function getTagsCsv()
+    {
         return $this->tagsCsv;
     }
 
     /**
      * @param string $value
+     *
      * @return $this
      */
-    public function setOrderCsv($value) {
+    public function setOrderCsv($value)
+    {
         $this->orderCsv = $value;
+
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getOrderCsv() {
+    public function getOrderCsv()
+    {
         return $this->orderCsv;
     }
 
     /**
      * @param string $value
+     *
      * @return $this
      */
-    public function setYearsCsv($value) {
+    public function setYearsCsv($value)
+    {
         $this->yearsCsv = $value;
+
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getYearsCsv() {
+    public function getYearsCsv()
+    {
         return $this->yearsCsv;
     }
 
     /**
      * @param string $name
+     *
      * @return self
      */
     public function setName($name)
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -265,11 +293,13 @@ class Model implements ISoftDeletable
 
     /**
      * @param string $description
+     *
      * @return self
      */
     public function setDescription($description)
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -283,11 +313,13 @@ class Model implements ISoftDeletable
 
     /**
      * @param User $owner
+     *
      * @return self
      */
     public function setOwner($owner)
     {
         $this->owner = $owner;
+
         return $this;
     }
 
@@ -301,11 +333,13 @@ class Model implements ISoftDeletable
 
     /**
      * @param null|Alaress_Date_Format $beforeDate
+     *
      * @return self
      */
     public function setBeforeDate(Alaress_Date_Format $beforeDate = null)
     {
         $this->beforeDate = $beforeDate;
+
         return $this;
     }
 
@@ -319,11 +353,13 @@ class Model implements ISoftDeletable
 
     /**
      * @param null|Alaress_Date_Format $afterDate
+     *
      * @return self
      */
     public function setAfterDate(Alaress_Date_Format $afterDate = null)
     {
         $this->afterDate = $afterDate;
+
         return $this;
     }
 
@@ -336,17 +372,19 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Collection|PastoralCategory\Model[] $types
+     * @param Collection|PastoralSubType\Model[] $types
+     *
      * @return self
      */
     public function setTypes(Collection $types)
     {
         $this->types = $types;
+
         return $this;
     }
 
     /**
-     * @return Collection|PastoralCategory\Model[]
+     * @return Collection|PastoralSubType\Model[]
      */
     public function getTypes()
     {
@@ -355,11 +393,13 @@ class Model implements ISoftDeletable
 
     /**
      * @param Collection|User[] $authors
+     *
      * @return self
      */
     public function setAuthors(Collection $authors)
     {
         $this->authors = $authors;
+
         return $this;
     }
 
@@ -373,11 +413,13 @@ class Model implements ISoftDeletable
 
     /**
      * @param Collection|User[] $students
+     *
      * @return self
      */
     public function setStudents(Collection $students)
     {
         $this->students = $students;
+
         return $this;
     }
 
@@ -391,11 +433,13 @@ class Model implements ISoftDeletable
 
     /**
      * @param Collection|PastoralTag\Model[] $tags
+     *
      * @return self
      */
     public function setTags(Collection $tags)
     {
         $this->tags = $tags;
+
         return $this;
     }
 
@@ -409,11 +453,13 @@ class Model implements ISoftDeletable
 
     /**
      * @param Collection $order
+     *
      * @return self
      */
     public function setOrder(Collection $order)
     {
         $this->order = $order;
+
         return $this;
     }
 
@@ -427,11 +473,13 @@ class Model implements ISoftDeletable
 
     /**
      * @param bool $involved
+     *
      * @return self
      */
     public function setInvolved($involved)
     {
         $this->involved = $involved;
+
         return $this;
     }
 
@@ -445,11 +493,13 @@ class Model implements ISoftDeletable
 
     /**
      * @param Collection $years
+     *
      * @return self
      */
     public function setYears(Collection $years)
     {
         $this->years = $years;
+
         return $this;
     }
 
@@ -463,11 +513,13 @@ class Model implements ISoftDeletable
 
     /**
      * @param Collection|PastoralGroup\Model[] $groups
+     *
      * @return self
      */
     public function setGroups(Collection $groups)
     {
         $this->groups = $groups;
+
         return $this;
     }
 
@@ -481,11 +533,13 @@ class Model implements ISoftDeletable
 
     /**
      * @param bool $dashboard
+     *
      * @return self
      */
     public function setDashboard($dashboard)
     {
         $this->dashboard = $dashboard;
+
         return $this;
     }
 
@@ -495,5 +549,26 @@ class Model implements ISoftDeletable
     public function getDashboard()
     {
         return $this->dashboard;
-    }    
+    }
+
+    /**
+     * @param User $user
+     * @return bool
+     */
+    public function hasAccess(User $user)
+    {
+        if ($this->getOwner()->getId() == $user->getId()) {
+            return true;
+        }
+
+        foreach ($this->getGroups() as $group) {
+            foreach ($group->getMembers() as $member) {
+                if ($member->getUser()->getId() == $user->getId()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }

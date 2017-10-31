@@ -5,17 +5,16 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Pastoral\Category;
+namespace Schoolbox\Pastoral\SubType;
 
+use JsonSerializable;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Pastoral\Type as PastoralType;
-use JsonSerializable;
 
 class Model implements ISoftDeletable, JsonSerializable
 {
-
     use Id;
     use DeletedAtDate;
 
@@ -32,17 +31,17 @@ class Model implements ISoftDeletable, JsonSerializable
      */
     private $externalCode;
 
-
     /**
      * @param string $name
+     *
      * @return $this
      */
     public function setName($name)
     {
         $this->name = $name;
+
         return $this;
     }
-
 
     /**
      * @return string
@@ -52,17 +51,17 @@ class Model implements ISoftDeletable, JsonSerializable
         return $this->name;
     }
 
-
     /**
-     * @param $pastoralType
+     * @param PastoralType\Model $pastoralType
+     *
      * @return $this
      */
-    public function setPastoralType($pastoralType)
+    public function setPastoralType(PastoralType\Model $pastoralType)
     {
         $this->pastoralType = $pastoralType;
+
         return $this;
     }
-
 
     /**
      * @return PastoralType\Model
@@ -72,17 +71,17 @@ class Model implements ISoftDeletable, JsonSerializable
         return $this->pastoralType;
     }
 
-
     /**
      * @param null|string $externalCode
+     *
      * @return $this
      */
     public function setExternalCode($externalCode = null)
     {
         $this->externalCode = $externalCode;
+
         return $this;
     }
-
 
     /**
      * @return null|string
@@ -91,7 +90,6 @@ class Model implements ISoftDeletable, JsonSerializable
     {
         return $this->externalCode;
     }
-
 
     /**
      * Specify data which should be serialized to JSON

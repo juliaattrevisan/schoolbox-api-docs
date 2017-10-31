@@ -1,0 +1,46 @@
+{% import '@pastoral/macros/profile.twig' as profile %}
+
+<div class="profile content">
+    <div class="row no-margin">
+        <div class="small-12 medium-2 columns no-pad">
+            {{ profile.imageSquare200(record.student) }}
+        </div>
+        <div class="small-12 medium-10 columns">
+            <dl class="profile">
+                <dt class="small-12 medium-3">Record Created:</dt>
+                <dd class="small-12 medium-9">
+                    {{ record.createdAt.short }}
+                </dd>
+                <dt class="small-12 medium-3">Author:</dt>
+                <dd class="small-12 medium-9">
+                    <a href="{{ profile.link(record.owner) }}">
+                        {{ record.owner.fullName }}
+                    </a>
+                </dd>
+                {% if record.severity.name is not empty and config.pastoral_severity %}
+                    <dt class="small-12 medium-3">{{ locale.severity.proper }}:</dt>
+                    <dd class="small-12 medium-9">{{ record.severity.name }}</dd>
+                {% endif %}
+                <dt class="small-12 medium-3">Type:</dt>
+                <dd class="small-12 medium-9">{{ record.type.name }}</dd>
+                {% if record.subtype.name is not empty %}
+                    <dt class="small-12 medium-3">Sub-Type:</dt>
+                    <dd class="small-12 medium-9">{{ record.subtype.name }}</dd>
+                {% endif %}
+                {% if record.points is not empty %}
+                    <dt class="small-12 medium-3">Points:</dt>
+                    <dd class="small-12 medium-9">{{ record.points }}</dd>
+                {% endif %}
+            </dl>
+            {% if record.tags | length %}
+                <div class="content">
+                    {% for tag in record.tags %}
+                        <a href="{{ routeLookup('pastoralReportBuilder.getReportTags', {tagId:tag.id}) }}" class="neutral label">
+                            {{ tag.name }}
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

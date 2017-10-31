@@ -9,17 +9,17 @@
 
 namespace Schoolbox\Pastoral\Authorizer\Rule;
 
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
-use Alaress\Authorizer\Failure\Unauthorized;
 
 class IsPastoralModerator implements IAuthorizationRule
 {
     /**
      * {@inheritdoc}
      */
-    public function authorize(array $params = array(), User $user = null)
+    public function authorize(array $params = [], User $user = null)
     {
         if ($user->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0) {
             return true;

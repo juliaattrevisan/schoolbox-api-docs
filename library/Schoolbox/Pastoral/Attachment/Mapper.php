@@ -8,17 +8,20 @@
 namespace Schoolbox\Pastoral\Attachment;
 
 use PDOStatement;
+use Schoolbox\File\Mimetype;
+use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Model as Storage;
-use Schoolbox\File\Mimetype;
-use Schoolbox\File\MimetypeMapper;
 
 /**
+ * Class Mapper
  * @method Model createModel($idValue = null)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ *
+ * @package Schoolbox\Pastoral\Attachment
  */
 class Mapper extends BaseMapper
 {
@@ -30,6 +33,7 @@ class Mapper extends BaseMapper
         $this->hasTable('pastoral_attachment');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('private', self::TYPE_BOOLEAN);
         $this->joins('pastoral_id', PastoralMapper::class, 'id', null, null, 'pastoral', 'pastoral');
         $this->joins('hash', StorageMapper::class, 'hash', null, null, 'storage', 'storage');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
