@@ -32,6 +32,7 @@ use \Component_ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Assessment\Replicator;
+use Schoolbox\Learning\Assessment\Component\Homepage\Outline;
 
 class Module extends \Alaress\Module\Module
 {
@@ -49,30 +50,7 @@ class Module extends \Alaress\Module\Module
     {
         $staffOnly = $this->getAuthRule('isStaffOrSuper');
 
-        $preloadImport = function ($params)
-        {
-            try{
-                $courseSpec = $params['courseSpecId']
-                    ? $this->getCourseSpecificationMapper()->findById($params['courseSpecId'])
-                    : null;
-            } catch (MapperException $e){
-                throw new NotFound("Course Spec not found. id: {$params['courseSpecId']}");
-            }
-
-            try{
-                $folder = $params['folderId']
-                    ? $this->getFolderMapper()->findById($params['folderId'])
-                    : null;
-            } catch (MapperException $e){
-                throw new NotFound("Folder not found. id: {$params['folderId']}");
-            }
-
-            return [
-                'courseSpec'  => $courseSpec,
-                'targetClass' => $folder,
-                'componentId' => isset($params['componentId']) ? (int)$params['componentId'] : null,
-            ];
-        };
+        $preloadImport = $this->buildPreloadImport();
 
         $preloadCourse = function (array $params)
         {
@@ -94,6 +72,7 @@ class Module extends \Alaress\Module\Module
         $this->register('DELETE', '/{courseImplId:\d+}',                                 'importDelete',    $staffOnly, $preloadCourse);
         $this->register('POST',   '/{courseImplId:\d+}/restore',                         'restoreCourse',   $staffOnly, $preloadCourse);
     }
+
 
     /**
      * @param Twig_Loader_Chain $templateLoader
@@ -141,6 +120,58 @@ class Module extends \Alaress\Module\Module
     }
 
     /**
+     * Return a function to preload objects for the import route
+     *
+     * @return callable
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Application\Exception\NotFound
+     *
+     */
+    private function buildPreloadImport(): callable
+    {
+        return function ($params)
+        {
+            try{
+                $courseSpec = $params['courseSpecId']
+                    ? $this->getCourseSpecificationMapper()->findById($params['courseSpecId'])
+                    : null;
+            } catch (MapperException $e){
+                throw new NotFound("Course Spec not found. id: {$params['courseSpecId']}");
+            }
+
+            try{
+                $folder = $params['folderId']
+                    ? $this->getFolderMapper()->findById($params['folderId'])
+                    : null;
+            } catch (MapperException $e){
+                throw new NotFound("Folder not found. id: {$params['folderId']}");
+            }
+
+            try {
+                $componentInstance = !empty($params['componentId'])
+                    ? $this->getComponentInstanceMapper()->findById($params['componentId'])
+                    : null;
+            } catch (MapperException $e) {
+                throw new NotFound("Component not found. id: {$params['componentId']}");
+            }
+
+            if($componentInstance){
+                $definitionId = $componentInstance->getDefinitionId();
+                $componentDefinition = $this->getComponentDefinitionMapper()->findById($definitionId);
+                if ($componentDefinition->getClass() !== Outline\Controller::class) {
+                    throw new NotFound("Not a Course-Outline component. id: {$params['componentId']}");
+                }
+            }
+
+            return [
+                'courseSpec'  => $courseSpec,
+                'targetClass' => $folder,
+                'componentId' => isset($params['componentId']) ? (int)$params['componentId'] : null,
+            ];
+        };
+    }
+
+    /**
      * @return CourseSpecificationMapper
      */
     protected function getCourseSpecificationMapper()
@@ -162,5 +193,24 @@ class Module extends \Alaress\Module\Module
     protected function getFolderMapper()
     {
         return $this->injector->get('mapperFactory')->get(Folder\Mapper::class);
+    }
+
+
+    /**
+     * @return Component_InstanceMapper|\Schoolbox\Mapper
+     * @throws \InvalidArgumentException
+     */
+    protected function getComponentInstanceMapper()
+    {
+        return $this->getMapperFactory()->get(Component_InstanceMapper::class);
+    }
+
+    /**
+     * @return Component_DefinitionMapper|\Schoolbox\Mapper
+     * @throws \InvalidArgumentException
+     */
+    protected function getComponentDefinitionMapper()
+    {
+        return $this->getMapperFactory()->get(Component_DefinitionMapper::class);
     }
 }

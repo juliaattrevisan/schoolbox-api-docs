@@ -116,27 +116,11 @@ class Controller extends Base\Base
      *
      * @param null|CourseSpecification $courseSpec  Null if a '0' in URL.
      * @param null|Folder              $targetClass Null if a '0' in URL.
-     * @param null|int                 $componentId Null if not specified in URL.
+     * @param null|Component_Instance  $component   Null if not specified in URL
      * @throws \Schoolbox\Application\Exception\Exception
      */
-    public function getImport(?CourseSpecification $courseSpec, ?Folder $targetClass, ?int $componentId)
+    public function getImport(?CourseSpecification $courseSpec, ?Folder $targetClass, ?Component_Instance $component)
     {
-        // Ensure that if present, the component instance is an extant CourseOutline
-        $componentInstance = null;
-        if ($componentId) {
-            try {
-                $componentInstance = $this->getComponentInstanceMapper()->findById($componentId);
-                $definitionId = $componentInstance->getDefinitionId();
-                $componentDefinition = $this->getComponentDefinitionMapper()->findById($definitionId);
-                if ($componentDefinition->getClass() !== HomepageOutlineComponentController::class) {
-                    $msg = 'Not a Course-Outline component';
-                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND, null, $msg);
-                }
-            } catch (MapperException $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
-            }
-        }
-
         // If the URL specifies a CourseSpec and Import destination (ie a Folder), then skip to stage 2
         $initialStage = $courseSpec && $targetClass
             ? self::IMPORT_STAGE_OWNERSHIPS
@@ -146,7 +130,7 @@ class Controller extends Base\Base
             'action'              => 'import',
             'initialStage'        => $initialStage,
             'courseSpec'          => $courseSpec,
-            'componentId'         => $componentInstance ? $componentInstance->getId() : null,
+            'componentId'         => $component ? $component->getId(): null,
             'folder'              => $targetClass,
             'destinations'        => $targetClass ?
                 [
