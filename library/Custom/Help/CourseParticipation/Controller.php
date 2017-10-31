@@ -412,7 +412,9 @@ class Controller extends Base
 
         foreach ($post['user'] as $userData) {
             if (!$this->userPayloadIsValid($userData)) {
-                $failedUsers[] = $userData;
+                $failedUsers[] = [
+                    'Invalid payload', $userData
+                ];
                 continue;
             }
 
@@ -427,7 +429,9 @@ class Controller extends Base
 
             } catch (Mapper\Exception\Deleted $e) {
                 // user exists, but is deleted; consider this a fail case
-                $failedUsers[] = $userData;
+                $failedUsers[] = [
+                    'User is deleted', $userData
+                ];
                 continue;
 
             } catch (Mapper\Exception $e) {
@@ -472,11 +476,15 @@ class Controller extends Base
                 }
             } catch (Mapper\Exception $e) {
                 // the user failed to save; is fail case
-                $failedUsers[] = $userData;
+                $failedUsers[] = [
+                    'Failed to save', $userData
+                ];
 
             } catch (UnexpectedValueException $e) {
                 // duplicate username
-                $failedUsers[] = $userData;
+                $failedUsers[] = [
+                    'Duplicate username', $userData
+                ];
             }
         }
 
