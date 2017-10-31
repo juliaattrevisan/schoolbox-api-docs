@@ -73,12 +73,10 @@ class Notifier extends AbstractModuleNotifier
         /** @var PastoralAccessModel $accessModel */
         foreach ($accessModels as $accessModel) {
 
+            // Target to role
             $role = $accessModel->getRole();
-
             if ($role instanceof Role) {
-                // Sending to a role
                 $roleId = $role->getId();
-
                 try {
                     /** @var Role $role */
                     $role = $this->getRoleMapper()->findById($roleId);
@@ -100,14 +98,28 @@ class Notifier extends AbstractModuleNotifier
                 } catch (MapperException $e) {
                     // noop
                 }
-            } else {
 
+                // Target to user
                 $user = $accessModel->getUser();
                 if ($user instanceof User) {
                     try {
                         $envelope->targetToUser($user->getId(), $message);
                     } catch (MapperException $e) {
                         // noop
+                    }
+                }
+
+                // Target to group
+                /** @var PastoralGroup $group */
+                $group = $accessModel->getGroup();
+                if ($group instanceof PastoralGroup) {
+                    try {
+                        $group = $this->getPastoralGroupMapper()->findById($group->getId());
+                    } catch (MapperException $e) {
+                        continue;
+                    }
+                    foreach ($group->getMembers() as $member) {
+                        $envelope->targetToUser($member->getUser()->getId(), $message);
                     }
                 }
             }
