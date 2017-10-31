@@ -200,6 +200,13 @@ $(function() {
                     depends: function() {
                         return $('#repeatUntilSelect').val() !== ''
                     }
+                },
+            },
+            'campus': {
+                required: {
+                    depends: function() {
+                        return $('#repeatUntilSelect').val() == "timetable"
+                    }
                 }
             }
         },
@@ -295,6 +302,16 @@ $(function() {
             }
         }
     )
+
+    $('#campusList').hide();
+    form.on('change', '#repeatUntilSelect', function(event) {
+        if($('#repeatUntilSelect').val() == "timetable" && $('#campusList').find('input[name="campus"]').length > 1){
+            $('#campusList').show();
+        }
+        else{
+            $('#campusList').hide();
+        }
+    });
 });
 </script>
 <!-- END custom_header -->
@@ -401,6 +418,16 @@ $(function() {
                                 </optgroup>
                             </select>
                         </label>
+
+                        <div id="campusList">
+                            <fieldset class="radiolist" data-equalizer-watch>
+                                <legend>Campus Timetable:</legend>
+                                {% for campus in campusList %}
+                                    <input type="radio" name="campus" value="{{ campus.id }}" id="campus-{{ campus.id }}" checked>
+                                    <label for="campus-{{ campus.id }}">{{ campus.name }}</label>
+                                {% endfor %}
+                            </fieldset>
+                        </div>
 
                         <div id="repeatUntil"> {# This ID must be on a div wrapping the label, because the input will be taken out of the label via JS #}
                             <label>
