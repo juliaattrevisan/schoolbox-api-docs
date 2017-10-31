@@ -98,29 +98,29 @@ class Notifier extends AbstractModuleNotifier
                 } catch (MapperException $e) {
                     // noop
                 }
+            }
 
-                // Target to user
-                $user = $accessModel->getUser();
-                if ($user instanceof User) {
-                    try {
-                        $envelope->targetToUser($user->getId(), $message);
-                    } catch (MapperException $e) {
-                        // noop
-                    }
+            // Target to user
+            $user = $accessModel->getUser();
+            if ($user instanceof User) {
+                try {
+                    $envelope->targetToUser($user->getId(), $message);
+                } catch (MapperException $e) {
+                    // noop
                 }
+            }
 
-                // Target to group
-                /** @var PastoralGroup $group */
-                $group = $accessModel->getGroup();
-                if ($group instanceof PastoralGroup) {
-                    try {
-                        $group = $this->getPastoralGroupMapper()->findById($group->getId());
-                    } catch (MapperException $e) {
-                        continue;
-                    }
+            // Target to group
+            /** @var PastoralGroup $group */
+            $group = $accessModel->getGroup();
+            if ($group instanceof PastoralGroup) {
+                try {
+                    $group = $this->getPastoralGroupMapper()->findById($group->getId());
                     foreach ($group->getMembers() as $member) {
                         $envelope->targetToUser($member->getUser()->getId(), $message);
                     }
+                } catch (MapperException $e) {
+                    // noop
                 }
             }
         }
