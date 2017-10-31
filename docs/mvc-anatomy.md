@@ -16,10 +16,10 @@ This is the basic flow of operations from the moment you access a url to seeing 
 4. Twig executes, performing rendering duties on the data provided 
 5. Twig output renders to browser 
 
-# Responsibilities of Module
+# 1 Responsibilities of Module
 Modules use the url to determine which controller method should run, whether there are permissions that might prevent a controller from starting and what objects a controller method should operate with.
 
-## 1 Determining the Route
+## 1.1 Determining the Route
 *Routes* are determined by pattern-matching the url to one of the regular expressions listed in `initRoutes()`. This contains a `$routes` key-value array; the `key` is the pattern and the `value` is the Controller method associated with that pattern. Additionally, the type of request is also used to help determine routes; specifically, whether this was a `GET` (a url you type in the browser) or a `POST` (a form submit) request.
 
 > GET and POST
@@ -57,7 +57,7 @@ The controller methods can only appear once. You can't make multiple routes end 
 
 > Sometimes you'll need to pass in other parameters to make your controller method do special things, such as passing it one or more dates to filter a data set, etc. This is left to your discretion though it is advisable to make your routes as utilitarian as possible.
 
-## 1.1 Route Permissions
+## 1.2 Route Permissions
 Controllers are kind of resource-intensive, they cost a bit to start up. To prevent unnecessary controller startup, we do our permissions checks as early as possible. The earliest place we can do it is in Module.php.
 
 There are a number of predefined classes which can be combined in myriad ways to fine-tune your authorisation check. It is useful to provide a synonymous docblock in plain English to reaffirm what's being seen. This example applies a particular set of requirements in order for the `getDetailForPlayer()` method to execute.
@@ -134,3 +134,5 @@ public function authorize(array $params = array(), User $user = null)
 ```
 
 Having said that, it is okay to make macros of common combinations. You can find some in `isStudentOfClass()` and `isTeacherOfClass()` etc.
+
+## 1.3 Preloads
