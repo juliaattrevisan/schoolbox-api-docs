@@ -58,7 +58,7 @@ class Module extends \Alaress\Module\Module
 
         // courseSpecId + folderId required (even if 0), componentId optional
         $this->register('GET',    '/{courseSpecId:\d+}/folder/{folderId}{/componentId}', 'getImport',       $staffOnly, $preloadImport);
-        $this->register('GET',    '/{courseImplId:\d+}/modify',                          'importModify',    $staffOnly, $preloadCourse);
+        $this->register('GET',    '/{courseImplId:\d+}/modify',                          'getModify',       $staffOnly, $preloadCourse);
         $this->register('GET',    '/classes',                                            'searchClasses',   $staffOnly);
         $this->register('GET',    '/management/{folderId}',                              'getManagement',   $staffOnly);
 

@@ -830,7 +830,7 @@ class Controller extends Base\Base
      * @param CourseImplementation\Model $courseImpl
      * @throws MapperException
      */
-    public function importModify(CourseImplementation\Model $courseImpl)
+    public function getModify(CourseImplementation\Model $courseImpl)
     {
         try {
             $courseSpec = $this->courseSpecificationMapper->findById($courseImpl->getSpecification()->getId());
