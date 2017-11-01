@@ -50,7 +50,7 @@ $routes = [
 ];
 ```
 
-...and the controller method `getDetailForPlayer()` would give you some kind of information about a player in a particular team that wasin a particular division for a particular sport. This is a fairly non-conflicting hierarchical structure.
+...and the controller method `getDetailForPlayer()` would give you some kind of information about a player in a particular team that was in a particular division for a particular sport. This is a fairly non-conflicting hierarchical structure.
 
 The controller methods can only appear once. You can't make multiple routes end up in the same controller method.
 
@@ -142,16 +142,19 @@ Computing the preloads in Module allows us to exit earlier without incurring the
 > Module provides objects for Controllers which then perform operations or analyses on them. When all the necessary pieces can't be provided, either through missing data, insufficient permissions, etc. then exit early. Controllers should be able to assume that they have the minimum amount of data to start
  
 # 2 Responsibilities of Controller 
-The bulk of business logic occurs in the Controller methods. This accepts the items provided by Module (if applicable) and performs operations or analyses on them, preparing the output for twig to render. Controllers are also primarily responsible for handling of error states that can't be foreseen or computed by Module. 
+The bulk of business logic occurs in the Controller methods. This accepts the items provided by Module (if applicable) and performs operations or analyses on them, preparing the output for twig to render. 
 
-Controller methods aren't easily reusable, except in subclasses; even then, having a whole bunch of logic dumped into Controller methods isn't ideal. These methods should act as "highways" which give you a rapid, higher-level overview of what is going on; it shouldn't be a place where lower-level details are found. This impedes reusability and heightens the chances of copy-paste bugs occurring, or inconsistent behaviours. It's much harder to unit test Controller methods than independent, high-cohesion classes. 
+> Controllers are arrangers and organisers of information, like a foreman at a construction site - they don't do the dirty work themselves. 
 
-When possible, abstract away all these details into other classes which can then be reused in various ways elsewhere. You should be able to read method names and get a general idea of what is going on without having to interpret every line of code for possible meaning. 
+Controller methods aren't easily reusable, except in subclasses; even then, having a whole bunch of logic dumped into Controller methods isn't ideal. Controller methods should act as "highways" which give you a rapid, higher-level overview of what is going on; it shouldn't be a place where lower-level details are found. This impedes reusability and heightens the chances of copy-paste bugs occurring, or inconsistent behaviours. It's much harder to unit test Controller methods than independent, high-cohesion classes. 
 
-Let's illustrate with an example. 
+> When possible, abstract away low-level details into other classes which can then be reused in various ways elsewhere. This segregation of details also helps prevent you making inadvertent changes that fly under the radar. 
 
+You should be able to read method names and get a general idea of what is going on without having to interpret every line of code to derive possible meaning. Don't be a human compiler! 
 
+> Worth noting is that one of the primary reasons to look at a Controller method is because we're pursuing a specific behaviour to change. The easier it is to find this, the better our lives become.
 
+Controllers are also primarily responsible for handling of error states that can't be foreseen or computed by Module. There are a couple of ways to do it in the current codebase, but the preferred approach is to throw an exception.
 
-
+ErrorMapper thing
 
