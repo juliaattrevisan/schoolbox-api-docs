@@ -99,8 +99,18 @@ class TtyFormatter extends CliFormatter
             $c = '[ ' . (isset($record['context']['char']) ? $record['context']['char'] : ' ') . ' ]';
         }
 
+        $pieces = [ rtrim($record['message']) ];
 
-        return $this->render(implode('', $left), rtrim($record['message']), $c);
+        // include context?
+        if ($this->contextualise) {
+            $context = $record['context'];
+            unset($context['char']);
+            foreach($context as $key => $value) {
+                $pieces[] = "\n   $key => $value";
+            }
+        }
+
+        return $this->render(implode('', $left), implode('', $pieces), $c);
     }
 
 
