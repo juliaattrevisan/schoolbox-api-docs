@@ -99,7 +99,9 @@ class Mapper extends BaseMapper
 
         foreach ($statement as $row) {
             $revision = $this->hydrateRow($row);
-            $collection->add($revision);
+            if ($revision instanceof Model) {
+                $collection->add($revision);
+            }
         }
 
         return $collection;

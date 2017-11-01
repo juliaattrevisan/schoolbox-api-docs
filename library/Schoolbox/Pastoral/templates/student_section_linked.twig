@@ -50,8 +50,8 @@
     {% endif %}
 </div>
 
-{% include '@pastoral/student_details.twig' with { student: student } %}
-{% include '@pastoral/student_filter.twig' %}
+{% include '@pastoral/student_section_details.twig' with { student: student } %}
+{% include '@pastoral/student_section_filter.twig' %}
 
 {# Empty State #}
 
@@ -109,9 +109,8 @@
                                     {# Display name of poster #}
 
                                     <p class="meta">
-                                        Posted by
-                                        <a href="{{ _self.userProfileLink(record.owner) }}">{{ record.owner.fullName }}</a>
-                                        {{ record.createdAt.short }}
+                                        Posted by <a href="{{ _self.userProfileLink(record.owner) }}">{{ record.owner.fullName }}</a>
+                                        <span title="{{ related.updatedAt.short }}">{{ related.updatedAt.relativeDay }}</span>
                                     </p>
 
                                     {# Display linked students to staff #}
@@ -131,8 +130,7 @@
 
                                 {% set routeGetStudentRecordUpdateForm = routeLookupIfAuthorized('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) %}
                                 {% if routeGetStudentRecordUpdateForm %}
-                                    <a class="icon-modify no-text" href="{{ routeGetStudentRecordUpdateForm }}"
-                                       title="Modify"></a>
+                                    <a class="icon-modify no-text" href="{{ routeGetStudentRecordUpdateForm }}" title="Modify"></a>
                                 {% endif %}
 
                                 {# Delete record #}

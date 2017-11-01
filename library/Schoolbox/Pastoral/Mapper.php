@@ -266,8 +266,8 @@ class Mapper extends BaseMapper
             return null;
         }
 
-        if ($this->isUserInPastoralService($user)) {
-            // Pastoral moderator see all, shortcut out of here
+        if ($this->isUserInPastoralService($user) || $user->getId() == $record->getOwner()->getId()) {
+            // Pastoral moderator and owner see all, shortcut out of here
             return $record;
         }
 

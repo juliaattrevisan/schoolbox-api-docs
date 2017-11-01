@@ -1,0 +1,61 @@
+{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+{# Pastoral Groups Access #}
+{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+
+{% if groups | length > 0 %}
+
+    <table class="no-margin">
+        <thead>
+            <tr>
+                <th class="small-5">{{ locale.pastoral.proper }} Group Visibility</th>
+                <th class="small-2"></th>
+                <th class="small-2"></th>
+                <th class="small-2"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for group in groups %}
+                {# Work out which radio should be checked for each row #}
+
+                {% set checkedNone = '' %}
+                {% set checkedPublic = '' %}
+                {% set checkedPrivate = '' %}
+
+                {% if record.id != '' %}
+                    {% for access in record.access if access.group.id != '' %}
+                        {% if access.group.id == group.id %}
+                            {% if access.private == 1 %}
+                                {% set checkedPrivate = 'checked' %}
+                            {% else %}
+                                {% set checkedPublic = 'checked' %}
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                {% if checkedPublic == '' and checkedPrivate == '' %}
+                    {% set checkedNone = 'checked' %}
+                {% endif %}
+
+                <tr>
+                    <td>
+                        {{ group.name }}
+                    </td>
+                    <td>
+                        <input type="radio" name="group[{{ group.id }}]" id="groupNone{{ group.id }}" value="0" {{ checkedNone }}>
+                        <label class="radio-label" for="groupNone{{ group.id }}"></label>
+                    </td>
+                    <td>
+                        <input type="radio" name="group[{{ group.id }}]" id="groupPublic{{ group.id }}" value="1" {{ checkedPublic }}>
+                        <label class="radio-label" for="groupPublic{{ group.id }}"></label>
+                    </td>
+                    <td>
+                        <input type="radio" name="group[{{ group.id }}]" id="groupPrivate{{ group.id }}" value="2" {{ checkedPrivate }}>
+                        <label class="radio-label" for="groupPrivate{{ group.id }}"></label>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endif %}

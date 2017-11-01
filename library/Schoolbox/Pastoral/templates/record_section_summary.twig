@@ -13,6 +13,11 @@
                 <dt class="small-12 medium-3">Record Created:</dt>
                 <dd class="small-12 medium-9">{{ record.createdAt.long }}</dd>
 
+                {% if record.createdAt.long != record.updatedAt.long %}
+                    <dt class="small-12 medium-3">Last Modified:</dt>
+                    <dd class="small-12 medium-9">{{ record.updatedAt.long }}</dd>
+                {% endif %}
+
                 {% if user.role.isStaff %}
 
                     {% if record.severity.name is not empty and config.pastoral_severity %}

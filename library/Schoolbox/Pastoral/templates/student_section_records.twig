@@ -29,7 +29,7 @@
                                     {# Display name of poster #}
                                     <p class="meta">
                                         Posted by <a href="{{ _self.userProfileLink(record.owner) }}">{{ record.owner.fullName }}</a>
-                                        <span title="{{ record.createdAt.short }}">{{ record.createdAt.relativeDay }}</span>
+                                        <span title="{{ record.updatedAt.short }}">{{ record.updatedAt.relativeDay }}</span>
                                     </p>
 
                                     {# Display linked students to staff #}

@@ -90,27 +90,31 @@
 <div class="row">
     <div class="small-12 island">
         <section class="no-pad">
-            {% include '@pastoral/record_summary.twig' %}
+            {% include '@pastoral/record_section_summary.twig' %}
         </section>
     </div>
 </div>
 
-{# Private body #}
+{# Confidential body #}
 
-{% include '@pastoral/record_body.twig' with { recordType: 'private' } %}
-{% include '@pastoral/record_comments.twig' with { comments: commentsPrivate, recordType: 'private' } %}
+{% include '@pastoral/record_section_body.twig' with { recordType: 'private' } %}
+{% include '@pastoral/record_section_comments.twig' with { comments: commentsPrivate, recordType: 'private' } %}
 
-{# Public body #}
+{# General body #}
 
-{% include '@pastoral/record_body.twig' with { recordType: 'public' } %}
-{% include '@pastoral/record_comments.twig' with { comments: commentsPublic, recordType: 'public' } %}
+{% include '@pastoral/record_section_body.twig' with { recordType: 'public' } %}
+{% include '@pastoral/record_section_comments.twig' with { comments: commentsPublic, recordType: 'public' } %}
 
 {# Only staff can ever see the other information things #}
 
 {% if user.role.isStaff %}
-    {% include '@pastoral/record_visibility.twig' %}
-    {% include '@pastoral/record_revisions.twig' %}
-    <div class="row">
-        {% include '@pastoral/record_related.twig' %}
-    </div>
+    {% include '@pastoral/record_section_comments_script.twig'%}
+
+    {# Record revision history #}
+    {% include '@pastoral/record_section_revisions.twig' %}
+
+    {# Visibility permissions#}
+
+    {% include '@pastoral/record_section_visibility.twig' %}
+    {% include '@pastoral/record_section_linked.twig' %}
 {% endif %}

@@ -253,7 +253,22 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
+        $this->updateSessionPermission($user);
+
         $this->getResponse()->redirect->afterPost("/adminv2/user/{$user->getId()}/modify#permissions");
+    }
+
+    /**
+     * Update the logged in users permissions in the session variable
+     *
+     * @param User $user
+     */
+    private function updateSessionPermission(User $user)
+    {
+        if ($user->getId() == $this->getUser()->getId()) {
+            $user->setAccessList($this->userAccessMapper->findAllForUser($user));
+            $_SESSION["user"] = $user;
+        }
     }
 
     /**
@@ -312,6 +327,8 @@ class Controller extends Base
             'sid' => $sid,
             'uid' => $user->getId()
         ]);
+
+        $this->updateSessionPermission($user);
 
         $this->getResponse()->content->set([
             'format' => 'json',
@@ -571,6 +588,8 @@ class Controller extends Base
             $this->userAccessMapper->save($userAccess);
         } catch (MapperException $e) {
         }
+
+        $this->updateSessionPermission($user);
 
         $this->getResponse()->content->set([
             'format' => 'json',
