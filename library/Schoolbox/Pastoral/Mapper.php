@@ -497,10 +497,10 @@ class Mapper extends BaseMapper
             
             OR
 
-            `pastoral`.`student_id` = :studentId2 AND `pastoral`.`id` IN (
+            `pastoral`.`student_id` = :linkedStudentId2 AND `pastoral`.`id` IN (
                 SELECT      `parent_id` 
                 FROM        `pastoral` `pastoralLinked2` 
-                WHERE       `pastoralLinked2`.`student_id` = :linkedStudentId2
+                WHERE       `pastoralLinked2`.`student_id` = :studentId2
             )
         ";
 
