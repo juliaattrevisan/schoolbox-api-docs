@@ -3,8 +3,6 @@ If you followed the Quickstart guide, you'll have seen how to make an Aura modul
 
 Nw we'll examine these pieces of an Aura module - the Module, Controller, Mapper, Model (and other classes) in greater detail. If none of these words hold meaning, go back to the Quickstart and get yourself back up to speed.
 
-You can find a run-down on the fundamental Model-View-Controller concept here: https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller
-
 # Overview of Terms
 * *Module.* A custom concept that we made. It encapsulates Routing, Permissions and Preloads. Respectively: determines which Controller method should execute based on the url provided, whether the Controller method has the permissions to execute, and what objects it needs to execute.
 * *Controller.* Deals with business logic, calculating the output data for the View to render (in this case, twig).  Utilises Mappers and Models.
@@ -187,3 +185,21 @@ Controllers are also primarily responsible for handling of error states that can
 
 Don't `die()` or `exit()` in Controllers - you should `return` instead (unless you're debugging or exploring)
 
+# 3 Responsibilities of Supporting Classes
+# 4 Responsibilities of Mapper
+# 5 Responsibilities of Model
+# 6 Responsibilities of View
+
+# 7 Further Reading
+
+* *Aura Routing.* 
+We developed an adaptation of this for Module.php, but this original documentation might help you with capabilities that aren't immediately obvious such as optional args etc.
+http://auraphp.com/framework/2.x/en/router/
+
+* MVC Model-View-Controller
+Aura modules follow this pattern.
+https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller
+
+* Cohesion and Coupling
+A brief overview on how to abstract details into Supporting Classes. A precursor to Design Patterns.
+https://stackoverflow.com/questions/10830135/what-is-high-cohesion-and-how-to-use-it-make-it
