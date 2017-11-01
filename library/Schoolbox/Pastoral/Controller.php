@@ -344,7 +344,7 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set([
-            'template' => '@pastoral/linked.twig',
+            'template' => '@pastoral/student_linked.twig',
             'data'     => [
                 'user'           => $this->getUser(),
                 'recordCount'    => $records->count(),

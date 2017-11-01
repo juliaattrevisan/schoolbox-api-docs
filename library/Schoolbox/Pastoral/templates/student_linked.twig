@@ -10,7 +10,6 @@
 [ 'Linked Records - ' ~ linkedStudent.fullName ]
 ) }}
 
-
 <div class="row">
     <div class="list-item">
         <div class="small-12 column">
@@ -24,75 +23,35 @@
             <h2 class="subheader">{{ locale.pastoral.proper }} Profile</h2>
         </div>
     </div>
-    <nav>
-        <a href="{{ routeLookup('pastoralReportBuilder.getIndex') }}" class="icon-result"
-           title="{{ locale.pastoral.proper }} Report Builder"></a>
+    {% if user.role.isStaff %}
+        <nav>
+            {% set routeGetGroups = routeLookupIfAuthorized('pastoralManagement.getGroups') %}
+            {% set routeRecordInsert = routeLookupIfAuthorized('pastoral.getStudentRecordInsertForm', {'studentId': record.student.id}) %}
+            {% set routeReportBuilder = routeLookupIfAuthorized('pastoralReportBuilder.getIndex') %}
 
-        {# Pastoral moderators can manage pastoral groups #}
-
-        {% set routeGetGroups = routeLookupIfAuthorized('pastoralManagement.getGroups') %}
-
-        {% if routeGetGroups %}
-            <a href="{{ routeGetGroups }}" class="icon-group" title="Manage {{ locale.pastoral.proper }} Groups"></a>
-        {% endif %}
-
-        {# Display linked student records #}
-
+            {% if routeReportBuilder %}<a href="{{ routeReportBuilder }}" class="icon-result" title="{{ locale.pastoral.proper }} Report Builder"></a>{% endif %}
+            {% if routeGetGroups %}<a href="{{ routeGetGroups }}" class="icon-group" title="Manage {{ locale.pastoral.proper }} Groups"></a>{% endif %}
+            {% if linkedStudents | length %}<a href="#" class="icon-link" data-dropdown="linked-students" title="Linked Students"></a>{% endif %}
+            {% if routeRecordInsert %}<a href="{{ routeRecordInsert }}" class="icon-add" title="Add {{ locale.pastoral.proper }} Record"></a>{% endif %}
+        </nav>
         {% if linkedStudents | length %}
-            <a href="#" class="icon-link" data-dropdown="linked-students" title="Linked Students"></a>
+            <ul class="f-dropdown" data-dropdown-content="" id="linked-students">
+                <li class="separator">Students With Linked Records</li>
+                {% for linkedStudent in linkedStudents %}
+                    <li>
+                        <a href="{{ routeLookup('pastoral.getLinked', {studentId: student.id, linkedStudentId: linkedStudent.student_id }) }}"
+                           class="icon-user">
+                            {{ linkedStudent.first_name }} {{ linkedStudent.last_name }} ({{ linkedStudent.count }})
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
         {% endif %}
-
-        {# Display link to insert pastoral record if the logged in user is authorized to do so #}
-
-        {% set routeGetStudentRecordInsertForm = routeLookupIfAuthorized('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) %}
-        {% if routeGetStudentRecordInsertForm %}
-            <a href="{{ routeGetStudentRecordInsertForm }}" class="icon-add"
-               title="Add {{ locale.pastoral.proper }} Record To {{ student.fullName }}"></a>
-        {% endif %}
-    </nav>
-
-    {% if linkedStudents | length %}
-        <ul class="f-dropdown" data-dropdown-content="" id="linked-students">
-            <li class="separator">Students With Linked Records</li>
-            {% for linkedStudent in linkedStudents %}
-                <li>
-                    <a href="{{ routeLookup('pastoral.getLinked', {studentId: student.id, linkedStudentId: linkedStudent.student_id }) }}"
-                       class="icon-user">
-                        {{ linkedStudent.first_name }} {{ linkedStudent.last_name }} ({{ linkedStudent.count }})
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
     {% endif %}
 </div>
 
 {% include '@pastoral/student_details.twig' with { student: student } %}
-
-{# Pastoral Type Filter Box #}
-
-{% if types | length %}
-
-    <div id="typeSelector">
-        <div class="small-12 island">
-            <label>Filter {{ locale.pastoral.proper }} Records By Type</label>
-            <select data-type-filter>
-                <option value="">Show All {{ locale.pastoral.proper }} Record Types</option>
-                {% for type in types %}
-                    <option value="{{ type.id }}"
-                            {% if typeSelected == type.id %}selected{% endif %}>{{ type.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-    </div>
-    <script>
-        $(function () {
-            $('[data-type-filter]').change(function () {
-                window.location.href = "?type=" + $(this).val();
-            });
-        });
-    </script>
-
-{% endif %}
+{% include '@pastoral/student_filter.twig' %}
 
 {# Empty State #}
 
@@ -100,13 +59,11 @@
     <div class="small-12 column">
         <div class="empty-state">
             <i class="icon-pastoral"></i>
-            <p>There are linked {{ locale.pastoral }} records {% if typeSelected is not empty %}of this type{% endif %}
-                available for {{ student.fullName }} and {{ linkedStudent.fullName }}.</p>
+            <p>There are no linked {{ locale.pastoral }} records {% if typeSelected is not empty %}of this type{% endif %} between {{ student.fullName }} and {{ linkedStudent.fullName }}.</p>
             {% set routeGetStudentRecordInsertForm = routeLookupIfAuthorized('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) %}
             {% if routeGetStudentRecordInsertForm %}
                 <p>
-                    You can <a href="{{ routeGetStudentRecordInsertForm }}">create a new {{ locale.pastoral }}
-                        record</a> now
+                    You can <a href="{{ routeGetStudentRecordInsertForm }}">create a new {{ locale.pastoral }} record</a> now
                     {% if typeSelected is not empty %}
                         or
                         <a href="{{ routeLookup('pastoral.getLinked', {'studentId': student.id, 'linkedStudentId': linkedStudent.id}) }}">

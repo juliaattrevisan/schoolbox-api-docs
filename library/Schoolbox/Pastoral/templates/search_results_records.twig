@@ -1,0 +1,26 @@
+{% import '@pastoral/macros/profile.twig' as profile %}
+
+<section>
+    <ul class="action-list">
+        {% for record in results %}
+            <li class="actions-small-1">
+                <div class="list-item">
+                    <div class="small-12 card wrap-down">
+                        <a href="{{ profile.link(record.owner) }}">
+                            {{ profile.imageSquare64(record.student) }}
+                        </a>
+                        <h4>
+                            <a href="{{ routeLookup('pastoral.getStudentRecord', { studentId: record.student.id, recordId: record.id}) }}">
+                                {{ record.student.fullName }} - {{ record.heading }}
+                            </a>
+                        </h4>
+                        <p class="spaced meta">
+                            Posted by <a href="{{ profile.link(record.owner) }}">{{ record.owner.fullName }}</a>
+                            <span title="{{ record.createdAt.short }}">{{ record.createdAt.relativeDay }}</span>
+                        </p>
+                    </div>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+</section>

@@ -1,0 +1,25 @@
+{# Pastoral Type Filter Box #}
+
+{% if types | length and user.role.isStaff %}
+
+    <div class="small-12 island">
+        <h2 class="subheader">Filter Records By Type</h2>
+        <select data-type-filter>
+            <option value="">Show All {{ locale.pastoral.proper }} Record Types</option>
+            {% for type in types %}
+                <option value="{{ type.id }}"
+                        {% if typeSelected == type.id %}selected{% endif %}>{{ type.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <script>
+        $(function () {
+            $('[data-type-filter]').change(function () {
+                window.location.href = "?type=" + $(this).val();
+            });
+        });
+    </script>
+
+{% endif %}
+

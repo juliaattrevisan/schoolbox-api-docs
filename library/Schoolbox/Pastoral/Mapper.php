@@ -486,16 +486,21 @@ class Mapper extends BaseMapper
      */
     public function findLinked($student, $linkedStudent, $typeId = null)
     {
-        $studentId       = $this->getDatabase()->quote($student->getId());
-        $linkedStudentId = $this->getDatabase()->quote($linkedStudent->getId());
-
-        $sql = $this->getSelectString();
-
-        $sql .= "
-            WHERE `pastoral`.`student_id` = {$studentId} AND `pastoral`.`id` IN (
+        $sql = $this->getSelectString() . "
+            WHERE 
+            
+            `pastoral`.`student_id` = :studentId1 AND `pastoral`.`id` IN (
                 SELECT      `parent_id` 
-                FROM        `pastoral` `pastoralLinked` 
-                WHERE       `pastoralLinked`.`student_id` = {$linkedStudentId}
+                FROM        `pastoral` `pastoralLinked1` 
+                WHERE       `pastoralLinked1`.`student_id` = :linkedStudentId1
+            ) 
+            
+            OR
+
+            `pastoral`.`student_id` = :studentId2 AND `pastoral`.`id` IN (
+                SELECT      `parent_id` 
+                FROM        `pastoral` `pastoralLinked2` 
+                WHERE       `pastoralLinked2`.`student_id` = :linkedStudentId2
             )
         ";
 
@@ -509,12 +514,18 @@ class Mapper extends BaseMapper
 
         $statement = $this->database->prepare($sql);
 
+        $params = [
+            'studentId1' => $student->getId(),
+            'linkedStudentId1' => $linkedStudent->getId(),
+            'studentId2' => $student->getId(),
+            'linkedStudentId2' => $linkedStudent->getId(),
+        ];
+
         if (!empty($typeId)) {
-            $statement->bindValue('typeId', $typeId);
+            $params['typeId'] = $typeId;
         }
 
-        $statement->execute();
-
+        $statement->execute($params);
         $results = $this->hydrateSelect($statement);
 
         return $results;

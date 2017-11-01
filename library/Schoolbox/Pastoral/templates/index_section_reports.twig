@@ -1,0 +1,36 @@
+{% import '@pastoral/macros/profile.twig' as profile %}
+
+{% if reportsDashboard | length %}
+    <h2 class="subheader">Quick Report Links</h2>
+    <section>
+        <ul class="information-list">
+            {% for report in reportsDashboard %}
+                <li>
+                    <div class="card small-12">
+                        <a href="{{ profile.link(user) }}">
+                            {{ profile.imageSquare64(user) }}
+                        </a>
+                        <a href='{{ routeLookup('pastoralReportBuilder.getReportResults', {reportId: report.id}) }}'>
+                            <h3>{{ report.name }}</h3>
+                        </a>
+                        <p class="meta">
+                            <i title="{{ locale.pastoralCare.proper }} Groups" class="icon-group"></i>
+                            {% if report.groups | length %}
+                                {% for group in report.groups %}
+                                    {{ group.name }}{% if not loop.last %},{% endif %}
+                                {% endfor %}
+                            {% else %}
+                                This report has not been shared with any groups
+                            {% endif %}
+                        </p>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="component-action">
+            <section>
+                <a href="{{ routeLookup('pastoralReportBuilder.getIndex') }}" class="button" title="View All Reports">View All</a>
+            </section>
+        </div>
+    </section>
+{% endif %}

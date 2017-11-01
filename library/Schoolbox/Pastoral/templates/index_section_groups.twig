@@ -1,0 +1,48 @@
+{% import '@pastoral/macros/profile.twig' as profile %}
+
+{% if groups | length %}
+    <h2 class="subheader">Group Memberships</h2>
+    <section>
+        <ul class="information-list">
+            {% for membership in groups %}
+                <li>
+                    <div class="card small-12">
+                        <a href="{{ profile.link(membership.group.user) }}">
+                            {{ profile.imageSquare64(membership.group.user) }}
+                        </a>
+                        {% if membership.group.user.id == user.id %}
+
+                        {% set routeGetGroupsModify = routeLookupIfAuthorized('pastoralManagement.getGroupsModify', {groupId: membership.group.id}) %}
+                        {% if routeGetGroupsModify %}
+                        <a href="{{ routeGetGroupsModify }}" title="Modify {{ locale.pastoral.proper }} Group">
+                            {% endif %}
+                            {% endif %}
+                            <h3>{{ membership.group.name }}</h3>
+                            {% if membership.group.user.id == user.id %}
+                            {% if routeGetGroupsModify %}
+                        </a>
+                        {% endif %}
+                        {% endif %}
+                        <p class="meta">Group managed by
+                            {% if membership.group.user.id == user.id %}
+                                you
+                            {% else %}
+                                <a href="{{ profile.link(membership.group.user) }}">
+                                    {{ membership.group.user.fullName }}
+                                </a>
+                            {% endif %}
+                        </p>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+        {% set routeGetGroups = routeLookupIfAuthorized('pastoralManagement.getGroups') %}
+        {% if routeGetGroups is not empty %}
+            <div class="component-action">
+                <section>
+                    <a href="{{ routeGetGroups }}" class="button" title="Groups Management">Groups Management</a>
+                </section>
+            </div>
+        {% endif %}
+    </section>
+{% endif %}
