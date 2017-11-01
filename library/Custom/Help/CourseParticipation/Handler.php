@@ -20,6 +20,10 @@ use Schoolbox\UserMapper;
 class Handler
 {
 
+    const REQUIRED_USER_FIELDS = [
+        'id', 'email', 'title', 'firstname', 'lastname'
+    ];
+
     /**
      * @var UserAccessMapper
      */

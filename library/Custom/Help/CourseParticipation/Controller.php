@@ -34,10 +34,6 @@ class Controller extends Base
     const PARTICIPANT_ROLE_NAME = 'School Staff';
     const PARTICIPANT_CAMPUS    = 1;
 
-    const REQUIRED_USER_FIELDS = [
-        'id', 'email', 'title', 'firstname', 'lastname'
-    ];
-
     /**
      * @var UserAccessMapper
      */
@@ -101,7 +97,7 @@ class Controller extends Base
             'codes'  => $codes,
             'ts'     => $now->getUnixTimeStamp(),
             'hashes' => [],
-            'fields' => self::REQUIRED_USER_FIELDS
+            'fields' => Handler::REQUIRED_USER_FIELDS,
         ];
 
         foreach ($codes as $code) {
@@ -507,7 +503,7 @@ class Controller extends Base
     private function userPayloadIsValid(array $userData)
     {
         // check all the necessary data is present
-        foreach (self::REQUIRED_USER_FIELDS as $required) {
+        foreach (Handler::REQUIRED_USER_FIELDS as $required) {
             if (!array_key_exists($required, $userData) || empty(trim($userData[$required]))) {
                 return false;
             }
