@@ -67,9 +67,10 @@ do
 			u.id = '$staffid' AND
 			u.synergy_id=uu.synergy_id AND
 			uu.group_id IN (SELECT id FROM groups WHERE group_type='parent') AND
-			u.group_id IN (SELECT id FROM groups WHERE group_type='staff')"`;
-	fullname=`$mysqldb -BNe "SELECT CONCAT(firstname,' ',lastname,' (',synergy_id,')') FROM user WHERE id = '$staffid'"`;
-	echo "Linking: $staffid to $parentid - $fullname";
+			u.group_id IN (SELECT id FROM groups WHERE group_type='staff') AND
+			(u.deleted_at IS null AND uu.deleted_at IS null)"`;
+	fullname=`$mysqldb -BNe "SELECT CONCAT(firstname,' ',lastname,' (Synergetic ID: ',synergy_id,')') FROM user WHERE id = '$staffid'"`;
+	echo "Linking: staffID $staffid to parentID $parentid - $fullname";
 
 	# Check if running in test mode before making changes
 	if [ -z $test ];
