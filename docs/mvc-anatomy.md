@@ -27,7 +27,7 @@ This is the basic flow of operations from the moment you access a url to seeing 
 5. Twig output renders to browser 
 
 # 1 Responsibilities of Module
-Modules use the url to determine which controller method should run, whether there are permissions that might prevent a controller from starting and what objects a controller method should operate with.
+Modules use the url to determine which Controller method should run, whether there are permissions that might prevent a Controller from starting and what objects a Controller method should operate with.
 
 There are a variety of formats and styles for building a Module. An example of the most recent can be found in `/library/Schoolbox/Learning/Assessment/Module.php` in the form of `$this->register()`. However, this is simply a reorganisation of the original implementation seen here, and also in older locations such as `/library/Schoolbox/ResourceBooking/Booking/Module.php`. The basic principles still apply regardless of the style chosen.
 
@@ -60,14 +60,14 @@ $routes = [
 ];
 ```
 
-...and the controller method `getDetailForPlayer()` would give you some kind of information about a player in a particular team that was in a particular division for a particular sport. This is a fairly non-conflicting hierarchical structure.
+...and the Controller method `getDetailForPlayer()` would give you some kind of information about a player in a particular team that was in a particular division for a particular sport. This is a fairly non-conflicting hierarchical structure.
 
-The controller methods can only appear once. You can't make multiple routes end up in the same controller method.
+The Controller methods can only appear once. You can't make multiple routes end up in the same Controller method.
 
-> Sometimes you'll need to pass in other parameters to make your controller method do special things, such as passing it one or more dates to filter a data set, etc. This is left to your discretion though it is advisable to make your routes as utilitarian as possible.
+> Sometimes you'll need to pass in other parameters to make your Controller method do special things, such as passing it one or more dates to filter a data set, etc. This is left to your discretion though it is advisable to make your routes as utilitarian as possible.
 
 ## 1.2 Route Permissions
-Controllers are kind of resource-intensive, they cost a bit to start up. To prevent unnecessary controller startup, we do our permissions checks as early as possible. The earliest place we can do it is in Module.php.
+Controllers are kind of resource-intensive, they cost a bit to start up. To prevent unnecessary Controller startup, we do our permissions checks as early as possible. The earliest place we can do it is in Module.php.
 
 There are a number of predefined classes which can be combined in myriad ways to fine-tune your authorisation check. It is useful to provide a synonymous docblock in plain English to reaffirm what's being seen. This example applies a particular set of requirements in order for the `getDetailForPlayer()` method to execute.
 
@@ -187,8 +187,3 @@ Controllers are also primarily responsible for handling of error states that can
 
 Don't `die()` or `exit()` in Controllers - you should `return` instead (unless you're debugging or exploring)
 
-
-# Duoug
-* Uses aura
-* What is mvc?
-* Glossary for each pice -module controller mapper model
