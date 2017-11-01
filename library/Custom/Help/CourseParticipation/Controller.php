@@ -60,6 +60,12 @@ class Controller extends Base
     private $passwordMailService;
 
     /**
+     * @var Handler
+     */
+    private $handler;
+
+
+    /**
      * @param UserAccessMapper          $userAccessMapper
      * @param SiteAccess\Mapper         $tokenMapper
      * @param Folder\Mapper             $folderMapper
@@ -77,6 +83,14 @@ class Controller extends Base
         $this->folderMapper     = $folderMapper;
         $this->codeMapper       = $folderMapper->getJoinMapper('codes');
         $this->passwordMailService = $mailService;
+
+        // TODO rejig for DI
+        $this->handler = new Handler(
+            $this->userAccessMapper,
+            $this->tokenMapper,
+            $this->folderMapper,
+            $this->passwordMailService
+        );
     }
 
 
@@ -200,16 +214,9 @@ class Controller extends Base
             return;
         }
 
-        $h = new Handler(
-            $this->userAccessMapper,
-            $this->tokenMapper,
-            $this->folderMapper,
-            $this->passwordMailService
-        );
+        $registeredUsers = $this->handler->getUsersBySchool($schoolCode);
 
-        $registeredUsers = $h->getUsersBySchool($schoolCode);
-
-        $enrolments = $h->getFolderAccessBySchool($schoolCode);
+        $enrolments = $this->handler->getFolderAccessBySchool($schoolCode);
 
         $rs->content->set($this->buildUnthemedHtmlOutput('@helpCourseParticipation/apitest-usertable.twig', [
             'courses' => $enrolments,
@@ -238,12 +245,7 @@ class Controller extends Base
         try {
             $rs->content->set(
                 $this->buildJsonOutput(
-                    (new Handler(
-                        $this->userAccessMapper,
-                        $this->tokenMapper,
-                        $this->folderMapper,
-                        $this->passwordMailService
-                    ))->getFolderAccessBySchool($schoolCode)
+                    $this->handler->getFolderAccessBySchool($schoolCode)
                 )
             );
         } catch (Mapper\Exception $e) {
@@ -357,12 +359,7 @@ class Controller extends Base
 
         $rs->content->set(
             $this->buildJsonOutput(
-                (new Handler(
-                    $this->userAccessMapper,
-                    $this->tokenMapper,
-                    $this->folderMapper,
-                    $this->passwordMailService
-                ))->getUsersBySchool($schoolCode)
+                $this->handler->getUsersBySchool($schoolCode)
             )
         );
     }
