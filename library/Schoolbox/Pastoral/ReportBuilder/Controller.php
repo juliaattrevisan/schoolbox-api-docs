@@ -267,7 +267,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set(
             [
-                'template' => '@pastoralReportBuilder/reportTags.twig',
+                'template' => '@pastoralReportBuilder/report_tags.twig',
                 'data'     => [
                     'tag'     => $tag,
                     'results' => $records,
@@ -307,7 +307,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set(
             [
-                'template' => '@pastoralReportBuilder/reportResults.twig',
+                'template' => '@pastoralReportBuilder/report_results.twig',
                 'data'     => [
                     'results' => $records,
                     'report'  => $report,

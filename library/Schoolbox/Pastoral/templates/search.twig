@@ -13,7 +13,7 @@
             <h1>Search {{ locale.pastoral.proper }} Records</h1>
             <h2 class="subheader">Search Results</h2>
 
-            {% include '@pastoral/fragments/search.twig' with {'search': search} %}
+            {% include '@pastoral/search_field.twig' with {'search': search} %}
 
             {% if search | length >= minimumSearchLength %}
 

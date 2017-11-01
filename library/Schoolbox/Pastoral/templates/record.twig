@@ -1,8 +1,14 @@
 {% import '@pastoral/macros/profile.twig' as profile %}
 
+{% if user.role.isStaff %}
+    {% set routeIndex = routeLookup('pastoral.getIndex') %}
+{% else %}
+    {% set routeIndex = '#' %}
+{% endif %}
+
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
-[locale.pastoralCare.proper, routeLookup('pastoral.getIndex')],
+[locale.pastoralCare.proper, routeIndex],
 [record.student.fullName, routeLookup('pastoral.getStudent', {studentId: record.student.id})],
 [record.heading]
 ) }}

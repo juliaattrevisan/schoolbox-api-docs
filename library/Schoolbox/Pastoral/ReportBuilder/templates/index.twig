@@ -89,10 +89,10 @@
             {% if found == 1 %}
                 </ul>
                 </section>
-                {% include '@pastoralReportBuilder/fragments/reportEmpty.twig' with {hidden: 1} %}
+                {% include '@pastoralReportBuilder/report_empty.twig' with {hidden: 1} %}
 
             {% else %}
-                {% include '@pastoralReportBuilder/fragments/reportEmpty.twig' %}
+                {% include '@pastoralReportBuilder/report_empty.twig' %}
             {% endif %}
 
             {% set found = 0 %}
@@ -146,7 +146,7 @@
 
         {% else %}
 
-            {% include '@pastoralReportBuilder/fragments/reportEmpty.twig' %}
+            {% include '@pastoralReportBuilder/report_empty.twig' %}
 
         {% endif %}
     </div>

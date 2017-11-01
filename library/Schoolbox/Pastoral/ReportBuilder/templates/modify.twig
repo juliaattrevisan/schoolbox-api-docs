@@ -194,7 +194,7 @@
                             <input id="dashboard" name="dashboard" value="1" type="checkbox"
                                    {% if report.dashboard %}checked{% endif %}>
                             <label for="dashboard">
-                                Show this report on my pastoral dashboard
+                                Show this report on my {{ locale.pastoral }} dashboard
                             </label>
                         </div>
                     </div>
@@ -278,15 +278,13 @@
                 </div>
             </section>
 
-            <h2 class="subheader">Year Levels</h2>
-            <p class="meta">Select the year levels you want included in the report</p>
-
             {# Pastoral moderators get an additional option to only show records in which they are involved #}
 
             {% if moderator %}
+                <h2 class="subheader">{{ locale.pastoral.proper }} Moderator Visiblity</h2>
                 <section>
                     <div class="small-12 columns content">
-                        <fieldset class="checklist">
+                        <div class="checklist">
                             <label>
                                 {{ locale.pastoral.proper }} Moderator Filter
                             </label>
@@ -301,12 +299,15 @@
                             <label for="involved">
                                 Only show records in which you are the author or an audience member
                             </label>
-                        </fieldset>
+                        </div>
                     </div>
                 </section>
             {% else %}
                 <input type="hidden" id="involved-checkbox" value="1">
             {% endif %}
+
+            <h2 class="subheader">Year Levels</h2>
+            <p class="meta">Select the year levels you want included in the report</p>
 
             <section>
                 <div class="small-12 columns content">

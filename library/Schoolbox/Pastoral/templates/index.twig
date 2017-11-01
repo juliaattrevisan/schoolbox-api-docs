@@ -1,5 +1,3 @@
-{% import '@pastoral/macros/profile.twig' as profile %}
-
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
 [ locale.pastoralCare.proper ]
@@ -12,13 +10,12 @@
         </div>
     </div>
     <nav>
-        <a href="{{ routeLookup('pastoralReportBuilder.getIndex') }}" class="icon-result"
-           title="{{ locale.pastoral.proper }} Report Builder"></a>
-
-        {# Pastoral moderators can manage pastoral groups #}
-
         {% set routeGetGroups = routeLookupIfAuthorized('pastoralManagement.getGroups') %}
+        {% set routeReportBuilder = routeLookupIfAuthorized('pastoralReportBuilder.getIndex') %}
 
+        {% if routeReportBuilder %}
+            <a href="{{ routeReportBuilder }}" class="icon-result" title="{{ locale.pastoral.proper }} Report Builder"></a>
+        {% endif %}
         {% if routeGetGroups %}
             <a href="{{ routeGetGroups }}" class="icon-group" title="Manage {{ locale.pastoral.proper }} Groups"></a>
         {% endif %}
@@ -27,182 +24,19 @@
 
 {# If the user has never viewed a pastoral record, show a welcome message #}
 
-{% if recentStudents is empty %}
+{% include '@pastoral/index_welcome.twig' %}
+{% include '@pastoral/search_field.twig' %}
 
+{% if recentDashboard is not empty or recentStudents is not empty or groups is not empty or reportsDashboard is not empty %}
     <div class="row">
-        <div class="small-12 island">
-            <section class="content">
-                <h2>
-                    Welcome to the {{ locale.pastoralCare.proper }} Dashboard!
-                </h2>
-                <i class="icon-pastoral size-64 left"></i>
-                <p>
-                    It looks like this is the first time you have used {{ locale.pastoralCare }}. Begin by searching for
-                    a students
-                    name, or the details of a {{ locale.pastoral }} record in the search box below. Once you start using
-                    the system this page will
-                    display your recently viewed students and any items which have been flagged by yourself and other
-                    staff as important.
-                </p>
-            </section>
-        </div>
-    </div>
-
-{% endif %}
-
-{% include '@pastoral/fragments/search.twig' %}
-
-{% set count = 0 %}
-
-{% if recentDashboard is not empty %}
-    {% set count = count + 1 %}
-{% endif %}
-
-{% if recentStudents is not empty %}
-    {% set count = count + 1 %}
-{% endif %}
-
-{% if groups is not empty or reportsDashboard is not empty %}
-    {% set count = count + 1 %}
-{% endif %}
-
-{% if count > 0 %}
-    <div class="row">
-        {# Pastoral groups memberships and reports dashboard items
-         # get grouped up for space utilisation
-         #}
-        {% if groups|length or recentStudents|length %}
-            <div class="small-12 medium-6 island">
-                {# Display high priority records #}
-                {% if recentDashboard is not empty %}
-                    <h2 class="subheader">Important Records</h2>
-                    <section>
-                        <ul class="information-list">
-                            {% for record in recentDashboard %}
-                                <li>
-                                    <div class="card small-12">
-                                        <a href='{{ routeLookup('pastoral.getStudentRecord', {studentId: record.student.id, recordId: record.id}) }}'
-                                           title="View Profile">
-                                            {{ profile.imageSquare64(record.student) }}
-                                            <h3>{{ record.heading }}</h3>
-                                        </a>
-                                        <p class="meta">{{ record.student.fullName }}</p>
-                                    </div>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </section>
-                {% endif %}
-
-                {# Display recently searched student records #}
-                {% if recentStudents is not empty %}
-                    <h2 class="subheader">Recently Viewed Students</h2>
-                    <section>
-                        <ul class="information-list">
-                            {% for student in recentStudents %}
-                                <li>
-                                    <div class="card small-12">
-                                        <a href='{{ routeLookup('pastoral.getStudent', {studentId: student.id}) }}'
-                                           title="View Profile">
-                                            {{ profile.imageSquare64(student) }}
-                                            <h3>{{ student.fullName }}</h3>
-                                        </a>
-                                        <p class="meta">{{ student.role.name }}</p>
-                                    </div>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </section>
-                {% endif %}
-            </div>
-        {% endif %}
+        {% include '@pastoral/index_section_records.twig' %}
 
         <div class="small-12 medium-6 island">
-            {% if reportsDashboard|length %}
-                <h2 class="subheader">Quick Report Links</h2>
-                <section>
-                    <ul class="information-list">
-                        {% for report in reportsDashboard %}
-                            <li>
-                                <div class="card small-12">
-                                    <a href="{{ profile.link(user) }}">
-                                        {{ profile.imageSquare64(user) }}
-                                    </a>
-                                    <a href='{{ routeLookup('pastoralReportBuilder.getReportResults', {reportId: report.id}) }}'>
-                                        <h3>{{ report.name }}</h3>
-                                    </a>
-                                    <p class="meta">
-                                        <i title="{{ locale.pastoralCare.proper }} Groups" class="icon-group"></i>
-                                        {% if report.groups | length %}
-                                            {% for group in report.groups %}
-                                                {{ group.name }}{% if not loop.last %},{% endif %}
-                                            {% endfor %}
-                                        {% else %}
-                                            This report has not been shared with any groups
-                                        {% endif %}
-                                    </p>
-                                </div>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                    <div class="component-action">
-                        <section>
-                            <a href="{{ routeLookup('pastoralReportBuilder.getIndex') }}" class="button"
-                               title="View All Reports">View All</a>
-                        </section>
-                    </div>
-                </section>
-            {% endif %}
-
-            {% if groups|length %}
-                <h2 class="subheader">Group Memberships</h2>
-                <section>
-                    <ul class="information-list">
-                        {% for membership in groups %}
-                            <li>
-                                <div class="card small-12">
-                                    <a href="{{ profile.link(membership.group.user) }}">
-                                        {{ profile.imageSquare64(membership.group.user) }}
-                                    </a>
-                                    {% if membership.group.user.id == user.id %}
-
-                                    {% set routeGetGroupsModify = routeLookupIfAuthorized('pastoralManagement.getGroupsModify', {groupId: membership.group.id}) %}
-                                    {% if routeGetGroupsModify %}
-                                    <a href="{{ routeGetGroupsModify }}"
-                                       title="Modify {{ locale.pastoral.proper }} Group">
-                                        {% endif %}
-                                        {% endif %}
-                                        <h3>{{ membership.group.name }}</h3>
-                                        {% if membership.group.user.id == user.id %}
-                                        {% if routeGetGroupsModify %}
-                                    </a>
-                                    {% endif %}
-                                    {% endif %}
-                                    <p class="meta">Group managed by
-                                        {% if membership.group.user.id == user.id %}
-                                            you
-                                        {% else %}
-                                            <a href="{{ profile.link(membership.group.user) }}">
-                                                {{ membership.group.user.fullName }}
-                                            </a>
-                                        {% endif %}
-                                    </p>
-                                </div>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                    {% set routeGetGroups = routeLookupIfAuthorized('pastoralManagement.getGroups') %}
-                    {% if routeGetGroups is not empty %}
-                    <div class="component-action">
-                        <section>
-                            <a href="{{ routeGetGroups }}" class="button"
-                               title="Groups Management">Groups Management</a>
-                        </section>
-                    </div>
-                    {% endif %}
-                </section>
-            {% endif %}
+            {% include '@pastoral/index_section_reports.twig' %}
+            {% include '@pastoral/index_section_groups.twig' %}
         </div>
-    </div>
 
+    </div>
 {% endif %}
+
+
