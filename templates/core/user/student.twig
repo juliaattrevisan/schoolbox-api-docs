@@ -394,36 +394,40 @@
                                                     </div>
 
                                                     <!-- Collapsable content -->
-                                                    <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-contact-{{ loop.index }}">
+                                                    {% if contact.StudentContactMobilePhone or contact.StudentContactOccupPhone or contact.StudentContactDefaultEmail %}
+                                                        <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-contact-{{ loop.index }}">
+                                                            <div class="list-item">
+                                                                <div class="small-12">
+                                                                    {% if contact.StudentContactMobilePhone %}
+                                                                        <div class="row">
+                                                                            <div class="column small-12 medium-5"><strong>Mobile Phone: </strong></div>
+                                                                            <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactMobilePhone }}" title="Call {{ contact.StudentContactMobilePhone }}">{{ contact.StudentContactMobilePhone }}</a></div>
+                                                                        </div>
+                                                                    {% endif %}
 
-                                                        {% if contact.StudentContactMobilePhone or contact.StudentContactOccupPhone or contact.StudentContactDefaultEmail %}
-                                                        <div class="list-item">
-                                                            <div class="small-12">
-                                                                {% if contact.StudentContactMobilePhone %}
-                                                                    <div class="row">
-                                                                        <div class="column small-12 medium-5"><strong>Mobile Phone: </strong></div>
-                                                                        <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactMobilePhone }}" title="Call {{ contact.StudentContactMobilePhone }}">{{ contact.StudentContactMobilePhone }}</a></div>
-                                                                    </div>
-                                                                {% endif %}
+                                                                    {% if contact.StudentContactOccupPhone %}
+                                                                        <div class="row">
+                                                                            <div class="column small-12 medium-5"><strong>Work Phone: </strong></div>
+                                                                            <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactOccupPhone }}" title="Call {{ contact.StudentContactOccupPhone }}">{{ contact.StudentContactOccupPhone }}</a></div>
+                                                                        </div>
+                                                                    {% endif %}
 
-                                                                {% if contact.StudentContactOccupPhone %}
-                                                                    <div class="row">
-                                                                        <div class="column small-12 medium-5"><strong>Work Phone: </strong></div>
-                                                                        <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactOccupPhone }}" title="Call {{ contact.StudentContactOccupPhone }}">{{ contact.StudentContactOccupPhone }}</a></div>
-                                                                    </div>
-                                                                {% endif %}
-
-                                                                {% if contact.StudentContactDefaultEmail %}
-                                                                    <div class="row">
-                                                                        <div class="column small-12 medium-5"><strong>Email: </strong></div>
-                                                                        <div class="column small-12 medium-7"><a href="{{ session.mailhandle }}{{ contact.StudentContactDefaultEmail }}">{{ contact.StudentContactDefaultEmail }}</a></div>
-                                                                    </div>
-                                                                {% endif %}
+                                                                    {% if contact.StudentContactDefaultEmail %}
+                                                                        <div class="row">
+                                                                            <div class="column small-12 medium-5"><strong>Email: </strong></div>
+                                                                            <div class="column small-12 medium-7"><a href="{{ session.mailhandle }}{{ contact.StudentContactDefaultEmail }}">{{ contact.StudentContactDefaultEmail }}</a></div>
+                                                                        </div>
+                                                                    {% endif %}
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                        {% endif %}
-                                                    </div>
-
+                                                    {% else %}
+                                                        <div class="hide" data-collapse-state="collapsed" data-collapsable="collap-contact-{{ loop.index }}">
+                                                            <div class="empty-state small-12">
+                                                                <p>No contact details found.</p>
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
                                                 </li>
 
                                                 {% if (contact.StudentContactSpouseTitle or contact.StudentContactSpousePreferred) and contact.spouse %}
