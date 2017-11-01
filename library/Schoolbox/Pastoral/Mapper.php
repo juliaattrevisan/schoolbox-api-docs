@@ -18,7 +18,6 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
-use Schoolbox\Pastoral\Access\Model as PastoralAccess;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
@@ -457,20 +456,16 @@ class Mapper extends BaseMapper
      */
     public function findByTag($tag)
     {
-        $tagId = $this->getDatabase()->quote($tagId = $tag->getId());
-
-        $sql = $this->getSelectString();
-
-        $sql .= "
+        $sql = $this->getSelectString() . "
         
             JOIN `pastoral_tags` ON 
                 `pastoral_tags`.`pastoral_id` = `pastoral`.`id` AND 
-                `pastoral_tags`.`tag_id` = {$tagId} AND
+                `pastoral_tags`.`tag_id` = :tagId AND
                 `pastoral_tags`.`deleted_at` IS NULL
         ";
 
         $statement = $this->database->prepare($sql);
-        $statement->execute();
+        $statement->execute(['tagId' => $tag->getId()]);
 
         return $this->hydrateSelect($statement);
     }
@@ -550,8 +545,10 @@ class Mapper extends BaseMapper
         $auditRecord->setSearch($search);
 
         $words = [];
+
         /** @var IQuoter $database */
         $database = $this->getDatabase();
+
         foreach (explode(' ', $search) as $word) {
             if (strlen($word) >= Results::MIN_SEARCH_LENGTH) {
                 $words[] = "%{$database->escapeForLike($word)}%";

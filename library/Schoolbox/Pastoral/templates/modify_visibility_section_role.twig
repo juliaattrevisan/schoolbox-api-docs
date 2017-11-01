@@ -1,0 +1,61 @@
+{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+{# User Roles Access #}
+{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+
+<table class="no-margin">
+    <thead>
+        <tr>
+            <th class="small-5">User Role Visibility</th>
+            <th class="small-2">No Visibility</th>
+            <th class="small-2">General</th>
+            <th class="small-2">{{ locale.pastoralPrivate.proper }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for role in roles if not role.isStudent and not role.isGuest %}
+            {% if allowParents == 1 or not role.isParent %}
+
+                {# Work out which radio should be checked for each row #}
+
+                {% set checkedNone = '' %}
+                {% set checkedPublic = '' %}
+                {% set checkedPrivate = '' %}
+
+                {% if record.id != '' %}
+                    {% for access in record.access if access.role.id != '' %}
+                        {% if access.role.id == role.id %}
+                            {% if access.private == 1 %}
+                                {% set checkedPrivate = 'checked' %}
+                            {% else %}
+                                {% set checkedPublic = 'checked' %}
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                {% if checkedPublic == '' and checkedPrivate == '' %}
+                    {% set checkedNone = 'checked' %}
+                {% endif %}
+
+                <tr>
+                    <td>
+                        {{ role.name }}
+                        {% if role.isParent %}Of Student{% endif %}
+                    </td>
+                    <td>
+                        <input type="radio" name="role[{{ role.id }}]" id="roleNone{{ role.id }}" value="0" {{ checkedNone }}>
+                        <label class="radio-label" for="roleNone{{ role.id }}"></label>
+                    </td>
+                    <td>
+                        <input type="radio" name="role[{{ role.id }}]" id="rolePublic{{ role.id }}" value="1" {{ checkedPublic }}>
+                        <label class="radio-label" for="rolePublic{{ role.id }}"></label>
+                    </td>
+                    <td>
+                        <input type="radio" name="role[{{ role.id }}]" id="rolePrivate{{ role.id }}" value="2" {{ checkedPrivate }}>
+                        <label class="radio-label" for="rolePrivate{{ role.id }}"></label>
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
