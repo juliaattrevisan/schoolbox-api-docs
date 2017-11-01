@@ -400,6 +400,8 @@ class Controller extends Base
 
         $failedUsers = [];
 
+        $byUsername = $rq->query->getBool('byUsername', false);
+
         foreach ($post['user'] as $userData) {
             if (!$this->userPayloadIsValid($userData)) {
                 $failedUsers[] = [
@@ -408,11 +410,16 @@ class Controller extends Base
                 continue;
             }
 
-            // user uniqueness is looked up by external ID
             $externalId = "{$schoolCode}.{$userData['id']}";
 
             try {
-                $user = $this->getUserMapper()->findOneByColumn('synergy_id', $externalId);
+                if ($byUsername) {
+                    // if explicitly stated by the request, look up user by username
+                    $user = $this->getUserMapper()->findOneByColumn('username', $userData['email']);
+                } else {
+                    // consider user uniqueness as looked up by external ID
+                    $user = $this->getUserMapper()->findOneByColumn('synergy_id', $externalId);
+                }
 
                 // cache the old value
                 $oldUsername = $user->getUsername();
