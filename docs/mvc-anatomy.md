@@ -140,7 +140,22 @@ Route Preloads, or simply Preloads, are pre-computed (hydrated) objects that are
 Computing the preloads in Module allows us to exit earlier without incurring the cost of starting up a Controller. This avoids a scenario where Controllers (expensively) start up, only to find out it didn't have everything it needed, and then consequently error out. A lot of logic is involved in checking all these pieces and it clutters up what the Controller method is really designed to do - that is, to operate on data, not check whether it should have started.
 
 > Module provides objects for Controllers which then perform operations or analyses on them. When all the necessary pieces can't be provided, either through missing data, insufficient permissions, etc. then exit early. Controllers should be able to assume that they have the minimum amount of data to start
- 
+
+## 1.4 Error Handling
+Errors are expressed by throwing an Exception that is caught and rendered elsewhere. Error messages correlate to a particular const in the `ErrorMapper` class; to avoid hardcoding integers everywhere you can use the human-readable const instead.
+
+```php
+use Schoolbox\Error\Mapper as ErrorMapper;
+
+if ($errorCondition) {
+    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+}
+```
+
+> To prevent unnecessary logic from executing, we also prefer to error out as early as possible.
+
+Throwing exceptions in this manner causes a grey screen to emerge with some reasonably end-user comprehensible error message, rather than an obnoxious stack trace. If you're in a Mage form, the message appears (usually) in a little red box near the submit button.
+
 # 2 Responsibilities of Controller 
 The bulk of business logic occurs in the Controller methods. This accepts the items provided by Module (if applicable) and performs operations or analyses on them, preparing the output for twig to render. 
 
@@ -152,9 +167,9 @@ Controller methods aren't easily reusable, except in subclasses; even then, havi
 
 You should be able to read method names and get a general idea of what is going on without having to interpret every line of code to derive possible meaning. Don't be a human compiler! 
 
-> Worth noting is that one of the primary reasons to look at a Controller method is because we're pursuing a specific behaviour to change. The easier it is to find this, the better our lives become.
+> One of the primary reasons to look at a Controller method is because we're pursuing a specific behaviour to change. The easier it is to find this, the better our lives become.
 
-Controllers are also primarily responsible for handling of error states that can't be foreseen or computed by Module. There are a couple of ways to do it in the current codebase, but the preferred approach is to throw an exception.
+Controllers are also primarily responsible for handling of error states that can't be foreseen or computed by Module. There are a couple of ways to do it in the current codebase, but the preferred approach is to throw an exception. See *1.4 Error Handling* for implementation example.
 
-ErrorMapper thing
+Don't `die()` or `exit()` in Controllers - you should `return` instead (unless you're debugging or exploring)
 
