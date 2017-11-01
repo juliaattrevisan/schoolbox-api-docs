@@ -8,11 +8,13 @@
 
 namespace Custom\Help\CourseParticipation;
 
+use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\Permission\SiteAccess;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -129,10 +131,40 @@ class Handler
 
 
     /**
+     * Compute an access token (digest auth) for the given school code and timestamp.
+     *
+     * @param string               $schoolCode
+     * @param Alaress_Date_Format $now
+     * @throws Mapper\Exception
+     * @return string
+     */
+    public function computeAuthDigest($schoolCode, Alaress_Date_Format $now)
+    {
+        $privateKey = $this->tokenMapper->findById($schoolCode)->getAccessToken();
+
+        return $this->computeAccessToken($now, $schoolCode, $privateKey);
+    }
+
+
+    /**
+     * Mash ingredients thoroughly in a small bowl, seasoning with a little salt to taste.
+     *
+     * @param Alaress_Date_Format $timestamp
+     * @param string              $schoolCode
+     * @param string              $privateKey
+     * @return string
+     */
+    public function computeAccessToken(Alaress_Date_Format $timestamp, $schoolCode, $privateKey)
+    {
+        return sha1(sprintf(':%s-%s-%s:', $timestamp, $schoolCode, $privateKey));
+    }
+
+
+    /**
      * @param string $schoolCode
      * @throws Mapper\Exception
      * @throws Mapper\Exception\Deleted
-     * @return Collection|Folder\Model[]
+     * @return Collection|IFolder[]
      */
     private function getCoursesBySchool($schoolCode)
     {

@@ -116,7 +116,7 @@ class Controller extends Base
 
         foreach ($codes as $code) {
             $school = $code->getSiteSchoolCode();
-            $data['hashes'][$school] = $this->computeAccessToken($now, $school, $code->getAccessToken());
+            $data['hashes'][$school] = $this->handler->computeAccessToken($now, $school, $code->getAccessToken());
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@helpCourseParticipation/apitest.twig', $data));
@@ -136,15 +136,14 @@ class Controller extends Base
         $now = Alaress_Date_Format::now();
 
         try {
-            $code = $this->tokenMapper->findById($schoolCode);
-            $token = $this->computeAccessToken($now, $schoolCode, $code->getAccessToken());
+            $token = $this->handler->computeAuthDigest($schoolCode, $now);
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'ts'    => $now->getUnixTimeStamp(),
                 'token' => $token
             ]));
 
-        } catch (\Schoolbox\Mapper\Exception $e) {
+        } catch (\Schoolbox\Mapper\Exception|Mapper\DefinitionException $e) {
             // bad request
             $this->sendGenericStatus(400);
         }
@@ -160,8 +159,6 @@ class Controller extends Base
 
         $school = $post['schoolCode'];
 
-        $code = $this->tokenMapper->findById($school);
-
         $now = Alaress_Date_Format::now();
 
         $route = 'helpCourseParticipation.postUserRegistrations';
@@ -175,7 +172,7 @@ class Controller extends Base
             $c->post($uri, [
                 'query' => [
                     'ts'    => $now->getUnixTimeStamp(),
-                    'token' => $this->computeAccessToken($now, $school, $code->getAccessToken())
+                    'token' => $this->handler->computeAuthDigest($school, $now)
                 ],
                 'form_params' => $post
             ]);
@@ -581,29 +578,21 @@ class Controller extends Base
             return 404;
         }
 
-        $expectedToken = $this->computeAccessToken(
-            $requestTimestamp,
-            $schoolCode,
-            $privateKey
-        );
+        try {
+            $expectedToken = $this->handler->computeAccessToken(
+                $requestTimestamp,
+                $schoolCode,
+                $privateKey
+            );
+        } catch (Mapper\DefinitionException $e) {
+            return 500;
+        }
 
         if ($expectedToken !== $authDigest) {
             return 403;
         }
 
         return 200;
-    }
-
-
-    /**
-     * @param string $timestamp
-     * @param string $schoolCode
-     * @param string $accessToken
-     * @return string
-     */
-    private function computeAccessToken($timestamp, $schoolCode, $accessToken)
-    {
-        return sha1(sprintf(':%s-%s-%s:', $timestamp, $schoolCode, $accessToken));
     }
 
 
