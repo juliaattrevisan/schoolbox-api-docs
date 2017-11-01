@@ -202,6 +202,12 @@ class Controller extends Assessment\Controller
                  */
 
             }
+            elseif ($previewFragment['type'] == 'inline') {
+
+                /* Embedded content like youtube videos etc
+                 */
+                $previewFragment['fragment'] = $this->buildUnthemedHtmlOutput($previewFragment['twig']['template'], $previewFragment['twig']['data'])->getAsString();
+            }
             elseif ($foundHash = preg_match('/hash=([a-zA-Z0-9]+)/', $task->getUrl(), $matches)) {
 
                 /* Other regular files
@@ -216,12 +222,7 @@ class Controller extends Assessment\Controller
                     unset($previewFragment);
                 }
             }
-            elseif ($previewFragment['type'] == 'inline') {
 
-                /* Embedded content like youtube videos etc
-                 */
-                $previewFragment['fragment'] = $this->buildUnthemedHtmlOutput($previewFragment['twig']['template'], $previewFragment['twig']['data'])->getAsString();
-            }
         }
 
         if ($this->getRequest()->query->get(Redirect::RETURN_URL)) {
