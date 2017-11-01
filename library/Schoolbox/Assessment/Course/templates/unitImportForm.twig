@@ -24,7 +24,7 @@
                             'Doing so will delete all associated activities and marks from the markbook.',
                     confirmEvent: function() {
                         // Uncheck
-                        $(e.target).prop("checked", false);
+                        $(e.target).prop("checked", false).trigger('change');
                     }
                 });
             }
