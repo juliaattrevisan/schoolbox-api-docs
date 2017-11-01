@@ -396,7 +396,7 @@
                                                     <!-- Collapsable content -->
                                                     <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-contact-{{ loop.index }}">
 
-                                                        {% if contact.StudentContactPhoneActual or contact.StudentContactMobilePhone or contact.StudentContactOccupPhone or contact.StudentContactDefaultEmail %}
+                                                        {% if contact.StudentContactMobilePhone or contact.StudentContactOccupPhone or contact.StudentContactDefaultEmail %}
                                                         <div class="list-item">
                                                             <div class="small-12">
                                                                 {% if contact.StudentContactMobilePhone %}
@@ -442,7 +442,7 @@
                                                             </div>
                                                         </div>
 
-                                                        {% if contact.StudentContactSpousePhoneActual or contact.StudentContactSpouseMobilePhone or contact.StudentContactSpouseOccupPhone or contact.StudentContactSpouseDefaultEmail %}
+                                                        {% if contact.StudentContactSpouseMobilePhone or contact.StudentContactSpouseOccupPhone or contact.StudentContactSpouseDefaultEmail %}
                                                             <!-- Collapsable content -->
                                                             <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-spouse-{{ loop.index }}">
                                                                 <div class="list-item">
@@ -497,7 +497,9 @@
                                                     </div>
                                                 </div>
                                                 <nav>
+                                                    {% if contact.StudentContactPhoneActual %}
                                                     <a class="icon-mobile" href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}"></a>
+                                                    {% endif %}
                                                 </nav>
                                             </li>
 
