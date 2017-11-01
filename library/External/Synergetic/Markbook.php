@@ -20,9 +20,9 @@ use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
-use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\UserMapper;
 
 class External_Synergetic_Markbook implements External_MarkbookInterface
@@ -42,6 +42,12 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
     /** @const int NO_MARK_GIVEN Magic number to represent 'No Mark' when nulls not permitted */
     const NO_MARK_GIVEN = -1;
+
+    /**
+     * @const Character encoding for fields within this database.
+     *        Required when converting field values from Schoolbox to Synergetic.
+     */
+    const CHARACTER_ENCODING = 'ASCII';
 
     /**
      * Constructor
@@ -101,7 +107,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     private function getMarkbookIdentifier(Activity $assessment)
     {
-        return ($assessment->isAssessment() ? self::ASSESSMENT_PREFIX : self::SUBMISSION_PREFIX) . $assessment->getId();
+        // This column is limited to 10 characters
+        $id = ($assessment->isAssessment() ? self::ASSESSMENT_PREFIX : self::SUBMISSION_PREFIX) . $assessment->getId();
+        return $this->truncateForDatabase($id, 10);
     }
 
     /**
@@ -157,14 +165,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         // Hydrate result type
 
-        if (!empty($assessment->getType())) {
-            $workType = WorkTypeMapper::getInstance()->findById($assessment->getType());
-            $resultType = $workType->getExternalResultType();
-        }
-
-        if (empty($resultType)) {
-            $resultType = 'OGRaw';
-        }
+        $resultType = $this->getResultType($assessment);
 
         /** @var FolderCode $classCode */
         foreach ($folder->getCodes() as $classCode) {
@@ -321,11 +322,15 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             $weight = $assessment->getAssessment()->getWeight();
         }
 
+        // DB-level limits:
+        // Heading: 255 chars
+        // HdgAbbrev1, HdgAbbrev2: 10 chars
+        // WeightingFactor: 0-9999
         return [
-            'Heading' => $assessment->getName(),
-            'HdgAbbrev1' => mb_substr($assessment->getName(), 0, 10, 'UTF-8'),
-            'HdgAbbrev2' => $this->getMarkbookIdentifier($assessment),
-            'WeightingFactor' => $weight,
+            'Heading'         => $this->truncateForDatabase($assessment->getName(), 255),
+            'HdgAbbrev1'      => $this->truncateForDatabase($assessment->getName(), 10),
+            'HdgAbbrev2'      => $this->getMarkbookIdentifier($assessment),
+            'WeightingFactor' => max(0, min($weight, 9999)),
         ];
     }
 
@@ -682,5 +687,55 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         ];
         $statement = $this->getConnector()->prepareQuery($sql, $bindings);
         return $statement->execute();
+    }
+
+    /**
+     * Determine what result type this assessment should have.
+     *
+     * @param Activity $assessment
+     * @return string
+     */
+    private function getResultType(Activity $assessment)
+    {
+        $defaultType = 'OGRaw';
+
+        // Does this assessment have a work type with an external result type?
+        if (!empty($assessment->getType())) {
+            $workType   = WorkTypeMapper::getInstance()->findById($assessment->getType());
+            $resultType = $workType->getExternalResultType();
+        }
+
+        // We know OGRaw is in the DB, and if it's not there's bigger problems
+        if (empty($resultType)) {
+            return $defaultType;
+        }
+
+        // Validate the result type is actually in the DB
+        $sql = "
+            SELECT COUNT(*)
+            FROM   luReportResultType
+            WHERE  Code = :resultType
+        ";
+        $count = $this->getConnector()->executeQuery($sql, ['resultType' => $resultType,])->fetchColumn();
+        if ($count > 0) {
+            return $resultType;
+        }
+        return $defaultType;
+    }
+
+    /**
+     * Performs truncation required for database inserts.
+     *
+     * No encoding conversion is required: the database connection is able to
+     * save characters if they're part of whatever the column's code page is,
+     * otherwise it just saves a ? (which unrecognised chars convert to anyway)
+     *
+     * @param string $string
+     * @param int    $length
+     * @return string
+     */
+    private function truncateForDatabase($string, $length)
+    {
+        return mb_substr($string, 0, $length, self::CHARACTER_ENCODING);
     }
 }
