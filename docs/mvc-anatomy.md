@@ -3,6 +3,16 @@ If you followed the Quickstart guide, you'll have seen how to make an Aura modul
 
 Nw we'll examine these pieces of an Aura module - the Module, Controller, Mapper, Model (and other classes) in greater detail. If none of these words hold meaning, go back to the Quickstart and get yourself back up to speed.
 
+You can find a run-down on the fundamental Model-View-Controller concept here: https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller
+
+# Overview of Terms
+* *Module.* A custom concept that we made. It encapsulates Routing, Permissions and Preloads. Respectively: determines which Controller method should execute based on the url provided, whether the Controller method has the permissions to execute, and what objects it needs to execute.
+* *Controller.* Deals with business logic, calculating the output data for the View to render (in this case, twig).  Utilises Mappers and Models.
+* *Supporting Classes.* Additional high-cohesion classes that contains lower-level details, hiding this from the main Controller methods.
+* *Mapper.* A database abstraction. Gets data out of the database into objects and vice versa. Typically contains other database queries that are commonly used.
+* *Model.* A representation of a concept or idea. They don't do persistent work in the database, but you can ask them about their properties and relations and other relevant calculations.
+* *View.* Renders the output of the Controller method so the user can see it in their browser.
+
 # A Quick Recap
 This is the basic flow of operations from the moment you access a url to seeing output on screen.
 
@@ -177,3 +187,8 @@ Controllers are also primarily responsible for handling of error states that can
 
 Don't `die()` or `exit()` in Controllers - you should `return` instead (unless you're debugging or exploring)
 
+
+# Duoug
+* Uses aura
+* What is mvc?
+* Glossary for each pice -module controller mapper model
