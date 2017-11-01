@@ -48,12 +48,9 @@
                                         {% if revision.bodyPrivate is not empty %}
                                             <p class="meta gradient-0">{{ locale.pastoralPrivate.proper }} Content</p>
                                             <p>{{ revision.bodyPrivate | purify }}</p>
-                                            <p class="meta">General Content</p>
-                                            <p>{{ revision.bodyPublic | purify }}</p>
-                                        {% else %}
-                                            <p class="meta">General Content</p>
-                                            <p>{{ revision.bodyPublic | purify }}</p>
                                         {% endif %}
+                                        <p class="meta">General Content</p>
+                                        <p>{{ revision.bodyPublic | purify }}</p>
                                     </div>
                                 </li>
                             {% endif %}
