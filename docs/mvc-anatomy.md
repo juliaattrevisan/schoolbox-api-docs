@@ -189,8 +189,9 @@ Don't `die()` or `exit()` in Controllers - you should `return` instead (unless y
 # 4 Responsibilities of Mapper
 # 5 Responsibilities of Model
 # 6 Responsibilities of View
+# 7 Executive Summary
 
-# 7 Further Reading
+# 8 Further Reading
 
 * *Aura Routing.* 
 We developed an adaptation of this for Module.php, but this original documentation might help you with capabilities that aren't immediately obvious such as optional args etc.
