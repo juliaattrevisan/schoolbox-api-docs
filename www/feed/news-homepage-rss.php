@@ -84,7 +84,7 @@ if (strlen($userKey)) {
                     'ITEM_DESCRIPTION' => "<![CDATA[" . Scrub::html($imageStr . $currentNews->getBody()) . "]]>",
                     'ITEM_DATE' => Scrub::xml($currentNews->getPostDate()->getUsingFormat(datetime::RFC2822)),
                     'ITEM_LINK' => Scrub::xml(
-                            $page->conType() . $_SERVER['HTTP_HOST'] . '/homepage/news/item/' . $currentNews->getCategory()->getId() . '/' . $currentNews->getId()
+                            $page->conType() . $_SERVER['HTTP_HOST'] . '/homepage/news/' . $currentNews->getCategory()->getId() . '/' . $currentNews->getId()
                         ),
                 )
             );
