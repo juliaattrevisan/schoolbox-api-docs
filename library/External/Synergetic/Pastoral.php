@@ -174,26 +174,13 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     }
 
     /**
-     * Retrieve the next available import ID from the schoolbox database
+     * Create a unique ID for each import. Just using the current timestamp.
      *
      * @return int
      */
     private function getNewImportId()
     {
-        // Get the last import ID from the database, all log entries in the database will be associated with this number
-
-        $importRecord = $this->getPastoralLogMapper()
-            ->findAll([
-                'limit' => 1,
-                'order' => ['import_id' => 'desc'],
-            ])
-            ->first();
-
-        if ($importRecord instanceof PastoralLog) {
-            return $importRecord->getImportId() + 1;
-        }
-
-        return 1;
+        return date("U");
     }
 
     /**
