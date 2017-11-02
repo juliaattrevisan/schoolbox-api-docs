@@ -789,8 +789,8 @@ class Controller extends Base
             $foundRoles = [];
 
             if (is_array($post["role"])) {
-                foreach ($post["role"] as $role_id => $permission) {
-                    if ($permission != PastoralAccessMapper::ACCESS_NONE && !in_array($role_id, $foundRoles)) {
+                foreach ($post["role"] as $role_id => $accessLevel) {
+                    if (!in_array($role_id, $foundRoles)) {
                         $foundRoles[] = $role_id;
 
                         try {
@@ -802,7 +802,7 @@ class Controller extends Base
 
                         $access = $this->pastoralAccessMapper->createModel();
                         $access->setPastoral($record);
-                        $access->setPrivate($permission == PastoralAccessMapper::ACCESS_PRIVATE);
+                        $access->setAccess($accessLevel);
                         $access->setRole($role);
                         $this->pastoralAccessMapper->save($access);
                     }
@@ -814,8 +814,8 @@ class Controller extends Base
             $foundGroups = [];
 
             if (is_array($post["group"])) {
-                foreach ($post["group"] as $group_id => $permission) {
-                    if ($permission != PastoralAccessMapper::ACCESS_NONE && !in_array($group_id, $foundGroups)) {
+                foreach ($post["group"] as $group_id => $accessLevel) {
+                    if (!in_array($group_id, $foundGroups)) {
                         $foundGroups[] = $group_id;
 
                         try {
@@ -827,7 +827,7 @@ class Controller extends Base
 
                         $access = $this->pastoralAccessMapper->createModel();
                         $access->setPastoral($record);
-                        $access->setPrivate($permission == PastoralAccessMapper::ACCESS_PRIVATE);
+                        $access->setAccess($accessLevel);
                         $access->setGroup($group);
                         $this->pastoralAccessMapper->save($access);
                     }
@@ -839,8 +839,8 @@ class Controller extends Base
             $foundUsers = [];
 
             if (is_array($post["user"])) {
-                foreach ($post["user"] as $user_id => $permission) {
-                    if ($permission != PastoralAccessMapper::ACCESS_NONE && !in_array($user_id, $foundUsers)) {
+                foreach ($post["user"] as $user_id => $accessLevel) {
+                    if (!in_array($user_id, $foundUsers)) {
                         $foundUsers[] = $user_id;
 
                         try {
@@ -852,7 +852,7 @@ class Controller extends Base
 
                         $access = $this->pastoralAccessMapper->createModel();
                         $access->setPastoral($record);
-                        $access->setPrivate($permission == PastoralAccessMapper::ACCESS_PRIVATE);
+                        $access->setAccessLevel($accessLevel);
                         $access->setUser($user);
                         $this->pastoralAccessMapper->save($access);
                     }

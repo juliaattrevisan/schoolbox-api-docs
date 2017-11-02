@@ -105,10 +105,8 @@ class Notifier extends AbstractModuleNotifier
 
         $timestamp = md5(date("YmdHis"));
 
-        $private = $pastoral->getPrivate() ? "private " : "";
-
         $builder = new Builder();
-        $builder->setTitle("A {$private}pastoral comment has been {$method}")
+        $builder->setTitle("A pastoral comment has been {$method}")
             ->setIcon("/portrait.php?size=square32&userId={$owner->getExternalId()}")
             ->setHref("/pastoral/student/{$pastoral->getStudent()->getId()}/pastoral/{$pastoral->getId()}?ts={$timestamp}")
             ->setNamespace($this->getSlug())
@@ -136,7 +134,7 @@ class Notifier extends AbstractModuleNotifier
                             if ($user->getRole()->getId() == $role->getId()) {
                                 // Make sure the role can see this comment if it is private
 
-                                if ($pastoralAccess->getPrivate() || !$model->getPrivate()) {
+                                if ($pastoralAccess->getAccess() || !$model->getPrivate()) {
                                     $envelope->targetToUser($user->getId(), $message);
                                 }
                             }

@@ -108,25 +108,19 @@ class Mapper extends BaseMapper
 
         // We need to iterate all access records to see if any of them grants private access
 
-        $hasAccess = false;
+        $accessLevel = $record->getAccessLevel($user);
 
-        foreach ($record->getAccess() as $access) {
-            if ($access->getAccessLevel($user) == PastoralAccessMapper::ACCESS_PUBLIC) {
-                $hasAccess = true;
-            } elseif ($access->getAccessLevel($user) == PastoralAccessMapper::ACCESS_PRIVATE) {
-                // Found a record with private access, shortcut true return
-                return $record;
-            }
+        // Deny access? No soup for you!
+        if ($accessLevel == PastoralAccessMapper::ACCESS_DENY) {
+            return null;
         }
 
-        if ($hasAccess) {
-            // Only has public access, strip the private body
-            $record->setBodyPrivate(null);
-
-            return $record;
+        // Only have public access? Strip the private body
+        if ($accessLevel == PastoralAccessMapper::ACCESS_PUBLIC) {
+            $record->setBodyPrivate("");
         }
 
-        return null;
+        return $record;
     }
 
     /**

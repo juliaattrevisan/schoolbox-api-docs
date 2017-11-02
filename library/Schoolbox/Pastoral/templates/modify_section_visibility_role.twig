@@ -2,60 +2,63 @@
 {# User Roles Access #}
 {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
 
-<table class="no-margin">
+<table class="no-margin" id="table-permission-roles">
     <thead>
         <tr>
-            <th class="small-5">User Role</th>
-            <th class="small-2">None</th>
+            <th class="small-5">Roles</th>
+            <th class="small-2">Deny</th>
             <th class="small-2">General</th>
             <th class="small-2">General + {{ locale.pastoralPrivate.proper }}</th>
+            <th class="small-1">&nbsp;</th>
         </tr>
     </thead>
-    <tbody>
-        {% for role in roles if not role.isStudent and not role.isGuest %}
-            {% if allowParents == 1 or not role.isParent %}
+    <tbody id="permission-roles">
+        {% for role in roles if role.isStaff or (role.isParent and allowParents == 1) %}
+            {# Work out which radio should be checked for each row #}
 
-                {# Work out which radio should be checked for each row #}
+            {% set checkedDeny = '' %}
+            {% set checkedPublic = '' %}
+            {% set checkedPrivate = '' %}
 
-                {% set checkedNone = '' %}
-                {% set checkedPublic = '' %}
-                {% set checkedPrivate = '' %}
-
-                {% if record.id != '' %}
-                    {% for access in record.access if access.role.id != '' %}
-                        {% if access.role.id == role.id %}
-                            {% if access.private == 1 %}
-                                {% set checkedPrivate = 'checked' %}
-                            {% else %}
-                                {% set checkedPublic = 'checked' %}
-                            {% endif %}
+            {% if record.id != '' %}
+                {% for access in record.access if access.role.id != '' %}
+                    {% if access.role.id == role.id %}
+                        {% if access.private == 0 %}
+                            {% set checkedDeny = 'checked' %}
+                        {% elseif access.private == 1 %}
+                            {% set checkedPublic = 'checked' %}
+                        {% elseif access.private == 2 %}
+                            {% set checkedPrivate = 'checked' %}
                         {% endif %}
-                    {% endfor %}
-                {% endif %}
-
-                {% if checkedPublic == '' and checkedPrivate == '' %}
-                    {% set checkedNone = 'checked' %}
-                {% endif %}
-
-                <tr>
-                    <td>
-                        {{ role.name }}
-                        {% if role.isParent %}Of Student{% endif %}
-                    </td>
-                    <td>
-                        <input type="radio" name="role[{{ role.id }}]" id="roleNone{{ role.id }}" value="0" {{ checkedNone }}>
-                        <label class="radio-label" for="roleNone{{ role.id }}"></label>
-                    </td>
-                    <td>
-                        <input type="radio" name="role[{{ role.id }}]" id="rolePublic{{ role.id }}" value="1" {{ checkedPublic }}>
-                        <label class="radio-label" for="rolePublic{{ role.id }}"></label>
-                    </td>
-                    <td>
-                        <input type="radio" name="role[{{ role.id }}]" id="rolePrivate{{ role.id }}" value="2" {{ checkedPrivate }}>
-                        <label class="radio-label" for="rolePrivate{{ role.id }}"></label>
-                    </td>
-                </tr>
+                    {% endif %}
+                {% endfor %}
             {% endif %}
+
+            {% if checkedPublic == '' and checkedPrivate == '' %}
+                {% set checkedDeny = 'checked' %}
+            {% endif %}
+
+            <tr>
+                <td class="small-5">
+                    {{ role.name }}
+                    {% if role.isParent %}Of Student{% endif %}
+                </td>
+                <td class="small-2">
+                    <input type="radio" name="role[{{ role.id }}]" id="roleDeny{{ role.id }}" value="0" {{ checkedDeny }}>
+                    <label class="radio-label" for="roleDeny{{ role.id }}"></label>
+                </td>
+                <td class="small-2">
+                    <input type="radio" name="role[{{ role.id }}]" id="rolePublic{{ role.id }}" value="1" {{ checkedPublic }}>
+                    <label class="radio-label" for="rolePublic{{ role.id }}"></label>
+                </td>
+                <td class="small-2">
+                    <input type="radio" name="role[{{ role.id }}]" id="rolePrivate{{ role.id }}" value="2" {{ checkedPrivate }}>
+                    <label class="radio-label" for="rolePrivate{{ role.id }}"></label>
+                </td>
+                <td class="small-1">
+                    <a href="#" data-delete-row="role" class="icon-delete"></a>
+                </td>
+            </tr>
         {% endfor %}
     </tbody>
 </table>

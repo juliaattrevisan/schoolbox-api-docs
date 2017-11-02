@@ -70,7 +70,6 @@ class Mapper extends BaseMapper
         $this->uses('body_public', self::TYPE_STRING);
         $this->uses('heading', self::TYPE_STRING);
         $this->uses('points', self::TYPE_DECIMAL);
-        $this->uses('private', self::TYPE_BOOLEAN);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -273,25 +272,21 @@ class Mapper extends BaseMapper
 
         // We need to iterate all access records to see if any of them grants private access
 
-        $hasAccess = false;
+        $accessLevel = $record->getAccessLevel($user);
 
-        foreach ($record->getAccess() as $access) {
-            if ($access->getAccessLevel($user) == PastoralAccessMapper::ACCESS_PUBLIC) {
-                $hasAccess = true;
-            } elseif ($access->getAccessLevel($user) == PastoralAccessMapper::ACCESS_PRIVATE) {
-                // Found a record with private access, shortcut true return
-                return $record;
-            }
+        // If denied, no soup for you!
+
+        if ($accessLevel == PastoralAccessMapper::ACCESS_DENY) {
+            return null;
         }
 
-        if ($hasAccess) {
-            // Only has public access, strip the private body
-            $record->setBodyPrivate(null);
+        // Only has public access? Strip the private body
 
-            return $record;
+        if ($accessLevel == PastoralAccessMapper::ACCESS_PUBLIC) {
+            $record->setBodyPrivate("");
         }
 
-        return null;
+        return $record;
     }
 
     /**

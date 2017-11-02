@@ -45,8 +45,8 @@ class Model implements ISoftDeletable
     /** @var null|Group $group */
     protected $group;
 
-    /** @var bool $private */
-    protected $private;
+    /** @var bool $access */
+    protected $access;
 
     /** @var PastoralGroupMemberMapper $pastoralGroupMemberMapper */
     private $pastoralGroupMemberMapper;
@@ -71,63 +71,46 @@ class Model implements ISoftDeletable
      */
     public function getAccessLevel($user)
     {
-        // Cache the permissions for the page cycle
+        $userId = $user->getId();
+        
+        // User any previously cached record of the permissions for the page cycle
 
-        if (isset($this->accessCache[$user->getId()])) {
-            return $this->accessCache[$user->getId()];
+        if (isset($this->accessCache[$userId])) {
+            return $this->accessCache[$userId];
         }
 
-        // If this is an individual user permission record, just match user ID
+        if ($this->getUser() instanceof User && $userId == $this->getUser()->getId()) {
+            // If this is an individual user permission record, just match user ID
 
-        if ($this->getUser() instanceof User && $user->getId() == $this->getUser()->getId()) {
-            $this->accessCache[$user->getId()] = $this->getRecordAccessLevel();
+            $this->accessCache[$userId] = $this->getAccess();
+        } elseif ($this->getRole() instanceof Role && $user->getRole()->getId() == $this->getRole()->getId()) {
+            // If this is a role access record, check group permissions
 
-            return $this->accessCache[$user->getId()];
-        }
+            $this->accessCache[$userId] = $this->getAccess();
+        } elseif ($this->getGroup() instanceof Group) {
+            // If this is a group access record, check group permissions
 
-        // If this is a role access record, check group permissions
-
-        if ($this->getRole() instanceof Role && $user->getRole()->getId() == $this->getRole()->getId()) {
-            $this->accessCache[$user->getId()] = $this->getRecordAccessLevel();
-
-            return $this->accessCache[$user->getId()];
-        }
-
-        // If this is a group access record, check group permissions
-
-        if ($this->getGroup() instanceof Group) {
             try {
                 // Make sure the user was in the group
                 $this->pastoralGroupMemberMapper->findOneByColumnList([
-                    'user_id'  => $user->getId(),
+                    'user_id' => $userId,
                     'group_id' => $this->getGroup()->getId(),
                 ]);
-                $this->accessCache[$user->getId()] = $this->getRecordAccessLevel();
+                $this->accessCache[$userId] = $this->getAccess();
 
-                return $this->accessCache[$user->getId()];
+                return $this->accessCache[$userId];
             } catch (MapperException $e) {
             }
         }
 
-        // If we get here this record doesn't give them any permissions to the pastoral record
+        if (!isset($this->accessCache[$userId])) {
+            // If we get here this record doesn't give them any permissions to the pastoral record-
+            // this doesn't necessarily mean they were denied access (they might just not have been in the group/role)
 
-        $this->accessCache[$user->getId()] = Mapper::ACCESS_NONE;
-
-        return $this->accessCache[$user->getId()];
-    }
-
-    /**
-     * Returns access level this record grants
-     *
-     * @return int
-     */
-    private function getRecordAccessLevel()
-    {
-        if ($this->getPrivate()) {
-            return Mapper::ACCESS_PRIVATE;
+            $this->accessCache[$userId] = null;
         }
-
-        return Mapper::ACCESS_PUBLIC;
+        
+        return $this->accessCache[$userId];
     }
 
     /**
@@ -211,22 +194,22 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param bool $private
+     * @param int $access
      *
      * @return self
      */
-    public function setPrivate($private)
+    public function setAccess($access)
     {
-        $this->private = $private;
+        $this->access = $access;
 
         return $this;
     }
 
     /**
-     * @return bool
+     * @return int
      */
-    public function getPrivate()
+    public function getAccess()
     {
-        return $this->private;
+        return $this->access;
     }
 }

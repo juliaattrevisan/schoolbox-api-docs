@@ -4,20 +4,21 @@
 
 {% if groups | length > 0 %}
 
-    <table class="no-margin">
+    <table class="no-margin" id="table-permission-groups">
         <thead>
             <tr>
-                <th class="small-5">{{ locale.pastoral.proper }} Group</th>
+                <th class="small-5">{{ locale.pastoral.proper }} Groups</th>
                 <th class="small-2"></th>
                 <th class="small-2"></th>
                 <th class="small-2"></th>
+                <th class="small-1"></th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="permission-groups">
             {% for group in groups %}
                 {# Work out which radio should be checked for each row #}
 
-                {% set checkedNone = '' %}
+                {% set checkedDeny = '' %}
                 {% set checkedPublic = '' %}
                 {% set checkedPrivate = '' %}
 
@@ -34,24 +35,27 @@
                 {% endif %}
 
                 {% if checkedPublic == '' and checkedPrivate == '' %}
-                    {% set checkedNone = 'checked' %}
+                    {% set checkedDeny = 'checked' %}
                 {% endif %}
 
                 <tr>
-                    <td>
+                    <td class="small-5">
                         {{ group.name }}
                     </td>
-                    <td>
-                        <input type="radio" name="group[{{ group.id }}]" id="groupNone{{ group.id }}" value="0" {{ checkedNone }}>
-                        <label class="radio-label" for="groupNone{{ group.id }}"></label>
+                    <td class="small-2">
+                        <input type="radio" name="group[{{ group.id }}]" id="groupDeny{{ group.id }}" value="0" {{ checkedDeny }}>
+                        <label class="radio-label" for="groupDeny{{ group.id }}"></label>
                     </td>
-                    <td>
+                    <td class="small-2">
                         <input type="radio" name="group[{{ group.id }}]" id="groupPublic{{ group.id }}" value="1" {{ checkedPublic }}>
                         <label class="radio-label" for="groupPublic{{ group.id }}"></label>
                     </td>
-                    <td>
+                    <td class="small-2">
                         <input type="radio" name="group[{{ group.id }}]" id="groupPrivate{{ group.id }}" value="2" {{ checkedPrivate }}>
                         <label class="radio-label" for="groupPrivate{{ group.id }}"></label>
+                    </td>
+                    <td class="small-1">
+                        <a href="#" data-delete-row="group" class="icon-delete"></a>
                     </td>
                 </tr>
             {% endfor %}

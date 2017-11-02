@@ -18,7 +18,7 @@ use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\User;
 
-class  IsInAudience implements IAuthorizationRule
+class IsInAudience implements IAuthorizationRule
 {
     /**
      * {@inheritdoc}
@@ -52,13 +52,12 @@ class  IsInAudience implements IAuthorizationRule
 
         // Check the audience of item
 
-        /** @var PastoralAccessModel $accessCurrent */
-        foreach ($record->getAccess() as $accessCurrent) {
-            if ($accessCurrent->getAccessLevel($user) > PastoralAccessMapper::ACCESS_NONE) {
-                return true;
-            }
+        $accessLevel = $record->getAccessLevel($user);
+
+        if ($accessLevel == PastoralAccessMapper::ACCESS_DENY) {
+            throw new Unauthorized();
         }
 
-        throw new Unauthorized();
+        return true;
     }
 }

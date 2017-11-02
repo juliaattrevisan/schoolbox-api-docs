@@ -32,7 +32,7 @@ class Mapper extends BaseMapper
 {
     // Define record access levels
 
-    const ACCESS_NONE = 0;
+    const ACCESS_DENY = 0;                      // Deny trumps all other access to allow exclusion of a user/group/role
     const ACCESS_PUBLIC = 1;
     const ACCESS_PRIVATE = 2;
 
@@ -44,7 +44,7 @@ class Mapper extends BaseMapper
         $this->hasTable('pastoral_access');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('private', self::TYPE_BOOLEAN);
+        $this->uses('access', self::TYPE_INTEGER);
         $this->joins('pastoral_id', PastoralMapper::class, 'id', null, null, 'pastoral', 'pastoral');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->joins('role_id', RoleMapper::class, 'id', null, null, 'role', 'role');

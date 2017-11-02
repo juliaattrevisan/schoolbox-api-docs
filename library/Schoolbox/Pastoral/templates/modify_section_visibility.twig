@@ -1,7 +1,139 @@
 <h2 class="subheader">Record Visibility</h2>
 
 <section>
+
+    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+    {# We need a unique GUID to wire up all of these modal events #}
+    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+
+    {% set guid = getGuid() %}
+
+    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+    {# Display Current Visibility #}
+    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+
     {% include '@pastoral/modify_section_visibility_role.twig' %}
     {% include '@pastoral/modify_section_visibility_group.twig' %}
-    {% include '@pastoral/modify_section_visibility_individual.twig' %}
+    {% include '@pastoral/modify_section_visibility_user.twig' %}
+
+    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+    {# Setup User Selection Modal #}
+    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+
+    {% if allowParents == 1 %}
+        {% set searchScope = 'staff;parentofstudent' %}
+    {% else %}
+        {% set searchScope = 'staff' %}
+    {% endif %}
+
+    {{ userSearch.modal(guid, 'Add User To Record', 'Enter name', searchScope, record.student.id, 'window.modalUserAdded') }}
+
+    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+    {# Setup Role Selection Modal #}
+    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+
+    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+    {# Setup Group Selection Modal #}
+    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+
+    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+    {# Scripts For Buttons #}
+    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+
+    <script>
+        $(function () {
+            window.usersAdded = [
+                {% for access in record.access if access.user.id != '' -%}
+                {{ access.user.id }},
+                {% endfor %}
+            ];
+
+            window.modalUserAdded = function (user) {
+                if ($.inArray(user.id, window.usersAdded) === -1) {
+                    $('#empty-users').remove();
+                    html = $('[data-user-permission-clone]').html()
+                        .replace(/{NAME}/g, user.first_name + ' ' + user.last_name)
+                        .replace(/{ID}/g, user.id)
+                        .replace(/{ROLE}/g, user.role);
+                    window.usersAdded.push(user.id);
+                    var userListPermission = $('#userListPermission');
+                    userListPermission.html(userListPermission.html() + html);
+                }
+            };
+        });
+    </script>
+
+    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+    {# Display Buttons #}
+    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+
+    <div class="component-action">
+        <section>
+            {# Each user modal required a unique identifier, however Twig macros are incapable of returning a variable and thus #}
+            {# we can't get it to just tell us what the unique identifier of the modal is. So we have to create it here and then #}
+            {# pass it into the macro #}
+
+            <a href="#" data-button="add-user" class="button" data-user-search="user-{{ guid }}">Add User</a>
+            <a href="#" data-button="add-role" class="button" data-role-search="role-{{ guid }}">Add Role</a>
+            <a href="#" data-button="add-group" class="button" data-group-search="group-{{ guid }}">Add Pastoral Group</a>
+        </section>
+    </div>
+
+    <script>
+
+        $(function() {
+            $('[data-delete-row]').click(function(e) {
+                e.preventDefault();
+
+                var row = $(this).closest('tr');
+                var type = $(this).attr('data-delete-row');
+
+                $('[data-reveal]').hide();
+
+                $(this).confirmDialog({
+                    text: 'Are you sure you wish to remove the ' + type + 's visibility?',
+                    confirmEvent: function() {
+                        row.remove();
+                        updateVisibility();
+                    }
+                });
+            });
+        });
+
+        {# Update the visibility of permission tables #}
+
+        function updateVisibility() {
+
+            {# Roles #}
+
+            var tableRoles = $("#table-permission-roles");
+
+            if ($('#permission-roles').find('tr').length === 0) {
+                tableRoles.addClass('hide');
+            } else {
+                tableRoles.removeClass('hide');
+            }
+
+            {# Groups #}
+
+            var tableGroups = $("#table-permission-groups");
+
+            if ($('#permission-groups').find('tr').length === 0) {
+                tableGroups.addClass('hide');
+            } else {
+                tableGroups.removeClass('hide');
+            }
+
+            {# Users #}
+
+            var tableUsers = $("#table-permission-users");
+
+            if ($('#permission-users').find('tr').length === 0) {
+                tableUsers.addClass('hide');
+            } else {
+                tableUsers.removeClass('hide');
+            }
+        }
+    </script>
+
 </section>

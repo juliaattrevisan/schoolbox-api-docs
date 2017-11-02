@@ -18,6 +18,7 @@ use Schoolbox\Pastoral\Revision\Model as PastoralRevision;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\Type\Model as PastoralType;
 use Schoolbox\User;
+use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 
 class Model implements ISoftDeletable
 {
@@ -134,26 +135,6 @@ class Model implements ISoftDeletable
     public function getTags()
     {
         return $this->tags;
-    }
-
-    /**
-     * @param bool $private
-     *
-     * @return self
-     */
-    public function setPrivate($private)
-    {
-        $this->private = $private;
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getPrivate()
-    {
-        return $this->private;
     }
 
     /**
@@ -474,5 +455,35 @@ class Model implements ISoftDeletable
         $this->revisions = $revisions;
 
         return $this;
+    }
+
+    /**
+     * Return the specified users access level to this record
+     *
+     * @param User $user
+     * @return int
+     */
+    public function getAccessLevel(User $user)
+    {
+        $accessLevel = PastoralAccessMapper::ACCESS_DENY;
+
+        foreach ($this->getAccess() as $access) {
+            $accessLevelCurrent = $access->getAccessLevel($user);
+
+            if ($accessLevelCurrent === null) {
+                // The access rule didn't apply to this user, continue to the next one
+                continue;
+            }
+
+            if ($accessLevelCurrent == PastoralAccessMapper::ACCESS_DENY) {
+                return PastoralAccessMapper::ACCESS_DENY;
+            }
+
+            // We want the highest access level
+
+            $accessLevel = max($accessLevel, $accessLevelCurrent);
+        }
+
+        return $accessLevel;
     }
 }

@@ -354,7 +354,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                         /** @var PastoralAccess $accessRecord */
                         $accessRecord = $this->getPastoralAccessMapper()->createModel();
                         $accessRecord->setPastoral($pastoralRecord);
-                        $accessRecord->setPrivate(false);
+                        $accessRecord->setAccess(false);
                         $accessRecord->setUser($audienceUser);
                         $this->getPastoralAccessMapper()->save($accessRecord);
 

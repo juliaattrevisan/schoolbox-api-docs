@@ -59,3 +59,5 @@ ALTER TABLE `pastoral_revision` MODIFY COLUMN `subtype_id` INT(11) AFTER `type_i
 
 INSERT INTO localisation (term, title, singular_form, plural_form, capitalise_first, indefinite_article)
 VALUES ('pastoralPrivate', 'Pastoral Care (Confidential)', 'confidential', 'confidential', 1, 'a');
+
+ALTER TABLE pastoral_access CHANGE private access INT(11) DEFAULT '0';
