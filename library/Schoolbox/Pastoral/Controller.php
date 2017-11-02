@@ -474,6 +474,10 @@ class Controller extends Base
             $severities = $this->pastoralSeverityMapper->findAll(['order' => ['order' => 'ASC']]);
         }
 
+        // Check if user is a pastoral moderator
+
+        $moderator = $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0;
+
         // Render this thing out
 
         $this->getResponse()->content->set([
@@ -487,6 +491,7 @@ class Controller extends Base
                 'severities'        => $severities,
                 'roles'             => $this->roleMapper->findAll(['order' => ['name' => 'ASC']]),
                 'groups'            => $this->pastoralGroupMapper->findAll(['name' => ['order' => 'ASC']]),
+                'moderator'         => $moderator,
                 'attachzonePublic'  => $this->getAttachZone(self::ATTACHZONE_PUBLIC, $record),
                 'attachzonePrivate' => $this->getAttachZone(self::ATTACHZONE_PRIVATE, $record),
             ],

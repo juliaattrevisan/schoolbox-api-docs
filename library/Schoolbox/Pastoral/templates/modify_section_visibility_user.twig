@@ -2,8 +2,6 @@
 {# Individual Users Access #}
 {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
 
-{% import '@pastoral/macros/user_search.twig' as userSearch %}
-
 {% if allowIndividual %}
 
     <table class="no-margin" id="table-permission-users">
@@ -43,7 +41,7 @@
                     {% set checkedDeny = 'checked' %}
                 {% endif %}
 
-                <tr>
+                <tr data-user-id="{{ access.user.id }}">
                     <td class="small-5">{{ access.user.firstname }} {{ access.user.lastname }} ({{ access.user.role.name }})</td>
                     <td class="small-2">
                         <input type="radio" name="user[{{ access.user.id }}]" id="userDeny{{ access.user.id }}" value="0" {{ checkedDeny }}>
@@ -58,7 +56,7 @@
                         <label class="radio-label" for="userPrivate{{ access.user.id }}"></label>
                     </td>
                     <td class="small-1">
-                        <a href="#" data-delete-="group" class="icon-delete"></a>
+                        <a href="#" data-delete-visibility="user" class="icon-delete"></a>
                     </td>
                 </tr>
                 {% set countUsers = countUsers + 1 %}
@@ -72,7 +70,7 @@
 
     <table class="hide">
         <tbody data-user-permission-clone>
-        <tr>
+        <tr data-user-id="{ID}">
             <td class="small-5">{NAME} ({ROLE})</td>
             <td class="small-2">
                 <input type="radio" name="user[{ID}]" id="userDeny{ID}" value="0" checked>
@@ -87,7 +85,7 @@
                 <label class="radio-label" for="userPrivate{ID}"></label>
             </td>
             <td class="small-1">
-                <a href="#" data-delete-="group" class="icon-delete"></a>
+                <a href="#" data-delete-visibility="user" class="icon-delete"></a>
             </td>
         </tr>
         </tbody>

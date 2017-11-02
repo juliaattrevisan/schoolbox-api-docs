@@ -1,6 +1,8 @@
 <h2 class="subheader">Record Visibility</h2>
 
-<section>
+{% import '@pastoral/macros/user_search.twig' as userSearch %}
+
+<section id="visibility-section">
 
     {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
     {# We need a unique GUID to wire up all of these modal events #}
@@ -26,7 +28,7 @@
         {% set searchScope = 'staff' %}
     {% endif %}
 
-    {{ userSearch.modal(guid, 'Add User To Record', 'Enter name', searchScope, record.student.id, 'window.modalUserAdded') }}
+    {{ userSearch.modal("U" ~ guid, 'Add User To Record', 'Enter name', searchScope, record.student.id, 'window.modalUserAdded') }}
 
     {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
     {# Setup Role Selection Modal #}
@@ -42,23 +44,26 @@
 
     <script>
         $(function () {
-            window.usersAdded = [
-                {% for access in record.access if access.user.id != '' -%}
-                {{ access.user.id }},
-                {% endfor %}
-            ];
+            window.usersAdded = [];
+
+            {% for access in record.access if access.user.id != ''%}
+                window.usersAdded[{{ access.user.id }}] = true;
+            {%endfor %}
 
             window.modalUserAdded = function (user) {
-                if ($.inArray(user.id, window.usersAdded) === -1) {
+                if (window.usersAdded[user.id] !== true) {
                     $('#empty-users').remove();
                     html = $('[data-user-permission-clone]').html()
                         .replace(/{NAME}/g, user.first_name + ' ' + user.last_name)
                         .replace(/{ID}/g, user.id)
                         .replace(/{ROLE}/g, user.role);
-                    window.usersAdded.push(user.id);
-                    var userListPermission = $('#userListPermission');
-                    userListPermission.html(userListPermission.html() + html);
+                    window.usersAdded[user.id] = true;
+                    var permissionListUsers = $('#permission-users');
+                    permissionListUsers.html(permissionListUsers.html() + html);
                 }
+
+                updateVisibility();
+                updateUserPermissionClickEvents();
             };
         });
     </script>
@@ -73,36 +78,45 @@
             {# we can't get it to just tell us what the unique identifier of the modal is. So we have to create it here and then #}
             {# pass it into the macro #}
 
-            <a href="#" data-button="add-user" class="button" data-user-search="user-{{ guid }}">Add User</a>
-            <a href="#" data-button="add-role" class="button" data-role-search="role-{{ guid }}">Add Role</a>
-            <a href="#" data-button="add-group" class="button" data-group-search="group-{{ guid }}">Add Pastoral Group</a>
+            <a href="#" data-button="add-user" class="button" data-user-search="U{{ guid }}">Add User</a>
+            <a href="#" data-button="add-role" class="button" data-role-search="R{{ guid }}">Add Role</a>
+            <a href="#" data-button="add-group" class="button" data-group-search="G{{ guid }}">Add Pastoral Group</a>
         </section>
     </div>
 
     <script>
 
-        $(function() {
-            $('[data-delete-row]').click(function(e) {
+        function updateUserPermissionClickEvents() {
+            $('[data-delete-visibility]').click(function (e) {
                 e.preventDefault();
 
                 var row = $(this).closest('tr');
-                var type = $(this).attr('data-delete-row');
+                var type = $(this).attr('data-delete-visibility');
+                var userId = $(row).attr('data-user-id');
 
                 $('[data-reveal]').hide();
 
+                console.log(window.usersAdded);
+
                 $(this).confirmDialog({
                     text: 'Are you sure you wish to remove the ' + type + 's visibility?',
-                    confirmEvent: function() {
+                    confirmEvent: function () {
+                        window.usersAdded[userId] = false;
                         row.remove();
                         updateVisibility();
+                        console.log(window.usersAdded);
                     }
                 });
             });
-        });
+        }
+
+        updateUserPermissionClickEvents();
 
         {# Update the visibility of permission tables #}
 
         function updateVisibility() {
+
+            var found = 0;
 
             {# Roles #}
 
@@ -112,6 +126,7 @@
                 tableRoles.addClass('hide');
             } else {
                 tableRoles.removeClass('hide');
+                found++;
             }
 
             {# Groups #}
@@ -122,6 +137,7 @@
                 tableGroups.addClass('hide');
             } else {
                 tableGroups.removeClass('hide');
+                found++;
             }
 
             {# Users #}
@@ -132,8 +148,50 @@
                 tableUsers.addClass('hide');
             } else {
                 tableUsers.removeClass('hide');
+                found++;
+            }
+
+            {# Empty State #}
+
+            if (found === 0) {
+                $('#visibility-section').addClass('hide');
+                $('#visibility-empty').removeClass('hide');
+            } else {
+                $('#visibility-section').removeClass('hide');
+                $('#visibility-empty').addClass('hide');
             }
         }
     </script>
 
 </section>
+
+{% if moderator %}
+    {% set other = "other" %}
+{% else %}
+    {% set other = "" %}
+{% endif %}
+
+{% if not record.id %}
+    {% set name = "yourself" %}
+    {% set tense = "will" %}
+{% elseif user.id != record.owner.id %}
+    {% set name = "yourself" %}
+    {% set tense = "is" %}
+{% else %}
+    {% set name = record.owner.fullName %}
+    {% set tense = "is" %}
+{% endif %}
+
+{# Empty state when no visibility rules #}
+
+<div class="empty-state" id="visibility-empty">
+    <i class="icon-locked"></i>
+    <p>No visibility rules have been added to this record, it {{ tense }} only visible by {{ name }} and {{ other }} {{ locale.pastoral }} moderators.</p>
+    <p>
+        To grant access to other users add a
+        <a href="#" data-user-search="U{{ guid }}" title="Add User">user</a>,
+        <a href="#" data-role-search="R{{ guid }}" title="Add Role">role</a> or
+        <a href="#" data-group-search="G{{ guid }}" title="Add Pastoral Group">pastoral group</a>
+        visibility rule to this record.
+    </p>
+</div>
