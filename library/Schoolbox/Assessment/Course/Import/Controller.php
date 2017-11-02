@@ -171,7 +171,7 @@ class Controller extends Base\Base
     public function postClasses()
     {
         $courseSpecId    = trim($this->getRequest()->post['course_spec_id']);
-        $targetFolderIds = $this->parseFolderIds(trim($this->getRequest()->post['import_folders']));
+        $targetFolderIds = $this->parseFolderIds($this->getRequest()->post['import_folders']);
         $componentId     = trim($this->getRequest()->post['component_id']);
 
         try {
@@ -289,7 +289,7 @@ class Controller extends Base\Base
         $action           = trim($post['action']);
         $encodedReturnUrl = trim($post[Redirect::RETURN_URL]);
         $courseSpecId     = trim($post['course_spec_id']);
-        $targetFolderIds  = $this->parseFolderIds(trim($this->getRequest()->post['import_folders']));
+        $targetFolderIds  = $this->parseFolderIds($this->getRequest()->post['import_folders']);
         $courseImplId     = trim($post['course_impl_id']);
         $componentId      = trim($post['component_id']);
         $units            = $post['unit'];
@@ -437,7 +437,7 @@ class Controller extends Base\Base
         $courseSpecId = trim($post['course_spec_id']);
         $courseImplId = trim($post['course_impl_id']);
         $componentId  = trim($post['component_id']);
-        $folderIds    = $this->parseFolderIds(trim($post['import_folders']));
+        $folderIds    = $this->parseFolderIds($post['import_folders']);
         $unitImplData = $post['unit'];
 
         // Algorithm:
@@ -1123,6 +1123,6 @@ class Controller extends Base\Base
         // Explode on ',', filter out empty, then cast to int
         return array_map(function ($folderId) {
             return (int)$folderId;
-        }, array_filter(explode(',', $folderIdCsv)));
+        }, array_filter(explode(',', trim($folderIdCsv))));
     }
 }
