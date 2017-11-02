@@ -35,7 +35,7 @@
                         <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
                         <input type="hidden" name="{{ returnUrlName }}" value="{{ returnUrl }}" />
                         <input type="hidden" name="folderId" value="{{ assessment.baseContext.folder.id }}" />
-                        {% include '@learningAssessment/fragments/'~assessmentType~'/create.twig' with { actionLabel: 'Update' } %}
+                        {% include '@learningAssessment/'~assessmentType~'/create.twig' with { actionLabel: 'Update' } %}
                     </div>
                 </fieldset>
             </section>

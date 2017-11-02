@@ -98,7 +98,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         // either output the fragment to the mage, or use the synchronous form
         if ($this->getRequest()->isXhr()) {
-            $content = $this->buildUnthemedHtmlOutput("@learningAssessment/fragments/$type/create.twig", $data);
+            $content = $this->buildUnthemedHtmlOutput("@learningAssessment/$type/create.twig", $data);
         } else {
             $content = $this->buildHtmlOutput('@learningAssessment/create.twig', $data);
         }

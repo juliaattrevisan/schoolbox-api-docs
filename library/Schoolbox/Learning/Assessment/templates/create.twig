@@ -142,7 +142,7 @@
 
                     <div class="small-12 columns {% if not assessmentType|length %}hide{% endif %}" data-mage-collapsed data-assessment-details>
                         {% if assessmentType|length %}
-                            {% include '@learningAssessment/fragments/'~assessmentType~'/create.twig' with {stage: 2} %}
+                            {% include '@learningAssessment/'~assessmentType~'/create.twig' with {stage: 2} %}
                         {% endif %}
                     </div>
                 </fieldset>
