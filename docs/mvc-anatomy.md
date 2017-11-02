@@ -358,6 +358,9 @@ http://auraphp.com/framework/2.x/en/router/
 * *Cohesion and Coupling.* A brief overview on how to abstract details into Supporting Classes. A precursor to Design Patterns.
 https://stackoverflow.com/questions/10830135/what-is-high-cohesion-and-how-to-use-it-make-it
 
+* *Data Mapper Pattern.* Part of an ORM Object-oriented Relational Mapping architectural design that deals with database transactions.
+https://en.wikipedia.org/wiki/Data_mapper_pattern
+
 * *Dependency Injection.* Passing objects to a class, instead of that class getting its own objects. 
 http://www.jamesshore.com/Blog/Dependency-Injection-Demystified.html
 
