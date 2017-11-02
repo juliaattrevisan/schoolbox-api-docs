@@ -1,63 +1,73 @@
 {% import '@pastoral/macros/profile.twig' as profile %}
 
-{% set commentInsertRoute = routeLookupIfAuthorized('pastoral.postCommentInsert', {'recordId': record.id}) %}
-{% set commentDeleteRoute = routeLookupIfAuthorized('pastoral.postCommentDelete', {'recordId': record.id, 'commentId': comment.id}) %}
+{% if recordType == 'public' %}
+    {% set body = record.bodyPublic %}
+{% elseif recordType == 'private' %}
+    {% set body = record.bodyPrivate %}
+{% endif %}
 
-{# Only users that are able to make comments should see comments #}
+{% if body is not empty %}
 
-{% if commentInsertRoute %}
+    {% set commentInsertRoute = routeLookupIfAuthorized('pastoral.postCommentInsert', {'recordId': record.id}) %}
+    {% set commentDeleteRoute = routeLookupIfAuthorized('pastoral.postCommentDelete', {'recordId': record.id, 'commentId': comment.id}) %}
 
-    <div class="content" id="comments">
-        <div class="row">
-            <div class="small-12 island">
-                {% if comments | length > 0 %}
-                    <section class="no-margin">
-                        <ul class="action-list">
-                            {% for comment in comments %}
-                                <li class="actions-small-1">
-                                    <div class="list-item">
-                                        <div class="small-12 card wrap-down">
-                                            <a href="{{ profile.link(comment.owner) }}" title="View Profile">{{ profile.imageSquare64(comment.owner) }}</a>
-                                            <p class="meta">
-                                                Posted by <a href="{{ profile.link(comment.owner) }}">{{ comment.owner.fullName }}</a>
-                                                <span title="{{ comment.createdAt.short }}">{{ comment.createdAt.relativeDay }}</span>
-                                            </p>
-                                            <p>{{ comment.body | purify | nl2br }}</p>
+    {# Only users that are able to make comments should see comments #}
+
+    {% if commentInsertRoute %}
+
+        <div class="content" id="comments">
+            <div class="row">
+                <div class="small-12 island">
+                    {% if comments | length > 0 %}
+                        <section class="no-margin">
+                            <ul class="action-list">
+                                {% for comment in comments %}
+                                    <li class="actions-small-1">
+                                        <div class="list-item">
+                                            <div class="small-12 card wrap-down">
+                                                <a href="{{ profile.link(comment.owner) }}" title="View Profile">{{ profile.imageSquare64(comment.owner) }}</a>
+                                                <p class="meta">
+                                                    Posted by <a href="{{ profile.link(comment.owner) }}">{{ comment.owner.fullName }}</a>
+                                                    <span title="{{ comment.createdAt.short }}">{{ comment.createdAt.relativeDay }}</span>
+                                                </p>
+                                                <p>{{ comment.body | purify | nl2br }}</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <nav>
-                                        {% if commentDeleteRoute %}
-                                            <a data-delete-comment="{{ comment.id }}" class="icon-delete" href="#" title="Delete Comment"></a>
-                                        {% endif %}
-                                    </nav>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </section>
-                {% endif %}
+                                        <nav>
+                                            {% if commentDeleteRoute %}
+                                                <a data-delete-comment="{{ comment.id }}" class="icon-delete" href="#" title="Delete Comment"></a>
+                                            {% endif %}
+                                        </nav>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </section>
+                    {% endif %}
 
-                <section class="content">
-                    <form class="no-margin" method="post" action="{{ commentInsertRoute }}">
-                        <input type="hidden" name="pastoral_id" value="{{ record.id }}"> <input type="hidden" name="student_id" value="{{ record.student.id }}">
-                        <textarea id="comment-body-{{ recordType }}" rows="3" cols="50" name="comment_body" placeholder="Add Comment"></textarea>
-                        {% if recordType == 'private' %}
-                            <input type="hidden" name="comment_private" value="1"/>
-                        {% endif %}
-                        <input disabled data-comment-insert-{{ recordType }} type="submit" class="expand" value="Add Comment">
-                    </form>
-                </section>
+                    <section class="content">
+                        <form class="no-margin" method="post" action="{{ commentInsertRoute }}">
+                            <input type="hidden" name="pastoral_id" value="{{ record.id }}"> <input type="hidden" name="student_id" value="{{ record.student.id }}">
+                            <textarea id="comment-body-{{ recordType }}" rows="3" cols="50" name="comment_body" placeholder="Add Comment"></textarea>
+                            {% if recordType == 'private' %}
+                                <input type="hidden" name="comment_private" value="1"/>
+                            {% endif %}
+                            <input disabled data-comment-insert-{{ recordType }} type="submit" class="expand" value="Add Comment">
+                        </form>
+                    </section>
+                </div>
             </div>
         </div>
-    </div>
 
-    <script type="text/javascript">
-        {# Disable the add comment button if text box is empty to prevent saving blank comments #}
+        <script type="text/javascript">
+            {# Disable the add comment button if text box is empty to prevent saving blank comments #}
 
-        $(function () {
-            $('#comment-body-{{ recordType }}').on('change keyup paste', function () {
-                $('[data-comment-insert-{{ recordType }}]').prop('disabled', $('#comment-body-{{ recordType }}').val().trim() === '');
+            $(function () {
+                $('#comment-body-{{ recordType }}').on('change keyup paste', function () {
+                    $('[data-comment-insert-{{ recordType }}]').prop('disabled', $('#comment-body-{{ recordType }}').val().trim() === '');
+                });
             });
-        });
-    </script>
+        </script>
+
+    {% endif %}
 
 {% endif %}

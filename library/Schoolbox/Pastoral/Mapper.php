@@ -305,6 +305,9 @@ class Mapper extends BaseMapper
      */
     public function filterRecordsForUser(Collection $records, User $user)
     {
+        /** @var PastoralCommentMapper $pastoralCommentMapper */
+        $pastoralCommentMapper = $this->getJoinMapper('comments');
+
         $collection = $this->createCollection();
 
         /** @var Model $record */
@@ -312,6 +315,9 @@ class Mapper extends BaseMapper
             $record = $this->filterRecordForUser($record, $user);
 
             if ($record instanceof Model) {
+                // And filter the comments on the record, because this is planet Earth and we don't trust anybody
+                $record->setComments($pastoralCommentMapper->filterRecordsForUser($record->getComments(), $user));
+
                 $collection->add($record);
             }
         }

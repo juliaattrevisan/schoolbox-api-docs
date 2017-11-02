@@ -418,6 +418,10 @@ class Controller extends Base
 
         $commentsPublic     = $record->getComments()->filterBy('private', false);
         $commentsPrivate    = $record->getComments()->filterBy('private', true);
+
+        $commentsPublic = $this->pastoralCommentMapper->filterRecordsForUser($commentsPublic, $this->getUser());
+        $commentsPrivate = $this->pastoralCommentMapper->filterRecordsForUser($commentsPrivate, $this->getUser());
+
         $attachmentsPublic  = $record->getAttachments()->filterBy('private', false);
         $attachmentsPrivate = $record->getAttachments()->filterBy('private', true);
 
@@ -785,22 +789,24 @@ class Controller extends Base
 
             $foundRoles = [];
 
-            foreach ($post["role"] as $role_id => $permission) {
-                if ($permission != PastoralAccessMapper::ACCESS_NONE && !in_array($role_id, $foundRoles)) {
-                    $foundRoles[] = $role_id;
+            if (is_array($post["role"])) {
+                foreach ($post["role"] as $role_id => $permission) {
+                    if ($permission != PastoralAccessMapper::ACCESS_NONE && !in_array($role_id, $foundRoles)) {
+                        $foundRoles[] = $role_id;
 
-                    try {
-                        /** @var Role $role */
-                        $role = $this->roleMapper->findById($role_id);
-                    } catch (MapperException $e) {
-                        throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
+                        try {
+                            /** @var Role $role */
+                            $role = $this->roleMapper->findById($role_id);
+                        } catch (MapperException $e) {
+                            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
+                        }
+
+                        $access = $this->pastoralAccessMapper->createModel();
+                        $access->setPastoral($record);
+                        $access->setPrivate($permission == PastoralAccessMapper::ACCESS_PRIVATE);
+                        $access->setRole($role);
+                        $this->pastoralAccessMapper->save($access);
                     }
-
-                    $access = $this->pastoralAccessMapper->createModel();
-                    $access->setPastoral($record);
-                    $access->setPrivate($permission == PastoralAccessMapper::ACCESS_PRIVATE);
-                    $access->setRole($role);
-                    $this->pastoralAccessMapper->save($access);
                 }
             }
 
@@ -808,22 +814,24 @@ class Controller extends Base
 
             $foundGroups = [];
 
-            foreach ($post["group"] as $group_id => $permission) {
-                if ($permission != PastoralAccessMapper::ACCESS_NONE && !in_array($group_id, $foundGroups)) {
-                    $foundGroups[] = $group_id;
+            if (is_array($post["group"])) {
+                foreach ($post["group"] as $group_id => $permission) {
+                    if ($permission != PastoralAccessMapper::ACCESS_NONE && !in_array($group_id, $foundGroups)) {
+                        $foundGroups[] = $group_id;
 
-                    try {
-                        /** @var PastoralGroup $group */
-                        $group = $this->pastoralGroupMapper->findById($group_id);
-                    } catch (MapperException $e) {
-                        throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
+                        try {
+                            /** @var PastoralGroup $group */
+                            $group = $this->pastoralGroupMapper->findById($group_id);
+                        } catch (MapperException $e) {
+                            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
+                        }
+
+                        $access = $this->pastoralAccessMapper->createModel();
+                        $access->setPastoral($record);
+                        $access->setPrivate($permission == PastoralAccessMapper::ACCESS_PRIVATE);
+                        $access->setGroup($group);
+                        $this->pastoralAccessMapper->save($access);
                     }
-
-                    $access = $this->pastoralAccessMapper->createModel();
-                    $access->setPastoral($record);
-                    $access->setPrivate($permission == PastoralAccessMapper::ACCESS_PRIVATE);
-                    $access->setGroup($group);
-                    $this->pastoralAccessMapper->save($access);
                 }
             }
 
@@ -831,22 +839,24 @@ class Controller extends Base
 
             $foundUsers = [];
 
-            foreach ($post["user"] as $user_id => $permission) {
-                if ($permission != PastoralAccessMapper::ACCESS_NONE && !in_array($user_id, $foundUsers)) {
-                    $foundUsers[] = $user_id;
+            if (is_array($post["user"])) {
+                foreach ($post["user"] as $user_id => $permission) {
+                    if ($permission != PastoralAccessMapper::ACCESS_NONE && !in_array($user_id, $foundUsers)) {
+                        $foundUsers[] = $user_id;
 
-                    try {
-                        /** @var UserMapper $user */
-                        $user = $this->userMapper->findById($user_id);
-                    } catch (MapperException $e) {
-                        throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
+                        try {
+                            /** @var UserMapper $user */
+                            $user = $this->userMapper->findById($user_id);
+                        } catch (MapperException $e) {
+                            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
+                        }
+
+                        $access = $this->pastoralAccessMapper->createModel();
+                        $access->setPastoral($record);
+                        $access->setPrivate($permission == PastoralAccessMapper::ACCESS_PRIVATE);
+                        $access->setUser($user);
+                        $this->pastoralAccessMapper->save($access);
                     }
-
-                    $access = $this->pastoralAccessMapper->createModel();
-                    $access->setPastoral($record);
-                    $access->setPrivate($permission == PastoralAccessMapper::ACCESS_PRIVATE);
-                    $access->setUser($user);
-                    $this->pastoralAccessMapper->save($access);
                 }
             }
 
