@@ -193,14 +193,11 @@ Don't `die()` or `exit()` in Controllers - you should `return` instead (unless y
 
 # 8 Further Reading
 
-* *Aura Routing.* 
-We developed an adaptation of this for Module.php, but this original documentation might help you with capabilities that aren't immediately obvious such as optional args etc.
+* *Aura Routing.* We developed an adaptation of this for Module.php, but this original documentation might help you with capabilities that aren't immediately obvious such as optional args etc.
 http://auraphp.com/framework/2.x/en/router/
 
-* MVC Model-View-Controller
-Aura modules follow this pattern.
-https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller
-
-* Cohesion and Coupling
-A brief overview on how to abstract details into Supporting Classes. A precursor to Design Patterns.
+* *Cohesion and Coupling.* A brief overview on how to abstract details into Supporting Classes. A precursor to Design Patterns.
 https://stackoverflow.com/questions/10830135/what-is-high-cohesion-and-how-to-use-it-make-it
+
+* *MVC Model-View-Controller.* Aura modules follow this pattern.
+https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller
