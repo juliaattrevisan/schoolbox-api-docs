@@ -8,6 +8,7 @@
 namespace Schoolbox\Pastoral;
 
 use Alaress\Authorizer\Rule;
+use Alaress\Authorizer\Rule\HasServicePermission;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
@@ -19,9 +20,6 @@ use Schoolbox\Pastoral\Authorizer\Rule\IsCommentOwner;
 use Schoolbox\Pastoral\Authorizer\Rule\IsInAudience;
 use Schoolbox\Pastoral\Authorizer\Rule\IsOwner;
 use Schoolbox\Pastoral\Authorizer\Rule\IsParentAccessAllowed;
-use Schoolbox\Pastoral\Authorizer\Rule\IsPastoralModerator;
-use Schoolbox\Pastoral\Authorizer\Rule\IsPastoralModeratorModerate;
-use Schoolbox\Pastoral\Authorizer\Rule\IsPastoralModeratorWrite;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
@@ -31,6 +29,7 @@ use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Role;
@@ -50,26 +49,9 @@ class Module extends BaseModule
     {
         // Define permissions for the routes
 
-        $permissionPastoralModerator =
-            new Rule\All(
-                new Rule\IsLoggedIn(),
-                new Rule\HasRole(Role::STAFF),
-                new IsPastoralModerator()
-            );
-
-        $permissionPastoralModeratorWrite =
-            new Rule\All(
-                new Rule\IsLoggedIn(),
-                new Rule\HasRole(Role::STAFF),
-                new IsPastoralModeratorWrite()
-            );
-
-        $permissionPastoralModeratorModerate =
-            new Rule\All(
-                new Rule\IsLoggedIn(),
-                new Rule\HasRole(Role::STAFF),
-                new IsPastoralModeratorModerate()
-            );
+        $permissionPastoralModeratorModerate = new HasServicePermission(UserAccess::SERVICE_PASTORAL,UserAccess::ACCESS_FULL);
+        $permissionPastoralModeratorWrite = new HasServicePermission(UserAccess::SERVICE_PASTORAL,UserAccess::ACCESS_WRITE);
+        $permissionPastoralModerator = new HasServicePermission(UserAccess::SERVICE_PASTORAL,UserAccess::ACCESS_READ);
 
         $permissionStaff =
             new Rule\All(
