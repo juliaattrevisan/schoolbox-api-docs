@@ -238,7 +238,7 @@ class Cat
     /**
      * Cat constructor.
      *
-     * Very hard to test, depends on database contents existing
+     * Easier to test, can throw any kind of data in to witness outcomes
      *
      * @param int $eventId
      * @param int $userId
