@@ -26,7 +26,15 @@ if (!isset($_SESSION['id']) && !$recaptcha->check_answer($_SERVER['REMOTE_ADDR']
     error(105, "The Human Checker (reCAPTCHA) words you entered did not match.");
 }
 
-if (validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/", $_POST['template'])) {
+if(isset($_SESSION['user'])) {
+    $name = $_SESSION['user']->getFirstName()." ".$_SESSION['user']->getLastName();
+    $userEmail = $_SESSION['user']->getEmail();
+} else {
+    $name = $_POST['name'];
+    $userEmail = $_POST['email'];
+}
+
+if (validateEmailAddress($userEmail) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/", $_POST['template'])) {
     foreach ($_POST as $key => $var) {
         if (!checkSpamHeaders($var)) {
             SitePage::localRedir('/');
@@ -44,7 +52,7 @@ if (validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.h
         $core = new CoreContext($myconf);
         $email = new TwigEmail('feedback.twig');
         $email->setCoreContext($core->getContext());
-        $email->setFrom($_POST['email'], $_POST['name']);
+        $email->setFrom($userEmail, $name);
         $email->setSubject(Cfg::get('title') . ' Feedback - ' . $_POST['subject']);
         $email->setContext($context)->send(array(
                             'name' => Cfg::get('mail_from_name'),
