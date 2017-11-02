@@ -644,7 +644,7 @@ class Controller extends Assessment\Controller
         // For some reason I can't use get/setFlash?
         $errorMessage = $this->getSession()->getSegment(static::class)->get('errorMessage');
         $this->getSession()->getSegment(static::class)->set('errorMessage', null);
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/fragments/dueWork/createSubmission.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/dueWork/createSubmission.twig', [
             'breadcrumbs'    => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(['Create Response for ' . $assessment->getTitle(), '']),
             'assessment'     => $assessment,
             'student'        => $student,
