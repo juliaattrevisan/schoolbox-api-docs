@@ -13,7 +13,7 @@ abstract class DebugTwig extends \Twig_Template {
         if (\Config::get('debug_mode') == 1) {
             if (substr($this->getTemplateName(), 0, 1) == '@') {
                 echo '<!-- START: ' . $this->getTemplateName() . ' -->';
-                echo '<div class="twigName" hidden><span class="gradient-0 small"><small>' . $this->getTemplateName() . '</small></span></div>';
+                echo '<div class="twigName" hidden><span class="gradient-1 small"><small>' . $this->getTemplateName() . '</small></span></div>';
             }
         }
 

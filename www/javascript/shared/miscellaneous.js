@@ -40,6 +40,32 @@ $(function() {
 		});
 	});
 
+	// Hacking into Phpdebugbar
+	$debugBar = ($('.phpdebugbar .phpdebugbar-header-right'));
+	if ($debugBar.length > 0) {
+		console.log($debugBar);
+
+		$html =
+			'<span class="phpdebugbar-indicator">' +
+			'<a id="showTwigNames">' +
+            '<i class="phpdebugbar-fa phpdebugbar-fa-leaf" style="color:#555"></i>' +
+			'</a>' +
+			'<span>' +
+			'<span class="phpdebugbar-tooltip">Twig templates</span>'
+		;
+
+		$debugBar.append($html);
+
+		$('#showTwigNames').click(function() {
+			if ($('.twigName').attr('hidden')) {
+				$('.twigName').removeAttr('hidden');
+			}
+			else {
+				$('.twigName').attr('hidden', true);
+			}
+		});
+	}
+
 //    /**
 //     * Remove the layerX and layerY console log reports from Webkit.
 //     */
