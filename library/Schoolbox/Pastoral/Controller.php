@@ -392,11 +392,10 @@ class Controller extends Base
 
         if ($moderator) {
             $record->setRevisions(
-                $this->pastoralRevisionMapper->findByColumn('root_id', $record->getId(), [
-                    'order' => [
-                        'updated_at' => 'desc',
-                    ],
-                ])
+                $this->pastoralRevisionMapper->filterRecordsForUser(
+                    $this->pastoralRevisionMapper->findByColumn('root_id', $record->getId(), ['order' => ['updated_at' => 'desc']]),
+                    $this->getUser()
+                )
             );
         }
 

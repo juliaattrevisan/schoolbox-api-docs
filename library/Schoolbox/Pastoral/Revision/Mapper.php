@@ -87,6 +87,80 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Filter records from the collection if the current user doesn't have access to them.
+     * If the user is not in the audience and is not the owner, they can't see the record.
+     *
+     * @param Model $record A pastoral record
+     * @param User  $user   The user who is trying to view them
+     *
+     * @return Model|null
+     */
+    public function filterRecordForUser(Model $record, User $user)
+    {
+        if (!$record instanceof Model) {
+            return null;
+        }
+
+        if ($this->isUserInPastoralService($user) || $user->getId() == $record->getOwner()->getId()) {
+            // Pastoral moderator and owner see all, shortcut out of here
+            return $record;
+        }
+
+        // We need to iterate all access records to see if any of them grants private access
+
+        $hasAccess = false;
+
+        foreach ($record->getAccess() as $access) {
+            if ($access->getAccessLevel($user) == PastoralAccessMapper::ACCESS_PUBLIC) {
+                $hasAccess = true;
+            } elseif ($access->getAccessLevel($user) == PastoralAccessMapper::ACCESS_PRIVATE) {
+                // Found a record with private access, shortcut true return
+                return $record;
+            }
+        }
+
+        if ($hasAccess) {
+            // Only has public access, strip the private body
+            $record->setBodyPrivate(null);
+
+            return $record;
+        }
+
+        return null;
+    }
+
+    /**
+     * Filter records from the collection if the current user doesn't have access to them.
+     * If the user is not in the audience and is not the owner, they can't see the record.
+     *
+     * @param Collection|Model[] $records A list of pastoral records
+     * @param User               $user    The user who is trying to view them
+     *
+     * @return Collection|Model[]
+     */
+    public function filterRecordsForUser(Collection $records, User $user)
+    {
+        /** @var PastoralCommentMapper $pastoralCommentMapper */
+        $pastoralCommentMapper = $this->getJoinMapper('comments');
+
+        $collection = $this->createCollection();
+
+        /** @var Model $record */
+        foreach ($records as $record) {
+            $record = $this->filterRecordForUser($record, $user);
+
+            if ($record instanceof Model) {
+                // And filter the comments on the record, because this is planet Earth and we don't trust anybody
+                $record->setComments($pastoralCommentMapper->filterRecordsForUser($record->getComments(), $user));
+
+                $collection->add($record);
+            }
+        }
+
+        return $collection;
+    }
+
+    /**
      * @inheritdoc
      */
     protected function hydrateSelect(PDOStatement $statement)
@@ -139,85 +213,23 @@ class Mapper extends BaseMapper
         /** @var Model $model */
         $model = $this->hydrate($row);
 
-        $model->setOwner($ownerMapper->hydrate($row, 'o'));
-        $model->setModifiedBy($modifiedByMapper->hydrate($row, 'mb'));
-        $model->setStudent($studentMapper->hydrate($row, 's')->loadParents()->loadTeachers());
-        $model->setAccess($this->getJoinMapper('access')->findByColumn('pastoral_id', $model->getRootId()));
-
-        // If there is no user in the session this call is coming from the notifier
-
-        if (isset($this->sessionData['user'])) {
-            $user = $this->getSessionUser();
-        } else {
-            // The notifier does not need access to anything other than the student ID and the record ID, so for
-            // safety reasons the remainder of the details on the record will be stripped.
-
-            $model->setBodyPublic(null);
-            $model->setBodyPrivate(null);
-            $model->setAttachments(new Collection());
-            $model->setRevisions(new Collection());
-            $model->setTags(new Collection());
-            $model->setComments(new Collection());
-            $model->setRelatedRecords(new Collection());
-
-            return $model;
-        }
-
         if ($this->getConfigLoader()->get('pastoral_severity')) {
             $model->setSeverity($severityMapper->hydrate($row, 'sv'));
         }
 
+        $model->setOwner($ownerMapper->hydrate($row, 'o'));
+        $model->setModifiedBy($modifiedByMapper->hydrate($row, 'mb'));
+        $model->setStudent($studentMapper->hydrate($row, 's')->loadParents()->loadTeachers());
+        $model->setAccess($this->getJoinMapper('access')->findByColumn('pastoral_id', $model->getRootId()));
         $model->setType($typeMapper->hydrate($row, 't'));
         $model->setSubType($subtypeMapper->hydrate($row, 'c'));
+        $model->setTags(PastoralTagMapper::getInstance()->findForRecord($model));
+        $model->setComments($this->getJoinMapper('comments')->findByColumn('pastoral_id', $model->getId()));
 
-        // If the user is not in the audience- and is not the owner, they can't see the record
+        // If the private body looks empty, make it really empty
 
-        if ($this->isUserInPastoralService($user) ||                  // Pastoral moderators
-            $model->getOwner()->getId() == $user->getId()) {          // The records owner
-            $accessLevel = PastoralAccessMapper::ACCESS_PRIVATE;      // Get private access
-        } else {
-            $accessLevel = PastoralAccessMapper::ACCESS_NONE;
-
-            foreach ($model->getAccess() as $access) {
-                $currentAccessLevel = $access->getAccessLevel($user);
-
-                if ($currentAccessLevel > $accessLevel) {
-                    $accessLevel = $currentAccessLevel;
-                }
-
-                // We are as high as we are going to get, stop looking
-
-                if ($accessLevel == PastoralAccessMapper::ACCESS_PRIVATE) {
-                    break;
-                }
-            }
-        }
-
-        if ($accessLevel == PastoralAccessMapper::ACCESS_NONE) {
-            // No access to the record
-
-            return false;
-        } elseif ($accessLevel == PastoralAccessMapper::ACCESS_PUBLIC) {
-            // Access to the public record details only, blank out the private body and attachments
-
-            $model->setBodyPrivate(null);
-            $model->setAttachments($this->getJoinMapper('attachments')->findByColumnList([
-                'pastoral_id' => $model->getId(),
-                'private'     => 0,
-            ]));
-        } elseif ($accessLevel == PastoralAccessMapper::ACCESS_PRIVATE) {
-            // Access to the whole record
-
-            $model->setAttachments(
-                $this->getJoinMapper('attachments')
-                    ->findByColumn('pastoral_id', $model->getId())
-            );
-
-            // If the private body looks empty, make it really empty
-
-            if (empty(trim(strip_tags($model->getBodyPrivate())))) {
-                $model->setBodyPrivate("");
-            }
+        if (empty(trim(strip_tags($model->getBodyPrivate())))) {
+            $model->setBodyPrivate("");
         }
 
         // If the public body looks empty, make it really empty
@@ -225,9 +237,6 @@ class Mapper extends BaseMapper
         if (empty(trim(strip_tags($model->getBodyPublic())))) {
             $model->setBodyPublic("");
         }
-
-        $model->setTags(PastoralTagMapper::getInstance()->findForRecord($model));
-        $model->setComments($this->getJoinMapper('comments')->findByColumn('pastoral_id', $model->getId()));
 
         // Return hydrated model
 
