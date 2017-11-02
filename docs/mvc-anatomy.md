@@ -264,6 +264,84 @@ Supporting classes are independent classes; they aren't bound to any particular 
 Design Patterns aren't rigid laws that absolutely must be obeyed and used at all times. They are simplified solutions that have consistently emerged. It is up to the author to determine whether a Design Pattern should be used, and if so, which one. A cron job or once-off script, for example, may not require the architectural forethought of a Design Pattern; a cruder solution may be sufficient. On the other hand, Design Patterns form the basis of a common language which can be used to succinctly communicate a larger system design.
 
 # 4 Responsibilities of Mapper
+A Mapper is a database abstraction layer; that is, it hides the way database queries are executed and the resultant output's generation before being passed back to the caller. In this way, the same business logic methods such as `findById()` obscure the mechanism by which it obtains data - whether that's from a csv file, a MySQL database or an API endpoint.
+
+> Mappers contain methods which alter persistent storage; putting data in and getting data out of that storage into a format that's compatible with Controller methods in the domain (business logic) layer.
+
+The Mapper classes themselves should contain a set of ubiquitous or common database queries in addition to the default set of `findById()` `findByColumnList()` et al. Here's an example of database queries that are useful in multiple parts of the application:
+
+```php
+
+/**
+ * Folder Mapper 
+ */
+class Mapper extends BaseMapper {
+
+    /**
+     * Find a folder by its associated Folder Code
+     */
+    public function findByCode($code) {
+        ...
+    }
+    
+    /**
+     * Find a folder's parent instance 
+     */
+    public function findParent(Folder $folder) {
+        ...
+    }
+}
+```
+
+## 4.1 Special Queries
+Less common or otherwise unique queries should be stored in supporting classes instead, which utilise an instance of a corresponding Mapper; otherwise people might misuse it. 
+
+One notable pitfall is taking a method that sort of does what you need, then you add what *you* need it to do without considering the impact it has elsewhere (or lack thereof).
+
+Eventually this method loses its specific purpose (reduces cohesion), touches and integrally affects numerous locations (high coupling) and evolves into technical debt. There's been a real-life example of this in an earlier incarnation of `findByParent($id)` in Folder Mapper; not only does it get a parent, but also a count of assessments and a set of configurations.
+
+> Break away these specific responsibilities into other classes instead. Note that Mappers expose a method that executes raw sql queries: `$mapper->getDatabase()->query()`
+ 
+```php
+
+class Cat {
+
+    /**
+     * Cat constructor.
+     */
+    public function __construct(Folder\Mapper $folderMapper) {
+        $this->setFolderMapper($folderMapper);
+    }
+    
+    /**
+     * Do a very specific query that nobody else really needs to know about
+     */
+    public function doSomething() {
+        $query = "
+            SELECT columns  
+            FROM table
+            INNER JOIN other places
+            LEFT JOIN this place
+            RIGHT OUTER JOIN that place
+            WHERE a lot of things happen
+            AND NOT include things
+            LIMIT a page worth's of stuff
+        ";
+    
+        $statement = $this->getDatabase()->query($query);
+        $statement->execute();
+        
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            ...
+            ...
+        }
+    }
+}
+``` 
+ 
+## 4.2 Predicates
+
+## 4.3 Caching
 
 # 5 Responsibilities of Model
 * Models shouldn't contain mechanisms to persist data to the db; they should rely on some other class to do that on their behalf. Models are simple representations of data that can confess details about themselves, but something else should remember it.
