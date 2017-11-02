@@ -266,6 +266,7 @@ Design Patterns aren't rigid laws that absolutely must be obeyed and used at all
 # 4 Responsibilities of Mapper
 
 # 5 Responsibilities of Model
+* Models shouldn't contain mechanisms to persist data to the db; they should rely on some other class to do that on their behalf. Models are simple representations of data that can confess details about themselves, but something else should remember it.
 
 # 6 Responsibilities of View
 
