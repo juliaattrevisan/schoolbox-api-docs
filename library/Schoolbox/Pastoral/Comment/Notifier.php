@@ -108,7 +108,7 @@ class Notifier extends AbstractModuleNotifier
         $builder = new Builder();
         $builder->setTitle("A pastoral comment has been {$method}")
             ->setIcon("/portrait.php?size=square32&userId={$owner->getExternalId()}")
-            ->setHref("/pastoral/student/{$pastoral->getStudent()->getId()}/pastoral/{$pastoral->getId()}?ts={$timestamp}")
+            ->setHref("/pastoral/student/{$pastoral->getStudent()->getId()}/record/{$pastoral->getId()}?ts={$timestamp}")
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::ERROR)
             ->addTopic("pastoral_comment.{$model->getId()}.{$method}");
