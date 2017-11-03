@@ -50,7 +50,7 @@
         "league/flysystem-aws-s3-v3": "1.0.*",
         "php-amqplib/php-amqplib": "~2.7.0",
         "cboden/ratchet": "0.3.4",
-        "react/stomp": "0.2.*@dev",
+        "react/stomp": "dev-master",
         "react/dns": "0.4.*",
         "react/socket-client": "~0.7.0",
         "mtdowling/cron-expression": "~2.0.0",

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "67e2cb6eddb9ecac2ba37440e6c952f9",
+    "content-hash": "9015cbf1835c914497f6162cb10654e7",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -2822,13 +2822,13 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/reactphp/stomp.git",
-                "reference": "5cae9c0ef6397785302c085c464c278a69427c26"
+                "url": "https://github.com/friends-of-reactphp/stomp.git",
+                "reference": "7c47d4d260ca9dae8496ad1cb4bf8fd888f7ec2d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/stomp/zipball/5cae9c0ef6397785302c085c464c278a69427c26",
-                "reference": "5cae9c0ef6397785302c085c464c278a69427c26",
+                "url": "https://api.github.com/repos/friends-of-reactphp/stomp/zipball/7c47d4d260ca9dae8496ad1cb4bf8fd888f7ec2d",
+                "reference": "7c47d4d260ca9dae8496ad1cb4bf8fd888f7ec2d",
                 "shasum": ""
             },
             "require": {
@@ -2838,17 +2838,12 @@
                 "react/socket": "0.4.*"
             },
             "require-dev": {
-                "phpunit/phpunit": "4.3.*"
+                "phpunit/phpunit": "^5"
             },
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "0.2-dev"
-                }
-            },
             "autoload": {
-                "psr-0": {
-                    "React\\Stomp": "src"
+                "psr-4": {
+                    "React\\Stomp\\": "src"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -2860,7 +2855,7 @@
                 "rabbitmq",
                 "stomp"
             ],
-            "time": "2015-01-25T19:06:56+00:00"
+            "time": "2017-10-01T19:40:05+00:00"
         },
         {
             "name": "react/stream",
