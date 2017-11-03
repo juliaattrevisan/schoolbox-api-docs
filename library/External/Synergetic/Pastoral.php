@@ -191,11 +191,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         // Give the import 30 minutes to complete and bump up the memory limit just to make sure we don't bomb out
 
         ini_set('memory_limit', '2048M');
-        set_time_limit(60 * 30);
-
-        // For some bizarre reason the Mapper doesn't have access to the session data at this point
-
-        $this->getPastoralLogMapper()->setSessionData($_SESSION);
+        set_time_limit(30 * 60);
 
         // Log start of import
 
@@ -218,119 +214,129 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         // Retrieve an iterator for all current students pastoral care records from Synergetic sorted by student name as
         // it makes searching the import log much easier.
 
-        $query = "
-            {$this->sqlPastoralSelect}
-            ORDER BY      Community_1.Surname, 
-                          Community_1.Given1, 
-                          dbo.tPastoralCare.PastoralCareSeq
-        ";
-
-        $records = $this->connector->executeQueryIterator($query);
+        $highestPastoralSeq = 0;
 
         // Keep the pastoral records we create so we can add audience members and remove the need for MARS
 
         $pastoralRecordsCreated = [];
 
-        foreach ($records as $record) {
-            // Remove the Synergetic magic blank value
+        do {
+            $queryRecords =
+            "
+                {$this->sqlPastoralSelect}
+                WHERE         PastoralCareSeq > {$highestPastoralSeq}
+                ORDER BY      dbo.tPastoralCare.PastoralCareSeq
+            ";
 
-            $record["Details"] = trim(strip_tags($record["Details"]));
+            // Chunk the import without using the iterator, because its failing miserably for some reason
 
-            if ($record["Details"] == self::BLANK_PRIVATE_RECORD) {
-                $record["Details"] = '';
-            }
+            $queryRecords = $this->connector->executeQuery(str_replace("SELECT", "SELECT TOP 5", $queryRecords));
+            $records = $queryRecords->fetchAll();
 
-            $record["PrivateDetails"] = trim(strip_tags($record["PrivateDetails"]));
+            foreach ($records as $record) {
+                // Capture the pastoral sequence so we can iterate
 
-            if ($record["PrivateDetails"] == self::BLANK_PRIVATE_RECORD) {
-                $record["PrivateDetails"] = '';
-            }
+                $highestPastoralSeq = $record["PastoralCareSeq"];
 
-            // Create a heading from the public details in Synergetic
 
-            $heading = substr(trim($record["Details"]), 0, 50);
+                // Remove the Synergetic magic blank value
 
-            if (empty($heading)) {
-                $heading = "Untitled Synergetic Record (Seq: {$record["PastoralCareSeq"]})";
-            }
+                $record["Details"] = trim(strip_tags($record["Details"]));
 
-            // Create a new log entry
-
-            $logRecord = $this->pastoralLogMapper->createModel();
-            $logRecord->setImportId($importId);
-            $logRecord->setUserId($user->getId());
-            $logRecord->setHeading($heading);
-            $logRecord->setStudentName("{$record["StudentLastname"]}, {$record["StudentFirstname"]}");
-            $logRecord->setCreatorName("{$record["OwnerLastname"]}, {$record["OwnerFirstname"]}");
-
-            try {
-                $student = $this->getSchoolboxUser($record["ID"]);
-                $owner   = $this->getSchoolboxUser($record["CreatedByID"]) ?: $defaultOwner;
-
-                if (!$student instanceof User) {
-                    // The student of the pastoral care record is not available in Schoolbox, skip this record
-
-                    $logRecord->setResult("Skipped Unknown Student ({$record["PastoralCareSeq"]})");
-                    $this->getPastoralLogMapper()->save($logRecord);
-
-                    continue;
+                if ($record["Details"] == self::BLANK_PRIVATE_RECORD) {
+                    $record["Details"] = '';
                 }
 
-                $logRecord->setCreatorName($owner->getFullName());
-                $logRecord->setStudentName($student->getFullName());
-                $logRecord->setResult("Importing ({$record["PastoralCareSeq"]})");
-                $this->getPastoralLogMapper()->save($logRecord);
+                $record["PrivateDetails"] = trim(strip_tags($record["PrivateDetails"]));
 
-                // If this pastoral care record already exists in Schoolbox, delete it so we don't end up with duplicate
-                // records. Could update the record, but its contents may have deviated it was originally imported, and
-                // deleting will at least keep that history
+                if ($record["PrivateDetails"] == self::BLANK_PRIVATE_RECORD) {
+                    $record["PrivateDetails"] = '';
+                }
 
-                $this->getPastoralMapper()->deleteByColumn("external_id", $record["PastoralCareSeq"]);
+                // Create a heading from the public details in Synergetic
 
-                // Only create record if both public and private aren't blank
+                $heading = substr(trim($record["Details"]), 0, 50);
 
-                if (!empty($record["Details"]) || !empty($record["PrivateDetails"])) {
-                    /** @var Pastoral $pastoralRecord */
-                    $pastoralRecord = $this->getPastoralMapper()->createModel();
-                    $pastoralRecord->setExternalId($record["PastoralCareSeq"]);
-                    $pastoralRecord->setOwner($owner);
-                    $pastoralRecord->setStudent($student);
-                    $pastoralRecord->setHeading($heading);
-                    $pastoralRecord->setBodyPublic("<p>{$record["Details"]}</p>");
-                    $pastoralRecord->setBodyPrivate("<p>{$record["PrivateDetails"]}</p>");
-                    $pastoralRecord->setType($this->getPastoralType($record));
-                    $pastoralRecord->setSubType($this->getPastoralSubType($record));
+                if (empty($heading)) {
+                    $heading = "Untitled Synergetic Record (Seq: {$record["PastoralCareSeq"]})";
+                }
 
-                    if ($this->config->get('pastoral_severity')) {
-                        $pastoralRecord->setSeverity($severity);
+                // Create a new log entry
+
+                $logRecord = $this->pastoralLogMapper->createModel();
+                $logRecord->setImportId($importId);
+                $logRecord->setUserId($user->getId());
+                $logRecord->setHeading($heading);
+                $logRecord->setStudentName("{$record["StudentLastname"]}, {$record["StudentFirstname"]}");
+                $logRecord->setCreatorName("{$record["OwnerLastname"]}, {$record["OwnerFirstname"]}");
+
+                try {
+                    $student = $this->getSchoolboxUser($record["ID"]);
+                    $owner = $this->getSchoolboxUser($record["CreatedByID"]) ?: $defaultOwner;
+
+                    if (!$student instanceof User) {
+                        // The student of the pastoral care record is not available in Schoolbox, skip this record
+
+                        $logRecord->setResult("Skipped Unknown Student ({$record["PastoralCareSeq"]})");
+                        $this->getPastoralLogMapper()->save($logRecord);
+
+                        continue;
                     }
 
-                    $this->getPastoralMapper()->save($pastoralRecord);
-                    $log->setResult("OK");
+                    $logRecord->setCreatorName($owner->getFullName());
+                    $logRecord->setStudentName($student->getFullName());
+                    $logRecord->setResult("Importing ({$record["PastoralCareSeq"]})");
+                    $this->getPastoralLogMapper()->save($logRecord);
 
+                    // If this pastoral care record already exists in Schoolbox, delete it so we don't end up with duplicate
+                    // records. Could update the record, but its contents may have deviated it was originally imported, and
+                    // deleting will at least keep that history
 
-                    $pastoralRecordsCreated[] = $pastoralRecord;
-                } else {
-                    // Skip blank records
+                    $this->getPastoralMapper()->deleteByColumn("external_id", $record["PastoralCareSeq"]);
 
-                    $logRecord->setResult("Skipped Blank Record ({$record["PastoralCareSeq"]})");
+                    // Only create record if both public and private aren't blank
+
+                    if (!empty($record["Details"]) || !empty($record["PrivateDetails"])) {
+                        /** @var Pastoral $pastoralRecord */
+                        $pastoralRecord = $this->getPastoralMapper()->createModel();
+                        $pastoralRecord->setExternalId($record["PastoralCareSeq"]);
+                        $pastoralRecord->setOwner($owner);
+                        $pastoralRecord->setStudent($student);
+                        $pastoralRecord->setHeading($heading);
+                        $pastoralRecord->setBodyPublic("<p>{$record["Details"]}</p>");
+                        $pastoralRecord->setBodyPrivate("<p>{$record["PrivateDetails"]}</p>");
+                        $pastoralRecord->setType($this->getPastoralType($record));
+                        $pastoralRecord->setSubType($this->getPastoralSubType($record));
+
+                        if ($this->config->get('pastoral_severity')) {
+                            $pastoralRecord->setSeverity($severity);
+                        }
+
+                        $this->getPastoralMapper()->save($pastoralRecord);
+                        $log->setResult("OK");
+
+                        $pastoralRecordsCreated[] = $pastoralRecord;
+                    } else {
+                        // Skip blank records
+
+                        $logRecord->setResult("Skipped Blank Record ({$record["PastoralCareSeq"]})");
+                    }
+                } catch (Exception $e) {
+                    // If ANYTHING goes wrong during the import we need to log it. The import is running in a detached
+                    // state, so there is no other way to communicate with the user, so an exception would leave the user
+                    // thinking the import is still running.
+
+                    $logRecord->setResult("Import Error: {$e->getMessage()}");
                 }
-            } catch (Exception $e) {
-                // If ANYTHING goes wrong during the import we need to log it. The import is running in a detached
-                // state, so there is no other way to communicate with the user, so an exception would leave the user
-                // thinking the import is still running.
 
-                $logRecord->setResult("Import Error: {$e->getMessage()}");
+                $this->getPastoralLogMapper()->save($logRecord);
             }
-
-            $this->getPastoralLogMapper()->save($logRecord);
-        }
+        } while (count($records) > 0);
 
         // Import audience members for each record we created
 
         foreach ($pastoralRecordsCreated as $pastoralRecord) {
-
-            $audienceIterator = $this->connector->executeQueryIterator(
+            $queryAudience = $this->connector->executeQuery(
                 "
                     SELECT  ID 
                     FROM    PastoralCareContacts 
@@ -339,14 +345,24 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 ['pastoralCareSeq' => $pastoralRecord->getExternalId()]
             );
 
+            $audienceRecords = $queryAudience->fetchAll();
+
+            $queryAudience->getPDOStatement()->errorCode();
+
             // Cache the access records in case we need to create identical ones for the private record, will
 
-            foreach ($audienceIterator as $audience) {
+            foreach ($audienceRecords as $audience) {
+                /** @var PastoralLog $logAccess */
+                $logAccess = $this->getPastoralLogMapper()->createModel();
+                $logAccess->setImportId($importId);
+                $logAccess->setUserId($user->getId());
+                $logAccess->setPastoralId($pastoralRecord->getId());
+                $logAccess->setCreatorName($pastoralRecord->getOwner()->getFullName());
+                $logAccess->setStudentName($pastoralRecord->getStudent()->getFullName());
+
                 $audienceUser = $this->getSchoolboxUser($audience["ID"]);
 
                 if ($audienceUser instanceof User) {
-                    /** @var PastoralLog $logAccess */
-                    $logAccess = $this->getPastoralLogMapper()->createModel();
 
                     // If the school does not want parents given access to pastoral records, then don't add them
 
@@ -354,22 +370,20 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                         /** @var PastoralAccess $accessRecord */
                         $accessRecord = $this->getPastoralAccessMapper()->createModel();
                         $accessRecord->setPastoral($pastoralRecord);
-                        $accessRecord->setAccess(false);
+                        $accessRecord->setAccess(PastoralAccessMapper::ACCESS_PUBLIC);
                         $accessRecord->setUser($audienceUser);
                         $this->getPastoralAccessMapper()->save($accessRecord);
 
-                        $logAccess->setImportId($importId);
-                        $logAccess->setUserId($user->getId());
-                        $logAccess->setPastoralId($pastoralRecord->getId());
-                        $logAccess->setCreatorName($pastoralRecord->getOwner()->getFullName());
-                        $logAccess->setStudentName($pastoralRecord->getStudent()->getFullName());
                         $logAccess->setResult("Audience: {$audienceUser->getFullName()}");
                     } else {
                         $logAccess->setResult("Skipped Audience: {$audienceUser->getFullName()}");
                     }
 
-                    $this->getPastoralLogMapper()->save($logAccess);
+                } else {
+                    $logAccess->setResult("Error Audience: {$audience["ID"]}");
                 }
+
+                $this->getPastoralLogMapper()->save($logAccess);
             }
         }
 
@@ -520,9 +534,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                     $this->connector->executeQuery($query, [
                         'externalId' => $pastoral->getExternalId(),
-                        'order'      => $order++,
-                        'email'      => $user->getEmail(),
-                        'userId'     => $user->getExternalId(),
+                        'order' => $order++,
+                        'email' => $user->getEmail(),
+                        'userId' => $user->getExternalId(),
                     ]);
 
                     $order++;
@@ -588,12 +602,12 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         ";
 
         $result = $this->connector->executeQuery($query, [
-            'externalId'      => $pastoral->getExternalId(),
-            'externalId2'     => $pastoral->getExternalId(),
-            'comment'         => $comment->getBody(),
-            'createdDate'     => $comment->getCreatedAt()->getDatabase(),
-            'createdOwnerId'  => $comment->getOwner()->getExternalId(),
-            'modifiedDate'    => $comment->getCreatedAt()->getDatabase(),
+            'externalId' => $pastoral->getExternalId(),
+            'externalId2' => $pastoral->getExternalId(),
+            'comment' => $comment->getBody(),
+            'createdDate' => $comment->getCreatedAt()->getDatabase(),
+            'createdOwnerId' => $comment->getOwner()->getExternalId(),
+            'modifiedDate' => $comment->getCreatedAt()->getDatabase(),
             'modifiedOwnerId' => $comment->getOwner()->getExternalId(),
         ]);
 
@@ -674,7 +688,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         // which is totally inefficient and very slow :(
 
         $pastoral = $upload->getPastoral();
-        $storage  = $upload->getStorage();
+        $storage = $upload->getStorage();
 
         $pastoralDocumentClassificationMapper = DocumentClassificationMapper::getInstance();
 
@@ -688,11 +702,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
         // Save the file into to the database
 
-        $externalId         = $upload->getExternalId();
-        $studentExternalId  = $upload->getStudentExternalId();
-        $date               = date("Y-m-d H:i:s");
-        $sourceDate         = $storage->getCreatedAt()->getDatabase();
-        $extension          = strtoupper($storage->getExtension());
+        $externalId = $upload->getExternalId();
+        $studentExternalId = $upload->getStudentExternalId();
+        $date = date("Y-m-d H:i:s");
+        $sourceDate = $storage->getCreatedAt()->getDatabase();
+        $extension = strtoupper($storage->getExtension());
         $pastoralExternalId = $pastoral->getExternalId();
 
         // Documents get uploaded with a classification code that is based on the pastoral records type
@@ -734,15 +748,15 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         ";
 
         $query = $this->connector->prepareQuery($sql, [
-            'filename'           => ['value' => $storage->getFilename()],
+            'filename' => ['value' => $storage->getFilename()],
             'classificationCode' => ['value' => $classificationCode],
-            'createdById'        => ['value' => $externalId],
-            'modifiedById'       => ['value' => $externalId],
-            'document'           => ['value' => $storage->readStream(), 'type' => PDO::PARAM_LOB],
-            'createdDate'        => ['value' => $date],
-            'modifiedDate'       => ['value' => $date],
-            'sourceDate'         => ['value' => $sourceDate],
-            'documentType'       => ['value' => $extension],
+            'createdById' => ['value' => $externalId],
+            'modifiedById' => ['value' => $externalId],
+            'document' => ['value' => $storage->readStream(), 'type' => PDO::PARAM_LOB],
+            'createdDate' => ['value' => $date],
+            'modifiedDate' => ['value' => $date],
+            'sourceDate' => ['value' => $sourceDate],
+            'documentType' => ['value' => $extension],
         ]);
 
         if (!$query->execute()) {
@@ -759,7 +773,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 VALUES (:id, :documentReferencesSeq);
             ",
             [
-                'id'                    => $studentExternalId,
+                'id' => $studentExternalId,
                 'documentReferencesSeq' => $documentReferencesSeq,
             ]
         );
@@ -792,8 +806,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         ";
 
         $query = $this->connector->prepareQuery($sql, [
-            'pastoralExternalId'     => $pastoralExternalId,
-            'documentReferencesSeq'  => $documentReferencesSeq,
+            'pastoralExternalId' => $pastoralExternalId,
+            'documentReferencesSeq' => $documentReferencesSeq,
             'documentReferencesSeq2' => $documentReferencesSeq,
         ]);
 
@@ -891,7 +905,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 $documentClassificationCode = '';
             } else {
                 try {
-                    $documentClassification     = PastoralDocumentClassificationMapper
+                    $documentClassification = PastoralDocumentClassificationMapper
                         ::getInstance()
                         ->findById(
                             $pastoral->getType()->getDocumentClassification()->getId()
@@ -906,17 +920,17 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         // Return an array containing the parameters for the insert/update query
 
         $params = [
-            'studentExternalId'   => $studentExternalId,
-            'itemDate'            => $pastoral->getCreatedAt()->getDatabase(),
-            'publicBody'          => substr($pastoral->getBodyPublic(), 0, 2000),
-            'privateBody'         => substr($pastoral->getBodyPrivate(), 0, 2000),
-            'pastoralTypeCode'    => substr($pastoralTypeCode, 0, 15),
+            'studentExternalId' => $studentExternalId,
+            'itemDate' => $pastoral->getCreatedAt()->getDatabase(),
+            'publicBody' => substr($pastoral->getBodyPublic(), 0, 2000),
+            'privateBody' => substr($pastoral->getBodyPrivate(), 0, 2000),
+            'pastoralTypeCode' => substr($pastoralTypeCode, 0, 15),
             'pastoralSubTypeCode' => substr($pastoralSubTypeCode, 0, 15),
-            'classificationCode'  => substr($documentClassificationCode, 0, 15),
-            'createdDate'         => $pastoral->getCreatedAt()->getDatabase(),
-            'createdOwnerId'      => $pastoral->getOwner()->getExternalId(),
-            'modifiedDate'        => $pastoral->getCreatedAt()->getDatabase(),
-            'modifiedOwnerId'     => $pastoral->getOwner()->getExternalId(),
+            'classificationCode' => substr($documentClassificationCode, 0, 15),
+            'createdDate' => $pastoral->getCreatedAt()->getDatabase(),
+            'createdOwnerId' => $pastoral->getOwner()->getExternalId(),
+            'modifiedDate' => $pastoral->getCreatedAt()->getDatabase(),
+            'modifiedOwnerId' => $pastoral->getOwner()->getExternalId(),
         ];
 
         // If this already has an external ID we are doing an update, so require an extra parameter
@@ -1035,7 +1049,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
             try {
                 $category = $this->getPastoralSubTypeMapper()->findOneByColumnList([
-                    'name'             => $record["CategoryDescription"],
+                    'name' => $record["CategoryDescription"],
                     'pastoral_type_id' => $pastoralType->getId(),
                 ]);
             } catch (MapperException $e) {

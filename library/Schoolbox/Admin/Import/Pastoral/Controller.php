@@ -10,6 +10,7 @@
 namespace Schoolbox\Admin\Import\Pastoral;
 
 use Alaress\Web\Controller\Base;
+use External_Pastoral;
 use Schoolbox\Import\ImportNavigation;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Log\Mapper as LogMapper;
@@ -137,14 +138,14 @@ class Controller extends Base
      *
      * @param int $id Pastoral import log ID
      */
-    public function getLogDetail($log)
+    public function getLogDetail($id)
     {
         $this->getResponse()->content->set([
             'template' => '@adminImportPastoral/logDetail.twig',
             'data'     => array(
                 'pageCurrent' => 'import',
                 'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
-                'log' => $log
+                'log' => $id
             )
         ]);
     }
@@ -194,7 +195,7 @@ class Controller extends Base
     {
         try
         {
-            $pastoralExternal = new \External_Pastoral();
+            $pastoralExternal = new External_Pastoral();
             $pastoralExternal->importPastoral($user, $defaultOwner, $importParentAccess);
         }
         catch (\Exception $e)
