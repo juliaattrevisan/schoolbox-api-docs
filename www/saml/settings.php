@@ -185,7 +185,7 @@ function ipInCIDRList ($ip, $cidr_list) {
 *
 * @return boolean
 */
-use phpbrowscap\Browscap;
+use BrowscapPHP\Browscap;
 function useSAMLKerberos() {
 
     // If whitelist not in use, don't use kerberos at all
@@ -216,7 +216,8 @@ function useSAMLKerberos() {
     * Errs on the side of kerberos than non-kerberos
     */
     SAMLDebugLog("IP in kerberos whitelist, attempting browser/platform check");
-    $bc = new Browscap(__DIR__.'/../../tools/browscap');
+//    $bc = new Browscap(__DIR__.'/../../tools/browscap');
+    $bc = new Browscap();
     // Don't attempt to update
     $bc->doAutoUpdate = false;
     // Use local version of the browscap.ini file
