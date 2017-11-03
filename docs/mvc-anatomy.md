@@ -375,6 +375,11 @@ There's a menagerie of user interface elements in `/pantry` which you can use as
    
 > Check the `/pantry` for user interface elements that you can use, and their interactions with other elements and styles. 
 
+## 6.4 Compiling CSS and Javascript 
+We use compilers for css and javascript to manage imports and minify the result. If you're experiencing stylistic oddities or behavioural weirdness, try recompiling your styles and javascript files. This is respectively known as `grunt sass` and `grunt uglify`.
+
+> Note that when you add javascript to the compilation step (look in your `Gruntfile.js`) you're making it globally available at the cost of increasing the minified file's size.
+
 # 7 Executive Summary
 
 # 8 Further Reading
