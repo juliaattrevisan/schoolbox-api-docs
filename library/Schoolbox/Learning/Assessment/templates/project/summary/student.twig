@@ -72,7 +72,7 @@
 
 <div class="row">
     <div class="small-6 island">
-        {% include '@learningAssessment/fragments/project/summary/meta.twig' with {assessment: assessment, student: student} only %}
+        {% include '@learningAssessment/project/summary/meta.twig' with {assessment: assessment, student: student} only %}
     </div>
     <div class="small-6 island">
 
@@ -91,7 +91,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        {% include '@learningAssessment/fragments/project/summary/description.twig' with {assessment: assessment} only %}
+        {% include '@learningAssessment/project/summary/description.twig' with {assessment: assessment} only %}
 
         {% if assessment.assessables|length %}
             <h2 class="subheader">Activities</h2>
