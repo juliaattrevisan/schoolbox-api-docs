@@ -54,7 +54,7 @@
         "react/stomp": "0.2.*@dev",
         "react/dns": "0.4.*",
         "react/socket-client": "~0.7.0",
-        "mtdowling/cron-expression": "1.0.*",
+        "mtdowling/cron-expression": "~2.0.0",
         "tijsverkoyen/css-to-inline-styles": "2.2.0",
         "html2text/html2text": "~4.1.0",
         "browscap/browscap-php": "~3.1.0",
