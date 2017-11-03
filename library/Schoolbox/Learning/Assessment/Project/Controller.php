@@ -167,7 +167,7 @@ class Controller extends Assessment\Controller
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                "@learningAssessment/fragments/project/status/staff.twig",
+                "@learningAssessment/project/status/staff.twig",
                 $twigData
             )
         );
