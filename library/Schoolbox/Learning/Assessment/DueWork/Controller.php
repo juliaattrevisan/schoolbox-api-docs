@@ -208,7 +208,7 @@ class Controller extends Assessment\Controller
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                "@learningAssessment/fragments/dueWork/summary/preview.twig",
+                "@learningAssessment/dueWork/summary/preview.twig",
                 $twigData, "{$assessment->getTitle()}", 'submission'
             )
         );
@@ -266,7 +266,7 @@ class Controller extends Assessment\Controller
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                "@learningAssessment/fragments/dueWork/summary/student.twig",
+                "@learningAssessment/dueWork/summary/student.twig",
                 $twigData, "{$assessment->getTitle()} - {$student->getFullName()}", 'submission'
             )
         );

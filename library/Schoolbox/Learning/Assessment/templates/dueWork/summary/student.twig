@@ -31,12 +31,12 @@
 
 <div class="row">
     <div class="small-12 island">
-        {% include '@learningAssessment/fragments/dueWork/summary/description.twig' with {assessment: participant.assessable, user: USER} %}
+        {% include '@learningAssessment/dueWork/summary/description.twig' with {assessment: participant.assessable, user: USER} %}
     </div>
 </div>
 
 {% if participant.assessable.useRubric %}
-    {% include '@learningAssessment/fragments/dueWork/summary/rubric.twig' %}
+    {% include '@learningAssessment/dueWork/summary/rubric.twig' %}
 {% endif %}
 
 {% include '@learningAssessment/dueWork/history.twig' %}
