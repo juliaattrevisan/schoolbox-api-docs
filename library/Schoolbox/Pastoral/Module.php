@@ -43,6 +43,11 @@ class Module extends BaseModule
     protected $basename = 'pastoral';
 
     /**
+     * @var DataSource
+     */
+    private $pastoralDataSource;
+
+    /**
      * {@inheritdoc}
      */
     protected function registerRoutes()
@@ -289,13 +294,14 @@ class Module extends BaseModule
 
             if (array_key_exists('recordId', $params)) {
                 try {
-                    /** @var PastoralMapper $pastoralMapper */
-                    $pastoralMapper = $this->getMapperFactory()->get(PastoralMapper::class);
-
                     /** @var PastoralAccessMapper $pastoralAccessMapper */
                     $pastoralAccessMapper = $this->getMapperFactory()->get(PastoralAccessMapper::class);
 
-                    $injectedValues['record'] = $pastoralMapper->findById($params['recordId']);
+                    // TODO make current user easily available in path matcher
+                    $injectedValues['record'] = $this->retrievePastoralDataSource()->findById(
+                        $this->getInjector()->get('user'),
+                        $params['recordId']
+                    );
                     $injectedValues['access'] = $pastoralAccessMapper->findByColumn('pastoral_id', $params['recordId']);
                 } catch (MapperException $e) {
                     /** @var ErrorMapper $errorMapper */
@@ -306,5 +312,20 @@ class Module extends BaseModule
 
             return $injectedValues;
         });
+    }
+
+    /**
+     * Set up and inject the pastoral data source
+     *
+     * TODO inject it or set up dependencies?
+     *
+     * @return DataSource
+     */
+    private function retrievePastoralDataSource(): DataSource
+    {
+        if (!$this->pastoralDataSource instanceof DataSource) {
+            $this->pastoralDataSource = new DataSource($this->getMapperFactory()->get(PastoralMapper::class));
+        }
+        return $this->pastoralDataSource;
     }
 }
