@@ -46,7 +46,7 @@
         "shareworks/xml-security": "dev-master",
         "predis/predis": "^1.0",
         "predis/predis-async": "0.3.*@dev",
-        "monolog/monolog": "1.17.2",
+        "monolog/monolog": "~1.23.0",
         "league/flysystem": "~1.0.16",
         "league/flysystem-aws-s3-v3": "1.0.*",
         "php-amqplib/php-amqplib": "2.6.3",
