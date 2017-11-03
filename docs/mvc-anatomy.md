@@ -240,13 +240,20 @@ class Cat
      *
      * Easier to test, can throw any kind of data in to witness outcomes
      *
-     * @param int $eventId
-     * @param int $userId
+     * @param Event\Model $eventId
+     * @param User\Model $userId
      */
-    public function __construct(Event $event, User $user)
+    public function __construct(Event\Model $event, User\Model $user)
     {
         $this->setEvent($event);
         $this->setUser($user);
+    }
+    
+    /**
+     * Do something
+     */
+    public function doSomething() {
+        // same as before
     }
     
     ...
@@ -271,7 +278,6 @@ A Mapper is a database abstraction layer; that is, it hides the way database que
 The Mapper classes themselves should contain a set of ubiquitous or common database queries in addition to the default set of `findById()` `findByColumnList()` et al. Here's an example of database queries that are useful in multiple parts of the application:
 
 ```php
-
 /**
  * Folder Mapper 
  */
@@ -303,7 +309,6 @@ Eventually this method loses its specific purpose (reduces cohesion), touches an
 > Break away these specific responsibilities into other classes instead. Note that Mappers expose a method that executes raw sql queries: `$mapper->getDatabase()->query()`
  
 ```php
-
 class Cat {
 
     /**
