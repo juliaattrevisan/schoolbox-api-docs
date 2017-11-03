@@ -147,7 +147,7 @@ class External_Humanedge_User implements External_UserInterface
                 ca.PostCode AS StudentContactPostCode,
                 '' AS StudentContactState,
                 c.PhoneHome AS StudentContactPhoneActual,
-                '' AS StudentContactMobilePhone,
+                c.PhoneMobile AS StudentContactMobilePhone,
                 c.PhoneWork AS StudentContactOccupPhone,
                 '' AS StudentContactRelation,
                 -- No speese
