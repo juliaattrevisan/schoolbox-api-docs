@@ -35,6 +35,15 @@ class DataSource
     }
 
     /**
+     * @param int $id
+     * @return Model
+     */
+    public function createModel($id = null): Model
+    {
+        return $this->mapper->createModel($id);
+    }
+
+    /**
      * User-sensitive wrapper for findById
      *
      * @param User $user
@@ -97,6 +106,16 @@ class DataSource
     }
 
     /**
+     * @param User $user
+     * @param string $search
+     * @return Collection
+     */
+    public function getSearchResults(User $user, $search): Collection
+    {
+        return $this->mapper->filterRecordsForUser($this->mapper->getSearchResults($search, $user), $user);
+    }
+
+    /**
      * User-sensitive wrapper for findRecentDashboard
      *
      * @param User $user
@@ -121,12 +140,11 @@ class DataSource
     }
 
     /**
-     * Delete this model
-     *
      * @param Model $model
+     * @return bool
      */
-    public function delete(Model $model)
+    public function delete(Model $model): bool
     {
-        $this->mapper->delete($model);
+        return $this->mapper->delete($model);
     }
 }

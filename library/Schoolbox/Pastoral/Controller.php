@@ -64,7 +64,7 @@ class Controller extends Base
     /** @var FileMapper $fileMapper */
     protected $fileMapper;
 
-    /** @var PastoralMapper $pastoralMapper */
+    /** @var DataSource $pastoralMapper */
     protected $pastoralMapper;
 
     /** @var PastoralAccessMapper $pastoralAccessMapper */
@@ -123,7 +123,7 @@ class Controller extends Base
      *
      * @param IConfigLoader             $config
      * @param FileMapper                $fileMapper
-     * @param Mapper                    $pastoralMapper
+     * @param DataSource                $pastoralMapper
      * @param UserAccessMapper          $userAccessMapper
      * @param PastoralAuditMapper       $pastoralAuditMapper
      * @param PastoralSubTypeMapper     $pastoralSubTypeMapper
@@ -145,7 +145,7 @@ class Controller extends Base
     public function __construct(
         IConfigLoader $config,
         FileMapper $fileMapper,
-        PastoralMapper $pastoralMapper,
+        DataSource $pastoralMapper,
         UserAccessMapper $userAccessMapper,
         PastoralAuditMapper $pastoralAuditMapper,
         PastoralSubTypeMapper $pastoralSubTypeMapper,
@@ -247,25 +247,34 @@ class Controller extends Base
         if (!is_numeric($get['type'])) {
             // Retrieve all of the students pastoral records
 
-            $records = $this->pastoralMapper->findByColumn('student_id', $student->getId(), [
-                'order' => [
-                    'updated_at' => 'desc',
-                ],
-            ]);
+            $records = $this->pastoralMapper->findByColumn(
+                $this->getUser(),
+                'student_id',
+                $student->getId(),
+                [
+                    'order' => [
+                        'updated_at' => 'desc',
+                    ],
+                ]
+            );
         } else {
             // Retrieve results filtered by pastoral type
 
-            $records = $this->pastoralMapper->findByColumnList([
-                'student_id' => $student->getId(),
-                'type_id'    => $get['type'],
-            ], [
-                'order' => [
-                    'updated_at' => 'desc',
+            $records = $this->pastoralMapper->findByColumnList(
+                $this->getUser(),
+                [
+                    'student_id' => $student->getId(),
+                    'type_id'    => $get['type'],
                 ],
-            ]);
+                [
+                    'order' => [
+                        'updated_at' => 'desc',
+                    ],
+                ]
+            );
         }
 
-        $records = $this->pastoralMapper->filterRecordsForUser($records, $this->getUser());
+//        $records = $this->pastoralMapper->filterRecordsForUser($records, $this->getUser());
 
         // Limit the number of pastoral records to display on each page of pastoral records
 
@@ -325,10 +334,7 @@ class Controller extends Base
 
         // Retrieve all of the students pastoral records
 
-        $records = $this->pastoralMapper->filterRecordsForUser(
-            $this->pastoralMapper->findLinked($student, $linkedStudent, $get['type']),
-            $this->getUser()
-        );
+        $records = $this->pastoralMapper->findLinked($this->getUser(), $student, $linkedStudent, $get['type']);
 
         // Limit the number of pastoral records to display on each page of pastoral records
 
@@ -379,7 +385,7 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
         }
 
-        $record = $this->pastoralMapper->filterRecordForUser($record, $this->getUser());
+//        $record = $this->pastoralMapper->filterRecordForUser($record, $this->getUser());
 
         // Create an audit record
 
@@ -552,7 +558,7 @@ class Controller extends Base
 
         try {
             /** @var Model $record */
-            $record = $this->pastoralMapper->findById($post['pastoral_id']);
+            $record = $this->pastoralMapper->findById($this->getUser(), $post['pastoral_id']);
 
             if (!empty(trim($post["comment_body"]))) {
                 // Insert the comment to the internal database
@@ -681,7 +687,7 @@ class Controller extends Base
 
         try {
             /** @var Model $record */
-            $record = $this->pastoralMapper->findById($post['id']);
+            $record = $this->pastoralMapper->findById($this->getUser(), $post['id']);
         } catch (MapperException $e) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
         }
@@ -792,7 +798,7 @@ class Controller extends Base
             $record->setBodyPublic(trim($post["body_public"]));
             $record->setBodyPrivate(trim($post["body_private"]));
             $record->setOwner($this->getUser());
-            $this->pastoralMapper->setSessionData($_SESSION);
+//            $this->pastoralMapper->setSessionData($_SESSION);
             $this->pastoralMapper->save($record);
 
             $records->add($record);
