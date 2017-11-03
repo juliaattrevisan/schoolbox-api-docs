@@ -5,7 +5,7 @@
 <section id="visibility-section">
 
     {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-    {# We need a unique GUID to wire up all of these modal events #}
+    {# We need a guid for the user select modal #}
     {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
 
     {% set guid = getGuid() %}
@@ -14,21 +14,21 @@
     {# Display Current Visibility #}
     {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
 
-    {% include '@pastoral/modify_section_visibility_role.twig' %}
-    {% include '@pastoral/modify_section_visibility_group.twig' %}
-    {% include '@pastoral/modify_section_visibility_user.twig' %}
-
-    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-    {# Setup User Selection Modal #}
-    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-
-    {% if allowParents == 1 %}
-        {% set searchScope = 'staff;parentofstudent' %}
-    {% else %}
-        {% set searchScope = 'staff' %}
-    {% endif %}
-
-    {{ userSearch.modal("U" ~ guid, 'Add User To Record', 'Enter name', searchScope, record.student.id, 'window.modalUserAdded') }}
+    <table class="no-margin" id="table-permission">
+        <thead>
+            <tr>
+                <th class="small-2">Type</th>
+                <th class="small-3">Audience</th>
+                <th class="small-2">Deny</th>
+                <th class="small-2">General</th>
+                <th class="small-2">General + {{ locale.pastoralPrivate.proper }}</th>
+                <th class="text-right small-1">Delete</th>
+            </tr>
+        </thead>
+        {% include '@pastoral/modify_section_visibility_role.twig' %}
+        {% include '@pastoral/modify_section_visibility_group.twig' %}
+        {% include '@pastoral/modify_section_visibility_user.twig' %}
+    </table>
 
     {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
     {# Setup Role Selection Modal #}
@@ -39,34 +39,8 @@
     {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
 
     {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-    {# Scripts For Buttons #}
+    {# Scripts For Add Permission Buttons #}
     {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-
-    <script>
-        $(function () {
-            window.usersAdded = [];
-
-            {% for access in record.access if access.user.id != ''%}
-                window.usersAdded[{{ access.user.id }}] = true;
-            {%endfor %}
-
-            window.modalUserAdded = function (user) {
-                if (window.usersAdded[user.id] !== true) {
-                    $('#empty-users').remove();
-                    html = $('[data-user-permission-clone]').html()
-                        .replace(/{NAME}/g, user.first_name + ' ' + user.last_name)
-                        .replace(/{ID}/g, user.id)
-                        .replace(/{ROLE}/g, user.role);
-                    window.usersAdded[user.id] = true;
-                    var permissionListUsers = $('#permission-users');
-                    permissionListUsers.html(permissionListUsers.html() + html);
-                }
-
-                updateVisibility();
-                updateUserPermissionClickEvents();
-            };
-        });
-    </script>
 
     {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
     {# Display Buttons #}
@@ -78,39 +52,19 @@
             {# we can't get it to just tell us what the unique identifier of the modal is. So we have to create it here and then #}
             {# pass it into the macro #}
 
-            <a href="#" data-button="add-user" class="button" data-user-search="U{{ guid }}">Add User</a>
-            <a href="#" data-button="add-role" class="button" data-role-search="R{{ guid }}">Add Role</a>
-            <a href="#" data-button="add-group" class="button" data-group-search="G{{ guid }}">Add Pastoral Group</a>
+            <a href="#" data-button="add-role" class="button" data-reveal-id="modal-role">Add Role</a>
+
+            {% if allowIndividual %}
+                <a href="#" data-button="add-user" class="button" data-user-search="{{ guid }}">Add User</a>
+            {% endif %}
+
+            {% if groups | length > 0 %}
+                <a href="#" data-button="add-group" class="button" data-reveal-id="modal-group">Add Pastoral Group</a>
+            {% endif %}
         </section>
     </div>
 
     <script>
-
-        function updateUserPermissionClickEvents() {
-            $('[data-delete-visibility]').click(function (e) {
-                e.preventDefault();
-
-                var row = $(this).closest('tr');
-                var type = $(this).attr('data-delete-visibility');
-                var userId = $(row).attr('data-user-id');
-
-                $('[data-reveal]').hide();
-
-                console.log(window.usersAdded);
-
-                $(this).confirmDialog({
-                    text: 'Are you sure you wish to remove the ' + type + 's visibility?',
-                    confirmEvent: function () {
-                        window.usersAdded[userId] = false;
-                        row.remove();
-                        updateVisibility();
-                        console.log(window.usersAdded);
-                    }
-                });
-            });
-        }
-
-        updateUserPermissionClickEvents();
 
         {# Update the visibility of permission tables #}
 
@@ -120,9 +74,9 @@
 
             {# Roles #}
 
-            var tableRoles = $("#table-permission-roles");
+            var tableRoles = $("#permission-roles");
 
-            if ($('#permission-roles').find('tr').length === 0) {
+            if (tableRoles.find('tr').length === 0) {
                 tableRoles.addClass('hide');
             } else {
                 tableRoles.removeClass('hide');
@@ -131,9 +85,9 @@
 
             {# Groups #}
 
-            var tableGroups = $("#table-permission-groups");
+            var tableGroups = $("#permission-groups");
 
-            if ($('#permission-groups').find('tr').length === 0) {
+            if (tableGroups.find('tr').length === 0) {
                 tableGroups.addClass('hide');
             } else {
                 tableGroups.removeClass('hide');
@@ -142,16 +96,16 @@
 
             {# Users #}
 
-            var tableUsers = $("#table-permission-users");
+            var tableUsers = $("#permission-users");
 
-            if ($('#permission-users').find('tr').length === 0) {
+            if (tableUsers.find('tr').length === 0) {
                 tableUsers.addClass('hide');
             } else {
                 tableUsers.removeClass('hide');
                 found++;
             }
 
-            {# Empty State #}
+            {# Empty state if there are no permissions #}
 
             if (found === 0) {
                 $('#visibility-section').addClass('hide');
@@ -189,9 +143,99 @@
     <p>No visibility rules have been added to this record, it {{ tense }} only visible by {{ name }} and {{ other }} {{ locale.pastoral }} moderators.</p>
     <p>
         To grant access to other users add a
-        <a href="#" data-user-search="U{{ guid }}" title="Add User">user</a>,
-        <a href="#" data-role-search="R{{ guid }}" title="Add Role">role</a> or
-        <a href="#" data-group-search="G{{ guid }}" title="Add Pastoral Group">pastoral group</a>
+        <a href="#" data-reveal-id="modal-role" title="Add Role">role</a>
+        {%- if allowIndividual -%}
+            {%- if groups | length == 0 %} or{% else %},{% endif %}
+            <a href="#" data-user-search="{{ guid }}" title="Add User">user</a>
+        {%- endif -%}
+        {% if groups | length > 0 %}
+            or <a href="#" data-reveal-id="modal-group" title="Add Pastoral Group">pastoral group</a>
+        {%- endif %}
         visibility rule to this record.
     </p>
 </div>
+
+
+{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+{# Cloneable HTML For Individual User Permission #}
+{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+
+<table class="hide">
+    <tbody data-user-permission-clone>
+    <tr data-user-id="{ID}">
+        <td class="small-2">User</td>
+        <td class="small-3">{NAME} ({ROLE})</td>
+        <td class="small-2">
+            <input type="radio" name="user[{ID}]" id="userDeny{ID}" value="0" checked>
+            <label class="radio-label" for="userDeny{ID}"></label>
+        </td>
+        <td class="small-2">
+            <input type="radio" name="user[{ID}]" id="userPublic{ID}" value="1">
+            <label class="radio-label" for="userPublic{ID}"></label>
+        </td>
+        <td class="small-2">
+            <input type="radio" name="user[{ID}]" id="userPrivate{ID}" value="2">
+            <label class="radio-label" for="userPrivate{ID}"></label>
+        </td>
+        <td class="text-right small-1">
+            <a href="#" data-delete-visibility="user" class="icon-delete"></a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+{# Cloneable HTML For Group Permission #}
+{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+
+<table class="hide">
+    <tbody data-group-permission-clone>
+    <tr data-group-id="{ID}">
+        <td class="small-2">Pastoral Group</td>
+        <td class="small-3">{NAME}</td>
+        <td class="small-2">
+            <input type="radio" name="group[{ID}]" id="groupDeny{ID}" value="0" checked>
+            <label class="radio-label" for="groupDeny{ID}"></label>
+        </td>
+        <td class="small-2">
+            <input type="radio" name="group[{ID}]" id="groupPublic{ID}" value="1">
+            <label class="radio-label" for="groupPublic{ID}"></label>
+        </td>
+        <td class="small-2">
+            <input type="radio" name="group[{ID}]" id="groupPrivate{ID}" value="2">
+            <label class="radio-label" for="groupPrivate{ID}"></label>
+        </td>
+        <td class="text-right small-1">
+            <a href="#" data-delete-visibility="group" class="icon-delete"></a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+{# Cloneable HTML For Role Permission #}
+{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+
+<table class="hide">
+    <tbody data-role-permission-clone>
+    <tr data-role-id="{ID}">
+        <td class="small-2">Role</td>
+        <td class="small-3">{NAME}</td>
+        <td class="small-2">
+            <input type="radio" name="role[{ID}]" id="roleDeny{ID}" value="0" checked>
+            <label class="radio-label" for="roleDeny{ID}"></label>
+        </td>
+        <td class="small-2">
+            <input type="radio" name="role[{ID}]" id="rolePublic{ID}" value="1">
+            <label class="radio-label" for="rolePublic{ID}"></label>
+        </td>
+        <td class="small-2">
+            <input type="radio" name="role[{ID}]" id="rolePrivate{ID}" value="2">
+            <label class="radio-label" for="rolePrivate{ID}"></label>
+        </td>
+        <td class="text-right small-1">
+            <a href="#" data-delete-visibility="role" class="icon-delete"></a>
+        </td>
+    </tr>
+    </tbody>
+</table>

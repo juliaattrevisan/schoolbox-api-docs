@@ -4,91 +4,113 @@
 
 {% if allowIndividual %}
 
-    <table class="no-margin" id="table-permission-users">
-        <thead>
-            <tr>
-                <th class="small-5">Users</th>
-                <th class="small-2"></th>
-                <th class="small-2"></th>
-                <th class="small-2"></th>
-                <th class="small-1"></th>
-            </tr>
-        </thead>
-        <tbody id="permission-users">
-            {% set countUsers = 0 %}
+    <tbody id="permission-users">
 
-            {% for access in record.access if access.user.id != '' %}
+        {% set countUsers = 0 %}
 
-                {# Work out which radio should be checked for each row#}
+        {% for access in record.access if access.user.id != '' %}
 
-                {% set checkedDeny = '' %}
-                {% set checkedPublic = '' %}
-                {% set checkedPrivate = '' %}
+            {# Work out which radio should be checked for each row#}
 
-                {% if record.id != '' %}
-                    {% for userAccess in record.access if access.user.id != '' %}
-                        {% if userAccess.user.id == access.user.id %}
-                            {% if userAccess.private == 1 %}
-                                {% set checkedPrivate = 'checked' %}
-                            {% else %}
-                                {% set checkedPublic = 'checked' %}
-                            {% endif %}
+            {% set checkedDeny = '' %}
+            {% set checkedPublic = '' %}
+            {% set checkedPrivate = '' %}
+
+            {% if record.id != '' %}
+                {% for userAccess in record.access if access.user.id != '' %}
+                    {% if userAccess.user.id == access.user.id %}
+                        {% if userAccess.access == 0 %}
+                            {% set checkedDeny = 'checked' %}
+                        {% elseif userAccess.access == 1 %}
+                            {% set checkedPublic = 'checked' %}
+                        {% elseif userAccess.access == 2 %}
+                            {% set checkedPrivate = 'checked' %}
                         {% endif %}
-                    {% endfor %}
-                {% endif %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
 
-                {% if checkedPublic == '' and checkedPrivate == '' %}
-                    {% set checkedDeny = 'checked' %}
-                {% endif %}
+            <tr data-user-id="{{ access.user.id }}">
+                <td class="small-2">User</td>
+                <td class="small-3">{{ access.user.firstname }} {{ access.user.lastname }} ({{ access.user.role.name }})</td>
+                <td class="small-2">
+                    <input type="radio" name="user[{{ access.user.id }}]" id="userDeny{{ access.user.id }}" value="0" {{ checkedDeny }}>
+                    <label class="radio-label" for="userDeny{{ access.user.id }}"></label>
+                </td>
+                <td class="small-2">
+                    <input type="radio" name="user[{{ access.user.id }}]" id="userPublic{{ access.user.id }}" value="1" {{ checkedPublic }}>
+                    <label class="radio-label" for="userPublic{{ access.user.id }}"></label>
+                </td>
+                <td class="small-2">
+                    <input type="radio" name="user[{{ access.user.id }}]" id="userPrivate{{ access.user.id }}" value="2" {{ checkedPrivate }}>
+                    <label class="radio-label" for="userPrivate{{ access.user.id }}"></label>
+                </td>
+                <td class="text-right small-1">
+                    <a href="#" data-delete-visibility="user" class="icon-delete"></a>
+                </td>
+            </tr>
+            {% set countUsers = countUsers + 1 %}
+        {% endfor %}
+    </tbody>
 
-                <tr data-user-id="{{ access.user.id }}">
-                    <td class="small-5">{{ access.user.firstname }} {{ access.user.lastname }} ({{ access.user.role.name }})</td>
-                    <td class="small-2">
-                        <input type="radio" name="user[{{ access.user.id }}]" id="userDeny{{ access.user.id }}" value="0" {{ checkedDeny }}>
-                        <label class="radio-label" for="userDeny{{ access.user.id }}"></label>
-                    </td>
-                    <td class="small-2">
-                        <input type="radio" name="user[{{ access.user.id }}]" id="userPublic{{ access.user.id }}" value="1" {{ checkedPublic }}>
-                        <label class="radio-label" for="userPublic{{ access.user.id }}"></label>
-                    </td>
-                    <td class="small-2">
-                        <input type="radio" name="user[{{ access.user.id }}]" id="userPrivate{{ access.user.id }}" value="2" {{ checkedPrivate }}>
-                        <label class="radio-label" for="userPrivate{{ access.user.id }}"></label>
-                    </td>
-                    <td class="small-1">
-                        <a href="#" data-delete-visibility="user" class="icon-delete"></a>
-                    </td>
-                </tr>
-                {% set countUsers = countUsers + 1 %}
+    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+    {# Setup User Selection Modal #}
+    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+
+    {% if allowParents == 1 %}
+        {% set searchScope = 'staff;parentofstudent' %}
+    {% else %}
+        {% set searchScope = 'staff' %}
+    {% endif %}
+
+    {{ userSearch.modal(guid, 'Add User To Record', 'Enter name', searchScope, record.student.id, 'window.modalUserAdded') }}
+
+    <script>
+        $(function () {
+            window.usersAdded = [];
+
+            {% for access in record.access if access.user.id != ''%}
+            window.usersAdded[{{ access.user.id }}] = true;
             {% endfor %}
-        </tbody>
-    </table>
 
-    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-    {# Cloneable HTML For Individual User Permission #}
-    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+            window.modalUserAdded = function (user) {
+                if (window.usersAdded[user.id] !== true) {
+                    $('#empty-users').remove();
+                    html = $('[data-user-permission-clone]').html()
+                        .replace(/{NAME}/g, user.first_name + ' ' + user.last_name)
+                        .replace(/{ID}/g, user.id)
+                        .replace(/{ROLE}/g, user.role);
+                    window.usersAdded[user.id] = true;
+                    var permissionListUsers = $('#permission-users');
+                    permissionListUsers.html(permissionListUsers.html() + html);
+                }
 
-    <table class="hide">
-        <tbody data-user-permission-clone>
-        <tr data-user-id="{ID}">
-            <td class="small-5">{NAME} ({ROLE})</td>
-            <td class="small-2">
-                <input type="radio" name="user[{ID}]" id="userDeny{ID}" value="0" checked>
-                <label class="radio-label" for="userDeny{ID}"></label>
-            </td>
-            <td class="small-2">
-                <input type="radio" name="user[{ID}]" id="userPublic{ID}" value="1">
-                <label class="radio-label" for="userPublic{ID}"></label>
-            </td>
-            <td class="small-2">
-                <input type="radio" name="user[{ID}]" id="userPrivate{ID}" value="2">
-                <label class="radio-label" for="userPrivate{ID}"></label>
-            </td>
-            <td class="small-1">
-                <a href="#" data-delete-visibility="user" class="icon-delete"></a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+                updateVisibility();
+                updateUserPermissionClickEvents();
+            };
+
+            function updateUserPermissionClickEvents() {
+                $('[data-delete-visibility="user"]').click(function (e) {
+                    e.preventDefault();
+
+                    var row = $(this).closest('tr');
+                    var userId = $(row).attr('data-user-id');
+
+                    $('[data-reveal]').hide();
+
+                    $(this).confirmDialog({
+                        text: 'Are you sure you wish to remove the users visibility record?',
+                        confirmEvent: function () {
+                            window.usersAdded[userId] = false;
+                            row.remove();
+                            updateVisibility();
+                        }
+                    });
+                });
+            }
+
+            updateUserPermissionClickEvents();
+        });
+    </script>
 
 {% endif %}

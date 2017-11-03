@@ -1,66 +1,195 @@
 {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-{# User Roles Access #}
+{# Pastoral Roles Access #}
 {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
 
-<table class="no-margin" id="table-permission-roles">
-    <thead>
-        <tr>
-            <th class="small-5">Roles</th>
-            <th class="small-2">Deny</th>
-            <th class="small-2">General</th>
-            <th class="small-2">General + {{ locale.pastoralPrivate.proper }}</th>
-            <th class="small-1">&nbsp;</th>
-        </tr>
-    </thead>
+{% if roles | length > 0 %}
+
     <tbody id="permission-roles">
-        {% for role in record.access if access.role.id != '' %}
-            {% if role.isStaff or (role.isParent and allowParents == 1) %}
-                {# Work out which radio should be checked for each row #}
 
-                {% set checkedDeny = '' %}
-                {% set checkedPublic = '' %}
-                {% set checkedPrivate = '' %}
+    {% if record.id != '' %}
+        {% for access in record.access if access.role.id != '' %}
+            {# Work out which radio should be checked for each row #}
 
-                {% if record.id != '' %}
-                    {% for access in record.access if access.role.id != '' %}
-                        {% if access.role.id == role.id %}
-                            {% if access.private == 0 %}
-                                {% set checkedDeny = 'checked' %}
-                            {% elseif access.private == 1 %}
-                                {% set checkedPublic = 'checked' %}
-                            {% elseif access.private == 2 %}
-                                {% set checkedPrivate = 'checked' %}
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
+            {% set checkedDeny = '' %}
+            {% set checkedPublic = '' %}
+            {% set checkedPrivate = '' %}
+
+            {% for userAccess in record.access if access.role.id != '' %}
+                {% if userAccess.role.id == role.id %}
+                    {% if userAccess.access == 0 %}
+                        {% set checkedDeny = 'checked' %}
+                    {% elseif userAccess.access == 1 %}
+                        {% set checkedPublic = 'checked' %}
+                    {% elseif userAccess.access == 2 %}
+                        {% set checkedPrivate = 'checked' %}
+                    {% endif %}
                 {% endif %}
+            {% endfor %}
 
-                {% if checkedPublic == '' and checkedPrivate == '' %}
-                    {% set checkedDeny = 'checked' %}
-                {% endif %}
-
-                <tr>
-                    <td class="small-5">
-                        {{ role.name }}
-                        {% if role.isParent %}Of Student{% endif %}
-                    </td>
-                    <td class="small-2">
-                        <input type="radio" name="role[{{ role.id }}]" id="roleDeny{{ role.id }}" value="0" {{ checkedDeny }}>
-                        <label class="radio-label" for="roleDeny{{ role.id }}"></label>
-                    </td>
-                    <td class="small-2">
-                        <input type="radio" name="role[{{ role.id }}]" id="rolePublic{{ role.id }}" value="1" {{ checkedPublic }}>
-                        <label class="radio-label" for="rolePublic{{ role.id }}"></label>
-                    </td>
-                    <td class="small-2">
-                        <input type="radio" name="role[{{ role.id }}]" id="rolePrivate{{ role.id }}" value="2" {{ checkedPrivate }}>
-                        <label class="radio-label" for="rolePrivate{{ role.id }}"></label>
-                    </td>
-                    <td class="small-1">
-                        <a href="#" data-delete-visibility="role" class="icon-delete"></a>
-                    </td>
-                </tr>
-            {% endif %}
+            <tr data-role-id="{{ access.role.id }}">
+                <td class="small-2">
+                    Pastoral Role
+                </td>
+                <td class="small-3">
+                    {{ access.role.name }}
+                </td>
+                <td class="small-2">
+                    <input type="radio" name="role[{{ access.role.id }}]" id="roleDeny{{ access.role.id }}"
+                           value="0" {{ checkedDeny }}>
+                    <label class="radio-label" for="roleDeny{{ access.role.id }}"></label>
+                </td>
+                <td class="small-2">
+                    <input type="radio" name="role[{{ access.role.id }}]" id="rolePublic{{ access.role.id }}"
+                           value="1" {{ checkedPublic }}>
+                    <label class="radio-label" for="rolePublic{{ access.role.id }}"></label>
+                </td>
+                <td class="small-2">
+                    <input type="radio" name="role[{{ access.role.id }}]" id="rolePrivate{{ access.role.id }}"
+                           value="2" {{ checkedPrivate }}>
+                    <label class="radio-label" for="rolePrivate{{ access.role.id }}"></label>
+                </td>
+                <td class="text-right small-1">
+                    <a href="#" data-delete-visibility="role" class="icon-delete"></a>
+                </td>
+            </tr>
         {% endfor %}
+    {% endif %}
     </tbody>
-</table>
+
+    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+    {# Setup Role Selection Modal #}
+    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+
+    <div id="modal-role" class="reveal-modal" data-reveal role="dialog">
+        <h2>Add Pastoral Role</h2>
+        <section>
+            <ul class="information-list">
+                {% for role in roles %}
+                    <li data-role-add="{{ role.id }}" data-role-name="{{ role.name }}">
+                        <a class="list-item link-row">
+                            <div class="card small-12">
+                                <i class="icon-group alert size-32"></i>
+                                <p>{{ role.name }}</p>
+                                <p class="meta">System Role ({{ roleUsers[role.id] | length }} Users)</p>
+                            </div>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+
+    <script>
+        $(function () {
+            {# Setup click events #}
+
+            function updateRolePermissionsClick() {
+                $('[data-delete-visibility="role"]').click(function (e) {
+                    e.preventDefault();
+
+                    var row = $(this).closest('tr');
+                    var roleId = $(row).attr('data-role-id');
+
+                    $('[data-reveal]').hide();
+
+                    $(this).confirmDialog({
+                        text: 'Are you sure you wish to remove the pastoral roles visibility record?',
+                        confirmEvent: function () {
+                            window.rolesAdded[roleId] = false;
+                            row.remove();
+                            updateRolesModal();
+                            updateVisibility();
+                        }
+                    });
+                });
+            }
+
+            {# Enable/Disable add pastoral role button depending on if there are any more roles available to add #}
+
+            function updateRolesModal()
+            {
+                var tableRolesAdded = $('[data-role-id]');
+
+                $("[data-role-add]").removeClass('hide');
+
+                if (tableRolesAdded.length > 1) {
+                    tableRolesAdded.each(function () {
+                        var roleId = $(this).attr('data-role-id');
+
+                        if (roleId !== '{ID}') {
+                            if (window.rolesAdded[roleId] === true) {
+                                $("[data-role-add=" + roleId + "]").addClass('hide');
+                            } else {
+                                $("[data-role-add=" + roleId + "]").removeClass('hide');
+                            }
+                        }
+                    });
+                }
+
+                var roleModalButtons = $("[data-reveal-id='modal-role']");
+
+                {# Subtracting one for the dummy clone row #}
+
+                if ($("[data-role-add]:not(.hide)").length === 0) {
+                    roleModalButtons.attr('disabled', 'true');
+                } else {
+                    roleModalButtons.removeAttr('disabled');
+                }
+            }
+
+            {# Add role to table #}
+
+            $('[data-role-add]').click(function(e) {
+                e.preventDefault();
+
+                var roleId = $(this).attr('data-role-add');
+                var roleName = $(this).attr('data-role-name');
+
+                if (window.rolesAdded[roleId] !== true) {
+                    $('#empty-roles').remove();
+
+                    html = $('[data-role-permission-clone]').html()
+                        .replace(/{NAME}/g, roleName)
+                        .replace(/{ID}/g, roleId);
+
+                    window.rolesAdded[roleId] = true;
+
+                    var permissionListRoles = $('#permission-roles');
+                    permissionListRoles.html(permissionListRoles.html() + html);
+                }
+
+                $(this).addClass('hide');
+
+                updateRolePermissionsClick();
+                updateRolesModal();
+                updateVisibility();
+
+                var remaining = 0;
+
+                $("[data-role-add]").each(function() {
+                    if (!$(this).hasClass('hide')) {
+                        remaining++;
+                    }
+                });
+
+                if (remaining === 0) {
+                    $('#modal-role').foundation('reveal', 'close');
+                }
+            });
+
+            {# Initial setup #}
+
+            window.rolesAdded = [];
+
+            {% for access in record.access if access.role.id != '' %}
+            window.rolesAdded[{{ access.role.id }}] = true;
+            {% endfor %}
+
+            updateRolePermissionsClick();
+            updateRolesModal();
+            updateVisibility();
+        });
+    </script>
+
+{% endif %}

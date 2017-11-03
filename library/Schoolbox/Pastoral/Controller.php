@@ -478,6 +478,23 @@ class Controller extends Base
 
         $moderator = $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0;
 
+        $allowParents = $this->config->get('pastoral_parent_access');
+
+        // Only want staff/parent roles
+
+        $roles = new Collection();
+        $roleUsers = [];
+
+        $rolesAll = $this->roleMapper->findAll(['order' => ['name' => 'ASC']]);
+
+        /** @var Role $roleCurrent */
+        foreach ($rolesAll as $roleCurrent) {
+            if ($roleCurrent->isStaff() || $roleCurrent->isParent() && $allowParents) {
+                $roles->add($roleCurrent);
+                $roleUsers[$roleCurrent->getId()] = $this->userMapper->findByColumn('group_id', $roleCurrent->getId());
+            }
+        }
+
         // Render this thing out
 
         $this->getResponse()->content->set([
@@ -485,11 +502,12 @@ class Controller extends Base
             'data'     => [
                 'record'            => $record,
                 'allowIndividual'   => $this->config->get('pastoral_individual_access'),
-                'allowParents'      => $this->config->get('pastoral_parent_access'),
+                'allowParents'      => $allowParents,
                 'types'             => $this->pastoralTypeMapper->findAll(['order' => ['name' => 'ASC']]),
                 'categories'        => $this->pastoralSubTypeMapper->findAll(['order' => ['name' => 'ASC']]),
                 'severities'        => $severities,
-                'roles'             => $this->roleMapper->findAll(['order' => ['name' => 'ASC']]),
+                'roles'             => $roles,
+                'roleUsers'         => $roleUsers,
                 'groups'            => $this->pastoralGroupMapper->findAll(['name' => ['order' => 'ASC']]),
                 'moderator'         => $moderator,
                 'attachzonePublic'  => $this->getAttachZone(self::ATTACHZONE_PUBLIC, $record),
@@ -801,15 +819,14 @@ class Controller extends Base
                         try {
                             /** @var Role $role */
                             $role = $this->roleMapper->findById($role_id);
+                            $access = $this->pastoralAccessMapper->createModel();
+                            $access->setPastoral($record);
+                            $access->setAccess($accessLevel);
+                            $access->setRole($role);
+                            $this->pastoralAccessMapper->save($access);
                         } catch (MapperException $e) {
-                            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
+                            // Noop
                         }
-
-                        $access = $this->pastoralAccessMapper->createModel();
-                        $access->setPastoral($record);
-                        $access->setAccess($accessLevel);
-                        $access->setRole($role);
-                        $this->pastoralAccessMapper->save($access);
                     }
                 }
             }
@@ -826,15 +843,14 @@ class Controller extends Base
                         try {
                             /** @var PastoralGroup $group */
                             $group = $this->pastoralGroupMapper->findById($group_id);
+                            $access = $this->pastoralAccessMapper->createModel();
+                            $access->setPastoral($record);
+                            $access->setAccess($accessLevel);
+                            $access->setGroup($group);
+                            $this->pastoralAccessMapper->save($access);
                         } catch (MapperException $e) {
-                            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
+                            // Noop
                         }
-
-                        $access = $this->pastoralAccessMapper->createModel();
-                        $access->setPastoral($record);
-                        $access->setAccess($accessLevel);
-                        $access->setGroup($group);
-                        $this->pastoralAccessMapper->save($access);
                     }
                 }
             }
@@ -851,15 +867,14 @@ class Controller extends Base
                         try {
                             /** @var UserMapper $user */
                             $user = $this->userMapper->findById($user_id);
+                            $access = $this->pastoralAccessMapper->createModel();
+                            $access->setPastoral($record);
+                            $access->setAccess($accessLevel);
+                            $access->setUser($user);
+                            $this->pastoralAccessMapper->save($access);
                         } catch (MapperException $e) {
-                            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
+                            // Noop
                         }
-
-                        $access = $this->pastoralAccessMapper->createModel();
-                        $access->setPastoral($record);
-                        $access->setAccessLevel($accessLevel);
-                        $access->setUser($user);
-                        $this->pastoralAccessMapper->save($access);
                     }
                 }
             }
