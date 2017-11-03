@@ -41,7 +41,7 @@
         "ezyang/htmlpurifier": "~4.9.3",
         "twig/twig": "~2.4.4",
         "twig/extensions": "~1.5.1",
-        "swiftmailer/swiftmailer": "5.4.*",
+        "swiftmailer/swiftmailer": "~6.0.2",
         "maximebf/debugbar": "~1.14.0",
         "shareworks/xml-security": "dev-master",
         "predis/predis": "^1.0",
