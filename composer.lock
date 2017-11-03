@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "fd6ba056f147799c5fd32dce0b242166",
+    "content-hash": "07dfeb491fd67ce05ccc3588b62d31ac",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -1730,16 +1730,16 @@
         },
         {
             "name": "mpratt/embera",
-            "version": "1.8.15",
+            "version": "1.9.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mpratt/Embera.git",
-                "reference": "43c55cd1402ebb957895a109627487136f5e867d"
+                "reference": "45c380c40f6d08687c193c685a7ebd3f3db27811"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mpratt/Embera/zipball/43c55cd1402ebb957895a109627487136f5e867d",
-                "reference": "43c55cd1402ebb957895a109627487136f5e867d",
+                "url": "https://api.github.com/repos/mpratt/Embera/zipball/45c380c40f6d08687c193c685a7ebd3f3db27811",
+                "reference": "45c380c40f6d08687c193c685a7ebd3f3db27811",
                 "shasum": ""
             },
             "require": {
@@ -1777,7 +1777,7 @@
                 "vine",
                 "youtube"
             ],
-            "time": "2016-01-21T14:24:42+00:00"
+            "time": "2016-07-15T15:57:44+00:00"
         },
         {
             "name": "mtdowling/cron-expression",
