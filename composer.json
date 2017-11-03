@@ -49,7 +49,7 @@
         "monolog/monolog": "~1.23.0",
         "league/flysystem": "~1.0.16",
         "league/flysystem-aws-s3-v3": "1.0.*",
-        "php-amqplib/php-amqplib": "2.6.3",
+        "php-amqplib/php-amqplib": "~2.7.0",
         "cboden/ratchet": "0.3.4",
         "react/stomp": "0.2.*@dev",
         "react/dns": "0.4.*",
