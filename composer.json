@@ -34,7 +34,7 @@
         "gggeek/phpxmlrpc": "0.1.0",
         "zendframework/zendservice-apple-apns": "~1.0",
         "zendframework/zend-uri": "2.2.*",
-        "symfony/http-foundation": "~3.2.6",
+        "symfony/http-foundation": "~3.3.10",
         "league/oauth2-client": "~2.2.1",
         "sabre/dav": "~3.2.2",
         "sabre/vobject" : "~4.1.2",
