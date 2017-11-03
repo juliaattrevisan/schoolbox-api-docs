@@ -33,7 +33,6 @@
     "require": {
         "gggeek/phpxmlrpc": "0.1.0",
         "zendframework/zendservice-apple-apns": "~1.0",
-        "zendframework/zend-uri": "2.2.*",
         "symfony/http-foundation": "~3.3.10",
         "league/oauth2-client": "~2.2.1",
         "sabre/dav": "~3.2.2",
@@ -72,7 +71,8 @@
         "nesbot/carbon": "~1.22.1",
         "league/flysystem-ziparchive": "^1.0",
         "phpoffice/phpexcel": "dev-master",
-        "roave/security-advisories": "dev-master"
+        "roave/security-advisories": "dev-master",
+        "zendframework/zend-uri": "~2.5.2"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",
