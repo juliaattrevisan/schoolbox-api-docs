@@ -1,0 +1,132 @@
+<?php
+/**
+ * @author      Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright   Copyright 2017, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Pastoral;
+
+use Schoolbox\Collection;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\User;
+
+/**
+ * Data source for pastoral care records.
+ *
+ * All access to pastoral care records should be through this object, not the
+ * mapper. This is for cleanliness reasons.
+ */
+class DataSource
+{
+    /**
+     * @var Mapper
+     */
+    private $mapper;
+
+    /**
+     * Constructor
+     *
+     * @param Mapper $mapper
+     */
+    public function __construct(Mapper $mapper)
+    {
+        $this->mapper = $mapper;
+    }
+
+    /**
+     * User-sensitive wrapper for findById
+     *
+     * @param User $user
+     * @param int  $id
+     * @return Model
+     * @throws MapperException
+     */
+    public function findById(User $user, $id): Model
+    {
+        $model = $this->mapper->filterRecordForUser($this->mapper->findById($id), $user);
+        if (!$model instanceof Model) {
+            throw new MapperException('Instance of object not found');
+        }
+        return $model;
+    }
+
+    /**
+     * User-sensitive wrapper for findByColumn
+     *
+     * @param User   $user
+     * @param string $columnName
+     * @param string $columnValue
+     * @param array  $options
+     * @return Collection
+     */
+    public function findByColumn(User $user, $columnName, $columnValue, $options = []): Collection
+    {
+        return $this->mapper->filterRecordsForUser(
+            $this->mapper->findByColumn($columnName, $columnValue, $options),
+            $user
+        );
+    }
+
+    /**
+     * User-sensitive wrapper for findByColumnList
+     *
+     * @param User  $user
+     * @param array $columnList
+     * @param array $options
+     * @return Collection|Model[]
+     */
+    public function findByColumnList(User $user, $columnList, $options = []): Collection
+    {
+        return $this->mapper->filterRecordsForUser($this->mapper->findByColumnList($columnList, $options), $user);
+    }
+
+    /**
+     * User-sensitive wrapper for findLinked
+     *
+     * @param User $user
+     * @param User $student
+     * @param User $linkedStudent
+     * @param int $typeId
+     *
+     * @return Collection|Model[]
+     */
+    public function findLinked(User $user, User $student, User $linkedStudent, $typeId = null): Collection
+    {
+        return $this->mapper->filterRecordsForUser($this->mapper->findLinked($student, $linkedStudent, $typeId), $user);
+    }
+
+    /**
+     * User-sensitive wrapper for findRecentDashboard
+     *
+     * @param User $user
+     * @param int $count
+     *
+     * @return Collection|Model[]
+     */
+    public function findRecentDashboard(User $user, $count = 5): Collection
+    {
+        // This relies upon the current user anyway
+        return $this->mapper->filterRecordsForUser($this->mapper->findRecentDashboard($user, $count), $user);
+    }
+
+    /**
+     * Save this model
+     *
+     * @param Model $model
+     */
+    public function save(Model $model)
+    {
+        $this->mapper->save($model);
+    }
+
+    /**
+     * Delete this model
+     *
+     * @param Model $model
+     */
+    public function delete(Model $model)
+    {
+        $this->mapper->delete($model);
+    }
+}
