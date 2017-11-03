@@ -358,6 +358,22 @@ They don't care about where they came from or where they are going; instantiatio
 > Models are not responsible for performing any persisting work; these duties should be delegated to another class, such as a Mapper or a service class that utilises a Mapper.  
   
 # 6 Responsibilities of View
+The View's only purpose is to render data that the Controller generated. It doesn't care about how that data as manufactured or from whence it came. It should only operate on the data that was provided. 
+
+## 6.1 Render what was provided
+Ironically, twig is so powerful it can actually execute php commands - on numerous occasions costly database calls were made without realising and this caused all sorts of weird performance issues. We can't enforce this very strictly so it's a soft constraint we impose on ourselves that we only render the data array that's provided by the Controller method.
+ 
+> Render only the data that was provided - though twig is powerful, it can be dangerous in an innocuous way.
+
+## 6.2 Reusable Fragments
+Twig also has the ability to set up layout inheritances, macros and includes - utilise these liberally where applicable. If you can reuse these pieces, do so. 
+
+> There's a /templates/sub folder where you can put globally reusable template pieces. Otherwise, store as many resuable pieces in your module's templates folder.
+
+## 6.3 The Pantry
+There's a menagerie of user interface elements in `/pantry` which you can use as a guide. This is a good place to check behaviours when you're building user interface elements - one element's style can have a dramatic effect on any number of other elements.
+   
+> Check the `/pantry` for user interface elements that you can use, and their interactions with other elements and styles. 
 
 # 7 Executive Summary
 
