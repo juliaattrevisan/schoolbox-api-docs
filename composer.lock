@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "44a9ca28cd635bd83069881db9ccba1b",
+    "content-hash": "c26da8f1d03b2c330a8be7e3801b34bf",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -2388,31 +2388,33 @@
         },
         {
             "name": "react/socket-client",
-            "version": "v0.4.6",
+            "version": "v0.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/socket-client.git",
-                "reference": "49e730523b73d912e56f7a41f53ed3fc083ae167"
+                "reference": "8ad621ef80fb23d10330c8cc9232c5a5e17af60c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/socket-client/zipball/49e730523b73d912e56f7a41f53ed3fc083ae167",
-                "reference": "49e730523b73d912e56f7a41f53ed3fc083ae167",
+                "url": "https://api.github.com/repos/reactphp/socket-client/zipball/8ad621ef80fb23d10330c8cc9232c5a5e17af60c",
+                "reference": "8ad621ef80fb23d10330c8cc9232c5a5e17af60c",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.4.0",
-                "react/dns": "0.4.*",
-                "react/event-loop": "0.4.*",
-                "react/promise": "~2.0",
-                "react/stream": "0.4.*"
+                "php": ">=5.3.0",
+                "react/dns": "0.4.*|0.3.*",
+                "react/event-loop": "0.4.*|0.3.*",
+                "react/promise": "^2.1 || ^1.2",
+                "react/promise-timer": "~1.0",
+                "react/stream": "^0.6 || ^0.5 || ^0.4.5"
+            },
+            "require-dev": {
+                "clue/block-react": "^1.1",
+                "phpunit/phpunit": "~4.8",
+                "react/socket": "^0.5",
+                "react/stream": "^0.6"
             },
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "0.4-dev"
-                }
-            },
             "autoload": {
                 "psr-4": {
                     "React\\SocketClient\\": "src"
@@ -2422,11 +2424,15 @@
             "license": [
                 "MIT"
             ],
-            "description": "Async connector to open TCP/IP and SSL/TLS based connections.",
+            "description": "Async, streaming plaintext TCP/IP and secure TLS based connections for ReactPHP",
             "keywords": [
-                "Socket"
+                "Connection",
+                "Socket",
+                "async",
+                "reactphp",
+                "stream"
             ],
-            "time": "2016-12-06T10:54:49+00:00"
+            "time": "2017-04-02T20:32:08+00:00"
         },
         {
             "name": "react/stomp",
