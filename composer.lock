@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "90c176a0d291e4b96245de00fd9928d0",
+    "content-hash": "43baae405da79fd5e476cfb2a14c82a3",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -739,20 +739,23 @@
         },
         {
             "name": "ezyang/htmlpurifier",
-            "version": "v4.8.0",
+            "version": "v4.9.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ezyang/htmlpurifier.git",
-                "reference": "d0c392f77d2f2a3dcf7fcb79e2a1e2b8804e75b2"
+                "reference": "95e1bae3182efc0f3422896a3236e991049dac69"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/d0c392f77d2f2a3dcf7fcb79e2a1e2b8804e75b2",
-                "reference": "d0c392f77d2f2a3dcf7fcb79e2a1e2b8804e75b2",
+                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/95e1bae3182efc0f3422896a3236e991049dac69",
+                "reference": "95e1bae3182efc0f3422896a3236e991049dac69",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.2"
+            },
+            "require-dev": {
+                "simpletest/simpletest": "^1.1"
             },
             "type": "library",
             "autoload": {
@@ -779,7 +782,7 @@
             "keywords": [
                 "html"
             ],
-            "time": "2016-07-16T12:58:58+00:00"
+            "time": "2017-06-03T02:28:16+00:00"
         },
         {
             "name": "gggeek/phpxmlrpc",
@@ -1075,20 +1078,24 @@
         },
         {
             "name": "html2text/html2text",
-            "version": "3.0.0",
+            "version": "4.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mtibben/html2text.git",
-                "reference": "dc89d6a6d32dcffd6ad4d62e0d0bd2d454589ffb"
+                "reference": "bf613dc8d3389d70c891cd847954346acab16574"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mtibben/html2text/zipball/dc89d6a6d32dcffd6ad4d62e0d0bd2d454589ffb",
-                "reference": "dc89d6a6d32dcffd6ad4d62e0d0bd2d454589ffb",
+                "url": "https://api.github.com/repos/mtibben/html2text/zipball/bf613dc8d3389d70c891cd847954346acab16574",
+                "reference": "bf613dc8d3389d70c891cd847954346acab16574",
                 "shasum": ""
             },
             "require-dev": {
                 "phpunit/phpunit": "~4"
+            },
+            "suggest": {
+                "ext-mbstring": "For best performance",
+                "symfony/polyfill-mbstring": "If you can't install ext-mbstring"
             },
             "type": "library",
             "autoload": {
@@ -1104,7 +1111,7 @@
                 "GPLv2"
             ],
             "description": "Converts HTML to formatted plain text",
-            "time": "2015-10-11T23:34:23+00:00"
+            "time": "2017-05-15T01:50:59+00:00"
         },
         {
             "name": "imagine/imagine",
