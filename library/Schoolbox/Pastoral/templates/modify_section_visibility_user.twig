@@ -6,51 +6,49 @@
 
     <tbody id="permission-users">
 
-        {% set countUsers = 0 %}
+        {% if record.id != '' %}
 
-        {% for access in record.access if access.user.id != '' %}
+            {% set countUsers = 0 %}
 
-            {# Work out which radio should be checked for each row#}
+            {% for userAccess in record.access if userAccess.user.id != '' %}
 
-            {% set checkedDeny = '' %}
-            {% set checkedPublic = '' %}
-            {% set checkedPrivate = '' %}
+                {# Work out which radio should be checked for each row#}
 
-            {% if record.id != '' %}
-                {% for userAccess in record.access if access.user.id != '' %}
-                    {% if userAccess.user.id == access.user.id %}
-                        {% if userAccess.access == 0 %}
-                            {% set checkedDeny = 'checked' %}
-                        {% elseif userAccess.access == 1 %}
-                            {% set checkedPublic = 'checked' %}
-                        {% elseif userAccess.access == 2 %}
-                            {% set checkedPrivate = 'checked' %}
-                        {% endif %}
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
+                {% set checkedDeny = '' %}
+                {% set checkedPublic = '' %}
+                {% set checkedPrivate = '' %}
 
-            <tr data-user-id="{{ access.user.id }}">
-                <td class="small-2">User</td>
-                <td class="small-3">{{ access.user.firstname }} {{ access.user.lastname }} ({{ access.user.role.name }})</td>
-                <td class="small-2">
-                    <input type="radio" name="user[{{ access.user.id }}]" id="userDeny{{ access.user.id }}" value="0" {{ checkedDeny }}>
-                    <label class="radio-label" for="userDeny{{ access.user.id }}"></label>
-                </td>
-                <td class="small-2">
-                    <input type="radio" name="user[{{ access.user.id }}]" id="userPublic{{ access.user.id }}" value="1" {{ checkedPublic }}>
-                    <label class="radio-label" for="userPublic{{ access.user.id }}"></label>
-                </td>
-                <td class="small-2">
-                    <input type="radio" name="user[{{ access.user.id }}]" id="userPrivate{{ access.user.id }}" value="2" {{ checkedPrivate }}>
-                    <label class="radio-label" for="userPrivate{{ access.user.id }}"></label>
-                </td>
-                <td class="text-right small-1">
-                    <a href="#" data-delete-visibility="user" class="icon-delete"></a>
-                </td>
-            </tr>
-            {% set countUsers = countUsers + 1 %}
-        {% endfor %}
+                {% if userAccess.access == 0 %}
+                    {% set checkedDeny = 'checked' %}
+                {% elseif userAccess.access == 1 %}
+                    {% set checkedPublic = 'checked' %}
+                {% elseif userAccess.access == 2 %}
+                    {% set checkedPrivate = 'checked' %}
+                {% endif %}
+
+                <tr data-user-id="{{ userAccess.user.id }}">
+                    <td class="small-2">User</td>
+                    <td class="small-3">{{ userAccess.user.firstname }} {{ userAccess.user.lastname }} ({{ userAccess.user.role.name }})</td>
+                    <td class="small-2">
+                        <input type="radio" name="user[{{ userAccess.user.id }}]" id="userDeny{{ userAccess.user.id }}" value="0" {{ checkedDeny }}>
+                        <label class="radio-label" for="userDeny{{ userAccess.user.id }}"></label>
+                    </td>
+                    <td class="small-2">
+                        <input type="radio" name="user[{{ userAccess.user.id }}]" id="userPublic{{ userAccess.user.id }}" value="1" {{ checkedPublic }}>
+                        <label class="radio-label" for="userPublic{{ userAccess.user.id }}"></label>
+                    </td>
+                    <td class="small-2">
+                        <input type="radio" name="user[{{ userAccess.user.id }}]" id="userPrivate{{ userAccess.user.id }}" value="2" {{ checkedPrivate }}>
+                        <label class="radio-label" for="userPrivate{{ userAccess.user.id }}"></label>
+                    </td>
+                    <td class="text-right small-1">
+                        <a href="#" data-delete-visibility="user" class="icon-delete"></a>
+                    </td>
+                </tr>
+                {% set countUsers = countUsers + 1 %}
+            {% endfor %}
+        {% endif %}
+
     </tbody>
 
     {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}

@@ -6,16 +6,14 @@
 
     <tbody id="permission-roles">
 
-    {% if record.id != '' %}
-        {% for access in record.access if access.role.id != '' %}
-            {# Work out which radio should be checked for each row #}
+        {% if record.id != '' %}
+            {% for userAccess in record.access if userAccess.role.id != '' %}
+                {# Work out which radio should be checked for each row #}
+                {% set checkedDeny = '' %}
+                {% set checkedPublic = '' %}
+                {% set checkedPrivate = '' %}
 
-            {% set checkedDeny = '' %}
-            {% set checkedPublic = '' %}
-            {% set checkedPrivate = '' %}
-
-            {% for userAccess in record.access if access.role.id != '' %}
-                {% if userAccess.role.id == role.id %}
+                {% if userAccess.role_id == role.id %}
                     {% if userAccess.access == 0 %}
                         {% set checkedDeny = 'checked' %}
                     {% elseif userAccess.access == 1 %}
@@ -24,36 +22,36 @@
                         {% set checkedPrivate = 'checked' %}
                     {% endif %}
                 {% endif %}
-            {% endfor %}
 
-            <tr data-role-id="{{ access.role.id }}">
-                <td class="small-2">
-                    Pastoral Role
-                </td>
-                <td class="small-3">
-                    {{ access.role.name }}
-                </td>
-                <td class="small-2">
-                    <input type="radio" name="role[{{ access.role.id }}]" id="roleDeny{{ access.role.id }}"
-                           value="0" {{ checkedDeny }}>
-                    <label class="radio-label" for="roleDeny{{ access.role.id }}"></label>
-                </td>
-                <td class="small-2">
-                    <input type="radio" name="role[{{ access.role.id }}]" id="rolePublic{{ access.role.id }}"
-                           value="1" {{ checkedPublic }}>
-                    <label class="radio-label" for="rolePublic{{ access.role.id }}"></label>
-                </td>
-                <td class="small-2">
-                    <input type="radio" name="role[{{ access.role.id }}]" id="rolePrivate{{ access.role.id }}"
-                           value="2" {{ checkedPrivate }}>
-                    <label class="radio-label" for="rolePrivate{{ access.role.id }}"></label>
-                </td>
-                <td class="text-right small-1">
-                    <a href="#" data-delete-visibility="role" class="icon-delete"></a>
-                </td>
-            </tr>
-        {% endfor %}
-    {% endif %}
+                <tr data-role-id="{{ userAccess.role.id }}">
+                    <td class="small-2">
+                        Pastoral Role
+                    </td>
+                    <td class="small-3">
+                        {{ userAccess.role.name }}
+                    </td>
+                    <td class="small-2">
+                        <input type="radio" name="role[{{ userAccess.role.id }}]" id="roleDeny{{ userAccess.role.id }}"
+                               value="0" {{ checkedDeny }}>
+                        <label class="radio-label" for="roleDeny{{ userAccess.role.id }}"></label>
+                    </td>
+                    <td class="small-2">
+                        <input type="radio" name="role[{{ userAccess.role.id }}]" id="rolePublic{{ userAccess.role.id }}"
+                               value="1" {{ checkedPublic }}>
+                        <label class="radio-label" for="rolePublic{{ userAccess.role.id }}"></label>
+                    </td>
+                    <td class="small-2">
+                        <input type="radio" name="role[{{ userAccess.role.id }}]" id="rolePrivate{{ userAccess.role.id }}"
+                               value="2" {{ checkedPrivate }}>
+                        <label class="radio-label" for="rolePrivate{{ userAccess.role.id }}"></label>
+                    </td>
+                    <td class="text-right small-1">
+                        <a href="#" data-delete-visibility="role" class="icon-delete"></a>
+                    </td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+
     </tbody>
 
     {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
@@ -107,8 +105,7 @@
 
             {# Enable/Disable add pastoral role button depending on if there are any more roles available to add #}
 
-            function updateRolesModal()
-            {
+            function updateRolesModal() {
                 var tableRolesAdded = $('[data-role-id]');
 
                 $("[data-role-add]").removeClass('hide');
@@ -140,7 +137,7 @@
 
             {# Add role to table #}
 
-            $('[data-role-add]').click(function(e) {
+            $('[data-role-add]').click(function (e) {
                 e.preventDefault();
 
                 var roleId = $(this).attr('data-role-add');
@@ -167,7 +164,7 @@
 
                 var remaining = 0;
 
-                $("[data-role-add]").each(function() {
+                $("[data-role-add]").each(function () {
                     if (!$(this).hasClass('hide')) {
                         remaining++;
                     }
@@ -182,8 +179,8 @@
 
             window.rolesAdded = [];
 
-            {% for access in record.access if access.role.id != '' %}
-            window.rolesAdded[{{ access.role.id }}] = true;
+            {% for userAccess in record.access if userAccess.role.id != '' %}
+                window.rolesAdded[{{ userAccess.role.id }}] = true;
             {% endfor %}
 
             updateRolePermissionsClick();

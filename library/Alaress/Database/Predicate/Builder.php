@@ -38,6 +38,9 @@ class Builder implements IBuilder
     /** @var array */
     protected $params = [];
 
+    /** @var string */
+    protected $paramPrefix = null;
+
     /**
      * PredicateBuilder constructor.
      *
@@ -629,6 +632,18 @@ class Builder implements IBuilder
     }
 
     /**
+     * Set a parameter prefix, because multiple predicate builders in a single query are a thing
+     *
+     * @param $string
+     * @return self|$this
+     */
+    public function setParamPrefix($string)
+    {
+        $this->paramPrefix = $string;
+        return $this;
+    }
+
+    /**
      * Find an alias for $param which isn't already in use in $this->params.
      *
      * @param string $param
@@ -638,7 +653,13 @@ class Builder implements IBuilder
     {
         $i = 0;
         while ($i < 10000) {
-            $candidate = "{$param}_{$i}";
+            if ($this->paramPrefix != null) {
+                $prefix = $this->paramPrefix . "_";
+            } else {
+                $prefix = '';
+            }
+
+            $candidate = "{$prefix}{$param}_{$i}";
             if (!array_key_exists($candidate, $this->params)) {
                 return $candidate;
             }

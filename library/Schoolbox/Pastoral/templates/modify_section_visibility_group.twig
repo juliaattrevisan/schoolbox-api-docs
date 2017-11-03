@@ -7,46 +7,44 @@
     <tbody id="permission-groups">
 
         {% if record.id != '' %}
-            {% for access in record.access if access.group.id != '' %}
+            {% for userAccess in record.access if userAccess.group.id != '' %}
                 {# Work out which radio should be checked for each row #}
 
                 {% set checkedDeny = '' %}
                 {% set checkedPublic = '' %}
                 {% set checkedPrivate = '' %}
 
-                {% for userAccess in record.access if access.group.id != '' %}
-                    {% if userAccess.group.id == group.id %}
-                        {% if userAccess.access == 0 %}
-                            {% set checkedDeny = 'checked' %}
-                        {% elseif userAccess.access == 1 %}
-                            {% set checkedPublic = 'checked' %}
-                        {% elseif userAccess.access == 2 %}
-                            {% set checkedPrivate = 'checked' %}
-                        {% endif %}
+                {% if userUserAccess.group.id == group.id %}
+                    {% if userUserAccess.access == 0 %}
+                        {% set checkedDeny = 'checked' %}
+                    {% elseif userUserAccess.access == 1 %}
+                        {% set checkedPublic = 'checked' %}
+                    {% elseif userUserAccess.access == 2 %}
+                        {% set checkedPrivate = 'checked' %}
                     {% endif %}
-                {% endfor %}
+                {% endif %}
 
-                <tr data-group-id="{{ access.group.id }}">
+                <tr data-group-id="{{ userAccess.group.id }}">
                     <td class="small-2">
                         Pastoral Group
                     </td>
                     <td class="small-3">
-                        {{ access.group.name }}
+                        {{ userAccess.group.name }}
                     </td>
                     <td class="small-2">
-                        <input type="radio" name="group[{{ access.group.id }}]" id="groupDeny{{ access.group.id }}"
+                        <input type="radio" name="group[{{ userAccess.group.id }}]" id="groupDeny{{ userAccess.group.id }}"
                                value="0" {{ checkedDeny }}>
-                        <label class="radio-label" for="groupDeny{{ access.group.id }}"></label>
+                        <label class="radio-label" for="groupDeny{{ userAccess.group.id }}"></label>
                     </td>
                     <td class="small-2">
-                        <input type="radio" name="group[{{ access.group.id }}]" id="groupPublic{{ access.group.id }}"
+                        <input type="radio" name="group[{{ userAccess.group.id }}]" id="groupPublic{{ userAccess.group.id }}"
                                value="1" {{ checkedPublic }}>
-                        <label class="radio-label" for="groupPublic{{ access.group.id }}"></label>
+                        <label class="radio-label" for="groupPublic{{ userAccess.group.id }}"></label>
                     </td>
                     <td class="small-2">
-                        <input type="radio" name="group[{{ access.group.id }}]" id="groupPrivate{{ access.group.id }}"
+                        <input type="radio" name="group[{{ userAccess.group.id }}]" id="groupPrivate{{ userAccess.group.id }}"
                                value="2" {{ checkedPrivate }}>
-                        <label class="radio-label" for="groupPrivate{{ access.group.id }}"></label>
+                        <label class="radio-label" for="groupPrivate{{ userAccess.group.id }}"></label>
                     </td>
                     <td class="text-right small-1">
                         <a href="#" data-delete-visibility="group" class="icon-delete"></a>
