@@ -71,9 +71,13 @@
                             <div class="small-12 card wrap-down">
                                 <div class="icon-group size-48" title="User Role"></div>
                                 <span class="neutral label right">{{ locale.pastoralPrivate.proper }} Content Visible</span>
-
-                                <p>{{ access.role.name }}</p>
-                                <p class="meta">User Role</p>
+                                {% if access.role.isParent %}
+                                    {% for parent in record.student.parents %}
+                                        <a href="{{ profile.link(access.user) }}">{{ parent.fullName }}</a><br>
+                                    {% endfor %}
+                                {% else %}
+                                    <p class="meta">User Role</p>
+                                {% endif %}
                             </div>
                         </li>
                     {% elseif access.user is not empty %}
@@ -140,7 +144,13 @@
                         <div class="small-12 card wrap-down">
                             <div class="icon-group size-48" title="User Role"></div>
                             <p>{{ access.role.name }}</p>
-                            <p class="meta">User Role</p>
+                            {% if access.role.isParent %}
+                                {% for parent in record.student.parents %}
+                                    <a href="{{ profile.link(access.user) }}">{{ parent.fullName }}</a><br>
+                                {% endfor %}
+                            {% else %}
+                                <p class="meta">User Role</p>
+                            {% endif %}
                         </div>
                     </li>
                 {% elseif access.user is not empty %}
@@ -207,8 +217,14 @@
                         <div class="small-12 card wrap-down">
                             <div class="icon-group size-48" title="User Role"></div>
                             <span class="alert label right">Denied Access</span>
-                            <p>{{ access.role.name }}</p>
-                            <p class="meta">User Role</p>
+                            {% if access.role.isParent %}
+                                {% for parent in record.student.parents %}
+                                    <a href="{{ profile.link(access.user) }}">{{ parent.fullName }}</a><br>
+                                {% endfor %}
+                            {% else %}
+                                <p class="meta">User Role</p>
+                            {% endif %}
+
                         </div>
                     </li>
                 {% elseif access.user is not empty %}
