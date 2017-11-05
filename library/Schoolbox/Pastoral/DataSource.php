@@ -9,6 +9,7 @@ namespace Schoolbox\Pastoral;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Pastoral\Tag\Model as PastoralTag;
 use Schoolbox\User;
 
 /**
@@ -88,6 +89,19 @@ class DataSource
     public function findByColumnList(User $user, $columnList, $options = []): Collection
     {
         return $this->mapper->filterRecordsForUser($this->mapper->findByColumnList($columnList, $options), $user);
+    }
+
+    /**
+     * User-sensitive wrapper for findByTag
+     *
+     * @param User        $user
+     * @param PastoralTag $tag
+     *
+     * @return Collection|Model[]
+     */
+    public function findByTag(User $user, PastoralTag $tag): Collection
+    {
+        return $this->mapper->filterRecordsForUser($this->mapper->findByTag($tag), $user);
     }
 
     /**

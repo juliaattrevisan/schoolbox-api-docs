@@ -391,7 +391,7 @@ class Mapper extends BaseMapper
      *
      * @return Collection
      */
-    public function findByTag($tag)
+    public function findByTag(PastoralTag $tag)
     {
         $sql = $this->getSelectString() . "
         
