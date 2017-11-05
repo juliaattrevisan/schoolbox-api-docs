@@ -8,6 +8,7 @@
 namespace Schoolbox\Pastoral\Comment;
 
 use Alaress\Async\Notification\Instance\Builder;
+use Alaress\Async\Notification\Instance\Instance;
 use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
@@ -80,10 +81,12 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * @param Model  $model
-     * @param string $method
+     * @param Model $model
+     * @param       $method
      *
      * @return Envelope
+     * @throws MapperException
+     * @throws MapperException\Deleted
      */
     protected function buildMessage($model, $method)
     {
@@ -107,12 +110,13 @@ class Notifier extends AbstractModuleNotifier
 
         $builder = new Builder();
         $builder->setTitle("A pastoral comment has been {$method}")
-            ->setIcon("/portrait.php?size=square32&userId={$owner->getExternalId()}")
-            ->setHref("/pastoral/student/{$pastoral->getStudent()->getId()}/record/{$pastoral->getId()}?ts={$timestamp}")
-            ->setNamespace($this->getSlug())
-            ->setSeverity(Logger::ERROR)
-            ->addTopic("pastoral_comment.{$model->getId()}.{$method}");
+                ->setIcon("/portrait.php?size=square32&userId={$owner->getExternalId()}")
+                ->setHref("/pastoral/student/{$pastoral->getStudent()->getId()}/record/{$pastoral->getId()}?ts={$timestamp}")
+                ->setNamespace($this->getSlug())
+                ->setSeverity(Logger::ERROR)
+                ->addTopic("pastoral_comment.{$model->getId()}.{$method}");
 
+        /** @var Instance $message */
         $message = $builder->build();
 
         // Work out who to send the message to
@@ -132,11 +136,7 @@ class Notifier extends AbstractModuleNotifier
                         /** @var User $user */
                         foreach ($teachers as $user) {
                             if ($user->getRole()->getId() == $role->getId()) {
-                                // Make sure the role can see this comment if it is private
-
-                                if ($pastoralAccess->getAccess() || !$model->getPrivate()) {
-                                    $envelope->targetToUser($user->getId(), $message);
-                                }
+                                $this->targetToUser($user, $model, $message, $pastoralAccess, $envelope);
                             }
                         }
                     }
@@ -153,14 +153,14 @@ class Notifier extends AbstractModuleNotifier
                         $user = $member->getUser();
 
                         if ($user->getRole()->isStaff()) {
-                            $envelope->targetToUser($user->getId(), $message);
+                            $this->targetToUser($user, $model, $message, $pastoralAccess, $envelope);
                         }
                     }
                 } elseif ($user instanceof User) {
                     // Only staff ever have access to pastoral comments
 
                     if ($user->getRole()->isStaff()) {
-                        $envelope->targetToUser($user->getId(), $message);
+                        $this->targetToUser($user, $model, $message, $pastoralAccess, $envelope);
                     }
                 }
             } catch (MapperException $e) {
@@ -170,6 +170,38 @@ class Notifier extends AbstractModuleNotifier
         }
 
         return $envelope;
+    }
+
+    /**
+     * Only target message to the user if they have sufficient permissions
+     *
+     * @param User           $user
+     * @param Model          $model
+     * @param Instance       $message
+     * @param PastoralAccess $pastoralAccess
+     * @param Envelope       $envelope
+     *
+     * @return bool
+     */
+    private function targetToUser($user, $model, $message, $pastoralAccess, $envelope)
+    {
+        // If user has deny permission, fail
+
+        if ($pastoralAccess->getAccess() === PastoralAccessMapper::ACCESS_DENY) {
+            return false;
+        }
+
+        // If the comment is private, and they don't have private, fail
+
+        if ($model->getPrivate() && $pastoralAccess->getAccess() < PastoralAccessMapper::ACCESS_PRIVATE) {
+            return false;
+        }
+
+        // Otherwise it's bombs away...
+
+        $envelope->targetToUser($user->getId(), $message);
+
+        return true;
     }
 
     /**
@@ -201,6 +233,8 @@ class Notifier extends AbstractModuleNotifier
      * @param array $diff
      *
      * @return Envelope
+     * @throws MapperException
+     * @throws MapperException\Deleted
      */
     public function notifyCreated(Model $model, User $effector, $diff = [])
     {
@@ -213,6 +247,8 @@ class Notifier extends AbstractModuleNotifier
      * @param array $diff
      *
      * @return Envelope
+     * @throws MapperException
+     * @throws MapperException\Deleted
      */
     public function notifyUpdated(Model $model, User $effector, $diff = [])
     {
