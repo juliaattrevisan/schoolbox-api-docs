@@ -115,7 +115,7 @@ class Handler
 
         if ($fuzzy) {
             // if we're doing a fuzzy lookup, search by `year`
-            $map = json_decode(__DIR__ . '/code-map.json', true);
+            $map = json_decode(file_get_contents(__DIR__ . '/code-map.json'), true);
             $predicate->equals('year', $map[$schoolCode]);
 
         } else {
