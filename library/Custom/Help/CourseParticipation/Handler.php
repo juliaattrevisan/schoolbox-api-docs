@@ -101,19 +101,27 @@ class Handler
 
     /**
      * @param string $schoolCode
+     * @param bool   $fuzzy
      * @return array
      * @throws Mapper\DefinitionException
      */
-    public function getUsersBySchool($schoolCode)
+    public function getUsersBySchool($schoolCode, $fuzzy = false)
     {
         $roleId = $this->getRoleMapper()->findOneByColumn('name', Controller::PARTICIPANT_ROLE_NAME)->getId();
 
         // show the list of users for this school
         // filter to the list of users whose external IDs are prefixed with the given school code
-        $predicate = $this->getUserMapper()->getPredicateBuilder()
-            ->like('synergy_id', "{$schoolCode}.%")
-            ->equals('group_id', $roleId)
-        ;
+        $predicate = $this->getUserMapper()->getPredicateBuilder()->equals('group_id', $roleId);
+
+        if ($fuzzy) {
+            // if we're doing a fuzzy lookup, search by `year`
+            $map = json_decode(__DIR__ . '/code-map.json', true);
+            $predicate->equals('year', $map[$schoolCode]);
+
+        } else {
+            // "normal" behaviour is to look up by external IDs
+            $predicate->like('synergy_id', "{$schoolCode}.%");
+        }
 
         // we only need the external ID itself, so bypass object hydration
         $rows = $this->getUserMapper()->findColumnsByPredicates([ 'username', 'synergy_id' ], $predicate);

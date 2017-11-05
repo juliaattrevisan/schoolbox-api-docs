@@ -354,9 +354,11 @@ class Controller extends Base
             return;
         }
 
+        $fuzzy = $rq->query->getBool('fuzzy', false);
+
         $rs->content->set(
             $this->buildJsonOutput(
-                $this->handler->getUsersBySchool($schoolCode)
+                $this->handler->getUsersBySchool($schoolCode, $fuzzy)
             )
         );
     }
