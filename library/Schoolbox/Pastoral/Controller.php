@@ -423,9 +423,6 @@ class Controller extends Base
         $commentsPublic     = $record->getComments()->filterBy('private', false);
         $commentsPrivate    = $record->getComments()->filterBy('private', true);
 
-        $commentsPublic = $this->pastoralCommentMapper->filterRecordsForUser($commentsPublic, $this->getUser());
-        $commentsPrivate = $this->pastoralCommentMapper->filterRecordsForUser($commentsPrivate, $this->getUser());
-
         $attachmentsPublic  = $record->getAttachments()->filterBy('private', false);
         $attachmentsPrivate = $record->getAttachments()->filterBy('private', true);
 
