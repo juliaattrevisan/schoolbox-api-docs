@@ -9,7 +9,6 @@ namespace Schoolbox\Pastoral;
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
-use Alaress_Date_Format;
 use Alaress_Date_NullDate;
 use Monolog\Logger;
 use Schoolbox\Collection;
