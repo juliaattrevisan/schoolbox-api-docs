@@ -96,7 +96,8 @@ class DataSource
      */
     public function findByColumnList(User $currentUser, $columnList, $options = []): Collection
     {
-        return $this->mapper->filterRecordsForUser($this->mapper->findByColumnList($columnList, $options), $currentUser);
+        return $this->mapper->filterRecordsForUser($this->mapper->findByColumnList($columnList, $options),
+            $currentUser);
     }
 
     /**
@@ -180,32 +181,38 @@ class DataSource
      * @param User $currentUser
      * @param User $student
      * @param User $linkedStudent
-     * @param int $typeId
+     * @param int  $typeId
      *
      * @return Collection|Model[]
      */
     public function findLinked(User $currentUser, User $student, User $linkedStudent, $typeId = null): Collection
     {
-        return $this->mapper->filterRecordsForUser($this->mapper->findLinked($student, $linkedStudent, $typeId), $currentUser);
+        return $this->mapper->filterRecordsForUser(
+            $this->mapper->findLinked($student, $linkedStudent, $typeId),
+            $currentUser
+        );
     }
 
     /**
      * User-sensitive wrapper for `Mapper::getSearchResults`.
      *
-     * @param User $currentUser
+     * @param User   $currentUser
      * @param string $search
      * @return Collection
      */
     public function getSearchResults(User $currentUser, $search): Collection
     {
-        return $this->mapper->filterRecordsForUser($this->mapper->getSearchResults($search, $currentUser), $currentUser);
+        return $this->mapper->filterRecordsForUser(
+            $this->mapper->getSearchResults($search, $currentUser),
+            $currentUser
+        );
     }
 
     /**
      * User-sensitive wrapper for `Mapper::findRecentDashboard`.
      *
      * @param User $currentUser
-     * @param int $count
+     * @param int  $count
      *
      * @return Collection|Model[]
      */
@@ -213,7 +220,10 @@ class DataSource
     {
         // The mapper method is user-sensitive,
         // but filter anyway as it's better to be explicit than implicit.
-        return $this->mapper->filterRecordsForUser($this->mapper->findRecentDashboard($currentUser, $count), $currentUser);
+        return $this->mapper->filterRecordsForUser(
+            $this->mapper->findRecentDashboard($currentUser, $count),
+            $currentUser
+        );
     }
 
     /**
