@@ -16,9 +16,7 @@ use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
-use Schoolbox\Pastoral\Group\Member\Model as PastoralGroupMember;
-use Schoolbox\Pastoral\Group\Model as PastoralGroup;
-use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Pastoral\DataSource as PastoralDataSource;
 use Schoolbox\Pastoral\Report\Dashboard\Mapper as PastoralReportDashboardMapper;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
 use Schoolbox\Pastoral\Report\Model as PastoralReport;
@@ -34,8 +32,8 @@ class Controller extends Base
     /** @var ErrorMapper $errorMapper */
     private $errorMapper;
 
-    /** @var PastoralMapper $pastoralMapper */
-    private $pastoralMapper;
+    /** @var PastoralDataSource $pastoralDataSource */
+    private $pastoralDataSource;
 
     /** @var PastoralTagMapper $pastoralTagMapper */
     private $pastoralTagMapper;
@@ -68,7 +66,7 @@ class Controller extends Base
      * Constructor
      *
      * @param ErrorMapper                   $errorMapper
-     * @param PastoralMapper                $pastoralMapper
+     * @param PastoralDataSource            $pastoralDataSource
      * @param PastoralAccessMapper          $pastoralAccessMapper
      * @param PastoralTagMapper             $pastoralTagMapper
      * @param PastoralTypeMapper            $pastoralTypeMapper
@@ -81,7 +79,7 @@ class Controller extends Base
      */
     public function __construct(
         ErrorMapper $errorMapper,
-        PastoralMapper $pastoralMapper,
+        PastoralDataSource $pastoralDataSource,
         PastoralAccessMapper $pastoralAccessMapper,
         PastoralTagMapper $pastoralTagMapper,
         PastoralTypeMapper $pastoralTypeMapper,
@@ -92,15 +90,15 @@ class Controller extends Base
         PastoralReportMapper $pastoralReportMapper,
         PastoralReportDashboardMapper $pastoralReportDashboardMapper
     ) {
-        $this->errorMapper                   = $errorMapper;
-        $this->pastoralMapper                = $pastoralMapper;
-        $this->pastoralAccessMapper          = $pastoralAccessMapper;
-        $this->pastoralTagMapper             = $pastoralTagMapper;
-        $this->pastoralTypeMapper            = $pastoralTypeMapper;
-        $this->pastoralSeverityMapper        = $pastoralSeverityMapper;
-        $this->userMapper                    = $userMapper;
-        $this->pastoralGroupMapper           = $pastoralGroupMapper;
-        $this->pastoralGroupMemberMapper     = $pastoralGroupMemberMapper;
+        $this->errorMapper               = $errorMapper;
+        $this->pastoralDataSource        = $pastoralDataSource;
+        $this->pastoralAccessMapper      = $pastoralAccessMapper;
+        $this->pastoralTagMapper         = $pastoralTagMapper;
+        $this->pastoralTypeMapper        = $pastoralTypeMapper;
+        $this->pastoralSeverityMapper    = $pastoralSeverityMapper;
+        $this->userMapper                = $userMapper;
+        $this->pastoralGroupMapper       = $pastoralGroupMapper;
+        $this->pastoralGroupMemberMapper = $pastoralGroupMemberMapper;
         $this->pastoralReportMapper          = $pastoralReportMapper;
         $this->pastoralReportDashboardMapper = $pastoralReportDashboardMapper;
     }
@@ -263,7 +261,7 @@ class Controller extends Base
      */
     public function getReportTags($tag)
     {
-        $records = $this->pastoralMapper->filterRecordsForUser($this->pastoralMapper->findByTag($tag), $this->getUser());
+        $records = $this->pastoralDataSource->findByTag($this->getUser(), $tag);
 
         // And spit this thing out
 
@@ -331,7 +329,7 @@ class Controller extends Base
     {
         // Get matching records
 
-        return $this->pastoralMapper->getReportData(
+        return $this->pastoralDataSource->getReportData(
             $this->getUser(),
             $report->getBeforeDate(),
             $report->getAfterDate(),

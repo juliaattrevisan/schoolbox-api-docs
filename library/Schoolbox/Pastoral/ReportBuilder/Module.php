@@ -66,7 +66,7 @@ class Module extends BaseModule
     {
         $mappers = [
             'userMapper'             => UserMapper::getInstance(),
-            'pastoralMapper'         => PastoralMapper::getInstance(),
+            'pastoralDataSource'     => $injector->get('pastoralDataSource'),
             'pastoralReportMapper'   => PastoralReportMapper::getInstance(),
             'pastoralSeverityMapper' => PastoralSeverityMapper::getInstance(),
             'pastoralTypeMapper'     => PastoralTypeMapper::getInstance(),
