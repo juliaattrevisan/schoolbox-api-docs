@@ -88,6 +88,24 @@
             };
 
             function updateUserPermissionClickEvents() {
+                {# There is an annoying glitch that clicking a checkbox doesn't actually update the 'checked' markup #}
+                {# and so when we add a new role to the table some Javascript somewhere goes and updates the state #}
+                {# of the radio buttons to whichever value was 'checked' on page load. So, we need to update the #}
+                {# check attribute in the DOM for all radio buttons in the clicked group #}
+
+                $('#table-permission').find('.radio-label').click(function() {
+                    var clickedElement = $("#" + $(this).attr('for'));
+                    var radioGroupSelector = 'input[name*="' + clickedElement.attr('name') + '"]';
+
+                    {# Uncheck all radio buttons in the group #}
+
+                    $(radioGroupSelector).removeAttr('checked');
+
+                    {# Check the one that was clicked #}
+
+                    $(clickedElement).attr('checked', 'true');
+                });
+
                 $('[data-delete-visibility="user"]').click(function (e) {
                     e.preventDefault();
 

@@ -29,7 +29,8 @@
             {# ---------------------------------------------------------------------------------------------------------------------------------------------------------- #}
 
             {% if record.bodyPrivate is not empty %}
-                {% for access in record.access if access.private %}
+
+                {% for access in record.access if access.access == 2 %}
                     {% if access.group is not empty %}
 
                         {# Pastoral Group Access #}
@@ -101,7 +102,7 @@
             {# Content Access #}
             {# ---------------------------------------------------------------------------------------------------------------------------------------------------------- #}
 
-            {% for access in record.access if not access.private %}
+            {% for access in record.access if access.access == 1 %}
                 {% if access.group is not empty %}
 
                     {# Pastoral Group Access #}

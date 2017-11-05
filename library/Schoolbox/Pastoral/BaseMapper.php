@@ -11,6 +11,7 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper as SchoolboxMapper;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 
 /**
