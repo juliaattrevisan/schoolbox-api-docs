@@ -86,6 +86,8 @@ class Notifier extends AbstractModuleNotifier
      * @param string $method
      *
      * @return Envelope
+     * @throws MapperException
+     * @throws MapperException\Deleted
      */
     protected function buildMessage($model, $method)
     {
@@ -110,11 +112,11 @@ class Notifier extends AbstractModuleNotifier
 
         $builder = new Builder();
         $builder->setTitle("A {$new}pastoral care record has been {$method}")
-            ->setIcon("/portrait.php?size=square32&userId={$pastoral->getOwner()->getExternalId()}")
-            ->setHref("/pastoral/student/{$model->getStudent()->getId()}/record/{$model->getId()}?ts={$timestamp}")
-            ->setNamespace($this->getSlug())
-            ->setSeverity(Logger::ERROR)
-            ->addTopic("pastoral.{$model->getId()}.{$method}");
+                ->setIcon("/portrait.php?size=square32&userId={$pastoral->getOwner()->getExternalId()}")
+                ->setHref("/pastoral/student/{$model->getStudent()->getId()}/record/{$model->getId()}?ts={$timestamp}")
+                ->setNamespace($this->getSlug())
+                ->setSeverity(Logger::ERROR)
+                ->addTopic("pastoral.{$model->getId()}.{$method}");
 
         $message = $builder->build();
 
@@ -208,7 +210,8 @@ class Notifier extends AbstractModuleNotifier
 
         // If the comment is private, and they don't have private, fail
 
-        if ($model->getAccess() == PastoralAccessMapper::ACCESS_PRIVATE && $pastoralAccess->getAccess() < PastoralAccessMapper::ACCESS_PRIVATE) {
+        if ($model->getAccess() == PastoralAccessMapper::ACCESS_PRIVATE &&
+            $pastoralAccess->getAccess() < PastoralAccessMapper::ACCESS_PRIVATE) {
             return false;
         }
 
@@ -248,6 +251,8 @@ class Notifier extends AbstractModuleNotifier
      * @param array $diff
      *
      * @return Envelope
+     * @throws MapperException
+     * @throws MapperException\Deleted
      */
     public function notifyCreated(Model $model, User $effector, $diff = [])
     {
@@ -260,6 +265,8 @@ class Notifier extends AbstractModuleNotifier
      * @param array $diff
      *
      * @return Envelope
+     * @throws MapperException
+     * @throws MapperException\Deleted
      */
     public function notifyUpdated(Model $model, User $effector, $diff = [])
     {
