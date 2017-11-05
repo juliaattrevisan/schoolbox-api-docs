@@ -136,6 +136,7 @@ class Controller extends Base
                     'reportsMine'  => $reportsMine,
                     'reportsGroup' => $reportsGroup,
                 ],
+                'title' => 'Pastoral Reports',
             ]
         );
     }
@@ -250,6 +251,7 @@ class Controller extends Base
                     'tagsSelected'     => $tagsSelected,
                     'report'           => $report,
                 ],
+                'title' => 'Pastoral Report',
             ]
         );
     }
@@ -272,6 +274,7 @@ class Controller extends Base
                     'tag'     => $tag,
                     'results' => $records,
                 ],
+                'title' => 'Pastoral Tag Report',
             ]
         );
     }
@@ -312,6 +315,7 @@ class Controller extends Base
                     'results' => $records,
                     'report'  => $report,
                 ],
+                'title' => $report->getName(),
             ]
         );
     }

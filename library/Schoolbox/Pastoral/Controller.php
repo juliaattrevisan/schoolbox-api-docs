@@ -203,6 +203,7 @@ class Controller extends Base
                     $this->getUser()->getId()
                 ),
             ],
+            'title' => 'Dashboard',
         ]);
     }
 
@@ -221,6 +222,7 @@ class Controller extends Base
                 'students'            => $this->userMapper->findStudents($get['keyword']),
                 'minimumSearchLength' => Results::MIN_SEARCH_LENGTH,
             ],
+            'title' => 'Search',
         ]);
     }
 
@@ -293,6 +295,7 @@ class Controller extends Base
                 'linkedStudents' => $this->pastoralMapper->getLinkedStudents($student),
                 'typeSelected'   => $get['type'],
             ],
+            'title' => $student->getFullName(),
         ]);
     }
 
@@ -356,6 +359,7 @@ class Controller extends Base
                 'linkedStudents' => $this->pastoralMapper->getLinkedStudents($student),
                 'typeSelected'   => $get['type'],
             ],
+            'title' => 'Linked Records',
         ]);
     }
 
@@ -437,6 +441,7 @@ class Controller extends Base
                 'user'               => $this->getUser(),
                 'showSeverity'       => $this->getConfigLoader()->get('pastoral_severity'),
             ],
+            'title' => $record->getHeading(),
         ]);
     }
 
@@ -512,6 +517,7 @@ class Controller extends Base
                 'attachzonePublic'  => $this->getAttachZone(self::ATTACHZONE_PUBLIC, $record),
                 'attachzonePrivate' => $this->getAttachZone(self::ATTACHZONE_PRIVATE, $record),
             ],
+            'title' => 'Pastoral Record',
         ]);
     }
 

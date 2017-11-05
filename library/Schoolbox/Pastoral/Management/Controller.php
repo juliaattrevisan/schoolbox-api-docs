@@ -60,6 +60,7 @@ class Controller extends Base
             'data'     => [
                 'groups' => $this->pastoralGroupMapper->findAll(),
             ],
+            'title' => 'Pastoral Group Management',
         ]);
     }
 
@@ -76,6 +77,7 @@ class Controller extends Base
                 'group'               => $group,
                 'minimumSearchLength' => Results::MIN_SEARCH_LENGTH,
             ],
+            'title' => 'Update Pastoral Group',
         ]);
     }
 
