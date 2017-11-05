@@ -218,7 +218,7 @@ class Controller extends Base
             'template' => '@pastoral/search.twig',
             'data'     => [
                 'search'              => trim($get['keyword']),
-                'results'             => $this->pastoralDataSource->getSearchResults($get['keyword'], $this->getUser()),
+                'results'             => $this->pastoralDataSource->getSearchResults($this->getUser(), $get['keyword']),
                 'students'            => $this->userMapper->findStudents($get['keyword']),
                 'minimumSearchLength' => Results::MIN_SEARCH_LENGTH,
             ],
