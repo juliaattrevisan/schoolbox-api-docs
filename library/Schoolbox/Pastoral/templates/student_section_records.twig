@@ -35,11 +35,9 @@
                                     {# Display linked students to staff #}
                                     {% if user.role.isStaff and record.relatedRecords|length %}
                                         <p class="meta">
-                                            Linked Records:
                                             {% for relatedRecord in record.relatedRecords %}
                                                 {% set getStudentRecord = routeLookupIfAuthorized('pastoral.getStudentRecord', {studentId: relatedRecord.student.id, 'recordId': relatedRecord.id}) %}
-                                                <a
-                                                href="{{ getStudentRecord }}">{{ relatedRecord.student.fullName }} - {{ relatedRecord.heading }}</a>{% if not loop.last %},{% endif %}
+                                                    Linked Record: <a href="{{ getStudentRecord }}">{{ relatedRecord.student.fullName }} - {{ relatedRecord.heading }}<br></a>
                                             {% endfor %}
                                         </p>
                                     {% endif %}
