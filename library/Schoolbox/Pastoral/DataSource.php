@@ -55,14 +55,14 @@ class DataSource
     /**
      * User-sensitive wrapper for `Mapper::findById`.
      *
-     * @param User $user
+     * @param User $currentUser
      * @param int  $id
      * @return Model
      * @throws MapperException
      */
-    public function findById(User $user, $id): Model
+    public function findById(User $currentUser, $id): Model
     {
-        $model = $this->mapper->filterRecordForUser($this->mapper->findById($id), $user);
+        $model = $this->mapper->filterRecordForUser($this->mapper->findById($id), $currentUser);
         if (!$model instanceof Model) {
             throw new MapperException('Instance of object not found');
         }
@@ -72,50 +72,50 @@ class DataSource
     /**
      * User-sensitive wrapper for `Mapper::findByColumn`.
      *
-     * @param User   $user
+     * @param User   $currentUser
      * @param string $columnName
      * @param string $columnValue
      * @param array  $options
      * @return Collection
      */
-    public function findByColumn(User $user, $columnName, $columnValue, $options = []): Collection
+    public function findByColumn(User $currentUser, $columnName, $columnValue, $options = []): Collection
     {
         return $this->mapper->filterRecordsForUser(
             $this->mapper->findByColumn($columnName, $columnValue, $options),
-            $user
+            $currentUser
         );
     }
 
     /**
      * User-sensitive wrapper for `Mapper::findByColumnList`.
      *
-     * @param User  $user
+     * @param User  $currentUser
      * @param array $columnList
      * @param array $options
      * @return Collection|Model[]
      */
-    public function findByColumnList(User $user, $columnList, $options = []): Collection
+    public function findByColumnList(User $currentUser, $columnList, $options = []): Collection
     {
-        return $this->mapper->filterRecordsForUser($this->mapper->findByColumnList($columnList, $options), $user);
+        return $this->mapper->filterRecordsForUser($this->mapper->findByColumnList($columnList, $options), $currentUser);
     }
 
     /**
      * User-sensitive wrapper for `Mapper::findByTag`.
      *
-     * @param User        $user
+     * @param User        $currentUser
      * @param PastoralTag $tag
      *
      * @return Collection|Model[]
      */
-    public function findByTag(User $user, PastoralTag $tag): Collection
+    public function findByTag(User $currentUser, PastoralTag $tag): Collection
     {
-        return $this->mapper->filterRecordsForUser($this->mapper->findByTag($tag), $user);
+        return $this->mapper->filterRecordsForUser($this->mapper->findByTag($tag), $currentUser);
     }
 
     /**
      * User-sensitive wrapper for `Mapper::getReportData`.
      *
-     * @param User                  $user
+     * @param User                  $currentUser
      * @param Alaress_Date_Format   $before_date
      * @param Alaress_Date_Format   $after_date
      * @param null|PastoralSeverity $severity
@@ -129,7 +129,7 @@ class DataSource
      * @return Collection
      */
     public function getReportData(
-        User $user,
+        User $currentUser,
         Alaress_Date_Format $before_date,
         Alaress_Date_Format $after_date,
         ?PastoralSeverity $severity,
@@ -145,7 +145,7 @@ class DataSource
         // but filter anyway as it's better to be explicit than implicit.
         return $this->mapper->filterRecordsForUser(
             $this->mapper->getReportData(
-                $user,
+                $currentUser,
                 $before_date,
                 $after_date,
                 $severity,
@@ -157,7 +157,7 @@ class DataSource
                 $involved,
                 $years
             ),
-            $user
+            $currentUser
         );
     }
 
@@ -177,43 +177,43 @@ class DataSource
     /**
      * User-sensitive wrapper for `Mapper::findLinked`.
      *
-     * @param User $user
+     * @param User $currentUser
      * @param User $student
      * @param User $linkedStudent
      * @param int $typeId
      *
      * @return Collection|Model[]
      */
-    public function findLinked(User $user, User $student, User $linkedStudent, $typeId = null): Collection
+    public function findLinked(User $currentUser, User $student, User $linkedStudent, $typeId = null): Collection
     {
-        return $this->mapper->filterRecordsForUser($this->mapper->findLinked($student, $linkedStudent, $typeId), $user);
+        return $this->mapper->filterRecordsForUser($this->mapper->findLinked($student, $linkedStudent, $typeId), $currentUser);
     }
 
     /**
      * User-sensitive wrapper for `Mapper::getSearchResults`.
      *
-     * @param User $user
+     * @param User $currentUser
      * @param string $search
      * @return Collection
      */
-    public function getSearchResults(User $user, $search): Collection
+    public function getSearchResults(User $currentUser, $search): Collection
     {
-        return $this->mapper->filterRecordsForUser($this->mapper->getSearchResults($search, $user), $user);
+        return $this->mapper->filterRecordsForUser($this->mapper->getSearchResults($search, $currentUser), $currentUser);
     }
 
     /**
      * User-sensitive wrapper for `Mapper::findRecentDashboard`.
      *
-     * @param User $user
+     * @param User $currentUser
      * @param int $count
      *
      * @return Collection|Model[]
      */
-    public function findRecentDashboard(User $user, $count = 5): Collection
+    public function findRecentDashboard(User $currentUser, $count = 5): Collection
     {
         // The mapper method is user-sensitive,
         // but filter anyway as it's better to be explicit than implicit.
-        return $this->mapper->filterRecordsForUser($this->mapper->findRecentDashboard($user, $count), $user);
+        return $this->mapper->filterRecordsForUser($this->mapper->findRecentDashboard($currentUser, $count), $currentUser);
     }
 
     /**

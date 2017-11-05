@@ -40,13 +40,13 @@ class DataSource
     /**
      * User-sensitive wrapper for `Mapper::findForRecord`.
      *
-     * @param User     $user
+     * @param User     $currentUser
      * @param Pastoral $record
      * @return Collection|Model[]
      * @throws MapperException
      */
-    public function findForRecord(User $user, Pastoral $record): Collection
+    public function findForRecord(User $currentUser, Pastoral $record): Collection
     {
-        return $this->mapper->filterRecordsForUser($this->mapper->findForRecord($record), $user);
+        return $this->mapper->filterRecordsForUser($this->mapper->findForRecord($record), $currentUser);
     }
 }
