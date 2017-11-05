@@ -30,7 +30,7 @@
                                                     Posted by <a href="{{ profile.link(comment.owner) }}">{{ comment.owner.fullName }}</a>
                                                     <span title="{{ comment.createdAt.short }}">{{ comment.createdAt.relativeDay }}</span>
                                                 </p>
-                                                <p>{{ comment.body | purify | nl2br }}</p>
+                                                <p>{{ comment.body | e('html') | nl2br }}</p>
                                             </div>
                                         </div>
                                         <nav>
