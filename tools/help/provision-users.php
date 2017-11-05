@@ -170,10 +170,16 @@ $kernel->run(new class extends App {
                     /** @var array $failedUsers */
                     $failedUsers = json_decode($r->getBody()->getContents(), true);
 
-                    foreach ($failedUsers as [$reason, $payload]) {
-                        $payload = json_encode($payload);
-                        $log->error("Failed to provision {$payload}: {$reason}");
+                    if (is_array($failedUsers)) {
+                        foreach ($failedUsers as [$reason, $payload]) {
+                            $payload = json_encode($payload);
+                            $log->error("Failed to provision {$payload}: {$reason}");
+                        }
+                    } else {
+                        // not an array: just dump the response body
+                        $log->warning($r->getBody()->getContents());
                     }
+
                 } else {
                     $log->critical('No parsable response received from server');
                 }
