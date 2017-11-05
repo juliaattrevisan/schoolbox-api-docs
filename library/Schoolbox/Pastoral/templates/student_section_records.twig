@@ -39,7 +39,7 @@
                                             {% for relatedRecord in record.relatedRecords %}
                                                 {% set getStudentRecord = routeLookupIfAuthorized('pastoral.getStudentRecord', {studentId: relatedRecord.student.id, 'recordId': relatedRecord.id}) %}
                                                 <a
-                                                href="{{ getStudentRecord }}">{{ relatedRecord.student.fullName }}</a>{% if not loop.last %},{% endif %}
+                                                href="{{ getStudentRecord }}">{{ relatedRecord.student.fullName }} - {{ relatedRecord.heading }}</a>{% if not loop.last %},{% endif %}
                                             {% endfor %}
                                         </p>
                                     {% endif %}
