@@ -132,8 +132,9 @@ $kernel->run(new class extends App {
         try {
             $log->info("Fetching '{$this->schoolCode}' user list from {$host}");
 
+            // TODO once fuzziness is no longer required, remove the fuzzy argument
             /** @var array $provisionedUsers */
-            $provisionedUsers = json_decode($this->getFromHelp(self::ROUTE_USERS_GET), true);
+            $provisionedUsers = json_decode($this->getFromHelp(self::ROUTE_USERS_GET, [ 'fuzzy' => 1 ]), true);
 
             // obtain list of user IDs
             $userIds = array_keys($provisionedUsers);
@@ -201,19 +202,22 @@ $kernel->run(new class extends App {
 
     /**
      * @param string $routeName
-     * @throws RuntimeException
+     * @param array  $query
      * @throws RouteNotFound
-     * @throws Schoolbox\Mapper\Exception
+     * @throws RuntimeException
+     * @throws \Schoolbox\Mapper\Exception
      * @return string
      */
-    private function getFromHelp($routeName)
+    private function getFromHelp($routeName, array $query = [])
     {
         $uri = $this->router->generate(
             "helpCourseParticipation.{$routeName}",
             [ 'schoolCode' => $this->schoolCode ]
         );
 
-        return $this->http->get($uri, [ 'query' => $this->generateAuth() ])->getBody()->getContents();
+        $query = array_merge($query, $this->generateAuth());
+
+        return $this->http->get($uri, [ 'query' => $query ])->getBody()->getContents();
     }
 
 
