@@ -47,7 +47,6 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Search\Results;
-use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
@@ -917,38 +916,6 @@ class Controller extends Base
         }
 
         return $records;
-    }
-
-    /**
-     * Save pastoral attachements
-     *
-     * @param PastoralModel $record
-     * @param IStorage      $storageObject
-     * @param bool          $private
-     */
-    private function attachmentSave($record, $storageObject, $private)
-    {
-        // Only add attachments which don't already exist on the record
-
-        // Check if external SIS uploads are enabled
-
-        if ($this->config->get("external_pastoral_upload")) {
-            // Queue file for upload to external SIS
-
-            $queue = $this->pastoralUploadQueueMapper->createModel();
-            $queue->setPastoral($record);
-            $queue->setExternalId($this->getUser()->getExternalId());
-            $queue->setStudentExternalId($record->getStudent()->getExternalId());
-            $queue->setStorage($storageObject);
-            $queue->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_PENDING);
-            $this->pastoralUploadQueueMapper->save($queue);
-        }
-
-        $attachment = $this->pastoralAttachmentMapper->createModel();
-        $attachment->setPastoral($record);
-        $attachment->setStorage($storageObject);
-        $attachment->setPrivate($private);
-        $this->pastoralAttachmentMapper->save($attachment);
     }
 
     /**
