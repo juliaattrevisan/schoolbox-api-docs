@@ -191,7 +191,7 @@ class Module extends BaseModule
             'config'                    => $injector->get('config'),
             'errorMapper'               => ErrorMapper::getInstance(),
             'fileMapper'                => FileMapper::getInstance(),
-            'pastoralMapper'            => $this->retrievePastoralDataSource(),
+            'pastoralDataSource'        => $this->retrievePastoralDataSource(),
             'pastoralAccessMapper'      => PastoralAccessMapper::getInstance(),
             'pastoralAttachmentMapper'  => PastoralAttachmentMapper::getInstance(),
             'pastoralSubTypeMapper'     => PastoralSubTypeMapper::getInstance(),

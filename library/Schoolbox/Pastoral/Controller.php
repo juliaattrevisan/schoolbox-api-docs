@@ -25,10 +25,10 @@ use Schoolbox\Pastoral\Attachment\Model as PastoralAttachmentModel;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
 use Schoolbox\Pastoral\Comment\Model as PastoralComment;
+use Schoolbox\Pastoral\DataSource as PastoralDataSource;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
 use Schoolbox\Pastoral\Group\Model as PastoralGroup;
-use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as PastoralModel;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
 use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
@@ -64,8 +64,8 @@ class Controller extends Base
     /** @var FileMapper $fileMapper */
     protected $fileMapper;
 
-    /** @var DataSource $pastoralMapper */
-    protected $pastoralMapper;
+    /** @var PastoralDataSource $pastoralDataSource */
+    protected $pastoralDataSource;
 
     /** @var PastoralAccessMapper $pastoralAccessMapper */
     protected $pastoralAccessMapper;
@@ -123,7 +123,7 @@ class Controller extends Base
      *
      * @param IConfigLoader             $config
      * @param FileMapper                $fileMapper
-     * @param DataSource                $pastoralMapper
+     * @param PastoralDataSource        $pastoralDataSource
      * @param UserAccessMapper          $userAccessMapper
      * @param PastoralAuditMapper       $pastoralAuditMapper
      * @param PastoralSubTypeMapper     $pastoralSubTypeMapper
@@ -145,7 +145,7 @@ class Controller extends Base
     public function __construct(
         IConfigLoader $config,
         FileMapper $fileMapper,
-        DataSource $pastoralMapper,
+        PastoralDataSource $pastoralDataSource,
         UserAccessMapper $userAccessMapper,
         PastoralAuditMapper $pastoralAuditMapper,
         PastoralSubTypeMapper $pastoralSubTypeMapper,
@@ -174,7 +174,7 @@ class Controller extends Base
         $this->pastoralAttachmentMapper  = $pastoralAttachmentMapper;
         $this->pastoralSubTypeMapper     = $pastoralSubTypeMapper;
         $this->pastoralCommentMapper     = $pastoralCommentMapper;
-        $this->pastoralMapper            = $pastoralMapper;
+        $this->pastoralDataSource        = $pastoralDataSource;
         $this->pastoralSeverityMapper    = $pastoralSeverityMapper;
         $this->pastoralRevisionMapper    = $pastoralRevisionMapper;
         $this->pastoralTagMapper         = $pastoralTagMapper;
@@ -196,7 +196,7 @@ class Controller extends Base
             'data'     => [
                 'user'             => $this->getUser(),
                 'recentStudents'   => $this->pastoralAuditMapper->findRecentStudents(),
-                'recentDashboard'  => $this->pastoralMapper->findRecentDashboard($this->getUser()),
+                'recentDashboard'  => $this->pastoralDataSource->findRecentDashboard($this->getUser()),
                 'reportsDashboard' => $this->pastoralReportMapper->findForUserDashboard($this->getUser()),
                 'groups'           => $this->pastoralGroupMemberMapper->findByColumn(
                     'user_id',
@@ -218,7 +218,7 @@ class Controller extends Base
             'template' => '@pastoral/search.twig',
             'data'     => [
                 'search'              => trim($get['keyword']),
-                'results'             => $this->pastoralMapper->getSearchResults($get['keyword'], $this->getUser()),
+                'results'             => $this->pastoralDataSource->getSearchResults($get['keyword'], $this->getUser()),
                 'students'            => $this->userMapper->findStudents($get['keyword']),
                 'minimumSearchLength' => Results::MIN_SEARCH_LENGTH,
             ],
@@ -247,7 +247,7 @@ class Controller extends Base
         if (!is_numeric($get['type'])) {
             // Retrieve all of the students pastoral records
 
-            $records = $this->pastoralMapper->findByColumn(
+            $records = $this->pastoralDataSource->findByColumn(
                 $this->getUser(),
                 'student_id',
                 $student->getId(),
@@ -260,7 +260,7 @@ class Controller extends Base
         } else {
             // Retrieve results filtered by pastoral type
 
-            $records = $this->pastoralMapper->findByColumnList(
+            $records = $this->pastoralDataSource->findByColumnList(
                 $this->getUser(),
                 [
                     'student_id' => $student->getId(),
@@ -301,7 +301,7 @@ class Controller extends Base
                 'student'        => $student,
                 'pageCurrent'    => $pageCurrent,
                 'types'          => $this->pastoralTypeMapper->findAll(),
-                'linkedStudents' => $this->pastoralMapper->getLinkedStudents($student),
+                'linkedStudents' => $this->pastoralDataSource->getLinkedStudents($student),
                 'typeSelected'   => $get['type'],
             ],
             'title' => $student->getFullName(),
@@ -334,7 +334,7 @@ class Controller extends Base
 
         // Retrieve all of the students pastoral records
 
-        $records = $this->pastoralMapper->findLinked($this->getUser(), $student, $linkedStudent, $get['type']);
+        $records = $this->pastoralDataSource->findLinked($this->getUser(), $student, $linkedStudent, $get['type']);
 
         // Limit the number of pastoral records to display on each page of pastoral records
 
@@ -362,7 +362,7 @@ class Controller extends Base
                 'linkedStudent'  => $linkedStudent,
                 'pageCurrent'    => $pageCurrent,
                 'types'          => $this->pastoralTypeMapper->findAll(),
-                'linkedStudents' => $this->pastoralMapper->getLinkedStudents($student),
+                'linkedStudents' => $this->pastoralDataSource->getLinkedStudents($student),
                 'typeSelected'   => $get['type'],
             ],
             'title' => 'Linked Records',
@@ -463,7 +463,7 @@ class Controller extends Base
         // Throw in a blank pastoral record with the student populated
 
         /** @var PastoralModel $record */
-        $record = $this->pastoralMapper->createModel();
+        $record = $this->pastoralDataSource->createModel();
         $record->setStudent($student);
 
         $this->getStudentRecordUpdateForm($record);
@@ -558,7 +558,7 @@ class Controller extends Base
 
         try {
             /** @var Model $record */
-            $record = $this->pastoralMapper->findById($this->getUser(), $post['pastoral_id']);
+            $record = $this->pastoralDataSource->findById($this->getUser(), $post['pastoral_id']);
 
             if (!empty(trim($post["comment_body"]))) {
                 // Insert the comment to the internal database
@@ -687,7 +687,7 @@ class Controller extends Base
 
         try {
             /** @var Model $record */
-            $record = $this->pastoralMapper->findById($this->getUser(), $post['id']);
+            $record = $this->pastoralDataSource->findById($this->getUser(), $post['id']);
         } catch (MapperException $e) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
         }
@@ -753,7 +753,7 @@ class Controller extends Base
             } else {
                 // Creating a new record
 
-                $record = $this->pastoralMapper->createModel();
+                $record = $this->pastoralDataSource->createModel();
 
                 if (isset($parent)) {
                     $record->setParent($parent);
@@ -799,7 +799,7 @@ class Controller extends Base
             $record->setBodyPrivate(trim($post["body_private"]));
             $record->setOwner($this->getUser());
 //            $this->pastoralMapper->setSessionData($_SESSION);
-            $this->pastoralMapper->save($record);
+            $this->pastoralDataSource->save($record);
 
             $records->add($record);
 
@@ -948,7 +948,7 @@ class Controller extends Base
          * is on the mapper, it catastrophical deletes the records in both systems.
          * Having the logic here also aligns with the approach taken for create/update SB => SIS.
          */
-        if ($this->pastoralMapper->delete($record)) {
+        if ($this->pastoralDataSource->delete($record)) {
             // Delete record from external database
             $pastoralExternal = new External_Pastoral();
             $pastoralExternal->deletePastoral($record);
