@@ -17,8 +17,10 @@ use Schoolbox\User;
 /**
  * Data source for pastoral care records.
  *
- * All access to pastoral care records should be through this object, not the
- * mapper. This is for cleanliness reasons.
+ * Web request access to pastoral care records must be through this object, not
+ * the mapper. This is because pastoral information is sensitive in nature, and
+ * therefore it MUST be appropriately filtered and censored before it can be
+ * viewed by a user.
  */
 class DataSource
 {
@@ -38,6 +40,10 @@ class DataSource
     }
 
     /**
+     * Wrapper for `Mapper::createModel`.
+     *
+     * Not user-sensitive, but must be exposed to web request code.
+     *
      * @param int $id
      * @return Model
      */
@@ -47,7 +53,7 @@ class DataSource
     }
 
     /**
-     * User-sensitive wrapper for findById
+     * User-sensitive wrapper for `Mapper::findById`.
      *
      * @param User $user
      * @param int  $id
@@ -64,7 +70,7 @@ class DataSource
     }
 
     /**
-     * User-sensitive wrapper for findByColumn
+     * User-sensitive wrapper for `Mapper::findByColumn`.
      *
      * @param User   $user
      * @param string $columnName
@@ -81,7 +87,7 @@ class DataSource
     }
 
     /**
-     * User-sensitive wrapper for findByColumnList
+     * User-sensitive wrapper for `Mapper::findByColumnList`.
      *
      * @param User  $user
      * @param array $columnList
@@ -94,7 +100,7 @@ class DataSource
     }
 
     /**
-     * User-sensitive wrapper for findByTag
+     * User-sensitive wrapper for `Mapper::findByTag`.
      *
      * @param User        $user
      * @param PastoralTag $tag
@@ -107,7 +113,7 @@ class DataSource
     }
 
     /**
-     * User-sensitive wrapper for getReportData
+     * User-sensitive wrapper for `Mapper::getReportData`.
      *
      * @param User                  $user
      * @param Alaress_Date_Format   $before_date
@@ -135,6 +141,8 @@ class DataSource
         $involved,
         Collection $years
     ): Collection {
+        // The mapper method is user-sensitive,
+        // but filter anyway as it's better to be explicit than implicit.
         return $this->mapper->filterRecordsForUser(
             $this->mapper->getReportData(
                 $user,
@@ -154,9 +162,9 @@ class DataSource
     }
 
     /**
-     * Wrapper for getLinkedStudents
+     * Wrapper for `Mapper::getLinkedStudents`.
      *
-     * This method isn't user-sensitive, but needs to be wrapped anyway.
+     * This method isn't user-sensitive, but must be exposed to web request code.
      *
      * @param User $student
      * @return array
@@ -167,7 +175,7 @@ class DataSource
     }
 
     /**
-     * User-sensitive wrapper for findLinked
+     * User-sensitive wrapper for `Mapper::findLinked`.
      *
      * @param User $user
      * @param User $student
@@ -182,6 +190,8 @@ class DataSource
     }
 
     /**
+     * User-sensitive wrapper for `Mapper::getSearchResults`.
+     *
      * @param User $user
      * @param string $search
      * @return Collection
@@ -192,7 +202,7 @@ class DataSource
     }
 
     /**
-     * User-sensitive wrapper for findRecentDashboard
+     * User-sensitive wrapper for `Mapper::findRecentDashboard`.
      *
      * @param User $user
      * @param int $count
@@ -201,12 +211,15 @@ class DataSource
      */
     public function findRecentDashboard(User $user, $count = 5): Collection
     {
-        // This relies upon the current user anyway
+        // The mapper method is user-sensitive,
+        // but filter anyway as it's better to be explicit than implicit.
         return $this->mapper->filterRecordsForUser($this->mapper->findRecentDashboard($user, $count), $user);
     }
 
     /**
-     * Save this model
+     * Wrapper for `Mapper::save`.
+     *
+     * Not user-sensitive, but must be exposed to web request code.
      *
      * @param Model $model
      */
@@ -216,6 +229,10 @@ class DataSource
     }
 
     /**
+     * Wrapper for `Mapper::delete`.
+     *
+     * Not user-sensitive, but must be exposed to web request code.
+     *
      * @param Model $model
      * @return bool
      */

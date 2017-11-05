@@ -15,8 +15,10 @@ use Schoolbox\User;
 /**
  * Data source for pastoral care revisions.
  *
- * All access to pastoral revisions should be through this object, not the
- * mapper. This is for cleanliness reasons.
+ * Web request access to pastoral care revisions must be through this object, not
+ * the mapper. This is because pastoral information is sensitive in nature, and
+ * therefore it MUST be appropriately filtered and censored before it can be
+ * viewed by a user.
  */
 class DataSource
 {
@@ -36,7 +38,7 @@ class DataSource
     }
 
     /**
-     * User-sensitive wrapper for findForRecord
+     * User-sensitive wrapper for `Mapper::findForRecord`.
      *
      * @param User     $user
      * @param Pastoral $record
