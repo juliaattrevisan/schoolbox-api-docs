@@ -8,6 +8,7 @@
 namespace Schoolbox\Pastoral;
 
 use Alaress\Async\Notification\Instance\Builder;
+use Alaress\Async\Notification\Instance\Instance;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
 use Monolog\Logger;
@@ -142,7 +143,7 @@ class Notifier extends AbstractModuleNotifier
                         /** @var User $teacher */
                         foreach ($teachers as $teacher) {
                             if ($teacher->getRole()->getId() == $role->getId()) {
-                                $envelope->targetToUser($teacher->getId(), $message);
+                                $this->targetToUser($user, $model, $message, $pastoralAccess, $envelope);
                             }
                         }
                     } elseif ($role->isParent() && $parentAccessEnabled) {
@@ -163,7 +164,7 @@ class Notifier extends AbstractModuleNotifier
                         $user = $member->getUser();
 
                         if ($user->getRole()->isStaff()) {
-                            $envelope->targetToUser($user->getId(), $message);
+                            $this->targetToUser($user, $model, $message, $pastoralAccess, $envelope);
                         }
                     }
                 } elseif ($user instanceof User) {
@@ -174,7 +175,7 @@ class Notifier extends AbstractModuleNotifier
                     // Only send to parents if parent access is enabled
 
                     if ($role->isStaff() || ($role->isParent() && $parentAccessEnabled)) {
-                        $envelope->targetToUser($user->getId(), $message);
+                        $this->targetToUser($user, $model, $message, $pastoralAccess, $envelope);
                     }
                 }
             } catch (MapperException $e) {
@@ -184,6 +185,38 @@ class Notifier extends AbstractModuleNotifier
         }
 
         return $envelope;
+    }
+
+    /**
+     * Only target message to the user if they have sufficient permissions
+     *
+     * @param User           $user
+     * @param Model          $model
+     * @param Instance       $message
+     * @param PastoralAccess $pastoralAccess
+     * @param Envelope       $envelope
+     *
+     * @return bool
+     */
+    private function targetToUser($user, $model, $message, $pastoralAccess, $envelope)
+    {
+        // If user has deny permission, fail
+
+        if ($pastoralAccess->getAccess() === PastoralAccessMapper::ACCESS_DENY) {
+            return false;
+        }
+
+        // If the comment is private, and they don't have private, fail
+
+        if ($model->getAccess() == PastoralAccessMapper::ACCESS_PRIVATE && $pastoralAccess->getAccess() < PastoralAccessMapper::ACCESS_PRIVATE) {
+            return false;
+        }
+
+        // Otherwise it's bombs away...
+
+        $envelope->targetToUser($user->getId(), $message);
+
+        return true;
     }
 
     /**
