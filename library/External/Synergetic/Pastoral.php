@@ -313,7 +313,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                         }
 
                         $this->getPastoralMapper()->save($pastoralRecord);
-                        $log->setResult("OK");
+                        $logRecord->setResult("OK");
+                        $logRecord->setPastoralId($pastoralRecord->getId());
 
                         $pastoralRecordsCreated[] = $pastoralRecord;
                     } else {
