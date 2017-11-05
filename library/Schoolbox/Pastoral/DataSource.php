@@ -154,6 +154,19 @@ class DataSource
     }
 
     /**
+     * Wrapper for getLinkedStudents
+     *
+     * This method isn't user-sensitive, but needs to be wrapped anyway.
+     *
+     * @param User $student
+     * @return array
+     */
+    public function getLinkedStudents(User $student): array
+    {
+        return $this->mapper->getLinkedStudents($student);
+    }
+
+    /**
      * User-sensitive wrapper for findLinked
      *
      * @param User $user
