@@ -8,6 +8,7 @@
 namespace Schoolbox\Pastoral\Revision;
 
 use PDOStatement;
+use Schoolbox\Collection;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -57,6 +58,17 @@ class Mapper extends BaseMapper
         $this->joinsReverseMulti('pastoral_id', PastoralAttachmentMapper::class, 'attachments', 'attachments');
         $this->joinsReverseMulti('pastoral_id', PastoralTagMapper::class, 'tags', 'tags');
         $this->joinsReverseMulti('root_id', PastoralRevisionMapper::class, 'revisions', 'revisions');
+    }
+
+    /**
+     * Finds all revisions for a pastoral care record.
+     *
+     * @param Pastoral $record
+     * @return Collection|Model[]
+     */
+    public function findForRecord(Pastoral $record): Collection
+    {
+        return $this->findByColumn('root_id', $record->getId(), ['order' => ['updated_at' => 'desc']]);
     }
 
     /**
