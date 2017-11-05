@@ -298,7 +298,7 @@ class Module extends BaseModule
                     $pastoralAccessMapper = $this->getMapperFactory()->get(PastoralAccessMapper::class);
 
                     // TODO make current user easily available in path matcher
-                    $injectedValues['record'] = $this->retrievePastoralDataSource()->findById(
+                    $injectedValues['record'] = $this->getInjector()->get('pastoralDataSource')->findById(
                         $this->getInjector()->get('user'),
                         $params['recordId']
                     );
