@@ -31,7 +31,7 @@ use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
 use Schoolbox\Pastoral\Group\Model as PastoralGroup;
 use Schoolbox\Pastoral\Model as PastoralModel;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
-use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
+use Schoolbox\Pastoral\Revision\DataSource as PastoralRevisionDataSource;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverityModel;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
@@ -91,8 +91,8 @@ class Controller extends Base
     /** @var PastoralSeverityMapper $pastoralSeverityMapper */
     protected $pastoralSeverityMapper;
 
-    /** @var PastoralRevisionMapper $pastoralRevisionMapper */
-    protected $pastoralRevisionMapper;
+    /** @var PastoralRevisionDataSource $pastoralRevisionDataSource */
+    protected $pastoralRevisionDataSource;
 
     /** @var PastoralTagMapper $pastoralTagMapper */
     protected $pastoralTagMapper;
@@ -121,26 +121,26 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param IConfigLoader             $config
-     * @param FileMapper                $fileMapper
-     * @param PastoralDataSource        $pastoralDataSource
-     * @param UserAccessMapper          $userAccessMapper
-     * @param PastoralAuditMapper       $pastoralAuditMapper
-     * @param PastoralSubTypeMapper     $pastoralSubTypeMapper
-     * @param PastoralTypeMapper        $pastoralTypeMapper
-     * @param PastoralUploadQueueMapper $pastoralUploadQueueMapper
-     * @param PastoralSeverityMapper    $pastoralSeverityMapper
-     * @param PastoralRevisionMapper    $pastoralRevisionMapper
-     * @param PastoralTagMapper         $pastoralTagMapper
-     * @param PastoralCommentMapper     $pastoralCommentMapper
-     * @param PastoralGroupMapper       $pastoralGroupMapper
-     * @param PastoralGroupMemberMapper $pastoralGroupMemberMapper
-     * @param PastoralAttachmentMapper  $pastoralAttachmentMapper
-     * @param RoleMapper                $roleMapper
-     * @param UserMapper                $userMapper
-     * @param PastoralAccessMapper      $pastoralAccessMapper
-     * @param ErrorMapper               $errorMapper
-     * @param PastoralReportMapper      $pastoralReportMapper
+     * @param IConfigLoader              $config
+     * @param FileMapper                 $fileMapper
+     * @param PastoralDataSource         $pastoralDataSource
+     * @param UserAccessMapper           $userAccessMapper
+     * @param PastoralAuditMapper        $pastoralAuditMapper
+     * @param PastoralSubTypeMapper      $pastoralSubTypeMapper
+     * @param PastoralTypeMapper         $pastoralTypeMapper
+     * @param PastoralUploadQueueMapper  $pastoralUploadQueueMapper
+     * @param PastoralSeverityMapper     $pastoralSeverityMapper
+     * @param PastoralRevisionDataSource $pastoralRevisionDataSource
+     * @param PastoralTagMapper          $pastoralTagMapper
+     * @param PastoralCommentMapper      $pastoralCommentMapper
+     * @param PastoralGroupMapper        $pastoralGroupMapper
+     * @param PastoralGroupMemberMapper  $pastoralGroupMemberMapper
+     * @param PastoralAttachmentMapper   $pastoralAttachmentMapper
+     * @param RoleMapper                 $roleMapper
+     * @param UserMapper                 $userMapper
+     * @param PastoralAccessMapper       $pastoralAccessMapper
+     * @param ErrorMapper                $errorMapper
+     * @param PastoralReportMapper       $pastoralReportMapper
      */
     public function __construct(
         IConfigLoader $config,
@@ -152,7 +152,7 @@ class Controller extends Base
         PastoralTypeMapper $pastoralTypeMapper,
         PastoralUploadQueueMapper $pastoralUploadQueueMapper,
         PastoralSeverityMapper $pastoralSeverityMapper,
-        PastoralRevisionMapper $pastoralRevisionMapper,
+        PastoralRevisionDataSource $pastoralRevisionDataSource,
         PastoralTagMapper $pastoralTagMapper,
         PastoralCommentMapper $pastoralCommentMapper,
         PastoralAttachmentMapper $pastoralAttachmentMapper,
@@ -176,7 +176,7 @@ class Controller extends Base
         $this->pastoralCommentMapper     = $pastoralCommentMapper;
         $this->pastoralDataSource        = $pastoralDataSource;
         $this->pastoralSeverityMapper    = $pastoralSeverityMapper;
-        $this->pastoralRevisionMapper    = $pastoralRevisionMapper;
+        $this->pastoralRevisionDataSource    = $pastoralRevisionDataSource;
         $this->pastoralTagMapper         = $pastoralTagMapper;
         $this->pastoralTypeMapper        = $pastoralTypeMapper;
         $this->pastoralUploadQueueMapper = $pastoralUploadQueueMapper;
@@ -396,12 +396,7 @@ class Controller extends Base
         $moderator = $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0;
 
         if ($moderator) {
-            $record->setRevisions(
-                $this->pastoralRevisionMapper->filterRecordsForUser(
-                    $this->pastoralRevisionMapper->findForRecord($record),
-                    $this->getUser()
-                )
-            );
+            $record->setRevisions($this->pastoralRevisionDataSource->findForRecord($this->getUser(), $record));
         }
 
         // Hydrate group members so we can display them in the visibility section
