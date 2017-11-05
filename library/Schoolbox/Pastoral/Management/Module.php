@@ -38,7 +38,7 @@ class Module extends BaseModule
     {
         // Define routes and permissions
 
-        $permissionPastoralModeratorWrite = new HasServicePermission(UserAccess::SERVICE_PASTORAL,UserAccess::ACCESS_WRITE);
+        $permissionPastoralModeratorWrite = new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE);
 
         $this->registerRoutesArray([
             'GET'  => [

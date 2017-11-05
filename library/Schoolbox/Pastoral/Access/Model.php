@@ -45,7 +45,7 @@ class Model implements ISoftDeletable
     /** @var null|Group $group */
     protected $group;
 
-    /** @var bool $access */
+    /** @var int $access */
     protected $access;
 
     /** @var PastoralGroupMemberMapper $pastoralGroupMemberMapper */

@@ -180,7 +180,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     private function getNewImportId()
     {
-        return date("U");
+        return (int)date("U");
     }
 
     /**

@@ -859,8 +859,7 @@ class Mapper extends BaseMapper
         Collection $order,
         $involved,
         Collection $years
-    )
-    {
+    ) {
         $this->bindings = [];
         $this->filters  = [];
 
