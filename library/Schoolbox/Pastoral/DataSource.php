@@ -7,8 +7,10 @@
 
 namespace Schoolbox\Pastoral;
 
+use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\Tag\Model as PastoralTag;
 use Schoolbox\User;
 
@@ -102,6 +104,53 @@ class DataSource
     public function findByTag(User $user, PastoralTag $tag): Collection
     {
         return $this->mapper->filterRecordsForUser($this->mapper->findByTag($tag), $user);
+    }
+
+    /**
+     * User-sensitive wrapper for getReportData
+     *
+     * @param User                  $user
+     * @param Alaress_Date_Format   $before_date
+     * @param Alaress_Date_Format   $after_date
+     * @param null|PastoralSeverity $severity
+     * @param Collection            $types
+     * @param Collection            $authors
+     * @param Collection            $students
+     * @param Collection            $tags
+     * @param Collection            $order
+     * @param                       $involved
+     * @param Collection            $years
+     * @return Collection
+     */
+    public function getReportData(
+        User $user,
+        Alaress_Date_Format $before_date,
+        Alaress_Date_Format $after_date,
+        ?PastoralSeverity $severity,
+        Collection $types,
+        Collection $authors,
+        Collection $students,
+        Collection $tags,
+        Collection $order,
+        $involved,
+        Collection $years
+    ): Collection {
+        return $this->mapper->filterRecordsForUser(
+            $this->mapper->getReportData(
+                $user,
+                $before_date,
+                $after_date,
+                $severity,
+                $types,
+                $authors,
+                $students,
+                $tags,
+                $order,
+                $involved,
+                $years
+            ),
+            $user
+        );
     }
 
     /**

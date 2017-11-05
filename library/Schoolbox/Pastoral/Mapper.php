@@ -851,7 +851,7 @@ class Mapper extends BaseMapper
         User $user,
         Alaress_Date_Format $before_date,
         Alaress_Date_Format $after_date,
-        PastoralSeverity $severity = null,
+        ?PastoralSeverity $severity,
         Collection $types,
         Collection $authors,
         Collection $students,
