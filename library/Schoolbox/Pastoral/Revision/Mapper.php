@@ -8,12 +8,12 @@
 namespace Schoolbox\Pastoral\Revision;
 
 use PDOStatement;
-use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
+use Schoolbox\Pastoral\BaseMapper as BaseMapper;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as Pastoral;
@@ -166,11 +166,10 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Create a revision record from a pastoral record
-     *
      * @param Pastoral $pastoral
      *
-     * @return PastoralRevision
+     * @return Model
+     * @throws MapperException
      */
     public function createRevision(Pastoral $pastoral)
     {
