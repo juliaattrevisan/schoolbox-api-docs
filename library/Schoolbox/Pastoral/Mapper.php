@@ -1,5 +1,11 @@
 <?php
 /**
+ * Please don't use this mapper directly in web requests!
+ *
+ * Use `\Schoolbox\Pastoral\DataSource` instead; it wraps this mapper with
+ * calls that automatically filter and censor records and fields that a user
+ * does not have permission to view.
+ *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
