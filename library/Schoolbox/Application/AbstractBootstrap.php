@@ -44,6 +44,8 @@ use Schoolbox\MapperFactory;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Notif\SilentNotif;
+use Schoolbox\Pastoral\DataSource as PastoralDataSource;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
@@ -804,6 +806,16 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     $assessmentDataSource = $di->get('assessmentDataSource');
                     return new Calendar_Api_Factory($assessmentDataSource, $databaseExternal);
                 }
+            )
+        );
+
+        // Pastoral Care data source
+        // TODO consider moving into a module's dependencies?
+        $di->set(
+            'pastoralDataSource',
+            $di->lazyNew(
+                PastoralDataSource::class,
+                ['mapper' => $mapperFactory->getLazy(PastoralMapper::class)]
             )
         );
 

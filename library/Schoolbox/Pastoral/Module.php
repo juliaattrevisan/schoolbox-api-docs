@@ -191,7 +191,7 @@ class Module extends BaseModule
             'config'                    => $injector->get('config'),
             'errorMapper'               => ErrorMapper::getInstance(),
             'fileMapper'                => FileMapper::getInstance(),
-            'pastoralDataSource'        => $this->retrievePastoralDataSource(),
+            'pastoralDataSource'        => $injector->get('pastoralDataSource'),
             'pastoralAccessMapper'      => PastoralAccessMapper::getInstance(),
             'pastoralAttachmentMapper'  => PastoralAttachmentMapper::getInstance(),
             'pastoralSubTypeMapper'     => PastoralSubTypeMapper::getInstance(),
@@ -312,20 +312,5 @@ class Module extends BaseModule
 
             return $injectedValues;
         });
-    }
-
-    /**
-     * Set up and inject the pastoral data source
-     *
-     * TODO inject it or set up dependencies?
-     *
-     * @return DataSource
-     */
-    private function retrievePastoralDataSource(): DataSource
-    {
-        if (!$this->pastoralDataSource instanceof DataSource) {
-            $this->pastoralDataSource = new DataSource($this->getMapperFactory()->get(PastoralMapper::class));
-        }
-        return $this->pastoralDataSource;
     }
 }
