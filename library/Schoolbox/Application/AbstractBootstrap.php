@@ -46,6 +46,8 @@ use Schoolbox\Notif\Notifactory;
 use Schoolbox\Notif\SilentNotif;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Pastoral\Revision\DataSource as PastoralRevisionDataSource;
+use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
@@ -816,6 +818,13 @@ abstract class AbstractBootstrap implements BootstrapInterface
             $di->lazyNew(
                 PastoralDataSource::class,
                 ['mapper' => $mapperFactory->getLazy(PastoralMapper::class)]
+            )
+        );
+        $di->set(
+            'pastoralRevisionDataSource',
+            $di->lazyNew(
+                PastoralRevisionDataSource::class,
+                ['mapper' => $mapperFactory->getLazy(PastoralRevisionMapper::class)]
             )
         );
 
