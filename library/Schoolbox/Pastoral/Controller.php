@@ -274,8 +274,6 @@ class Controller extends Base
             );
         }
 
-//        $records = $this->pastoralMapper->filterRecordsForUser($records, $this->getUser());
-
         // Limit the number of pastoral records to display on each page of pastoral records
 
         $resultsPerPage = $this->config->get('pastoral_page_size');
@@ -384,8 +382,6 @@ class Controller extends Base
         if (!$record instanceof Model) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
         }
-
-//        $record = $this->pastoralMapper->filterRecordForUser($record, $this->getUser());
 
         // Create an audit record
 
