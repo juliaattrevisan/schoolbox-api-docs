@@ -14,22 +14,21 @@ use Alaress_Date_NullDate;
 use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
-use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
-use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
-use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
-use Schoolbox\Pastoral\Tag\Model as PastoralTag;
-use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
 use Schoolbox\Pastoral\Revision\Model as PastoralRevision;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
-use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
+use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
+use Schoolbox\Pastoral\Tag\Model as PastoralTag;
+use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Resource\Search\Results;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -167,7 +166,8 @@ class Mapper extends BaseMapper
      * @param PDOStatement $statement
      * @param bool         $hydrateRelatedRecords
      *
-     * @return Collection|Model[]
+     * @return GenericCollection
+     * @throws MapperException
      */
     protected function hydrateSelectInternal(PDOStatement $statement, $hydrateRelatedRecords = true)
     {
@@ -251,81 +251,12 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Filter records from the collection if the current user doesn't have access to them.
-     * If the user is not in the audience and is not the owner, they can't see the record.
-     *
-     * @param Model $record A pastoral record
-     * @param User  $user   The user who is trying to view them
-     *
-     * @return Model|null
-     */
-    public function filterRecordForUser(Model $record, User $user)
-    {
-        if (!$record instanceof Model) {
-            return null;
-        }
-
-        if ($this->isUserInPastoralService($user) || $user->getId() == $record->getOwner()->getId()) {
-            // Pastoral moderator and owner see all, shortcut out of here
-            return $record;
-        }
-
-        // We need to iterate all access records to see if any of them grants private access
-
-        $accessLevel = $record->getAccessLevel($user);
-
-        // If denied, no soup for you!
-
-        if ($accessLevel == PastoralAccessMapper::ACCESS_DENY) {
-            return null;
-        }
-
-        // Only has public access? Strip the private body
-
-        if ($accessLevel == PastoralAccessMapper::ACCESS_PUBLIC) {
-            $record->setBodyPrivate("");
-        }
-
-        return $record;
-    }
-
-    /**
-     * Filter records from the collection if the current user doesn't have access to them.
-     * If the user is not in the audience and is not the owner, they can't see the record.
-     *
-     * @param Collection|Model[] $records A list of pastoral records
-     * @param User               $user    The user who is trying to view them
-     *
-     * @return Collection|Model[]
-     */
-    public function filterRecordsForUser(Collection $records, User $user)
-    {
-        /** @var PastoralCommentMapper $pastoralCommentMapper */
-        $pastoralCommentMapper = $this->getJoinMapper('comments');
-
-        $collection = $this->createCollection();
-
-        /** @var Model $record */
-        foreach ($records as $record) {
-            $record = $this->filterRecordForUser($record, $user);
-
-            if ($record instanceof Model) {
-                // And filter the comments on the record, because this is planet Earth and we don't trust anybody
-                $record->setComments($pastoralCommentMapper->filterRecordsForUser($record->getComments(), $user));
-
-                $collection->add($record);
-            }
-        }
-
-        return $collection;
-    }
-
-    /**
      * Return any records immediately related to the supplied pastoral record
      *
      * @param Model $record
      *
-     * @return Collection
+     * @return GenericCollection
+     * @throws MapperException
      */
     public function getRelatedRecords(Model $record)
     {
@@ -345,8 +276,8 @@ class Mapper extends BaseMapper
                     `{$tableName}`.`id` = :parent_id_1 OR 
                     `{$tableName}`.`parent_id` = :id_0
                 ) AND
-                   `{$tableName}`.`id` <> :id_1
-                 AND `{$tableName}`.deleted_at IS NULL
+                `{$tableName}`.`id` <> :id_1 AND 
+                `{$tableName}`.deleted_at IS NULL
             ";
 
             $bindings['id_0']        = $record->getId();
@@ -357,8 +288,8 @@ class Mapper extends BaseMapper
             // This is a parent item, just find its children
 
             $query .= "
-                WHERE       `{$tableName}`.`parent_id` = :parent_id AND 
-                            `{$tableName}`.`deleted_at` IS NULL
+                WHERE   `{$tableName}`.`parent_id` = :parent_id AND 
+                        `{$tableName}`.`deleted_at` IS NULL
             ";
 
             $bindings['parent_id'] = $record->getId();
@@ -381,39 +312,43 @@ class Mapper extends BaseMapper
      */
     public function getLinkedStudents($student)
     {
+        /** @noinspection SqlDialectInspection */
         $statement = $this->database->prepare("
-            SELECT DISTINCT   `student_id`,
-              COUNT(*) AS `count`,
-              `user`.`lastname` AS `last_name`,
-              `user`.`firstname` AS `first_name`
-            FROM              `pastoral` p
-              JOIN              `user` ON `user`.`id` = `student_id`
-            WHERE             `p`.`deleted_at` IS NULL AND
-                              `user`.`deleted_at` IS NULL AND
-                              (
-                                p.`parent_id` IN (
-                                  SELECT `id`
-                                  FROM pastoral
-                                  WHERE
-                                    `deleted_at` IS NULL AND (
-                                      `student_id` = :student_id_0) OR `pastoral`.`id` IN (SELECT `parent_id`
-                                                                                           FROM pastoral
-                                                                                           WHERE `student_id` = :student_id_1 AND `deleted_at` IS NULL))
-            
-                                OR
-                                  p.`id` IN (
-                                    SELECT `id`
-                                    FROM pastoral
-                                    WHERE
-                                      `deleted_at` IS NULL AND (
-                                        `student_id` = :student_id_2) OR `pastoral`.`id` IN (SELECT `parent_id`
-                                                                                             FROM pastoral
-                                                                                             WHERE `student_id` = :student_id_3 AND `deleted_at` IS NULL)
-                                  )
-                              )
-              AND student_id <> :student_id_4
-            GROUP BY `student_id`
-            ORDER BY `count` DESC, `user`.`lastname`, `user`.`firstname`            
+            SELECT DISTINCT     `student_id`,
+                                COUNT(*)            AS `count`,
+                                `user`.`lastname`   AS `last_name`,
+                                `user`.`firstname`  AS `first_name`
+            FROM                `pastoral` p
+            JOIN                `user` ON `user`.`id` = `student_id`
+            WHERE               `p`.`deleted_at` IS NULL AND
+                                `user`.`deleted_at` IS NULL AND (
+                                    `p`.`parent_id` IN (
+                                        SELECT    `id`
+                                        FROM      `pastoral`
+                                        WHERE     `deleted_at` IS NULL AND 
+                                                  `student_id` = :student_id_0 OR 
+                                                  `pastoral`.`id` IN (
+                                                      SELECT    `parent_id`
+                                                      FROM      `pastoral`
+                                                      WHERE     `student_id` = :student_id_1 AND `deleted_at` IS NULL
+                                                  )
+                                    ) OR p.`id` IN (
+                                        SELECT    `id`
+                                        FROM      `pastoral`
+                                        WHERE     `deleted_at` IS NULL AND 
+                                                  `student_id` = :student_id_2 OR 
+                                                  `pastoral`.`id` IN (
+                                                      SELECT    `parent_id`
+                                                      FROM      `pastoral`
+                                                      WHERE     `student_id` = :student_id_3 AND `deleted_at` IS NULL
+                                                  )
+                                    )
+                                ) AND 
+                                `student_id` <> :student_id_4
+            GROUP BY            `student_id`
+            ORDER BY            `count` DESC, 
+                                `user`.`lastname`, 
+                                `user`.`firstname`            
         ");
 
         $statement->execute([
@@ -431,9 +366,10 @@ class Mapper extends BaseMapper
      * Display the most recent records that are tagged for display on dashboard based on their severity
      *
      * @param User $user
-     * @param int  $count Number of recent records to display
+     * @param int  $count
      *
      * @return Collection|Model[]
+     * @throws MapperException
      */
     public function findRecentDashboard(User $user, $count = 5)
     {
@@ -459,10 +395,9 @@ class Mapper extends BaseMapper
     {
         $sql = $this->getSelectString() . "
         
-            JOIN `pastoral_tags` ON 
-                `pastoral_tags`.`pastoral_id` = `pastoral`.`id` AND 
-                `pastoral_tags`.`tag_id` = :tagId AND
-                `pastoral_tags`.`deleted_at` IS NULL
+            JOIN    `pastoral_tags` ON `pastoral_tags`.`pastoral_id` = `pastoral`.`id` AND 
+                    `pastoral_tags`.`tag_id` = :tagId AND
+                    `pastoral_tags`.`deleted_at` IS NULL
         ";
 
         $statement = $this->database->prepare($sql);
@@ -489,10 +424,8 @@ class Mapper extends BaseMapper
                 SELECT      `parent_id` 
                 FROM        `pastoral` `pastoralLinked1` 
                 WHERE       `pastoralLinked1`.`student_id` = :linkedStudentId1
-            ) 
+            ) OR
             
-            OR
-
             `pastoral`.`student_id` = :linkedStudentId2 AND `pastoral`.`id` IN (
                 SELECT      `parent_id` 
                 FROM        `pastoral` `pastoralLinked2` 
@@ -511,9 +444,9 @@ class Mapper extends BaseMapper
         $statement = $this->database->prepare($sql);
 
         $params = [
-            'studentId1' => $student->getId(),
+            'studentId1'       => $student->getId(),
             'linkedStudentId1' => $linkedStudent->getId(),
-            'studentId2' => $student->getId(),
+            'studentId2'       => $student->getId(),
             'linkedStudentId2' => $linkedStudent->getId(),
         ];
 
@@ -540,8 +473,10 @@ class Mapper extends BaseMapper
         $search = trim($search);
 
         // Keep an audit trail of searches
+
         $pastoralAuditMapper = PastoralAuditMapper::getInstance();
-        $auditRecord         = $pastoralAuditMapper->createModel();
+
+        $auditRecord = $pastoralAuditMapper->createModel();
         $auditRecord->setUser($user);
         $auditRecord->setSearch($search);
 
@@ -556,317 +491,310 @@ class Mapper extends BaseMapper
             }
         }
 
-        if (count($words)) {
-
-            // --------------------------------------------------------------------------------------------------------
-            // Not deleted pastoral records 
-            // --------------------------------------------------------------------------------------------------------
-
-            $recordNotDeletedClause = $this->getPredicateBuilder()
-                ->setParamPrefix('rec_nondel')
-                ->isNull('pastoral.deleted_at')
-                ->getWhere()[0];
-
-            // --------------------------------------------------------------------------------------------------------
-            // Pastoral record heading
-            // --------------------------------------------------------------------------------------------------------
-
-            $pbHeadingSearch = $this->getPredicateBuilder()
-                ->setParamPrefix('heading')
-                ->like('pastoral.heading', $words);
-
-            $recordHeadingClause = $pbHeadingSearch->getWhere()[0];
-
-            // --------------------------------------------------------------------------------------------------------
-            // Public pastoral content
-            // --------------------------------------------------------------------------------------------------------
-
-            $pbPublicBodySearch = $this->getPredicateBuilder()
-                ->setParamPrefix('pub_body')
-                ->like('pastoral.body_public', $words);
-
-            $recordPublicBodyClause = $pbPublicBodySearch->getWhere()[0];
-
-            // --------------------------------------------------------------------------------------------------------
-            // Private pastoral content
-            // --------------------------------------------------------------------------------------------------------
-
-            $pbPrivateBodySearch = $this->getPredicateBuilder()
-                ->setParamPrefix('pri_body')
-                ->like('pastoral.body_private', $words);
-
-            $recordPrivateBodyClause = $pbPrivateBodySearch->getWhere()[0];
-
-            // --------------------------------------------------------------------------------------------------------
-            // Not deleted comments
-            // --------------------------------------------------------------------------------------------------------
-
-            $commentNotDeletedClause = $this->getPredicateBuilder()
-                ->setParamPrefix('com_nondel')
-                ->isNull('pastoral_comment.deleted_at')
-                ->getWhere()[0];
-
-            // --------------------------------------------------------------------------------------------------------
-            // Public comments
-            // --------------------------------------------------------------------------------------------------------
-
-            $pbPublicCommentSearch = $this->getPredicateBuilder()
-                ->setParamPrefix('pub_cs')
-                ->like('pastoral_comment.body', $words);
-
-            $commentPublicClause = implode(' OR ', $pbPublicCommentSearch->getWhere());
-
-            $pbPublicCommentNotPrivateSearch = $this->getPredicateBuilder()
-                ->setParamPrefix('pub_ispub')
-                ->equals('pastoral_comment.private', false);
-
-            $commentPublicClause = "({$commentPublicClause} AND {$pbPublicCommentNotPrivateSearch->getWhere()[0]}) AND {$commentNotDeletedClause}";
-
-            // --------------------------------------------------------------------------------------------------------
-            // Private comments
-            // --------------------------------------------------------------------------------------------------------
-
-            $pbPrivateCommentSearch = $this->getPredicateBuilder()
-                ->setParamPrefix('pri_cs')
-                ->like('pastoral_comment.body', $words);
-
-            $commentPrivateClause = implode(' OR ', $pbPrivateCommentSearch->getWhere());
-
-            $pbPrivateCommentIsPrivateSearch = $this->getPredicateBuilder()
-                ->setParamPrefix('pri_ispri')
-                ->equals('pastoral_comment.private', true);
-
-            $commentPrivateClause = "{$commentPrivateClause} AND {$pbPrivateCommentIsPrivateSearch->getWhere()[0]} AND {$commentNotDeletedClause}";
-
-            // --------------------------------------------------------------------------------------------------------
-            // Is the owner
-            // --------------------------------------------------------------------------------------------------------
-
-            $pbOwnerSearch = $this->getPredicateBuilder()
-                ->setParamPrefix('os')
-                ->equals('pastoral.owner_id', $user->getId());
-
-            $recordOwnerClause = $pbOwnerSearch->getWhere()[0];
-
-            // --------------------------------------------------------------------------------------------------------
-            // Pastoral group access
-            // --------------------------------------------------------------------------------------------------------
-
-            $pbPublicGroupSearch = $this->getPredicateBuilder()
-                ->setParamPrefix('pub_gs')
-                ->greaterThanOrEqualTo('pastoral_access.access', PastoralAccessMapper::ACCESS_PUBLIC)
-                ->notNull('pastoral_access.group_id')
-                ->isNull('pastoral_access.deleted_at');
-
-            $recordPublicGroupClause = implode(' AND ', $pbPublicGroupSearch->getWhere());
-
-            $pbPrivateGroupSearch = $this->getPredicateBuilder()
-                ->setParamPrefix('pri_gs')
-                ->greaterThanOrEqualTo('pastoral_access.access', PastoralAccessMapper::ACCESS_PRIVATE)
-                ->notNull('pastoral_access.group_id')
-                ->isNull('pastoral_access.deleted_at');
-
-            $recordPrivateGroupClause = implode(' AND ', $pbPrivateGroupSearch->getWhere());
-
-            $pbGroupMemberSearch = $this->getPredicateBuilder()
-                ->setParamPrefix('gms')
-                ->equals('pastoral_group_member.user_id', $user->getId())
-                ->isNull('pastoral_group_member.deleted_at');
-
-            $recordGroupMemberClause = implode(' AND ', $pbGroupMemberSearch->getWhere());
-
-            // --------------------------------------------------------------------------------------------------------
-            // Pastoral role access
-            // --------------------------------------------------------------------------------------------------------
-
-            $pbPublicRoleSearch = $this->getPredicateBuilder()
-                ->setParamPrefix('pub_rs')
-                ->greaterThanOrEqualTo('pastoral_access.access', PastoralAccessMapper::ACCESS_PUBLIC)
-                ->equals('pastoral_access.role_id', $user->getRole()->getId())
-                ->isNull('pastoral_access.deleted_at');
-
-            $recordPublicRoleClause = implode(' AND ', $pbPublicRoleSearch->getWhere());
-
-            $pbPrivateRoleSearch = $this->getPredicateBuilder()
-                ->setParamPrefix('pri_rs')
-                ->greaterThanOrEqualTo('pastoral_access.access', PastoralAccessMapper::ACCESS_PRIVATE)
-                ->equals('pastoral_access.role_id', $user->getRole()->getId())
-                ->isNull('pastoral_access.deleted_at');
-
-            $recordPrivateRoleClause = implode(' AND ', $pbPrivateRoleSearch->getWhere());
-
-            // --------------------------------------------------------------------------------------------------------
-            // Is explicitly allowed via individual user access
-            // --------------------------------------------------------------------------------------------------------
-
-            $pbPublicUserSearch = $this->getPredicateBuilder()
-                ->setParamPrefix('pub_us')
-                ->greaterThanOrEqualTo('pastoral_access.access', PastoralAccessMapper::ACCESS_PUBLIC)
-                ->equals('pastoral_access.user_id', $user->getId())
-                ->isNull('pastoral_access.deleted_at');
-
-            $recordPublicUserClause = implode(' AND ', $pbPublicUserSearch->getWhere());
-
-            $pbPrivateUserSearch = $this->getPredicateBuilder()
-                ->setParamPrefix('pri_us')
-                ->greaterThanOrEqualTo('pastoral_access.access', PastoralAccessMapper::ACCESS_PRIVATE)
-                ->equals('pastoral_access.user_id', $user->getId())
-                ->isNull('pastoral_access.deleted_at');
-
-            $recordPrivateUserClause = implode(' AND ', $pbPrivateUserSearch->getWhere());
-
-            // --------------------------------------------------------------------------------------------------------
-            // Public/private access query amalgamations
-            // --------------------------------------------------------------------------------------------------------
-
-            $hasPublicAccess = "
-                (
-                    -- PUBLIC GROUP ACCESS
-                
-                    `pastoral`.`id` IN (
-                        SELECT  `pastoral_id` 
-                        FROM    `pastoral_access` 
-                        WHERE   {$recordPublicGroupClause} AND
-                                `pastoral_access`.`group_id` IN (
-                                    SELECT  `group_id`
-                                    FROM    `pastoral_group_member`
-                                    WHERE   {$recordGroupMemberClause}
-                                ) 
-                    )
-                    
-                    OR
-                    
-                    -- PUBLIC ROLE ACCESS
-                    
-                    `pastoral`.`id` IN (
-                        SELECT  `pastoral_id` 
-                        FROM    `pastoral_access` 
-                        WHERE   {$recordPublicRoleClause}
-                    )
-                    
-                    OR
-                    
-                    -- PUBLIC USER ACCESS
-                    
-                    `pastoral`.`id` IN (
-                        SELECT  `pastoral_id` 
-                        FROM    `pastoral_access` 
-                        WHERE   {$recordPublicUserClause}
-                    )
-                    
-                    OR
-                    
-                    -- RECORD OWNER
-    
-                    {$recordOwnerClause}                    
-                )
-            ";
-
-            $hasPrivateAccess = "
-                (
-                    -- PRIVATE GROUP ACCESS
-
-                    `pastoral`.`id` IN (
-                        SELECT  `pastoral_id` 
-                        FROM    `pastoral_access` 
-                        WHERE   {$recordPrivateGroupClause} AND
-                                `pastoral_access`.`group_id` IN (
-                                    SELECT  `group_id`
-                                    FROM    `pastoral_group_member`
-                                    WHERE   {$recordGroupMemberClause}
-                                ) 
-                    )  
-                    
-                    OR
-                    
-                    -- PRIVATE ROLE ACCESS
-                    
-                    `pastoral`.`id` IN (
-                        SELECT  `pastoral_id` 
-                        FROM    `pastoral_access` 
-                        WHERE   {$recordPrivateRoleClause}
-                    )  
-                    
-                    OR
-                    
-                    -- PRIVATE USER ACCESS
-                    
-                    `pastoral`.`id` IN (
-                        SELECT  `pastoral_id` 
-                        FROM    `pastoral_access` 
-                        WHERE   {$recordPrivateUserClause}
-                    )        
-                                        
-                    OR
-                    
-                    -- RECORD OWNER
-    
-                    {$recordOwnerClause}               
-                )
-            ";
-
-            $sql = $this->getSelectString() . "
-                LEFT JOIN `pastoral_comment` ON `pastoral_comment`.`pastoral_id` = `pastoral`.`id`
-                WHERE 
-                (
-                    -- PASTORAL RECORD NOT DELETED
-                
-                    {$recordNotDeletedClause} AND
-
-                    (
-                        -- PUBLIC RECORD HEADING/BODY/COMMENT & ACCESS
-                                            
-                        (({$recordHeadingClause} OR {$recordPublicBodyClause} OR {$commentPublicClause}) AND ({$hasPublicAccess})) OR 
-                        
-                        -- PRIVATE RECORD HEADING/BODY/COMMENT & ACCESS
-                                            
-                        (({$recordHeadingClause} OR {$recordPrivateBodyClause} OR {$commentPrivateClause}) AND ({$hasPrivateAccess})) 
-                    )
-                )
-            ";
-
-            $parameters = array_merge(
-                $pbHeadingSearch->getParams(),
-                $pbPublicBodySearch->getParams(),
-                $pbPrivateBodySearch->getParams(),
-                $pbPublicCommentSearch->getParams(),
-                $pbPublicCommentNotPrivateSearch->getParams(),
-                $pbPrivateCommentSearch->getParams(),
-                $pbPrivateCommentIsPrivateSearch->getParams(),
-                $pbOwnerSearch->getParams(),
-                $pbPublicGroupSearch->getParams(),
-                $pbPrivateGroupSearch->getParams(),
-                $pbGroupMemberSearch->getParams(),
-                $pbPublicRoleSearch->getParams(),
-                $pbPrivateRoleSearch->getParams(),
-                $pbPublicUserSearch->getParams(),
-                $pbPrivateUserSearch->getParams()
-            );
-
-            $statement = $this->database->prepare($sql);
-            $statement->execute($parameters);
-
-            $results = $this->filterRecordsForUser($this->hydrateSelect($statement), $user);
-
-            // Keep a record of all searches performed by users, and what results were displayed
-            $searchResults = [];
-
-            /** @var Model $record */
-            foreach ($results as $result) {
-                $searchResults[] = $result->getId();
-            }
-
-            // Record the search results that were returned by the search by imploding their IDs down into CSV
-            if (count($searchResults) > 0) {
-                $auditRecord->setSearchResult(implode(',', $searchResults));
-            }
-        } else {
+        if (!count($words)) {
             // All search words were too short
-            $results = $this->createCollection();
+            return $this->createCollection();
+        }
+
+        // --------------------------------------------------------------------------------------------------------
+        // Not deleted pastoral records
+        // --------------------------------------------------------------------------------------------------------
+
+        $recordNotDeletedClause = $this->getPredicateBuilder()
+                                       ->setParamPrefix('rec_nondel')
+                                       ->isNull('pastoral.deleted_at')
+                                       ->getWhere()[0];
+
+        // --------------------------------------------------------------------------------------------------------
+        // Pastoral record heading
+        // --------------------------------------------------------------------------------------------------------
+
+        $pbHeadingSearch     = $this->getPredicateBuilder()
+                                    ->setParamPrefix('heading')
+                                    ->like('pastoral.heading', $words);
+        $recordHeadingClause = $pbHeadingSearch->getWhere()[0];
+
+        // --------------------------------------------------------------------------------------------------------
+        // Public pastoral content
+        // --------------------------------------------------------------------------------------------------------
+
+        $pbPublicBodySearch     = $this->getPredicateBuilder()
+                                       ->setParamPrefix('pub_body')
+                                       ->like('pastoral.body_public', $words);
+        $recordPublicBodyClause = $pbPublicBodySearch->getWhere()[0];
+
+        // --------------------------------------------------------------------------------------------------------
+        // Private pastoral content
+        // --------------------------------------------------------------------------------------------------------
+
+        $pbPrivateBodySearch     = $this->getPredicateBuilder()
+                                        ->setParamPrefix('pri_body')
+                                        ->like('pastoral.body_private', $words);
+        $recordPrivateBodyClause = $pbPrivateBodySearch->getWhere()[0];
+
+        // --------------------------------------------------------------------------------------------------------
+        // Not deleted comments
+        // --------------------------------------------------------------------------------------------------------
+
+        $commentNotDeletedClause = $this->getPredicateBuilder()
+                                        ->setParamPrefix('com_nondel')
+                                        ->isNull('pastoral_comment.deleted_at')
+                                        ->getWhere()[0];
+
+        // --------------------------------------------------------------------------------------------------------
+        // Public comments
+        // --------------------------------------------------------------------------------------------------------
+
+        $pbPublicCommentSearch = $this->getPredicateBuilder()
+                                      ->setParamPrefix('pub_cs')
+                                      ->like('pastoral_comment.body', $words);
+
+        $commentPublicClause = implode(' OR ', $pbPublicCommentSearch->getWhere());
+
+        $pbPublicCommentNotPrivateSearch = $this->getPredicateBuilder()
+                                                ->setParamPrefix('pub_ispub')
+                                                ->equals('pastoral_comment.private', false);
+
+        $commentPublicClause = "
+            (
+                {$commentPublicClause} AND 
+                {$pbPublicCommentNotPrivateSearch->getWhere()[0]} AND 
+                {$commentNotDeletedClause}
+            )
+        ";
+
+        // --------------------------------------------------------------------------------------------------------
+        // Private comments
+        // --------------------------------------------------------------------------------------------------------
+
+        $pbPrivateCommentSearch = $this->getPredicateBuilder()
+                                       ->setParamPrefix('pri_cs')
+                                       ->like('pastoral_comment.body', $words);
+
+        $commentPrivateClause = implode(' OR ', $pbPrivateCommentSearch->getWhere());
+
+        $pbPrivateCommentIsPrivateSearch = $this->getPredicateBuilder()
+                                                ->setParamPrefix('pri_ispri')
+                                                ->equals('pastoral_comment.private', true);
+
+        $commentPrivateClause = "
+            (
+                {$commentPrivateClause} AND 
+                {$pbPrivateCommentIsPrivateSearch->getWhere()[0]} AND 
+                {$commentNotDeletedClause}
+            )
+        ";
+
+        // --------------------------------------------------------------------------------------------------------
+        // Is the owner
+        // --------------------------------------------------------------------------------------------------------
+
+        $pbOwnerSearch     = $this->getPredicateBuilder()
+                                  ->setParamPrefix('os')
+                                  ->equals('pastoral.owner_id', $user->getId());
+        $recordOwnerClause = $pbOwnerSearch->getWhere()[0];
+
+        // --------------------------------------------------------------------------------------------------------
+        // Pastoral group access
+        // --------------------------------------------------------------------------------------------------------
+
+        $pbPublicGroupSearch = $this->getPredicateBuilder()
+                                    ->setParamPrefix('pub_gs')
+                                    ->greaterThanOrEqualTo('pastoral_access.access', PastoralAccessMapper::ACCESS_PUBLIC)
+                                    ->notNull('pastoral_access.group_id')
+                                    ->isNull('pastoral_access.deleted_at');
+
+        $recordPublicGroupClause = implode(' AND ', $pbPublicGroupSearch->getWhere());
+
+        $pbPrivateGroupSearch = $this->getPredicateBuilder()
+                                     ->setParamPrefix('pri_gs')
+                                     ->greaterThanOrEqualTo('pastoral_access.access', PastoralAccessMapper::ACCESS_PRIVATE)
+                                     ->notNull('pastoral_access.group_id')
+                                     ->isNull('pastoral_access.deleted_at');
+
+        $recordPrivateGroupClause = implode(' AND ', $pbPrivateGroupSearch->getWhere());
+
+        $pbGroupMemberSearch = $this->getPredicateBuilder()
+                                    ->setParamPrefix('gms')
+                                    ->equals('pastoral_group_member.user_id', $user->getId())
+                                    ->isNull('pastoral_group_member.deleted_at');
+
+        $recordGroupMemberClause = implode(' AND ', $pbGroupMemberSearch->getWhere());
+
+        // --------------------------------------------------------------------------------------------------------
+        // Pastoral role access
+        // --------------------------------------------------------------------------------------------------------
+
+        $pbPublicRoleSearch = $this->getPredicateBuilder()
+                                   ->setParamPrefix('pub_rs')
+                                   ->greaterThanOrEqualTo('pastoral_access.access', PastoralAccessMapper::ACCESS_PUBLIC)
+                                   ->equals('pastoral_access.role_id', $user->getRole()->getId())
+                                   ->isNull('pastoral_access.deleted_at');
+
+        $recordPublicRoleClause = implode(' AND ', $pbPublicRoleSearch->getWhere());
+
+        $pbPrivateRoleSearch = $this->getPredicateBuilder()
+                                    ->setParamPrefix('pri_rs')
+                                    ->greaterThanOrEqualTo('pastoral_access.access', PastoralAccessMapper::ACCESS_PRIVATE)
+                                    ->equals('pastoral_access.role_id', $user->getRole()->getId())
+                                    ->isNull('pastoral_access.deleted_at');
+
+        $recordPrivateRoleClause = implode(' AND ', $pbPrivateRoleSearch->getWhere());
+
+        // --------------------------------------------------------------------------------------------------------
+        // Is explicitly allowed via individual user access
+        // --------------------------------------------------------------------------------------------------------
+
+        $pbPublicUserSearch = $this->getPredicateBuilder()
+                                   ->setParamPrefix('pub_us')
+                                   ->greaterThanOrEqualTo('pastoral_access.access', PastoralAccessMapper::ACCESS_PUBLIC)
+                                   ->equals('pastoral_access.user_id', $user->getId())
+                                   ->isNull('pastoral_access.deleted_at');
+
+        $recordPublicUserClause = implode(' AND ', $pbPublicUserSearch->getWhere());
+
+        $pbPrivateUserSearch = $this->getPredicateBuilder()
+                                    ->setParamPrefix('pri_us')
+                                    ->greaterThanOrEqualTo('pastoral_access.access', PastoralAccessMapper::ACCESS_PRIVATE)
+                                    ->equals('pastoral_access.user_id', $user->getId())
+                                    ->isNull('pastoral_access.deleted_at');
+
+        $recordPrivateUserClause = implode(' AND ', $pbPrivateUserSearch->getWhere());
+
+        // --------------------------------------------------------------------------------------------------------
+        // Public access query amalgamation
+        // --------------------------------------------------------------------------------------------------------
+
+        $hasPublicAccess = "
+            (
+                `pastoral`.`id` IN (
+                    SELECT  `pastoral_id` 
+                    FROM    `pastoral_access` 
+                    WHERE   {$recordPublicGroupClause} AND
+                            `pastoral_access`.`group_id` IN (
+                                SELECT  `group_id`
+                                FROM    `pastoral_group_member`
+                                WHERE   {$recordGroupMemberClause}
+                            ) 
+                ) OR
+                `pastoral`.`id` IN (
+                    SELECT  `pastoral_id` 
+                    FROM    `pastoral_access` 
+                    WHERE   {$recordPublicRoleClause}
+                ) OR
+                `pastoral`.`id` IN (
+                    SELECT  `pastoral_id` 
+                    FROM    `pastoral_access` 
+                    WHERE   {$recordPublicUserClause}
+                ) OR
+                {$recordOwnerClause}                    
+            )
+        ";
+
+        // --------------------------------------------------------------------------------------------------------
+        // Private access query amalgamation
+        // --------------------------------------------------------------------------------------------------------
+
+        $hasPrivateAccess = "
+            (
+                `pastoral`.`id` IN (
+                    SELECT  `pastoral_id` 
+                    FROM    `pastoral_access` 
+                    WHERE   {$recordPrivateGroupClause} AND
+                            `pastoral_access`.`group_id` IN (
+                                SELECT  `group_id`
+                                FROM    `pastoral_group_member`
+                                WHERE   {$recordGroupMemberClause}
+                            ) 
+                ) OR
+                `pastoral`.`id` IN (
+                    SELECT  `pastoral_id` 
+                    FROM    `pastoral_access` 
+                    WHERE   {$recordPrivateRoleClause}
+                ) OR
+                `pastoral`.`id` IN (
+                    SELECT  `pastoral_id` 
+                    FROM    `pastoral_access` 
+                    WHERE   {$recordPrivateUserClause}
+                ) OR
+                {$recordOwnerClause}               
+            )
+        ";
+
+        // --------------------------------------------------------------------------------------------------------
+        // Construct the final query
+        // --------------------------------------------------------------------------------------------------------
+
+        $sql = $this->getSelectString() . "
+            LEFT JOIN `pastoral_comment` ON `pastoral_comment`.`pastoral_id` = `pastoral`.`id`
+            WHERE 
+            (
+                ({$recordNotDeletedClause}) AND
+                (
+                    (
+                        ({$recordHeadingClause} OR {$recordPublicBodyClause} OR {$commentPublicClause}) AND 
+                        ({$hasPublicAccess})
+                    ) 
+                    OR 
+                    (
+                        ({$recordHeadingClause} OR {$recordPrivateBodyClause} OR {$commentPrivateClause}) AND 
+                        ({$hasPrivateAccess})
+                    ) 
+                )
+            )
+        ";
+
+        // --------------------------------------------------------------------------------------------------------
+        // Bind the necessary parameters and get this show on the road
+        // --------------------------------------------------------------------------------------------------------
+
+        $parameters = array_merge(
+            $pbHeadingSearch->getParams(),
+            $pbPublicBodySearch->getParams(),
+            $pbPrivateBodySearch->getParams(),
+            $pbPublicCommentSearch->getParams(),
+            $pbPublicCommentNotPrivateSearch->getParams(),
+            $pbPrivateCommentSearch->getParams(),
+            $pbPrivateCommentIsPrivateSearch->getParams(),
+            $pbOwnerSearch->getParams(),
+            $pbPublicGroupSearch->getParams(),
+            $pbPrivateGroupSearch->getParams(),
+            $pbGroupMemberSearch->getParams(),
+            $pbPublicRoleSearch->getParams(),
+            $pbPrivateRoleSearch->getParams(),
+            $pbPublicUserSearch->getParams(),
+            $pbPrivateUserSearch->getParams()
+        );
+
+        $statement = $this->database->prepare($sql);
+        $statement->execute($parameters);
+
+        $results = $this->filterRecordsForUser($this->hydrateSelect($statement), $user);
+
+        // --------------------------------------------------------------------------------------------------------
+        // Keep a record of all searches performed by users, and what results were displayed
+        // --------------------------------------------------------------------------------------------------------
+
+        $searchResults = [];
+
+        /** @var Model $record */
+        foreach ($results as $result) {
+            PastoralAuditMapper::save($auditRecord);
+            $searchResults[] = $result->getId();
+        }
+
+        // Record the search results that were returned by the search by imploding their IDs down into CSV
+
+        if (count($searchResults) > 0) {
+            $auditRecord->setSearchResult(implode(',', $searchResults));
         }
 
         // Save the audit record of the search
         $pastoralAuditMapper->save($auditRecord);
+
+        // --------------------------------------------------------------------------------------------------------
+        // Return the search results
+        // --------------------------------------------------------------------------------------------------------
 
         return $results;
     }
@@ -931,7 +859,8 @@ class Mapper extends BaseMapper
         Collection $order,
         $involved,
         Collection $years
-    ) {
+    )
+    {
         $this->bindings = [];
         $this->filters  = [];
 
@@ -1064,17 +993,5 @@ class Mapper extends BaseMapper
         }
 
         return $resultsFiltered;
-    }
-
-    /**
-     * Does the given user have access to the pastoral service?
-     *
-     * @param User $user
-     *
-     * @return bool
-     */
-    private function isUserInPastoralService(User $user)
-    {
-        return $user->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0;
     }
 }

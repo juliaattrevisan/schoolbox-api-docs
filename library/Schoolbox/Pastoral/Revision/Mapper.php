@@ -8,7 +8,6 @@
 namespace Schoolbox\Pastoral\Revision;
 
 use PDOStatement;
-use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -24,8 +23,6 @@ use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Mapper extends BaseMapper
@@ -83,74 +80,6 @@ class Mapper extends BaseMapper
             INNER JOIN   {$this->getJoinSql('type', '', 't', true)}
             LEFT  JOIN   {$this->getJoinSql('subtype', '', 'c')}
         ";
-    }
-
-    /**
-     * Filter records from the collection if the current user doesn't have access to them.
-     * If the user is not in the audience and is not the owner, they can't see the record.
-     *
-     * @param Model $record A pastoral record
-     * @param User  $user   The user who is trying to view them
-     *
-     * @return Model|null
-     */
-    public function filterRecordForUser(Model $record, User $user)
-    {
-        if (!$record instanceof Model) {
-            return null;
-        }
-
-        if ($this->isUserInPastoralService($user) || $user->getId() == $record->getOwner()->getId()) {
-            // Pastoral moderator and owner see all, shortcut out of here
-            return $record;
-        }
-
-        // We need to iterate all access records to see if any of them grants private access
-
-        $accessLevel = $record->getAccessLevel($user);
-
-        // Deny access? No soup for you!
-        if ($accessLevel == PastoralAccessMapper::ACCESS_DENY) {
-            return null;
-        }
-
-        // Only have public access? Strip the private body
-        if ($accessLevel == PastoralAccessMapper::ACCESS_PUBLIC) {
-            $record->setBodyPrivate("");
-        }
-
-        return $record;
-    }
-
-    /**
-     * Filter records from the collection if the current user doesn't have access to them.
-     * If the user is not in the audience and is not the owner, they can't see the record.
-     *
-     * @param Collection|Model[] $records A list of pastoral records
-     * @param User               $user    The user who is trying to view them
-     *
-     * @return Collection|Model[]
-     */
-    public function filterRecordsForUser(Collection $records, User $user)
-    {
-        /** @var PastoralCommentMapper $pastoralCommentMapper */
-        $pastoralCommentMapper = $this->getJoinMapper('comments');
-
-        $collection = $this->createCollection();
-
-        /** @var Model $record */
-        foreach ($records as $record) {
-            $record = $this->filterRecordForUser($record, $user);
-
-            if ($record instanceof Model) {
-                // And filter the comments on the record, because this is planet Earth and we don't trust anybody
-                $record->setComments($pastoralCommentMapper->filterRecordsForUser($record->getComments(), $user));
-
-                $collection->add($record);
-            }
-        }
-
-        return $collection;
     }
 
     /**
@@ -234,18 +163,6 @@ class Mapper extends BaseMapper
         // Return hydrated model
 
         return $model;
-    }
-
-    /**
-     * Does the given user have access to the pastoral service?
-     *
-     * @param User $user
-     *
-     * @return bool
-     */
-    private function isUserInPastoralService(User $user)
-    {
-        return $user->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0;
     }
 
     /**
