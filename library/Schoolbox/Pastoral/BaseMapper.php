@@ -57,6 +57,11 @@ abstract class BaseMapper extends SchoolboxMapper
             $record->setBodyPrivate("");
         }
 
+        // And filter the comments on the record, because this is planet Earth and we don't trust anybody
+        /** @var PastoralCommentMapper $pastoralCommentMapper */
+        $pastoralCommentMapper = $this->getJoinMapper('comments');
+        $record->setComments($pastoralCommentMapper->filterRecordsForUser($record->getComments(), $user));
+
         return $record;
     }
 
@@ -71,21 +76,11 @@ abstract class BaseMapper extends SchoolboxMapper
      */
     public function filterRecordsForUser(Collection $records, User $user)
     {
-        /** @var PastoralCommentMapper $pastoralCommentMapper */
-        $pastoralCommentMapper = $this->getJoinMapper('comments');
-
         $collection = $this->createCollection();
 
         /** @var Model $record */
         foreach ($records as $record) {
-            $record = $this->filterRecordForUser($record, $user);
-
-            if ($record instanceof Model) {
-                // And filter the comments on the record, because this is planet Earth and we don't trust anybody
-                $record->setComments($pastoralCommentMapper->filterRecordsForUser($record->getComments(), $user));
-
-                $collection->add($record);
-            }
+            $collection->add($this->filterRecordForUser($record, $user));
         }
 
         return $collection;
