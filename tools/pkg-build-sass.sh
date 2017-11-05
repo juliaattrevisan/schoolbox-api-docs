@@ -23,5 +23,5 @@ fi
 
 if [ $sass = 1 ]; then
 	echo "Build SASS files (Vagrant provision only, not package build)";
-	grunt sass;
+	grunt build.sass;
 fi
