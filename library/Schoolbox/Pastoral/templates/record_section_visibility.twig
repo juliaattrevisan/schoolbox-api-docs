@@ -99,7 +99,7 @@
             {% endif %}
 
             {# ---------------------------------------------------------------------------------------------------------------------------------------------------------- #}
-            {# Content Access #}
+            {# General Content Access #}
             {# ---------------------------------------------------------------------------------------------------------------------------------------------------------- #}
 
             {% for access in record.access if access.access == 1 %}
@@ -151,6 +151,75 @@
                         <div class="small-12 card wrap-down">
                             <a href="{{ profile.link(access.user) }}">
                                 {{ profile.imageSquare64(access.user) }}
+                                <p>
+                                    {{ access.user.firstname }} {{ access.user.lastname }}
+                                </p>
+                                <p class="meta">
+                                    {{ access.user.role.name }}
+                                </p>
+                            </a>
+                        </div>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {# ---------------------------------------------------------------------------------------------------------------------------------------------------------- #}
+            {# Denied Access #}
+            {# ---------------------------------------------------------------------------------------------------------------------------------------------------------- #}
+
+            {% for access in record.access if access.access == 0 %}
+                {% if access.group is not empty %}
+
+                    {# Pastoral Group Access #}
+
+                    <li>
+                        <div class="small-12 card wrap-down">
+                            <div class="icon-teacher size-48" title="Pastoral Group"></div>
+                            <span class="alert label right">Denied Access</span>
+
+                            {# Display link to group if the user is a pastoral moderator #}
+
+                            {% set routeGetGroupModify = routeLookupIfAuthorized('pastoralManagement.getGroupsModify', {groupId: access.group.id}) %}
+
+                            {% if routeGetGroupModify %}
+                                <a href="{{ routeGetGroupModify }}">
+                                    <p>{{ access.group.name }}</p>
+                                </a>
+                            {% else %}
+                                <p>{{ access.group.name }}</p>
+                            {% endif %}
+
+                            {# Display links to group members profiles#}
+
+                            <p class="meta">
+                                {% for member in access.group.members %}
+                                    <a href="{{ profile.link(member.user) }}">{{ member.user.fullName }}</a><br>
+                                {% endfor %}
+                            </p>
+
+                        </div>
+                    </li>
+                {% elseif access.role is not empty %}
+
+                    {# User Role Access #}
+
+                    <li>
+                        <div class="small-12 card wrap-down">
+                            <div class="icon-group size-48" title="User Role"></div>
+                            <span class="alert label right">Denied Access</span>
+                            <p>{{ access.role.name }}</p>
+                            <p class="meta">User Role</p>
+                        </div>
+                    </li>
+                {% elseif access.user is not empty %}
+
+                    {# Individual User Access #}
+
+                    <li>
+                        <div class="small-12 card wrap-down">
+                            <a href="{{ profile.link(access.user) }}">
+                                {{ profile.imageSquare64(access.user) }}
+                                <span class="alert label right">Denied Access</span>
                                 <p>
                                     {{ access.user.firstname }} {{ access.user.lastname }}
                                 </p>
