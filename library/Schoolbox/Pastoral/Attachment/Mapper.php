@@ -13,6 +13,7 @@ use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as Pastoral;
+use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Model as Storage;
 
@@ -39,6 +40,7 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'syncToPastoralUploadQueue']);
     }
 
     /**
@@ -99,5 +101,32 @@ class Mapper extends BaseMapper
         }
 
         return $collection;
+    }
+
+    /**
+     * Post-save hook; sync this to the pastoral upload queue if it's a new file.
+     *
+     * @param Model      $model
+     * @param Model|null $previous
+     */
+    public function syncToPastoralUploadQueue(Model $model, Model $previous = null)
+    {
+        // Do NOT sync private attachments for now, for privacy reasons
+        // TODO move this restriction to the pastoral upload Q
+        if (!$previous instanceof Model
+            && !$model->getPrivate()
+            && $this->getConfigLoader()->get("external_pastoral_upload")
+        ) {
+            // Queue file for upload to Synergetic DocMan
+            // TODO don't getInstance, instead inject
+            $pastoralUploadQueueMapper = PastoralUploadQueueMapper::getInstance();
+            $queue = $pastoralUploadQueueMapper->createModel();
+            $queue->setPastoral($model->getPastoral());
+            $queue->setExternalId($model->getPastoral()->getOwner()->getExternalId());
+            $queue->setStudentExternalId($model->getPastoral()->getStudent()->getExternalId());
+            $queue->setStorage($model->getStorage());
+            $queue->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_PENDING);
+            $pastoralUploadQueueMapper->save($queue);
+        }
     }
 }

@@ -1012,22 +1012,25 @@ class Controller extends Base
             $collectorFactory  = new CollectorFactory();
             $attachmentObjects = $collectorFactory->build($post[$attachzone . '_attachments'])->getAll();
 
+
+
+
             /** @var Storage $storageObject */
             foreach ($attachmentObjects as $storageObject) {
                 // Only add attachments which don't already exist
 
-                // Do NOT sync private attachments for now, for privacy reasons
-                // TODO move this restriction to the pastoral upload Q
-                if (!$isPrivate && $this->config->get("external_pastoral_upload")) {
-                    // Queue file for upload to Synergetic DocMan
-                    $queue = $this->pastoralUploadQueueMapper->createModel();
-                    $queue->setPastoral($record);
-                    $queue->setExternalId($this->getUser()->getExternalId());
-                    $queue->setStudentExternalId($record->getStudent()->getExternalId());
-                    $queue->setStorage($storageObject);
-                    $queue->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_PENDING);
-                    $this->pastoralUploadQueueMapper->save($queue);
-                }
+//                // Do NOT sync private attachments for now, for privacy reasons
+//                // TODO move this restriction to the pastoral upload Q
+//                if (!$isPrivate && $this->config->get("external_pastoral_upload")) {
+//                    // Queue file for upload to Synergetic DocMan
+//                    $queue = $this->pastoralUploadQueueMapper->createModel();
+//                    $queue->setPastoral($record);
+//                    $queue->setExternalId($this->getUser()->getExternalId());
+//                    $queue->setStudentExternalId($record->getStudent()->getExternalId());
+//                    $queue->setStorage($storageObject);
+//                    $queue->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_PENDING);
+//                    $this->pastoralUploadQueueMapper->save($queue);
+//                }
 
                 $attachment = $this->pastoralAttachmentMapper->createModel();
                 $attachment->setPastoral($record);
