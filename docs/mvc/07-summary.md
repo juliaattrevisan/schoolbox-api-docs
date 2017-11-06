@@ -24,6 +24,8 @@ This is a collection of takeaways from each of the sections, distilled from thei
 
 * In unit tests we can declare the outcomes such that we can automatically detect behavioural changes.
 
+* Design Patterns aren't rigid laws that absolutely must be obeyed and used at all times. They are (generally) simplified empirical solutions to particular *kinds* of problems that have consistently emerged. It is up to the author to determine whether a Design Pattern should be used, and if so, which one. 
+
 ## 7.4 Summary of Mapper
 * Mappers contain methods which alter persistent storage; putting data in and getting data out of that storage into a format that's compatible with Controller methods in the domain (business logic) layer.
 

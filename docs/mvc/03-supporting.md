@@ -79,6 +79,8 @@ class Cat
 > In unit tests we can declare the outcomes such that we can automatically detect behavioural changes.
 
 ## 3.1 Design Patterns
-Supporting classes are independent classes; they aren't bound to any particular paradigm. To this end, you can invent your own architecture to solve whatever problem is at hand.
+Supporting classes are independent classes; they aren't bound to any particular paradigm. To this end, you can invent your own architecture to solve whatever problem is at hand. Some architecture has already been pre-solved and are documented as Design Patterns.
 
-Design Patterns aren't rigid laws that absolutely must be obeyed and used at all times. They are simplified solutions that have consistently emerged. It is up to the author to determine whether a Design Pattern should be used, and if so, which one. A cron job or once-off script, for example, may not require the architectural forethought of a Design Pattern; a cruder solution may be sufficient. On the other hand, Design Patterns form the basis of a common language which can be used to succinctly communicate a larger system design.
+> Design Patterns aren't rigid laws that absolutely must be obeyed and used at all times. They are (generally) simplified empirical solutions to particular *kinds* of problems that have consistently emerged. It is up to the author to determine whether a Design Pattern should be used, and if so, which one. 
+
+A cron job or once-off script, for example, may not require the architectural forethought of a Design Pattern; a cruder solution may be sufficient. On the other hand, Design Patterns form the basis of a common language which can be used to succinctly communicate a larger system design.
