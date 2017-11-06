@@ -47,8 +47,8 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             ccd.`key`,
             COALESCE(cci.value, '') AS `value`
         FROM component_definition cd
-        LEFT JOIN component_config_definition ccd ON cd.id  = ccd.component_definition_id
-        LEFT JOIN component_config_instance   cci ON ccd.id = cci.component_config_definition_id
+        JOIN component_config_definition ccd ON cd.id  = ccd.component_definition_id
+        JOIN component_config_instance   cci ON ccd.id = cci.component_config_definition_id
         WHERE cd.class = 'Component_Homepage_CountdownController'
         AND ccd.`key` IN ('date', 'time')
     ");
