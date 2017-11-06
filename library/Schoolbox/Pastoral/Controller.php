@@ -985,7 +985,7 @@ class Controller extends Base
             ->setAttachPrompt('Upload attachment')
             ->setMimeFilter('*/*')
             ->setReadOnly(false)
-            ->setFileVar("{$name}_attachments")
+            ->setFileVar("{$name}_attachments[]")
             ->setMulti(true);
 
         // Attach any existing files
