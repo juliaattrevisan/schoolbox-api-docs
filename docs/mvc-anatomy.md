@@ -347,6 +347,22 @@ class Cat {
 ## 4.2 Predicates
 
 ## 4.3 Caching
+Due to the frequency of hydrations and the need to reduce computational overhead, there's a caching system built into all the base mapper methods prefixed by `find`, such as `findById()`, `findByColumn()`, `findByColumnList()` etc. We used to make our own hashtables locally but that tradition has since been superseded by the mapper cache.
+
+Unfortunately it also has the side effect of caching when it shouldn't, leading to anomalous behaviours. This isn't an error state, so you won't be alerted; you'll just have to be vigilant when testing. You can disable the cache like this:
+
+```php
+$uncached = $mapper->findByColumn('id', 1, ['cache' => false]);
+```
+
+You can disable the cache on a per-call basis for
+
+* findByColumn()
+* findByColumnList()
+* findOneByColumn()
+* findOneByColumnList()
+
+> If you encounter strange mapper/instance behaviour, try turning off the mapper cache by passing the `cache => false` option.
 
 # 5 Responsibilities of Model
 Models are domain representations of database records. While a Model's properties frequently mirror that of database columns for that Model's table, this isn't always the case: more complex Models may consist of other Models as well. 
@@ -443,6 +459,8 @@ This is a collection of takeaways from each of the sections, distilled from thei
 * Mappers contain methods which alter persistent storage; putting data in and getting data out of that storage into a format that's compatible with Controller methods in the domain (business logic) layer.
 
 * Break away specific responsibilities into other classes instead. Note that Mappers expose a method that executes raw sql queries: `$mapper->getDatabase()->query()`
+
+* If you encounter strange mapper/instance behaviour, try turning off the mapper cache by passing the `cache => false` option.
 
 ## 7.5 Summary of Model
 * Regardless of their complexity, Models are narcissistic in that they only care about their own properties, behaviours and "possessions" (dependencies). You can expect the ability to interrogate Models or ask them questions about themselves and their dependencies. 
