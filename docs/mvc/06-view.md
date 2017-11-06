@@ -4,7 +4,7 @@ The View's only purpose is to render data that the Controller generated. It does
 ## 6.1 Render what was provided
 Ironically, twig is so powerful it can actually execute php commands - on numerous occasions costly database calls were made without realising and this caused all sorts of weird performance issues. We can't enforce this very strictly so it's a soft constraint we impose on ourselves that we only render the data array that's provided by the Controller method.
  
-> Render only the data that was provided - though twig is powerful, it can be dangerous in an innocuous way.
+> Render only the data that was provided - though twig is powerful, it can be dangerous in an indirect or obscure manner.
 
 ## 6.2 Twig Syntax
 Despite twig being able to call php methods, we don't actually want twig vars to reference php methods directly. This prevents the twig template from being used in a different context in an unambiguous fashion; twig performs a chain-of-responsibility upon this syntax. See *Implementation* https://twig.symfony.com/doc/2.x/templates.html

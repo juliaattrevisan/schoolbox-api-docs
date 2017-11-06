@@ -41,7 +41,7 @@ This is a collection of takeaways from each of the sections, distilled from thei
 * Models are not responsible for performing any persisting work; these duties should be delegated to another class, such as a Mapper or a service class that utilises a Mapper.  
 
 ## 7.6 Summary of View
-* Render only the data that was provided - though twig is powerful, it can be dangerous in an innocuous way.
+* Render only the data that was provided - though twig is powerful, it can be dangerous in an indirect or obscure manner.
 
 * Twig vars should be data-structure agnostic; twig vars should not know whether they're operating on an object or an array.
 
