@@ -163,7 +163,18 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
     elseif ($action == 'update') {
 
         try {
-            $user = $userMapper->findById($_GET['user_id']);
+            if (!empty($_GET['user_id'])) {
+                $user = $userMapper->findById($_GET['user_id']);
+            } elseif (!empty($_GET['username'])) {
+                $user = $userMapper->findOneByColumn('username', $_GET['username']);
+            } else {
+                $response = "<?xml version='1.0' standalone='yes'?>
+                         <response>
+                            <code>400</code>
+                            <message>The request cannot be fulfilled due to bad syntax.</message>
+                         </response>";
+                exit($response);
+            }
         } catch (\Exception $e) {
             $response = "<?xml version='1.0' standalone='yes'?>
                          <response>
