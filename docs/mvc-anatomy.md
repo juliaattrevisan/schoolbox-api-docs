@@ -240,8 +240,8 @@ class Cat
      *
      * Easier to test, can throw any kind of data in to witness outcomes
      *
-     * @param Event\Model $eventId
-     * @param User\Model $userId
+     * @param Event\Model $event
+     * @param User\Model $user
      */
     public function __construct(Event\Model $event, User\Model $user)
     {
