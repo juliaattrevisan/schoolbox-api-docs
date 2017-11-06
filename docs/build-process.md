@@ -19,8 +19,9 @@ You have two options for running grunt tasks - from your Vagrant box or from you
 #### Setting up Grunt on your local PC
 To install grunt on your PC, you'll first need to [install Node.js](https://docs.npmjs.com/getting-started/installing-node).
 
-> Vagrant boxes currently run an old version of NodeJS, which provides the executable `node` instead of `nodejs`. You may
-need to install a legacy version of NodeJS to run Grunt locally. On Ubuntu you can do this with `sudo apt install nodejs-legacy`.
+> Vagrant boxes currently run an old version of NodeJS, which provides the executable `node` instead of `nodejs`; the
+installed Grunt version, and the other build packages, may depend on the `node` executable existing.
+> You may need to install a legacy version of NodeJS to run Grunt locally; on Ubuntu you can do this with `sudo apt install nodejs-legacy`.
 
 From there, you can go your Schoolbox folder locally, and run `npm install`. This will install Grunt and any required Grunt plugins.
 
