@@ -57,6 +57,9 @@ abstract class BaseMapper extends SchoolboxMapper
             $record->setBodyPrivate("");
         }
 
+        // Filter out related records, too
+        $record->setRelatedRecords($this->filterRecordsForUser($record->getRelatedRecords(), $user));
+
         // And filter the comments on the record, because this is planet Earth and we don't trust anybody
         /** @var PastoralCommentMapper $pastoralCommentMapper */
         $pastoralCommentMapper = $this->getJoinMapper('comments');
