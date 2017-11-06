@@ -10,6 +10,7 @@
 namespace Schoolbox\Admin\Import\Pastoral;
 
 use Alaress\Web\Controller\Base;
+use Exception;
 use External_Pastoral;
 use Schoolbox\Collection;
 use Schoolbox\Import\ImportNavigation;
@@ -25,24 +26,16 @@ class Controller extends Base
 {
     use ImportNavigation;
 
-    /**
-     * @var ConfigMapper
-     */
+    /** @var ConfigMapper */
     protected $configMapper;
 
-    /**
-     * @var PastoralLogMapper
-     */
+    /** @var PastoralLogMapper */
     protected $pastoralLogMapper;
 
-    /**
-     * @var UserMapper
-     */
+    /** @var UserMapper */
     protected $userMapper;
 
-    /**
-     * @var ErrorMapper
-     */
+    /** @var ErrorMapper */
     protected $errorMapper;
 
     /**
@@ -57,22 +50,39 @@ class Controller extends Base
     }
 
     /**
+     * Display import page
+     */
+    public function getIndex()
+    {
+        $this->getResponse()->content->set(
+            [
+                'template' => '@adminImportPastoral/index.twig',
+                'data'     => [
+                    'pageCurrent'     => 'import',
+                    'allBreadcrumbs'  => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
+                    'externalEnabled' => $this->getConfigMapper()->get("external_pastoral"),
+                ],
+            ]
+        );
+    }
+
+    /**
      * Display list of available logs
      */
     public function getLog()
     {
         $this->getResponse()->content->set([
             'template' => '@adminImportPastoral/log.twig',
-            'data'     => array(
-                'pageCurrent' => 'import',
+            'data'     => [
+                'pageCurrent'    => 'import',
                 'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
-                'logs' => $this->getPastoralLogMapper()->findImportIds()
-            )
+                'logs'           => $this->getPastoralLogMapper()->findImportIds(),
+            ],
         ]);
     }
 
     /**
-     * Display list of available logs
+     * Display log entries for the selected log
      *
      * @param Collection|PastoralLog[] $log Pastoral log
      */
@@ -80,11 +90,11 @@ class Controller extends Base
     {
         $this->getResponse()->content->set([
             'template' => '@adminImportPastoral/logDetail.twig',
-            'data'     => array(
-                'pageCurrent' => 'import',
+            'data'     => [
+                'pageCurrent'    => 'import',
                 'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
-                'log' => $log
-            )
+                'log'            => $log,
+            ],
         ]);
     }
 
@@ -96,7 +106,7 @@ class Controller extends Base
         $post = $this->getRequest()->post;
 
         try {
-            $defaultOwner = $this->getUserMapper()->findById($post["defaultOwnerId"]);
+            $defaultOwner       = $this->getUserMapper()->findById($post["defaultOwnerId"]);
             $importParentAccess = $post["importParentAccess"];
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
@@ -107,17 +117,17 @@ class Controller extends Base
 
         // Do the import in a detached state so it doesn't time out
         $this->getResponse()->content->set([
-            'template' => '@adminImportPastoral/log.twig',
-            'data'     => array(
-                'pageCurrent'   => 'import',
+            'template'   => '@adminImportPastoral/log.twig',
+            'data'       => [
+                'pageCurrent'    => 'import',
                 'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
-                'logs'          => $this->getPastoralLogMapper()->findImportIds(),
-                'message'       => true
-            ),
+                'logs'           => $this->getPastoralLogMapper()->findImportIds(),
+                'message'        => true,
+            ],
             'postOutput' => [
-                function() use ($sessionUser, $defaultOwner, $importParentAccess) {
+                function () use ($sessionUser, $defaultOwner, $importParentAccess) {
                     $this->importCallback($sessionUser, $defaultOwner, $importParentAccess);
-                }
+                },
             ],
         ]);
     }
@@ -131,13 +141,10 @@ class Controller extends Base
      */
     public function importCallback(User $user, User $defaultOwner, $importParentAccess)
     {
-        try
-        {
+        try {
             $pastoralExternal = new External_Pastoral();
             $pastoralExternal->importPastoral($user, $defaultOwner, $importParentAccess);
-        }
-        catch (\Exception $e)
-        {
+        } catch (Exception $e) {
             //                                  .
             //                                 -|-
             //                                  |
@@ -153,84 +160,85 @@ class Controller extends Base
         }
     }
 
-    public function getIndex()
-    {
-        // Render this thing out
-
-        $this->getResponse()->content->set(
-            array(
-                'template' => '@adminImportPastoral/index.twig',
-                'data'     => array(
-                    'pageCurrent' => 'import',
-                    'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
-                    'externalEnabled' => $this->getConfigMapper()->get("external_pastoral")
-                ),
-            )
-        );
-    }
+    // Getters & Setters
 
     /***
      * @return ErrorMapper
      */
-    public function getErrorMapper() {
+    public function getErrorMapper()
+    {
         return $this->errorMapper;
     }
 
     /**
      * @param ErrorMapper $errorMapper
-     * @return $this
+     *
+     * @return self|$this
      */
-    public function setErrorMapper($errorMapper) {
+    public function setErrorMapper($errorMapper)
+    {
         $this->errorMapper = $errorMapper;
+
         return $this;
     }
 
     /***
      * @return ConfigMapper
      */
-    public function getConfigMapper() {
+    public function getConfigMapper()
+    {
         return $this->configMapper;
     }
 
     /**
      * @param ConfigMapper $configMapper
-     * @return $this
+     *
+     * @return self|$this
      */
-    public function setConfigMapper($configMapper) {
+    public function setConfigMapper($configMapper)
+    {
         $this->configMapper = $configMapper;
+
         return $this;
     }
 
     /***
      * @return UserMapper
      */
-    public function getUserMapper() {
+    public function getUserMapper()
+    {
         return $this->userMapper;
     }
 
     /**
      * @param UserMapper $userMapper
-     * @return $this
+     *
+     * @return self|$this
      */
-    public function setUserMapper($userMapper) {
+    public function setUserMapper($userMapper)
+    {
         $this->userMapper = $userMapper;
+
         return $this;
     }
 
     /***
      * @return PastoralLogMapper
      */
-    public function getPastoralLogMapper() {
+    public function getPastoralLogMapper()
+    {
         return $this->pastoralLogMapper;
     }
 
     /**
      * @param PastoralLogMapper $pastoralLogMapper
      *
-     * @return $this
+     * @return self|$this
      */
-    public function setPastoralLogMapper($pastoralLogMapper) {
+    public function setPastoralLogMapper($pastoralLogMapper)
+    {
         $this->pastoralLogMapper = $pastoralLogMapper;
+
         return $this;
     }
 }
