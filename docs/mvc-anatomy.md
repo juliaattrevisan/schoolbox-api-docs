@@ -526,6 +526,8 @@ This is a collection of takeaways from each of the sections, distilled from thei
 
 * Break away specific responsibilities into other classes instead. Note that Mappers expose a method that executes raw sql queries: `$mapper->getDatabase()->query()`
 
+* Use `getSelectString()`, `getFromString()` and `hydrateSelect()` to specify a default hydration for each of your basic `findBy*` queries. This ensures a uniform behaviour in hydration and assembly.
+
 * If you encounter strange mapper/instance behaviour, try turning off the mapper cache by passing the `cache => false` option.
 
 ## 7.5 Summary of Model
@@ -545,7 +547,6 @@ This is a collection of takeaways from each of the sections, distilled from thei
 * Note that when you add javascript to the compilation step (look in your `Gruntfile.js`) you're making it globally available at the cost of increasing the minified file's size.
 
 # 8 Further Reading
-
 * *Aura Routing.* We developed an adaptation of this for Module.php, but this original documentation might help you with capabilities that aren't immediately obvious such as optional args etc.
 http://auraphp.com/framework/2.x/en/router/
 
