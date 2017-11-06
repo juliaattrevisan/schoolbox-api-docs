@@ -344,7 +344,73 @@ class Cat {
 }
 ``` 
  
-## 4.2 Predicates
+## 4.2 Default Hydration
+Some hierarchical objects require complex hydration to take place - for example, File instances need Folder, User and Mimetypes also hydrated for it to be meaningful. 
+
+However, manually defining and constructing this every time you do a database query is longwinded and unnecessary because we can define the default hydration that applies to base `findBy*` methods. This also prevents the usual copy-paste that would otherwise be required. 
+
+Instead, we only need to do it once by specifying three methods in our Mapper:
+
+* `getSelectString()` This specifies which columns and their aliases are used in the query.
+* `getFromString()` This specifies which tables and joins are used in the query.
+* `hydrateSelect()` This specifies how objects are hydrated into the final result.
+
+> Use `getSelectString()`, `getFromString()` and `hydrateSelect()` to specify a default hydration for each of your basic `findBy*` queries. This ensures a uniform behaviour in hydration and assembly.
+
+An example can be found in `library/EOTC/EventMapper.php`. For the purposes of illustration I've distilled the contents somewhat: every EOTC event has an Author, Event Type and User (Teacher In Charge) instance hydrated into it.
+
+```php
+protected function getSelectString()
+{
+    $authorMapper          = $this->getJoinMapper('author');
+    $eventTypeMapper       = $this->getJoinMapper('eventType');
+    $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
+
+    return "
+        SELECT
+            {$this->getColumnString()},
+            {$authorMapper->getColumnString('a')},
+            {$teacherInChargeMapper->getColumnString('c')},
+            {$eventTypeMapper->getColumnString('t')}
+    ";
+}
+
+
+protected function getFromString()
+{
+    return "
+        FROM `{$this->table}`
+        LEFT JOIN {$this->getJoinSql('author', '', 'a', true)}
+        LEFT JOIN {$this->getJoinSql('teacherInCharge', '', 'c', true)}
+        LEFT JOIN {$this->getJoinSql('eventType', '', 't', true)}
+    ";
+}
+
+
+protected function hydrateSelect(\PDOStatement $statement)
+{
+    $authorMapper          = $this->getJoinMapper('author');
+    $eventTypeMapper       = $this->getJoinMapper('eventType');
+    $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
+
+    while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+
+        /* Assemble event pieces
+         */
+        $eventItem = $this->hydrate($row);
+
+        /* Author
+         */
+        /** @var User $authorItem */
+        $authorItem = $authorMapper->hydrate($row, 'a');
+        $eventItem->setAuthor($authorItem);
+        
+        ...
+        ...
+        ...
+    }
+}
+```
 
 ## 4.3 Caching
 Due to the frequency of hydrations and the need to reduce computational overhead, there's a caching system built into all the base mapper methods prefixed by `find`, such as `findById()`, `findByColumn()`, `findByColumnList()` etc. We used to make our own hashtables locally but that tradition has since been superseded by the mapper cache.
@@ -357,10 +423,10 @@ $uncached = $mapper->findByColumn('id', 1, ['cache' => false]);
 
 You can disable the cache on a per-call basis for
 
-* findByColumn()
-* findByColumnList()
-* findOneByColumn()
-* findOneByColumnList()
+* `findByColumn()`
+* `findByColumnList()`
+* `findOneByColumn()`
+* `findOneByColumnList()`
 
 > If you encounter strange mapper/instance behaviour, try turning off the mapper cache by passing the `cache => false` option.
 

@@ -122,7 +122,7 @@ class Builder implements IBuilder
      * @param array $columnList
      * @return self
      */
-    public function addColumnList(array $columnList)
+    public function  addColumnList(array $columnList)
     {
         foreach ($columnList as $columnName => $columnValue) {
             $split = preg_split('/\\s+/', $columnName, 2);
