@@ -419,7 +419,7 @@ Sometimes we need to do that because we manufacture our own data structure, prev
 ## 6.3 Reusable Fragments
 Twig also has the ability to set up layout inheritances, macros and includes - utilise these liberally where applicable. If you can reuse these pieces, do so. 
 
-> There's a /templates/sub folder where you can put globally reusable template pieces. Otherwise, store as many resuable pieces in your module's templates folder.
+> There's a `/templates/sub` folder where you can put globally reusable template pieces. Otherwise, store as many resuable pieces in your module's templates folder.
 
 ## 6.4 The Pantry
 There's a menagerie of user interface elements in `/pantry` which you can use as a guide. This is a good place to check behaviours when you're building user interface elements - one element's style can have a dramatic effect on any number of other elements.
@@ -472,7 +472,7 @@ This is a collection of takeaways from each of the sections, distilled from thei
 
 * Twig vars should be data-structure agnostic; twig vars should not know whether they're operating on an object or an array.
 
-* There's a /templates/sub folder where you can put globally reusable template pieces. Otherwise, store as many resuable pieces in your module's templates folder.
+* There's a `/templates/sub` folder where you can put globally reusable template pieces. Otherwise, store as many resuable pieces in your module's templates folder.
 
 * Check the `/pantry` for user interface elements that you can use, and their interactions with other elements and styles.
 
