@@ -883,54 +883,13 @@ class Controller extends Base
             $pastoralExternal->syncPastoral($record);
         }
 
-        $collectorFactory = new CollectorFactory();
-
         /** @var Model $record */
         foreach ($records as $record) {
             // Save public attachments
-            if (is_array($post[self::ATTACHZONE_PUBLIC.'_attachments'])) {
-                $attachmentObjects = $collectorFactory->build($post[self::ATTACHZONE_PUBLIC.'_attachments'])->getAll();
-
-                /** @var Storage $storageObject */
-                foreach ($attachmentObjects as $storageObject) {
-                    // Only add attachments which don't already exist
-
-                    if ($this->config->get("external_pastoral_upload")) {
-                        // Queue file for upload to Synergetic DocMan
-                        $queue = $this->pastoralUploadQueueMapper->createModel();
-                        $queue->setPastoral($record);
-                        $queue->setExternalId($this->getUser()->getExternalId());
-                        $queue->setStudentExternalId($record->getStudent()->getExternalId());
-                        $queue->setStorage($storageObject);
-                        $queue->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_PENDING);
-                        $this->pastoralUploadQueueMapper->save($queue);
-                    }
-
-                    $attachment = $this->pastoralAttachmentMapper->createModel();
-                    $attachment->setPastoral($record);
-                    $attachment->setStorage($storageObject);
-                    $attachment->setPrivate(false);
-                    $this->pastoralAttachmentMapper->save($attachment);
-                }
-            }
+            $this->persistAttachments($record, $post, true);
 
             // Save private attachments
-            // Do NOT sync private attachments for now, for privacy reasons
-            // TODO move this restriction to the pastoral upload Q
-            if (is_array($post[self::ATTACHZONE_PRIVATE.'_attachments'])) {
-                $attachmentObjects = $collectorFactory->build($post[self::ATTACHZONE_PRIVATE.'_attachments'])->getAll();
-
-                /** @var Storage $storageObject */
-                foreach ($attachmentObjects as $storageObject) {
-                    // Only add attachments which don't already exist
-
-                    $attachment = $this->pastoralAttachmentMapper->createModel();
-                    $attachment->setPastoral($record);
-                    $attachment->setStorage($storageObject);
-                    $attachment->setPrivate(true);
-                    $this->pastoralAttachmentMapper->save($attachment);
-                }
-            }
+            $this->persistAttachments($record, $post, false);
         }
 
         return $records;
@@ -1037,6 +996,46 @@ class Controller extends Base
         fpassthru($attachment->getStorage()->readStream());
 
         exit;
+    }
+
+    /**
+     * Persist pastoral record attachments.
+     *
+     * @param RequestValues $post      POST request vars
+     * @param PastoralModel $record    The record to persist
+     * @param bool          $isPrivate Is this a private or public attachment?
+     */
+    private function persistAttachments(PastoralModel $record, RequestValues $post, bool $isPrivate)
+    {
+        $attachzone = $isPrivate ? self::ATTACHZONE_PRIVATE : self::ATTACHZONE_PUBLIC;
+        if (is_array($post[$attachzone . '_attachments'])) {
+            $collectorFactory  = new CollectorFactory();
+            $attachmentObjects = $collectorFactory->build($post[$attachzone . '_attachments'])->getAll();
+
+            /** @var Storage $storageObject */
+            foreach ($attachmentObjects as $storageObject) {
+                // Only add attachments which don't already exist
+
+                // Do NOT sync private attachments for now, for privacy reasons
+                // TODO move this restriction to the pastoral upload Q
+                if (!$isPrivate && $this->config->get("external_pastoral_upload")) {
+                    // Queue file for upload to Synergetic DocMan
+                    $queue = $this->pastoralUploadQueueMapper->createModel();
+                    $queue->setPastoral($record);
+                    $queue->setExternalId($this->getUser()->getExternalId());
+                    $queue->setStudentExternalId($record->getStudent()->getExternalId());
+                    $queue->setStorage($storageObject);
+                    $queue->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_PENDING);
+                    $this->pastoralUploadQueueMapper->save($queue);
+                }
+
+                $attachment = $this->pastoralAttachmentMapper->createModel();
+                $attachment->setPastoral($record);
+                $attachment->setStorage($storageObject);
+                $attachment->setPrivate($isPrivate);
+                $this->pastoralAttachmentMapper->save($attachment);
+            }
+        }
     }
 }
 
