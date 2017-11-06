@@ -24,6 +24,8 @@ need to install a legacy version of NodeJS to run Grunt locally. On Ubuntu you c
 
 From there, you can go your Schoolbox folder locally, and run `npm install`. This will install Grunt and any required Grunt plugins.
 
+> You may also need to install the Grunt CLI tool; `sudo npm install -g grunt-cli`
+
 ### Grunt Tasks
 
 Grunt tasks can be split into two categories:
