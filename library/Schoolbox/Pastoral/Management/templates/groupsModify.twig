@@ -1,4 +1,6 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@pastoral/macros/profile.twig' as profile %}
+{% import '@pastoral/macros/user_search.twig' as userSearch %}
 
 {# Change a couple of labels depending on if we are creating/updating a group #}
 
@@ -10,12 +12,21 @@
     {% set button = 'Create Group' %}
 {% endif %}
 
-{% import 'sub/breadcrumbs.twig' as bread %}
+{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+{# Breadcrumbs #}
+{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+
 {{ bread.crumbs(
-[ locale.pastoralCare.proper,      routeLookup('pastoral.getIndex') ],
+[ locale.pastoralCare.proper, routeLookup('pastoral.getIndex') ],
 [ 'Groups Management',  routeLookup('pastoralManagement.getGroups') ],
 [ heading ]
 ) }}
+
+{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+{# We need a guid for the user select modal #}
+{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+
+{% set guid = getGuid() %}
 
 <div class="row">
     <div class="small-12 columns">
@@ -29,7 +40,9 @@
     </div>
 </div>
 
-{# The form- containing the only editable thing on this screen, the group name #}
+{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+{# Pastoral group form #}
+{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
 
 <div class="row">
     <div class="small-12 island">
@@ -71,7 +84,7 @@
                 </div>
             </div>
             <nav>
-                <a data-member-search href="#" class="icon-add" title="Add Group Member"></a>
+                <a data-user-search="{{ guid }}" href="#" class="icon-add" title="Add Group Member"></a>
             </nav>
         </div>
 
@@ -88,14 +101,14 @@
                                 <a href="{{ profile.link(member.user) }}" title="View Profile">
                                     {{ profile.imageSquare64(member.user) }}
                                 </a>
-                                <p><a href="{{ profile.link(member.user) }}"
-                                      title="View Profile">{{ member.user.fullName }}</a></p>
+                                <p>
+                                    <a href="{{ profile.link(member.user) }}" title="View Profile">{{ member.user.fullName }}</a>
+                                </p>
                                 <p class="meta">{{ member.user.role.name }}</p>
                             </div>
                         </div>
                         <nav>
-                            <a data-member-delete="{{ member.user.id }}" class="icon-delete no-text" href="#"
-                               title="Remove Group Member"></a>
+                            <a data-member-delete="{{ member.user.id }}" class="icon-delete no-text" href="#" title="Remove Group Member"></a>
                         </nav>
                     </li>
                 {% endfor %}
@@ -109,7 +122,7 @@
         <div id="membersEmpty" class="empty-state {% if group.members | length %}hide{% endif %}">
             <i class="icon-group"></i>
             <p>There are no users current in this group.</p>
-            <p>Do you want to <a href="#" data-member-search>add a user to this group</a>?</p>
+            <p>Do you want to <a href="#" data-user-search="{{ guid }}">add a user to this group</a>?</p>
         </div>
 
         {# --------------------------------------------------------------------------------------------------------------------------------------------#}
@@ -123,19 +136,102 @@
     </div>
 </div>
 
+<!--suppress JSUnusedLocalSymbols -->
 <script>
-
     $(function () {
 
-        {# This is a list of IDs that have been added to the group. This is what ultimately gets sent off to the database #}
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+        {# Prepopulate array with existing group members #}
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
 
-        window.membersAdded = [{% for member in group.members %}{% if not loop.first %},{% endif %}{{ member.user.id }}{% endfor %}];
+        window.usersAdded = [];
 
-        var form = $('#formGroup');
+        {% for member in group.members %}
+        window.usersAdded[{{ member.user.id }}] = true;
+        {% endfor %}
+
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+        {# Callback functions #}
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+
+        {# Group member added #}
+
+        window.modalUserAdded = function (user) {
+
+            {# Only add if they don't already exist in the table #}
+
+            if (window.usersAdded[user.id] !== true) {
+
+                {# Add the selected members ID to the array we use when saving to the database #}
+
+                window.usersAdded[user.id] = true;
+
+                {# Add them to the list of members in the HTML #}
+
+                var membersList = $('#membersList');
+
+                //noinspection JSUnresolvedVariable
+                var html = $('#cloneMember').html()
+                    .replace(/{NAME}/g, user.first_name + ' ' + user.last_name)
+                    .replace(/{ID}/g, user.id)
+                    .replace(/{ROLE}/g, user.role)
+                    .replace(/{FIRSTNAME}/g, user.first_name)
+                    .replace(/{LASTNAME}/g, user.last_name)
+                    .replace(/{EXTERNALID}/g, user.external_id);
+
+                membersList.html(membersList.html() + html);
+                $('#membersListContainer').removeClass('hide');
+
+                {# Remove the empty state if it was visible #}
+
+                $('#membersEmpty').addClass('hide');
+
+                {# Update delete events #}
+
+                window.updateDeleteEvents();
+            }
+        };
+
+        {# Group member deleted #}
+
+        window.memberDelete = function (item) {
+            var memberItem = item.closest('li');
+            var memberId = item.attr('data-member-delete');
+
+            $(this).confirmDialog({
+
+                text: 'Are you sure you want to delete this person from the group?',
+                confirmEvent: function () {
+                    window.usersAdded[memberId] = false;
+
+                    {# Remove from HTML #}
+
+                    memberItem.remove();
+
+                    if ($('#membersList').children('li').length === 0) {
+                        $('#membersListContainer').addClass('hide');
+                        $('#membersEmpty').removeClass('hide');
+                    }
+                }
+            });
+        };
+
+        {# Wire up delete buttons #}
+
+        window.updateDeleteEvents = function () {
+            $('[data-member-delete]').click(function (e) {
+                e.preventDefault();
+                window.memberDelete($(this));
+            });
+        };
+
+        window.updateDeleteEvents();
 
         {# --------------------------------------------------------------------------------------------------------------------------------------------#}
         {# Setup form validation (for that one lonely field...) #}
         {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+
+        var form = $('#formGroup');
 
         form.alaressValidate({
             rules: {
@@ -147,7 +243,7 @@
         });
 
         {# --------------------------------------------------------------------------------------------------------------------------------------------#}
-        {# Save Changes #}
+        {# Submit form #}
         {# --------------------------------------------------------------------------------------------------------------------------------------------#}
 
         $('[data-save]').click(function (e) {
@@ -160,7 +256,17 @@
 
             if (form.valid()) {
 
-                if (window.membersAdded.length == 0) {
+                {# Squish group members ID numbers into a CSV string for submission with the form #}
+
+                var selectedIds = [];
+
+                $(window.usersAdded).each(function (id, selected) {
+                    if (selected) {
+                        selectedIds.push(id);
+                    }
+                });
+
+                if (selectedIds.length === 0) {
 
                     {# Warn the user they are saving an empty group #}
 
@@ -168,81 +274,49 @@
 
                         text: 'Are you sure you want to save this group with no members?',
                         confirmEvent: function () {
-
-                            {# Save it anyway #}
-
                             form.submit();
                         }
                     });
 
                 } else {
 
-                    {# Put the group members ID numbers into a CSV string for submission with the form #}
-
-                    $('#members').val(window.membersAdded.join());
-
-                    {# Send it off to the backend #}
+                    $('#members').val(selectedIds.join());
 
                     form.submit();
                 }
             }
 
         });
-
-        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
-        {# Delete Group #}
-        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
-
-        window.memberDelete = function (item) {
-            var memberItem = item.closest('li');
-            var memberId = item.attr('data-member-delete');
-
-            $(this).confirmDialog({
-
-                text: 'Are you sure you want to delete this person from the group?',
-                confirmEvent: function () {
-
-                    var index = window.membersAdded.indexOf(parseInt(memberId));
-
-                    if (index != -1) {
-                        window.membersAdded.splice(index, 1);
-                    }
-
-                    {# Remove from HTML #}
-
-                    memberItem.remove();
-
-                    if ($('#membersList').children('li').length == 0) {
-                        $('#membersListContainer').addClass('hide');
-                        $('#membersEmpty').removeClass('hide');
-                    }
-                }
-            });
-        };
-
-        $('[data-member-delete]').click(function (e) {
-            e.preventDefault();
-            window.memberDelete($(this));
-        });
-
-        {# If we were modifying an existing group in the database, add the javascript to allow deletion #}
-
-        {% if group is not empty %}
-        $('[data-delete]').click(function (e) {
-            e.preventDefault();
-            $(this).confirmDialog({
-                text: 'Are you sure you want to delete this group? Their access will be permanently removed from any associated {{ locale.pastoral }} records.',
-                confirmEvent: function () {
-                    $('#formDelete').submit();
-                }
-            });
-        });
-        {% endif %}
     });
 </script>
 
 {# --------------------------------------------------------------------------------------------------------------------------------------------#}
-{# Search modal stuff is fragmented in another templated to stop this getting much larger #}
+{# This is the HTML that gets cloned for a group member that has been added to the group. This is displayed behind the modal. #}
 {# --------------------------------------------------------------------------------------------------------------------------------------------#}
 
-{% include '@pastoralManagement/fragments/searchModal.twig' %}
+{# This is only inside a <ul> to stop storm complaining about there being an <li> floating on its own #}
+
+<ul id="cloneMember" class="hide">
+    <li class="actions-small-1">
+        <div class="list-item">
+            <div class="card small-12">
+                <!--suppress HtmlUnknownTarget -->
+                <a href="/search/user/{ID}" title="View Profile">
+                    <img style="background-color:#c6c6c6;width:64px;height:64px;"
+                         src="/portrait.php?userId={EXTERNALID}&size=square64" alt="{NAME}" title="{NAME}">
+                    <p>{FIRSTNAME} {LASTNAME}</p>
+                </a>
+                <p class="meta">{ROLE}</p>
+            </div>
+        </div>
+        <nav>
+            <a data-member-delete="{ID}" class="icon-delete no-text" href="#" title="Remove Group Member"></a>
+        </nav>
+    </li>
+</ul>
+
+{# --------------------------------------------------------------------------------------------------------------------------------------------#}
+{# Setup modal #}
+{# --------------------------------------------------------------------------------------------------------------------------------------------#}
+
+{{ userSearch.modal(guid, 'Add User To Group', 'Enter name', 'staff', null, 'window.modalUserAdded') }}
