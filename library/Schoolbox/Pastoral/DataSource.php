@@ -66,6 +66,13 @@ class DataSource
         if (!$model instanceof Model) {
             throw new MapperException('Instance of object not found');
         }
+
+        // Only directly returned items require attachments
+        $model->setAttachments(
+            $this->mapper->getJoinMapper('attachments')
+                         ->findByColumn('pastoral_id', $model->getId())
+        );
+
         return $model;
     }
 
