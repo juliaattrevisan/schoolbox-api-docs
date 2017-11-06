@@ -34,7 +34,7 @@ This is a collection of takeaways from each of the sections, distilled from thei
 * If you encounter strange mapper/instance behaviour, try turning off the mapper cache by passing the `cache => false` option.
 
 ## 7.5 Summary of Model
-* Regardless of their complexity, Models are narcissistic in that they only care about their own properties, behaviours and "possessions" (dependencies). You can expect the ability to interrogate Models or ask them questions about themselves and their dependencies. 
+* Regardless of their complexity, Models are narcissistic in that they only care about their own properties, behaviours and "possessions" (dependencies). You can expect to interrogate Models to ask them questions about themselves and their dependencies. 
 
 * Models are not responsible for performing any persisting work; these duties should be delegated to another class, such as a Mapper or a service class that utilises a Mapper.  
 
