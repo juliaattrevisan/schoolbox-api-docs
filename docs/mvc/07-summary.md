@@ -8,6 +8,8 @@ This is a collection of takeaways from each of the sections, distilled from thei
 
 * Module provides objects for Controllers which then perform operations or analyses on them. When all the necessary pieces can't be provided, either through missing data, insufficient permissions, etc. then exit early. Controllers should be able to assume that they have the minimum amount of data to start
 
+* The `register()` method is cleaner and preferred, though not universal. It builds on the basic `initRoutes()` `initRoutePermissions()` and `initRoutePreloads()` concepts. 
+
 * To prevent unnecessary logic from executing, we also prefer to error out as early as possible.
 
 ## 7.2 Summary of Controller

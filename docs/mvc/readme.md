@@ -7,7 +7,8 @@
   * 1.1 Determining the Route
   * 1.2 Route Permissions
   * 1.3 Preloads
-  * 1.4 Error Handling
+  * 1.4 register() format
+  * 1.5 Error Handling
 * 2 Responsibilities of Controller 
   * 2.1 Shove details elsewhere
   * 2.2 Error Handling

@@ -123,7 +123,20 @@ Computing the preloads in Module allows us to exit earlier without incurring the
 
 > Module provides objects for Controllers which then perform operations or analyses on them. When all the necessary pieces can't be provided, either through missing data, insufficient permissions, etc. then exit early. Controllers should be able to assume that they have the minimum amount of data to start
 
-## 1.4 Error Handling
+## 1.4 register() format
+We previously saw that the Module methods `initRoutes()`, `initRoutePermissions()` and `initRoutePreloads()` comprise the basic Module. The `register()` method is shortcut that abstracts away these details. You can see an example in `library/Schoolbox/Learning/Assessment/Module.php`.
+ 
+ Each `register()` usage takes five arguments:
+ 
+ * *GET or POST.* We saw this in the `initRoutes()` method.
+ * *Regex route.* We saw this in the `initRoutes()` method.
+ * *Corresponding controller method.* We saw this in the `initRoutes()` method.
+ * *Permission objects.* We saw this in the `initRoutePermissions()` method.
+ * *Preloads.* We saw this in the `initRoutePreloads()` method.
+ 
+> The `register()` method is cleaner and preferred, though not universal. It builds on the basic `initRoutes()` `initRoutePermissions()` and `initRoutePreloads()` concepts. 
+
+## 1.5 Error Handling
 Errors are expressed by throwing an Exception that is caught and rendered elsewhere. Error messages correlate to a particular const in the `ErrorMapper` class; to avoid hardcoding integers everywhere you can use the human-readable const instead.
 
 ```php
