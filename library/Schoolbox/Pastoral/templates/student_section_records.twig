@@ -37,7 +37,9 @@
                                         <p class="meta">
                                             {% for relatedRecord in record.relatedRecords %}
                                                 {% set getStudentRecord = routeLookupIfAuthorized('pastoral.getStudentRecord', {studentId: relatedRecord.student.id, 'recordId': relatedRecord.id}) %}
+                                                {% if getStudentRecord %}
                                                     Linked Record: <a href="{{ getStudentRecord }}">{{ relatedRecord.student.fullName }} - {{ relatedRecord.heading }}<br></a>
+                                                {% endif %}
                                             {% endfor %}
                                         </p>
                                     {% endif %}
