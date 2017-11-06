@@ -306,10 +306,13 @@ One notable pitfall is taking a method that sort of does what you need, then you
 
 Eventually this method loses its specific purpose (reduces cohesion), touches and integrally affects numerous locations (high coupling) and evolves into technical debt. There's been a real-life example of this in an earlier incarnation of `findByParent($id)` in Folder Mapper; not only does it get a parent, but also a count of assessments and a set of configurations.
 
-> Break away specific responsibilities into other classes instead. Note that Mappers expose a method that executes raw sql queries: `$mapper->getDatabase()->query()`
+> Break away specific responsibilities into other classes instead. Note that Mappers expose a method that executes raw sql queries: `$mapper->getDatabase()->prepare()`
+ 
+An example class follows. Obviously this is a fairly contrived example, but you have an entire class in which to organise your algorithms.
  
 ```php
 class Cat {
+    const SPECIAL_FOLDER = 237;
 
     /**
      * Cat constructor.
@@ -320,25 +323,22 @@ class Cat {
     
     /**
      * Do a very specific query that nobody else really needs to know about
+     * You can still use these convenience methods to save you from some hardcoding
      */
     public function doSomething() {
         $query = "
-            SELECT columns  
-            FROM table
-            INNER JOIN other places
-            LEFT JOIN this place
-            RIGHT OUTER JOIN that place
-            WHERE a lot of things happen
-            AND NOT include things
-            LIMIT a page worth's of stuff
+            SELECT {$folderMapper->getColumnString()}
+            FROM {$folderMapper->getTable()}
+            WHERE {$folderMapper->getIdentifierColumn()} = :specialFolder
         ";
     
-        $statement = $this->getDatabase()->query($query);
-        $statement->execute();
+        $statement = $this->getFolderMapper()->getDatabase()->prepare($query);
+        $statement->execute([
+            'specialFolder' => self::SPECIAL_FOLDER
+        ]);
         
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            ...
-            ...
+            new \Alaress_Probe($row);
         }
     }
 }
