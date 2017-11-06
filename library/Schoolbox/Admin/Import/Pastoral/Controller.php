@@ -11,9 +11,11 @@ namespace Schoolbox\Admin\Import\Pastoral;
 
 use Alaress\Web\Controller\Base;
 use External_Pastoral;
+use Schoolbox\Collection;
 use Schoolbox\Import\ImportNavigation;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Pastoral\Log\Mapper as LogMapper;
+use Schoolbox\Pastoral\Log\Mapper as PastoralLogMapper;
+use Schoolbox\Pastoral\Log\Model as PastoralLog;
 use Schoolbox\User;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Config\ConfigMapper;
@@ -29,9 +31,9 @@ class Controller extends Base
     protected $configMapper;
 
     /**
-     * @var LogMapper
+     * @var PastoralLogMapper
      */
-    protected $logMapper;
+    protected $pastoralLogMapper;
 
     /**
      * @var UserMapper
@@ -92,18 +94,19 @@ class Controller extends Base
     }
 
     /***
-     * @return LogMapper
+     * @return PastoralLogMapper
      */
-    public function getLogMapper() {
-        return $this->logMapper;
+    public function getPastoralLogMapper() {
+        return $this->PastoralLogMapper;
     }
 
     /**
-     * @param LogMapper $logMapper
+     * @param PastoralLogMapper $pastoralLogMapper
+     *
      * @return $this
      */
-    public function setLogMapper($logMapper) {
-        $this->logMapper = $logMapper;
+    public function setPastoralLogMapper($pastoralLogMapper) {
+        $this->PastoralLogMapper = $pastoralLogMapper;
         return $this;
     }
 
@@ -115,7 +118,7 @@ class Controller extends Base
         $this->setConfigMapper(ConfigMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setUserMapper(UserMapper::getInstance());
-        $this->setLogMapper(LogMapper::getInstance());
+        $this->setPastoralLogMapper(PastoralLogMapper::getInstance());
     }
 
     /**
@@ -128,7 +131,7 @@ class Controller extends Base
             'data'     => array(
                 'pageCurrent' => 'import',
                 'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
-                'logs' => $this->getLogMapper()->findImportIds()
+                'logs' => $this->getPastoralLogMapper()->findImportIds()
             )
         ]);
     }
@@ -136,16 +139,16 @@ class Controller extends Base
     /**
      * Display list of available logs
      *
-     * @param int $id Pastoral import log ID
+     * @param Collection|PastoralLog[] $log Pastoral log
      */
-    public function getLogDetail($id)
+    public function getLogDetail($log)
     {
         $this->getResponse()->content->set([
             'template' => '@adminImportPastoral/logDetail.twig',
             'data'     => array(
                 'pageCurrent' => 'import',
                 'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
-                'log' => $id
+                'log' => $log
             )
         ]);
     }
@@ -173,7 +176,7 @@ class Controller extends Base
             'data'     => array(
                 'pageCurrent'   => 'import',
                 'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
-                'logs'          => $this->getLogMapper()->findImportIds(),
+                'logs'          => $this->getPastoralLogMapper()->findImportIds(),
                 'message'       => true
             ),
             'postOutput' => [
