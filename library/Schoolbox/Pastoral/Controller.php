@@ -1012,32 +1012,25 @@ class Controller extends Base
             $collectorFactory  = new CollectorFactory();
             $attachmentObjects = $collectorFactory->build($post[$attachzone . '_attachments'])->getAll();
 
-
-
-
             /** @var Storage $storageObject */
+            $newAttachments = $this->pastoralAttachmentMapper->createCollection();
+            $oldAttachments = $record->getAttachments()->filterBy('private', $isPrivate);
             foreach ($attachmentObjects as $storageObject) {
                 // Only add attachments which don't already exist
-
-//                // Do NOT sync private attachments for now, for privacy reasons
-//                // TODO move this restriction to the pastoral upload Q
-//                if (!$isPrivate && $this->config->get("external_pastoral_upload")) {
-//                    // Queue file for upload to Synergetic DocMan
-//                    $queue = $this->pastoralUploadQueueMapper->createModel();
-//                    $queue->setPastoral($record);
-//                    $queue->setExternalId($this->getUser()->getExternalId());
-//                    $queue->setStudentExternalId($record->getStudent()->getExternalId());
-//                    $queue->setStorage($storageObject);
-//                    $queue->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_PENDING);
-//                    $this->pastoralUploadQueueMapper->save($queue);
-//                }
-
                 $attachment = $this->pastoralAttachmentMapper->createModel();
                 $attachment->setPastoral($record);
                 $attachment->setStorage($storageObject);
                 $attachment->setPrivate($isPrivate);
-                $this->pastoralAttachmentMapper->save($attachment);
+                $newAttachments->add($attachment);
             }
+
+            // Save new attachments that aren't in old
+            // Delete old attachments that aren't in new
+            $diffMethod = function (PastoralAttachmentModel $a, PastoralAttachmentModel $b) {
+                return $a->getStorage()->getHash() === $b->getStorage()->getHash();
+            };
+            $this->pastoralAttachmentMapper->save($newAttachments->diff($oldAttachments, $diffMethod));
+            $this->pastoralAttachmentMapper->delete($oldAttachments->diff($newAttachments, $diffMethod));
         }
     }
 }
