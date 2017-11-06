@@ -785,8 +785,11 @@ class Controller extends Base
             $record->setSeverity($severity);
             $record->setBodyPublic(trim($post["body_public"]));
             $record->setBodyPrivate(trim($post["body_private"]));
-            $record->setOwner($this->getUser());
-//            $this->pastoralMapper->setSessionData($_SESSION);
+
+            // Only set owner if this is a new record
+            if (!$record->getId()) {
+                $record->setOwner($this->getUser());
+            }
             $this->pastoralDataSource->save($record);
 
             $records->add($record);
