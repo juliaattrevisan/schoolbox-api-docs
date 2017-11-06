@@ -887,10 +887,9 @@ class Controller extends Base
 
         /** @var Model $record */
         foreach ($records as $record) {
-            // Save attachments
-
-            if (is_array($post['attachment'])) {
-                $attachmentObjects = $collectorFactory->build($post['attachment'])->getAll();
+            // Save public attachments
+            if (is_array($post[self::ATTACHZONE_PUBLIC.'_attachments'])) {
+                $attachmentObjects = $collectorFactory->build($post[self::ATTACHZONE_PUBLIC.'_attachments'])->getAll();
 
                 /** @var Storage $storageObject */
                 foreach ($attachmentObjects as $storageObject) {
@@ -910,6 +909,25 @@ class Controller extends Base
                     $attachment = $this->pastoralAttachmentMapper->createModel();
                     $attachment->setPastoral($record);
                     $attachment->setStorage($storageObject);
+                    $attachment->setPrivate(false);
+                    $this->pastoralAttachmentMapper->save($attachment);
+                }
+            }
+
+            // Save private attachments
+            // Do NOT sync private attachments for now, for privacy reasons
+            // TODO move this restriction to the pastoral upload Q
+            if (is_array($post[self::ATTACHZONE_PRIVATE.'_attachments'])) {
+                $attachmentObjects = $collectorFactory->build($post[self::ATTACHZONE_PRIVATE.'_attachments'])->getAll();
+
+                /** @var Storage $storageObject */
+                foreach ($attachmentObjects as $storageObject) {
+                    // Only add attachments which don't already exist
+
+                    $attachment = $this->pastoralAttachmentMapper->createModel();
+                    $attachment->setPastoral($record);
+                    $attachment->setStorage($storageObject);
+                    $attachment->setPrivate(true);
                     $this->pastoralAttachmentMapper->save($attachment);
                 }
             }
