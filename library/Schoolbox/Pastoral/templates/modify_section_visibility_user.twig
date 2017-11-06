@@ -4,6 +4,8 @@
 
 {% if allowIndividual %}
 
+    {% import '@pastoral/macros/user_search.twig' as userSearch %}
+
     <tbody id="permission-users">
 
         {% if record.id != '' %}
