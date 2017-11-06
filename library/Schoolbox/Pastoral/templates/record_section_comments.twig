@@ -2,11 +2,13 @@
 
 {% if recordType == 'public' %}
     {% set body = record.bodyPublic %}
+    {% set attachments = attachmentsPublic %}
 {% elseif recordType == 'private' %}
     {% set body = record.bodyPrivate %}
+    {% set attachments = attachmentsPrivate %}
 {% endif %}
 
-{% if body is not empty %}
+{% if not (body is empty and attachments is empty) %}
 
     {% set commentInsertRoute = routeLookupIfAuthorized('pastoral.postCommentInsert', {'recordId': record.id}) %}
     {% set commentDeleteRoute = routeLookupIfAuthorized('pastoral.postCommentDelete', {'recordId': record.id, 'commentId': comment.id}) %}
