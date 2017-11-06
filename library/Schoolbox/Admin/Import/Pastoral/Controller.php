@@ -45,71 +45,6 @@ class Controller extends Base
      */
     protected $errorMapper;
 
-    /***
-     * @return ErrorMapper
-     */
-    public function getErrorMapper() {
-        return $this->errorMapper;
-    }
-
-    /**
-     * @param ErrorMapper $errorMapper
-     * @return $this
-     */
-    public function setErrorMapper($errorMapper) {
-        $this->errorMapper = $errorMapper;
-        return $this;
-    }
-
-    /***
-     * @return ConfigMapper
-     */
-    public function getConfigMapper() {
-        return $this->configMapper;
-    }
-
-    /**
-     * @param ConfigMapper $configMapper
-     * @return $this
-     */
-    public function setConfigMapper($configMapper) {
-        $this->configMapper = $configMapper;
-        return $this;
-    }
-
-    /***
-     * @return UserMapper
-     */
-    public function getUserMapper() {
-        return $this->userMapper;
-    }
-
-    /**
-     * @param UserMapper $userMapper
-     * @return $this
-     */
-    public function setUserMapper($userMapper) {
-        $this->userMapper = $userMapper;
-        return $this;
-    }
-
-    /***
-     * @return PastoralLogMapper
-     */
-    public function getPastoralLogMapper() {
-        return $this->PastoralLogMapper;
-    }
-
-    /**
-     * @param PastoralLogMapper $pastoralLogMapper
-     *
-     * @return $this
-     */
-    public function setPastoralLogMapper($pastoralLogMapper) {
-        $this->PastoralLogMapper = $pastoralLogMapper;
-        return $this;
-    }
-
     /**
      * Controller constructor.
      */
@@ -232,5 +167,70 @@ class Controller extends Base
                 ),
             )
         );
+    }
+
+    /***
+     * @return ErrorMapper
+     */
+    public function getErrorMapper() {
+        return $this->errorMapper;
+    }
+
+    /**
+     * @param ErrorMapper $errorMapper
+     * @return $this
+     */
+    public function setErrorMapper($errorMapper) {
+        $this->errorMapper = $errorMapper;
+        return $this;
+    }
+
+    /***
+     * @return ConfigMapper
+     */
+    public function getConfigMapper() {
+        return $this->configMapper;
+    }
+
+    /**
+     * @param ConfigMapper $configMapper
+     * @return $this
+     */
+    public function setConfigMapper($configMapper) {
+        $this->configMapper = $configMapper;
+        return $this;
+    }
+
+    /***
+     * @return UserMapper
+     */
+    public function getUserMapper() {
+        return $this->userMapper;
+    }
+
+    /**
+     * @param UserMapper $userMapper
+     * @return $this
+     */
+    public function setUserMapper($userMapper) {
+        $this->userMapper = $userMapper;
+        return $this;
+    }
+
+    /***
+     * @return PastoralLogMapper
+     */
+    public function getPastoralLogMapper() {
+        return $this->pastoralLogMapper;
+    }
+
+    /**
+     * @param PastoralLogMapper $pastoralLogMapper
+     *
+     * @return $this
+     */
+    public function setPastoralLogMapper($pastoralLogMapper) {
+        $this->pastoralLogMapper = $pastoralLogMapper;
+        return $this;
     }
 }
