@@ -71,7 +71,7 @@ public function initRoutePermissions(Authorizer $authorizer)
 }
 ```
 
-> It is recommended to compose a larger rule from a set of smaller discrete non-contextual rules, instead of making a giant monolith that is so specific it can't be reused or easily redefined. You can find some elementary authorisation classes in `/library/Alaress/Authorizer/Rule`.
+> It is recommended to compose a larger authorisation rule from a set of smaller discrete non-contextual rules, instead of making a giant monolith that is so specific it can't be reused or easily redefined. You can find some elementary authorisation classes in `/library/Alaress/Authorizer/Rule`.
 
 Tokens in the url are made available in a secret `$params` array that some authorisation classes can utilise. It's not made particularly clear, but if you dig you'll find where it's used. Alternatively you can just accept it works like this, and simply use it.
 
