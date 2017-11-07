@@ -52,10 +52,11 @@ abstract class BaseMapper extends SchoolboxMapper
             return null;
         }
 
-        // Only has public access? Strip the private body
+        // Only has public access? Strip the private body and files
 
         if ($accessLevel == PastoralAccessMapper::ACCESS_PUBLIC) {
             $record->setBodyPrivate("");
+            $record->setAttachments($record->getAttachments()->filterBy('private', false));
         }
 
         // Filter out related records, too

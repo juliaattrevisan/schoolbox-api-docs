@@ -64,17 +64,18 @@ class DataSource
      */
     public function findById(User $currentUser, $id): Model
     {
-        $model = $this->mapper->filterRecordForUser($this->mapper->findById($id), $currentUser);
+        $model = $this->mapper->findById($id);
 
-        if (!$model instanceof Model) {
-            throw new MapperException('Instance of object not found');
-        }
-
-        // Only directly returned items require attachments
+        // Add attachments, then filter
         $model->setAttachments(
             $this->mapper->getJoinMapper('attachments')
                          ->findByColumn('pastoral_id', $model->getId())
         );
+        $model = $this->mapper->filterRecordForUser($model, $currentUser);
+
+        if (!$model instanceof Model) {
+            throw new MapperException('Instance of object not found');
+        }
 
         return $model;
     }
