@@ -34,7 +34,7 @@ sqlhost=`grep "\"SQL_host" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' 
 sqldb=`grep "\"SQL_db" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
 
 echo "";
-echo "Looking for Staff accounts with a matching Parent account";
+echo "Looking for Staff accounts with a matching Parent account - ignoring soft-deleted";
 
 mysqldb="mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb";
 
