@@ -42,7 +42,6 @@ numberacc=`$mysqldb -BNe "
 	SELECT count(*) FROM user u
 	JOIN user uu ON u.synergy_id = uu.synergy_id
 	WHERE	u.synergy_id != '' AND u.synergy_id is not NULL
-		AND u.synergy_id=uu.synergy_id
 		AND uu.group_id IN (SELECT id FROM groups WHERE group_type='parent')
 		AND u.group_id IN (SELECT id FROM groups WHERE group_type='staff')
 		AND u.deleted_at IS null and uu.deleted_at IS null"`;
@@ -55,7 +54,6 @@ stafflist=`$mysqldb -BNe "
 	SELECT u.id FROM user u
         JOIN user uu ON u.synergy_id = uu.synergy_id
         WHERE   u.synergy_id != '' AND u.synergy_id is not NULL
-                AND u.synergy_id=uu.synergy_id
                 AND uu.group_id IN (SELECT id FROM groups WHERE group_type='parent')
                 AND u.group_id IN (SELECT id FROM groups WHERE group_type='staff')
                 AND u.deleted_at IS null and uu.deleted_at IS null"`;
