@@ -34,6 +34,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Twig_Loader_Chain;
 
@@ -298,10 +299,11 @@ class Module extends BaseModule
                     // TODO make current user easily available in path matcher
                     /** @var DataSource $pastoralDataSource */
                     $pastoralDataSource       = $this->getInjector()->get('pastoralDataSource');
-                    $injectedValues['record'] = $pastoralDataSource->findById(
-                        $this->getInjector()->get('user'),
-                        $params['recordId']
-                    );
+
+                    /** @var User $user */
+                    $user = $this->getInjector()->get('user');
+
+                    $injectedValues['record'] = $pastoralDataSource->findById($user, $params['recordId']);
 
                     /** @var PastoralAccessMapper $pastoralAccessMapper */
                     $pastoralAccessMapper = $this->getMapperFactory()->get(PastoralAccessMapper::class);

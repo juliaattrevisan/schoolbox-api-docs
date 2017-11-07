@@ -28,9 +28,17 @@
 
                                     {# Display name of poster #}
                                     <p class="meta">
-                                        Posted by <a href="{{ _self.userProfileLink(record.owner) }}">{{ record.owner.fullName }}</a>
+                                        Created by <a href="{{ _self.userProfileLink(record.owner) }}">{{ record.owner.fullName }}</a>
                                         <span title="{{ record.createdAt.short }}">{{ record.createdAt.relativeDay }}</span>
                                     </p>
+
+                                    {# Display last updated by if applicable #}
+                                    {% if record.createdAt.long != record.updatedAtDisplay.long %}
+                                        <p class="meta">
+                                            Last updated by <a href="{{ _self.userProfileLink(record.modifiedByDisplay) }}">{{ record.modifiedByDisplay.fullName }}</a>
+                                            <span title="{{ record.updatedAtDisplay.short }}">{{ record.updatedAtDisplay.relativeDay }}</span>
+                                        </p>
+                                    {% endif %}
 
                                     {# Display linked students to staff #}
                                     {% if user.role.isStaff and record.relatedRecords|length %}

@@ -11,6 +11,7 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper as SchoolboxMapper;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
+use Schoolbox\Pastoral\Comment\Model as PastoralComment;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 
@@ -36,18 +37,18 @@ abstract class BaseMapper extends SchoolboxMapper
             return null;
         }
 
-        if ($this->isUserInPastoralService($user) || $user->getId() == $record->getOwner()->getId()) {
-            // Pastoral moderator and owner see all, shortcut out of here
-            return $record;
-        }
-
         // We need to iterate all access records to see if any of them grants private access
 
         $accessLevel = $record->getAccessLevel($user);
 
         // If denied, no soup for you!
+        //
+        // We ignore pastoral moderators and the record owner get ignored by this, otherwise they'll never get able to
+        // update an erroneous Deny access level added to a record
 
-        if ($accessLevel == PastoralAccessMapper::ACCESS_DENY) {
+        if ($accessLevel == PastoralAccessMapper::ACCESS_DENY &&
+            !$this->isUserInPastoralService($user) &&                       // Pastoral moderators ignored
+            !$user->getId() == $record->getOwner()->getId()) {              // Record owner ignored
             return null;
         }
 
@@ -64,6 +65,22 @@ abstract class BaseMapper extends SchoolboxMapper
         /** @var PastoralCommentMapper $pastoralCommentMapper */
         $pastoralCommentMapper = $this->getJoinMapper('comments');
         $record->setComments($pastoralCommentMapper->filterRecordsForUser($record->getComments(), $user));
+
+        // Set the 'updatedAtDisplay' value now that we have all of the comments
+
+        $modifiedBy = $record->getModifiedBy();
+        $highestDate = $record->getUpdatedAt();
+
+        /** @var PastoralComment $comment */
+        foreach ($record->getComments() as $comment) {
+            if ($comment->getUpdatedAt()->gt($highestDate)) {
+                $modifiedBy = $comment->getOwner();
+                $highestDate = $comment->getUpdatedAt();
+            }
+        }
+
+        $record->setModifiedByDisplay($modifiedBy);
+        $record->setUpdatedAtDisplay($highestDate);
 
         return $record;
     }

@@ -63,6 +63,7 @@ class DataSource
     public function findById(User $currentUser, $id): Model
     {
         $model = $this->mapper->filterRecordForUser($this->mapper->findById($id), $currentUser);
+
         if (!$model instanceof Model) {
             throw new MapperException('Instance of object not found');
         }
@@ -97,9 +98,11 @@ class DataSource
      * User-sensitive wrapper for `Mapper::findByColumnList`.
      *
      * @param User  $currentUser
-     * @param array $columnList
+     * @param       $columnList
      * @param array $options
-     * @return Collection|Model[]
+     *
+     * @return Collection
+     * @throws MapperException
      */
     public function findByColumnList(User $currentUser, $columnList, $options = []): Collection
     {

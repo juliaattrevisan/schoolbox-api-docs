@@ -250,12 +250,7 @@ class Controller extends Base
             $records = $this->pastoralDataSource->findByColumn(
                 $this->getUser(),
                 'student_id',
-                $student->getId(),
-                [
-                    'order' => [
-                        'updated_at' => 'desc',
-                    ],
-                ]
+                $student->getId()
             );
         } else {
             // Retrieve results filtered by pastoral type
@@ -265,14 +260,11 @@ class Controller extends Base
                 [
                     'student_id' => $student->getId(),
                     'type_id'    => $get['type'],
-                ],
-                [
-                    'order' => [
-                        'updated_at' => 'desc',
-                    ],
                 ]
             );
         }
+
+        $records = $records->sortBy('updatedAtDisplay', 'desc');
 
         // Limit the number of pastoral records to display on each page of pastoral records
 
@@ -373,7 +365,7 @@ class Controller extends Base
      * @param Model $record
      * @param User  $student
      *
-     * @throws SchoolboxException
+     * @throws MapperException
      */
     public function getStudentRecord($record, $student)
     {

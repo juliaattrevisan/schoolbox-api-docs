@@ -7,15 +7,20 @@
         </div>
         <div class="small-12 medium-10 columns">
             <dl class="profile">
-                <dt class="small-12 medium-3">Author:</dt>
+                <dt class="small-12 medium-3">Created By:</dt>
                 <dd class="small-12 medium-9"><a href="{{ profile.link(record.owner) }}">{{ record.owner.fullName }}</a></dd>
 
-                <dt class="small-12 medium-3">Record Created:</dt>
+                <dt class="small-12 medium-3">Created:</dt>
                 <dd class="small-12 medium-9">{{ record.createdAt.long }}</dd>
 
-                {% if record.createdAt.long != record.updatedAt.long %}
-                    <dt class="small-12 medium-3">Last Modified:</dt>
-                    <dd class="small-12 medium-9">{{ record.updatedAt.long }}</dd>
+                {% if record.createdAt.long != record.updatedAtDisplay.long %}
+                    <dt class="small-12 medium-3">Last Updated By:</dt>
+                    <dd class="small-12 medium-9"><a href="{{ profile.link(record.modifiedByDisplay) }}">{{ record.modifiedByDisplay.fullName }}</a></dd>
+                {% endif %}
+
+                {% if record.createdAt.long != record.updatedAtDisplay.long %}
+                    <dt class="small-12 medium-3">Last Updated:</dt>
+                    <dd class="small-12 medium-9">{{ record.updatedAtDisplay.long }}</dd>
                 {% endif %}
 
                 {% if user.role.isStaff %}

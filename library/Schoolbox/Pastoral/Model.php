@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Pastoral;
 
+use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -26,6 +27,12 @@ class Model implements ISoftDeletable
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
+
+    /** @var Alaress_Date_Format $updatedAtDisplay The date this record, or any of its accessible comments were last updated */
+    private $updatedAtDisplay;
+
+    /** @var User $modifiedByDisplay The person that last modified the record, or any of its accessible comments */
+    private $modifiedByDisplay;
 
     /** @var null|int Identifier of corresponding SIS record. NULL if none. */
     private $externalId;
@@ -395,6 +402,58 @@ class Model implements ISoftDeletable
     public function getOwner()
     {
         return $this->owner;
+    }
+
+    /**
+     * @param Alaress_Date_Format $updatedAtDisplay
+     *
+     * @return self
+     */
+    public function setUpdatedAtDisplay(Alaress_Date_Format $updatedAtDisplay)
+    {
+        $this->updatedAtDisplay = $updatedAtDisplay;
+
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getUpdatedAtDisplay()
+    {
+        // If this has not been calculated fall back to the records updated_at date
+
+        if ($this->updatedAtDisplay === null) {
+            return $this->updatedAt;
+        }
+
+        return $this->updatedAtDisplay;
+    }
+    
+    /**
+     * @param User $modifiedByDisplay
+     *
+     * @return self
+     */
+    public function setModifiedByDisplay(User $modifiedByDisplay)
+    {
+        $this->modifiedByDisplay = $modifiedByDisplay;
+
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getModifiedByDisplay()
+    {
+        // If this has not been set fall back to the last record modifier
+
+        if ($this->modifiedByDisplay === null) {
+            return $this->modifiedBy;
+        }
+
+        return $this->modifiedByDisplay;
     }
 
     /**

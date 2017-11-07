@@ -113,6 +113,7 @@ class Mapper extends BaseMapper
      * Prior to saving changes to a record, we cover out butts and keep a backup in the revision table for posterity
      *
      * @param Model $model
+     * @throws MapperException
      */
     public function saveRevision(Model $model)
     {
@@ -241,7 +242,7 @@ class Mapper extends BaseMapper
         }
 
         $model->setTags(PastoralTagMapper::getInstance()->findForRecord($model));
-        $model->setComments($this->getJoinMapper('comments')->findByColumn('pastoral_id', $model->getId()));
+        $model->setComments($this->getJoinMapper('comments')->findByColumn('pastoral_id', $model->getId(), ['sort' => ['created_at'. 'asc']]));
 
         $revisionMapper = PastoralRevisionMapper::getInstance();
         $revisions      = $revisionMapper->findByColumn('root_id', $model->getId());
