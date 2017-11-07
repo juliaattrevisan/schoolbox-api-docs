@@ -8,7 +8,15 @@
 *                                                           *
 ************************************************************/
 
-//Function for handling error conditions
+/**
+ * Function for handling error conditions
+ * @deprecated 17.5
+ * @see Schoolbox\Error\Mapper::generateException()
+ *
+ * @param $ec
+ * @param $message
+ * @param $code
+ */
 function error($ec, $message="", $code = 400) {
     /** @var Schoolbox\Application\WebRequest\Kernel $kernel */
     global $kernel;
