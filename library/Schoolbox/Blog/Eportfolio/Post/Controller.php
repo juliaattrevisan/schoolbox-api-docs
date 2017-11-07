@@ -221,7 +221,7 @@ class Controller extends Base
         } else {
             $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
-        $comment->setBody($this->getRequest()->post['commentBody']);
+        
         $comment->setCreatedAt(\Alaress_Date_Format::now());
         $this->getEportfolioBlogCommentMapper()->save($comment);
 
