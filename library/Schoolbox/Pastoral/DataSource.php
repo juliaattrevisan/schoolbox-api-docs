@@ -45,6 +45,7 @@ class DataSource
      * Not user-sensitive, but must be exposed to web request code.
      *
      * @param int $id
+     *
      * @return Model
      */
     public function createModel($id = null): Model
@@ -57,6 +58,7 @@ class DataSource
      *
      * @param User $currentUser
      * @param int  $id
+     *
      * @return Model
      * @throws MapperException
      */
@@ -84,6 +86,7 @@ class DataSource
      * @param string $columnName
      * @param string $columnValue
      * @param array  $options
+     *
      * @return Collection
      */
     public function findByColumn(User $currentUser, $columnName, $columnValue, $options = []): Collection
@@ -137,6 +140,7 @@ class DataSource
      * @param Collection            $order
      * @param                       $involved
      * @param Collection            $years
+     *
      * @return Collection
      */
     public function getReportData(
@@ -151,7 +155,8 @@ class DataSource
         Collection $order,
         $involved,
         Collection $years
-    ): Collection {
+    ): Collection
+    {
         // The mapper method is user-sensitive,
         // but filter anyway as it's better to be explicit than implicit.
         return $this->mapper->filterRecordsForUser(
@@ -178,6 +183,7 @@ class DataSource
      * This method isn't user-sensitive, but must be exposed to web request code.
      *
      * @param User $student
+     *
      * @return array
      */
     public function getLinkedStudents(User $student): array
@@ -208,6 +214,7 @@ class DataSource
      *
      * @param User   $currentUser
      * @param string $search
+     *
      * @return Collection
      */
     public function getSearchResults(User $currentUser, $search): Collection
@@ -225,15 +232,16 @@ class DataSource
      * @param int  $count
      *
      * @return Collection|Model[]
+     * @throws MapperException
      */
     public function findRecentDashboard(User $currentUser, $count = 5): Collection
     {
         // The mapper method is user-sensitive,
         // but filter anyway as it's better to be explicit than implicit.
-        return $this->mapper->filterRecordsForUser(
-            $this->mapper->findRecentDashboard($currentUser, $count),
-            $currentUser
-        );
+
+        return $this->mapper->filterRecordsForUser($this->mapper->findRecentDashboard($currentUser), $currentUser)
+                            ->sortBy('updatedAtDisplay', 'desc')
+                            ->limit($count);
     }
 
     /**
@@ -254,6 +262,7 @@ class DataSource
      * Not user-sensitive, but must be exposed to web request code.
      *
      * @param Model $model
+     *
      * @return bool
      */
     public function delete(Model $model): bool

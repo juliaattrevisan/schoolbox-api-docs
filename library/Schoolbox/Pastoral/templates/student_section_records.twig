@@ -21,21 +21,23 @@
                         <li data-record-type="{{ record.type.id }}" class="actions-small-2" id="pastoral-{{ record.id }}">
                             <div class="list-item">
                                 <div class="card small-12 wrap-down">
-                                    <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': student.id, 'recordId': record.id}) }}">
+                                    <a href="{{ profile.link(record.owner) }}">
                                         {{ profile.imageSquare64(record.owner) }}
+                                    </a>
+                                    <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': student.id, 'recordId': record.id}) }}">
                                         <h3>{{ record.heading }}</h3>
                                     </a>
 
                                     {# Display name of poster #}
                                     <p class="meta">
-                                        Created by <a href="{{ _self.userProfileLink(record.owner) }}">{{ record.owner.fullName }}</a>
+                                        Created by <a href="{{ profile.link(record.owner) }}">{{ record.owner.fullName }}</a>
                                         <span title="{{ record.createdAt.short }}">{{ record.createdAt.relativeDay }}</span>
                                     </p>
 
                                     {# Display last updated by if applicable #}
                                     {% if record.createdAt.long != record.updatedAtDisplay.long %}
                                         <p class="meta">
-                                            Last updated by <a href="{{ _self.userProfileLink(record.modifiedByDisplay) }}">{{ record.modifiedByDisplay.fullName }}</a>
+                                            Last updated by <a href="{{ profile.link(record.modifiedByDisplay) }}">{{ record.modifiedByDisplay.fullName }}</a>
                                             <span title="{{ record.updatedAtDisplay.short }}">{{ record.updatedAtDisplay.relativeDay }}</span>
                                         </p>
                                     {% endif %}

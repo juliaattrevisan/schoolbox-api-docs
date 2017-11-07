@@ -9,18 +9,26 @@
         {# -------------------------------------------------------------------------------------------------- #}
 
         {% if recentDashboard is not empty %}
-            <h2 class="subheader">Important Records</h2>
+            <h2 class="subheader">Recently Updated Important Records</h2>
             <section>
                 <ul class="information-list">
                     {% for record in recentDashboard %}
                         <li>
+                            {% set recordLink = routeLookup('pastoral.getStudentRecord', {studentId: record.student.id, recordId: record.id}) %}
                             <div class="card small-12">
-                                <a href='{{ routeLookup('pastoral.getStudentRecord', {studentId: record.student.id, recordId: record.id}) }}'
-                                   title="View Profile">
+                                <a href="{{ profile.link(record.student) }}">
                                     {{ profile.imageSquare64(record.student) }}
-                                    <h3>{{ record.heading }}</h3>
                                 </a>
-                                <p class="meta">{{ record.student.fullName }}</p>
+                                <a href="{{ recordLink }}"><h3>{{ record.heading }}</h3></a>
+                                <p class="meta">
+                                    <a href="{{ profile.link(record.student) }}">
+                                    {{ record.student.fullName }}
+                                    </a>
+                                </p>
+                                <p class="meta">
+                                    Last updated by <a href="{{ profile.link(record.modifiedByDisplay) }}">{{ record.modifiedByDisplay.fullName }}</a>
+                                    <span title="{{ record.updatedAtDisplay.short }}">{{ record.updatedAtDisplay.relativeDay }}</span>
+                                </p>
                             </div>
                         </li>
                     {% endfor %}
