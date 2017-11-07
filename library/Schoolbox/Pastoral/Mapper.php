@@ -242,7 +242,7 @@ class Mapper extends BaseMapper
         }
 
         $model->setTags(PastoralTagMapper::getInstance()->findForRecord($model));
-        $model->setComments($this->getJoinMapper('comments')->findByColumn('pastoral_id', $model->getId(), ['sort' => ['created_at'. 'asc']]));
+        $model->setComments($this->getJoinMapper('comments')->findByColumn('pastoral_id', $model->getId(), ['sort' => ['created_at', 'asc']]));
 
         $revisionMapper = PastoralRevisionMapper::getInstance();
         $revisions      = $revisionMapper->findByColumn('root_id', $model->getId());
