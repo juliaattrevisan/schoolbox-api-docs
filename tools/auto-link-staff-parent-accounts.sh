@@ -44,7 +44,8 @@ numberacc=`$mysqldb -BNe "
 	WHERE	u.synergy_id != '' AND u.synergy_id is not NULL
 		AND u.synergy_id=uu.synergy_id
 		AND uu.group_id IN (SELECT id FROM groups WHERE group_type='parent')
-		AND u.group_id IN (SELECT id FROM groups WHERE group_type='staff')"`;
+		AND u.group_id IN (SELECT id FROM groups WHERE group_type='staff')
+		AND u.deleted_at IS null and uu.deleted_at IS null"`;
 
 echo "Matching accounts: $numberacc";
 echo "";
@@ -56,7 +57,8 @@ stafflist=`$mysqldb -BNe "
         WHERE   u.synergy_id != '' AND u.synergy_id is not NULL
                 AND u.synergy_id=uu.synergy_id
                 AND uu.group_id IN (SELECT id FROM groups WHERE group_type='parent')
-                AND u.group_id IN (SELECT id FROM groups WHERE group_type='staff')"`;
+                AND u.group_id IN (SELECT id FROM groups WHERE group_type='staff')
+                AND u.deleted_at IS null and uu.deleted_at IS null"`;
 
 for staffid in `echo "$stafflist"`;
 do
