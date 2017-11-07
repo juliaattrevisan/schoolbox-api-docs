@@ -34,17 +34,17 @@ sqlhost=`grep "\"SQL_host" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' 
 sqldb=`grep "\"SQL_db" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
 
 echo "";
-echo "Looking for Staff accounts with a matching Parent account";
+echo "Looking for Staff accounts with a matching Parent account - ignoring soft-deleted";
 
 mysqldb="mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb";
 
 numberacc=`$mysqldb -BNe "
 	SELECT count(*) FROM user u
 	JOIN user uu ON u.synergy_id = uu.synergy_id
-	WHERE	u.synergy_id != '' AND u.synergy_id is not NULL
-		AND u.synergy_id=uu.synergy_id
-		AND uu.group_id IN (SELECT id FROM groups WHERE group_type='parent')
-		AND u.group_id IN (SELECT id FROM groups WHERE group_type='staff')"`;
+	WHERE   u.synergy_id != '' AND u.synergy_id IS NOT NULL
+            AND uu.group_id IN (SELECT id FROM groups WHERE group_type='parent')
+            AND u.group_id IN (SELECT id FROM groups WHERE group_type='staff')
+            AND u.deleted_at IS NULL and uu.deleted_at IS NULL"`;
 
 echo "Matching accounts: $numberacc";
 echo "";
@@ -52,24 +52,24 @@ echo "Attempting to link accounts";
 
 stafflist=`$mysqldb -BNe "
 	SELECT u.id FROM user u
-        JOIN user uu ON u.synergy_id = uu.synergy_id
-        WHERE   u.synergy_id != '' AND u.synergy_id is not NULL
-                AND u.synergy_id=uu.synergy_id
-                AND uu.group_id IN (SELECT id FROM groups WHERE group_type='parent')
-                AND u.group_id IN (SELECT id FROM groups WHERE group_type='staff')"`;
+    JOIN user uu ON u.synergy_id = uu.synergy_id
+    WHERE   u.synergy_id != '' AND u.synergy_id IS NOT NULL
+            AND uu.group_id IN (SELECT id FROM groups WHERE group_type='parent')
+            AND u.group_id IN (SELECT id FROM groups WHERE group_type='staff')
+            AND u.deleted_at IS NULL and uu.deleted_at IS NULL"`;
 
 for staffid in `echo "$stafflist"`;
 do
 	parentid=`$mysqldb -BNe "
 		SELECT uu.id FROM user u
 		JOIN user uu ON u.synergy_id = uu.synergy_id
-		WHERE
-			u.id = '$staffid' AND
-			u.synergy_id=uu.synergy_id AND
-			uu.group_id IN (SELECT id FROM groups WHERE group_type='parent') AND
-			u.group_id IN (SELECT id FROM groups WHERE group_type='staff')"`;
-	fullname=`$mysqldb -BNe "SELECT CONCAT(firstname,' ',lastname,' (',synergy_id,')') FROM user WHERE id = '$staffid'"`;
-	echo "Linking: $staffid to $parentid - $fullname";
+		WHERE   u.id = '$staffid' AND
+                u.synergy_id=uu.synergy_id AND
+                uu.group_id IN (SELECT id FROM groups WHERE group_type='parent') AND
+                u.group_id IN (SELECT id FROM groups WHERE group_type='staff') AND
+                (u.deleted_at IS NULL AND uu.deleted_at IS NULL)"`;
+	fullname=`$mysqldb -BNe "SELECT CONCAT(firstname,' ',lastname,' (Synergetic ID: ',synergy_id,')') FROM user WHERE id = '$staffid'"`;
+	echo "Linking: staffID $staffid to parentID $parentid - $fullname";
 
 	# Check if running in test mode before making changes
 	if [ -z $test ];
