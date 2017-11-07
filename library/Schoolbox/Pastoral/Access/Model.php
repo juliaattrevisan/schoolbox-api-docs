@@ -69,7 +69,7 @@ class Model implements ISoftDeletable
      *
      * @return int
      */
-    public function getAccessLevel($user)
+    public function getAccessLevel(User $user)
     {
         $userId = $user->getId();
         
@@ -85,8 +85,12 @@ class Model implements ISoftDeletable
             $this->accessCache[$userId] = $this->getAccess();
         } elseif ($this->getRole() instanceof Role && $user->getRole()->getId() == $this->getRole()->getId()) {
             // If this is a role access record, check group permissions
+            // Parents do not get role access to records unless they're
+            // actually parents of the record's user
 
-            $this->accessCache[$userId] = $this->getAccess();
+            if (!$user->getRole()->isParent() || $user->isParentOf($this->getPastoral()->getStudent())) {
+                $this->accessCache[$userId] = $this->getAccess();
+            }
         } elseif ($this->getGroup() instanceof Group) {
             // If this is a group access record, check group permissions
 
