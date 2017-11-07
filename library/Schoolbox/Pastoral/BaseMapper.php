@@ -68,19 +68,14 @@ abstract class BaseMapper extends SchoolboxMapper
 
         // Set the 'updatedAtDisplay' value now that we have all of the comments
 
-        $modifiedBy = $record->getModifiedBy();
-        $highestDate = $record->getUpdatedAt();
-
         /** @var PastoralComment $comment */
         foreach ($record->getComments() as $comment) {
-            if ($comment->getUpdatedAt()->gt($highestDate)) {
-                $modifiedBy = $comment->getOwner();
-                $highestDate = $comment->getUpdatedAt();
+            if ($comment->getUpdatedAt()->gt($record->getUpdatedAtDisplay())) {
+                // Found a newer comment, update the record with the date/time, and author of the comment
+                $record->setUpdatedAtDisplay($comment->getUpdatedAt());
+                $record->setModifiedByDisplay($comment->getOwner());
             }
         }
-
-        $record->setModifiedByDisplay($modifiedBy);
-        $record->setUpdatedAtDisplay($highestDate);
 
         return $record;
     }

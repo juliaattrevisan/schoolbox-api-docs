@@ -99,7 +99,7 @@ class Mapper extends BaseMapper
 
         // Owners can see their comments
 
-        if ($user->getId() == $comment->getOwner()->getId()) {
+        if ($user->getId() == $comment->getOwner()->getId() || $user->getId() == $comment->getPastoral()->getOwner()->getId()) {
             return $comment;
         }
 
