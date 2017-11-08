@@ -42,6 +42,7 @@ abstract class BaseMapper extends SchoolboxMapper
         if ($record->isFiltered()) {
             return $record;
         }
+
         $record->setFiltered(true);
 
         // We need to iterate all access records to see if any of them grants private access
@@ -63,8 +64,11 @@ abstract class BaseMapper extends SchoolboxMapper
         // Only has public access? Strip the private body and files
 
         if ($accessLevel == PastoralAccessMapper::ACCESS_PUBLIC) {
-            $record->setBodyPrivate("");
-            $record->setAttachments($record->getAttachments()->filterBy('private', false));
+            // Pastoral moderators and Record owner ignored
+            if (!($this->isUserInPastoralService($user) || $user->getId() == $record->getOwner()->getId())) {
+                $record->setBodyPrivate("");
+                $record->setAttachments($record->getAttachments()->filterBy('private', false));
+            }
         }
 
         // Filter out related records, too

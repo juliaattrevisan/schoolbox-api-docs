@@ -71,6 +71,7 @@ class DataSource
             $this->mapper->getJoinMapper('attachments')
                          ->findByColumn('pastoral_id', $model->getId())
         );
+
         $model = $this->mapper->filterRecordForUser($model, $currentUser);
 
         if (!$model instanceof Model) {
