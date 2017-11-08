@@ -11,7 +11,6 @@
 {% if not (body is empty and attachments is empty) %}
 
     {% import '@pastoral/macros/profile.twig' as profile %}
-    {% set recordRoute = routeLookup('pastoral.getStudentRecordAttachment', { recordId: record.id, studentId: record.student.id, attachmentId: attachment.id }) %}
 
     <div class="row">
         <div class="small-12 island">
@@ -23,6 +22,7 @@
                 {{ body | purify }}
                 {% if attachments | length %}
                     {% for attachment in attachments %}
+                        {% set recordRoute = routeLookup('pastoral.getStudentRecordAttachment', { recordId: record.id, studentId: record.student.id, attachmentId: attachment.id }) %}
                         <div class="card small-12">
                             <a href="{{ recordRoute }}" target="_blank">
                                 {% if attachment.storage.mimetype.isImage %}
