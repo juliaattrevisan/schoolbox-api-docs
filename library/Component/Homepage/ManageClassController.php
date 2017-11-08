@@ -54,6 +54,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
     {
         $isGroupPage = $this->getContext()->isGroup();
         $isClassPage = $this->getContext()->isClass();
+        $isUnitPage = $this->getContext()->hasUnitSpecification();
 
         /* This boolean is a hack to make the Class Actions heading
          * render only when needed.
@@ -63,7 +64,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $hasClassActions = false;
 
         // If context is not a group or class, render nothing
-        if (!$isGroupPage && !$isClassPage) {
+        if (!$isGroupPage && !$isClassPage && !$isUnitPage) {
             return false;
         }
 
