@@ -14,6 +14,8 @@ You should be able to read method names and get a general idea of what is going 
 
 > One of the primary reasons to look at a Controller method is because we're pursuing a specific behaviour to change. The easier it is to find this, the better our lives become.
 
+## 2.2 getRequest() and getResponse()
+
 ## 2.3 Superglobals
 We don't directly access the superglobals `$_SESSION`, `$_GET` and `$_POST` because we can't mock these out with test data and also presumes a lot about where this data came from. Instead, there are accessor methods which provide an abstraction. 
 
