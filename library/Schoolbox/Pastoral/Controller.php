@@ -977,7 +977,7 @@ class Controller extends Base
      *
      * @param PastoralAttachmentModel $attachment
      */
-    public function getStudentRecordAttachment($attachment)
+    public function getStudentRecordAttachment(PastoralAttachmentModel $attachment)
     {
         if (!$attachment->getStorage()->getMimetype()->getInline()) {
             $attach = "attachment;";
