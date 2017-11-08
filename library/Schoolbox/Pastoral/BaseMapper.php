@@ -37,6 +37,13 @@ abstract class BaseMapper extends SchoolboxMapper
             return null;
         }
 
+        // Don't allow records to be filtered more than once.
+        // This is to avoid recursion when filtering related records.
+        if ($record->isFiltered()) {
+            return $record;
+        }
+        $record->setFiltered(true);
+
         // We need to iterate all access records to see if any of them grants private access
 
         $accessLevel = $record->getAccessLevel($user);
