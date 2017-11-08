@@ -22,6 +22,8 @@ This is a collection of takeaways from each of the sections, distilled from thei
  
 * One of the primary reasons to look at a Controller method is because we're pursuing a specific behaviour to change. The easier it is to find this, the better our lives become.
 
+* Use the @api docblock in your Controller method so you can see the corresponding Route, saving you from manually looking it up.
+
 ## 7.3 Summary of Supporting Classes
 * As per Controller methods, supporting classes should utilise dependency injection of interfaces (where possible) instead of concrete classes. This promotes reusability and testing by allowing us to substitute actual instances with stubs or mocked data.
 

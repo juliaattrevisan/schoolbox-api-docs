@@ -13,6 +13,7 @@
 * 2 Responsibilities of Controller 
   * 2.1 Shove details elsewhere
   * 2.2 Error Handling
+  * 2.3 Corresponding Route Docblock
 * 3 Responsibilities of Supporting Classes
   * 3.1 Design Patterns
 * 4 Responsibilities of Mapper

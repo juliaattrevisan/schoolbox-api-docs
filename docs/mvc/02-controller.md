@@ -18,3 +18,20 @@ You should be able to read method names and get a general idea of what is going 
 Controllers are also primarily responsible for handling of error states that can't be foreseen or computed by Module. There are a couple of ways to do it in the current codebase, but the preferred approach is to throw an exception. See *1.4 Error Handling* for implementation example.
 
 Don't `die()` or `exit()` in Controllers - you should `return` instead (unless you're debugging or exploring)
+
+## 2.3 Corresponding Route Docblock
+In Module we can see which Controller method is executed from a particular Route, but the converse isn't so obvious. To alleviate the need to manually cross-reference, we can use a docblock `@api` to state which Route is relevant to a particular Controller method.
+
+```php
+class Controller extends Base {
+
+    /**
+     * @api GET /sports/{sportId}/divisions/{divisionId}/teams/{teamId}/players/{playerId}
+     */
+     public function getDetailForPlayer( ... ) {
+        ...
+     }
+}
+```
+
+> Use the @api docblock in your Controller method so you can see the corresponding Route, saving you from manually looking it up.
