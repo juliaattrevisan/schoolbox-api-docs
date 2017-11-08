@@ -18,6 +18,7 @@ use Schoolbox\Pastoral\SubType\Model as PastoralSubType;
 use Schoolbox\Pastoral\Revision\Model as PastoralRevision;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\Type\Model as PastoralType;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 
@@ -534,6 +535,14 @@ class Model implements ISoftDeletable
      */
     public function getAccessLevel(User $user)
     {
+        // Owners and moderators get private access regardless of any other permission set
+
+        if ($this->isUserInPastoralService($user) || $user->getId() == $this->getOwner()->getId()) {
+            return PastoralAccessMapper::ACCESS_PRIVATE;
+        }
+
+        // Otherwise start with deny access, and work our way up the permission levels
+
         $accessLevel = PastoralAccessMapper::ACCESS_DENY;
 
         foreach ($this->getAccess() as $access) {
@@ -572,5 +581,18 @@ class Model implements ISoftDeletable
     {
         $this->filtered = $filtered;
         return $this;
+    }
+
+
+    /**
+     * Does the given user have access to the pastoral service?
+     *
+     * @param User $user
+     *
+     * @return bool
+     */
+    protected function isUserInPastoralService(User $user)
+    {
+        return $user->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0;
     }
 }
