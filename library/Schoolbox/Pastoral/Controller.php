@@ -479,9 +479,21 @@ class Controller extends Base
 
         /** @var Role $roleCurrent */
         foreach ($rolesAll as $roleCurrent) {
-            if ($roleCurrent->isStaff() || $roleCurrent->isParent() && $allowParents) {
+            // Staff role? Show all users
+            if ($roleCurrent->isStaff()) {
                 $roles->add($roleCurrent);
                 $roleUsers[$roleCurrent->getId()] = $this->userMapper->countByColumn('group_id', $roleCurrent->getId());
+            }
+
+            // Parent role? Show only the # of this student's parents in this role
+            if ($allowParents && $roleCurrent->isParent()) {
+                $roles->add($roleCurrent);
+                $roleUsers[$roleCurrent->getId()] = 0;
+                foreach ($record->getStudent()->getParents() as $parent) {
+                    if ($parent->getRole()->getId() == $roleCurrent->getId()) {
+                        $roleUsers[$roleCurrent->getId()]++;
+                    }
+                }
             }
         }
 
