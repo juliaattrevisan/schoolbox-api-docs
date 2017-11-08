@@ -11,27 +11,35 @@
     </div>
 
     {% if reports|length %}
-        {% for year, yearReports in reports %}
-            <div class="small-12 island">
-                <h2 class="subheader">{{ year }}</h2>
-                <section>
-                    <ul class="information-list">
-                        {% for reportId, reportData in yearReports %}
-                            <li class="actions-small-1">
-                                <div class="list-item">
-                                    <div class="compact card small-12">
-                                        <a href="{{ routeLookupIfAuthorized('profileDocumentManagement.getDownload', {studentId: student.id, documentId: reportId, source: reportData.source}) }}">
-                                            <img src="/images/mime/application-pdf.svg" class="mime">
-                                            <h3>{{ reportData.description }}</h3>
-                                        </a>
-                                    </div>
-                                </div>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </section>
-            </div>
+        {% set previousFileYear = -1 %}
+        {% for report in reports %}
+            {% if previousFileYear != report.FileYear %}
+                {% if previousFileYear != -1 %}
+                            </ul>
+                        </section>
+                    </div>
+                {% endif %}
+                {% set previousFileYear = report.FileYear %}
+                <div class="small-12 island">
+                    <h2 class="subheader">{{ report.FileYear }}</h2>
+                        <section>
+                        <ul class="information-list">
+            {% endif %}
+            <li class="actions-small-1">
+                <div class="list-item">
+                    <div class="compact card small-12">
+                        <a href="{{ routeLookupIfAuthorized('profileDocumentManagement.getDownload', {studentId: student.id, documentId: report.ID, source: report.Source}) }}">
+                            <img src="/images/mime/application-pdf.svg" class="mime">
+                            <h3>{{ report.Description }}</h3>
+                        </a>
+                    </div>
+                </div>
+            </li>
         {% endfor %}
+                </ul>
+            </section>
+        </div>
+
     {% else %}
         <div class="small-12 island">
             <div class="empty-state">
