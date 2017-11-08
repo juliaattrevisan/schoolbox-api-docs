@@ -4,11 +4,11 @@
 * Overview of Terms
 * A Quick Recap
 * 1 Responsibilities of Module
-  * 1.1 Determining the Route
-  * 1.2 Route Permissions
+  * 1.1 Determining the Route and corresponding Controller method
+  * 1.2 Permissions
   * 1.3 Preloads
-  * 1.4 register() format
-  * 1.5 Error Handling
+  * 1.4 Error Handling
+  * 1.5 Historical Format
 * 2 Responsibilities of Controller 
   * 2.1 Shove details elsewhere
   * 2.2 Error Handling
@@ -25,7 +25,7 @@
   * 6.3 Reusable Fragments
   * 6.4 The Pantry
   * 6.5 Compiling CSS and Javascript 
-* 7 Executive Summary
+* 7 Conclusions
   * 7.1 Summary of Module
   * 7.2 Summary of Controller
   * 7.3 Summary of Supporting Classes

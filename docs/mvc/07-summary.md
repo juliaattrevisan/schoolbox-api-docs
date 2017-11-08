@@ -1,14 +1,17 @@
-# 7 Executive Summary
+# 7 Conclusions
 This is a collection of takeaways from each of the sections, distilled from their explanations and reasoning into more bite-sized chunks for easier reference
 
 ## 7.1 Summary of Module
+
+* The `register()` method is cleaner and preferred, though not universal.
+
+* Note that ajax requests can initiate both types by using `$.get` and `$.post` respectively. These types of requests still follow the same rules.
+
 * Sometimes you'll need to pass in other parameters to make your Controller method do special things, such as passing it one or more dates to filter a data set, etc. This is left to your discretion though it is advisable to make your routes as utilitarian as possible.
 
 * It is recommended to compose a larger authorisation rule from a set of smaller discrete non-contextual rules, instead of making a giant monolith that is so specific it can't be reused or easily redefined. You can find some elementary authorisation classes in `/library/Alaress/Authorizer/Rule`.
 
 * Module provides objects for Controllers which then perform operations or analyses on them. When all the necessary pieces can't be provided, either through missing data, insufficient permissions, etc. then exit early. Controllers should be able to assume that they have the minimum amount of data to start
-
-* The `register()` method is cleaner and preferred, though not universal. It builds on the basic `initRoutes()` `initRoutePermissions()` and `initRoutePreloads()` concepts. 
 
 * To prevent unnecessary logic from executing, we also prefer to error out as early as possible.
 
