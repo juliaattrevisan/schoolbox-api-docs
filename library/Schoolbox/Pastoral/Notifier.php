@@ -144,7 +144,7 @@ class Notifier extends AbstractModuleNotifier
                         /** @var User $teacher */
                         foreach ($teachers as $teacher) {
                             if ($teacher->getRole()->getId() == $role->getId()) {
-                                $this->targetToUser($user, $model, $message, $pastoralAccess, $envelope);
+                                $this->targetToUser($user, $message, $pastoralAccess, $envelope);
                             }
                         }
                     } elseif ($role->isParent() && $parentAccessEnabled) {
@@ -165,7 +165,7 @@ class Notifier extends AbstractModuleNotifier
                         $user = $member->getUser();
 
                         if ($user->getRole()->isStaff()) {
-                            $this->targetToUser($user, $model, $message, $pastoralAccess, $envelope);
+                            $this->targetToUser($user, $message, $pastoralAccess, $envelope);
                         }
                     }
                 } elseif ($user instanceof User) {
@@ -176,7 +176,7 @@ class Notifier extends AbstractModuleNotifier
                     // Only send to parents if parent access is enabled
 
                     if ($role->isStaff() || ($role->isParent() && $parentAccessEnabled)) {
-                        $this->targetToUser($user, $model, $message, $pastoralAccess, $envelope);
+                        $this->targetToUser($user, $message, $pastoralAccess, $envelope);
                     }
                 }
             } catch (MapperException $e) {
@@ -192,14 +192,13 @@ class Notifier extends AbstractModuleNotifier
      * Only target message to the user if they have sufficient permissions
      *
      * @param User           $user
-     * @param Model          $model
      * @param Instance       $message
      * @param PastoralAccess $pastoralAccess
      * @param Envelope       $envelope
      *
      * @return bool
      */
-    private function targetToUser($user, $model, $message, $pastoralAccess, $envelope)
+    private function targetToUser($user, $message, $pastoralAccess, $envelope)
     {
         // If user has deny permission, fail
 
