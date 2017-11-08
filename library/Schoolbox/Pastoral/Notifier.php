@@ -144,7 +144,7 @@ class Notifier extends AbstractModuleNotifier
                         /** @var User $teacher */
                         foreach ($teachers as $teacher) {
                             if ($teacher->getRole()->getId() == $role->getId()) {
-                                $this->targetToUser($user, $message, $pastoralAccess, $envelope);
+                                $this->targetToUser($teacher, $message, $pastoralAccess, $envelope);
                             }
                         }
                     } elseif ($role->isParent() && $parentAccessEnabled) {
@@ -162,10 +162,8 @@ class Notifier extends AbstractModuleNotifier
                     foreach ($pastoralGroup->getMembers() as $member) {
                         // Only staff should be in pastoral groups
 
-                        $user = $member->getUser();
-
-                        if ($user->getRole()->isStaff()) {
-                            $this->targetToUser($user, $message, $pastoralAccess, $envelope);
+                        if ($member->getUser()->getRole()->isStaff()) {
+                            $this->targetToUser($member->getUser(), $message, $pastoralAccess, $envelope);
                         }
                     }
                 } elseif ($user instanceof User) {
