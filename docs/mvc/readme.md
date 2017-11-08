@@ -5,6 +5,7 @@
 * A Quick Recap
 * 1 Responsibilities of Module
   * 1.1 Determining the Route and corresponding Controller method
+    * 1.1.1 Tokens are array keys in $params
   * 1.2 Permissions
   * 1.3 Preloads
   * 1.4 Error Handling

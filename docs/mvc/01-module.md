@@ -35,6 +35,9 @@ $this->register('GET', $playerRoute, 'getDetailForPlayer', ... , ...);
 
 > Sometimes you'll need to pass in other parameters to make your Controller method do special things, such as passing it one or more dates to filter a data set, etc. This is left to your discretion though it is advisable to make your routes as utilitarian as possible.
 
+### 1.1.1 Tokens are array keys in $params
+The tokens in route regexes - the stuff in curly braces `{  }` will be made available to you as keys in the `$params` array. This array gets used to calculate Permissions and Preloads.
+
 ## 1.2 Permissions
 Controllers are kind of resource-intensive, they cost a bit to start up. To prevent unnecessary Controller startup, we do our permissions checks as early as possible. The earliest place we can do it is in Module.php.
 
