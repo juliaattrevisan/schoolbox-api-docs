@@ -5,8 +5,8 @@ Nw we'll examine these pieces of an Aura module - the Module, Controller, Mapper
 
 # Overview of Terms
 * *Module.* A custom concept that we made. It encapsulates Routing, Permissions and Preloads. Respectively: determines which Controller method should execute based on the url provided, whether the Controller method has the permissions to execute, and what objects it needs to execute.
-* *Controller.* Deals with business logic, calculating the output data for the View to render (in this case, twig).  Utilises Mappers and Models.
-* *Supporting Classes.* Additional high-cohesion classes that contains lower-level details, hiding this from the main Controller methods.
+* *Controller.* Provides details about the web request to business logic contained in Supporting Classes. Controller arranges the output data for the View to render (in this case, twig). 
+* *Supporting Classes.* Additional high-cohesion classes that contains lower-level details, hiding this from the main Controller methods. Utilises Mappers and Models.
 * *Mapper.* A database abstraction. Gets data out of the database into objects and vice versa. Typically contains other database queries that are commonly used.
 * *Model.* A representation of a concept or idea. They don't do persistent work in the database, but you can ask them about their properties and relations and other relevant calculations.
 * *View.* Renders the output of the Controller method so the user can see it in their browser.
