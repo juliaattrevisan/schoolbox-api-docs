@@ -215,7 +215,13 @@ class Controller extends Base
 
         $comment->setOwner($this->getUser());
         $comment->setBlog($blog);
-        $comment->setBody($this->getRequest()->post['body']);
+        // Comments must not be empty
+        if (trim($this->getRequest()->post["commentBody"])) {
+            $comment->setBody($this->getRequest()->post["commentBody"]);
+        } else {
+            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        }
+        
         $comment->setCreatedAt(\Alaress_Date_Format::now());
         $this->getEportfolioBlogCommentMapper()->save($comment);
 

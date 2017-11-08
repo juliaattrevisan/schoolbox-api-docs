@@ -8,7 +8,15 @@
 *                                                           *
 ************************************************************/
 
-//Function for handling error conditions
+/**
+ * Function for handling error conditions
+ * @deprecated 17.5
+ * @see Schoolbox\Error\Mapper::generateException()
+ *
+ * @param $ec
+ * @param $message
+ * @param $code
+ */
 function error($ec, $message="", $code = 400) {
     /** @var Schoolbox\Application\WebRequest\Kernel $kernel */
     global $kernel;
@@ -28,6 +36,8 @@ function error($ec, $message="", $code = 400) {
 
 /**
  * Uses superglobals to ascertain whether or not a file was attempted upload, but failed
+ * @deprecated 17.5
+ * 
  * @return bool
  */
 function upload_failed() {
@@ -40,6 +50,8 @@ function upload_failed() {
 
 /**
  * An HTTP-sensitive way to send a plaintext failure response.
+ * @deprecated 17.5
+ *
  * @param $code - the HTTP code to send
  * @param $message - if numeric, will be looked up in the error table on the DB, otherwise displayed as-is
  */
