@@ -14,12 +14,34 @@ You should be able to read method names and get a general idea of what is going 
 
 > One of the primary reasons to look at a Controller method is because we're pursuing a specific behaviour to change. The easier it is to find this, the better our lives become.
 
-## 2.2 Error Handling
+## 2.3 Superglobals
+We don't directly access the superglobals `$_SESSION`, `$_GET` and `$_POST` because we can't mock these out with test data and also presumes a lot about where this data came from. Instead, there are accessor methods which provide an abstraction. 
+
+> Use the abstractions to access contents of superglobals $_SESSION, $_GET and $_POST and pass those to Supporting Classes instead of accessing them directly.
+
+## 2.3.1 Session Superglobal
+Don't reference `$_SESSION` directly. This is very difficult to test and not great when on the command line. Instead, you can use `$this->getSession()->set()` and `$this->getSession()->get()` methods.
+
+## 2.3.2 GET Superglobal
+Querystring parameters can be obtained using the `$this->getRequest()->query` array instead. To access a particular querystring parameter `cat`, you can use
+
+```php
+$this->getRequest()->query['cat']
+```
+
+## 2.3.3 POST Superglobal
+POST parameters can be obtained using the `$this->getRequest()->post` array instead. To access a particular POST parameter `cat`, you can use
+
+```php
+$this->getRequest()->post['cat']
+```
+
+## 2.4 Error Handling
 Controllers are also primarily responsible for handling of error states that can't be foreseen or computed by Module. There are a couple of ways to do it in the current codebase, but the preferred approach is to throw an exception. See *1.4 Error Handling* for implementation example.
 
 Don't `die()` or `exit()` in Controllers - you should `return` instead (unless you're debugging or exploring)
 
-## 2.3 Corresponding Route Docblock
+## 2.5 Corresponding Route Docblock
 In Module we can see which Controller method is executed from a particular Route, but the converse isn't so obvious. To alleviate the need to manually cross-reference, we can use a docblock `@api` to state which Route is relevant to a particular Controller method.
 
 ```php
