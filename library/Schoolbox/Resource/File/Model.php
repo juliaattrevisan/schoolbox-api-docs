@@ -12,6 +12,7 @@ namespace Schoolbox\Resource\File;
 
 use Alaress_Date_Format;
 use Schoolbox\Resource\AbstractFile;
+use Schoolbox\Resource\Folder;
 
 /**
  * Class Model
@@ -19,6 +20,7 @@ use Schoolbox\Resource\AbstractFile;
  * The SBFS File Model. Represents a file within SBFS.
  *
  * @package Schoolbox\Resource\File
+ * @method Folder\Model getFolder()
  */
 class Model extends AbstractFile
 {
