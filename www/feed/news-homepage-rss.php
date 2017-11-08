@@ -91,11 +91,11 @@ if (strlen($userKey)) {
             );
 
                 $page->parse('rss_item_block', 'rss_item', true);
-            }
         }
     } else {
         $page->setVar('rss_item_block', '');
     }
+
 } else {
     error(31);
 }
