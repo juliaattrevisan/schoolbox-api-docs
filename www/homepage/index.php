@@ -171,13 +171,6 @@ if ($virtualPermission >= WRITE_ACCESS) {
     } else {
         $this->setVar('course_actions_block', '');
     }
-    // Render link to markbook and criteria management if user is staff
-    if ($this->getDi()->get('session')->get('user')->getRole()->isStaff()) {
-        $this->parse('class_mark_block', 'class_mark');
-        $hasClassActions = true;
-    } else {
-        $this->setVar('class_mark_block', '');
-    }
 
     if (Cfg::get('homepage_enable_colour')) {
         $this->parse('homepage_color_selector_block', 'homepage_color_selector');
