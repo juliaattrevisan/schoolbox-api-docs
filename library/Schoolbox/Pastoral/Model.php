@@ -431,11 +431,11 @@ class Model implements ISoftDeletable
     }
     
     /**
-     * @param User $modifiedByDisplay
+     * @param User|null $modifiedByDisplay
      *
      * @return self
      */
-    public function setModifiedByDisplay(User $modifiedByDisplay)
+    public function setModifiedByDisplay(?User $modifiedByDisplay = null)
     {
         $this->modifiedByDisplay = $modifiedByDisplay;
 
@@ -461,7 +461,7 @@ class Model implements ISoftDeletable
      *
      * @return self
      */
-    public function setModifiedBy(User $modifiedBy = null)
+    public function setModifiedBy(?User $modifiedBy = null)
     {
         $this->modifiedBy = $modifiedBy;
 
