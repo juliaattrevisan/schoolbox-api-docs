@@ -16,6 +16,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
+use Schoolbox\Pastoral\Attachment\Model as PastoralAttachment;
 use Schoolbox\Pastoral\Authorizer\Rule\IsCommentOwner;
 use Schoolbox\Pastoral\Authorizer\Rule\IsInAudience;
 use Schoolbox\Pastoral\Authorizer\Rule\IsOwner;
@@ -24,7 +25,6 @@ use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
-use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
@@ -280,25 +280,13 @@ class Module extends BaseModule
                 }
             }
 
-            // Load attachment
-
-            if (array_key_exists('attachmentId', $params)) {
-                try {
-                    /** @var PastoralAttachmentMapper $pastoralAttachmentMapper */
-                    $pastoralAttachmentMapper = $this->getMapperFactory()->get(PastoralAttachmentMapper::class);
-
-                    $injectedValues['attachment'] = $pastoralAttachmentMapper->findById($params['attachmentId']);
-                } catch (MapperException $e) {
-                }
-            }
-
             // Load pastoral record and associated access details
 
             if (array_key_exists('recordId', $params)) {
                 try {
                     // TODO make current user easily available in path matcher
                     /** @var DataSource $pastoralDataSource */
-                    $pastoralDataSource       = $this->getInjector()->get('pastoralDataSource');
+                    $pastoralDataSource = $this->getInjector()->get('pastoralDataSource');
 
                     /** @var User $user */
                     $user = $this->getInjector()->get('user');
@@ -312,6 +300,21 @@ class Module extends BaseModule
                     /** @var ErrorMapper $errorMapper */
                     $errorMapper = $this->getMapperFactory()->get(ErrorMapper::class);
                     throw $errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+                }
+
+                // Load attachment (if requested) out of item
+                // Pastoral data source has already filtered out attachments I can't view
+
+                if (array_key_exists('attachmentId', $params)) {
+
+                    $attachment = $injectedValues['record']->getAttachments()->getBy('id', $params['attachmentId']);
+                    if ($attachment instanceof PastoralAttachment) {
+                        $injectedValues['attachment'] = $attachment;
+                    } else {
+                        /** @var ErrorMapper $errorMapper */
+                        $errorMapper = $this->getMapperFactory()->get(ErrorMapper::class);
+                        throw $errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_PERM_RECORD);
+                    }
                 }
             }
 
