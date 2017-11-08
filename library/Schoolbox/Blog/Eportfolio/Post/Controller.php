@@ -209,7 +209,7 @@ class Controller extends Base
     public function postCommentInsert(EportfolioBlogModel $blog)
     {
         // Comments must not be empty
-        if (trim($this->getRequest()->post["commentBody"])) {
+        if (strlen(trim($this->getRequest()->post["commentBody"]))) {
             // Create the comment and save
 
             /** @var EportfolioBlogCommentModel $comment */
