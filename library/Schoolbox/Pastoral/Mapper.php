@@ -785,7 +785,6 @@ class Mapper extends BaseMapper
 
         /** @var Model $record */
         foreach ($results as $result) {
-            PastoralAuditMapper::save($auditRecord);
             $searchResults[] = $result->getId();
         }
 
