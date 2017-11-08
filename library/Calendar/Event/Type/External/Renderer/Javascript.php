@@ -6,6 +6,7 @@
  * @copyright Copyright 2017, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+
 namespace Calendar\Event\Type\External\Renderer;
 
 class Javascript extends Base
@@ -31,7 +32,7 @@ class Javascript extends Base
             $classes[] = 'type' . $this->event->getType();
 
             $event = array(
-                'title'     => $this->event->getTitle(),
+                'title'     => \Scrub::text($this->event->getTitle()),
                 'start'     => $this->event->getStartTime()->getDatabase(),
                 'end'       => $this->event->getEndTime()->getDatabase(),
 
@@ -83,11 +84,11 @@ class Javascript extends Base
                         'status'        => $hasStatus,
                         'listButton'    => $hasListButton,
                         'requestButton' => $hasAttendanceRequestButton,
-                    )
-                )
+                    ),
+                ),
             );
 
-            return json_encode($event) . ',';
+            return json_encode($event, JSON_PARTIAL_OUTPUT_ON_ERROR) . ',';
         }
     }
 
