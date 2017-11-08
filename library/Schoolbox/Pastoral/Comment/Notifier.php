@@ -43,7 +43,7 @@ class Notifier extends AbstractModuleNotifier
     /** @var PastoralGroupMapper $pastoralGroupMapper */
     protected $pastoralGroupMapper;
 
-    /** @var Mapper $pastoralMapper */
+    /** @var PastoralMapper $pastoralMapper */
     protected $pastoralMapper;
 
     /** @var RoleMapper $roleMapper */
