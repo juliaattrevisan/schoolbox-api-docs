@@ -1,7 +1,7 @@
 # 2 Responsibilities of Controller 
 The bulk of business logic occurs in the Controller methods. This accepts the items provided by Module (if applicable) and performs operations or analyses on them, preparing the output for twig to render. 
 
-> Controllers are arrangers and organisers of information, like a foreman at a construction site - they don't do the dirty work themselves.
+> Controllers are arrangers and organisers of information, like a foreman at a construction site - they don't do the dirty work themselves, instead delegating as much as possible to Supporting Classes.
  
 We deliberately choose which data to provide to twig. Twig has the ability to execute public methods on whatever objects are provided; sometimes these public methods include database calls that weren't intended for rendering purposes. Unbenownst to front-end developers, they might be making expensive database calls - getting a parent of a user is an example. This is a good reason for Models to be quite dumb but we'll get to that shortly.  
 

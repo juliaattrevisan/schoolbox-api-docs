@@ -16,7 +16,7 @@ This is a collection of takeaways from each of the sections, distilled from thei
 * To prevent unnecessary logic from executing, we also prefer to error out as early as possible.
 
 ## 7.2 Summary of Controller
-* Controllers are arrangers and organisers of information, like a foreman at a construction site - they don't do the dirty work themselves.
+* Controllers are arrangers and organisers of information, like a foreman at a construction site - they don't do the dirty work themselves, instead delegating as much as possible to Supporting Classes.
 
 * When possible, abstract away low-level details into other classes which can then be reused in various ways elsewhere. This segregation of details also helps prevent you making inadvertent changes that fly under the radar.
  
