@@ -42,8 +42,8 @@ class Mapper extends BaseMapper
      *
      * @param Model $model
      */
-    public function deleteGroupMembers(Model $model) {
-
+    public function deleteGroupMembers(Model $model)
+    {
         // Delete members from group
 
         $this->getJoinMapper('members')->deleteByColumn('group_id', $model->getId());

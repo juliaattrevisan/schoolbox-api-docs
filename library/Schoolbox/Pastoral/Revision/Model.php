@@ -16,11 +16,13 @@ class Model extends Pastoral
 
     /**
      * @param int $rootId
+     *
      * @return self
      */
     public function setRootId($rootId)
     {
         $this->rootId = $rootId;
+
         return $this;
     }
 

@@ -28,7 +28,7 @@ use Schoolbox\News\TopicMapper;
 use Schoolbox\WebDav\Mapper as WebDavMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
-use Schoolbox\Pastoral\Category\Mapper as PastoralCategoryMapper;
+use Schoolbox\Pastoral\SubType\Mapper as PastoralCategoryMapper;
 use Schoolbox\Pastoral\DocumentClassification\Mapper as PastoralDocumentClassificationMapper;
 use Timetable_ColourMapper;
 

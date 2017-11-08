@@ -12,11 +12,12 @@ namespace Schoolbox\Pastoral\Tag;
 use PDO;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\User;
-use Schoolbox\Pastoral\Tag\Model as PastoralTag;
+use Schoolbox\Mapper\UsableAsTagSource as UsableAsTagSource;
 use Schoolbox\Pastoral\Model as Pastoral;
+use Schoolbox\Pastoral\Tag\Model as PastoralTag;
+use Schoolbox\User;
 
-class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
+class Mapper extends BaseMapper implements UsableAsTagSource
 {
     /**
      * Setup mapper
@@ -35,7 +36,7 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
     /**
      * Assign a pastoral tag to a pastoral record
      *
-     * @param Pastoral $pastoral
+     * @param Pastoral    $pastoral
      * @param PastoralTag $tag
      */
     public function assignToRecord(Pastoral $pastoral, PastoralTag $tag)
@@ -46,7 +47,7 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
 
         $statement->execute([
             'pastoralId' => $pastoral->getId(),
-            'tagId' => $tag->getId()
+            'tagId'      => $tag->getId(),
         ]);
     }
 
@@ -54,13 +55,14 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
      * Find out if a pastoral tag is associated with a pastoral record
      *
      * @param Pastoral $pastoral
-     * @param array $tagNames
+     * @param array    $tagNames
+     *
      * @return bool
      */
     public function isAssociatedWith(Pastoral $pastoral, $tagNames)
     {
         if (count($tagNames)) {
-            $count = 0;
+            $count            = 0;
             $namePlaceholders = '';
 
             $bindings = ['pastoralId' => $pastoral->getId()];
@@ -70,7 +72,7 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
                     $namePlaceholders .= ", ";
                 }
 
-                $namePlaceholders .= ":name_{$count}";
+                $namePlaceholders           .= ":name_{$count}";
                 $bindings[":name_{$count}"] = $tagName;
 
                 $count++;
@@ -85,6 +87,7 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
             ");
 
             $statement->execute($bindings);
+
             return $statement->fetchColumn() > 0;
         }
 
@@ -95,6 +98,7 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
      * Find a collection of tags associated with pastoral record
      *
      * @param Pastoral $pastoral
+     *
      * @return Collection
      */
     public function findForRecord($pastoral)
@@ -148,10 +152,11 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
     /**
      * Find pastoral tags that contain the specified keyword
      *
-     * @param User $user
+     * @param User   $user
      * @param string $keyword
-     * @param int $offset
-     * @param int $limit
+     * @param int    $offset
+     * @param int    $limit
+     *
      * @return Collection
      */
     public function findForTag(User $user, $keyword, $offset = 0, $limit = 0)

@@ -7,16 +7,19 @@
 
 namespace Schoolbox\Pastoral;
 
+use Alaress_Date_Format;
+use Schoolbox\Collection;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
-use Schoolbox\Collection;
-use Schoolbox\ISoftDeletable;
-use Schoolbox\Pastoral\Category\Model as PastoralCategory;
+use Schoolbox\Pastoral\SubType\Model as PastoralSubType;
+use Schoolbox\Pastoral\Revision\Model as PastoralRevision;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\Type\Model as PastoralType;
 use Schoolbox\User;
+use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 
 class Model implements ISoftDeletable
 {
@@ -25,35 +28,25 @@ class Model implements ISoftDeletable
     use UpdatedAtDate;
     use DeletedAtDate;
 
-    /**
-     * Identifier of corresponding SIS record. NULL if none.
-     *
-     * @var null|int
-     */
+    /** @var Alaress_Date_Format $updatedAtDisplay The date this record, or any of its accessible comments were last updated */
+    private $updatedAtDisplay;
+
+    /** @var User $modifiedByDisplay The person that last modified the record, or any of its accessible comments */
+    private $modifiedByDisplay;
+
+    /** @var null|int Identifier of corresponding SIS record. NULL if none. */
     private $externalId;
 
-    /**
-     * Null if does not have a parent.
-     *
-     * @var null|Model
-     */
+    /** @var null|Model Null if does not have a parent. */
     private $parent;
 
     /**@var PastoralType */
     protected $type;
 
-    /**
-     * AKA 'sub-type'. Optional.
-     *
-     * @var null|PastoralCategory
-     */
-    private $category;
+    /** @var null|PastoralSubType Optional */
+    private $subtype;
 
-    /**
-     * Optional. Will be NULL if admin has configured 'pastoral_severity' to off.
-     *
-     * @var null|PastoralSeverity
-     */
+    /** @var null|PastoralSeverity Optional. Will be NULL if admin has configured 'pastoral_severity' to off. */
     private $severity;
 
     /** @var User */
@@ -62,8 +55,14 @@ class Model implements ISoftDeletable
     /** @var string */
     protected $heading;
 
+    /** @var bool */
+    protected $private;
+
     /** @var string */
-    protected $body;
+    protected $bodyPrivate;
+
+    /** @var string */
+    protected $bodyPublic;
 
     /** @var null|float */
     protected $points;
@@ -71,11 +70,7 @@ class Model implements ISoftDeletable
     /** @var User */
     protected $owner;
 
-    /**
-     * Null if imported from SIS
-     *
-     * @var null|User
-     */
+    /** @var null|User Null if imported from SIS */
     private $modifiedBy;
 
     /** @var Collection|Access\Model[] */
@@ -93,16 +88,41 @@ class Model implements ISoftDeletable
     /** @var Collection|Model[] */
     private $relatedRecords;
 
-    /** @var Collection|Revision\Model[] */
+    /** @var Collection|PastoralRevision[] */
     private $revisions;
 
     /**
-     * @param  Collection|Access\Model[] $access
-     * @return $this
+     * Has this record already been filtered? If so, it should not be filtered
+     * again.
+     *
+     * (This is an unmapped property.)
+     *
+     * @var bool
+     */
+    private $filtered = false;
+
+    /**
+     * Model constructor
+     */
+    public function __construct()
+    {
+        $this->access = new Collection();
+        $this->comments = new Collection();
+        $this->attachments = new Collection();
+        $this->tags = new Collection();
+        $this->relatedRecords = new Collection();
+        $this->revisions = new Collection();
+    }
+
+    /**
+     * @param Collection|Access\Model[] $access
+     *
+     * @return self
      */
     public function setAccess(Collection $access)
     {
         $this->access = $access;
+
         return $this;
     }
 
@@ -115,12 +135,14 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param  Collection|Tag\Model[] $tags
-     * @return $this
+     * @param Collection|Tag\Model[] $tags
+     *
+     * @return self
      */
     public function setTags(Collection $tags)
     {
         $this->tags = $tags;
+
         return $this;
     }
 
@@ -133,30 +155,54 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param string $body
+     * @param string|null $bodyPrivate
+     *
      * @return self
      */
-    public function setBody($body)
+    public function setBodyPrivate($bodyPrivate)
     {
-        $this->body = $body;
+        $this->bodyPrivate = $bodyPrivate;
+
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getBody()
+    public function getBodyPrivate()
     {
-        return $this->body;
+        return $this->bodyPrivate;
+    }
+
+    /**
+     * @param string|null $bodyPublic
+     *
+     * @return self
+     */
+    public function setBodyPublic($bodyPublic)
+    {
+        $this->bodyPublic = $bodyPublic;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getBodyPublic()
+    {
+        return $this->bodyPublic;
     }
 
     /**
      * @param string $heading
+     *
      * @return self
      */
     public function setHeading($heading)
     {
         $this->heading = $heading;
+
         return $this;
     }
 
@@ -170,11 +216,13 @@ class Model implements ISoftDeletable
 
     /**
      * @param float $points
+     *
      * @return self
      */
     public function setPoints($points)
     {
         $this->points = $points;
+
         return $this;
     }
 
@@ -188,11 +236,13 @@ class Model implements ISoftDeletable
 
     /**
      * @param Collection|Comment\Model[] $comments
-     * @return $this
+     *
+     * @return self
      */
     public function setComments(Collection $comments)
     {
         $this->comments = $comments;
+
         return $this;
     }
 
@@ -214,21 +264,25 @@ class Model implements ISoftDeletable
 
     /**
      * @param Collection|Attachment\Model[] $attachments
-     * @return $this
+     *
+     * @return self
      */
     public function setAttachments(Collection $attachments)
     {
         $this->attachments = $attachments;
+
         return $this;
     }
 
     /**
      * @param null|int $externalId
+     *
      * @return self
      */
     public function setExternalId($externalId)
     {
         $this->externalId = $externalId;
+
         return $this;
     }
 
@@ -242,11 +296,13 @@ class Model implements ISoftDeletable
 
     /**
      * @param PastoralType $type
+     *
      * @return self
      */
     public function setType(PastoralType $type)
     {
         $this->type = $type;
+
         return $this;
     }
 
@@ -259,30 +315,34 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param null|PastoralCategory $category
-     * @return $this
+     * @param null|PastoralSubType $subtype
+     *
+     * @return self
      */
-    public function setCategory(PastoralCategory $category = null)
+    public function setSubType(PastoralSubType $subtype = null)
     {
-        $this->category = $category;
+        $this->subtype = $subtype;
+
         return $this;
     }
 
     /**
-     * @return null|PastoralCategory
+     * @return null|PastoralSubType
      */
-    public function getCategory()
+    public function getSubType()
     {
-        return $this->category;
+        return $this->subtype;
     }
 
     /**
      * @param null|Model $parent
+     *
      * @return self
      */
     public function setParent(Model $parent = null)
     {
         $this->parent = $parent;
+
         return $this;
     }
 
@@ -296,11 +356,13 @@ class Model implements ISoftDeletable
 
     /**
      * @param null|PastoralSeverity $severity
+     *
      * @return self
      */
     public function setSeverity(PastoralSeverity $severity = null)
     {
         $this->severity = $severity;
+
         return $this;
     }
 
@@ -314,11 +376,13 @@ class Model implements ISoftDeletable
 
     /**
      * @param User $student
+     *
      * @return self
      */
     public function setStudent(User $student)
     {
         $this->student = $student;
+
         return $this;
     }
 
@@ -332,11 +396,13 @@ class Model implements ISoftDeletable
 
     /**
      * @param User $owner
+     *
      * @return self
      */
     public function setOwner(User $owner)
     {
         $this->owner = $owner;
+
         return $this;
     }
 
@@ -349,12 +415,66 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param null|User $modifiedBy
-     * @return $this
+     * @param Alaress_Date_Format $updatedAtDisplay
+     *
+     * @return self
      */
-    public function setModifiedBy(User $modifiedBy = null)
+    public function setUpdatedAtDisplay(Alaress_Date_Format $updatedAtDisplay)
+    {
+        $this->updatedAtDisplay = $updatedAtDisplay;
+
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getUpdatedAtDisplay()
+    {
+        // If this has not been calculated fall back to the records updated_at date
+
+        if ($this->updatedAtDisplay === null) {
+            return $this->updatedAt;
+        }
+
+        return $this->updatedAtDisplay;
+    }
+    
+    /**
+     * @param User|null $modifiedByDisplay
+     *
+     * @return self
+     */
+    public function setModifiedByDisplay(?User $modifiedByDisplay = null)
+    {
+        $this->modifiedByDisplay = $modifiedByDisplay;
+
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getModifiedByDisplay()
+    {
+        // If this has not been set fall back to the last record modifier
+
+        if ($this->modifiedByDisplay === null) {
+            return $this->modifiedBy;
+        }
+
+        return $this->modifiedByDisplay;
+    }
+
+    /**
+     * @param null|User $modifiedBy
+     *
+     * @return self
+     */
+    public function setModifiedBy(?User $modifiedBy = null)
     {
         $this->modifiedBy = $modifiedBy;
+
         return $this;
     }
 
@@ -364,15 +484,17 @@ class Model implements ISoftDeletable
     public function getModifiedBy()
     {
         return $this->modifiedBy;
-    }    
+    }
 
     /**
      * @param Collection|Model[] $relatedRecords
-     * @return $this
+     *
+     * @return self
      */
     public function setRelatedRecords(Collection $relatedRecords)
     {
         $this->relatedRecords = $relatedRecords;
+
         return $this;
     }
 
@@ -387,18 +509,68 @@ class Model implements ISoftDeletable
     /**
      * @return Collection
      */
-    public function getRevisions() {
+    public function getRevisions()
+    {
         return $this->revisions;
     }
 
     /**
-     * @param Collection|Revision\Model[] $revisions
-     * @return $this
+     * @param Collection|PastoralRevision[] $revisions
+     *
+     * @return self
      */
     public function setRevisions(Collection $revisions)
     {
         $this->revisions = $revisions;
+
         return $this;
     }
 
+    /**
+     * Return the specified users access level to this record
+     *
+     * @param User $user
+     * @return int
+     */
+    public function getAccessLevel(User $user)
+    {
+        $accessLevel = PastoralAccessMapper::ACCESS_DENY;
+
+        foreach ($this->getAccess() as $access) {
+            $accessLevelCurrent = $access->getAccessLevel($user);
+
+            if ($accessLevelCurrent === null) {
+                // The access rule didn't apply to this user, continue to the next one
+                continue;
+            }
+
+            if ($accessLevelCurrent == PastoralAccessMapper::ACCESS_DENY) {
+                return PastoralAccessMapper::ACCESS_DENY;
+            }
+
+            // We want the highest access level
+
+            $accessLevel = max($accessLevel, $accessLevelCurrent);
+        }
+
+        return $accessLevel;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFiltered(): bool
+    {
+        return $this->filtered;
+    }
+
+    /**
+     * @param bool $filtered
+     * @return static
+     */
+    public function setFiltered($filtered)
+    {
+        $this->filtered = $filtered;
+        return $this;
+    }
 }

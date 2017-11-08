@@ -8,12 +8,13 @@
 namespace Schoolbox\Pastoral\Group;
 
 use Schoolbox\Collection;
-use Schoolbox\User;
-use Schoolbox\Mapper\Traits\Model\Id;
-use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
-use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
-use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Pastoral\Group\Member\Model as PastoralGroupMember;
+use Schoolbox\User;
 
 class Model implements ISoftDeletable
 {
@@ -31,17 +32,19 @@ class Model implements ISoftDeletable
      * @var User $user
      */
     protected $user;
-    
-    /** @var Collection|Member\Model[] $members */
+
+    /** @var Collection|PastoralGroupMember[] $members */
     protected $members;
 
     /**
      * @param string $name
+     *
      * @return self
      */
     public function setName($name)
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -55,11 +58,13 @@ class Model implements ISoftDeletable
 
     /**
      * @param User $user
+     *
      * @return self
      */
     public function setUser(User $user)
     {
         $this->user = $user;
+
         return $this;
     }
 
@@ -72,17 +77,18 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Collection|Member\Model[] $members
+     * @param Collection|PastoralGroupMember[] $members
      * @return self
      */
     public function setMembers(Collection $members)
     {
         $this->members = $members;
+
         return $this;
     }
 
     /**
-     * @return Collection|Member\Model[]
+     * @return Collection|PastoralGroupMember[]
      */
     public function getMembers()
     {

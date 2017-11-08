@@ -9,6 +9,7 @@ namespace Schoolbox\Pastoral\Severity;
 
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Pastoral;
+use UnexpectedValueException;
 
 class Mapper extends BaseMapper
 {
@@ -28,14 +29,14 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteCheckPastoralRecords']);
     }
 
-
     /**
      * Pre-soft-delete callback to ensure there are no
      * non-soft-deleted pastoral records with this severity.
      *
      * @param Model $severity
+     *
      * @return bool
-     * @throws \UnexpectedValueException If pastoral records exists with this severity
+     * @throws UnexpectedValueException If pastoral records exists with this severity
      */
     public function softDeleteCheckPastoralRecords(Model $severity)
     {
@@ -46,10 +47,11 @@ class Mapper extends BaseMapper
 
         $countRecords = $pastoralRecordMapper->countByPredicates($pb);
         if ($countRecords) {
-            throw new \UnexpectedValueException(
+            throw new UnexpectedValueException(
                 sprintf('Cannot delete Severity Model. %d non-deleted pastoral records still linked', $countRecords)
             );
         }
+
         return true;
     }
 }

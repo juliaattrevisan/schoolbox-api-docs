@@ -7,8 +7,8 @@
 ) }}
 
 <script>
-    $(function() {
-        $('[data-report-dashboard]').click(function() {
+    $(function () {
+        $('[data-report-dashboard]').click(function () {
             $.post('{{ routeLookup('pastoralReportBuilder.postReportDashboardModify') }}', {
                 reportId: $(this).attr('data-report-dashboard'),
                 display: $(this).prop('checked') === true ? 1 : 0
@@ -32,7 +32,8 @@
         </div>
     </div>
     <nav>
-        <a href="{{ routeLookup('pastoralReportBuilder.getReportInsert') }}" class="icon-add" title="New {{ locale.pastoral.proper }} Report"></a>
+        <a href="{{ routeLookup('pastoralReportBuilder.getReportInsert') }}" class="icon-add"
+           title="New {{ locale.pastoral.proper }} Report"></a>
     </nav>
 </div>
 
@@ -73,10 +74,13 @@
                                {% if report.dashboard %}checked{% endif %}
                                data-report-dashboard="{{ report.id }}"
                                type="checkbox">
-                        <label for="report-dashboard-{{ report.id }}" class="input-toggle" title="Show report on dashboard">
+                        <label for="report-dashboard-{{ report.id }}" class="input-toggle"
+                               title="Show report on dashboard">
                             <span class="icon-star alert"></span>
                         </label>
-                        <a class="icon-modify no-text" href="{{ routeLookup('pastoralReportBuilder.getReportUpdate', {reportId: report.id}) }}" title="Modify Report"></a>
+                        <a class="icon-modify no-text"
+                           href="{{ routeLookup('pastoralReportBuilder.getReportUpdate', {reportId: report.id}) }}"
+                           title="Modify Report"></a>
                         <a class="icon-delete no-text" data-delete="{{ report.id }}" href="#" title="Delete Report"></a>
                     </nav>
                 </li>
@@ -85,10 +89,10 @@
             {% if found == 1 %}
                 </ul>
                 </section>
-                {% include '@pastoralReportBuilder/fragments/reportEmpty.twig' with {hidden: 1} %}
+                {% include '@pastoralReportBuilder/report_empty.twig' with {hidden: 1} %}
 
             {% else %}
-                {% include '@pastoralReportBuilder/fragments/reportEmpty.twig' %}
+                {% include '@pastoralReportBuilder/report_empty.twig' %}
             {% endif %}
 
             {% set found = 0 %}
@@ -98,7 +102,9 @@
                 {% if loop.first %}
 
                     {% set found = 1 %}
-                    <h2 class="subheader">Shared Reports<span data-tooltip title="These reports have been shared with you based on your {{ locale.pastoral }} group membership" class="hint has-tip tip-top">?</span></h2>
+                    <h2 class="subheader">Shared Reports<span data-tooltip
+                                                              title="These reports have been shared with you based on your {{ locale.pastoral }} group membership"
+                                                              class="hint has-tip tip-top">?</span></h2>
 
                     <section>
                     <ul id="studentsList" class="information-list">
@@ -125,7 +131,8 @@
                                {% if report.dashboard %}checked{% endif %}
                                data-report-dashboard="{{ report.id }}"
                                type="checkbox">
-                        <label for="report-dashboard-{{ report.id }}" class="input-toggle" title="Show report on dashboard">
+                        <label for="report-dashboard-{{ report.id }}" class="input-toggle"
+                               title="Show report on dashboard">
                             <span class="icon-star alert"></span>
                         </label>
                     </nav>
@@ -139,14 +146,14 @@
 
         {% else %}
 
-            {% include '@pastoralReportBuilder/fragments/reportEmpty.twig' %}
+            {% include '@pastoralReportBuilder/report_empty.twig' %}
 
         {% endif %}
     </div>
 </div>
 
 <script>
-    $(function() {
+    $(function () {
         $('[data-delete]').click(function (e) {
             e.preventDefault();
 
@@ -159,13 +166,13 @@
                     var route = '{{ routeLookup('pastoralReportBuilder.postReportDelete', {'reportId': '_reportId'}) }}';
 
                     $.post(route.replace(/_reportId/g, reportId))
-                    .done(function () {
-                        li.remove();
+                        .done(function () {
+                            li.remove();
 
-                        if ($('[data-delete]').length == 0) {
-                            $('.empty-state').removeClass('hide');
-                        }
-                    });
+                            if ($('[data-delete]').length == 0) {
+                                $('.empty-state').removeClass('hide');
+                            }
+                        });
                 }
             });
         });

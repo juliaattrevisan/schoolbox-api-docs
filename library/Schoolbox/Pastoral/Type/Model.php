@@ -9,12 +9,12 @@
 namespace Schoolbox\Pastoral\Type;
 
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Pastoral\DocumentClassification\Model as DocumentClassification;
 
-class Model implements ISoftDeletable {
-
+class Model implements ISoftDeletable
+{
     use Id;
     use DeletedAtDate;
 
@@ -29,49 +29,61 @@ class Model implements ISoftDeletable {
 
     /**
      * @param DocumentClassification $documentClassification
+     *
      * @return self
      */
-    public function setDocumentClassification($documentClassification) {
+    public function setDocumentClassification($documentClassification)
+    {
         $this->documentClassification = $documentClassification;
+
         return $this;
     }
 
     /**
      * @return DocumentClassification
      */
-    public function getDocumentClassification() {
+    public function getDocumentClassification()
+    {
         return $this->documentClassification;
     }
 
     /**
      * @param string $name
+     *
      * @return self
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
+
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
     /**
      * @param string $externalCode
+     *
      * @return self
      */
-    public function setExternalCode($externalCode) {
+    public function setExternalCode($externalCode)
+    {
         $this->externalCode = $externalCode;
+
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getExternalCode() {
+    public function getExternalCode()
+    {
         return $this->externalCode;
     }
 }

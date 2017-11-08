@@ -1,0 +1,215 @@
+{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+{# Pastoral Roles Access #}
+{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+
+{% if roles | length > 0 %}
+
+    <tbody id="permission-roles">
+
+        {% if record.id != '' %}
+            {% for userAccess in record.access if userAccess.role.id != '' %}
+                {# Work out which radio should be checked for each row #}
+                {% set checkedDeny = '' %}
+                {% set checkedPublic = '' %}
+                {% set checkedPrivate = '' %}
+
+                {% if userAccess.role_id == role.id %}
+                    {% if userAccess.access == 0 %}
+                        {% set checkedDeny = 'checked' %}
+                    {% elseif userAccess.access == 1 %}
+                        {% set checkedPublic = 'checked' %}
+                    {% elseif userAccess.access == 2 %}
+                        {% set checkedPrivate = 'checked' %}
+                    {% endif %}
+                {% endif %}
+
+                <tr data-role-id="{{ userAccess.role.id }}">
+                    <td class="small-2">
+                        Pastoral Role
+                    </td>
+                    <td class="small-3">
+                        {{ userAccess.role.name }}
+                    </td>
+                    <td class="small-2">
+                        <input type="radio" name="role[{{ userAccess.role.id }}]" id="roleDeny{{ userAccess.role.id }}"
+                               value="0" {{ checkedDeny }}>
+                        <label class="radio-label" for="roleDeny{{ userAccess.role.id }}"></label>
+                    </td>
+                    <td class="small-2">
+                        <input type="radio" name="role[{{ userAccess.role.id }}]" id="rolePublic{{ userAccess.role.id }}"
+                               value="1" {{ checkedPublic }}>
+                        <label class="radio-label" for="rolePublic{{ userAccess.role.id }}"></label>
+                    </td>
+                    <td class="small-2">
+                        <input type="radio" name="role[{{ userAccess.role.id }}]" id="rolePrivate{{ userAccess.role.id }}"
+                               value="2" {{ checkedPrivate }}>
+                        <label class="radio-label" for="rolePrivate{{ userAccess.role.id }}"></label>
+                    </td>
+                    <td class="text-right small-1">
+                        <a href="#" data-delete-visibility="role" class="icon-delete"></a>
+                    </td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+
+    </tbody>
+
+    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+    {# Setup Role Selection Modal #}
+    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+
+    <div id="modal-role" class="reveal-modal" data-reveal role="dialog">
+        <h2>Add Pastoral Role</h2>
+        <section>
+            <ul class="information-list">
+                {% for role in roles %}
+                    <li data-role-add="{{ role.id }}" data-role-name="{{ role.name }}">
+                        <a class="list-item link-row">
+                            <div class="card small-12">
+                                <i class="icon-group alert size-32"></i>
+                                <p>{{ role.name }}</p>
+                                <p class="meta">
+                                    System Role
+                                    ({{ roleUsers[role.id] }} {% if roleUsers[role.id] == 1 %}User{% else %}Users{% endif %})
+                                    {% if role.isParent %}
+                                        <br />(Only {{ record.student.firstName }}'s parents will be able to view this record.)
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+
+    <script>
+        $(function () {
+            {# Setup click events #}
+
+            function updateRolePermissionsClick() {
+
+                {# There is an annoying glitch that clicking a checkbox doesn't actually update the 'checked' markup #}
+                {# and so when we add a new role to the table some Javascript somewhere goes and updates the state #}
+                {# of the radio buttons to whichever value was 'checked' on page load. So, we need to update the #}
+                {# check attribute in the DOM for all radio buttons in the clicked group #}
+
+                $('#table-permission').find('.radio-label').click(function() {
+                    var clickedElement = $("#" + $(this).attr('for'));
+                    var radioGroupSelector = 'input[name*="' + clickedElement.attr('name') + '"]';
+
+                    {# Uncheck all radio buttons in the group #}
+
+                    $(radioGroupSelector).removeAttr('checked');
+
+                    {# Check the one that was clicked #}
+
+                    $(clickedElement).attr('checked', 'true');
+                });
+
+                $('[data-delete-visibility="role"]').click(function (e) {
+                    e.preventDefault();
+
+                    var row = $(this).closest('tr');
+                    var roleId = $(row).attr('data-role-id');
+
+                    $('[data-reveal]').hide();
+
+                    $(this).confirmDialog({
+                        text: 'Are you sure you wish to remove the pastoral roles visibility record?',
+                        confirmEvent: function () {
+                            window.rolesAdded[roleId] = false;
+                            row.remove();
+                            updateRolesModal();
+                            updateVisibility();
+                        }
+                    });
+                });
+            }
+
+            {# Enable/Disable add pastoral role button depending on if there are any more roles available to add #}
+
+            function updateRolesModal() {
+                var tableRolesAdded = $('[data-role-id]');
+
+                $("[data-role-add]").removeClass('hide');
+
+                if (tableRolesAdded.length > 1) {
+                    tableRolesAdded.each(function () {
+                        var roleId = $(this).attr('data-role-id');
+
+                        if (roleId !== '{ID}') {
+                            if (window.rolesAdded[roleId] === true) {
+                                $("[data-role-add=" + roleId + "]").addClass('hide');
+                            } else {
+                                $("[data-role-add=" + roleId + "]").removeClass('hide');
+                            }
+                        }
+                    });
+                }
+
+                var roleModalButtons = $("[data-reveal-id='modal-role']");
+
+                if ($("[data-role-add]:not(.hide)").length === 0) {
+                    roleModalButtons.attr('disabled', 'true');
+                } else {
+                    roleModalButtons.removeAttr('disabled');
+                }
+            }
+
+            {# Add role to table #}
+
+            $('[data-role-add]').click(function (e) {
+                e.preventDefault();
+
+                var roleId = $(this).attr('data-role-add');
+                var roleName = $(this).attr('data-role-name');
+
+                if (window.rolesAdded[roleId] !== true) {
+                    $('#empty-roles').remove();
+
+                    html = $('[data-role-permission-clone]').html()
+                        .replace(/{NAME}/g, roleName)
+                        .replace(/{ID}/g, roleId);
+
+                    window.rolesAdded[roleId] = true;
+
+                    var permissionListRoles = $('#permission-roles');
+                    permissionListRoles.html(permissionListRoles.html() + html);
+                }
+
+                $(this).addClass('hide');
+
+                updateRolePermissionsClick();
+                updateRolesModal();
+                updateVisibility();
+
+                var remaining = 0;
+
+                $("[data-role-add]").each(function () {
+                    if (!$(this).hasClass('hide')) {
+                        remaining++;
+                    }
+                });
+
+                if (remaining === 0) {
+                    $('#modal-role').foundation('reveal', 'close');
+                }
+            });
+
+            {# Initial setup #}
+
+            window.rolesAdded = [];
+
+            {% for userAccess in record.access if userAccess.role.id != '' %}
+                window.rolesAdded[{{ userAccess.role.id }}] = true;
+            {% endfor %}
+
+            updateRolePermissionsClick();
+            updateRolesModal();
+            updateVisibility();
+        });
+    </script>
+
+{% endif %}

@@ -1,0 +1,17 @@
+{% import '@pastoral/macros/profile.twig' as profile %}
+
+<section>
+    <ul id="studentsList" class="information-list">
+        {% for student in students %}
+            <li>
+                <div class="card small-12">
+                    <a href='{{ routeLookup('pastoral.getStudent', {studentId: student.id}) }}'>
+                        {{ profile.imageSquare64(student) }}
+                        <h3>{{ student.fullName }}</h3>
+                    </a>
+                    <p class="meta">{{ student.role.name }}</p>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+</section>

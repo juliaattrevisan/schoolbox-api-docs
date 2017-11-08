@@ -44,6 +44,10 @@ use Schoolbox\MapperFactory;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Notif\SilentNotif;
+use Schoolbox\Pastoral\DataSource as PastoralDataSource;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Pastoral\Revision\DataSource as PastoralRevisionDataSource;
+use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
@@ -473,6 +477,16 @@ abstract class AbstractBootstrap implements BootstrapInterface
                         )
                     );
 
+                    $twig->addFunction(
+                        new Twig_SimpleFunction(
+                            'getGuid',
+                            function() {
+                                mt_srand((double)microtime() * 10000);
+                                return strtoupper(md5(uniqid((string)rand(), true)));
+                            }
+                        )
+                    );
+
                     $twig->addFunction(new Twig_SimpleFunction('routeLookupIfAuthorized', $di->get('templateEngine:routeLookupIfAuthorized')));
 
                     return $twig;
@@ -794,6 +808,23 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     $assessmentDataSource = $di->get('assessmentDataSource');
                     return new Calendar_Api_Factory($assessmentDataSource, $databaseExternal);
                 }
+            )
+        );
+
+        // Pastoral Care data source
+        // TODO consider moving into a module's dependencies?
+        $di->set(
+            'pastoralDataSource',
+            $di->lazyNew(
+                PastoralDataSource::class,
+                ['mapper' => $mapperFactory->getLazy(PastoralMapper::class)]
+            )
+        );
+        $di->set(
+            'pastoralRevisionDataSource',
+            $di->lazyNew(
+                PastoralRevisionDataSource::class,
+                ['mapper' => $mapperFactory->getLazy(PastoralRevisionMapper::class)]
             )
         );
 

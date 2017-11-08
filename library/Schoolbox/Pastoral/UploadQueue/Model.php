@@ -14,7 +14,6 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Pastoral\Model as Pastoral;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage\IStorage;
 
 class Model implements ISoftDeletable
@@ -47,33 +46,41 @@ class Model implements ISoftDeletable
 
     /**
      * @param Pastoral $pastoral
+     *
      * @return self
      */
-    public function setPastoral($pastoral) {
+    public function setPastoral($pastoral)
+    {
         $this->pastoral = $pastoral;
+
         return $this;
     }
 
     /**
      * @param IStorage $storage
+     *
      * @return self
      */
-    public function setStorage($storage) {
+    public function setStorage($storage)
+    {
         $this->storage = $storage;
+
         return $this;
     }
 
     /**
      * @return IStorage
      */
-    public function getStorage() {
+    public function getStorage()
+    {
         return $this->storage;
     }
 
     /**
      * @return Pastoral
      */
-    public function getPastoral() {
+    public function getPastoral()
+    {
         return $this->pastoral;
     }
 
@@ -87,11 +94,13 @@ class Model implements ISoftDeletable
 
     /**
      * @param int $externalId
+     *
      * @return self
      */
     public function setExternalId($externalId)
     {
         $this->externalId = $externalId;
+
         return $this;
     }
 
@@ -105,21 +114,25 @@ class Model implements ISoftDeletable
 
     /**
      * @param int $studentExternalId
+     *
      * @return self
      */
     public function setStudentExternalId($studentExternalId)
     {
         $this->studentExternalId = $studentExternalId;
+
         return $this;
     }
 
     /**
      * @param string $status
+     *
      * @return self
      */
     public function setStatus($status)
     {
         $this->status = $status;
+
         return $this;
     }
 
@@ -133,11 +146,13 @@ class Model implements ISoftDeletable
 
     /**
      * @param string $message
+     *
      * @return self
      */
     public function setMessage($message)
     {
         $this->message = $message;
+
         return $this;
     }
 
@@ -151,11 +166,13 @@ class Model implements ISoftDeletable
 
     /**
      * Upload this file to Synergetic DocMan
+     *
      * @returns int
      */
     public function uploadPastoralDocument()
     {
         $pastoralExternal = new External_Pastoral();
+
         return $pastoralExternal->uploadPastoralDocument($this);
     }
 }

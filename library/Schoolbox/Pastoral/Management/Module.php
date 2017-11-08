@@ -7,25 +7,22 @@
 
 namespace Schoolbox\Pastoral\Management;
 
-use Alaress\Authorizer\Authorizer;
-use Alaress\Authorizer\Rule;
+use Alaress\Authorizer\Rule\HasServicePermission;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Pastoral\Authorizer\Rule\IsPastoralModeratorWrite;
+use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Group\Mapper as GroupMapper;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
-use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
-use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
-use Schoolbox\Role;
+use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\UserMapper;
 use Twig_Loader_Chain;
 
 // These mappers are injected into controllers where required
-
-use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
@@ -41,22 +38,17 @@ class Module extends BaseModule
     {
         // Define routes and permissions
 
-        $ruleStaff = new Rule\HasRole(Role::STAFF);
-        $rulePastoralModeratorWrite = new Rule\All(
-            $ruleStaff,
-            new Rule\IsLoggedIn(),
-            new IsPastoralModeratorWrite()
-        );
+        $permissionPastoralModeratorWrite = new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE);
 
         $this->registerRoutesArray([
-            'GET' => [
-                '/groups' => ['getGroups' => $rulePastoralModeratorWrite],
-                '/groups/modify{/groupId}' => ['getGroupsModify' => $rulePastoralModeratorWrite],
+            'GET'  => [
+                '/groups'                  => ['getGroups' => $permissionPastoralModeratorWrite],
+                '/groups/modify{/groupId}' => ['getGroupsModify' => $permissionPastoralModeratorWrite],
             ],
             'POST' => [
-                '/groups/delete' => ['postGroupsDelete' => $rulePastoralModeratorWrite],
-                '/groups/modify' => ['postGroupsModify' => $rulePastoralModeratorWrite],
-            ]
+                '/groups/delete' => ['postGroupsDelete' => $permissionPastoralModeratorWrite],
+                '/groups/modify' => ['postGroupsModify' => $permissionPastoralModeratorWrite],
+            ],
         ]);
     }
 
@@ -66,12 +58,12 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $mappers = [
-            'userMapper' => UserMapper::getInstance(),
-            'pastoralMapper' => PastoralMapper::getInstance(),
+            'userMapper'             => UserMapper::getInstance(),
+            'pastoralMapper'         => PastoralMapper::getInstance(),
             'pastoralSeverityMapper' => PastoralSeverityMapper::getInstance(),
-            'pastoralTypeMapper' => PastoralTypeMapper::getInstance(),
-            'pastoralAccessMapper' => PastoralAccessMapper::getInstance(),
-            'pastoralTagMapper' => PastoralTagMapper::getInstance()
+            'pastoralTypeMapper'     => PastoralTypeMapper::getInstance(),
+            'pastoralAccessMapper'   => PastoralAccessMapper::getInstance(),
+            'pastoralTagMapper'      => PastoralTagMapper::getInstance(),
         ];
 
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));
@@ -92,7 +84,6 @@ class Module extends BaseModule
     {
         $this->addRoutePreload($matcher, '.*',
             function ($params) {
-
                 $returnArray = [];
 
                 // Load group record
@@ -100,7 +91,7 @@ class Module extends BaseModule
                 if (array_key_exists('groupId', $params)) {
                     try {
                         /** @var GroupMapper $groupMapper */
-                        $groupMapper = $this->getMapperFactory()->get(GroupMapper::class);
+                        $groupMapper          = $this->getMapperFactory()->get(GroupMapper::class);
                         $returnArray['group'] = $groupMapper->findById($params['groupId']);
                     } catch (MapperException $e) {
                     }

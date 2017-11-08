@@ -1,0 +1,39 @@
+{% import '@pastoral/macros/profile.twig' as profile %}
+
+<h2 class="subheader">Create Duplicate Record</h2>
+
+<section>
+    <fieldset class="content">
+        <div class="small-12 columns">
+            <label>
+                Select Students
+                <span class="hint has-tip tip-top" data-tooltip title="This will create a duplicate entry on each selected students {{ locale.pastoral }} record.">?</span>
+                <select id="addStudent" name="duplicate_id[]" multiple placeholder="Enter Student Names"></select>
+            </label>
+
+            {% if record.relatedRecords | length %}
+                <label>Existing Duplicate Records</label>
+                <ul class="action-list">
+                    {% for related in record.relatedRecords %}
+                        <li class="actions-small-1">
+                            <div class="list-item">
+                                <div class="small-12 card wrap-down">
+                                    <a href="{{ profile.link(related.student) }}">{{ profile.imageSquare64(related.student) }}</a>
+                                    <p>
+                                        <a title="View Record" href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': related.student.id, 'recordId': related.id}) }}">
+                                            {{ related.heading }}
+                                        </a>
+                                    </p>
+                                    <p class="meta">{{ related.student.fullName }}</p>
+                                    <p>
+                                        Posted by <a href="{{ profile.link(related.owner) }}">{{ related.owner.fullName }}</a> {{ related.createdAt.relativeDay }}
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </fieldset>
+</section>

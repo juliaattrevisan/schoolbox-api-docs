@@ -15,6 +15,14 @@ use Schoolbox\User;
 interface External_PastoralInterface
 {
     /**
+     * Returns the pastoral record if found in remote system
+     *
+     * @param PastoralModel $pastoral
+     * @return array
+     */
+    public function getPastoral(PastoralModel $pastoral);
+
+    /**
      * Import pastoral care records from external SIS
      *
      * @param User $user Schoolbox user doing the import
@@ -25,28 +33,12 @@ interface External_PastoralInterface
     public function importPastoral(User $user, User $defaultOwner, $importParentAccess);
 
     /**
-     * Returns the pastoral record if found in remote system
-     *
-     * @param PastoralModel $pastoral
-     * @return array
-     */
-    public function getPastoral(PastoralModel $pastoral);
-
-    /**
-     * Creates a new pastoral record in the remote system
+     * Sync a schoolbox pastoral record with the remote system
      *
      * @param PastoralModel $pastoral
      * @return bool
      */
-    public function createPastoral(PastoralModel $pastoral);
-
-    /**
-     * Updates an existing pastoral record
-     *
-     * @param PastoralModel $pastoral
-     * @return bool
-     */
-    public function updatePastoral(PastoralModel $pastoral);
+    public function syncPastoral(PastoralModel $pastoral);
 
     /**
      * Deletes an existing pastoral record

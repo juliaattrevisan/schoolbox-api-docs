@@ -1,7 +1,8 @@
 <?php
 /**
- * Pastoral care access control. This allows the user to audience a pastoral care record to individual users, system
- * roles and user defined pastoral care groups.
+ * Pastoral care access control
+ *
+ * This allows the user to audience a pastoral care record to individual users, roles and user defined pastoral groups
  *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
@@ -10,20 +11,31 @@
 
 namespace Schoolbox\Pastoral\Access;
 
+use PDO;
 use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Pastoral\Group\Mapper as GroupMapper;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
-use Schoolbox\UserMapper;
 use Schoolbox\RoleMapper;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 /**
+ * Class Mapper
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ *
+ * @package Schoolbox\Pastoral\Access
  */
 class Mapper extends BaseMapper
 {
+    // Define record access levels
+
+    const ACCESS_DENY = 0;                      // Deny trumps all other access to allow exclusion of a user/group/role
+    const ACCESS_PUBLIC = 1;
+    const ACCESS_PRIVATE = 2;
+
     /**
      * Setup mapper
      */
@@ -32,6 +44,7 @@ class Mapper extends BaseMapper
         $this->hasTable('pastoral_access');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('access', self::TYPE_INTEGER);
         $this->joins('pastoral_id', PastoralMapper::class, 'id', null, null, 'pastoral', 'pastoral');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->joins('role_id', RoleMapper::class, 'id', null, null, 'role', 'role');
@@ -48,10 +61,9 @@ class Mapper extends BaseMapper
      */
     protected function getSelectString()
     {
-        /* Intentionally does not join onto soft-deleted strong entities.
-         * eg, If an access is for a User, and user is soft-deleted, the no access model
-         * should be fetched.
-         */
+        // Intentionally does not join onto soft-deleted strong entities
+        // (e.g. An access is for a User, and user is soft-deleted)
+
         return "
 			SELECT      {$this->getColumnString()},
                         {$this->getJoinColumnString('role', 'r')},
@@ -66,42 +78,47 @@ class Mapper extends BaseMapper
 
     /**
      * @param PDOStatement $statement
+     *
      * @throws Exception
      * @return GenericCollection
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $c = $this->createCollection();
+        $results = $this->createCollection();
 
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             // The record must have a user, role or group specified
 
             if (empty($row['u.id']) && empty($row['r.id']) && empty($row['g.id'])) {
-                // This record is invalid as it doesn't specify any of these, so don't bother adding to array
                 continue;
             }
 
             $access = $this->hydrate($row);
 
+            // Hydrate user
+
             if (!empty($row['u.id'])) {
-                /** @noinspection PhpParamsInspection */
-                $access->setUser($this->hydrateJoin($row, 'user', 'u'));
+                /** @var User $user */
+                $user = $this->hydrateJoin($row, 'user', 'u');
+                $user->setRole = $this->getJoinMapper('role')->findByIdWithFallback($user->getRole()->getId());
+                $access->setUser($user);
             }
 
+            // Hydrate role
+
             if (!empty($row['r.id'])) {
-                /** @noinspection PhpParamsInspection */
                 $access->setRole($this->hydrateJoin($row, 'role', 'r'));
             }
 
+            // Hydrate group
+
             if (!empty($row['g.id'])) {
-                /** @noinspection PhpParamsInspection */
                 $access->setGroup($this->hydrateJoin($row, 'group', 'g'));
             }
 
-            $c->add($access);
+            $results->add($access);
         }
 
-        return $c;
+        return $results;
     }
 }

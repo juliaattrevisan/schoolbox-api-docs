@@ -1,0 +1,402 @@
+{% macro modal(guid, title, placeholder, roles, studentId, callbackAdded, callbackClosed, minimumSearchLength, errorNoResults, errorSearchLength) %}
+
+    {# Create search modal #}
+
+    <div data-reveal class="reveal-modal tiny" id="userSearchModal{{ guid }}">
+
+        <h2>{{ title | default('Search Users') }}</h2>
+        <input id="userSearch{{ guid }}" placeholder="{{ title | default('Enter name') }}" maxlength="50"/>
+
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+        {# Container for search results #}
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+
+        <div class="row {% if members | length == 0 %}hide{% endif %}" id="searchResultsContainerRow{{ guid }}">
+            <div class="small-12">
+                <section id="searchResultsContainer{{ guid }}">
+                    <ul class="information-list" id="searchResults{{ guid }}"></ul>
+                </section>
+            </div>
+        </div>
+
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+        {# Displayed when there are no users left that aren't already in the group, or the search result returned nothing #}
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+
+        <div id="searchResultsEmpty{{ guid }}" class="hide">
+            <div class="empty-state">
+                <p>{{ errorNoResults | default('No users were found matching your search.') }}</p>
+            </div>
+        </div>
+
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+        {# Displayed when search string is too short #}
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+
+        <div id="searchResultsLength{{ guid }}" class="hide">
+            <div class="empty-state">
+                <p>{{ errorSearchLength | default('Your search must be at least ' ~ (minimumSearchLength | default(2)) ~ ' characters.') }}</p>
+            </div>
+        </div>
+
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+        {# Preloader displayed while AJAX request is running #}
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+
+        <div id="searchResultsPending{{ guid }}" class="loader hide"></div>
+
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+
+    </div>
+
+    {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+    {# This is the HTML that will be cloned for each user in the search results. #}
+    {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+
+    {#
+        {ID}            - Schoolbox user ID
+        {EXTERNALID}    - External user ID
+        {NAME}          - The users name in the format 'Zane Smith - Teachers (165)'
+        {FIRSTNAME}     - Users first name
+        {LASTNAME}      - Users last name
+        {ROLE}          - Users role
+    #}
+
+    {# This is only inside a <ul> to stop storm complaining about there being an <li> floating on its own #}
+
+    <ul data-user-clone="{{ guid }}" class="hide">
+        <li>
+            <!--suppress HtmlUnknownTarget -->
+            <a data-user-add="{{ guid }}" data-user-id="{ID}" class="list-item link-row">
+                <div class="card small-12">
+                    {# Have hardcoded the image size, and a background color so the list heights don't change as images pop in #}
+                    <img style="background-color:#c6c6c6;width:64px;height:64px;" height="64" width="64" src="/portrait.php?userId={EXTERNALID}&size=square64" alt="{NAME}" title="{NAME}">
+                    <p>{FIRSTNAME} {LASTNAME}</p>
+                    <p class="meta">{ROLE}</p>
+                </div>
+            </a>
+        </li>
+    </ul>
+
+    <script>
+
+        $(function () {
+
+            if (window.addClickEvent === undefined) {
+                window.addClickEvent = [];
+            }
+
+            if (window.userAdded === undefined) {
+                window.userAdded = [];
+            }
+
+            window.userAdded['{{ guid }}'] = [];
+
+            {# Shut storm up with its duplicate selector bitching #}
+
+            var searchResults = $('#searchResults{{ guid }}');
+            var searchResultsEmpty = $('#searchResultsEmpty{{ guid }}');
+            var searchResultsContainer = $('#searchResultsContainer{{ guid }}');
+            var searchResultsContainerRow = $('#searchResultsContainerRow{{ guid }}');
+            var searchResultsPending = $('#searchResultsPending{{ guid }}');
+            var searchTooShort = $('#searchResultsLength{{ guid }}');
+
+            var userSearch = $('#userSearch{{ guid }}');
+
+            {# This is a cache of AJAX responses indexed by the search string that generated it them to prevent duplicate requests #}
+
+            var ajaxCache = [];
+
+            {# The search modal only displays the top 5 search results from any search. This is used to store any additional records that matched the
+               search, and as users are added items the HTML will be popped off this array until all of the results have potentially been added #}
+
+            var additionalHtmlResults = [];
+
+            {# This stores each of the users details found as a result of the search indexed by their ID number. This is used to generate the HTML
+               on the main page when a user is clicked and added to the group members list #}
+
+            window.userCache = [];
+            window.userCache['{{ guid }}'] = [];
+
+            {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+            {# Trigger display of search modal #}
+            {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+
+            $('[data-user-search="{{ guid }}"]').click(function (e) {
+                e.preventDefault();
+
+                {# Every time the modal is displayed restore it to its default state #}
+
+                userSearch.val('');
+                searchResults.removeClass('hide');
+                searchResultsContainer.addClass('hide');
+                searchResultsContainerRow.addClass('hide');
+                searchResultsEmpty.addClass('hide');
+                searchTooShort.addClass('hide');
+
+                {# Display it #}
+
+                $('#userSearchModal{{ guid }}').foundation('reveal', 'open');
+            });
+
+            {# After the search modal is revealed automatically highlight the search box #}
+
+            $(document).on('opened.fndtn.reveal', '#userSearchModal{{ guid }}', function () {
+                userSearch.focus();
+            });
+
+            {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+            {# Render search results as list items in modal #}
+            {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+
+            function updateSearchResults(results) {
+
+                {# Clear any previous search results displayed #}
+
+                searchResults.html('');
+                searchTooShort.addClass('hide');
+
+                {# Check if we got any results #}
+
+                if (results === undefined) {
+
+                    {# Nothing was found, display an empty state #}
+
+                    searchResultsEmpty.removeClass('hide');
+                    searchResultsContainer.addClass('hide');
+                    searchResultsContainerRow.addClass('hide');
+
+                } else {
+
+                    {# Clear additional search results HTML #}
+
+                    additionalHtmlResults = [];
+
+                    {# Cound the number of results we display so we don't blow the modal up too much #}
+
+                    var countFound = 0;
+
+                    for (var i = 0; i < results.length; i++) {
+
+                        {# Cache the user so we don't have to search for them again this page load cycle #}
+
+                        window.userCache['{{ guid }}'][results[i].id] = results[i];
+
+                        {# Only action this person if they're not already in the group #}
+
+                        if (window.userAdded['{{ guid }}'].indexOf(results[i].id) == -1) {
+
+                            {# Create the HTML markup for the user in the search results #}
+
+                            //noinspection JSUnresolvedVariable
+                            var html = $('[data-user-clone="{{ guid }}"]').html()
+                                .replace(/{NAME}/g, results[i].name)
+                                .replace(/{ID}/g, results[i].id)
+                                .replace(/{ROLE}/g, results[i].role)
+                                .replace(/{FIRSTNAME}/g, results[i].first_name)
+                                .replace(/{LASTNAME}/g, results[i].last_name)
+                                .replace(/{EXTERNALID}/g, results[i].external_id);
+
+                            {# Maximum number of search results #}
+
+                            if (countFound < 5) {
+
+                                {# Add to the HTML to the list of users on screen #}
+
+                                searchResults.html(searchResults.html() + html);
+
+                            } else {
+
+                                {# We've already got 5 users, store this HTML for display only after the user adds one of the existing displayed results #}
+
+                                additionalHtmlResults.push(html)
+                            }
+
+                            countFound++;
+                        }
+                    }
+
+                    if (countFound === 0) {
+
+                        {# Couldn't find any more users to be added #}
+
+                        {# Hide preloader #}
+
+                        searchResultsPending.addClass('hide');
+
+                        {# Display empty state#}
+
+                        searchResultsEmpty.removeClass('hide');
+
+                    } else {
+
+                        {# Found people matching the search #}
+
+                        {# Hide preloader #}
+
+                        searchResultsPending.addClass('hide');
+
+                        {# Hide empty state if it was visible #}
+
+                        searchResultsEmpty.addClass('hide');
+
+                        {# Show search results #}
+
+                        searchResultsContainer.removeClass('hide');
+                        searchResultsContainerRow.removeClass('hide');
+                    }
+                }
+
+                {# Wire up the event to add members to the group list #}
+
+                $('[data-user-add="{{ guid }}"]').click(window.addClickEvent['{{ guid }}']);
+            }
+
+            {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+            {# Trigger AJAX request on keypress in the search box #}
+            {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+
+            userSearch.on('input propertychange paste', function () {
+
+                {# Grab the search text #}
+
+                var searchText = $(this).val();
+
+                {# Clear any previously pending AJAX request that hasn't fired #}
+
+                if (window.userSearchTimeout{{ guid }} !== undefined) {
+                    clearTimeout(window.userSearchTimeout{{ guid }});
+                    delete window.userSearchTimeout{{ guid }};
+                }
+
+                {# If we've already retrieved this search don't bother AJAX'ing to get the result again #}
+
+                if (ajaxCache[searchText.toLowerCase()] !== undefined) {
+
+                    {# Already found the results for this search, just use the old one #}
+
+                    updateSearchResults(ajaxCache[searchText.toLowerCase()]);
+
+                } else if (searchText.length >= {{ minimumSearchLength | default(2) }}) {
+
+                    {# Clear previous search results from the dialog and display preloader while we wait for the AJAX request to fire #}
+
+                    searchResults.html('');
+                    searchResultsEmpty.addClass('hide');
+                    searchResultsPending.removeClass('hide');
+                    searchTooShort.addClass('hide');
+
+                    {# Because we don't want to overload the server, only do the search every 250 milliseconds #}
+
+                    window.userSearchTimeout{{ guid }} = setTimeout(function () {
+
+                        {# Do AJAX search #}
+
+                        $.get('/ajax/user.php', {
+
+                            query: searchText,
+                            studentId: '{{ studentId }}',
+                            roleTypeID: '{{ roles | default('staff') }}'
+
+                        }).done(function (data) {
+
+                            {# Cache the search results so we don't have to AJAX for them again #}
+
+                            ajaxCache[searchText.toLowerCase()] = data;
+
+                            updateSearchResults(ajaxCache[searchText.toLowerCase()]);
+
+                        }).error(function () {
+
+                            {# Something went wrong searching for this, invalidate any previous result so it can be searched for again #}
+
+                            delete ajaxCache[searchText.toLowerCase()];
+
+                            updateSearchResults();
+                        });
+
+                        {# May want to tweak this value depending on how fast people in the real world type #}
+
+                    }, 250);
+
+                } else {
+
+                    {# Search was too short, display the empty state #}
+
+                    searchResults.html('');
+                    searchResultsEmpty.addClass('hide');
+                    searchTooShort.removeClass('hide');
+                }
+            });
+
+            {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+            {# This is the click event that gets added to search results, this adds them to the group members list #}
+            {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+
+            window.addClickEvent['{{ guid }}'] = function () {
+
+                {# Grab the ID of the person we are adding to the group #}
+
+                var id = parseInt($(this).attr('data-user-id'));
+
+                {# Add the selected members ID to the array we use when saving to the database #}
+
+                window.userAdded['{{ guid }}'].push(window.userCache['{{ guid }}'][id]);
+
+                {# Add them to the list of members in the HTML #}
+
+                //noinspection JSUnresolvedVariable
+
+                var html = $('[data-user-clone="{{ guid }}"]').html()
+                    .replace(/{NAME}/g,         window.userCache['{{ guid }}'][id].name)
+                    .replace(/{ID}/g,           window.userCache['{{ guid }}'][id].id)
+                    .replace(/{ROLE}/g,         window.userCache['{{ guid }}'][id].role)
+                    .replace(/{FIRSTNAME}/g,    window.userCache['{{ guid }}'][id].first_name)
+                    .replace(/{LASTNAME}/g,     window.userCache['{{ guid }}'][id].last_name)
+                    .replace(/{EXTERNALID}/g,   window.userCache['{{ guid }}'][id].external_id);
+
+                {# Remove the search result from the list #}
+
+                $(this).closest('li').remove();
+
+                {# If there were more results we weren't displaying, add the next one to the list #}
+
+                if (additionalHtmlResults.length > 0) {
+
+                    searchResults.html(searchResults.html() + additionalHtmlResults[0]);
+                    additionalHtmlResults.shift();
+
+                    {# Add click event to this new search result #}
+
+                    $('[data-user-add="{{ guid }}"]').click(window.addClickEvent['{{ guid }}']);
+                }
+
+                {# If there are no results left display the empty state #}
+
+                if (additionalHtmlResults.length === 0 && searchResults.html().trim() === '') {
+                    searchResultsEmpty.removeClass('hide');
+                }
+
+                {# Put focus back on the search box so they can keep typing #}
+
+                userSearch.focus();
+
+                {# Execute requested callback #}
+
+                {% if callbackAdded is not empty %}
+                    {{ callbackAdded }}(window.userCache['{{ guid }}'][id]);
+                {% endif %}
+            }
+
+            {# When the modal closes call the requested callback function #}
+
+            {% if callbackClosed is not empty %}
+                $(document).on('closed.fndtn.reveal', '#userSearchModal{{ guid }}[data-reveal]', function () {
+                    {{ callbackClosed }}(window.userAdded['{{ guid }}']);
+                });
+            {% endif %}
+        });
+
+    </script>
+
+{% endmacro %}

@@ -1,0 +1,32 @@
+{% import '@pastoral/macros/profile.twig' as profile %}
+
+{% if record.relatedRecords | length %}
+    <div class="row">
+        <div class="small-12 {% if record.relatedRecords | length %}medium-6{% endif %} island">
+            <h2 class="subheader">Linked Student Records</h2>
+            <section>
+                <ul class="action-list">
+                    {% for related in record.relatedRecords %}
+                        {% if related.student.id != record.student.id %}
+                            <li>
+                                <div class="small-12 card wrap-down">
+                                    <a href="{{ profile.link(related.student) }}">{{ profile.imageSquare64(related.student) }}</a>
+                                    <p>
+                                        <a title="View Record" href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': related.student.id, 'recordId': related.id}) }}">
+                                            {{ related.heading }}
+                                        </a>
+                                    </p>
+                                    <p class="meta">{{ related.student.fullName }}</p>
+                                    <p>
+                                        Posted by <a href="{{ profile.link(related.owner) }}">{{ related.owner.fullName }}</a>
+                                        <span title="{{ related.createdAt.short }}">{{ related.createdAt.relativeDay }}</span>
+                                    </p>
+                                </div>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </section>
+        </div>
+    </div>
+{% endif %}

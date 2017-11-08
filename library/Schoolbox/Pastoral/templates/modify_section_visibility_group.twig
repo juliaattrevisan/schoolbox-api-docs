@@ -1,0 +1,211 @@
+{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+{# Pastoral Groups Access #}
+{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+
+{% if groups | length > 0 %}
+
+    <tbody id="permission-groups">
+
+        {% if record.id != '' %}
+            {% for userAccess in record.access if userAccess.group.id != '' %}
+                {# Work out which radio should be checked for each row #}
+
+                {% set checkedDeny = '' %}
+                {% set checkedPublic = '' %}
+                {% set checkedPrivate = '' %}
+
+                {% if userUserAccess.group.id == group.id %}
+                    {% if userUserAccess.access == 0 %}
+                        {% set checkedDeny = 'checked' %}
+                    {% elseif userUserAccess.access == 1 %}
+                        {% set checkedPublic = 'checked' %}
+                    {% elseif userUserAccess.access == 2 %}
+                        {% set checkedPrivate = 'checked' %}
+                    {% endif %}
+                {% endif %}
+
+                <tr data-group-id="{{ userAccess.group.id }}">
+                    <td class="small-2">
+                        Pastoral Group
+                    </td>
+                    <td class="small-3">
+                        {{ userAccess.group.name }}
+                    </td>
+                    <td class="small-2">
+                        <input type="radio" name="group[{{ userAccess.group.id }}]" id="groupDeny{{ userAccess.group.id }}"
+                               value="0" {{ checkedDeny }}>
+                        <label class="radio-label" for="groupDeny{{ userAccess.group.id }}"></label>
+                    </td>
+                    <td class="small-2">
+                        <input type="radio" name="group[{{ userAccess.group.id }}]" id="groupPublic{{ userAccess.group.id }}"
+                               value="1" {{ checkedPublic }}>
+                        <label class="radio-label" for="groupPublic{{ userAccess.group.id }}"></label>
+                    </td>
+                    <td class="small-2">
+                        <input type="radio" name="group[{{ userAccess.group.id }}]" id="groupPrivate{{ userAccess.group.id }}"
+                               value="2" {{ checkedPrivate }}>
+                        <label class="radio-label" for="groupPrivate{{ userAccess.group.id }}"></label>
+                    </td>
+                    <td class="text-right small-1">
+                        <a href="#" data-delete-visibility="group" class="icon-delete"></a>
+                    </td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+    </tbody>
+
+    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+    {# Setup Group Selection Modal #}
+    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+
+    <div id="modal-group" class="reveal-modal" data-reveal role="dialog">
+        <h2>Add Pastoral Group</h2>
+        <section>
+            <ul class="information-list">
+                {% for group in groups %}
+                    <li data-group-add="{{ group.id }}" data-group-name="{{ group.name }}">
+                        <a class="list-item link-row">
+                            <div class="card small-12">
+                                <i class="icon-group alert size-32"></i>
+                                <p>{{ group.name }}</p>
+                                <p class="meta">Pastoral Group ({{ group.members | length }} Users)</p>
+                            </div>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+
+    <script>
+        $(function () {
+            {# Setup click events #}
+
+            function updateGroupPermissionsClick() {
+                {# There is an annoying glitch that clicking a checkbox doesn't actually update the 'checked' markup #}
+                {# and so when we add a new role to the table some Javascript somewhere goes and updates the state #}
+                {# of the radio buttons to whichever value was 'checked' on page load. So, we need to update the #}
+                {# check attribute in the DOM for all radio buttons in the clicked group #}
+
+                $('#table-permission').find('.radio-label').click(function() {
+                    var clickedElement = $("#" + $(this).attr('for'));
+                    var radioGroupSelector = 'input[name*="' + clickedElement.attr('name') + '"]';
+
+                    {# Uncheck all radio buttons in the group #}
+
+                    $(radioGroupSelector).removeAttr('checked');
+
+                    {# Check the one that was clicked #}
+
+                    $(clickedElement).attr('checked', 'true');
+                });
+
+                $('[data-delete-visibility="group"]').click(function (e) {
+                    e.preventDefault();
+
+                    var row = $(this).closest('tr');
+                    var groupId = $(row).attr('data-group-id');
+
+                    $('[data-reveal]').hide();
+
+                    $(this).confirmDialog({
+                        text: 'Are you sure you wish to remove the pastoral groups visibility record?',
+                        confirmEvent: function () {
+                            window.groupsAdded[groupId] = false;
+                            row.remove();
+                            updateGroupsModal();
+                            updateVisibility();
+                        }
+                    });
+                });
+            }
+
+            {# Enable/Disable add pastoral group button depending on if there are any more groups available to add #}
+
+            function updateGroupsModal()
+            {
+                var tableGroupsAdded = $('[data-group-id]');
+
+                $("[data-group-add]").removeClass('hide');
+
+                if (tableGroupsAdded.length > 1) {
+                    tableGroupsAdded.each(function () {
+                        var groupId = $(this).attr('data-group-id');
+
+                        if (groupId !== '{ID}') {
+                            if (window.groupsAdded[groupId] === true) {
+                                $("[data-group-add=" + groupId + "]").addClass('hide');
+                            } else {
+                                $("[data-group-add=" + groupId + "]").removeClass('hide');
+                            }
+                        }
+                    });
+                }
+
+                var groupModalButtons = $("[data-reveal-id='modal-group']");
+
+                {# Subtracting one for the dummy clone row #}
+
+                if ($("[data-group-add]:not(.hide)").length === 0) {
+                    groupModalButtons.attr('disabled', 'true');
+                } else {
+                    groupModalButtons.removeAttr('disabled');
+                }
+            }
+
+            {# Add group to table #}
+
+            $('[data-group-add]').click(function(e) {
+                e.preventDefault();
+
+                var groupId = $(this).attr('data-group-add');
+                var groupName = $(this).attr('data-group-name');
+
+                if (window.groupsAdded[groupId] !== true) {
+                    $('#empty-groups').remove();
+
+                    html = $('[data-group-permission-clone]').html()
+                        .replace(/{NAME}/g, groupName)
+                        .replace(/{ID}/g, groupId);
+
+                    window.groupsAdded[groupId] = true;
+
+                    var permissionListGroups = $('#permission-groups');
+                    permissionListGroups.html(permissionListGroups.html() + html);
+                }
+
+                $(this).addClass('hide');
+
+                updateGroupPermissionsClick();
+                updateGroupsModal();
+                updateVisibility();
+
+                var remaining = 0;
+
+                $("[data-group-add]").each(function() {
+                    if (!$(this).hasClass('hide')) {
+                        remaining++;
+                    }
+                });
+
+                if (remaining === 0) {
+                    $('#modal-group').foundation('reveal', 'close');
+                }
+            });
+
+            {# Initial setup #}
+
+            window.groupsAdded = [];
+
+            {% for access in record.access if access.group.id != '' %}
+                window.groupsAdded[{{ access.group.id }}] = true;
+            {% endfor %}
+
+            updateGroupPermissionsClick();
+            updateGroupsModal();
+            updateVisibility();
+        });
+    </script>
+
+{% endif %}

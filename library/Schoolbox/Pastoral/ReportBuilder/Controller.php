@@ -9,31 +9,31 @@ namespace Schoolbox\Pastoral\ReportBuilder;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\UserMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Pastoral\Mapper as PastoralMapper;
-use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
-use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
-use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
-use Schoolbox\Pastoral\Tag\Model as PastoralTag;
-use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
-use Schoolbox\Pastoral\Report\Model as PastoralReport;
-use Schoolbox\Pastoral\Report\Dashboard\Mapper as PastoralReportDashboardMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
+use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
-use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
+use Schoolbox\Pastoral\DataSource as PastoralDataSource;
+use Schoolbox\Pastoral\Report\Dashboard\Mapper as PastoralReportDashboardMapper;
+use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
+use Schoolbox\Pastoral\Report\Model as PastoralReport;
+use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
+use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
+use Schoolbox\Pastoral\Tag\Model as PastoralTag;
+use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
     /** @var ErrorMapper $errorMapper */
     private $errorMapper;
 
-    /** @var PastoralMapper $pastoralMapper */
-    private $pastoralMapper;
+    /** @var PastoralDataSource $pastoralDataSource */
+    private $pastoralDataSource;
 
     /** @var PastoralTagMapper $pastoralTagMapper */
     private $pastoralTagMapper;
@@ -49,7 +49,7 @@ class Controller extends Base
 
     /** @var PastoralReportMapper $pastoralReportMapper */
     private $pastoralReportMapper;
-    
+
     /** @var PastoralReportDashboardMapper $pastoralReportDashboardMapper */
     private $pastoralReportDashboardMapper;
 
@@ -64,21 +64,22 @@ class Controller extends Base
 
     /**
      * Constructor
-     * @param ErrorMapper $errorMapper
-     * @param PastoralMapper $pastoralMapper
-     * @param PastoralAccessMapper $pastoralAccessMapper
-     * @param PastoralTagMapper $pastoralTagMapper
-     * @param PastoralTypeMapper $pastoralTypeMapper
-     * @param PastoralSeverityMapper $pastoralSeverityMapper
-     * @param UserMapper $userMapper
-     * @param PastoralGroupMapper $pastoralGroupMapper
-     * @param PastoralGroupMemberMapper $pastoralGroupMemberMapper
-     * @param PastoralReportMapper $pastoralReportMapper
+     *
+     * @param ErrorMapper                   $errorMapper
+     * @param PastoralDataSource            $pastoralDataSource
+     * @param PastoralAccessMapper          $pastoralAccessMapper
+     * @param PastoralTagMapper             $pastoralTagMapper
+     * @param PastoralTypeMapper            $pastoralTypeMapper
+     * @param PastoralSeverityMapper        $pastoralSeverityMapper
+     * @param UserMapper                    $userMapper
+     * @param PastoralGroupMapper           $pastoralGroupMapper
+     * @param PastoralGroupMemberMapper     $pastoralGroupMemberMapper
+     * @param PastoralReportMapper          $pastoralReportMapper
      * @param PastoralReportDashboardMapper $pastoralReportDashboardMapper
      */
     public function __construct(
         ErrorMapper $errorMapper,
-        PastoralMapper $pastoralMapper,
+        PastoralDataSource $pastoralDataSource,
         PastoralAccessMapper $pastoralAccessMapper,
         PastoralTagMapper $pastoralTagMapper,
         PastoralTypeMapper $pastoralTypeMapper,
@@ -89,16 +90,16 @@ class Controller extends Base
         PastoralReportMapper $pastoralReportMapper,
         PastoralReportDashboardMapper $pastoralReportDashboardMapper
     ) {
-        $this->errorMapper = $errorMapper;
-        $this->pastoralMapper = $pastoralMapper;
-        $this->pastoralAccessMapper = $pastoralAccessMapper;
-        $this->pastoralTagMapper = $pastoralTagMapper;
-        $this->pastoralTypeMapper = $pastoralTypeMapper;
-        $this->pastoralSeverityMapper = $pastoralSeverityMapper;
-        $this->userMapper = $userMapper;
-        $this->pastoralGroupMapper = $pastoralGroupMapper;
+        $this->errorMapper               = $errorMapper;
+        $this->pastoralDataSource        = $pastoralDataSource;
+        $this->pastoralAccessMapper      = $pastoralAccessMapper;
+        $this->pastoralTagMapper         = $pastoralTagMapper;
+        $this->pastoralTypeMapper        = $pastoralTypeMapper;
+        $this->pastoralSeverityMapper    = $pastoralSeverityMapper;
+        $this->userMapper                = $userMapper;
+        $this->pastoralGroupMapper       = $pastoralGroupMapper;
         $this->pastoralGroupMemberMapper = $pastoralGroupMemberMapper;
-        $this->pastoralReportMapper = $pastoralReportMapper;
+        $this->pastoralReportMapper          = $pastoralReportMapper;
         $this->pastoralReportDashboardMapper = $pastoralReportDashboardMapper;
     }
 
@@ -109,29 +110,32 @@ class Controller extends Base
     {
         $reportsAll = $this->pastoralReportMapper->findForUser($this->getUser());
 
-        $reportsMine = [];
+        $reportsMine  = [];
         $reportsGroup = [];
 
-        /** @var \Schoolbox\Pastoral\Report\Model $reportCurrent */
+        /** @var PastoralReport $reportCurrent */
         foreach ($reportsAll as $reportCurrent) {
             if ($reportCurrent->getOwner()->getId() == $this->getUser()->getId()) {
                 $reportsMine[] = $reportCurrent;
             } else {
-                $reportsGroup[] = $reportCurrent;
+                if ($reportCurrent->hasAccess($this->getUser())) {
+                    $reportsGroup[] = $reportCurrent;
+                }
             }
         }
 
         // And render this thing out
 
         $this->getResponse()->content->set(
-            array(
+            [
                 'template' => '@pastoralReportBuilder/index.twig',
-                'data' => array(
-                    'user' => $this->getUser(),
-                    'reportsMine' => $reportsMine,
-                    'reportsGroup' => $reportsGroup
-                ),
-            )
+                'data'     => [
+                    'user'         => $this->getUser(),
+                    'reportsMine'  => $reportsMine,
+                    'reportsGroup' => $reportsGroup,
+                ],
+                'title' => 'Pastoral Reports',
+            ]
         );
     }
 
@@ -148,21 +152,22 @@ class Controller extends Base
 
     /**
      * Display report builder page
-     * 
+     *
      * @param PastoralReport $report
      */
     public function getReportUpdate($report)
     {
         // These are required to populate the selectize
-        
+
         // Students
 
         $studentsSelected = [];
 
         foreach ($report->getStudents() as $student) {
             $studentsSelected[] = [
-                'id'    => $student->getId(),
-                'name'  => "{$student->getFullName()} - Year {$student->getYear()} {$student->getRole()->getName()} ({$student->getExternalId()})"
+                'id'   => $student->getId(),
+                'name' => "{$student->getFullName()} - Year {$student->getYear()} {$student->getRole()->getName()} " .
+                    "({$student->getExternalId()})",
             ];
         }
 
@@ -172,8 +177,9 @@ class Controller extends Base
 
         foreach ($report->getAuthors() as $author) {
             $authorsSelected[] = [
-                'id'    => $author->getId(),
-                'name'  => "{$author->getFullName()} - Year {$author->getYear()} {$author->getRole()->getName()} ({$author->getExternalId()})"
+                'id'   => $author->getId(),
+                'name' => "{$author->getFullName()} - Year {$author->getYear()} {$author->getRole()->getName()} " .
+                    "({$author->getExternalId()})",
             ];
         }
 
@@ -183,18 +189,18 @@ class Controller extends Base
 
         foreach ($report->getTags() as $tag) {
             $tagsSelected[] = [
-                'id'    => $tag->getId(),
-                'name'  => $tag->getName()
+                'id'   => $tag->getId(),
+                'name' => $tag->getName(),
             ];
         }
 
         $orders = [
             'student',
             'date',
-            'category',
+            'subtype',
             'author',
             'points',
-            'year'
+            'year',
         ];
 
         // Only show severity if it is enabled by policy
@@ -202,7 +208,7 @@ class Controller extends Base
         if (!$this->getConfigLoader()->get('pastoral_severity')) {
             $severities = [];
         } else {
-            $orders[] = 'severity';
+            $orders[]   = 'severity';
             $severities = $this->pastoralSeverityMapper->findAll()->sortBy('order', 'asc');
         }
 
@@ -214,8 +220,8 @@ class Controller extends Base
 
         try {
             $this->pastoralReportDashboardMapper->findOneByColumnList([
-                'user_id' => $report->getOwner()->getId(),
-                'report_id' => $report->getId()
+                'user_id'   => $report->getOwner()->getId(),
+                'report_id' => $report->getId(),
             ]);
 
             $report->setDashboard(true);
@@ -226,42 +232,48 @@ class Controller extends Base
         // And render this thing out
 
         $this->getResponse()->content->set(
-            array(
+            [
                 'template' => '@pastoralReportBuilder/modify.twig',
-                'data' => [
-                    'moderator'             => $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0,
-                    'years'                 => $this->userMapper->getYearLevels(),
-                    'types'                 => $this->pastoralTypeMapper->findAll()->sortBy('name', 'asc'),
-                    'severities'            => $severities,
-                    'tags'                  => $this->pastoralTagMapper->findAll(),
-                    'groups'                => $this->pastoralGroupMapper->findAll(['order' => ['name' => 'asc']]),
-                    'studentsSelected'      => $studentsSelected,
-                    'authorsSelected'       => $authorsSelected,
-                    'tagsSelected'          => $tagsSelected,
-                    'report'                => $report
-                ]
-            )
+                'data'     => [
+                    'moderator'        => $this->getUser()->getAccessList()->filterBy(
+                            'service',
+                            UserAccess::SERVICE_PASTORAL
+                        )->count() > 0,
+                    'years'            => $this->userMapper->getYearLevels(),
+                    'types'            => $this->pastoralTypeMapper->findAll()->sortBy('name', 'asc'),
+                    'severities'       => $severities,
+                    'tags'             => $this->pastoralTagMapper->findAll(),
+                    'groups'           => $this->pastoralGroupMapper->findAll(['order' => ['name' => 'asc']]),
+                    'studentsSelected' => $studentsSelected,
+                    'authorsSelected'  => $authorsSelected,
+                    'tagsSelected'     => $tagsSelected,
+                    'report'           => $report,
+                ],
+                'title' => 'Pastoral Report',
+            ]
         );
     }
 
     /**
      * Retrieve report of all pastoral records with the selected tag
+     *
      * @param PastoralTag $tag
      */
     public function getReportTags($tag)
     {
-        $records = $this->pastoralMapper->filterForUser($this->pastoralMapper->findByTag($tag), $this->getUser());
+        $records = $this->pastoralDataSource->findByTag($this->getUser(), $tag);
 
         // And spit this thing out
 
         $this->getResponse()->content->set(
-            array(
-                'template' => '@pastoralReportBuilder/reportTags.twig',
-                'data' => array(
-                    'tag'               => $tag,
-                    'results'           => $records
-                ),
-            )
+            [
+                'template' => '@pastoralReportBuilder/report_tags.twig',
+                'data'     => [
+                    'tag'     => $tag,
+                    'results' => $records,
+                ],
+                'title' => 'Pastoral Tag Report',
+            ]
         );
     }
 
@@ -295,13 +307,14 @@ class Controller extends Base
         // And spit this thing out
 
         $this->getResponse()->content->set(
-            array(
-                'template' => '@pastoralReportBuilder/reportResults.twig',
-                'data' => array(
-                    'results'           => $records,
-                    'report'            => $report
-                ),
-            )
+            [
+                'template' => '@pastoralReportBuilder/report_results.twig',
+                'data'     => [
+                    'results' => $records,
+                    'report'  => $report,
+                ],
+                'title' => $report->getName(),
+            ]
         );
     }
 
@@ -309,13 +322,14 @@ class Controller extends Base
      * Get pastoral report records
      *
      * @param PastoralReport $report
+     *
      * @return Collection
      */
     private function getReportData($report)
     {
         // Get matching records
 
-        return $this->pastoralMapper->getReportData(
+        return $this->pastoralDataSource->getReportData(
             $this->getUser(),
             $report->getBeforeDate(),
             $report->getAfterDate(),
@@ -332,6 +346,7 @@ class Controller extends Base
 
     /**
      * Delete pastoral report
+     *
      * @param PastoralReport $report
      */
     public function postReportDelete($report)
@@ -417,7 +432,6 @@ class Controller extends Base
         // Save groups the report is shared with
 
         if (is_array($post['group'])) {
-
             $groupsCollection = new Collection();
 
             foreach ($post['group'] as $groupId => $checked) {
@@ -454,13 +468,13 @@ class Controller extends Base
         $report = $this->pastoralReportMapper->createModel($post['reportId']);
 
         $result = $this->updatePastoralDashboard($report, $post['display']);
-        
+
         $this->getResponse()->content->set([
             'format' => 'json',
-            'data' => $this->buildJsonOutput([
+            'data'   => $this->buildJsonOutput([
                 'status' => 'OK',
-                'result' => $result
-            ])
+                'result' => $result,
+            ]),
         ]);
     }
 
@@ -468,24 +482,23 @@ class Controller extends Base
      * Update pastoral dashboard record
      *
      * @param PastoralReport $report
-     * @param bool $display
+     * @param bool           $display
+     *
      * @return string
      */
     private function updatePastoralDashboard($report, $display)
     {
         try {
-
             // Check if the report is already on the dashboard
 
             $pastoralReportDashboard = $this->pastoralReportDashboardMapper->findOneByColumnList([
-                'user_id' => $this->getUser()->getId(),
-                'report_id' => $report->getId()
+                'user_id'   => $this->getUser()->getId(),
+                'report_id' => $report->getId(),
             ]);
 
             // We found the report on the dashboard, check if we need to remove it
 
             if (!$display) {
-
                 // Report was being displayed on dashboard, delete it
 
                 $this->pastoralReportDashboardMapper->delete($pastoralReportDashboard);
@@ -494,11 +507,9 @@ class Controller extends Base
                 $result = 'No action, already on dashboard';
             }
         } catch (MapperException $e) {
-
             // Report wasn't on the dashboard already, check if we need to add it
 
             if ($display) {
-
                 // Add the report to the dashboard
 
                 $pastoralReportDashboard = $this->pastoralReportDashboardMapper->createModel();

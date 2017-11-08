@@ -49,17 +49,9 @@ class External_Pastoral implements External_PastoralInterface
     /**
      * @inheritdoc
      */
-    public function createPastoral(PastoralModel $pastoral)
+    public function syncPastoral(PastoralModel $pastoral)
     {
-        return $this->getDatabase()->createPastoral($pastoral);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function updatePastoral(PastoralModel $pastoral)
-    {
-        return $this->getDatabase()->updatePastoral($pastoral);
+        return $this->getDatabase()->syncPastoral($pastoral);
     }
 
     /**

@@ -9,19 +9,19 @@
 
 namespace Schoolbox\Pastoral\Authorizer\Rule;
 
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
-use Schoolbox\User;
-use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\Pastoral\Comment\Model as PastoralComment;
+use Schoolbox\User;
 
 class IsCommentOwner implements IAuthorizationRule
 {
     /**
      * {@inheritdoc}
      */
-    public function authorize(array $params = array(), User $user = null)
+    public function authorize(array $params = [], User $user = null)
     {
         if (!isset($params['comment'])) {
             if (!isset($params['commentId'])) {

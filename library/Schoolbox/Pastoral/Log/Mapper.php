@@ -40,6 +40,7 @@ class Mapper extends BaseMapper
 
     /**
      * Retrieves a list of unique import IDs from the log table along with the date the import started
+     *
      * @return Collection
      */
     public function findImportIds()
@@ -48,10 +49,13 @@ class Mapper extends BaseMapper
 
         $query = "
             SELECT DISTINCT   l.import_id,
-                              (select MIN(created_at) from pastoral_import_log where import_id = l.import_id) AS created_at,
+                              (
+                                  SELECT MIN(created_at) 
+                                  FROM pastoral_import_log 
+                                  WHERE import_id = l.import_id) AS created_at,
                               l.user_id,
                               (
-                                  select result FROm pastoral_import_log where id = (
+                                  SELECT result FROM pastoral_import_log WHERE id = (
                                     SELECT id
                                     FROM pastoral_import_log
                                     WHERE import_id = l.import_id
@@ -60,7 +64,7 @@ class Mapper extends BaseMapper
                                   )
                               ) AS result
             FROM              pastoral_import_log l
-            WHERE             created_at IS NOT NULL and creator_name is not null
+            WHERE             created_at IS NOT NULL AND creator_name IS NOT NULL
             GROUP BY          created_at
             ORDER BY          import_id DESC
         ";
@@ -73,13 +77,13 @@ class Mapper extends BaseMapper
 
         foreach ($statement as $row) {
             $result->add([
-                'importId' => $row['import_id'],
+                'importId'  => $row['import_id'],
                 'createdAt' => Alaress_Date_Format::newDatabaseDate($row['created_at']),
-                'creator' => $userMapper->findByIdWithFallback($row['user_id']),
-                'result' => $row['result']
+                'creator'   => $userMapper->findByIdWithFallback($row['user_id']),
+                'result'    => $row['result'],
             ]);
         }
 
         return $result;
-    }    
+    }
 }

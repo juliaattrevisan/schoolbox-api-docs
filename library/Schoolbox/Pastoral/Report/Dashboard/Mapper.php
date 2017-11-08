@@ -9,8 +9,8 @@ namespace Schoolbox\Pastoral\Report\Dashboard;
 
 use PDOStatement;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Pastoral\Report\Model as Report;
 use Schoolbox\Pastoral\Report\Mapper as ReportMapper;
+use Schoolbox\Pastoral\Report\Model as Report;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
