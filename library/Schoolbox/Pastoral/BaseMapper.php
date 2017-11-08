@@ -53,10 +53,11 @@ abstract class BaseMapper extends SchoolboxMapper
         // We ignore pastoral moderators and the record owner get ignored by this, otherwise they'll never get able to
         // update an erroneous Deny access level added to a record
 
-        if ($accessLevel == PastoralAccessMapper::ACCESS_DENY &&
-            !$this->isUserInPastoralService($user) &&                       // Pastoral moderators ignored
-            !$user->getId() == $record->getOwner()->getId()) {              // Record owner ignored
-            return null;
+        if ($accessLevel == PastoralAccessMapper::ACCESS_DENY) {
+            // Pastoral moderators and Record owner ignored
+            if (!($this->isUserInPastoralService($user) || $user->getId() == $record->getOwner()->getId())) {
+                return null;
+            }
         }
 
         // Only has public access? Strip the private body and files
