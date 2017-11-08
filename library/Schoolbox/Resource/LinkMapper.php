@@ -22,6 +22,9 @@ use Schoolbox\User;
 use Schoolbox\Resource\Link\Search\Result;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
+/**
+ * @method Link hydrate(array $row, $alias = '', $callback = null)
+ */
 class LinkMapper extends Mapper implements ILocator, Searchable
 {
     /**
@@ -170,7 +173,7 @@ class LinkMapper extends Mapper implements ILocator, Searchable
 
     /**
      * @param PDOStatement $statement
-     * @return Collection
+     * @return Link[]|Collection
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
