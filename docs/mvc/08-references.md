@@ -16,3 +16,6 @@ https://sourcemaking.com/design_patterns
 
 * *MVC Model-View-Controller.* Aura modules follow this pattern.
 https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller
+
+* *RESTful.* A particular architectural philosophy centered around HTTP request types such as GET and POST. 
+https://stackoverflow.com/questions/671118/what-exactly-is-restful-programming
