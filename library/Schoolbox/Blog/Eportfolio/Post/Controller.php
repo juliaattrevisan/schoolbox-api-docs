@@ -219,7 +219,7 @@ class Controller extends Base
         if (trim($this->getRequest()->post["commentBody"])) {
             $comment->setBody($this->getRequest()->post["commentBody"]);
         } else {
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
         
         $comment->setCreatedAt(\Alaress_Date_Format::now());
