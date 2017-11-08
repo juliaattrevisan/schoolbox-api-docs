@@ -27,4 +27,3 @@ abstract class DebugTwig extends \Twig_Template {
 
     }
 }
-?>
