@@ -164,7 +164,7 @@ class LinkMapper extends Mapper implements ILocator, Searchable
                    {$this->getJoinColumnString('folder', 'c')}
             FROM `$table`
             INNER JOIN {$this->getJoinSql('user', $table, 'u',  true)}
-            LEFT JOIN {$this->getJoinSql('folder', $table, 'c')}
+            INNER JOIN {$this->getJoinSql('folder', $table, 'c', true)}
         ";
     }
 
