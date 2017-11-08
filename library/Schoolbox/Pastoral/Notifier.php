@@ -207,13 +207,6 @@ class Notifier extends AbstractModuleNotifier
             return false;
         }
 
-        // If the comment is private, and they don't have private, fail
-
-        if ($model->getAccess() == PastoralAccessMapper::ACCESS_PRIVATE &&
-            $pastoralAccess->getAccess() < PastoralAccessMapper::ACCESS_PRIVATE) {
-            return false;
-        }
-
         // Otherwise it's bombs away...
 
         $envelope->targetToUser($user->getId(), $message);
