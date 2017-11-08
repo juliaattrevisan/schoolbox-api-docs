@@ -24,6 +24,10 @@ This is a collection of takeaways from each of the sections, distilled from thei
 
 * Use the abstractions to access contents of superglobals $_SESSION, $_GET and $_POST and pass those to Supporting Classes instead of accessing them directly.
 
+* Controllers should format an unfriendly Exception into a user-friendly one. This provides users with a human-readable (if a little bland) message rather than the alternative, a stack trace.
+
+* Supporting Classes should manage the exceptions being thrown by their dependents. Controllers should manage exceptions being thrown by Supporting Classes.
+
 * Use the @api docblock in your Controller method so you can see the corresponding Route, saving you from manually looking it up.
 
 ## 7.3 Summary of Supporting Classes

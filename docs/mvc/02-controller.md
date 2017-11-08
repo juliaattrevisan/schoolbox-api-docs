@@ -41,7 +41,17 @@ $this->getRequest()->post['cat']
 ## 2.4 Error Handling
 Controllers are also primarily responsible for handling of error states that can't be foreseen or computed by Module. There are a couple of ways to do it in the current codebase, but the preferred approach is to throw an exception. See *1.4 Error Handling* for implementation example.
 
-Don't `die()` or `exit()` in Controllers - you should `return` instead (unless you're debugging or exploring)
+> Controllers should format an unfriendly Exception into a user-friendly one. This provides users with a human-readable (if a little bland) message rather than the alternative, a stack trace.
+
+Controllers are also the last opportunity in which to do this; especially when coordinating a series of Supporting Classes, each capable of throwing their own Exceptions. 
+
+With that in mind, Supporting Classes should manage the exceptions that their dependents throw, and those dependents do the same to their dependents and so on, leaving the Controller to deal with exceptions that none of their dependents could manage. 
+
+This prevents the need for Controllers to know about all the exceptions being thrown everywhere (it shouldn't need to deal with that much detail)
+
+> Supporting Classes should manage the exceptions being thrown by their dependents. Controllers should manage exceptions being thrown by Supporting Classes.
+
+Also, don't `die()` or `exit()` in Controllers - you should `return` instead (unless you're debugging or exploring)
 
 ## 2.5 Corresponding Route Docblock
 In Module we can see which Controller method is executed from a particular Route, but the converse isn't so obvious. To alleviate the need to manually cross-reference, we can use a docblock `@api` to state which Route is relevant to a particular Controller method.
