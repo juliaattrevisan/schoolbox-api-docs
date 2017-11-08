@@ -44,11 +44,6 @@ class Module extends BaseModule
     protected $basename = 'pastoral';
 
     /**
-     * @var DataSource
-     */
-    private $pastoralDataSource;
-
-    /**
      * {@inheritdoc}
      */
     protected function registerRoutes()
