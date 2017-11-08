@@ -14,10 +14,18 @@
                                 {{ record.student.fullName }} - {{ record.heading }}
                             </a>
                         </h4>
-                        <p class="spaced meta">
-                            Posted by <a href="{{ profile.link(record.owner) }}">{{ record.owner.fullName }}</a>
+                        <p class="meta">
+                            Created by <a href="{{ profile.link(record.owner) }}">{{ record.owner.fullName }}</a>
                             <span title="{{ record.createdAt.short }}">{{ record.createdAt.relativeDay }}</span>
                         </p>
+
+                        {# Display last updated by if applicable #}
+                        {% if record.createdAt.long != record.updatedAtDisplay.long %}
+                            <p class="meta">
+                                Last updated by <a href="{{ profile.link(record.modifiedByDisplay) }}">{{ record.modifiedByDisplay.fullName }}</a>
+                                <span title="{{ record.updatedAtDisplay.short }}">{{ record.updatedAtDisplay.relativeDay }}</span>
+                            </p>
+                        {% endif %}
                     </div>
                 </div>
             </li>
