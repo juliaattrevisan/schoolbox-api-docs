@@ -44,8 +44,8 @@ class CompletionMapper extends Mapper {
                 {$this->getJoinColumnString('task', 't')},
                 {$this->getJoinColumnString('marking_user', 'm')}
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
-            LEFT JOIN {$this->getJoinSql('task', '', 't')}
-            LEFT JOIN {$this->getJoinSql('marking_user', '', 'm', true)}
+            INNER JOIN {$this->getJoinSql('task', '', 't', true)}
+            INNER JOIN {$this->getJoinSql('marking_user', '', 'm', true)}
         ";
     }
 
