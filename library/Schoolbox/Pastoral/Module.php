@@ -12,6 +12,7 @@ use Alaress\Authorizer\Rule\HasServicePermission;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
@@ -236,9 +237,7 @@ class Module extends BaseModule
 
                     $injectedValues['student'] = $student;
                 } catch (MapperException $e) {
-                    /** @var ErrorMapper $errorMapper */
-                    $errorMapper = $this->getMapperFactory()->get(ErrorMapper::class);
-                    throw $errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
+                    throw $this->generateError(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
                 }
             }
 
@@ -257,9 +256,7 @@ class Module extends BaseModule
 
                     $injectedValues['linkedStudent'] = $student;
                 } catch (MapperException $e) {
-                    /** @var ErrorMapper $errorMapper */
-                    $errorMapper = $this->getMapperFactory()->get(ErrorMapper::class);
-                    throw $errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
+                    throw $this->generateError(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
                 }
             }
 
@@ -272,6 +269,7 @@ class Module extends BaseModule
 
                     $injectedValues['comment'] = $pastoralCommentMapper->findById($params['commentId']);
                 } catch (MapperException $e) {
+                    throw $this->generateError(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
                 }
             }
 
@@ -292,9 +290,7 @@ class Module extends BaseModule
                     $pastoralAccessMapper = $this->getMapperFactory()->get(PastoralAccessMapper::class);
                     $injectedValues['access'] = $pastoralAccessMapper->findByColumn('pastoral_id', $params['recordId']);
                 } catch (MapperException $e) {
-                    /** @var ErrorMapper $errorMapper */
-                    $errorMapper = $this->getMapperFactory()->get(ErrorMapper::class);
-                    throw $errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+                    throw $this->generateError(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
                 }
 
                 // Load attachment (if requested) out of item
@@ -306,14 +302,25 @@ class Module extends BaseModule
                     if ($attachment instanceof PastoralAttachment) {
                         $injectedValues['attachment'] = $attachment;
                     } else {
-                        /** @var ErrorMapper $errorMapper */
-                        $errorMapper = $this->getMapperFactory()->get(ErrorMapper::class);
-                        throw $errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_PERM_RECORD);
+                        throw $this->generateError(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
                     }
                 }
             }
 
             return $injectedValues;
         });
+    }
+
+    /**
+     * Helper for generating a human-readable exception.
+     *
+     * @param int $errorCode A `\Schoolbox\Error\Mapper::ERROR_*` constant.
+     * @return SchoolboxException
+     */
+    private function generateError($errorCode)
+    {
+        /** @var ErrorMapper $errorMapper */
+        $errorMapper = $this->getMapperFactory()->get(ErrorMapper::class);
+        return $errorMapper->generateException($errorCode);
     }
 }
