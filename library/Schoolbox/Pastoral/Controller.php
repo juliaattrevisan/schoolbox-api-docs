@@ -481,7 +481,7 @@ class Controller extends Base
         foreach ($rolesAll as $roleCurrent) {
             if ($roleCurrent->isStaff() || $roleCurrent->isParent() && $allowParents) {
                 $roles->add($roleCurrent);
-                $roleUsers[$roleCurrent->getId()] = $this->userMapper->findByColumn('group_id', $roleCurrent->getId());
+                $roleUsers[$roleCurrent->getId()] = $this->userMapper->countByColumn('group_id', $roleCurrent->getId());
             }
         }
 
