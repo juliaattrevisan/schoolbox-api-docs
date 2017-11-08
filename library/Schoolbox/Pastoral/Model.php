@@ -537,7 +537,7 @@ class Model implements ISoftDeletable
     {
         // Owners and moderators get private access regardless of any other permission set
 
-        if (!($this->isUserInPastoralService($user) || $user->getId() == $this->getOwner()->getId())) {
+        if ($this->isUserInPastoralService($user) || $user->getId() == $this->getOwner()->getId()) {
             return PastoralAccessMapper::ACCESS_PRIVATE;
         }
 
