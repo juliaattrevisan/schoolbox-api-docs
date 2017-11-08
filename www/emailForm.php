@@ -27,8 +27,10 @@ if (!isset($_SESSION['id']) && !$recaptcha->check_answer($_SERVER['REMOTE_ADDR']
 }
 
 if(isset($_SESSION['user'])) {
-    $name = $_SESSION['user']->getFirstName()." ".$_SESSION['user']->getLastName();
-    $userEmail = $_SESSION['user']->getEmail();
+    /** @var \Schoolbox\User $user */
+    $user = $_SESSION['user'];
+    $name = $user->getFullName();
+    $userEmail = $user->getEmail();
 } else {
     $name = $_POST['name'];
     $userEmail = $_POST['email'];
