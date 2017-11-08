@@ -68,7 +68,13 @@
                             <div class="card small-12">
                                 <i class="icon-group alert size-32"></i>
                                 <p>{{ role.name }}</p>
-                                <p class="meta">System Role ({{ roleUsers[role.id] }} Users)</p>
+                                <p class="meta">
+                                    System Role
+                                    ({{ roleUsers[role.id] }} {% if roleUsers[role.id] == 1 %}User{% else %}Users{% endif %})
+                                    {% if role.isParent %}
+                                        <br />(Only {{ record.student.firstName }}'s parents will be able to view this record.)
+                                    {% endif %}
+                                </p>
                             </div>
                         </a>
                     </li>
