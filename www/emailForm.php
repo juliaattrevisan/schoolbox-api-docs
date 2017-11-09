@@ -48,16 +48,18 @@ if (validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.h
         }
     }
 
-        $myconf = ConfigMapper::getInstance();
-        $core = new CoreContext($myconf);
-        $email = new TwigEmail('feedback.twig');
-        $email->setCoreContext($core->getContext());
-        $email->setFrom($_POST['email'], $name);
-        $email->setSubject(Cfg::get('title') . ' Feedback - ' . $_POST['subject']);
-        $email->setContext($context)->send(array(
-                            'name' => Cfg::get('mail_from_name'),
-                            'email' => Cfg::get('mail_support_address')
-                    ));
+    $context['NAME'] = $name;
+
+    $myconf = ConfigMapper::getInstance();
+    $core = new CoreContext($myconf);
+    $email = new TwigEmail('feedback.twig');
+    $email->setCoreContext($core->getContext());
+    $email->setFrom($_POST['email'], $name);
+    $email->setSubject(Cfg::get('title') . ' Feedback - ' . $_POST['subject']);
+    $email->setContext($context)->send(array(
+                        'name' => Cfg::get('mail_from_name'),
+                        'email' => Cfg::get('mail_support_address')
+                ));
 
 /*	if($_POST['receipt']) {
         $receiptHandler = new Mailer($_POST['receipt'], $_POST['receipt_subject'], $_POST['email']);
