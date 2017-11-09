@@ -22,7 +22,7 @@ Basic statements on what to do. For specific reasoning, see links next to each s
 ## 2 Controller
 * Controllers organise low-level implementations that produce actual output. [(more)](02-controller.md#2-responsibilities-of-controller)
 * Delegate low-level implementations to Supporting Classes. [(more)](02-controller.md#21-shove-details-elsewhere)
-* Controllers themselves should do very little other than taking the request and arranging the output for the View. [(more)](02-controller.md#2-responsibilities-of-controller)
+* Controllers themselves should do very little other than taking the request and arranging the output to give to the View. [(more)](02-controller.md#2-responsibilities-of-controller)
 * Don't access superglobals directly; use abstraction methods `$this->getSession()`, `$this->getRequest()->query` and `$this->getRequest()->post` instead. [(more)](02-controller.md#23-superglobals)
 * Use `getResponse()` to set up data for twig. [(more)](02-controller.md#222-setting-the-response-for-view)
 * Use `getResponse()` to redirect to specific urls or Routes. [(more)](02-controller.md#223-redirects)
