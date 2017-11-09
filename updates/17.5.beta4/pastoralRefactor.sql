@@ -27,10 +27,6 @@ ALTER TABLE `pastoral_revision` CHANGE `_private` `private` TINYINT(4) DEFAULT '
 
 ALTER TABLE `pastoral_access` ADD `private` INT DEFAULT 0 NULL;
 
--- Put a default message into the `body_public` field for every record
-
-UPDATE `pastoral` SET `body_public` = 'The contents of this record are private. Please contact the author for more information.';
-
 -- We now need private and public attachments
 
 ALTER TABLE `pastoral_attachment` ADD `private` INT DEFAULT 0 NULL;
