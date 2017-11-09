@@ -22,6 +22,8 @@ This is a collection of takeaways from each of the sections, distilled from thei
  
 * One of the primary reasons to look at a Controller method is because we're pursuing a specific behaviour to change. The easier it is to find this, the better our lives become.
 
+* Use `getResponse()` to set up twig data and also to process redirects using Routes.
+
 * Use the abstractions to access contents of superglobals $_SESSION, $_GET and $_POST and pass those to Supporting Classes instead of accessing them directly.
 
 * Controllers should format an unfriendly Exception into a user-friendly one. This provides users with a human-readable (if a little bland) message rather than the alternative, a stack trace.

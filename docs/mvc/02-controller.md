@@ -15,6 +15,50 @@ You should be able to read method names and get a general idea of what is going 
 > One of the primary reasons to look at a Controller method is because we're pursuing a specific behaviour to change. The easier it is to find this, the better our lives become.
 
 ## 2.2 getRequest() and getResponse()
+These represent the parameters from a `GET` or `POST` request, and the data at the end of a Controller method that will be passed to View, respectively.
+
+### 2.2.1 GET and POST vars
+Querystring parameters can be obtained using the `$this->getRequest()->query` array instead. To access a particular querystring parameter `cat`, you can use
+
+```php
+$this->getRequest()->query['cat']
+```
+
+POST parameters can be obtained using the `$this->getRequest()->post` array instead. To access a particular POST parameter `cat`, you can use
+
+```php
+$this->getRequest()->post['cat']
+```
+
+### 2.2.2 Setting The Response for View
+When a Controller finishes processing, it needs to set up the resultant data for the View to render. This is done via the `getResponse()` method.
+ 
+ ```php
+ $this->getResponse()->content->set(
+     $this->buildHtmlOutput('@test/index.twig', [
+        'name' => $name
+     ])
+ );
+ ```
+  
+The example above gives an array of values `['name' => $name]` to twig to render in a template `index.twig`. You can pass scalars and objects to twig, though you should be mindful of the various pitfalls with the latter. 
+
+### 2.2.3 Redirects
+Sometimes you need to redirect. You can use the `getResponse()` method to also get access to a redirection method in which you can specify a url:
+
+```php
+$this->getResponse()->redirect->to('http://www.google.com');
+```
+
+...or derive a Route instead:
+
+```php
+$this->getRouter()->generate('myModule.myRoute', [
+    'id' => 1,
+]));
+```
+
+> Use `getResponse()` to set up twig data and also to process redirects using Routes.
 
 ## 2.3 Superglobals
 We don't directly access the superglobals `$_SESSION`, `$_GET` and `$_POST` because we can't mock these out with test data and also presumes a lot about where this data came from. Instead, there are accessor methods which provide an abstraction. 
@@ -24,19 +68,7 @@ We don't directly access the superglobals `$_SESSION`, `$_GET` and `$_POST` beca
 ## 2.3.1 Session Superglobal
 Don't reference `$_SESSION` directly. This is very difficult to test and not great when on the command line. Instead, you can use `$this->getSession()->set()` and `$this->getSession()->get()` methods.
 
-## 2.3.2 GET Superglobal
-Querystring parameters can be obtained using the `$this->getRequest()->query` array instead. To access a particular querystring parameter `cat`, you can use
-
-```php
-$this->getRequest()->query['cat']
-```
-
-## 2.3.3 POST Superglobal
-POST parameters can be obtained using the `$this->getRequest()->post` array instead. To access a particular POST parameter `cat`, you can use
-
-```php
-$this->getRequest()->post['cat']
-```
+For other Superglobals, see [2.2.1 GET and POST vars](#221-get-and-post-vars)
 
 ## 2.4 Error Handling
 Controllers are also primarily responsible for handling of error states that can't be foreseen or computed by Module. There are a couple of ways to do it in the current codebase, but the preferred approach is to throw an exception. See *1.4 Error Handling* for implementation example.

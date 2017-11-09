@@ -13,10 +13,12 @@
     * 1.5 Historical Format
 * [2 Responsibilities of Controller](02-controller.md) 
     * 2.1 Shove details elsewhere
+    * 2.2 getRequest() and getResponse()
+        * 2.2.1 GET and POST vars
+        * 2.2.2 Setting The Response for View
+        * 2.2.3 Redirects
     * 2.3 Superglobals
         * 2.3.1 Session Superglobal
-        * 2.3.2 GET Superglobal
-        * 2.3.3 POST Superglobal
     * 2.4 Error Handling
     * 2.5 Corresponding Route Docblock
 * [3 Responsibilities of Supporting Classes](03-supporting.md)
