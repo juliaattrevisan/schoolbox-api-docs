@@ -208,22 +208,22 @@ class Controller extends Base
      */
     public function postCommentInsert(EportfolioBlogModel $blog)
     {
-        // Create the comment and save
-
-        /** @var EportfolioBlogCommentModel $comment */
-        $comment = $this->getEportfolioBlogCommentMapper()->createModel();
-
-        $comment->setOwner($this->getUser());
-        $comment->setBlog($blog);
         // Comments must not be empty
-        if (trim($this->getRequest()->post["commentBody"])) {
-            $comment->setBody($this->getRequest()->post["commentBody"]);
+        if (strlen(trim($this->getRequest()->post["commentBody"]))) {
+            // Create the comment and save
+
+            /** @var EportfolioBlogCommentModel $comment */
+            $comment = $this->getEportfolioBlogCommentMapper()->createModel();
+
+            $comment->setOwner($this->getUser());
+            $comment->setBlog($blog);
+            $comment->setBody($this->getRequest()->post['commentBody']);
+            $comment->setCreatedAt(\Alaress_Date_Format::now());
+
+            $this->getEportfolioBlogCommentMapper()->save($comment);
         } else {
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
-        
-        $comment->setCreatedAt(\Alaress_Date_Format::now());
-        $this->getEportfolioBlogCommentMapper()->save($comment);
 
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
