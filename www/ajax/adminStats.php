@@ -10,7 +10,7 @@
 
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Database;
-use Schoolbox\Engagement;
+use Schoolbox\Engagement\Login;
 
 require_once __DIR__ . '/../../library/Bootstrap.php';
 
@@ -25,7 +25,8 @@ if(!isset($_POST['module'])) {
 switch($_POST['module']) {
     // cases mirror categories listed
     case 'users':
-        $login         = new Engagement\Login(Database\Factory::getInstanceInternal(), ConfigMapper::getInstance());
+        $configMapper = ConfigMapper::getInstance();
+        $login         = new Login(Database\Factory::getInstanceInternal(), $configMapper->get('session_length'));
         $summary       = $login->userSummary();
         $totalUser     = 0;
         $totalLogin    = 0;

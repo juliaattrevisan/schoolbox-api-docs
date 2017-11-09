@@ -10,25 +10,34 @@
 namespace Schoolbox\Engagement;
 
 use Alaress\Database\Connector\IConnector;
-use Schoolbox\IConfigLoader;
 
 class Login
 {
+    // Fallback value if session length not configured in DB
+    const SESSION_LENGTH_DEFAULT = 1800;
+
     /** @var IConnector */
     private $database;
 
-    /** @var IConfigLoader */
-    private $config;
+
+    /**
+     * Number of seconds that sessions exists for
+     *
+     * @var int
+     */
+    private $sessionLength;
+
 
     /**
      * Constructor - sets up database
-     * @param IConnector    $database
-     * @param IConfigLoader $config
+     *
+     * @param IConnector  $database
+     * @param null|string $sessionLength
      */
-    public function __construct(IConnector $database, IConfigLoader $config)
+    public function __construct(IConnector $database, ?string $sessionLength)
     {
-        $this->database = $database;
-        $this->config   = $config;
+        $this->database      = $database;
+        $this->sessionLength = null === $sessionLength ? self::SESSION_LENGTH_DEFAULT : (int)$sessionLength;
     }
 
     public function loginByGroup(\Alaress_Date_Format $start, \Alaress_Date_Format $end) {
@@ -92,7 +101,7 @@ class Login
             ];
         }
 
-        $interval = $this->config->get('session_length') * 2;
+        $interval = $this->sessionLength * 2;
         $query = "
             SELECT user.group_id, COUNT(DISTINCT `user`.id) AS logged_in
             FROM login_log

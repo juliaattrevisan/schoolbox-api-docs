@@ -4,6 +4,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Database;
 use Schoolbox\MapperFactory;
 use Schoolbox\RoleMapper;
+use Schoolbox\Engagement\Login;
 
 /** @var SitePage $this */
 $this->setBlock('REPORT_CONTENT', 'month_head', 'month_head_block' );
@@ -28,7 +29,7 @@ $currentMonth = clone $start;
  */
 $mapperFactory = $this->getDi()->get('mapperFactory');
 $configMapper  = $mapperFactory->get(ConfigMapper::class);
-$loginReport   = new Schoolbox\Engagement\Login(Database\Factory::getInstanceInternal(), $configMapper);
+$loginReport   = new Login(Database\Factory::getInstanceInternal(), $configMapper->get('session_length'));
 $roleMapper    = $mapperFactory->get(RoleMapper::class);
 $roleList      = $roleMapper->findAll();
 $roleSummary   = $loginReport->userSummary();
