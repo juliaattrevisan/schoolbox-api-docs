@@ -271,3 +271,30 @@ You can disable the cache on a per-call basis for
 
 > If you encounter strange mapper/instance behaviour, try turning off the mapper cache by passing the `cache => false` option.
 
+## 4.5 Useful Methods
+These base methods should solve most of your database retrieval needs. You can pass it an additional `$options` array for further configuration such as including soft-deleted objects, caching, ordering and limits.
+
+* `findOneByColumn()` Find exactly one model to return for a specified column and value; throws exception otherwise.
+* `findOneByColumnList()` Find exactly one model to return for an associative array of column-value pairs; throws exception otherwise.
+* `findIdsByColumn()` Finds only the scalar ID value of records matched, rather than the full objects, for the specified column and value.
+* `findIdsByColumn()` Finds only the scalar ID value of records matched, rather than the full objects, for associative array of column-value pairs.
+* `findByPredicates()` Finds a set of models that match the provided predicates (builds a `WHERE` clause using objects)
+* `findByIdWithFallback()` Finds exactly one model, even if it's been soft-deleted.
+    
+There are other public methods in the Mapper which you might find useful in more specific situations.
+
+Note that some methods allow you to specify an `$options` array. In this array you can supply settings for ordering, limits, whether to bypass the cache and whether to include deleted records.
+
+```php
+$user = $userMapper->findByColumnList(
+    ['username' => $username], 
+    [
+        'cache' => false,
+        'deleted' => false,
+        'limit' => 1,
+        'order' => [
+            'firstname' => 'ASC'
+        ],
+    ]
+);
+```

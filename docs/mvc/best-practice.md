@@ -42,6 +42,13 @@ Basic statements on what to do. For specific reasoning, see links next to each s
 * Use Supporting Classes to store very specific queries that can only be used in rare places. Use Mappers as dependencies so you can execute queries meaningfully. [(more)](04-mapper.md#42-special-queries)
 * Specify a default hydration using `getSelectString()`, `getFromString()` and `hydrateSelect()` methods in your Mapper. [(more)](04-mapper.md#43-default-hydration)
 * Sometimes you need to turn off caching by passing it a `'cache' => false` option especially when you're mutating instances procedurally. [(more)](04-mapper.md#44-caching)
+* These base methods should solve most of your database access needs. You can pass it an additional `$options` array for further configuration such as including soft-deleted objects, caching, ordering and limits. [(more)](04-mapper.md#45-useful-methods)
+    * `findOneByColumn()` Find exactly one model to return for a specified column and value; throws exception otherwise.
+    * `findOneByColumnList()` Find exactly one model to return for an associative array of column-value pairs; throws exception otherwise.
+    * `findIdsByColumn()` Finds only the scalar ID value of records matched, rather than the full objects, for the specified column and value.
+    * `findIdsByColumn()` Finds only the scalar ID value of records matched, rather than the full objects, for associative array of column-value pairs.
+    * `findByPredicates()` Finds a set of models that match the provided predicates (builds a `WHERE` clause using objects)
+    * `findByIdWithFallback()` Finds exactly one model, even if it's been soft-deleted.
 
 ## 5 Model
 * Models only know about themselves and their own dependencies. [(more)](05-model.md#5-responsibilities-of-model)
