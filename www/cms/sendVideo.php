@@ -120,7 +120,8 @@ if (isset($type) && isset($id)) {
                 $readTill = $byteLength;
 
                 while (!feof($handle) && ftell($handle) <= $byteLength) {
-                    echo fread($handle, 8192);
+                    $sendLength = $byteLength < 8192 ? $byteLength : 8192;
+                    echo fread($handle, $sendLength);
                     flush();
                     ob_flush();
                 }
