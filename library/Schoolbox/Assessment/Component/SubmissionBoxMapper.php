@@ -146,8 +146,12 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
     public function softDeleteSubmissions(SubmissionBox $dueWork)
     {
         $submissionMapper = $this->getJoinMapper('submission');
-        $submissions = $submissionMapper->findByColumn('box_id', $dueWork->getId(), ['deleted' => true]);
+        $submissions      = $submissionMapper->findByColumn('box_id', $dueWork->getId(), ['deleted' => true]);
+
+        // TODO This should *really* be silenceNotifications() and unSilenceNotifications()
+        $submissionMapper->setSessionData([]);
         $submissionMapper->delete($submissions);
+        $submissionMapper->setSessionData($this->getSessionData());
     }
 
     /**
