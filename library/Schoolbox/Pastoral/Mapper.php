@@ -431,16 +431,14 @@ class Mapper extends BaseMapper
         $sql = $this->getSelectString() . "
             WHERE 
             
-            `pastoral`.`student_id` = :studentId1 AND `pastoral`.`id` IN (
+            `pastoral`.`student_id` = :linkedStudentId AND `pastoral`.`parent_id` IN (
+                SELECT      `id` 
+                FROM        `pastoral` `pastoralLinked` 
+                WHERE       `pastoralLinked`.`student_id` = :studentId
+            ) OR `pastoral`.`id` IN (
                 SELECT      `parent_id` 
-                FROM        `pastoral` `pastoralLinked1` 
-                WHERE       `pastoralLinked1`.`student_id` = :linkedStudentId1
-            ) OR
-            
-            `pastoral`.`student_id` = :linkedStudentId2 AND `pastoral`.`id` IN (
-                SELECT      `parent_id` 
-                FROM        `pastoral` `pastoralLinked2` 
-                WHERE       `pastoralLinked2`.`student_id` = :studentId2
+                FROM        `pastoral` `pastoralLinked` 
+                WHERE       `pastoralLinked`.`student_id` = :studentId2
             )
         ";
 
@@ -455,10 +453,9 @@ class Mapper extends BaseMapper
         $statement = $this->database->prepare($sql);
 
         $params = [
-            'studentId1'       => $student->getId(),
-            'linkedStudentId1' => $linkedStudent->getId(),
-            'studentId2'       => $student->getId(),
-            'linkedStudentId2' => $linkedStudent->getId(),
+            'studentId' => $student->getId(),
+            'studentId2' => $student->getId(),
+            'linkedStudentId' => $linkedStudent->getId(),
         ];
 
         if (!empty($typeId)) {

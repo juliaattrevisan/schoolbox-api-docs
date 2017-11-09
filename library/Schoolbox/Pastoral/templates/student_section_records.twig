@@ -10,6 +10,7 @@
 
             {% if user.role.isStaff %}
                 <h2 class="subheader">
+                    {% if linkedStudent %}{{ linkedStudent.firstName }}'s {% endif %}
                     {{ locale.pastoral.proper }} Records <span class="hide-for-medium-down right">{{ paginator.text(pageCurrent, recordCount) }}</span>
                 </h2>
             {% endif %}
@@ -24,7 +25,14 @@
                                     <a href="{{ profile.link(record.owner) }}">
                                         {{ profile.imageSquare64(record.owner) }}
                                     </a>
-                                    <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': student.id, 'recordId': record.id}) }}">
+                                    {% if linkedStudent %}
+                                        {% set studentId = linkedStudent.id %}
+                                        {% set recordId = record.id %}
+                                    {% else %}
+                                        {% set studentId = student.id %}
+                                        {% set recordId = record.parent_id %}
+                                    {% endif %}
+                                    <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': studentId, 'recordId': recordId}) }}">
                                         <h3>{{ record.heading }}</h3>
                                     </a>
 
@@ -42,7 +50,7 @@
                                         {# Display linked students to staff #}
                                         {% if user.role.isStaff and record.relatedRecords|length %}
                                             {% for relatedRecord in record.relatedRecords %}
-                                                {% if student.id != relatedRecord.student.id %}
+                                                {% if relatedRecord.student.id != student.id and relatedRecord.student.id != linkedStudent.id %}
                                                     {% set getStudentRecord = routeLookupIfAuthorized('pastoral.getStudentRecord', {studentId: relatedRecord.student.id, 'recordId': relatedRecord.id}) %}
                                                     {% if getStudentRecord %}
                                                         Linked Record:
