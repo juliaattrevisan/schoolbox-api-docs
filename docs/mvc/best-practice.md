@@ -10,7 +10,7 @@ Basic statements on what to do. For specific reasoning, see links next to each s
 * Add docblocks and inline comments to explain intent.
 * Reuse before reinvent (don't be wasteful)
 * Rebase frequently to minimise merge conflict sufferage.
-* Please double check everything you make (don't *compel* others clean up after you)
+* Please double check everything you make (don't *compel* others to clean up after you)
 
 ## 1 Module
 * Use the `register()` method when defining Routes. [(more)](01-module.md#1-responsibilities-of-module)
