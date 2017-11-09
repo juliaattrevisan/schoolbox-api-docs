@@ -27,7 +27,11 @@ class Mapper extends BaseMapper {
 }
 ```
 
-## 4.1 Special Queries
+## 4.1 Mapper Usage
+
+
+
+## 4.2 Special Queries
 Less common or otherwise unique queries should be stored in supporting classes instead, which utilise an instance of a corresponding Mapper; otherwise people might misuse it. 
 
 One notable pitfall is taking a method that sort of does what you need, then you add what *you* need it to do without considering the impact it has elsewhere (or lack thereof).
@@ -72,7 +76,7 @@ class Cat {
 }
 ``` 
  
-## 4.2 Default Hydration
+## 4.3 Default Hydration
 Some hierarchical objects require complex hydration to take place - for example, File instances need Folder, User and Mimetypes also hydrated for it to be meaningful. 
 
 However, manually defining and constructing this every time you do a database query is longwinded and unnecessary because we can define the default hydration that applies to base `findBy*` methods. This also prevents the usual copy-paste that would otherwise be required. 
@@ -143,7 +147,7 @@ protected function hydrateSelect(\PDOStatement $statement)
 }
 ```
 
-## 4.3 Caching
+## 4.4 Caching
 Due to the frequency of hydrations and the need to reduce computational overhead, there's a caching system built into all the base mapper methods prefixed by `find`, such as `findById()`, `findByColumn()`, `findByColumnList()` etc. 
 
 The cache remembers global instantiations of objects. If it was retrieved at some point in the past, it won't be fetched and rehydrated. This saves on some processing at the expense of storage space. We used to make our own hashtables locally but that tradition has since been superseded by the mapper cache.
@@ -162,3 +166,4 @@ You can disable the cache on a per-call basis for
 * `findOneByColumnList()`
 
 > If you encounter strange mapper/instance behaviour, try turning off the mapper cache by passing the `cache => false` option.
+

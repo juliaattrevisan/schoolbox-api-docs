@@ -21,9 +21,10 @@
 * 3 Responsibilities of Supporting Classes
     * 3.1 Design Patterns
 * 4 Responsibilities of Mapper
-    * 4.1 Special Queries
-    * 4.2 Default Hydration
-    * 4.3 Caching
+    * 4.1 Mapper Usage
+    * 4.2 Special Queries
+    * 4.3 Default Hydration
+    * 4.4 Caching
 * 5 Responsibilities of Model
 * 6 Responsibilities of View
     * 6.1 Render what was provided
