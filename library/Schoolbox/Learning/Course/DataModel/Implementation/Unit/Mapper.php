@@ -113,12 +113,14 @@ class Mapper extends AbstractUnitMapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('course', 'c')},
                 {$this->getJoinColumnString('course.folder', 'cf')},
+                {$this->getJoinColumnString('course.folder.codes', 'cfc')},
                 {$this->getJoinColumnString('course.folder.homepages', 'cfh')},
                 {$this->getJoinColumnString('specification', 's')},
                 {$this->getJoinColumnString('specification.folder', 'sf')}
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('course', '', 'c', true)}
             INNER JOIN {$this->getJoinSql('course.folder', 'c', 'cf', true)}
+            LEFT  JOIN {$this->getJoinSql('course.folder.codes', 'cf', 'cfc')}
             LEFT  JOIN {$this->getJoinSql('course.folder.homepages', 'cf', 'cfh')}
             INNER JOIN {$this->getJoinSql('specification', '', 's', true)}
             INNER JOIN {$this->getJoinSql('specification.folder', 's', 'sf', true)}
@@ -141,6 +143,13 @@ class Mapper extends AbstractUnitMapper
             $courseFolder = $this->hydrateJoin($row, 'course.folder', 'cf');
             /** @var HomepageConfig $homepageConfig */
             $homepageConfig = $this->hydrateJoin($row, 'course.folder.homepages', 'cfh');
+
+            // Folder Codes: Ensure we de-duplicate (as we have joined multiple 1:N relationships)
+            if ($row['cfc.code']) {
+                $folderCode = $this->hydrateJoin($row,'course.folder.codes','cfc');
+                $courseFolder->getCodes()[$folderCode->getCode()] = $folderCode;
+            }
+
             $courseFolder->setHomepage($homepageConfig);
             $course->setFolder($courseFolder);
             $model->setCourse($course);
