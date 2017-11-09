@@ -13,7 +13,6 @@
 
         /* Results table
          */
-        // TODO this needs extra stuff to treat the unix timestamp as an int
         $('table[data-sortable]').DataTable({
             info: false,
             paging: false,
@@ -121,13 +120,13 @@
                 {% for event in eventList %}
                     {% set booking = event.getBooking() %}
                     <tr>
-                        <td>
-                             <time datetime="{{ event.getStartTime().getUnixTimeStamp() }}">
+                        <td data-sort="{{ event.getStartTime().getUnixTimeStamp() }}">
+                             <time>
                                 {{ event.getStartTime().getLocal() }}
                             </time>
                         </td>
-                        <td>
-                            <time datetime="{{ event.getEndTime().getUnixTimeStamp() }}">
+                        <td data-sort="{{ event.getEndTime().getUnixTimeStamp() }}">
+                            <time>
                                 {{ event.getEndTime().getLocal() }}
                             </time>
                         </td>
