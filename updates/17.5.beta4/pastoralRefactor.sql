@@ -35,17 +35,13 @@ UPDATE `pastoral` SET `body_public` = 'The contents of this record are private. 
 
 ALTER TABLE `pastoral_attachment` ADD `private` INT DEFAULT 0 NULL;
 
-UPDATE `pastoral_attachment` SET `private` = 1 WHERE `pastoral_id` IN (
-  SELECT `id` FROM `pastoral` WHERE `private` = 1
-);
+UPDATE `pastoral_attachment` SET `private` = 1;
 
 -- We now need private and public comments too
 
 ALTER TABLE `pastoral_comment` ADD `private` INT DEFAULT 0 NULL;
 
-UPDATE `pastoral_comment` SET `private` = 1 WHERE `pastoral_id` IN (
-  SELECT `id` FROM `pastoral` WHERE `private` = 1
-);
+UPDATE `pastoral_comment` SET `private` = 1;
 
 ALTER TABLE `lu_pastoral_category` RENAME TO `lu_pastoral_subtype`;
 
