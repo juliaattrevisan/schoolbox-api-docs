@@ -141,9 +141,11 @@ protected function hydrateSelect(\PDOStatement $statement)
 ```
 
 ## 4.3 Caching
-Due to the frequency of hydrations and the need to reduce computational overhead, there's a caching system built into all the base mapper methods prefixed by `find`, such as `findById()`, `findByColumn()`, `findByColumnList()` etc. We used to make our own hashtables locally but that tradition has since been superseded by the mapper cache.
+Due to the frequency of hydrations and the need to reduce computational overhead, there's a caching system built into all the base mapper methods prefixed by `find`, such as `findById()`, `findByColumn()`, `findByColumnList()` etc. 
 
-Unfortunately it also has the side effect of caching when it shouldn't, leading to anomalous behaviours. This isn't an error state, so you won't be alerted; you'll just have to be vigilant when testing. You can disable the cache like this:
+The cache remembers global instantiations of objects. If it was retrieved at some point in the past, it won't be fetched and rehydrated. This saves on some processing at the expense of storage space. We used to make our own hashtables locally but that tradition has since been superseded by the mapper cache.
+
+Unfortunately it also has the side effect of caching when you didn't want or realise, leading to anomalous behaviours. This isn't an error state, so you won't be alerted; you'll just have to be vigilant when testing. You can disable the cache like this:
 
 ```php
 $uncached = $mapper->findByColumn('id', 1, ['cache' => false]);
