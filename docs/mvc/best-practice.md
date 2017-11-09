@@ -16,6 +16,7 @@ Basic statements on what to do. For specific reasoning, see links next to each s
 * Use the `register()` method when defining Routes. [(more)](01-module.md#1-responsibilities-of-module)
 * Use a RESTful arrangement of Route tokens when deciding your url structure. [(more)](01-module.md#11-determining-the-route-and-corresponding-controller-method)
 * Use existing Permissions classes (or compositions thereof) before making a new one. [(more)](01-module.md#12-permissions)
+* Be efficient when you make new Permission classes. [(more)](01-module.md#12-permissions)
 * Construct Preloads for the Controller. If something went wrong, throw an appropriate exception from ErrorMapper as early as possible. [(more)](01-module.md#13-preloads)
 
 ## 2 Controller

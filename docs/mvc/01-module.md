@@ -86,6 +86,8 @@ class MyPermission implements IAuthorizationRule {
 }
 ```
 
+Note that these Permission classes are used in twig whenever someone uses `isRouteAuthorized` or `routeIfAuthorized`. They're used fairly liberally without much thought given as to *what* is being executed behind the scenes, so be mindful when you're making new Permission classes.
+
 ## 1.3 Preloads
 Route Preloads, or simply Preloads, are pre-computed (hydrated) objects that are given to a Controller in an associative array. The Controller accepts these as parameters. 
 
