@@ -30,13 +30,11 @@ if(isset($_SESSION['user'])) {
     /** @var \Schoolbox\User $user */
     $user = $_SESSION['user'];
     $name = $user->getFullName();
-    $userEmail = $user->getEmail();
 } else {
     $name = $_POST['name'];
-    $userEmail = $_POST['email'];
 }
 
-if (validateEmailAddress($userEmail) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/", $_POST['template'])) {
+if (validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/", $_POST['template'])) {
     foreach ($_POST as $key => $var) {
         if (!checkSpamHeaders($var)) {
             SitePage::localRedir('/');
@@ -50,16 +48,18 @@ if (validateEmailAddress($userEmail) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/
         }
     }
 
-        $myconf = ConfigMapper::getInstance();
-        $core = new CoreContext($myconf);
-        $email = new TwigEmail('feedback.twig');
-        $email->setCoreContext($core->getContext());
-        $email->setFrom($userEmail, $name);
-        $email->setSubject(Cfg::get('title') . ' Feedback - ' . $_POST['subject']);
-        $email->setContext($context)->send(array(
-                            'name' => Cfg::get('mail_from_name'),
-                            'email' => Cfg::get('mail_support_address')
-                    ));
+    $context['NAME'] = $name;
+
+    $myconf = ConfigMapper::getInstance();
+    $core = new CoreContext($myconf);
+    $email = new TwigEmail('feedback.twig');
+    $email->setCoreContext($core->getContext());
+    $email->setFrom($_POST['email'], $name);
+    $email->setSubject(Cfg::get('title') . ' Feedback - ' . $_POST['subject']);
+    $email->setContext($context)->send(array(
+                        'name' => Cfg::get('mail_from_name'),
+                        'email' => Cfg::get('mail_support_address')
+                ));
 
 /*	if($_POST['receipt']) {
         $receiptHandler = new Mailer($_POST['receipt'], $_POST['receipt_subject'], $_POST['email']);
