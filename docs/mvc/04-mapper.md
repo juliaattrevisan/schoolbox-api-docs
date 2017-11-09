@@ -94,6 +94,9 @@ protected function getSelectString()
     $eventTypeMapper       = $this->getJoinMapper('eventType');
     $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
 
+    /* Note that $this->>getColumnString() cannot use an alias like the others
+     * You'll get an "Unknown column" error if you try
+     */
     return "
         SELECT
             {$this->getColumnString()},
