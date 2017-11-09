@@ -50,7 +50,7 @@
     $(function() {
         $('[data-warn-removal]').click(function(e) {
             if (!$(e.target).prop('checked')) {
-                e.event.preventDefault();
+                e.preventDefault();
                 $(this).confirmDialog({
                     text: 'Are you sure you want to remove this assessment? ' +
                     'Doing so will delete all associated marks from the markbook.',
