@@ -13,14 +13,12 @@
                 {% set checkedPublic = '' %}
                 {% set checkedPrivate = '' %}
 
-                {% if userAccess.role_id == role.id %}
-                    {% if userAccess.access == 0 %}
-                        {% set checkedDeny = 'checked' %}
-                    {% elseif userAccess.access == 1 %}
-                        {% set checkedPublic = 'checked' %}
-                    {% elseif userAccess.access == 2 %}
-                        {% set checkedPrivate = 'checked' %}
-                    {% endif %}
+                {% if userAccess.access == 0 %}
+                    {% set checkedDeny = 'checked' %}
+                {% elseif userAccess.access == 1 %}
+                    {% set checkedPublic = 'checked' %}
+                {% elseif userAccess.access == 2 %}
+                    {% set checkedPrivate = 'checked' %}
                 {% endif %}
 
                 <tr data-role-id="{{ userAccess.role.id }}">
