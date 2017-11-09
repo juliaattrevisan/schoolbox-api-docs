@@ -31,28 +31,27 @@
                                     {# Display name of poster #}
                                     <p class="meta">
                                         Created by <a href="{{ profile.link(record.owner) }}">{{ record.owner.fullName }}</a>
-                                        <span title="{{ record.createdAt.short }}">{{ record.createdAt.relativeDay }}</span>
-                                    </p>
+                                        <span title="{{ record.createdAt.short }}">{{ record.createdAt.relativeDay }}</span><br>
 
-                                    {# Display last updated by if applicable #}
-                                    {% if record.createdAt.long != record.updatedAtDisplay.long %}
-                                        <p class="meta">
-                                            Last updated by <a href="{{ profile.link(record.modifiedByDisplay) }}">{{ record.modifiedByDisplay.fullName }}</a>
-                                            <span title="{{ record.updatedAtDisplay.short }}">{{ record.updatedAtDisplay.relativeDay }}</span>
-                                        </p>
-                                    {% endif %}
+                                        {# Display last updated by if applicable #}
+                                        {% if record.createdAt.long != record.updatedAtDisplay.long %}
+                                                Last updated by <a href="{{ profile.link(record.modifiedByDisplay) }}">{{ record.modifiedByDisplay.fullName }}</a>
+                                                <span title="{{ record.updatedAtDisplay.short }}">{{ record.updatedAtDisplay.relativeDay }}</span><br>
+                                        {% endif %}
 
-                                    {# Display linked students to staff #}
-                                    {% if user.role.isStaff and record.relatedRecords|length %}
-                                        <p class="meta">
+                                        {# Display linked students to staff #}
+                                        {% if user.role.isStaff and record.relatedRecords|length %}
                                             {% for relatedRecord in record.relatedRecords %}
-                                                {% set getStudentRecord = routeLookupIfAuthorized('pastoral.getStudentRecord', {studentId: relatedRecord.student.id, 'recordId': relatedRecord.id}) %}
-                                                {% if getStudentRecord %}
-                                                    Linked Record: <a href="{{ getStudentRecord }}">{{ relatedRecord.student.fullName }} - {{ relatedRecord.heading }}<br></a>
+                                                {% if student.id != relatedRecord.student.id %}
+                                                    {% set getStudentRecord = routeLookupIfAuthorized('pastoral.getStudentRecord', {studentId: relatedRecord.student.id, 'recordId': relatedRecord.id}) %}
+                                                    {% if getStudentRecord %}
+                                                        Linked Record:
+                                                        <a href="{{ getStudentRecord }}">{{ relatedRecord.heading }}</a> (<a href="{{ profile.link(relatedRecord.student) }}">{{ relatedRecord.student.fullName }}</a>)<br>
+                                                    {% endif %}
                                                 {% endif %}
                                             {% endfor %}
-                                        </p>
-                                    {% endif %}
+                                        {% endif %}
+                                    </p>
                                 </div>
                             </div>
                             <nav>

@@ -296,11 +296,16 @@ class Mapper extends BaseMapper
             // This is a parent item, just find its children
 
             $query .= "
-                WHERE   `{$tableName}`.`parent_id` = :parent_id AND 
-                        `{$tableName}`.`deleted_at` IS NULL
+                WHERE   (
+                            (`{$tableName}`.`parent_id` = :parent_id_0 AND `{$tableName}`.`student_id` <> :student_id) OR
+                            (`{$tableName}`.`id` = :parent_id_1)
+                        ) 
+                        AND `{$tableName}`.`deleted_at` IS NULL
             ";
 
-            $bindings['parent_id'] = $record->getId();
+            $bindings['student_id'] = $record->getStudent()->getId();
+            $bindings['parent_id_0'] = $record->getId();
+            $bindings['parent_id_1'] = $record->getId();
         }
 
         $statement = $this->database->prepare($query);

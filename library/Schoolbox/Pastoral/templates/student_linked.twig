@@ -7,50 +7,18 @@
 {{ bread.crumbs(
 [ locale.pastoralCare.proper,              routeLookup('pastoral.getIndex') ],
 [ student.fullName,      routeLookup('pastoral.getStudent', {studentId: student.id}) ],
-[ 'Linked Records - ' ~ linkedStudent.fullName ]
+[ 'Linked Records (' ~ linkedStudent.fullName ~ ')' ]
 ) }}
 
 <div class="row">
     <div class="list-item">
         <div class="small-12 column">
-            <h1>{{ student.fullName }} - Linked Records - {{ linkedStudent.fullName }}</h1>
+            <h1>{{ student.fullName }} - Linked Records ({{ linkedStudent.fullName }})</h1>
         </div>
     </div>
 </div>
-<div class="row actions-small-2">
-    <div class="list-item">
-        <div class="small-12 island">
-            <h2 class="subheader">{{ locale.pastoral.proper }} Profile</h2>
-        </div>
-    </div>
-    {% if user.role.isStaff %}
-        <nav>
-            {% set routeGetGroups = routeLookupIfAuthorized('pastoralManagement.getGroups') %}
-            {% set routeRecordInsert = routeLookupIfAuthorized('pastoral.getStudentRecordInsertForm', {'studentId': record.student.id}) %}
-            {% set routeReportBuilder = routeLookupIfAuthorized('pastoralReportBuilder.getIndex') %}
 
-            {% if routeReportBuilder %}<a href="{{ routeReportBuilder }}" class="icon-result" title="{{ locale.pastoral.proper }} Report Builder"></a>{% endif %}
-            {% if routeGetGroups %}<a href="{{ routeGetGroups }}" class="icon-group" title="Manage {{ locale.pastoral.proper }} Groups"></a>{% endif %}
-            {% if linkedStudents | length %}<a href="#" class="icon-link" data-dropdown="linked-students" title="Linked Students"></a>{% endif %}
-            {% if routeRecordInsert %}<a href="{{ routeRecordInsert }}" class="icon-add" title="Add {{ locale.pastoral.proper }} Record"></a>{% endif %}
-        </nav>
-        {% if linkedStudents | length %}
-            <ul class="f-dropdown" data-dropdown-content="" id="linked-students">
-                <li class="separator">Students With Linked Records</li>
-                {% for linkedStudent in linkedStudents %}
-                    <li>
-                        <a href="{{ routeLookup('pastoral.getLinked', {studentId: student.id, linkedStudentId: linkedStudent.student_id }) }}"
-                           class="icon-user">
-                            {{ linkedStudent.first_name }} {{ linkedStudent.last_name }} ({{ linkedStudent.count }})
-                        </a>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    {% endif %}
-</div>
-
-{% include '@pastoral/student_section_summary.twig' with { student: student } %}
+{% include '@pastoral/student_section_summary.twig' with { student: student, linkedStudent: linkedStudent } %}
 {% include '@pastoral/student_section_filter.twig' %}
-{% include '@pastoral/student_section_records.twig' %}
+{% include '@pastoral/student_section_records.twig' with { linkedStudent: linkedStudent } %}
 
