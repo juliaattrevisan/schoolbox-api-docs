@@ -10,6 +10,7 @@
 namespace Schoolbox\Engagement;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress_Date_Format;
 
 class Login
 {
@@ -40,10 +41,18 @@ class Login
         $this->sessionLength = null === $sessionLength ? self::SESSION_LENGTH_DEFAULT : (int)$sessionLength;
     }
 
-    public function loginByGroup(\Alaress_Date_Format $start, \Alaress_Date_Format $end) {
-        $query = "SELECT groups.name,  groups.id,  COUNT(*) AS total FROM login_log JOIN  `user` ON login_log.username = `user`.username JOIN groups ON user.group_id = groups.id
-                  WHERE login=1 AND date >= :start AND date <= :end
-                  GROUP BY group_id";
+    public function loginByGroup(Alaress_Date_Format $start, Alaress_Date_Format $end)
+    {
+        $query = '
+            SELECT
+                groups.name,
+                groups.id,
+                COUNT(*) AS total
+            FROM login_log
+            JOIN `user` ON login_log.username = `user`.username
+            JOIN groups ON user.group_id = groups.id
+            WHERE login=1 AND date >= :start AND date <= :end
+            GROUP BY group_id';
 
         $statement = $this->database->prepareQuery($query);
         $statement->execute([
@@ -53,15 +62,23 @@ class Login
         return $statement->fetchAll();
     }
 
-    public function uniqueLoginByGroup(\Alaress_Date_Format $start, \Alaress_Date_Format $end) {
-        $query = "SELECT groups.`name`,
-                    (
-                        SELECT COUNT(DISTINCT(`user`.username)) FROM `user`
-                        INNER JOIN  login_log ON `user`.username = login_log.username
-                        WHERE group_id = groups.id AND login=1 AND `date` >= :start AND `date` <= :end
-                    ) as total
-                  FROM groups
-                    ";
+
+    /**
+     * @param Alaress_Date_Format $start
+     * @param Alaress_Date_Format $end
+     * @return array
+     * @throws \Alaress\Database\Exception
+     */
+    public function uniqueLoginByGroup(Alaress_Date_Format $start, Alaress_Date_Format $end): array
+    {
+        $query = '
+            SELECT groups.`name`,
+            (
+                SELECT COUNT(DISTINCT(`user`.username)) FROM `user`
+                INNER JOIN login_log ON `user`.username = login_log.username
+                WHERE group_id = groups.id AND login=1 AND `date` >= :start AND `date` <= :end
+            ) AS total
+          FROM groups';
 
         $statement = $this->database->prepareQuery($query);
         $statement->execute([
