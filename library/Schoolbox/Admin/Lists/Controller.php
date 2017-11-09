@@ -468,7 +468,7 @@ class Controller extends Base
                     ],
                     'displayAs'     => [
                         'caption'   => 'Display Name',
-                        'width'     => 8,
+                        'width'     => 6,
                         'maxLength' => 16,
                     ],
                     'normaliseAs'   => [
