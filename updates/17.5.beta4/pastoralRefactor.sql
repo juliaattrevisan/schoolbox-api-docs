@@ -61,3 +61,7 @@ INSERT INTO localisation (term, title, singular_form, plural_form, capitalise_fi
 VALUES ('pastoralPrivate', 'Pastoral Care (Confidential)', 'confidential', 'confidential', 1, 'a');
 
 ALTER TABLE pastoral_access CHANGE private access INT(11) DEFAULT '0';
+
+-- All pastoral care records have general+confidential access by default
+
+UPDATE `pastoral_access` SET `access` = 2;
