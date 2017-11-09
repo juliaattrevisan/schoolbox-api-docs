@@ -57,6 +57,7 @@
                     confirmEvent: function() {
                         // Uncheck
                         $(e.target).prop("checked", false);
+                        $(e.target).trigger('change')
                     }
                 });
             }
