@@ -13,12 +13,6 @@ ALTER TABLE pastoral MODIFY COLUMN `body_public` TEXT AFTER `body_private`;
 ALTER TABLE `pastoral_revision` ADD `body_public` TEXT NULL;
 ALTER TABLE pastoral_revision MODIFY COLUMN `body_public` TEXT AFTER `body_private`;
 
--- Undeprecate the `private` flag
-
-ALTER TABLE `pastoral` CHANGE `_private` `private` TINYINT(4) DEFAULT '0' COMMENT 'reinstated in 17.0.4';
-
-ALTER TABLE `pastoral_revision` CHANGE `_private` `private` TINYINT(4) DEFAULT '0' COMMENT 'reinstated in 17.0.4';
-
 -- Add a `private` flag to each access record
 
 -- If this is ticked then the user or group reference by the record will be able to see the `body_private` field
