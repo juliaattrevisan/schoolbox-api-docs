@@ -39,6 +39,8 @@ This is a collection of takeaways from each of the sections, distilled from thei
 
 * To make testable code, it can't rely on database records existing. Use mock content instead and use dependency injection so we can substitute custom-built objects when testing various scenarios.
 
+* Lower-level exceptions should be caught and managed, otherwise defer them to the caller. This ultimately limits the amount of exceptions that the Controller method must know about.
+
 ## 7.4 Summary of Mapper
 * Mappers contain methods which alter persistent storage; putting data in and getting data out of that storage into a format that's compatible with Controller methods in the domain (business logic) layer.
 

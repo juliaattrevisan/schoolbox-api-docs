@@ -91,3 +91,10 @@ Unit tests allow us to automatically verify that the behaviour of business logic
 > To make testable code, it can't rely on database records existing. Use mock content instead and use dependency injection so we can substitute custom-built objects when testing various scenarios.
 
 Try to invent tests that thwart your implementation. The more we automate these tests, the less we have to do manually.
+
+## 3.3 Error Handling
+Supporting Classes should be catching exceptions thrown by dependencies and dealing with them accordingly. If an exception cannot be handled by this Supporting Class, don't try to catch it and process it somehow; let it be dealt with by whatever is calling the Supporting Class.
+
+> Lower-level exceptions should be caught and managed, otherwise defer them to the caller. This ultimately limits the amount of exceptions that the Controller method must know about.
+ 
+Eventually the Controller method must catch all the exceptions that were thrown by its delegates. Ideally we should minimise the list of exceptions that the Controller must know about and convert into a user-friendly version.

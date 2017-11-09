@@ -31,6 +31,7 @@ Basic statements on what to do. For specific reasoning, see links next to each s
 * Inject dependencies into Supporting Classes for testability and reusability purposes. [(more)](03-supporting.md#3-responsibilities-of-supporting-classes)
 * Add unit tests. [(more)](03-supporting.md#32-unit-tests)
 * Optionally use existing Design Patterns as starting points when architecting additional classes. [(more)](03-supporting.md#31-design-patterns)
+* Progressively catch and process exceptions from lower-level dependencies. If a Supporting Class can't/shouldn't manage a particular exception, defer it to the caller. [(more)](03-supporting.md#33-error-handling)
  
 ## 4 Mapper
 * Remember that Mappers convert database records into business models. With large data sets this could be costly process. [(more)](04-mapper.md#4-responsibilities-of-mapper)
