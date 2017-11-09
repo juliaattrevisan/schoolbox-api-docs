@@ -14,6 +14,12 @@ http://www.jamesshore.com/Blog/Dependency-Injection-Demystified.html
 * *Design Patterns.* Common architectural solutions to problems. There are numerous patterns that you can use. Find a reasonably similar description to your current problem and see if it helps.
 https://sourcemaking.com/design_patterns
 
+* *Hydration.* Putting values into an instance.
+https://www.reddit.com/r/PHP/comments/2x5sur/what_is_hydration/
+
+* *Information Hiding.* Encapsulating logic to hide details from the caller.
+https://www.webopedia.com/TERM/I/information_hiding.html
+
 * *MVC Model-View-Controller.* Aura modules follow this pattern.
 https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller
 
