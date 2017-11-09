@@ -21,6 +21,7 @@
     * 2.5 Corresponding Route Docblock
 * [3 Responsibilities of Supporting Classes](03-supporting.md)
     * 3.1 Design Patterns
+    * 3.2 Unit Tests
 * [4 Responsibilities of Mapper](04-mapper.md)
     * 4.1 Mapper Usage
         * 4.1.1 Fetch minimal data set vs trimming away

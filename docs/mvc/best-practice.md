@@ -29,7 +29,7 @@ Basic statements on what to do. For specific reasoning, see links next to each s
 ## 3 Supporting Classes
 * Contains low-level business logic and processing, hiding it from the main Controller method in which it's called. [(more)](03-supporting.md#3-responsibilities-of-supporting-classes)
 * Inject dependencies into Supporting Classes for testability and reusability purposes. [(more)](03-supporting.md#3-responsibilities-of-supporting-classes)
-* Add unit tests. 
+* Add unit tests. [(more)](03-supporting.md#32-unit-tests)
 * Optionally use existing Design Patterns as starting points when architecting additional classes. [(more)](03-supporting.md#31-design-patterns)
  
 ## 4 Mapper

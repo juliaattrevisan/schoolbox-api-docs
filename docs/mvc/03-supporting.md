@@ -84,3 +84,10 @@ Supporting classes are independent classes; they aren't bound to any particular 
 > Design Patterns aren't rigid laws that absolutely must be obeyed and used at all times. They are (generally) simplified empirical solutions to particular *kinds* of problems that have consistently emerged. It is up to the author to determine whether a Design Pattern should be used, and if so, which one. 
 
 A cron job or once-off script, for example, may not require the architectural forethought of a Design Pattern; a cruder solution may be sufficient. On the other hand, Design Patterns form the basis of a common language which can be used to succinctly communicate a larger system design.
+
+## 3.2 Unit Tests
+Unit tests allow us to automatically verify that the behaviour of business logic still produces the same output. If a behaviour changes and causes output to be slightly different, it can go unchecked until it reaches public usage and by then, all sorts of things can go wrong - from displaying wrong data to a user, to data being irrevocably destroyed.
+
+> To make testable code, it can't rely on database records existing. Use mock content instead and use dependency injection so we can substitute custom-built objects when testing various scenarios.
+
+Try to invent tests that thwart your implementation. The more we automate these tests, the less we have to do manually.
