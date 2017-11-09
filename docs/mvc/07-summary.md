@@ -40,6 +40,8 @@ This is a collection of takeaways from each of the sections, distilled from thei
 ## 7.4 Summary of Mapper
 * Mappers contain methods which alter persistent storage; putting data in and getting data out of that storage into a format that's compatible with Controller methods in the domain (business logic) layer.
 
+* Whenever you access the database try to obtain the minimum amount of data necessary and minimise the number of database calls needed to accomplish this. Avoid postprocessing data where possible.
+
 * Break away specific responsibilities into other classes instead. Note that Mappers expose a method that executes raw sql queries: `$mapper->getDatabase()->prepare()`
 
 * Use `getSelectString()`, `getFromString()` and `hydrateSelect()` to specify a default hydration for each of your basic `findBy*` queries. This ensures a uniform behaviour in hydration and assembly.

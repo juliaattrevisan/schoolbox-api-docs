@@ -22,6 +22,9 @@
     * 3.1 Design Patterns
 * 4 Responsibilities of Mapper
     * 4.1 Mapper Usage
+        * 4.1.1 Fetch minimal data set vs trimming away
+        * 4.1.2 Fetching Scalars
+        * 4.1.3 Queries in loops
     * 4.2 Special Queries
     * 4.3 Default Hydration
     * 4.4 Caching

@@ -28,8 +28,112 @@ class Mapper extends BaseMapper {
 ```
 
 ## 4.1 Mapper Usage
+Mapper calls can be somewhat expensive to use due to the sheer amount of data being obtained. On very complex data sets this can lead to terrible load times (if it loads at all) and we should avoid this situation if possible. 
 
+> Whenever you access the database try to obtain the minimum amount of data necessary and minimise the number of database calls needed to accomplish this. Avoid postprocessing data where possible.
 
+There are some scenarios where you can't do this very effectively - namely when you can't apply sufficient conditionals in the query itself, such as data being affected by role-based permissions checks (we can't compute those in joins). 
+
+### 4.1.1 Fetch minimal data set vs trimming away
+Obtain the minimum data set instead of getting more than you need, only to delete records you don't want in a postprocessing loop. Use limits and conditionals to restrict the data set.
+
+Using the predicate builder:
+
+```php
+/* Do: use limits and conditionals
+ */
+$pb = $mapper->getPredicateBuilder()
+  ->equals('a', $value)
+  ->greaterThan('size', 50)
+  ->isFalse('visible');
+
+$mapper->findByPredicates($pb, [
+  'order' => [ 'b' => 'ASC' ],
+  'limit' => 3
+]);
+
+/* Don't: get everything and then remove the stuff you don't want or need
+ */
+$mapper->findByColumn('a', $value)
+       ->filter(function ($obj) { return $obj->getSize() > 50 && !$obj->isVisible(); })
+       ->sortBy('b', 'ASC')
+       ->limit(3);
+```
+
+Using normal queries:
+
+```php
+/* Do: Use the predicate builder (see above)
+ * Alternatively, use a special query
+ */
+$allResults = $mapper->findBySomeSpecialName($value);
+
+/* Don't: get everything and then remove the stuff you don't want or need
+ */
+$allResults = $mapper->findByColumn('a', $value);
+
+foreach ($allResults as $current) {
+    if (($current->getSize() < 50) || $current->isVisible()) {
+        $filteredResults[] = $current;
+    }
+}
+```
+
+### 4.1.2 Fetching Scalars
+There are convenience methods that allow you to get the values of a particular column/property so that you don't have to hydrate a whole bunch of stuff. 
+
+```php
+/* Do: Use this convenience method instead of hydrating everything
+ */
+$mapper->findIdsByColumn('a', $value);
+
+/* Don't: Hydrate everything like this then throw away data
+ */
+$allResults = $mapper->findByColumn('a', $value);
+
+foreach ($allResults as $current) {
+    $ids[] = $current->getId();
+}
+
+/* Don't: this is also not nice
+ */
+$mapper->findByColumn('a', $value)->getColumnValues('id');
+```
+
+### 4.1.3 Queries in loops
+Database connections cost time, as do their queries. Instead of repeatedly getting one record at a time, fetch them all in one go.
+
+```php
+/* Do: Use a set to find all the records such that column 'a' is one of
+ * the values provided in the array
+ */
+$mapper->findByColumn('a', [1,2,3,4,5,6]);
+
+/* Don't: Get them all individually 
+ */
+foreach ([1,2,3,4,5,6] as $current) {
+    $allResults[] = $mapper->findByColumn('a', $current);
+}
+```
+
+Note that if you are using your own special queries and PDO, there's a `WHERE IN` equivalent in prepared statements.  
+
+```php
+/* Do: Collate a set of values to obtain in one query
+ */
+$values = [1,2,3,4,5,6];
+
+$query = "
+    SELECT * 
+    FROM table
+    WHERE FIND_IN_SET(a, :values)
+";
+
+$statement = $this->database->prepare($query);
+$statement->execute([
+    'values' => implode(',', $values)
+]);
+```
 
 ## 4.2 Special Queries
 Less common or otherwise unique queries should be stored in supporting classes instead, which utilise an instance of a corresponding Mapper; otherwise people might misuse it. 
