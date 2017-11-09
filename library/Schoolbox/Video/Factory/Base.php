@@ -18,7 +18,6 @@ use Schoolbox\Video\ResourceVideo;
 use \Schoolbox\Video\ResourceVideoMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
-use Eportfolio_Authenticator;
 
 abstract class Base {
 
