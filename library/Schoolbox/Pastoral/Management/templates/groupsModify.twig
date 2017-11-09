@@ -84,7 +84,7 @@
                 </div>
             </div>
             <nav>
-                <a data-user-search="{{ guid }}" href="#" class="icon-add" title="Add Group Member"></a>
+                <a data-user-search="{{ guid }}" href="#" class="icon-add" title="Add User"></a>
             </nav>
         </div>
 
@@ -113,6 +113,11 @@
                     </li>
                 {% endfor %}
             </ul>
+            <div class="component-action">
+                <section>
+                    <a href="#" data-button="add-user" class="button" data-user-search="{{ guid }}">Add User</a>
+                </section>
+            </div>
         </section>
 
         {# --------------------------------------------------------------------------------------------------------------------------------------------#}
@@ -147,7 +152,7 @@
         window.usersAdded = [];
 
         {% for member in group.members %}
-        window.usersAdded[{{ member.user.id }}] = true;
+            window.usersAdded[{{ member.user.id }}] = true;
         {% endfor %}
 
         {# --------------------------------------------------------------------------------------------------------------------------------------------#}
@@ -180,16 +185,27 @@
                     .replace(/{EXTERNALID}/g, user.external_id);
 
                 membersList.html(membersList.html() + html);
+
+                {# Unhide the user list if it was previously empty #}
+
                 $('#membersListContainer').removeClass('hide');
 
                 {# Remove the empty state if it was visible #}
 
                 $('#membersEmpty').addClass('hide');
-
-                {# Update delete events #}
-
-                window.updateDeleteEvents();
             }
+
+            {# Update delete events #}
+
+            window.updateDeleteEvents();
+        };
+
+        {# Return existing group members #}
+
+        window.modalUsersExisting = function() {
+            {# Need to use slice to clone the array, otherwise the modal will update the contents of this erroneously #}
+
+            return window.usersAdded.slice(0);
         };
 
         {# Group member deleted #}
@@ -319,4 +335,4 @@
 {# Setup modal #}
 {# --------------------------------------------------------------------------------------------------------------------------------------------#}
 
-{{ userSearch.modal(guid, 'Add User To Group', 'Enter name', 'staff', null, 'window.modalUserAdded') }}
+{{ userSearch.modal(guid, 'Add User To Group', 'Enter name', 'staff', null, 'window.modalUserAdded', 'window.modalUsersExisting') }}
