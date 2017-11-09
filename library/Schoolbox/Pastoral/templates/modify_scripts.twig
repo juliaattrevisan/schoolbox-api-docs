@@ -94,7 +94,7 @@
             e.preventDefault();
             if (form.valid()) {
                 $(this).attr('disabled', 'true');
-                $(this).prop('value', 'Saving, Please Wait');
+                $(this).val('Saving, Please Wait');
                 form.submit();
             }
         });
