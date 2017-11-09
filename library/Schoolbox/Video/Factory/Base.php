@@ -18,7 +18,6 @@ use Schoolbox\Video\ResourceVideo;
 use \Schoolbox\Video\ResourceVideoMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as SubmissionMapper;
 
 abstract class Base {
 
@@ -83,7 +82,6 @@ abstract class Base {
 
                 // For my files we must first load myfile, then resolve the hash
                 $file = MyFileMapper::getInstance()->findById($this->getId());
-                $this->permissionCheck($file);
 
                 return $videoMapper->findByStorageHash($file->getHash());
 		}
