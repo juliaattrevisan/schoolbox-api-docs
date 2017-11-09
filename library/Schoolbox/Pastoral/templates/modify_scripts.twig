@@ -91,12 +91,12 @@
         {# Disable Save Button To Prevent Multiple Saves #}
 
         $('[data-submit]').click(function (e) {
+            e.preventDefault();
             if (form.valid()) {
                 $(this).attr('disabled', 'true');
                 $(this).prop('value', 'Saving, Please Wait');
                 form.submit();
             }
-            e.preventDefault();
         });
 
         {# Chain Pastoral Type/Subtype Dropdowns #}
