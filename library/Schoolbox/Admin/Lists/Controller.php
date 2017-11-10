@@ -477,9 +477,9 @@ class Controller extends Base
                         'width'     => 2,
                     ],
                     'isDefaultForNewSubmissions' => [
-                       'caption'   => 'Default for new submissions?',
-                       'radio'     => '1',
-                       'width'     => 2,
+                        'caption'   => 'Default for new submissions?',
+                        'radio'     => '1',
+                        'width'     => 2,
                     ]
                 ]
             ],
