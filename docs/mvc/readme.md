@@ -1,9 +1,9 @@
 # Table of Contents
 * [Best Practice Statements](best-practice.md)
 
-* [Anatomy of Module, Controller, Mapper, Model, Other](intro.md)
-* [Overview of Terms](intro.md)
-* [A Quick Recap](intro.md)
+* [Anatomy of Module, Controller, Mapper, Model, Other](00-intro.md)
+* [Overview of Terms](00-intro.md)
+* [A Quick Recap](00-intro.md)
 * [1 Responsibilities of Module](01-module.md)
     * 1.1 Determining the Route and corresponding Controller method
         * 1.1.1 Tokens are array keys in $params
