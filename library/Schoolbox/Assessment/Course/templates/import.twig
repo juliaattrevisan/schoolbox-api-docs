@@ -7,7 +7,7 @@ Importing a CourseSpec to mulitple classes generates multiple CourseImpls.
 
 Usages:
     action:                 string {'import' | 'modify'}
-    initialStage:           int {1,2,3}
+    initialStage:           int {1,2}
     courseSpec:             CourseSpecification | null
     courseImpl:             CourseImplementation | null  - null if an 'import'
     destinations:           array
@@ -34,7 +34,7 @@ Usages:
 
         {# Global mage init #}
         $('input[data-mage-next]').mage({
-            // all use the same reversion test
+            // all use the same reversion test. Subsequent mage attachment will merge options.
             confirmRevert: confirmRevert
         });
 
@@ -58,7 +58,7 @@ Usages:
         {# Setup class selectize #}
         $('#import_folders').selectizeSelector({
             ajax: {
-                url:      '/course/import/classes',
+                url:      '{{ routeLookup('courseImport.searchClasses') }}',
                 type:     'GET',
                 dataType: 'json'
             },
@@ -66,47 +66,29 @@ Usages:
             value: {{ destinations|json_encode|raw }}
         });
 
-        // This function name is called dynamically. (hence erroneous storm-warning re: unused local var)
         var initStage1 = function() {
             {# Init stage 1 mage #}
-            var stageOne = $('input[data-mage-next="part-ownership"]');
-
-            stageOne.mage({
+            $('input[data-mage-next="part-2"]').mage({
                 validateOptions: {
                     rules: {
-                        importCourse: {required: true},
-                        importFolders: {required: true}
+                        course_spec_id: {required: true},
+                        import_folders: {required: true}
                     }
                 },
                 onXhrDone: function (data) {
-                    $('#ownership_assignment').html(data);
+                    $('#import_units').html(data);
                     initStage2();
                 }
             });
         };
 
 
+        {# Init stage 2 mage #}
         var initStage2 = function() {
-
-            var stageTwo = $('input[data-mage-next="part-unit-select"]');
-
-            stageTwo.mage({
-                onXhrDone: function (data) {
-                    $('#import_units').html(data);
-                    initStage3();
-                }
-            });
-        };
-
-        {# Init stage 3 mage #}
-        var initStage3 = function() {
-
             $('[data-datepicker]').each(attachAlaressDatePicker);
 
-            var stageThree = $('input[data-mage-next="part-assessments-select"]');
-
-            stageThree.mage({
-                confirmRevert: confirmRevert,
+            var $magePart2 = $('input[data-mage-next="part-3"]');
+            $magePart2.mage({
                 validateOptions: {
                     ignore: ':disabled'
                 },
@@ -143,19 +125,18 @@ Usages:
                     {# Set content #}
 
                     $('#import_assessments').html(data);
-                    initStage4();
+                    initStage3();
                 }
             });
+            $magePart2.mage('open');
         };
 
-        var initStage4 = function(){
-
-            {# Init stage 4 mage #}
+        var initStage3 = function(){
+            {# Init stage 3 mage #}
             $('[data-datepicker]').each(attachAlaressDatePicker);
 
-            var stageFour = $('input[data-mage-next="part-results-select"]');
-
-            stageFour.mage({
+            var $magePart3 = $('input[data-mage-next="none"]');
+            $magePart3.mage({
                 validateOptions: {},
                 beforeSubmit: function() {
                     // check every visible publish date field
@@ -176,12 +157,13 @@ Usages:
                     });
                     // check every visible due date field
                     $('input[data-role="due_date"]:visible:enabled').each(function() {
-                        var lessonId = $(this).data('assessment-id');
+                        var lessonId = $(this).data('assessment-id'),
+                            dateRole;
                         // if an open date exists then it needs to be before then, otherwise before publish date
                         if ($('input[data-role="open_date"][data-assessment-id="' + lessonId + '"]').length > 0) {
-                            var dateRole = 'open_date';
+                            dateRole = 'open_date';
                         } else {
-                            var dateRole = 'publish_date';
+                            dateRole = 'publish_date';
                         }
                         var otherDate = $('input[data-role="' + dateRole + '"][data-assessment-id="' + lessonId + '"]');
                         $(this).rules('add', {
@@ -201,18 +183,25 @@ Usages:
                 },
                 onXhrDone: function(data) {
 
-                    if (typeof data == 'object' && 'redirect' in data && data.redirect) {
+                    if (typeof data === 'object' && 'redirect' in data && data.redirect) {
                         {# Go back to wherever you came from (hopefully) -#}
+                        /** @var {string} data.redirect*/
                         window.location.href = data.redirect;
                     }
                     // If something goes wrong, DO NOT redirect. Stay here to enable debugging.
-                    // TODO this should display an error message in mage, but there's no documentation on how to do that.
                 }
             });
+            $magePart3.mage('open');
         };
 
         // Initialise JS at correct stage
-        eval('initStage' + {{ initialStage }})();
+        {% if 1 == initialStage %}
+            initStage1();
+        {% elseif 2 == initialStage %}
+            initStage2();
+        {% else %}
+            throw new Error('Unrecognised initial mage step: ' + {{ initialStage }});
+        {% endif %}
     });
 </script>
 <div class="row">
@@ -227,17 +216,20 @@ Usages:
         <div class="row">
             <div class="small-12 column">
                 <ul class="train-line">
-                    <li data-mage-trainstop="part-course-select"{% if 1 == initialStage %} class="current-stop"{% endif %}><a><span class="icon-course-builder"></span>Course</a></li>
-                    <li data-mage-trainstop="part-ownership"{% if 2 == initialStage %} class="current-stop"{% endif %}><a><span class="icon-teacher"></span>Ownership</a></li>
-                    <li data-mage-trainstop="part-unit-select"{% if 3 == initialStage %} class="current-stop"{% endif %}><a><span class="icon-unit"></span>{{ locale.unit.properPlural }}</a></li>
-                    <li data-mage-trainstop="part-assessments-select"><a><span class="icon-curriculum"></span>Coursework</a></li>
+                    <li data-mage-trainstop="part-1"{% if 1 == initialStage %} class="current-stop"{% endif %}>
+                        <a><span class="icon-course-builder"></span>Course</a>
+                    </li>
+                    <li data-mage-trainstop="part-2"{% if 2 == initialStage %} class="current-stop"{% endif %}>
+                        <a><span class="icon-unit"></span>{{ locale.unit.properPlural }}</a>
+                    </li>
+                    <li data-mage-trainstop="part-3"><a><span class="icon-curriculum"></span>Coursework</a></li>
                 </ul>
             </div>
         </div>
 
         <form method="post">
             <section>
-                <fieldset class="content" data-mage="part-course-select" {% if 1 != initialStage %}disabled="disabled"{% endif %}>
+                <fieldset class="content" data-mage="part-1" {% if 1 != initialStage %}disabled="disabled"{% endif %}>
                     <legend>1. Course</legend>
                     {% if 1 == initialStage %}
                     <div class="meta small-12 column" data-mage-helptext>
@@ -246,14 +238,13 @@ Usages:
                     {% endif %}
                     <div class="small-5 medium-5 large-3 columns">
                         {% include 'sub/selectorShard.twig' with {
-                                'formLabel': 'Course',
+                                'formLabel':     'Course',
                                 'formInputName': 'course_spec_id',
                                 'formInputValue': courseSpec.id,
                                 'formInputLabel': courseSpec.folder.name,
-                                'folder': folder,
-                                'activator': 'data-course-selector',
-                                'title': 'Select Course to import'
-                            }
+                                'activator':      'data-course-selector',
+                                'title':          'Select Course to import'
+                            } only
                         %}
                     </div>
                     <div class="small-2 medium-2 large-1 columns text-center">
@@ -271,74 +262,83 @@ Usages:
                                     <p class="alert alert-box icon-alert" data-mage-error></p>
                                 </div>
                                 <div class="small-12 medium-4 column">
-                                    <input type="submit" name="part-course-select" value="Next" data-mage-next="part-ownership" data-mage-working="Working..." formaction="{{ routeLookup('courseImport.postClasses') }}" />
+                                    <input
+                                        type="submit"
+                                        name="part-1"
+                                        value="Next"
+                                        data-mage-next="part-2"
+                                        data-mage-working="Working..."
+                                        formaction="{{ routeLookup('courseImport.postClasses') }}"
+                                    />
                                 </div>
                             </div>
                         </div>
                     {% endif %}
                     <input type="hidden" name="component_id" value="{{ componentId }}">
                 </fieldset>
-                <fieldset class="content" data-mage="part-ownership" {% if initialStage > 2 %}disabled{% endif %}>
-                    <legend>2. Ownership</legend>
-                    <div class="small-12 column {% if initialStage < 2 %}hide{% endif %}" data-mage-collapsed>
-                        <div id="ownership_assignment">
-                        {% if 2 == initialStage %}
-                            {% include '@course/import/ownership.twig' with {
-                                courseSpec:                    courseSpec,
-                                componentId:                   componentId,
-                                targetFolders:                 [ folder ],
-                                ownershipCandidates:           ownershipCandidates,
-                                _disabled:                     false
-                            } only %}
-                        {% elseif 3 == initialStage %}
-                            {% include '@course/import/ownership.twig' with {
-                                courseSpec:                    courseSpec,
-                                componentId:                   componentId,
-                                targetFolders:                 [ folder ],
-                                ownershipCandidates:           ownershipCandidates,
-                                _disabled:                     true
-                            } only %}
-                        {% else %}
-                            {# will be populated by ajax #}
-                        {% endif %}
+                <fieldset class='content' data-mage="part-2">
+                    <legend>2. {{ locale.unit.properPlural }}</legend>
+                    {% if encodedReturnUrl %}
+                        <input type="hidden" name="{{ returnUrlName }}" value="{{ encodedReturnUrl }}" />
+                    {% endif %}
+                    <div class="small-12 column{% if 2 != initialStage %} hide{% endif %}" data-mage-collapsed >
+                        <div id="import_units">
+                            {% if 2 == initialStage %}
+                                {% include '@course/unitImportForm.twig' with {
+                                    action:       action,
+                                    courseSpecId: courseSpecId,
+                                    folderIds:    folderIds,
+                                    courseImplId: courseImpl.id,
+                                    componentId:  componentId,
+                                    unitsImpls:   unitsImpls
+                                } only %}
+                            {% endif %}
                         </div>
-                        {% if initialStage < 3 %}
+                        <div class="small-12 column">
                             <div class="row" data-mage-submitrow>
                                 <div class="small-12 medium-8 column">
                                     <p class="alert alert-box icon-alert" data-mage-error></p>
                                 </div>
                                 <div class="small-12 medium-4 column">
-                                    <input type="submit" name="part-ownership" value="Next" data-mage-next="part-unit-select" data-mage-working="Working..." formaction="{{ routeLookup('courseImport.postOwnership') }}" />
+                                    <input
+                                        type="submit"
+                                        name="part-2"
+                                        value="Next"
+                                        data-mage-next="part-3"
+                                        data-mage-working="Working..."
+                                        formaction="{{ routeLookup('courseImport.postUnits') }}"
+                                    />
                                 </div>
                             </div>
-                        {% endif %}
-                    </div>
-                </fieldset>
-                <fieldset class='content' data-mage="part-unit-select">
-                    <legend>3. {{ locale.unit.properPlural }}</legend>
-                    {% if encodedReturnUrl %}<input type="hidden" name="{{ returnUrlName }}" value="{{ encodedReturnUrl }}" />{% endif %}
-                    <div class="small-12 column{% if 3 != initialStage %} hide{% endif %}" data-mage-collapsed >
-                        <div id="import_units">
-                            {% if 3 == initialStage %}
-                                {% include '@course/unitImportForm.twig' with {
-                                    action:       action,
-                                    courseSpecId: courseSpecId,
-                                    courseImplId: courseImpl.id,
-                                    componentId:  componentId,
-                                    unitsImpls:   unitsImpls,
-                                    componentId:  componentId,
-                                    ownerships:   ownerships
-                                } only %}
-                            {% endif %}
                         </div>
                     </div>
                 </fieldset>
-                <fieldset class='content' data-mage="part-assessments-select">
-                    <legend>4. Coursework</legend>
+                <fieldset class='content' data-mage="part-3">
+                    <legend>3. Coursework</legend>
                     <div class="small-12 column hide" data-mage-collapsed>
                         <div id="import_assessments">{# will be populated by ajax #}</div>
                         <!-- Notable absence: no [data-mage-submitrow] since this is the final section -->
-                        <input type="hidden" data-mage-next="none" name="part-assessments-select" value="1" />
+                        <div class="small-12 column">
+                            <div class="row" data-mage-submitrow>
+                                <div class="small-12 medium-8 column">
+                                    <p class="alert alert-box icon-alert" data-mage-error></p>
+                                </div>
+                                <div class="small-12 medium-4 column">
+                                    {% set urlSuffix = (encodedReturnUrl | length)
+                                        ? ('?' ~ returnUrlName ~ '=' ~ encodedReturnUrl)
+                                        : ''
+                                    %}
+                                    <input
+                                        name="part-3"
+                                        type="submit"
+                                        value="{% if 'import' == action %}Import{% else %}Modify{% endif %}"
+                                        data-mage-next="none"
+                                        data-mage-working="Working..."
+                                        formaction="{{ routeLookup('courseImport.postAssessments') }}{{ urlSuffix }}"
+                                    />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </fieldset>
             </section>

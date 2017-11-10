@@ -7,7 +7,7 @@
 
             $component.setupCourseOutline({
                 course_homepage: '{{ course.folder.id }}',
-                import_base_url: '{{ routeLookup('courseImport.getImportToClassForm', { courseSpecId: courseSpecification.id, classCode: courseImplementation.folder.id }) }}',
+                import_base_url: '{{ routeLookup('courseImport.getImport', { courseSpecId: courseSpecification.id, folderId: courseImplementation.folder.id }) }}',
                 readonly:        {{ readOnly ? 'true':'false' }},
                 previewSelector: '[data-plugin=preview]'
             });
@@ -47,7 +47,7 @@
         {% if not readOnly %}
         <div class="component-action">
             <section>
-                <a href="{{ routeLookup('courseImport.importModify', { courseImplId: courseImplementation.id }) }}{{ urlSuffix }}" class="button">Modify</a>
+                <a href="{{ routeLookup('courseImport.getModify', { courseImplId: courseImplementation.id }) }}{{ urlSuffix }}" class="button">Modify</a>
             </section>
         </div>
         {% endif %}

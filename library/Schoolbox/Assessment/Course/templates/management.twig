@@ -136,7 +136,7 @@ Usage:
                 </div>
             </div>
             <nav>
-                <a href="{{ routeLookup('courseImport.getImportToClassForm', { courseSpecId: 0, classCode: folder.id }) }}" class="icon-add" title="Import Course" data-course-selector></a>
+                <a href="{{ routeLookup('courseImport.getImport', { courseSpecId: 0, folderId: folder.id }) }}" class="icon-add" title="Import Course" data-course-selector></a>
             </nav>
         </div>
 
@@ -179,7 +179,11 @@ Usage:
                             </li>
                         {% endif %}
                         <li>
-                            <a href="{{ routeLookup('courseImport.importModify', { courseImplId: currentCourse.id }) }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-modify" title="Modify Import">Modify</a>
+                            <a
+                                href="{{ routeLookup('courseImport.getModify', {courseImplId: currentCourse.id}) }}?{{ returnUrlName }}={{ encodedReturnUrl }}"
+                                class="icon-modify"
+                                title="Modify Import"
+                            >Modify</a>
                         </li>
                         <li>
                             <a href="{{ routeLookup('courseImport.importDelete', { courseImplId: currentCourse.id }) }}" class="icon-delete" title="Permanently Delete Import" data-delete>Delete</a>
@@ -197,7 +201,10 @@ Usage:
             <i class="icon-course"></i>
             <p>
                 There are no courses associated with this homepage, but you can
-                <a href="{{ routeLookup('courseImport.getImportToClassForm', { courseSpecId: 0, classCode: folder.id }) }}" data-course-selector>import one</a>.
+                <a
+                    href="{{ routeLookup('courseImport.getImport', { courseSpecId: 0, folderId: folder.id }) }}"
+                    data-course-selector
+                >import one</a>.
             </p>
         </div>
 

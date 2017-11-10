@@ -2,6 +2,7 @@
     {% include '@course/unitImportResullts.twig' with {
         action:       string {'import'|'modify'},
         courseSpecId: int,
+        folderIds:        null|int[]                                       - null if a 'modify''. List of folder IDs if 'import'
         courseImplId: int|null,
         units:        array,
         units[unitSpecId]['unitSpec']: UnitSpecification,
@@ -10,11 +11,9 @@
         units[unitSpecId]['assessments'][]['spec']: IAssessable | null,
         units[unitSpecId]['assessments'][]['impl']: IAssessable | null,
         componentId:  int|null,
-        ownerships:   string
     } only %}
 #}
 
-<script type="text/javascript" src="/javascript/shared/course/jquery.course-import.js"></script>
 <script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
 
 <script>
@@ -30,7 +29,7 @@
         // Copy dates from Unit to Assessment when user clicks 'Use Unit Date'
         $(document).on('click', '[data-handler="hide"]', function () {
 
-            if (typeof $.datepicker._curInst.id == 'string') {
+            if (typeof $.datepicker._curInst.id === 'string') {
 
                 var $input = $('#' + $.datepicker._curInst.id);
 
@@ -123,11 +122,9 @@
 
 <input type="hidden" name="action" value="{{ action }}" />
 <input type="hidden" name="course_spec_id" value="{{ courseSpecId }}" />
+<input type="hidden" name="import_folders" value="{{ folderIds|join(',') }}" />
 <input type="hidden" name="course_impl_id" value="{{ courseImplId }}" />
 <input type="hidden" name="component_id"   value="{{ componentId }}" />
-<input type="hidden" name="ownerships"     value="{{ ownerships }}" />
-
-
 
 {# Iterate through each unit being imported #}
 
@@ -144,15 +141,3 @@
     } only %}
 
 {% endfor %}
-
-<div class="small-12 column">
-    <div class="row" data-mage-submitrow>
-        <div class="small-12 medium-8 column">
-            <p class="alert alert-box icon-alert" data-mage-error></p>
-        </div>
-        <div class="small-12 medium-4 column">
-            {% set urlSuffix = (encodedReturnUrl | length) ? ('?' ~ returnUrlName ~ '=' ~ encodedReturnUrl) : '' %}
-            <input name="finalise" type="submit" value="{% if 'import' == action %}Import{% else %}Modify{% endif %}" data-mage-next="part-results-select" data-mage-working="Working..." formaction="{{ routeLookup('courseImport.postAssessments') }}{{ urlSuffix }}" />
-        </div>
-    </div>
-</div>

@@ -2,16 +2,15 @@
     {% include '@course/unitImportForm.twig' with {
         action:           string                       - {'import'|'modify'}
         courseSpecId:     int
-        courseImplId:     int|null
-        unitsImpls:       UnitImplementation[]
+        folderIds:        null|int[]                   - null if a 'modify''. List of folder IDs if 'import'
+        courseImplId:     int|null                     - null if an 'import', int if 'modify'
+        unitsImpls:       UnitImplementation[]         - with null IDs if an 'import'.
         componentId:      int|null                     - (optional)
-        ownerships:       string
     } only %}
 #}
 
 <!-- BEGIN custom_head -->
 
-<script type="text/javascript" src="/javascript/shared/course/jquery.course-import.js"></script>
 <script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
 
 <script>
@@ -24,7 +23,7 @@
                             'Doing so will delete all associated activities and marks from the markbook.',
                     confirmEvent: function() {
                         // Uncheck
-                        $(e.target).prop("checked", false);
+                        $(e.target).prop("checked", false).trigger('change');
                     }
                 });
             }
@@ -50,9 +49,9 @@
 
     <input type="hidden" name="action" value="{{ action|e }}"/>
     <input type="hidden" name="course_spec_id" value="{{ courseSpecId }}"/>
+    <input type="hidden" name="import_folders" value="{{ folderIds|join(',') }}" />
     <input type="hidden" name="course_impl_id" value="{{ courseImplId }}"/>
     <input type="hidden" name="component_id" value="{{ componentId }}"/>
-    <input type="hidden" name="ownerships" value="{{ ownerships }}" />
 
         <p data-mage-helptext class="meta">Select the {{ locale.unit.plural }} to be imported, and their open and close dates.</p>
         <ul class="information-list">
@@ -115,15 +114,6 @@
             {% endfor %}
 
         </ul>
-
-    <div class="small-12 column">
-        <div class="row" data-mage-submitrow>
-            <div class="small-12 medium-4 column">
-                <input type="submit" name="part-unit-select" value="Next" data-mage-next="part-assessments-select" data-mage-working="Working..." formaction="{{ routeLookup('courseImport.postUnits') }}" />
-            </div>
-        </div>
-    </div>
-
 {% endif %}
 
 
