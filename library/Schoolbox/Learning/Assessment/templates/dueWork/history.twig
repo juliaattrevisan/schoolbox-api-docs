@@ -90,9 +90,9 @@
                 {% endif %}
 
                 {% if currentInteraction is response %}
-                    {% include '@learningAssessment/fragments/dueWork/summary/interaction/response.twig' with {currentInteraction: currentInteraction, participant: participant} %}
+                    {% include '@learningAssessment/dueWork/summary/interaction/response.twig' with {currentInteraction: currentInteraction, participant: participant} %}
                 {% elseif currentInteraction is feedback %}
-                    {% include '@learningAssessment/fragments/dueWork/summary/interaction/feedback.twig' with {currentFeedback: currentInteraction, participant: participant} %}
+                    {% include '@learningAssessment/dueWork/summary/interaction/feedback.twig' with {currentFeedback: currentInteraction, participant: participant} %}
                 {% endif %}
             {% endfor %}
 

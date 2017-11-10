@@ -65,7 +65,7 @@
     });
 </script>
 
-{% import "@learningAssessment/fragments/project/macro/icon.twig" as icon %}
+{% import "@learningAssessment/project/macro/icon.twig" as icon %}
 
 <ul class="information-list {% if depth %}no-pad{% endif %}" {% if project %}data-project="{{ project.id }}"{% endif %} style="{% if hideRows %}display: none;{% endif %}">
     {% for assessmentPair in assessmentPairs %}

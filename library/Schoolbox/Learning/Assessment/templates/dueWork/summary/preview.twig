@@ -16,10 +16,10 @@
 
 <div class="row">
     <div class="small-12 island">
-        {% include '@learningAssessment/fragments/dueWork/summary/description.twig' with {assessment: assessment} %}
+        {% include '@learningAssessment/dueWork/summary/description.twig' with {assessment: assessment} %}
     </div>
 </div>
 
 {% if assessment.useRubric %}
-    {% include '@learningAssessment/fragments/dueWork/summary/rubric.twig' %}
+    {% include '@learningAssessment/dueWork/summary/rubric.twig' %}
 {% endif %}

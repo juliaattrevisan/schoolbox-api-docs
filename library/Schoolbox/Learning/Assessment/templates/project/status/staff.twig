@@ -79,8 +79,8 @@
 <div class="row">
     <div class="small-12 island">
 
-        {% include '@learningAssessment/fragments/project/summary/meta.twig' with {assessment: assessment} only %}
-        {% include '@learningAssessment/fragments/project/summary/description.twig' with {assessment: assessment} only %}
+        {% include '@learningAssessment/project/summary/meta.twig' with {assessment: assessment} only %}
+        {% include '@learningAssessment/project/summary/description.twig' with {assessment: assessment} only %}
 
         <div class="row">
             {% if assessment.baseContext is unitSpecification %}
@@ -97,7 +97,7 @@
                                 data-assessment-list
                                 data-action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'projects', contextId: assessment.id, context: context}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
                                 {% for assessable in assessment.assessables %}
-                                    {% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
+                                    {% import '@learningAssessment/project/macro/icon.twig' as icon %}
 
                                     <li data-assessment="{{ assessable.id }}" data-assessment-title="{{ assessable.title }}">
                                         <div class="actions-small-1">
