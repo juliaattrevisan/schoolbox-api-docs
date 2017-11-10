@@ -61,7 +61,6 @@ class ResponseFile
     /**
      * Figure out which fragment to load
      *
-     * @param Submission     $submission
      * @param SubmissionFile $file
      * @param User           $user
      * @return array
