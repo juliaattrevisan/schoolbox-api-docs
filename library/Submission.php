@@ -344,7 +344,7 @@ class Submission extends DeprecatedModel implements \Schoolbox\IHomepageCleanabl
         $query = "
             SELECT COUNT(DISTINCT(owner))
             FROM submission_return
-            WHERE box_id = '$box_id' AND is_confirmation_of_submission IS FALSE
+            WHERE box_id = '$box_id'
         ";
         $count['marked'] = $this->db->getOne($query);
         return $count;
