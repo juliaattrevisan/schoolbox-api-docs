@@ -8,17 +8,23 @@
 
 namespace Custom\Help\CourseParticipation;
 
+use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\Permission\SiteAccess;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Handler
 {
+
+    const REQUIRED_USER_FIELDS = [
+        'id', 'email', 'title', 'firstname', 'lastname'
+    ];
 
     /**
      * @var UserAccessMapper
@@ -95,19 +101,33 @@ class Handler
 
     /**
      * @param string $schoolCode
+     * @param bool   $fuzzy
      * @return array
      * @throws Mapper\DefinitionException
      */
-    public function getUsersBySchool($schoolCode)
+    public function getUsersBySchool($schoolCode, $fuzzy = false)
     {
         $roleId = $this->getRoleMapper()->findOneByColumn('name', Controller::PARTICIPANT_ROLE_NAME)->getId();
 
         // show the list of users for this school
         // filter to the list of users whose external IDs are prefixed with the given school code
-        $predicate = $this->getUserMapper()->getPredicateBuilder()
-            ->like('synergy_id', "{$schoolCode}.%")
-            ->equals('group_id', $roleId)
-        ;
+        $predicate = $this->getUserMapper()->getPredicateBuilder()->equals('group_id', $roleId);
+
+        if ($fuzzy) {
+            // if we're doing a fuzzy lookup, search by `year`
+            $map = json_decode(file_get_contents(__DIR__ . '/code-map.json'), true);
+
+            if (empty($map[$schoolCode])) {
+                // we don't have this code mapped, therefore nobody matches
+                return [];
+            }
+
+            $predicate->equals('year', $map[$schoolCode]);
+
+        } else {
+            // "normal" behaviour is to look up by external IDs
+            $predicate->like('synergy_id', "{$schoolCode}.%");
+        }
 
         // we only need the external ID itself, so bypass object hydration
         $rows = $this->getUserMapper()->findColumnsByPredicates([ 'username', 'synergy_id' ], $predicate);
@@ -125,10 +145,40 @@ class Handler
 
 
     /**
+     * Compute an access token (digest auth) for the given school code and timestamp.
+     *
+     * @param string               $schoolCode
+     * @param Alaress_Date_Format $now
+     * @throws Mapper\Exception
+     * @return string
+     */
+    public function computeAuthDigest($schoolCode, Alaress_Date_Format $now)
+    {
+        $privateKey = $this->tokenMapper->findById($schoolCode)->getAccessToken();
+
+        return $this->computeAccessToken($now, $schoolCode, $privateKey);
+    }
+
+
+    /**
+     * Mash ingredients thoroughly in a small bowl, seasoning with a little salt to taste.
+     *
+     * @param Alaress_Date_Format $timestamp
+     * @param string              $schoolCode
+     * @param string              $privateKey
+     * @return string
+     */
+    public function computeAccessToken(Alaress_Date_Format $timestamp, $schoolCode, $privateKey)
+    {
+        return sha1(sprintf(':%s-%s-%s:', $timestamp, $schoolCode, $privateKey));
+    }
+
+
+    /**
      * @param string $schoolCode
      * @throws Mapper\Exception
      * @throws Mapper\Exception\Deleted
-     * @return Collection|Folder\Model[]
+     * @return Collection|IFolder[]
      */
     private function getCoursesBySchool($schoolCode)
     {

@@ -10,7 +10,7 @@ namespace Config\Modules\Custom\Help;
 
 use Config\ModuleLoader;
 use Custom\Help\CourseParticipation;
-use Schoolbox\Application\WebRequest\Kernel;
+use Alaress\Application\Kernel;
 
 class API extends ModuleLoader
 {

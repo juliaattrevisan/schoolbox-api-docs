@@ -34,10 +34,6 @@ class Controller extends Base
     const PARTICIPANT_ROLE_NAME = 'School Staff';
     const PARTICIPANT_CAMPUS    = 1;
 
-    const REQUIRED_USER_FIELDS = [
-        'id', 'email', 'title', 'firstname', 'lastname'
-    ];
-
     /**
      * @var UserAccessMapper
      */
@@ -64,6 +60,12 @@ class Controller extends Base
     private $passwordMailService;
 
     /**
+     * @var Handler
+     */
+    private $handler;
+
+
+    /**
      * @param UserAccessMapper          $userAccessMapper
      * @param SiteAccess\Mapper         $tokenMapper
      * @param Folder\Mapper             $folderMapper
@@ -81,6 +83,14 @@ class Controller extends Base
         $this->folderMapper     = $folderMapper;
         $this->codeMapper       = $folderMapper->getJoinMapper('codes');
         $this->passwordMailService = $mailService;
+
+        // TODO rejig for DI
+        $this->handler = new Handler(
+            $this->userAccessMapper,
+            $this->tokenMapper,
+            $this->folderMapper,
+            $this->passwordMailService
+        );
     }
 
 
@@ -101,12 +111,12 @@ class Controller extends Base
             'codes'  => $codes,
             'ts'     => $now->getUnixTimeStamp(),
             'hashes' => [],
-            'fields' => self::REQUIRED_USER_FIELDS
+            'fields' => Handler::REQUIRED_USER_FIELDS,
         ];
 
         foreach ($codes as $code) {
             $school = $code->getSiteSchoolCode();
-            $data['hashes'][$school] = $this->computeAccessToken($now, $school, $code->getAccessToken());
+            $data['hashes'][$school] = $this->handler->computeAccessToken($now, $school, $code->getAccessToken());
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@helpCourseParticipation/apitest.twig', $data));
@@ -126,15 +136,14 @@ class Controller extends Base
         $now = Alaress_Date_Format::now();
 
         try {
-            $code = $this->tokenMapper->findById($schoolCode);
-            $token = $this->computeAccessToken($now, $schoolCode, $code->getAccessToken());
+            $token = $this->handler->computeAuthDigest($schoolCode, $now);
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'ts'    => $now->getUnixTimeStamp(),
                 'token' => $token
             ]));
 
-        } catch (\Schoolbox\Mapper\Exception $e) {
+        } catch (\Schoolbox\Mapper\Exception|Mapper\DefinitionException $e) {
             // bad request
             $this->sendGenericStatus(400);
         }
@@ -150,8 +159,6 @@ class Controller extends Base
 
         $school = $post['schoolCode'];
 
-        $code = $this->tokenMapper->findById($school);
-
         $now = Alaress_Date_Format::now();
 
         $route = 'helpCourseParticipation.postUserRegistrations';
@@ -165,7 +172,7 @@ class Controller extends Base
             $c->post($uri, [
                 'query' => [
                     'ts'    => $now->getUnixTimeStamp(),
-                    'token' => $this->computeAccessToken($now, $school, $code->getAccessToken())
+                    'token' => $this->handler->computeAuthDigest($school, $now)
                 ],
                 'form_params' => $post
             ]);
@@ -204,16 +211,9 @@ class Controller extends Base
             return;
         }
 
-        $h = new Handler(
-            $this->userAccessMapper,
-            $this->tokenMapper,
-            $this->folderMapper,
-            $this->passwordMailService
-        );
+        $registeredUsers = $this->handler->getUsersBySchool($schoolCode);
 
-        $registeredUsers = $h->getUsersBySchool($schoolCode);
-
-        $enrolments = $h->getFolderAccessBySchool($schoolCode);
+        $enrolments = $this->handler->getFolderAccessBySchool($schoolCode);
 
         $rs->content->set($this->buildUnthemedHtmlOutput('@helpCourseParticipation/apitest-usertable.twig', [
             'courses' => $enrolments,
@@ -242,12 +242,7 @@ class Controller extends Base
         try {
             $rs->content->set(
                 $this->buildJsonOutput(
-                    (new Handler(
-                        $this->userAccessMapper,
-                        $this->tokenMapper,
-                        $this->folderMapper,
-                        $this->passwordMailService
-                    ))->getFolderAccessBySchool($schoolCode)
+                    $this->handler->getFolderAccessBySchool($schoolCode)
                 )
             );
         } catch (Mapper\Exception $e) {
@@ -359,14 +354,11 @@ class Controller extends Base
             return;
         }
 
+        $fuzzy = $rq->query->getBool('fuzzy', false);
+
         $rs->content->set(
             $this->buildJsonOutput(
-                (new Handler(
-                    $this->userAccessMapper,
-                    $this->tokenMapper,
-                    $this->folderMapper,
-                    $this->passwordMailService
-                ))->getUsersBySchool($schoolCode)
+                $this->handler->getUsersBySchool($schoolCode, $fuzzy)
             )
         );
     }
@@ -410,24 +402,35 @@ class Controller extends Base
 
         $failedUsers = [];
 
+        $byUsername = $rq->query->getBool('byUsername', false);
+
         foreach ($post['user'] as $userData) {
             if (!$this->userPayloadIsValid($userData)) {
-                $failedUsers[] = $userData;
+                $failedUsers[] = [
+                    'Invalid payload', $userData
+                ];
                 continue;
             }
 
-            // user uniqueness is looked up by external ID
             $externalId = "{$schoolCode}.{$userData['id']}";
 
             try {
-                $user = $this->getUserMapper()->findOneByColumn('synergy_id', $externalId);
+                if ($byUsername) {
+                    // if explicitly stated by the request, look up user by username
+                    $user = $this->getUserMapper()->findOneByColumn('username', $userData['email']);
+                } else {
+                    // consider user uniqueness as looked up by external ID
+                    $user = $this->getUserMapper()->findOneByColumn('synergy_id', $externalId);
+                }
 
                 // cache the old value
                 $oldUsername = $user->getUsername();
 
             } catch (Mapper\Exception\Deleted $e) {
                 // user exists, but is deleted; consider this a fail case
-                $failedUsers[] = $userData;
+                $failedUsers[] = [
+                    'User is deleted', $userData
+                ];
                 continue;
 
             } catch (Mapper\Exception $e) {
@@ -472,11 +475,15 @@ class Controller extends Base
                 }
             } catch (Mapper\Exception $e) {
                 // the user failed to save; is fail case
-                $failedUsers[] = $userData;
+                $failedUsers[] = [
+                    'Failed to save', $userData
+                ];
 
             } catch (UnexpectedValueException $e) {
                 // duplicate username
-                $failedUsers[] = $userData;
+                $failedUsers[] = [
+                    'Duplicate username', $userData
+                ];
             }
         }
 
@@ -499,7 +506,7 @@ class Controller extends Base
     private function userPayloadIsValid(array $userData)
     {
         // check all the necessary data is present
-        foreach (self::REQUIRED_USER_FIELDS as $required) {
+        foreach (Handler::REQUIRED_USER_FIELDS as $required) {
             if (!array_key_exists($required, $userData) || empty(trim($userData[$required]))) {
                 return false;
             }
@@ -580,29 +587,21 @@ class Controller extends Base
             return 404;
         }
 
-        $expectedToken = $this->computeAccessToken(
-            $requestTimestamp,
-            $schoolCode,
-            $privateKey
-        );
+        try {
+            $expectedToken = $this->handler->computeAccessToken(
+                $requestTimestamp,
+                $schoolCode,
+                $privateKey
+            );
+        } catch (Mapper\DefinitionException $e) {
+            return 500;
+        }
 
         if ($expectedToken !== $authDigest) {
             return 403;
         }
 
         return 200;
-    }
-
-
-    /**
-     * @param string $timestamp
-     * @param string $schoolCode
-     * @param string $accessToken
-     * @return string
-     */
-    private function computeAccessToken($timestamp, $schoolCode, $accessToken)
-    {
-        return sha1(sprintf(':%s-%s-%s:', $timestamp, $schoolCode, $accessToken));
     }
 
 
