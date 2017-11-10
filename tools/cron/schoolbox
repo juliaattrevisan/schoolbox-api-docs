@@ -39,8 +39,8 @@ MAILTO="support@schoolbox.com.au"
 # Pastoral DocMan upload - Every 5 minutes
 */5 * * * *     root    php /usr/share/schoolbox/tools/docman/pastoralUpload.php >> /var/log/schoolbox/docman.log 2>&1
 
-# Kami - Upload 'pending' documents every 5 minutes
-*/5 * * * *   www-data    php /usr/share/schoolbox/tools/kami/upload.php --perform -v >> /var/lib/schoolbox/cache/logs/kami.log 2>&1
+# Kami - Upload 'pending' documents every 1 minute
+* * * * *   www-data    php /usr/share/schoolbox/tools/kami/upload.php --perform -v >> /var/lib/schoolbox/cache/logs/kami.log 2>&1
 
 # Kami - Retry any 'failed' every day at 2:17am (offset by 2min from uploader)
 17 2 * * *    www-data    php /usr/share/schoolbox/tools/kami/upload.php --perform --retry-failed -v >> /var/lib/schoolbox/cache/logs/kami-retry-failed.log 2>&1
