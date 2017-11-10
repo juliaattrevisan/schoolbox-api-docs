@@ -9,6 +9,7 @@
 
 namespace Schoolbox;
 
+use Alaress_Date_Format;
 use Alaress\Cache;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Quoter\IQuoter;
@@ -1766,7 +1767,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * @return null|array
      */
-    protected function getCreatedMap()
+    protected function getCreatedMap(): ?array
     {
         return $this->createdMap;
     }
@@ -1775,7 +1776,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param null|array $createdMap
      * @return $this
      */
-    protected function setCreatedMap(?array $createdMap)
+    protected function setCreatedMap(?array $createdMap): self
     {
         $this->createdMap = $createdMap;
         return $this;
@@ -1784,7 +1785,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * @return null|array
      */
-    protected function getUpdatedMap()
+    protected function getUpdatedMap(): ?array
     {
         return $this->updatedMap;
     }
@@ -1793,7 +1794,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param null|array $updatedMap
      * @return $this
      */
-    protected function setUpdatedMap(?array $updatedMap)
+    protected function setUpdatedMap(?array $updatedMap): self
     {
         $this->updatedMap = $updatedMap;
         return $this;
@@ -3777,13 +3778,13 @@ abstract class Mapper implements IMapper, Serializable
      * @param Collection $collection
      * @return Collection
      */
-    private function populateSaveTimestamps(Collection $collection)
+    private function populateSaveTimestamps(Collection $collection): Collection
     {
         // Does the mapper have 'created_at' or 'updated_at' timestamps?
         if (!$this->createdMap && !$this->updatedMap) {
             return $collection;
         }
-        $now = \Alaress_Date_Format::now();
+        $now = Alaress_Date_Format::now();
 
         if ($this->createdMap) {
             $getMethod = $this->getGetMethodName($this->createdMap['property']);
