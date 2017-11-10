@@ -213,7 +213,6 @@ class Controller extends Base
                     'markbook'     => $markbook,
                     'viewee'       => $viewee,
                     'writable'     => $this->getAssessmentsWritability($markbook->getAssessments()),
-                    'pendingLabel' => $this->getPendingLabel(),
                     'queryArgs'    => $codec->convertSelectionsToQueryString($selectionsPerFilter),
                 ])->getAsString(),
             ]));
@@ -343,22 +342,6 @@ class Controller extends Base
         }
         return $writable;
     }
-
-
-    /**
-     * @return null|string
-     */
-    private function getPendingLabel()
-    {
-        // What text should we display if student has submitted but not been marked?
-        try {
-            return $this->dueWorkErrorMapper->findDefaultForNewSubmissions()->getDisplayAs();
-        } catch (Mapper\Exception $e) {
-            // Let Twig figure it out
-            return null;
-        }
-    }
-
 
     /**
      * Returns a JSON representation of an exception suitable for AJAX HTML alert divs

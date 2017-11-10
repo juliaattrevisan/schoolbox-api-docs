@@ -468,7 +468,7 @@ class Controller extends Base
                     ],
                     'displayAs'     => [
                         'caption'   => 'Display Name',
-                        'width'     => 6,
+                        'width'     => 8,
                         'maxLength' => 16,
                     ],
                     'normaliseAs'   => [
@@ -476,11 +476,6 @@ class Controller extends Base
                         'nullable'  => true,
                         'width'     => 2,
                     ],
-                    'isDefaultForNewSubmissions' => [
-                        'caption'   => 'Default for new submissions?',
-                        'radio'     => '1',
-                        'width'     => 2,
-                    ]
                 ]
             ],
             'component-definition'  => [
