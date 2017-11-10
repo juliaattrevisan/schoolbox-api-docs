@@ -582,7 +582,7 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
-     * @return IDatabase
+     * @return IDatabase|IQuoter
      */
     public function getDatabase()
     {

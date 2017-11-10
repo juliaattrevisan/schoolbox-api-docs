@@ -1,5 +1,6 @@
 <?php
 
+use Schoolbox\Role;
 use \Schoolbox\User as UserModel;
 use \Schoolbox\UserMapper;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -54,19 +55,6 @@ class Group extends DeprecatedModel
         return $this->userNotifier;
     }
 
-
-    /**
-     * Get a group by name
-     *
-     * @param  $name
-     * @return array|bool
-     */
-    public function searchByName($name)
-    {
-        $query = "SELECT * FROM groups WHERE name LIKE \"%{$this->db->escapeForLike($name)}%\"";
-
-        return $this->db->getAll($query);
-    }
 
     function setService($service = HOMEPAGE_SERVICE)
     {
@@ -163,7 +151,7 @@ class Group extends DeprecatedModel
      */
     public function getStaffGroupTypeIds()
     {
-        return $this->getGroupTypeIds(Group::STAFF_GROUP_TYPE);
+        return $this->getGroupTypeIds(Role::STAFF);
     }
 
     /**
@@ -173,7 +161,7 @@ class Group extends DeprecatedModel
      */
     public function getParentGroupTypeIds()
     {
-        return $this->getGroupTypeIds(Group::PARENT_GROUP_TYPE);
+        return $this->getGroupTypeIds(Role::PARENT);
     }
 
     /**
@@ -183,7 +171,7 @@ class Group extends DeprecatedModel
      */
     public function getStudentGroupTypeIds()
     {
-        return $this->getGroupTypeIds(Group::STUDENT_GROUP_TYPE);
+        return $this->getGroupTypeIds(Role::STUDENT);
     }
 
     /**
@@ -193,7 +181,7 @@ class Group extends DeprecatedModel
      */
     public function getGuestGroupTypeIds()
     {
-        return $this->getGroupTypeIds(Group::GUEST_GROUP_TYPE);
+        return $this->getGroupTypeIds(Role::GUEST);
     }
 
     function getAllByType($type)
@@ -566,7 +554,7 @@ class Group extends DeprecatedModel
      */
     public function isGuest($userID = 0)
     {
-        return $this->isUserOfType($userID, Group::GUEST_GROUP_TYPE);
+        return $this->isUserOfType($userID, Role::GUEST);
     }
 
     /**
@@ -577,7 +565,7 @@ class Group extends DeprecatedModel
      */
     public function isStudent($userID = 0)
     {
-        return $this->isUserOfType($userID, Group::STUDENT_GROUP_TYPE);
+        return $this->isUserOfType($userID, Role::STUDENT);
     }
 
     /**
@@ -588,7 +576,7 @@ class Group extends DeprecatedModel
      */
     public function isParent($userID = 0)
     {
-        return $this->isUserOfType($userID, Group::PARENT_GROUP_TYPE);
+        return $this->isUserOfType($userID, Role::PARENT);
     }
 
     /**
@@ -599,7 +587,7 @@ class Group extends DeprecatedModel
      */
     public function isStaff($userID = 0)
     {
-        return $this->isUserOfType($userID, Group::STAFF_GROUP_TYPE);
+        return $this->isUserOfType($userID, Role::STAFF);
     }
 
     /**
@@ -829,36 +817,6 @@ class Group extends DeprecatedModel
         return $catList;
     }
 
-    function userSummary()
-    {
-
-        $query = "SELECT groups.id, groups.`name`, COUNT(*) total
-				  FROM groups
-				  JOIN `user` ON groups.id=`user`.group_id AND `user`.deleted_at IS NULL
-				  GROUP BY groups.id
-				  ORDER BY groups.`name`";
-
-        $result = $this->db->query($query);
-
-        while ($group = $this->db->getNextArray($result)) {
-            $query = "SELECT COUNT(DISTINCT `user`.id) as loggedIn
-						FROM login_log
-						JOIN `user` ON login_log.username=`user`.username AND `user`.deleted_at IS NULL
-						WHERE `date` > DATE_SUB(NOW(), INTERVAL " . (Cfg::get('session_length') * 2) . " SECOND)
-						AND group_id = '{$group['id']}'
-						AND login = 1";
-            $loggedIn = $this->db->getOne($query);
-
-            $summary[] = array(
-                'id' => $group['id'],
-                'name' => $group['name'],
-                'total' => $group['total'],
-                'logged_in' => $loggedIn
-            );
-        }
-
-        return $summary;
-    }
 
     public function getGroupName($groupID)
     {

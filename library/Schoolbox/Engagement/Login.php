@@ -9,48 +9,132 @@
 
 namespace Schoolbox\Engagement;
 
-use Database;
+use Alaress\Database\Connector\IConnector;
+use Alaress_Date_Format;
 
 class Login
 {
+    // Fallback value if session length not configured in DB
+    const SESSION_LENGTH_DEFAULT = 1800;
+
+    /** @var IConnector */
+    private $database;
+
+
+    /**
+     * Number of seconds that sessions exists for
+     *
+     * @var int
+     */
+    private $sessionLength;
+
 
     /**
      * Constructor - sets up database
+     *
+     * @param IConnector  $database
+     * @param null|string $sessionLength
      */
-    public function __construct()
+    public function __construct(IConnector $database, ?string $sessionLength)
     {
-        $this->database = Database::getInstance();
+        $this->database      = $database;
+        $this->sessionLength = null === $sessionLength ? self::SESSION_LENGTH_DEFAULT : (int)$sessionLength;
     }
 
-    public function loginByGroup(\Alaress_Date_Format $start, \Alaress_Date_Format $end) {
-        $query = "SELECT groups.name,  groups.id,  COUNT(*) AS total FROM login_log JOIN  `user` ON login_log.username = `user`.username JOIN groups ON user.group_id = groups.id
-                  WHERE login=1 AND date >= :start AND date <= :end
-                  GROUP BY group_id";
+    public function loginByGroup(Alaress_Date_Format $start, Alaress_Date_Format $end)
+    {
+        $query = '
+            SELECT
+                groups.name,
+                groups.id,
+                COUNT(*) AS total
+            FROM login_log
+            JOIN `user` ON login_log.username = `user`.username
+            JOIN groups ON user.group_id = groups.id
+            WHERE login=1 AND date >= :start AND date <= :end
+            GROUP BY group_id';
 
-        $statement = $this->database->prepare($query);
-        $statement->bindParam(':start', $start->getDatabaseDate());
-        $statement->bindParam(':end', $end->getDatabaseDate());
-
-        $statement->execute();
+        $statement = $this->database->prepareQuery($query);
+        $statement->execute([
+            'start' => $start->getDatabaseDate(),
+            'end'   => $end->getDatabaseDate(),
+        ]);
         return $statement->fetchAll();
     }
 
-    public function uniqueLoginByGroup(\Alaress_Date_Format $start, \Alaress_Date_Format $end) {
-        $query = "SELECT groups.`name`,
-                    (
-                        SELECT COUNT(DISTINCT(`user`.username)) FROM `user`
-                        INNER JOIN  login_log ON `user`.username = login_log.username
-                        WHERE group_id = groups.id AND login=1 AND `date` >= :start AND `date` <= :end
-                    ) as total
-                  FROM groups
-                    ";
 
-        $statement = $this->database->prepare($query);
-        $statement->bindParam(':start', $start->getDatabaseDate());
-        $statement->bindParam(':end', $end->getDatabaseDate());
+    /**
+     * @param Alaress_Date_Format $start
+     * @param Alaress_Date_Format $end
+     * @return array
+     * @throws \Alaress\Database\Exception
+     */
+    public function uniqueLoginByGroup(Alaress_Date_Format $start, Alaress_Date_Format $end): array
+    {
+        $query = '
+            SELECT groups.`name`,
+            (
+                SELECT COUNT(DISTINCT(`user`.username)) FROM `user`
+                INNER JOIN login_log ON `user`.username = login_log.username
+                WHERE group_id = groups.id AND login=1 AND `date` >= :start AND `date` <= :end
+            ) AS total
+          FROM groups';
 
-        $statement->execute();
+        $statement = $this->database->prepareQuery($query);
+        $statement->execute([
+            'start' => $start->getDatabaseDate(),
+            'end'   => $end->getDatabaseDate(),
+        ]);
         return $statement->fetchAll();
     }
 
+
+    /**
+     * Returns a summary of total users in system, and number of active sessions
+     *
+     * @return array
+     * @throws \Alaress\Database\Exception
+     */
+    public function userSummary(): array
+    {
+        $query = '
+                SELECT groups.id, groups.`name`, COUNT(*) total
+                FROM groups
+                JOIN `user` ON groups.id=`user`.group_id AND `user`.deleted_at IS NULL
+                GROUP BY groups.id
+                ORDER BY groups.`name`';
+
+        $statement = $this->database->prepareQuery($query);
+        $statement->execute();
+        $summary = [];
+
+        /** @noinspection PhpAssignmentInConditionInspection */
+        while ($group = $statement->fetch()) {
+            $summary[$group['id']] = [
+                'id'        => $group['id'],
+                'name'      => $group['name'],
+                'total'     => $group['total'],
+                'logged_in' => 0,
+            ];
+        }
+
+        $interval = $this->sessionLength * 2;
+        $query = "
+            SELECT user.group_id, COUNT(DISTINCT `user`.id) AS logged_in
+            FROM login_log
+            JOIN `user` ON login_log.username=`user`.username AND `user`.deleted_at IS NULL
+            WHERE `date` > DATE_SUB(NOW(), INTERVAL {$interval} SECOND)
+            AND login = 1
+            GROUP BY user.group_id;";
+
+        $statement = $this->database->prepareQuery($query);
+        $statement->execute();
+
+        /** @noinspection PhpAssignmentInConditionInspection */
+        while ($row = $statement->fetch()) {
+            $summary[$row['group_id']]['logged_in'] = $row['logged_in'];
+        }
+
+        return $summary;
+    }
 }

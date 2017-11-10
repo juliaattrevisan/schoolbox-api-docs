@@ -1,40 +1,39 @@
 <?php
+
+use Schoolbox\MapperFactory;
+use Schoolbox\RoleMapper;
+use Schoolbox\Resource\Folder;
+
 require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
 require_once SITE_root . '/www/include/stdfuncs.php';
 
-$groupHandler = new Group();
-$categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
+/**
+ * @var MapperFactory $mapperFactory
+ * @var RoleMapper    $roleMapper
+ * @var Folder\Mapper $folderMapper
+ */
+$mapperFactory = $kernel->getDependencyInjector()->get('mapperFactory');
+$roleMapper    = $mapperFactory->get(RoleMapper::class);
+$folderMapper  = $mapperFactory->get(Folder\Mapper::class);
+$return        = [];
 
-$suggestions = array();
-$data = array();
-$return = array();
-
-if ($_GET['type'] == 'system') {
-/* Add from this group...
+if ($_GET['type'] === 'system') {
+    /* Add from this role...
      */
-    $groupID   = $_GET['systemGroupID'];
-    $allGroups = $groupHandler->searchByName($_GET['query']);
-
-
-    if (is_array($allGroups) && count($allGroups)) {
-        foreach ($allGroups as $currentGroup) {
-            $return[] = array(
-                'name' => $currentGroup['name'],
-                'id'   => intval($currentGroup['id']),
-            );
-        }
+    foreach ($roleMapper->findByName($_GET['query']) as $role) {
+        $return[] = [
+            'name' => $role->getName(),
+            'id'   => $role->getId(),
+        ];
     }
 } else {
     /* Add from this group...
      */
-    $groupID   = $_GET['individualGroupID'];
-    $allGroups = $categoryMapper->searchByName($_GET['query'], true);
-
-    foreach ($allGroups as $currentGroup) {
-        $return[] = array(
-            'name' => $currentGroup->getName(),
-            'id'   => intval($currentGroup->getId()),
-        );
+    foreach ($folderMapper->searchByName($_GET['query'], true) as $group) {
+        $return[] = [
+            'name' => $group->getName(),
+            'id'   => $group->getId(),
+        ];
     }
 }
 
