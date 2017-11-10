@@ -1,5 +1,7 @@
 # Table of Contents
 * [Best Practice Statements](best-practice.md)
+* Sample files can be found in the `example` folder - copy and paste into the appropriate folder locations and you should be good to go
+
 
 * [Anatomy of Module, Controller, Mapper, Model, Other](00-intro.md)
 * [Overview of Terms](00-intro.md)
