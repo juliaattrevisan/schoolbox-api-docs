@@ -38,6 +38,11 @@ $this->register('GET', $playerRoute, 'getDetailForPlayer', ... , ...);
 ### 1.1.1 Tokens are array keys in $params
 The tokens in route regexes - the stuff in curly braces `{  }` will be made available to you as keys in the `$params` array. This array gets used to calculate Permissions and Preloads.
 
+### 1.1.2 GET Routes should not mutate data
+`GET` requests are reserved for retrieving data. These urls should never be destructive (ie. deleting data) or mutative (changing data). Such behaviours are better suited to a `POST` route. See RESTful interface implementation for more details.
+
+> Use GET requests for retrieving data only. Use POST requests for changing data.
+
 ## 1.2 Permissions
 Controllers are kind of resource-intensive, they cost a bit to start up. To prevent unnecessary Controller startup, we do our permissions checks as early as possible. The earliest place we can do it is in Module.php.
 

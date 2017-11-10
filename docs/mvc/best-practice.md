@@ -18,6 +18,7 @@ Basic statements on what to do. For specific reasoning, see links next to each s
 * Use existing Permissions classes (or compositions thereof) before making a new one. [(more)](01-module.md#12-permissions)
 * Be efficient when you make new Permission classes. [(more)](01-module.md#12-permissions)
 * Construct Preloads for the Controller. If something went wrong, throw an appropriate exception from ErrorMapper as early as possible. [(more)](01-module.md#13-preloads)
+* Use GET requests for retrieving data only. Use POST requests for changing data. [(more)](01-module.md#112-get-routes-should-not-mutate-data)
 
 ## 2 Controller
 * Controllers organise low-level implementations that produce actual output. [(more)](02-controller.md#2-responsibilities-of-controller)
