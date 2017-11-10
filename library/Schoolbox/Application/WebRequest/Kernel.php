@@ -13,8 +13,11 @@ use Alaress\Authorizer\Failure\Base;
 use Alaress\Authorizer\Failure\Forbidden;
 use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Failure\Unauthorized;
+use Alaress\DebugBar\DataCollector\RouteCollector;
+use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Web\Output\OutputInterface;
 use Aura\Router\Route;
+use Monolog\Logger;
 use ReflectionMethod;
 use RuntimeException;
 use Schoolbox\Application\Exception\NotFound;
@@ -174,6 +177,14 @@ class Kernel extends \Alaress\Application\Kernel
                     $name   = $parameter->getName();
                     $args[] = (array_key_exists($name, $params)) ? $params[$name] : null;
                 }
+
+                // Set the route into the debug bar
+                if (DebugBar::isEnabled()) {
+                    DebugBar::getInstance()->addCollector(
+                        new RouteCollector(sprintf('%s::%s', $method->class, $method->name))
+                    );
+                }
+
                 $method->invokeArgs($controller, $args);
                 $response = $controller->getResponse();
             } catch (Unauthenticated $e) {

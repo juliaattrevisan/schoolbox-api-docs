@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Application\WebRequest;
 
+use Alaress\DebugBar\DataCollector\RouteCollector;
 use Alaress\DebugBar\DataCollector\TidewaysCollector;
 use Alaress\DebugBar\DataCollector\XhprofCollector;
 use Alaress\DebugBar\Instance as DebugBar;
