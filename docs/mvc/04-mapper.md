@@ -232,6 +232,8 @@ protected function hydrateSelect(\PDOStatement $statement)
     $eventTypeMapper       = $this->getJoinMapper('eventType');
     $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
 
+    $collection = new Collection();
+    
     while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
 
         /* Assemble event pieces
@@ -247,7 +249,11 @@ protected function hydrateSelect(\PDOStatement $statement)
         ...
         ...
         ...
+        
+        $collection->add($eventItem);
     }
+    
+    return $collection;
 }
 ```
 
