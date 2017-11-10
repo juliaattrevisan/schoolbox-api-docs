@@ -46,6 +46,25 @@
 
 </script>
 
+<script>
+    $(function() {
+        $('[data-warn-removal]').click(function(e) {
+            if (!$(e.target).prop('checked')) {
+                e.preventDefault();
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to remove this assessment? ' +
+                    'Doing so will delete all associated marks from the markbook.',
+                    confirmEvent: function() {
+                        // Uncheck
+                        $(e.target).prop("checked", false);
+                        $(e.target).trigger('change')
+                    }
+                });
+            }
+        });
+    });
+</script>
+
 {% import "@learningAssessment/fragments/project/macro/icon.twig" as icon %}
 
 <ul class="information-list {% if depth %}no-pad{% endif %}" {% if project %}data-project="{{ project.id }}"{% endif %} style="{% if hideRows %}display: none;{% endif %}">
@@ -77,7 +96,8 @@
             <div class="compact card small-12">
                 <input type="checkbox"
                        id="a_import-{{ assessment.id}}"
-                       {% if isChecked %} checked="checked"{% endif %}
+                       {% if isChecked %} checked="checked" {% endif %}
+                       {% if assessmentImpl %} data-warn-removal {% endif %}
                        data-assessment-import="{{ assessment.id }}"
                        data-checkbox-group="unit-spec-{{ unitSpec.id }}"
                        name="{{ inputPrefix }}[{{ assessment.id }}][checked]"
