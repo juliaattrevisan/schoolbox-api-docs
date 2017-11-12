@@ -1,6 +1,7 @@
 <?php
 
-use Zend\Uri\Uri;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Zend\Uri\Http as HttpUri;
 
 // Figure out if the URL ends with /window - and don't include it in the
 // decoded URL if it does.
@@ -22,9 +23,14 @@ $remoteUrl = base64_decode(str_replace(' ', '+', implode('/', $encodedUrlParts))
 $heightStyle = '';
 $class = '';
 
-$url = new Uri($remoteUrl);
+try {
+    $url = new HttpUri($remoteUrl);
+} catch (InvalidArgumentException $e) {
+    // Not a HTTP(s) URI
+    $this->error(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+}
 if (!$url->isValid()) {
-    $this->error(2);
+    $this->error(ErrorMapper::ERROR_INFORMATION_MISSING);
 }
 
 $fragment = $url->getFragment();
