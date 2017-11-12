@@ -138,7 +138,7 @@
                 self.triggerEvent('playbackStop', []);
             });
         } else {
-            self.webrtc.supported = false;
+            self.media.supported = false;
         }
         return this;
     };
