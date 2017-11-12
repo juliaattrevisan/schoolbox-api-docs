@@ -48,7 +48,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         $this->uses('comment', self::TYPE_STRING);
         $this->uses('mark', self::TYPE_STRING, null, 'humanReadableMark');
         $this->uses('norm_mark', self::TYPE_STRING, null, 'normalizedMark');
-        $this->uses('is_confirmation_of_submission', self::TYPE_BOOLEAN);
         $this->uses('published_at', self::TYPE_DATETIME);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
@@ -223,7 +222,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
 			AND sb.deleted IS FALSE
 			AND sb.mark_visibility IN {$this->getArrayPlaceholders($visibilities, 'vis')}
 			AND sr.owner = :user_id
-			AND sr.is_confirmation_of_submission IS FALSE
 			ORDER BY sr.returned DESC
 			LIMIT :limit
 		";
@@ -363,7 +361,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
 			LEFT JOIN {$this->getJoinSql('storage.allowedFileExtension', 'files', 'mime')}
 			WHERE sr.owner = :user_id
 			AND sb.id = :box_id
-			AND sr.is_confirmation_of_submission IS FALSE
 			ORDER BY sr.returned DESC
 		";
         $statement = $this->database->prepare($query);

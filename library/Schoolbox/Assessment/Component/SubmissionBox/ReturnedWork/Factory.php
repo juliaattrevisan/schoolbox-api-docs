@@ -214,7 +214,6 @@ class Factory
                 array(
                     'owner' => $this->getUser()->getId(),
                     'box_id' => $this->getSubmissionBox()->getId(),
-                    'is_confirmation_of_submission' => false,
                 ),
                 array(
                     'returned' => 'desc'
