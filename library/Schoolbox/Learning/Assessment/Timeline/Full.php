@@ -216,13 +216,6 @@ class Full
                     /* Every associated feedback has a set of attached files
                      * that were added via the attachzone
                      *
-                     * It also has a set of crocodocked files. These crocodocked
-                     * files don't get added via the attachzone; they won't appear
-                     * here normally. In the case of the Timeline, Feedback includes
-                     * both the set of attached files and any Submission Files that
-                     * were annotated via crocodoc.
-                     *
-                     * Kami:
                      * * If feedback is for specific response, for all files in that *response* that have a KamiDoc,
                      *   add the file to the feedback.
                      * * If feedback is floating, we do *not* add any response files to it. Floating feedbacks now
@@ -230,7 +223,7 @@ class Full
                      *   time of feedback creation.
                      */
                     foreach ($currentResponse->getAllFiles() as $currentFile) {
-                        if ($currentFile->getCrocodocId() || $currentFile->getKami()) {
+                        if ($currentFile->getKami()) {
                             $currentFeedback->getAllFiles()->add($currentFile);
                         }
                     }
@@ -239,12 +232,6 @@ class Full
                      */
                     $currentFeedback->getAllFiles()->sortBy('filename', 'asc');
                 }
-
-                /* Mutate collection :/
-                 * This seems pretty deadly, but I kinda have to mutate it anyway
-                 * to display crocodocked files in the Feedback File list
-                 */
-                $currentResponse->setAllFeedback($includedFeedback);
 
                 /* Sort files alphabetically
                  */

@@ -38,19 +38,4 @@ class DueWork extends AbstractSubSource
     {
         return $assessment instanceof DueWorkObject;
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function findByCrocodocId(IAssessable $assessment, $crocodocId)
-    {
-        if ($this->recognizes($assessment)) {
-            $model = $this->mapperProxy->findByCrocodocId($crocodocId);
-            $model->setAssessable($assessment);
-
-            return $model;
-        }
-
-        return null;
-    }
 }

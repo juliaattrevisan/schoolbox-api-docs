@@ -42,12 +42,6 @@ class Model implements IFile, ISoftDeletable
     protected $submission;
 
     /**
-     * @var string
-     */
-    protected $uuid;
-
-
-    /**
      * @var bool
      */
     protected $editableInline;
@@ -83,43 +77,6 @@ class Model implements IFile, ISoftDeletable
     public function getOwner()
     {
         return $this->getSubmission()->getOwner();
-    }
-
-    /**
-     * @return string
-     */
-    public function getUuid()
-    {
-        return $this->uuid;
-    }
-
-    /**
-     * @param string $uuid
-     * @return static
-     */
-    public function setUuid($uuid)
-    {
-        $this->uuid = $uuid;
-        return $this;
-    }
-
-
-    /**
-     * @return string
-     */
-    public function getCrocodocId()
-    {
-        return $this->getUuid();
-    }
-
-
-    /**
-     * @param string $crocodocId
-     * @return self
-     */
-    public function setCrocodocId($crocodocId)
-    {
-        return $this->setUuid($crocodocId);
     }
 
 

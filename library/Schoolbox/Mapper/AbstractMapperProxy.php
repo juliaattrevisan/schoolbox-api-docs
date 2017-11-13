@@ -13,7 +13,6 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper;
-use Schoolbox\Learning\InlineGrader\FindableCrocodoc;
 
 /**
  * Common logic when we need to wrap a traditional mapper inside an
@@ -316,25 +315,6 @@ abstract class AbstractMapperProxy
     public function getPredicateBuilder()
     {
         return new Builder($this->database, $this->mapper->getTable());
-    }
-
-    /**
-     * Pass-through to the deeper mapper within
-     *
-     * @param $crocodocId
-     * @return object
-     */
-    public function findByCrocodocId($crocodocId)
-    {
-        if ($this->mapper instanceof FindableCrocodoc) {
-            $model = $this->mapper->findByCrocodocId($crocodocId);
-
-            $transformed = $this->transformModels(new Collection([$model]))->first();
-
-            return $transformed;
-        }
-
-        return null;
     }
 
     /* Getters / Setters

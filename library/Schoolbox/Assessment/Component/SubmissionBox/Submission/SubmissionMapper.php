@@ -19,10 +19,7 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as SubmissionFileMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Learning\InlineGrader\FindableCrocodoc;
 
 /**
  * A mapper for a student's submission to a due work.
@@ -31,7 +28,7 @@ use Schoolbox\Learning\InlineGrader\FindableCrocodoc;
  * @method Submission findById($id)
  * @method Submission hydrate(array $row, $alias = '', $callback = null)
  */
-class SubmissionMapper extends BaseMapper implements FindableCrocodoc
+class SubmissionMapper extends BaseMapper
 {
     /**
      * @return void
@@ -56,8 +53,10 @@ class SubmissionMapper extends BaseMapper implements FindableCrocodoc
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreSubmissionFiles']);
     }
 
+
     /**
      * @return string
+     * @throws BaseMapper\DefinitionException
      */
     protected function getSelectString()
     {
@@ -71,11 +70,13 @@ class SubmissionMapper extends BaseMapper implements FindableCrocodoc
         ";
     }
 
+
     /**
      * Include all files that are part of this submission.
      *
      * @param PDOStatement $statement
      * @return Collection
+     * @throws BaseMapper\DefinitionException
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
@@ -123,8 +124,9 @@ class SubmissionMapper extends BaseMapper implements FindableCrocodoc
      * Creates a new instance of class with name passed in $this->hasModel().
      *
      * @param int $idValue
-     * @throws \Schoolbox\Mapper\Exception
      * @return Submission
+     * @throws BaseMapper\DefinitionException
+     * @throws MapperException
      */
     public function createModel($idValue = null)
     {
@@ -139,6 +141,8 @@ class SubmissionMapper extends BaseMapper implements FindableCrocodoc
      *
      * @param Submission $object
      * @param Submission $previous
+     * @throws BaseMapper\DefinitionException
+     * @throws \PDOException
      */
     public function persistFiles(Submission $object, Submission $previous = null)
     {
@@ -170,35 +174,12 @@ class SubmissionMapper extends BaseMapper implements FindableCrocodoc
         }
     }
 
-    /**
-     * Find a particular record that contains $crocodocId
-     *
-     * @param $crocodocId
-     * @return Submission|null
-     */
-    public function findByCrocodocId($crocodocId)
-    {
-        try {
-            $submissionFileMapper = $this->getJoinMapper('files');
-
-            /** @var Submission $submission */
-            $submission = $submissionFileMapper->findOneByColumn('uuid', $crocodocId)->getSubmission();
-
-            $existingFiles = $submissionFileMapper->findByColumn('student_submission_id', $submission->getId());
-
-            $submission->setFiles($existingFiles);
-
-            return $submission;
-        }
-        catch (MapperException $e) {
-            return null;
-        }
-    }
 
     /**
      * Soft deletes all Files for the specified Submission
      *
      * @param Submission $submission
+     * @throws BaseMapper\DefinitionException
      */
     public function softDeleteSubmissionFiles(Submission $submission)
     {
@@ -212,6 +193,7 @@ class SubmissionMapper extends BaseMapper implements FindableCrocodoc
      * Restores all soft-deleted Files for the specified Submission
      *
      * @param Submission $submission
+     * @throws BaseMapper\DefinitionException
      */
     public function restoreSubmissionFiles(Submission $submission)
     {
@@ -220,17 +202,18 @@ class SubmissionMapper extends BaseMapper implements FindableCrocodoc
         $submissionFileMapper->restoreSoftDeleted($files);
     }
 
+
     /**
      * Gets the list of activities related to student submissions.
      *
      * An activity is returned for each submission that this user has made into
      * a submission box in the given categories.
      *
-     * @param int $userId
-     * @param int $limit
+     * @param int   $userId
+     * @param int   $limit
      * @param array $categories
-     *
-     * @return ActivityCollection|Activity[]
+     * @return Activity[]|ActivityCollection
+     * @throws BaseMapper\DefinitionException
      */
     public function getActivities($userId, $limit, array $categories)
     {
@@ -265,6 +248,7 @@ class SubmissionMapper extends BaseMapper implements FindableCrocodoc
      * @param int $userId
      * @param int $boxId
      * @return ActivityCollection
+     * @throws BaseMapper\DefinitionException
      * @deprecated 165
      */
     public function getHistory($userId, $boxId)
@@ -334,8 +318,9 @@ class SubmissionMapper extends BaseMapper implements FindableCrocodoc
      * * afe: allowed file extension
      *
      * @param array $row
-     *
      * @return Submission
+     * @throws BaseMapper\DefinitionException
+     * @throws MapperException
      */
     protected function hydrateForActivityList($row) {
         $boxJoin = $this->getJoinMapper('box_id');
@@ -351,14 +336,15 @@ class SubmissionMapper extends BaseMapper implements FindableCrocodoc
         return $submission;
     }
 
+
     /**
      * Retrieves draft submissions for this user and box, ordered by most recent first.
      *
      * @param int $user_id
      * @param int $box_id
      * @param int $limit
-     *
-     * @return Collection|Submission[]
+     * @return Submission[]|Collection
+     * @throws MapperException
      */
     public function getDrafts($user_id, $box_id, $limit = null)
     {

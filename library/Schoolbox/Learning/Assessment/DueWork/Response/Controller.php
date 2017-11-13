@@ -26,8 +26,6 @@ use \Schoolbox\Learning\Assessment\Attachzone;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
-use \Schoolbox\Learning\InlineGrader\Facade as InlineGraderFacade;
-use \Schoolbox\Learning\InlineGrader\Authenticator as InlineGraderAuthenticator;
 use \Schoolbox\Learning\InlineGrader\Factory;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use DueWork_ErrorMapper;
@@ -91,16 +89,15 @@ class Controller extends Base
     /**
      * Get the contents of a particular $response
      *
-     * Show the specified $_GET['hash'] in iframe window if it's a crocodoc-compatible
-     * file; otherwise display html/audio/video/image contents differently, inline with
-     * the dom
+     * Show the specified kami doc in an inline window if available;
+     * otherwise display html/audio/video/image contents differently, inline with the dom
      *
      * I can't call it getResponse() lol wups
      *
      * @param DueWork     $assessment
      * @param Participant $participant
      * @param Model       $response
-     * @throws ApplicationException\Exception Cannot authenticate crocodoc or a curl error between us and crocodoc
+     * @throws ApplicationException\Exception When trying to access a draft Response when you shouldn't
      * @throws ServiceNotFound If unable to locate HTML web Output
      * @throws \Aura\Router\Exception\RouteNotFound If cannot generate a requested route
      * @throws \InvalidArgumentException If assessment due date is null.
@@ -164,7 +161,7 @@ class Controller extends Base
             /* This is now conditional depending on the presence of a $response
              */
             'file' => $file,
-            'subfragment' => $file ? $this->getSubFragment($response, $file) : null,
+            'subfragment' => $file ? $this->getSubFragment($file) : null,
 
             /* For saving feedbacks
              */
@@ -311,28 +308,25 @@ class Controller extends Base
 
 
     /**
-     * ResponseFile Factory might throw exceptions if you're viewing crocodocable files that somehow die
+     * Preview the Response's filetype
      *
-     * @param Model          $response
      * @param SubmissionFile $file
      * @return array
-     * @throws ApplicationException\Exception If a Crocodoc or Kami exception occurs
+     * @throws ApplicationException\Exception If a Kami exception occurs
      * @throws \InvalidArgumentException If cannot convert Kami request or response to a string
      * @throws \LogicException If attempting to update the status of a kami doc that is not processing.
      * @throws \PDOException If something went wrong when saving the kami document's status
      * @throws \UnexpectedValueException If unexpected status change is reported from Kami API
      */
-    private function getSubFragment(Model $response, SubmissionFile $file): array
+    private function getSubFragment(SubmissionFile $file): array
     {
         try {
             return (new Factory\ResponseFile(
                 $this->kamiMapper,
                 $this->kamiConnector
-            ))->produce($response, $file, $this->getUser());
-        } catch (\RangeException|\DomainException $e) {
-            // Crocodoc exceptions
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
-        } catch (Kami\Exception\IKamiException $e) {
+            ))->produce($file, $this->getUser());
+        }
+        catch (Kami\Exception\IKamiException $e) {
             // Kami Exceptions
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
         }
@@ -370,86 +364,6 @@ class Controller extends Base
 
         $this->getResponse()->status->set($code);
         $this->getResponse()->content->set($this->buildContent('', $data));
-    }
-
-    /**
-     * Download a particular annotated crocodoc as a pdf
-     *
-     * @param Model          $response
-     * @param SubmissionFile $file
-     * @throws ApplicationException\Exception
-     */
-    public function getCrocodocDownload(Model $response, SubmissionFile $file)
-    {
-        try {
-            $download = $this->getInlineGraderFacade($response, $file)->getDownloadUrl();
-        }
-        catch (\InvalidArgumentException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-        }
-        catch (\RangeException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
-        }
-        catch (\DomainException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
-        }
-
-        $this->getResponse()->redirect->to($download);
-    }
-
-    /**
-     * View a particular annotated crocodoc
-     *
-     * @param Model $response
-     * @param Feedback $feedback
-     * @param SubmissionFile $file
-     * @throws ServiceNotFound If unable to locate Web Renderer in DI
-     * @throws ApplicationException\Exception
-     */
-    public function getCrocodocView(Model $response, Feedback $feedback, SubmissionFile $file)
-    {
-        try {
-            $facade = $this->getInlineGraderFacade($response, $file);
-        }
-        catch (\InvalidArgumentException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-        }
-        catch (\RangeException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
-        }
-        catch (\DomainException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
-        }
-
-        $data = [
-            'viewUrl'     => $facade->getViewUrl(),
-            'downloadUrl' => $facade->getDownloadUrl(),
-            'response'    => $response,
-            'feedback'    => $feedback,
-            'file'        => $file,
-        ];
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/crocodocView.twig', $data));
-    }
-
-    /**
-     * Figure out a Response File's crocodoc url
-     * This is a link to the third-party Crocodoc system
-     *
-     * @param Model          $response
-     * @param SubmissionFile $file
-     * @return InlineGraderFacade
-     * @throws \RangeException Cannot authenticate at crocodoc
-     * @throws \DomainException Some kind of curl error between us and crocodoc
-     * @throws \InvalidArgumentException If no crocodoc ID
-     */
-    private function getInlineGraderFacade(Model $response, SubmissionFile $file)
-    {
-        if (!$file->getCrocodocId()) {
-            throw new \InvalidArgumentException('There is no Inline Grader annotated version of this document.');
-        }
-
-        return new InlineGraderFacade(new InlineGraderAuthenticator(), $response, $file, $this->getUser());
     }
 
     /**

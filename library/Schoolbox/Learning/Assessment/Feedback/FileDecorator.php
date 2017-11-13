@@ -10,11 +10,11 @@
 
 namespace Schoolbox\Learning\Assessment\Feedback;
 
-use \Schoolbox\Collection;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IFeedback;
-use \Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
-use \Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
 
 class FileDecorator
 {
@@ -61,18 +61,6 @@ class FileDecorator
 
                 // And repopulate
                 foreach ($factory->build($this->getFiles())->getAll() as $attachment) {
-
-                    /* Feedback Files are never related to a crocodoc
-                     * Crocodoc is always related to a SubmissionFile, via its crocodocId
-                     *
-                     * Any crocodocable file is sneakily appended to the Feedback File
-                     * collection via other business logic, it's never created like that
-                     * Such representation is only shown in Timeline views - see
-                     * Timeline/Full:200-215
-                     *
-                     * Though, with the advent of being able to save Feedback Files properly
-                     * maybe that responsibility should be moved here instead?
-                     */
                     $this->getFeedback()->getAllFiles()->add(
                         (new DueWorkFeedbackFile())
                             ->setStorage($attachment)

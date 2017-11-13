@@ -147,9 +147,6 @@
 
         {% set attachedMsg = 'Feedback also includes <a href="' ~ pActionResponses ~ '">' %}
 
-        {# Check if this feedback has a crocodoc annotation attached to it #}
-        {% set hasCrocodoc = false %}
-
         {% if (latestFeedback and latestFeedback.response.allFiles.count > 0) or
         (not latestFeedback and participant.findMostRecentResponse().allFiles.count > 0) %}
             {% if latestFeedback %}
@@ -157,33 +154,16 @@
             {% else %}
                 {% set allFiles = participant.findMostRecentResponse().allFiles %}
             {% endif %}
-
-            {% for currentFile in allFiles %}
-                {% if currentFile.crocodocId %}
-                    {% set hasCrocodoc = true %}
-                {% endif %}
-            {% endfor %}
-        {% endif %}
-
-        {# Annotated document/Crocodoc #}
-        {% if hasCrocodoc %}
-            {% set attachedMsg = attachedMsg ~ 'annotated document' %}
         {% endif %}
 
         {# Rubric #}
         {% if rubricMarks[participant.user.id] %}
-            {% if hasCrocodoc and latestFeedback.allFiles.count > 0 %}
-                {% set attachedMsg = attachedMsg ~ ', ' %}
-            {% elseif hasCrocodoc and latestFeedback.allFiles.count == 0 %}
-                {% set attachedMsg = attachedMsg ~ ' and ' %}
-            {% endif %}
             {% set attachedMsg = attachedMsg ~ 'rubric' %}
         {% endif %}
 
         {# Files #}
         {% if latestFeedback.allFiles.count > 0 %}
-
-            {% if hasCrocodoc or rubricMarks[participant.user.id] %}
+            {% if rubricMarks[participant.user.id] %}
                 {% set attachedMsg = attachedMsg ~ ' and ' %}
             {% endif %}
 
@@ -192,13 +172,10 @@
             {% if latestFeedback.allFiles.count > 1 %}
                 {% set attachedMsg = attachedMsg ~ 's' %}
             {% endif %}
-
         {% endif %}
 
         {% set attachedMsg = attachedMsg ~ '</a>.' %}
-
     {% endif %}
-
 
     {# Action Bar #}
     {% set feedback            = participant.findMostRecentFeedback %}

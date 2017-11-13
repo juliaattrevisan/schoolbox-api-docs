@@ -32,30 +32,6 @@ class Model implements IFile, ISoftDeletable
     protected $return;
 
     /**
-     * @var string
-     */
-    protected $uuid;
-
-
-    /**
-     * @return string
-     */
-    public function getUuid()
-    {
-        return $this->uuid;
-    }
-
-    /**
-     * @param string $uuid
-     * @return static
-     */
-    public function setUuid($uuid)
-    {
-        $this->uuid = $uuid;
-        return $this;
-    }
-
-    /**
      * @return ReturnedWork
      */
     public function getReturn()

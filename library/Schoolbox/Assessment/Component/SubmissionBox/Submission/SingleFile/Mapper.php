@@ -16,7 +16,6 @@ use \Schoolbox\File\Mimetype;
 use \Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
-use \Schoolbox\Learning\InlineGrader\Factory\ResponseFile;
 use Schoolbox\Learning\InlineGrader\Kami;
 
 /**
@@ -39,7 +38,6 @@ class Mapper extends BaseMapper
         $this->joins('hash', StorageMapper::class, 'hash', null, null, 'storage', 'storage');
         $this->uses('realname', self::TYPE_STRING, null, 'filename');
         $this->uses('editable_inline', self::TYPE_BOOLEAN);
-        $this->uses('uuid', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -50,10 +48,12 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restorePlagScan'));
     }
 
+
     /**
      * Soft deletes any PlagScan for the specified File
      *
      * @param Model $file
+     * @throws BaseMapper\DefinitionException
      */
     public function softDeletePlagScan(Model $file)
     {
@@ -67,6 +67,7 @@ class Mapper extends BaseMapper
      * Restores any PlagScan for the specified File
      *
      * @param Model $file
+     * @throws BaseMapper\DefinitionException
      */
     public function restorePlagScan(Model $file)
     {
@@ -75,8 +76,10 @@ class Mapper extends BaseMapper
         $plagScanMapper->restoreSoftDeleted($plagScans);
     }
 
+
     /**
      * @return string
+     * @throws BaseMapper\DefinitionException
      */
     protected function getSelectString()
     {
@@ -99,11 +102,13 @@ class Mapper extends BaseMapper
         ";
     }
 
+
     /**
      * Include storage and student's submission.
      *
      * @param PDOStatement $statement
-     * @return Collection|Model[]
+     * @return Model[]|Collection
+     * @throws BaseMapper\DefinitionException
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
@@ -162,31 +167,5 @@ class Mapper extends BaseMapper
         }
 
         return $resultSet;
-    }
-
-    /**
-     * Get list of submissions that should be submitted to crocodoc
-     *
-     * @return Collection
-     */
-    public function findPendingCrocodocUpload()
-    {
-        /* Get a list of legal files that crocodoc accepts
-         */
-        $allowedExtensions = "'" . implode("','", ResponseFile::getAllowedFileTypes()) . "'";
-
-        $query = $this->getSelectString();
-
-        $query .= "
-            WHERE uuid IS NULL
-            AND YEAR(submitted_at) = YEAR(NOW())
-            AND ext IN ($allowedExtensions)
-            LIMIT 0,100
-        ";
-
-        $statement = $this->database->prepare($query);
-        $statement->execute();
-
-        return $this->hydrateSelect($statement);
     }
 }

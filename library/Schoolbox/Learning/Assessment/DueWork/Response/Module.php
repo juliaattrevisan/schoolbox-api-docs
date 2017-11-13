@@ -58,13 +58,12 @@ class Module extends BaseModule
     protected function registerRoutes()
     {
         $preloadParticipant     = function (array $params) { return $this->preloadParticipant($params); };
-        $preloadResponse        = function (array $params) { return $this->preloadResponseWithFeedback($params); };
         $preloadPlagscanWithAss = function (array $params) { return $this->preloadPlagscanWithAssessment($params); };
         $preloadKami            = function (array $params) { return $this->preloadKami($params); };
 
         $hasWriteAccess = $this->buildRuleHasWriteAccess();
 
-        $canAccessCrocodoc = $this->buildRuleCanAccessCrocodoc();
+        $hasKamiAccess = $this->buildRuleCanAccessKami();
 
         $hasPlagscanAccess = new Rule\Any(
             $hasWriteAccess,
@@ -78,27 +77,22 @@ class Module extends BaseModule
         $assessmentPattern  = '/assessments/{assessmentId:\d+}';
         $participantPattern = $assessmentPattern . '/{studentId:\d+}';
         $responsePattern    = $assessmentPattern . '/responses/{responseId:\d+}';
-        $feedbackPattern    = $assessmentPattern . '/feedback/{feedbackId:\d+}';
-        $crocodocPattern    = $feedbackPattern . '/{crocodocId:[0-9a-f-]+}';
 
         $this->register('DELETE', $responsePattern, 'deleteParticularResponse',  $hasWriteAccess, $preloadParticipant); // a || r
 
         $this->register('GET', $participantPattern . '/responses{/responseId:\d+}', 'getParticularResponse', $hasWriteAccess, $preloadParticipant); // a || r
-
-        $this->register('GET', $crocodocPattern . '/download',  'getCrocodocDownload', $canAccessCrocodoc, $preloadResponse); // a || r
-        $this->register('GET', $crocodocPattern . '/annotated', 'getCrocodocView',     $canAccessCrocodoc, $preloadResponse); // a || r
 
         $this->register('GET', $plagscanPattern,             'getPlagscanReport',         $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
         $this->register('GET', $plagscanPattern . '/iframe', 'getPlagscanReportContents', $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
 
         // For now, same auth rules as crocodoc.
         $canAccessKami = new Rule\All(
-            $canAccessCrocodoc,
+            $hasKamiAccess,
             new Kami\Authentication\IsEnabled($this->getKamiConnector())
         );
         // Don't attempt to export a kamiDoc if not possible
         $canExportKami = new Rule\All(
-            $canAccessCrocodoc,
+            $hasKamiAccess,
             new Kami\Authentication\IsEnabled($this->getKamiConnector()),
             new Rule\Callback(function (array $params) {
                 $kami = $this->getKamiMapper()->findById($params['kamiId']);
@@ -149,7 +143,7 @@ class Module extends BaseModule
 
     /**
      * Returns an auth rule determining if current user can view/download an
-     * annotated student submission file (aka 'crocodoc').
+     * annotated student submission file (aka 'kami').
      *
      * Permitted if user is either of:
      * * SuperUser,
@@ -159,9 +153,9 @@ class Module extends BaseModule
      *
      * @return Rule\IAuthorizationRule
      * @throws \InvalidArgumentException if any sub-rule is not a IAuthorizationRule
-     * @throws Unauthorized If current user not permitted to access the crocodoc
+     * @throws Unauthorized If current user not permitted to access the kami
      */
-    private function buildRuleCanAccessCrocodoc()
+    private function buildRuleCanAccessKami()
     {
         // And combine - ensuring parent check is last
         return new Rule\Any(
@@ -176,6 +170,10 @@ class Module extends BaseModule
     /**
      * @param array $params
      * @return array [ assessment, participant, response ]
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \UnexpectedValueException
      */
     private function preloadParticipant(array $params)
     {
@@ -221,113 +219,11 @@ class Module extends BaseModule
 
     /**
      * @param array $params
-     * @return array [ response, feedback, file ]
-     */
-    private function preloadResponseWithFeedback(array $params)
-    {
-
-        /* Die early when requested Assessment doesn't exist
-         */
-        try {
-            $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
-        }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
-        }
-
-        /* Get all the feedbacks associated with $assessment, then find the requested Feedback
-         * Find everything the hard way
-         */
-        try {
-            /** @var Feedback\Model $feedback */
-            $feedbacks = $this->getFeedbackMapperProxy()->findForAssessment($assessment);
-            $feedback = false;
-
-            foreach ($feedbacks as $currentFeedback) {
-                if ($currentFeedback->getId() == $params['feedbackId']) {
-                    $feedback = $currentFeedback;
-                }
-            }
-
-            if (!$feedback) {
-                throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
-            }
-
-            $responses = $this->getResponseMapperProxy()->findForAssessment($assessment);
-            $response = false;
-
-            if ($feedback->getResponse() instanceof IResponse) {
-                foreach ($responses as $currentResponse) {
-                    if ($currentResponse->getId() == $feedback->getResponse()->getId()) {
-                        $response = $currentResponse;
-                    }
-                }
-            }
-
-            /* No response found
-             * This can happen when there really isn't a response that meets the params specified,
-             * or when a previously-associated feedback became floating.
-             */
-            if (!$response) {
-
-                /* If a crocodoc id exists, it may have been in a Response which had an Associated
-                 * Feedback that got converted into a Floating Feedback. This was a misbehaviour that
-                 * was repaired previously, but there might be some orphaned data as a result.
-                 *
-                 * In this case, look for a Response that contained the crocodoc id. If you can't find
-                 * one, then die with GENERIC_NOT_FOUND.
-                 */
-                if (strlen($params['crocodocId'])) {
-                    $response = $this->getResponseMapperProxy()->findByCrocodocId($assessment, $params['crocodocId']);
-                }
-
-                /* Still didn't find it? Then it really didn't exist
-                 */
-                if (!$response) {
-                    throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
-                }
-            }
-        }
-        catch (OutOfBoundsException $e) {
-            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
-        }
-
-        /* Factory to figure out which fragment is required
-         */
-        $file = null;
-
-        /** @var Model $response */
-        foreach ($response->getAllFiles() as $currentFile) {
-            if ($currentFile->getCrocodocId() == $params['crocodocId']) {
-                $file = $currentFile;
-                break;
-            }
-        }
-
-        /* Die early when requested crocodocked File doesn't exist
-         */
-        if (!$file) {
-            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
-        }
-
-        /* Spawn participant(s)
-         */
-        $this->getAssessmentMapperProxy()->loadParticipantsIntoAssessment($assessment, $feedback->getReviewee());
-
-        /* Otherwise you succeeded in running the gauntlet
-         * Shove all required ingredients into Controller at last
-         */
-        return [
-            'response' => $response,
-            'feedback' => $feedback,
-            'file' => $file,
-            'participant' => $assessment->getParticipant($feedback->getReviewee())
-        ];
-    }
-
-    /**
-     * @param array $params
      * @return array [ assessment, response, plagscan ]
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \UnexpectedValueException
      */
     private function preloadPlagscanWithAssessment(array $params)
     {
@@ -406,8 +302,8 @@ class Module extends BaseModule
      * @param array $params
      * @return array
      * @throws MapperException\Deleted If the assessment the kami belongs to is deleted
-     * @throws NotFound If the requested Kami Doc has not finished processing
      * @throws OutOfBoundsException
+     * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException If mapper class not found
      * @throws \UnexpectedValueException If the kami files owner is not a participant
      */
@@ -463,30 +359,37 @@ class Module extends BaseModule
 
     /**
      * @return object|IConfigLoader
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     protected function getConfigLoader()
     {
         return $this->injector->get('config');
     }
 
+
     /**
      * @return object|AssessmentMapperProxy
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     protected function getAssessmentMapperProxy()
     {
         return $this->injector->get('assessmentDataSource');
     }
 
+
     /**
      * @return object|ResponseMapperProxy
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     protected function getResponseMapperProxy()
     {
         return $this->injector->get('responseDataSource');
     }
 
+
     /**
      * @return object|FeedbackMapperProxy
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     protected function getFeedbackMapperProxy()
     {
