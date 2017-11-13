@@ -130,9 +130,9 @@ $this->setBlock(TEMPLATE_content, 'edit_page', 'edit_page_block');
 $this->setBlock(TEMPLATE_content, 'page_controls', 'page_controls_block');
 $this->setBlock('page_controls', 'course_actions', 'course_actions_block');
 $this->setBlock('page_controls', 'manage_class', 'manage_class_block');
-$this->setBlock('manage_class', 'class_mark', 'class_mark_block');
 $this->setBlock(TEMPLATE_content, 'readonly_switch_on', 'readonly_switch_on_block');
 $this->setBlock(TEMPLATE_content, 'readonly_switch_off', 'readonly_switch_off_block');
+
 $this->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
 $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
 
@@ -171,6 +171,7 @@ if ($virtualPermission >= WRITE_ACCESS) {
     } else {
         $this->setVar('course_actions_block', '');
     }
+
 
     if (Cfg::get('homepage_enable_colour')) {
         $this->parse('homepage_color_selector_block', 'homepage_color_selector');
