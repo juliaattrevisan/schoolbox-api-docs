@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\File;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Schoolbox\Collection;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Resource\ResourceNotifier;
@@ -43,10 +44,11 @@ class Notifier extends ResourceNotifier
      */
     public function notifyCreated($roletype, $file, $effector, $diff = null)
     {
-        if (!$file->getFolder() instanceof Folder\Model) {
+        try {
+            $category = $this->folderMapper->findById($file->getFolder()->getId());
+        } catch (Deleted $e) {
             return new Envelope();
         }
-        $category = $this->folderMapper->findById($file->getFolder()->getId());
 
         return $this->notify(
             LogMapper::KIND_FILE,
@@ -68,10 +70,11 @@ class Notifier extends ResourceNotifier
      */
     public function notifyDeleted($roletype, $file, $effector, $diff = null)
     {
-        if (!$file->getFolder() instanceof Folder\Model) {
+        try {
+            $category = $this->folderMapper->findById($file->getFolder()->getId());
+        } catch (Deleted $e) {
             return new Envelope();
         }
-        $category = $this->folderMapper->findById($file->getFolder()->getId());
 
         // abstract this so far it doesn't even make sense any more
         return $this->notify(

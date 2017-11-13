@@ -66,7 +66,7 @@ class SubmissionMapper extends BaseMapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('box_id', 'b')}
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
-            LEFT JOIN {$this->getJoinSql('box_id', '', 'b')}
+            INNER JOIN {$this->getJoinSql('box_id', '', 'b', true)}
         ";
     }
 

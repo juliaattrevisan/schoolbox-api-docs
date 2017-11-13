@@ -17,6 +17,7 @@ use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Feed\SourceInterface;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
@@ -194,7 +195,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param string             $action
      * @param ParameterInterface $param
      * @param User               $effector
-     * @param Folder             $category
+     * @param Folder|ISoftDeletable $category
      * @param string             $roletype
      * @return Envelope
      */
@@ -207,7 +208,11 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
         // manuel hydration
         if (!$category->getName()) {
-            $category = $this->folderMapper->findById($categoryId);
+            try {
+                $category = $this->folderMapper->findById($categoryId);
+            } catch (Mapper\Exception\Deleted $e) {
+                $category = $e->getDeletedObject();
+            }
         }
 
         $bob = new Builder();

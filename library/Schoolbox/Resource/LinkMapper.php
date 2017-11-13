@@ -22,6 +22,9 @@ use Schoolbox\User;
 use Schoolbox\Resource\Link\Search\Result;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
+/**
+ * @method Link hydrate(array $row, $alias = '', $callback = null)
+ */
 class LinkMapper extends Mapper implements ILocator, Searchable
 {
     /**
@@ -163,14 +166,14 @@ class LinkMapper extends Mapper implements ILocator, Searchable
                    {$this->getJoinColumnString('user', 'u')},
                    {$this->getJoinColumnString('folder', 'c')}
             FROM `$table`
-            LEFT JOIN {$this->getJoinSql('user', $table, 'u',  true)}
-            LEFT JOIN {$this->getJoinSql('folder', $table, 'c')}
+            INNER JOIN {$this->getJoinSql('user', $table, 'u',  true)}
+            INNER JOIN {$this->getJoinSql('folder', $table, 'c', true)}
         ";
     }
 
     /**
      * @param PDOStatement $statement
-     * @return Collection
+     * @return Link[]|Collection
      */
     protected function hydrateSelect(PDOStatement $statement)
     {

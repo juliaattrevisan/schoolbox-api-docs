@@ -94,7 +94,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinMapper('plagscan')->getColumnString('ps')},
                 {$this->getJoinMapper('kami')->getColumnString('k')}
             FROM {$db->quoteIdentifier($this->getTable())}
-            LEFT JOIN {$this->getJoinSql('submission', '', 's')}
+            INNER JOIN {$this->getJoinSql('submission', '', 's', true)}
             LEFT JOIN {$this->getJoinSql('storage', '', 'f')}
             LEFT JOIN {$this->getJoinSql('storage.allowedFileExtension', 'f', 'm')}
             LEFT JOIN {$this->getJoinSql('plagscan', '', 'ps')}

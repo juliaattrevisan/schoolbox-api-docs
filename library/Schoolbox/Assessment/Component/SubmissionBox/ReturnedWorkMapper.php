@@ -123,8 +123,8 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
     {
         return "
             FROM `{$this->table}`
-            LEFT JOIN {$this->getJoinSql('marker', '', 'm', true)}
-            LEFT JOIN {$this->getJoinSql('submission_box', '', 'b', true)}
+            INNER JOIN {$this->getJoinSql('marker', '', 'm', true)}
+            INNER JOIN {$this->getJoinSql('submission_box', '', 'b', true)}
             LEFT JOIN {$this->getJoinSql('submission', '', 's', true)}
         ";
     }

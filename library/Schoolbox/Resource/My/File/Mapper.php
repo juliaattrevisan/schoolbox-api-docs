@@ -96,4 +96,16 @@ class Mapper extends AbstractFileMapper implements ILocator, IFileMapper
     {
         return $this->findByColumn('owner', $userId, [ 'mime' => 'image/*' ]);
     }
+
+
+    /**
+     * @inheritdoc
+     * @return string
+     */
+    protected function getFolderJoin()
+    {
+        // a myFile can have a parent = 0 meaning it does not reside inside a myFolder.
+        // TODO consider changing myFile.parent from mandatory to optional and add a FK, where NULL => topLevel.
+        return 'LEFT JOIN';
+    }
 }

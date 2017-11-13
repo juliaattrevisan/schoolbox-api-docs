@@ -124,7 +124,7 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
             LEFT JOIN {$this->getJoinSql('hash', $table, 'h')}
             LEFT JOIN {$hashJoin->getJoinSql('allowedFileExtension', 'h', 'm', true)}
             LEFT JOIN {$this->getJoinSql('owner', $table, 'u', true)}
-            LEFT JOIN {$this->getJoinSql($this->getFolderFieldname(), $table, 'c')}
+            {$this->getFolderJoin()} {$this->getJoinSql($this->getFolderFieldname(), $table, 'c', true)}
         ";
     }
 
@@ -216,4 +216,15 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
      */
     protected abstract function getFolderFieldname();
 
+
+    /**
+     * Is the relationship to the file's folder optional (LEFT) or mandatory (INNER)?
+     *
+     * @return string
+     */
+    protected function getFolderJoin()
+    {
+        // Defaults to mandatory
+        return 'INNER JOIN';
+    }
 }

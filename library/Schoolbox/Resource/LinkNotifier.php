@@ -13,6 +13,7 @@ namespace Schoolbox\Resource;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Schoolbox\Collection;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\User;
 
@@ -58,7 +59,12 @@ class LinkNotifier extends ResourceNotifier {
 	 * @return Envelope
 	 */
 	public function notifyDeleted($roletype, $link, $effector, $diff = null) {
-		$category = $this->folderMapper->findById($link->getFolder()->getId());
+        try {
+            $category = $this->folderMapper->findById($link->getFolder()->getId());
+        } catch (Deleted $e) {
+            return new Envelope();
+        }
+
 		// abstract this so far it doesn't even make sense any more
 		return $this->notify(
 			LogMapper::KIND_LINK, $link->getId(), self::TRIGGER_DELETED,    // "link.{id}.deleted"

@@ -37,6 +37,7 @@ use Schoolbox\ValueLabelInterface;
  * The SBFS Folder Model. Represents a folder within SBFS.
  *
  * @package Schoolbox\Resource\Folder
+ * @method Model getParent()
  */
 class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterface, AssessmentContext, IAssessmentContextDataModel
 {

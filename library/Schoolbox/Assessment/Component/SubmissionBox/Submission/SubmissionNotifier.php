@@ -33,7 +33,9 @@ use Schoolbox\UserMapper;
  * Notifier that is used when students submit work to a submission box.
  *
  * Class SubmissionNotifier
+ *
  * @package Schoolbox\Assessment\Component\SubmissionBox
+ * @method SubmissionMapper getMapper()
  */
 class SubmissionNotifier extends AbstractModuleNotifier
 {
@@ -130,8 +132,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
         $studentId = $submission->getOwner()->getId();
         $boxId     = $submission->getSubmissionBox()->getId();
 
-        /** @var SubmissionMapper $mapper */
-        $mapper = $this->mapper;
+        $mapper = $this->getMapper();
 
         switch ($method) {
             case Mapper::METHOD_CREATE: // new submission created
@@ -152,30 +153,12 @@ class SubmissionNotifier extends AbstractModuleNotifier
                 break;
 
             case Mapper::METHOD_DELETE: // submission deleted - if single-submit, student can submit again
-
-                // Maybe the box itself doesn't exist any more?
-                // No point attempting to trigger anything if so
-                if ($boxId) {
-                    /** @var SubmissionBox $owningBox */
-                    $owningBox = $this->submissionBoxMapper->findByIdWithFallback($boxId);
-
-                    if ($owningBox->getId() === null) {
-                        // don't. even. bother.
-                        return;
-                    }
-
-                    if ($owningBox->isDeleted()) {
-                        break;
-                    }
-
-                    // if multi-submit, don't notify
-                    if ($owningBox->getAcceptMultiple()) {
-                        break;
-                    }
-
-                    $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
+                $owningBox = $submission->getSubmissionBox();
+                // Don't trigger if box permits multi-submit
+                if ($owningBox->getAcceptMultiple()) {
+                    break;
                 }
-
+                $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
                 break;
 
             case Mapper::METHOD_READ:
@@ -296,7 +279,13 @@ class SubmissionNotifier extends AbstractModuleNotifier
         $studentId    = $student->getId();
         $studentExtId = $student->getExternalId();
 
-        $box = $this->submissionBoxMapper->findById($submission->getSubmissionBox()->getId());
+        try {
+            $box = $this->submissionBoxMapper->findById($submission->getSubmissionBox()->getId());
+        } catch (Mapper\Exception\Deleted $e) {
+            // Suppress notification if box is also deleted.
+            return $envelope;
+        }
+
         $folder = $box->getAssessmentModel()->getAssessmentContext()->getFolder();
 
         $boxId = $box->getId();
