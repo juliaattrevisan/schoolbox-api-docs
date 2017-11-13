@@ -14,12 +14,9 @@ use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Statement\Query\Base as BaseQuery;
 use PDO;
-use PDOStatement;
 
 class Base extends BaseQuery implements IStoredProcedure
 {
-    /** @var IBroker $broker */
-    protected $broker;
 
     /** @var string $name Function name */
     protected $name;

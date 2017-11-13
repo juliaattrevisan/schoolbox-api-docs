@@ -20,9 +20,6 @@ class Base extends BaseStatement
     /** @var string $sql */
     protected $sql;
 
-    /** @var IBroker $broker */
-    protected $broker;
-
     /**
      * Database statement constructor
      *
