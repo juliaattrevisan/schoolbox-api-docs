@@ -120,13 +120,13 @@
                 {% for event in eventList %}
                     {% set booking = event.getBooking() %}
                     <tr>
-                        <td>
-                            <time datetime="{{ event.getStartTime().getDatabase() }}">
+                        <td data-sort="{{ event.getStartTime().getUnixTimeStamp() }}">
+                             <time>
                                 {{ event.getStartTime().getLocal() }}
                             </time>
                         </td>
-                        <td>
-                            <time datetime="{{ event.getEndTime().getDatabase() }}">
+                        <td data-sort="{{ event.getEndTime().getUnixTimeStamp() }}">
+                            <time>
                                 {{ event.getEndTime().getLocal() }}
                             </time>
                         </td>
