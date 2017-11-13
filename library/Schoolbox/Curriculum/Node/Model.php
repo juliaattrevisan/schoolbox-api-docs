@@ -379,7 +379,8 @@ class Model implements ISoftDeletable, JsonSerializable
     {
         $parts   = [];
         $current = $this;
-        while ($current->getParent() instanceof Model) {
+        $i       = 0;
+        while ($current instanceof static && $i++ <= 50) {
             array_unshift($parts, $current->getName());
             $current = $current->getParent();
         }
