@@ -12,30 +12,39 @@
 
     {% set pStatusText %}
         {%- spaceless %}
-            {% if not latestResponse and not latestFeedback %}
-                Not submitted
-            {% else %}
-                {%  if latestResponse %}
-                    {% if assessable is task %}
-                        {% if not latestResponse.isMarkedComplete %}
-                            Incomplete
-                        {% elseif latestResponse.isSelfAssessed %}
-                            Self-Assessed
-                        {% else %}
-                            Teacher-Assessed
-                        {% endif %}
+            {% if participant.responseRequired %}
+                {% if assessable is task %}
+                    Incomplete
+                {% elseif assessable is quiz %}
+                    Not attempted
+                {% else %}
+                    Not submitted
+                {% endif %}
+            {% elseif participant.feedbackRequired %}
+                {% if assessable is task %}
+                    Self-Assessed
+                {% elseif assessable is quiz %}
+                    {% if multipleResponses %}
+                        Reattempted
                     {% else %}
-                        {% if multipleResponses %}
-                            Resubmitted
-                        {% else %}
-                            Submitted
-                        {% endif %}
-                        {% if latestResponse.submittedOnTime %}
-                            on time
-                        {% else %}
-                            late
-                        {% endif %}
+                        Attempted
                     {% endif %}
+                {% else %}
+                    {% if multipleResponses %}
+                        Resubmitted
+                    {% else %}
+                        Submitted
+                    {% endif %}
+                {% endif %}
+                {% if latestResponse.submittedOnTime %}
+                    on time
+                {% else %}
+                    late
+                {% endif %}
+            {% else %}
+                {# implicitly 'ReviewComplete' state if not 'ResponseRequired' or 'FeedbackRequired' #}
+                {% if assessable is task %}
+                    Teacher-Assessed
                 {% else %}
                     Reviewed
                 {% endif %}
