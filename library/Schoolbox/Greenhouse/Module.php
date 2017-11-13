@@ -14,7 +14,7 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Twig_Error_Loader;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 use \Schoolbox\Permission\Access\UserAccess;
 
 class Module extends BaseModule
@@ -68,10 +68,10 @@ class Module extends BaseModule
     }
 
     /**
-     * @param Twig_Loader_Chain $templateLoader
+     * @param IChainLoader $templateLoader
      * @throws Twig_Error_Loader
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }

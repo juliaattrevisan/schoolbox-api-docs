@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Assessment\Test\DataModel\Translator;
 
 use Alaress_Date_Format;
+use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Collection;
@@ -25,7 +26,7 @@ use Schoolbox\Resource\Storage\Model as StorageModel;
 /**
  * Tests for the assessment data model translator (due work only).
  */
-class DueWorkTest extends \PHPUnit_Framework_TestCase
+class DueWorkTest extends TestCase
 {
     use TestTrait;
 

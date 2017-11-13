@@ -12,7 +12,7 @@ namespace Schoolbox\Admin\Navigation;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Failure;
 use Alaress\Authorizer\Rule;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 
 class Module extends BaseModule
 {
@@ -21,7 +21,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader) {
+    public function initTemplatePaths(IChainLoader $templateLoader) {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 }

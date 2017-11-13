@@ -9,12 +9,12 @@ namespace Alaress\Jitter\Test;
 
 use Alaress\Jitter\Jitter;
 use Alaress\Random\PredeterminedGenerator;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class JitterTest
  */
-class JitterTest extends PHPUnit_Framework_TestCase
+class JitterTest extends TestCase
 {
     /**
      * Test jitter

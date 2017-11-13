@@ -5,9 +5,11 @@ require_once __DIR__.'/../../library/Bootstrap.php';
 echo "<pre>";
 echo "Detected Browser Info:\n\n";
 
-use phpbrowscap\Browscap;
+use BrowscapPHP\Browscap;
 
-$bc = new Browscap(__DIR__.'/../../tools/browscap');
+//$bc = new Browscap(__DIR__.'/../../tools/browscap');
+$bc = new Browscap();
+
 //$bc->remoteIniUrl = 'http://browscap.org/stream?q=Full_PHP_BrowsCapINI';
 // Don't attempt to update
 $bc->doAutoUpdate = false;

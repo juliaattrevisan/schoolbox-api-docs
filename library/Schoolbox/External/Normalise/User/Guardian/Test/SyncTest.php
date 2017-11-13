@@ -10,11 +10,11 @@ namespace Schoolbox\External\Normalise\User\Test\Guardian;
 
 use ArrayIterator;
 use Iterator;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Schoolbox\External\Normalise\User\Guardian as GuardianObject;
 use Schoolbox\Sync\Iterator\Guardian as GuardianIterator;
 
-class SyncTest extends PHPUnit_Framework_TestCase
+class SyncTest extends TestCase
 {
 
     /**

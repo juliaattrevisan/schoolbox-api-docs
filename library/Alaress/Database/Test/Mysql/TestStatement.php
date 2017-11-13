@@ -12,9 +12,9 @@ namespace Alaress\Database\Test\Mysql;
 
 use Alaress\Database\Test\TestConnectorTrait;
 use PDO;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class TestStatement extends PHPUnit_Framework_TestCase
+class TestStatement extends TestCase
 {
     use TestConnectorTrait;
 
@@ -224,10 +224,24 @@ class TestStatement extends PHPUnit_Framework_TestCase
      */
     public function testFunctionCall()
     {
+        // create and drop test function here, instead of in updates
+        $this->schoolbox->executeQuery("
+            CREATE FUNCTION IF NOT EXISTS testFunction (`input` VARCHAR(255))
+                RETURNS VARCHAR(500)
+                DETERMINISTIC NO SQL
+                BEGIN
+                    DECLARE `concatenated` VARCHAR(500);
+                    SET `concatenated` = CONCAT('testFunctionDidThis:', `input`);
+                    RETURN `concatenated`;
+                END;
+        ");
+
         $function = $this->schoolbox->executeFunctionCall('testFunction', [
             'input' => 'Got Milk?'
         ]);
 
         $this->assertSame($function->fetchColumn(), 'testFunctionDidThis:Got Milk?');
+
+        $this->schoolbox->executeQuery("DROP FUNCTION IF EXISTS testFunction;");
     }
 }

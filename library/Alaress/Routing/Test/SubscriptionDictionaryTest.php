@@ -10,8 +10,9 @@ namespace Alaress\Routing\Test;
 
 use Alaress\Routing\Dictionary\SubscriptionDictionary;
 use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 
-class SubscriptionDictionaryTest extends \PHPUnit_Framework_TestCase
+class SubscriptionDictionaryTest extends TestCase
 {
 
     /**

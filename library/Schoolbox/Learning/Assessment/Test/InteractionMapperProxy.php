@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning\Assessment\Test;
 
+use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\Assessment;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
@@ -15,7 +16,7 @@ use Schoolbox\Learning\Quiz;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Mapper;
 
-class InteractionMapperProxy extends \PHPUnit_Framework_TestCase
+class InteractionMapperProxy extends TestCase
 {
     /**
      * @param Mapper\AbstractMapperProxy $mapperProxy

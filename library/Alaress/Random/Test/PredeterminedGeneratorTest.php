@@ -9,12 +9,12 @@ namespace Alaress\Random\Test;
 
 use Alaress\Random\PredeterminedGenerator;
 use LengthException;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Test the float generator
  */
-class PredeterminedGeneratorTest extends PHPUnit_Framework_TestCase
+class PredeterminedGeneratorTest extends TestCase
 {
     /**
      * Test that I can't create a generator with no predetermined values.

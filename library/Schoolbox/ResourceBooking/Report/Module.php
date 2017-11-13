@@ -17,7 +17,7 @@ use Aura\Router\Router;
 use Calendar_Api_Composite;
 use External_Timetable;
 use Schoolbox\Role;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 use Twig_Loader_Filesystem;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ResourceBooking\Category;
@@ -61,7 +61,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }

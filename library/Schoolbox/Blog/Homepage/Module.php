@@ -28,7 +28,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 
 class Module extends BaseModule
 {
@@ -182,7 +182,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }

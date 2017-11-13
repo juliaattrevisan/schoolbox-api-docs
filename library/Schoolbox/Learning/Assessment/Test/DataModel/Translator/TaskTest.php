@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Assessment\Test\DataModel\Translator;
 
 use Alaress_Date_Format;
+use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Course\Task as TaskModel;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
@@ -18,7 +19,7 @@ use Schoolbox\User;
 /**
  * Tests for the assessment data model translator (tasks only).
  */
-class TaskTest extends \PHPUnit_Framework_TestCase
+class TaskTest extends TestCase
 {
     use TestTrait;
 

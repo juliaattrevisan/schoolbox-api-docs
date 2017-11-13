@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\MarkScheme;
 
 use Alaress\Module\Module as BaseModule;
+use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 
 class Module extends BaseModule
@@ -25,7 +26,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initTemplatePaths(\Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }

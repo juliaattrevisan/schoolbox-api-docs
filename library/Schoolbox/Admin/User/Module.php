@@ -24,7 +24,7 @@ use Schoolbox\User\Title\Mapper as UserTitleMapper;
 use Schoolbox\User\Log\Mapper as UserLogMapper;
 use Schoolbox\CMS\Log\Mapper as CMSLogMapper;
 use Schoolbox\CampusMapper;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 
 /**
  * The module for managing school users through the admin section.
@@ -129,7 +129,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }

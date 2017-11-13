@@ -1,7 +1,7 @@
 <?php
 /**
  * Custom chain loader for Twig templates.
-
+ *
  * Overrides template methods to first check if the module has been loaded, and
  * then attempt to load it from the dependency injector before checking whether
  * this exists or not.
@@ -14,11 +14,18 @@
 namespace Alaress\Twig\Loader;
 
 use Alaress\Module\Loader as ModuleLoader;
-use Aura\Di;
-use Twig_Loader_Chain;
+use Twig\Loader\ChainLoader as TwigChainLoader;
+use Twig\Loader\LoaderInterface;
 
-class ChainLoader extends Twig_Loader_Chain
+class ChainLoader implements IChainLoader
 {
+    /**
+     * Twig loader
+     *
+     * @var TwigChainLoader
+     */
+    protected $twigLoader;
+
     /**
      * Module loader
      *
@@ -36,13 +43,23 @@ class ChainLoader extends Twig_Loader_Chain
     /**
      * Constructor
      *
-     * @param ModuleLoader $moduleLoader
-     * @param array        $loaders
+     * @param ModuleLoader    $moduleLoader
+     * @param TwigChainLoader $twigLoader
      */
-    public function __construct(ModuleLoader $moduleLoader, array $loaders = array())
+    public function __construct(ModuleLoader $moduleLoader, TwigChainLoader $twigLoader)
     {
-        parent::__construct($loaders);
         $this->moduleLoader = $moduleLoader;
+        $this->twigLoader   = $twigLoader;
+    }
+
+    /**
+     * Add a loader
+     *
+     * @param LoaderInterface $loader
+     */
+    public function addLoader(LoaderInterface $loader)
+    {
+        $this->twigLoader->addLoader($loader);
     }
 
     /**
@@ -51,17 +68,17 @@ class ChainLoader extends Twig_Loader_Chain
     public function exists($name)
     {
         $this->moduleLoader->loadModule($name);
-        return parent::exists($name);
+        return $this->twigLoader->exists($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getSource($name)
-    {
-        $this->moduleLoader->loadModule($name);
-        return parent::getSource($name);
-    }
+//    /**
+//     * {@inheritdoc}
+//     */
+//    public function getSource($name)
+//    {
+//        $this->moduleLoader->loadModule($name);
+//        return $this->twigLoader->getSource($name);
+//    }
 
     /**
      * {@inheritdoc}
@@ -69,7 +86,7 @@ class ChainLoader extends Twig_Loader_Chain
     public function getCacheKey($name)
     {
         $this->moduleLoader->loadModule($name);
-        return parent::getCacheKey($name);
+        return $this->twigLoader->getCacheKey($name);
     }
 
     /**
@@ -78,6 +95,15 @@ class ChainLoader extends Twig_Loader_Chain
     public function isFresh($name, $time)
     {
         $this->moduleLoader->loadModule($name);
-        return parent::isFresh($name, $time);
+        return $this->twigLoader->isFresh($name, $time);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSourceContext($name)
+    {
+        $this->moduleLoader->loadModule($name);
+        return $this->twigLoader->getSourceContext($name);
     }
 }

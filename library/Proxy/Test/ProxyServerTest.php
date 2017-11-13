@@ -9,10 +9,10 @@
 
 namespace Proxy\Test;
 
-use PHPUnit_Framework_Error_Warning;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\Error\Warning;
+use PHPUnit\Framework\TestCase;
 
-class ProxyServerTest extends PHPUnit_Framework_TestCase
+class ProxyServerTest extends TestCase
 {
 
     // default internal Alaress proxy test settings
@@ -163,11 +163,10 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
 
     /**
      * HTTP connection using an invalid server using streams fails to connect to host
-     *
-     * @expectedException PHPUnit_Framework_Error_Warning
      */
     public function testInvalidServerHttpFopen()
     {
+        $this->expectException(Warning::class);
 
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader('192.168.1.200', '8080', '', ''));
         $data = $this->fopen(false);
@@ -188,11 +187,10 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
 
     /**
      * HTTPS connection using an invalid server using streams fails to connect to host
-     *
-     * @expectedException PHPUnit_Framework_Error_Warning
      */
     public function testInvalidServerHttpsFopen()
     {
+        $this->expectException(Warning::class);
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader('192.168.1.200', '8080', '', ''));
         $data = $this->fopen(true);
 
@@ -260,11 +258,10 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
 
     /**
      * Unauthorised proxy HTTP connection using streams returns a 407 code with proxy response
-     *
-     * @expectedException PHPUnit_Framework_Error_Warning
      */
     public function testUnauthorizedHttpFopen()
     {
+        $this->expectException(Warning::class);
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, 'fail', 'fail'));
         $data = $this->fopen(false);
 
@@ -284,11 +281,10 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
 
     /**
      * Unauthorised proxy HTTPS connection using streams returns a 407 code with proxy response
-     *
-     * @expectedException PHPUnit_Framework_Error_Warning
      */
     public function testUnauthorizedHttpsFopen()
     {
+        $this->expectException(Warning::class);
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, 'fail', 'fail'));
         $data = $this->fopen(true);
 

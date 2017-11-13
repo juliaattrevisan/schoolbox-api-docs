@@ -13,7 +13,7 @@ use Aura\Di\ContainerInterface;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Filter\Filters;
-use \Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 
 
 class Module extends AlaressModule
@@ -76,7 +76,7 @@ class Module extends AlaressModule
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
         $this->addTemplatePath($templateLoader, __DIR__ . '/Filters', 'filterDefinitions');

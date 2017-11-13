@@ -872,8 +872,8 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Twig_Error_Loader;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
+use Twig\Error\LoaderError;
 
 class Module extends BaseModule
 {
@@ -916,10 +916,10 @@ class Module extends BaseModule
     }
 
     /**
-     * @param Twig_Loader_Chain $templateLoader
-     * @throws Twig_Error_Loader
+     * @param IChainLoader $templateLoader
+     * @throws LoaderError
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }

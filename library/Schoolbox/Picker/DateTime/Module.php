@@ -18,7 +18,7 @@ use Alaress\Web\Router\PathMatcher;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\UserMapper;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
@@ -122,7 +122,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }

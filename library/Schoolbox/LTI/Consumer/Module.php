@@ -16,7 +16,7 @@ use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 use SitePage;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 
 class Module extends BaseModule
 {
@@ -124,9 +124,9 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      *
-     * @param Twig_Loader_Chain $templateLoader
+     * @param IChainLoader $templateLoader
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }

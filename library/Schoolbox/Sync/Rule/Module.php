@@ -16,7 +16,7 @@ use Alaress\Authorizer\Rule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 use Twig_Loader_Filesystem;
 use Schoolbox\Permission\Access\UserAccess;
 
@@ -74,7 +74,7 @@ class Module extends BaseModule
      *
      * {@inheritdoc}
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }

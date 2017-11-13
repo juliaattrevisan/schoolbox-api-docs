@@ -11,8 +11,9 @@ namespace Alaress\Routing\Test;
 
 use Alaress\Routing\Route\Route;
 use Alaress\Routing\Trie;
+use PHPUnit\Framework\TestCase;
 
-class RouteTest extends \PHPUnit_Framework_TestCase
+class RouteTest extends TestCase
 {
     /** @var Trie */
     private static $root;

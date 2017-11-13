@@ -7,13 +7,14 @@
 
 namespace Schoolbox\Learning\Assessment\Test;
 
+use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\MarkScheme\Completion;
 use Schoolbox\User;
 
-class CompletionTest extends \PHPUnit_Framework_TestCase
+class CompletionTest extends TestCase
 {
     /**
      * @dataProvider provider_normalised

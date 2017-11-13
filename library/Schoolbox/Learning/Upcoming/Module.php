@@ -13,7 +13,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Role;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
@@ -77,7 +77,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }

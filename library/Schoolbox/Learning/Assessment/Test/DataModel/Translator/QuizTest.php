@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Assessment\Test\DataModel\Translator;
 
 use Alaress_Date_Format;
+use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\Quiz\Model as QuizModel;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
@@ -17,7 +18,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
 /**
  * Tests for the assessment data model translator (quizzes only).
  */
-class QuizTest extends \PHPUnit_Framework_TestCase
+class QuizTest extends TestCase
 {
     use TestTrait;
 

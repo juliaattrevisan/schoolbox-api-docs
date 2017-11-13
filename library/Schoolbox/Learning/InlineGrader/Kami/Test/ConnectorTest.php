@@ -13,6 +13,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Schoolbox\Config\TestLoader;
 use Schoolbox\IConfigLoader;
@@ -21,7 +22,7 @@ use Schoolbox\Learning\InlineGrader\Kami\MockConnector;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
-class ConnectorTest extends \PHPUnit_Framework_TestCase
+class ConnectorTest extends TestCase
 {
 
     /**

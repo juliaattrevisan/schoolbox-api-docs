@@ -16,7 +16,7 @@ use InvalidArgumentException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 
 // These mappers are injected into controllers where required
 
@@ -88,7 +88,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }

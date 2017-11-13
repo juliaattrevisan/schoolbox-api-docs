@@ -4,7 +4,7 @@
 namespace Alaress\Test;
 
 use InvalidArgumentException;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Url;
 
 /**
@@ -14,7 +14,7 @@ use Url;
  * override with domain, http_host and hostname with whatever
  * values you require, so you don't need to use Cfg
  */
-class RelativeUrlTest extends PHPUnit_Framework_TestCase
+class RelativeUrlTest extends TestCase
 {
     // Test __construct()
 //

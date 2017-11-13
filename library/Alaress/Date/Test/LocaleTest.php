@@ -12,9 +12,10 @@ namespace Alaress\Date\Test;
 use Alaress\Test\Date\MockDateObject;
 use Alaress_Date_Format;
 use Alaress_Date_Locale_Config;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
+use Schoolbox\Config\Loader;
 
-class LocaleTest extends PHPUnit_Framework_TestCase
+class LocaleTest extends TestCase
 {
     use MockDateObject;
 
@@ -28,7 +29,7 @@ class LocaleTest extends PHPUnit_Framework_TestCase
      */
     public function setup()
     {
-        $mockConfig = $this->getMock('\\Schoolbox\\Config\\Loader');
+        $mockConfig = $this->createMock(Loader::class);
         $mockConfig
             ->expects($this->any())
             ->method('get')

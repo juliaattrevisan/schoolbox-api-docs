@@ -22,7 +22,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Storage;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 use Twig_Loader_Filesystem;
 
 class Module extends BaseModule

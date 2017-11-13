@@ -23,7 +23,7 @@ use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 
 // These mappers are injected into controllers where required
 
@@ -80,7 +80,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }

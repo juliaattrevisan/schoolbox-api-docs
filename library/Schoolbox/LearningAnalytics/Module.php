@@ -31,7 +31,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificat
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Role;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -260,7 +260,7 @@ class Module extends BaseModule
      * {@inheritdoc}
      * @throws \Twig_Error_Loader
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }

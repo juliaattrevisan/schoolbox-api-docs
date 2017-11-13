@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Course\Test\Unit;
 
 use Alaress_Date_Format;
+use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
@@ -18,7 +19,7 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
 /**
  * Tests for Unit Implementation objects
  */
-class ImplementationTest extends \PHPUnit_Framework_TestCase
+class ImplementationTest extends TestCase
 {
     /**
      * Test that object is in a particular state when created.

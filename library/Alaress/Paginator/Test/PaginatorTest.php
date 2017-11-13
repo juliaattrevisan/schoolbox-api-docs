@@ -9,10 +9,10 @@
 
 namespace Alaress\Paginator\Test;
 use Alaress\Paginator\Paginator;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use OutOfRangeException;
 
-class PaginatorTest extends PHPUnit_Framework_TestCase {
+class PaginatorTest extends TestCase {
 
     /**
      * Simple factory for a test Paginator object.

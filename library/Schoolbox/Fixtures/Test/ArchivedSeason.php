@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Fixtures\Test;
 
+use PHPUnit\Framework\TestCase;
 use Schoolbox\Fixtures\Authorizer\Rule\IsSeasonNotArchived;
 use Schoolbox\Fixtures\Sport;
 use Schoolbox\Fixtures\Season;
@@ -15,7 +16,7 @@ use Schoolbox\Fixtures\Team;
 use \Alaress_Date_Format;
 use \Alaress_Date_NullDate;
 
-class ArchivedSeason extends \PHPUnit_Framework_TestCase
+class ArchivedSeason extends TestCase
 {
 
     /**

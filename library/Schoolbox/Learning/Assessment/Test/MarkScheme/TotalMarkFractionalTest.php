@@ -7,13 +7,14 @@
 
 namespace Schoolbox\Learning\Assessment\Test;
 
+use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use \InvalidArgumentException;
 
-class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
+class TotalMarkFractionalTest extends TestCase
 {
 
     /**

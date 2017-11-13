@@ -8,7 +8,7 @@
 
 namespace Schoolbox\Learning\Assessment\Participant\Test;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\Assessment\Participant;
 
 /**
@@ -22,7 +22,7 @@ use Schoolbox\Learning\Assessment\Participant;
  * @see Participant::hasSubmittedResponse()
  * @see Participant::hasPublishedFeedback()
  */
-class TaskStatus extends PHPUnit_Framework_TestCase
+class TaskStatus extends TestCase
 {
     /**
      * @dataProvider provider_selfAssessable_isResponseRequired

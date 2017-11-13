@@ -10,9 +10,9 @@
 namespace Alaress\Date\Test;
 
 use Alaress_Date_Format;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class IsPastAndFutureDateTest extends PHPUnit_Framework_TestCase
+class IsPastAndFutureDateTest extends TestCase
 {
     /**
      * Data provider for whether date is in the past or future.

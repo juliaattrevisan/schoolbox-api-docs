@@ -8,12 +8,12 @@
 namespace Alaress\Random\Test;
 
 use Alaress\Random\FloatGenerator;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Test the float generator
  */
-class FloatGeneratorTest extends PHPUnit_Framework_TestCase
+class FloatGeneratorTest extends TestCase
 {
     /**
      * Test for the float generator.

@@ -12,6 +12,7 @@ namespace Alaress\OAuth2\Client\Provider;
 
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Token\AccessToken;
+use Psr\Http\Message\ResponseInterface;
 
 class Office365 extends AbstractProvider
 {
@@ -68,4 +69,34 @@ class Office365 extends AbstractProvider
         return null;
     }
 
-} 
+    public function getBaseAuthorizationUrl()
+    {
+        return 'https://login.windows.net/common/oauth2/authorize';
+    }
+
+    public function getBaseAccessTokenUrl(array $params)
+    {
+        return 'https://login.windows.net/common/oauth2/token';
+    }
+
+    public function getResourceOwnerDetailsUrl(AccessToken $token)
+    {
+        return 'https://outlook.office.com/api/v1.0/me';
+    }
+
+    protected function getDefaultScopes()
+    {
+        // Not sure if there are any?
+        return [];
+    }
+
+    protected function checkResponse(ResponseInterface $response, $data)
+    {
+        // Don't think there is any response checking?
+    }
+
+    protected function createResourceOwner(array $response, AccessToken $token)
+    {
+        // TODO: Implement createResourceOwner() method.
+    }
+}

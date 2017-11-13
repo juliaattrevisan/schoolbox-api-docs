@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Calendar\Test\Event;
 
+use PHPUnit\Framework\TestCase;
 use Schoolbox\Campus;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -18,7 +19,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\Access as FolderAccess;
 use Schoolbox\Calendar\Relation\Category as CategoryRelation;
 
-class AccessTest extends \PHPUnit_Framework_TestCase
+class AccessTest extends TestCase
 {
     /** @var Role[] */
     private $roles;

@@ -18,8 +18,9 @@ use Alaress\Web\Router\PathMatcher;
 use Alaress\Web\Router\RouteCollection;
 use LogicException;
 use Schoolbox\MapperFactory;
-use Twig_Loader_Chain;
-use Twig_Loader_Filesystem;
+use Alaress\Twig\Loader\IChainLoader;
+use Twig\Loader\FilesystemLoader;
+use Twig\Error\LoaderError;
 
 class Module {
 
@@ -545,10 +546,10 @@ class Module {
     /**
      * Initializes template paths for this module.
      *
-     * @param Twig_Loader_Chain $templateLoader
-     * @throws \Twig_Error_Loader if the directory does not exist
+     * @param IChainLoader $templateLoader
+     * @throws LoaderError if the directory does not exist
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader) {}
+    public function initTemplatePaths(IChainLoader $templateLoader) {}
 
 
     /**
@@ -556,20 +557,20 @@ class Module {
      *
      * Now adds school-specific templates to "$dir/custom/$config[site_location]".
      *
-     * @param  Twig_Loader_Chain $templateLoader
+     * @param  IChainLoader $templateLoader
      * @param  string            $dir The directory to use as the template path
      * @param  string            $basename
      * @return $this
-     * @throws \Twig_Error_Loader
+     * @throws LoaderError if something happened whilst loading
      */
-    protected function addTemplatePath(Twig_Loader_Chain $templateLoader, $dir, $basename = '')
+    protected function addTemplatePath(IChainLoader $templateLoader, $dir, $basename = '')
     {
         $basePath     = $dir;
         $overridePath = $basePath . '/custom/' . $this->getConfig()->get('site_location');
         $namespace    = $basename ?: $this->basename;
 
         // Set up the loader for this namespace.
-        $loader = new Twig_Loader_Filesystem([]);
+        $loader = new FilesystemLoader([]);
         if (is_dir($overridePath)) {
             // Add the school-specific dir if it's there
             $loader->addPath($overridePath, $namespace);
@@ -580,7 +581,7 @@ class Module {
         // Set up the core loader for this namespace as "$basename:core".
         // This contains only the base path, even if the custom path exists:
         // this allows custom templates to extend a core version of the template.
-        $coreLoader = new Twig_Loader_Filesystem([]);
+        $coreLoader = new FilesystemLoader([]);
         $coreLoader->addPath($basePath, $namespace . ':core');
         $templateLoader->addLoader($coreLoader);
 
@@ -644,7 +645,7 @@ class Module {
     /**
      * Typehinted convenience method for obtaining template loader reference
      *
-     * @return Twig_Loader_Chain
+     * @return IChainLoader
      */
     protected function getTemplateLoader()
     {

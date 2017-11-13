@@ -11,9 +11,9 @@ namespace Alaress\Rules\Token\Test;
 
 
 use Alaress\Rules\Lang\Map;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class TokenizerTest extends PHPUnit_Framework_TestCase
+class TokenizerTest extends TestCase
 {
     /** @var MockTokenizer */
     protected $tokenizer;

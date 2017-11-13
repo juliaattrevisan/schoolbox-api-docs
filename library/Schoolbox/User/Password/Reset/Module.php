@@ -17,7 +17,7 @@ use Schoolbox\Mail;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User\Password\MailService;
 use \Schoolbox\UserMapper;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 
 /**
  * Module for password resets
@@ -67,7 +67,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }

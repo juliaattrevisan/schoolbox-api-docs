@@ -11,9 +11,9 @@
 namespace Alaress\Database\Test\Mssql;
 
 use Alaress\Database\Test\TestConnectorTrait;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-abstract class AbstractTestPostProcessor extends PHPUnit_Framework_TestCase
+abstract class AbstractTestPostProcessor extends TestCase
 {
     use TestConnectorTrait;
 

@@ -333,7 +333,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
             $di->lazy(
                 function () use ($di) {
                     $config      = $di->get('config');
-                    $chainLoader = new ChainLoader(new ModuleLoader($di, '[^@(?P<module>[^/]+)/]'));
+                    $chainLoader = new ChainLoader(new ModuleLoader($di, '[^@(?P<module>[^/]+)/]'), new \Twig\Loader\ChainLoader());
                     $baseLoader  = new Twig_Loader_Filesystem(array());
                     // Paths: prefer templates/{site_location} over templates/core
                     $basePath     = $config->get('siteRoot').'/templates/';
@@ -385,10 +385,10 @@ abstract class AbstractBootstrap implements BootstrapInterface
 
                     $twig = new Twig_Environment($di->get('templateEngine:loader'), $options);
 
-                    if($this->debugEnabled) {
-                        $twig = new TraceableTwigEnvironment($twig);
-                        DebugBar::getInstance()->addCollector(new TwigCollector($twig));
-                    }
+//                    if($this->debugEnabled) {
+//                        $twig = new TraceableTwigEnvironment($twig);
+//                        DebugBar::getInstance()->addCollector(new TwigCollector($twig));
+//                    }
 
                     $twig->addExtension(new Twig_Extension_Debug());
                     $twig->addExtension(new Twig_Extensions_Extension_Text());

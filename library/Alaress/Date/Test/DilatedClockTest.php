@@ -10,9 +10,9 @@
 namespace Alaress\Date\Test;
 
 use Alaress\Date\DilatedClock;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class DilatedClockTest extends PHPUnit_Framework_TestCase
+class DilatedClockTest extends TestCase
 {
     /**
      * Verifies that a clock for right now keeps the correct time.

@@ -7,10 +7,11 @@
 
 namespace Schoolbox\L10n\RosettaStone\Test;
 
+use PHPUnit\Framework\TestCase;
 use Schoolbox\L10n\Model;
 use Schoolbox\L10n\RosettaStone;
 
-class RosettaStoneTest extends \PHPUnit_Framework_TestCase
+class RosettaStoneTest extends TestCase
 {
     /**
      * @var RosettaStone

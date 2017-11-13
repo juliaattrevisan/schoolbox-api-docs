@@ -11,9 +11,9 @@ namespace Alaress\Color\Test;
 
 use Alaress\Color\Color;
 use Alaress\Color\ColorFactory;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class ColorFactoryTest extends PHPUnit_Framework_TestCase
+class ColorFactoryTest extends TestCase
 {
     /**
      * @var ColorFactory

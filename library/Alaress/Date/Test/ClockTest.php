@@ -10,9 +10,9 @@
 namespace Alaress\Date\Test;
 
 use Alaress\Date\Clock;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class ClockTest extends PHPUnit_Framework_TestCase
+class ClockTest extends TestCase
 {
     /**
      * Verifies that a clock for right now keeps the correct time.

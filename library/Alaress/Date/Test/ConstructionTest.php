@@ -15,9 +15,9 @@ use Alaress_Date_Locale_Static;
 use DateTime;
 use DateTimeZone;
 use InvalidArgumentException;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class ConstructionTest extends PHPUnit_Framework_TestCase
+class ConstructionTest extends TestCase
 {
     use MockDateObject;
 

@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Learning\Assessment\Participant\Test;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Summator\Average;
@@ -26,7 +26,7 @@ use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
  * @see Participant::hasSubmittedResponse()
  * @see Participant::hasPublishedFeedback()
  */
-class ProjectStatus extends PHPUnit_Framework_TestCase
+class ProjectStatus extends TestCase
 {
     /**
      * @dataProvider provider_requiresResponse_optionalSubAssessments

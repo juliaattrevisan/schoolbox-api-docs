@@ -12,7 +12,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 
 /**
  * The module for managing school terms through the admin section.
@@ -72,7 +72,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }

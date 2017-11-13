@@ -16,7 +16,7 @@ use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Schoolbox\Survey\Mapper as SurveyMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Twig_Loader_Chain;
+use Alaress\Twig\Loader\IChainLoader;
 
 class Module extends BaseModule
 {
@@ -82,7 +82,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }

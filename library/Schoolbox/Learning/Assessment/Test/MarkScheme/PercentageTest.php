@@ -7,10 +7,11 @@
 
 namespace Schoolbox\Learning\Assessment\Test;
 
+use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use \RangeException;
 
-class PercentageTest extends \PHPUnit_Framework_TestCase
+class PercentageTest extends TestCase
 {
 
     /**

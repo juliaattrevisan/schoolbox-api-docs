@@ -7,11 +7,12 @@
 
 namespace Schoolbox\Learning\Assessment\Test;
 
+use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\MarkScheme\None;
 use \InvalidArgumentException;
 use \RangeException;
 
-class NoneTest extends \PHPUnit_Framework_TestCase
+class NoneTest extends TestCase
 {
     public function test_getHumanReadable_Null()
     {
