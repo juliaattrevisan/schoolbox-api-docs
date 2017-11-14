@@ -8,6 +8,19 @@
         <input id="userSearch{{ guid }}" placeholder="{{ title | default('Enter name') }}" maxlength="50"/>
 
         {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+        {# Empty state #}
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+
+        <div id="searchResultsNotice{{ guid }}">
+            <div class="empty-state">
+                <p>
+                    Please type the name of a person in the text box above.<br>
+                    Users that have already been added will not appear in search results.
+                </p>
+            </div>
+        </div>
+
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
         {# Container for search results #}
         {# --------------------------------------------------------------------------------------------------------------------------------------------#}
 
@@ -95,6 +108,7 @@
             {# Shut storm up with its duplicate selector bitching #}
 
             var searchResults = $('#searchResults{{ guid }}');
+            var searchResultsNotice = $('#searchResultsNotice{{ guid }}');
             var searchResultsEmpty = $('#searchResultsEmpty{{ guid }}');
             var searchResultsContainer = $('#searchResultsContainer{{ guid }}');
             var searchResultsContainerRow = $('#searchResultsContainerRow{{ guid }}');
@@ -136,6 +150,7 @@
 
                 userSearch.val('');
                 searchResults.removeClass('hide');
+                searchResultsNotice.removeClass('hide');
                 searchResultsContainer.addClass('hide');
                 searchResultsContainerRow.addClass('hide');
                 searchResultsEmpty.addClass('hide');
@@ -268,6 +283,10 @@
             {# --------------------------------------------------------------------------------------------------------------------------------------------#}
 
             userSearch.on('input propertychange paste', function () {
+
+                {# Hide the notice text #}
+
+                searchResultsNotice.addClass('hide');
 
                 {# Grab the search text #}
 
