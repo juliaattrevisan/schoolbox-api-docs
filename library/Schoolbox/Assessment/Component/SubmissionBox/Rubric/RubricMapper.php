@@ -1011,7 +1011,8 @@ class RubricMapper
                 WHERE {$where}
                 GROUP BY sb.assessment_id, rd.criterion_id
             ) t
-            WHERE `a`.`id` = `t`.`a.id` AND `rc`.`id` = `t`.`rc.id` AND `rm`.`published_at` = `t`.`rm.max_published_at`
+            WHERE {$where}
+            AND   `a`.`id` = `t`.`a.id` AND `rc`.`id` = `t`.`rc.id` AND `rm`.`published_at` = `t`.`rm.max_published_at`
             ORDER BY rc.grouping ASC, rc.name ASC, a.due_date DESC;
         ");
 
