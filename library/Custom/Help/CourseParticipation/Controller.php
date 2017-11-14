@@ -64,19 +64,26 @@ class Controller extends Base
      */
     private $handler;
 
+    /**
+     * @var string
+     */
+    private $portraitDir;
+
 
     /**
      * @param UserAccessMapper          $userAccessMapper
      * @param SiteAccess\Mapper         $tokenMapper
      * @param Folder\Mapper             $folderMapper
      * @param User\Password\MailService $mailService
+     * @param string                    $portraitDir
      * @throws Mapper\DefinitionException
      */
     public function __construct(
         UserAccessMapper $userAccessMapper,
         SiteAccess\Mapper $tokenMapper,
         Folder\Mapper $folderMapper,
-        User\Password\MailService $mailService
+        User\Password\MailService $mailService,
+        $portraitDir
     ) {
         $this->userAccessMapper = $userAccessMapper;
         $this->tokenMapper      = $tokenMapper;
@@ -91,6 +98,7 @@ class Controller extends Base
             $this->folderMapper,
             $this->passwordMailService
         );
+        $this->portraitDir = $portraitDir;
     }
 
 
