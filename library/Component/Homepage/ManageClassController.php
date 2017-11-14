@@ -56,6 +56,9 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $isClassPage = $this->getContext()->isClass();
         $isUnitPage = $this->getContext()->hasUnitSpecification();
 
+        $classActionsHeading = ($isUnitPage ? "Unit Actions" : "Class Actions");
+        $this->setVar('CLASS_ACTIONS_HEADING', $classActionsHeading);
+
         /* This boolean is a hack to make the Class Actions heading
          * render only when needed.
          * It gets set to true whenever content that should fall under
@@ -71,7 +74,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, 'class_list', 'class_list_block');
         $this->setBlock($templateHandle, 'class_mark', 'class_mark_block');
         $this->setBlock($templateHandle, 'student_grades', 'student_grades_block');
-
 
         // Determine the term for the grades link
         $this->setVar('WORK_TERM', $this->termMapper->findForToday()->getCode());
