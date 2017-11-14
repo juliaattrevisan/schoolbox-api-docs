@@ -72,7 +72,7 @@ class Controller extends Base
     public function getGroupsModify($group)
     {
         $this->getResponse()->content->set([
-            'template' => '@pastoralManagement/groupsModify.twig',
+            'template' => '@pastoralManagement/groups_modify.twig',
             'data'     => [
                 'group'               => $group,
                 'minimumSearchLength' => Results::MIN_SEARCH_LENGTH,
