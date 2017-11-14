@@ -23,16 +23,7 @@
             <li>Periods will be imported in the order specified, regardless of their start/finish times.</li>
             <li>Any empty fields will be filled with the previous non-empty value in that column.</li>
             <li>
-                <strong>Term Start</strong> and <strong>Term Finish</strong> must be in:
-                {# TODO add a ADF instance for now to Twig context #}
-                <ul>
-                    <li>Y-M-D format <em>(<time>{{ now.getUsingFormat('Y-m-d') }}</time>)</em></li>
-                    <li>D/M/Y format <em>(<time>{{ now.getUsingFormat('d/m/Y') }}</time>)</em></li>
-                </ul>
-                They may not be in:
-                <ul>
-                    <li>M/D/Y format <em>(<time>{{ now.getUsingFormat('m/d/Y') }}</time>)</em></li>
-                </ul>
+                <strong>Term Start</strong> and <strong>Term Finish</strong> must only be in Y-M-D format <em>(<time>{{ now.getUsingFormat('Y-m-d') }}</time>)</em>
             </li>
             <li>
                 <strong>Period Start</strong> and <strong>Period Finish</strong> must be in:

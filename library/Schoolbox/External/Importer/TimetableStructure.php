@@ -138,7 +138,7 @@ class TimetableStructure extends AbstractImporter
                         [Alaress_Date_Format::DATABASE_DATE_FORMAT, 'd/m/Y']
                     );
                 } catch (\InvalidArgumentException $e) {
-                    $this->log->warning('"Term Start" and "Term Finish" must both be dates in YYYY-MM-DD or DD/MM/YYYY format');
+                    $this->log->warning('"Term Start" and "Term Finish" must both be dates in YYYY-MM-DD format: skipping!');
                     continue;
                 }
                 $campus
@@ -174,7 +174,7 @@ class TimetableStructure extends AbstractImporter
                         ['row' => $row]);
                     $periodStart = NULL;
                 } else {
-                    $periodStart = new Alaress_Date_Format($row['Period Start'], ['H:i', 'G:ia', 'Hi']);
+                    $periodStart = new Alaress_Date_Format($row['Period Start'], ['H:i', 'G:ia']);
                 }
                 if(empty($row['Period Finish'])){
                     $this->log->notice(
@@ -182,10 +182,10 @@ class TimetableStructure extends AbstractImporter
                         ['row' => $row]);
                     $periodFinish = NULL;
                 } else {
-                    $periodFinish = new Alaress_Date_Format($row['Period Finish'], ['H:i', 'G:ia', 'Hi']);
+                    $periodFinish = new Alaress_Date_Format($row['Period Finish'], ['H:i', 'G:ia']);
                 }
             } catch (\InvalidArgumentException $e) {
-                $this->log->warning('"Period Start" and "Period Finish" must both be times in HH:MM format');
+                $this->log->warning('"Period Start" and "Period Finish" must both be times in 12 hour (1:00pm) or 24 hour (13:00) format: skipping!');
                 continue;
             }
             $period
