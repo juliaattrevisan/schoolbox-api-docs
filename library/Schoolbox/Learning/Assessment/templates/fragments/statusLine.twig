@@ -32,10 +32,12 @@
                         Submitted
                     {% endif %}
                 {% endif %}
-                {% if latestResponse.submittedOnTime %}
-                    on time
-                {% else %}
-                    late
+                {% if assessable is not project %}
+                    {% if latestResponse.submittedOnTime %}
+                        on time
+                    {% else %}
+                        late
+                    {% endif %}
                 {% endif %}
             {% else %}
                 {# implicitly 'ReviewComplete' state if not 'ResponseRequired' or 'FeedbackRequired' #}
