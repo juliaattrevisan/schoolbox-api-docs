@@ -1,41 +1,50 @@
-{% if assessable.isParticipant(student) %}
-    {% set participant       = assessable.getParticipant(student) %}
-    {% set latestFeedback    = participant.findMostRecentFeedback %}
-    {% set latestResponse    = participant.findMostRecentSubmittedResponse %}
-    {% set multipleResponses = participant.allResponses | length > 1 %}
-
-    {% set isPublished  = latestFeedback.published %}
-    {% set canPublish   = latestFeedback and not isPublished %}
-
-    {% set pStatusClass = participant.isResponseRequired ? 'incomplete' : (participant.isFeedbackRequired ? 'pending' : 'reviewed') %}
-    {% set pTooltip     = participant.isResponseRequired ? 'Submission Required' : (participant.isFeedbackRequired ? 'Mark required' : 'Reviewed') %}
-
+{% set participant = assessable.getParticipantIfExtant(student) %}
+{% if participant %}
     {% set pStatusText %}
         {%- spaceless %}
-            {% if not latestResponse and not latestFeedback %}
-                Not submitted
-            {% else %}
-                {%  if latestResponse %}
-                    {% if assessable is task %}
-                        {% if not latestResponse.isMarkedComplete %}
-                            Incomplete
-                        {% elseif latestResponse.isSelfAssessed %}
-                            Self-Assessed
-                        {% else %}
-                            Teacher-Assessed
-                        {% endif %}
+            {% if participant.responseRequired %}
+                {% set pStatusClass = 'incomplete' %}
+                {% set pTooltip = 'Submission Required' %}
+                {% if assessable is task %}
+                    Incomplete
+                {% elseif assessable is quiz %}
+                    Not attempted
+                {% else %}
+                    Not submitted
+                {% endif %}
+            {% elseif participant.feedbackRequired %}
+                {% set pStatusClass = 'pending' %}
+                {% set pTooltip = 'Mark required' %}
+                {% set latestResponse    = participant.findMostRecentSubmittedResponse %}
+                {% set multipleResponses = participant.allResponses | length > 1 %}
+                {% if assessable is task %}
+                    Self-Assessed
+                {% elseif assessable is quiz %}
+                    {% if multipleResponses %}
+                        Reattempted
                     {% else %}
-                        {% if multipleResponses %}
-                            Resubmitted
-                        {% else %}
-                            Submitted
-                        {% endif %}
-                        {% if latestResponse.submittedOnTime %}
-                            on time
-                        {% else %}
-                            late
-                        {% endif %}
+                        Attempted
                     {% endif %}
+                {% else %}
+                    {% if multipleResponses %}
+                        Resubmitted
+                    {% else %}
+                        Submitted
+                    {% endif %}
+                {% endif %}
+                {% if assessable is not project %}
+                    {% if latestResponse.submittedOnTime %}
+                        on time
+                    {% else %}
+                        late
+                    {% endif %}
+                {% endif %}
+            {% else %}
+                {# implicitly 'ReviewComplete' state if not 'ResponseRequired' or 'FeedbackRequired' #}
+                {% set pStatusClass = 'reviewed' %}
+                {% set pTooltip = 'Reviewed' %}
+                {% if assessable is task %}
+                    Teacher-Assessed
                 {% else %}
                     Reviewed
                 {% endif %}
