@@ -84,7 +84,7 @@ class Date implements HydratorInterface
 
             }
             if (!$date || !$date->isValid()) {
-                throw new \UnexpectedValueException('"Date of Birth" must be a date in YYYY-MM-DD format: skipping the value!');
+                throw new \UnexpectedValueException('"Date of Birth" must be a date in YYYY-MM-DD format: skipping the value');
             }
             return call_user_func([$user, 'setDob'], $date);
 

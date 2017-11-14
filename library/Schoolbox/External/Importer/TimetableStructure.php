@@ -138,13 +138,9 @@ class TimetableStructure extends AbstractImporter
                         [Alaress_Date_Format::DATABASE_DATE_FORMAT, 'd/m/Y']
                     );
                 } catch (\InvalidArgumentException $e) {
-
-                }
-                if (!$termStart->isValid() || !$termFinish->isValid()) {
                     $this->log->warning('"Term Start" and "Term Finish" must both be dates in YYYY-MM-DD or DD/MM/YYYY format');
                     continue;
                 }
-
                 $campus
                     ->setCycle($cycle)
                     ->setCampus($campusObject)
