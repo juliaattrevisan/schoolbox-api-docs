@@ -36,7 +36,31 @@ class Module extends BaseModule
             )
         );
 
-        $this->register('POST', '/update/{userId}', 'postUpdate', $updatePD, null);
+        $preloadUser = function ($params) { return $this->preloadUser($params); };
+
+        $this->register('POST', '/update/{userId}', 'postUpdate', $updatePD, $preloadUser);
+    }
+
+    /**
+     * Preload the user
+     *
+     * @param array $params
+     * @return array
+     * @throws InvalidArgumentException
+     * @throws NotFound
+     */
+    private function preloadUser(array $params)
+    {
+        try {
+            $user = $this->getUserMapper()->findById($params['userId']);
+        }
+        catch (MapperException $e) {
+            throw new NotFound();
+        }
+
+        return [
+            'user' => $user,
+        ];
     }
 
     /**

@@ -8,23 +8,29 @@
 namespace Schoolbox\ProfessionalDevelopment;
 
 use Alaress\Web\Controller\Base;
-
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\User;
 
 class Controller extends Base
 {
     /**
-     * Load $templateName
+     * @param User $user
+     * @throws MapperException
+     * @throws \PDOException
      */
-    public function postUpdate()
+    public function postUpdate(User $user)
     {
         try {
-            $pd = Mapper::getInstance()->findById(1);
-            new \Alaress_Probe($this->getRequest()->post, $pd);
+            $pd = Mapper::getInstance()->findOneByColumn('user_id', $user->getId());
         }
-        catch (\Schoolbox\Mapper\Exception $e) {
-            var_dump($e->getMessage());
+        catch (MapperException $e) {
+            $pd = Mapper::getInstance()->createModel();
+            $pd->setUser($user);
         }
 
-        die();
+        $pd->setNumber($this->getRequest()->post['pdNumber']);
+        $pd->setRegistrationState($this->getRequest()->post['pdState']);
+
+        Mapper::getInstance()->save($pd);
     }
 }
