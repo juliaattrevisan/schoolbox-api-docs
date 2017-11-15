@@ -29,10 +29,14 @@ class Module extends BaseModule
     protected function registerRoutes()
     {
         $updatePD = new Rule\All(
-            new Rule\IsLoggedIn()
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\IsUser('userId')
+            )
         );
 
-        $this->register('POST', '/update', 'postUpdate', $updatePD, null);
+        $this->register('POST', '/update/{userId}', 'postUpdate', $updatePD, null);
     }
 
     /**
@@ -60,6 +64,7 @@ class Module extends BaseModule
             'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class)
         ];
     }
+
     /**
      * @return Mapper|UserMapper
      * @throws \InvalidArgumentException If cannot find mapper class
