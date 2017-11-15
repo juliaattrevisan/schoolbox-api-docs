@@ -22,6 +22,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
+use Schoolbox\Learning\Authorizer\Rule\CanSelfAssess;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -57,7 +58,8 @@ class Module extends BaseModule
                     throw new Forbidden('User does not have homepage access');
                 }, Access::getInstance()),
                 new IsInteractionUnLocked(new Assessment\LockedChecker($this->getTermMapper()))
-            )
+            ),
+            new CanSelfAssess()
         );
 
         $canGiveFeedbackForAssessment = new Rule\Any(

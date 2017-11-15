@@ -16,6 +16,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
+use Schoolbox\Learning\Authorizer\Rule\CanSelfAssess;
 use Schoolbox\Learning\Authorizer\Rule\IsParticipant;
 use Schoolbox\Learning\Authorizer\Rule\ParentCanViewFeedback;
 use Schoolbox\Learning\Authorizer\Rule\StudentCanViewFeedback;
@@ -62,8 +63,11 @@ class Module extends BaseModule
         $preloadKami            = function (array $params) { return $this->preloadKami($params); };
 
         $hasWriteAccess = $this->buildRuleHasWriteAccess();
-
         $hasKamiAccess = $this->buildRuleCanAccessKami();
+        $hasInlineAccess = new Rule\Any(
+            $this->buildRuleHasWriteAccess(),
+            new CanSelfAssess()
+        );
 
         $hasPlagscanAccess = new Rule\Any(
             $hasWriteAccess,
@@ -80,7 +84,7 @@ class Module extends BaseModule
 
         $this->register('DELETE', $responsePattern, 'deleteParticularResponse',  $hasWriteAccess, $preloadParticipant); // a || r
 
-        $this->register('GET', $participantPattern . '/responses{/responseId:\d+}', 'getParticularResponse', $hasWriteAccess, $preloadParticipant); // a || r
+        $this->register('GET', $participantPattern . '/responses{/responseId:\d+}', 'getParticularResponse', $hasInlineAccess, $preloadParticipant); // a || r
 
         $this->register('GET', $plagscanPattern,             'getPlagscanReport',         $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
         $this->register('GET', $plagscanPattern . '/iframe', 'getPlagscanReportContents', $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
