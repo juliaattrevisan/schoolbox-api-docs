@@ -95,6 +95,13 @@ class Model extends AbstractAssessment
     private $maxMark;
 
     /**
+     * Students may self-assess their submission to the Due Work, if selfAssessable is true
+     *
+     * @var bool
+     */
+    protected $selfAssessable;
+
+    /**
      * Model constructor.
      */
     public function __construct()
@@ -596,5 +603,23 @@ class Model extends AbstractAssessment
     public function getFeedbackClass()
     {
         return Feedback\Model::class;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getSelfAssessable()
+    {
+        return $this->selfAssessable;
+    }
+
+    /**
+     * @param boolean $useRubric
+     * @return static
+     */
+    public function setSelfAssessable($selfAssessable)
+    {
+        $this->selfAssessable = $selfAssessable;
+        return $this;
     }
 }

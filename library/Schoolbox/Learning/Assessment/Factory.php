@@ -154,6 +154,7 @@ class Factory
         $this->setUseRubric(trim($post['useRubric']));
         $this->setMarkPerCapability(trim($post['markPerCapability']));
         $this->setMaxMark(trim($post['maxMark']));
+        $this->setSelfAssessable($post['selfAssessable']);
 
         $this->setRubricData($post[$post['formField']]);
 
@@ -250,7 +251,8 @@ class Factory
                 $this->getMarkPerCapability(),
                 $this->getMaxMark(),
                 $this->getRubricData(),
-                $this->getAttachedFiles()
+                $this->getAttachedFiles(),
+                $this->getSelfAssessable()
             );
 
         } elseif ($assessment instanceof Task) {
