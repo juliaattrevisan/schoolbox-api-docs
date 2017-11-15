@@ -168,6 +168,8 @@ class Mapper extends BaseMapper implements IExceptionGenerator
 
     const ERROR_INVALID_PD_DETAILS = 200;
 
+    const ERROR_ASSESSMENT_NO_SELF_ASSESS = 201;
+
     /**
      * Setup mapping
      */

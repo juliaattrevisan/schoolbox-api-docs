@@ -8,8 +8,9 @@
 
 namespace Schoolbox\Learning\Authorizer\Rule;
 
-use Alaress\Authorizer\Failure\Forbidden;
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
@@ -31,8 +32,15 @@ use InvalidArgumentException;
 class CanSelfAssess implements IAuthorizationRule
 {
     /**
-     * @inheritdoc
-     * @throws \InvalidArgumentException If unable to locate a Participant instance in $params
+     * Performs an authorization check.
+     *
+     * @param  array $params Any parameters passed as part of the route.
+     * @param  User  $user   The user to authorize, if any. Null value assumes
+     *                       that no user is logged in.
+     *
+     * @throws InvalidArgumentException If unable to locate a Participant instance in $params
+     * @throws Unauthorized If assessment is not self-assessable, or user is not the participant
+     * @return bool
      */
     public function authorize(array $params = [], User $user = null)
     {
@@ -49,7 +57,7 @@ class CanSelfAssess implements IAuthorizationRule
 
         // Error out if assessment is not self-assessable
         if (1 != 1) { // TODO: replace with "if (!$assessment->isSelfAssessable())" once it exists
-            throw new \Error('Assessment is not self-assessable'); // TODO: use an error from DB
+            throw new Unauthorized(ErrorMapper::ERROR_ASSESSMENT_NO_SELF_ASSESS);
         }
 
         // Check logged in user is the participant
@@ -58,6 +66,6 @@ class CanSelfAssess implements IAuthorizationRule
             return true;
         }
 
-        throw new Forbidden();
+        throw new Unauthorized();
     }
 }
