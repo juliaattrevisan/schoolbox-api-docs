@@ -107,7 +107,8 @@ $kernel->run(new class extends App {
                 $mapFactory->get(Schoolbox\User\Password\Reset\Mapper::class),
                 $mapFactory->get(Schoolbox\UserMapper::class),
                 new TwigEmailFactory(new CoreContext($config), $log)
-            )
+            ),
+            $config->get('portrait_dir')
         );
     }
 
