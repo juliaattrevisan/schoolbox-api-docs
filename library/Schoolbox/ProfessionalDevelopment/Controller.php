@@ -32,5 +32,7 @@ class Controller extends Base
         $pd->setRegistrationState($this->getRequest()->post['pdState']);
 
         Mapper::getInstance()->save($pd);
+
+        $this->getResponse()->redirect->to("/search/user/{$user->getId()}");
     }
 }
