@@ -30,7 +30,7 @@ class Model implements ISoftDeletable
      *
      * @var int
      */
-    private $num;
+    private $number;
 
     /**
      * The state in which the teacher registered
@@ -63,19 +63,19 @@ class Model implements ISoftDeletable
     /**
      * @return int
      */
-    public function getNum(): int
+    public function getNumber(): int
     {
-        return $this->num;
+        return $this->number;
     }
 
 
     /**
-     * @param int $num
+     * @param int $number
      * @return $this
      */
-    public function setNum(int $num)
+    public function setNumber(int $number)
     {
-        $this->num = $num;
+        $this->number = $number;
         return $this;
     }
 
