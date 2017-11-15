@@ -119,7 +119,7 @@
             {% endblock buttons_island %}
         </section>
 
-        {% set pdUpdateRoute = routeLookupIfAuthorized('professionaldevelopment.postUpdate') %}
+        {% set pdUpdateRoute = routeLookupIfAuthorized('professionaldevelopment.postUpdate', {userId: user.id}) %}
 
         {% if pdUpdateRoute %}
         <form action="{{ pdUpdateRoute }}" method="post">
@@ -145,7 +145,6 @@
                 </section>
             </fieldset>
         </form>
-
         {% endif %}
     </div>
 </div>
