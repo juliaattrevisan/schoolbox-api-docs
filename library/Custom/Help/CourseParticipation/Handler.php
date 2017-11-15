@@ -311,7 +311,7 @@ class Handler
      */
     private function getPortraitPath($externalId)
     {
-        return realpath("{$this->portraitDir}/{$externalId}.jpg");
+        return realpath($this->portraitDir) . "/{$externalId}.jpg";
     }
 
 
