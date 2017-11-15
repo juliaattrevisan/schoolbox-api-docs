@@ -28,7 +28,7 @@ class Model implements ISoftDeletable
     /**
      * Professional Development number
      *
-     * @var int
+     * @var string
      */
     private $number;
 
@@ -61,19 +61,19 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return int
+     * @return string
      */
-    public function getNumber(): int
+    public function getNumber(): string
     {
         return $this->number;
     }
 
 
     /**
-     * @param int $number
+     * @param string $number
      * @return $this
      */
-    public function setNumber(int $number)
+    public function setNumber(string $number)
     {
         $this->number = $number;
         return $this;
