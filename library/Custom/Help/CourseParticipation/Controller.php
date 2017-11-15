@@ -431,8 +431,9 @@ class Controller extends Base
                     $user = $this->getUserMapper()->findOneByColumn('synergy_id', $externalId);
                 }
 
-                // cache the old value
-                $oldUsername = $user->getUsername();
+                // cache the old values
+                $oldUsername   = $user->getUsername();
+                $oldExternalId = $user->getExternalId();
 
             } catch (Mapper\Exception\Deleted $e) {
                 // user exists, but is deleted; consider this a fail case
@@ -452,8 +453,9 @@ class Controller extends Base
                     ->setEportfolioEnable(false)
                 ;
 
-                // no previous username
-                $oldUsername = '';
+                // no previous data
+                $oldUsername   = '';
+                $oldExternalId = '';
             }
 
             // update user object
@@ -481,6 +483,21 @@ class Controller extends Base
                     // new user: send new-user email ("welcome and here's how to set your password")
                     $this->passwordMailService->sendWelcomeEmailToUser($user);
                 }
+
+                if ($oldExternalId !== $externalId) {
+                    // the external ID has changed, so we need to change the filename of the profile pic (if it exists)
+                    if (is_readable($this->getPortraitPath($oldExternalId))) {
+                        $renameSuccess = rename(
+                            $this->getPortraitPath($oldExternalId),
+                            $this->getPortraitPath($externalId)
+                        );
+
+                        if (!$renameSuccess) {
+                            // ... where do I log this failure? :|
+                        }
+                    }
+                }
+
             } catch (Mapper\Exception $e) {
                 // the user failed to save; is fail case
                 $failedUsers[] = [
@@ -506,6 +523,15 @@ class Controller extends Base
         }
     }
 
+
+    /**
+     * @param string|int $externalId
+     * @return bool|string
+     */
+    private function getPortraitPath($externalId)
+    {
+        return realpath("{$this->portraitDir}/{$externalId}.jpg");
+    }
 
     /**
      * @param array $userData
