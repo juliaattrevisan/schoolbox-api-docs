@@ -27,7 +27,8 @@ class Mapper extends BaseMapper
         'Northern Territory',
         'Western Australia',
         'South Australia',
-        'Canberra'
+        'Canberra',
+        'Tasmania'
     ];
 
     /**
