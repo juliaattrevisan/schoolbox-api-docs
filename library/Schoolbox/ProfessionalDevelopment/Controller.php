@@ -9,6 +9,7 @@ namespace Schoolbox\ProfessionalDevelopment;
 
 use Alaress\Web\Controller\Base;
 
+
 class Controller extends Base
 {
     /**
@@ -16,7 +17,14 @@ class Controller extends Base
      */
     public function postUpdate()
     {
-        new \Alaress_Probe($this->getRequest()->post);
+        try {
+            $pd = Mapper::getInstance()->findById(1);
+            new \Alaress_Probe($this->getRequest()->post, $pd);
+        }
+        catch (\Schoolbox\Mapper\Exception $e) {
+            var_dump($e->getMessage());
+        }
+
         die();
     }
 }
