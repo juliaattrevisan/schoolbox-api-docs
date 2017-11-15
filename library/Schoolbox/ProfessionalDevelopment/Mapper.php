@@ -38,7 +38,13 @@ class Mapper extends BaseMapper
         $this->hasTable('user_professionaldevelopment');
         $this->hasModel(Model::class);
 
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
+        $this->uses('num', self::TYPE_INTEGER);
+        $this->uses('registration_state', self::TYPE_INTEGER);
+        $this->uses('created_at', self::TYPE_DATETIME);
+        $this->uses('updated_at', self::TYPE_DATETIME);
+        $this->uses('deleted_at', self::TYPE_DATETIME);
     }
 
 
@@ -82,12 +88,16 @@ class Mapper extends BaseMapper
     {
         $userMapper = $this->getJoinMapper('user');
 
-        $row = $statement->fetch(\PDO::FETCH_ASSOC);
+        $collection = $this->createCollection();
 
-        $pd = $this->hydrate($row);
-        $pd->setUser($userMapper->hydrate($row, 'u'));
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $pd = $this->hydrate($row);
+            $pd->setUser($userMapper->hydrate($row, 'u'));
 
-        return $pd;
+            $collection->add($pd);
+        }
+
+        return $collection;
     }
 
 
