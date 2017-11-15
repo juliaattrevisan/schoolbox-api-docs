@@ -137,6 +137,11 @@ $kernel->run(new class extends App {
             /** @var array $provisionedUsers */
             $provisionedUsers = json_decode($this->getFromHelp(self::ROUTE_USERS_GET, [ 'fuzzy' => 1 ]), true);
 
+            if (!is_array($provisionedUsers)) {
+                $log->error("Did not receive array of users back from {$host}");
+                return;
+            }
+
             // obtain list of user IDs
             $userIds = array_keys($provisionedUsers);
 
