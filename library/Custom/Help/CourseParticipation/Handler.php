@@ -9,6 +9,7 @@
 namespace Custom\Help\CourseParticipation;
 
 use Alaress_Date_Format;
+use InvalidArgumentException;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Permission\SiteAccess;
@@ -67,6 +68,7 @@ class Handler
      * @param Folder\Mapper             $folderMapper
      * @param User\Password\MailService $mailService
      * @param string                    $portraitDir
+     * @throws InvalidArgumentException
      * @throws Mapper\DefinitionException
      */
     public function __construct(
@@ -81,6 +83,13 @@ class Handler
         $this->folderMapper     = $folderMapper;
         $this->codeMapper       = $folderMapper->getJoinMapper('codes');
         $this->passwordMailService = $mailService;
+
+        $portraitDir = realpath($portraitDir);
+
+        if (!$portraitDir) {
+            throw new InvalidArgumentException('Invalid portrait directly given; is it readable?');
+        }
+
         $this->portraitDir = $portraitDir;
     }
 
@@ -311,7 +320,7 @@ class Handler
      */
     private function getPortraitPath($externalId)
     {
-        return realpath($this->portraitDir) . "/{$externalId}.jpg";
+        return "{$this->portraitDir}/{$externalId}.jpg";
     }
 
 
