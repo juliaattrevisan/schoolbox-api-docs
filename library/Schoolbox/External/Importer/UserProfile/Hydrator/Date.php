@@ -13,7 +13,6 @@
 namespace Schoolbox\External\Importer\UserProfile\Hydrator;
 
 use Schoolbox\External\UserProfile as UserProfileModel;
-use Schoolbox\External\Importer\User as UserImporter;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
 
@@ -25,6 +24,7 @@ use Alaress_Date_NullDate;
  */
 class Date implements HydratorInterface
 {
+
     /**
      * The key in $row to set the value in the user to.
      *
@@ -39,20 +39,16 @@ class Date implements HydratorInterface
      */
     protected $setMethod;
 
-    protected $userImporter;
-
-
     /**
      * Constructor
      *
      * @param string $fieldname
      * @param string $setMethod
      */
-    public function __construct($fieldname, $setMethod, UserImporter $userImporter)
+    public function __construct($fieldname, $setMethod)
     {
         $this->fieldname = $fieldname;
         $this->setMethod = $setMethod;
-        $this->userImpoter = $userImporter;
 
     }
 
@@ -81,16 +77,13 @@ class Date implements HydratorInterface
                 );
 
             } catch (\InvalidArgumentException $e) {
-
-            }
-            if (!$date || !$date->isValid()) {
                 throw new \UnexpectedValueException('"Date of Birth" must be a date in YYYY-MM-DD format: skipping the value');
             }
+
             return call_user_func([$user, 'setDob'], $date);
 
         }
 
         return call_user_func([$user, $this->setMethod], $row[$this->fieldname]);
     }
-
 }

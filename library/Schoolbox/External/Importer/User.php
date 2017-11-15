@@ -258,7 +258,7 @@ class User extends AbstractImporter
         $this->userHydrators[] = new User\Hydrator\Lookup('Residential House', 'setResidentialHouse', $this->residentialHouseList);
 
         // User Profile hydrators
-        $this->userProfileHydrators[] = new UserProfile\Hydrator\Date('Date of Birth', 'setDob', $this);
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Date('Date of Birth', 'setDob');
         $this->userProfileHydrators[] = new UserProfile\Hydrator\Field('Year', 'setLevel');
         // Join these fields together
         $this->userProfileHydrators[] = new UserProfile\Hydrator\MultiField(['Title', 'First Name', 'Surname'], 'setGuardian1Name');
