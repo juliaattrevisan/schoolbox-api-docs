@@ -63,10 +63,11 @@ function renderStaff(
     $user,
     External_User $synUserHandler,
     UserMapper $userMapper,
-    Eportfolio_Authenticator $authenticator
+    Eportfolio_Authenticator $authenticator,
+    \Schoolbox\IConfigLoader $config
 ) {
-
     $externalUser = $synUserHandler->getStaff($user['synergy_id']);
+
     // TwigLib
     $page->setFile(TEMPLATE_content, 'output.html');
     $page->setVar(
@@ -78,6 +79,7 @@ function renderStaff(
                 'user'            => $userMapper->findById($user['uid']),
                 'externalUser'    => $externalUser,
                 'eportfolioAuth'  => $authenticator->canView(),
+                'pdEnabled'       => $config->get('enable_professional_development'),
                 'now'             => Alaress_Date_Format::now(),
             ]
         )
@@ -404,6 +406,7 @@ if (is_numeric($this->arg[0])) {
 
     $userHandler  = new \User();
     $groupHandler = new Group();
+    $config = new \Schoolbox\Config\Loader();
 
     $user = $userHandler->getByID($this->arg[0]);
 
@@ -437,7 +440,8 @@ if (is_numeric($this->arg[0])) {
             $user,
             $synUserHandler,
             new UserMapper(),
-            new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
+            new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile'),
+            $config
         );
     } else {
         $this->pageNotFound();
