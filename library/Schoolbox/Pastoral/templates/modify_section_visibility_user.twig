@@ -53,37 +53,47 @@
 
     </tbody>
 
-    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-    {# Setup User Selection Modal #}
-    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-
-    {% if allowParents == 1 %}
-        {% set searchScope = 'staff;parentofstudent' %}
-    {% else %}
-        {% set searchScope = 'staff' %}
-    {% endif %}
-
-    {{ userSearch.modal(guid, 'Add User To Record', 'Enter name', searchScope, record.student.id, 'window.modalUserAdded') }}
-
     <script>
         $(function () {
             window.usersAdded = [];
 
             {% for access in record.access if access.user.id != ''%}
-            window.usersAdded[{{ access.user.id }}] = true;
+                window.usersAdded[{{ access.user.id }}] = true;
             {% endfor %}
 
+            {# Return existing users #}
+
+            window.modalUsersExisting = function() {
+                {# Need to use slice to clone the array, otherwise the modal will update the contents of this erroneously #}
+
+                return window.usersAdded.slice(0);
+            };
+
+            {# Callback when user added from modal #}
+
             window.modalUserAdded = function (user) {
+
+                {# Only add if they don't already exist in the table #}
+
                 if (window.usersAdded[user.id] !== true) {
-                    $('#empty-users').remove();
+
+                    {# Add the selected members ID to the array we use when saving to the database #}
+
+                    window.usersAdded[user.id] = true;
+
+                    {# Add them to the list of members in the HTML #}
+
+                    //noinspection JSUnresolvedVariable
                     html = $('[data-user-permission-clone]').html()
                         .replace(/{NAME}/g, user.first_name + ' ' + user.last_name)
                         .replace(/{ID}/g, user.id)
                         .replace(/{ROLE}/g, user.role);
-                    window.usersAdded[user.id] = true;
+
                     var permissionListUsers = $('#permission-users');
                     permissionListUsers.html(permissionListUsers.html() + html);
                 }
+
+                {# Update visibility table and click events #}
 
                 updateVisibility();
                 updateUserPermissionClickEvents();
@@ -130,5 +140,17 @@
             updateUserPermissionClickEvents();
         });
     </script>
+
+    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+    {# Setup User Selection Modal #}
+    {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+
+    {% if allowParents == 1 %}
+        {% set searchScope = 'staff;parentofstudent' %}
+    {% else %}
+        {% set searchScope = 'staff' %}
+    {% endif %}
+
+    {{ userSearch.modal(guid, 'Add User To Record', 'Enter name', searchScope, record.student.id, 'window.modalUserAdded', 'window.modalUsersExisting') }}
 
 {% endif %}

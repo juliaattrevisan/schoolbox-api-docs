@@ -77,15 +77,12 @@
 <div id="groupMembers" class="row">
     <div class="small-12 island">
 
-        <div class="row actions-small-1">
+        <div class="row">
             <div class="list-item">
                 <div class="small-12 columns">
                     <h2 class="subheader">Group Members</h2>
                 </div>
             </div>
-            <nav>
-                <a data-user-search="{{ guid }}" href="#" class="icon-add" title="Add Group Member"></a>
-            </nav>
         </div>
 
         {# --------------------------------------------------------------------------------------------------------------------------------------------#}
@@ -113,6 +110,11 @@
                     </li>
                 {% endfor %}
             </ul>
+            <div class="component-action">
+                <section>
+                    <a href="#" data-button="add-user" class="button" data-user-search="{{ guid }}">Add User</a>
+                </section>
+            </div>
         </section>
 
         {# --------------------------------------------------------------------------------------------------------------------------------------------#}
@@ -121,7 +123,7 @@
 
         <div id="membersEmpty" class="empty-state {% if group.members | length %}hide{% endif %}">
             <i class="icon-group"></i>
-            <p>There are no users current in this group.</p>
+            <p>There are no users currently in this group.</p>
             <p>Do you want to <a href="#" data-user-search="{{ guid }}">add a user to this group</a>?</p>
         </div>
 
@@ -147,7 +149,7 @@
         window.usersAdded = [];
 
         {% for member in group.members %}
-        window.usersAdded[{{ member.user.id }}] = true;
+            window.usersAdded[{{ member.user.id }}] = true;
         {% endfor %}
 
         {# --------------------------------------------------------------------------------------------------------------------------------------------#}
@@ -180,16 +182,27 @@
                     .replace(/{EXTERNALID}/g, user.external_id);
 
                 membersList.html(membersList.html() + html);
+
+                {# Unhide the user list if it was previously empty #}
+
                 $('#membersListContainer').removeClass('hide');
 
                 {# Remove the empty state if it was visible #}
 
                 $('#membersEmpty').addClass('hide');
-
-                {# Update delete events #}
-
-                window.updateDeleteEvents();
             }
+
+            {# Update delete events #}
+
+            window.updateDeleteEvents();
+        };
+
+        {# Return existing group members #}
+
+        window.modalUsersExisting = function() {
+            {# Need to use slice to clone the array, otherwise the modal will update the contents of this erroneously #}
+
+            return window.usersAdded.slice(0);
         };
 
         {# Group member deleted #}
@@ -319,4 +332,4 @@
 {# Setup modal #}
 {# --------------------------------------------------------------------------------------------------------------------------------------------#}
 
-{{ userSearch.modal(guid, 'Add User To Group', 'Enter name', 'staff', null, 'window.modalUserAdded') }}
+{{ userSearch.modal(guid, 'Add User To Group', 'Enter name', 'staff', null, 'window.modalUserAdded', 'window.modalUsersExisting') }}

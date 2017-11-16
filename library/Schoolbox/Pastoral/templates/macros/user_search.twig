@@ -1,4 +1,4 @@
-{% macro modal(guid, title, placeholder, roles, studentId, callbackAdded, callbackClosed, minimumSearchLength, errorNoResults, errorSearchLength) %}
+{% macro modal(guid, title, placeholder, roles, studentId, callbackAdded, callbackUsers, callbackClosed, minimumSearchLength, errorNoResults, errorSearchLength) %}
 
     {# Create search modal #}
 
@@ -6,6 +6,19 @@
 
         <h2>{{ title | default('Search Users') }}</h2>
         <input id="userSearch{{ guid }}" placeholder="{{ title | default('Enter name') }}" maxlength="50"/>
+
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+        {# Empty state #}
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+
+        <div id="searchResultsNotice{{ guid }}">
+            <div class="empty-state">
+                <p>
+                    Please type the name of a person in the text box above.<br>
+                    Users that have already been added will not appear in search results.
+                </p>
+            </div>
+        </div>
 
         {# --------------------------------------------------------------------------------------------------------------------------------------------#}
         {# Container for search results #}
@@ -86,15 +99,16 @@
                 window.addClickEvent = [];
             }
 
-            if (window.userAdded === undefined) {
-                window.userAdded = [];
+            if (window.modalInternalUsersAdded === undefined) {
+                window.modalInternalUsersAdded = [];
             }
 
-            window.userAdded['{{ guid }}'] = [];
+            window.modalInternalUsersAdded['{{ guid }}'] = [];
 
             {# Shut storm up with its duplicate selector bitching #}
 
             var searchResults = $('#searchResults{{ guid }}');
+            var searchResultsNotice = $('#searchResultsNotice{{ guid }}');
             var searchResultsEmpty = $('#searchResultsEmpty{{ guid }}');
             var searchResultsContainer = $('#searchResultsContainer{{ guid }}');
             var searchResultsContainerRow = $('#searchResultsContainerRow{{ guid }}');
@@ -115,8 +129,15 @@
             {# This stores each of the users details found as a result of the search indexed by their ID number. This is used to generate the HTML
                on the main page when a user is clicked and added to the group members list #}
 
-            window.userCache = [];
-            window.userCache['{{ guid }}'] = [];
+            {# Create global array if it does not already exist #}
+
+            if (window.modalInternalUserCache === undefined) {
+                window.modalInternalUserCache = [];
+            }
+
+            {# Create array to hold users that have been added #}
+
+            window.modalInternalUsersAdded['{{ guid }}'] = [];
 
             {# --------------------------------------------------------------------------------------------------------------------------------------------#}
             {# Trigger display of search modal #}
@@ -129,10 +150,15 @@
 
                 userSearch.val('');
                 searchResults.removeClass('hide');
+                searchResultsNotice.removeClass('hide');
                 searchResultsContainer.addClass('hide');
                 searchResultsContainerRow.addClass('hide');
                 searchResultsEmpty.addClass('hide');
                 searchTooShort.addClass('hide');
+
+                {# Update the internal array with any existing users #}
+
+                window.modalInternalUsersAdded['{{ guid }}'] = {{ callbackUsers }}();
 
                 {# Display it #}
 
@@ -180,11 +206,11 @@
 
                         {# Cache the user so we don't have to search for them again this page load cycle #}
 
-                        window.userCache['{{ guid }}'][results[i].id] = results[i];
+                        window.modalInternalUserCache[results[i].id] = results[i];
 
                         {# Only action this person if they're not already in the group #}
 
-                        if (window.userAdded['{{ guid }}'].indexOf(results[i].id) == -1) {
+                        if (window.modalInternalUsersAdded['{{ guid }}'][results[i].id] !== true) {
 
                             {# Create the HTML markup for the user in the search results #}
 
@@ -257,6 +283,10 @@
             {# --------------------------------------------------------------------------------------------------------------------------------------------#}
 
             userSearch.on('input propertychange paste', function () {
+
+                {# Hide the notice text #}
+
+                searchResultsNotice.addClass('hide');
 
                 {# Grab the search text #}
 
@@ -341,19 +371,19 @@
 
                 {# Add the selected members ID to the array we use when saving to the database #}
 
-                window.userAdded['{{ guid }}'].push(window.userCache['{{ guid }}'][id]);
+                window.modalInternalUsersAdded['{{ guid }}'][id] = true;
 
                 {# Add them to the list of members in the HTML #}
 
                 //noinspection JSUnresolvedVariable
 
                 var html = $('[data-user-clone="{{ guid }}"]').html()
-                    .replace(/{NAME}/g,         window.userCache['{{ guid }}'][id].name)
-                    .replace(/{ID}/g,           window.userCache['{{ guid }}'][id].id)
-                    .replace(/{ROLE}/g,         window.userCache['{{ guid }}'][id].role)
-                    .replace(/{FIRSTNAME}/g,    window.userCache['{{ guid }}'][id].first_name)
-                    .replace(/{LASTNAME}/g,     window.userCache['{{ guid }}'][id].last_name)
-                    .replace(/{EXTERNALID}/g,   window.userCache['{{ guid }}'][id].external_id);
+                    .replace(/{NAME}/g,         window.modalInternalUserCache[id].name)
+                    .replace(/{ID}/g,           window.modalInternalUserCache[id].id)
+                    .replace(/{ROLE}/g,         window.modalInternalUserCache[id].role)
+                    .replace(/{FIRSTNAME}/g,    window.modalInternalUserCache[id].first_name)
+                    .replace(/{LASTNAME}/g,     window.modalInternalUserCache[id].last_name)
+                    .replace(/{EXTERNALID}/g,   window.modalInternalUserCache[id].external_id);
 
                 {# Remove the search result from the list #}
 
@@ -384,7 +414,7 @@
                 {# Execute requested callback #}
 
                 {% if callbackAdded is not empty %}
-                    {{ callbackAdded }}(window.userCache['{{ guid }}'][id]);
+                    {{ callbackAdded }}(window.modalInternalUserCache[id]);
                 {% endif %}
             }
 
@@ -392,7 +422,7 @@
 
             {% if callbackClosed is not empty %}
                 $(document).on('closed.fndtn.reveal', '#userSearchModal{{ guid }}[data-reveal]', function () {
-                    {{ callbackClosed }}(window.userAdded['{{ guid }}']);
+                    {{ callbackClosed }}(window.modalInternalUsersAdded['{{ guid }}']);
                 });
             {% endif %}
         });
