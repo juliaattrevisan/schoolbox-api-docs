@@ -44,7 +44,8 @@ class Mapper extends AbstractUnitMapper
 
         // SoftDelete/Restore Assessments in UnitSpecification
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteAssessments'));
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreAssessments'));
+
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreFolder'));
     }
 
     /**
@@ -61,19 +62,6 @@ class Mapper extends AbstractUnitMapper
         return true;
     }
 
-    /**
-     * Restores all soft-deleted Assessments in the specified UnitSpecification
-     *
-     * @param Model $unitSpec
-     * @return bool
-     */
-    public function restoreAssessments(Model $unitSpec)
-    {
-        $assessmentMapper = AssessmentMapper::getInstance();
-        $assessments = $assessmentMapper->findByColumn('v_us.course_unit_specification_id', $unitSpec->getId(), ['deleted' => true]);
-        $assessmentMapper->restoreSoftDeleted($assessments);
-        return true;
-    }
 
     /**
      * Ensures that if we restore a UnitSpec, the folder it is linked to is restored also
@@ -87,11 +75,12 @@ class Mapper extends AbstractUnitMapper
     public function restoreFolder(Model $unitSpec)
     {
         /** @var FolderMapper $folderMapper */
-        $folderMapper = $this->getJoinMapper('folder_id');
+        $folderMapper = $this->getJoinMapper('folder');
         $folder = $folderMapper->findByColumn('id', $unitSpec->getFolder()->getId(), ['deleted' => true]);
         $folderMapper->restoreSoftDeleted($folder);
         return true;
     }
+
 
     /**
      * Folders and course spec are hydrated by default.

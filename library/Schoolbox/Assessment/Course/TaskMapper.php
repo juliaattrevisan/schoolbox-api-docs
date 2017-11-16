@@ -48,7 +48,6 @@ class TaskMapper extends Schoolbox\Mapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCompletions']);
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreCompletions']);
     }
 
 
@@ -63,19 +62,5 @@ class TaskMapper extends Schoolbox\Mapper
         $taskCompletionMapper = $this->getJoinMapper('completion');
         $completions          = $taskCompletionMapper->findByColumn('task_id', $task->getId(), ['deleted' => true]);
         $taskCompletionMapper->delete($completions);
-    }
-
-
-    /**
-     * Restores all soft-deleted Completions for the specified Task
-     *
-     * @param Task $task
-     * @throws Schoolbox\Mapper\DefinitionException
-     */
-    public function restoreCompletions(Task $task)
-    {
-        $taskCompletionMapper = $this->getJoinMapper('completion');
-        $completions          = $taskCompletionMapper->findByColumn('task_id', $task->getId(), ['deleted' => true]);
-        $taskCompletionMapper->restoreSoftDeleted($completions);
     }
 }

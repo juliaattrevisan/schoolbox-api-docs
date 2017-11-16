@@ -65,7 +65,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
 
         // SoftDelete/Restore weak entities
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteReturnedWorkFiles'));
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreReturnedWorkFiles'));
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'syncToMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'persistFiles'));
     }
@@ -83,18 +82,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         $returnedWorkFileMapper->delete($files);
     }
 
-
-    /**
-     * Restores all soft-deleted Files for the specified Return
-     *
-     * @param ReturnedWork $return
-     */
-    public function restoreReturnedWorkFiles(ReturnedWork $return)
-    {
-        $returnedWorkFileMapper = $this->getJoinMapper('files');
-        $files = $returnedWorkFileMapper->findByColumn('submission_return_id', $return->getId(), ['deleted' => true]);
-        $returnedWorkFileMapper->restoreSoftDeleted($files);
-    }
 
     /**
      * Include submission box (and its assessment ID)

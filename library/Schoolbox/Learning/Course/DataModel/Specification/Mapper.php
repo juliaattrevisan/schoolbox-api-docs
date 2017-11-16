@@ -49,7 +49,6 @@ class Mapper extends AbstractCourseMapper
 
         // SoftDelete/Restore UnitSpecifications in CourseSpecification
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteUnits'));
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreUnits'));
 
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreFolder'));
     }
@@ -68,19 +67,6 @@ class Mapper extends AbstractCourseMapper
         return true;
     }
 
-    /**
-     * Restores all soft-deleted Units for the specified CourseSpecification
-     *
-     * @param Model $courseSpec
-     * @return bool
-     */
-    public function restoreUnits(Model $courseSpec)
-    {
-        $unitMapper = UnitSpecificationMapper::getInstance();
-        $units = $unitMapper->findByColumn('course_specification_id', $courseSpec->getId(), ['deleted' => true]);
-        $unitMapper->restoreSoftDeleted($units);
-        return true;
-    }
 
     /**
      * Ensures that if we restore a CourseSpec, the folder it is linked to is restored also

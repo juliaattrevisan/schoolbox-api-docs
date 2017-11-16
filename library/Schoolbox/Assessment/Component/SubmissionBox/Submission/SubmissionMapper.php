@@ -50,7 +50,6 @@ class SubmissionMapper extends BaseMapper
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'persistFiles' ]);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'softDeleteSubmissionFiles']);
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreSubmissionFiles']);
     }
 
 
@@ -186,20 +185,6 @@ class SubmissionMapper extends BaseMapper
         $submissionFileMapper = $this->getJoinMapper('files');
         $files = $submissionFileMapper->findByColumn('student_submission_id', $submission->getId(), ['deleted' => true]);
         $submissionFileMapper->delete($files);
-    }
-
-
-    /**
-     * Restores all soft-deleted Files for the specified Submission
-     *
-     * @param Submission $submission
-     * @throws BaseMapper\DefinitionException
-     */
-    public function restoreSubmissionFiles(Submission $submission)
-    {
-        $submissionFileMapper = $this->getJoinMapper('files');
-        $files = $submissionFileMapper->findByColumn('student_submission_id', $submission->getId(), ['deleted' => true]);
-        $submissionFileMapper->restoreSoftDeleted($files);
     }
 
 

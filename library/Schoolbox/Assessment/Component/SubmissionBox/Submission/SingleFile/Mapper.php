@@ -45,7 +45,6 @@ class Mapper extends BaseMapper
         $this->joinsReverseSingle('student_submission_file_id', Kami\Mapper::class, 'kami', 'kami');
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'softDeletePlagScan' ]);
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restorePlagScan'));
     }
 
 
@@ -60,20 +59,6 @@ class Mapper extends BaseMapper
         $plagScanMapper = $this->getJoinMapper('plagscan');
         $plagScans = $plagScanMapper->findByColumn('student_submission_file_id', $file->getId(), ['deleted' => true]);
         $plagScanMapper->delete($plagScans);
-    }
-
-
-    /**
-     * Restores any PlagScan for the specified File
-     *
-     * @param Model $file
-     * @throws BaseMapper\DefinitionException
-     */
-    public function restorePlagScan(Model $file)
-    {
-        $plagScanMapper = $this->getJoinMapper('plagscan');
-        $plagScans = $plagScanMapper->findByColumn('student_submission_file_id', $file->getId(), ['deleted' => true]);
-        $plagScanMapper->restoreSoftDeleted($plagScans);
     }
 
 

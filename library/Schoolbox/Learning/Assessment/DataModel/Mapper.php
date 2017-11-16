@@ -156,10 +156,6 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteTask'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteDueWork'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteProject'));
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreQuiz'));
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreTask'));
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreDueWork'));
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreProject'));
     }
 
     /**
@@ -228,19 +224,6 @@ class Mapper extends BaseMapper
         }
     }
 
-    /**
-     * When restoring an Assessment that is a Quiz, we need to restore all sub-objects of the Quiz
-     * @param Model $assessment
-     * @throws BaseMapper\DefinitionException If join name is not on this mapper
-     */
-    public function restoreQuiz(Model $assessment)
-    {
-        if($assessment->getQuiz() instanceof Quiz\Model){
-            $quizMapper = $this->getJoinMapper('quiz');
-            $quiz = $quizMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
-            $quizMapper->restoreSoftDeleted($quiz);
-        }
-    }
 
     /**
      * When deleting an Assessment that is a Task, we need to delete all sub-objects of the Task
@@ -256,19 +239,6 @@ class Mapper extends BaseMapper
         }
     }
 
-    /**
-     * When restoring an Assessment that is a Task, we need to restore all sub-objects of the Task
-     * @param Model $assessment
-     * @throws BaseMapper\DefinitionException If join name is not on this mapper
-     */
-    public function restoreTask(Model $assessment)
-    {
-        if($assessment->getTask() instanceof Task){
-            $taskMapper = $this->getJoinMapper('task');
-            $task = $taskMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
-            $taskMapper->restoreSoftDeleted($task);
-        }
-    }
 
     /**
      * When deleting an Assessment that is a DueWork, we need to delete all sub-objects of the DueWork
@@ -281,19 +251,6 @@ class Mapper extends BaseMapper
             $dueWorkMapper = $this->getJoinMapper('duework');
             $dueWork = $dueWorkMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
             $dueWorkMapper->delete($dueWork);
-        }
-    }
-    /**
-     * When restoring an Assessment that is a DueWork, we need to restore all sub-objects of the DueWork
-     * @param Model $assessment
-     * @throws BaseMapper\DefinitionException If join name is not on this mapper
-     */
-    public function restoreDueWork(Model $assessment)
-    {
-        if($assessment->getDueWork() instanceof SubmissionBox){
-            $dueWorkMapper = $this->getJoinMapper('duework');
-            $dueWork = $dueWorkMapper->findByColumn('assessment_id', $assessment->getId(), ['deleted' => true]);
-            $dueWorkMapper->restoreSoftDeleted($dueWork);
         }
     }
 
@@ -311,19 +268,7 @@ class Mapper extends BaseMapper
             $projectMapper->delete($project);
         }
     }
-    /**
-     * When restoring an Assessment that is a Project, we need to restore all sub-objects of the Project
-     * @param Model $assessment
-     * @throws BaseMapper\DefinitionException If join name is not on this mapper
-     */
-    public function restoreProject(Model $assessment)
-    {
-        if($assessment->getProject() instanceof Project\Model){
-            $projectMapper = $this->getJoinMapper('project');
-            $project = $projectMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
-            $projectMapper->restoreSoftDeleted($project);
-        }
-    }
+
 
     /**
      * Somewhat efficient query for retrieving the assessments which this student has participated in.

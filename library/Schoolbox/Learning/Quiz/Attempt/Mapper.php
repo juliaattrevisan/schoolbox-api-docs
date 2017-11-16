@@ -53,7 +53,6 @@ class Mapper extends BaseMapper
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateExternalMarkbook']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteAnswers']);
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreAnswers']);
     }
 
 
@@ -71,20 +70,6 @@ class Mapper extends BaseMapper
         return true;
     }
 
-    /**
-     * Restores all Answers in for the specified Attempt
-     *
-     * @param Model $attempt
-     * @return true
-     */
-    public function restoreAnswers(Model $attempt)
-    {
-        $quizAnswerMapper = $this->getJoinMapper('answers');
-        // TODO SA-1277 - should only restore items that were part of the parent's cascade delete
-        $answers = $quizAnswerMapper->findByColumn('attempt_id', $attempt->getId(), ['deleted' => true]);
-        $quizAnswerMapper->restoreSoftDeleted($answers);
-        return true;
-    }
 
     /**
      * @return string

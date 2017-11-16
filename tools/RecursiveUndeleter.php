@@ -49,7 +49,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project;
 use Schoolbox\Assessment\Course\Task;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile as SubmissionBoxFile;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile as StudentSubmissionFile;
 use \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile as ReturnedWorkFile;
 use Schoolbox\Resource\File;
@@ -183,13 +183,13 @@ class RecursiveUndeleter
             Assessment\Mapper::class => 'v_ui.course_unit_implementation_id',
         ],
         Quiz\Mapper::class              => [
-            QuizSection\Mapper::class,
-            QuizAttempt\Mapper::class,
+            QuizSection\Mapper::class => 'assess_id',
+            QuizAttempt\Mapper::class => 'assess_id',
         ],
         SubmissionBoxMapper::class      => [
-            SubmissionMapper::class   => 'student_submission.box_id',
-            ReturnedWorkMapper::class => 'submission_return.box_id',
-            Rubric\LevelMapper::class => 'rubric_level.box_id',
+            SubmissionMapper::class   => 'box_id',
+            ReturnedWorkMapper::class => 'box_id',
+            Rubric\LevelMapper::class => 'box_id',
         ],
         TaskMapper::class               => [
             Task\CompletionMapper::class,
@@ -199,13 +199,13 @@ class RecursiveUndeleter
             Assessment\Mapper::class => 'v_pa.project_id',
         ],
         QuizSection\Mapper::class       => [
-            QuizQuestion\Mapper::class => 'assess_question.section_id',
+            QuizQuestion\Mapper::class => 'section_id',
         ],
         QuizAttempt\Mapper::class       => [
-            QuizAnswer\Mapper::class => 'assess_response.attempt_id',
+            QuizAnswer\Mapper::class => 'attempt_id',
         ],
         SubmissionMapper::class         => [
-            SubmissionBoxFile\Mapper::class,
+            StudentSubmissionFile\Mapper::class,
         ],
         ReturnedWorkMapper::class       => [
             ReturnedWorkFile\Mapper::class,
@@ -214,11 +214,11 @@ class RecursiveUndeleter
             Rubric\DescriptorMapper::class => 'rubric_descriptor.level_id',
         ],
         QuizQuestion\Mapper::class      => [
-            QuizSolution\Mapper::class => 'assess_answer.question_id',
+            QuizSolution\Mapper::class => 'question_id',
         ],
         QuizAnswer\Mapper::class        => [],
         QuizSolution\Mapper::class      => [],
-        SubmissionBoxFile\Mapper::class => [
+        StudentSubmissionFile\Mapper::class => [
             Plagscan\Mapper::class,
         ],
         ReturnedWorkFile\Mapper::class  => [],
@@ -1057,11 +1057,15 @@ EXAMPLES:
         $this->checkRegistry($mapperClass);
 
         $childMappers = self::$softDeleteRegistry[$mapperClass];
-        $parentIds    = $deletedParentModels->getColumnValues($parentMapper->getIdentifierColumn());
+        $parentIds    = $deletedParentModels->getPropertyValues($parentMapper->getIdentifierProperty());
         $this->logger->info(sprintf("Finding children of mapper '%s' with ids %s", $mapperClass, $this->getIdString($parentIds)));
 
         // For each child entity of this parent entity
         foreach($childMappers as $key => $val) {
+            /**
+             * @var IMapper $childMapper
+             * @var string  $foreignKeyColumn
+             */
             list($childMapper, $foreignKeyColumn) = $this->getMapperClassAndForeignKeyFromRegistryPair($parentMapper, $key, $val);
             $mapperClass = get_class($childMapper);
             $this->logger->info(sprintf("Fetching children from mapper '%s'", $mapperClass));
@@ -1079,7 +1083,8 @@ EXAMPLES:
                 continue;
             }
 
-            $childModelIds = $deletedChildModels->getColumnValues($childModelIdentifier);
+            $this->logger->info(sprintf("Child mapper identifier column '%s'", $childModelIdentifier));
+            $childModelIds = $deletedChildModels->getPropertyValues($childMapper->getIdentifierProperty());
             $this->logger->debug(sprintf('Child model IDs: %s', $this->getIdString($childModelIds)));
 
             if(0 === count($childModelIds)) {

@@ -45,7 +45,6 @@ class Mapper extends AbstractCourseMapper
 
         // SoftDelete/Restore weak entities
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteUnitImpls']);
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreUnitImpls']);
     }
 
     /**
@@ -60,18 +59,6 @@ class Mapper extends AbstractCourseMapper
         $unitImplMapper->delete($unitImpls);
     }
 
-
-    /**
-     * Soft deletes all UnitImpls for the specified CourseImpl
-     *
-     * @param Model $courseImpl
-     */
-    public function restoreUnitImpls(Model $courseImpl)
-    {
-        $unitImplMapper = UnitImplementationMapper::getInstance();
-        $unitImpls = $unitImplMapper->findByColumn('course_implementation_id', $courseImpl->getId(), ['deleted' => true]);
-        $unitImplMapper->restoreSoftDeleted($unitImpls);
-    }
 
     /**
      * Finds the Courses Implementations for this folder.
