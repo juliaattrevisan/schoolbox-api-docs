@@ -73,7 +73,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
          */
         $hasClassActions = false;
 
-        // If context is not a group or class, render nothing
+        // If context is not a group, unit or class, render nothing
         if (!$isGroupPage && !$isClassPage && !$isUnitPage) {
             return false;
         }
@@ -119,7 +119,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $hasClassActions = true;
         }
 
-        // Render link to markbook if user is staff and has WRITE+ perm
+        // Render link to markbook and/or criteria if user is staff and has WRITE+ perm
         if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE && $this->getUser()->getRole()->isStaff()) {
             $this->parse('class_mark_block', 'class_mark');
             $hasClassActions = true;
