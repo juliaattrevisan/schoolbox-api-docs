@@ -98,13 +98,21 @@ class Controller extends BaseController
     {
         $assessmentImpls = $this->buildImplementationsForSpecification($assessmentSpec);
 
+        $notImported = $assessmentImpls->filter(function(IAssessable $assessmentImpl){
+            return null === $assessmentImpl->getId();
+        });
+        $imported    = $assessmentImpls->filter(function(IAssessable $assessmentImpl){
+            return $assessmentImpl->getId();
+        });
+
         $data = [
-            'assessmentSpec'   => $assessmentSpec,
-            'returnUrl'        => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
-            'returnUrlName'    => Redirect::RETURN_URL,
-            'implementations'  => $assessmentImpls,
-            'folderWritePerms' => $this->buildFolderWritePermissions($assessmentImpls),
-            'enableReimport'   => (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled'),
+            'assessmentSpec'        => $assessmentSpec,
+            'returnUrl'             => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
+            'returnUrlName'         => Redirect::RETURN_URL,
+            'unImported'            => $notImported,
+            'imported'              => $imported,
+            'folderWritePerms'      => $this->buildFolderWritePermissions($assessmentImpls),
+            'enableReimport'        => (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled'),
         ];
 
         $template = '@learningAssessmentExporter/export.twig';

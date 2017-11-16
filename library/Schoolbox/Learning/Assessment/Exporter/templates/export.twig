@@ -2,7 +2,8 @@
     'assessmentSpec'   IAssessable   - The assessment spec
     'returnUrl'        string        - A URL to return to
     'returnUrlName'    string        - query arg name
-    'implementations'  IAssessable[] - ID is NULL if not yet imported
+    'unImported'       IAssessable[] - Assessments not yet imported
+    'imported'         IAssessable[] - Assessments already imported
     'folderWritePerms' bool[]        - Does current user have WRITE+ perm to the class folder
     'enableReimport'   bool          - Should already imported class assessments be re-importable?
 #}
@@ -12,23 +13,18 @@
 {#{{ bread.crumbsArray(breadcrumbs) }}#}
 <script type="text/javascript">
     $(function () {
+        var $importForm   = $('#importForm'),
+            $checkboxes   = $importForm.find('input[type=checkbox]'),
+            $submitButton = $importForm.find('input[type=submit]');
 
-        $('#importForm').find('[data-select-all-group]').change(function () {
-            var unit = $(this).attr('data-unit-id');
-            if (this.checked && $(this).attr('disabled') === undefined) {
-                $('#unit-' + unit + '-dates').removeAttr('hidden');
-            }
-            else {
-                $('#unit-' + unit + '-dates').attr('hidden', true);
-            }
-            if ($('#importForm input[data-select-all-group]:checked:not(:disabled)').length) {
-                $('#importForm input[type=submit]').removeAttr('disabled');
-            }
-            else {
-                $('#importForm input[type=submit]').attr('disabled', true);
+        // Enable submit button if any checkbox is checked.
+        $checkboxes.change(function () {
+            if ($checkboxes.filter(':checked:not(:disabled)').length) {
+                $submitButton.prop('disabled', false);
+            } else {
+                $submitButton.prop('disabled', true);
             }
         });
-
     });
 </script>
 
@@ -38,7 +34,7 @@
     </div>
 </div>
 <div class="row">
-    {% if implementations|length == 0 %}
+    {% if unImported|length == 0 and imported|length == 0 %}
         <div class="small-12 island">
             <div class="empty-state">
                 <i class="icon-class-list"></i>
@@ -53,86 +49,41 @@
             <form method="post"
                   action="{{ routeLookup('learningAssessmentExporter.postExport', {assessmentId: assessmentSpec.id}) }}?{{ returnUrlName|e('html_attr') }}={{ returnUrl|e('html_attr') }}"
                   id="importForm">
-                <section>
+                <section data-not-imported>
                     <ul class="information-list card-selectable">
                         <li>
                             <div class="small-12 column">
                                 <div class="selector">
                                     <input id="checkAll"
                                            type="checkbox"
-                                           data-select-all
-                                           data-select-all-for-group="unit-implementation"/>
+                                           data-select-all="[data-not-imported]"
+                                    />
                                     <label for="checkAll" class="checkbox-label"></label>
                                 </div>
                             </div>
                         </li>
                     </ul>
                     <ul class="information-list card-selectable">
-                        {% for assessmentImpl in implementations %}
-                            {% set unitImpl     = assessmentImpl.baseContext %}
-                            {% set isInstructor = folderWritePerms[unitImpl.course.folder.id] %}
-                            {% set isImported   = assessmentImpl.id is not null %}
-                            {% set canImport    = isInstructor and (not isImported or enableReimport) %}
-                            <li>
-                                <div class="small-12 columns">
-                                    <div class="selector">
-                                        <input type="checkbox"
-                                               id="import-{{ unitImpl.id }}"
-                                               name="unitImplementation[{{ unitImpl.id }}]"
-                                               value="1"
-                                               {% if not canImport %}disabled{% endif %}
-                                               data-select-all-group="unit-implementation"
-                                               data-unit-id="{{ unitImpl.id }}"/>
-                                        <label for="import-{{ unitImpl.id }}" class="checkbox-label"></label>
-                                    </div>
-                                    <div class="card small-12">
-                                        <span class="size-32 icon-home"></span>
-                                        <h3><a href="/homepage/{{ unitImpl.course.folder.id }}">
-                                                {{ unitImpl.course.folder.title }}
-                                            </a>
-                                        </h3>
-                                        <p class="meta">
-                                            {% spaceless %}
-                                                <time title="{{ unitImpl.openDate.short }}"
-                                                      datetime="{{ unitImpl.openDate.databaseDate }}"
-                                                >{{ unitImpl.openDate.relativeTime }}</time>
-                                                &ndash;
-                                                <time title="{{ unitImpl.dueDate.short }}"
-                                                      datetime="{{ unitImpl.dueDate.databaseDate }}"
-                                                >{{ unitImpl.dueDate.relativeTime }}</time>
-                                            {% endspaceless %}
-                                        </p>
-                                        <p class="meta">
-                                            {% if isImported %}
-                                                This activity already exists in this class.
-                                            {% elseif not isInstructor %}
-                                                You don't have write permission for this class.
-                                            {% else %}
-                                                This activity does not exist in this class.
-                                            {% endif %}
-                                        </p>
-                                    </div>
-                                </div>
+                        {% for assessmentImpl in unImported %}
+                            {% include '@learningAssessmentExporter/assessment_row.twig' with {
+                                assessmentSpec:   assessmentSpec,
+                                assessmentImpl:   assessmentImpl,
+                                folderWritePerms: folderWritePerms,
+                                enableReimport:   enableReimport
+                            } only %}
+                        {% endfor %}
+                    </ul>
+                </section>
 
-                                {% if (assessmentSpec is quiz or (assessmentSpec is dueWork and not assessmentSpec.acceptNone)) %}
-                                    {% set dates = ['publish', 'open', 'due', 'close'] %}
-                                    {% set fullSetOfDates = true %}
-                                {% else %}
-                                    {% set dates = ['publish', 'due'] %}
-                                    {% set fullSetOfDates = false %}
-                                {% endif %}
-
-                                <div class="list-item" id="unit-{{ unitImpl.id }}-dates" hidden>
-                                    {% for date in dates %}
-                                        {% include '@learningAssessmentExporter/date.twig' with {
-                                            fullSetOfDates:     fullSetOfDates,
-                                            dateType:           date,
-                                            unitImplementation: unitImpl,
-                                            assessment:         assessmentImpl
-                                        } only %}
-                                    {% endfor %}
-                                </div>
-                            </li>
+                <section>
+                    <ul class="information-list card-selectable">
+                        {% for assessmentImpl in imported %}
+                            {% include '@learningAssessmentExporter/assessment_row.twig' with {
+                                assessmentSpec:   assessmentSpec,
+                                assessmentImpl:   assessmentImpl,
+                                folderWritePerms: folderWritePerms,
+                                enableReimport:   enableReimport
+                            } only %}
                         {% endfor %}
                     </ul>
                 </section>

@@ -1,0 +1,83 @@
+{#
+    'assessmentSpec'   IAssessable
+    'assessmentImpl'   IAssessable
+    'folderWritePerms' bool[]        - Does current user have WRITE+ perm to the class folder
+    'enableReimport'   bool          - Should already imported class assessments be re-importable?
+#}
+{% set unitImpl     = assessmentImpl.baseContext %}
+{% set isInstructor = folderWritePerms[unitImpl.course.folder.id] %}
+{% set isImported   = assessmentImpl.id is not null %}
+{% set canImport    = isInstructor and (not isImported or enableReimport) %}
+
+<script type="text/javascript">
+    $(function () {
+        var $checkbox = $('#import-{{ unitImpl.id }}'),
+            unitId    = $checkbox.attr('data-unit-id');
+
+        // Toggle date fields
+        $checkbox.change(function () {
+            if ($checkbox.prop('checked') && !$checkbox.prop('disabled')) {
+                $('#unit-' + unitId + '-dates').removeAttr('hidden');
+            } else {
+                $('#unit-' + unitId + '-dates').attr('hidden', true);
+            }
+        });
+    });
+</script>
+
+<li>
+    <div class="small-12 columns">
+        <div class="selector">
+            <input type="checkbox"
+                   id="import-{{ unitImpl.id }}"
+                   name="unitImplementation[{{ unitImpl.id }}]"
+                   value="1"
+                   {% if not canImport %}disabled{% endif %}
+                   data-unit-id="{{ unitImpl.id }}"/>
+            <label for="import-{{ unitImpl.id }}" class="checkbox-label"></label>
+        </div>
+        <div class="card small-12">
+            <span class="size-32 icon-home"></span>
+            <h3><a href="/homepage/{{ unitImpl.course.folder.id }}">{{ unitImpl.course.folder.title }}</a></h3>
+            <p class="meta">
+                {% spaceless %}
+                    <time title="{{ unitImpl.openDate.short }}"
+                          datetime="{{ unitImpl.openDate.databaseDate }}"
+                    >{{ unitImpl.openDate.relativeTime }}</time>
+                    &ndash;
+                    <time title="{{ unitImpl.dueDate.short }}"
+                          datetime="{{ unitImpl.dueDate.databaseDate }}"
+                    >{{ unitImpl.dueDate.relativeTime }}</time>
+                {% endspaceless %}
+            </p>
+            <p class="meta">
+                {% if isImported %}
+                    This activity already exists in this class.
+                {% elseif not isInstructor %}
+                    You don't have write permission for this class.
+                {% else %}
+                    This activity does not exist in this class.
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    {% if (assessmentSpec is quiz or (assessmentSpec is dueWork and not assessmentSpec.acceptNone)) %}
+        {% set dates = ['publish', 'open', 'due', 'close'] %}
+        {% set fullSetOfDates = true %}
+    {% else %}
+        {% set dates = ['publish', 'due'] %}
+        {% set fullSetOfDates = false %}
+    {% endif %}
+
+    <div class="list-item" id="unit-{{ unitImpl.id }}-dates" hidden>
+        {% for date in dates %}
+            {% include '@learningAssessmentExporter/date.twig' with {
+                fullSetOfDates:     fullSetOfDates,
+                dateType:           date,
+                unitImplementation: unitImpl,
+                assessment:         assessmentImpl
+            } only %}
+        {% endfor %}
+    </div>
+</li>
