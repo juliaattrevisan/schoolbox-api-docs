@@ -131,11 +131,11 @@ class TimetableStructure extends AbstractImporter
                 try {
                     $termStart = new Alaress_Date_Format(
                         $row['Term Start'],
-                        [Alaress_Date_Format::DATABASE_DATE_FORMAT, 'd/m/Y']
+                        [Alaress_Date_Format::DATABASE_DATE_FORMAT]
                     );
                     $termFinish = new Alaress_Date_Format(
                         $row['Term Finish'],
-                        [Alaress_Date_Format::DATABASE_DATE_FORMAT, 'd/m/Y']
+                        [Alaress_Date_Format::DATABASE_DATE_FORMAT]
                     );
                 } catch (\InvalidArgumentException $e) {
                     $this->log->warning('"Term Start" and "Term Finish" must both be dates in YYYY-MM-DD format: skipping!');

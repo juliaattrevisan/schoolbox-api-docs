@@ -54,6 +54,7 @@ class Date implements HydratorInterface
 
     /**
      * @inheritdoc
+     * @throws \UnexpectedValueException
      */
     public function hydrate($row, UserProfileModel $user)
     {
@@ -67,23 +68,17 @@ class Date implements HydratorInterface
         /* Date has been provided
          */
 
-        if ($this->setMethod === 'setDob') {
+        $date = null;
+        try {
+            $date = new Alaress_Date_Format(
+                $row[$this->fieldname],
+                [Alaress_Date_Format::DATABASE_DATE_FORMAT]
+            );
 
-            $date = null;
-            try {
-                $date = new Alaress_Date_Format(
-                    $row[$this->fieldname],
-                    [Alaress_Date_Format::DATABASE_DATE_FORMAT]
-                );
-
-            } catch (\InvalidArgumentException $e) {
-                throw new \UnexpectedValueException('"Date of Birth" must be a date in YYYY-MM-DD format: skipping the value');
-            }
-
-            return call_user_func([$user, 'setDob'], $date);
-
+        } catch (\InvalidArgumentException $e) {
+            throw new \UnexpectedValueException('"Date of Birth" must be a date in YYYY-MM-DD format: skipping the value');
         }
 
-        return call_user_func([$user, $this->setMethod], $row[$this->fieldname]);
+        return call_user_func([$user, 'setDob'], $date);
     }
 }
