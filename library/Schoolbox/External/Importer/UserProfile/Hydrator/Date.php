@@ -76,6 +76,10 @@ class Date implements HydratorInterface
             );
 
         } catch (\InvalidArgumentException $e) {
+
+        }
+
+        if (!($date instanceof Alaress_Date_Format && $date->isValid())) {
             throw new \UnexpectedValueException('"Date of Birth" must be a date in YYYY-MM-DD format: skipping the value');
         }
 

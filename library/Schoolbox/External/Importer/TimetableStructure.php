@@ -26,6 +26,7 @@ use Schoolbox\External\TimetablePeriodMapper;
 
 class TimetableStructure extends AbstractImporter
 {
+
     /**
      * @var Collection|Campus[]
      */
@@ -126,10 +127,10 @@ class TimetableStructure extends AbstractImporter
                     $campus->setStartDay($row['Term Offset'] + 1);
                 }
 
-                $termStart = null;
+                $termStart  = null;
                 $termFinish = null;
                 try {
-                    $termStart = new Alaress_Date_Format(
+                    $termStart  = new Alaress_Date_Format(
                         $row['Term Start'],
                         [Alaress_Date_Format::DATABASE_DATE_FORMAT]
                     );
@@ -138,9 +139,14 @@ class TimetableStructure extends AbstractImporter
                         [Alaress_Date_Format::DATABASE_DATE_FORMAT]
                     );
                 } catch (\InvalidArgumentException $e) {
+
+                }
+                if (!($termStart instanceof Alaress_Date_Format && $termStart->isValid()) ||
+                    !($termFinish instanceof Alaress_Date_Format && $termFinish->isValid())) {
                     $this->log->warning('"Term Start" and "Term Finish" must both be dates in YYYY-MM-DD format: skipping!');
                     continue;
                 }
+
                 $campus
                     ->setCycle($cycle)
                     ->setCampus($campusObject)
@@ -158,8 +164,8 @@ class TimetableStructure extends AbstractImporter
             }
 
             // Sort the periods by start then end later, then use that to apply a sequence
-            $day    = $row['Period Day'];
-            $title  = $row['Period Title'];
+            $day   = $row['Period Day'];
+            $title = $row['Period Title'];
 //            $period = $this->timetablePeriodMapper->findOneByColumnList([
 //                'cycle_id' => $result[$key]['cycle']->getId(),
 //                'day'      => $day,
@@ -168,26 +174,32 @@ class TimetableStructure extends AbstractImporter
             $period = new TimetablePeriod();
             $this->log->info(sprintf('Parsing period "%s" for day %d', $title, $day));
             try {
-                if(empty($row['Period Start'])){
+                if (empty($row['Period Start'])) {
                     $this->log->notice(
-                        sprintf('Period "%s" for day %d missing "Period Start"',$title,$day),
+                        sprintf('Period "%s" for day %d missing "Period Start"', $title, $day),
                         ['row' => $row]);
-                    $periodStart = NULL;
+                    $periodStart = null;
                 } else {
-                    $periodStart = new Alaress_Date_Format($row['Period Start'], ['H:i', 'G:ia']);
+                    $periodStart = new Alaress_Date_Format($row['Period Start'], ['H:i:s', 'G:i:sa', 'H:i', 'G:ia']);
                 }
-                if(empty($row['Period Finish'])){
+                if (empty($row['Period Finish'])) {
                     $this->log->notice(
-                        sprintf('Period "%s" for day %d missing "Period Finish"',$title,$day),
+                        sprintf('Period "%s" for day %d missing "Period Finish"', $title, $day),
                         ['row' => $row]);
-                    $periodFinish = NULL;
+                    $periodFinish = null;
                 } else {
-                    $periodFinish = new Alaress_Date_Format($row['Period Finish'], ['H:i', 'G:ia']);
+                    $periodFinish = new Alaress_Date_Format($row['Period Finish'], ['H:i:s', 'G:i:sa', 'H:i', 'G:ia']);
                 }
             } catch (\InvalidArgumentException $e) {
-                $this->log->warning('"Period Start" and "Period Finish" must both be times in 12 hour (1:00pm) or 24 hour (13:00) format: skipping!');
+
+            }
+
+            if (!($periodStart instanceof Alaress_Date_Format && $periodStart->isValid()) ||
+                !($periodFinish instanceof Alaress_Date_Format && $periodFinish->isValid())) {
+                $this->log->warning('"Period Start" and "Period Finish" must both be times in 12 hour (1:00pm or 1:00:00pm) or 24 hour (13:00 or 13:00:00) format: skipping!');
                 continue;
             }
+
             $period
                 ->setCycle($result[$key]['cycle'])
                 ->setDay($day)
@@ -246,13 +258,13 @@ class TimetableStructure extends AbstractImporter
 
                 // For any period on this day, if period start or finish not defined, retain CSV ordering.
                 $isMissingTimes = false;
-                foreach($periods as $period){
-                    if(empty($period->getStart()) || empty($period->getFinish())){
+                foreach ($periods as $period) {
+                    if (empty($period->getStart()) || empty($period->getFinish())) {
                         $isMissingTimes = true;
                         break;
                     }
                 }
-                if(!$isMissingTimes) {
+                if (!$isMissingTimes) {
                     /** @var Collection|TimetablePeriod[] $periods */
                     $periods->sortByCallback(
                         function ($a, $b) {
@@ -261,6 +273,7 @@ class TimetableStructure extends AbstractImporter
                             if (($cmp = $a->getStart()->compare($b->getStart())) !== 0) {
                                 return $cmp;
                             }
+
                             return $a->getFinish()->compare($b->getFinish());
                         }
                     );
@@ -290,7 +303,8 @@ class TimetableStructure extends AbstractImporter
     /**
      * Reads the rows to insert from the CSV, and writes to the database.
      */
-    public function save()
+    public
+    function save()
     {
         // Eventual override rules:
         // * Term: same title/campus combination

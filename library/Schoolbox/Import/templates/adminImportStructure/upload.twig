@@ -28,8 +28,8 @@
             <li>
                 <strong>Period Start</strong> and <strong>Period Finish</strong> must be in:
                 <ul>
-                    <li>12 hour format, with am/pm <em>(<time>{{ now.getUsingFormat('g:ia') }}</time>)</em></li>
-                    <li>24 hour format <em>(<time>{{ now.getUsingFormat('G:i') }}</time>)</em></li>
+                    <li>12 hour format, with am/pm <em>(<time>{{ now.getUsingFormat('g:ia') }} or {{ now.getUsingFormat('g:i:sa') }}</time>)</em></li>
+                    <li>24 hour format <em>(<time>{{ now.getUsingFormat('G:i') }} or {{ now.getUsingFormat('G:i:s') }}</time>)</em></li>
                 </ul>
             </li>
         </ul>
