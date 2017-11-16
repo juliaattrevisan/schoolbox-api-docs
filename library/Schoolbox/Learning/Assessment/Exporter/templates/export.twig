@@ -1,9 +1,10 @@
 {#
-    'assessment'      IAssessable - The assessment spec
-    'returnUrl'       string      - A URL to return to
-    'returnUrlName'   string      - query arg name
-    'implementations' mixed[]     - TODO replace with AssessmentImpls
-    'enableReimport'  bool        - Should already imported class assessments be re-importable?
+    'assessmentSpec'   IAssessable   - The assessment spec
+    'returnUrl'        string        - A URL to return to
+    'returnUrlName'    string        - query arg name
+    'implementations'  IAssessable[] - ID is NULL if not yet imported
+    'folderWritePerms' bool[]        - Does current user have WRITE+ perm to the class folder
+    'enableReimport'   bool          - Should already imported class assessments be re-importable?
 #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
@@ -33,7 +34,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h1>Export {{ assessment.typeName }}: {{ assessment.title }}</h1>
+        <h1>Export {{ assessmentSpec.typeName }}: {{ assessmentSpec.title }}</h1>
     </div>
 </div>
 <div class="row">
@@ -50,7 +51,7 @@
             <script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
 
             <form method="post"
-                  action="{{ routeLookup('learningAssessmentExporter.postExport', {assessmentId: assessment.id}) }}?{{ returnUrlName|e('html_attr') }}={{ returnUrl|e('html_attr') }}"
+                  action="{{ routeLookup('learningAssessmentExporter.postExport', {assessmentId: assessmentSpec.id}) }}?{{ returnUrlName|e('html_attr') }}={{ returnUrl|e('html_attr') }}"
                   id="importForm">
                 <section>
                     <ul class="information-list card-selectable">
@@ -67,63 +68,67 @@
                         </li>
                     </ul>
                     <ul class="information-list card-selectable">
-                        {% for implementation in implementations %}
+                        {% for assessmentImpl in implementations %}
+                            {% set unitImpl     = assessmentImpl.baseContext %}
+                            {% set isInstructor = folderWritePerms[unitImpl.course.folder.id] %}
+                            {% set isImported   = assessmentImpl.id is not null %}
+                            {% set canImport    = isInstructor and (not isImported or enableReimport) %}
                             <li>
                                 <div class="small-12 columns">
                                     <div class="selector">
                                         <input type="checkbox"
-                                               id="import-{{ implementation.unit.id }}"
-                                               name="unitImplementation[{{ implementation.unit.id }}]"
+                                               id="import-{{ unitImpl.id }}"
+                                               name="unitImplementation[{{ unitImpl.id }}]"
                                                value="1"
-                                               {% if not implementation.allowed %}disabled{% endif %}
+                                               {% if not canImport %}disabled{% endif %}
                                                data-select-all-group="unit-implementation"
-                                               data-unit-id="{{ implementation.unit.id }}"/>
-                                        <label for="import-{{ implementation.unit.id }}" class="checkbox-label"></label>
+                                               data-unit-id="{{ unitImpl.id }}"/>
+                                        <label for="import-{{ unitImpl.id }}" class="checkbox-label"></label>
                                     </div>
                                     <div class="card small-12">
                                         <span class="size-32 icon-home"></span>
-                                        <h3><a href="/homepage/{{ implementation.unit.course.folder.id }}">
-                                                {{ implementation.unit.course.folder.title }}
+                                        <h3><a href="/homepage/{{ unitImpl.course.folder.id }}">
+                                                {{ unitImpl.course.folder.title }}
                                             </a>
                                         </h3>
                                         <p class="meta">
                                             {% spaceless %}
-                                                <time title="{{ implementation.unit.openDate.short }}"
-                                                      datetime="{{ implementation.unit.openDate.databaseDate }}"
-                                                >{{ implementation.unit.openDate.relativeTime }}</time>
+                                                <time title="{{ unitImpl.openDate.short }}"
+                                                      datetime="{{ unitImpl.openDate.databaseDate }}"
+                                                >{{ unitImpl.openDate.relativeTime }}</time>
                                                 &ndash;
-                                                <time title="{{ implementation.unit.dueDate.short }}"
-                                                      datetime="{{ implementation.unit.dueDate.databaseDate }}"
-                                                >{{ implementation.unit.dueDate.relativeTime }}</time>
+                                                <time title="{{ unitImpl.dueDate.short }}"
+                                                      datetime="{{ unitImpl.dueDate.databaseDate }}"
+                                                >{{ unitImpl.dueDate.relativeTime }}</time>
                                             {% endspaceless %}
                                         </p>
                                         <p class="meta">
-                                            {% if implementation.allowed %}
-                                                This activity does not exist in this class.
+                                            {% if isImported %}
+                                                This activity already exists in this class.
+                                            {% elseif not isInstructor %}
+                                                You don't have write permission for this class.
                                             {% else %}
-                                                {# why not? #}
-                                                {% if implementation.imported %}
-                                                    This activity already exists in this class.
-                                                {% else %}
-                                                    You don't have write permission for this class.
-                                                {% endif %}
+                                                This activity does not exist in this class.
                                             {% endif %}
                                         </p>
                                     </div>
                                 </div>
 
-                                {% if (assessment is quiz or (assessment is dueWork and not assessment.acceptNone)) %}
+                                {% if (assessmentSpec is quiz or (assessmentSpec is dueWork and not assessmentSpec.acceptNone)) %}
                                     {% set dates = ['publish', 'open', 'due', 'close'] %}
+                                    {% set fullSetOfDates = true %}
                                 {% else %}
                                     {% set dates = ['publish', 'due'] %}
+                                    {% set fullSetOfDates = false %}
                                 {% endif %}
 
-                                <div class="list-item" id="unit-{{ implementation.unit.id }}-dates" hidden>
+                                <div class="list-item" id="unit-{{ unitImpl.id }}-dates" hidden>
                                     {% for date in dates %}
                                         {% include '@learningAssessmentExporter/date.twig' with {
+                                            fullSetOfDates:     fullSetOfDates,
                                             dateType:           date,
-                                            unitImplementation: implementation.unit,
-                                            assessment:         assessment
+                                            unitImplementation: unitImpl,
+                                            assessment:         assessmentImpl
                                         } only %}
                                     {% endfor %}
                                 </div>

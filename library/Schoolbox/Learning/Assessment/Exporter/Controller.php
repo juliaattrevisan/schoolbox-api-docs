@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\Exporter;
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\File\Exception;
 use Schoolbox\Filter\BrokenFilterException;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -17,7 +18,6 @@ use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilter;
@@ -51,6 +51,7 @@ class Controller extends BaseController
     /** @var AssessmentFilter\IdFinder */
     private $assessmentIdFinder;
 
+
     /**
      * Constructor
      *
@@ -82,7 +83,7 @@ class Controller extends BaseController
      * * Assessments may only be exported to unit implementations which are:
      * ** based on the same specification
      * ** not closed yet
-     * ** not already containing a copy of this assessment
+     * ** not already containing a copy of this assessment (unless destructive re-export is enabled)
      *
      * GET vars:
      * * returnUrl: a URL to return to once done
@@ -95,16 +96,36 @@ class Controller extends BaseController
      */
     public function getExportForm(IAssessable $assessmentSpec)
     {
+        $assessmentImpls = $this->buildImplementationsForSpecification($assessmentSpec);
+
         $data = [
-            'assessment'      => $assessmentSpec,
-            'returnUrl'       => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
-            'returnUrlName'   => Redirect::RETURN_URL,
-            'implementations' => $this->retrieveUnitImplementationsForSpecification($assessmentSpec),
-            'enableReimport'  => (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled'),
+            'assessmentSpec'   => $assessmentSpec,
+            'returnUrl'        => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
+            'returnUrlName'    => Redirect::RETURN_URL,
+            'implementations'  => $assessmentImpls,
+            'folderWritePerms' => $this->buildFolderWritePermissions($assessmentImpls),
+            'enableReimport'   => (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled'),
         ];
 
-        $template = "@learningAssessmentExporter/export.twig";
+        $template = '@learningAssessmentExporter/export.twig';
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
+    }
+
+
+    /**
+     * Determine whether the current user has WRITE+ perm to the assessments' folders.
+     *
+     * @param IAssessable[]|GenericCollection $assessmentImpls
+     * @return bool[]
+     */
+    private function buildFolderWritePermissions(GenericCollection $assessmentImpls): array
+    {
+        $folderWritePerms = [];
+        foreach ($assessmentImpls as $assessmentImpl) {
+            $folder                             = $assessmentImpl->getContext()->getFolder();
+            $folderWritePerms[$folder->getId()] = $this->access->isInstructor($this->getUser(), $folder);
+        }
+        return $folderWritePerms;
     }
 
 
@@ -131,7 +152,7 @@ class Controller extends BaseController
         $importedImplementations     = $this->getRequest()->post->get('unitImplementation', []);
         $importedImplementationDates = $this->getRequest()->post->get('unit', []);
 
-        foreach ($this->retrieveUnitImplementationsForSpecification($assessmentSpec) as $unitImplData) {
+        foreach ($this->buildImplementationsForSpecification($assessmentSpec) as $unitImplData) {
             /** @var UnitImplementation $unitImpl */
             $unitImpl = $unitImplData['unit'];
 
@@ -255,18 +276,16 @@ class Controller extends BaseController
         return $assessmentImpl;
     }
 
+
     /**
-     * Helper method: retrieves unit implementations for a spec assessment
+     * Helper method: builds assessment implementations for a spec assessment
      *
      * @param IAssessable $assessment
-     *
-     * @return array[] unit:     The unit implementation that this assessment's spec uses
-     *                 allowed:  Is the current user allowed to import this?
-     *                 imported: Is this assessment already imported?
+     * @return IAssessable[]|GenericCollection
      */
-    protected function retrieveUnitImplementationsForSpecification(IAssessable $assessment): array
+    protected function buildImplementationsForSpecification(IAssessable $assessment): GenericCollection
     {
-        $result              = [];
+        $assessmentImpls     = $this->assessmentDataSource->createCollection();
         $unitImplementations = $this->unitImplementationMapper->findAllByUnitSpecificationId(
             $assessment->getContext()->getId()
         );
@@ -283,13 +302,6 @@ class Controller extends BaseController
                 $this->assessmentDataSource->findAllByUnitImplementationId($unitImplementation->getId())
             );
 
-            // Can I even import into $unitImplementation's folder?
-            $accessLevel = $this->access->getFolderAccess(
-                $this->getUser(),
-                $unitImplementation->getCourse()->getFolder()->getId()
-            );
-            $isAllowed   = $accessLevel >= UserAccess::ACCESS_WRITE;
-
             // Is $assessable imported into this unit yet?
             $isAlreadyImported = false;
             foreach ($unitImplementation->getAssessables() as $implementationAssessment) {
@@ -298,19 +310,26 @@ class Controller extends BaseController
                 $spec = $implementationAssessment->getSpecificationAssessment();
                 if ($spec instanceof IAssessable && $spec->getId() == $assessment->getId()) {
                     $isAlreadyImported = true;
+                    $assessmentImpls->add($implementationAssessment);
                     break;
                 }
             }
-
-            $result[] = [
-                'unit'     => $unitImplementation,
-                'allowed'  => $isAllowed && !$isAlreadyImported,
-                'imported' => $isAlreadyImported,
-            ];
+            // Not yet imported?
+            if (!$isAlreadyImported) {
+                $assessmentImpl = $assessment->cloneForCopy();
+                $assessmentImpl->setContext($unitImplementation);
+                $assessmentImpl->setPublishAt($unitImplementation->getOpenDate());
+                $assessmentImpl->setOpenAt($unitImplementation->getOpenDate());
+                $assessmentImpl->setDueAt($unitImplementation->getDueDate());
+                $assessmentImpl->setCloseAt($unitImplementation->getDueDate());
+                $unitImplementation->getAssessables()->add($assessmentImpl);
+                $assessmentImpls->add($assessmentImpl);
+            }
         }
 
-        return $result;
+        return $assessmentImpls;
     }
+
 
     /**
      * Download a csv of assessment results for Accellerus
