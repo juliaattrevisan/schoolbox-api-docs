@@ -56,6 +56,16 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $isClassPage = $this->getContext()->isClass();
         $isUnitPage = $this->getContext()->hasUnitSpecification();
 
+        $classActionsHeading = "Actions";
+        if ($isClassPage) {
+            $classActionsHeading = "Class Actions";
+        } elseif ($isUnitPage) {
+            $classActionsHeading = "Unit Actions";
+        } elseif ($isGroupPage) {
+            $classActionsHeading = "Group Actions";
+        }
+        $this->setVar('CLASS_ACTIONS_HEADING', $classActionsHeading);
+
         /* This boolean is a hack to make the Class Actions heading
          * render only when needed.
          * It gets set to true whenever content that should fall under
@@ -63,7 +73,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
          */
         $hasClassActions = false;
 
-        // If context is not a group or class, render nothing
+        // If context is not a group, unit or class, render nothing
         if (!$isGroupPage && !$isClassPage && !$isUnitPage) {
             return false;
         }
@@ -71,7 +81,14 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, 'class_list', 'class_list_block');
         $this->setBlock($templateHandle, 'class_mark', 'class_mark_block');
         $this->setBlock($templateHandle, 'student_grades', 'student_grades_block');
+        $this->setBlock('class_mark', 'markbook_link', 'markbook_link_block');
 
+        // Hide markbook link on unit pages
+        if ($isUnitPage) {
+            $this->setVar('markbook_link_block', '');
+        } else {
+            $this->parse('markbook_link_block', 'markbook_link');
+        }
 
         // Determine the term for the grades link
         $this->setVar('WORK_TERM', $this->termMapper->findForToday()->getCode());
@@ -102,7 +119,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $hasClassActions = true;
         }
 
-        // Render link to markbook if user is staff and has WRITE+ perm
+        // Render link to markbook and/or criteria if user is staff and has WRITE+ perm
         if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE && $this->getUser()->getRole()->isStaff()) {
             $this->parse('class_mark_block', 'class_mark');
             $hasClassActions = true;
