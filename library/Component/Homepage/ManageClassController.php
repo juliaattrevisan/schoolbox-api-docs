@@ -56,8 +56,10 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $isClassPage = $this->getContext()->isClass();
         $isUnitPage = $this->getContext()->hasUnitSpecification();
 
-        $classActionsHeading = "Class Actions";
-        if ($isUnitPage) {
+        $classActionsHeading = "Actions";
+        if ($isClassPage) {
+            $classActionsHeading = "Class Actions";
+        } elseif ($isUnitPage) {
             $classActionsHeading = "Unit Actions";
         } elseif ($isGroupPage) {
             $classActionsHeading = "Group Actions";
