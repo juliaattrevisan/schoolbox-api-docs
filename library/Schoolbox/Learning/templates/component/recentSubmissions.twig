@@ -14,7 +14,16 @@ Usage:
 
                 <p class="meta">
                     Last {{ responseType }} {{ assessment.responses.first.submittedAt.relativeTime }} in
-                    <a href="/homepage/{{ assessment.context.id }}">{{ assessment.context.title }}</a>
+
+                    {% set context = assessment.context %}
+
+                    {% if context is folder %}
+                        <a href="/homepage/{{ context.id }}">{{ context.title }}</a>
+                    {% elseif context is unitImplementation %}
+                        <a href="/homepage/{{ context.folder.id }}">{{ context.folder.title }}</a>
+                    {% elseif context is project %}
+                        <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: context.id}) }}">{{ context.title }}</a>
+                    {% endif %}
                 </p>
             </div>
         </li>

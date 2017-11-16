@@ -391,11 +391,7 @@ class Builder implements IBuilder
 
         } else {
             // This method is smart enough to work with arrays and IN statements
-            // If the list of values is empty, though: there's no way
-            // that the query could ever return anything, so just return
-            // an empty collection.
-
-            if ($this->canTraverse($columnValue)) {
+            if (self::canTraverse($columnValue)) {
 
                 if (count($columnValue) === 0) {
                     // bad, and not ignorable
@@ -406,7 +402,7 @@ class Builder implements IBuilder
                     // fuzzy match: use (LIKE :x OR LIKE :y), or (NOT LIKE :x AND NOT LIKE :y)
                     $likeParts = [];
 
-                    foreach ($this->getPlaceholders($columnValue, $columnName) as $option) {
+                    foreach (self::getPlaceholders($columnValue, $columnName) as $option) {
                         $likeParts[] = "$escaped_name {$whereNot}LIKE $option";
                     }
                     $subOperator = $negate ? ' AND ' : ' OR ';
@@ -414,10 +410,11 @@ class Builder implements IBuilder
 
                 } else {
                     // exact match: use IN
-                    $this->where[] = "$escaped_name {$whereNot}IN {$this->getArrayPlaceholders($columnValue, $columnName)}";
+                    $placeHolders = self::getArrayPlaceholders($columnValue, $columnName);
+                    $this->where[] = "$escaped_name {$whereNot}IN {$placeHolders}";
                 }
 
-                $this->params  = array_merge($this->params, $this->getArrayParameters($columnValue, $columnName));
+                $this->params  = array_merge($this->params, self::getArrayParameters($columnValue, $columnName));
 
             } else {
                 // alias the param
