@@ -1,3 +1,10 @@
+{#
+    'assessment'      IAssessable - The assessment spec
+    'returnUrl'       string      - A URL to return to
+    'returnUrlName'   string      - query arg name
+    'implementations' mixed[]     - TODO replace with AssessmentImpls
+    'enableReimport'  bool        - Should already imported class assessments be re-importable?
+#}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
@@ -114,10 +121,10 @@
                                 <div class="list-item" id="unit-{{ implementation.unit.id }}-dates" hidden>
                                     {% for date in dates %}
                                         {% include '@learningAssessmentExporter/date.twig' with {
-                                        dateType: date,
-                                        unitImplementation: implementation.unit,
-                                        assessment: assessment
-                                        } %}
+                                            dateType:           date,
+                                            unitImplementation: implementation.unit,
+                                            assessment:         assessment
+                                        } only %}
                                     {% endfor %}
                                 </div>
                             </li>

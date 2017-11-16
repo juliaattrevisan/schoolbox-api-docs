@@ -100,6 +100,7 @@ class Controller extends BaseController
             'returnUrl'       => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
             'returnUrlName'   => Redirect::RETURN_URL,
             'implementations' => $this->retrieveUnitImplementationsForSpecification($assessmentSpec),
+            'enableReimport'  => (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled'),
         ];
 
         $template = "@learningAssessmentExporter/export.twig";
