@@ -97,7 +97,7 @@
 
 <label for="selfAssessable">Allow students to self-assess</label>
 <div class="switch round">
-    <input type="checkbox" value="1" id="selfAssessable" name="selfAssessable">
+    <input type="checkbox" value="1" {% if assessment.selfAssessable %}checked{% endif %} id="selfAssessable" name="selfAssessable">
     <label for="selfAssessable">
         <span class="icon-approve"></span>
         <span class="icon-cancel"></span>

@@ -96,6 +96,7 @@ class Decorator implements DecoratorInterface
 
         $assessment->setUseRubric($this->getUseRubric());
         $assessment->setMarkPerCapability($this->getMarkPerCapability());
+        $assessment->setSelfAssessable($this->getSelfAssessable());
 
 
 
