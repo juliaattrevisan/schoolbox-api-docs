@@ -173,22 +173,24 @@ class TimetableStructure extends AbstractImporter
 //            ]);
             $period = new TimetablePeriod();
             $this->log->info(sprintf('Parsing period "%s" for day %d', $title, $day));
+
+            $periodStart = null;
+            $periodFinish = null;
+            
             try {
                 if (empty($row['Period Start'])) {
                     $this->log->notice(
                         sprintf('Period "%s" for day %d missing "Period Start"', $title, $day),
                         ['row' => $row]);
-                    $periodStart = null;
                 } else {
-                    $periodStart = new Alaress_Date_Format($row['Period Start'], ['H:i:s', 'G:i:sa', 'H:i', 'G:ia']);
+                    $periodStart = new Alaress_Date_Format($row['Period Start'], ['G:i:sa', 'H:i:s', 'G:ia', 'H:i']);
                 }
                 if (empty($row['Period Finish'])) {
                     $this->log->notice(
                         sprintf('Period "%s" for day %d missing "Period Finish"', $title, $day),
                         ['row' => $row]);
-                    $periodFinish = null;
                 } else {
-                    $periodFinish = new Alaress_Date_Format($row['Period Finish'], ['H:i:s', 'G:i:sa', 'H:i', 'G:ia']);
+                    $periodFinish = new Alaress_Date_Format($row['Period Finish'], ['G:i:sa', 'H:i:s', 'G:ia', 'H:i']);
                 }
             } catch (\InvalidArgumentException $e) {
 
