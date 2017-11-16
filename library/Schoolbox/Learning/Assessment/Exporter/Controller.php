@@ -74,6 +74,7 @@ class Controller extends BaseController
         $this->assessmentIdFinder       = $assessmentIdFinder;
     }
 
+
     /**
      * Get the form for exporting a single assessment.
      *
@@ -90,6 +91,7 @@ class Controller extends BaseController
      * @level 165
      *
      * @param IAssessable $assessmentSpec
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getExportForm(IAssessable $assessmentSpec)
     {
@@ -104,16 +106,22 @@ class Controller extends BaseController
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
     }
 
+
     /**
      * Processes the export assessment request.
      *
-     * @api   POST /learning/export/assessment/:assessmentId
-     * @level 165
+     * @api      POST /learning/export/assessment/:assessmentId
+     * @level    165
      *
      * @param IAssessable $assessmentSpec
      *
-     * @var string        $_GET  ['returnUrl']            a URL to return to once done
-     * @var int[]         $_POST ['unitImplementation']   unit implementations to push this into.
+     * @throws InvalidArgumentException
+     * @throws \Alaress\Web\Controller\Exception
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \DomainException
+     * @throws \Schoolbox\Mapper\Exception
+     * @internal param string $_GET ['returnUrl']            a URL to return to once done
+     * @internal param int[] $_POST ['unitImplementation']   unit implementations to push this into.
      *                                           key:   unit implementation id
      *                                           value: true/false
      */
@@ -145,7 +153,7 @@ class Controller extends BaseController
                 $expectedDateTypes = ['publish', 'open', 'due', 'close'];
                 $datesObjects      = [];
 
-                if (is_array($dates)) {
+                if (\is_array($dates)) {
                     foreach ($expectedDateTypes as $dateType) {
                         try {
                             $datesObjects[$dateType] = Alaress_Date_Format::newLocal($dates[$dateType]);
@@ -185,6 +193,7 @@ class Controller extends BaseController
         }
     }
 
+
     /**
      * Recursively export an AssessmentSpec to a new context
      *
@@ -194,11 +203,11 @@ class Controller extends BaseController
      * @param Alaress_Date_Format|null $openDate
      * @param Alaress_Date_Format|null $dueDate
      * @param Alaress_Date_Format|null $closeDate
-     *
      * @return IAssessable
+     * @throws InvalidArgumentException
+     * @throws \DomainException
      * @throws \Schoolbox\Mapper\Exception
      * @internal param null $dates
-     *
      */
     protected function exportToNewContext(
         IAssessable $assessmentSpec,
@@ -207,7 +216,7 @@ class Controller extends BaseController
         Alaress_Date_Format $openDate = null,
         Alaress_Date_Format $dueDate = null,
         Alaress_Date_Format $closeDate = null
-    ) {
+    ): IAssessable {
 
         if ($context instanceof UnitImplementation) {
             $publishDate = $publishDate ?? $context->getOpenDate();
@@ -220,7 +229,7 @@ class Controller extends BaseController
             $dueDate     = $dueDate ?? $context->getDueAt();
             $closeDate   = $closeDate ?? $context->getDueAt();
         } else {
-            throw new \DomainException('Invalid context: ' . get_class($context));
+            throw new \DomainException('Invalid context: ' . \get_class($context));
         }
 
         // Set sensible defaults for dates
@@ -254,7 +263,7 @@ class Controller extends BaseController
      *                 allowed:  Is the current user allowed to import this?
      *                 imported: Is this assessment already imported?
      */
-    protected function retrieveUnitImplementationsForSpecification(IAssessable $assessment)
+    protected function retrieveUnitImplementationsForSpecification(IAssessable $assessment): array
     {
         $result              = [];
         $unitImplementations = $this->unitImplementationMapper->findAllByUnitSpecificationId(
@@ -310,7 +319,7 @@ class Controller extends BaseController
      * @throws InvalidArgumentException If any filter keys not recognised
      * @throws BrokenFilterException If a injected filter is unable to be processed
      */
-    public function getCSV()
+    public function getCSV(): void
     {
         // Generate an updated csv
         $filename = sb_tempnam();
