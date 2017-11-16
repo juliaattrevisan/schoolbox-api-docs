@@ -138,7 +138,7 @@
                 self.triggerEvent('playbackStop', []);
             });
         } else {
-            self.webrtc.supported = false;
+            self.media.supported = false;
         }
         return this;
     };
@@ -400,7 +400,6 @@
         var self = this;
         if (self.isMediaRecorderUsed()) {
             clearInterval(self.intervalMethod);
-            self.media.stream.stop();
             self.media.recorder.stop();
             // At this point I have a blob. Put it in the audio element.
             self.media.recorder.ondataavailable =
@@ -418,7 +417,6 @@
             self.triggerEvent('recordingStop', []);
         } else if (self.isWebRtcUsed()) {
             clearInterval(self.intervalMethod);
-            self.webrtc.stream.stop();
             self.webrtc.recorder.stop();
             // At this point I have a blob. Put it in the audio element.
             self.webrtc.recorder.exportWAV(
