@@ -24,7 +24,7 @@
             data-value-default="{% if roleSelection.selected %}1{% else %}0{% endif %}"
             {% if userSelection.selected %}checked{% endif %}
             {% if disabled %}disabled data-disabled{% endif %}
-            {{ block('extraAttrs') }}
+            {% block extraAttrs %}{% endblock %}
     >
     <label for="filter_selection_{{ userSelection.filter.id }}_{{ userSelection.key }}{{ idSuffix }}">{{ label }}</label>
 {% endif %}
