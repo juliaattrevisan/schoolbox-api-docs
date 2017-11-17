@@ -35,7 +35,7 @@ class Model implements ISoftDeletable
     /**
      * The state in which the teacher registered
      *
-     * @var int
+     * @var string
      */
     private $registrationState;
 
@@ -81,19 +81,19 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return int
+     * @return string
      */
-    public function getRegistrationState(): int
+    public function getRegistrationState(): string
     {
         return $this->registrationState;
     }
 
 
     /**
-     * @param int $registrationState
+     * @param string $registrationState
      * @return $this
      */
-    public function setRegistrationState(int $registrationState)
+    public function setRegistrationState(string $registrationState)
     {
         $this->registrationState = $registrationState;
         return $this;
