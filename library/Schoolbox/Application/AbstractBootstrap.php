@@ -390,11 +390,6 @@ abstract class AbstractBootstrap implements BootstrapInterface
 //                        DebugBar::getInstance()->addCollector(new TwigCollector($twig));
 //                    }
 
-                    $twig->addExtension(new Twig_Extension_Debug());
-                    $twig->addExtension(new Twig_Extensions_Extension_Text());
-                    $twig->addExtension(new AdminNavigationRenderer());
-                    $twig->addExtension(new LearningRenderer());
-
                     // HTML Purifier filter - known to output safe HTML
 
                     $twig->addFilter(
@@ -488,6 +483,14 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     );
 
                     $twig->addFunction(new Twig_SimpleFunction('routeLookupIfAuthorized', $di->get('templateEngine:routeLookupIfAuthorized')));
+
+                    // Add extensions after everything else.
+                    // According to https://twig.symfony.com/doc/1.x/deprecated.html#globals
+                    // globals must be loaded before extensions.
+                    $twig->addExtension(new Twig_Extension_Debug());
+                    $twig->addExtension(new Twig_Extensions_Extension_Text());
+                    $twig->addExtension(new AdminNavigationRenderer());
+                    $twig->addExtension(new LearningRenderer());
 
                     return $twig;
                 }
