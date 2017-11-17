@@ -68,7 +68,15 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
             'Invalid Complete Details 3' => [
                 (new Model())->setNumber('  ')->setRegistrationState(' '),
                 false
-            ]
+            ],
+            'Invalid Complete Details 4' => [
+                (new Model())->setNumber('987 abc')->setRegistrationState('    '),
+                false
+            ],
+            'Invalid Complete Details 5' => [
+                (new Model())->setNumber('  ')->setRegistrationState('      '),
+                false
+            ],
         ];
     }
 
@@ -108,7 +116,23 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
                 false
             ],
             'Invalid State 4' => [
-                (new Model())->setNumber(123)->setRegistrationState('vic'),
+                (new Model())->setNumber(123)->setRegistrationState('MI'),
+                false
+            ],
+            'Invalid State 5' => [
+                (new Model())->setNumber(123)->setRegistrationState(' MI '),
+                false
+            ],
+            'Invalid State 6' => [
+                (new Model())->setNumber(123)->setRegistrationState('mi '),
+                false
+            ],
+            'Invalid State 7' => [
+                (new Model())->setNumber(123)->setRegistrationState(' mi'),
+                false
+            ],
+            'Invalid State 8' => [
+                (new Model())->setNumber(123)->setRegistrationState('mi'),
                 false
             ],
         ];
