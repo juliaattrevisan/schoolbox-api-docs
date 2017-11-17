@@ -351,6 +351,7 @@ class Gateway
         if (!$externalId) {
             return array();
         }
+
         // Adapted External_Tass_User->getSubjectList()
         $query  = "
             SELECT DISTINCT
@@ -364,20 +365,17 @@ class Gateway
             INNER JOIN subtab
                 ON subtab.sub_code = studsub.sub_code
                 AND subtab.cmpy_code = studsub.cmpy_code
-            WHERE studsub.stud_code = :externalId
-            AND subtab.sub_code IN ('9994','9995','9996','9997','9998','9999')
-            AND studsub.cmpy_code = '01'
-            ORDER BY
-                studsub.sub_code ASC,
-                studsub.class ASC
         ";
-        $params = array(
-            ':externalId' => $externalId,
-        );
-        $result = $this->getDatabase()->trimAll(
-            $this->getDatabase()->getAll(strtr($query, $params))
-        );
-        return $result ?: array();
+
+        $pb = new PredicateBuilder($this->getDatabase(), 'studsub');
+        $pb = $pb->equals('studsub.stud_code', $externalId)
+                 ->equals('studsub.cmpy_code', '01')
+                 ->equals('subtab.sub_code', ['9994','9995','9996','9997','9998','9999']);
+
+        $query .= " WHERE " . implode(' AND ', $pb->getWhere())
+                . " ORDER BY studsub.sub_code ASC, studsub.class ASC";
+
+        return $this->getDatabase()->prepareQuery($query, $pb->getPredicates())->fetchAll();
     }
 
     /**
