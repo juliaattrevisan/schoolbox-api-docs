@@ -2,7 +2,21 @@
     {% set pdUpdateRoute = routeLookupIfAuthorized('professionaldevelopment.postUpdate', {userId: userId}) %}
 
     {% if pdUpdateRoute %}
-        <form action="{{ pdUpdateRoute }}" method="post">
+        <script type="text/javascript">
+            $(function() {
+                $("#pdForm").alaressValidate({
+                    rules: {
+                        'pdNumber':  {
+                            requiredNotBlank:true
+                        },
+                        'pdState':  {
+                            requiredNotBlank:true
+                        }
+                    }
+                });
+            });
+        </script>
+        <form action="{{ pdUpdateRoute }}" method="post" id="pdForm">
             <section class="content">
                 <div class="small-12 medium-8 columns">
                     <label>Professional Development Number</label>
