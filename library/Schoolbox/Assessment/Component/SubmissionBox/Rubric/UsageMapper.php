@@ -129,4 +129,19 @@ class UsageMapper extends Schoolbox\Mapper {
         $statement->execute([$criterionId]);
         return $statement->fetchAll();
     }
+
+
+    /**
+     * No notifications.
+     *
+     * @param object $object
+     * @param string $verb
+     * @param object $previous
+     * @return bool
+     */
+    protected function raiseNotification($object, $verb, $previous = null)
+    {
+        return true;
+    }
+
 }

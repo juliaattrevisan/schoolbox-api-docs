@@ -26,4 +26,19 @@ class ResultMapper extends Schoolbox\Mapper {
         $this->uses('value', self::TYPE_INTEGER);
         $this->uses('label', self::TYPE_STRING);
     }
+
+
+    /**
+     * No notifications.
+     *
+     * @param object $object
+     * @param string $verb
+     * @param object $previous
+     * @return bool
+     */
+    protected function raiseNotification($object, $verb, $previous = null)
+    {
+        return true;
+    }
+
 }

@@ -254,4 +254,18 @@ class DescriptorMapper extends Schoolbox\Mapper {
         return $this->create($toList);
     }
 
+
+    /**
+     * No notifications.
+     *
+     * @param object $object
+     * @param string $verb
+     * @param object $previous
+     * @return bool
+     */
+    protected function raiseNotification($object, $verb, $previous = null)
+    {
+        return true;
+    }
+
 }

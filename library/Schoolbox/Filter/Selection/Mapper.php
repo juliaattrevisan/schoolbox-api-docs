@@ -63,4 +63,20 @@ class Mapper extends \Schoolbox\Mapper
         }
         return $this->save($selectionsToSave);
     }
+
+
+    /**
+     * No notifications.
+     *
+     * @param object $object
+     * @param string $verb
+     * @param object $previous
+     * @return bool
+     */
+    protected function raiseNotification($object, $verb, $previous = null)
+    {
+        return true;
+    }
+
+
 }
