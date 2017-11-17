@@ -53,9 +53,9 @@ class Gateway
             AND absent_date BETWEEN :yearStart AND :yearEnd
         ";
         $params = array(
-            ':externalId' => $this->getDatabase()->smartQuote($externalId),
-            ':yearStart'  => $this->getDatabase()->smartQuote($year . '-01-01'),
-            ':yearEnd'    => $this->getDatabase()->smartQuote($year . '-12-31'),
+            ':externalId' => $externalId,
+            ':yearStart'  => $year . '-01-01',
+            ':yearEnd'    => $year . '-12-31',
         );
         if (!empty($absenceTypes)) {
             $query .= ' AND absent_type IN (:absenceTypes) ';
@@ -114,9 +114,9 @@ class Gateway
             AND ecactivity.cmpy_code = '01'
         ";
         $params = array(
-            ':externalId'   => $this->getDatabase()->smartQuote($externalId),
-            ':year'         => $this->getDatabase()->smartQuote($year),
-            ':activityType' => $this->getDatabase()->smartQuote($activityType),
+            ':externalId'   => $externalId,
+            ':year'         => $year,
+            ':activityType' => $activityType,
         );
         $result = $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll(strtr($query, $params))
@@ -348,8 +348,8 @@ class Gateway
                 teacher.tch_name ASC
         ";
         $params = array(
-            ':externalId' => $this->getDatabase()->smartQuote($externalId),
-            ':year'       => $this->getDatabase()->smartQuote($year),
+            ':externalId' => $externalId,
+            ':year'       => $year,
         );
         $result = $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll(strtr($query, $params))
@@ -391,7 +391,7 @@ class Gateway
                 studsub.class ASC
         ";
         $params = array(
-            ':externalId' => $this->getDatabase()->smartQuote($externalId),
+            ':externalId' => $externalId,
         );
         $result = $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll(strtr($query, $params))
@@ -434,8 +434,8 @@ class Gateway
                 studsub.class ASC
         ";
         $params = array(
-            ':externalId' => $this->getDatabase()->smartQuote($externalId),
-            ':year'       => $this->getDatabase()->smartQuote($year),
+            ':externalId' => $externalId,
+            ':year'       => $year,
         );
         $result = $this->getDatabase()->trimRow(
             $this->getDatabase()->getRow(strtr($query, $params))
@@ -497,8 +497,8 @@ class Gateway
                 subtab.sub_desc ASC
         ";
         $params = array(
-            ':externalId' => $this->getDatabase()->smartQuote($externalId),
-            ':year'       => $this->getDatabase()->smartQuote($year),
+            ':externalId' => $externalId,
+            ':year'       => $year,
         );
         $result = $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll(strtr($query, $params))
@@ -557,9 +557,9 @@ class Gateway
         ";
         list(, $code, $class) = explode('-', $subjectCode);
         $params = array(
-            ':code'  => $this->getDatabase()->smartQuote($code),
-            ':year'  => $this->getDatabase()->smartQuote($year),
-            ':class' => $this->getDatabase()->smartQuote($class),
+            ':code'  => $code,
+            ':year'  => $year,
+            ':class' => $class,
         );
         $allResults = $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll(strtr($query, $params))
@@ -602,8 +602,8 @@ class Gateway
         ";
         list(, $code, $class) = explode('-', $subjectCode);
         $params = array(
-            ':code'  => $this->getDatabase()->smartQuote($code),
-            ':class' => $this->getDatabase()->smartQuote($class),
+            ':code'  => $code,
+            ':class' => $class,
         );
         $result = $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll(strtr($query, $params))
