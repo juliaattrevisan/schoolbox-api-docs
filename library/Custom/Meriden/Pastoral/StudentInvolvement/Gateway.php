@@ -369,8 +369,8 @@ class Gateway
 
         $pb = new PredicateBuilder($this->getDatabase(), 'studsub');
         $pb = $pb->equals('studsub.stud_code', $externalId)
-                 ->equals('studsub.cmpy_code', '01')
-                 ->equals('subtab.sub_code', ['9994','9995','9996','9997','9998','9999']);
+                 ->equals('subtab.sub_code', ['9994','9995','9996','9997','9998','9999'])
+                 ->equals('studsub.cmpy_code', '01');
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere())
                 . " ORDER BY studsub.sub_code ASC, studsub.class ASC";
