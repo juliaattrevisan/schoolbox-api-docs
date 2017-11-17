@@ -149,15 +149,15 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
                 (new Model())->setNumber('  123  ')->setRegistrationState('VIC'),
                 true
             ],
-            'Valid Number 4' => [
+            'Valid Number 5' => [
                 (new Model())->setNumber('123  ')->setRegistrationState('VIC'),
                 true
             ],
-            'Valid Number 5' => [
+            'Valid Number 6' => [
                 (new Model())->setNumber('a123a')->setRegistrationState('VIC'),
                 true
             ],
-            'Valid Number 6' => [
+            'Valid Number 7' => [
                 (new Model())->setNumber('aaabbbbbcccc')->setRegistrationState('VIC'),
                 true
             ],

@@ -41,7 +41,9 @@ class ValidProfessionalDevelopment
      */
     private function isValidNumber($pdNumber)
     {
-        if (strlen(trim($pdNumber))) {
+        $filtered = preg_replace('/[^a-zA-Z0-9]/', '', $pdNumber);
+
+        if (strlen($filtered)) {
             return true;
         }
 
