@@ -19,7 +19,6 @@ use Schoolbox\User;
 use Swift_Attachment;
 use Swift_EmbeddedFile;
 use Swift_Mailer;
-use Swift_MailTransport;
 use Swift_Message;
 use Swift_SmtpTransport;
 use Swift_SwiftException;
@@ -265,7 +264,7 @@ abstract class AbstractMailer implements IMailer {
     {
         // create transport and send email
         try {
-            $mailer = Swift_Mailer::newInstance(self::getSwiftTransport($reinitialise));
+            $mailer = new Swift_Mailer(self::getSwiftTransport($reinitialise));
             $this->configureSwiftMailer($mailer);
 
             $mailer->send($this->email);
@@ -306,6 +305,7 @@ abstract class AbstractMailer implements IMailer {
 	 * @param IConfigLoader $conf
 	 * @param bool $reinitialise
 	 * @return Swift_Transport
+	 * @throws Swift_SwiftException if SMTP isn't configured
 	 */
 	public static function getConfiguredSwiftTransport($conf, $reinitialise = false) {
 		if (!(self::$transport instanceof Swift_Transport) || $reinitialise) {
@@ -324,7 +324,9 @@ abstract class AbstractMailer implements IMailer {
 				}
 			}
 			else {
-				self::$transport = new Swift_MailTransport();
+				throw new Swift_SwiftException(
+					'Swift_MailTransport is no longer supported; SMTP must be configured'
+				);
 			}
 		}
 		return self::$transport;

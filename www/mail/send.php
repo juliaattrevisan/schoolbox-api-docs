@@ -129,7 +129,8 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments = array())
     }
 
     try {
-        Swift_Mailer::newInstance(Mailer::getSwiftTransport())->send($mail);
+        $mailer = new Swift_Mailer(Mailer::getSwiftTransport());
+        $mailer->send($mail);
     }
     catch (Exception $ex) {
         error(9, $ex->getMessage());
