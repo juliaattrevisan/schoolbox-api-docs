@@ -129,9 +129,7 @@ class Module extends BaseModule
             = Grades::getInstance();
 
         $injector->params[StudentInvolvement\Gateway::class]['database']
-            = $injector->lazy(function () {
-            return \MSSQL::getInstance();
-        });
+            = $injector->lazyGet('databaseExternal');
 
         $injector->set(
             'controller:' . $this->basename,
