@@ -12,21 +12,16 @@
                     <div class="small-12 medium-4 columns">
                         <label>Registration State</label>
                         <select name="pdState">
-                            {% for state in pdStates %}
-                                {% if loop.first %}
-                                    {% set disabled = ' disabled="disabled"' %}
-                                {% else %}
-                                    {% set disabled = '' %}
-                                {% endif %}
+                            <option value="" disabled="disabled">Please Select</option>
 
-                                {% if loop.index0 == pd.registrationState %}
+                            {% for state in pdStates %}
+                                {% if state == pd.registrationState %}
                                     {% set selected = ' selected="selected"' %}
                                 {% else %}
                                     {% set selected = '' %}
                                 {% endif %}
 
-                                <option value="{{ loop.index0 }}"{{ disabled }}{{ selected }}>{{ pdStates[loop.index0] }}</option>
-
+                                <option value="{{ state }}"{{ selected }}>{{ state }}</option>
                             {% endfor %}
                         </select>
                     </div>
