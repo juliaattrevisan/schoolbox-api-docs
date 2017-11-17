@@ -433,6 +433,7 @@ class Gateway
         if (!$externalId) {
             return array();
         }
+
         // Adapted External_Tass_User->getSubjectList()
         $query  = "
             SELECT DISTINCT
@@ -453,37 +454,20 @@ class Gateway
                 AND studsub.semester = tchsub.semester
                 AND studsub.yr_study = tchsub.year_num
                 AND studsub.class = tchsub.class
-            WHERE studsub.stud_code = :externalId
-            AND subtab.sub_code NOT IN (
-                '9994',
-                '9995',
-                '9996',
-                '9997',
-                '9998',
-                '9999',
-                '0107',
-                '0074',
-                '4099',
-                '0093',
-                '0103'
-            )
-            AND studsub.cmpy_code = '01'
-            AND studsub.yr_study = :year
-            ORDER BY
-                subtab.sub_desc ASC
         ";
-        $params = array(
-            ':externalId' => $externalId,
-            ':year'       => $year,
-        );
-        $result = $this->getDatabase()->trimAll(
-            $this->getDatabase()->getAll(strtr($query, $params))
-        );
-        $result = $result ?: array();
+
+        $pb = new PredicateBuilder($this->getDatabase(), 'studsub');
+        $pb = $pb->equals('studsub.stud_code', $externalId)
+                 ->equals('studsub.yr_study', $year)
+                 ->notEquals('subtab.sub_code', ['9994', '9995', '9996', '9997', '9998', '9999', '0107', '0074', '4099', '0093', '0103'])
+                 ->equals('studsub.cmpy_code', '01');
+
+        $query .= " WHERE " . implode(' AND ', $pb->getWhere())
+                . " ORDER BY subtab.sub_desc ASC";
 
         // Join all teacher codes into a single result.
         $result = array_reduce(
-            $result,
+            $this->getDatabase()->prepareQuery($query, $pb->getPredicates())->fetchAll(),
             function ($carry, $newRow) {
                 $isDuplicateCode = false;
                 foreach ($carry as &$row) {
