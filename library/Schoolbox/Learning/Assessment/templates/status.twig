@@ -123,17 +123,17 @@
                                     {% if pActionSummary %}
                                         <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s history">{{ locale.submissionHistory.proper }}</a></li>
                                     {% endif %}
-                                    {{ block('extra_nav_items') }}
+                                    {% block extra_nav_items %}{% endblock %}
                                 {% endspaceless -%}
                             </ul>
                             {% endif %}
                         </div>
                     </div>
 
-                    {# Child templates to populate #}
-                    {{ block('grading') }}
-                    {{ block('meta') }}
-                    {{ block('action_bar') }}
+                    {# Child templates may populate #}
+                    {% block grading %}{% endblock %}
+                    {% block meta %}{% endblock %}
+                    {% block action_bar %}{% endblock %}
                 </li>
                 {% endblock %}
             {% endfor %}

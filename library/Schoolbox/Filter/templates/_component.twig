@@ -9,7 +9,7 @@
 
 <div class="item checklist filter-component{% if isUserConfigurable %} user-configurable{% endif %}" data-component="{{ definition.filter.id }}">
 
-    {{ block('scripts') }}
+    {% block scripts %}{% endblock %}
 
     {% set isDisabled = (isUserConfigurable and 1 == roleSelections | length) %}
 
