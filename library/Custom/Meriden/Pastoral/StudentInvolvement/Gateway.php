@@ -84,6 +84,7 @@ class Gateway
         if (!$externalId) {
             return array();
         }
+
         $query = "
             SELECT DISTINCT
                 studecact.stud_code,
@@ -94,20 +95,17 @@ class Gateway
             INNER JOIN studecact
                 ON studecact.act_code = ecactivity.act_code
                 AND studecact.cmpy_code = ecactivity.cmpy_code
-            WHERE studecact.stud_code = :externalId
-            AND studecact.act_year = :year
-            AND ecactivity.act_type = :activityType
-            AND ecactivity.cmpy_code = '01'
         ";
-        $params = array(
-            ':externalId'   => $externalId,
-            ':year'         => $year,
-            ':activityType' => $activityType,
-        );
-        $result = $this->getDatabase()->trimAll(
-            $this->getDatabase()->getAll(strtr($query, $params))
-        );
-        return $result ?: array();
+
+        $pb = new PredicateBuilder($this->getDatabase(), 'ecactivity');
+        $pb = $pb->equals('studecact.stud_code', $externalId)
+                 ->equals('studecact.act_year', $year)
+                 ->equals('ecactivity.act_type', $activityType)
+                 ->equals('ecactivity.cmpy_code', '01');
+
+        $query .= " WHERE " . implode(' AND ', $pb->getWhere());
+
+        return $this->getDatabase()->prepareQuery($query, $pb->getPredicates())->fetchAll();
     }
 
     /**
