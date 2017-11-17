@@ -133,7 +133,7 @@ class Module extends BaseModule
 
         $injector->set(
             'controller:' . $this->basename,
-            $injector->lazyNew('Custom\\Meriden\\Pastoral\\Controller')
+            $injector->lazyNew(Controller::class)
         );
     }
 
