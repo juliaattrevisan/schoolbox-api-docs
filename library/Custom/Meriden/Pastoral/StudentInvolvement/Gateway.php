@@ -37,11 +37,11 @@ class Gateway
      *
      * @return array
      */
-    protected function queryDays($year, User $student, array $absenceTypes, array $reasonCodes = array())
+    protected function queryDays($year, User $student, array $absenceTypes, array $reasonCodes = [])
     {
         $externalId = $student->getExternalId();
         if (!$externalId) {
-            return array();
+            return [];
         }
 
         $query = "
@@ -82,7 +82,7 @@ class Gateway
     {
         $externalId = $student->getExternalId();
         if (!$externalId) {
-            return array();
+            return [];
         }
 
         $query = "
@@ -125,10 +125,10 @@ class Gateway
         $resultSet = $this->queryDays(
             $year,
             $student,
-            array('AFS', 'APD', 'AAM', 'APM', 'EDP'),
-            array('A', 'L', 'S')
+            ['AFS', 'APD', 'AAM', 'APM', 'EDP'],
+            ['A', 'L', 'S']
         );
-        $count = 0;
+        $count     = 0;
         foreach ($resultSet as $row) {
             switch ($row['absent_type']) {
                 case 'AFS':
@@ -158,8 +158,8 @@ class Gateway
         $resultSet = $this->queryDays(
             $year,
             $student,
-            array('LFS'),
-            array('A', 'L', 'S')
+            ['LFS'],
+            ['A', 'L', 'S']
         );
         return count($resultSet);
     }
@@ -177,7 +177,7 @@ class Gateway
         $resultSet = $this->queryDays(
             $year,
             $student,
-            array('DET')
+            ['DET']
         );
         return count($resultSet);
     }
@@ -195,8 +195,8 @@ class Gateway
         $resultSet = $this->queryDays(
             $year,
             $student,
-            array('AFS'),
-            array('M')
+            ['AFS'],
+            ['M']
         );
         return count($resultSet);
     }
@@ -211,12 +211,12 @@ class Gateway
      */
     public function getAllAttendances($year, User $student)
     {
-        return array(
+        return [
             'absent'        => $this->getAbsenceCount($year, $student),
             'late'          => $this->getLateCount($year, $student),
             'detentions'    => $this->getDetentionCount($year, $student),
             'endorsedLeave' => $this->getLeaveCount($year, $student),
-        );
+        ];
     }
 
     /**
@@ -282,12 +282,12 @@ class Gateway
      */
     public function getAllActivities($year, User $student)
     {
-        return array(
+        return [
             'awards'       => $this->getAwards($year, $student),
             'cocurricular' => $this->getCocurricular($year, $student),
             'service'      => $this->getService($year, $student),
             'positions'    => $this->getPositions($year, $student),
-        );
+        ];
     }
 
     /**
@@ -302,7 +302,7 @@ class Gateway
     {
         $externalId = $student->getExternalId();
         if (!$externalId) {
-            return array();
+            return [];
         }
 
         // In Schoolbox-Tass nomeclature, Schoolbox classes will have the
@@ -330,7 +330,7 @@ class Gateway
         $pb = new PredicateBuilder($this->getDatabase(), 'teacher');
         $pb = $pb->equals('studsub.stud_code', $externalId)
                  ->equals('studsub.cmpy_code', '01')
-                 ->equals('studsub.sub_code', ['9994','9995','9996','9997','9998','9999'])
+                 ->equals('studsub.sub_code', ['9994', '9995', '9996', '9997', '9998', '9999'])
                  ->equals('studsub.year_num', $year);
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere()) . " ORDER BY teacher.tch_name ASC";
@@ -349,11 +349,11 @@ class Gateway
     {
         $externalId = $student->getExternalId();
         if (!$externalId) {
-            return array();
+            return [];
         }
 
         // Adapted External_Tass_User->getSubjectList()
-        $query  = "
+        $query = "
             SELECT DISTINCT
                 studsub.class,
                 studsub.yr_study,
@@ -369,11 +369,11 @@ class Gateway
 
         $pb = new PredicateBuilder($this->getDatabase(), 'studsub');
         $pb = $pb->equals('studsub.stud_code', $externalId)
-                 ->equals('subtab.sub_code', ['9994','9995','9996','9997','9998','9999'])
+                 ->equals('subtab.sub_code', ['9994', '9995', '9996', '9997', '9998', '9999'])
                  ->equals('studsub.cmpy_code', '01');
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere())
-                . " ORDER BY studsub.sub_code ASC, studsub.class ASC";
+            . " ORDER BY studsub.sub_code ASC, studsub.class ASC";
 
         return $this->getDatabase()->prepareQuery($query, $pb->getPredicates())->fetchAll();
     }
@@ -390,10 +390,10 @@ class Gateway
     {
         $externalId = $student->getExternalId();
         if (!$externalId) {
-            return array();
+            return [];
         }
 
-        $query  = "
+        $query = "
             SELECT
                 studsub.class,
                 studsub.yr_study,
@@ -410,11 +410,11 @@ class Gateway
         $pb = new PredicateBuilder($this->getDatabase(), 'studsub');
         $pb = $pb->equals('studsub.stud_code', $externalId)
                  ->equals('studsub.yr_study', $year)
-                 ->equals('subtab.sub_code', ['9994','9995','9996','9997','9998','9999'])
+                 ->equals('subtab.sub_code', ['9994', '9995', '9996', '9997', '9998', '9999'])
                  ->equals('studsub.cmpy_code', '01');
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere())
-                . " ORDER BY studsub.sub_code ASC, studsub.class ASC";
+            . " ORDER BY studsub.sub_code ASC, studsub.class ASC";
 
         return $this->getDatabase()->prepareQuery($query, $pb->getPredicates())->fetchAll();
     }
@@ -431,11 +431,11 @@ class Gateway
     {
         $externalId = $student->getExternalId();
         if (!$externalId) {
-            return array();
+            return [];
         }
 
         // Adapted External_Tass_User->getSubjectList()
-        $query  = "
+        $query = "
             SELECT DISTINCT
                 studsub.class,
                 studsub.yr_study,
@@ -459,11 +459,13 @@ class Gateway
         $pb = new PredicateBuilder($this->getDatabase(), 'studsub');
         $pb = $pb->equals('studsub.stud_code', $externalId)
                  ->equals('studsub.yr_study', $year)
-                 ->notEquals('subtab.sub_code', ['9994', '9995', '9996', '9997', '9998', '9999', '0107', '0074', '4099', '0093', '0103'])
+                 ->notEquals(
+                     'subtab.sub_code',
+                     ['9994', '9995', '9996', '9997', '9998', '9999', '0107', '0074', '4099', '0093', '0103'])
                  ->equals('studsub.cmpy_code', '01');
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere())
-                . " ORDER BY subtab.sub_desc ASC";
+            . " ORDER BY subtab.sub_desc ASC";
 
         // Join all teacher codes into a single result.
         $result = array_reduce(
@@ -473,18 +475,18 @@ class Gateway
                 foreach ($carry as &$row) {
                     if ($row['code'] == $newRow['code']) {
                         $row['tch_code'][] = $newRow['tch_code'];
-                        $isDuplicateCode = true;
+                        $isDuplicateCode   = true;
                         break;
                     }
                 }
                 unset($row);
                 if (!$isDuplicateCode) {
-                    $newRow['tch_code'] = array($newRow['tch_code']);
-                    $carry[] = $newRow;
+                    $newRow['tch_code'] = [$newRow['tch_code']];
+                    $carry[]            = $newRow;
                 }
                 return $carry;
             },
-            array()
+            []
         );
         return $result;
     }
@@ -501,7 +503,7 @@ class Gateway
     {
         list(, $code, $class) = explode('-', $subjectCode);
 
-        $query  = "
+        $query = "
             SELECT DISTINCT
                 st.sub_desc,
                 so.outline_text,
@@ -526,7 +528,7 @@ class Gateway
         $result = [];
         foreach ($this->getDatabase()->prepareQuery($query, $pb->getPredicates())->executeIterator() as $singleResult) {
             if (empty($result)) {
-                $result = $singleResult;
+                $result             = $singleResult;
                 $result['tch_code'] = [];
             }
             $result['tch_code'][] = $singleResult['tch_code'];
@@ -548,7 +550,7 @@ class Gateway
     {
         list(, $code, $class) = explode('-', $subjectCode);
 
-        $query  = "
+        $query = "
             SELECT DISTINCT
                 ('-' + RTRIM(st.sub_code) + '-' + RTRIM(ss.class)) AS code
             FROM subtab st
