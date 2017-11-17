@@ -64,7 +64,8 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $this->uses('skip_unsubmitted', self::TYPE_BOOLEAN);
         $this->uses('created', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP); // TODO deprecated, lives on `assessment` table now
         $this->uses('deleted', self::TYPE_BOOLEAN, self::COLUMN_SOFTDELETE); // TODO deprecated, lives on `assessment` table now
-
+        $this->uses('self_assessable', self::TYPE_BOOLEAN, null, 'selfAssessable');
+        
         $this->joins('category', Folder\Mapper::class); // TODO deprecated, retained for legacy compatibility only
         $this->joins('owner', Schoolbox\UserMapper::class);
         $this->joins('mark_type', SubmissionBox\MarkTypeMapper::class, 'mark_type_id');
@@ -429,6 +430,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 			r.norm_mark,
 			r.comment,
 			b.mark_visibility,
+			b.self_assessable,
 			b.created, s.submitted_at, r.published_at
 			FROM submission_box b
 			LEFT JOIN folder c ON c.id = b.category

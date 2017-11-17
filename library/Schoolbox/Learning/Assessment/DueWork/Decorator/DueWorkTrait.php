@@ -56,6 +56,11 @@ trait DueWorkTrait
     protected $attachedFiles;
 
     /**
+     * @var bool
+     */
+    protected $selfAssessable;
+
+    /**
      * Only relevant if this DueWork's MarkType is 'TotalMark'
      *
      * @var $int
@@ -202,6 +207,24 @@ trait DueWorkTrait
     protected function setAttachedFiles($attachedFiles)
     {
         $this->attachedFiles = $attachedFiles;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    protected function getSelfAssessable()
+    {
+        return $this->selfAssessable;
+    }
+
+    /**
+     * @param boolean $selfAssessable
+     * @return $this
+     */
+    protected function setSelfAssessable($selfAssessable)
+    {
+        $this->selfAssessable = $selfAssessable;
         return $this;
     }
 }

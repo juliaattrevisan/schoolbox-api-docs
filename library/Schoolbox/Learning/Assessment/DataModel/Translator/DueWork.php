@@ -50,6 +50,7 @@ class DueWork implements IAssessmentTypeTranslator
                 ->setOwner($assessment->getCreator())
                 ->setMarkType(new DueWorkModel\MarkType())
                 ->setGradeGroup(new DueWorkModel\GradeLevel\Group\Model())
+                ->setSelfAssessable($assessment->getSelfAssessable())
             ;
 
             // Convert a mark type into fields
@@ -130,6 +131,12 @@ class DueWork implements IAssessmentTypeTranslator
                 }
             } else {
                 $assessable->setAcceptsNone();
+            }
+
+            if ($model->getSelfAssessable()) {
+                $assessable->setSelfAssessable(true);
+            } else {
+                $assessable->setSelfAssessable(false);
             }
 
             // Convert attachments
