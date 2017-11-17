@@ -83,8 +83,8 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, 'student_grades', 'student_grades_block');
         $this->setBlock('class_mark', 'markbook_link', 'markbook_link_block');
 
-        // Hide markbook link on unit pages
-        if ($isUnitPage) {
+        // Hide markbook link on unit pages that aren't groups
+        if ($isUnitPage && !$isGroupPage) {
             $this->setVar('markbook_link_block', '');
         } else {
             $this->parse('markbook_link_block', 'markbook_link');
