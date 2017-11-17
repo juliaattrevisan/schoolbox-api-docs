@@ -265,7 +265,7 @@ abstract class AbstractMailer implements IMailer {
     {
         // create transport and send email
         try {
-            $mailer = Swift_Mailer::newInstance(self::getSwiftTransport($reinitialise));
+            $mailer = new Swift_Mailer(self::getSwiftTransport($reinitialise));
             $this->configureSwiftMailer($mailer);
 
             $mailer->send($this->email);
