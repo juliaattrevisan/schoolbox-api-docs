@@ -91,6 +91,7 @@ class Controller extends Base
             $this->userAccessMapper,
             $this->tokenMapper,
             $this->folderMapper,
+            $this->pdMapper,
             $mailService,
             $portraitDir
         );

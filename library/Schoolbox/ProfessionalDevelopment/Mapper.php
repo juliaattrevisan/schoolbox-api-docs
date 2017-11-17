@@ -41,7 +41,7 @@ class Mapper extends BaseMapper
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
-        $this->uses('number', self::TYPE_INTEGER);
+        $this->uses('number', self::TYPE_STRING);
         $this->uses('registration_state', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);

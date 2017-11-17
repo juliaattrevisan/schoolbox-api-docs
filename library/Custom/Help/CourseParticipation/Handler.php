@@ -15,6 +15,7 @@ use Schoolbox\Collection;
 use Schoolbox\Permission\SiteAccess;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\ProfessionalDevelopment;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\RoleMapper;
@@ -63,11 +64,12 @@ class Handler
 
 
     /**
-     * @param UserAccessMapper          $userAccessMapper
-     * @param SiteAccess\Mapper         $tokenMapper
-     * @param Folder\Mapper             $folderMapper
-     * @param User\Password\MailService $mailService
-     * @param string                    $portraitDir
+     * @param UserAccessMapper               $userAccessMapper
+     * @param SiteAccess\Mapper              $tokenMapper
+     * @param Folder\Mapper                  $folderMapper
+     * @param ProfessionalDevelopment\Mapper $pdMapper
+     * @param User\Password\MailService      $mailService
+     * @param string                         $portraitDir
      * @throws InvalidArgumentException
      * @throws Mapper\DefinitionException
      */
@@ -75,14 +77,16 @@ class Handler
         UserAccessMapper $userAccessMapper,
         SiteAccess\Mapper $tokenMapper,
         Folder\Mapper $folderMapper,
+        ProfessionalDevelopment\Mapper $pdMapper,
         User\Password\MailService $mailService,
         $portraitDir
     ) {
         $this->userAccessMapper = $userAccessMapper;
-        $this->tokenMapper      = $tokenMapper;
-        $this->folderMapper     = $folderMapper;
-        $this->codeMapper       = $folderMapper->getJoinMapper('codes');
+        $this->tokenMapper = $tokenMapper;
+        $this->folderMapper = $folderMapper;
+        $this->codeMapper = $folderMapper->getJoinMapper('codes');
         $this->passwordMailService = $mailService;
+        $this->pdMapper = $pdMapper;
 
         $portraitDir = realpath($portraitDir);
 
@@ -241,6 +245,23 @@ class Handler
 
             try {
                 $this->getUserMapper()->save($user);
+
+                /* Add Professional Development data
+                 * Create a new one if it doesn't already exist
+                 */
+                try {
+                    $pd = $this->pdMapper->findOneByColumn('user_id', $user->getId());
+                }
+                catch (Mapper\Exception $e) {
+                    $pd = $this->pdMapper->createModel();
+                    $pd->setUser($user);
+                }
+
+
+                $pd->setNumber($userData['pdNumber']);
+                $pd->setRegistrationState($userData['pdState']);
+
+                $this->pdMapper->save($pd);
 
                 if ($oldUsername) {
                     // existing user
