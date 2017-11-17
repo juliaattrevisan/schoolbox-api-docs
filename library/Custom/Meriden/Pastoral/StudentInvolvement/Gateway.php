@@ -18,14 +18,17 @@ class Gateway
     /**
      * @var IConnector
      */
-    protected $database;
+    private $database;
 
+    /**
+     * Constructor
+     *
+     * @param IConnector $database
+     */
     public function __construct(IConnector $database)
     {
-        // Set up required mappers, DB access, etc. here.
-        $this->setDatabase($database);
+        $this->database = $database;
     }
-
 
     /**
      * Base query for querying a student's absences.
@@ -53,7 +56,7 @@ class Gateway
             FROM studabsent
         ";
 
-        $pb = new PredicateBuilder($this->getDatabase(), 'studabsent');
+        $pb = new PredicateBuilder($this->database, 'studabsent');
         $pb = $pb->equals('stud_code', $externalId)
                  ->between('absent_date', $year . '-01-01', $year . '-12-31');
 
@@ -66,7 +69,7 @@ class Gateway
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere());
 
-        return $this->getDatabase()->prepareQuery($query, $pb->getPredicates())->fetchAll();
+        return $this->database->prepareQuery($query, $pb->getPredicates())->fetchAll();
     }
 
     /**
@@ -97,7 +100,7 @@ class Gateway
                 AND studecact.cmpy_code = ecactivity.cmpy_code
         ";
 
-        $pb = new PredicateBuilder($this->getDatabase(), 'ecactivity');
+        $pb = new PredicateBuilder($this->database, 'ecactivity');
         $pb = $pb->equals('studecact.stud_code', $externalId)
                  ->equals('studecact.act_year', $year)
                  ->equals('ecactivity.act_type', $activityType)
@@ -105,7 +108,7 @@ class Gateway
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere());
 
-        return $this->getDatabase()->prepareQuery($query, $pb->getPredicates())->fetchAll();
+        return $this->database->prepareQuery($query, $pb->getPredicates())->fetchAll();
     }
 
     /**
@@ -327,7 +330,7 @@ class Gateway
                 AND subtab.cmpy_code = studsub.cmpy_code
         ";
 
-        $pb = new PredicateBuilder($this->getDatabase(), 'teacher');
+        $pb = new PredicateBuilder($this->database, 'teacher');
         $pb = $pb->equals('studsub.stud_code', $externalId)
                  ->equals('studsub.cmpy_code', '01')
                  ->equals('studsub.sub_code', ['9994', '9995', '9996', '9997', '9998', '9999'])
@@ -335,7 +338,7 @@ class Gateway
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere()) . " ORDER BY teacher.tch_name ASC";
 
-        return $this->getDatabase()->prepareQuery($query, $pb->getPredicates())->fetchAll();
+        return $this->database->prepareQuery($query, $pb->getPredicates())->fetchAll();
     }
 
     /**
@@ -367,7 +370,7 @@ class Gateway
                 AND subtab.cmpy_code = studsub.cmpy_code
         ";
 
-        $pb = new PredicateBuilder($this->getDatabase(), 'studsub');
+        $pb = new PredicateBuilder($this->database, 'studsub');
         $pb = $pb->equals('studsub.stud_code', $externalId)
                  ->equals('subtab.sub_code', ['9994', '9995', '9996', '9997', '9998', '9999'])
                  ->equals('studsub.cmpy_code', '01');
@@ -375,7 +378,7 @@ class Gateway
         $query .= " WHERE " . implode(' AND ', $pb->getWhere())
             . " ORDER BY studsub.sub_code ASC, studsub.class ASC";
 
-        return $this->getDatabase()->prepareQuery($query, $pb->getPredicates())->fetchAll();
+        return $this->database->prepareQuery($query, $pb->getPredicates())->fetchAll();
     }
 
     /**
@@ -407,7 +410,7 @@ class Gateway
                 AND subtab.cmpy_code = studsub.cmpy_code
         ";
 
-        $pb = new PredicateBuilder($this->getDatabase(), 'studsub');
+        $pb = new PredicateBuilder($this->database, 'studsub');
         $pb = $pb->equals('studsub.stud_code', $externalId)
                  ->equals('studsub.yr_study', $year)
                  ->equals('subtab.sub_code', ['9994', '9995', '9996', '9997', '9998', '9999'])
@@ -416,7 +419,7 @@ class Gateway
         $query .= " WHERE " . implode(' AND ', $pb->getWhere())
             . " ORDER BY studsub.sub_code ASC, studsub.class ASC";
 
-        return $this->getDatabase()->prepareQuery($query, $pb->getPredicates())->fetchAll();
+        return $this->database->prepareQuery($query, $pb->getPredicates())->fetchAll();
     }
 
     /**
@@ -456,7 +459,7 @@ class Gateway
                 AND studsub.class = tchsub.class
         ";
 
-        $pb = new PredicateBuilder($this->getDatabase(), 'studsub');
+        $pb = new PredicateBuilder($this->database, 'studsub');
         $pb = $pb->equals('studsub.stud_code', $externalId)
                  ->equals('studsub.yr_study', $year)
                  ->notEquals(
@@ -469,7 +472,7 @@ class Gateway
 
         // Join all teacher codes into a single result.
         $result = array_reduce(
-            $this->getDatabase()->prepareQuery($query, $pb->getPredicates())->fetchAll(),
+            $this->database->prepareQuery($query, $pb->getPredicates())->fetchAll(),
             function ($carry, $newRow) {
                 $isDuplicateCode = false;
                 foreach ($carry as &$row) {
@@ -516,7 +519,7 @@ class Gateway
                 ON st.sub_code = ts.sub_code AND st.cmpy_code = ts.cmpy_code
         ";
 
-        $pb = new PredicateBuilder($this->getDatabase(), 'suboutline');
+        $pb = new PredicateBuilder($this->database, 'suboutline');
         $pb = $pb->equals('so.sub_code', $code)
                  ->equals('ts.year_num', $year)
                  ->equals('ts.class', $class)
@@ -526,7 +529,7 @@ class Gateway
 
         // Reduce to one result
         $result = [];
-        foreach ($this->getDatabase()->prepareQuery($query, $pb->getPredicates())->executeIterator() as $singleResult) {
+        foreach ($this->database->prepareQuery($query, $pb->getPredicates())->executeIterator() as $singleResult) {
             if (empty($result)) {
                 $result             = $singleResult;
                 $result['tch_code'] = [];
@@ -559,7 +562,7 @@ class Gateway
                 AND st.cmpy_code = ss.cmpy_code
         ";
 
-        $pb = new PredicateBuilder($this->getDatabase(), 'studsub');
+        $pb = new PredicateBuilder($this->database, 'studsub');
         $pb = $pb->equals('st.sub_code', $code)
                  ->equals('ss.class', $class)
                  ->equals('st.cmpy_code', '01');
@@ -570,26 +573,7 @@ class Gateway
             function ($v) {
                 return $v['code'];
             },
-            $this->getDatabase()->prepareQuery($query, $pb->getPredicates())->fetchAll()
+            $this->database->prepareQuery($query, $pb->getPredicates())->fetchAll()
         );
-    }
-
-    /**
-     * @return IConnector
-     */
-    protected function getDatabase(): IConnector
-    {
-        return $this->database;
-    }
-
-    /**
-     * @param  IConnector $database
-     *
-     * @return $this
-     */
-    protected function setDatabase(IConnector $database)
-    {
-        $this->database = $database;
-        return $this;
     }
 }
