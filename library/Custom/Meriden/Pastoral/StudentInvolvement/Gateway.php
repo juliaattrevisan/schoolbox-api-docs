@@ -10,6 +10,7 @@
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\User;
 
 class Gateway
@@ -42,6 +43,11 @@ class Gateway
         if (!$externalId) {
             return array();
         }
+
+        $pb = new PredicateBuilder($this->getDatabase(), 'studabsent');
+        $pb = $pb->equals('stud_code', $externalId)
+                 ->between('absent_date', $year . '-01-01', $year . '-12-31');
+
         $query = "
             SELECT
                 studabsent.stud_code,
@@ -49,38 +55,18 @@ class Gateway
                 studabsent.absent_type,
                 studabsent.reas_code
             FROM studabsent
-            WHERE stud_code = :externalId
-            AND absent_date BETWEEN :yearStart AND :yearEnd
         ";
-        $params = array(
-            ':externalId' => $externalId,
-            ':yearStart'  => $year . '-01-01',
-            ':yearEnd'    => $year . '-12-31',
-        );
+
         if (!empty($absenceTypes)) {
-            $query .= ' AND absent_type IN (:absenceTypes) ';
-            $params[':absenceTypes'] = implode(
-                ',',
-                array_map(
-                    array($this->getDatabase(), 'smartQuote'),
-                    $absenceTypes
-                )
-            );
+            $pb = $pb->equals('absent_type', $absenceTypes);
         }
         if (!empty($reasonCodes)) {
-            $query .= ' AND reas_code IN (:reasonCodes) ';
-            $params[':reasonCodes'] = implode(
-                ',',
-                array_map(
-                    array($this->getDatabase(), 'smartQuote'),
-                    $reasonCodes
-                )
-            );
+            $pb = $pb->equals('reas_code', $reasonCodes);
         }
-        $result = $this->getDatabase()->trimAll(
-            $this->getDatabase()->getAll(strtr($query, $params))
-        );
-        return $result ?: array();
+
+        $query .= " WHERE " . implode(' AND ', $pb->getWhere());
+
+        return $this->getDatabase()->prepareQuery($query, $pb->getPredicates())->fetchAll();
     }
 
     /**
