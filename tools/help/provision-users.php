@@ -23,6 +23,7 @@ use Schoolbox\Mail\CoreContext;
 use Schoolbox\Mail\TwigEmailFactory;
 use Schoolbox\MapperFactory;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\ProfessionalDevelopment;
 use Schoolbox\UserMapper;
 
 
@@ -156,6 +157,19 @@ $kernel->run(new class extends App {
 
                 foreach (Handler::REQUIRED_USER_FIELDS as $field) {
                     $userData[$user->getId()][$field] = trim(UserMapper::getInstance()->getModelProperty($user, $field));
+                }
+
+                /* Get Professional Development fields
+                 */
+                /** @var ProfessionalDevelopment\Model $pd */
+                try {
+                    $pd = ProfessionalDevelopment\Mapper::getInstance()->findOneByColumn('user_id', $user->getId());
+
+                    $userData['pdNumber'] = $pd->getNumber();
+                    $userData['pdState'] = $pd->getRegistrationState();
+                }
+                catch (\Schoolbox\Mapper\Exception $e) {
+                    // noop (no data exists)
                 }
             }
 
