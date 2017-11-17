@@ -546,30 +546,29 @@ class Gateway
      */
     public function getOtherSubjectClasses($subjectCode)
     {
-        $query = "
+        list(, $code, $class) = explode('-', $subjectCode);
+
+        $query  = "
             SELECT DISTINCT
                 ('-' + RTRIM(st.sub_code) + '-' + RTRIM(ss.class)) AS code
             FROM subtab st
             INNER JOIN studsub ss
                 ON st.sub_code = ss.sub_code
                 AND st.cmpy_code = ss.cmpy_code
-            WHERE st.sub_code = :code
-            AND ss.class != :class
-            AND st.cmpy_code = '01';
         ";
-        list(, $code, $class) = explode('-', $subjectCode);
-        $params = array(
-            ':code'  => $code,
-            ':class' => $class,
-        );
-        $result = $this->getDatabase()->trimAll(
-            $this->getDatabase()->getAll(strtr($query, $params))
-        );
+
+        $pb = new PredicateBuilder($this->getDatabase(), 'studsub');
+        $pb = $pb->equals('st.sub_code', $code)
+                 ->equals('ss.class', $class)
+                 ->equals('st.cmpy_code', '01');
+
+        $query .= " WHERE " . implode(' AND ', $pb->getWhere());
+
         return array_map(
             function ($v) {
                 return $v['code'];
             },
-            $result ?: array()
+            $this->getDatabase()->prepareQuery($query, $pb->getPredicates())->fetchAll()
         );
     }
 
