@@ -9,17 +9,17 @@
 
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
-use MSSQL;
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\User;
 
 class Gateway
 {
     /**
-     * @var MSSQL
+     * @var IConnector
      */
     protected $database;
 
-    public function __construct(MSSQL $database)
+    public function __construct(IConnector $database)
     {
         // Set up required mappers, DB access, etc. here.
         $this->setDatabase($database);
@@ -617,19 +617,19 @@ class Gateway
     }
 
     /**
-     * @return MSSQL
+     * @return IConnector
      */
-    protected function getDatabase()
+    protected function getDatabase(): IConnector
     {
         return $this->database;
     }
 
     /**
-     * @param  MSSQL $database
+     * @param  IConnector $database
      *
      * @return $this
      */
-    protected function setDatabase($database)
+    protected function setDatabase(IConnector $database)
     {
         $this->database = $database;
         return $this;
