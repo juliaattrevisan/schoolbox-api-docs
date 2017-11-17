@@ -1,17 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-{% macro spacer(fqdn, height, width, colspan) %}
-<td colspan="{{ colspan|default('1') }}"
-    valign="top"
-    height="{{ height|default('1') }}"
-    width="{{ width|default('1') }}"
-    style="line-height:{{ height|default('1') }}px;">
-    <img src="http://{{ fqdn }}/images/emails/spacer.gif"
-         height="{{ height|default('1') }}"
-         width="0"
-         border="0" />
-</td>
-{% endmacro %}
-{% import _self as fn %}
+
+{% import 'macro/spacer.twig' as fn %}
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
