@@ -1,3 +1,5 @@
+{% import 'macro/spacer.twig' as fn %}
+
 <tr class="{{ loop.index is even ? 'dark' : '' }}">{{ fn.spacer(config.fqdn, 8, 0, 4) }}</tr>
 <tr class="{{ loop.index is even ? 'dark' : '' }}">
     <td width="64" height="32" valign="top">
