@@ -304,6 +304,7 @@ class Gateway
         if (!$externalId) {
             return array();
         }
+
         // In Schoolbox-Tass nomeclature, Schoolbox classes will have the
         // following code:
         // {tchsub.year_num(optional)}-{tchsub.sub_code}-{tchsub.class}
@@ -324,21 +325,17 @@ class Gateway
             INNER JOIN subtab
                 ON subtab.sub_code = studsub.sub_code
                 AND subtab.cmpy_code = studsub.cmpy_code
-            WHERE studsub.stud_code = :externalId
-            AND studsub.cmpy_code = '01'
-            AND subtab.sub_code IN ('9994','9995','9996','9997','9998','9999')
-            AND tchsub.year_num = :year
-            ORDER BY
-                teacher.tch_name ASC
         ";
-        $params = array(
-            ':externalId' => $externalId,
-            ':year'       => $year,
-        );
-        $result = $this->getDatabase()->trimAll(
-            $this->getDatabase()->getAll(strtr($query, $params))
-        );
-        return $result ?: array();
+
+        $pb = new PredicateBuilder($this->getDatabase(), 'teacher');
+        $pb = $pb->equals('studsub.stud_code', $externalId)
+                 ->equals('studsub.cmpy_code', '01')
+                 ->equals('studsub.sub_code', ['9994','9995','9996','9997','9998','9999'])
+                 ->equals('studsub.year_num', $year);
+
+        $query .= " WHERE " . implode(' AND ', $pb->getWhere()) . " ORDER BY teacher.tch_name ASC";
+
+        return $this->getDatabase()->prepareQuery($query, $pb->getPredicates())->fetchAll();
     }
 
     /**
