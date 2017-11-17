@@ -42,7 +42,7 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->uses('number', self::TYPE_STRING);
-        $this->uses('registration_state', self::TYPE_INTEGER);
+        $this->uses('registration_state', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -109,6 +109,23 @@ class Mapper extends BaseMapper
      */
     public function getStates()
     {
-        return $this->states;
+        $query = "
+            SELECT column_type 
+            FROM information_schema.COLUMNS 
+            WHERE table_schema = ? 
+            AND table_name = ? 
+            AND column_name = ?
+        ";
+
+        $args = [ SQL_db, $this->getTable(), 'registration_state' ];
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute($args);
+
+        $row = $statement->fetch(\PDO::FETCH_ASSOC);
+
+        $states = explode("','", preg_replace("/(enum|set)\('(.+?)'\)/","\\2", $row['column_type']));
+
+        return $states;
     }
 }
