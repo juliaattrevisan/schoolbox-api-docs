@@ -499,7 +499,9 @@ class Gateway
      */
     public function getSubject($year, $subjectCode)
     {
-        $query = "
+        list(, $code, $class) = explode('-', $subjectCode);
+
+        $query  = "
             SELECT DISTINCT
                 st.sub_desc,
                 so.outline_text,
@@ -510,24 +512,19 @@ class Gateway
                 ON so.sub_code=st.sub_code AND so.cmpy_code=st.cmpy_code
             LEFT JOIN tchsub ts
                 ON st.sub_code = ts.sub_code AND st.cmpy_code = ts.cmpy_code
-            WHERE so.sub_code = :code
-            AND   ts.year_num = :year
-            AND   ts.class    = :class
-            AND   so.cmpy_code = '01'
         ";
-        list(, $code, $class) = explode('-', $subjectCode);
-        $params = array(
-            ':code'  => $code,
-            ':year'  => $year,
-            ':class' => $class,
-        );
-        $allResults = $this->getDatabase()->trimAll(
-            $this->getDatabase()->getAll(strtr($query, $params))
-        );
+
+        $pb = new PredicateBuilder($this->getDatabase(), 'suboutline');
+        $pb = $pb->equals('so.sub_code', $code)
+                 ->equals('ts.year_num', $year)
+                 ->equals('ts.class', $class)
+                 ->equals('so.cmpy_code', '01');
+
+        $query .= " WHERE " . implode(' AND ', $pb->getWhere());
 
         // Reduce to one result
         $result = [];
-        foreach ($allResults as $singleResult) {
+        foreach ($this->getDatabase()->prepareQuery($query, $pb->getPredicates())->executeIterator() as $singleResult) {
             if (empty($result)) {
                 $result = $singleResult;
                 $result['tch_code'] = [];
