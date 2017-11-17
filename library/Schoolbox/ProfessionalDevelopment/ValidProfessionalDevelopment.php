@@ -13,11 +13,6 @@ class ValidProfessionalDevelopment
 {
 
     /**
-     * @var Model
-     */
-    private $pd;
-
-    /**
      * @var array
      */
     private $states;
