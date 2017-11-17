@@ -20,6 +20,7 @@ class Controller extends Base
      */
     public function postUpdate(User $user)
     {
+        /** @var Model $pd */
         try {
             $pd = Mapper::getInstance()->findOneByColumn('user_id', $user->getId());
         }
@@ -28,10 +29,14 @@ class Controller extends Base
             $pd->setUser($user);
         }
 
-        $pd->setNumber($this->getRequest()->post['pdNumber']);
+        $pd->setNumber(preg_replace('/[^a-zA-Z0-9]/', '', $this->getRequest()->post['pdNumber']));
         $pd->setRegistrationState($this->getRequest()->post['pdState']);
 
-        Mapper::getInstance()->save($pd);
+        $validation = new ValidProfessionalDevelopment(Mapper::getInstance()->getStates());
+
+        if ($validation->isSatisfiedBy($pd)) {
+            Mapper::getInstance()->save($pd);
+        }
 
         $this->getResponse()->redirect->to("/search/user/{$user->getId()}");
     }
