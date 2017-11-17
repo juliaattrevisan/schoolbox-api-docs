@@ -2,14 +2,21 @@
 
 <div class="list-item">
     <div class="small-{% if linkedStudent %}6{% else %}12{% endif %} island">
-        <h2 class="subheader">{{ locale.pastoral.proper }} Profile</h2>
+        <h2 class="subheader">
+            {% if linkedStudent %}
+                {{ student.fullName }}
+            {% else %}
+                {{ locale.pastoral.proper }} Profile
+            {% endif %}
+
+        </h2>
     </div>
 </div>
 
 {% if linkedStudent %}
     <div class="list-item">
         <div class="small-6 island">
-            <h2 class="subheader">Linked Student Records</h2>
+            <h2 class="subheader">{{ linkedStudent.fullName }}</h2>
         </div>
     </div>
 
@@ -18,23 +25,25 @@
             {% set routeReportBuilder = routeLookupIfAuthorized('pastoralReportBuilder.getIndex') %}
             {% set routeGetGroups = routeLookupIfAuthorized('pastoralManagement.getGroups') %}
             {% set routeRecordInsert = routeLookupIfAuthorized('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) %}
-            <nav>
-                {% if routeReportBuilder %}<a href="{{ routeReportBuilder }}" class="icon-result" title="{{ locale.pastoral.proper }} Report Builder"></a>{% endif %}
-                {% if routeGetGroups %}<a href="{{ routeGetGroups }}" class="icon-group" title="Manage {{ locale.pastoral.proper }} Groups"></a>{% endif %}
-                {% if linkedStudents | length %}<a href="#" class="icon-link" data-dropdown="linked-students" title="Linked Students"></a>{% endif %}
-                {% if routeRecordInsert %}<a href="{{ routeRecordInsert }}" class="icon-add" title="Add {{ locale.pastoral.proper }} Record"></a>{% endif %}
-            </nav>
-            {% if linkedStudents | length %}
-                <ul class="f-dropdown" data-dropdown-content="" id="linked-students">
-                    <li class="separator">{{ student.firstName }}'s Linked Records</li>
-                    {% for linkedStudent in linkedStudents %}
-                        <li>
-                            <a href="{{ routeLookup('pastoral.getLinked', {studentId: student.id, linkedStudentId: linkedStudent.student_id }) }}" class="icon-user">
-                                {{ linkedStudent.first_name }} {{ linkedStudent.last_name }} ({{ linkedStudent.count }})
-                            </a>
-                        </li>
-                    {% endfor %}
-                </ul>
+            {% if not linkedStudent %}
+                <nav>
+                    {% if routeReportBuilder %}<a href="{{ routeReportBuilder }}" class="icon-result" title="{{ locale.pastoral.proper }} Report Builder"></a>{% endif %}
+                    {% if routeGetGroups %}<a href="{{ routeGetGroups }}" class="icon-group" title="Manage {{ locale.pastoral.proper }} Groups"></a>{% endif %}
+                    {% if linkedStudents | length %}<a href="#" class="icon-link" data-dropdown="linked-students" title="Linked Students"></a>{% endif %}
+                    {% if routeRecordInsert %}<a href="{{ routeRecordInsert }}" class="icon-add" title="Add {{ locale.pastoral.proper }} Record"></a>{% endif %}
+                </nav>
+                {% if linkedStudents | length %}
+                    <ul class="f-dropdown" data-dropdown-content="" id="linked-students">
+                        <li class="separator">{{ student.firstName }}'s Linked Records</li>
+                        {% for linkedStudent in linkedStudents %}
+                            <li>
+                                <a href="{{ routeLookup('pastoral.getLinked', {studentId: student.id, linkedStudentId: linkedStudent.student_id }) }}" class="icon-user">
+                                    {{ linkedStudent.first_name }} {{ linkedStudent.last_name }} ({{ linkedStudent.count }})
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
             {% endif %}
         {% endif %}
     </div>
@@ -81,14 +90,16 @@
                         <dl>
                             {# Display student name #}
 
-                            <dt class="small-12 medium-3">Student Name</dt>
-                            <dd class="small-12 medium-9">
-                                {% if student.deleted %}
-                                    {{ student.fullName }}
-                                {% else %}
-                                    <a href="{{ profile.link(student) }}">{{ student.fullName }}</a>
-                                {% endif %}
-                            </dd>
+                            {% if not linkedStudent %}
+                                <dt class="small-12 medium-3">Student Name</dt>
+                                <dd class="small-12 medium-9">
+                                    {% if student.deleted %}
+                                        {{ student.fullName }}
+                                    {% else %}
+                                        <a href="{{ profile.link(student) }}">{{ student.fullName }}</a>
+                                    {% endif %}
+                                </dd>
+                            {% endif %}
 
                             <dt class="small-12 medium-3">Year Level</dt>
                             <dd class="small-12 medium-9">{{ student.year | default('Unknown') }}</dd>
@@ -123,17 +134,6 @@
                     </div>
                     <div class="small-12 medium-10 columns no-pad">
                         <dl>
-                            {# Display student name #}
-
-                            <dt class="small-12 medium-3">Linked Student</dt>
-                            <dd class="small-12 medium-9">
-                                {% if linkedStudent.deleted %}
-                                    {{ linkedStudent.fullName }}
-                                {% else %}
-                                    <a href="{{ profile.link(linkedStudent) }}">{{ linkedStudent.fullName }}</a>
-                                {% endif %}
-                            </dd>
-
                             <dt class="small-12 medium-3">Year Level</dt>
                             <dd class="small-12 medium-9">{{ linkedStudent.year | default('Unknown') }}</dd>
 

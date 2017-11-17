@@ -7,13 +7,13 @@
 {{ bread.crumbs(
 [ locale.pastoralCare.proper,              routeLookup('pastoral.getIndex') ],
 [ student.fullName,      routeLookup('pastoral.getStudent', {studentId: student.id}) ],
-[ 'Linked Records (' ~ linkedStudent.fullName ~ ')' ]
+[ 'Linked Records' ]
 ) }}
 
 <div class="row">
     <div class="list-item">
         <div class="small-12 column">
-            <h1>{{ student.fullName }} - Linked Records ({{ linkedStudent.fullName }})</h1>
+            <h1>Linked Pastoral Records</h1>
         </div>
     </div>
 </div>
