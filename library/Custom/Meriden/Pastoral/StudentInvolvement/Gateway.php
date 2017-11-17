@@ -392,6 +392,7 @@ class Gateway
         if (!$externalId) {
             return array();
         }
+
         $query  = "
             SELECT
                 studsub.class,
@@ -404,22 +405,18 @@ class Gateway
             INNER JOIN subtab
                 ON subtab.sub_code = studsub.sub_code
                 AND subtab.cmpy_code = studsub.cmpy_code
-            WHERE studsub.stud_code = :externalId
-            AND studsub.yr_study = :year
-            AND subtab.sub_code IN ('9994','9995','9996','9997','9998','9999')
-            AND studsub.cmpy_code = '01'
-            ORDER BY
-                studsub.sub_code ASC,
-                studsub.class ASC
         ";
-        $params = array(
-            ':externalId' => $externalId,
-            ':year'       => $year,
-        );
-        $result = $this->getDatabase()->trimRow(
-            $this->getDatabase()->getRow(strtr($query, $params))
-        );
-        return $result ?: array();
+
+        $pb = new PredicateBuilder($this->getDatabase(), 'studsub');
+        $pb = $pb->equals('studsub.stud_code', $externalId)
+                 ->equals('studsub.yr_study', $year)
+                 ->equals('subtab.sub_code', ['9994','9995','9996','9997','9998','9999'])
+                 ->equals('studsub.cmpy_code', '01');
+
+        $query .= " WHERE " . implode(' AND ', $pb->getWhere())
+                . " ORDER BY studsub.sub_code ASC, studsub.class ASC";
+
+        return $this->getDatabase()->prepareQuery($query, $pb->getPredicates())->fetchAll();
     }
 
     /**
