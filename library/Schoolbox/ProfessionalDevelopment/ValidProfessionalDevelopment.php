@@ -35,6 +35,7 @@ class ValidProfessionalDevelopment
 
     /**
      * Conditions that determine a valid Professional Development number
+     * Alphanumerics only; all other characters are removed
      *
      * @param $pdNumber
      * @return bool
