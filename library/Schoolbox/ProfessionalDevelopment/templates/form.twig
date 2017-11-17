@@ -3,34 +3,32 @@
 
     {% if pdUpdateRoute %}
         <form action="{{ pdUpdateRoute }}" method="post">
-            <fieldset>
-                <section class="content">
-                    <div class="small-12 medium-8 columns">
-                        <label>Professional Development Number</label>
-                        <input type="text" name="pdNumber" value="{{ pd.number }}" />
-                    </div>
-                    <div class="small-12 medium-4 columns">
-                        <label>Registration State</label>
-                        <select name="pdState">
-                            <option value="" disabled="disabled">Please Select</option>
+            <section class="content">
+                <div class="small-12 medium-8 columns">
+                    <label>Professional Development Number</label>
+                    <input type="text" name="pdNumber" value="{{ pd.number }}" />
+                </div>
+                <div class="small-12 medium-4 columns">
+                    <label>Registration State</label>
+                    <select name="pdState">
+                        <option value="" disabled="disabled">Please Select</option>
 
-                            {% for state in pdStates %}
-                                {% if state == pd.registrationState %}
-                                    {% set selected = ' selected="selected"' %}
-                                {% else %}
-                                    {% set selected = '' %}
-                                {% endif %}
+                        {% for state in pdStates %}
+                            {% if state == pd.registrationState %}
+                                {% set selected = ' selected="selected"' %}
+                            {% else %}
+                                {% set selected = '' %}
+                            {% endif %}
 
-                                <option value="{{ state }}"{{ selected }}>{{ state }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
+                            <option value="{{ state }}"{{ selected }}>{{ state }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-                    <div class="small-12 columns">
-                        <input type="submit" value="Update Professional Development details" />
-                    </div>
-                </section>
-            </fieldset>
+                <div class="small-12 columns">
+                    <input type="submit" value="Update Professional Development details" />
+                </div>
+            </section>
         </form>
     {% endif %}
 {% endif %}
