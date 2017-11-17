@@ -44,10 +44,6 @@ class Gateway
             return array();
         }
 
-        $pb = new PredicateBuilder($this->getDatabase(), 'studabsent');
-        $pb = $pb->equals('stud_code', $externalId)
-                 ->between('absent_date', $year . '-01-01', $year . '-12-31');
-
         $query = "
             SELECT
                 studabsent.stud_code,
@@ -56,6 +52,10 @@ class Gateway
                 studabsent.reas_code
             FROM studabsent
         ";
+
+        $pb = new PredicateBuilder($this->getDatabase(), 'studabsent');
+        $pb = $pb->equals('stud_code', $externalId)
+                 ->between('absent_date', $year . '-01-01', $year . '-12-31');
 
         if (!empty($absenceTypes)) {
             $pb = $pb->equals('absent_type', $absenceTypes);
