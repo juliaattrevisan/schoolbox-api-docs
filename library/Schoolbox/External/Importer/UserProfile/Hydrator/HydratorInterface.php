@@ -21,6 +21,7 @@ interface HydratorInterface
      *
      * @param  array            $row  The row from the CSV file
      * @param  UserProfileModel $user The user profile object to update
+     * @throws \UnexpectedValueException
      * @return UserProfileModel An updated user profile object
      */
     public function hydrate($row, UserProfileModel $user);

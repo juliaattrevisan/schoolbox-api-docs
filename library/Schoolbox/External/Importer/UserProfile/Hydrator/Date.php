@@ -13,6 +13,8 @@
 namespace Schoolbox\External\Importer\UserProfile\Hydrator;
 
 use Schoolbox\External\UserProfile as UserProfileModel;
+use Alaress_Date_Format;
+use Alaress_Date_NullDate;
 
 /**
  * Sets a field in the user based on the value of a key in the imported row,
@@ -22,6 +24,7 @@ use Schoolbox\External\UserProfile as UserProfileModel;
  */
 class Date implements HydratorInterface
 {
+
     /**
      * The key in $row to set the value in the user to.
      *
@@ -46,10 +49,12 @@ class Date implements HydratorInterface
     {
         $this->fieldname = $fieldname;
         $this->setMethod = $setMethod;
+
     }
 
     /**
      * @inheritdoc
+     * @throws \UnexpectedValueException
      */
     public function hydrate($row, UserProfileModel $user)
     {
@@ -57,11 +62,27 @@ class Date implements HydratorInterface
          * Assume null data
          */
         if (!strlen(trim($row[$this->fieldname]))) {
-            return call_user_func([$user, $this->setMethod], new \Alaress_Date_NullDate());
+            return call_user_func([$user, $this->setMethod], new Alaress_Date_NullDate());
         }
 
         /* Date has been provided
          */
-        return call_user_func([$user, $this->setMethod], $row[$this->fieldname]);
+
+        $date = null;
+        try {
+            $date = new Alaress_Date_Format(
+                $row[$this->fieldname],
+                [Alaress_Date_Format::DATABASE_DATE_FORMAT]
+            );
+
+        } catch (\InvalidArgumentException $e) {
+
+        }
+
+        if (!($date instanceof Alaress_Date_Format && $date->isValid())) {
+            throw new \UnexpectedValueException('"Date of Birth" must be a date in YYYY-MM-DD format: skipping the value');
+        }
+
+        return call_user_func([$user, 'setDob'], $date);
     }
 }

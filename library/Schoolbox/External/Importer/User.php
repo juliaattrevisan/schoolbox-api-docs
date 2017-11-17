@@ -15,7 +15,6 @@ use HouseResidential as HouseResidentialModel;
 use Schoolbox\Campus as CampusModel;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
-use Schoolbox\External\Importer\User\Result;
 use Schoolbox\External\UserProfile as UserProfileModel;
 use Schoolbox\External\UserProfileMapper;
 use Schoolbox\External\UserRelation as UserRelationModel;
@@ -441,7 +440,13 @@ class User extends AbstractImporter
     protected function hydrateUserProfile($row, UserProfileModel $userProfile)
     {
         foreach ($this->userProfileHydrators as $hydrator) {
-            $userProfile = $hydrator->hydrate($row, $userProfile);
+            try {
+                $userProfile = $hydrator->hydrate($row, $userProfile);
+            }
+            catch (\UnexpectedValueException $e) {
+                $this->log->warning($e->getMessage());
+                continue;
+            }
         }
         return $userProfile;
     }
