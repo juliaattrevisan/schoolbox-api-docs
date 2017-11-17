@@ -49,6 +49,7 @@ class ValidProfessionalDevelopment
 
     /**
      * Conditions that determine a valid Professional Development registration state
+     * Must be one of the $states provided in constructor
      *
      * @param $state
      * @return bool
@@ -77,6 +78,8 @@ class ValidProfessionalDevelopment
             return $this->isValidNumber($number) && $this->isValidRegistrationState($state);
         }
         catch (\Throwable $e) {
+
+            // In case it came out of the db as null etc.
             return false;
         }
     }
