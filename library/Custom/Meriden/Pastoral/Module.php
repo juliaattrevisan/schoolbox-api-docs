@@ -93,9 +93,9 @@ class Module extends BaseModule
                 } catch (\Exception $e) {
                     // noop - the controller will die at this point anyway
                 }
-                return array(
+                return [
                     'student' => $student,
-                );
+                ];
             }
         );
     }
