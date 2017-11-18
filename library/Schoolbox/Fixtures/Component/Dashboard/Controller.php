@@ -10,8 +10,9 @@ namespace Schoolbox\Fixtures\Component\Dashboard;
 use Alaress\Session\Session;
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
+use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Fixtures\Component\ComponentDelegate as ComponentDelegate;
+use Schoolbox\Fixtures\Component\ComponentDelegate;
 use Schoolbox\User;
 use SitePage;
 
@@ -33,7 +34,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
         parent::__construct($instance, $user, $sitepage);
-        $this->setDelegate(new ComponentDelegate());
+        $this->setDelegate(new ComponentDelegate($sitepage->getDi()->get('databaseInternal')));
     }
 
     /**
@@ -50,7 +51,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-        $playerIds = [];
+        $matches = new Collection();
         $getHistorical = false;
 
         // Grab the relevant data depending on role type
@@ -60,13 +61,12 @@ class Controller extends Component_Dashboard_ControllerAbstract
             $session  = $this->getSitePage()->getDi()->get('session');
             $children = $session->get('children') ?: [];
             foreach ($children as $child) {
-                $playerIds[] = $child['id'];
+                $matches = $matches->mergeUnique($this->getDelegate()->getMatchesForUser($child['id'], $getHistorical),'id');
             }
         } else {
-            $playerIds[] = $this->getUser()->getId();
+            $matches = $this->getDelegate()->getMatchesForUser($this->getUser()->getId(), $getHistorical);
         }
 
-        $matches = $this->getDelegate()->getMatchesForUsers($playerIds, $getHistorical);
 
         if (0 == count($matches)) {
             return false;

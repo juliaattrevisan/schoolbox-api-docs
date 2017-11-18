@@ -13,6 +13,7 @@
 
 namespace Schoolbox\Fixtures\Component;
 
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\Fixtures\Team\Mapper as TeamMapper;
@@ -53,10 +54,19 @@ class ComponentDelegate
     protected $resultMapper;
 
     /**
-     * Delegate constructor.
+     * @var IConnector
      */
-    public function __construct()
+    protected $database;
+
+    /**
+     * Delegate constructor.
+     *
+     * @var IConnector $database
+     */
+    public function __construct(IConnector $database)
     {
+        $this->database = $database;
+
         $this
             ->setTeamMapper(TeamMapper::getInstance())
             ->setTeamPlayerMapper(TeamPlayerMapper::getInstance())
@@ -69,83 +79,48 @@ class ComponentDelegate
     /**
      * Gets a collection of matches with only relevant teams and players attached, sorted by 'startAt'
      *
-     * @param int[] $userIds
+     * @param int $userId
      * @param bool  $includeHistorical Whether to return matches in the past
      * @return Collection|Match[]
      */
-    public function getMatchesForUsers(array $userIds, $includeHistorical)
+    public function getMatchesForUser($userId, $includeHistorical)
     {
-        /** @var Collection|Match[] $teams */
-        $matches = new Collection();
 
-        if (!count($userIds)) {
-            return $matches;
+        $query = 'SELECT sportsfixtures_match.id FROM sportsfixtures_match
+                  LEFT JOIN sportsfixtures_team_participantcoach 
+                    ON sportsfixtures_match.id = sportsfixtures_team_participantcoach.match_id 
+                    AND sportsfixtures_team_participantcoach.user_id = :userId
+                  LEFT JOIN sportsfixtures_team_participantuser 
+                    ON sportsfixtures_team_participantuser.match_id = sportsfixtures_match.id 
+                    AND sportsfixtures_team_participantuser.user_id = :userId
+                  LEFT JOIN sportsfixtures_team awayTeam ON sportsfixtures_match.away_team_id = awayTeam.id
+                  LEFT JOIN sportsfixtures_team homeTeam ON sportsfixtures_match.home_team_id = homeTeam.id
+                  LEFT JOIN sportsfixtures_team_coach 
+                    ON (sportsfixtures_team_coach.team_id = awayTeam.id OR sportsfixtures_team_coach.team_id = homeTeam.id) 
+                    AND sportsfixtures_team_coach.coach_id = :userId 
+                  LEFT JOIN sportsfixtures_team_user 
+                    ON (sportsfixtures_team_user.team_id = awayTeam.id OR sportsfixtures_team_user.team_id = homeTeam.id) 
+                    AND sportsfixtures_team_user.user_id = :userId 
+                  WHERE
+                    (sportsfixtures_team_participantcoach.user_id = :userId
+                    OR  sportsfixtures_team_participantuser.user_id = :userId
+                    OR sportsfixtures_team_coach.coach_id = :userId
+                    OR sportsfixtures_team_user.user_id = :userId)';
+
+
+        if (!$includeHistorical) {
+            $query .= ' AND DATE(sportsfixtures_match.start_at) > DATE(NOW())';
+        }
+        $query .= ' ORDER BY sportsfixtures_match.start_at DESC';
+
+        $statement = $this->database->prepareQuery($query);
+        if ( $statement->execute(array(':userId'=>$userId)) ) {
+            $result = $statement->fetchAll(\PDO::FETCH_COLUMN, 0);
+            return $this->getMatchMapper()->findByColumn('id', $result);
         }
 
-        // Get all teams the users are currently in
+        return new Collection();
 
-        /** @var Collection|TeamPlayer[] $teamPlayers */
-        $teamPlayers = $this->getTeamPlayerMapper()->findByColumn('user_id', $userIds);
-
-
-        // Uniquify the teams, and ensure relevant players are in team player lists
-
-        /** @var Collection|Team[] $teams */
-        $teams = new Collection();
-        foreach ($teamPlayers as $teamPlayer) {
-            $team = $teamPlayer->getTeam();
-            // Don't clobber teams
-            if (!$teams[$team->getId()]) {
-                $teams[$team->getId()] = $team;
-            }
-            // Add player to team, but prevent duplicates by inserting at collection index
-            $teams[$team->getId()]->getPlayers()[$teamPlayer->getUser()->getId()] = $teamPlayer->getUser();
-        }
-
-        // Are we interested in matches in the past ?
-        if ($includeHistorical) {
-            // Get all teams that the users played in
-            $teamParticipants = $this->getTeamParticipantMapper()->findByColumn('user_id', $userIds);
-            foreach ($teamParticipants as $teamParticipant) {
-                $team = $teamParticipant->getTeam();
-                if (!$teams[$team->getId()]) {
-                    $teams[$team->getId()] = $team;
-                }
-                // Add player to team, but prevent duplicates by inserting at collection index
-                $teams[$team->getId()]->getPlayers()[$teamParticipant->getUser()->getId()] = $teamParticipant->getUser();
-            }
-        }
-
-        // Get all matches which involved these teams
-        $home_matches = $this->getMatchMapper()->findByColumn('home_team_id', $teams->keys());
-        $away_matches = $this->getMatchMapper()->findByColumn('away_team_id', $teams->keys());
-
-        /** @var Collection|Match[] $all_matches */
-        $all_matches = $home_matches->mergeUnique($away_matches, 'id');
-
-        // Filter matches, and link teams which now contain relevant players
-        foreach ($all_matches as $match) {
-            $matchDay = clone $match->getStartAt();
-            $matchDay->endOfDay();
-
-            if ($includeHistorical || $matchDay->isFuture()) {
-                $matches[$match->getId()] = $match;
-            } else {
-                continue;
-            }
-
-            // Can we link a home team ?
-            if ($match->getHomeTeam() && $teams[$match->getHomeTeam()->getId()]) {
-                $match->setHomeTeam($teams[$match->getHomeTeam()->getId()]);
-            }
-
-            // Can we link an away team ?
-            if ($match->getAwayTeam() && $teams[$match->getAwayTeam()->getId()]) {
-                $match->setAwayTeam($teams[$match->getAwayTeam()->getId()]);
-            }
-        }
-
-        return $this->sortMatches($matches);
     }
 
 
