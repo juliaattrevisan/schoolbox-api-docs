@@ -11,7 +11,6 @@ use Alaress\Session\Session;
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
 use Schoolbox\Collection;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Fixtures\Component\ComponentDelegate;
 use Schoolbox\User;
 use SitePage;

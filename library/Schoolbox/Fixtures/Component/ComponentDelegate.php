@@ -18,12 +18,10 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\Fixtures\Team\Mapper as TeamMapper;
 use \Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
-use \Schoolbox\Fixtures\Team\Player\Model as TeamPlayer;
 use \Schoolbox\Fixtures\Match\Model as Match;
 use \Schoolbox\Fixtures\Match\Mapper as MatchMapper;
 use \Schoolbox\Fixtures\Result\Model as Result;
 use \Schoolbox\Fixtures\Result\Mapper as ResultMapper;
-use Schoolbox\Fixtures\Team\Model as Team;
 use Schoolbox\Fixtures\Team\Player\Participant\Mapper as TeamParticipantMapper;
 
 class ComponentDelegate
