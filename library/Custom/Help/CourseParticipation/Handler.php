@@ -62,6 +62,11 @@ class Handler
      */
     private $portraitDir;
 
+    /**
+     * @var ProfessionalDevelopment\Mapper
+     */
+    private $pdMapper;
+
 
     /**
      * @param UserAccessMapper               $userAccessMapper
