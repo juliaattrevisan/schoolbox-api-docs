@@ -73,7 +73,7 @@ class Model implements ISoftDeletable
      * @param string $number
      * @return $this
      */
-    public function setNumber(string $number)
+    public function setNumber(?string $number)
     {
         $this->number = $number;
         return $this;
@@ -93,7 +93,7 @@ class Model implements ISoftDeletable
      * @param string $registrationState
      * @return $this
      */
-    public function setRegistrationState(string $registrationState)
+    public function setRegistrationState(?string $registrationState)
     {
         $this->registrationState = $registrationState;
         return $this;
