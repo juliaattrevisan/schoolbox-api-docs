@@ -19,6 +19,9 @@
                 element.find('[data-itinerary-date]')
                     .attr('id', 'itineraryDate-new-' + String(Date.now()))
                     .alaressDateTimePicker();
+                $('input[name="itinerary[date][]"]').rules("add", {
+                    datepickerDate: true
+                });
             }
         });
     });
