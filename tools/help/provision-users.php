@@ -187,8 +187,10 @@ $kernel->run(new class extends App {
                 if ($r) {
                     $log->warning("Received client error: {$r->getStatusCode()} {$r->getReasonPhrase()}");
 
+                    $responseBody = $r->getBody()->getContents();
+
                     /** @var array $failedUsers */
-                    $failedUsers = json_decode($r->getBody()->getContents(), true);
+                    $failedUsers = json_decode($responseBody, true);
 
                     if (is_array($failedUsers)) {
                         foreach ($failedUsers as [$reason, $payload]) {
@@ -197,7 +199,7 @@ $kernel->run(new class extends App {
                         }
                     } else {
                         // not an array: just dump the response body
-                        $log->warning($r->getBody()->getContents());
+                        $log->warning($responseBody);
                     }
 
                 } else {
