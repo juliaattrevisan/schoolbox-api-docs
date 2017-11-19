@@ -614,7 +614,7 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * @param boolean $useRubric
+     * @param boolean $selfAssessable
      * @return static
      */
     public function setSelfAssessable($selfAssessable)
