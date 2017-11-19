@@ -165,8 +165,8 @@ $kernel->run(new class extends App {
                 try {
                     $pd = ProfessionalDevelopment\Mapper::getInstance()->findOneByColumn('user_id', $user->getId());
 
-                    $userData['pdNumber'] = $pd->getNumber();
-                    $userData['pdState'] = $pd->getRegistrationState();
+                    $userData[$user->getId()]['pdNumber'] = $pd->getNumber();
+                    $userData[$user->getId()]['pdState'] = $pd->getRegistrationState();
                 }
                 catch (\Schoolbox\Mapper\Exception $e) {
                     // noop (no data exists)
