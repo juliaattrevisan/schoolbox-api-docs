@@ -98,11 +98,11 @@ $kernel->run(new class extends App {
 
         $this->router = $di->get('router');
 
-        /** @noinspection PhpParamsInspection */
         $this->handler = new Handler(
             $mapFactory->get(UserAccessMapper::class),
             $mapFactory->get(Schoolbox\Permission\SiteAccess\Mapper::class),
             $mapFactory->get(Schoolbox\Resource\Folder\Mapper::class),
+            $mapFactory->get(ProfessionalDevelopment\Mapper::class),
             new Schoolbox\User\Password\MailService(
                 $config,
                 $mapFactory->get(Schoolbox\User\Password\Reset\Mapper::class),
