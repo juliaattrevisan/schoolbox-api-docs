@@ -2,5 +2,7 @@
 
 {% block buttons %}
     {{ parent() }}
+    {% if isParentOfStudent %}
     <li><a class="icon-result" href="/modules/remote/aHR0cDovLzUyLjY1LjI2LjQ2L2FwcGEvcmVwb3J0cw==/window">Results</a></li>
+    {% endif %}
 {% endblock buttons %}
