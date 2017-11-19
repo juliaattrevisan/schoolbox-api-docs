@@ -96,13 +96,16 @@ class Controller extends Base
         }
 
         // Use the student ids to grab an array of parent emails and add it to $parentEmails
-        $parentEmails += $this->getExternalHandler()->getParentEmails($studentIds);
+        $parentEmails = $this->getExternalHandler()->getParentEmails($studentIds);
 
         // Reset the array with no keys (getParentEmails() returns student ids as array keys)
         $parentEmails = array_values($parentEmails);
 
         // Dedupe emails
         $parentEmails = array_unique($parentEmails);
+
+        // Reset the array with no keys again https://stackoverflow.com/questions/17876414/json-encode-after-array-unique-returning-associative-array
+        $parentEmails = array_values($parentEmails);
 
         // Return a json encoded array :)
         $this->getResponse()->content->set($this->buildJsonOutput($parentEmails));
