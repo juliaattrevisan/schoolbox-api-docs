@@ -8,15 +8,13 @@
 namespace Schoolbox\Learning\Assessment\Exporter;
 
 use Alaress\Web\Controller\Base as BaseController;
-use Schoolbox\File\Exception;
 use Schoolbox\Filter\BrokenFilterException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Replicator;
@@ -41,7 +39,7 @@ class Controller extends BaseController
     protected $assessmentDataSource;
 
     /**
-     * @var UnitImplementationMapper
+     * @var UnitImplementation\Mapper
      */
     private $unitImplementationMapper;
 
@@ -57,14 +55,14 @@ class Controller extends BaseController
      *
      * @param Access                    $access
      * @param AssessmentDataSource      $assessmentDataSource
-     * @param UnitImplementationMapper  $unitImplementationMapper
+     * @param UnitImplementation\Mapper $unitImplementationMapper
      * @param Replicator                $replicator
      * @param AssessmentFilter\IdFinder $assessmentIdFinder
      */
     public function __construct(
         Access $access,
         AssessmentDataSource $assessmentDataSource,
-        UnitImplementationMapper $unitImplementationMapper,
+        UnitImplementation\Mapper $unitImplementationMapper,
         Replicator $replicator,
         AssessmentFilter\IdFinder $assessmentIdFinder
     ) {
@@ -98,10 +96,10 @@ class Controller extends BaseController
     {
         $assessmentImpls = $this->buildImplementationsForSpecification($assessmentSpec);
 
-        $notImported = $assessmentImpls->filter(function(IAssessable $assessmentImpl){
+        $notImported = $assessmentImpls->filter(function (IAssessable $assessmentImpl) {
             return null === $assessmentImpl->getId();
         });
-        $imported    = $assessmentImpls->filter(function(IAssessable $assessmentImpl){
+        $imported    = $assessmentImpls->filter(function (IAssessable $assessmentImpl) {
             return $assessmentImpl->getId();
         });
 
@@ -112,13 +110,13 @@ class Controller extends BaseController
         }
 
         $data = [
-            'assessmentSpec'        => $assessmentSpec,
-            'returnUrl'             => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
-            'returnUrlName'         => Redirect::RETURN_URL,
-            'unImported'            => $notImported,
-            'imported'              => $imported,
-            'folderWritePerms'      => $this->buildFolderWritePermissions($assessmentImpls),
-            'enableReimport'        => (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled'),
+            'assessmentSpec'   => $assessmentSpec,
+            'returnUrl'        => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),
+            'returnUrlName'    => Redirect::RETURN_URL,
+            'unImported'       => $notImported,
+            'imported'         => $imported,
+            'folderWritePerms' => $this->buildFolderWritePermissions($assessmentImpls),
+            'enableReimport'   => (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled'),
         ];
 
         $template = '@learningAssessmentExporter/export.twig';
@@ -130,7 +128,7 @@ class Controller extends BaseController
      * Determine whether the current user has WRITE+ perm to the assessments' folders.
      *
      * @param IAssessable[]|GenericCollection $assessmentImpls
-     * @return bool[]
+     * @return bool[] Indexed by folder.id
      */
     private function buildFolderWritePermissions(GenericCollection $assessmentImpls): array
     {
@@ -160,54 +158,72 @@ class Controller extends BaseController
      * @internal param int[] $_POST ['unitImplementation']   unit implementations to push this into.
      *                                           key:   unit implementation id
      *                                           value: true/false
+     * @internal param string[][] $_GET ['dates']            by unitImpl.id, then ['publish', 'open', 'due', 'close']
      */
     public function postExport(IAssessable $assessmentSpec)
     {
         $importedImplementations     = $this->getRequest()->post->get('unitImplementation', []);
         $importedImplementationDates = $this->getRequest()->post->get('unit', []);
+        $assessmentImpls             = $this->buildImplementationsForSpecification($assessmentSpec);
+        $folderWritePerms            = $this->buildFolderWritePermissions($assessmentImpls);
 
-        foreach ($this->buildImplementationsForSpecification($assessmentSpec) as $unitImplData) {
-            /** @var UnitImplementation $unitImpl */
-            $unitImpl = $unitImplData['unit'];
+        // Check all permissions before making any changes to system
+        $errors = [];
+        foreach ($assessmentImpls as $assessmentImpl) {
+            $folderId = $assessmentImpl->getContext()->getFolder()->getId();
+            if (!$folderWritePerms[$folderId]) {
+                $errors[$folderId] = true;
+            }
+        }
+        if (\count($errors)) {
+            $folderIds = '[' . implode(',', array_keys($errors)) . ']';
+            $this->sendError(
+                "You do not have permission to write to the selected classes: $folderIds",
+                [],
+                403
+            );
+            return;
+        }
 
-            if (!empty($importedImplementations[$unitImpl->getId()])) {
+        $enableReimport    = (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled');
+        $expectedDateTypes = ['publish', 'open', 'due', 'close'];
+        foreach ($assessmentImpls as $assessmentImpl) {
+            /** @var UnitImplementation\Model $unitImpl */
+            $unitImpl = $assessmentImpl->getBaseContext();
 
-                if ($unitImplData['imported']) {
-                    // This has already been exported between now and when the request was made.
-                    // That is probably fine to ignore
+            // Was unitImport not selected in form?
+            if (empty($importedImplementations[$unitImpl->getId()])) {
+                continue;
+            }
+
+            // Does the assessment already exist in the unit import?
+            if ($assessmentImpl->getId()) {
+                // Does the system permit destructive re-export?
+                if ($enableReimport) {
+                    $this->assessmentDataSource->delete($assessmentImpl);
+                } else {
                     continue;
                 }
-
-                if (!$unitImplData['allowed']) {
-                    // banhammer
-                    $this->sendError('You do not have permission to write to the selected class', [], 403);
-
-                    return;
-                }
-
-                $dates             = $importedImplementationDates[$unitImpl->getId()];
-                $expectedDateTypes = ['publish', 'open', 'due', 'close'];
-                $datesObjects      = [];
-
-                if (\is_array($dates)) {
-                    foreach ($expectedDateTypes as $dateType) {
-                        try {
-                            $datesObjects[$dateType] = Alaress_Date_Format::newLocal($dates[$dateType]);
-                        } catch (Exception $e) {
-                            // banhammer
-                        }
-                    }
-                }
-
-                $this->exportToNewContext(
-                    $assessmentSpec,
-                    $unitImpl,
-                    $datesObjects['publish'],
-                    $datesObjects['open'],
-                    $datesObjects['due'],
-                    $datesObjects['close']
-                );
             }
+
+            $dates        = $importedImplementationDates[$unitImpl->getId()];
+            $datesObjects = [];
+
+            foreach ($expectedDateTypes as $dateType) {
+                if (!array_key_exists($dateType, $dates)) {
+                    continue;
+                }
+                $datesObjects[$dateType] = Alaress_Date_Format::newLocal($dates[$dateType]);
+            }
+
+            $this->exportToNewContext(
+                $assessmentSpec,
+                $unitImpl,
+                $datesObjects['publish'],
+                $datesObjects['open'] ?? $datesObjects['publish'],
+                $datesObjects['due'],
+                $datesObjects['close'] ?? $datesObjects['due']
+            );
         }
 
         // Decode the return URL, if it was set
@@ -254,7 +270,7 @@ class Controller extends BaseController
         Alaress_Date_Format $closeDate = null
     ): IAssessable {
 
-        if ($context instanceof UnitImplementation) {
+        if ($context instanceof UnitImplementation\Model) {
             $publishDate = $publishDate ?? $context->getOpenDate();
             $openDate    = $openDate ?? $context->getOpenDate();
             $dueDate     = $dueDate ?? $context->getDueDate();
