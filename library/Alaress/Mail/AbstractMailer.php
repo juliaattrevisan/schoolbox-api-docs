@@ -176,7 +176,7 @@ abstract class AbstractMailer implements IMailer {
 			$attachment = Swift_Attachment::fromPath($file, $type);
 		}
 		else {
-			$attachment = Swift_Attachment::newInstance($file, null, $type);
+			$attachment = new Swift_Attachment($file, null, $type);
 		}
 		if ($filename) {
 			$attachment->setFilename($filename);
