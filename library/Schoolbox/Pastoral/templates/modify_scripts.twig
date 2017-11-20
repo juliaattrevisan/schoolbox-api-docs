@@ -86,15 +86,12 @@
             messages: {
                 'heading': {required: 'You must enter a title before you can proceed'}
             },
-        });
 
-        {# Disable Save Button To Prevent Multiple Saves #}
+            submitHandler: function () {
+                var button = $("[data-submit]");
+                button.val('Saving, Please Wait');
+                button.attr('disabled', 'true');
 
-        $('[data-submit]').click(function (e) {
-            e.preventDefault();
-            if (form.valid()) {
-                $(this).attr('disabled', 'true');
-                $(this).val('Saving, Please Wait');
                 form.submit();
             }
         });
