@@ -37,13 +37,7 @@ class ValidProfessionalDevelopment
      */
     private function isValidNumber($pdNumber)
     {
-        $isValid = preg_match('/^[a-zA-Z0-9]+$/', $pdNumber);
-
-        if ($isValid) {
-            return true;
-        }
-
-        return false;
+        return preg_match('/^[a-zA-Z0-9]+$/', $pdNumber);
     }
 
 
