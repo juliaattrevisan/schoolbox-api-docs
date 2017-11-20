@@ -36,8 +36,20 @@ class External_Pcschools_Class implements External_ClassInterface
      *
      * @return array
      */
-    public function getStudents($classCode)
+    public function getStudents($classCodes)
     {
+        $first = true;
+        $query= "";
+
+        foreach(explode(',', $classCodes) as $code) {
+            if($first) {
+                $query .= $this->getTimefileFilter($code);
+                $first = false;
+            } else {
+                $query .= " OR ".$this->getTimefileFilter($code);
+            }
+        }
+
         return $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll("
                 SELECT DISTINCT
@@ -57,7 +69,7 @@ class External_Pcschools_Class implements External_ClassInterface
                     AND tf.TIME_PERIOD = su.PERIOD_ID
                 INNER JOIN SUBJECT s  ON tf.SUBJECT = s.NO
                 INNER JOIN STUDENT st ON su.STUDKEY = st.STUDKEY
-                WHERE {$this->getTimefileFilter($classCode)}
+                WHERE $query;
             ")
         );
     }
