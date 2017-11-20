@@ -102,7 +102,7 @@ class Javascript extends Base
                 $reviewHref .= '?date=' . urlencode($relatedBooking->getEvent()->getStartDateTime()->getURLDate());
             }
             $relatedBookings[] = [
-                'title'  => \Scrub::text($relatedBooking->getResource()->getName()),
+                'title'  => $relatedBooking->getResource()->getName(),
                 'item'   => array(
                     'id'   => $relatedBooking->getResource()->getId(),
                     'name' => $relatedBooking->getResource()->getName(),
