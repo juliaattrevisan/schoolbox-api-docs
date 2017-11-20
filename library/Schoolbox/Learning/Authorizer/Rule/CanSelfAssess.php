@@ -40,7 +40,7 @@ class CanSelfAssess implements IAuthorizationRule
      *                       that no user is logged in.
      *
      * @throws InvalidArgumentException If unable to locate a Participant instance in $params, or assessment is not a due work or task
-     * @throws Unauthorized If assessment is not self-assessable, or user is not the participant
+     * @throws Unauthorized If assessment is not self-assessable, there's no response, or user is not the participant
      * @return bool
      */
     public function authorize(array $params = [], User $user = null)
@@ -61,7 +61,12 @@ class CanSelfAssess implements IAuthorizationRule
 
         // Error out if assessment is not self-assessable
         if (!$assessment->isSelfAssessable()) {
-            throw new Unauthorized('', ErrorMapper::ERROR_ASSESSMENT_NO_SELF_ASSESS);
+            throw new Unauthorized('', ErrorMapper::ERROR_NO_SELF_ASSESS);
+        }
+
+        // Error out if participant has no responses
+        if (!$participant->hasSubmittedResponse()) {
+            throw new Unauthorized('', ErrorMapper::ERROR_COMPLETE_BEFORE_SELF_ASSESS);
         }
 
         // Check logged in user is the participant
