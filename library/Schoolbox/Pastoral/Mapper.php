@@ -259,7 +259,7 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Return any records immediately related to the supplied pastoral record
+     * Returns a collection containing all records related to the supplied pastoral record (including itself)
      *
      * @param Model $record
      *
