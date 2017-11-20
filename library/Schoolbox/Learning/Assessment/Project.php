@@ -522,6 +522,43 @@ class Project extends AbstractAssessment implements AssessmentContext
         return true;
     }
 
+
+    /**
+     * Returns the number of responses submitted to this assessment.
+     *
+     * (includes sub-assessment counts for projects)
+     *
+     * @param bool $includeDrafts
+     * @return int
+     */
+    public function getCountResponses(bool $includeDrafts = false): int
+    {
+        $count = 0;
+        foreach ($this->assessables as $assessable) {
+            $count += $assessable->getCountResponses($includeDrafts);
+        }
+        return $count;
+    }
+
+
+    /**
+     * Returns the number of feedbacks given on this assessment
+     *
+     * (includes sub-assessment counts for projects)
+     *
+     * @param bool $includeDrafts
+     * @return int
+     */
+    public function getCountFeedbacks(bool $includeDrafts = false): int
+    {
+        $count = 0;
+        foreach ($this->assessables as $assessable) {
+            $count += $assessable->getCountFeedbacks($includeDrafts);
+        }
+        return $count;
+    }
+
+
     /**
      * Clones this object in preparation for persisting as a copy of this object.
      *

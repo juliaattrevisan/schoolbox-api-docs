@@ -105,6 +105,12 @@ class Controller extends BaseController
             return $assessmentImpl->getId();
         });
 
+        // Load participants into imported assessments
+        $imported = $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($imported);
+        foreach ($imported as $importedAssessment) {
+            $this->assessmentDataSource->copyParticipantInteractionsToAssessment($importedAssessment);
+        }
+
         $data = [
             'assessmentSpec'        => $assessmentSpec,
             'returnUrl'             => $this->getRequest()->query->get(Redirect::RETURN_URL, ''),

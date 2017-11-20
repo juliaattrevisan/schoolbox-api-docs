@@ -120,7 +120,7 @@ abstract class AbstractAssessment implements IAssessable
     private $responses;
 
     /**
-     * @var Collection|IFeedback
+     * @var Collection|IFeedback[]
      */
     private $feedbacks;
 
@@ -476,6 +476,54 @@ abstract class AbstractAssessment implements IAssessable
             default:
                 return $role->isStaff();
         }
+    }
+
+
+    /**
+     * Returns the number of responses submitted to this assessment.
+     *
+     * (includes sub-assessment counts for projects)
+     *
+     * @param bool $includeDrafts
+     * @return int
+     */
+    public function getCountResponses(bool $includeDrafts = false): int
+    {
+        // Short-circuit if not excluding drafts
+        if ($includeDrafts) {
+            return $this->responses->count();
+        }
+        $count = 0;
+        foreach ($this->responses as $response) {
+            if ($response->isSubmitted()) {
+                $count++;
+            }
+        }
+        return $count;
+    }
+
+
+    /**
+     * Returns the number of feedbacks given on this assessment
+     *
+     * (includes sub-assessment counts for projects)
+     *
+     * @param bool $includeDrafts
+     * @return int
+     */
+    public function getCountFeedbacks(bool $includeDrafts = false): int
+    {
+        // Short-circuit if not excluding drafts
+        if ($includeDrafts) {
+            return $this->feedbacks->count();
+        }
+        $count = 0;
+        foreach ($this->feedbacks as $feedback) {
+            if ($feedback->isPublished()) {
+                $count++;
+            }
+        }
+        return $count;
     }
 
 

@@ -385,6 +385,28 @@ interface IAssessable extends ISoftDeletable
      */
     public function isFeedbackVisibleToUser(User $viewingUser);
 
+
+    /**
+     * Returns the number of responses submitted to this assessment.
+     *
+     * (includes sub-assessment counts for projects)
+     *
+     * @param bool $includeDrafts
+     * @return int
+     */
+    public function getCountResponses(bool $includeDrafts = false): int;
+
+
+    /**
+     * Returns the number of feedbacks given on this assessment
+     *
+     * (includes sub-assessment counts for projects)
+     *
+     * @param bool $includeDrafts
+     * @return int
+     */
+    public function getCountFeedbacks(bool $includeDrafts = false): int;
+
     /* Getters/Setters
      */
 

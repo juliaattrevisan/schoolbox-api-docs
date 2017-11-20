@@ -969,6 +969,35 @@ class MapperProxy
         return $collection;
     }
 
+
+    /**
+     * Copies all participant interactions to the assessment.
+     *
+     * @param IAssessable $assessable
+     * @return IAssessable
+     */
+    public function copyParticipantInteractionsToAssessment(IAssessable $assessable): IAssessable
+    {
+        // Recursive Case:
+        if ($assessable instanceof ProjectObject) {
+            foreach ($assessable->getAssessables() as $subAssessable) {
+                $this->copyParticipantInteractionsToAssessment($subAssessable);
+            }
+        }
+
+        // Base case:
+        foreach ($assessable->getAllParticipants() as $participant) {
+            foreach ($participant->getAllResponses() as $response) {
+                $assessable->getResponses()[$response->getId()] = $response;
+            }
+            foreach ($participant->getAllFeedbacks() as $feedback) {
+                $assessable->getFeedbacks()[$feedback->getId()] = $feedback;
+            }
+        }
+        return $assessable;
+    }
+
+
     /**
      * Override base mapper to always return new collection object
      *

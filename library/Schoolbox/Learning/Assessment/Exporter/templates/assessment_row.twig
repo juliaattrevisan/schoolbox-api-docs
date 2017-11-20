@@ -22,6 +22,34 @@
                 $('#unit-' + unitId + '-dates').attr('hidden', true);
             }
         });
+
+        // Warn user they are about to clobber previous interactions
+        {% if enableReimport %}
+        $('[data-warn-destructive-export]').click(function(e) {
+            var $checkbox = $(this),
+                countResponses = $checkbox.data('countResponses'),
+                countFeedbacks = $checkbox.data('countFeedbacks'),
+                message        = 'Are you sure you want to re-export to this class? ' +
+                                 'Doing so will overwrite the existing class assessment.';
+
+            // Only display interaction counts if there are interactions
+            if(countResponses || countFeedbacks){
+                message += ' This will also delete ' + countResponses + ' student submissions and ' +
+                    countFeedbacks + ' teacher feedbacks.'
+            }
+
+            if ($checkbox.prop('checked')) {
+                e.preventDefault();
+                $checkbox.confirmDialog({
+                    text: message,
+                    confirmEvent: function() {
+                        $checkbox.prop('checked', true);
+                        $checkbox.trigger('change')
+                    }
+                });
+            }
+        });
+        {% endif %}
     });
 </script>
 
@@ -33,6 +61,11 @@
                    name="unitImplementation[{{ unitImpl.id }}]"
                    value="1"
                    {% if not canImport %}disabled{% endif %}
+                   {% if enableReimport and isImported %}
+                       data-warn-destructive-export
+                       data-count-responses="{{ assessmentImpl.countResponses }}"
+                       data-count-feedbacks="{{ assessmentImpl.countFeedbacks }}"
+                   {% endif %}
                    data-unit-id="{{ unitImpl.id }}"/>
             <label for="import-{{ unitImpl.id }}" class="checkbox-label"></label>
         </div>
