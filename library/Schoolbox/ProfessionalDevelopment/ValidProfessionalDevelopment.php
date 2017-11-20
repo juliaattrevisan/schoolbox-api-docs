@@ -30,16 +30,16 @@ class ValidProfessionalDevelopment
 
     /**
      * Conditions that determine a valid Professional Development number
-     * Alphanumerics only; all other characters are removed
+     * Alphanumerics only; if it contains anything else, it's invalid
      *
      * @param $pdNumber
      * @return bool
      */
     private function isValidNumber($pdNumber)
     {
-        $filtered = preg_replace('/[^a-zA-Z0-9]/', '', $pdNumber);
+        $isValid = preg_match('/^[a-zA-Z0-9]+$/', $pdNumber);
 
-        if (strlen($filtered)) {
+        if ($isValid) {
             return true;
         }
 
