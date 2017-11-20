@@ -72,7 +72,7 @@ class Javascript extends Base
 
             $event = array(
                 'resourceId' => $this->event->getResourceId(),
-                'title'      => \Scrub::text($this->event->getTitle()),
+                'title'      => $this->event->getTitle(),
                 'start'      => $start,
                 'end'        => $end,
 

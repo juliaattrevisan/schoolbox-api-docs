@@ -132,7 +132,7 @@ class Javascript extends Base
         $detail = $this->getEvent()->getDetail();
         $event = array(
             'resourceId' => $booking->getResource()->getId(),
-            'title'      => \Scrub::text($this->getEvent()->getTitle()),
+            'title'      => $this->getEvent()->getTitle(),
             'start'      => $start,
             'end'        => $end,
 
