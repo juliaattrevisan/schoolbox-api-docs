@@ -11,8 +11,9 @@ namespace Schoolbox\Learning\Authorizer\Rule;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Task\Model as TaskModel;
 use Schoolbox\User;
 use InvalidArgumentException;
 
@@ -21,10 +22,10 @@ use InvalidArgumentException;
  *
  * In $params we need:
  *  - 'participant' Participant:
- *      - assessable fully hydrated
+ *      - assessable fully hydrated, must be a task or due work
  *
  * The rule is:
- *  - if the assessment is self assessable and you are the participant, you are good
+ *  - if the due work or task is self assessable and you are the participant, you are good
  *
  *
  * @package Schoolbox\Learning\Authorizer\Rule
@@ -38,7 +39,7 @@ class CanSelfAssess implements IAuthorizationRule
      * @param  User  $user   The user to authorize, if any. Null value assumes
      *                       that no user is logged in.
      *
-     * @throws InvalidArgumentException If unable to locate a Participant instance in $params
+     * @throws InvalidArgumentException If unable to locate a Participant instance in $params, or assessment is not a due work or task
      * @throws Unauthorized If assessment is not self-assessable, or user is not the participant
      * @return bool
      */
@@ -48,16 +49,19 @@ class CanSelfAssess implements IAuthorizationRule
         if (isset($params['participant']) && $params['participant'] instanceof Participant) {
             /** @var Participant $participant */
             $participant = $params['participant'];
-
-            /** @var IAssessable $assessment */
             $assessment = $participant->getAssessable();
         } else {
             throw new InvalidArgumentException("Cannot check auth, need a participant param of 'participant'");
         }
 
+        // Error out if assessment is not a due work or task
+        if (!$assessment instanceof DueWorkModel && !$assessment instanceof TaskModel) {
+            throw new InvalidArgumentException("Cannot check auth, assessment must be due work or task");
+        }
+
         // Error out if assessment is not self-assessable
-        if (1 != 1) { // TODO: replace with "if (!$assessment->isSelfAssessable())" once it exists
-            throw new Unauthorized(ErrorMapper::ERROR_ASSESSMENT_NO_SELF_ASSESS);
+        if (!$assessment->isSelfAssessable()) {
+            throw new Unauthorized('', ErrorMapper::ERROR_ASSESSMENT_NO_SELF_ASSESS);
         }
 
         // Check logged in user is the participant
