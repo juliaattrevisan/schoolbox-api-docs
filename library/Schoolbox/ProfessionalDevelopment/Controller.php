@@ -29,6 +29,8 @@ class Controller extends Base
     }
 
     /**
+     * Save a Professional Development Number + Registration State combination
+     *
      * @param User $user
      * @throws MapperException
      * @throws \PDOException
