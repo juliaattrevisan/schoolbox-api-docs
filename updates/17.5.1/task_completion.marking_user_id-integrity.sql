@@ -35,6 +35,13 @@ UPDATE task_completion tc
   AND tc.completion_status = 1
   AND t.requires_confirmation IS FALSE;
 
+-- If still NULL (maybe because task.user_id points to missing user - there is no FK to ensure it)
+UPDATE task_completion tc
+SET tc.marking_user_id = (
+    SELECT id FROM user WHERE username LIKE 'alaress'
+)
+WHERE tc.marking_user_id IS NULL;
+
 
 -- Change from optional to mandatory
 SET FOREIGN_KEY_CHECKS = 0;
