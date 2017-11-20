@@ -43,18 +43,17 @@ $(function() {
 	// Hacking into Phpdebugbar
 	$debugBar = ($('.phpdebugbar .phpdebugbar-header-right'));
 	if ($debugBar.length > 0) {
-		console.log($debugBar);
 
 		$html =
 			'<span class="phpdebugbar-indicator">' +
-			'<a id="showTwigNames">' +
-            '<i class="phpdebugbar-fa phpdebugbar-fa-leaf" style="color:#555"></i>' +
-			'</a>' +
-			'<span>' +
-			'<span class="phpdebugbar-tooltip">Twig templates</span>'
+				'<a id="showTwigNames">' +
+				'<i class="phpdebugbar-fa phpdebugbar-fa-leaf" style="color:#555"></i>' +
+				'</a>' +
+				'<span class="phpdebugbar-tooltip">Twig templates</span>' +
+        	'</span>'
 		;
 
-		$debugBar.append($html);
+        $debugBar.find('.phpdebugbar-indicator').first().before($html);
 
 		$('#showTwigNames').click(function() {
 			if ($('.twigName').attr('hidden')) {
