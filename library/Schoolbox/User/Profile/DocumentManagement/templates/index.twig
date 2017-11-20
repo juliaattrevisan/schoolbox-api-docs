@@ -31,8 +31,8 @@
                         <a href="{{ routeLookupIfAuthorized('profileDocumentManagement.getDownload', {studentId: student.id, documentId: report.ID, source: report.Source}) }}">
                             <img src="/images/mime/application-pdf.svg" class="mime">
                             <h3>{{ report.Description }}</h3>
-                            <p class="meta" title="{{ report.CreatedDate.relativeTime }}">
-                                Uploaded {{ report.CreatedDate.long }}
+                            <p class="meta" title="{{ report.CreatedDate.long }}">
+                                Uploaded {{ report.CreatedDate.relativeTime }}
                             </p>
                         </a>
                     </div>
