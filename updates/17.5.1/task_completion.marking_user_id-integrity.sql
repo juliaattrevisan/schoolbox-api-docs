@@ -7,6 +7,7 @@
 -- Marked as teacher assessed => teacher
 UPDATE task_completion tc
   JOIN task t ON t.id = tc.task_id
+  JOIN user u ON u.id = t.user_id
   SET tc.marking_user_id = t.user_id
   WHERE tc.marking_user_id IS NULL
   AND tc.completion_status = 3;
@@ -20,6 +21,7 @@ UPDATE task_completion
 -- Marked as incomplete, and requires confirmation => teacher
 UPDATE task_completion tc
   JOIN task t ON t.id = tc.task_id
+  JOIN user u ON u.id = t.user_id
   SET tc.marking_user_id = t.user_id
   WHERE tc.marking_user_id IS NULL
   AND tc.completion_status = 1
