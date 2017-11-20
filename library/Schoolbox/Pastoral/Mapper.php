@@ -270,22 +270,16 @@ class Mapper extends BaseMapper
     {
         $query = $this->getSelectString();
 
-        if ($record instanceof PastoralRevision) {
-            $tableName = 'pastoral_revision';
-        } else {
-            $tableName = 'pastoral';
-        }
-
         if ($record->getParent() instanceof Model) {
             // This is a child item, find its parent and its other siblings
             $query .= "                
                 WHERE (
-                    `{$tableName}`.`parent_id` = :parent_id_0 OR 
-                    `{$tableName}`.`id` = :parent_id_1 OR 
-                    `{$tableName}`.`parent_id` = :id_0
+                    `pastoral`.`parent_id` = :parent_id_0 OR 
+                    `pastoral`.`id` = :parent_id_1 OR 
+                    `pastoral`.`parent_id` = :id_0
                 ) AND
-                `{$tableName}`.`id` <> :id_1 AND 
-                `{$tableName}`.deleted_at IS NULL
+                `pastoral`.`id` <> :id_1 AND 
+                `pastoral`.deleted_at IS NULL
             ";
 
             $bindings['id_0']        = $record->getId();
@@ -297,10 +291,10 @@ class Mapper extends BaseMapper
 
             $query .= "
                 WHERE   (
-                            (`{$tableName}`.`parent_id` = :parent_id_0 AND `{$tableName}`.`student_id` <> :student_id) OR
-                            (`{$tableName}`.`id` = :parent_id_1)
+                            (`pastoral`.`parent_id` = :parent_id_0 AND `pastoral`.`student_id` <> :student_id) OR
+                            (`pastoral`.`id` = :parent_id_1)
                         ) 
-                        AND `{$tableName}`.`deleted_at` IS NULL
+                        AND `pastoral`.`deleted_at` IS NULL
             ";
 
             $bindings['student_id'] = $record->getStudent()->getId();
