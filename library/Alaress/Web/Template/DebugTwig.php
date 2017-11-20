@@ -6,7 +6,8 @@
  */
 namespace Alaress\Web\Template;
 
-abstract class DebugTwig extends \Twig_Template {
+abstract class DebugTwig extends \Twig_Template
+{
 
     public function display(array $context, array $blocks = array())
     {
@@ -24,6 +25,5 @@ abstract class DebugTwig extends \Twig_Template {
                 echo '<!-- END: ' . $this->getTemplateName() . ' -->';
             }
         }
-
     }
 }
