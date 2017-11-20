@@ -33,25 +33,32 @@
                                     {% set studentId = student.id %}
 
                                     {% if linkedStudent %}
-                                        <h3>{{ record.heading }}</h3>
-
-                                    <p class="meta">
+                                        <p class="meta">
 
                                         {% for linkedRecord in record.relatedRecords %}
-                                            <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': linkedRecord.student.id, 'recordId': linkedRecord.id}) }}">
-                                                {{ linkedRecord.student.fullName }}
-                                            </a><br>
+
+
+                                            {% if linkedRecord.parent.id is empty %}
+                                                Original Record:
+                                            {% else %}
+                                                Linked Record:
+                                            {% endif %}
+
+                                            <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': linkedRecord.student.id, 'recordId': linkedRecord.id}) }}"> {{ linkedRecord.student.fullName }} - {{ record.heading }}</a><br>
                                         {% endfor %}
                                         
                                     {% else %}
+
                                         {% set recordId = record.parent_id %}
+
                                         <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': studentId, 'recordId': recordId}) }}">
                                             <h3>{{ record.heading }}</h3>
                                         </a>
                                         <p class="meta">
+
                                     {% endif %}
 
-                                    {# Display name of poster #}
+                                        {# Display name of poster #}
                                         Created by <a href="{{ profile.link(record.owner) }}">{{ record.owner.fullName }}</a>
                                         <span title="{{ record.createdAt.short }}">{{ record.createdAt.relativeDay }}</span><br>
 
