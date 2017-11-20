@@ -37,7 +37,8 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 
         $this->setBlock($templateHandle, "student_block", "student_subjects");
         $this->setBlock("student_block", "subject_block", "subject_item");
-		$this->setBlock('student_block', 'eportfolio', 'eportfolio_block');
+        $this->setBlock('student_block', 'reports', 'reports_block');
+        $this->setBlock('student_block', 'eportfolio', 'eportfolio_block');
         $this->setBlock('student_block', 'pastoral', 'pastoral_block');
         $this->setBlock('student_block', 'due_work', 'due_work_block');
         $this->setBlock('student_block', 'grades_button', 'grades_button_block');
@@ -121,6 +122,15 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 				else {
 					$this->setVar('eportfolio_block', '');
 				}
+
+				/* Academic report link
+				*/
+				if($this->getConfigMapper()->get('external_document_report_enabled')) {
+                    $this->parse('reports_block', 'reports');
+                }
+                else {
+				    $this->setVar('reports_block');
+                }
 
                 $this->parse("student_subjects", "student_block", true);
                 $this->setVar('subject_item', '');
