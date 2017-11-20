@@ -162,42 +162,43 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
                 true
             ],
             'Valid Number 2' => [
-                (new Model())->setNumber('123')->setRegistrationState('VIC'),
-                true
-            ],
-            'Valid Number 3' => [
-                (new Model())->setNumber('  123')->setRegistrationState('VIC'),
-                true
-            ],
-            'Valid Number 4' => [
-                (new Model())->setNumber('  123  ')->setRegistrationState('VIC'),
-                true
-            ],
-            'Valid Number 5' => [
-                (new Model())->setNumber('123  ')->setRegistrationState('VIC'),
-                true
-            ],
-            'Valid Number 6' => [
                 (new Model())->setNumber('a123a')->setRegistrationState('VIC'),
                 true
             ],
-            'Valid Number 7' => [
+            'Valid Number 3' => [
                 (new Model())->setNumber('aaabbbbbcccc')->setRegistrationState('VIC'),
                 true
             ],
+
             'Invalid Number 1' => [
-                (new Model())->setNumber('@(#&(*#!(*&!')->setRegistrationState('VIC'),
+                (new Model())->setNumber('123')->setRegistrationState('VIC'),
                 false
             ],
             'Invalid Number 2' => [
-                (new Model())->setNumber('')->setRegistrationState('VIC'),
+                (new Model())->setNumber('  123')->setRegistrationState('VIC'),
                 false
             ],
             'Invalid Number 3' => [
-                (new Model())->setRegistrationState('VIC'),
+                (new Model())->setNumber('  123  ')->setRegistrationState('VIC'),
                 false
             ],
             'Invalid Number 4' => [
+                (new Model())->setNumber('123  ')->setRegistrationState('VIC'),
+                false
+            ],
+            'Invalid Number 5' => [
+                (new Model())->setNumber('@(#&(*#!(*&!')->setRegistrationState('VIC'),
+                false
+            ],
+            'Invalid Number 6' => [
+                (new Model())->setNumber('')->setRegistrationState('VIC'),
+                false
+            ],
+            'Invalid Number 7' => [
+                (new Model())->setRegistrationState('VIC'),
+                false
+            ],
+            'Invalid Number 8' => [
                 (new Model())->setNumber('     ')->setRegistrationState('VIC'),
                 false
             ],
