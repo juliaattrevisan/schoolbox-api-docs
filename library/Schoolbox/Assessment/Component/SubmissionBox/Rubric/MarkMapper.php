@@ -203,4 +203,19 @@ class MarkMapper extends Mapper
         }
         return $rubricMarks;
     }
+
+
+    /**
+     * No notifications.
+     *
+     * @param object $object
+     * @param string $verb
+     * @param object $previous
+     * @return bool
+     */
+    protected function raiseNotification($object, $verb, $previous = null)
+    {
+        return true;
+    }
+
 }

@@ -123,4 +123,19 @@ class LevelMapper extends Mapper
         }
         return $this->create($levels);
     }
+
+
+    /**
+     * No notifications.
+     *
+     * @param object $object
+     * @param string $verb
+     * @param object $previous
+     * @return bool
+     */
+    protected function raiseNotification($object, $verb, $previous = null)
+    {
+        return true;
+    }
+
 }
