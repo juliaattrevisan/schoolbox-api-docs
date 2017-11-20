@@ -622,4 +622,14 @@ class Model extends AbstractAssessment
         $this->selfAssessable = $selfAssessable;
         return $this;
     }
+
+    /**
+    * Determine whether this due work is self-assessable
+    *
+    * @return bool
+    */
+    public function isSelfAssessable()
+    {
+        return $this->selfAssessable;
+    }
 }
