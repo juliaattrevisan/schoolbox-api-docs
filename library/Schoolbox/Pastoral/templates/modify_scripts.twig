@@ -87,12 +87,12 @@
                 'heading': {required: 'You must enter a title before you can proceed'}
             },
 
-            submitHandler: function () {
+            submitHandler: function (form) {
                 var button = $("[data-submit]");
                 button.val('Saving, Please Wait');
                 button.attr('disabled', 'true');
 
-                form.submit();
+                $(form).ajaxSubmit();
             }
         });
 
