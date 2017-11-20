@@ -34,13 +34,15 @@
 
                                     {% if linkedStudent %}
                                         <h3>{{ record.heading }}</h3>
-                                        <p class="meta">
-                                            <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': student.id, 'recordId': record.parent.id}) }}">
-                                                {{ student.fullName }}
+
+                                    <p class="meta">
+
+                                        {% for linkedRecord in record.relatedRecords %}
+                                            <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': linkedRecord.student.id, 'recordId': linkedRecord.id}) }}">
+                                                {{ linkedRecord.student.fullName }}
                                             </a><br>
-                                            <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': linkedStudent.id, 'recordId': record.id}) }}">
-                                                {{ linkedStudent.fullName }}
-                                            </a><br>
+                                        {% endfor %}
+                                        
                                     {% else %}
                                         {% set recordId = record.parent_id %}
                                         <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': studentId, 'recordId': recordId}) }}">
