@@ -52,6 +52,6 @@ class Controller extends Base
 
         /* Otherwise...
          */
-        throw $this->errorMapper->generateException(Error\Mapper::ERROR_INFORMATION_MISSING);
+        throw $this->errorMapper->generateException(Error\Mapper::ERROR_INVALID_PD_DETAILS);
     }
 }
