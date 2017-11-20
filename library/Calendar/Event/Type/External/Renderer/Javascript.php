@@ -32,7 +32,7 @@ class Javascript extends Base
             $classes[] = 'type' . $this->event->getType();
 
             $event = array(
-                'title'     => \Scrub::text($this->event->getTitle()),
+                'title'     => $this->event->getTitle(),
                 'start'     => $this->event->getStartTime()->getDatabase(),
                 'end'       => $this->event->getEndTime()->getDatabase(),
 

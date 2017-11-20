@@ -81,7 +81,7 @@ class Javascript extends Base
             }
 
             $event = array(
-                'title'     => \Scrub::text($this->getEvent()->getTitle()),
+                'title'     => $this->getEvent()->getTitle(),
                 'start'     => "$start",
                 'end'       => "$end",
 
