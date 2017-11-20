@@ -468,13 +468,11 @@ class Module extends BaseModule
                 new CanRespondToAssessment($this->getAccess())
             ),
             new Rule\All(
-                new Rule\HasRole(Role::STAFF),
                 $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
                 new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
                 new CanRespondToAssessment($this->getAccess())
             ),
             new Rule\All(
-                new Rule\HasRole(Role::STUDENT),
                 new Rule\IsUser('studentId'),
                 new IsParticipant(),
                 new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
