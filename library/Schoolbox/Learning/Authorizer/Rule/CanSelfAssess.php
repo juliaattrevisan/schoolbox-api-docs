@@ -46,14 +46,14 @@ class CanSelfAssess implements IAuthorizationRule
     public function authorize(array $params = [], User $user = null)
     {
         // Grab the participant and assessment from $params
-        if (isset($params['participant']) && $params['participant'] instanceof Participant) {
-            /** @var Participant $participant */
-            $participant = $params['participant'];
-            $assessment = $participant->getAssessable();
-        } else {
+        if (empty($params['participant']) || !$params['participant'] instanceof Participant) {
             throw new InvalidArgumentException("Cannot check auth, need a participant param of 'participant'");
         }
 
+        /** @var Participant $participant */
+        $participant = $params['participant'];
+        $assessment = $participant->getAssessable();
+        
         // Error out if assessment is not a due work or task
         if (!$assessment instanceof DueWorkModel && !$assessment instanceof TaskModel) {
             throw new InvalidArgumentException("Cannot check auth, assessment must be due work or task");
