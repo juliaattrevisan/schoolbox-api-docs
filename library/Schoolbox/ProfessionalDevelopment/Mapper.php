@@ -87,7 +87,7 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Get the hardcoded list of states
+     * Get the hardcoded list of states; derive it from the enum field
      *
      * @return array
      */
