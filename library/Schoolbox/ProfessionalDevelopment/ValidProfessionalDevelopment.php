@@ -50,11 +50,7 @@ class ValidProfessionalDevelopment
      */
     private function isValidRegistrationState($state)
     {
-        if (in_array($state, $this->states)) {
-            return true;
-        }
-
-        return false;
+        return in_array($state, $this->states);
     }
 
     /**
