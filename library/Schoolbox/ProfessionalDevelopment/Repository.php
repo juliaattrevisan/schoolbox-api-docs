@@ -36,6 +36,8 @@ class Repository
             $pd->setUser($user);
         }
 
+        /* Intentionally filter invalid chars
+         */
         $pd->setNumber(preg_replace('/[^a-zA-Z0-9]/', '', $pdNumber));
         $pd->setRegistrationState($pdState);
 

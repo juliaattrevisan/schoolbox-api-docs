@@ -7,9 +7,11 @@
                 $("#pdForm").alaressValidate({
                     rules: {
                         'pdNumber':  {
+                            alphanumeric: true,
                             requiredNotBlank:true
                         },
                         'pdState':  {
+                            alphanumeric: true,
                             requiredNotBlank:true
                         }
                     }
