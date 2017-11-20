@@ -7,6 +7,7 @@
 -- Marked as teacher assessed => teacher
 UPDATE task_completion tc
   JOIN task t ON t.id = tc.task_id
+  JOIN user u ON u.id = t.user_id
   SET tc.marking_user_id = t.user_id
   WHERE tc.marking_user_id IS NULL
   AND tc.completion_status = 3;
@@ -20,6 +21,7 @@ UPDATE task_completion
 -- Marked as incomplete, and requires confirmation => teacher
 UPDATE task_completion tc
   JOIN task t ON t.id = tc.task_id
+  JOIN user u ON u.id = t.user_id
   SET tc.marking_user_id = t.user_id
   WHERE tc.marking_user_id IS NULL
   AND tc.completion_status = 1
@@ -32,6 +34,13 @@ UPDATE task_completion tc
   WHERE tc.marking_user_id IS NULL
   AND tc.completion_status = 1
   AND t.requires_confirmation IS FALSE;
+
+-- If still NULL (maybe because task.user_id points to missing user - there is no FK to ensure it)
+UPDATE task_completion tc
+SET tc.marking_user_id = (
+    SELECT id FROM user WHERE username LIKE 'alaress'
+)
+WHERE tc.marking_user_id IS NULL;
 
 
 -- Change from optional to mandatory
