@@ -96,7 +96,7 @@ class Controller extends Base
         }
 
         // Use the student ids to grab an array of parent emails and add it to $parentEmails
-        $parentEmails = array_merge($parentEmails, $this->getExternalHandler()->getParentEmails($studentIds));
+        $parentEmails = array_merge($parentEmails, $this->getExternalHandler()->getParentEmails($studentIds) ?: []);
 
         // Reset the array with no keys (getParentEmails() returns student ids as array keys)
         $parentEmails = array_values($parentEmails);
@@ -151,4 +151,4 @@ class Controller extends Base
         return $this;
     }
 
-} 
+}
