@@ -216,8 +216,7 @@ class Document extends Base implements IDocument
         $documents = $documentsQuery->fetchAll();
 
         foreach ($documents as &$document) {
-            $document["CreatedDateRelative"] = Alaress_Date_Format::newDatabaseDate($document["CreatedDate"])->getRelativeTime();
-            $document["CreatedDate"] = Alaress_Date_Format::newDatabaseDate($document["CreatedDate"])->getLong();
+            $document["CreatedDate"] = Alaress_Date_Format::newDatabaseDate($document["CreatedDate"]);
         }
 
         return $documents;
