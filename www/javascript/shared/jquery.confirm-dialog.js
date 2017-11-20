@@ -71,7 +71,6 @@
 
         var okayButton   = $('<a href="#" class="button submit" />').text(settings.confirmLabel).on('click.confirmDialog', function(e) {
             e.preventDefault();
-            $(this).attr('disabled', true);
             settings.confirmEvent(element);
             modal.foundation('reveal', 'close');
         });
