@@ -59,7 +59,8 @@ class Broker extends Base
             'SET ANSI_NULL_DFLT_ON ON',
             'SET ANSI_NULLS ON',
             'SET CONCAT_NULL_YIELDS_NULL ON',
-            'SET ANSI_WARNINGS ON',
+            'SET ANSI_WARNINGS OFF',
+            'SET ARITHABORT ON',
             'SET NOCOUNT ON'
         ];
 
