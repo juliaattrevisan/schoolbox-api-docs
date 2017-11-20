@@ -14,22 +14,6 @@ use Schoolbox\UserMapper;
 
 class Mapper extends BaseMapper
 {
-    /**
-     * Store this so I don't need to make db schema etc
-     *
-     * @var array
-     */
-    private $states = [
-        'Please select',
-        'New South Wales',
-        'Victoria',
-        'Queensland',
-        'Northern Territory',
-        'Western Australia',
-        'South Australia',
-        'Canberra',
-        'Tasmania'
-    ];
 
     /**
      * @inheritdoc
