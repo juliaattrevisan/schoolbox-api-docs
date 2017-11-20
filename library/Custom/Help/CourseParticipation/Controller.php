@@ -373,7 +373,7 @@ class Controller extends Base
         try {
             // check the server is correctly configured
             $this->getRoleMapper()->findOneByColumn('name', Handler::PARTICIPANT_ROLE_NAME);
-            $this->getCampusMapper()->findByColumn('id', Handler::PARTICIPANT_CAMPUS);
+            $this->getCampusMapper()->findOneByColumn('id', Handler::PARTICIPANT_CAMPUS);
 
         } catch (Mapper\Exception $e) {
             // if this role doesn't exist, that's *bad* bad
