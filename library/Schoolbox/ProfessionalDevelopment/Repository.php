@@ -17,6 +17,8 @@ class Repository
 
     /**
      * Save profesional development data
+     * Only save if valid data exists; otherwise noop
+     * (PD data is optional to provide)
      *
      * @param User   $user
      * @param string $pdNumber
@@ -43,6 +45,8 @@ class Repository
 
         $validation = new ValidProfessionalDevelopment(Mapper::getInstance()->getStates());
 
+        /* Only save if valid data exists; otherwise noop
+         */
         if ($validation->isSatisfiedBy($pd)) {
             Mapper::getInstance()->save($pd);
 

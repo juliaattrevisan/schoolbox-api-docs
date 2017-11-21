@@ -16,6 +16,7 @@ use Schoolbox\Permission\SiteAccess;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\ProfessionalDevelopment;
+use Schoolbox\ProfessionalDevelopment\Repository;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\RoleMapper;
@@ -252,27 +253,11 @@ class Handler
                 $this->getUserMapper()->save($user);
 
                 /* Add Professional Development data
-                 * Create a new one if it doesn't already exist
                  */
-                /** @var ProfessionalDevelopment\Model $pd */
-                try {
-                    $pd = $this->pdMapper->findOneByColumn('user_id', $user->getId());
-                }
-                catch (Mapper\Exception $e) {
-                    $pd = $this->pdMapper->createModel();
-                    $pd->setUser($user);
-                }
+                $result = (new Repository())->save($user, $userData['pdNumber'], $userData['pdState']);
 
-                $pd->setNumber($userData['pdNumber']);
-                $pd->setRegistrationState($userData['pdState']);
-
-                $validation = new ProfessionalDevelopment\ValidProfessionalDevelopment($this->pdMapper->getStates());
-
-                /* Only save if valid data exists; otherwise noop
-                 * PD data is optional to provide
-                 */
-                if ($validation->isSatisfiedBy($pd)) {
-                    $this->pdMapper->save($pd);
+                if (!$result) {
+                    // ... where do I log this failure? :|
                 }
 
                 if ($oldUsername) {
