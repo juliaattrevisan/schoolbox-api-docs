@@ -8,36 +8,48 @@
 namespace Schoolbox\ProfessionalDevelopment;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Error;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 
 class Controller extends Base
 {
     /**
+     * @var Error\Mapper
+     */
+    private $errorMapper;
+
+    /**
+     * Controller constructor.
+     * @param Error\Mapper $errorMapper
+     */
+    public function __construct(Error\Mapper $errorMapper)
+    {
+        $this->errorMapper = $errorMapper;
+    }
+
+    /**
      * @param User $user
      * @throws MapperException
      * @throws \PDOException
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     public function postUpdate(User $user)
     {
-        /** @var Model $pd */
-        try {
-            $pd = Mapper::getInstance()->findOneByColumn('user_id', $user->getId());
-        }
-        catch (MapperException $e) {
-            $pd = Mapper::getInstance()->createModel();
-            $pd->setUser($user);
-        }
+        $number = $this->getRequest()->post['pdNumber'];
+        $state = $this->getRequest()->post['pdState'];
 
-        $pd->setNumber(preg_replace('/[^a-zA-Z0-9]/', '', $this->getRequest()->post['pdNumber']));
-        $pd->setRegistrationState($this->getRequest()->post['pdState']);
+        $result = (new Repository())->save($user, $number, $state);
 
-        $validation = new ValidProfessionalDevelopment(Mapper::getInstance()->getStates());
-
-        if ($validation->isSatisfiedBy($pd)) {
-            Mapper::getInstance()->save($pd);
+        /* Redirect upon successful save
+         */
+        if ($result) {
+            $this->getResponse()->redirect->to("/search/user/{$user->getId()}");
+            return;
         }
 
-        $this->getResponse()->redirect->to("/search/user/{$user->getId()}");
+        /* Otherwise...
+         */
+        throw $this->errorMapper->generateException(Error\Mapper::ERROR_INFORMATION_MISSING);
     }
 }
