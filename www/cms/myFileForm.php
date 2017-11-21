@@ -5,6 +5,7 @@ use Schoolbox\Resource\File\IFile;
 use \Schoolbox\Resource\My\File\Mapper as MyFileMapper;
 use \Schoolbox\Resource\My\File\Model as MyFile;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 $ajax = isset($_GET['ajax']) && $_GET['ajax'];
 
@@ -64,12 +65,15 @@ if (isset($_POST['description'])) {
             // Yes, we may have just overridden the result of findById(), but that was also for additional safety checks
             $file = $result;
         }
+        else {
+            throw new InvalidArgumentException('No file attachment supplied');
+        }
 
     } catch (\Schoolbox\Mapper\Exception $e) {
-        error(41);
+        error(ErrorMapper::ERROR_FILE_NOT_FOUND);
         exit; // shut UP, storm.
     } catch (\InvalidArgumentException $e) {
-        error(43);
+        error(ErrorMapper::ERROR_FILE_UPLOAD_INCOMPLETE);
         exit;
     }
 
