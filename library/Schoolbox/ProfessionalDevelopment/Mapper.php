@@ -76,10 +76,18 @@ class Mapper extends BaseMapper
         $collection = $this->createCollection();
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $pd = $this->hydrate($row);
-            $pd->setUser($userMapper->hydrate($row, 'u'));
+            try {
+                $pd = $this->hydrate($row);
 
-            $collection->add($pd);
+                if ($pd) {
+                    $pd->setUser($userMapper->hydrate($row, 'u'));
+                }
+
+                $collection->add($pd);
+            }
+            catch (BaseMapper\Exception $e) {
+                // noop, couldn't hydrate for some reason
+            }
         }
 
         return $collection;
@@ -93,13 +101,13 @@ class Mapper extends BaseMapper
      */
     public function getStates()
     {
-        $query = "
+        $query = '
             SELECT column_type 
             FROM information_schema.COLUMNS 
             WHERE table_schema = ? 
             AND table_name = ? 
             AND column_name = ?
-        ";
+        ';
 
         $args = [ SQL_db, $this->getTable(), 'registration_state' ];
 

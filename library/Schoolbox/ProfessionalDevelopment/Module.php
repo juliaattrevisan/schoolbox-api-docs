@@ -58,7 +58,7 @@ class Module extends BaseModule
             $user = $this->getUserMapper()->findById($params['userId']);
         }
         catch (MapperException $e) {
-            throw new NotFound();
+            throw new NotFound(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
         return [
