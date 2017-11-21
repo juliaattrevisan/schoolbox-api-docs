@@ -209,8 +209,10 @@ class FileListMapper extends Schoolbox\Mapper
             $mime = $mimeMapper->hydrate($row, $this->mimeAlias);
 
             // aaaaaand rewind...
-            $storage->setMimetype($mime);
-            $file->setStorage($storage);
+            if($storage instanceof Schoolbox\Resource\Storage\Model) {
+                $storage->setMimetype($mime);
+                $file->setStorage($storage);
+            }
             $fileListItem->setFile($file);
 
             /* Put file list item instance into collection
