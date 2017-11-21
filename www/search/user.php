@@ -1,11 +1,9 @@
 <?php
 
-use Schoolbox\IConfigLoader;
+use Schoolbox\UserMapper;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access as Access;
-use Schoolbox\ProfessionalDevelopment\Mapper as ProfessionalDevelopmentMapper;
-use Schoolbox\Resource\Folder;
-use Schoolbox\UserMapper;
 
 //require_once 'include/permission.php';
 
@@ -54,18 +52,11 @@ function renderParent(
 
 /**
  * Staff rendering, extracted to a method.
- *
- * @param SitePage                      $page
- * @param array                         $user
- * @param External_User                 $synUserHandler
- * @param UserMapper                    $userMapper
- * @param Eportfolio_Authenticator      $authenticator
- * @param IConfigLoader                 $config
- * @param ProfessionalDevelopmentMapper $pdMapper
- * @throws RuntimeException
- * @throws Twig_Error_Loader
- * @throws Twig_Error_Runtime
- * @throws Twig_Error_Syntax
+ * @param SitePage                 $page
+ * @param array                    $user
+ * @param External_User            $synUserHandler
+ * @param UserMapper               $userMapper
+ * @param Eportfolio_Authenticator $authenticator
  */
 function renderStaff(
     SitePage $page,
@@ -73,19 +64,9 @@ function renderStaff(
     External_User $synUserHandler,
     UserMapper $userMapper,
     Eportfolio_Authenticator $authenticator,
-    IConfigLoader $config,
-    ProfessionalDevelopmentMapper $pdMapper
+    \Schoolbox\IConfigLoader $config
 ) {
     $externalUser = $synUserHandler->getStaff($user['synergy_id']);
-
-    /* Load Professional Development details if they exist
-     */
-    try {
-        $pd = $pdMapper->findOneByColumn('user_id', $user['uid']);
-    }
-    catch (MapperException $e) {
-        $pd = null;
-    }
 
     // TwigLib
     $page->setFile(TEMPLATE_content, 'output.html');
@@ -99,8 +80,6 @@ function renderStaff(
                 'externalUser'    => $externalUser,
                 'eportfolioAuth'  => $authenticator->canView(),
                 'pdEnabled'       => $config->get('enable_professional_development'),
-                'pdStates'        => $pdMapper->getStates(),
-                'pd'              => $pd,
                 'now'             => Alaress_Date_Format::now(),
             ]
         )
@@ -462,8 +441,7 @@ if (is_numeric($this->arg[0])) {
             $synUserHandler,
             new UserMapper(),
             new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile'),
-            $config,
-            ProfessionalDevelopmentMapper::getInstance()
+            $config
         );
     } else {
         $this->pageNotFound();
