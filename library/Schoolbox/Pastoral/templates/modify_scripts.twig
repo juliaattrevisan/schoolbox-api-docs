@@ -92,7 +92,9 @@
                 button.val('Saving, Please Wait');
                 button.attr('disabled', 'true');
 
-                $(form).ajaxSubmit();
+                {# Need to submit the form on timeout, otherwise the DOM doesn't update with new button label #}
+
+                window.setTimeout(function() { form.submit(); }, 0);
             }
         });
 
