@@ -1,4 +1,13 @@
-CREATE TABLE `user_professionaldevelopment`( `id` INT(11) NOT NULL AUTO_INCREMENT, `user_id` INT(4) UNSIGNED   NOT NULL, `number` VARCHAR(255) NOT NULL, `registration_state` INT(1) NOT NULL, `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, PRIMARY KEY (`id`) );
+CREATE TABLE `user_professionaldevelopment`(
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `user_id` INT(4) UNSIGNED NOT NULL,
+  `number` VARCHAR(255) NOT NULL,
+  `registration_state` INT(1) NOT NULL,
+  `created_at` DATETIME,
+  `updated_at` DATETIME,
+  `deleted_at` DATETIME,
+  PRIMARY KEY (`id`)
+);
 
 ALTER TABLE `user_professionaldevelopment` CHANGE `registration_state` `registration_state` ENUM('NSW','VIC','QLD','NT','WA','SA','ACT','TAS') NOT NULL;
 
