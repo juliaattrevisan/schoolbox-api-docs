@@ -65,6 +65,21 @@ if (isset($_POST['description'])) {
             // Yes, we may have just overridden the result of findById(), but that was also for additional safety checks
             $file = $result;
         }
+        // if file was synchronously uploaded
+        else if ($_FILES['file']['name'] && is_uploaded_file($_FILES['file']['tmp_name'])) {
+            try {
+                // fake this momentarily
+                $file->setFilename($_FILES['file']['name']);
+
+                // dump into storage
+                $storage = Schoolbox\Resource\Storage\Mapper::getInstance()->accept($_FILES['file']['name'], $_FILES['file']['tmp_name'], false);
+
+                // and link onto a fresh object
+                $file = MyFileMapper::getInstance()->createModel()->setStorage($storage);
+            } catch (Exception $e) {
+                outputException($e, $file, $ajax);
+            }
+        }
         else {
             throw new InvalidArgumentException('No file attachment supplied');
         }
@@ -75,22 +90,6 @@ if (isset($_POST['description'])) {
     } catch (\InvalidArgumentException $e) {
         error(ErrorMapper::ERROR_FILE_UPLOAD_INCOMPLETE);
         exit;
-    }
-
-    // if file was synchronously uploaded
-    if ($_FILES['file']['name'] && is_uploaded_file($_FILES['file']['tmp_name'])) {
-        try {
-            // fake this momentarily
-            $file->setFilename($_FILES['file']['name']);
-
-            // dump into storage
-            $storage = Schoolbox\Resource\Storage\Mapper::getInstance()->accept($_FILES['file']['name'], $_FILES['file']['tmp_name'], false);
-
-            // and link onto a fresh object
-            $file = MyFileMapper::getInstance()->createModel()->setStorage($storage);
-        } catch (Exception $e) {
-            outputException($e, $file, $ajax);
-        }
     }
 
     // set attributes
