@@ -160,14 +160,7 @@ class Document extends Base implements IDocument
                     
                     SELECT      d.tDocumentsSeq AS ID,
                                 d.Description,
-                                COALESCE(
-                                    (
-                                        SELECT TOP 1 FileYear
-                                        FROM FileSemesters
-                                        WHERE d.SourceDate 
-                                        BETWEEN StartDate AND EndDate
-                                    ), YEAR(d.SourceDate)
-                                ) AS FileYear,
+                                YEAR(d.SourceDate) AS FileYear,
                                 CONVERT(VARCHAR(20), SourceDate, 20) as CreatedDate,
                                 'tDocuments' AS Source
                     FROM        {$this->schema}.pvDocumentReferences dr
