@@ -98,11 +98,11 @@ $kernel->run(new class extends App {
 
         $this->router = $di->get('router');
 
+        /** @noinspection PhpParamsInspection */
         $this->handler = new Handler(
             $mapFactory->get(UserAccessMapper::class),
             $mapFactory->get(Schoolbox\Permission\SiteAccess\Mapper::class),
             $mapFactory->get(Schoolbox\Resource\Folder\Mapper::class),
-            $mapFactory->get(ProfessionalDevelopment\Mapper::class),
             new Schoolbox\User\Password\MailService(
                 $config,
                 $mapFactory->get(Schoolbox\User\Password\Reset\Mapper::class),
@@ -165,8 +165,8 @@ $kernel->run(new class extends App {
                 try {
                     $pd = ProfessionalDevelopment\Mapper::getInstance()->findOneByColumn('user_id', $user->getId());
 
-                    $userData[$user->getId()]['pdNumber'] = $pd->getNumber();
-                    $userData[$user->getId()]['pdState'] = $pd->getRegistrationState();
+                    $userData['pdNumber'] = $pd->getNumber();
+                    $userData['pdState'] = $pd->getRegistrationState();
                 }
                 catch (\Schoolbox\Mapper\Exception $e) {
                     // noop (no data exists)
@@ -187,10 +187,8 @@ $kernel->run(new class extends App {
                 if ($r) {
                     $log->warning("Received client error: {$r->getStatusCode()} {$r->getReasonPhrase()}");
 
-                    $responseBody = $r->getBody()->getContents();
-
                     /** @var array $failedUsers */
-                    $failedUsers = json_decode($responseBody, true);
+                    $failedUsers = json_decode($r->getBody()->getContents(), true);
 
                     if (is_array($failedUsers)) {
                         foreach ($failedUsers as [$reason, $payload]) {
@@ -199,7 +197,7 @@ $kernel->run(new class extends App {
                         }
                     } else {
                         // not an array: just dump the response body
-                        $log->warning($responseBody);
+                        $log->warning($r->getBody()->getContents());
                     }
 
                 } else {
