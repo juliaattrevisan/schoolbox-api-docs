@@ -96,11 +96,11 @@
             </p>
             <p class="meta">
                 {% if isImported %}
-                    This activity already exists in this class.
+                    This {{ locale.assessment }} already exists in this class.
                 {% elseif not isInstructor %}
                     You don't have write permission for this class.
                 {% else %}
-                    This activity does not exist in this class.
+                    This {{ locale.assessment }} does not exist in this class.
                 {% endif %}
             </p>
         </div>
