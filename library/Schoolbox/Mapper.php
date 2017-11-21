@@ -3778,7 +3778,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param Collection $collection
      * @return Collection
      */
-    private function populateSaveTimestamps(Collection $collection): Collection
+    protected function populateSaveTimestamps(Collection $collection): Collection
     {
         // Does the mapper have 'created_at' or 'updated_at' timestamps?
         if (!$this->createdMap && !$this->updatedMap) {
