@@ -201,7 +201,7 @@ class Document extends Base implements IDocument
         }
 
         $query .= "
-            ORDER BY CreatedDate DESC
+            ORDER BY FileYear DESC, CreatedDate DESC
         ";
 
         // Get all documents for the student
@@ -209,11 +209,16 @@ class Document extends Base implements IDocument
         $documentsQuery = $this->databaseExternal->executeQuery($query, $params);
         $documents = $documentsQuery->fetchAll();
 
+        $documentsUnique = [];
+
         foreach ($documents as &$document) {
-            $document["CreatedDate"] = Alaress_Date_Format::newDatabaseDate($document["CreatedDate"]);
+            if (!isset($documentsUnique["{$document["Source"]}.{$document["ID"]}"])) {
+                $document["CreatedDate"] = Alaress_Date_Format::newDatabaseDate($document["CreatedDate"]);
+                $documentsUnique["{$document["Source"]}.{$document["ID"]}"] = $document;
+            }
         }
 
-        return $documents;
+        return $documentsUnique;
     }
 
     /**
