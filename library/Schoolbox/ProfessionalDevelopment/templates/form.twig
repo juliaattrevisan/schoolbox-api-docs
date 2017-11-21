@@ -2,49 +2,40 @@
     {% set pdUpdateRoute = routeLookupIfAuthorized('professionaldevelopment.postUpdate', {userId: userId}) %}
 
     {% if pdUpdateRoute %}
-        <script type="text/javascript">
-            $(function() {
-                $("#pdForm").alaressValidate({
-                    rules: {
-                        'pdNumber':  {
-                            alphanumeric: true,
-                            requiredNotBlank:true
-                        },
-                        'pdState':  {
-                            alphanumeric: true,
-                            requiredNotBlank:true
-                        }
-                    }
-                });
-            });
-        </script>
-        <form action="{{ pdUpdateRoute }}" method="post" id="pdForm">
-            <section class="content">
-                <div class="small-12 medium-8 columns">
-                    <label>Professional Development Number</label>
-                    <input type="text" name="pdNumber" value="{{ pd.number }}" />
-                </div>
-                <div class="small-12 medium-4 columns">
-                    <label>Registration State</label>
-                    <select name="pdState">
-                        <option value="" disabled="disabled">Please Select</option>
+        <form action="{{ pdUpdateRoute }}" method="post">
+            <fieldset>
+                <section class="content">
+                    <div class="small-12 medium-8 columns">
+                        <label>Professional Development Number</label>
+                        <input type="text" name="pdNumber" value="{{ pd.number }}" />
+                    </div>
+                    <div class="small-12 medium-4 columns">
+                        <label>Registration State</label>
+                        <select name="pdState">
+                            {% for state in pdStates %}
+                                {% if loop.first %}
+                                    {% set disabled = ' disabled="disabled"' %}
+                                {% else %}
+                                    {% set disabled = '' %}
+                                {% endif %}
 
-                        {% for state in pdStates %}
-                            {% if state == pd.registrationState %}
-                                {% set selected = ' selected="selected"' %}
-                            {% else %}
-                                {% set selected = '' %}
-                            {% endif %}
+                                {% if loop.index0 == pd.registrationState %}
+                                    {% set selected = ' selected="selected"' %}
+                                {% else %}
+                                    {% set selected = '' %}
+                                {% endif %}
 
-                            <option value="{{ state }}"{{ selected }}>{{ state }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+                                <option value="{{ loop.index0 }}"{{ disabled }}{{ selected }}>{{ pdStates[loop.index0] }}</option>
 
-                <div class="small-12 columns">
-                    <input type="submit" value="Update Professional Development details" />
-                </div>
-            </section>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="small-12 columns">
+                        <input type="submit" value="Update Professional Development details" />
+                    </div>
+                </section>
+            </fieldset>
         </form>
     {% endif %}
 {% endif %}

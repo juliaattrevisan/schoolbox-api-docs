@@ -119,46 +119,12 @@
             {% endblock buttons_island %}
         </section>
 
-        {% if pdEnabled %}
-            {% set pdUpdateRoute = routeLookupIfAuthorized('professionaldevelopment.postUpdate', {userId: user.id}) %}
-
-            {% if pdUpdateRoute %}
-            <form action="{{ pdUpdateRoute }}" method="post">
-                <fieldset>
-                    <section class="content">
-                        <div class="small-12 medium-8 columns">
-                            <label>Professional Development Number</label>
-                            <input type="text" name="pdNumber" value="{{ pd.number }}" />
-                        </div>
-                        <div class="small-12 medium-4 columns">
-                            <label>Registration State</label>
-                            <select name="pdState">
-                                {% for state in pdStates %}
-                                    {% if loop.first %}
-                                        {% set disabled = ' disabled="disabled"' %}
-                                    {% else %}
-                                        {% set disabled = '' %}
-                                    {% endif %}
-
-                                    {% if loop.index0 == pd.registrationState %}
-                                        {% set selected = ' selected="selected"' %}
-                                    {% else %}
-                                        {% set selected = '' %}
-                                    {% endif %}
-
-                                    <option value="{{ loop.index0 }}"{{ disabled }}{{ selected }}>{{ pdStates[loop.index0] }}</option>
-
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <div class="small-12 columns">
-                            <input type="submit" value="Update Professional Development details" />
-                        </div>
-                    </section>
-                </fieldset>
-            </form>
-            {% endif %}
-        {% endif %}
+        {# Professional Development #}
+        {% include '@professionaldevelopment/form.twig' with {
+            pdEnabled: pdEnabled,
+            userId: user.id,
+            pd: pd,
+            pdStates: pdStates
+        } only %}
     </div>
 </div>
