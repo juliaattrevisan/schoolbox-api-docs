@@ -1776,7 +1776,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param null|array $createdMap
      * @return $this
      */
-    protected function setCreatedMap(?array $createdMap): self
+    private function setCreatedMap(?array $createdMap): self
     {
         $this->createdMap = $createdMap;
         return $this;
@@ -1794,7 +1794,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param null|array $updatedMap
      * @return $this
      */
-    protected function setUpdatedMap(?array $updatedMap): self
+    private function setUpdatedMap(?array $updatedMap): self
     {
         $this->updatedMap = $updatedMap;
         return $this;
