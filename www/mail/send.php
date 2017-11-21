@@ -115,7 +115,7 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments = array())
         foreach ($files as $storage) {
             $stream = new AttachmentStream($storage->readStream());
             $basename = $storage->getBasename();
-            $attach = Swift_Attachment::newInstance($stream, $basename, $storage->getMime());
+            $attach = new Swift_Attachment($stream, $basename, $storage->getMime());
             $mail->attach($attach);
         }
     } catch (Swift_IoException $e) {
