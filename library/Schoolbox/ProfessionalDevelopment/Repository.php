@@ -49,9 +49,18 @@ class Repository
         $validation = new ValidProfessionalDevelopment(Mapper::getInstance()->getStates());
 
         /* Only save if valid data exists; otherwise noop
+         * Catch all the errors that Mapper->save can throw and bin them for now
          */
         if ($validation->isSatisfiedBy($pd)) {
-            Mapper::getInstance()->save($pd);
+            try {
+                Mapper::getInstance()->save($pd);
+            }
+            catch (\PDOException $e) {
+                return false;
+            }
+            catch (\UnexpectedValueException $e) {
+                return false;
+            }
 
             return true;
         }
