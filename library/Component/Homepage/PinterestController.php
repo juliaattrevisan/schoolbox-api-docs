@@ -53,7 +53,7 @@ class Component_Homepage_PinterestController extends Component_Homepage_Controll
                  * Remove domain, check how may parts there are
                  */
                 $url = trim($this->getConfig('url'));
-                $url = preg_replace('#https?://(.*).pinterest.com/?#', '', $url);
+                $url = preg_replace('#https?://(.*).pinterest.com(\.[a-z]+)?/?#', '', $url);
 
                 $parts = array_filter(explode('/', $url));
 
