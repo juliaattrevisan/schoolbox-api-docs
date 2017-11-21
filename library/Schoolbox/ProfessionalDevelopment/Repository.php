@@ -43,7 +43,7 @@ class Repository
      * @throws MapperException
      * @throws \PDOException
      */
-    public function save(User $user, string $pdNumber, string $pdState)
+    public function save(User $user, ?string $pdNumber, ?string $pdState)
     {
         /** @var Model $pd */
         try {
