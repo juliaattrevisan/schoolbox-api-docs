@@ -80,8 +80,7 @@ class Module extends RestfulModule
                 new Rule\HasServicePermission(
                     UserAccess::SERVICE_SPORTS_ADMINISTRATOR,
                     UserAccess::ACCESS_WRITE
-                ),
-                new IsSeasonNotArchived()
+                )
             )
         );
 
