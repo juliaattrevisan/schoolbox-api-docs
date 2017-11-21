@@ -66,24 +66,28 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 			$j = 0;
 			
 			foreach ($allItems as $currentItem) {
-				$this->setVar(array(
-					'LIST_ITEM_ID' => $currentItem->getId(),
-					'FILE_ITEM_ID' => $currentItem->getFileId(),
-					'FILE_ITEM_TITLE' => Scrub::text($currentItem->getFile()->getTitle()),
-					'FILE_ITEM_FILENAME' => Scrub::text($currentItem->getFile()->getFilename()),
-					'FILE_ITEM_MIMETYPE' => $currentItem->getFile()->getMimetype()->getIconFile(),
-					'FILE_ITEM_CREATED_AT' => $currentItem->getCreatedAt()->getShort(),
-					'ON_OFF' => ++$j % 2 ? '' : 'dark',
-					'FILE_ITEM_FILESIZE' => Alaress_Byte_Format::bytesToString($currentItem->getFile()->getSize()),
-				));
+			    if($currentItem->getFile()->getMimetype()) {
+                    $this->setVar(
+                        array(
+                            'LIST_ITEM_ID'         => $currentItem->getId(),
+                            'FILE_ITEM_ID'         => $currentItem->getFileId(),
+                            'FILE_ITEM_TITLE'      => Scrub::text($currentItem->getFile()->getTitle()),
+                            'FILE_ITEM_FILENAME'   => Scrub::text($currentItem->getFile()->getFilename()),
+                            'FILE_ITEM_MIMETYPE'   => $currentItem->getFile()->getMimetype() ? $currentItem->getFile()->getMimetype()->getIconFile() : '',
+                            'FILE_ITEM_CREATED_AT' => $currentItem->getCreatedAt()->getShort(),
+                            'ON_OFF'               => ++$j % 2 ? '' : 'dark',
+                            'FILE_ITEM_FILESIZE'   => Alaress_Byte_Format::bytesToString($currentItem->getFile()->getSize()),
+                        )
+                    );
 
-				/* Controls
-				 */
-				if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-					$this->parse('has_unpublish_form_block', 'has_unpublish_form');
-				}
+                    /* Controls
+                     */
+                    if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
+                        $this->parse('has_unpublish_form_block', 'has_unpublish_form');
+                    }
 
-				$this->parse('list_item_block', 'list_item', true);
+                    $this->parse('list_item_block', 'list_item', true);
+                }
 
 				/* Clear children after parsing out the parent
 				 */
