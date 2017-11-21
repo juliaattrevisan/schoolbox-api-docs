@@ -12,12 +12,9 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
-use Twig_Loader_Chain;
-
 
 class Module extends BaseModule
 {
@@ -32,38 +29,10 @@ class Module extends BaseModule
     protected function registerRoutes()
     {
         $updatePD = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\IsUser('userId')
-            )
+            new Rule\IsLoggedIn()
         );
 
-        $preloadUser = function ($params) { return $this->preloadUser($params); };
-
-        $this->register('POST', '/update/{userId}', 'postUpdate', $updatePD, $preloadUser);
-    }
-
-    /**
-     * Preload the user
-     *
-     * @param array $params
-     * @return array
-     * @throws InvalidArgumentException
-     * @throws NotFound
-     */
-    private function preloadUser(array $params)
-    {
-        try {
-            $user = $this->getUserMapper()->findById($params['userId']);
-        }
-        catch (MapperException $e) {
-            throw new NotFound();
-        }
-
-        return [
-            'user' => $user,
-        ];
+        $this->register('POST', '/update', 'postUpdate', $updatePD, null);
     }
 
     /**
@@ -72,14 +41,6 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
-    {
-        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
     /**
@@ -96,11 +57,9 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
-            'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class)
+            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class)
         ];
     }
-
     /**
      * @return Mapper|UserMapper
      * @throws \InvalidArgumentException If cannot find mapper class
@@ -108,15 +67,5 @@ class Module extends BaseModule
     protected function getUserMapper()
     {
         return $this->getMapperFactory()->get(UserMapper::class);
-    }
-
-
-    /**
-     * @return Mapper|ErrorMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
-     */
-    protected function getErrorMapper()
-    {
-        return $this->getMapperFactory()->get(ErrorMapper::class);
     }
 }
