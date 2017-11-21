@@ -381,6 +381,13 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     // do not cache when in debug mode
                     if (!$config->get('debug_mode')) {
                         $options['cache'] = $config->get('stream_dir') . '/templates/';
+                    } else {
+                        if (class_exists('\Alaress\Web\Template\DebugTwig')) {
+                            $twigClass = '\Alaress\Web\Template\DebugTwig';
+                        } else {
+                            $twigClass = 'Twig_Template';
+                        }
+                        $options['base_template_class'] = $twigClass;
                     }
 
                     $twig = new Twig_Environment($di->get('templateEngine:loader'), $options);
