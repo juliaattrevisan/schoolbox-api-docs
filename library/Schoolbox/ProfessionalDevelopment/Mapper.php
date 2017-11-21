@@ -14,6 +14,21 @@ use Schoolbox\UserMapper;
 
 class Mapper extends BaseMapper
 {
+    /**
+     * Store this so I don't need to make db schema etc
+     *
+     * @var array
+     */
+    private $states = [
+        'Please select',
+        'New South Wales',
+        'Victoria',
+        'Queensland',
+        'Northern Territory',
+        'Western Australia',
+        'South Australia',
+        'Canberra'
+    ];
 
     /**
      * @inheritdoc
@@ -23,13 +38,7 @@ class Mapper extends BaseMapper
         $this->hasTable('user_professionaldevelopment');
         $this->hasModel(Model::class);
 
-        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
-        $this->uses('number', self::TYPE_STRING);
-        $this->uses('registration_state', self::TYPE_STRING);
-        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
-        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
-        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
 
@@ -73,43 +82,22 @@ class Mapper extends BaseMapper
     {
         $userMapper = $this->getJoinMapper('user');
 
-        $collection = $this->createCollection();
+        $row = $statement->fetch(\PDO::FETCH_ASSOC);
 
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $pd = $this->hydrate($row);
-            $pd->setUser($userMapper->hydrate($row, 'u'));
+        $pd = $this->hydrate($row);
+        $pd->setUser($userMapper->hydrate($row, 'u'));
 
-            $collection->add($pd);
-        }
-
-        return $collection;
+        return $pd;
     }
 
 
     /**
-     * Get the hardcoded list of states; derive it from the enum field
+     * Get the hardcoded list of states
      *
      * @return array
      */
     public function getStates()
     {
-        $query = "
-            SELECT column_type 
-            FROM information_schema.COLUMNS 
-            WHERE table_schema = ? 
-            AND table_name = ? 
-            AND column_name = ?
-        ";
-
-        $args = [ SQL_db, $this->getTable(), 'registration_state' ];
-
-        $statement = $this->getDatabase()->prepare($query);
-        $statement->execute($args);
-
-        $row = $statement->fetch(\PDO::FETCH_ASSOC);
-
-        $states = explode("','", preg_replace("/(enum|set)\('(.+?)'\)/","\\2", $row['column_type']));
-
-        return $states;
+        return $this->states;
     }
 }

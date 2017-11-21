@@ -28,14 +28,14 @@ class Model implements ISoftDeletable
     /**
      * Professional Development number
      *
-     * @var string
+     * @var int
      */
-    private $number;
+    private $num;
 
     /**
      * The state in which the teacher registered
      *
-     * @var string
+     * @var int
      */
     private $registrationState;
 
@@ -61,39 +61,39 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return string
+     * @return int
      */
-    public function getNumber(): string
+    public function getNum(): int
     {
-        return $this->number;
+        return $this->num;
     }
 
 
     /**
-     * @param string $number
+     * @param int $num
      * @return $this
      */
-    public function setNumber(?string $number)
+    public function setNum(int $num)
     {
-        $this->number = $number;
+        $this->num = $num;
         return $this;
     }
 
 
     /**
-     * @return string
+     * @return int
      */
-    public function getRegistrationState(): string
+    public function getRegistrationState(): int
     {
         return $this->registrationState;
     }
 
 
     /**
-     * @param string $registrationState
+     * @param int $registrationState
      * @return $this
      */
-    public function setRegistrationState(?string $registrationState)
+    public function setRegistrationState(int $registrationState)
     {
         $this->registrationState = $registrationState;
         return $this;

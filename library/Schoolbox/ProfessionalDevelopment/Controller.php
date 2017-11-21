@@ -16,6 +16,7 @@ class Controller extends Base
      */
     public function postUpdate()
     {
-        new \Alaress_Probe($this->getRequest()->post['test']);
+        new \Alaress_Probe($this->getRequest()->post);
+        die();
     }
 }
