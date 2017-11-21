@@ -2,6 +2,9 @@
 /**
  * Repository
  *
+ * Essentially a Facade for saving a Professional Development instance, abstracting away the mechanism by which a PD
+ * instance is spawned and populated before saving.
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -16,7 +19,7 @@ class Repository
 {
 
     /**
-     * Save profesional development data
+     * Save professional development data
      * Only save if valid data exists; otherwise noop
      * (PD data is optional to provide)
      *
