@@ -168,12 +168,6 @@ class Document extends Base implements IDocument
                                         BETWEEN StartDate AND EndDate
                                     ), YEAR(d.SourceDate)
                                 ) AS FileYear,
-                                (
-                                    SELECT TOP 1 FileSemester
-                                    FROM FileSemesters
-                                    WHERE d.SourceDate 
-                                    BETWEEN StartDate AND EndDate
-                                ) AS FileSemester,
                                 CONVERT(VARCHAR(20), SourceDate, 20) as CreatedDate,
                                 'tDocuments' AS Source
                     FROM        {$this->schema}.pvDocumentReferences dr
