@@ -107,7 +107,8 @@ $kernel->run(new class extends App {
                 $mapFactory->get(Schoolbox\User\Password\Reset\Mapper::class),
                 $mapFactory->get(Schoolbox\UserMapper::class),
                 new TwigEmailFactory(new CoreContext($config), $log)
-            )
+            ),
+            $config->get('portrait_dir')
         );
     }
 
@@ -135,6 +136,11 @@ $kernel->run(new class extends App {
             // TODO once fuzziness is no longer required, remove the fuzzy argument
             /** @var array $provisionedUsers */
             $provisionedUsers = json_decode($this->getFromHelp(self::ROUTE_USERS_GET, [ 'fuzzy' => 1 ]), true);
+
+            if (!is_array($provisionedUsers)) {
+                $log->error("Did not receive array of users back from {$host}");
+                return;
+            }
 
             // obtain list of user IDs
             $userIds = array_keys($provisionedUsers);

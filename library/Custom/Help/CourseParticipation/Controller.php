@@ -27,13 +27,9 @@ use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use UnexpectedValueException;
 
 class Controller extends Base
 {
-    const PARTICIPANT_ROLE_NAME = 'School Staff';
-    const PARTICIPANT_CAMPUS    = 1;
-
     /**
      * @var UserAccessMapper
      */
@@ -55,11 +51,6 @@ class Controller extends Base
     private $codeMapper;
 
     /**
-     * @var User\Password\MailService
-     */
-    private $passwordMailService;
-
-    /**
      * @var Handler
      */
     private $handler;
@@ -70,26 +61,28 @@ class Controller extends Base
      * @param SiteAccess\Mapper         $tokenMapper
      * @param Folder\Mapper             $folderMapper
      * @param User\Password\MailService $mailService
+     * @param string                    $portraitDir
      * @throws Mapper\DefinitionException
      */
     public function __construct(
         UserAccessMapper $userAccessMapper,
         SiteAccess\Mapper $tokenMapper,
         Folder\Mapper $folderMapper,
-        User\Password\MailService $mailService
+        User\Password\MailService $mailService,
+        $portraitDir
     ) {
         $this->userAccessMapper = $userAccessMapper;
         $this->tokenMapper      = $tokenMapper;
         $this->folderMapper     = $folderMapper;
         $this->codeMapper       = $folderMapper->getJoinMapper('codes');
-        $this->passwordMailService = $mailService;
 
         // TODO rejig for DI
         $this->handler = new Handler(
             $this->userAccessMapper,
             $this->tokenMapper,
             $this->folderMapper,
-            $this->passwordMailService
+            $mailService,
+            $portraitDir
         );
     }
 
@@ -378,8 +371,9 @@ class Controller extends Base
         $rs = $this->getResponse();
 
         try {
-            $participantRole     = $this->getRoleMapper()->findOneByColumn('name', self::PARTICIPANT_ROLE_NAME);
-            $participantCampuses = $this->getCampusMapper()->findByColumn('id', self::PARTICIPANT_CAMPUS);
+            // check the server is correctly configured
+            $this->getRoleMapper()->findOneByColumn('name', Handler::PARTICIPANT_ROLE_NAME);
+            $this->getCampusMapper()->findOneByColumn('id', Handler::PARTICIPANT_CAMPUS);
 
         } catch (Mapper\Exception $e) {
             // if this role doesn't exist, that's *bad* bad
@@ -400,94 +394,11 @@ class Controller extends Base
             return;
         }
 
-        $failedUsers = [];
-
         $byUsername = $rq->query->getBool('byUsername', false);
 
-        foreach ($post['user'] as $userData) {
-            if (!$this->userPayloadIsValid($userData)) {
-                $failedUsers[] = [
-                    'Invalid payload', $userData
-                ];
-                continue;
-            }
+        $failedUsers = $this->handler->postUserRegistrations($schoolCode, $byUsername, $post);
 
-            $externalId = "{$schoolCode}.{$userData['id']}";
-
-            try {
-                if ($byUsername) {
-                    // if explicitly stated by the request, look up user by username
-                    $user = $this->getUserMapper()->findOneByColumn('username', $userData['email']);
-                } else {
-                    // consider user uniqueness as looked up by external ID
-                    $user = $this->getUserMapper()->findOneByColumn('synergy_id', $externalId);
-                }
-
-                // cache the old value
-                $oldUsername = $user->getUsername();
-
-            } catch (Mapper\Exception\Deleted $e) {
-                // user exists, but is deleted; consider this a fail case
-                $failedUsers[] = [
-                    'User is deleted', $userData
-                ];
-                continue;
-
-            } catch (Mapper\Exception $e) {
-                // user does not exist; create the model
-                $user = $this->getUserMapper()->createModel()
-                    ->setRole($participantRole)
-                    ->setCampusCollection($participantCampuses)
-                    ->setLocalEmail(false)
-                    ->setWebmail(false)
-                    ->setUseInternalMail(false)
-                    ->setEportfolioEnable(false)
-                ;
-
-                // no previous username
-                $oldUsername = '';
-            }
-
-            // update user object
-            $user
-                ->setUsername($userData['email']) // yes, email -> username is on purpose
-                ->setTitle($userData['title'])
-                ->setFirstname($userData['firstname'])
-                ->setLastname($userData['lastname'])
-                ->setAltEmail($userData['email'])
-                ->setEnabled(true)
-                ->setExternalId($externalId)
-                ->setLocalEmail(false) // use alt-email in ALL cases always
-            ;
-
-            try {
-                $this->getUserMapper()->save($user);
-
-                if ($oldUsername) {
-                  // existing user
-                    if ($user->getUsername() !== $oldUsername) {
-                        // send existing-user email ("your username has changed")
-                        $this->passwordMailService->sendUsernameChangeEmailToUser($user, $oldUsername);
-                    }
-                } else {
-                    // new user: send new-user email ("welcome and here's how to set your password")
-                    $this->passwordMailService->sendWelcomeEmailToUser($user);
-                }
-            } catch (Mapper\Exception $e) {
-                // the user failed to save; is fail case
-                $failedUsers[] = [
-                    'Failed to save', $userData
-                ];
-
-            } catch (UnexpectedValueException $e) {
-                // duplicate username
-                $failedUsers[] = [
-                    'Duplicate username', $userData
-                ];
-            }
-        }
-
-        if (count($failedUsers)) {
+        if (\count($failedUsers)) {
             // just blame the client :P
             $this->sendGenericStatus(400);
             $rs->content->set($this->buildJsonOutput($failedUsers));
@@ -497,24 +408,6 @@ class Controller extends Base
             $this->sendGenericStatus(204);
         }
     }
-
-
-    /**
-     * @param array $userData
-     * @return bool
-     */
-    private function userPayloadIsValid(array $userData)
-    {
-        // check all the necessary data is present
-        foreach (Handler::REQUIRED_USER_FIELDS as $required) {
-            if (!array_key_exists($required, $userData) || empty(trim($userData[$required]))) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
 
     /**
      * @param string $schoolCode

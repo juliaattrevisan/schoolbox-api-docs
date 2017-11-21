@@ -101,6 +101,9 @@ class Module extends Alaress\Module\Module
             'tokenMapper'      => $mapperFactory->getLazy(SiteAccess\Mapper::class),
             'folderMapper'     => $mapperFactory->getLazy(Folder\Mapper::class),
             'mailService'      => $injector->lazyNew(MailService::class),
+            'portraitDir'      => $injector->lazy(function () use ($injector) {
+                return $injector->get('config')->get('portrait_dir');
+            })
         ];
     }
 
