@@ -119,12 +119,33 @@
             {% endblock buttons_island %}
         </section>
 
-        {# Professional Development #}
-        {% include '@professionaldevelopment/form.twig' with {
-            pdEnabled: pdEnabled,
-            userId: user.id,
-            pd: pd,
-            pdStates: pdStates
-        } only %}
+        {% set pdUpdateRoute = routeLookupIfAuthorized('professionaldevelopment.postUpdate') %}
+
+        {% if pdUpdateRoute %}
+        <form action="{{ pdUpdateRoute }}" method="post">
+            <fieldset>
+                <section class="content">
+                    <div class="small-12 medium-8 columns">
+                        <label>Professional Development Number</label>
+                        <input type="text" name="pdNumber" />
+                    </div>
+                    <div class="small-12 medium-4 columns">
+                        <label>Registration State</label>
+                        <select name="pdState">
+                            <option value="1">Victoria</option>
+                            <option value="2">New South Wales</option>
+                            <option value="3">Queensland</option>
+                            <option value="4">Northern Territory</option>
+                            <option value="5">Western Australia</option>
+                            <option value="6">South Australia</option>
+                            <option value="7">Tasmania</option>
+                            <option value="8">Canberra</option>
+                        </select>
+                    </div>
+                </section>
+            </fieldset>
+        </form>
+
+        {% endif %}
     </div>
 </div>
