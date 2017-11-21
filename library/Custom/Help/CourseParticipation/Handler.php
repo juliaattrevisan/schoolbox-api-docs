@@ -249,6 +249,7 @@ class Handler
                 /* Add Professional Development data
                  * Create a new one if it doesn't already exist
                  */
+                /** @var ProfessionalDevelopment\Model $pd */
                 try {
                     $pd = $this->pdMapper->findOneByColumn('user_id', $user->getId());
                 }
@@ -257,11 +258,17 @@ class Handler
                     $pd->setUser($user);
                 }
 
-
                 $pd->setNumber($userData['pdNumber']);
                 $pd->setRegistrationState($userData['pdState']);
 
-                $this->pdMapper->save($pd);
+                $validation = new ProfessionalDevelopment\ValidProfessionalDevelopment($this->pdMapper->getStates());
+
+                /* Only save if valid data exists; otherwise noop
+                 * PD data is optional to provide
+                 */
+                if ($validation->isSatisfiedBy($pd)) {
+                    $this->pdMapper->save($pd);
+                }
 
                 if ($oldUsername) {
                     // existing user

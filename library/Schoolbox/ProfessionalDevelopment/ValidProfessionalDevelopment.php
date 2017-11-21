@@ -13,6 +13,11 @@ class ValidProfessionalDevelopment
 {
 
     /**
+     * @var Model
+     */
+    private $pd;
+
+    /**
      * @var array
      */
     private $states;
@@ -30,27 +35,33 @@ class ValidProfessionalDevelopment
 
     /**
      * Conditions that determine a valid Professional Development number
-     * Alphanumerics only; if it contains anything else, it's invalid
      *
      * @param $pdNumber
      * @return bool
      */
     private function isValidNumber($pdNumber)
     {
-        return preg_match('/^[a-zA-Z0-9]+$/', $pdNumber);
+        if (strlen(trim($pdNumber))) {
+            return true;
+        }
+
+        return false;
     }
 
 
     /**
      * Conditions that determine a valid Professional Development registration state
-     * Must be one of the $states provided in constructor
      *
      * @param $state
      * @return bool
      */
     private function isValidRegistrationState($state)
     {
-        return in_array($state, $this->states);
+        if (in_array($state, $this->states)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -68,8 +79,6 @@ class ValidProfessionalDevelopment
             return $this->isValidNumber($number) && $this->isValidRegistrationState($state);
         }
         catch (\Throwable $e) {
-
-            // In case it came out of the db as null etc.
             return false;
         }
     }
