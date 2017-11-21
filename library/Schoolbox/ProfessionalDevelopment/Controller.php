@@ -14,6 +14,12 @@ use Schoolbox\User;
 
 class Controller extends Base
 {
+
+    /**
+     * @var Mapper
+     */
+    private $pdMapper;
+
     /**
      * @var Error\Mapper
      */
@@ -21,10 +27,12 @@ class Controller extends Base
 
     /**
      * Controller constructor.
+     * @param Mapper       $pdMapper
      * @param Error\Mapper $errorMapper
      */
-    public function __construct(Error\Mapper $errorMapper)
+    public function __construct(Mapper $pdMapper, Error\Mapper $errorMapper)
     {
+        $this->pdMapper = $pdMapper;
         $this->errorMapper = $errorMapper;
     }
 
@@ -41,7 +49,7 @@ class Controller extends Base
         $number = $this->getRequest()->post['pdNumber'];
         $state = $this->getRequest()->post['pdState'];
 
-        $result = (new Repository())->save($user, $number, $state);
+        $result = (new Repository($this->pdMapper))->save($user, $number, $state);
 
         /* Redirect upon successful save
          */

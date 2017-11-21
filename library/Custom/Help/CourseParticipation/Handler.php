@@ -254,7 +254,7 @@ class Handler
 
                 /* Add Professional Development data
                  */
-                $pdSaveSuccess = (new Repository())->save($user, $userData['pdNumber'], $userData['pdState']);
+                $pdSaveSuccess = (new Repository($this->pdMapper))->save($user, $userData['pdNumber'], $userData['pdState']);
 
                 if (!$pdSaveSuccess) {
                     // ... where do I log this failure? :|

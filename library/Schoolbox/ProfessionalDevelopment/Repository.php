@@ -17,6 +17,19 @@ use Schoolbox\Mapper\Exception as MapperException;
 
 class Repository
 {
+    /**
+     * @var Mapper
+     */
+    private $pdMapper;
+
+    /**
+     * Repository constructor.
+     * @param Mapper $pdMapper
+     */
+    public function __construct(Mapper $pdMapper)
+    {
+        $this->pdMapper = $pdMapper;
+    }
 
     /**
      * Save professional development data
@@ -34,10 +47,10 @@ class Repository
     {
         /** @var Model $pd */
         try {
-            $pd = Mapper::getInstance()->findOneByColumn('user_id', $user->getId());
+            $pd = $this->pdMapper->findOneByColumn('user_id', $user->getId());
         }
         catch (MapperException $e) {
-            $pd = Mapper::getInstance()->createModel();
+            $pd = $this->pdMapper->createModel();
             $pd->setUser($user);
         }
 
@@ -46,7 +59,7 @@ class Repository
         $pd->setNumber(preg_replace('/[^a-zA-Z0-9]/', '', $pdNumber));
         $pd->setRegistrationState($pdState);
 
-        $validation = new ValidProfessionalDevelopment(Mapper::getInstance()->getStates());
+        $validation = new ValidProfessionalDevelopment($this->pdMapper->getStates());
 
         /* Only save if valid data exists; otherwise noop
          * Catch all the errors that Mapper->save can throw and bin them for now
