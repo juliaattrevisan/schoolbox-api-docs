@@ -43,7 +43,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
      *
      * @return array
      */
-    public function provider_validCompleteDetails() {
+    public function provider_validCompleteDetails() :array {
         return [
             'Valid Complete Details 1' => [
                 (new Model())->setNumber(123)->setRegistrationState('NSW'),
@@ -101,7 +101,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
      *
      * @return array
      */
-    public function provider_validState() {
+    public function provider_validState() :array {
         return [
             'Valid State 1' => [
                 (new Model())->setNumber(123)->setRegistrationState('VIC'),
@@ -159,7 +159,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
      *
      * @return array
      */
-    public function provider_validNumber() {
+    public function provider_validNumber() :array {
         return [
             'Valid Number 1' => [
                 (new Model())->setNumber(123)->setRegistrationState('VIC'),
