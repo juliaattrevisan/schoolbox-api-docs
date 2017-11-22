@@ -18,17 +18,9 @@
  */
 
 use Alaress\Database\Connector\IConnector;
-use Alaress\Jitter\Jitter;
-use Alaress\Random\FloatGenerator;
 use Aura\Di;
-use GuzzleHttp\Client as HttpClient;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
-use Schoolbox\Learning\InlineGrader\Crocodoc\Archiver as CrocodocArchiver;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\MapperFactory;
-use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\UserMapper;
 
 $options = require_once __DIR__ . '/../../conf/core/require-cli.php';
 
@@ -41,7 +33,7 @@ $kernel = new Schoolbox\Application\Daemon\Kernel(
     ]
 );
 
-$kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array $options) {
+$kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log) {
 
     /** @var IConnector $db */
     $db = $di->get('databaseInternal');
@@ -109,7 +101,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
                 $row['archiveFeedbackId'],
                 $row['studentId'],
                 $row['dueWorkId'],
-                $i+1,
+                $i + 1,
                 $migrateCount
             )
         );
