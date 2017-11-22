@@ -1,22 +1,22 @@
-{% if dates|length == 4 %}
-    {% set fullSetOfDates = true %}
-{% endif %}
+{#
+    'fullSetOfDates'     bool
+    'dateType'           string
+    'unitImplementation' UnitImplementation\Model
+    'assessment'         IAssessable
+#}
 
 {% set large = (fullSetOfDates) ? 3 : 6 %}
+{% set date  = attribute(assessment, dateType ~ 'At') %}
 
 {% if dateType == 'publish' %}
-    {% set date = unitImplementation.openDate.local %}
     {% set endSync = (fullSetOfDates) ? 'open' : 'due' %}
 {% elseif dateType == 'open' %}
-    {% set date = unitImplementation.openDate.local %}
     {% set startSync = 'publish' %}
     {% set endSync = 'due' %}
 {% elseif dateType == 'due' %}
-    {% set date = unitImplementation.dueDate.local %}
     {% set startSync = (fullSetOfDates) ? 'open' : 'publish' %}
     {% set endSync = (fullSetOfDates) ? 'close' : '' %}
 {% else %}
-    {% set date = unitImplementation.dueDate.local %}
     {% set startSync = 'due' %}
 {% endif %}
 
@@ -25,7 +25,7 @@
     <input id="{{ dateType }}Date-{{ unitImplementation.id }}"
            name="unit[{{ unitImplementation.id }}][{{ dateType }}]"
            type="text"
-           value="{{ date }}"
+           value="{{ date.local }}"
            data-datepicker
            data-datepicker-time
            data-datepicker-format="datetime"

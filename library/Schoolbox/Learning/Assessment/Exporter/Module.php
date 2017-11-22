@@ -9,12 +9,12 @@ namespace Schoolbox\Learning\Assessment\Exporter;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
+use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -38,12 +38,16 @@ class Module extends BaseModule
      */
     protected $basename = 'learningAssessmentExporter';
 
+
     /**
      * Hook method for setting up routes via self::register()
      *
      * @return void
+     * @throws \InvalidArgumentException
+     * @throws ServiceNotFound
+     * @throws \Schoolbox\Application\Exception\Exception
      */
-    protected function registerRoutes()
+    protected function registerRoutes(): void
     {
         // preloaders to use
         $preloadAssessment = function ($params) { return $this->preloadAssessment($params); };
@@ -59,13 +63,17 @@ class Module extends BaseModule
         $this->register('POST', $route, 'postExport', $isStaff, $preloadAssessment);
     }
 
+
     /**
      * Convert route params into an assessment object
      *
      * @param array $params
      * @return array
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Application\Exception\Exception
      */
-    protected function preloadAssessment(array $params)
+    protected function preloadAssessment(array $params): array
     {
         try {
             $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
@@ -76,7 +84,7 @@ class Module extends BaseModule
         }
 
         // If the assessment isn't a specification - it can't be imported anywhere
-        if (!$assessment->getContext() instanceof UnitSpecification) {
+        if (!$assessment->getContext() instanceof UnitSpecification\Model) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
@@ -88,15 +96,17 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initTemplatePaths(IChainLoader $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
     /**
      * @inheritdoc
+     * @throws \InvalidArgumentException
+     * @throws ServiceNotFound
      */
-    public function initControllers(ContainerInterface $injector)
+    public function initControllers(ContainerInterface $injector): void
     {
         /** @var Container $injector */
         $injector->set(
@@ -129,80 +139,97 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|UserMapper
+     * @throws \InvalidArgumentException
      */
     protected function getUserMapper()
     {
         return $this->getMapperFactory()->get(UserMapper::class);
     }
 
+
     /**
-     * @return QuizMapper
+     * @return QuizMapper|Mapper
+     * @throws \InvalidArgumentException
      */
     protected function getQuizMapper()
     {
-        /** @var QuizMapper $quizMapper */
-        $quizMapper = $this->getMapperFactory()->get(QuizMapper::class);
-        return $quizMapper;
+        return $this->getMapperFactory()->get(QuizMapper::class);
     }
 
+
     /**
-     * @return Mapper|ErrorMapper
+     * @return ErrorMapper|Mapper
+     * @throws \InvalidArgumentException
      */
     protected function getErrorMapper()
     {
         return $this->getMapperFactory()->get(ErrorMapper::class);
     }
 
+
     /**
      * @return object|AssessmentMapperProxy
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     protected function getAssessmentMapperProxy()
     {
         return $this->injector->get('assessmentDataSource');
     }
 
+
     /**
-     * @return Mapper|UnitImplementationMapper
+     * @return UnitImplementation\Mapper|Mapper
+     * @throws \InvalidArgumentException
      */
     protected function getUnitImplementationMapper()
     {
-        return $this->getMapperFactory()->get(UnitImplementationMapper::class);
+        return $this->getMapperFactory()->get(UnitImplementation\Mapper::class);
     }
 
+
     /**
-     * @return Mapper|UnitSpecificationMapper
+     * @return UnitSpecification\Mapper|Mapper
+     * @throws \InvalidArgumentException
      */
     protected function getUnitSpecificationMapper()
     {
-        return $this->getMapperFactory()->get(UnitSpecificationMapper::class);
+        return $this->getMapperFactory()->get(UnitSpecification\Mapper::class);
     }
 
+
     /**
-     * @return Mapper|StudentSubmissionMapper
+     * @return StudentSubmissionMapper|Mapper
+     * @throws \InvalidArgumentException
      */
     protected function getStudentSubmissionMapper()
     {
         return $this->getMapperFactory()->get(StudentSubmissionMapper::class);
     }
 
+
     /**
-     * @return Mapper|SubmissionReturnMapper
+     * @return SubmissionReturnMapper|Mapper
+     * @throws \InvalidArgumentException
      */
     protected function getSubmissionReturnMapper()
     {
         return $this->getMapperFactory()->get(SubmissionReturnMapper::class);
     }
 
+
     /**
      * @return Mapper|StorageMapper
+     * @throws \InvalidArgumentException
      */
     protected function getStorageMapper()
     {
         return $this->getMapperFactory()->get(StorageMapper::class);
     }
 
+
     /**
      * @return Mapper|FolderMapper
+     * @throws \InvalidArgumentException
      */
     protected function getFolderMapper()
     {

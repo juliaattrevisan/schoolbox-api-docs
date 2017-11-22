@@ -1,0 +1,127 @@
+{#
+    'assessmentSpec'   IAssessable
+    'assessmentImpl'   IAssessable
+    'folderWritePerms' bool[]        - Does current user have WRITE+ perm to the class folder
+    'enableReimport'   bool          - Should already imported class assessments be re-importable?
+#}
+{% set unitImpl     = assessmentImpl.baseContext %}
+{% set isInstructor = folderWritePerms[unitImpl.course.folder.id] %}
+{% set isImported   = assessmentImpl.id is not null %}
+{% set canImport    = isInstructor and (not isImported or enableReimport) %}
+
+<script type="text/javascript">
+    $(function () {
+        var $checkbox = $('#import-{{ unitImpl.id }}'),
+            unitId    = $checkbox.attr('data-unit-id');
+
+        // Toggle date fields
+        $checkbox.change(function () {
+            if ($checkbox.prop('checked') && !$checkbox.prop('disabled')) {
+                $('#unit-' + unitId + '-dates').removeAttr('hidden');
+            } else {
+                $('#unit-' + unitId + '-dates').attr('hidden', true);
+            }
+        });
+
+        // Warn user they are about to clobber previous interactions
+        {% if enableReimport %}
+        $('[data-warn-destructive-export]').click(function(e) {
+            var $checkbox               = $(this),
+                countResponses          = $checkbox.data('countResponses'),
+                countSubmittedResponses = $checkbox.data('countSubmittedResponses'),
+                countDraftResponses     = countResponses - countSubmittedResponses,
+                countFeedbacks          = $checkbox.data('countFeedbacks'),
+                countPublishedFeedbacks = $checkbox.data('countPublishedFeedbacks'),
+                countDraftFeedbacks     = countFeedbacks - countPublishedFeedbacks,
+                message                 = 'Are you sure you want to re-export to this class? ' +
+                                          'Doing so will overwrite the existing class assessment.';
+
+            // Only display interaction counts if there are interactions
+            if(countResponses || countFeedbacks){
+                message += '<br><br>This will also delete ' + countResponses + ' student submissions (' +
+                    countDraftResponses + ' drafts, ' + countSubmittedResponses + ' submitted) and ' +
+                    countFeedbacks + ' teacher feedbacks (' + countDraftFeedbacks + ' drafts, ' +
+                    countPublishedFeedbacks + ' published).'
+            }
+
+            if ($checkbox.prop('checked')) {
+                e.preventDefault();
+                $checkbox.confirmDialog({
+                    text: message,
+                    format: 'html',
+                    confirmLabel: 'Delete and re-export',
+                    cancelLabel: 'Cancel',
+                    confirmEvent: function() {
+                        $checkbox.prop('checked', true);
+                        $checkbox.trigger('change')
+                    }
+                });
+            }
+        });
+        {% endif %}
+    });
+</script>
+
+<li>
+    <div class="small-12 columns">
+        <div class="selector">
+            <input type="checkbox"
+                   id="import-{{ unitImpl.id }}"
+                   name="unitImplementation[{{ unitImpl.id }}]"
+                   value="1"
+                   {% if not canImport %}disabled{% endif %}
+                   {% if enableReimport and isImported %}
+                       data-warn-destructive-export
+                       data-count-responses="{{ assessmentImpl.countResponses(true) }}"
+                       data-count-submitted-responses="{{ assessmentImpl.countResponses(false) }}"
+                       data-count-feedbacks="{{ assessmentImpl.countFeedbacks(true) }}"
+                       data-count-published-feedbacks="{{ assessmentImpl.countFeedbacks(false) }}"
+                   {% endif %}
+                   data-unit-id="{{ unitImpl.id }}"/>
+            <label for="import-{{ unitImpl.id }}" class="checkbox-label"></label>
+        </div>
+        <div class="card small-12">
+            <span class="size-32 icon-home"></span>
+            <h3><a href="/homepage/{{ unitImpl.course.folder.id }}">{{ unitImpl.course.folder.title }}</a></h3>
+            <p class="meta">
+                {% spaceless %}
+                    <time title="{{ unitImpl.openDate.short }}"
+                          datetime="{{ unitImpl.openDate.databaseDate }}"
+                    >{{ unitImpl.openDate.relativeTime }}</time>
+                    &ndash;
+                    <time title="{{ unitImpl.dueDate.short }}"
+                          datetime="{{ unitImpl.dueDate.databaseDate }}"
+                    >{{ unitImpl.dueDate.relativeTime }}</time>
+                {% endspaceless %}
+            </p>
+            <p class="meta">
+                {% if isImported %}
+                    This {{ locale.assessment }} already exists in this class.
+                {% elseif not isInstructor %}
+                    You don't have write permission for this class.
+                {% else %}
+                    This {{ locale.assessment }} does not exist in this class.
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    {% if (assessmentSpec is quiz or (assessmentSpec is dueWork and not assessmentSpec.acceptNone)) %}
+        {% set dates = ['publish', 'open', 'due', 'close'] %}
+        {% set fullSetOfDates = true %}
+    {% else %}
+        {% set dates = ['publish', 'due'] %}
+        {% set fullSetOfDates = false %}
+    {% endif %}
+
+    <div class="list-item" id="unit-{{ unitImpl.id }}-dates" hidden>
+        {% for date in dates %}
+            {% include '@learningAssessmentExporter/date.twig' with {
+                fullSetOfDates:     fullSetOfDates,
+                dateType:           date,
+                unitImplementation: unitImpl,
+                assessment:         assessmentImpl
+            } only %}
+        {% endfor %}
+    </div>
+</li>
