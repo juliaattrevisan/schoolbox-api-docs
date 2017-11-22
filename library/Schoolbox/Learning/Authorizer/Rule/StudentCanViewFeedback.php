@@ -30,16 +30,23 @@ class StudentCanViewFeedback extends AbstractCanViewFeedback
 
         $assessment = $this->findAssessment($params);
         $student    = $this->findStudent($params);
-        $feedback   = $this->findFeedback($params);
+
+        // If there's feedback, check it's published
+        try {
+            $feedback = $this->findFeedback($params);
+            if (!$feedback->isPublished()) {
+                throw new Unauthorized('Feedback is not published. Students cannot view draft feedback');
+            }
+        } catch (\InvalidArgumentException $e) {
+            // Let this continue, in case the only thing being checked here is a Kami doc
+        }
 
         if ($user->getId() !== $student->getId()) {
             throw new Unauthorized('Current user is not participation student');
         }
+
         if (!$assessment->isFeedbackVisibleToUser($user)) {
             throw new Unauthorized('This assessment is configured to not permit students to see feedback');
-        }
-        if(!$feedback->isPublished()){
-            throw new Unauthorized('Feedback is not published. Students cannot view draft feedback');
         }
     }
 }
