@@ -489,14 +489,16 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function getCountResponses(bool $includeDrafts = false): int
     {
-        // Short-circuit if not excluding drafts
-        if ($includeDrafts) {
-            return $this->responses->count();
-        }
         $count = 0;
-        foreach ($this->responses as $response) {
-            if ($response->isSubmitted()) {
-                $count++;
+        foreach ($this->allParticipants as $participant) {
+            if ($includeDrafts) {
+                $count += $participant->getAllResponses()->count();
+            } else {
+                foreach ($participant->getAllResponses() as $response) {
+                    if ($response->isSubmitted()) {
+                        $count++;
+                    }
+                }
             }
         }
         return $count;
@@ -513,14 +515,16 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function getCountFeedbacks(bool $includeDrafts = false): int
     {
-        // Short-circuit if not excluding drafts
-        if ($includeDrafts) {
-            return $this->feedbacks->count();
-        }
         $count = 0;
-        foreach ($this->feedbacks as $feedback) {
-            if ($feedback->isPublished()) {
-                $count++;
+        foreach ($this->allParticipants as $participant) {
+            if ($includeDrafts) {
+                $count += $participant->getAllFeedbacks()->count();
+            } else {
+                foreach ($participant->getAllFeedbacks() as $feedback) {
+                    if ($feedback->isPublished()) {
+                        $count++;
+                    }
+                }
             }
         }
         return $count;
