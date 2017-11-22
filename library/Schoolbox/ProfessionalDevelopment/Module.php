@@ -52,7 +52,7 @@ class Module extends BaseModule
      * @throws InvalidArgumentException
      * @throws NotFound
      */
-    private function preloadUser(array $params)
+    private function preloadUser(array $params) :array
     {
         try {
             $user = $this->getUserMapper()->findById($params['userId']);

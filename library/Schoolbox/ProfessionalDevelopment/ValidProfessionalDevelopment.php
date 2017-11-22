@@ -35,7 +35,7 @@ class ValidProfessionalDevelopment
      * @param $pdNumber
      * @return bool
      */
-    private function isValidNumber($pdNumber)
+    private function isValidNumber($pdNumber) :bool
     {
         return preg_match('/^[a-zA-Z0-9]+$/', $pdNumber);
     }
@@ -48,7 +48,7 @@ class ValidProfessionalDevelopment
      * @param $state
      * @return bool
      */
-    private function isValidRegistrationState($state)
+    private function isValidRegistrationState($state) :bool
     {
         return in_array($state, $this->states);
     }
@@ -59,7 +59,7 @@ class ValidProfessionalDevelopment
      * @param Model $pd
      * @return bool
      */
-    public function isSatisfiedBy(Model $pd)
+    public function isSatisfiedBy(Model $pd) :bool
     {
         try {
             $number = $pd->getNumber();
