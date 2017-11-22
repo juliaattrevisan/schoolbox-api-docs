@@ -161,7 +161,6 @@ class Component_Renderer
                 $component->getPageTemplate()->setVar([
                     'PAGE_ID' => $eportfolioPage->getPageId(),
                     'EPORTFOLIO_PAGE_USER_ID' => $eportfolioPage->getUserId(),
-                    'EPORTFOLIO_PAGE_ID'    => $eportfolioPage->getPageId(),
                 ]);
 
                 $component->getPageTemplate()->pParse($templateTarget, $templateHandle);
