@@ -10,6 +10,7 @@
 namespace Schoolbox\Resource\My\File;
 
 
+use Component\Eportfolio\FileListMapper;
 use Schoolbox\Collection;
 use Schoolbox\Resource;
 use Schoolbox\Resource\AbstractFileMapper;
@@ -55,6 +56,10 @@ class Mapper extends AbstractFileMapper implements ILocator, IFileMapper
         $this->uses('published', self::TYPE_DATETIME, null, 'publishedAt');
 
         $this->joins($this->getFolderFieldname(), Resource\My\Folder\Mapper::class, 'id', null, null, 'folder');
+
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'deleteEportfolio' ]);
+
+
     }
 
 
@@ -108,4 +113,16 @@ class Mapper extends AbstractFileMapper implements ILocator, IFileMapper
         // TODO consider changing myFile.parent from mandatory to optional and add a FK, where NULL => topLevel.
         return 'LEFT JOIN';
     }
+
+    /**
+     * Post-deletecallback
+     *
+     * @param Model $file
+     */
+    public function deleteEportfolio(Model $file)
+    {
+        $fileListMapper = FileListMapper::getInstance();
+        $fileListMapper->deleteByColumn('file_id',$file->getId());
+    }
+
 }
