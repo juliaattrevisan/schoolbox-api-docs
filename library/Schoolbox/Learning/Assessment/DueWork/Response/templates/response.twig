@@ -204,7 +204,7 @@ Usage:
                         </div>
                     </div>
                     <nav>
-                        {% include '@learning/dueWork/plagscan/link.twig' with {assessment: assessment, response: response, plagscan: currentFile.plagscan} only %}
+                        {% include '@learning/dueWork/plagscan/link.twig' with {assessment: assessment, response: response, plagscan: currentFile.plagscan, participant: participant} only %}
                         <a class="icon-download" title="" data-dropdown="download-options-{{ currentFile.id }}"></a>
                     </nav>
                     <ul id="download-options-{{ currentFile.id }}" class="f-dropdown" data-dropdown-content>
