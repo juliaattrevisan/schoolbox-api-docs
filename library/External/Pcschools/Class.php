@@ -72,7 +72,7 @@ class External_Pcschools_Class implements External_ClassInterface
      *
      * @return array
      */
-    public function getTeacherName($classCode)
+    public function getTeacherName($classCodes)
     {
         return array_map(
             function($v) { return $v['TEACHER']; },
@@ -81,7 +81,7 @@ class External_Pcschools_Class implements External_ClassInterface
                     SELECT DISTINCT
                         tf.TEACHER
                     FROM TIMEFILE tf
-                    WHERE {$this->getTimefileFilter($classCode)}
+                    WHERE {$this->getTimefileFilter($classCodes)}
                 ")
             )
         );
