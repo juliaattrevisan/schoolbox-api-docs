@@ -9,7 +9,7 @@ namespace Schoolbox\Test;
 
 use Schoolbox\Blog\Homepage\Post as Blog;
 
-class PopulateTimestamps extends \PHPUnit_Framework_TestCase
+class PopulateTimestamps extends \PHPUnit\Framework\TestCase
 {
 
     /**
