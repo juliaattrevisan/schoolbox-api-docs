@@ -59,8 +59,8 @@ class Sync extends Base implements ISync
                         WHEN (sb.resid_code) IS NOT NULL THEN 'Y'
                         ELSE 'N'
                     END              AS student_boarder,
-                    sb.resid_code AS student_boarding_house,
-                    s.campus_code AS student_campus
+                    sb.resid_code    AS student_boarding_house,
+                    s.campus_code    AS student_campus
                 FROM student AS s
                 LEFT JOIN studboard AS sb ON s.stud_code = sb.stud_code AND s.cmpy_code = sb.cmpy_code
                 WHERE s.cmpy_code = :companyCode
