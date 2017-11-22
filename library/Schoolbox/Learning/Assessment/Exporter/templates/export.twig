@@ -14,7 +14,7 @@
 <script type="text/javascript">
     $(function () {
         var $importForm   = $('#importForm'),
-            $checkboxes   = $importForm.find('input[type=checkbox]'),
+            $checkboxes   = $importForm.find('input[type=checkbox][data-unit-id]'),
             $submitButton = $importForm.find('input[type=submit]');
 
         // Enable submit button if any checkbox is checked.
