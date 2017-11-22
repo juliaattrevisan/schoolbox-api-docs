@@ -58,28 +58,48 @@ class Component extends Filter\BaseComponent
         $roleType            = $this->getUser()->getRole()->getType();
         $isUserConfigurable  = $this->getPageFilter()->getUserConfigurable();
 
-        foreach ($abstractOptions as $option) {
-            // has admin configured the filter to be user-configurable, but that this option should not be available?
-            if ($isUserConfigurable && !$option->getAvailable()) {
+        // Had admin configured Groups and/or Classes to be available for current user's role type?
+        // (if not user configurable, set to always available - filtering applied by roleDefault)
+        $isGroupsAvailable  = $abstractOptions[Definition::KEY_GROUPS]->getAvailable();
+        $isClassesAvailable = $abstractOptions[Definition::KEY_CLASSES]->getAvailable();
+
+        // Had admin configured Groups and/or Classes to be selected for current user's role type?
+        $selectGroups  = $abstractOptions[Definition::KEY_GROUPS]->getDefaults()[$roleType]->getSelected();
+        $selectClasses = $abstractOptions[Definition::KEY_CLASSES]->getDefaults()[$roleType]->getSelected();
+
+        foreach ($this->folders as $folder) {
+
+            /* Should the folder be available?
+             * - if not user configurable, set to always available - filtering applied by roleDefault
+             * - is group and groups are available
+             * - is/was class and classes are available
+             */
+            $available = !$isUserConfigurable || ($isGroupsAvailable && $folder->isGroup())
+                || ($isClassesAvailable && ($folder->isClass() || $this->wasClass($folder)));
+            if (!$available) {
                 continue;
             }
 
-            // did the admin configure the abstract option to be selected by default for the specified role?
-            $selected = $option->getDefaults()[$roleType]->getSelected();
+            // Folder is available. Should it be selected?
+            $selected = ($selectGroups && $folder->isGroup())
+                || ($selectClasses && ($folder->isClass() || $this->wasClass($folder)));
 
-            foreach ($this->folders as $folder) {
-                $key = (string)$folder->getId();
-
-                if (!$availableSelections->offsetExists($key)) {
-                    // Does the folder not yet exist in selections ?
-                    $availableSelections[$key] = $this->createSelection($key, $selected);
-                } elseif ($selected) {
-                    // Does it exist, ensure it is selected if abstract option is selected
-                    $availableSelections[$key]->setSelected(true);
-                }
-            }
+            $key                       = (string)$folder->getId();
+            $availableSelections[$key] = $this->createSelection($key, $selected);
         }
         return $availableSelections;
+    }
+
+
+    /**
+     * Returns whether a folder's name indicates the folder is a rolled-over class
+     *
+     * @param Folder\Model $folder
+     * @return bool
+     */
+    private function wasClass(Folder\Model $folder): bool
+    {
+        return (bool)preg_match('#\[.+\]$#', $folder->getName());
     }
 
 
