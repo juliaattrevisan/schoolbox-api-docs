@@ -25,10 +25,18 @@ class BaseComponent implements IComponent
     /** @var Page\Model */
     private $pageFilter;
 
-    /**  @var null|GenericCollection|Selection\Model[] */
+    /**
+     * Will be NULL if user does not have any saved settings for this filter
+     *
+     * @var null|GenericCollection|Selection\Model[]
+     */
     private $userSelections;
 
-    /**  @var null|GenericCollection|Selection\Model[] */
+    /**
+     * Will be NULL if no overrides are present in URL for this filter
+     *
+     * @var null|GenericCollection|Selection\Model[]
+     */
     private $urlOverrides;
 
     /** @var Selection\Mapper */
@@ -52,9 +60,6 @@ class BaseComponent implements IComponent
         ?GenericCollection $urlOverrides,
         Selection\Mapper $filterSelectionMapper
     ) {
-        if (!$userSelections && !$urlOverrides) {
-            throw new \InvalidArgumentException('Either $userSelections or $urlOverrides must be specified');
-        }
         $this->definition            = $definition;
         $this->user                  = $user;
         $this->pageFilter            = $pageFilter;
@@ -121,7 +126,7 @@ class BaseComponent implements IComponent
                 $userSelection->setSelected(
                     $this->urlOverrides->offsetExists($key) && $this->urlOverrides[$key]->getSelected()
                 );
-            } else {
+            } elseif ($this->userSelections) {
                 // fall back to any saved user selections
                 if ($this->userSelections->offsetExists($key)) {
                     $userSelection->setSelected($this->userSelections[$key]->getSelected());
@@ -206,6 +211,7 @@ class BaseComponent implements IComponent
     {
         return $this->user;
     }
+
 
     /**
      * @return Page\Model
