@@ -206,6 +206,20 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
 
 
     /**
+     * Returns whether this folder's name indicates the folder is a rolled-over class
+     *
+     * WARNING: This is pretty fragile. If you change a folder's name after roll-over this
+     *          will return a false negative.
+     *
+     * @return bool
+     */
+    public function wasClass(): bool
+    {
+        return (bool)preg_match('#\[.+\]$#', $this->name);
+    }
+
+
+    /**
      * Get a truncated version of the Folder Code string
      * by getting the first $maxCodes codes and appending
      * an ellipsis to indicate the rest. If there are less

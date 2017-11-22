@@ -75,31 +75,19 @@ class Component extends Filter\BaseComponent
              * - is/was class and classes are available
              */
             $available = !$isUserConfigurable || ($isGroupsAvailable && $folder->isGroup())
-                || ($isClassesAvailable && ($folder->isClass() || $this->wasClass($folder)));
+                || ($isClassesAvailable && ($folder->isClass() || $folder->wasClass()));
             if (!$available) {
                 continue;
             }
 
             // Folder is available. Should it be selected?
             $selected = ($selectGroups && $folder->isGroup())
-                || ($selectClasses && ($folder->isClass() || $this->wasClass($folder)));
+                || ($selectClasses && ($folder->isClass() || $folder->wasClass()));
 
             $key                       = (string)$folder->getId();
             $availableSelections[$key] = $this->createSelection($key, $selected);
         }
         return $availableSelections;
-    }
-
-
-    /**
-     * Returns whether a folder's name indicates the folder is a rolled-over class
-     *
-     * @param Folder\Model $folder
-     * @return bool
-     */
-    private function wasClass(Folder\Model $folder): bool
-    {
-        return (bool)preg_match('#\[.+\]$#', $folder->getName());
     }
 
 
