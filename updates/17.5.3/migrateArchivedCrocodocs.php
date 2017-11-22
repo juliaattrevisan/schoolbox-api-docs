@@ -66,7 +66,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log) {
         SELECT sr.id AS actualFeedbackId
         FROM  submission_return sr
         WHERE sr.deleted_at IS NULL
-        AND   sr.marker != :systemUserId
+        AND   sr.id    != :archiveFeedbackId
         AND   sr.box_id = :dueWorkId
         AND   sr.owner  = :studentId
         ORDER BY created_at DESC
@@ -108,9 +108,9 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log) {
 
         // Figure out which feedback to attach to
         $selectMostRecentFeedbackQuery->execute([
-            'systemUserId' => $systemUserId,
-            'dueWorkId'    => $row['dueWorkId'],
-            'studentId'    => $row['studentId'],
+            'archiveFeedbackId' => $row['archiveFeedbackId'],
+            'dueWorkId'         => $row['dueWorkId'],
+            'studentId'         => $row['studentId'],
         ]);
         $mostRecentFeedbackId = $selectMostRecentFeedbackQuery->fetchColumn();
         if (empty($mostRecentFeedbackId)) {
