@@ -524,7 +524,10 @@
 
                     applyMessageData(item, amqpMsg);
 
-                    list.append(item);
+                    // Do not re-append the same message
+                    if (list.find('#'+item.attr('id')).length === 0) {
+                        list.append(item);
+                    }
 
                     if (!title.html().length) {
                         title.text(amqpMsg.meta.title);
