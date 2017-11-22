@@ -25,31 +25,41 @@ class BaseComponent implements IComponent
     /** @var Page\Model */
     private $pageFilter;
 
-    /**  @var GenericCollection|Selection\Model[] */
+    /**  @var null|GenericCollection|Selection\Model[] */
     private $userSelections;
+
+    /**  @var null|GenericCollection|Selection\Model[] */
+    private $urlOverrides;
 
     /** @var Selection\Mapper */
     private $filterSelectionMapper;
 
 
     /**
-     * @param IDefinition                         $definition
-     * @param User                                $user
-     * @param Page\Model                          $pageFilter
-     * @param GenericCollection|Selection\Model[] $userSelections
-     * @param Selection\Mapper                    $filterSelectionMapper
+     * @param IDefinition                              $definition
+     * @param User                                     $user
+     * @param Page\Model                               $pageFilter
+     * @param null|GenericCollection|Selection\Model[] $userSelections
+     * @param null|GenericCollection|Selection\Model[] $urlOverrides
+     * @param Selection\Mapper                         $filterSelectionMapper
+     * @throws \InvalidArgumentException If neither $userSelections or $urlOverrides are supplied
      */
     public function __construct(
         IDefinition $definition,
         User $user,
         Page\Model $pageFilter,
-        GenericCollection $userSelections,
+        ?GenericCollection $userSelections,
+        ?GenericCollection $urlOverrides,
         Selection\Mapper $filterSelectionMapper
     ) {
+        if (!$userSelections && !$urlOverrides) {
+            throw new \InvalidArgumentException('Either $userSelections or $urlOverrides must be specified');
+        }
         $this->definition            = $definition;
         $this->user                  = $user;
         $this->pageFilter            = $pageFilter;
         $this->userSelections        = $userSelections;
+        $this->urlOverrides          = $urlOverrides;
         $this->filterSelectionMapper = $filterSelectionMapper;
     }
 
@@ -98,11 +108,24 @@ class BaseComponent implements IComponent
     {
         $userSelections = $roleSelections->emptyClone();
 
+        /* Do we have URL overrides present?
+         * If so, all user-selections are deselected unless explicitly specified to be selected.
+         * Else we overlay the role-selections with any saved user selections.
+         */
+
         // Overlay user-specific selection settings
         foreach ($roleSelections as $key => $roleSelection) {
             $userSelection = clone $roleSelection;
-            if ($this->userSelections->offsetExists($key)) {
-                $userSelection->setSelected($this->userSelections[$key]->getSelected());
+            if ($this->urlOverrides) {
+                // Select option only if explicitly declared by URL overrides
+                $userSelection->setSelected(
+                    $this->urlOverrides->offsetExists($key) && $this->urlOverrides[$key]->getSelected()
+                );
+            } else {
+                // fall back to any saved user selections
+                if ($this->userSelections->offsetExists($key)) {
+                    $userSelection->setSelected($this->userSelections[$key]->getSelected());
+                }
             }
             $userSelections[$key] = $userSelection;
         }

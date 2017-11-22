@@ -24,22 +24,25 @@ class Component extends Filter\BaseComponent
 
 
     /**
-     * @param Filter\IDefinition                          $definition
-     * @param User                                        $user
-     * @param Filter\Page\Model                           $pageFilter
-     * @param GenericCollection|Filter\Selection\Model[]  $userSelections
-     * @param Filter\Selection\Mapper                     $filterSelectionMapper
-     * @param Collection|GenericCollection|Folder\Model[] $folders
+     * @param Filter\IDefinition                              $definition
+     * @param User                                            $user
+     * @param Filter\Page\Model                               $pageFilter
+     * @param null|GenericCollection|Filter\Selection\Model[] $userSelections
+     * @param null|GenericCollection|Filter\Selection\Model[] $urlOverrides
+     * @param Filter\Selection\Mapper                         $filterSelectionMapper
+     * @param Collection|GenericCollection|Folder\Model[]     $folders
+     * @throws \InvalidArgumentException If neither $userSelections or $urlOverrides are supplied
      */
     public function __construct(
         Filter\IDefinition $definition,
         User $user,
         Filter\Page\Model $pageFilter,
-        GenericCollection $userSelections,
+        ?GenericCollection $userSelections,
+        ?GenericCollection $urlOverrides,
         Filter\Selection\Mapper $filterSelectionMapper,
         GenericCollection $folders
     ) {
-        parent::__construct($definition, $user, $pageFilter, $userSelections, $filterSelectionMapper);
+        parent::__construct($definition, $user, $pageFilter, $userSelections, $urlOverrides, $filterSelectionMapper);
         $this->folders = $folders;
     }
 

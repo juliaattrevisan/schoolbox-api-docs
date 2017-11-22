@@ -46,7 +46,7 @@ interface IFactory
      * @param IDefinition                              $definition They type of filter we are building
      * @param User                                     $user
      * @param Page\Model                               $pageFilter
-     * @param GenericCollection|Selection\Model[]      $selections Indexed selection.key
+     * @param null|GenericCollection|Selection\Model[] $selections Indexed selection.key
      * @param null|User                                $viewee
      * @param null|GenericCollection|Selection\Model[] $overrides  Indexed selection.key
      * @return IComponent
@@ -55,7 +55,7 @@ interface IFactory
         IDefinition $definition,
         User $user,
         Page\Model $pageFilter,
-        GenericCollection $selections,
+        ?GenericCollection $selections,
         ?User $viewee,
         ?GenericCollection $overrides
     ): IComponent;

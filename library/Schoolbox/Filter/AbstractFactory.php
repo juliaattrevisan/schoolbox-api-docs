@@ -33,23 +33,24 @@ abstract class AbstractFactory implements IFactory
     }
 
     /**
-     * @param IDefinition     $definition
-     * @param User                   $user
-     * @param Page\Model      $pageFilter
-     * @param GenericCollection      $selections
-     * @param null|User              $viewee
-     * @param null|GenericCollection $overrides
+     * @param IDefinition                              $definition
+     * @param User                                     $user
+     * @param Page\Model                               $pageFilter
+     * @param null|GenericCollection|Selection\Model[] $selections Indexed selection.key
+     * @param null|User                                $viewee
+     * @param null|GenericCollection|Selection\Model[] $overrides  Indexed selection.key
      * @return IComponent
+     * @throws \InvalidArgumentException If neither $selections or $overrides are supplied
      */
     public function buildComponent(
         IDefinition $definition,
         User $user,
         Page\Model $pageFilter,
-        GenericCollection $selections,
+        ?GenericCollection $selections,
         ?User $viewee,
         ?GenericCollection $overrides
     ): IComponent {
-        return new BaseComponent($definition, $user, $pageFilter, $overrides ?: $selections, $this->selectionMapper);
+        return new BaseComponent($definition, $user, $pageFilter, $selections, $overrides, $this->selectionMapper);
     }
 
 

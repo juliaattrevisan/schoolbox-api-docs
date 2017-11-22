@@ -42,23 +42,24 @@ abstract class Factory extends AbstractFactory
     }
 
     /**
-     * @param Filter\IDefinition     $definition
-     * @param User                   $user
-     * @param Filter\Page\Model      $pageFilter
-     * @param GenericCollection      $selections
-     * @param null|User              $viewee
-     * @param null|GenericCollection $overrides
+     * @param Filter\IDefinition                              $definition
+     * @param User                                            $user
+     * @param Filter\Page\Model                               $pageFilter
+     * @param null|GenericCollection|Filter\Selection\Model[] $selections Indexed selection.key
+     * @param null|User                                       $viewee
+     * @param null|GenericCollection|Filter\Selection\Model[] $overrides  Indexed selection.key
      * @return Filter\IComponent|Component
+     * @throws \InvalidArgumentException If neither $selections or $overrides are supplied
      */
     public function buildComponent(
         Filter\IDefinition $definition,
         User $user,
         Filter\Page\Model $pageFilter,
-        GenericCollection $selections,
+        ?GenericCollection $selections,
         ?User $viewee,
         ?GenericCollection $overrides
     ): Filter\IComponent {
-        return new Component($definition, $user, $pageFilter, $overrides ?: $selections, $this->getSelectionMapper());
+        return new Component($definition, $user, $pageFilter, $selections, $overrides, $this->getSelectionMapper());
     }
 
 

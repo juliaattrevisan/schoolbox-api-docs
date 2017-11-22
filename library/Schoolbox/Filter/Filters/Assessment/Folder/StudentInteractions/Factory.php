@@ -37,22 +37,22 @@ class Factory extends FolderFilter\Factory
 
 
     /**
-     * @param Filter\IDefinition     $definition
-     * @param User                   $user
-     * @param Filter\Page\Model      $pageFilter
-     * @param GenericCollection      $selections
-     * @param null|User              $viewee
-     * @param null|GenericCollection $overrides
+     * @param Filter\IDefinition                              $definition
+     * @param User                                            $user
+     * @param Filter\Page\Model                               $pageFilter
+     * @param null|GenericCollection|Filter\Selection\Model[] $selections Indexed selection.key
+     * @param null|User                                       $viewee
+     * @param null|GenericCollection|Filter\Selection\Model[] $overrides  Indexed selection.key
      * @return Filter\IComponent|FolderFilter\Component
      * @throws DefinitionException if join $name isn't on this mapper
      * @throws \UnexpectedValueException
-     * @throws \InvalidArgumentException
+     * @throws \InvalidArgumentException If neither $selections or $overrides are supplied
      */
     public function buildComponent(
         Filter\IDefinition $definition,
         User $user,
         Filter\Page\Model $pageFilter,
-        GenericCollection $selections,
+        ?GenericCollection $selections,
         ?User $viewee,
         ?GenericCollection $overrides
     ): Filter\IComponent {
@@ -84,7 +84,8 @@ class Factory extends FolderFilter\Factory
             $definition,
             $user,
             $pageFilter,
-            $overrides ?: $selections,
+            $selections,
+            $overrides,
             $this->getSelectionMapper(),
             $folders->sortBy('name', 'ASC')
         );
