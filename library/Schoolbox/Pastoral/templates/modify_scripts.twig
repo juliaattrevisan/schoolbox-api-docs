@@ -1,0 +1,115 @@
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+<script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
+<script type="text/javascript" src="/javascript/jquery.chained.min.js"></script>
+
+<script type="text/javascript">
+    $(function () {
+
+        {# Setup ckEditor #}
+
+        $.fn.alaressEditor();
+
+        {# Pastoral Tag Selectize #}
+
+        $('#tags').selectizeSelector({
+            ajax: {
+                url: '/ajax/tags/pastoral',
+                type: 'GET',
+                dataType: 'json'
+            },
+            multiple: true,
+            selectize: {
+                create: function (input) {
+                    return {
+                        id: input,
+                        name: input
+                    }
+                }
+            },
+            value: [
+                {% for tag in record.tags %}
+
+                {% set tagName = tag.name | escape('js') %}
+                {'id': '{{ tagName }}', 'name': '{{ tagName }}'}{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ]
+        });
+
+        {# Delete Button For Existing Records #}
+
+        {% if record.id != '' %}
+
+        $('[data-delete]').click(function (e) {
+            e.preventDefault();
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this record?',
+                confirmEvent: function () {
+                    $.post('{{ routeLookup('pastoral.postRecordDelete', {'studentId': record.student.id, 'recordId': record.id}) }}')
+                        .done(function () {
+                            window.location.href = '{{ routeLookup('pastoral.getIndex', {'studentId': record.student.id ? record.student.id : student.id}) }}';
+                        });
+                }
+            });
+        });
+
+        {% endif %}
+
+        {# Create Duplicate Record Selectize #}
+
+        $('#addStudent').selectizeSelector({
+            multiple: true,
+            ajax: {
+                url: '/ajax/user.php',
+                type: 'GET',
+                data: {
+                    roleTypeID: 'student',
+                    excludeID: '{{ record.student.id }}'
+                },
+                dataType: 'json'
+            }
+        });
+
+        {# Form Validation #}
+
+        var form = $('form#pastoralForm');
+
+        form.alaressValidate({
+            ignore: ':disabled',
+            rules: {
+                'heading': {required: true}
+            },
+
+            messages: {
+                'heading': {required: 'You must enter a title before you can proceed'}
+            },
+
+            submitHandler: function (form) {
+                var button = $("[data-submit]");
+                button.val('Saving, Please Wait');
+                button.attr('disabled', 'true');
+
+                {# Need to submit the form on timeout, otherwise the DOM doesn't update with new button label #}
+
+                window.setTimeout(function() { form.submit(); }, 0);
+            }
+        });
+
+        {# Chain Pastoral Type/Subtype Dropdowns #}
+
+        $('#subtypeId').chained('#typeId');
+
+        {# Update record permissions section #}
+
+        updateVisibility();
+
+        {# Display preloader #}
+
+        $('#formPastoralPreloader').addClass('hide');
+        $('#formPastoral').removeClass('hide');
+        $('#formPastoralDelete').removeClass('hide');
+    });
+</script>
