@@ -178,7 +178,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
                         $c = $c->merge(new Collection($this->notifyDeleted($roletype, $resource, $user)->getAll($time)));
                         break;
                 }
-            } catch(Mapper\Exception $e) {
+            } catch(Mapper\Exception|\Error $e) {
                 // mute failures where things were logged about resources that no longer exist
             }
 
