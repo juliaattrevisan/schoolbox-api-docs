@@ -157,16 +157,8 @@ class Controller extends AbstractController
             }
         }
 
-        // Don't permit creation of modification of teams in archived divisions
-        if($context->getSeason()->isArchived()){
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
-        }
-
-
         // Load coaches into entity
         $entity->setCoaches($this->getCoachCloud()->findForTeam($entity));
-
-
 
         try {
             $sport = $this->getSportMapper()->findById($context->getSport()->getId());
