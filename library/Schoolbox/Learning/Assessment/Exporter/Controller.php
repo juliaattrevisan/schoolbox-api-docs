@@ -15,6 +15,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Replicator;
@@ -230,10 +231,12 @@ class Controller extends BaseController
         if ($encodedReturnUrl) {
             $returnUrl = Redirect::decode($encodedReturnUrl);
         } else {
+            /** @var UnitSpecification\Model $unitSpec */
+            $unitSpec  = $assessmentSpec->getBaseContext();
             $returnUrl = $this->getRouter()->generate(
-                'course.modifyCourse',
-                ['id' => $assessmentSpec->getContext()->getId(),]
-            );
+                    'course.modifyCourse',
+                    ['id' => $unitSpec->getCourse()->getId(),]
+                ) . "#{$unitSpec->getId()}";
         }
 
         // Redir back to the return URL (if set) or the course page if not
