@@ -29,6 +29,8 @@ class Sync extends Base implements ISync
     {
         parent::__construct($config, $databaseExternal);
 
+        $this->databaseExternal->addPostProcessor([$this, 'trimWhitespace']);
+
         $this->companyCode = $config->get('external_tass_company_code');
         $this->helper = new External_Tass_Helper();
     }
@@ -57,8 +59,8 @@ class Sync extends Base implements ISync
                         WHEN (sb.resid_code) IS NOT NULL THEN 'Y'
                         ELSE 'N'
                     END              AS student_boarder,
-                    sb.resid_code    AS student_boarding_house,
-                    s.campus_code    AS student_campus
+                    sb.resid_code AS student_boarding_house,
+                    s.campus_code AS student_campus
                 FROM student AS s
                 LEFT JOIN studboard AS sb ON s.stud_code = sb.stud_code AND s.cmpy_code = sb.cmpy_code
                 WHERE s.cmpy_code = :companyCode
@@ -263,5 +265,24 @@ class Sync extends Base implements ISync
         );
 
         return new Iterator\Staff($iterator);
+    }
+
+    /**
+     * Function to trim whitespace from array/value
+     *
+     * @param array|string $input
+     * @return array|string $input
+     */
+    public function trimWhitespace($input)
+    {
+        if (is_array($input)) {
+            $output = [];
+            foreach ($input as $key => $value) {
+                $output[$key] = trim($value);
+            }
+            return $output;
+        } else {
+            return trim($input);
+        }
     }
 }
