@@ -46,7 +46,14 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     /** @var IConnector $db */
     $db = $di->get('databaseInternal');
 
+    // Get the system user
     $selectSystemUserQuery = $db->prepareQuery("SELECT id FROM user WHERE username='alaress' AND deleted_at IS NULL");
+    $selectSystemUserQuery->execute();
+    $systemUserId = $selectSystemUserQuery->fetchColumn();
+    if (!$systemUserId) {
+        $log->error('No "alaress" user found; cannot identify feedback to archive!');
+        exit(1);
+    }
 
     // Get return ID, student ID, assessment ID
     $selectArchivedFeedbackQuery = $db->prepareQuery("
@@ -77,7 +84,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     // Move file to most recent feedback
     $moveCrocodocArchiveFileQuery = $db->prepareQuery("
         UPDATE submission_return_file
-        SET    submission_return_id = :actualFeedbackId
+        SET    submission_return_id = :mostRecentFeedbackId
         WHERE  id                   = :fileId
     ");
 
@@ -87,4 +94,67 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         SET    deleted_at = COALESCE(created_at, NOW())
         WHERE  id         = :archiveFeedbackId
     ");
+
+
+    // Go
+    $selectArchivedFeedbackQuery->execute(['systemUserId' => $systemUserId]);
+    $migrateCount = $selectArchivedFeedbackQuery->rowCount();
+    $successCount = 0;
+    $failureCount = 0;
+    foreach ($selectArchivedFeedbackQuery->fetchAll() as $i => $row) {
+
+        $log->notice(
+            sprintf(
+                'Migrating archived feedback #%d (student #%d, due work #%d, %d/%d)',
+                $row['archiveFeedbackId'],
+                $row['studentId'],
+                $row['dueWorkId'],
+                $i+1,
+                $migrateCount
+            )
+        );
+
+        // Figure out which feedback to attach to
+        $selectMostRecentFeedbackQuery->execute([
+            'systemUserId' => $systemUserId,
+            'dueWorkId'    => $row['dueWorkId'],
+            'studentId'    => $row['studentId'],
+        ]);
+        $mostRecentFeedbackId = $selectMostRecentFeedbackQuery->fetchColumn();
+        if (empty($mostRecentFeedbackId)) {
+            $log->debug('No other feedback exists for student/work; skipping');
+            $successCount++;
+            continue;
+        }
+
+        // Move it
+        $log->debug(sprintf('Migrating Crocodoc archive to most recent feedback #%d', $mostRecentFeedbackId));
+        $moveCrocodocArchiveFileQuery->execute([
+            'mostRecentFeedbackId' => $mostRecentFeedbackId,
+            'fileId'               => $row['fileId'],
+        ]);
+
+        // Delete old feedback
+        $log->debug(sprintf('Deleting archived feedback #%d', $row['archiveFeedbackId']));
+        $deleteArchiveFeedbackQuery->execute([
+            'archiveFeedbackId' => $row['archiveFeedbackId'],
+        ]);
+
+        $log->info('Feedback successfully migrated');
+        $successCount++;
+    }
+
+    // Output a message.
+    // Currently no failure state, but it's here anyway.
+    $message = sprintf(
+        'Migration completed - %d archived, %d failed, %d to do',
+        $successCount,
+        $failureCount,
+        $migrateCount - $successCount - $failureCount
+    );
+    if ($failureCount > 0) {
+        $log->warning($message);
+    } else {
+        $log->notice($message);
+    }
 });
