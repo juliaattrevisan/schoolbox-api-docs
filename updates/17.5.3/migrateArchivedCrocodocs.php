@@ -51,7 +51,8 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     // Get return ID, student ID, assessment ID
     $selectArchivedFeedbackQuery = $db->prepareQuery("
         SELECT
-            sr.id     AS returnId,
+            srf.id    AS fileId,
+            sr.id     AS archiveFeedbackId,
             sr.owner  AS studentId,
             sr.box_id AS dueWorkId
         FROM       student_submission_file_crocodoc_archive_log log
@@ -63,7 +64,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
 
     // Get ID of most recent feedback for participant NOT created by archive tool
     $selectMostRecentFeedbackQuery = $db->prepareQuery("
-        SELECT sr.id
+        SELECT sr.id AS actualFeedbackId
         FROM  submission_return sr
         WHERE sr.deleted_at IS NULL
         AND   sr.marker != :systemUserId
@@ -71,5 +72,19 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         AND   sr.owner  = :studentId
         ORDER BY created_at DESC
         LIMIT 1
+    ");
+
+    // Move file to most recent feedback
+    $moveCrocodocArchiveFileQuery = $db->prepareQuery("
+        UPDATE submission_return_file
+        SET    submission_return_id = :actualFeedbackId
+        WHERE  id                   = :fileId
+    ");
+
+    // Delete archived feedback
+    $deleteArchiveFeedbackQuery = $db->prepareQuery("
+        UPDATE submission_return
+        SET    deleted_at = COALESCE(created_at, NOW())
+        WHERE  id         = :archiveFeedbackId
     ");
 });
