@@ -38,17 +38,7 @@ class External_Pcschools_Class implements External_ClassInterface
      */
     public function getStudents($classCodes)
     {
-        $first = true;
-        $query= "";
-
-        foreach(explode(',', $classCodes) as $code) {
-            if($first) {
-                $query .= $this->getTimefileFilter($code);
-                $first = false;
-            } else {
-                $query .= " OR ".$this->getTimefileFilter($code);
-            }
-        }
+        $query = $this->getTimefileFilter($classCodes);
 
         return $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll("
@@ -104,17 +94,25 @@ class External_Pcschools_Class implements External_ClassInterface
      *
      * @return string
      */
-    private function getTimefileFilter($classCode)
+    private function getTimefileFilter($classCodes)
     {
-        $parts = explode('/', $classCode);
-        if (count($parts) > 1) {
-            list($timePeriod, $classCode) = $parts;
+        $query = [];
+        foreach (explode(',', $classCodes) as $code) {
+
+            $parts = explode('/', $code);
+            if (count($parts) > 1) {
+                list($timePeriod, $code) = $parts;
+            }
+            $filter = "(tf.YEAR + tf.ABBREV + tf.CLASS) = {$this->getDatabase()->smartQuote($code)}";
+            if (isset($timePeriod)) {
+                $filter .= " AND tf.TIME_PERIOD = {$this->getDatabase()->smartQuote($timePeriod)}";
+            }
+
+            $query[] = $filter;
         }
-        $filter = "(tf.YEAR + tf.ABBREV + tf.CLASS) = {$this->getDatabase()->smartQuote($classCode)}";
-        if (isset($timePeriod)) {
-            $filter .= " AND tf.TIME_PERIOD = {$this->getDatabase()->smartQuote($timePeriod)}";
-        }
-        return $filter;
+        $query = implode(' OR ', $query);
+
+        return $query;
     }
 
     /**
