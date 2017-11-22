@@ -58,6 +58,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log) {
         INNER JOIN submission_return_file                       srf ON log.submission_return_file_id = srf.id
         INNER JOIN submission_return                            sr  ON srf.submission_return_id      = sr.id
         WHERE sr.published_at IS NULL
+        AND   sr.deleted_at   IS NULL
         AND   sr.marker = :systemUserId
     ");
 
