@@ -15,6 +15,8 @@
       <description>{ITEM_DESCRIPTION}</description>
 	  <link>{ITEM_LINK}</link>
       <pubDate>{ITEM_DATE}</pubDate>
-    </item><!-- END rss_item -->
+      <guid>{ITEM_LINK}</guid>
+    </item>
+    <!-- END rss_item -->
   </channel>
 </rss>

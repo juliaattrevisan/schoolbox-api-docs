@@ -47,8 +47,8 @@ if (strlen($userKey)) {
     /* Find the articles
     findForFolder() automatically filters out articles that have expired.
      */
-    $newsMapper = new NewsMapper();
-    $allNews = $newsMapper->findForFolder($folder->getId());
+    $newsMapper = NewsMapper::getInstance();
+    $allNews = $newsMapper->findForFolder($folder->getId(), new Schoolbox\User());
 
     /* Render all this stuff
      */
@@ -60,8 +60,8 @@ if (strlen($userKey)) {
             'TITLE' => Scrub::xml(Cfg::get('school_name') . ' - '.$folder->getTitle().' News'),
             'DESCRIPTION' => Scrub::xml('Recent news items from Schoolbox'),
             'DATE' => Scrub::xml(date('r')),
-            'LINK' => Scrub::xml($page->conType() . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']),
-            'SELF' => Scrub::xml($page->conType() . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF']),
+            'LINK' => Scrub::xml($page->conType() . $_SERVER['HTTP_HOST'] . '/homepage/' . $folder->getId() ),
+            'SELF' => Scrub::xml($page->conType() . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']),
         )
     );
 
