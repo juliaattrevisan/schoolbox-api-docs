@@ -74,6 +74,8 @@ class External_Pcschools_Class implements External_ClassInterface
      */
     public function getTeacherName($classCodes)
     {
+        $query = $this->getTimefileFilter($classCodes);
+        
         return array_map(
             function($v) { return $v['TEACHER']; },
             $this->getDatabase()->trimAll(
@@ -81,7 +83,7 @@ class External_Pcschools_Class implements External_ClassInterface
                     SELECT DISTINCT
                         tf.TEACHER
                     FROM TIMEFILE tf
-                    WHERE {$this->getTimefileFilter($classCodes)}
+                    WHERE $query
                 ")
             )
         );
