@@ -67,6 +67,8 @@ class Component extends Filter\BaseComponent
         $selectGroups  = $abstractOptions[Definition::KEY_GROUPS]->getDefaults()[$roleType]->getSelected();
         $selectClasses = $abstractOptions[Definition::KEY_CLASSES]->getDefaults()[$roleType]->getSelected();
 
+        $urlOverrides = $this->getUrlOverrides();
+
         foreach ($this->folders as $folder) {
 
             /* Should the folder be available?
@@ -79,12 +81,17 @@ class Component extends Filter\BaseComponent
             if (!$available) {
                 continue;
             }
+            $key        = (string)$folder->getId();
+            $isInjected = $urlOverrides && $urlOverrides->offsetExists($key);
 
-            // Folder is available. Should it be selected?
-            $selected = ($selectGroups && $folder->isGroup())
+            /* Folder is available. Should it be selected?
+             * - if injected via URL override
+             * - is group and roleDefault for group is true
+             * - is/was class and roleDefault for class is true
+             */
+            $selected = $isInjected || ($selectGroups && $folder->isGroup())
                 || ($selectClasses && ($folder->isClass() || $folder->wasClass()));
 
-            $key                       = (string)$folder->getId();
             $availableSelections[$key] = $this->createSelection($key, $selected);
         }
         return $availableSelections;

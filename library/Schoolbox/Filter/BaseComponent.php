@@ -223,6 +223,15 @@ class BaseComponent implements IComponent
 
 
     /**
+     * @return null|GenericCollection
+     */
+    protected function getUrlOverrides(): ?GenericCollection
+    {
+        return $this->urlOverrides;
+    }
+
+
+    /**
      * @return Selection\Mapper
      */
     protected function getFilterSelectionMapper()
