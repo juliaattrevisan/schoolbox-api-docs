@@ -23,6 +23,7 @@ use Schoolbox\Mail\CoreContext;
 use Schoolbox\Mail\TwigEmailFactory;
 use Schoolbox\MapperFactory;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\ProfessionalDevelopment;
 use Schoolbox\UserMapper;
 
 
@@ -97,11 +98,11 @@ $kernel->run(new class extends App {
 
         $this->router = $di->get('router');
 
-        /** @noinspection PhpParamsInspection */
         $this->handler = new Handler(
             $mapFactory->get(UserAccessMapper::class),
             $mapFactory->get(Schoolbox\Permission\SiteAccess\Mapper::class),
             $mapFactory->get(Schoolbox\Resource\Folder\Mapper::class),
+            $mapFactory->get(ProfessionalDevelopment\Mapper::class),
             new Schoolbox\User\Password\MailService(
                 $config,
                 $mapFactory->get(Schoolbox\User\Password\Reset\Mapper::class),
@@ -157,6 +158,19 @@ $kernel->run(new class extends App {
                 foreach (Handler::REQUIRED_USER_FIELDS as $field) {
                     $userData[$user->getId()][$field] = trim(UserMapper::getInstance()->getModelProperty($user, $field));
                 }
+
+                /* Get Professional Development fields
+                 */
+                /** @var ProfessionalDevelopment\Model $pd */
+                try {
+                    $pd = ProfessionalDevelopment\Mapper::getInstance()->findOneByColumn('user_id', $user->getId());
+
+                    $userData[$user->getId()]['pdNumber'] = $pd->getNumber();
+                    $userData[$user->getId()]['pdState'] = $pd->getRegistrationState();
+                }
+                catch (\Schoolbox\Mapper\Exception $e) {
+                    // noop (no data exists)
+                }
             }
 
             // strip indexing
@@ -173,8 +187,10 @@ $kernel->run(new class extends App {
                 if ($r) {
                     $log->warning("Received client error: {$r->getStatusCode()} {$r->getReasonPhrase()}");
 
+                    $responseBody = $r->getBody()->getContents();
+
                     /** @var array $failedUsers */
-                    $failedUsers = json_decode($r->getBody()->getContents(), true);
+                    $failedUsers = json_decode($responseBody, true);
 
                     if (is_array($failedUsers)) {
                         foreach ($failedUsers as [$reason, $payload]) {
@@ -183,7 +199,7 @@ $kernel->run(new class extends App {
                         }
                     } else {
                         // not an array: just dump the response body
-                        $log->warning($r->getBody()->getContents());
+                        $log->warning($responseBody);
                     }
 
                 } else {

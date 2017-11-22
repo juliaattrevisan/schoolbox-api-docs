@@ -2551,8 +2551,10 @@ abstract class Mapper implements IMapper, Serializable
      * @brief Saves an object to the database. Updates or inserts
      *
      * @param $object
-     *
-     * @return int[]|bool
+     * @return bool|\int[]
+     * @throws Exception
+     * @throws PDOException
+     * @throws \UnexpectedValueException
      */
     public function save($object)
     {

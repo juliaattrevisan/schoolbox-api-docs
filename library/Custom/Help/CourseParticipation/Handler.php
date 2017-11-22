@@ -15,6 +15,8 @@ use Schoolbox\Collection;
 use Schoolbox\Permission\SiteAccess;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\ProfessionalDevelopment;
+use Schoolbox\ProfessionalDevelopment\Repository;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\RoleMapper;
@@ -61,13 +63,19 @@ class Handler
      */
     private $portraitDir;
 
+    /**
+     * @var ProfessionalDevelopment\Mapper
+     */
+    private $pdMapper;
+
 
     /**
-     * @param UserAccessMapper          $userAccessMapper
-     * @param SiteAccess\Mapper         $tokenMapper
-     * @param Folder\Mapper             $folderMapper
-     * @param User\Password\MailService $mailService
-     * @param string                    $portraitDir
+     * @param UserAccessMapper               $userAccessMapper
+     * @param SiteAccess\Mapper              $tokenMapper
+     * @param Folder\Mapper                  $folderMapper
+     * @param ProfessionalDevelopment\Mapper $pdMapper
+     * @param User\Password\MailService      $mailService
+     * @param string                         $portraitDir
      * @throws InvalidArgumentException
      * @throws Mapper\DefinitionException
      */
@@ -75,14 +83,16 @@ class Handler
         UserAccessMapper $userAccessMapper,
         SiteAccess\Mapper $tokenMapper,
         Folder\Mapper $folderMapper,
+        ProfessionalDevelopment\Mapper $pdMapper,
         User\Password\MailService $mailService,
         $portraitDir
     ) {
         $this->userAccessMapper = $userAccessMapper;
-        $this->tokenMapper      = $tokenMapper;
-        $this->folderMapper     = $folderMapper;
-        $this->codeMapper       = $folderMapper->getJoinMapper('codes');
+        $this->tokenMapper = $tokenMapper;
+        $this->folderMapper = $folderMapper;
+        $this->codeMapper = $folderMapper->getJoinMapper('codes');
         $this->passwordMailService = $mailService;
+        $this->pdMapper = $pdMapper;
 
         $portraitDir = realpath($portraitDir);
 
@@ -241,6 +251,14 @@ class Handler
 
             try {
                 $this->getUserMapper()->save($user);
+
+                /* Add Professional Development data
+                 */
+                $pdSaveSuccess = (new Repository($this->pdMapper))->save($user, $userData['pdNumber'], $userData['pdState']);
+
+                if (!$pdSaveSuccess) {
+                    // ... where do I log this failure? :|
+                }
 
                 if ($oldUsername) {
                     // existing user

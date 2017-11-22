@@ -256,4 +256,8 @@
         return false;
     }, 'This field cannot be blank')
 
+    $.validator.addMethod("alphanumeric", function(value, element) {
+        return this.optional(element) || /^[a-z0-9]+$/i.test(value);
+    }, "This field must only contain letters or numbers.");
+
 }(jQuery));

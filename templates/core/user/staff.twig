@@ -118,5 +118,13 @@
                 </ul>
             {% endblock buttons_island %}
         </section>
+
+        {# Professional Development #}
+        {% include '@professionaldevelopment/form.twig' with {
+            pdEnabled: pdEnabled,
+            userId: user.id,
+            pd: pd,
+            pdStates: pdStates
+        } only %}
     </div>
 </div>

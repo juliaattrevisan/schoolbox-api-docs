@@ -41,7 +41,16 @@
                                 <input type="text" name="user[0][{{ field }}]" value="" />
                             </label>
                         {% endfor %}
+                        <label>Professional Development Number
+                            <input type="text" name="user[0][pdNumber]" value="" />
+                        </label>
 
+                        <label>Professional Development Registration State
+                            <select name="user[0][pdState]">
+                                {% for state in pdStates %}
+                                <option value="{{ state }}">{{ state }}</option>
+                                {% endfor %}
+                        </label>
                     </div>
                 </fieldset>
             </section>

@@ -166,6 +166,8 @@ class Mapper extends BaseMapper implements IExceptionGenerator
 
     const ERROR_INVALID_TASK_COMPLETION = 199;
 
+    const ERROR_INVALID_PD_DETAILS = 200;
+
     /**
      * Setup mapping
      */
