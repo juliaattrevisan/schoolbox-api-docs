@@ -151,6 +151,7 @@ class Controller extends BaseController
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \DomainException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      * @internal param string $_GET ['returnUrl']            a URL to return to once done
      * @internal param int[] $_POST ['unitImplementation']   unit implementations to push this into.
      *                                           key:   unit implementation id
@@ -216,6 +217,7 @@ class Controller extends BaseController
             $this->exportToNewContext(
                 $assessmentSpec,
                 $unitImpl,
+                $assessmentImpl->getId() ? $assessmentImpl->getSequence() : null,
                 $datesObjects['publish'],
                 $datesObjects['open'] ?? $datesObjects['publish'],
                 $datesObjects['due'],
@@ -248,6 +250,7 @@ class Controller extends BaseController
      *
      * @param IAssessable              $assessmentSpec
      * @param AssessmentContext        $context
+     * @param null|int                 $sequence
      * @param Alaress_Date_Format|null $publishDate
      * @param Alaress_Date_Format|null $openDate
      * @param Alaress_Date_Format|null $dueDate
@@ -256,11 +259,12 @@ class Controller extends BaseController
      * @throws InvalidArgumentException
      * @throws \DomainException
      * @throws \Schoolbox\Mapper\Exception
-     * @internal param null $dates
+     * @throws \UnexpectedValueException
      */
     protected function exportToNewContext(
         IAssessable $assessmentSpec,
         AssessmentContext $context,
+        int $sequence = null,
         Alaress_Date_Format $publishDate = null,
         Alaress_Date_Format $openDate = null,
         Alaress_Date_Format $dueDate = null,
@@ -289,7 +293,7 @@ class Controller extends BaseController
             ->setCloseAt($closeDate);
 
         // Replicate !
-        $assessmentImpl = $this->replicator->replicateInNewContext($assessmentSpec, $context, $this->getUser());
+        $assessmentImpl = $this->replicator->replicateInNewContext($assessmentSpec, $context, $this->getUser(), $sequence);
 
         // Recursive case
         if ($assessmentSpec instanceof Project) {

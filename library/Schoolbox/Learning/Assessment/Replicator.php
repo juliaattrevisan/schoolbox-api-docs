@@ -52,6 +52,7 @@ class Replicator
         $this->rubricMapper = $rubricMapper;
     }
 
+
     /**
      * Deep-clone and re-create the given assessments in a new context
      *
@@ -59,18 +60,26 @@ class Replicator
      * if the source Assessments are Specifications. This avoids needing to pass the dates in
      * a custom DTO.
      *
-     * @param IAssessable       $assessmentSpec  the assessments to replicate
-     * @param AssessmentContext $destination     the location into which to replicate the assessments
-     * @param User              $newOwner        who should own the newly created assessment
-     * @throws Mapper\Exception                  if any part of the replication fails
-     * @throws \InvalidArgumentException         If Destination Quiz already has Sections
-     * @return IAssessable                       the NEW assessments, as replicated
+     * @param IAssessable       $assessmentSpec the assessments to replicate
+     * @param AssessmentContext $destination    the location into which to replicate the assessments
+     * @param User              $newOwner       who should own the newly created assessment
+     * @param null|int          $sequence       enable explicit sequence setting
+     * @return IAssessable if any part of the replication fails
+     * @throws \InvalidArgumentException If Destination Quiz already has Sections
+     * @throws \UnexpectedValueException
      */
-    public function replicateInNewContext(IAssessable $assessmentSpec, AssessmentContext $destination, User $newOwner)
-    {
+    public function replicateInNewContext(
+        IAssessable $assessmentSpec,
+        AssessmentContext $destination,
+        User $newOwner,
+        int $sequence = null
+    ): IAssessable {
         $newAssessment = $assessmentSpec->cloneForCopy();
         $newAssessment->setContext($destination);
         $newAssessment->setCreator($newOwner);
+        if (null !== $sequence) {
+            $newAssessment->setSequence($sequence);
+        }
 
         $this->assessmentMapperProxy->save($newAssessment);
         $destination->getAssessables()->add($newAssessment);
