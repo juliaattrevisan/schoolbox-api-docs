@@ -49,44 +49,48 @@
             <form method="post"
                   action="{{ routeLookup('learningAssessmentExporter.postExport', {assessmentId: assessmentSpec.id}) }}?{{ returnUrlName|e('html_attr') }}={{ returnUrl|e('html_attr') }}"
                   id="importForm">
-                <section data-not-imported>
-                    <ul class="information-list card-selectable">
-                        <li>
-                            <div class="small-12 column">
-                                <div class="selector">
-                                    <input id="checkAll"
-                                           type="checkbox"
-                                           data-select-all="[data-not-imported]"
-                                    />
-                                    <label for="checkAll" class="checkbox-label"></label>
+                {% if unImported|length %}
+                    <section data-not-imported>
+                        <ul class="information-list card-selectable">
+                            <li>
+                                <div class="small-12 column">
+                                    <div class="selector">
+                                        <input id="checkAll"
+                                               type="checkbox"
+                                               data-select-all="[data-not-imported]"
+                                        />
+                                        <label for="checkAll" class="checkbox-label"></label>
+                                    </div>
                                 </div>
-                            </div>
-                        </li>
-                    </ul>
-                    <ul class="information-list card-selectable">
-                        {% for assessmentImpl in unImported %}
-                            {% include '@learningAssessmentExporter/assessment_row.twig' with {
-                                assessmentSpec:   assessmentSpec,
-                                assessmentImpl:   assessmentImpl,
-                                folderWritePerms: folderWritePerms,
-                                enableReimport:   enableReimport
-                            } only %}
-                        {% endfor %}
-                    </ul>
-                </section>
+                            </li>
+                        </ul>
+                        <ul class="information-list card-selectable">
+                            {% for assessmentImpl in unImported %}
+                                {% include '@learningAssessmentExporter/assessment_row.twig' with {
+                                    assessmentSpec:   assessmentSpec,
+                                    assessmentImpl:   assessmentImpl,
+                                    folderWritePerms: folderWritePerms,
+                                    enableReimport:   enableReimport
+                                } only %}
+                            {% endfor %}
+                        </ul>
+                    </section>
+                {% endif %}
 
-                <section>
-                    <ul class="information-list card-selectable">
-                        {% for assessmentImpl in imported %}
-                            {% include '@learningAssessmentExporter/assessment_row.twig' with {
-                                assessmentSpec:   assessmentSpec,
-                                assessmentImpl:   assessmentImpl,
-                                folderWritePerms: folderWritePerms,
-                                enableReimport:   enableReimport
-                            } only %}
-                        {% endfor %}
-                    </ul>
-                </section>
+                {% if imported|length %}
+                    <section>
+                        <ul class="information-list card-selectable">
+                            {% for assessmentImpl in imported %}
+                                {% include '@learningAssessmentExporter/assessment_row.twig' with {
+                                    assessmentSpec:   assessmentSpec,
+                                    assessmentImpl:   assessmentImpl,
+                                    folderWritePerms: folderWritePerms,
+                                    enableReimport:   enableReimport
+                                } only %}
+                            {% endfor %}
+                        </ul>
+                    </section>
+                {% endif %}
                 <input type="submit" class='expand' disabled value="Export to selected classes"/>
             </form>
         </div>
