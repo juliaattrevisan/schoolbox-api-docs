@@ -49,7 +49,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
 
         if($this->getContext()->getInherit()) {
             // Find nearest nian folder
-            $folderMapper = new FolderMapper();
+            $folderMapper = FolderMapper::getInstance();
             $nianFolder = $folderMapper->findNearestNonInheritingAncestralNode($this->getContext());
             $managerList   = $userMapper->findByAccess(
                 UserAccess::SERVICE_HOMEPAGE,

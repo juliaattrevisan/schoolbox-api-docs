@@ -50,7 +50,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
         $userMapper = new UserMapper();
         if($this->getContext()->getInherit()) {
             // Find nearest nian folder
-            $folderMapper = new FolderMapper();
+            $folderMapper = FolderMapper::getInstance();
             $nianFolder = $folderMapper->findNearestNonInheritingAncestralNode($this->getContext());
             $userList   = $userMapper->findByAccess(
                 UserAccess::SERVICE_HOMEPAGE,

@@ -6,8 +6,10 @@ use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Resource\Group;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 $this->setFile(TEMPLATE_content, 'group/modify.html');
 $this->setBlock(TEMPLATE_content, 'groupOwner', 'groupOwner_block');
@@ -38,19 +40,25 @@ if (is_numeric($this->arg[0])) {
     $userHandler      = new User();
     $groupHandler     = new \Group(HOMEPAGE_SERVICE);
     $userAccessMapper = UserAccessMapper::getInstance();
+    $access           = Access::getInstance();
     $roleAccessMapper = RoleAccessMapper::getInstance();
-    $categoryMapper   = FolderMapper::getInstance();
+    $folderMapper     = FolderMapper::getInstance();
 
     try {
-        $category = $categoryMapper->findByID($this->arg[0]);
+        $folder = $folderMapper->findByID($this->arg[0]);
     } catch (\Exception $e) {
-        error(19);
+        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 
     // check access
-    if ($groupHandler->getPermission($this->arg[0]) < FULL_ACCESS) {
-        error(19);
+    if ($access->getFolderAccess($_SESSION['user'], $folder->getId()) <  UserAccess::ACCESS_FULL) {
+        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
+
+    if( $folder->getInherit() ) {
+        error(ErrorMapper::ERROR_GROUP_NIAN_DENIED);
+    }
+
 
     $this->setVar(
         [
@@ -64,15 +72,15 @@ if (is_numeric($this->arg[0])) {
     );
 
     $output = [
-        'CATEGORY_NAME' => Scrub::text($category->getName()),
-        'CATEGORY_ID'   => $category->getId(),
+        'CATEGORY_NAME' => Scrub::text($folder->getName()),
+        'CATEGORY_ID'   => $folder->getId(),
         'GROUP_TYPE_1'  => '',
         'GROUP_TYPE_2'  => '',
         'GROUP_TYPE_3'  => '',
     ];
 
-    if ($category->getGroup() instanceof Group) {
-        $output['GROUP_TYPE_' . $category->getGroup()
+    if ($folder->getGroup() instanceof Group) {
+        $output['GROUP_TYPE_' . $folder->getGroup()
                                          ->getType()] = 'checked="checked"';
     }
 
@@ -80,7 +88,7 @@ if (is_numeric($this->arg[0])) {
 
     $search = [
         'user_id'       => 0,
-        'msg_route_key' => "service.1.{$category->getId()}",
+        'msg_route_key' => "service.1.{$folder->getId()}",
         'delivery'      => RoutePermission::MUTE,
     ];
 
@@ -88,7 +96,7 @@ if (is_numeric($this->arg[0])) {
      */
     $groupMessagesEnabled = !RerouteOverrideMapper::getInstance()
                                                   ->isRouteMuted(
-                                                      "service.1.{$category->getId()}"
+                                                      "service.1.{$folder->getId()}"
                                                   );
 
     $output = [
@@ -103,7 +111,7 @@ if (is_numeric($this->arg[0])) {
          */
         $groupMapper = new \Schoolbox\Resource\GroupMapper();
         try {
-            $groupSettings = $groupMapper->findOneByColumn('cid', $category->getId());
+            $groupSettings = $groupMapper->findOneByColumn('cid', $folder->getId());
             if ($groupSettings->getForceFollow()) {
                 $output['MSG_FORCE_FOLLOW_CHECKED'] = 'checked="checked"';
             }
@@ -125,7 +133,7 @@ if (is_numeric($this->arg[0])) {
     }
 
     // Get collection of group members (including admin)
-    $memberList = $userAccessMapper->findUsersInCategory($category);
+    $memberList = $userAccessMapper->findUsersInCategory($folder);
     $hasMembers = false;
     $hasAdmin   = false;
 
@@ -134,7 +142,7 @@ if (is_numeric($this->arg[0])) {
     $email_object      = new Email();
 
     foreach ($memberList as $member) {
-        $memberAccess = $userAccessMapper->getAccess($member, $category->getId());
+        $memberAccess = $userAccessMapper->getAccess($member, $folder->getId());
         $memberMayOwn = $roleAccessMapper->roleMayOwnFolders($member->getRole());
 
         // Store member email for 'email group members' button
@@ -154,7 +162,7 @@ if (is_numeric($this->arg[0])) {
 
             $following = !RerouteOverrideMapper::getInstance()
                                                ->isRouteMuted(
-                                                   "service.1.{$category->getId()}",
+                                                   "service.1.{$folder->getId()}",
                                                    $member->getId()
                                                );
 
@@ -266,7 +274,7 @@ if (is_numeric($this->arg[0])) {
         $this->parse('mail_all_parents_form_block', 'mail_all_parents_form');
     }
 
-    $waitingList = $groupHandler->getWaitingList($category->getId());
+    $waitingList = $groupHandler->getWaitingList($folder->getId());
     if (is_array($waitingList)) {
         foreach ($waitingList as $waiting) {
             $output = [
@@ -294,8 +302,8 @@ if (is_numeric($this->arg[0])) {
     $trail = new \Schoolbox\Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
-            'text'  => $category->getName(),
-            'href'  => "/homepage/{$category->getId()}",
+            'text'  => $folder->getName(),
+            'href'  => "/homepage/{$folder->getId()}",
             'class' => '',
         ],
         [
