@@ -93,7 +93,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                                                          ->getId(),
             ]);
 
-            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE || $this->getContext()->getInherit()) {
                 $block = 'empty_read_members';
             } elseif ($this->getSource()->getFolder()->getCodes()->count()) {
                 $block = 'empty_class';

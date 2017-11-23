@@ -90,7 +90,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                 'FOLDER_ID' => $this->getSource()->getFolder()->getId(),
             ]);
 
-            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE || $this->getContext()->getInherit() ) {
                 $block = 'empty_read_managers';
             } elseif ($this->getSource()->getFolder()->getCodes()->count()) {
                 $block = 'empty_class';
