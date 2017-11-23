@@ -61,6 +61,7 @@ class External_Humanedge_Class implements External_ClassInterface
                 '' AS StudentHouseDescription,
                 '' AS StudentMedicalAlert,
                 '' AS StudentSpecialNeedsFlag,
+                '' AS StudentTutorDescription,
                 st.Code AS synergy_id,
                 '' AS ClassCampus
             FROM tblSubject s
@@ -80,6 +81,7 @@ class External_Humanedge_Class implements External_ClassInterface
                 '' AS StudentHouseDescription,
                 '' AS StudentMedicalAlert,
                 '' AS StudentSpecialNeedsFlag,
+                '' AS StudentTutorDescription,
                 st.Code AS synergy_id,
                 '' AS ClassCampus
             FROM tblSubject s
