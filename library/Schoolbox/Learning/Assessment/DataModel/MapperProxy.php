@@ -140,6 +140,9 @@ class MapperProxy
      */
     public function findAllByIds($ids, array $options = [])
     {
+        if (!\count($ids)) {
+            return $this->createCollection();
+        }
         return $this->translateToDomainModelCollection($this->baseMapper->findByColumn('id', $ids, $options));
     }
 

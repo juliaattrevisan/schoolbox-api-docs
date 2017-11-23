@@ -76,6 +76,10 @@ abstract class AbstractSubSource implements IResponseDataSource
         // Find responses which belong to any assessments this recognizes
         $recognizedIds = $assessments->filter([$this, 'recognizes'])->getColumnValues('id');
 
+        if (!\count($recognizedIds)) {
+            return new Collection();
+        }
+
         // Only fetch for student if provided
         $columns = ['assessment_id' => $recognizedIds,];
         if ($student instanceof User) {
