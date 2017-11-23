@@ -51,7 +51,7 @@ class External_Doublefirst_Class implements External_ClassInterface
         foreach ($arrayCodes as $code) {
             $query =
                 "
-                SELECT DISTINCT pbi.Surname as lastname, pbi.ForeName as firstname, pbi.YearGroup as yearlevel, pbi.House as house, CAST(pbi.UrgentNotes as NVARCHAR(max)) as StudentMedicalAlert, 0 as StudentSpecialNeedsFlag, pbi.PupilID as synergy_id, null AS ClassCampus 
+                SELECT DISTINCT pbi.Surname as lastname, pbi.ForeName as firstname, pbi.YearGroup as yearlevel, pbi.House as house, CAST(pbi.UrgentNotes as NVARCHAR(max)) as StudentMedicalAlert, 0 as StudentSpecialNeedsFlag, pbi.PupilID as synergy_id, null AS ClassCampus, null as StudentTutorDescription
                 FROM PupilSubjects ps JOIN V_PupilBasicInformation pbi ON pbi.PupilID = ps.PupilID 
                 LEFT JOIN YearGroupSubjectDivision ygsd ON ygsd.DivisionID = ps.DivisionID AND ygsd.SubjectID = ps.SubjectID AND ygsd.YearGroup = ps.YearGroup AND ygsd.AcademicYear = ps.SchoolYear 
                 JOIN TimetableClassRoom tcr ON tcr.YearGroup = ps.yeargroup AND tcr.SubjectID = ps.SubjectID AND tcr.DivisionID = ps.DivisionID AND tcr.AcademicYear = ps.SchoolYear 
