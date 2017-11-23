@@ -235,6 +235,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     $factory = new Factory(
                         $_COOKIE,
                         $config,
+                        $di->get('redis'),
                         $_SERVER['REQUEST_TIME']
                     );
                     $session = $factory->build();

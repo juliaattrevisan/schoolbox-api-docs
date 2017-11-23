@@ -345,7 +345,13 @@ class EventRecurrenceMapper
 
         $diff = $previous && ($verb != Schoolbox\Mapper::METHOD_DELETE) ? $em->diff($object, $previous) : null;
 
-        $em->getEventPropagator()->propagate($sess['user'], $verb, $object, $em, $diff);
+        try {
+            $em->getEventPropagator()->propagate($sess['user'], $verb, $object, $em, $diff);
+        }
+        catch( \ErrorException $e) {
+            //Unable to connect to notification system
+            return false;
+        }
 
         return true;
     }

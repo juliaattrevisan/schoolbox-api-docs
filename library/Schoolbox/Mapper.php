@@ -259,31 +259,6 @@ abstract class Mapper implements IMapper, Serializable
             : new LiveMonitor()
         ;
 
-        try {
-
-            self::$prop = $di->newInstance(Propagator::class, [
-                'splitter'   => $di->lazyNew(Splitter::class, [
-                    'conf'        => $di->lazyGet('config'),
-                    'di'          => $di,
-                    'factory'     => $di->lazyNew(TriggerFactoryFactory::class, [ true ]),
-                ]),
-                'redis'      => $di->lazyGet('redis'),
-                'broker'     => $di->lazyNew(Broker::class, [
-                    'instanceId' => INSTANCE_ID,
-                    'amqp'       => $di->lazyGet('amqp'),
-                    'redis'      => $di->lazyGet('redis'),
-                    // no 'stomp'
-                ]),
-                'instanceId' => INSTANCE_ID,
-            ]);
-
-        } catch (Di\Exception\ServiceNotFound $e) {
-
-            // in PHPUnit land, we do not have external services.
-            // this catch is merely to accommodate that case, it should not be
-            // relied upon in development
-            self::$prop = new MockPropagator();
-        }
     }
 
 
@@ -666,6 +641,40 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function getEventPropagator()
     {
+        if(!$this->propagator && !self::$prop ) {
+            // We don't have a propagator setup, lets connect to the rabbit
+            try {
+                self::$prop = $this->getDi()->newInstance(
+                    Propagator::class, [
+                    'splitter'   => $this->getDi()->lazyNew(
+                        Splitter::class, [
+                        'conf'    => $this->getDi()->lazyGet('config'),
+                        'di'      => $this->getDi(),
+                        'factory' => $this->getDi()->lazyNew(TriggerFactoryFactory::class, [true]),
+                    ]
+                    ),
+                    'redis'      => $this->getDi()->lazyGet('redis'),
+                    'broker'     => $this->getDi()->lazyNew(
+                        Broker::class, [
+                        'instanceId' => INSTANCE_ID,
+                        'amqp'       => $this->getDi()->lazyGet('amqp'),
+                        'redis'      => $this->getDi()->lazyGet('redis'),
+                        // no 'stomp'
+                    ]
+                    ),
+                    'instanceId' => INSTANCE_ID,
+                ]
+                );
+
+            } catch (Di\Exception\ServiceNotFound $e) {
+
+                // in PHPUnit land, we do not have external services.
+                // this catch is merely to accommodate that case, it should not be
+                // relied upon in development
+                self::$prop = new MockPropagator();
+            }
+        }
+
         return $this->propagator;
     }
 
@@ -3497,7 +3506,13 @@ abstract class Mapper implements IMapper, Serializable
         $diff = $previous && ($verb != self::METHOD_DELETE) ? $this->diff($object, $previous) : null;
 
         // create a new event, and send it to the scheduler
-        $this->getEventPropagator()->propagate($this->sessionData['user'], $verb, $object, $this, $diff);
+        try {
+            $this->getEventPropagator()->propagate($this->sessionData['user'], $verb, $object, $this, $diff);
+        }
+        catch( \ErrorException $e) {
+            //Unable to connect to notification system
+            return false;
+        }
 
         return true;
     }
