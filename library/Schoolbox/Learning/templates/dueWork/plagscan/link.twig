@@ -2,7 +2,8 @@
  # assessment   an IAssessable instance containing id
  # response     an IResponse instance containing id
  # plagscan     a Plagscan\Model instance containing plagscan_id
+ # participant  a Participant instance
  #}
 {% if plagscan.isComplete %}
-<a href="{{ routeLookupIfAuthorized('learningDueWorkResponse.getPlagscanReport', {assessmentId: assessment.id, assessment: assessment, responseId: response.id, plagscanId: plagscan.plagscanId }) }}" class="icon-report" title="Plagscan Report"></a>
+<a href="{{ routeLookupIfAuthorized('learningDueWorkResponse.getPlagscanReport', {assessmentId: assessment.id, assessment: assessment, responseId: response.id, plagscanId: plagscan.plagscanId, participant: participant }) }}" class="icon-report" title="Plagscan Report"></a>
 {% endif %}

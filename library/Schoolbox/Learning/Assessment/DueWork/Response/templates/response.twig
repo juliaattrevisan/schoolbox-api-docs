@@ -164,7 +164,7 @@ Usage:
     <div class="small-12 columns">
         <select id="response-selector" title="Select a Submission">
             {% for currentResponse in responseList %}
-                {% set viewRoute = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id, responseId: currentResponse.id, response: currentResponse}) %}
+                {% set viewRoute = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id, responseId: currentResponse.id, response: currentResponse, participant: participant}) %}
 
                 {% if viewRoute %}
                 <option value="{{ currentResponse.id }}" {% if currentResponse.id == response.id %}selected="selected"{% endif %} data-url="{{ viewRoute }}">#{{ loop.revindex }}. Submission at {{ currentResponse.submittedAt.local }}</option>
@@ -204,7 +204,7 @@ Usage:
                         </div>
                     </div>
                     <nav>
-                        {% include '@learning/dueWork/plagscan/link.twig' with {assessment: assessment, response: response, plagscan: currentFile.plagscan} only %}
+                        {% include '@learning/dueWork/plagscan/link.twig' with {assessment: assessment, response: response, plagscan: currentFile.plagscan, participant: participant} only %}
                         <a class="icon-download" title="" data-dropdown="download-options-{{ currentFile.id }}"></a>
                     </nav>
                     <ul id="download-options-{{ currentFile.id }}" class="f-dropdown" data-dropdown-content>
