@@ -45,14 +45,23 @@ class External_Tass_Class implements External_ClassInterface {
 
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
-		$query = "SELECT DISTINCT studsub.stud_code as synergy_id, student.preferred_name as firstname, student.surname as lastname, student.year_grp as yearlevel, student.house
-		FROM studsub
-		JOIN student ON student.stud_code = studsub.stud_code AND student.cmpy_code = studsub.cmpy_code
-		WHERE semester = '{$fileSemester}'
-			AND yr_study = '{$fileYear}'
-			AND next_yr_ind != 'F'
-			AND ( $classQuery )
-		ORDER BY lastname, firstname";
+		$query = "
+            SELECT DISTINCT 
+                studsub.stud_code as synergy_id, 
+                student.preferred_name as firstname, 
+                student.surname as lastname, 
+                student.year_grp as yearlevel, 
+                student.house, 
+                '' AS StudentMedicalAlert, 
+                '' AS StudentSpecialNeedsFlag, 
+                '' as StudentTutorDescription
+            FROM studsub
+            JOIN student ON student.stud_code = studsub.stud_code AND student.cmpy_code = studsub.cmpy_code
+            WHERE semester = '{$fileSemester}'
+                AND yr_study = '{$fileYear}'
+                AND next_yr_ind != 'F'
+                AND ( $classQuery )
+            ORDER BY lastname, firstname";
 
 		return $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
 	}

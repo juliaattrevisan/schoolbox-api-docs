@@ -55,6 +55,8 @@ class External_Schoolbox_Class implements External_ClassInterface
                     'house'                   => $student['house'],
                     'StudentMedicalAlert'     => '',
                     'StudentSpecialNeedsFlag' => '',
+                    'StudentTutorDescription' => '',
+                    'ClassCampus'             => '',
                 ];
 
                 $found[$studentExternalId] = true;

@@ -15,9 +15,10 @@ interface External_ClassInterface {
      * lastname,
      * firstname,
      * yearlevel,
-     * StudentHouseDescription as house,
+     * house,
      * StudentMedicalAlert,
      * StudentSpecialNeedsFlag,
+     * StudentTutorDescription,
      * synergy_id,
      * ClassCampus
      *

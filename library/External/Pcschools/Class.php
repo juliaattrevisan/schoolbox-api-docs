@@ -47,8 +47,9 @@ class External_Pcschools_Class implements External_ClassInterface
                     st.HOUSE AS house,
                     st.ALERT AS StudentMedicalAlert,
                     '' AS StudentSpecialNeedsFlag,
+                    '' AS StudentTutorDescription,
                     st.STUDKEY AS synergy_id,
-                    st.CAMPUS AS campusCode
+                    st.CAMPUS AS ClassCampus
                 FROM TIMEFILE tf
                 INNER JOIN SUB su
                     ON  tf.[YEAR]      = su.[YEAR]

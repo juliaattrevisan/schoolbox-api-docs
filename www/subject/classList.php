@@ -133,6 +133,7 @@ if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser())
                 'EMAIL_ADDRESS' => $user->getEmail(),
                 'SPECIAL_NEEDS' => $this->getLocalisedTerm('specialNeeds', false, true),
                 'MEDICAL_ALERT' => $student['StudentMedicalAlert'],
+                'TUTORGROUP' => $externalUser["StudentTutorDescription"],
                 'ON_OFF' => ++$j % 2 ? '' : 'dark',
                 'SELECT' => $user->getEmail() ? sprintf('<input id="c%s" name="c%s" type="checkbox" value="%s"/>', $j, $j, $emailaddr) : '',
             ));
@@ -228,12 +229,6 @@ if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser())
                 'eportfolio_small_block' => '',
                 'pastoral_care_small_block' => '',
             ));
-
-            $externalUserHandler = new External_User();
-
-            $externalUser = $externalUserHandler->getStudent($student['synergy_id']);
-
-            $this->setVar( ["TUTORGROUP" => $externalUser["StudentTutorDescription"]]);
         }
 
         // Show the email view/select forms

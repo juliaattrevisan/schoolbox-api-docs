@@ -52,6 +52,7 @@ class External_Maze_Class implements External_ClassInterface {
 				KGH.DESCRIPTION AS House,
 				MEDICAL AS MedicalAlert,
 				'' AS SpecialNeedsFlag,
+				'' AS StudentTutorDescription,
 				'' AS ClassCampus
 			FROM STMA
 			LEFT JOIN SU ON STMA.MKEY = SU.SUKEY
@@ -92,6 +93,7 @@ class External_Maze_Class implements External_ClassInterface {
 				KGH.DESCRIPTION AS House,
 				MEDICAL AS MedicalAlert,
 				'' AS SpecialNeedsFlag,
+				'' AS StudentTutorDescription,
 				'' AS ClassCampus
 			FROM ST
 			LEFT JOIN KGC ON ST.ROLL_GROUP = KGC.ROLL_GROUP
@@ -120,7 +122,8 @@ class External_Maze_Class implements External_ClassInterface {
 					'house' => $currentStudent['House'],
 					'StudentMedicalAlert' => $currentStudent['MedicalAlert'],
 					'StudentSpecialNeedsFlag' => $currentStudent['SpecialNeedsFlag'],
-					'ClassCampus' => $currentStudent['ClassCampus'],
+                    'StudentTutorDescription' => $currentStudent['StudentTutorDescription'],
+					'ClassCampus' => $currentStudent['ClassCampus']
 				);
 
 				$studentList[] = $student;

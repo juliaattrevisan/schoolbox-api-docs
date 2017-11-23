@@ -51,10 +51,11 @@ class External_Humanedge_Ngsl_Class extends External_Humanedge_Class implements 
             SELECT DISTINCT
                 st.FirstName AS firstname,
                 st.FamilyName AS lastname,
-                '' AS StudentYearLevel,
-                '' AS StudentHouseDescription,
+                '' AS yearlevel,
+                '' AS house,
                 '' AS StudentMedicalAlert,
                 '' AS StudentSpecialNeedsFlag,
+                '' AS StudentTutorDescription,
                 st.Code AS synergy_id,
                 '' AS ClassCampus
             FROM tblSubject s
@@ -70,10 +71,11 @@ class External_Humanedge_Ngsl_Class extends External_Humanedge_Class implements 
             SELECT DISTINCT
                 st.FirstName AS firstname,
                 st.FamilyName AS lastname,
-                '' AS StudentYearLevel,
-                '' AS StudentHouseDescription,
+                '' AS yearlevel,
+                '' AS house,
                 '' AS StudentMedicalAlert,
                 '' AS StudentSpecialNeedsFlag,
+                '' AS StudentTutorDescription,
                 st.Code AS synergy_id,
                 '' AS ClassCampus
             FROM tblSubject s

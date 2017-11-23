@@ -37,7 +37,16 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
 
         // prepare
         $stmt = $this->getConnection()->prepareQuery("
-            SELECT firstname, surname AS lastname, $studentClass.student_number AS synergy_id, year_level AS yearlevel, house
+            SELECT 
+                firstname, 
+                surname AS lastname, 
+                $studentClass.student_number AS synergy_id, 
+                year_level AS yearlevel, 
+                house, 
+                '' AS StudentMedicalAlert, 
+                '' AS StudentSpecialNeedsFlag, 
+                '' AS StudentTutorDescription,
+                '' AS ClassCampus
             FROM  $studentClass
             LEFT JOIN $students ON $studentClass.student_number = $students.student_number
             WHERE $studentClass.class_code IN (".implode(',',$codes).")

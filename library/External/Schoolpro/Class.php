@@ -56,6 +56,7 @@ class External_Schoolpro_Class implements External_ClassInterface
                     'house'                   => $currentStudent['House'],
                     'StudentMedicalAlert'     => '',
                     'StudentSpecialNeedsFlag' => '',
+                    'StudentTutorDescription' => '',
                     'ClassCampus'             => '',
                 ];
 
