@@ -63,6 +63,7 @@ class External_Isams_Class implements External_ClassInterface
                       V_Student.MedicalFlag         as StudentMedicalAlert, 
                       V_Student.txtadditionalHealth as StudentSpecialNeedsFlag, 
                       V_Student.StudentID as synergy_id, 
+                      '' AS StudentTutorDescription,
                       null                as ClassCampus 
             FROM      V_Student 
             JOIN      V_Class ON V_Class.StudentID = V_Student.StudentID
