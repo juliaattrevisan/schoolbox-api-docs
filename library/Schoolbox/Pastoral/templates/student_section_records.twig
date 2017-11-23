@@ -25,7 +25,7 @@
                     {% for record in records %}
                         <li data-record-type="{{ record.type.id }}" class="actions-small-2" id="pastoral-{{ record.id }}">
                             <div class="list-item">
-                                <div class="card small-{% if linkedStudent %}6{% else %}12{% endif %} wrap-down">
+                                <div class="card small-12 wrap-down">
                                     <a href="{{ profile.link(record.owner) }}">
                                         {{ profile.imageSquare64(record.owner) }}
                                     </a>
