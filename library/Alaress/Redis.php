@@ -21,7 +21,9 @@ class Redis
     protected static $instance;
 
     /**
-     * @var Predis\ClientInterface
+     * Will be null prior to connect() being called
+     *
+     * @var null|Predis\ClientInterface
      */
     protected $client;
 
@@ -43,7 +45,7 @@ class Redis
     public static function getInstance()
     {
         if (!(static::$instance instanceof static)) {
-            static::$instance = new static(null, null, INSTANCE_ID);
+            static::$instance = new static();
         }
         return static::$instance;
     }
@@ -51,9 +53,11 @@ class Redis
     /**
      * Gets client within singleton instance.
      *
-     * @return Predis\ClientInterface
+     * Will return null if connect() has not yet been called
+     *
+     * @return null|Predis\ClientInterface
      */
-    public static function getClientInstance()
+    public static function getClientInstance(): ?Predis\ClientInterface
     {
         return static::getInstance()->getClient();
     }
@@ -77,9 +81,11 @@ class Redis
     }
 
     /**
+     * Will return null if connect() has not yet been called
+     *
      * @return Predis\ClientInterface
      */
-    public function getClient()
+    public function getClient(): ?Predis\ClientInterface
     {
         return $this->client;
     }
