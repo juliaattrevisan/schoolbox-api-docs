@@ -71,7 +71,6 @@ class CanSelfAssess implements IAuthorizationRule
 
         // Check logged in user is the participant
         if ($user->getId() != $participant->getUser()->getId()) {
-            // Assessment is self-assessable and logged in user is the participant, good to go
             throw new Unauthorized();
         }
 
@@ -80,6 +79,7 @@ class CanSelfAssess implements IAuthorizationRule
             throw new Unauthorized('', ErrorMapper::ERROR_COMPLETE_BEFORE_SELF_ASSESS);
         }
 
+        // Assessment is self-assessable and logged in user is the participant, good to go
         return true;
     }
 }
