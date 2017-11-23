@@ -5,7 +5,9 @@ This feature was commissioned by Melbourne Girls Grammar School (MGGS).
 They wished to alert all senior students and staff (in practise, all users in 
 the Senior Campus) of when a timetable period:
 * is starting now
-* has just ended
+* ~~has just ended~~
+  * this alert was removed by request, presumably because the user was notified
+    that the next period is going to start soon
 * is going to start in 5 minutes
 
 This alert takes the form of a dialog window in Schoolbox, which may be 
