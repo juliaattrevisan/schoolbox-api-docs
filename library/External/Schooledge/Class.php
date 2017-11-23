@@ -61,6 +61,7 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
                 s.House        AS StudentHouseDescription,
                 ''             AS StudentMedicalAlert,
                 s.SpecialNeeds AS StudentSpecialNeedsFlag,
+                ''             AS StudentTutorDescription,
                 s.Code         AS synergy_id,
                 ''             AS ClassCampus
             FROM fc.TimetableSubject ts
@@ -81,6 +82,7 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
                 s.House        AS StudentHouseDescription,
                 ''             AS StudentMedicalAlert,
                 s.SpecialNeeds AS StudentSpecialNeedsFlag,
+                ''             AS StudentTutorDescription,
                 s.Code         AS synergy_id,
                 ''             AS ClassCampus
 
