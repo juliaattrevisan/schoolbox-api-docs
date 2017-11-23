@@ -8,6 +8,7 @@
  * @version     SVN: $Id$
  */
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php';
+use Schoolbox\Resource\Category\NewsMapper;
 
 $page = new SitePage(false);
 
@@ -44,9 +45,10 @@ if (strlen($userKey)) {
     }
 
     /* Find the articles
+    findForFolder() automatically filters out articles that have expired.
      */
-    $articleMapper = new \Schoolbox\News\ArticleMapper();
-    $allNews = $articleMapper->findAllForUserAndCategory($user, $folder);
+    $newsMapper = NewsMapper::getInstance();
+    $allNews = $newsMapper->findForFolder($folder->getId(), new Schoolbox\User());
 
     /* Render all this stuff
      */
@@ -58,24 +60,23 @@ if (strlen($userKey)) {
             'TITLE' => Scrub::xml(Cfg::get('school_name') . ' - '.$folder->getTitle().' News'),
             'DESCRIPTION' => Scrub::xml('Recent news items from Schoolbox'),
             'DATE' => Scrub::xml(date('r')),
-            'LINK' => Scrub::xml($page->conType() . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']),
-            'SELF' => Scrub::xml($page->conType() . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF']),
+            'LINK' => Scrub::xml($page->conType() . $_SERVER['HTTP_HOST'] . '/homepage/' . $folder->getId() ),
+            'SELF' => Scrub::xml($page->conType() . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']),
         )
     );
 
     if ($allNews->count()) {
         foreach ($allNews as $currentNews) {
-
             /* Image detection (category news has no images)
              */
             $imageStr = '';
 
-           /* if (($currentNews instanceof Schoolbox\News\Article) && !is_null($currentNews->getImage())) {
-                $imageStr = "<img src=\"" . $page->conType(
-                    ) . $_SERVER['HTTP_HOST'] . "/storage/image.php?hash={$currentNews->getImage()->getHash(
-                    )}&size=constrain200\">";
-            }
-           */
+            /* if (($currentNews instanceof Schoolbox\News\Article) && !is_null($currentNews->getImage())) {
+                 $imageStr = "<img src=\"" . $page->conType(
+                     ) . $_SERVER['HTTP_HOST'] . "/storage/image.php?hash={$currentNews->getImage()->getHash(
+                     )}&size=constrain200\">";
+             }
+            */
 
             $page->setVar(
                 array(
@@ -89,11 +90,12 @@ if (strlen($userKey)) {
                 )
             );
 
-            $page->parse('rss_item_block', 'rss_item', true);
+                $page->parse('rss_item_block', 'rss_item', true);
         }
     } else {
         $page->setVar('rss_item_block', '');
     }
+
 } else {
     error(31);
 }

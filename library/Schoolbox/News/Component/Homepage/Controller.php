@@ -38,7 +38,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         /** @var NewsMapper $newsMapper */
         $newsMapper      = $this->getMapperFactory()->get(NewsMapper::class);
         $limit           = '0' === $this->getConfig('size') ? null : (int)$this->getConfig('size');
-        $this->newsItems = $newsMapper->findForFolder($this->getSource()->getId(), $limit);
+        $this->newsItems = $newsMapper->findForFolder($this->getSource()->getId(), $this->getUser(), $limit);
 
         // Check if there's any news items in the archive to conditionally show the archive link
         $this->showArchive = $newsMapper->checkArchive($this->getSource()->getId(), $this->getUser()->getId());

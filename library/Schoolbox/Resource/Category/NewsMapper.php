@@ -106,12 +106,14 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface
 
     /**
      * Finds all non-archived news items in specified folder
+     * Note that the user will see unpublished items that they own
      *
      * @param int      $folderId
+     * @param User     $user
      * @param null|int $limit
      * @return GenericCollection|News[]
      */
-    public function findForFolder($folderId, $limit = null)
+    public function findForFolder($folderId, $user, $limit = null)
     {
         if (0 === $limit) {
             return $this->createCollection();
@@ -123,7 +125,7 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface
 
         $subBuilder = $this->getPredicateBuilder();
         $subBuilder->lessThan('datetime_published', \Alaress_Date_Format::now());
-        $subBuilder->equals('owner', $this->getSessionUser()->getId());
+        $subBuilder->equals('owner', $user->getId());
         $pb->any($subBuilder);
 
         $options = [];
