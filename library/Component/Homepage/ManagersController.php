@@ -11,6 +11,8 @@
 use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+
 
 class Component_Homepage_ManagersController extends Component_Homepage_ControllerAbstract
 {
@@ -44,7 +46,24 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
 
         // Get collection of members
         $userMapper = new UserMapper();
-        $managerList = $userMapper->findByAccess(UserAccess::SERVICE_HOMEPAGE, UserAccess::ACCESS_WRITE, $this->getContext()->getId(), Array ('lastname' => 'asc'));
+
+        if($this->getContext()->getInherit()) {
+            // Find nearest nian folder
+            $folderMapper = new FolderMapper();
+            $nianFolder = $folderMapper->findNearestNonInheritingAncestralNode($this->getContext());
+            $managerList   = $userMapper->findByAccess(
+                UserAccess::SERVICE_HOMEPAGE,
+                UserAccess::ACCESS_WRITE,
+                $nianFolder->getId(),
+                ['lastname' => 'asc']);
+        }
+        else {
+            $managerList   = $userMapper->findByAccess(
+                UserAccess::SERVICE_HOMEPAGE,
+                UserAccess::ACCESS_WRITE,
+                $this->getContext()->getId(),
+                ['lastname' => 'asc']);
+        }
 
         if (count($managerList) == 0) {
 
