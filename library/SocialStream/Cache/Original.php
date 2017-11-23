@@ -129,19 +129,24 @@ class Original extends \Alaress_Cache_Abstract {
 	private function processUrl($url) {
 		$streamHandle = @fopen($url, 'r');
 
-        $smapper = Storage\Mapper::getInstance();
-        $storage = $smapper->acceptStream(pathinfo($url, PATHINFO_BASENAME), $streamHandle, true);
+		if($streamHandle) {
+            $smapper = Storage\Mapper::getInstance();
+            $storage = $smapper->acceptStream(pathinfo($url, PATHINFO_BASENAME), $streamHandle, true);
 
-        $this->post->setCacheHash($storage->getHash());
+            $this->post->setCacheHash($storage->getHash());
 
-        // only save it if it actually already exists
-        if ($this->post->getPostId()) {
-            PostMapper::getInstance()->save($this->post);
+            // only save it if it actually already exists
+            if ($this->post->getPostId()) {
+                PostMapper::getInstance()->save($this->post);
+            }
+
+            $this->setCachedFile($storage);
+
+            return true;
         }
-
-        $this->setCachedFile($storage);
-
-		return true;
+        else {
+		    return false;
+        }
 	}
 
 	/**
