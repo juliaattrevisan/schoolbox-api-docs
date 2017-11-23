@@ -55,6 +55,7 @@ class External_Humanedge_Ngsl_Class extends External_Humanedge_Class implements 
                 '' AS StudentHouseDescription,
                 '' AS StudentMedicalAlert,
                 '' AS StudentSpecialNeedsFlag,
+                '' AS StudentTutorDescription,
                 st.Code AS synergy_id,
                 '' AS ClassCampus
             FROM tblSubject s
@@ -74,6 +75,7 @@ class External_Humanedge_Ngsl_Class extends External_Humanedge_Class implements 
                 '' AS StudentHouseDescription,
                 '' AS StudentMedicalAlert,
                 '' AS StudentSpecialNeedsFlag,
+                '' AS StudentTutorDescription,
                 st.Code AS synergy_id,
                 '' AS ClassCampus
             FROM tblSubject s
