@@ -10,11 +10,12 @@
 
 namespace Schoolbox\ProfessionalDevelopment\Test;
 
+use PHPUnit\Framework\TestCase;
 use Schoolbox\ProfessionalDevelopment\Model;
 use Schoolbox\ProfessionalDevelopment\ValidProfessionalDevelopment;
 
 
-class ValidationTest extends \PHPUnit_Framework_TestCase
+class ValidationTest extends TestCase
 {
     /**
      * Permitted Registration States
