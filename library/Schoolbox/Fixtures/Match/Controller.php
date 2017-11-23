@@ -131,24 +131,24 @@ class Controller extends AbstractController
                 $isMatchesInCurrentSeason = true;
             }
 
+            /* If we don't know anything about the entities participating, use the least-assuming entity (a school) as
+             * a placeholder. The system shouldn't be in this state, but somehow is.
+             */
             if (!$currentMatch->getHomeTeam() instanceof Team) {
-                if( $currentMatch->getHomeSchool() instanceof School) {
-                    $facelessTeam = $this->getTeamMapper()->createModel()->setName($currentMatch->getHomeSchool()->getName());
+                if (!$currentMatch->getHomeSchool() instanceof School) {
+                    $facelessSchool = $this->getSchoolMapper()->createModel()->setName('Unknown');
+                    $currentMatch->setHomeSchool($facelessSchool);
                 }
-                else {
-                    $facelessTeam = $this->getTeamMapper()->createModel()->setName('Unknown');
-                }
-                $currentMatch->setHomeTeam($facelessTeam);
             }
 
+            /* If we don't know anything about the entities participating, use the least-assuming entity (a school) as
+             * a placeholder. The system shouldn't be in this state, but somehow is.
+             */
             if (!$currentMatch->getAwayTeam() instanceof Team) {
-                if( $currentMatch->getAwaySchool() instanceof School) {
-                    $facelessTeam = $this->getTeamMapper()->createModel()->setName($currentMatch->getAwaySchool()->getName());
+                if (!$currentMatch->getAwaySchool() instanceof School) {
+                    $facelessSchool = $this->getSchoolMapper()->createModel()->setName('Unknown');
+                    $currentMatch->setAwaySchool($facelessSchool);
                 }
-                else {
-                    $facelessTeam = $this->getTeamMapper()->createModel()->setName('Unknown');
-                }
-                $currentMatch->setAwayTeam($facelessTeam);
             }
 
             // Is is the first time we've seen this season ?
