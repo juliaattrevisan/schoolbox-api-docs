@@ -150,7 +150,7 @@ class Mapper extends AbstractUnitMapper
             $model->setSpecification($specification);
 
             // Add
-            $modelList->add($model);
+            $modelList[$model->getId()] = $model;
         }
 
         return $modelList;
