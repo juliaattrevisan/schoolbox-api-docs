@@ -98,6 +98,7 @@ class External_Synergetic_Class implements External_ClassInterface
                         StudentClasses.StudentYearLevelDescription as yearlevel,
                         StudentClasses.StudentHouseDescription as house,
                         vStudents.StudentMedicalAlert, vStudents.StudentSpecialNeedsFlag,
+                        vStudents.StudentTutorDescription,
                         StudentClasses.StudentID as synergy_id, StudentClasses.ClassCampus
         FROM    dbo.vStudentClasses StudentClasses
         JOIN dbo.vStudents vStudents ON (
