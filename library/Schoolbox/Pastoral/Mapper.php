@@ -278,12 +278,10 @@ class Mapper extends BaseMapper
                     `pastoral`.`id` = :parent_id_1 OR 
                     `pastoral`.`parent_id` = :id_0
                 ) AND
-                `pastoral`.`id` <> :id_1 AND 
                 `pastoral`.deleted_at IS NULL
             ";
 
             $bindings['id_0']        = $record->getId();
-            $bindings['id_1']        = $record->getId();
             $bindings['parent_id_0'] = $record->getParent()->getId();
             $bindings['parent_id_1'] = $record->getParent()->getId();
         } else {

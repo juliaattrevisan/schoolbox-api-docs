@@ -40,11 +40,13 @@
 
                                             {% if linkedRecord.parent.id is empty %}
                                                 Original Record:
+                                                {% set headingCurrent = linkedRecord.heading %}
                                             {% else %}
                                                 Linked Record:
+                                                {% set headingCurrent = record.heading %}
                                             {% endif %}
 
-                                            <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': linkedRecord.student.id, 'recordId': linkedRecord.id}) }}"> {{ linkedRecord.student.fullName }} - {{ record.heading }}</a><br>
+                                            <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': linkedRecord.student.id, 'recordId': linkedRecord.id}) }}"> {{ linkedRecord.student.fullName }} - {{ headingCurrent }}</a><br>
                                         {% endfor %}
                                         
                                     {% else %}
@@ -58,30 +60,30 @@
 
                                     {% endif %}
 
-                                        {# Display name of poster #}
-                                        Created by <a href="{{ profile.link(record.owner) }}">{{ record.owner.fullName }}</a>
-                                        <span title="{{ record.createdAt.short }}">{{ record.createdAt.relativeDay }}</span><br>
+                                    {# Display name of poster #}
+                                    Created by <a href="{{ profile.link(record.owner) }}">{{ record.owner.fullName }}</a>
+                                    <span title="{{ record.createdAt.short }}">{{ record.createdAt.relativeDay }}</span><br>
 
-                                        {% if not linkedStudent %}
-                                            {# Display last updated by if applicable #}
-                                            {% if record.createdAt.long != record.updatedAtDisplay.long %}
-                                                    Last updated by <a href="{{ profile.link(record.modifiedByDisplay) }}">{{ record.modifiedByDisplay.fullName }}</a>
-                                                    <span title="{{ record.updatedAtDisplay.short }}">{{ record.updatedAtDisplay.relativeDay }}</span><br>
-                                            {% endif %}
-
-                                            {# Display linked students to staff #}
-                                            {% if user.role.isStaff and record.relatedRecords|length %}
-                                                {% for relatedRecord in record.relatedRecords %}
-                                                    {% if relatedRecord.student.id != student.id and relatedRecord.student.id != linkedStudent.id %}
-                                                        {% set getStudentRecord = routeLookupIfAuthorized('pastoral.getStudentRecord', {studentId: relatedRecord.student.id, 'recordId': relatedRecord.id}) %}
-                                                        {% if getStudentRecord %}
-                                                            Linked Record:
-                                                            <a href="{{ getStudentRecord }}">{{ relatedRecord.heading }}</a> (<a href="{{ profile.link(relatedRecord.student) }}">{{ relatedRecord.student.fullName }}</a>)<br>
-                                                        {% endif %}
-                                                    {% endif %}
-                                                {% endfor %}
-                                            {% endif %}
+                                    {% if not linkedStudent %}
+                                        {# Display last updated by if applicable #}
+                                        {% if record.createdAt.long != record.updatedAtDisplay.long %}
+                                                Last updated by <a href="{{ profile.link(record.modifiedByDisplay) }}">{{ record.modifiedByDisplay.fullName }}</a>
+                                                <span title="{{ record.updatedAtDisplay.short }}">{{ record.updatedAtDisplay.relativeDay }}</span><br>
                                         {% endif %}
+                                    {% endif %}
+
+                                    {# Display linked students to staff #}
+                                    {% if user.role.isStaff and record.relatedRecords | length %}
+                                        {% for relatedRecord in record.relatedRecords %}
+                                            {% if relatedRecord.student.id != student.id and relatedRecord.student.id != linkedStudent.id %}
+                                                {% set getStudentRecord = routeLookupIfAuthorized('pastoral.getStudentRecord', {studentId: relatedRecord.student.id, 'recordId': relatedRecord.id}) %}
+                                                {% if getStudentRecord %}
+                                                    Linked Record:
+                                                    <a href="{{ getStudentRecord }}">{{ relatedRecord.heading }}</a> (<a href="{{ profile.link(relatedRecord.student) }}">{{ relatedRecord.student.fullName }}</a>)<br>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
                                     </p>
                                 </div>
                             </div>
