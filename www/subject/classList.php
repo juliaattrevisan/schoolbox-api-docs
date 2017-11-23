@@ -228,6 +228,12 @@ if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser())
                 'eportfolio_small_block' => '',
                 'pastoral_care_small_block' => '',
             ));
+
+            $externalUserHandler = new External_User();
+
+            $externalUser = $externalUserHandler->getStudent($student['synergy_id']);
+
+            $this->setVar( ["TUTORGROUP" => $externalUser["StudentTutorDescription"]]);
         }
 
         // Show the email view/select forms
