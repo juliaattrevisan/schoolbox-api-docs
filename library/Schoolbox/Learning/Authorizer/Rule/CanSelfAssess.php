@@ -45,6 +45,11 @@ class CanSelfAssess implements IAuthorizationRule
      */
     public function authorize(array $params = [], User $user = null)
     {
+        // If there's no session, this test fails
+        if (!$user instanceof User) {
+            throw new Unauthorized();
+        }
+
         // Grab the participant and assessment from $params
         if (empty($params['participant']) || !$params['participant'] instanceof Participant) {
             throw new InvalidArgumentException("Cannot check auth, need a participant param of 'participant'");
@@ -64,17 +69,17 @@ class CanSelfAssess implements IAuthorizationRule
             throw new Unauthorized('', ErrorMapper::ERROR_NO_SELF_ASSESS);
         }
 
+        // Check logged in user is the participant
+        if ($user->getId() != $participant->getUser()->getId()) {
+            // Assessment is self-assessable and logged in user is the participant, good to go
+            throw new Unauthorized();
+        }
+
         // Error out if participant has no responses
         if (!$participant->hasSubmittedResponse()) {
             throw new Unauthorized('', ErrorMapper::ERROR_COMPLETE_BEFORE_SELF_ASSESS);
         }
 
-        // Check logged in user is the participant
-        if ($user->getId() == $participant->getUser()->getId()) {
-            // Assessment is self-assessable and logged in user is the participant, good to go
-            return true;
-        }
-
-        throw new Unauthorized();
+        return true;
     }
 }
