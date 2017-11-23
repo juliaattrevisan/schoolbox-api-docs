@@ -8,11 +8,10 @@
 namespace Schoolbox\Filter\Filters\Assessment\Term;
 
 use Schoolbox\Assessment\Term;
-use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractFactory;
 use Schoolbox\GenericCollection;
-use Schoolbox\User;
 use Schoolbox\Filter;
+use Schoolbox\User;
 
 /**
  * A factory for building 'Term' filter objects
@@ -42,51 +41,31 @@ abstract class Factory extends AbstractFactory
         $this->termMapper = $termMapper;
     }
 
-
     /**
-     * @inheritdoc
+     * @param Filter\IDefinition     $definition
+     * @param User                   $user
+     * @param Filter\Page\Model      $pageFilter
+     * @param GenericCollection      $selections
+     * @param null|User              $viewee
+     * @param null|GenericCollection $overrides
+     * @return Filter\IComponent|Component
      */
-    protected function buildDefinitionArgs(Filter\Model $filter)
-    {
-        $sortedTerms = $this->getSortedTerms();
-
-        return array_merge(parent::buildDefinitionArgs($filter), [
-            'terms'        => $sortedTerms,
-            'currentTerm'  => $this->getCurrentTerm($sortedTerms),
-            'previousTerm' => $this->getPreviousTerm($sortedTerms),
-        ]);
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function buildExtraComponentArgs(
+    public function buildComponent(
+        Filter\IDefinition $definition,
         User $user,
         Filter\Page\Model $pageFilter,
-        Filter\IDefinition $definition,
-        Collection $overrides,
-        User $viewee = null
-    ) {
-        return [];
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function buildKeyConverterArgs(Filter\Model $filter)
-    {
-        return array_merge(parent::buildKeyConverterArgs($filter), [
-            'terms' => new Collection($this->getSortedTerms()->getColumnValues('id')),
-        ]);
+        GenericCollection $selections,
+        ?User $viewee,
+        ?GenericCollection $overrides
+    ): Filter\IComponent {
+        return new Component($definition, $user, $pageFilter, $overrides ?: $selections, $this->getSelectionMapper());
     }
 
 
     /**
      * @return GenericCollection|Term\Model[]
      */
-    private function getSortedTerms()
+    protected function getSortedTerms(): GenericCollection
     {
         /** @var GenericCollection|Term\Model[] $terms */
         $terms = $this->termMapper->findAll(['order' => ['start' => 'DESC']])->indexBy('id');
@@ -96,9 +75,9 @@ abstract class Factory extends AbstractFactory
 
     /**
      * @param GenericCollection|Term\Model[] $terms
-     * @return Term\Model|null
+     * @return null|Term\Model
      */
-    private function getCurrentTerm(GenericCollection $terms)
+    protected function getCurrentTerm(GenericCollection $terms): ?Term\Model
     {
         $now = \Alaress_Date_Format::now();
         foreach ($terms as $term) {
@@ -118,7 +97,7 @@ abstract class Factory extends AbstractFactory
      * @param GenericCollection|Term\Model[] $terms
      * @return null|Term\Model
      */
-    private function getPreviousTerm(GenericCollection $terms)
+    protected function getPreviousTerm(GenericCollection $terms): ?Term\Model
     {
         /** @var GenericCollection|Term\Model[] $sortedTerms */
         $currentTerm = $this->getCurrentTerm($terms);

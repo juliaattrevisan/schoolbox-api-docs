@@ -13,7 +13,7 @@ use Schoolbox\User;
 /**
  * Common logic for Filter Components
  */
-abstract class AbstractComponent implements IComponent
+class BaseComponent implements IComponent
 {
 
     /** @var IDefinition */
@@ -132,7 +132,7 @@ abstract class AbstractComponent implements IComponent
         $isUserConfigurable  = $this->pageFilter->getUserConfigurable();
 
         foreach ($abstractOptions as $option) {
-            if($isUserConfigurable && !$option->getAvailable()){
+            if ($isUserConfigurable && !$option->getAvailable()) {
                 continue;
             }
             $key                       = $option->getKey();

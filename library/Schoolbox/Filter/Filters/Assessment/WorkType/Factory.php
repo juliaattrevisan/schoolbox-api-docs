@@ -9,7 +9,6 @@ namespace Schoolbox\Filter\Filters\Assessment\WorkType;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\User;
 use Schoolbox\Learning\Assessment\WorkType;
 
 
@@ -44,46 +43,36 @@ class Factory extends Filter\AbstractFactory
 
     /**
      * @inheritdoc
+     * @param Filter\Model $filter
+     * @return Definition|Filter\IDefinition
      */
-    protected function buildDefinitionArgs(Filter\Model $filter)
+    public function buildDefinition(Filter\Model $filter): Filter\IDefinition
     {
-        return array_merge(parent::buildDefinitionArgs($filter), [
-            'workTypes' => $this->getWorkTypes(),
-        ]);
+        return new Definition(
+            $filter,
+            $this->getOptionMapper(),
+            $this->getDefaultsMapper(),
+            $this->getWorkTypes()
+        );
     }
 
 
     /**
      * @inheritdoc
+     * @param Filter\Model $filter
+     * @return Filter\IKeyConverter|KeyConverter
      */
-    protected function buildExtraComponentArgs(
-        User $user,
-        Filter\Page\Model $pageFilter,
-        Filter\IDefinition $definition,
-        Collection $overrides,
-        User $viewee = null
-    ) {
-        return [];
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function buildKeyConverterArgs(Filter\Model $filter)
+    public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
     {
         $workTypeIds = $this->getWorkTypes()->getColumnValues('id');
-
-        return array_merge(parent::buildKeyConverterArgs($filter), [
-            'workTypes' => new Collection(array_combine($workTypeIds, $workTypeIds)),
-        ]);
+        return new KeyConverter($filter, new Collection(array_combine($workTypeIds, $workTypeIds)));
     }
 
 
     /**
      * Includes a NULL for when an assessment has no WorkType
      *
-     * @return Collection|WorkType\Model[]
+     * @return Collection|WorkType\Model[]|null[]
      */
     private function getWorkTypes()
     {
@@ -95,5 +84,4 @@ class Factory extends Filter\AbstractFactory
         }
         return $collection;
     }
-
 }

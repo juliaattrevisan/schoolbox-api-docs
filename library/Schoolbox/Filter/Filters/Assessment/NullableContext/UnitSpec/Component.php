@@ -7,12 +7,12 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitSpec;
 
-use Schoolbox\Filter\AbstractComponent;
+use Schoolbox\Filter\BaseComponent;
 
 /**
  * @method Definition getDefinition()
  */
-class Component extends AbstractComponent
+class Component extends BaseComponent
 {
 
     // No implementation yet - exists for now just to enable query building

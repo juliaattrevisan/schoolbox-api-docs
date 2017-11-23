@@ -64,24 +64,65 @@ class Factory extends NullableContext\Factory
 
 
     /**
-     * Return the set of projects that both:
+     * @inheritdoc
+     * @param Filter\Model $filter
+     * @return Definition|Filter\IDefinition
+     */
+    public function buildDefinition(Filter\Model $filter): Filter\IDefinition
+    {
+        return new Definition(
+            $filter,
+            $this->getOptionMapper(),
+            $this->getDefaultsMapper()
+        );
+    }
+
+    /**
+     * Includes the set of projects that both:
      * * reside in the contexts set by admin
      * * are linked to folders taught by the $viewee
      *
-     * @inheritdoc
+     * @param Filter\IDefinition     $definition
+     * @param User                   $user
+     * @param Filter\Page\Model      $pageFilter
+     * @param GenericCollection      $selections
+     * @param null|User              $viewee
+     * @param null|GenericCollection $overrides
+     * @return Filter\IComponent|Component
      * @throws DefinitionException If unable to find a joined mapper
      * @throws Mapper\Exception If unable to hydrate a row
+     * @throws \InvalidArgumentException If $viewee is null
      */
-    protected function buildExtraComponentArgs(
+    public function buildComponent(
+        Filter\IDefinition $definition,
         User $user,
         Filter\Page\Model $pageFilter,
-        Filter\IDefinition $definition,
-        Collection $overrides,
-        User $viewee = null
-    ) {
-        return [
-            'projects' => $this->getProjects($pageFilter, $viewee, $overrides),
-        ];
+        GenericCollection $selections,
+        ?User $viewee,
+        ?GenericCollection $overrides
+    ): Filter\IComponent {
+        $userSelections  = $overrides ?: $selections;
+        $selectionMapper = $this->getSelectionMapper();
+        if (null === $viewee) {
+            throw new \InvalidArgumentException('$viewee cannot be null');
+        }
+        $projects        = $this->getProjects($pageFilter, $viewee, $overrides);
+        return new Component($definition, $user, $pageFilter, $userSelections, $selectionMapper, $projects);
+    }
+
+
+    /**
+     * @inheritdoc
+     * @param Filter\Model $filter
+     * @return Filter\IKeyConverter|KeyConverter
+     */
+    public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
+    {
+        $projectIds = (new Collection($this->projectMapper->findAllIds(['deleted' => true])))
+            ->indexByCallback(function ($projectId) {
+                return $projectId;
+            });
+        return new KeyConverter($filter, $projectIds);
     }
 
 
@@ -89,7 +130,7 @@ class Factory extends NullableContext\Factory
      * @param Filter\Page\Model $pageFilter
      * @param User              $viewee
      * @param Collection        $overrides Indexed by filter.id, selection.key
-     * @return Collection|Project\Model[]
+     * @return GenericCollection|Project\Model[]
      * @throws DefinitionException If unable to find a joined mapper
      * @throws Mapper\Exception If unable to hydrate a row
      */
@@ -305,20 +346,5 @@ class Factory extends NullableContext\Factory
             }
         }
         return $projects;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function buildKeyConverterArgs(Filter\Model $filter)
-    {
-        $projectIds = (new Collection($this->projectMapper->findAllIds(['deleted' => true])))->indexByCallback(function ($projectId) {
-            return $projectId;
-        });
-
-        return array_merge(parent::buildKeyConverterArgs($filter), [
-            'projectIds' => $projectIds,
-        ]);
     }
 }

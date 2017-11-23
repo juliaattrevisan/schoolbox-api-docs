@@ -17,7 +17,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 /**
  * @method Definition getDefinition()
  */
-class Component extends Filter\AbstractComponent
+class Component extends Filter\BaseComponent
 {
 
     /**

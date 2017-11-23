@@ -9,6 +9,7 @@ namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitSpec;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
+use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Filter\Filters\Assessment\NullableContext;
@@ -42,30 +43,51 @@ class Factory extends NullableContext\Factory
 
     /**
      * @inheritdoc
+     * @param Filter\Model $filter
+     * @return Definition|Filter\IDefinition
      */
-    protected function buildExtraComponentArgs(
+    public function buildDefinition(Filter\Model $filter): Filter\IDefinition
+    {
+        return new Definition(
+            $filter,
+            $this->getOptionMapper(),
+            $this->getDefaultsMapper()
+        );
+    }
+
+
+    /**
+     * @param Filter\IDefinition     $definition
+     * @param User                   $user
+     * @param Filter\Page\Model      $pageFilter
+     * @param GenericCollection      $selections
+     * @param null|User              $viewee
+     * @param null|GenericCollection $overrides
+     * @return Filter\IComponent|Component
+     */
+    public function buildComponent(
+        Filter\IDefinition $definition,
         User $user,
         Filter\Page\Model $pageFilter,
-        Filter\IDefinition $definition,
-        Collection $overrides,
-        User $viewee = null
-    ) {
-        return [];
+        GenericCollection $selections,
+        ?User $viewee,
+        ?GenericCollection $overrides
+    ): Filter\IComponent {
+        return new Component($definition, $user, $pageFilter, $overrides ?: $selections, $this->getSelectionMapper());
     }
 
 
     /**
      * @inheritdoc
+     * @param Filter\Model $filter
+     * @return Filter\IKeyConverter|KeyConverter
      */
-    protected function buildKeyConverterArgs(Filter\Model $filter)
+    public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
     {
-        $unitSpecIds = (new Collection($this->unitSpecMapper->findAllIds(['deleted' => true])))->indexByCallback(function ($unitSpecId) {
-            return $unitSpecId;
-        });
-
-        return array_merge(parent::buildKeyConverterArgs($filter), [
-            'unitSpecIds' => $unitSpecIds,
-        ]);
+        $unitSpecIds = (new Collection($this->unitSpecMapper->findAllIds(['deleted' => true])))
+            ->indexByCallback(function ($unitSpecId) {
+                return $unitSpecId;
+            });
+        return new KeyConverter($filter, $unitSpecIds);
     }
-
 }

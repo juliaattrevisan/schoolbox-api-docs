@@ -9,37 +9,59 @@ namespace Schoolbox\Filter\Filters\Assessment\Folder\TeacherInvolved;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
+use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
 
 
 /**
- * A factory for building 'Folder' filter objects
+ * A factory for building Teacher 'Folder' filter objects
  */
 class Factory extends FolderFilter\Factory
 {
 
     /**
      * @inheritdoc
-     * @throws \InvalidArgumentException If $viewee is NULL
+     * @param Filter\Model $filter
+     * @return Definition|Filter\IDefinition
      */
-    protected function buildExtraComponentArgs(
+    public function buildDefinition(Filter\Model $filter): Filter\IDefinition
+    {
+        return new Definition(
+            $filter,
+            $this->getOptionMapper(),
+            $this->getDefaultsMapper()
+        );
+    }
+
+
+    /**
+     * @param Filter\IDefinition     $definition
+     * @param User                   $user
+     * @param Filter\Page\Model      $pageFilter
+     * @param GenericCollection      $selections
+     * @param null|User              $viewee
+     * @param null|GenericCollection $overrides
+     * @return Filter\IComponent|FolderFilter\Component
+     * @throws \InvalidArgumentException If $viewee is null
+     */
+    public function buildComponent(
+        Filter\IDefinition $definition,
         User $user,
         Filter\Page\Model $pageFilter,
-        Filter\IDefinition $definition,
-        Collection $overrides,
-        User $viewee = null
-    ) {
-
-        if(null === $viewee){
+        GenericCollection $selections,
+        ?User $viewee,
+        ?GenericCollection $overrides
+    ): Filter\IComponent {
+        if (null === $viewee) {
             throw new \InvalidArgumentException('Viewee cannot be null');
         }
 
         // Should this role type see classes for this page?
         $options = $pageFilter->getOptions();
 
-        if($pageFilter->getUserConfigurable()){
+        if ($pageFilter->getUserConfigurable()) {
             $getClasses = $options[Definition::KEY_CLASSES]->getAvailable();
             $getGroups  = $options[Definition::KEY_GROUPS]->getAvailable();
         } else {
@@ -48,7 +70,7 @@ class Factory extends FolderFilter\Factory
             $getGroups  = $options[Definition::KEY_GROUPS]->getDefaults()[$roleType]->getSelected();
 
             // Are all available options unchecked ?
-            if(!$getClasses && !$getGroups){
+            if (!$getClasses && !$getGroups) {
                 // For consistency, this must logically equate to the filter not reducing the full set.
                 $getClasses = $getGroups = true;
             }
@@ -61,9 +83,8 @@ class Factory extends FolderFilter\Factory
 
         // Did caller specify they wish to insert some custom folders in the list?
         // (Note that perm check was already performed by key-converter)
-        $filterOverrides = $overrides[$definition->getFilter()->getId()];
-        if ($filterOverrides && $filterOverrides->count()) {
-            $folderIds    = $filterOverrides->getColumnValues('key');
+        if ($overrides && $overrides->count()) {
+            $folderIds    = $overrides->getColumnValues('key');
             $extraFolders = $this->getFolderMapper()->findByColumn($this->getFolderMapper()->getIdentifierColumn(), $folderIds);
 
             foreach ($extraFolders as $extraFolder) {
@@ -71,8 +92,30 @@ class Factory extends FolderFilter\Factory
             }
         }
 
-        return [
-            'folders' => $folders->sortBy('name', 'ASC'),
-        ];
+        return new FolderFilter\Component(
+            $definition,
+            $user,
+            $pageFilter,
+            $overrides ?: $selections,
+            $this->getSelectionMapper(),
+            $folders->sortBy('name', 'ASC')
+        );
+    }
+
+
+    /**
+     * @inheritdoc
+     * @param Filter\Model $filter
+     * @return Filter\IKeyConverter|KeyConverter
+     */
+    public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
+    {
+        $folderIds = (new Collection($this->getFolderMapper()->findAllIds(['deleted' => true])))
+            ->indexByCallback(function ($folderId) {
+                return $folderId;
+            });
+//        TODO resolve merge conflict remnant. Should we perm check client-supplied folder ids?
+//        return new KeyConverter($filter, $folderIds, $this->getAccess());
+        return new KeyConverter($filter, $folderIds);
     }
 }
