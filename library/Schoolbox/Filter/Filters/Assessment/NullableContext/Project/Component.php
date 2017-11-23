@@ -30,22 +30,25 @@ class Component extends Filter\BaseComponent
 
 
     /**
-     * @param Filter\IDefinition                         $definition
-     * @param User                                       $user
-     * @param Filter\Page\Model                          $pageFilter
-     * @param GenericCollection|Filter\Selection\Model[] $userSelections
-     * @param Filter\Selection\Mapper                    $filterSelectionMapper
-     * @param GenericCollection|Project\Model[]          $projects
+     * @param Filter\IDefinition                              $definition
+     * @param User                                            $user
+     * @param Filter\Page\Model                               $pageFilter
+     * @param null|GenericCollection|Filter\Selection\Model[] $userSelections
+     * @param null|GenericCollection|Filter\Selection\Model[] $urlOverrides
+     * @param Filter\Selection\Mapper                         $filterSelectionMapper
+     * @param GenericCollection|Project\Model[]               $projects
+     * @throws \InvalidArgumentException If neither $userSelections or $urlOverrides are supplied
      */
     public function __construct(
         Filter\IDefinition $definition,
         User $user,
         Filter\Page\Model $pageFilter,
-        GenericCollection $userSelections,
+        ?GenericCollection $userSelections,
+        ?GenericCollection $urlOverrides,
         Filter\Selection\Mapper $filterSelectionMapper,
         GenericCollection $projects
     ) {
-        parent::__construct($definition, $user, $pageFilter, $userSelections, $filterSelectionMapper);
+        parent::__construct($definition, $user, $pageFilter, $userSelections, $urlOverrides, $filterSelectionMapper);
         $this->projects = $projects;
     }
 

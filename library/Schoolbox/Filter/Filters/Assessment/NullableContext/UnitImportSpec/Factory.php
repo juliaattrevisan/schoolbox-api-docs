@@ -75,18 +75,18 @@ class Factory extends NullableContext\Factory
      * @param Filter\IDefinition     $definition
      * @param User                   $user
      * @param Filter\Page\Model      $pageFilter
-     * @param GenericCollection      $selections
-     * @param null|User              $viewee
-     * @param null|GenericCollection $overrides
+     * @param null|GenericCollection|Filter\Selection\Model[] $selections Indexed selection.key
+     * @param null|User                                       $viewee
+     * @param null|GenericCollection|Filter\Selection\Model[] $overrides  Indexed selection.key
      * @return Filter\IComponent
-     * @throws \InvalidArgumentException If $viewee is NULL
+     * @throws \InvalidArgumentException If $viewee is NULL or neither $selections or $overrides are supplied
      * @throws \UnexpectedValueException
      */
     public function buildComponent(
         Filter\IDefinition $definition,
         User $user,
         Filter\Page\Model $pageFilter,
-        GenericCollection $selections,
+        ?GenericCollection $selections,
         ?User $viewee,
         ?GenericCollection $overrides
     ): Filter\IComponent {
@@ -177,7 +177,8 @@ class Factory extends NullableContext\Factory
             $definition,
             $user,
             $pageFilter,
-            $overrides ?: $selections,
+            $selections,
+            $overrides,
             $this->getSelectionMapper(),
             $unitSpecsImportedToFolders,
             $unitSpecsImportedToClasses,

@@ -52,26 +52,29 @@ class Component extends Filter\BaseComponent
      * In this case, it will most likely clobber user-selections, so don't select the units
      * imported to that injected folder so the unit filter can be nulled.
      *
-     * @param Filter\IDefinition                         $definition
-     * @param User                                       $user
-     * @param Filter\Page\Model                          $pageFilter
-     * @param GenericCollection|Filter\Selection\Model[] $userSelections
-     * @param Filter\Selection\Mapper                    $filterSelectionMapper
-     * @param GenericCollection|UnitSpec\Model[]         $unitSpecsImportedToFolders - the full set
-     * @param GenericCollection|UnitSpec\Model[]         $unitSpecsImportedToClasses - to classes
-     * @param GenericCollection|UnitSpec\Model[]         $unitSpecsImportedToGroups  - to groups
+     * @param Filter\IDefinition                              $definition
+     * @param User                                            $user
+     * @param Filter\Page\Model                               $pageFilter
+     * @param null|GenericCollection|Filter\Selection\Model[] $userSelections
+     * @param null|GenericCollection|Filter\Selection\Model[] $urlOverrides
+     * @param Filter\Selection\Mapper                         $filterSelectionMapper
+     * @param GenericCollection|UnitSpec\Model[]              $unitSpecsImportedToFolders - the full set
+     * @param GenericCollection|UnitSpec\Model[]              $unitSpecsImportedToClasses - to classes
+     * @param GenericCollection|UnitSpec\Model[]              $unitSpecsImportedToGroups  - to groups
+     * @throws \InvalidArgumentException If neither $userSelections or $urlOverrides are supplied
      */
     public function __construct(
         Filter\IDefinition $definition,
         User $user,
         Filter\Page\Model $pageFilter,
-        GenericCollection $userSelections,
+        ?GenericCollection $userSelections,
+        ?GenericCollection $urlOverrides,
         Filter\Selection\Mapper $filterSelectionMapper,
         GenericCollection $unitSpecsImportedToFolders,
         GenericCollection $unitSpecsImportedToClasses,
         GenericCollection $unitSpecsImportedToGroups
     ) {
-        parent::__construct($definition, $user, $pageFilter, $userSelections, $filterSelectionMapper);
+        parent::__construct($definition, $user, $pageFilter, $userSelections, $urlOverrides, $filterSelectionMapper);
         // (for injected folders that are neither classes or groups)
         $this->unitSpecsImportedToFolders = $unitSpecsImportedToFolders;
         $this->unitSpecsImportedToClasses = $unitSpecsImportedToClasses;

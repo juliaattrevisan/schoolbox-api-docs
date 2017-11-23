@@ -206,13 +206,11 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
             $definition = $factory->buildDefinition($filter);
             $definition->normalisePageOptions($pageFilter, $user->getRole()->getType());
 
-            $filterSelections = $selections[$filter->getId()] ?: $this->getSelectionMapper()->createCollection();
-
             $filterComponents[$class] = $factory->buildComponent(
                 $definition,
                 $user,
                 $pageFilter,
-                $filterSelections,
+                $selections[$filter->getId()],
                 $viewee,
                 $overrides[$filter->getId()]
             );
