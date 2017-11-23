@@ -376,25 +376,18 @@
         })
 
         c.getForm('editTask').on('click', '[data-interaction="delete"]', function(e) {
-            var id = $(this).siblings('input[name=eventId]').val();
-            c.cdelete(
-                {eventId: id},
-                function() {
-                    // Remove this event from the calendar
-                    c.dom.fullCalendar(
-                        'removeEvents',
-                        function(thisEvent) {
-                            try {
-                                return thisEvent.data.meta.eventId == id;
-                            } catch (e) {
-                                return false;
-                            }
-                        }
-                    );
-                }
-            );
-            c.bubble.hide()
-            e.preventDefault()
+                // Do delete stuff
+                var element = $(this);
+                event.preventDefault();
+                c.getForm('editTask').closest('[data-reveal]')
+                    .one('closed.fndtn.reveal', function() {
+                            // confirmy-dialogy
+                            element.confirmDialog({
+                                text: 'Are you sure you wish to delete this event?',
+                            });
+                            c.bubble.hide();
+                    })
+                    .foundation('reveal', 'close');
         })
 
         // Dialog for use when clicking an item that is in a series
@@ -665,7 +658,6 @@
 
     <form id="editTask">
         <input type="hidden" name="eventId" />
-
         <h3>Task</h3>
 
         <label>
@@ -690,7 +682,7 @@
         </label>
 
         <input type="submit" value="Update Task" />
-        <a href="#" class="button icon-delete" data-interaction="delete">Delete</a>
+        <span class="deleteLink" data-is-html="1"></span>
     </form>
 
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
