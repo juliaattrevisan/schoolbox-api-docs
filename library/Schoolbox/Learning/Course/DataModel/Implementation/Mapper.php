@@ -119,7 +119,7 @@ class Mapper extends AbstractCourseMapper
             $model->setSpecification($specification);
 
             // Add
-            $modelList->add($model);
+            $modelList[$model->getId()] = $model;
         }
         return $modelList;
     }
