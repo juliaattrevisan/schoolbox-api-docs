@@ -20,7 +20,6 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
-use Schoolbox\Fixtures\Authorizer\Rule\IsAnyParentOfTeamPlayer;
 use Schoolbox\Fixtures\Authorizer\Rule\IsCoachOfTeam;
 
 class Module extends RestfulModule
@@ -61,10 +60,10 @@ class Module extends RestfulModule
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                new Rule\HasServicePermission(UserAccess::SERVICE_SPORTS_ADMINISTRATOR, UserAccess::ACCESS_WRITE),
                 new Rule\HasRole(Role::STUDENT),
                 new Rule\HasRole(Role::STAFF),
-                new IsAnyParentOfTeamPlayer(new \External_User()),
+                new Rule\HasRole(Role::PARENT),
+                new Rule\HasServicePermission(UserAccess::SERVICE_SPORTS_ADMINISTRATOR, UserAccess::ACCESS_WRITE),
                 new IsCoachOfTeam()
             )
         );
