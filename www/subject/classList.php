@@ -133,7 +133,7 @@ if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser())
                 'EMAIL_ADDRESS' => $user->getEmail(),
                 'SPECIAL_NEEDS' => $this->getLocalisedTerm('specialNeeds', false, true),
                 'MEDICAL_ALERT' => $student['StudentMedicalAlert'],
-                'TUTORGROUP' => $externalUser["StudentTutorDescription"],
+                'TUTORGROUP' => $student["StudentTutorDescription"],
                 'ON_OFF' => ++$j % 2 ? '' : 'dark',
                 'SELECT' => $user->getEmail() ? sprintf('<input id="c%s" name="c%s" type="checkbox" value="%s"/>', $j, $j, $emailaddr) : '',
             ));
