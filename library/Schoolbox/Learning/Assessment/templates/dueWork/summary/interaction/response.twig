@@ -1,6 +1,12 @@
 {# If staff, try going to Inline Grader #}
 {% if currentUser.role.isStaff %}
-    {% set url = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessmentId: currentInteraction.assessable.id, studentId: participant.user.id, responseId: currentInteraction.id, response: currentInteraction}) %}
+    {% set url = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {
+        assessmentId: currentInteraction.assessable.id,
+        studentId:    participant.user.id,
+        responseId:   currentInteraction.id,
+        response:     currentInteraction,
+        participant:  participant
+    }) %}
     {% set tooltip = 'View in Inline Grader' %}
 {% elseif currentUser.role.isStudent and not currentInteraction.isSubmitted%}
     {% set url = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', {assessmentId: currentInteraction.assessable.id, studentId: participant.user.id, assessment: currentInteraction.assessable, participant: participant}) %}
