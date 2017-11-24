@@ -9,6 +9,7 @@
 
 class External_Synergetic_Class implements External_ClassInterface
 {
+    use External_Synergetic_ClearInvalidValuesTrait;
 
     /**
      * @var MSSQL $database
@@ -112,7 +113,9 @@ class External_Synergetic_Class implements External_ClassInterface
             AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
         ORDER BY StudentClasses.StudentSurname, StudentClasses.StudentPreferred";
 
-        return $this->getDatabase()->getAll($query);
+        return $this->clearInvalidValues(
+            $this->getDatabase()->getAll($query)
+        );
     }
 
     /**
