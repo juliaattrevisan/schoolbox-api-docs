@@ -1309,7 +1309,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     protected function hasSoftDeleteDateField($column)
     {
-        return $this->hasSoftDeleteField($column, date('Y-m-d H:i:s'), null);
+        return $this->hasSoftDeleteField($column, Alaress_Date_Format::now()->getDatabase(), null);
     }
 
     /**
