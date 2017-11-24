@@ -24,6 +24,9 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+/**
+ * @method Model createModel($idValue = null)
+ */
 class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
 {
     /**

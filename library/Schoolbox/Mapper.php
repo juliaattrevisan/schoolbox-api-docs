@@ -9,6 +9,7 @@
 
 namespace Schoolbox;
 
+use Alaress_Date_Format;
 use Alaress\Cache;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Quoter\IQuoter;
@@ -158,6 +159,20 @@ abstract class Mapper implements IMapper, Serializable
      * @var array
      */
     protected $identifier;
+
+    /**
+     * 'created' timestamp map (if registered in mapping())
+     *
+     * @var null|array
+     */
+    private $createdMap;
+
+    /**
+     * 'updated' timestamp map (if registered in mapping())
+     *
+     * @var null|array
+     */
+    private $updatedMap;
 
     /**
      * Callbacks that are called on certain events within this mapper.
@@ -1228,6 +1243,14 @@ abstract class Mapper implements IMapper, Serializable
             $this->setIdentifier($map);
         }
 
+        if (isset($map['created_timestamp'])) {
+            $this->setCreatedMap($map);
+        }
+
+        if (isset($map['updated_timestamp'])) {
+            $this->setUpdatedMap($map);
+        }
+
         $this->map->setOffset($map['property'], $map);
 
         // Has a join definition been defined? If so create the join.
@@ -1286,7 +1309,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     protected function hasSoftDeleteDateField($column)
     {
-        return $this->hasSoftDeleteField($column, date('Y-m-d H:i:s'), null);
+        return $this->hasSoftDeleteField($column, Alaress_Date_Format::now()->getDatabase(), null);
     }
 
     /**
@@ -1738,6 +1761,43 @@ abstract class Mapper implements IMapper, Serializable
     public function hasIdentifier()
     {
         return !empty($this->getIdentifier());
+    }
+
+
+    /**
+     * @return null|array
+     */
+    protected function getCreatedMap(): ?array
+    {
+        return $this->createdMap;
+    }
+
+    /**
+     * @param null|array $createdMap
+     * @return $this
+     */
+    private function setCreatedMap(?array $createdMap): self
+    {
+        $this->createdMap = $createdMap;
+        return $this;
+    }
+
+    /**
+     * @return null|array
+     */
+    protected function getUpdatedMap(): ?array
+    {
+        return $this->updatedMap;
+    }
+
+    /**
+     * @param null|array $updatedMap
+     * @return $this
+     */
+    private function setUpdatedMap(?array $updatedMap): self
+    {
+        $this->updatedMap = $updatedMap;
+        return $this;
     }
 
     /**
@@ -2540,9 +2600,9 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * @brief calls save(), but forces create by nulling the identifier field.
      *
-     * @param $object
+     * @param object $object
      *
-     * @return int[]
+     * @return int[] IDs of newly-created models
      */
     public function create($object)
     {
@@ -2550,6 +2610,12 @@ abstract class Mapper implements IMapper, Serializable
         if ($this->hasIdentifier()) {
             foreach ($collection as $model) {
                 $this->setModelProperty($model, $this->getIdentifierProperty(), null);
+            }
+        }
+        if ($this->createdMap) {
+            $setMethod = $this->getSetMethodName($this->createdMap['property']);
+            foreach ($collection as $model) {
+                $model->{$setMethod}(null);
             }
         }
         return $this->save($collection);
@@ -2570,6 +2636,7 @@ abstract class Mapper implements IMapper, Serializable
         $collection  = $this->getModelAsCollection($object);
         $tbl         = $this->table;
         $colString   = $this->getColumnString();
+        $collection  = $this->populateSaveTimestamps($collection);
         $plcString   = $this->getPlaceholderString();
         $updString   = $this->getUpdateString();
         $statement   = $this->database->prepare(
@@ -3296,14 +3363,7 @@ abstract class Mapper implements IMapper, Serializable
             if (empty($map['column']) || isset($map['join_def']['reverse'])) {
                 continue;
             }
-            //
-            // Is this a create or update timestamp field?
-            // Update with now() instead of a placeholder.
-            $placeholder = ":{$map['column']}";
-            if (isset($map['created_timestamp']) || isset($map['updated_timestamp'])) {
-                $placeholder = 'NOW()';
-            }
-            $placeholderList[] = $placeholder;
+            $placeholderList[] = ":{$map['column']}";
         }
         return implode(', ', $placeholderList);
     }
@@ -3344,7 +3404,7 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
-     * @brief Returns an SQL fragment containg the assignment portion of an UPDATE query
+     * @brief Returns an SQL fragment containing the assignment portion of an UPDATE query
      * @return String
      */
     public function getUpdateString()
@@ -3362,12 +3422,7 @@ abstract class Mapper implements IMapper, Serializable
             if (empty($map['column'])) {
                 continue;
             }
-            $assignment  = "`{$this->table}`.`{$map['column']}`";
-            $placeholder = ":{$map['column']}";
-            if (isset($map['updated_timestamp'])) {
-                $placeholder = 'NOW()';
-            }
-            $assignmentList[] = "$assignment = $placeholder";
+            $assignmentList[] = "`{$this->table}`.`{$map['column']}` = :{$map['column']}";
         }
         return implode(', ', $assignmentList);
     }
@@ -3376,11 +3431,10 @@ abstract class Mapper implements IMapper, Serializable
      * Inverse of hydrate(). Converts a model to an array with indices matching the db fields.
      *
      * @param object $model              The model to get values from
-     * @param bool   $includeTimestamps  Whether or not to include timestamps in the dehydrated output
      * @throws Mapper\Exception if the map is not valid
      * @return array
      */
-    public function dehydrate($model, $includeTimestamps = false)
+    public function dehydrate($model)
     {
         $result = array();
         foreach ($this->map as $map) {
@@ -3408,11 +3462,7 @@ abstract class Mapper implements IMapper, Serializable
             }
             $propertyName = $map['property'];
             $columnName   = $map['column'];
-            //
-            // Timestamp fields will never be bound.
-            if ($includeTimestamps || !(isset($map['updated_timestamp']) || isset($map['created_timestamp']))) {
-                $result[$columnName] = $this->getModelProperty($model, $propertyName);
-            }
+            $result[$columnName] = $this->getModelProperty($model, $propertyName);
         }
         return $result;
     }
@@ -3719,5 +3769,40 @@ abstract class Mapper implements IMapper, Serializable
         $foreignMapper->save($create);
 
         return true;
+    }
+
+
+    /**
+     * Set model 'createAt' and update 'updatedAt' timestamps prior to saving to DB
+     *
+     * @param Collection $collection
+     * @return Collection
+     */
+    protected function populateSaveTimestamps(Collection $collection): Collection
+    {
+        // Does the mapper have 'created_at' or 'updated_at' timestamps?
+        if (!$this->createdMap && !$this->updatedMap) {
+            return $collection;
+        }
+        $now = Alaress_Date_Format::now();
+
+        if ($this->createdMap) {
+            $getMethod = $this->getGetMethodName($this->createdMap['property']);
+            $setMethod = $this->getSetMethodName($this->createdMap['property']);
+            foreach ($collection as $model) {
+                // Has the model not been created?
+                if (null === $model->{$getMethod}()) {
+                    $model->{$setMethod}(clone $now);
+                }
+            }
+        }
+        if ($this->updatedMap) {
+            $setMethod = $this->getSetMethodName($this->updatedMap['property']);
+            foreach ($collection as $model) {
+                // Always set the update timestamp
+                $model->{$setMethod}(clone $now);
+            }
+        }
+        return $collection;
     }
 }
