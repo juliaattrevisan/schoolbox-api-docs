@@ -15,22 +15,24 @@
                 <label>Existing Duplicate Records</label>
                 <ul class="action-list">
                     {% for related in record.relatedRecords %}
-                        <li class="actions-small-1">
-                            <div class="list-item">
-                                <div class="small-12 card wrap-down">
-                                    <a href="{{ profile.link(related.student) }}">{{ profile.imageSquare64(related.student) }}</a>
-                                    <p>
-                                        <a title="View Record" href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': related.student.id, 'recordId': related.id}) }}">
-                                            {{ related.heading }}
-                                        </a>
-                                    </p>
-                                    <p class="meta">{{ related.student.fullName }}</p>
-                                    <p>
-                                        Posted by <a href="{{ profile.link(related.owner) }}">{{ related.owner.fullName }}</a> {{ related.createdAt.relativeDay }}
-                                    </p>
+                        {% if related.student.id != record.student.id %}
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="small-12 card wrap-down">
+                                        <a href="{{ profile.link(related.student) }}">{{ profile.imageSquare64(related.student) }}</a>
+                                        <p>
+                                            <a title="View Record" href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': related.student.id, 'recordId': related.id}) }}">
+                                                {{ related.heading }}
+                                            </a>
+                                        </p>
+                                        <p class="meta">{{ related.student.fullName }}</p>
+                                        <p>
+                                            Posted by <a href="{{ profile.link(related.owner) }}">{{ related.owner.fullName }}</a> {{ related.createdAt.relativeDay }}
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
-                        </li>
+                            </li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             {% endif %}

@@ -259,7 +259,7 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Return any records immediately related to the supplied pastoral record
+     * Returns a collection containing all records related to the supplied pastoral record (including itself)
      *
      * @param Model $record
      *
@@ -270,37 +270,34 @@ class Mapper extends BaseMapper
     {
         $query = $this->getSelectString();
 
-        if ($record instanceof PastoralRevision) {
-            $tableName = 'pastoral_revision';
-        } else {
-            $tableName = 'pastoral';
-        }
-
         if ($record->getParent() instanceof Model) {
             // This is a child item, find its parent and its other siblings
             $query .= "                
                 WHERE (
-                    `{$tableName}`.`parent_id` = :parent_id_0 OR 
-                    `{$tableName}`.`id` = :parent_id_1 OR 
-                    `{$tableName}`.`parent_id` = :id_0
+                    `pastoral`.`parent_id` = :parent_id_0 OR 
+                    `pastoral`.`id` = :parent_id_1 OR 
+                    `pastoral`.`parent_id` = :id_0
                 ) AND
-                `{$tableName}`.`id` <> :id_1 AND 
-                `{$tableName}`.deleted_at IS NULL
+                `pastoral`.deleted_at IS NULL
             ";
 
             $bindings['id_0']        = $record->getId();
-            $bindings['id_1']        = $record->getId();
             $bindings['parent_id_0'] = $record->getParent()->getId();
             $bindings['parent_id_1'] = $record->getParent()->getId();
         } else {
             // This is a parent item, just find its children
 
             $query .= "
-                WHERE   `{$tableName}`.`parent_id` = :parent_id AND 
-                        `{$tableName}`.`deleted_at` IS NULL
+                WHERE   (
+                            (`pastoral`.`parent_id` = :parent_id_0 AND `pastoral`.`student_id` <> :student_id) OR
+                            (`pastoral`.`id` = :parent_id_1)
+                        ) 
+                        AND `pastoral`.`deleted_at` IS NULL
             ";
 
-            $bindings['parent_id'] = $record->getId();
+            $bindings['student_id'] = $record->getStudent()->getId();
+            $bindings['parent_id_0'] = $record->getId();
+            $bindings['parent_id_1'] = $record->getId();
         }
 
         $statement = $this->database->prepare($query);
@@ -426,16 +423,14 @@ class Mapper extends BaseMapper
         $sql = $this->getSelectString() . "
             WHERE 
             
-            `pastoral`.`student_id` = :studentId1 AND `pastoral`.`id` IN (
+            `pastoral`.`student_id` = :linkedStudentId AND `pastoral`.`parent_id` IN (
+                SELECT      `id` 
+                FROM        `pastoral` `pastoralLinked` 
+                WHERE       `pastoralLinked`.`student_id` = :studentId
+            ) OR `pastoral`.`id` IN (
                 SELECT      `parent_id` 
-                FROM        `pastoral` `pastoralLinked1` 
-                WHERE       `pastoralLinked1`.`student_id` = :linkedStudentId1
-            ) OR
-            
-            `pastoral`.`student_id` = :linkedStudentId2 AND `pastoral`.`id` IN (
-                SELECT      `parent_id` 
-                FROM        `pastoral` `pastoralLinked2` 
-                WHERE       `pastoralLinked2`.`student_id` = :studentId2
+                FROM        `pastoral` `pastoralLinked` 
+                WHERE       `pastoralLinked`.`student_id` = :studentId2
             )
         ";
 
@@ -450,10 +445,9 @@ class Mapper extends BaseMapper
         $statement = $this->database->prepare($sql);
 
         $params = [
-            'studentId1'       => $student->getId(),
-            'linkedStudentId1' => $linkedStudent->getId(),
-            'studentId2'       => $student->getId(),
-            'linkedStudentId2' => $linkedStudent->getId(),
+            'studentId' => $student->getId(),
+            'studentId2' => $student->getId(),
+            'linkedStudentId' => $linkedStudent->getId(),
         ];
 
         if (!empty($typeId)) {

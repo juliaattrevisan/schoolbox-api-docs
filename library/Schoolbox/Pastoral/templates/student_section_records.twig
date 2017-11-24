@@ -10,65 +10,99 @@
 
             {% if user.role.isStaff %}
                 <h2 class="subheader">
-                    {{ locale.pastoral.proper }} Records <span class="hide-for-medium-down right">{{ paginator.text(pageCurrent, recordCount) }}</span>
+                    {% if linkedStudent %}
+                        Linked Pastoral Records
+                    {% else %}
+                        {{ locale.pastoral.proper }} Records
+                    {% endif %}
+
+                    <span class="hide-for-medium-down right">{{ paginator.text(pageCurrent, recordCount) }}</span>
                 </h2>
             {% endif %}
 
             <section>
                 <ul class="information-list">
                     {% for record in records %}
-
                         <li data-record-type="{{ record.type.id }}" class="actions-small-2" id="pastoral-{{ record.id }}">
                             <div class="list-item">
                                 <div class="card small-12 wrap-down">
                                     <a href="{{ profile.link(record.owner) }}">
                                         {{ profile.imageSquare64(record.owner) }}
                                     </a>
-                                    <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': student.id, 'recordId': record.id}) }}">
-                                        <h3>{{ record.heading }}</h3>
-                                    </a>
+
+                                    {% set studentId = student.id %}
+
+                                    {% if linkedStudent %}
+                                        <p class="meta">
+
+                                        {% for linkedRecord in record.relatedRecords %}
+
+
+                                            {% if linkedRecord.parent.id is empty %}
+                                                Original Record:
+                                                {% set headingCurrent = linkedRecord.heading %}
+                                            {% else %}
+                                                Linked Record:
+                                                {% set headingCurrent = record.heading %}
+                                            {% endif %}
+
+                                            <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': linkedRecord.student.id, 'recordId': linkedRecord.id}) }}"> {{ linkedRecord.student.fullName }} - {{ headingCurrent }}</a><br>
+                                        {% endfor %}
+                                        
+                                    {% else %}
+
+                                        {% set recordId = record.parent_id %}
+
+                                        <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': studentId, 'recordId': recordId}) }}">
+                                            <h3>{{ record.heading }}</h3>
+                                        </a>
+                                        <p class="meta">
+
+                                    {% endif %}
 
                                     {# Display name of poster #}
-                                    <p class="meta">
-                                        Created by <a href="{{ profile.link(record.owner) }}">{{ record.owner.fullName }}</a>
-                                        <span title="{{ record.createdAt.short }}">{{ record.createdAt.relativeDay }}</span>
-                                    </p>
+                                    Created by <a href="{{ profile.link(record.owner) }}">{{ record.owner.fullName }}</a>
+                                    <span title="{{ record.createdAt.short }}">{{ record.createdAt.relativeDay }}</span><br>
 
-                                    {# Display last updated by if applicable #}
-                                    {% if record.createdAt.long != record.updatedAtDisplay.long %}
-                                        <p class="meta">
-                                            Last updated by <a href="{{ profile.link(record.modifiedByDisplay) }}">{{ record.modifiedByDisplay.fullName }}</a>
-                                            <span title="{{ record.updatedAtDisplay.short }}">{{ record.updatedAtDisplay.relativeDay }}</span>
-                                        </p>
+                                    {% if not linkedStudent %}
+                                        {# Display last updated by if applicable #}
+                                        {% if record.createdAt.long != record.updatedAtDisplay.long %}
+                                                Last updated by <a href="{{ profile.link(record.modifiedByDisplay) }}">{{ record.modifiedByDisplay.fullName }}</a>
+                                                <span title="{{ record.updatedAtDisplay.short }}">{{ record.updatedAtDisplay.relativeDay }}</span><br>
+                                        {% endif %}
                                     {% endif %}
 
                                     {# Display linked students to staff #}
-                                    {% if user.role.isStaff and record.relatedRecords|length %}
-                                        <p class="meta">
-                                            {% for relatedRecord in record.relatedRecords %}
+                                    {% if user.role.isStaff and record.relatedRecords | length %}
+                                        {% for relatedRecord in record.relatedRecords %}
+                                            {% if relatedRecord.student.id != student.id and relatedRecord.student.id != linkedStudent.id %}
                                                 {% set getStudentRecord = routeLookupIfAuthorized('pastoral.getStudentRecord', {studentId: relatedRecord.student.id, 'recordId': relatedRecord.id}) %}
                                                 {% if getStudentRecord %}
-                                                    Linked Record: <a href="{{ getStudentRecord }}">{{ relatedRecord.student.fullName }} - {{ relatedRecord.heading }}<br></a>
+                                                    Linked Record:
+                                                    <a href="{{ getStudentRecord }}">{{ relatedRecord.heading }}</a> (<a href="{{ profile.link(relatedRecord.student) }}">{{ relatedRecord.student.fullName }}</a>)<br>
                                                 {% endif %}
-                                            {% endfor %}
-                                        </p>
+                                            {% endif %}
+                                        {% endfor %}
                                     {% endif %}
+                                    </p>
                                 </div>
                             </div>
-                            <nav>
-                                {# Modify record #}
+                            {% if not linkedStudent %}
+                                <nav>
+                                    {# Modify record #}
 
-                                {% set routeRecordUpdate = routeLookupIfAuthorized('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) %}
-                                {% if routeRecordUpdate %}
-                                    <a class="icon-modify no-text" href="{{ routeRecordUpdate }}" title="Modify"></a>
-                                {% endif %}
+                                    {% set routeRecordUpdate = routeLookupIfAuthorized('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) %}
+                                    {% if routeRecordUpdate %}
+                                        <a class="icon-modify no-text" href="{{ routeRecordUpdate }}" title="Modify"></a>
+                                    {% endif %}
 
-                                {# Delete record #}
+                                    {# Delete record #}
 
-                                {% if isRouteAuthorized('pastoral.postRecordDelete', {recordId: record.id}) %}
-                                    <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>
-                                {% endif %}
-                            </nav>
+                                    {% if isRouteAuthorized('pastoral.postRecordDelete', {recordId: record.id}) %}
+                                        <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>
+                                    {% endif %}
+                                </nav>
+                            {% endif %}
                         </li>
                     {% endfor %}
                 </ul>
