@@ -46,7 +46,7 @@ $buildLogger = function () use ($limits, $threshold) {
 };
 
 try {
-    new \Schoolbox\Application\Daemon\Kernel('System Check');
+    $kernel = new \Schoolbox\Application\Daemon\Kernel('System Check');
 
     /** @var Logger $d */
     $d = $buildLogger();
@@ -60,7 +60,7 @@ try {
 
     try {
         // test redis is online
-        $r = \Alaress\Redis::getClientInstance();
+        $r = $kernel->get('redis');
         $r->executeCommand($r->createCommand('get', array('test')));
         $d->notice('Redis is online', array('char' => '+'));
 

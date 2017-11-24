@@ -135,12 +135,8 @@ abstract class AbstractBootstrap implements BootstrapInterface
         // Config loader
         $di->set('config', $di->lazyNew(ConfigLoader::class));
 
-        $di->set('redis', $di->lazy(function () use ($di) {
-            // Redis connection configuration
-            Redis::getInstance()->connect($di->get('config')->get('redis_url'), null, INSTANCE_ID);
-
-            return Redis::getClientInstance();
-        }));
+        Redis::getInstance()->connect($di->get('config')->get('redis_url'), null, INSTANCE_ID);
+        $di->set('redis', Redis::getClientInstance());
 
         $di->set('amqp', $di->lazy(function () {
             return Connector::getInstance();
