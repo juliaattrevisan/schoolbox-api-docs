@@ -11,6 +11,7 @@ use Schoolbox\User;
 class External_Synergetic_User implements External_UserInterface
 {
     use External_MssqlConnector;
+    use External_Synergetic_ClearInvalidValuesTrait;
     use External_Synergetic_ValidateExternalIdTrait;
 
     /**
@@ -1227,26 +1228,6 @@ class External_Synergetic_User implements External_UserInterface
         }
 
         return $forms;
-    }
-
-    /**
-     * This is a helper function to clear the 'Not Selected' placeholder value that Synergetic loves to add as an option in every lookup table
-     *
-     * @param array $array
-     * @param string $placeholder
-     * @return array
-     */
-    private function clearInvalidValues($array, $placeholder = 'Not Selected')
-    {
-        // Remove the 'Not Selected' Synergetic placeholder value
-
-        return array_map(function($value) use ($placeholder) {
-            if (is_array($value)) {
-                return $this->clearInvalidValues($value);
-            } else {
-                return trim(str_replace($placeholder, '', $value));
-            }
-        }, $array);
     }
 
     // Everything below here is FileYear/FileSemester retrieval shenanigans, this should all disappear and be replaced by proper SQL joins
