@@ -52,8 +52,14 @@ class Coach implements ISnapshot
     {
         /** @var Match $match */
         $match = $this->getMetadata()->getMatch();
+        $allTeams = [];
 
-        $allTeams = [$match->getHomeTeam(), $match->getAwayTeam()];
+        if ($match->getHomeTeam()) {
+            $allTeams[] = $match->getHomeTeam();
+        }
+        if ($match->getAwayTeam()) {
+            $allTeams[] = $match->getAwayTeam();
+        }
 
         /** @var Team $currentTeam */
         foreach ($allTeams as $currentTeam) {
