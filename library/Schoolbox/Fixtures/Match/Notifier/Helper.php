@@ -180,15 +180,18 @@ class Helper
     public function postToTeams(Envelope $envelope, Builder $bob, Match $match, $stacking = Param::STACKING_REPLACE)
     {
         // Home
-        $bob->setMatchHref($match, $match->getHomeTeam())
-            ->setMatchParam($match, $match->getHomeTeam(), $stacking);
-        $this->postToTeam($envelope, $bob, $match->getHomeTeam());
+        if ($match->getHomeTeam()) {
+            $bob->setMatchHref($match, $match->getHomeTeam())
+                ->setMatchParam($match, $match->getHomeTeam(), $stacking);
+            $this->postToTeam($envelope, $bob, $match->getHomeTeam());
+        }
 
         // and away
-        $bob->setMatchHref($match, $match->getAwayTeam())
-            ->setMatchParam($match, $match->getAwayTeam(), $stacking);
-        $this->postToTeam($envelope, $bob, $match->getAwayTeam());
-
+        if ($match->getAwayTeam()) {
+            $bob->setMatchHref($match, $match->getAwayTeam())
+                ->setMatchParam($match, $match->getAwayTeam(), $stacking);
+            $this->postToTeam($envelope, $bob, $match->getAwayTeam());
+        }
         return $envelope;
     }
 
