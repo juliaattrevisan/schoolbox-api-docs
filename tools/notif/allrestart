@@ -1,6 +1,8 @@
 #!/bin/bash
 
-./allstop
+scriptdir="$(command dirname -- "${0}")"
+
+$scriptdir/allstop
 
 service schoolbox-scheduled start;
 service schoolbox-routed    start;
