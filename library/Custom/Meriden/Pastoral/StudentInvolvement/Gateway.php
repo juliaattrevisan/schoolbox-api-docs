@@ -16,6 +16,14 @@ use Schoolbox\User;
 class Gateway
 {
     /**
+     * TASS company code.
+     *
+     * This may be injected later, as it's `config.external_tass_company_code`,
+     * but this is not required.
+     */
+    const COMPANY_CODE = '01';
+
+    /**
      * @var IConnector
      */
     private $database;
@@ -104,7 +112,7 @@ class Gateway
         $pb = $pb->equals('studecact.stud_code', $externalId)
                  ->equals('studecact.act_year', $year)
                  ->equals('ecactivity.act_type', $activityType)
-                 ->equals('ecactivity.cmpy_code', '01');
+                 ->equals('ecactivity.cmpy_code', self::COMPANY_CODE);
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere());
 
@@ -332,7 +340,7 @@ class Gateway
 
         $pb = new PredicateBuilder($this->database, 'teacher');
         $pb = $pb->equals('studsub.stud_code', $externalId)
-                 ->equals('studsub.cmpy_code', '01')
+                 ->equals('studsub.cmpy_code', self::COMPANY_CODE)
                  ->equals('studsub.sub_code', ['9994', '9995', '9996', '9997', '9998', '9999'])
                  ->equals('tchsub.year_num', $year);
 
@@ -373,7 +381,7 @@ class Gateway
         $pb = new PredicateBuilder($this->database, 'studsub');
         $pb = $pb->equals('studsub.stud_code', $externalId)
                  ->equals('subtab.sub_code', ['9994', '9995', '9996', '9997', '9998', '9999'])
-                 ->equals('studsub.cmpy_code', '01');
+                 ->equals('studsub.cmpy_code', self::COMPANY_CODE);
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere())
             . " ORDER BY studsub.sub_code ASC, studsub.class ASC";
@@ -414,7 +422,7 @@ class Gateway
         $pb = $pb->equals('studsub.stud_code', $externalId)
                  ->equals('studsub.yr_study', $year)
                  ->equals('subtab.sub_code', ['9994', '9995', '9996', '9997', '9998', '9999'])
-                 ->equals('studsub.cmpy_code', '01');
+                 ->equals('studsub.cmpy_code', self::COMPANY_CODE);
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere())
             . " ORDER BY studsub.sub_code ASC, studsub.class ASC";
@@ -465,7 +473,7 @@ class Gateway
                  ->notEquals(
                      'subtab.sub_code',
                      ['9994', '9995', '9996', '9997', '9998', '9999', '0107', '0074', '4099', '0093', '0103'])
-                 ->equals('studsub.cmpy_code', '01');
+                 ->equals('studsub.cmpy_code', self::COMPANY_CODE);
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere())
             . " ORDER BY subtab.sub_desc ASC";
@@ -523,7 +531,7 @@ class Gateway
         $pb = $pb->equals('so.sub_code', $code)
                  ->equals('ts.year_num', $year)
                  ->equals('ts.class', $class)
-                 ->equals('so.cmpy_code', '01');
+                 ->equals('so.cmpy_code', self::COMPANY_CODE);
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere());
 
@@ -565,7 +573,7 @@ class Gateway
         $pb = new PredicateBuilder($this->database, 'studsub');
         $pb = $pb->equals('st.sub_code', $code)
                  ->equals('ss.class', $class)
-                 ->equals('st.cmpy_code', '01');
+                 ->equals('st.cmpy_code', self::COMPANY_CODE);
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere());
 
