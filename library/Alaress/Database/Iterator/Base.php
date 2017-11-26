@@ -93,6 +93,11 @@ class Base implements IIterator
     {
         ++$this->rowIndex;
         $this->currentRow = $this->pdoStatement->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT);
+
+        /* Call post processor on rowset */
+        foreach ($this->broker->getPostProcessors() as $callable) {
+            $this->currentRow = call_user_func($callable, $this->currentRow);
+        }
     }
 
     /**

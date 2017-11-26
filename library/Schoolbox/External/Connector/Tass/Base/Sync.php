@@ -29,6 +29,8 @@ class Sync extends Base implements ISync
     {
         parent::__construct($config, $databaseExternal);
 
+        $this->databaseExternal->addPostProcessor([$this, 'trimWhitespace']);
+
         $this->companyCode = $config->get('external_tass_company_code');
         $this->helper = new External_Tass_Helper();
     }
@@ -263,5 +265,24 @@ class Sync extends Base implements ISync
         );
 
         return new Iterator\Staff($iterator);
+    }
+
+    /**
+     * Function to trim whitespace from array/value
+     *
+     * @param array|string $input
+     * @return array|string $input
+     */
+    public function trimWhitespace($input)
+    {
+        if (is_array($input)) {
+            $output = [];
+            foreach ($input as $key => $value) {
+                $output[$key] = trim($value);
+            }
+            return $output;
+        } else {
+            return trim($input);
+        }
     }
 }
