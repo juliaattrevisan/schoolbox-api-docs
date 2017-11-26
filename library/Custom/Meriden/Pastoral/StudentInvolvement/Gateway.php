@@ -69,7 +69,7 @@ class Gateway
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere());
 
-        return $this->database->prepareQuery($query, $pb->getPredicates())->fetchAll();
+        return $this->database->executeQuery($query, $pb->getParams())->fetchAll();
     }
 
     /**
@@ -108,7 +108,7 @@ class Gateway
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere());
 
-        return $this->database->prepareQuery($query, $pb->getPredicates())->fetchAll();
+        return $this->database->executeQuery($query, $pb->getParams())->fetchAll();
     }
 
     /**
@@ -338,7 +338,7 @@ class Gateway
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere()) . " ORDER BY teacher.tch_name ASC";
 
-        return $this->database->prepareQuery($query, $pb->getPredicates())->fetchAll();
+        return $this->database->executeQuery($query, $pb->getParams())->fetchAll();
     }
 
     /**
@@ -378,7 +378,7 @@ class Gateway
         $query .= " WHERE " . implode(' AND ', $pb->getWhere())
             . " ORDER BY studsub.sub_code ASC, studsub.class ASC";
 
-        return $this->database->prepareQuery($query, $pb->getPredicates())->fetchAll();
+        return $this->database->executeQuery($query, $pb->getParams())->fetchAll();
     }
 
     /**
@@ -419,7 +419,7 @@ class Gateway
         $query .= " WHERE " . implode(' AND ', $pb->getWhere())
             . " ORDER BY studsub.sub_code ASC, studsub.class ASC";
 
-        return $this->database->prepareQuery($query, $pb->getPredicates())->fetchAll();
+        return $this->database->executeQuery($query, $pb->getParams())->fetchAll();
     }
 
     /**
@@ -472,7 +472,7 @@ class Gateway
 
         // Join all teacher codes into a single result.
         $result = array_reduce(
-            $this->database->prepareQuery($query, $pb->getPredicates())->fetchAll(),
+            $this->database->executeQuery($query, $pb->getParams())->fetchAll(),
             function ($carry, $newRow) {
                 $isDuplicateCode = false;
                 foreach ($carry as &$row) {
@@ -529,7 +529,7 @@ class Gateway
 
         // Reduce to one result
         $result = [];
-        foreach ($this->database->prepareQuery($query, $pb->getPredicates())->executeIterator() as $singleResult) {
+        foreach ($this->database->executeQueryIterator($query, $pb->getParams()) as $singleResult) {
             if (empty($result)) {
                 $result             = $singleResult;
                 $result['tch_code'] = [];
@@ -573,7 +573,7 @@ class Gateway
             function ($v) {
                 return $v['code'];
             },
-            $this->database->prepareQuery($query, $pb->getPredicates())->fetchAll()
+            $this->database->executeQuery($query, $pb->getParams())->fetchAll()
         );
     }
 }
