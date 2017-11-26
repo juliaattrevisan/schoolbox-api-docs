@@ -131,6 +131,22 @@ class Model implements ISoftDeletable
         return in_array($team->getId(), $teamIds);
     }
 
+    /**
+     * Returns a collection of all teams involved in match
+     * @return Collection
+     */
+    public function getAllTeams() {
+        $allTeams = new Collection();
+
+        if ($this->getHomeTeam() instanceof Team) {
+            $allTeams->add($this->getHomeTeam());
+        }
+        if ($this->getAwayTeam() instanceof Team) {
+            $allTeams->add($this->getAwayTeam());
+        }
+        return $allTeams;
+    }
+
     /* Getters/Setters
      */
 

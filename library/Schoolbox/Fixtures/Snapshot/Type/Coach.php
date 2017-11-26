@@ -52,17 +52,9 @@ class Coach implements ISnapshot
     {
         /** @var Match $match */
         $match = $this->getMetadata()->getMatch();
-        $allTeams = [];
-
-        if ($match->getHomeTeam()) {
-            $allTeams[] = $match->getHomeTeam();
-        }
-        if ($match->getAwayTeam()) {
-            $allTeams[] = $match->getAwayTeam();
-        }
 
         /** @var Team $currentTeam */
-        foreach ($allTeams as $currentTeam) {
+        foreach ($match->getAllTeams() as $currentTeam) {
             if (is_numeric($currentTeam->getId())) {
 
                 /* Delete all the existing Coaches for the Team

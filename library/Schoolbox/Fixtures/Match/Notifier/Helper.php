@@ -179,18 +179,10 @@ class Helper
      */
     public function postToTeams(Envelope $envelope, Builder $bob, Match $match, $stacking = Param::STACKING_REPLACE)
     {
-        // Home
-        if ($match->getHomeTeam()) {
-            $bob->setMatchHref($match, $match->getHomeTeam())
-                ->setMatchParam($match, $match->getHomeTeam(), $stacking);
-            $this->postToTeam($envelope, $bob, $match->getHomeTeam());
-        }
-
-        // and away
-        if ($match->getAwayTeam()) {
-            $bob->setMatchHref($match, $match->getAwayTeam())
-                ->setMatchParam($match, $match->getAwayTeam(), $stacking);
-            $this->postToTeam($envelope, $bob, $match->getAwayTeam());
+        foreach($match->getAllTeams() as $team) {
+            $bob->setMatchHref($match, $team)
+                ->setMatchParam($match, $team, $stacking);
+            $this->postToTeam($envelope, $bob, $team);
         }
         return $envelope;
     }
@@ -206,16 +198,11 @@ class Helper
      */
     public function postToParentsOfTeams(Envelope $envelope, Builder $bob, Match $match, $stacking = Param::STACKING_REPLACE)
     {
-        // Home
-        $bob->setMatchHref($match, $match->getHomeTeam())
-            ->setMatchParam($match, $match->getHomeTeam(), $stacking);
-        $this->postToParentsOfTeam($envelope, $bob, $match->getHomeTeam());
-
-        // and away
-        $bob->setMatchHref($match, $match->getAwayTeam())
-            ->setMatchParam($match, $match->getAwayTeam(), $stacking);
-        $this->postToParentsOfTeam($envelope, $bob, $match->getAwayTeam());
-
+        foreach($match->getAllTeams() as $team) {
+            $bob->setMatchHref($match, $team)
+                ->setMatchParam($match, $team, $stacking);
+            $this->postToParentsOfTeam($envelope, $bob, $team);
+        }
         return $envelope;
     }
 
