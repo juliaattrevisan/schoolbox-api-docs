@@ -367,7 +367,7 @@ class Controller extends Assessment\Controller
                     /** @var SubmissionFile $file */
                     foreach ($files as $file)
                     {
-                        if($file->exists()) {
+                        if ($file->exists()) {
                             $filenameSanitized = $this->sanitizeForFilename($file->getBasename());
                             $zipFilename = sprintf("%s/%s", $directory, $filenameSanitized);
                             $zip->addStream($file->readStream(), $zipFilename);
