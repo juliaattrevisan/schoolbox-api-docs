@@ -33,6 +33,11 @@ class Gateway
      */
     const EXCLUDED_SUBJECTS = ['9994', '9995', '9996', '9997', '9998', '9999', '0107', '0074', '4099', '0093', '0103'];
 
+    const ACTIVITY_TYPE_AWARD = 'C';
+    const ACTIVITY_TYPE_COCURRICULAR = 'B';
+    const ACTIVITY_TYPE_SERVICE = 'O';
+    const ACTIVITY_TYPE_POSITIONS_OF_OFFICE = 'A';
+
     /**
      * @var IConnector
      */
@@ -250,7 +255,7 @@ class Gateway
      */
     public function getAwards($year, User $student)
     {
-        return $this->queryActivities($year, $student, 'C');
+        return $this->queryActivities($year, $student, self::ACTIVITY_TYPE_AWARD);
     }
 
     /**
@@ -263,7 +268,7 @@ class Gateway
      */
     public function getCocurricular($year, User $student)
     {
-        return $this->queryActivities($year, $student, 'B');
+        return $this->queryActivities($year, $student, self::ACTIVITY_TYPE_COCURRICULAR);
     }
 
     /**
@@ -276,7 +281,7 @@ class Gateway
      */
     public function getService($year, User $student)
     {
-        return $this->queryActivities($year, $student, 'O');
+        return $this->queryActivities($year, $student, self::ACTIVITY_TYPE_SERVICE);
     }
 
     /**
@@ -289,7 +294,7 @@ class Gateway
      */
     public function getPositions($year, User $student)
     {
-        return $this->queryActivities($year, $student, 'A');
+        return $this->queryActivities($year, $student, self::ACTIVITY_TYPE_POSITIONS_OF_OFFICE);
     }
 
     /**
