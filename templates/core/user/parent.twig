@@ -71,13 +71,6 @@
                                 {% endif %}
                             {% endif %}
 
-                            {% if showDetails and externalUser.Email %}
-                                    <dt class="small-12 medium-3">Email:</dt>
-                                    <dd class="small-12 medium-9">
-                                        <a href="{{ session.mailhandle }}{{ externalUser.Email }}">{{ externalUser.Email }}</a>
-                                    </dd>
-                            {% endif %}
-
                             {% if showDetails %}
                                 {% if externalUser.SpouseDirectoryIncludeFlag and externalUser.SpouseSurname and (not spouse.getHideContacts()) %}
                                     <dt class="small-12">Partner:</dt>
