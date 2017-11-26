@@ -341,7 +341,6 @@ abstract class Mapper implements IMapper, Serializable
         // If for some reason self::di() wasn't called before this constructor:
         $this->setColumnFactory(self::$columnFactory ?: new ColumnFactory());
         $this->setMonitor(self::$perfmon ?: new LiveMonitor());
-        $this->setEventPropagator(self::$prop ?: new MockPropagator());
 
         $this->setSessionData(isset($_SESSION) ? $_SESSION : array());
         $this->mapping();
