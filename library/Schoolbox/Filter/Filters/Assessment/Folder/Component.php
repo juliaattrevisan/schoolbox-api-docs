@@ -58,26 +58,41 @@ class Component extends Filter\BaseComponent
         $roleType            = $this->getUser()->getRole()->getType();
         $isUserConfigurable  = $this->getPageFilter()->getUserConfigurable();
 
-        foreach ($abstractOptions as $option) {
-            // has admin configured the filter to be user-configurable, but that this option should not be available?
-            if ($isUserConfigurable && !$option->getAvailable()) {
+        // Had admin configured Groups and/or Classes to be available for current user's role type?
+        // (if not user configurable, set to always available - filtering applied by roleDefault)
+        $isGroupsAvailable  = $abstractOptions[Definition::KEY_GROUPS]->getAvailable();
+        $isClassesAvailable = $abstractOptions[Definition::KEY_CLASSES]->getAvailable();
+
+        // Had admin configured Groups and/or Classes to be selected for current user's role type?
+        $selectGroups  = $abstractOptions[Definition::KEY_GROUPS]->getDefaults()[$roleType]->getSelected();
+        $selectClasses = $abstractOptions[Definition::KEY_CLASSES]->getDefaults()[$roleType]->getSelected();
+
+        $urlOverrides = $this->getUrlOverrides();
+
+        foreach ($this->folders as $folder) {
+
+            /* Should the folder be available?
+             * - if not user configurable, set to always available - filtering applied by roleDefault
+             * - is group and groups are available
+             * - is/was class and classes are available
+             */
+            $available = !$isUserConfigurable || ($isGroupsAvailable && $folder->isGroup())
+                || ($isClassesAvailable && ($folder->isClass() || $folder->wasClass()));
+            if (!$available) {
                 continue;
             }
+            $key        = (string)$folder->getId();
+            $isInjected = $urlOverrides && $urlOverrides->offsetExists($key);
 
-            // did the admin configure the abstract option to be selected by default for the specified role?
-            $selected = $option->getDefaults()[$roleType]->getSelected();
+            /* Folder is available. Should it be selected?
+             * - if injected via URL override
+             * - is group and roleDefault for group is true
+             * - is/was class and roleDefault for class is true
+             */
+            $selected = $isInjected || ($selectGroups && $folder->isGroup())
+                || ($selectClasses && ($folder->isClass() || $folder->wasClass()));
 
-            foreach ($this->folders as $folder) {
-                $key = (string)$folder->getId();
-
-                if (!$availableSelections->offsetExists($key)) {
-                    // Does the folder not yet exist in selections ?
-                    $availableSelections[$key] = $this->createSelection($key, $selected);
-                } elseif ($selected) {
-                    // Does it exist, ensure it is selected if abstract option is selected
-                    $availableSelections[$key]->setSelected(true);
-                }
-            }
+            $availableSelections[$key] = $this->createSelection($key, $selected);
         }
         return $availableSelections;
     }
