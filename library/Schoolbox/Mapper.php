@@ -655,38 +655,41 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function getEventPropagator()
     {
-        if(!$this->propagator && !self::$prop ) {
-            // We don't have a propagator setup, lets connect to the rabbit
-            try {
-                self::$prop = $this->getDi()->newInstance(
-                    Propagator::class, [
-                    'splitter'   => $this->getDi()->lazyNew(
-                        Splitter::class, [
-                        'conf'    => $this->getDi()->lazyGet('config'),
-                        'di'      => $this->getDi(),
-                        'factory' => $this->getDi()->lazyNew(TriggerFactoryFactory::class, [true]),
-                    ]
-                    ),
-                    'redis'      => $this->getDi()->lazyGet('redis'),
-                    'broker'     => $this->getDi()->lazyNew(
-                        Broker::class, [
-                        'instanceId' => INSTANCE_ID,
-                        'amqp'       => $this->getDi()->lazyGet('amqp'),
-                        'redis'      => $this->getDi()->lazyGet('redis'),
-                        // no 'stomp'
-                    ]
-                    ),
-                    'instanceId' => INSTANCE_ID,
-                ]
-                );
+        if (!$this->propagator) {
+            if (!self::$prop) {
+                // We don't have a propagator setup, lets connect to the rabbit
+                try {
+                    self::$prop = $this->getDi()->newInstance(
+                        Propagator::class, [
+                            'splitter'   => $this->getDi()->lazyNew(
+                                Splitter::class, [
+                                    'conf'    => $this->getDi()->lazyGet('config'),
+                                    'di'      => $this->getDi(),
+                                    'factory' => $this->getDi()->lazyNew(TriggerFactoryFactory::class, [true]),
+                                ]
+                            ),
+                            'redis'      => $this->getDi()->lazyGet('redis'),
+                            'broker'     => $this->getDi()->lazyNew(
+                                Broker::class, [
+                                    'instanceId' => INSTANCE_ID,
+                                    'amqp'       => $this->getDi()->lazyGet('amqp'),
+                                    'redis'      => $this->getDi()->lazyGet('redis'),
+                                    // no 'stomp'
+                                ]
+                            ),
+                            'instanceId' => INSTANCE_ID,
+                        ]
+                    );
 
-            } catch (Di\Exception\ServiceNotFound $e) {
+                } catch (Di\Exception\ServiceNotFound $e) {
 
-                // in PHPUnit land, we do not have external services.
-                // this catch is merely to accommodate that case, it should not be
-                // relied upon in development
-                self::$prop = new MockPropagator();
+                    // in PHPUnit land, we do not have external services.
+                    // this catch is merely to accommodate that case, it should not be
+                    // relied upon in development
+                    self::$prop = new MockPropagator();
+                }
             }
+            $this->propagator = self::$prop;
         }
 
         return $this->propagator;
