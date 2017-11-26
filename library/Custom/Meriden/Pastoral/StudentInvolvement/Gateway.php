@@ -24,6 +24,16 @@ class Gateway
     const COMPANY_CODE = '01';
 
     /**
+     * Tutor group codes in TASS.
+     */
+    const TUTOR_GROUPS = ['9994', '9995', '9996', '9997', '9998', '9999'];
+
+    /**
+     * Subjects excluded from a student's list of subjects.
+     */
+    const EXCLUDED_SUBJECTS = ['9994', '9995', '9996', '9997', '9998', '9999', '0107', '0074', '4099', '0093', '0103'];
+
+    /**
      * @var IConnector
      */
     private $database;
@@ -341,7 +351,7 @@ class Gateway
         $pb = new PredicateBuilder($this->database, 'teacher');
         $pb = $pb->equals('studsub.stud_code', $externalId)
                  ->equals('studsub.cmpy_code', self::COMPANY_CODE)
-                 ->equals('studsub.sub_code', ['9994', '9995', '9996', '9997', '9998', '9999'])
+                 ->equals('studsub.sub_code', self::TUTOR_GROUPS)
                  ->equals('tchsub.year_num', $year);
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere()) . " ORDER BY teacher.tch_name ASC";
@@ -380,7 +390,7 @@ class Gateway
 
         $pb = new PredicateBuilder($this->database, 'studsub');
         $pb = $pb->equals('studsub.stud_code', $externalId)
-                 ->equals('subtab.sub_code', ['9994', '9995', '9996', '9997', '9998', '9999'])
+                 ->equals('subtab.sub_code', self::TUTOR_GROUPS)
                  ->equals('studsub.cmpy_code', self::COMPANY_CODE);
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere())
@@ -421,7 +431,7 @@ class Gateway
         $pb = new PredicateBuilder($this->database, 'studsub');
         $pb = $pb->equals('studsub.stud_code', $externalId)
                  ->equals('studsub.yr_study', $year)
-                 ->equals('subtab.sub_code', ['9994', '9995', '9996', '9997', '9998', '9999'])
+                 ->equals('subtab.sub_code', self::TUTOR_GROUPS)
                  ->equals('studsub.cmpy_code', self::COMPANY_CODE);
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere())
@@ -470,9 +480,7 @@ class Gateway
         $pb = new PredicateBuilder($this->database, 'studsub');
         $pb = $pb->equals('studsub.stud_code', $externalId)
                  ->equals('studsub.yr_study', $year)
-                 ->notEquals(
-                     'subtab.sub_code',
-                     ['9994', '9995', '9996', '9997', '9998', '9999', '0107', '0074', '4099', '0093', '0103'])
+                 ->notEquals('subtab.sub_code', self::EXCLUDED_SUBJECTS)
                  ->equals('studsub.cmpy_code', self::COMPANY_CODE);
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere())
