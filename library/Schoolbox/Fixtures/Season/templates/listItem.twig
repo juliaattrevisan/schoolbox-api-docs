@@ -2,7 +2,7 @@
     <div class="list-item">
         <div class="small-12 card">
             <h3>
-                <a href="{{ routeLookup('sportsfixturesSeason.getEntity', {entityId: currentSeason.id}) }}">
+                <a href="{{ routeLookup('sportsfixturesSeason.getModifyForm', {entityId: currentSeason.id}) }}">
                     {% if currentSeason.isArchived %}
                         <del class="icon icon-archive" title="This season is archived, and will be de-emphasised in selectors.">{{ currentSeason.name }}</del>
                     {% else %}
