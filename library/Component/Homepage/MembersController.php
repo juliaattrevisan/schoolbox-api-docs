@@ -11,6 +11,7 @@
 use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Component_Homepage_MembersController extends Component_Homepage_ControllerAbstract
 {
@@ -47,8 +48,23 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
         // Get collection of members
         $userMapper = new UserMapper();
-        $userList   = $userMapper->findByAccess(UserAccess::SERVICE_HOMEPAGE, UserAccess::ACCESS_READ, $this->getContext()
-                                                                                                            ->getId(), ['lastname' => 'asc']);
+        if($this->getContext()->getInherit()) {
+            // Find nearest nian folder
+            $folderMapper = FolderMapper::getInstance();
+            $nianFolder = $folderMapper->findNearestNonInheritingAncestralNode($this->getContext());
+            $userList   = $userMapper->findByAccess(
+                UserAccess::SERVICE_HOMEPAGE,
+                UserAccess::ACCESS_READ,
+                $nianFolder->getId(),
+                ['lastname' => 'asc']);
+        }
+        else {
+            $userList   = $userMapper->findByAccess(
+                UserAccess::SERVICE_HOMEPAGE,
+                UserAccess::ACCESS_READ,
+                $this->getContext()->getId(),
+                ['lastname' => 'asc']);
+        }
 
         if (count($userList) == 0) {
 
@@ -77,7 +93,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                                                          ->getId(),
             ]);
 
-            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE || $this->getContext()->getInherit()) {
                 $block = 'empty_read_members';
             } elseif ($this->getSource()->getFolder()->getCodes()->count()) {
                 $block = 'empty_class';
