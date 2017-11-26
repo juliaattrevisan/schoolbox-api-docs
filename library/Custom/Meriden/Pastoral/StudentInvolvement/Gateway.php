@@ -334,7 +334,7 @@ class Gateway
         $pb = $pb->equals('studsub.stud_code', $externalId)
                  ->equals('studsub.cmpy_code', '01')
                  ->equals('studsub.sub_code', ['9994', '9995', '9996', '9997', '9998', '9999'])
-                 ->equals('studsub.year_num', $year);
+                 ->equals('tchsub.year_num', $year);
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere()) . " ORDER BY teacher.tch_name ASC";
 
