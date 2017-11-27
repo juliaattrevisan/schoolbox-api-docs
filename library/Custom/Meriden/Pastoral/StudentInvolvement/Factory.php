@@ -12,6 +12,7 @@ namespace Custom\Meriden\Pastoral\StudentInvolvement;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -361,6 +362,13 @@ class Factory
         ) as $assessment) {
             // Not interested in non-dueworks
             if (!$assessment instanceof DueWork) {
+                continue;
+            }
+
+            // Not interested in work types other than assessment tasks
+            // TODO filter in a query
+            $workType = $assessment->getWorkType();
+            if (!($workType instanceof WorkType && $workType->getId() === self::WORK_TYPE_ASSESSMENT_TASK)) {
                 continue;
             }
 
