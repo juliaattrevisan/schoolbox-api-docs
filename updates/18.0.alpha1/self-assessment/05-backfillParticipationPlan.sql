@@ -11,4 +11,4 @@ SELECT            `assessment_id`,          -- Assessment ID
                   1,                        -- Dynamic participation flag
                   CURRENT_TIMESTAMP,        -- Created timestamp
                   CURRENT_TIMESTAMP         -- Updated timestamp
-FROM              `submission_box`
+FROM              `submission_box`;

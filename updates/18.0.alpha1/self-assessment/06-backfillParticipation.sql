@@ -13,4 +13,4 @@ SELECT DISTINCT   `participation_plan`.`id`,      -- Participation plan
                   CURRENT_TIMESTAMP               -- Updated timestamp
 FROM              `submission_box`
 JOIN              `submission_return` ON `submission_return`.`box_id` = `submission_box`.`id`
-JOIN              `participation_plan` ON `participation_plan`.`assessment_id` = `submission_box`.`assessment_id`
+JOIN              `participation_plan` ON `participation_plan`.`assessment_id` = `submission_box`.`assessment_id`;
