@@ -12,7 +12,8 @@ SELECT            `assessment_id`,          -- Assessment ID
                   CURRENT_TIMESTAMP,        -- Created timestamp
                   CURRENT_TIMESTAMP         -- Updated timestamp
 FROM              `submission_box`
-WHERE             `assessment_id` IN (select `id` FROM `assessment`);
+WHERE             `assessment_id` IN (select `id` FROM `assessment`) AND
+                  `assessment_id` NOT IN (select `assessment_id` FROM `participation_plan`);
 
 INSERT INTO       `participation_plan`
                   (
@@ -26,7 +27,8 @@ SELECT            `assessment_id`,          -- Assessment ID
                   CURRENT_TIMESTAMP,        -- Created timestamp
                   CURRENT_TIMESTAMP         -- Updated timestamp
 FROM              `assess`
-WHERE             `assessment_id` IN (select `id` FROM `assessment`);
+WHERE             `assessment_id` IN (select `id` FROM `assessment`) AND
+                  `assessment_id` NOT IN (select `assessment_id` FROM `participation_plan`);
 
 
 INSERT INTO       `participation_plan`
@@ -41,4 +43,5 @@ SELECT            `assessment_id`,          -- Assessment ID
                   CURRENT_TIMESTAMP,        -- Created timestamp
                   CURRENT_TIMESTAMP         -- Updated timestamp
 FROM              `task`
-WHERE             `task`.`assessment_id` IN (select `id` FROM `assessment`);
+WHERE             `task`.`assessment_id` IN (select `id` FROM `assessment`) AND
+                  `assessment_id` NOT IN (select `assessment_id` FROM `participation_plan`);
