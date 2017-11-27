@@ -354,7 +354,10 @@ class Factory
         foreach ($this->assessmentDataSource->findAllByFolderIdForReview(
             $folder->getId(),
             $student,
-            ['type' => AssessmentType::TYPE_DUE_WORK]
+            [
+                'order' => ['a.due_date' => 'asc'],
+                'type'  => AssessmentType::TYPE_DUE_WORK,
+            ]
         ) as $assessment) {
             $participant = $assessment->getParticipantIfExtant($student);
             if ($participant) {
