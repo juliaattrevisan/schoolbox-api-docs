@@ -2,17 +2,13 @@
 
 CREATE TABLE `participation`
 (
+  `id`                      INT(10) UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   `participation_plan_id`   INT(10) UNSIGNED NOT NULL,
   `user_id`                 INT(4) UNSIGNED NOT NULL,
   `created_at`              DATETIME NOT NULL,
   `updated_at`              DATETIME NOT NULL,
   `deleted_at`              DATETIME
 );
-
--- Create composite primary key using user and participation plan IDs
-
-ALTER TABLE     `participation`
-ADD PRIMARY KEY (`participation_plan_id`, `user_id`);
 
 -- Add foreign key to `user` table
 
