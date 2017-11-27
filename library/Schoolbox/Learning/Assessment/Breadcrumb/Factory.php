@@ -70,7 +70,7 @@ class Factory
 
         } elseif ($context instanceof UnitImplementation) {
             if ($user->getRole()->isStaff()) {
-                $path = $this->router->generate('learningMarkbook.getMarkbook', ['class' => $context->getFolder(), 'classId' => $context->getFolder()->getId()]);
+                $path = $this->router->generate('learningMarkbook.getMarkbookForClass', ['folder' => $context->getFolder(), 'folderId' => $context->getFolder()->getId()]);
 
             } elseif ($user->getRole()->isStudent()) {
                 $path = "/homepage/{$context->getFolder()->getId()}";
