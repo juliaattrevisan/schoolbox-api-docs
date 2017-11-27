@@ -383,12 +383,12 @@
                     .one('closed.fndtn.reveal', function() {
                             // confirmy-dialogy
                             element.confirmDialog({
-                                text: 'Are you sure you wish to delete this event?',
+                                text: 'Are you sure you wish to delete this task?'
                             });
                             c.bubble.hide();
                     })
                     .foundation('reveal', 'close');
-        })
+        });
 
         // Dialog for use when clicking an item that is in a series
         var updateSeriesDialog = $('#dialog-booking-bulk-update');
