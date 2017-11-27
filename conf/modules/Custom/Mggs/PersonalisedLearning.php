@@ -10,7 +10,7 @@ namespace Config\Modules\Custom\Mggs;
 use Alaress\Application\Kernel;
 use Config\Modules\ModuleConfigInterface;
 use Schoolbox\Learning\Mastery\Module as MasteryModule;
-use Schoolbox\Learning\Personalised\Module as PersonalisedLearningModule;
+use Custom\Mggs\Learning\Personalised\Module as PersonalisedLearningModule;
 
 /**
  * Configuration for the (currently) MGGS-specific personalised learning and mastery pages.

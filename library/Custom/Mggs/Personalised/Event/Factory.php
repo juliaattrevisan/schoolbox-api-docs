@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Personalised\Event;
+namespace Custom\Mggs\Learning\Personalised\Event;
 
 use Aura\Router\Router;
 use Schoolbox\Collection;
@@ -15,7 +15,7 @@ use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
-use Schoolbox\Learning\Personalised\Participant;
+use Custom\Mggs\Learning\Personalised\Participant;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 

@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Personalised;
+namespace Custom\Mggs\Learning\Personalised;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
