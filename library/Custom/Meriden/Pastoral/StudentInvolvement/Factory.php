@@ -17,6 +17,7 @@ use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
+use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -544,26 +545,59 @@ class Factory
      */
     protected function buildDistribution($grade, $cohortFolders)
     {
-        if (!($grade['assessment'] instanceof SubmissionBox)) {
+        if (!($grade['assessment'] instanceof DueWork)) {
             return [];
         }
-        $boxMapper          = SubmissionBoxMapper::getInstance();
-        $returnedWorkMapper = ReturnedWorkMapper::getInstance();
 
-        // Get the matching assessments in the cohort classes
-        $cohortFolderIds = [];
-        foreach ($cohortFolders as $cohortFolder) {
-            $cohortFolderIds[] = $cohortFolder->getId();
+        // Get cohort for this class
+        // Original implementation searched on assessment name,
+        // but we can use unit spec ID here.
+        // TODO swamp offers both; figure out which to use?
+        // TODO add worktype ID to query
+        $assessments    = [];
+        $specAssessment = $grade['assessment']->getSpecificationAssessment();
+        if ($specAssessment) {
+            $assessments = $this->assessmentDataSource->findAllByFolderIdForReview(
+                $cohortFolders,
+                null,
+                ['spec_assessment_id' => $specAssessment->getId()]
+            );
+        } else {
+            $assessments[] = $this->assessmentDataSource->findByIdForReview($grade['assessment']->getId());
         }
-        $assessmentName = $grade['assessment']->getName();
-        $assessments    = $boxMapper->findByColumnList(
-            [
-                'name'     => $assessmentName,
-                'category' => $cohortFolderIds,
-//                'type'     => self::WORK_TYPE_ASSESSMENT_TASK,
-            ]
-        );
-        $assessments->add($grade['assessment']);
+
+        // Load rubrics? Not sure if required
+        foreach ($assessments as $assessment) {
+            if ($assessment instanceof DueWork && $assessment->getUseRubric()) {
+                $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
+            }
+        }
+
+//        // Build a markbook
+//        // TODO inject the grade group and user
+//        // TODO make the markbook group by assessment spec ID
+//        $markbook = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
+//        foreach ($markbook->getAssessmentStatistics() as $statistic) {
+//            //
+//        }
+
+//        $boxMapper          = SubmissionBoxMapper::getInstance();
+//        $returnedWorkMapper = ReturnedWorkMapper::getInstance();
+//
+//        // Get the matching assessments in the cohort classes
+//        $cohortFolderIds = [];
+//        foreach ($cohortFolders as $cohortFolder) {
+//            $cohortFolderIds[] = $cohortFolder->getId();
+//        }
+//        $assessmentName = $grade['assessment']->getName();
+//        $assessments    = $boxMapper->findByColumnList(
+//            [
+//                'name'     => $assessmentName,
+//                'category' => $cohortFolderIds,
+////                'type'     => self::WORK_TYPE_ASSESSMENT_TASK,
+//            ]
+//        );
+//        $assessments->add($grade['assessment']);
 
         $distribution = [
             'grouped'    => [],
@@ -572,25 +606,31 @@ class Factory
             ],
         ];
         foreach ($assessments as $assessment) {
-            // Get everyone who has submitted to this assessment
             $returnStudents = [];
-            foreach ($returnedWorkMapper->findByColumn('box_id', $assessment->getId()) as $return) {
-                $returnStudentId                  = $return->getOwner()->getId();
+            $studentMarks = [];
+            foreach ($assessment->getAllParticipants() as $participant) {
+                $returnStudentId                  = $participant->getUser()->getId();
                 $returnStudents[$returnStudentId] = $returnStudentId;
+                $studentMarks[$returnStudentId] = $participant->getNormalisedMark(true);
             }
 
-            // Slurp out all student marks for this folder, and put back the one we
-            // actually want if it's there.
-            $studentMarks = [];
-            foreach ($returnStudents as $studentId) {
-                $marks = $returnedWorkMapper->getStudentMarks(
-                    $assessment->getCategory()->getId(),
-                    $studentId
-                );
-                if (array_key_exists($assessment->getId(), $marks)) {
-                    $studentMarks[$studentId] = $marks[$assessment->getId()];
-                }
-            }
+//            foreach ($returnedWorkMapper->findByColumn('box_id', $assessment->getId()) as $return) {
+//                $returnStudentId                  = $return->getOwner()->getId();
+//                $returnStudents[$returnStudentId] = $returnStudentId;
+//            }
+//
+//            // Slurp out all student marks for this folder, and put back the one we
+//            // actually want if it's there.
+//            $studentMarks = [];
+//            foreach ($returnStudents as $studentId) {
+//                $marks = $returnedWorkMapper->getStudentMarks(
+//                    $assessment->getCategory()->getId(),
+//                    $studentId
+//                );
+//                if (array_key_exists($assessment->getId(), $marks)) {
+//                    $studentMarks[$studentId] = $marks[$assessment->getId()];
+//                }
+//            }
 
             // What are the possible pretty marks for this assessment?
             // Assume all assessments use the same assessment type, otherwise chaos occurs!
