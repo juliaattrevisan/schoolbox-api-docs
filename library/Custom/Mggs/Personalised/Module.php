@@ -110,7 +110,10 @@ class Module extends BaseModule
      */
     protected function getUserMapper()
     {
-        return $this->getMapperFactory()->get(UserMapper::class);
+        /** @var UserMapper $userMapper */
+        $userMapper = $this->getMapperFactory()->get(UserMapper::class);
+
+        return $userMapper;
     }
 
     /**
@@ -118,6 +121,9 @@ class Module extends BaseModule
      */
     protected function getParticipantMapper()
     {
-        return $this->getMapperFactory()->get(Participant\Mapper::class);
+        /** @var Participant\Mapper $participantMapper */
+        $participantMapper = $this->getMapperFactory()->get(Participant\Mapper::class);
+
+        return $participantMapper;
     }
 }
