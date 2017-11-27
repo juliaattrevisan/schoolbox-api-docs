@@ -454,14 +454,18 @@ class Factory
         // Get cohort for this class
         // Original implementation searched on assessment name,
         // but we can use unit spec ID here.
-        // TODO swamp offers both; figure out which to use?
         $assessments    = [];
         $specAssessment = $grade['assessment']->getSpecificationAssessment();
         if ($specAssessment) {
             $assessments = $this->assessmentDataSource->findAllByFolderIdForReview(
                 $cohortFolders,
                 null,
-                ['spec_assessment_id' => $specAssessment->getId()]
+                [
+                    'spec_assessment_id' => $specAssessment->getId(),
+                    'order'              => ['a.due_date' => 'asc'],
+                    'type'               => AssessmentType::TYPE_DUE_WORK,
+                    'work_type'          => self::WORK_TYPE_ASSESSMENT_TASK,
+                ]
             );
         } else {
             $assessments[] = $this->assessmentDataSource->findByIdForReview($grade['assessment']->getId());
