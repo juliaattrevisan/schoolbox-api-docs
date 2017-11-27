@@ -11,18 +11,16 @@
 namespace Schoolbox\Fixtures\Team\Position\Participant;
 
 use PDOStatement;
-use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper As BaseMapper;
-use Schoolbox\User as User;
 use Schoolbox\UserMapper;
 use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
-use Schoolbox\Fixtures\Team\Model as Team;
 use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
-use Schoolbox\Fixtures\Position\Model as Position;
-use Schoolbox\Fixtures\Team\Position\Mapper as TeamPositionMapper;
 use Schoolbox\Fixtures\Team\Position\Participant\Model as ParticipantPosition;
 
+/**
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ */
 class Mapper extends BaseMapper
 {
     /**
@@ -63,31 +61,22 @@ class Mapper extends BaseMapper
      *
      * @param  PDOStatement $statement
      * @return GenericCollection|Model[]
+     * @throws BaseMapper\DefinitionException
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
+        /**
+         * @var UserMapper $userMapper
+         * @var TeamMapper $teamMapper
+         */
+        $userMapper = $this->getJoinMapper('user');
+        $teamMapper = $this->getJoinMapper('team');
+
         $collection = $this->createCollection();
         foreach ($statement as $row) {
-            $teamPosition = TeamPositionMapper::getInstance()->createModel();
-            $teamPosition->setId($row['id']);
-
-            $user = $this->hydrateJoin($row, 'user', 'u');
-
-            if ($user instanceof User) {
-                $teamPosition->setUser($user);
-            }
-
-            $team = $this->hydrateJoin($row, 'team', 't');
-
-            if ($team instanceof Team) {
-                $teamPosition->setTeam($team);
-            }
-
-            $position = new Position();
-            $position->setName($row['name']);
-
-            $teamPosition->setPosition($position);
-
+            $teamPosition = $this->hydrate($row);
+            $teamPosition->setUser($userMapper->hydrate($row, 'u'));
+            $teamPosition->setTeam($teamMapper->hydrate($row, 't'));
             $collection->add($teamPosition);
         }
 
