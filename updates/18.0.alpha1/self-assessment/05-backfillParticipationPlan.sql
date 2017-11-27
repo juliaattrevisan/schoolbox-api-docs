@@ -15,6 +15,8 @@ FROM              `submission_box`
 WHERE             `assessment_id` IN (select `id` FROM `assessment`) AND
                   `assessment_id` NOT IN (select `assessment_id` FROM `participation_plan`);
 
+-- Create a dynamic participation plan for each quiz in the database
+
 INSERT INTO       `participation_plan`
                   (
                       assessment_id,
@@ -30,6 +32,7 @@ FROM              `assess`
 WHERE             `assessment_id` IN (select `id` FROM `assessment`) AND
                   `assessment_id` NOT IN (select `assessment_id` FROM `participation_plan`);
 
+-- Create a dynamic participation plan for each task in the database
 
 INSERT INTO       `participation_plan`
                   (
