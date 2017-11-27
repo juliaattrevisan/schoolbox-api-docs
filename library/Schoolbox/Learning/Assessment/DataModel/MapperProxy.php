@@ -924,6 +924,11 @@ class MapperProxy
             $builder->equals('a.work_type_id', $options['work_type']);
         }
 
+        // Assessment title filter?
+        if (isset($options['title'])) {
+            $builder->equals('a.title', $options['title']);
+        }
+
         return $builder;
     }
 
