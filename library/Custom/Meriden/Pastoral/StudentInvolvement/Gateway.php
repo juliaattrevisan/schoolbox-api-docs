@@ -44,6 +44,10 @@ class Gateway
 
     const ABSENCE_TYPES_AWAY = ['AFS', 'APD', 'AAM', 'APM', 'EDP'];
 
+    const REASON_CODES_AWAY_OR_LATE = ['A', 'L', 'S'];
+
+    const REASON_CODES_ENDORSED_LEAVE = ['M'];
+
     /**
      * @var IConnector
      */
@@ -158,7 +162,7 @@ class Gateway
             $year,
             $student,
             self::ABSENCE_TYPES_AWAY,
-            ['A', 'L', 'S']
+            self::REASON_CODES_AWAY_OR_LATE
         );
         $count     = 0;
         foreach ($resultSet as $row) {
@@ -188,7 +192,7 @@ class Gateway
             $year,
             $student,
             [self::ABSENCE_TYPE_LATE],
-            ['A', 'L', 'S']
+            self::REASON_CODES_AWAY_OR_LATE
         );
         return count($resultSet);
     }
@@ -225,7 +229,7 @@ class Gateway
             $year,
             $student,
             [self::ABSENCE_TYPE_ENDORSED_LEAVE],
-            ['M']
+            self::REASON_CODES_ENDORSED_LEAVE
         );
         return count($resultSet);
     }
