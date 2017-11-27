@@ -604,11 +604,14 @@ class Factory
         foreach ($assessments as $assessment) {
             $studentMarks = [];
             foreach ($assessment->getAllParticipants() as $participant) {
-                $returnStudentId                = $participant->getUser()->getId();
-                $studentMarks[$returnStudentId] = [
-                    'mark'        => $participant->getNormalisedMark(true),
-                    'pretty_mark' => $participant->getHumanReadableMark(true),
-                ];
+                // Only add mark if not null?
+                $normMark = $participant->getNormalisedMark(true);
+                if (isset($normMark)) {
+                    $studentMarks[$participant->getUser()->getId()] = [
+                        'mark'        => $normMark,
+                        'pretty_mark' => $participant->getHumanReadableMark(true),
+                    ];
+                }
             }
 
 //            foreach ($returnedWorkMapper->findByColumn('box_id', $assessment->getId()) as $return) {
