@@ -380,30 +380,6 @@ class Factory
             }
         }
         return $allGrades;
-
-//        $allGrades = array();
-//        $assessGrades = ReturnedWorkMapper::getInstance()->getStudentMarks(
-//            $folder->getId(),
-//            $student->getId()
-//        ) ?: array();
-//        $quizGrades = QuizAttemptMapper::getInstance()->getStudentMarks(
-//            $folder->getId(),
-//            $student->getId()
-//        ) ?: array();
-//        foreach ($assessGrades as $id => $grade) {
-//            $allGrades['a'.$id] = $grade;
-//        }
-//        foreach ($quizGrades as $id => $grade) {
-//            $allGrades['q'.$id] = $grade;
-//        }
-//        // Sort grades too
-//        uksort(
-//            $allGrades,
-//            function ($a, $b) {
-//                return $a['date'] < $b['date'] ? -1 : 1;
-//            }
-//        );
-//        return $allGrades;
     }
 
     /**
@@ -442,71 +418,6 @@ class Factory
         return $cohortList;
     }
 
-//    /**
-//     * Adds assessment into grades fetched by getStudentInvolvement().
-//     *
-//     * @param array $grades
-//     * @param User  $student
-//     *
-//     * @return array
-//     */
-//    protected function augmentGradesWithAssessment($grades, User $student)
-//    {
-//        // TODO inject dependencies
-//
-//        // Get the 'a' off the start of the assessment grades to get a list of
-//        // actual assess IDs
-//        $assessKeys = array();
-//        $quizKeys   = array();
-//        foreach (array_keys($grades) as $key) {
-//            $type = substr($key, 0, 1);
-//            $id   = substr($key, 1);
-//            if ($type === 'a') {
-//                $assessKeys[] = $id;
-//            } elseif ($type === 'q') {
-//                $quizKeys[] = $id;
-//            }
-//        }
-//
-//
-//        // Fetch only assessment tasks
-//        $assessments = SubmissionBoxMapper::getInstance()->findByColumnList([
-//            'id'   => $assessKeys,
-////            'type' => self::WORK_TYPE_ASSESSMENT_TASK,
-//        ]);
-//        foreach ($assessments as $assess) {
-//            /** @var SubmissionBox $assess */
-//            $assessId = $assess->getId();
-//            $gradeKey = 'a'.$assessId;
-//            $grades[$gradeKey]['assessment'] = $assess;
-//            $grades[$gradeKey]['rubric']     = array();
-//            // Is there a rubric involved? If so get student's marks for it
-//            if ($assess->isRubric()) {
-//                $grid = SubmissionBox\Rubric\RubricMapper::getInstance()->findBySubmissionBoxAndStudent($assess, $student);
-//                $grades[$gradeKey]['rubric'] = $grid->toContext();
-//            }
-//        }
-//        // No quizzes anymore
-////        foreach (QuizMapper::getInstance()->findByColumn('assess_id', $quizKeys) as $quiz) {
-////            /** @var Quiz $quiz */
-////            $grades['q'.$quiz->getId()]['quiz'] = $quiz;
-////        }
-//
-//        // Sort assessments by due date
-//        uasort(
-//            $grades,
-//            function($a, $b) {
-//                $assessA = $a['assessment'];
-//                $assessB = $b['assessment'];
-//                if ($assessA instanceof SubmissionBox && $assessB instanceof SubmissionBox) {
-//                    return $assessA->getDueDate()->compare($assessB->getDueDate());
-//                }
-//                return 0;
-//            }
-//        );
-//        return $grades;
-//    }
-
     /**
      * Augments a subject retrieved by getAllSubjectsForYear() with one or
      * more teachers.
@@ -544,7 +455,6 @@ class Factory
         // Original implementation searched on assessment name,
         // but we can use unit spec ID here.
         // TODO swamp offers both; figure out which to use?
-        // TODO add worktype ID to query
         $assessments    = [];
         $specAssessment = $grade['assessment']->getSpecificationAssessment();
         if ($specAssessment) {
@@ -564,32 +474,6 @@ class Factory
             }
         }
 
-//        // Build a markbook
-//        // TODO inject the grade group and user
-//        // TODO make the markbook group by assessment spec ID
-//        $markbook = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
-//        foreach ($markbook->getAssessmentStatistics() as $statistic) {
-//            //
-//        }
-
-//        $boxMapper          = SubmissionBoxMapper::getInstance();
-//        $returnedWorkMapper = ReturnedWorkMapper::getInstance();
-//
-//        // Get the matching assessments in the cohort classes
-//        $cohortFolderIds = [];
-//        foreach ($cohortFolders as $cohortFolder) {
-//            $cohortFolderIds[] = $cohortFolder->getId();
-//        }
-//        $assessmentName = $grade['assessment']->getName();
-//        $assessments    = $boxMapper->findByColumnList(
-//            [
-//                'name'     => $assessmentName,
-//                'category' => $cohortFolderIds,
-////                'type'     => self::WORK_TYPE_ASSESSMENT_TASK,
-//            ]
-//        );
-//        $assessments->add($grade['assessment']);
-
         $distribution = [
             'grouped'    => [],
             'continuous' => [
@@ -608,24 +492,6 @@ class Factory
                     ];
                 }
             }
-
-//            foreach ($returnedWorkMapper->findByColumn('box_id', $assessment->getId()) as $return) {
-//                $returnStudentId                  = $return->getOwner()->getId();
-//                $returnStudents[$returnStudentId] = $returnStudentId;
-//            }
-//
-//            // Slurp out all student marks for this folder, and put back the one we
-//            // actually want if it's there.
-//            $studentMarks = [];
-//            foreach ($returnStudents as $studentId) {
-//                $marks = $returnedWorkMapper->getStudentMarks(
-//                    $assessment->getCategory()->getId(),
-//                    $studentId
-//                );
-//                if (array_key_exists($assessment->getId(), $marks)) {
-//                    $studentMarks[$studentId] = $marks[$assessment->getId()];
-//                }
-//            }
 
             // What are the possible pretty marks for this assessment?
             // Assume all assessments use the same assessment type, otherwise chaos occurs!
@@ -682,16 +548,6 @@ class Factory
             $prettyMean = $markScheme->getHumanReadableMark($mean);
             $prettySd   = $markScheme->getHumanReadableMark($sd);
 
-//            $markType                           = SubmissionBox\MarkTypeMapper::getInstance()->findById(
-//                $grade['assessment']->getMarkType()->getId()
-//            );
-//            $converter                          = \Marksheet_Factory::build(
-//                $markType->getSlug(),
-//                $grade['assessment']
-//            );
-//            $maxMark                            = $grade['assessment']->getMaxMark();
-//            $prettyMean                         = $converter->convertRawMark($mean, $maxMark);
-//            $prettySd                           = $converter->convertRawMark($sd, $maxMark);
             $distribution['continuous']['mean'] = [
                 'mark'        => round($mean, 1),
                 'pretty_mark' => is_numeric($prettyMean)
