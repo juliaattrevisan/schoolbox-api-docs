@@ -105,28 +105,19 @@
 
 </section>
 
-{% if moderator %}
-    {% set other = "other" %}
-{% else %}
-    {% set other = "" %}
-{% endif %}
-
 {% if not record.id %}
     {% set name = "yourself" %}
-    {% set tense = "will" %}
 {% elseif user.id != record.owner.id %}
     {% set name = "yourself" %}
-    {% set tense = "is" %}
 {% else %}
     {% set name = record.owner.fullName %}
-    {% set tense = "is" %}
 {% endif %}
 
 {# Empty state when no visibility rules #}
 
 <div class="empty-state" id="visibility-empty">
     <i class="icon-locked"></i>
-    <p>No visibility rules have been added to this record, it {{ tense }} only visible by {{ name }} and {{ other }} {{ locale.pastoral }} moderators.</p>
+    <p>There are no visibility rules on this record, it will only be visible by {{ name }} and the {{ locale.pastoral }} moderators.</p>
     <p>
         To grant access to other users add a
         <a href="#" data-reveal-id="modal-role" title="Add Role">role</a>
