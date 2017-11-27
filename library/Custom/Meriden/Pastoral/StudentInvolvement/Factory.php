@@ -15,6 +15,7 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
@@ -51,24 +52,32 @@ class Factory
     private $assessmentDataSource;
 
     /**
+     * @var RubricMapper
+     */
+    private $rubricMapper;
+
+    /**
      * Constructor
      *
      * @param Gateway              $gateway
      * @param UserMapper           $userMapper
      * @param FolderMapper         $folderMapper
      * @param AssessmentDataSource $assessmentDataSource
+     * @param RubricMapper         $rubricMapper
      */
     public function __construct(
         Gateway $gateway,
         UserMapper $userMapper,
         FolderMapper $folderMapper,
-        AssessmentDataSource $assessmentDataSource
+        AssessmentDataSource $assessmentDataSource,
+        RubricMapper $rubricMapper
     ) {
         // Set up required mappers, DB access, etc. here.
         $this->gateway              = $gateway;
         $this->userMapper           = $userMapper;
         $this->folderMapper         = $folderMapper;
         $this->assessmentDataSource = $assessmentDataSource;
+        $this->rubricMapper         = $rubricMapper;
     }
 
     /**
