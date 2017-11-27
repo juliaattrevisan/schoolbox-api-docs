@@ -349,23 +349,18 @@ class Factory
         $allGrades = [];
 
         // Only due works are shown
+        // Not interested in work types other than assessment tasks
         foreach ($this->assessmentDataSource->findAllByFolderIdForReview(
             $folder->getId(),
             $student,
             [
-                'order' => ['a.due_date' => 'asc'],
-                'type'  => AssessmentType::TYPE_DUE_WORK,
+                'order'     => ['a.due_date' => 'asc'],
+                'type'      => AssessmentType::TYPE_DUE_WORK,
+                'work_type' => self::WORK_TYPE_ASSESSMENT_TASK,
             ]
         ) as $assessment) {
             // Not interested in non-dueworks
             if (!$assessment instanceof DueWork) {
-                continue;
-            }
-
-            // Not interested in work types other than assessment tasks
-            // TODO filter in a query
-            $workType = $assessment->getWorkType();
-            if (!($workType instanceof WorkType && $workType->getId() === self::WORK_TYPE_ASSESSMENT_TASK)) {
                 continue;
             }
 
