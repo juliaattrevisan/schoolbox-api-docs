@@ -125,6 +125,8 @@ class Module extends BaseModule
             = $this->getMapperFactory()->getLazy(Folder\Mapper::class);
         $injector->params[StudentInvolvement\Factory::class]['userMapper']
             = $this->getMapperFactory()->getLazy(UserMapper::class);
+        $injector->params[StudentInvolvement\Factory::class]['assessmentDataSource']
+            = $injector->lazyGet('assessmentDataSource');
 
         $injector->params[StudentInvolvement\Gateway::class]['database']
             = $injector->lazyGet('databaseExternal');

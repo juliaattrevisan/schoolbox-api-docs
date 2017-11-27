@@ -9,6 +9,7 @@
 
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -43,21 +44,29 @@ class Factory
     private $folderMapper;
 
     /**
+     * @var AssessmentDataSource
+     */
+    private $assessmentDataSource;
+
+    /**
      * Constructor
      *
-     * @param Gateway      $gateway
-     * @param UserMapper   $userMapper
-     * @param FolderMapper $folderMapper
+     * @param Gateway              $gateway
+     * @param UserMapper           $userMapper
+     * @param FolderMapper         $folderMapper
+     * @param AssessmentDataSource $assessmentDataSource
      */
     public function __construct(
         Gateway $gateway,
         UserMapper $userMapper,
-        FolderMapper $folderMapper
+        FolderMapper $folderMapper,
+        AssessmentDataSource $assessmentDataSource
     ) {
         // Set up required mappers, DB access, etc. here.
-        $this->gateway      = $gateway;
-        $this->userMapper   = $userMapper;
-        $this->folderMapper = $folderMapper;
+        $this->gateway              = $gateway;
+        $this->userMapper           = $userMapper;
+        $this->folderMapper         = $folderMapper;
+        $this->assessmentDataSource = $assessmentDataSource;
     }
 
     /**
