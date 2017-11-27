@@ -113,7 +113,7 @@ class Factory
         $tutorGroup
             ->setSubjectCode($tutorGroupCode['code'])
             ->setFolder($folderWithGrades['folder'])
-            ->setGrades($this->augmentGradesWithAssessment($folderWithGrades['grades'], $student))
+            ->setGrades($folderWithGrades['grades'])
             ->moveToNamedGrade('athletics', 'Athletics Carnival')
             ->moveToNamedGrade('swimming', 'Swimming Carnival')
             ->moveToNamedGrade('camp', 'School Camp')
@@ -164,7 +164,7 @@ class Factory
         $subject
             ->setFolder($folderWithGrades['folder'])
             ->setCohortFolders($this->getCohortFolders($folderWithGrades['folder'], $subjectCode))
-            ->setGrades($this->augmentGradesWithAssessment($folderWithGrades['grades'], $student))
+            ->setGrades($folderWithGrades['grades'])
             ->moveToNamedGrade('courseGrade', 'Course Grade')
             ->moveToNamedGrade('endeavourGrades', 'Endeavour Grades')
             ->moveToNamedGrade('endeavourGrade1', 'Endeavour Grade Term 1')
@@ -447,70 +447,70 @@ class Factory
         return $cohortList;
     }
 
-    /**
-     * Adds assessment into grades fetched by getStudentInvolvement().
-     *
-     * @param array $grades
-     * @param User  $student
-     *
-     * @return array
-     */
-    protected function augmentGradesWithAssessment($grades, User $student)
-    {
-        // TODO inject dependencies
-
-        // Get the 'a' off the start of the assessment grades to get a list of
-        // actual assess IDs
-        $assessKeys = array();
-        $quizKeys   = array();
-        foreach (array_keys($grades) as $key) {
-            $type = substr($key, 0, 1);
-            $id   = substr($key, 1);
-            if ($type === 'a') {
-                $assessKeys[] = $id;
-            } elseif ($type === 'q') {
-                $quizKeys[] = $id;
-            }
-        }
-
-
-        // Fetch only assessment tasks
-        $assessments = SubmissionBoxMapper::getInstance()->findByColumnList([
-            'id'   => $assessKeys,
-//            'type' => self::WORK_TYPE_ASSESSMENT_TASK,
-        ]);
-        foreach ($assessments as $assess) {
-            /** @var SubmissionBox $assess */
-            $assessId = $assess->getId();
-            $gradeKey = 'a'.$assessId;
-            $grades[$gradeKey]['assessment'] = $assess;
-            $grades[$gradeKey]['rubric']     = array();
-            // Is there a rubric involved? If so get student's marks for it
-            if ($assess->isRubric()) {
-                $grid = SubmissionBox\Rubric\RubricMapper::getInstance()->findBySubmissionBoxAndStudent($assess, $student);
-                $grades[$gradeKey]['rubric'] = $grid->toContext();
-            }
-        }
-        // No quizzes anymore
-//        foreach (QuizMapper::getInstance()->findByColumn('assess_id', $quizKeys) as $quiz) {
-//            /** @var Quiz $quiz */
-//            $grades['q'.$quiz->getId()]['quiz'] = $quiz;
+//    /**
+//     * Adds assessment into grades fetched by getStudentInvolvement().
+//     *
+//     * @param array $grades
+//     * @param User  $student
+//     *
+//     * @return array
+//     */
+//    protected function augmentGradesWithAssessment($grades, User $student)
+//    {
+//        // TODO inject dependencies
+//
+//        // Get the 'a' off the start of the assessment grades to get a list of
+//        // actual assess IDs
+//        $assessKeys = array();
+//        $quizKeys   = array();
+//        foreach (array_keys($grades) as $key) {
+//            $type = substr($key, 0, 1);
+//            $id   = substr($key, 1);
+//            if ($type === 'a') {
+//                $assessKeys[] = $id;
+//            } elseif ($type === 'q') {
+//                $quizKeys[] = $id;
+//            }
 //        }
-
-        // Sort assessments by due date
-        uasort(
-            $grades,
-            function($a, $b) {
-                $assessA = $a['assessment'];
-                $assessB = $b['assessment'];
-                if ($assessA instanceof SubmissionBox && $assessB instanceof SubmissionBox) {
-                    return $assessA->getDueDate()->compare($assessB->getDueDate());
-                }
-                return 0;
-            }
-        );
-        return $grades;
-    }
+//
+//
+//        // Fetch only assessment tasks
+//        $assessments = SubmissionBoxMapper::getInstance()->findByColumnList([
+//            'id'   => $assessKeys,
+////            'type' => self::WORK_TYPE_ASSESSMENT_TASK,
+//        ]);
+//        foreach ($assessments as $assess) {
+//            /** @var SubmissionBox $assess */
+//            $assessId = $assess->getId();
+//            $gradeKey = 'a'.$assessId;
+//            $grades[$gradeKey]['assessment'] = $assess;
+//            $grades[$gradeKey]['rubric']     = array();
+//            // Is there a rubric involved? If so get student's marks for it
+//            if ($assess->isRubric()) {
+//                $grid = SubmissionBox\Rubric\RubricMapper::getInstance()->findBySubmissionBoxAndStudent($assess, $student);
+//                $grades[$gradeKey]['rubric'] = $grid->toContext();
+//            }
+//        }
+//        // No quizzes anymore
+////        foreach (QuizMapper::getInstance()->findByColumn('assess_id', $quizKeys) as $quiz) {
+////            /** @var Quiz $quiz */
+////            $grades['q'.$quiz->getId()]['quiz'] = $quiz;
+////        }
+//
+//        // Sort assessments by due date
+//        uasort(
+//            $grades,
+//            function($a, $b) {
+//                $assessA = $a['assessment'];
+//                $assessB = $b['assessment'];
+//                if ($assessA instanceof SubmissionBox && $assessB instanceof SubmissionBox) {
+//                    return $assessA->getDueDate()->compare($assessB->getDueDate());
+//                }
+//                return 0;
+//            }
+//        );
+//        return $grades;
+//    }
 
     /**
      * Augments a subject retrieved by getAllSubjectsForYear() with one or
