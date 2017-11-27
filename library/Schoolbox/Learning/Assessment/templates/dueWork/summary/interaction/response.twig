@@ -1,23 +1,29 @@
-{# try going to Inline Grader #}
-{% set url = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {
-    assessmentId: currentInteraction.assessable.id,
-    studentId:    participant.user.id,
-    responseId:   currentInteraction.id,
-    response:     currentInteraction,
-    participant:  participant
-}) %}
-{% if url %}
-    {% set tooltip = 'View in Inline Grader' %}
-{% elseif not currentInteraction.isSubmitted %}
-    {# else if not submitted, try going to 'submit response' page #}
-    {% set url = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', {
+{# if submitted, try going to inline grader #}
+{% if currentInteraction.isSubmitted %}
+    {% set url = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {
         assessmentId: currentInteraction.assessable.id,
         studentId:    participant.user.id,
-        assessment:   currentInteraction.assessable,
+        responseId:   currentInteraction.id,
+        response:     currentInteraction,
         participant:  participant
     }) %}
     {% if url %}
-        {% set tooltip = 'Resume Submission' %}
+        {% set tooltip = 'View in Inline Grader' %}
+    {% endif %}
+{# else this is a draft #}
+{% else %}
+    {# does it belong to current user? #}
+    {% if currentInteraction.submittedOnBehalfOf.id == USER.id %}
+        {# try to resume at 'submit response' page #}
+        {% set url = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', {
+            assessmentId: currentInteraction.assessable.id,
+            studentId:    participant.user.id,
+            assessment:   currentInteraction.assessable,
+            participant:  participant
+        }) %}
+        {% if url %}
+            {% set tooltip = 'Resume Submission' %}
+        {% endif %}
     {% endif %}
 {% endif %}
 
