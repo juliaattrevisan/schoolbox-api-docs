@@ -9,15 +9,10 @@
 
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
-use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
-use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
@@ -683,9 +678,9 @@ class Factory
             );
 
             // Convert mean and SD to pretty mark
-            $markScheme                         = $grade['assessment']->getMarkScheme();
-            $prettyMean                         = $markScheme->getHumanReadableMark($mean);
-            $prettySd                           = $markScheme->getHumanReadableMark($sd);
+            $markScheme = $grade['assessment']->getMarkScheme();
+            $prettyMean = $markScheme->getHumanReadableMark($mean);
+            $prettySd   = $markScheme->getHumanReadableMark($sd);
 
 //            $markType                           = SubmissionBox\MarkTypeMapper::getInstance()->findById(
 //                $grade['assessment']->getMarkType()->getId()
