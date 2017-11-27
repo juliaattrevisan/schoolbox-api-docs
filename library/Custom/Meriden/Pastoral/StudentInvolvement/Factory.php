@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\Markbook\Markbook;
+use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -606,11 +607,9 @@ class Factory
             ],
         ];
         foreach ($assessments as $assessment) {
-            $returnStudents = [];
             $studentMarks = [];
             foreach ($assessment->getAllParticipants() as $participant) {
-                $returnStudentId                  = $participant->getUser()->getId();
-                $returnStudents[$returnStudentId] = $returnStudentId;
+                $returnStudentId                = $participant->getUser()->getId();
                 $studentMarks[$returnStudentId] = $participant->getNormalisedMark(true);
             }
 
@@ -634,15 +633,9 @@ class Factory
 
             // What are the possible pretty marks for this assessment?
             // Assume all assessments use the same assessment type, otherwise chaos occurs!
-            if ($assessment->getMarkType()->getId() == SubmissionBox\MarkType::TYPE_LETTER) {
-                $levels = SubmissionBox\GradeLevel\Mapper::getInstance()
-                                                         ->findByColumn(
-                                                             'submission_grade_group_id',
-                                                             $assessment->getGradeGroup()->getId(),
-                                                             [
-                                                                 'order' => ['raw_grade' => 'desc'],
-                                                             ]
-                                                         );
+            $markScheme = $assessment->getMarkScheme();
+            if ($markScheme instanceof LetterGrade) {
+                $levels = $markScheme->getGradeGroup()->getGradeLevels();
 
                 // For now, assume that distributions are only calculated for
                 // letter grade assessments.
