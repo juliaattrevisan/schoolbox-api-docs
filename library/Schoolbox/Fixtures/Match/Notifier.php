@@ -90,7 +90,7 @@ class Notifier extends AbstractModuleNotifier
             }
         }
         else {
-            $this->log->warning("Got unkown type as object in fixtures event: ".get_class($match), ['char' => '+']);
+            $this->log->warning("Got unknown type as object in fixtures event: ".get_class($match), ['char' => '+']);
 
         }
     }
