@@ -40,24 +40,24 @@ class Factory
     /**
      * @var FolderMapper
      */
-    private $categoryMapper;
+    private $folderMapper;
 
     /**
      * Constructor
      *
      * @param Gateway      $gateway
      * @param UserMapper   $userMapper
-     * @param FolderMapper $categoryMapper
+     * @param FolderMapper $folderMapper
      */
     public function __construct(
         Gateway $gateway,
         UserMapper $userMapper,
-        FolderMapper $categoryMapper
+        FolderMapper $folderMapper
     ) {
         // Set up required mappers, DB access, etc. here.
-        $this->gateway        = $gateway;
-        $this->userMapper     = $userMapper;
-        $this->categoryMapper = $categoryMapper;
+        $this->gateway      = $gateway;
+        $this->userMapper   = $userMapper;
+        $this->folderMapper = $folderMapper;
     }
 
     /**
@@ -246,7 +246,7 @@ class Factory
     {
         try {
             // Find by category code, and figure out if they're involved.
-            $folder = $this->categoryMapper->findByCode($subjectCode);
+            $folder = $this->folderMapper->findByCode($subjectCode);
             if ($involvement = $this->getStudentInvolvement($folder, $student)) {
                 return array(
                     'folder' => $folder,
@@ -262,7 +262,7 @@ class Factory
         // Multiple rolled-over categories with this code could exist,
         // get the one that has the requested student in it.
         // To do this, every matching category has to be checked.
-        $archivedFolders = $this->categoryMapper->findAllByArchivedCode($subjectCode);
+        $archivedFolders = $this->folderMapper->findAllByArchivedCode($subjectCode);
         foreach ($archivedFolders as $archivedFolder) {
             if ($involvement = $this->getStudentInvolvement($archivedFolder, $student)) {
                 return array(
@@ -274,7 +274,7 @@ class Factory
 
         // everything failed? return an empty model
         return array(
-            'folder' => $this->categoryMapper->createModel(),
+            'folder' => $this->folderMapper->createModel(),
             'grades' => array(),
         );
     }
@@ -373,14 +373,14 @@ class Factory
             // All archived or live codes with the same parent as $category
             // are cohorts.
             try {
-                $liveCategory = $this->categoryMapper->findByCode($otherCode);
+                $liveCategory = $this->folderMapper->findByCode($otherCode);
                 if ($liveCategory->getParent()->getId() == $parentId) {
                     $cohortList[] = $liveCategory;
                 }
             } catch (\Exception $e) {
                 // noop
             }
-            foreach ($this->categoryMapper->findAllByArchivedCode($otherCode) as $archivedCategory) {
+            foreach ($this->folderMapper->findAllByArchivedCode($otherCode) as $archivedCategory) {
                 if ($archivedCategory->getParent()->getId() == $parentId) {
                     $cohortList[] = $archivedCategory;
                 }

@@ -121,7 +121,7 @@ class Module extends BaseModule
 
         $injector->params[StudentInvolvement\Factory::class]['gateway']
             = $injector->lazyNew(StudentInvolvement\Gateway::class);
-        $injector->params[StudentInvolvement\Factory::class]['categoryMapper']
+        $injector->params[StudentInvolvement\Factory::class]['folderMapper']
             = $this->getMapperFactory()->getLazy(Folder\Mapper::class);
         $injector->params[StudentInvolvement\Factory::class]['userMapper']
             = $this->getMapperFactory()->getLazy(UserMapper::class);
