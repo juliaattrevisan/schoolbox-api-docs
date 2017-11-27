@@ -38,6 +38,12 @@ class Gateway
     const ACTIVITY_TYPE_SERVICE = 'O';
     const ACTIVITY_TYPE_POSITIONS_OF_OFFICE = 'A';
 
+    const ABSENCE_TYPE_LATE = 'LFS';
+    const ABSENCE_TYPE_DETENTION = 'DET';
+    const ABSENCE_TYPE_ENDORSED_LEAVE = 'AFS';
+
+    const ABSENCE_TYPES_AWAY = ['AFS', 'APD', 'AAM', 'APM', 'EDP'];
+
     /**
      * @var IConnector
      */
@@ -151,19 +157,16 @@ class Gateway
         $resultSet = $this->queryDays(
             $year,
             $student,
-            ['AFS', 'APD', 'AAM', 'APM', 'EDP'],
+            self::ABSENCE_TYPES_AWAY,
             ['A', 'L', 'S']
         );
         $count     = 0;
         foreach ($resultSet as $row) {
             switch ($row['absent_type']) {
-                case 'AFS':
+                case self::ABSENCE_TYPE_ENDORSED_LEAVE:
                     $count += 1;
                     break;
-                case 'APD':
-                case 'AAM':
-                case 'APM':
-                case 'EDP':
+                default:
                     $count += 0.5;
                     break;
             }
@@ -184,7 +187,7 @@ class Gateway
         $resultSet = $this->queryDays(
             $year,
             $student,
-            ['LFS'],
+            [self::ABSENCE_TYPE_LATE],
             ['A', 'L', 'S']
         );
         return count($resultSet);
@@ -203,7 +206,7 @@ class Gateway
         $resultSet = $this->queryDays(
             $year,
             $student,
-            ['DET']
+            [self::ABSENCE_TYPE_DETENTION]
         );
         return count($resultSet);
     }
@@ -221,7 +224,7 @@ class Gateway
         $resultSet = $this->queryDays(
             $year,
             $student,
-            ['AFS'],
+            [self::ABSENCE_TYPE_ENDORSED_LEAVE],
             ['M']
         );
         return count($resultSet);
