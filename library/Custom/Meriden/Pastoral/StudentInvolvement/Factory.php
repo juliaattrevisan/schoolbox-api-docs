@@ -669,7 +669,7 @@ class Factory
                 },
                 $distribution['continuous']['marks']
             );
-            $count = count($marks);
+            $count = \count($marks);
             $mean  = array_sum($marks) / $count;
             $sd    = sqrt(
                 array_sum(
