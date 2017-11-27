@@ -37,6 +37,7 @@ class AdminV2_Nav
         'video'            => 'Media Queue',
         'import'           => 'Import',
         'filters'          => 'Filters',
+        'feature-tours'    => 'Feature Tours',
     );
 
     public function parse(SitePage $page, $currentPage = 'home')
