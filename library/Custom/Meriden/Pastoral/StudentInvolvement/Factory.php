@@ -10,6 +10,7 @@
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -337,29 +338,43 @@ class Factory
      */
     protected function getGrades(Folder $folder, User $student)
     {
-        $allGrades = array();
-        $assessGrades = ReturnedWorkMapper::getInstance()->getStudentMarks(
-            $folder->getId(),
-            $student->getId()
-        ) ?: array();
-        $quizGrades = QuizAttemptMapper::getInstance()->getStudentMarks(
-            $folder->getId(),
-            $student->getId()
-        ) ?: array();
-        foreach ($assessGrades as $id => $grade) {
-            $allGrades['a'.$id] = $grade;
-        }
-        foreach ($quizGrades as $id => $grade) {
-            $allGrades['q'.$id] = $grade;
-        }
-        // Sort grades too
-        uksort(
-            $allGrades,
-            function ($a, $b) {
-                return $a['date'] < $b['date'] ? -1 : 1;
+        $allGrades = [];
+        foreach ($this->assessmentDataSource->findAllByFolderIdForReview($folder->getId(), $student) as $assessment) {
+            // Only due works are shown
+            if ($assessment instanceof DueWork) {
+                $feedback = $assessment->getParticipant($student)->getAuthoritativeFeedback(true);
+                if ($feedback) {
+                    $allGrades['a'.$assessment->getId()] = [
+                        'mark' => $feedback->getNormalisedMark()
+                    ];
+                }
             }
-        );
+        }
         return $allGrades;
+
+//        $allGrades = array();
+//        $assessGrades = ReturnedWorkMapper::getInstance()->getStudentMarks(
+//            $folder->getId(),
+//            $student->getId()
+//        ) ?: array();
+//        $quizGrades = QuizAttemptMapper::getInstance()->getStudentMarks(
+//            $folder->getId(),
+//            $student->getId()
+//        ) ?: array();
+//        foreach ($assessGrades as $id => $grade) {
+//            $allGrades['a'.$id] = $grade;
+//        }
+//        foreach ($quizGrades as $id => $grade) {
+//            $allGrades['q'.$id] = $grade;
+//        }
+//        // Sort grades too
+//        uksort(
+//            $allGrades,
+//            function ($a, $b) {
+//                return $a['date'] < $b['date'] ? -1 : 1;
+//            }
+//        );
+//        return $allGrades;
     }
 
     /**
