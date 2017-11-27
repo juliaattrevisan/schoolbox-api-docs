@@ -67,7 +67,7 @@
 
 {% import "@learningAssessment/project/macro/icon.twig" as icon %}
 
-<ul class="information-list {% if depth %}no-pad{% endif %}" {% if project %}data-project="{{ project.id }}"{% endif %} style="{% if hideRows %}display: none;{% endif %}">
+<ul class="information-list" {% if project %}data-project="{{ project.id }}"{% endif %} style="{% if hideRows %}display: none;{% endif %}">
     {% for assessmentPair in assessmentPairs %}
 
         {# decide some things about this assessment #}
@@ -104,8 +104,7 @@
                        value="1"
                         {% if isImplOnly %}disabled data-mage-disabled{% endif %}
                 />
-                {# TODO - replace the inline-style with SASS #}
-                <label {% if depth %}style="margin-left: {{ depth * 25 }}px;"{% endif %} for="a_import-{{ assessment.id}}" class="checkbox-label" {% if isImplOnly %}title="Created in class. Not imported from Course"{% endif %}>
+                <label for="a_import-{{ assessment.id}}" class="checkbox-label" {% if isImplOnly %}title="Created in class. Not imported from Course"{% endif %}>
                     <span class="{{ icon.renderClass(assessment) }}"></span>
                     <span>{{ assessment.title }}</span>
                     {% if assessmentImpl and assessmentSpec and assessmentImpl.title != assessmentSpec.title %}
