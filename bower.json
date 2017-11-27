@@ -37,7 +37,8 @@
     "datatables.net-fixedcolumns": "3.2.2",
     "highcharts-release": "4.2.3",
     "flatpickr": "2.4.8",
-    "jquery.scrollTo": "2.1.2"
+    "jquery.scrollTo": "2.1.2",
+    "intro.js": "alaress/intro.js"
   },
   "ignore": [
     "**/.*",
