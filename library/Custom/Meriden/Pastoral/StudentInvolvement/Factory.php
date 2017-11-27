@@ -359,15 +359,23 @@ class Factory
                 'type'  => AssessmentType::TYPE_DUE_WORK,
             ]
         ) as $assessment) {
+            // Not interested in non-dueworks
+            if (!$assessment instanceof DueWork) {
+                continue;
+            }
+
             $participant = $assessment->getParticipantIfExtant($student);
             if ($participant) {
                 $feedback = $participant->getAuthoritativeFeedback(true);
                 if ($feedback) {
+
+                    // Load rubrics into assessment whilst here
                     $allGrades['a'.$assessment->getId()] = [
                         'assessment'  => [
                             'id'      => $assessment->getId(),
                             'name'    => $assessment->getTitle(),
                             'dueDate' => $assessment->getDueAt(),
+                            'rubric'  => $this->rubricMapper->findByDueWork($assessment)->toContext(),
                         ],
                         'pretty_mark' => $feedback->getHumanReadableMark(),
                         'mark'        => $feedback->getNormalisedMark(),
