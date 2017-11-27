@@ -7,6 +7,7 @@
 
 namespace Custom\Mggs\Learning\Personalised\Event;
 
+use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
 use Custom\Mggs\Learning\Personalised\Participant;
 use Schoolbox\Collection;
@@ -65,6 +66,8 @@ class Factory
      * @param User                           $student
      * @param Collection|Participant\Model[] $participation Student participation
      * @return Collection|array[]
+     *
+     * @throws RouteNotFound
      */
     public function buildFromAssessment(IAssessable $assessable, User $student, Collection $participation = null)
     {
@@ -161,6 +164,8 @@ class Factory
      * @param User        $student
      * @param Collection  $participation
      * @return array
+     *
+     * @throws RouteNotFound
      */
     protected function buildAssessableEvent(
         IAssessable $assessable,
@@ -255,7 +260,8 @@ class Factory
      * Helper for generating a link to an assessable.
      *
      * @param IAssessable $assessable
-     * @return string
+     * @return false|string
+     * @throws RouteNotFound
      */
     protected function generateLink(IAssessable $assessable)
     {
