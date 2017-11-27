@@ -445,7 +445,7 @@ class Factory
      *
      * @return array
      */
-    protected function buildDistribution($grade, $cohortFolders)
+    public function buildDistribution($grade, $cohortFolders)
     {
         if (!($grade['assessment'] instanceof DueWork)) {
             return [];
