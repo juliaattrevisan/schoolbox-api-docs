@@ -13,7 +13,6 @@ use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Grades;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -44,29 +43,21 @@ class Factory
     private $categoryMapper;
 
     /**
-     * @var Grades
-     */
-    private $gradesService;
-
-    /**
      * Constructor
      *
-     * @param Gateway        $gateway
-     * @param UserMapper     $userMapper
+     * @param Gateway      $gateway
+     * @param UserMapper   $userMapper
      * @param FolderMapper $categoryMapper
-     * @param Grades         $gradesService
      */
     public function __construct(
         Gateway $gateway,
         UserMapper $userMapper,
-        FolderMapper $categoryMapper,
-        Grades $gradesService
+        FolderMapper $categoryMapper
     ) {
         // Set up required mappers, DB access, etc. here.
         $this->gateway        = $gateway;
         $this->userMapper     = $userMapper;
         $this->categoryMapper = $categoryMapper;
-        $this->gradesService  = $gradesService;
     }
 
     /**
