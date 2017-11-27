@@ -31,7 +31,7 @@ use Schoolbox\UserMapper;
 class Factory
 {
     // This is pretty fragile. Must match value configured in Admin WorkType lists
-    const WORK_TYPE_ASSESSMENT_TASK = 1;
+    private const WORK_TYPE_ASSESSMENT_TASK = 1;
 
     /**
      * @var Gateway
