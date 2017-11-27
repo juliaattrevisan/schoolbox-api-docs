@@ -310,7 +310,7 @@ EOL;
     {
         $this->callExceptionCallbacks($e);
         try {
-            $this->logger()->alert('FATAL ' . get_class($e) . ': ' . $e->getMessage(), [$e]);
+            $this->logger()->alert('FATAL ' . get_class($e) . ': ' . $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile(), [$e]);
         } catch (IOException $e) {
             // can't do anything, STDOUT has been closed
         }

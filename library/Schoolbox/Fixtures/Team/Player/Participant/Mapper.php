@@ -17,8 +17,6 @@ use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\User as User;
 use Schoolbox\UserMapper;
 use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
-use Schoolbox\Fixtures\Team\Player\Model as TeamPlayer;
-use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\Fixtures\Team\Player\Participant\Model as ParticipantPlayer;
 use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
 
@@ -71,10 +69,7 @@ class Mapper extends BaseMapper
         $collection = $this->createCollection();
 
         foreach ($statement as $row) {
-            /** @var TeamPlayer $model */
-            $teamPlayer = TeamPlayerMapper::getInstance()->createModel();
-            $teamPlayer->setId($row['id'])
-                ->setSequence($row['sequence']);
+            $teamPlayer = $this->hydrate($row);
 
             // set user and team only if retrieved properly
             $user = $this->hydrateJoin($row, 'user', 'u');

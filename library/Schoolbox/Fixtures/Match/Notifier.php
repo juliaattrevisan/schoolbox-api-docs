@@ -71,21 +71,27 @@ class Notifier extends AbstractModuleNotifier
         /** @var Match $match */
         $match = $bundle->getEvent()->getObject();
 
-        $startAt = $match->getStartAt()->getUnixTimeStamp();
+        if($match instanceof Match) {
+            $startAt = $match->getStartAt()->getUnixTimeStamp();
 
-        // Notify 24 hours before the match start time
-        $notifyTime = clone $match->getStartAt();
-        $notifyTime = $notifyTime->addHours(-24)->getUnixTimeStamp();
+            // Notify 24 hours before the match start time
+            $notifyTime = clone $match->getStartAt();
+            $notifyTime = $notifyTime->addHours(-24)->getUnixTimeStamp();
 
-        switch ($method) {
-            case Mapper::METHOD_CREATE:
-                $bundle->attach(self::TRIGGER_CREATED, $notifyTime);
-                $bundle->attach(self::TRIGGER_SNAPSHOT_CREATED, $startAt);
-                break;
-            case Mapper::METHOD_UPDATE:
-                $bundle->attach(self::TRIGGER_UPDATED, $notifyTime);
-                $bundle->attach(self::TRIGGER_SNAPSHOT_UPDATED, $startAt);
-                break;
+            switch ($method) {
+                case Mapper::METHOD_CREATE:
+                    $bundle->attach(self::TRIGGER_CREATED, $notifyTime);
+                    $bundle->attach(self::TRIGGER_SNAPSHOT_CREATED, $startAt);
+                    break;
+                case Mapper::METHOD_UPDATE:
+                    $bundle->attach(self::TRIGGER_UPDATED, $notifyTime);
+                    $bundle->attach(self::TRIGGER_SNAPSHOT_UPDATED, $startAt);
+                    break;
+            }
+        }
+        else {
+            $this->log->warning("Got unknown type as object in fixtures event: ".get_class($match), ['char' => '+']);
+
         }
     }
 

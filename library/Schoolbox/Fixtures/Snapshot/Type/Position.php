@@ -53,10 +53,8 @@ class Position implements ISnapshot
         /** @var Match $match */
         $match = $this->getMetadata()->getMatch();
 
-        $allTeams = [$match->getHomeTeam(), $match->getAwayTeam()];
-
         /** @var Team $currentTeam */
-        foreach ($allTeams as $currentTeam) {
+        foreach ($match->getAllTeams() as $currentTeam) {
             if (is_numeric($currentTeam->getId())) {
 
                 /* Delete all the existing Positions for the Team
