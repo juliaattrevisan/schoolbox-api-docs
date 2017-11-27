@@ -31,22 +31,22 @@ class Factory
     /**
      * @var Gateway
      */
-    protected $gateway;
+    private $gateway;
 
     /**
      * @var UserMapper
      */
-    protected $userMapper;
+    private $userMapper;
 
     /**
      * @var FolderMapper
      */
-    protected $categoryMapper;
+    private $categoryMapper;
 
     /**
      * @var Grades
      */
-    protected $gradesService;
+    private $gradesService;
 
     /**
      * Constructor
@@ -63,12 +63,10 @@ class Factory
         Grades $gradesService
     ) {
         // Set up required mappers, DB access, etc. here.
-        $this
-            ->setGateway($gateway)
-            ->setUserMapper($userMapper)
-            ->setCategoryMapper($categoryMapper)
-            ->setGradesService($gradesService)
-        ;
+        $this->gateway        = $gateway;
+        $this->userMapper     = $userMapper;
+        $this->categoryMapper = $categoryMapper;
+        $this->gradesService  = $gradesService;
     }
 
     /**
@@ -86,15 +84,15 @@ class Factory
             ->setName($year . ' eReport')
             ->setStudent($student)
             ->setYear($year)
-            ->setActivities($this->getGateway()->getAllActivities($year, $student))
-            ->setAttendances($this->getGateway()->getAllAttendances($year, $student))
-            ->setTutors($this->getGateway()->getAllTutors($year, $student))
-            ->setTutorGroup($this->getGateway()->getYearLevelGroup($year, $student))
+            ->setActivities($this->gateway->getAllActivities($year, $student))
+            ->setAttendances($this->gateway->getAllAttendances($year, $student))
+            ->setTutors($this->gateway->getAllTutors($year, $student))
+            ->setTutorGroup($this->gateway->getYearLevelGroup($year, $student))
             // Add teachers into subjects - debatable if this is part of tutor group?
             ->setSubjects(
                 array_map(
                     array($this, 'augmentSubjectWithTeacher'),
-                    $this->getGateway()->getAllSubjectsForYear($year, $student)
+                    $this->gateway->getAllSubjectsForYear($year, $student)
                 )
             )
         ;
@@ -140,7 +138,7 @@ class Factory
     public function buildSubject($year, User $student, $subjectCode)
     {
         $subject = new Subject();
-        $externalData = $this->getGateway()->getSubject($year, $subjectCode);
+        $externalData = $this->gateway->getSubject($year, $subjectCode);
         $externalData = $this->augmentSubjectWithTeacher($externalData);
         $subject
             ->setName($externalData['sub_desc'])
@@ -201,7 +199,7 @@ class Factory
     public function buildTutorGroupList(User $student)
     {
         $tutorGroups = array();
-        foreach ($this->getGateway()->getAllYearLevelGroups($student) as $level) {
+        foreach ($this->gateway->getAllYearLevelGroups($student) as $level) {
             $tutorGroup = new TutorGroup();
             $tutorGroup
                 ->setName($level['yr_study'] . ' eReport')
@@ -226,7 +224,7 @@ class Factory
         $subjects = array();
         $result   = array_map(
             array($this, 'augmentSubjectWithTeacher'),
-            $this->getGateway()->getAllSubjectsForYear($year, $student)
+            $this->gateway->getAllSubjectsForYear($year, $student)
         );
         foreach ($result as $row) {
             $subject = new Subject();
@@ -257,7 +255,7 @@ class Factory
     {
         try {
             // Find by category code, and figure out if they're involved.
-            $folder = $this->getCategoryMapper()->findByCode($subjectCode);
+            $folder = $this->categoryMapper->findByCode($subjectCode);
             if ($involvement = $this->getStudentInvolvement($folder, $student)) {
                 return array(
                     'folder' => $folder,
@@ -273,7 +271,7 @@ class Factory
         // Multiple rolled-over categories with this code could exist,
         // get the one that has the requested student in it.
         // To do this, every matching category has to be checked.
-        $archivedFolders = $this->getCategoryMapper()->findAllByArchivedCode($subjectCode);
+        $archivedFolders = $this->categoryMapper->findAllByArchivedCode($subjectCode);
         foreach ($archivedFolders as $archivedFolder) {
             if ($involvement = $this->getStudentInvolvement($archivedFolder, $student)) {
                 return array(
@@ -285,7 +283,7 @@ class Factory
 
         // everything failed? return an empty model
         return array(
-            'folder' => $this->getCategoryMapper()->createModel(),
+            'folder' => $this->categoryMapper->createModel(),
             'grades' => array(),
         );
     }
@@ -380,18 +378,18 @@ class Factory
         $cohortList = array();
         $parent     = $category->getParent();
         $parentId   = $parent instanceof Folder ? $parent->getId() : null;
-        foreach ($this->getGateway()->getOtherSubjectClasses($subjectCode) as $otherCode) {
+        foreach ($this->gateway->getOtherSubjectClasses($subjectCode) as $otherCode) {
             // All archived or live codes with the same parent as $category
             // are cohorts.
             try {
-                $liveCategory = $this->getCategoryMapper()->findByCode($otherCode);
+                $liveCategory = $this->categoryMapper->findByCode($otherCode);
                 if ($liveCategory->getParent()->getId() == $parentId) {
                     $cohortList[] = $liveCategory;
                 }
             } catch (\Exception $e) {
                 // noop
             }
-            foreach ($this->getCategoryMapper()->findAllByArchivedCode($otherCode) as $archivedCategory) {
+            foreach ($this->categoryMapper->findAllByArchivedCode($otherCode) as $archivedCategory) {
                 if ($archivedCategory->getParent()->getId() == $parentId) {
                     $cohortList[] = $archivedCategory;
                 }
@@ -477,7 +475,7 @@ class Factory
     {
         // Get every teacher by their tch_code
         if (!empty($subject['tch_code'])) {
-            $subject['teachers'] = $this->getUserMapper()->findByColumn('synergy_id', $subject['tch_code']);
+            $subject['teachers'] = $this->userMapper->findByColumn('synergy_id', $subject['tch_code']);
         } else {
             $subject['teachers'] = [];
         }
