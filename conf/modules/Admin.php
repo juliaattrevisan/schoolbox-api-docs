@@ -115,5 +115,9 @@ class Admin implements ModuleConfigInterface
         // Filters
         $filters = new FilterModule($di);
         $filters->init('/adminv2/filters');
+
+        //Feature Tours
+        $featureTours = new \Schoolbox\Admin\FeatureTours\Module($di);
+        $featureTours->init('/adminv2/feature-tours');
     }
 } 

@@ -4,7 +4,18 @@
     <div class="small-12 island">
         <h2 class="subheader">Feature Tours</h2>
         <section>
-
+            <form id="newAllowedFile" method="post" data-action="createNewFileType" action="/adminv2/allowed-fileForm.php">
+                <label>Enabled<span data-tooltip class="hint has-tip tip-bottom" title="Controls if files of this type can be uploaded">?</span></label>
+                <span class="switch">
+                    <input name="enable" value="false" />
+                    <input id="enabled-new" type="checkbox" name="enable" checked="checked" value="true" />
+                    <label for="enabled-new">
+                        <span>On</span>
+                        <span>Off</span>
+                    </label>
+                </span>
+                <input type="submit" value="Save" />
+            </form>
         </section>
     </div>
 </div>
