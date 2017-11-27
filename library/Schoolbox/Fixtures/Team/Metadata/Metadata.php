@@ -72,13 +72,8 @@ class Metadata
      */
     public function collect()
     {
-        $homeTeam = $this->getMatch()->getHomeTeam();
-        $awayTeam = $this->getMatch()->getAwayTeam();
-        if ($homeTeam instanceof Team) {
-            $this->collectForTeam($homeTeam);
-        }
-        if ($awayTeam instanceof Team) {
-            $this->collectForTeam($awayTeam);
+        foreach($this->getMatch()->getAllTeams() as $team) {
+            $this->collectForTeam($team);
         }
     }
 
