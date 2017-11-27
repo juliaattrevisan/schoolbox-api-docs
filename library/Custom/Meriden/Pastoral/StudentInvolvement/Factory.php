@@ -345,7 +345,14 @@ class Factory
                 $feedback = $assessment->getParticipant($student)->getAuthoritativeFeedback(true);
                 if ($feedback) {
                     $allGrades['a'.$assessment->getId()] = [
-                        'mark' => $feedback->getNormalisedMark()
+                        'assessment'  => [
+                            'id'      => $assessment->getId(),
+                            'name'    => $assessment->getTitle(),
+                            'dueDate' => $assessment->getDueAt(),
+                        ],
+                        'pretty_mark' => $feedback->getHumanReadableMark(),
+                        'mark'        => $feedback->getNormalisedMark(),
+                        'comment'     => $feedback->getComment(),
                     ];
                 }
             }
