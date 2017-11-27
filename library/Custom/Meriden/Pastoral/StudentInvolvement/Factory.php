@@ -349,7 +349,7 @@ class Factory
             $folder->getId(),
             $student,
             [
-                'order'     => ['a.due_date' => 'asc'],
+                'order'     => ['due_date' => 'asc'],
                 'type'      => AssessmentType::TYPE_DUE_WORK,
                 'work_type' => self::WORK_TYPE_ASSESSMENT_TASK,
             ]
@@ -462,7 +462,7 @@ class Factory
                 null,
                 [
                     'spec_assessment_id' => $specAssessment->getId(),
-                    'order'              => ['a.due_date' => 'asc'],
+                    'order'              => ['due_date' => 'asc'],
                     'type'               => AssessmentType::TYPE_DUE_WORK,
                     'work_type'          => self::WORK_TYPE_ASSESSMENT_TASK,
                 ]
