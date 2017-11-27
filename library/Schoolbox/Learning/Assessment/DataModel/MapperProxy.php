@@ -387,6 +387,31 @@ class MapperProxy
     }
 
     /**
+     * Finds all implementations of a specification assessment.
+     *
+     * This method loads participants, responses and feedback.
+     *
+     * @param int   $specificationAssessmentId
+     * @param array $options
+     *
+     * @return Collection|IAssessable[]
+     */
+    public function findAllImplementationsForSpecificationId($specificationAssessmentId, array $options = [])
+    {
+        try {
+            $builder = $this->convertOptionsToPredicateBuilder($options)
+                            ->equals('v_spec.specification_assessment_id', $specificationAssessmentId);
+            return $this->loadParticipantsIntoAssessmentCollection(
+                $this->translateToDomainModelCollection(
+                    $this->baseMapper->findByPredicates($builder, $options)
+                )
+            );
+        } catch (UnderflowException $e) {
+            return $this->createCollection();
+        }
+    }
+
+    /**
      * Finds all assessables for a folder, not including course implementation
      * assessables.
      *
