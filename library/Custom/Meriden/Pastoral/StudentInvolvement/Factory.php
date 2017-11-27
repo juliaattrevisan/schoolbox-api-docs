@@ -471,13 +471,6 @@ class Factory
             $assessments[] = $this->assessmentDataSource->findByIdForReview($grade['assessment']->getId());
         }
 
-        // Load rubrics? Not sure if required
-        foreach ($assessments as $assessment) {
-            if ($assessment instanceof DueWork && $assessment->getUseRubric()) {
-                $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
-            }
-        }
-
         $distribution = [
             'grouped'    => [],
             'continuous' => [
