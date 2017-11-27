@@ -430,7 +430,7 @@ class Factory
         // Fetch only assessment tasks
         $assessments = SubmissionBoxMapper::getInstance()->findByColumnList([
             'id'   => $assessKeys,
-            'type' => self::WORK_TYPE_ASSESSMENT_TASK,
+//            'type' => self::WORK_TYPE_ASSESSMENT_TASK,
         ]);
         foreach ($assessments as $assess) {
             /** @var SubmissionBox $assess */
@@ -510,7 +510,7 @@ class Factory
             array(
                 'name'     => $assessmentName,
                 'category' => $cohortFolderIds,
-                'type'     => self::WORK_TYPE_ASSESSMENT_TASK,
+//                'type'     => self::WORK_TYPE_ASSESSMENT_TASK,
             )
         );
         $assessments->add($grade['assessment']);

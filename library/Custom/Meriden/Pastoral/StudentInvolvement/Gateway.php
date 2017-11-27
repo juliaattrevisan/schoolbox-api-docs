@@ -9,22 +9,49 @@
 
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
-use MSSQL;
+use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\User;
 
 class Gateway
 {
     /**
-     * @var MSSQL
+     * TASS company code.
+     *
+     * This may be injected later, as it's `config.external_tass_company_code`,
+     * but this is not required.
      */
-    protected $database;
+    const COMPANY_CODE = '01';
 
-    public function __construct(MSSQL $database)
+    /**
+     * Tutor group codes in TASS.
+     */
+    const TUTOR_GROUPS = ['9994', '9995', '9996', '9997', '9998', '9999'];
+
+    /**
+     * Subjects excluded from a student's list of subjects.
+     */
+    const EXCLUDED_SUBJECTS = ['9994', '9995', '9996', '9997', '9998', '9999', '0107', '0074', '4099', '0093', '0103'];
+
+    const ACTIVITY_TYPE_AWARD = 'C';
+    const ACTIVITY_TYPE_COCURRICULAR = 'B';
+    const ACTIVITY_TYPE_SERVICE = 'O';
+    const ACTIVITY_TYPE_POSITIONS_OF_OFFICE = 'A';
+
+    /**
+     * @var IConnector
+     */
+    private $database;
+
+    /**
+     * Constructor
+     *
+     * @param IConnector $database
+     */
+    public function __construct(IConnector $database)
     {
-        // Set up required mappers, DB access, etc. here.
-        $this->setDatabase($database);
+        $this->database = $database;
     }
-
 
     /**
      * Base query for querying a student's absences.
@@ -36,12 +63,13 @@ class Gateway
      *
      * @return array
      */
-    protected function queryDays($year, User $student, array $absenceTypes, array $reasonCodes = array())
+    protected function queryDays($year, User $student, array $absenceTypes, array $reasonCodes = [])
     {
         $externalId = $student->getExternalId();
         if (!$externalId) {
-            return array();
+            return [];
         }
+
         $query = "
             SELECT
                 studabsent.stud_code,
@@ -49,38 +77,22 @@ class Gateway
                 studabsent.absent_type,
                 studabsent.reas_code
             FROM studabsent
-            WHERE stud_code = :externalId
-            AND absent_date BETWEEN :yearStart AND :yearEnd
         ";
-        $params = array(
-            ':externalId' => $this->getDatabase()->smartQuote($externalId),
-            ':yearStart'  => $this->getDatabase()->smartQuote($year . '-01-01'),
-            ':yearEnd'    => $this->getDatabase()->smartQuote($year . '-12-31'),
-        );
+
+        $pb = new PredicateBuilder($this->database, 'studabsent');
+        $pb = $pb->equals('stud_code', $externalId)
+                 ->between('absent_date', $year . '-01-01', $year . '-12-31');
+
         if (!empty($absenceTypes)) {
-            $query .= ' AND absent_type IN (:absenceTypes) ';
-            $params[':absenceTypes'] = implode(
-                ',',
-                array_map(
-                    array($this->getDatabase(), 'smartQuote'),
-                    $absenceTypes
-                )
-            );
+            $pb = $pb->equals('absent_type', $absenceTypes);
         }
         if (!empty($reasonCodes)) {
-            $query .= ' AND reas_code IN (:reasonCodes) ';
-            $params[':reasonCodes'] = implode(
-                ',',
-                array_map(
-                    array($this->getDatabase(), 'smartQuote'),
-                    $reasonCodes
-                )
-            );
+            $pb = $pb->equals('reas_code', $reasonCodes);
         }
-        $result = $this->getDatabase()->trimAll(
-            $this->getDatabase()->getAll(strtr($query, $params))
-        );
-        return $result ?: array();
+
+        $query .= " WHERE " . implode(' AND ', $pb->getWhere());
+
+        return $this->database->executeQuery($query, $pb->getParams())->fetchAll();
     }
 
     /**
@@ -96,8 +108,9 @@ class Gateway
     {
         $externalId = $student->getExternalId();
         if (!$externalId) {
-            return array();
+            return [];
         }
+
         $query = "
             SELECT DISTINCT
                 studecact.stud_code,
@@ -108,20 +121,17 @@ class Gateway
             INNER JOIN studecact
                 ON studecact.act_code = ecactivity.act_code
                 AND studecact.cmpy_code = ecactivity.cmpy_code
-            WHERE studecact.stud_code = :externalId
-            AND studecact.act_year = :year
-            AND ecactivity.act_type = :activityType
-            AND ecactivity.cmpy_code = '01'
         ";
-        $params = array(
-            ':externalId'   => $this->getDatabase()->smartQuote($externalId),
-            ':year'         => $this->getDatabase()->smartQuote($year),
-            ':activityType' => $this->getDatabase()->smartQuote($activityType),
-        );
-        $result = $this->getDatabase()->trimAll(
-            $this->getDatabase()->getAll(strtr($query, $params))
-        );
-        return $result ?: array();
+
+        $pb = new PredicateBuilder($this->database, 'ecactivity');
+        $pb = $pb->equals('studecact.stud_code', $externalId)
+                 ->equals('studecact.act_year', $year)
+                 ->equals('ecactivity.act_type', $activityType)
+                 ->equals('ecactivity.cmpy_code', self::COMPANY_CODE);
+
+        $query .= " WHERE " . implode(' AND ', $pb->getWhere());
+
+        return $this->database->executeQuery($query, $pb->getParams())->fetchAll();
     }
 
     /**
@@ -141,10 +151,10 @@ class Gateway
         $resultSet = $this->queryDays(
             $year,
             $student,
-            array('AFS', 'APD', 'AAM', 'APM', 'EDP'),
-            array('A', 'L', 'S')
+            ['AFS', 'APD', 'AAM', 'APM', 'EDP'],
+            ['A', 'L', 'S']
         );
-        $count = 0;
+        $count     = 0;
         foreach ($resultSet as $row) {
             switch ($row['absent_type']) {
                 case 'AFS':
@@ -174,8 +184,8 @@ class Gateway
         $resultSet = $this->queryDays(
             $year,
             $student,
-            array('LFS'),
-            array('A', 'L', 'S')
+            ['LFS'],
+            ['A', 'L', 'S']
         );
         return count($resultSet);
     }
@@ -193,7 +203,7 @@ class Gateway
         $resultSet = $this->queryDays(
             $year,
             $student,
-            array('DET')
+            ['DET']
         );
         return count($resultSet);
     }
@@ -211,8 +221,8 @@ class Gateway
         $resultSet = $this->queryDays(
             $year,
             $student,
-            array('AFS'),
-            array('M')
+            ['AFS'],
+            ['M']
         );
         return count($resultSet);
     }
@@ -227,12 +237,12 @@ class Gateway
      */
     public function getAllAttendances($year, User $student)
     {
-        return array(
+        return [
             'absent'        => $this->getAbsenceCount($year, $student),
             'late'          => $this->getLateCount($year, $student),
             'detentions'    => $this->getDetentionCount($year, $student),
             'endorsedLeave' => $this->getLeaveCount($year, $student),
-        );
+        ];
     }
 
     /**
@@ -245,7 +255,7 @@ class Gateway
      */
     public function getAwards($year, User $student)
     {
-        return $this->queryActivities($year, $student, 'C');
+        return $this->queryActivities($year, $student, self::ACTIVITY_TYPE_AWARD);
     }
 
     /**
@@ -258,7 +268,7 @@ class Gateway
      */
     public function getCocurricular($year, User $student)
     {
-        return $this->queryActivities($year, $student, 'B');
+        return $this->queryActivities($year, $student, self::ACTIVITY_TYPE_COCURRICULAR);
     }
 
     /**
@@ -271,7 +281,7 @@ class Gateway
      */
     public function getService($year, User $student)
     {
-        return $this->queryActivities($year, $student, 'O');
+        return $this->queryActivities($year, $student, self::ACTIVITY_TYPE_SERVICE);
     }
 
     /**
@@ -284,7 +294,7 @@ class Gateway
      */
     public function getPositions($year, User $student)
     {
-        return $this->queryActivities($year, $student, 'A');
+        return $this->queryActivities($year, $student, self::ACTIVITY_TYPE_POSITIONS_OF_OFFICE);
     }
 
     /**
@@ -298,12 +308,12 @@ class Gateway
      */
     public function getAllActivities($year, User $student)
     {
-        return array(
+        return [
             'awards'       => $this->getAwards($year, $student),
             'cocurricular' => $this->getCocurricular($year, $student),
             'service'      => $this->getService($year, $student),
             'positions'    => $this->getPositions($year, $student),
-        );
+        ];
     }
 
     /**
@@ -318,8 +328,9 @@ class Gateway
     {
         $externalId = $student->getExternalId();
         if (!$externalId) {
-            return array();
+            return [];
         }
+
         // In Schoolbox-Tass nomeclature, Schoolbox classes will have the
         // following code:
         // {tchsub.year_num(optional)}-{tchsub.sub_code}-{tchsub.class}
@@ -340,21 +351,17 @@ class Gateway
             INNER JOIN subtab
                 ON subtab.sub_code = studsub.sub_code
                 AND subtab.cmpy_code = studsub.cmpy_code
-            WHERE studsub.stud_code = :externalId
-            AND studsub.cmpy_code = '01'
-            AND subtab.sub_code IN ('9994','9995','9996','9997','9998','9999')
-            AND tchsub.year_num = :year
-            ORDER BY
-                teacher.tch_name ASC
         ";
-        $params = array(
-            ':externalId' => $this->getDatabase()->smartQuote($externalId),
-            ':year'       => $this->getDatabase()->smartQuote($year),
-        );
-        $result = $this->getDatabase()->trimAll(
-            $this->getDatabase()->getAll(strtr($query, $params))
-        );
-        return $result ?: array();
+
+        $pb = new PredicateBuilder($this->database, 'teacher');
+        $pb = $pb->equals('studsub.stud_code', $externalId)
+                 ->equals('studsub.cmpy_code', self::COMPANY_CODE)
+                 ->equals('studsub.sub_code', self::TUTOR_GROUPS)
+                 ->equals('tchsub.year_num', $year);
+
+        $query .= " WHERE " . implode(' AND ', $pb->getWhere()) . " ORDER BY teacher.tch_name ASC";
+
+        return $this->database->executeQuery($query, $pb->getParams())->fetchAll();
     }
 
     /**
@@ -368,10 +375,11 @@ class Gateway
     {
         $externalId = $student->getExternalId();
         if (!$externalId) {
-            return array();
+            return [];
         }
+
         // Adapted External_Tass_User->getSubjectList()
-        $query  = "
+        $query = "
             SELECT DISTINCT
                 studsub.class,
                 studsub.yr_study,
@@ -383,20 +391,17 @@ class Gateway
             INNER JOIN subtab
                 ON subtab.sub_code = studsub.sub_code
                 AND subtab.cmpy_code = studsub.cmpy_code
-            WHERE studsub.stud_code = :externalId
-            AND subtab.sub_code IN ('9994','9995','9996','9997','9998','9999')
-            AND studsub.cmpy_code = '01'
-            ORDER BY
-                studsub.sub_code ASC,
-                studsub.class ASC
         ";
-        $params = array(
-            ':externalId' => $this->getDatabase()->smartQuote($externalId),
-        );
-        $result = $this->getDatabase()->trimAll(
-            $this->getDatabase()->getAll(strtr($query, $params))
-        );
-        return $result ?: array();
+
+        $pb = new PredicateBuilder($this->database, 'studsub');
+        $pb = $pb->equals('studsub.stud_code', $externalId)
+                 ->equals('subtab.sub_code', self::TUTOR_GROUPS)
+                 ->equals('studsub.cmpy_code', self::COMPANY_CODE);
+
+        $query .= " WHERE " . implode(' AND ', $pb->getWhere())
+            . " ORDER BY studsub.sub_code ASC, studsub.class ASC";
+
+        return $this->database->executeQuery($query, $pb->getParams())->fetchAll();
     }
 
     /**
@@ -411,9 +416,10 @@ class Gateway
     {
         $externalId = $student->getExternalId();
         if (!$externalId) {
-            return array();
+            return [];
         }
-        $query  = "
+
+        $query = "
             SELECT
                 studsub.class,
                 studsub.yr_study,
@@ -425,22 +431,18 @@ class Gateway
             INNER JOIN subtab
                 ON subtab.sub_code = studsub.sub_code
                 AND subtab.cmpy_code = studsub.cmpy_code
-            WHERE studsub.stud_code = :externalId
-            AND studsub.yr_study = :year
-            AND subtab.sub_code IN ('9994','9995','9996','9997','9998','9999')
-            AND studsub.cmpy_code = '01'
-            ORDER BY
-                studsub.sub_code ASC,
-                studsub.class ASC
         ";
-        $params = array(
-            ':externalId' => $this->getDatabase()->smartQuote($externalId),
-            ':year'       => $this->getDatabase()->smartQuote($year),
-        );
-        $result = $this->getDatabase()->trimRow(
-            $this->getDatabase()->getRow(strtr($query, $params))
-        );
-        return $result ?: array();
+
+        $pb = new PredicateBuilder($this->database, 'studsub');
+        $pb = $pb->equals('studsub.stud_code', $externalId)
+                 ->equals('studsub.yr_study', $year)
+                 ->equals('subtab.sub_code', self::TUTOR_GROUPS)
+                 ->equals('studsub.cmpy_code', self::COMPANY_CODE);
+
+        $query .= " WHERE " . implode(' AND ', $pb->getWhere())
+            . " ORDER BY studsub.sub_code ASC, studsub.class ASC";
+
+        return $this->database->executeQuery($query, $pb->getParams())->fetchAll();
     }
 
     /**
@@ -455,10 +457,11 @@ class Gateway
     {
         $externalId = $student->getExternalId();
         if (!$externalId) {
-            return array();
+            return [];
         }
+
         // Adapted External_Tass_User->getSubjectList()
-        $query  = "
+        $query = "
             SELECT DISTINCT
                 studsub.class,
                 studsub.yr_study,
@@ -477,54 +480,37 @@ class Gateway
                 AND studsub.semester = tchsub.semester
                 AND studsub.yr_study = tchsub.year_num
                 AND studsub.class = tchsub.class
-            WHERE studsub.stud_code = :externalId
-            AND subtab.sub_code NOT IN (
-                '9994',
-                '9995',
-                '9996',
-                '9997',
-                '9998',
-                '9999',
-                '0107',
-                '0074',
-                '4099',
-                '0093',
-                '0103'
-            )
-            AND studsub.cmpy_code = '01'
-            AND studsub.yr_study = :year
-            ORDER BY
-                subtab.sub_desc ASC
         ";
-        $params = array(
-            ':externalId' => $this->getDatabase()->smartQuote($externalId),
-            ':year'       => $this->getDatabase()->smartQuote($year),
-        );
-        $result = $this->getDatabase()->trimAll(
-            $this->getDatabase()->getAll(strtr($query, $params))
-        );
-        $result = $result ?: array();
+
+        $pb = new PredicateBuilder($this->database, 'studsub');
+        $pb = $pb->equals('studsub.stud_code', $externalId)
+                 ->equals('studsub.yr_study', $year)
+                 ->notEquals('subtab.sub_code', self::EXCLUDED_SUBJECTS)
+                 ->equals('studsub.cmpy_code', self::COMPANY_CODE);
+
+        $query .= " WHERE " . implode(' AND ', $pb->getWhere())
+            . " ORDER BY subtab.sub_desc ASC";
 
         // Join all teacher codes into a single result.
         $result = array_reduce(
-            $result,
+            $this->database->executeQuery($query, $pb->getParams())->fetchAll(),
             function ($carry, $newRow) {
                 $isDuplicateCode = false;
                 foreach ($carry as &$row) {
                     if ($row['code'] == $newRow['code']) {
                         $row['tch_code'][] = $newRow['tch_code'];
-                        $isDuplicateCode = true;
+                        $isDuplicateCode   = true;
                         break;
                     }
                 }
                 unset($row);
                 if (!$isDuplicateCode) {
-                    $newRow['tch_code'] = array($newRow['tch_code']);
-                    $carry[] = $newRow;
+                    $newRow['tch_code'] = [$newRow['tch_code']];
+                    $carry[]            = $newRow;
                 }
                 return $carry;
             },
-            array()
+            []
         );
         return $result;
     }
@@ -539,6 +525,8 @@ class Gateway
      */
     public function getSubject($year, $subjectCode)
     {
+        list(, $code, $class) = explode('-', $subjectCode);
+
         $query = "
             SELECT DISTINCT
                 st.sub_desc,
@@ -550,26 +538,21 @@ class Gateway
                 ON so.sub_code=st.sub_code AND so.cmpy_code=st.cmpy_code
             LEFT JOIN tchsub ts
                 ON st.sub_code = ts.sub_code AND st.cmpy_code = ts.cmpy_code
-            WHERE so.sub_code = :code
-            AND   ts.year_num = :year
-            AND   ts.class    = :class
-            AND   so.cmpy_code = '01'
         ";
-        list(, $code, $class) = explode('-', $subjectCode);
-        $params = array(
-            ':code'  => $this->getDatabase()->smartQuote($code),
-            ':year'  => $this->getDatabase()->smartQuote($year),
-            ':class' => $this->getDatabase()->smartQuote($class),
-        );
-        $allResults = $this->getDatabase()->trimAll(
-            $this->getDatabase()->getAll(strtr($query, $params))
-        );
+
+        $pb = new PredicateBuilder($this->database, 'suboutline');
+        $pb = $pb->equals('so.sub_code', $code)
+                 ->equals('ts.year_num', $year)
+                 ->equals('ts.class', $class)
+                 ->equals('so.cmpy_code', self::COMPANY_CODE);
+
+        $query .= " WHERE " . implode(' AND ', $pb->getWhere());
 
         // Reduce to one result
         $result = [];
-        foreach ($allResults as $singleResult) {
+        foreach ($this->database->executeQueryIterator($query, $pb->getParams()) as $singleResult) {
             if (empty($result)) {
-                $result = $singleResult;
+                $result             = $singleResult;
                 $result['tch_code'] = [];
             }
             $result['tch_code'][] = $singleResult['tch_code'];
@@ -589,6 +572,8 @@ class Gateway
      */
     public function getOtherSubjectClasses($subjectCode)
     {
+        list(, $code, $class) = explode('-', $subjectCode);
+
         $query = "
             SELECT DISTINCT
                 ('-' + RTRIM(st.sub_code) + '-' + RTRIM(ss.class)) AS code
@@ -596,42 +581,20 @@ class Gateway
             INNER JOIN studsub ss
                 ON st.sub_code = ss.sub_code
                 AND st.cmpy_code = ss.cmpy_code
-            WHERE st.sub_code = :code
-            AND ss.class != :class
-            AND st.cmpy_code = '01';
         ";
-        list(, $code, $class) = explode('-', $subjectCode);
-        $params = array(
-            ':code'  => $this->getDatabase()->smartQuote($code),
-            ':class' => $this->getDatabase()->smartQuote($class),
-        );
-        $result = $this->getDatabase()->trimAll(
-            $this->getDatabase()->getAll(strtr($query, $params))
-        );
+
+        $pb = new PredicateBuilder($this->database, 'studsub');
+        $pb = $pb->equals('st.sub_code', $code)
+                 ->equals('ss.class', $class)
+                 ->equals('st.cmpy_code', self::COMPANY_CODE);
+
+        $query .= " WHERE " . implode(' AND ', $pb->getWhere());
+
         return array_map(
             function ($v) {
                 return $v['code'];
             },
-            $result ?: array()
+            $this->database->executeQuery($query, $pb->getParams())->fetchAll()
         );
-    }
-
-    /**
-     * @return MSSQL
-     */
-    protected function getDatabase()
-    {
-        return $this->database;
-    }
-
-    /**
-     * @param  MSSQL $database
-     *
-     * @return $this
-     */
-    protected function setDatabase($database)
-    {
-        $this->database = $database;
-        return $this;
     }
 }

@@ -93,9 +93,9 @@ class Module extends BaseModule
                 } catch (\Exception $e) {
                     // noop - the controller will die at this point anyway
                 }
-                return array(
+                return [
                     'student' => $student,
-                );
+                ];
             }
         );
     }
@@ -129,13 +129,11 @@ class Module extends BaseModule
             = Grades::getInstance();
 
         $injector->params[StudentInvolvement\Gateway::class]['database']
-            = $injector->lazy(function () {
-            return \MSSQL::getInstance();
-        });
+            = $injector->lazyGet('databaseExternal');
 
         $injector->set(
             'controller:' . $this->basename,
-            $injector->lazyNew('Custom\\Meriden\\Pastoral\\Controller')
+            $injector->lazyNew(Controller::class)
         );
     }
 
