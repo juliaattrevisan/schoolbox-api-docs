@@ -227,8 +227,7 @@ class MapperProxy
     /**
      * Finds the specification assessment for a implementation assessment.
      *
-     * Currently, this does not load participants or the rubric grid - I am not
-     * yet sure which context this method will be used.
+     * This method loads participants, responses and feedback.
      *
      * @param int $assessmentId
      * @param array $options
@@ -238,9 +237,13 @@ class MapperProxy
     {
         try {
             // Get all assessables which have this assessment as a spec
-            $builder = $this->convertOptionsToPredicateBuilder($options)
-                            ->equals('spec.id', $assessmentId);
-            return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
+            $options['spec_assessment_id'] = $assessmentId;
+            $builder = $this->convertOptionsToPredicateBuilder($options);
+            return $this->loadParticipantsIntoAssessmentCollection(
+                $this->translateToDomainModelCollection(
+                    $this->baseMapper->findByPredicates($builder, $options)
+                )
+            );
         } catch (UnderflowException $e) {
             return $this->createCollection();
         }
@@ -384,31 +387,6 @@ class MapperProxy
             ),
             $student
         );
-    }
-
-    /**
-     * Finds all implementations of a specification assessment.
-     *
-     * This method loads participants, responses and feedback.
-     *
-     * @param int   $specificationAssessmentId
-     * @param array $options
-     *
-     * @return Collection|IAssessable[]
-     */
-    public function findAllImplementationsForSpecificationId($specificationAssessmentId, array $options = [])
-    {
-        try {
-            $builder = $this->convertOptionsToPredicateBuilder($options)
-                            ->equals('v_spec.specification_assessment_id', $specificationAssessmentId);
-            return $this->loadParticipantsIntoAssessmentCollection(
-                $this->translateToDomainModelCollection(
-                    $this->baseMapper->findByPredicates($builder, $options)
-                )
-            );
-        } catch (UnderflowException $e) {
-            return $this->createCollection();
-        }
     }
 
     /**
@@ -952,6 +930,11 @@ class MapperProxy
         // Assessment title filter?
         if (isset($options['title'])) {
             $builder->equals('a.title', $options['title']);
+        }
+
+        // Spec assessment filter?
+        if (isset($options['spec_assessment_id'])) {
+            $builder->equals('v_spec.specification_assessment_id', $options['spec_assessment_id']);
         }
 
         return $builder;
