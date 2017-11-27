@@ -918,6 +918,12 @@ class MapperProxy
             default:
                 break;
         }
+
+        // Work type filter
+        if (isset($options['work_type'])) {
+            $builder->equals('a.work_type_id', $options['work_type']);
+        }
+
         return $builder;
     }
 
