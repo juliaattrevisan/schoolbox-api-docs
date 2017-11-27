@@ -9,6 +9,7 @@
 
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
@@ -339,10 +340,16 @@ class Factory
     protected function getGrades(Folder $folder, User $student)
     {
         $allGrades = [];
-        foreach ($this->assessmentDataSource->findAllByFolderIdForReview($folder->getId(), $student) as $assessment) {
-            // Only due works are shown
-            if ($assessment instanceof DueWork) {
-                $feedback = $assessment->getParticipant($student)->getAuthoritativeFeedback(true);
+
+        // Only due works are shown
+        foreach ($this->assessmentDataSource->findAllByFolderIdForReview(
+            $folder->getId(),
+            $student,
+            ['type' => AssessmentType::TYPE_DUE_WORK]
+        ) as $assessment) {
+            $participant = $assessment->getParticipantIfExtant($student);
+            if ($participant) {
+                $feedback = $participant->getAuthoritativeFeedback(true);
                 if ($feedback) {
                     $allGrades['a'.$assessment->getId()] = [
                         'assessment'  => [
