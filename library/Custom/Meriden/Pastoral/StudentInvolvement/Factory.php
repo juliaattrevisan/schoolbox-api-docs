@@ -605,7 +605,10 @@ class Factory
             $studentMarks = [];
             foreach ($assessment->getAllParticipants() as $participant) {
                 $returnStudentId                = $participant->getUser()->getId();
-                $studentMarks[$returnStudentId] = $participant->getNormalisedMark(true);
+                $studentMarks[$returnStudentId] = [
+                    'mark'        => $participant->getNormalisedMark(true),
+                    'pretty_mark' => $participant->getHumanReadableMark(true),
+                ];
             }
 
 //            foreach ($returnedWorkMapper->findByColumn('box_id', $assessment->getId()) as $return) {
