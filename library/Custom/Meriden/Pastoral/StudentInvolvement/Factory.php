@@ -9,20 +9,19 @@
 
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
-use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
-use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -103,11 +102,10 @@ class Factory
             // Add teachers into subjects - debatable if this is part of tutor group?
             ->setSubjects(
                 array_map(
-                    array($this, 'augmentSubjectWithTeacher'),
+                    [$this, 'augmentSubjectWithTeacher'],
                     $this->gateway->getAllSubjectsForYear($year, $student)
                 )
-            )
-        ;
+            );
 
         $tutorGroupCode   = $tutorGroup->getTutorGroup();
         $folderWithGrades = $this->getFolderWithGrades($tutorGroupCode['code'], $student);
@@ -120,8 +118,7 @@ class Factory
             ->moveToNamedGrade('camp', 'School Camp')
             ->moveToNamedGrade('uniform', 'Uniform')
             ->moveToNamedGrade('pastoral', 'Pastoral activities involvement')
-            ->moveToNamedGrade('tutorComment', 'Tutor Comment')
-        ;
+            ->moveToNamedGrade('tutorComment', 'Tutor Comment');
 
         // Add write level staff as coordinators
         $folder = $tutorGroup->getFolder();
@@ -149,7 +146,7 @@ class Factory
      */
     public function buildSubject($year, User $student, $subjectCode)
     {
-        $subject = new Subject();
+        $subject      = new Subject();
         $externalData = $this->gateway->getSubject($year, $subjectCode);
         $externalData = $this->augmentSubjectWithTeacher($externalData);
         $subject
@@ -158,8 +155,7 @@ class Factory
             ->setTeachers($externalData['teachers'])
             ->setStudent($student)
             ->setYear($year)
-            ->setSubjectCode($subjectCode)
-        ;
+            ->setSubjectCode($subjectCode);
 
         $folderWithGrades = $this->getFolderWithGrades($subjectCode, $student);
         $subject
@@ -172,17 +168,16 @@ class Factory
             ->moveToNamedGrade('endeavourGrade2', 'Endeavour Grade Term 2')
             ->moveToNamedGrade('endeavourGrade3', 'Endeavour Grade Term 3')
             ->moveToNamedGrade('endeavourGrade4', 'Endeavour Grade Term 4')
-            ->moveToNamedGrade('learningApproaches', 'Approaches to Learning')
-        ;
+            ->moveToNamedGrade('learningApproaches', 'Approaches to Learning');
 
         // Add grade distributions
-        $newGrades = array();
+        $newGrades = [];
         foreach ($subject->getGrades() as $key => $grade) {
             $grade['distribution'] = $this->buildDistribution(
                 $grade,
                 $subject->getCohortFolders()
             );
-            $newGrades[$key] = $grade;
+            $newGrades[$key]       = $grade;
         }
         $subject->setGrades($newGrades);
 
@@ -210,7 +205,7 @@ class Factory
      */
     public function buildTutorGroupList(User $student)
     {
-        $tutorGroups = array();
+        $tutorGroups = [];
         foreach ($this->gateway->getAllYearLevelGroups($student) as $level) {
             $tutorGroup = new TutorGroup();
             $tutorGroup
@@ -233,9 +228,9 @@ class Factory
      */
     public function buildSubjectList($year, User $student)
     {
-        $subjects = array();
+        $subjects = [];
         $result   = array_map(
-            array($this, 'augmentSubjectWithTeacher'),
+            [$this, 'augmentSubjectWithTeacher'],
             $this->gateway->getAllSubjectsForYear($year, $student)
         );
         foreach ($result as $row) {
@@ -269,10 +264,10 @@ class Factory
             // Find by category code, and figure out if they're involved.
             $folder = $this->folderMapper->findByCode($subjectCode);
             if ($involvement = $this->getStudentInvolvement($folder, $student)) {
-                return array(
+                return [
                     'folder' => $folder,
                     'grades' => $involvement['grades'],
-                );
+                ];
             }
         } catch (MapperException $e) {
             // no folder with this cat code exists.
@@ -286,18 +281,18 @@ class Factory
         $archivedFolders = $this->folderMapper->findAllByArchivedCode($subjectCode);
         foreach ($archivedFolders as $archivedFolder) {
             if ($involvement = $this->getStudentInvolvement($archivedFolder, $student)) {
-                return array(
+                return [
                     'folder' => $archivedFolder,
                     'grades' => $involvement['grades'],
-                );
+                ];
             }
         }
 
         // everything failed? return an empty model
-        return array(
+        return [
             'folder' => $this->folderMapper->createModel(),
-            'grades' => array(),
-        );
+            'grades' => [],
+        ];
     }
 
     /**
@@ -308,7 +303,7 @@ class Factory
      * * Does this student have a grade in this folder?
      *
      * @param Folder $folder
-     * @param User     $student
+     * @param User   $student
      *
      * @return array {
      *  grades: array (if the student is involved)
@@ -322,9 +317,9 @@ class Factory
                 if ($code->getCode() == $subject['code']) {
                     // Student is involved, even if they have no grades.
                     // Try to get them anyway.
-                    return array(
+                    return [
                         'grades' => $this->getGrades($folder, $student),
-                    );
+                    ];
                 }
             }
         }
@@ -332,18 +327,18 @@ class Factory
         // If not, has $student got a grade in this folder?
         $grades = $this->getGrades($folder, $student);
         if (!empty($grades)) {
-            return array(
+            return [
                 'grades' => $grades,
-            );
+            ];
         }
-        return array();
+        return [];
     }
 
     /**
      * Gets all assessment and quiz grades.
      *
      * @param Folder $folder
-     * @param User     $student
+     * @param User   $student
      *
      * @return array
      */
@@ -378,7 +373,7 @@ class Factory
                 if ($feedback) {
 
                     // Load rubrics into assessment whilst here
-                    $allGrades['a'.$assessment->getId()] = [
+                    $allGrades['a' . $assessment->getId()] = [
                         'assessment'  => [
                             'id'      => $assessment->getId(),
                             'name'    => $assessment->getTitle(),
@@ -432,7 +427,7 @@ class Factory
     {
         // Find the equivalent assessments for each cohort class
         // (class with the same second part of the class code)
-        $cohortList = array();
+        $cohortList = [];
         $parent     = $category->getParent();
         $parentId   = $parent instanceof Folder ? $parent->getId() : null;
         foreach ($this->gateway->getOtherSubjectClasses($subjectCode) as $otherCode) {
@@ -542,7 +537,7 @@ class Factory
     /**
      * Builds a distribution of grades for this grade.
      *
-     * @param array            $grade
+     * @param array          $grade
      * @param array|Folder[] $cohortFolders
      *
      * @return array
@@ -550,43 +545,43 @@ class Factory
     protected function buildDistribution($grade, $cohortFolders)
     {
         if (!($grade['assessment'] instanceof SubmissionBox)) {
-            return array();
+            return [];
         }
         $boxMapper          = SubmissionBoxMapper::getInstance();
         $returnedWorkMapper = ReturnedWorkMapper::getInstance();
 
         // Get the matching assessments in the cohort classes
-        $cohortFolderIds = array();
+        $cohortFolderIds = [];
         foreach ($cohortFolders as $cohortFolder) {
             $cohortFolderIds[] = $cohortFolder->getId();
         }
         $assessmentName = $grade['assessment']->getName();
         $assessments    = $boxMapper->findByColumnList(
-            array(
+            [
                 'name'     => $assessmentName,
                 'category' => $cohortFolderIds,
 //                'type'     => self::WORK_TYPE_ASSESSMENT_TASK,
-            )
+            ]
         );
         $assessments->add($grade['assessment']);
 
-        $distribution = array(
-            'grouped'    => array(),
-            'continuous' => array(
-                'marks' => array(),
-            ),
-        );
+        $distribution = [
+            'grouped'    => [],
+            'continuous' => [
+                'marks' => [],
+            ],
+        ];
         foreach ($assessments as $assessment) {
             // Get everyone who has submitted to this assessment
-            $returnStudents = array();
+            $returnStudents = [];
             foreach ($returnedWorkMapper->findByColumn('box_id', $assessment->getId()) as $return) {
-                $returnStudentId = $return->getOwner()->getId();
+                $returnStudentId                  = $return->getOwner()->getId();
                 $returnStudents[$returnStudentId] = $returnStudentId;
             }
 
             // Slurp out all student marks for this folder, and put back the one we
             // actually want if it's there.
-            $studentMarks = array();
+            $studentMarks = [];
             foreach ($returnStudents as $studentId) {
                 $marks = $returnedWorkMapper->getStudentMarks(
                     $assessment->getCategory()->getId(),
@@ -601,20 +596,20 @@ class Factory
             // Assume all assessments use the same assessment type, otherwise chaos occurs!
             if ($assessment->getMarkType()->getId() == SubmissionBox\MarkType::TYPE_LETTER) {
                 $levels = SubmissionBox\GradeLevel\Mapper::getInstance()
-                    ->findByColumn(
-                        'submission_grade_group_id',
-                        $assessment->getGradeGroup()->getId(),
-                        array(
-                            'order' => array('raw_grade' => 'desc')
-                        )
-                    );
+                                                         ->findByColumn(
+                                                             'submission_grade_group_id',
+                                                             $assessment->getGradeGroup()->getId(),
+                                                             [
+                                                                 'order' => ['raw_grade' => 'desc'],
+                                                             ]
+                                                         );
 
                 // For now, assume that distributions are only calculated for
                 // letter grade assessments.
                 foreach ($levels as $level) {
                     $caption = $level->getCaption();
                     if (!empty($caption) && empty($distribution['grouped'][$caption])) {
-                        $distribution['grouped'][$caption] = array();
+                        $distribution['grouped'][$caption] = [];
                     }
                 }
                 foreach ($studentMarks as $item) {
@@ -654,28 +649,28 @@ class Factory
             );
 
             // Convert mean and SD to pretty mark
-            $markType  = SubmissionBox\MarkTypeMapper::getInstance()->findById(
+            $markType                           = SubmissionBox\MarkTypeMapper::getInstance()->findById(
                 $grade['assessment']->getMarkType()->getId()
             );
-            $converter = \Marksheet_Factory::build(
+            $converter                          = \Marksheet_Factory::build(
                 $markType->getSlug(),
                 $grade['assessment']
             );
-            $maxMark    = $grade['assessment']->getMaxMark();
-            $prettyMean = $converter->convertRawMark($mean, $maxMark);
-            $prettySd   = $converter->convertRawMark($sd, $maxMark);
-            $distribution['continuous']['mean'] = array(
+            $maxMark                            = $grade['assessment']->getMaxMark();
+            $prettyMean                         = $converter->convertRawMark($mean, $maxMark);
+            $prettySd                           = $converter->convertRawMark($sd, $maxMark);
+            $distribution['continuous']['mean'] = [
                 'mark'        => round($mean, 1),
                 'pretty_mark' => is_numeric($prettyMean)
                     ? sprintf('%.1f', $prettyMean)
-                    : $prettyMean
-            );
-            $distribution['continuous']['sd'] = array(
+                    : $prettyMean,
+            ];
+            $distribution['continuous']['sd']   = [
                 'mark'        => round($sd, 1),
                 'pretty_mark' => is_numeric($prettySd)
                     ? sprintf('%.1f', $prettySd)
-                    : $prettySd
-            );
+                    : $prettySd,
+            ];
         }
         return $distribution;
     }
