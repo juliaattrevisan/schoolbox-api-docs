@@ -682,16 +682,20 @@ class Factory
             );
 
             // Convert mean and SD to pretty mark
-            $markType                           = SubmissionBox\MarkTypeMapper::getInstance()->findById(
-                $grade['assessment']->getMarkType()->getId()
-            );
-            $converter                          = \Marksheet_Factory::build(
-                $markType->getSlug(),
-                $grade['assessment']
-            );
-            $maxMark                            = $grade['assessment']->getMaxMark();
-            $prettyMean                         = $converter->convertRawMark($mean, $maxMark);
-            $prettySd                           = $converter->convertRawMark($sd, $maxMark);
+            $markScheme                         = $grade['assessment']->getMarkScheme();
+            $prettyMean                         = $markScheme->getHumanReadableMark($mean);
+            $prettySd                           = $markScheme->getHumanReadableMark($sd);
+
+//            $markType                           = SubmissionBox\MarkTypeMapper::getInstance()->findById(
+//                $grade['assessment']->getMarkType()->getId()
+//            );
+//            $converter                          = \Marksheet_Factory::build(
+//                $markType->getSlug(),
+//                $grade['assessment']
+//            );
+//            $maxMark                            = $grade['assessment']->getMaxMark();
+//            $prettyMean                         = $converter->convertRawMark($mean, $maxMark);
+//            $prettySd                           = $converter->convertRawMark($sd, $maxMark);
             $distribution['continuous']['mean'] = [
                 'mark'        => round($mean, 1),
                 'pretty_mark' => is_numeric($prettyMean)
