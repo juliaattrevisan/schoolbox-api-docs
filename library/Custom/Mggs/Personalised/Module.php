@@ -9,12 +9,11 @@ namespace Custom\Mggs\Learning\Personalised;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
-use Alaress\Twig\Loader\IChainLoader;
 
 /**
  * Sub-module for a student's personalised learning view.

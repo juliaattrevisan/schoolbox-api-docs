@@ -8,6 +8,7 @@
 namespace Custom\Mggs\Learning\Personalised\Event;
 
 use Aura\Router\Router;
+use Custom\Mggs\Learning\Personalised\Participant;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
@@ -15,10 +16,8 @@ use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
-use Custom\Mggs\Learning\Personalised\Participant;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
-
 
 /**
  * Factory for building a set of FullCalendar-compatible events from an
