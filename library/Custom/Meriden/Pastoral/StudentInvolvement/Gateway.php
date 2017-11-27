@@ -21,32 +21,30 @@ class Gateway
      * This may be injected later, as it's `config.external_tass_company_code`,
      * but this is not required.
      */
-    const COMPANY_CODE = '01';
+    private const COMPANY_CODE = '01';
 
     /**
      * Tutor group codes in TASS.
      */
-    const TUTOR_GROUPS = ['9994', '9995', '9996', '9997', '9998', '9999'];
+    private const TUTOR_GROUPS = ['9994', '9995', '9996', '9997', '9998', '9999'];
 
     /**
      * Subjects excluded from a student's list of subjects.
      */
-    const EXCLUDED_SUBJECTS = ['9994', '9995', '9996', '9997', '9998', '9999', '0107', '0074', '4099', '0093', '0103'];
+    private const EXCLUDED_SUBJECTS = ['9994', '9995', '9996', '9997', '9998', '9999', '0107', '0074', '4099', '0093', '0103'];
 
-    const ACTIVITY_TYPE_AWARD = 'C';
-    const ACTIVITY_TYPE_COCURRICULAR = 'B';
-    const ACTIVITY_TYPE_SERVICE = 'O';
-    const ACTIVITY_TYPE_POSITIONS_OF_OFFICE = 'A';
+    private const ACTIVITY_TYPE_AWARD = 'C';
+    private const ACTIVITY_TYPE_COCURRICULAR = 'B';
+    private const ACTIVITY_TYPE_SERVICE = 'O';
+    private const ACTIVITY_TYPE_POSITIONS_OF_OFFICE = 'A';
 
-    const ABSENCE_TYPE_LATE = 'LFS';
-    const ABSENCE_TYPE_DETENTION = 'DET';
-    const ABSENCE_TYPE_ENDORSED_LEAVE = 'AFS';
+    private const ABSENCE_TYPE_LATE = 'LFS';
+    private const ABSENCE_TYPE_DETENTION = 'DET';
+    private const ABSENCE_TYPE_ENDORSED_LEAVE = 'AFS';
+    private const ABSENCE_TYPES_AWAY = ['AFS', 'APD', 'AAM', 'APM', 'EDP'];
 
-    const ABSENCE_TYPES_AWAY = ['AFS', 'APD', 'AAM', 'APM', 'EDP'];
-
-    const REASON_CODES_AWAY_OR_LATE = ['A', 'L', 'S'];
-
-    const REASON_CODES_ENDORSED_LEAVE = ['M'];
+    private const REASON_CODES_AWAY_OR_LATE = ['A', 'L', 'S'];
+    private const REASON_CODES_ENDORSED_LEAVE = ['M'];
 
     /**
      * @var IConnector
