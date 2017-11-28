@@ -2128,7 +2128,6 @@ class AssessableTest extends TestCase
         $response2->setMarkedComplete(true);
         $response2->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $participant2->getAllResponses()->add($response2);
-        $task->getResponses()->add($response2);
 
 
         // user3: teacher-assessed
@@ -2140,7 +2139,6 @@ class AssessableTest extends TestCase
         $response3->setMarkedComplete(true);
         $response3->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $participant3->getAllResponses()->add($response3);
-        $task->getResponses()->add($response3);
 
         $feedback3 = (new TaskFeedback())
             ->setResponse($response3);
@@ -2157,7 +2155,6 @@ class AssessableTest extends TestCase
         $response4a->setMarkedComplete(true);
         $response4a->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $participant4->getAllResponses()->add($response4a);
-        $task->getResponses()->add($response4a);
 
         $response4b = new TaskResponse();
         $response4b->setId(4);
@@ -2167,7 +2164,6 @@ class AssessableTest extends TestCase
         $response4b->setMarkedComplete(true);
         $response4b->setUpdatedAt($this->getDummyDate('2016-10-10 21:03:19'));
         $participant4->getAllResponses()->add($response4b);
-        $task->getResponses()->add($response4b);
 
         $feedback4b = (new TaskFeedback())
             ->setResponse($response4b);
@@ -2306,15 +2302,6 @@ class AssessableTest extends TestCase
             ->add($participant3)
             ->add($participant4)
             ->add($participant5);
-
-        // Add Responses to Assessable
-        $quiz->getResponses()
-            ->add($attempt2)
-            ->add($attempt3)
-            ->add($attempt4a)
-            ->add($attempt4b)
-            ->add($attempt5a)
-            ->add($attempt5b);
 
         // Add Assessable to Responses
         $attempt2->setAssessable($quiz);
@@ -2559,17 +2546,6 @@ class AssessableTest extends TestCase
             ->add($participant7)
             ->add($participant8)
             ->add($participant9);
-
-        // Add Responses to Assessable
-        $dueWork->getResponses()
-            ->add($submission2)
-            ->add($submission3)
-            ->add($submission4)
-            ->add($submission5)
-            ->add($submission6a)
-            ->add($submission6b)
-            ->add($submission7a)
-            ->add($submission7b);
 
         // Add Assessable to Responses
         $submission2->setAssessable($dueWork);
