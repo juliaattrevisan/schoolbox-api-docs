@@ -494,7 +494,6 @@ class DemoData
             ->setCreatedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now())
             ->setDeletedAt(new Alaress_Date_NullDate());
-        $task->getResponses()->add($responseB);
         $participantB->getAllResponses()->add($responseB);
 
 
@@ -511,7 +510,6 @@ class DemoData
             ->setCreatedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now())
             ->setDeletedAt(new Alaress_Date_NullDate());
-        $task->getResponses()->add($responseC);
         $participantC->getAllResponses()->add($responseC);
 
 
@@ -528,7 +526,6 @@ class DemoData
             ->setCreatedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now())
             ->setDeletedAt(new Alaress_Date_NullDate());
-        $task->getResponses()->add($responseD);
         $participantD->getAllResponses()->add($responseD);
 
         $feedbackD = (new TaskFeedback())
@@ -549,7 +546,6 @@ class DemoData
             ->setCreatedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now())
             ->setDeletedAt(new Alaress_Date_NullDate());
-        $task->getResponses()->add($responseE);
         $participantE->getAllResponses()->add($responseE);
 
         $feedbackE = (new TaskFeedback())
@@ -570,7 +566,6 @@ class DemoData
             ->setCreatedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now())
             ->setDeletedAt(new Alaress_Date_NullDate());
-        $task->getResponses()->add($responseF1);
         $participantF->getAllResponses()->add($responseF1);
 
         $responseF2 = (new TaskResponse())
@@ -582,7 +577,6 @@ class DemoData
             ->setCreatedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setDeletedAt(new Alaress_Date_NullDate());
-        $task->getResponses()->add($responseF2);
         $participantF->getAllResponses()->add($responseF2);
 
         $feedbackF2 = (new TaskFeedback())
@@ -603,7 +597,6 @@ class DemoData
             ->setCreatedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now())
             ->setDeletedAt(new Alaress_Date_NullDate());
-        $task->getResponses()->add($responseG1);
         $participantG->getAllResponses()->add($responseG1);
 
         $responseG2 = (new TaskResponse())
@@ -615,7 +608,6 @@ class DemoData
             ->setCreatedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setDeletedAt(new Alaress_Date_NullDate());
-        $task->getResponses()->add($responseG2);
         $participantG->getAllResponses()->add($responseG2);
 
         $feedbackG2 = (new TaskFeedback())
@@ -635,7 +627,6 @@ class DemoData
             ->setCreatedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now())
             ->setDeletedAt(new Alaress_Date_NullDate());
-        $task->getResponses()->add($responseH1);
         $participantH->getAllResponses()->add($responseH1);
 
         $feedbackH1 = (new TaskFeedback())
@@ -651,7 +642,6 @@ class DemoData
             ->setCreatedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setDeletedAt(new Alaress_Date_NullDate());
-        $task->getResponses()->add($responseH2);
         $participantH->getAllResponses()->add($responseH2);
 
         $feedbackH2 = (new TaskFeedback())
@@ -672,7 +662,6 @@ class DemoData
             ->setCreatedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now())
             ->setDeletedAt(new Alaress_Date_NullDate());
-        $task->getResponses()->add($responseI1);
         $participantI->getAllResponses()->add($responseI1);
 
         $feedbackI1 = (new TaskFeedback())
@@ -688,7 +677,6 @@ class DemoData
             ->setCreatedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setDeletedAt(new Alaress_Date_NullDate());
-        $task->getResponses()->add($responseI2);
         $participantI->getAllResponses()->add($responseI2);
 
 
@@ -735,7 +723,6 @@ class DemoData
             ->setCreatedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now())
             ->setDeletedAt(new Alaress_Date_NullDate());
-        $task->getResponses()->add($responseB);
         $participantB->getAllResponses()->add($responseB);
 
         $feedbackB = (new TaskFeedback())
@@ -755,7 +742,6 @@ class DemoData
             ->setCreatedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now())
             ->setDeletedAt(new Alaress_Date_NullDate());
-        $task->getResponses()->add($responseC);
         $participantC->getAllResponses()->add($responseC);
 
         $feedbackC = (new TaskFeedback())
@@ -776,7 +762,6 @@ class DemoData
             ->setCreatedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now())
             ->setDeletedAt(new Alaress_Date_NullDate());
-        $task->getResponses()->add($responseD1);
         $participantD->getAllResponses()->add($responseD1);
 
         $feedbackD1 = (new TaskFeedback())
@@ -792,7 +777,6 @@ class DemoData
             ->setCreatedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setDeletedAt(new Alaress_Date_NullDate());
-        $task->getResponses()->add($responseD2);
         $participantD->getAllResponses()->add($responseD2);
 
         $feedbackD2 = (new TaskFeedback())
@@ -812,7 +796,6 @@ class DemoData
             ->setCreatedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now())
             ->setDeletedAt(new Alaress_Date_NullDate());
-        $task->getResponses()->add($responseE1);
         $participantE->getAllResponses()->add($responseE1);
 
         $feedbackE1 = (new TaskFeedback())
@@ -828,7 +811,6 @@ class DemoData
             ->setCreatedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setDeletedAt(new Alaress_Date_NullDate());
-        $task->getResponses()->add($responseE2);
         $participantE->getAllResponses()->add($responseE2);
 
         $feedbackE2 = (new TaskFeedback())
