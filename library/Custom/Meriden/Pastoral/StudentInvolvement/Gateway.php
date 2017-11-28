@@ -590,7 +590,7 @@ class Gateway
 
         $pb = new PredicateBuilder($this->database, 'studsub');
         $pb = $pb->equals('st.sub_code', $code)
-                 ->equals('ss.class', $class)
+                 ->notEquals('ss.class', $class)
                  ->equals('st.cmpy_code', self::COMPANY_CODE);
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere());
