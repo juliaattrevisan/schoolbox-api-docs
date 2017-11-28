@@ -115,11 +115,6 @@ abstract class AbstractAssessment implements IAssessable
     private $markScheme;
 
     /**
-     * @var Collection|IResponse[]
-     */
-    private $responses;
-
-    /**
      * @var Collection|IFeedback[]
      */
     private $feedbacks;
@@ -836,24 +831,6 @@ abstract class AbstractAssessment implements IAssessable
     public function setMarkScheme(IMarkScheme $markScheme)
     {
         $this->markScheme = $markScheme;
-        return $this;
-    }
-
-    /**
-     * @return Collection|IResponse[]
-     */
-    public function getResponses()
-    {
-        return $this->responses;
-    }
-
-    /**
-     * @param Collection|IResponse[] $responses
-     * @return $this
-     */
-    public function setResponses(Collection $responses)
-    {
-        $this->responses = $responses;
         return $this;
     }
 
