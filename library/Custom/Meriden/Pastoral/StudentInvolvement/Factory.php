@@ -492,8 +492,13 @@ class Factory
      */
     public function buildDistribution($grade, $cohortFolders)
     {
+        // Only interested in distribution of due works that are assessment tasks
         $baseAssessment = $grade['assessment'];
         if (!$baseAssessment instanceof DueWork) {
+            return [];
+        }
+        $workType = $baseAssessment->getWorkType();
+        if (!($workType instanceof WorkType && (int)$workType->getId() === self::WORK_TYPE_ASSESSMENT_TASK)) {
             return [];
         }
 
