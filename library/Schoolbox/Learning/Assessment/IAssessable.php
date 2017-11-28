@@ -672,16 +672,6 @@ interface IAssessable extends ISoftDeletable
      */
     public function getResponseClass();
 
-    /**
-     * @return Collection|IFeedback[]
-     */
-    public function getFeedbacks();
-
-    /**
-     * @param Collection|IFeedback[] $feedbacks
-     * @return $this
-     */
-    public function setFeedbacks(Collection $feedbacks);
 
     /**
      * Return the IFeedback implementation class for this IAssessable
