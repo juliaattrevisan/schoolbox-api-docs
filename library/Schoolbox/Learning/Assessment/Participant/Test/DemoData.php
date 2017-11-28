@@ -132,7 +132,6 @@ class DemoData
             ->setPublishedAt(new Alaress_Date_NullDate())
             ->setUpdatedAt(Alaress_Date_Format::now());
         $participantE->getAllFeedbacks()->add($feedbackE);
-        $dueWork->getFeedbacks()->add($feedbackE);
 
 
         // User F - published feedback
@@ -143,7 +142,6 @@ class DemoData
             ->setPublishedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now());
         $participantF->getAllFeedbacks()->add($feedbackF);
-        $dueWork->getFeedbacks()->add($feedbackF);
 
 
         // User G - published feedback then draft feedback
@@ -154,13 +152,11 @@ class DemoData
             ->setPublishedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now());
         $participantG->getAllFeedbacks()->add($feedbackG1);
-        $dueWork->getFeedbacks()->add($feedbackG1);
 
         $feedbackG2 = (new Feedback())
             ->setPublishedAt(new Alaress_Date_NullDate())
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantG->getAllFeedbacks()->add($feedbackG2);
-        $dueWork->getFeedbacks()->add($feedbackG2);
 
 
         // User H - submitted response with draft floating feedback
@@ -176,7 +172,6 @@ class DemoData
             ->setPublishedAt(new Alaress_Date_NullDate())
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantG->getAllFeedbacks()->add($feedbackH);
-        $dueWork->getFeedbacks()->add($feedbackH);
 
 
         // User I - submitted response with later published floating feedback
@@ -192,7 +187,6 @@ class DemoData
             ->setPublishedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantI->getAllFeedbacks()->add($feedbackI);
-        $dueWork->getFeedbacks()->add($feedbackI);
 
 
         // User J - submitted response with later draft linked feedback
@@ -209,7 +203,6 @@ class DemoData
             ->setPublishedAt(new Alaress_Date_NullDate())
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantJ->getAllFeedbacks()->add($feedbackJ);
-        $dueWork->getFeedbacks()->add($feedbackJ);
         $responseJ->getAllFeedback()->add($feedbackJ);
 
 
@@ -227,7 +220,6 @@ class DemoData
             ->setPublishedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantK->getAllFeedbacks()->add($feedbackK);
-        $dueWork->getFeedbacks()->add($feedbackK);
         $responseK->getAllFeedback()->add($feedbackK);
 
 
@@ -245,7 +237,6 @@ class DemoData
             ->setPublishedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantL->getAllFeedbacks()->add($feedbackL1);
-        $dueWork->getFeedbacks()->add($feedbackL1);
         $responseL1->getAllFeedback()->add($feedbackL1);
 
         $responseL2 = (new Response())
@@ -267,7 +258,6 @@ class DemoData
             ->setPublishedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantM->getAllFeedbacks()->add($feedbackM1);
-        $dueWork->getFeedbacks()->add($feedbackM1);
 
         $responseM2 = (new Response())
             ->setSubmittedAt(new Alaress_Date_NullDate())
@@ -288,7 +278,6 @@ class DemoData
             ->setPublishedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantN->getAllFeedbacks()->add($feedbackN1);
-        $dueWork->getFeedbacks()->add($feedbackN1);
 
         $responseN2 = (new Response())
             ->setSubmittedAt(Alaress_Date_Format::now()->addDays(+2))
@@ -303,7 +292,6 @@ class DemoData
             ->setPublishedAt(new Alaress_Date_NullDate())
             ->setUpdatedAt(Alaress_Date_Format::now());
         $participantO->getAllFeedbacks()->add($feedbackO);
-        $dueWork->getFeedbacks()->add($feedbackO);
 
         $responseO = (new Response())
             ->setSubmittedAt(new Alaress_Date_NullDate())
@@ -319,7 +307,6 @@ class DemoData
             ->setPublishedAt(new Alaress_Date_NullDate())
             ->setUpdatedAt(Alaress_Date_Format::now());
         $participantP->getAllFeedbacks()->add($feedbackP);
-        $dueWork->getFeedbacks()->add($feedbackP);
 
         $responseP = (new Response())
             ->setSubmittedAt(Alaress_Date_Format::now()->addDays(+1))
@@ -335,7 +322,6 @@ class DemoData
             ->setPublishedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now());
         $participantQ->getAllFeedbacks()->add($feedbackQ);
-        $dueWork->getFeedbacks()->add($feedbackQ);
 
         $responseQ = (new Response())
             ->setSubmittedAt(new Alaress_Date_NullDate())
@@ -351,7 +337,6 @@ class DemoData
             ->setPublishedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now());
         $participantR->getAllFeedbacks()->add($feedbackR);
-        $dueWork->getFeedbacks()->add($feedbackR);
 
         $responseR = (new Response())
             ->setSubmittedAt(Alaress_Date_Format::now()->addDays(+1))
@@ -423,7 +408,6 @@ class DemoData
             ->setResponse($responseD);
         $responseD->getAllFeedback()->add($feedbackD);
         $participantD->getAllFeedbacks()->add($feedbackD);
-        $quiz->getFeedbacks()->add($feedbackD);
 
 
         // User E - attempt reviewed, then attempt not finished
@@ -439,7 +423,6 @@ class DemoData
             ->setResponse($responseE1);
         $responseE1->getAllFeedback()->add($feedbackE1);
         $participantE->getAllFeedbacks()->add($feedbackE1);
-        $quiz->getFeedbacks()->add($feedbackE1);
 
         $responseE2 = (new Attempt())
             ->setSubmittedAt(new Alaress_Date_NullDate());
@@ -459,7 +442,6 @@ class DemoData
             ->setResponse($responseF1);
         $responseF1->getAllFeedback()->add($feedbackF1);
         $participantF->getAllFeedbacks()->add($feedbackF1);
-        $quiz->getFeedbacks()->add($feedbackF1);
 
         $responseF2 = (new Attempt())
             ->setSubmittedAt(Alaress_Date_Format::now()->addDays(+2));
