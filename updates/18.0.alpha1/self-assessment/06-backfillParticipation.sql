@@ -1,5 +1,3 @@
-DELETE FROM `participation`;
-
 -- Find all submission box returns and create a participation record for the owner (student) of each return
 
 INSERT INTO       `participation`
