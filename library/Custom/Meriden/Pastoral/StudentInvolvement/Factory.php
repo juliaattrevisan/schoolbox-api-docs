@@ -18,10 +18,8 @@ use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -56,6 +54,20 @@ class Factory
     private $rubricMapper;
 
     /**
+     * The currently authenticated user.
+     *
+     * @var User
+     */
+    private $currentUser;
+
+    /**
+     * Access permissions data source
+     *
+     * @var Access
+     */
+    private $access;
+
+    /**
      * Constructor
      *
      * @param Gateway              $gateway
@@ -63,13 +75,17 @@ class Factory
      * @param FolderMapper         $folderMapper
      * @param AssessmentDataSource $assessmentDataSource
      * @param RubricMapper         $rubricMapper
+     * @param User                 $currentUser
+     * @param Access               $access
      */
     public function __construct(
         Gateway $gateway,
         UserMapper $userMapper,
         FolderMapper $folderMapper,
         AssessmentDataSource $assessmentDataSource,
-        RubricMapper $rubricMapper
+        RubricMapper $rubricMapper,
+        User $currentUser,
+        Access $access
     ) {
         // Set up required mappers, DB access, etc. here.
         $this->gateway              = $gateway;
@@ -77,6 +93,8 @@ class Factory
         $this->folderMapper         = $folderMapper;
         $this->assessmentDataSource = $assessmentDataSource;
         $this->rubricMapper         = $rubricMapper;
+        $this->currentUser          = $currentUser;
+        $this->access               = $access;
     }
 
     /**
@@ -384,8 +402,8 @@ class Factory
                             ->generate(
                                 $assessment,
                                 $student,
-                                $_SESSION['user'],
-                                Access::getInstance()
+                                $this->currentUser,
+                                $this->access
                             )['rubric'],
                         'pretty_mark' => $feedback->getHumanReadableMark(),
                         'mark'        => $feedback->getNormalisedMark(),
