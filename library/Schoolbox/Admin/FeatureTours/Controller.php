@@ -37,7 +37,7 @@ class Controller extends Base
         /**
          * @var Config $config
          */
-        $config = ConfigMapper::getInstance()->findOneByColumn("name", "enable_feature_tours");
+        $config = ConfigMapper::getInstance()->findOneByColumn("name", "tours_enabled");
 
         if ($this->getRequest()->post['enabled']) {
             $config->setValue("1");
