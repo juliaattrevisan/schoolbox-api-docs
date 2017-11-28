@@ -18,6 +18,7 @@ class Controller extends Base
     {
         $twigData = [
             'toursEnabled' => ConfigMapper::getInstance()->get('tours_enabled'),
+            'pageCurrent' => 'feature-tours',
         ];
 
         $this->getResponse()->content->set(
