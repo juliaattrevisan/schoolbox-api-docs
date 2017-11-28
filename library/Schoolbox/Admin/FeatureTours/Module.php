@@ -18,6 +18,9 @@ class Module extends BaseModule
         $perms = new IsSuperuser();
 
         $this->register('GET', $route, 'render', $perms);
+
+        $this->register('POST', $route, 'updateConfig', $perms);
+
     }
 
     /**
