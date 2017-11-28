@@ -35,7 +35,7 @@ class Controller extends Base
         } else {
             $config->setValue("0");
         }
-        
+
         ConfigMapper::getInstance()->save($config);
         $this->getResponse()->redirect->afterPost($this->getRouteIfAuthorized('featureTours.render'));
     }
