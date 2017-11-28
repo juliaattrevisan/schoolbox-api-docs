@@ -92,7 +92,7 @@ class Involvement
     public function moveToNamedGrade($key, $assessmentName)
     {
         foreach ($this->grades as $gradeId => $grade) {
-            $assessment = $grade['assessment']['object'];
+            $assessment = $grade['assessment'];
             if ($assessment instanceof IAssessable) {
                 $name = $assessment->getTitle();
                 if (strcasecmp($name, $assessmentName) === 0) {
