@@ -37,12 +37,12 @@ class Factory extends FolderFilter\Factory
 
 
     /**
-     * @param Filter\IDefinition                              $definition
-     * @param User                                            $user
-     * @param Filter\Page\Model                               $pageFilter
-     * @param null|GenericCollection|Filter\Selection\Model[] $selections Indexed selection.key
-     * @param null|User                                       $viewee
-     * @param null|GenericCollection|Filter\Selection\Model[] $overrides  Indexed selection.key
+     * @param Filter\IDefinition                                               $definition
+     * @param User                                                             $user
+     * @param Filter\Page\Model                                                $pageFilter
+     * @param null|GenericCollection|Filter\Selection\Model[]                  $selections Indexed selection.key
+     * @param null|User                                                        $viewee
+     * @param GenericCollection|GenericCollection[]|Filter\Selection\Model[][] $overrides  Indexed filter.id, selection.key
      * @return Filter\IComponent|FolderFilter\Component
      * @throws DefinitionException if join $name isn't on this mapper
      * @throws \UnexpectedValueException
@@ -54,7 +54,7 @@ class Factory extends FolderFilter\Factory
         Filter\Page\Model $pageFilter,
         ?GenericCollection $selections,
         ?User $viewee,
-        ?GenericCollection $overrides
+        GenericCollection $overrides
     ): Filter\IComponent {
         $options = $pageFilter->getOptions();
         $folders = $this->getFolderMapper()->createCollection();
@@ -85,7 +85,7 @@ class Factory extends FolderFilter\Factory
             $user,
             $pageFilter,
             $selections,
-            $overrides,
+            $overrides[$pageFilter->getFilter()->getId()],
             $this->getSelectionMapper(),
             $folders->sortBy('name', 'ASC')
         );

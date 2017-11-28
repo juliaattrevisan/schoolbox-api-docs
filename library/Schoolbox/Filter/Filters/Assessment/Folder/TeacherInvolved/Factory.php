@@ -37,12 +37,12 @@ class Factory extends FolderFilter\Factory
 
 
     /**
-     * @param Filter\IDefinition                              $definition
-     * @param User                                            $user
-     * @param Filter\Page\Model                               $pageFilter
-     * @param null|GenericCollection|Filter\Selection\Model[] $selections Indexed selection.key
-     * @param null|User                                       $viewee
-     * @param null|GenericCollection|Filter\Selection\Model[] $overrides  Indexed selection.key
+     * @param Filter\IDefinition                                        $definition
+     * @param User                                                      $user
+     * @param Filter\Page\Model                                         $pageFilter
+     * @param null|GenericCollection|Filter\Selection\Model[]           $selections Indexed selection.key
+     * @param null|User                                                 $viewee
+     * @param GenericCollection|Collection[]|Filter\Selection\Model[][] $overrides  Indexed filter.id, selection.key
      * @return Filter\IComponent|FolderFilter\Component
      * @throws \InvalidArgumentException If $viewee is null
      */
@@ -52,7 +52,7 @@ class Factory extends FolderFilter\Factory
         Filter\Page\Model $pageFilter,
         ?GenericCollection $selections,
         ?User $viewee,
-        ?GenericCollection $overrides
+        GenericCollection $overrides
     ): Filter\IComponent {
         if (null === $viewee) {
             throw new \InvalidArgumentException('Viewee cannot be null');
@@ -83,8 +83,9 @@ class Factory extends FolderFilter\Factory
 
         // Did caller specify they wish to insert some custom folders in the list?
         // (Note that perm check was already performed by key-converter)
-        if ($overrides && $overrides->count()) {
-            $folderIds    = $overrides->getColumnValues('key');
+        $folderOverrides = $overrides[$pageFilter->getFilter()->getId()];
+        if ($folderOverrides && $folderOverrides->count()) {
+            $folderIds    = $folderOverrides->getPropertyValues('key');
             $extraFolders = $this->getFolderMapper()->findByColumn($this->getFolderMapper()->getIdentifierColumn(), $folderIds);
 
             foreach ($extraFolders as $extraFolder) {
@@ -97,7 +98,7 @@ class Factory extends FolderFilter\Factory
             $user,
             $pageFilter,
             $selections,
-            $overrides,
+            $folderOverrides,
             $this->getSelectionMapper(),
             $folders->sortBy('name', 'ASC')
         );
