@@ -161,7 +161,7 @@
                  # All these are attendances, and are based off of assessments in the grade page.
                  #}
                 {% for grade in report.tutorGroupReport.grades %}
-                    <dt>{{ grade.assessment.name }}</dt>
+                    <dt>{{ grade.assessment.title }}</dt>
                     <dd>{{ grade.pretty_mark }}</dd>
                 {% endfor %}
             </dl>

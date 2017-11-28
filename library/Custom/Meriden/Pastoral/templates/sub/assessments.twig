@@ -27,7 +27,7 @@
 {% set first = true %}
 {% for workItem in work %}
     {# Is this work item shown to the logged in user? #}
-    {% if workItem.assessment.object.isFeedbackVisibleToUser(user) %}
+    {% if workItem.assessment.isFeedbackVisibleToUser(user) %}
         {# Is this the first row that's getting displayed? show the header and that #}
         {% if first %}
             {% set first = false %}
@@ -36,13 +36,13 @@
         <tr>
             <td>
                 <a href="/learning/assessments/{{ workItem.assessment.id }}/{{ student.id }}">
-                    {{ workItem.assessment.name }}
+                    {{ workItem.assessment.title }}
                 </a>
             </td>
             <td>{{ workItem.pretty_mark | replace({'%': ''}) }}</td>
             <td>{{ workItem.distribution.continuous.mean.pretty_mark }}</td>
             <td>{{ workItem.distribution.continuous.sd.pretty_mark }}</td>
-            <td>{{ workItem.assessment.dueDate|date('j F') }}</td>
+            <td>{{ workItem.assessment.dueAt|date('j F') }}</td>
         </tr>
     {% endif %}
 {% endfor %}

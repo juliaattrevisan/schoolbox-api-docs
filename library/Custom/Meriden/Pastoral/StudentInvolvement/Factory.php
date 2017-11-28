@@ -404,22 +404,22 @@ class Factory
                                        )['rubric'];
                     }
 
-                    // Only add assessment object in if it's a due work of the right type
                     $assessmentData = [
+                        'assessment'  => $assessment,
                         'rubric'      => $rubric,
                         'pretty_mark' => $feedback->getHumanReadableMark(),
                         'mark'        => $feedback->getNormalisedMark(),
                         'comment'     => $feedback->getComment(),
                     ];
-                    $workType = $assessment->getWorkType();
-                    if ($workType instanceof WorkType && (int)$workType->getId() === self::WORK_TYPE_ASSESSMENT_TASK) {
-                        $assessmentData['assessment'] = [
-                            'object'  => $assessment,
-                            'id'      => $assessment->getId(),
-                            'name'    => $assessment->getTitle(),
-                            'dueDate' => $assessment->getDueAt(),
-                        ];
-                    }
+//                    $workType = $assessment->getWorkType();
+//                    if ($workType instanceof WorkType && (int)$workType->getId() === self::WORK_TYPE_ASSESSMENT_TASK) {
+//                        $assessmentData['assessment'] = [
+//                            'object'  => $assessment,
+//                            'id'      => $assessment->getId(),
+//                            'name'    => $assessment->getTitle(),
+//                            'dueDate' => $assessment->getDueAt(),
+//                        ];
+//                    }
                     $allGrades['a' . $assessment->getId()] = $assessmentData;
                 }
             }
@@ -492,7 +492,7 @@ class Factory
      */
     public function buildDistribution($grade, $cohortFolders)
     {
-        $baseAssessment = $grade['assessment']['object'];
+        $baseAssessment = $grade['assessment'];
         if (!$baseAssessment instanceof DueWork) {
             return [];
         }
