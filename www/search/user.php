@@ -61,7 +61,6 @@ function renderParent(
  * @param UserMapper                    $userMapper
  * @param Eportfolio_Authenticator      $authenticator
  * @param IConfigLoader                 $config
- * @param ProfessionalDevelopmentMapper $pdMapper
  * @throws RuntimeException
  * @throws Twig_Error_Loader
  * @throws Twig_Error_Runtime
@@ -73,19 +72,9 @@ function renderStaff(
     External_User $synUserHandler,
     UserMapper $userMapper,
     Eportfolio_Authenticator $authenticator,
-    IConfigLoader $config,
-    ProfessionalDevelopmentMapper $pdMapper
+    IConfigLoader $config
 ) {
     $externalUser = $synUserHandler->getStaff($user['synergy_id']);
-
-    /* Load Professional Development details if they exist
-     */
-    try {
-        $pd = $pdMapper->findOneByColumn('user_id', $user['uid']);
-    }
-    catch (MapperException $e) {
-        $pd = null;
-    }
 
     // TwigLib
     $page->setFile(TEMPLATE_content, 'output.html');
@@ -98,9 +87,6 @@ function renderStaff(
                 'user'            => $userMapper->findById($user['uid']),
                 'externalUser'    => $externalUser,
                 'eportfolioAuth'  => $authenticator->canView(),
-                'pdEnabled'       => $config->get('enable_professional_development'),
-                'pdStates'        => $pdMapper->getStates(),
-                'pd'              => $pd,
                 'now'             => Alaress_Date_Format::now(),
             ]
         )
@@ -110,14 +96,20 @@ function renderStaff(
 /**
  * Student rendering, extracted to a method.
  *
- * @param SitePage                 $page
- * @param array                    $user
- * @param Group                    $groupHandler
- * @param External_User            $synUserHandler
- * @param External_Class           $classHandler
- * @param UserMapper               $userMapper
- * @param Folder\Mapper            $folderMapper
- * @param Eportfolio_Authenticator $authenticator
+ * @param SitePage                      $page
+ * @param array                         $user
+ * @param Group                         $groupHandler
+ * @param External_User                 $synUserHandler
+ * @param External_Class                $classHandler
+ * @param UserMapper                    $userMapper
+ * @param Folder\Mapper                 $folderMapper
+ * @param Eportfolio_Authenticator      $authenticator
+ * @param ProfessionalDevelopmentMapper $pdMapper
+ * @throws MapperException
+ * @throws RuntimeException
+ * @throws Twig_Error_Loader
+ * @throws Twig_Error_Runtime
+ * @throws Twig_Error_Syntax
  */
 function renderStudent(
     SitePage $page,
@@ -127,7 +119,8 @@ function renderStudent(
     External_Class $classHandler,
     UserMapper $userMapper,
     Folder\Mapper $folderMapper,
-    Eportfolio_Authenticator $authenticator
+    Eportfolio_Authenticator $authenticator,
+    ProfessionalDevelopmentMapper $pdMapper
 ) {
     $externalUser = $synUserHandler->getStudent($user['synergy_id']);
     $externalUser['AlertMessages'] = preg_split(
@@ -388,7 +381,15 @@ function renderStudent(
     }
 
     $allTeacherEmails = implode(',', array_filter($emails));
-    
+
+    /* Load Professional Development details if they exist
+     */
+    try {
+        $pd = $pdMapper->findOneByColumn('user_id', $user['uid']);
+    }
+    catch (MapperException $e) {
+        $pd = null;
+    }
 
     $page->setVar(
         'OUTPUT',
@@ -416,6 +417,8 @@ function renderStudent(
                 'isRelatedToStudent' => $isRelatedToStudent,
                 'isPrimaryCarer'     => $isPrimaryCarer,
                 'allTeacherEmails'   => $allTeacherEmails,
+                'pdStates'           => $pdMapper->getStates(),
+                'pd'                 => $pd,
             ]
         )
     );
@@ -453,7 +456,8 @@ if (is_numeric($this->arg[0])) {
             new External_Class(),
             new UserMapper(),
             new Folder\Mapper(),
-            new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile')
+            new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile'),
+            ProfessionalDevelopmentMapper::getInstance()
         );
     } elseif ($groupHandler->isStaff($user['uid'])) {
         renderStaff(
@@ -462,8 +466,7 @@ if (is_numeric($this->arg[0])) {
             $synUserHandler,
             new UserMapper(),
             new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile'),
-            $config,
-            ProfessionalDevelopmentMapper::getInstance()
+            $config
         );
     } else {
         $this->pageNotFound();
