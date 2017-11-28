@@ -121,11 +121,10 @@ class Factory
         $folder = $tutorGroup->getFolder();
         if ($folder instanceof Folder) {
             $tutorGroup->setCoordinators(
-                UserAccessMapper::getInstance()->findUsersInCategory(
-                    $folder,
-                    Role::STAFF,
+                $this->userMapper->findByAccess(
+                    UserAccess::SERVICE_HOMEPAGE,
                     UserAccess::ACCESS_WRITE,
-                    false
+                    $folder->getId()
                 )
             );
         }
