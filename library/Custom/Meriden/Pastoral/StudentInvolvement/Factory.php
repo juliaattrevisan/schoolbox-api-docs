@@ -18,8 +18,10 @@ use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -141,10 +143,11 @@ class Factory
         $folder = $tutorGroup->getFolder();
         if ($folder instanceof Folder) {
             $tutorGroup->setCoordinators(
-                $this->userMapper->findByAccess(
-                    UserAccess::SERVICE_HOMEPAGE,
+                UserAccessMapper::getInstance()->findUsersInCategory(
+                    $folder,
+                    Role::STAFF,
                     UserAccess::ACCESS_WRITE,
-                    $folder->getId()
+                    false
                 )
             );
         }
