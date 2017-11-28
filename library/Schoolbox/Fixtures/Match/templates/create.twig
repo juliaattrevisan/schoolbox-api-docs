@@ -7,7 +7,6 @@
 <script type="text/javascript">
     $(function() {
         $('#matchForm').alaressValidate({
-            ignore: ':hidden',
             rules: {
                 venueId: {
                     required: true,
@@ -22,11 +21,6 @@
                     minlength: 1,
                     datepickerDate: true
                 },
-                startAtTime: {
-                    required: true,
-                    minlength: 1,
-                    timepickerTime: true
-                },
                 homeTeamId: {
                     required: true,
                     minlength: 1
@@ -34,12 +28,6 @@
                 awayTeamId: {
                     required: true,
                     minlength: 1
-                },
-                'itinerary[date][]': {
-                    datepickerDate: true
-                },
-                'itinerary[time][]': {
-                    timepickerTime: true
                 }
             },
             messages: {
@@ -48,9 +36,6 @@
                 'seasonId': 'Please choose a Season',
                 'startAtDate': {
                     required: 'Please choose a date.'
-                },
-                'startAtTime': {
-                    required: 'Please choose a time.'
                 }
             },
             errorPlacement: function(error, element) {
