@@ -8,10 +8,6 @@ use Schoolbox\Config\ConfigMapper;
 
 class Controller extends Base
 {
-
-    /**
-     * Load $templateName
-     */
     public function render()
     {
         $twigData = [
