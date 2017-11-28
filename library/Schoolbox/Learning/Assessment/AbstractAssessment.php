@@ -114,10 +114,6 @@ abstract class AbstractAssessment implements IAssessable
      */
     private $markScheme;
 
-    /**
-     * @var Collection|IFeedback[]
-     */
-    private $feedbacks;
 
     /**
      * The UnitSpec, UnitImpl, Project or Folder where this Assessment resides.
@@ -177,7 +173,6 @@ abstract class AbstractAssessment implements IAssessable
     public function __construct()
     {
         $this->setAllParticipants(new Collection());
-        $this->feedbacks = new GenericCollection($this->getFeedbackClass());
         $this->setCurriculumNodes(new Collection());
     }
 
@@ -830,24 +825,6 @@ abstract class AbstractAssessment implements IAssessable
     public function setMarkScheme(IMarkScheme $markScheme)
     {
         $this->markScheme = $markScheme;
-        return $this;
-    }
-
-    /**
-     * @return Collection|IFeedback[]
-     */
-    public function getFeedbacks()
-    {
-        return $this->feedbacks;
-    }
-
-    /**
-     * @param Collection|IFeedback[] $feedbacks
-     * @return $this
-     */
-    public function setFeedbacks(Collection $feedbacks)
-    {
-        $this->feedbacks = $feedbacks;
         return $this;
     }
 
