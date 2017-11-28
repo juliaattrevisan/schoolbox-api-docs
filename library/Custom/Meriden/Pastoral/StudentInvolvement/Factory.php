@@ -368,6 +368,7 @@ class Factory
                     // Load rubrics into assessment whilst here
                     $allGrades['a' . $assessment->getId()] = [
                         'assessment'  => [
+                            'object'  => $assessment,
                             'id'      => $assessment->getId(),
                             'name'    => $assessment->getTitle(),
                             'dueDate' => $assessment->getDueAt(),
@@ -448,7 +449,8 @@ class Factory
      */
     public function buildDistribution($grade, $cohortFolders)
     {
-        if (!($grade['assessment'] instanceof DueWork)) {
+        $baseAssessment = $grade['assessment']['object'];
+        if (!$baseAssessment instanceof DueWork) {
             return [];
         }
 
@@ -456,10 +458,14 @@ class Factory
         // Original implementation searched on assessment name,
         // but we can use unit spec ID here.
         $assessments    = [];
-        $specAssessment = $grade['assessment']->getSpecificationAssessment();
+        $specAssessment = $baseAssessment->getSpecificationAssessment();
         if ($specAssessment) {
+            $cohortFolderIds = [];
+            foreach ($cohortFolders as $cohortFolder) {
+                $cohortFolderIds[] = $cohortFolder->getId();
+            }
             $assessments = $this->assessmentDataSource->findAllByFolderIdForReview(
-                $cohortFolders,
+                $cohortFolderIds,
                 null,
                 [
                     'spec_assessment_id' => $specAssessment->getId(),
@@ -469,7 +475,7 @@ class Factory
                 ]
             );
         } else {
-            $assessments[] = $this->assessmentDataSource->findByIdForReview($grade['assessment']->getId());
+            $assessments[] = $this->assessmentDataSource->findByIdForReview($baseAssessment->getId());
         }
 
         $distribution = [
@@ -541,7 +547,7 @@ class Factory
             );
 
             // Convert mean and SD to pretty mark
-            $markScheme = $grade['assessment']->getMarkScheme();
+            $markScheme = $baseAssessment->getMarkScheme();
             $prettyMean = $markScheme->getHumanReadableMark($mean);
             $prettySd   = $markScheme->getHumanReadableMark($sd);
 
