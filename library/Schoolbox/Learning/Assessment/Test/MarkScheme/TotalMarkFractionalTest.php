@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Assessment\Test;
 
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
@@ -160,7 +161,7 @@ class TotalMarkFractionalTest extends TestCase
         $quiz = $this->getDummyQuiz();
 
         // Attempt has total marks of 2.0
-        $quizAttempt = $quiz->getResponses()->first();
+        $quizAttempt = $quiz->getParticipant($this->getDummyQuizAttempter())->getAllResponses()->first();
         $humanReadable = 1;
 
         // 1 / 2.0 * 100.0
@@ -178,7 +179,7 @@ class TotalMarkFractionalTest extends TestCase
         $quiz = $this->getDummyQuiz();
 
         // Attempt has total marks of 2.0
-        $quizAttempt = $quiz->getResponses()->first();
+        $quizAttempt = $quiz->getParticipant($this->getDummyQuizAttempter())->getAllResponses()->first();
         $humanReadable = 1;
 
         // 1 / 2.0 * 100.0
@@ -211,7 +212,7 @@ class TotalMarkFractionalTest extends TestCase
         $quiz = $this->getDummyQuiz();
 
         // Attempt has total marks of 2.0
-        $quizAttempt = $quiz->getResponses()->first();
+        $quizAttempt = $quiz->getParticipant($this->getDummyQuizAttempter())->getAllResponses()->first();
         $normalised = 50.0;
         $expected = '1 / 2';
 
@@ -227,7 +228,7 @@ class TotalMarkFractionalTest extends TestCase
         $quiz = $this->getDummyQuiz();
 
         // Attempt has total marks of 2.0
-        $quizAttempt = $quiz->getResponses()->first();
+        $quizAttempt = $quiz->getParticipant($this->getDummyQuizAttempter())->getAllResponses()->first();
         $normalised = 87.6;
         $expected = '1.75 / 2';
 
@@ -246,7 +247,7 @@ class TotalMarkFractionalTest extends TestCase
         $quiz = $this->getDummyQuiz();
 
         // Attempt has total marks of 2.0
-        $quizAttempt = $quiz->getResponses()->first();
+        $quizAttempt = $quiz->getParticipant($this->getDummyQuizAttempter())->getAllResponses()->first();
         $normalised = 87.6;
         $expected = '1.75 / 2';
 
@@ -422,8 +423,12 @@ class TotalMarkFractionalTest extends TestCase
         $attempt = new QuizAttempt();
         $feedback = new QuizFeedback();
 
+        $participant = new Participant($this->getDummyQuizAttempter(), $quiz);
+        $participant->getAllResponses()->add($attempt);
+
+        $quiz->getAllParticipants()->add($participant);
+
         // Link them all together
-        $quiz->getResponses()->add($attempt);
         $quiz->getFeedbacks()->add($feedback);
         $feedback->setResponse($attempt);
         $feedback->setAssessable($quiz);
@@ -461,5 +466,17 @@ class TotalMarkFractionalTest extends TestCase
     private function getDummyQuizAttempt($totalMark)
     {
         return (new QuizAttempt())->setMarksAvailable($totalMark);
+    }
+
+
+    /**
+     * Generate a dummy User instance
+     * This person "attempted the quiz"
+     *
+     * @return mixed
+     */
+    private function getDummyQuizAttempter()
+    {
+        return (new \Schoolbox\User())->setId(19);
     }
 }
