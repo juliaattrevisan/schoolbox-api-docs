@@ -123,9 +123,10 @@ class Controller extends Base
             $data['hashes'][$school] = $this->handler->computeAccessToken($now, $school, $code->getAccessToken());
         }
 
-        /* Add list of Professional Development Registration States
-         */
-        $data['pdStates'] = $this->pdMapper->getStates();
+// Disabled in SA-5378
+//        /* Add list of Professional Development Registration States
+//         */
+//        $data['pdStates'] = $this->pdMapper->getStates();
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@helpCourseParticipation/apitest.twig', $data));
     }

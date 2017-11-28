@@ -252,13 +252,14 @@ class Handler
             try {
                 $this->getUserMapper()->save($user);
 
-                /* Add Professional Development data
-                 */
-                $pdSaveSuccess = (new Repository($this->pdMapper))->save($user, $userData['pdNumber'], $userData['pdState']);
-
-                if (!$pdSaveSuccess) {
-                    // ... where do I log this failure? :|
-                }
+// Disabled in SA-5378
+//                /* Add Professional Development data
+//                 */
+//                $pdSaveSuccess = (new Repository($this->pdMapper))->save($user, $userData['pdNumber'], $userData['pdState']);
+//
+//                if (!$pdSaveSuccess) {
+//                    // ... where do I log this failure? :|
+//                }
 
                 if ($oldUsername) {
                     // existing user
