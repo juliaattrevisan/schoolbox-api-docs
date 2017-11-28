@@ -7,8 +7,8 @@
             <form id="newAllowedFile" method="post" data-action="createNewFileType" action="/adminv2/allowed-fileForm.php">
                 <label>Enabled<span data-tooltip class="hint has-tip tip-bottom" title="Controls if files of this type can be uploaded">?</span></label>
                 <span class="switch">
-                    <input name="enable" value="false" />
-                    <input id="enabled-new" type="checkbox" name="enable" checked="checked" value="true" />
+                    <input type="hidden" name="enable" value="0" />
+                    <input id="enabled-new" type="checkbox" name="enable" value="0" {% if toursEnabled  %} checked {% endif %}/>
                     <label for="enabled-new">
                         <span>On</span>
                         <span>Off</span>
