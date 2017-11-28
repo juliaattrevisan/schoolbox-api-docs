@@ -2143,7 +2143,6 @@ class AssessableTest extends TestCase
         $feedback3 = (new TaskFeedback())
             ->setResponse($response3);
         $participant3->getAllFeedbacks()->add($feedback3);
-        $task->getFeedbacks()->add($feedback3);
         $response3->getAllFeedback()->add($feedback3);
 
         // user4: student-assessed then teacher-assessed
@@ -2168,7 +2167,6 @@ class AssessableTest extends TestCase
         $feedback4b = (new TaskFeedback())
             ->setResponse($response4b);
         $participant4->getAllFeedbacks()->add($feedback4b);
-        $task->getFeedbacks()->add($feedback4b);
         $response4b->getAllFeedback()->add($feedback4b);
 
         return $task;
@@ -2310,15 +2308,6 @@ class AssessableTest extends TestCase
         $attempt4b->setAssessable($quiz);
         $attempt5a->setAssessable($quiz);
         $attempt5b->setAssessable($quiz);
-
-        // Add Feedback to Assessable
-        $quiz->getFeedbacks()
-            ->add($feedback2)
-            ->add($feedback3)
-            ->add($feedback4a)
-            ->add($feedback4b)
-            ->add($feedback5a)
-            ->add($feedback5b);
 
         // Add Assessable to Feedbacks
         $feedback2->setAssessable($quiz);
@@ -2556,19 +2545,6 @@ class AssessableTest extends TestCase
         $submission6b->setAssessable($dueWork);
         $submission7a->setAssessable($dueWork);
         $submission7b->setAssessable($dueWork);
-
-        // Add Feedback to Assessable
-        $dueWork->getFeedbacks()
-            ->add($feedback3)
-            ->add($feedback4)
-            ->add($feedback5a)
-            ->add($feedback5b)
-            ->add($feedback6)
-            ->add($feedback7a)
-            ->add($feedback7b)
-            ->add($feedback8)
-            ->add($feedback9a)
-            ->add($feedback9b);
 
         // Add Assessable to Feedbacks
         $feedback3->setAssessable($dueWork);
