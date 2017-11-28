@@ -427,7 +427,8 @@ class Healthcheck
             'AttendanceMaster',
             'tAttendances',
             'IndividualPlans',
-            'StudentYears'
+            'StudentYears',
+            'pvDocumentReferences',
         ];
 
         // Pastoral Care Tables (Only If Module Enabled)
