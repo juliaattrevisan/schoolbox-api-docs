@@ -147,13 +147,13 @@ class Factory extends NullableContext\Factory
         // Was course imported to a class? ?
         /** @var CourseImpl\Model[] $courseImplsOnClasses */
         $courseImplsOnClasses = $courseImpls->filter(function (CourseImpl\Model $courseImpl) {
-            return $courseImpl->getFolder()->getCodes()->count();
+            return $courseImpl->getFolder()->isClass() || $courseImpl->getFolder()->wasClass();
         })->indexBy('id');
 
         // Was course imported to a group? ?
         /** @var CourseImpl\Model[] $courseImplsOnGroups */
         $courseImplsOnGroups = $courseImpls->filter(function (CourseImpl\Model $courseImpl) {
-            return $courseImpl->getFolder()->getGroup();
+            return $courseImpl->getFolder()->isGroup();
         })->indexBy('id');
 
         // Get all unitSpecs imported to classes
