@@ -14,6 +14,7 @@ use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\RubricContext;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -382,16 +383,8 @@ class Factory
         foreach ($this->assessmentDataSource->findAllByFolderIdForReview(
             $folder->getId(),
             $student,
-            [
-                'order'     => ['due_date' => 'asc'],
-                'type'      => AssessmentType::TYPE_DUE_WORK,
-                'work_type' => self::WORK_TYPE_ASSESSMENT_TASK,
-            ]
+            ['order' => ['due_date' => 'asc'],]
         ) as $assessment) {
-            // Not interested in non-dueworks
-            if (!$assessment instanceof DueWork) {
-                continue;
-            }
 
             $participant = $assessment->getParticipantIfExtant($student);
             if ($participant) {
@@ -399,28 +392,35 @@ class Factory
                 if ($feedback) {
 
                     // Load rubrics into assessment whilst here
-                    if ($assessment->getUseRubric()) {
+                    $rubric = [];
+                    if ($assessment instanceof DueWork && $assessment->getUseRubric()) {
                         $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
+                        $rubric = (new RubricContext($this->rubricMapper))
+                                       ->generate(
+                                           $assessment,
+                                           $student,
+                                           $this->currentUser,
+                                           $this->access
+                                       )['rubric'];
                     }
 
-                    $allGrades['a' . $assessment->getId()] = [
-                        'assessment'  => [
-                            'object'  => $assessment,
-                            'id'      => $assessment->getId(),
-                            'name'    => $assessment->getTitle(),
-                            'dueDate' => $assessment->getDueAt(),
-                        ],
-                        'rubric'      => (new RubricContext($this->rubricMapper))
-                            ->generate(
-                                $assessment,
-                                $student,
-                                $this->currentUser,
-                                $this->access
-                            )['rubric'],
+                    // Only add assessment object in if it's a due work of the right type
+                    $assessmentData = [
+                        'rubric'      => $rubric,
                         'pretty_mark' => $feedback->getHumanReadableMark(),
                         'mark'        => $feedback->getNormalisedMark(),
                         'comment'     => $feedback->getComment(),
                     ];
+                    $workType = $assessment->getWorkType();
+                    if ($workType instanceof WorkType && (int)$workType->getId() === self::WORK_TYPE_ASSESSMENT_TASK) {
+                        $assessmentData['assessment'] = [
+                            'object'  => $assessment,
+                            'id'      => $assessment->getId(),
+                            'name'    => $assessment->getTitle(),
+                            'dueDate' => $assessment->getDueAt(),
+                        ];
+                    }
+                    $allGrades['a' . $assessment->getId()] = $assessmentData;
                 }
             }
         }
