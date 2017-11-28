@@ -27,7 +27,7 @@
 {% set first = true %}
 {% for workItem in work %}
     {# Is this work item shown to the logged in user? #}
-    {% if workItem.assessment.isFeedbackVisibleToUser(USER) %}
+    {% if workItem.distribution and workItem.assessment.isFeedbackVisibleToUser(USER) %}
         {# Is this the first row that's getting displayed? show the header and that #}
         {% if first %}
             {% set first = false %}

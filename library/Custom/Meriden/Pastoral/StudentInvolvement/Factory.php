@@ -200,18 +200,18 @@ class Factory
             ->moveToNamedGrade('endeavourGrade4', 'Endeavour Grade Term 4')
             ->moveToNamedGrade('learningApproaches', 'Approaches to Learning');
 
-        // Add grade distributions
+        // Add grade distributions, only for assessments which have them
         $newGrades = [];
         foreach ($subject->getGrades() as $key => $grade) {
-            $grade['distribution'] = $this->buildDistribution(
-                $grade,
-                $subject->getCohortFolders()
-            );
-            $newGrades[$key]       = $grade;
+            $distribution = $this->buildDistribution($grade, $subject->getCohortFolders());
+            if (!empty($distribution)) {
+                $grade['distribution'] = $distribution;
+            }
+            $newGrades[$key] = $grade;
         }
         $subject->setGrades($newGrades);
 
-        // What are the other grade distributions?
+        // Add course grade distribution
         $courseGrade = $subject->getNamedGrade('courseGrade');
         if (!empty($courseGrade)) {
             $courseGrade['distribution'] = $this->buildDistribution(
@@ -404,23 +404,13 @@ class Factory
                                        )['rubric'];
                     }
 
-                    $assessmentData = [
+                    $allGrades['a' . $assessment->getId()] = [
                         'assessment'  => $assessment,
                         'rubric'      => $rubric,
                         'pretty_mark' => $feedback->getHumanReadableMark(),
                         'mark'        => $feedback->getNormalisedMark(),
                         'comment'     => $feedback->getComment(),
                     ];
-//                    $workType = $assessment->getWorkType();
-//                    if ($workType instanceof WorkType && (int)$workType->getId() === self::WORK_TYPE_ASSESSMENT_TASK) {
-//                        $assessmentData['assessment'] = [
-//                            'object'  => $assessment,
-//                            'id'      => $assessment->getId(),
-//                            'name'    => $assessment->getTitle(),
-//                            'dueDate' => $assessment->getDueAt(),
-//                        ];
-//                    }
-                    $allGrades['a' . $assessment->getId()] = $assessmentData;
                 }
             }
         }
