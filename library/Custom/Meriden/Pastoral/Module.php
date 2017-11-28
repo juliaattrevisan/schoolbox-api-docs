@@ -20,6 +20,7 @@ use HouseMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Grades;
 use Schoolbox\External\SubjectMapper;
+use Schoolbox\Learning\Assessment\DueWork\RubricContext;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
@@ -130,6 +131,11 @@ class Module extends BaseModule
             = $injector->lazyGet('assessmentDataSource');
         $injector->params[StudentInvolvement\Factory::class]['rubricMapper']
             = $this->getMapperFactory()->getLazy(RubricMapper::class);
+        $injector->params[StudentInvolvement\Factory::class]['rubricContext']
+            = $injector->lazyNew(
+                RubricContext::class,
+                [$this->getMapperFactory()->getLazy(RubricMapper::class)]
+            );
 
         $injector->params[StudentInvolvement\Gateway::class]['database']
             = $injector->lazyGet('databaseExternal');
