@@ -421,11 +421,11 @@ class FactoryTest extends TestCase
 
         $participant = new Participant($this->getDummyQuizAttempter(), $quiz);
         $participant->getAllResponses()->add($attempt);
+        $participant->getAllFeedbacks()->add($feedback);
 
         $quiz->getAllParticipants()->add($participant);
 
         // Link them all together
-        $quiz->getFeedbacks()->add($feedback);
         $feedback->setResponse($attempt);
         $feedback->setAssessable($quiz);
         $attempt->getAllFeedback()->add($feedback);
