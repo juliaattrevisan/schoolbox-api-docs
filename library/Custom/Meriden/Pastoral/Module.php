@@ -21,6 +21,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Grades;
 use Schoolbox\External\SubjectMapper;
 use Schoolbox\Learning\Assessment\DueWork\RubricContext;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
@@ -136,6 +137,9 @@ class Module extends BaseModule
                 RubricContext::class,
                 [$this->getMapperFactory()->getLazy(RubricMapper::class)]
             );
+        $injector->params[StudentInvolvement\Factory::class]['currentUser']
+            = $injector->lazyGet('user');
+        $injector->params[StudentInvolvement\Factory::class]['access'] = Access::getInstance();
 
         $injector->params[StudentInvolvement\Gateway::class]['database']
             = $injector->lazyGet('databaseExternal');
