@@ -13,8 +13,10 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\DueWork\RubricContext;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -366,6 +368,11 @@ class Factory
                 if ($feedback) {
 
                     // Load rubrics into assessment whilst here
+                    // TODO inject
+                    if ($assessment->getUseRubric()) {
+                        $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
+                    }
+
                     $allGrades['a' . $assessment->getId()] = [
                         'assessment'  => [
                             'object'  => $assessment,
@@ -373,7 +380,13 @@ class Factory
                             'name'    => $assessment->getTitle(),
                             'dueDate' => $assessment->getDueAt(),
                         ],
-                        'rubric'      => $this->rubricMapper->findByDueWork($assessment)->toContext(),
+                        'rubric'      => (new RubricContext($this->rubricMapper))
+                            ->generate(
+                                $assessment,
+                                $student,
+                                $_SESSION['user'],
+                                Access::getInstance()
+                            )['rubric'],
                         'pretty_mark' => $feedback->getHumanReadableMark(),
                         'mark'        => $feedback->getNormalisedMark(),
                         'comment'     => $feedback->getComment(),
