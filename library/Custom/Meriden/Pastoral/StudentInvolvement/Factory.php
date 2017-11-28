@@ -386,7 +386,6 @@ class Factory
                 if ($feedback) {
 
                     // Load rubrics into assessment whilst here
-                    // TODO inject
                     if ($assessment->getUseRubric()) {
                         $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
                     }
