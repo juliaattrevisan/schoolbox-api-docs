@@ -260,7 +260,8 @@ class Factory
         try {
             // Find by category code, and figure out if they're involved.
             $folder = $this->folderMapper->findByCode($subjectCode);
-            if ($involvement = $this->getStudentInvolvement($folder, $student)) {
+            $involvement = $this->getStudentInvolvement($folder, $student);
+            if ($involvement) {
                 return [
                     'folder' => $folder,
                     'grades' => $involvement['grades'],
@@ -277,7 +278,8 @@ class Factory
         // To do this, every matching category has to be checked.
         $archivedFolders = $this->folderMapper->findAllByArchivedCode($subjectCode);
         foreach ($archivedFolders as $archivedFolder) {
-            if ($involvement = $this->getStudentInvolvement($archivedFolder, $student)) {
+            $involvement = $this->getStudentInvolvement($archivedFolder, $student);
+            if ($involvement) {
                 return [
                     'folder' => $archivedFolder,
                     'grades' => $involvement['grades'],
@@ -512,10 +514,9 @@ class Factory
                 }
             } else {
                 // Pretty marks are continuous and hence not to be grouped
-                $distribution['continuous']['marks'] = array_merge(
-                    $distribution['continuous']['marks'],
-                    $studentMarks
-                );
+                foreach ($studentMarks as $item) {
+                    $distribution['continuous']['marks'][] = $item;
+                }
             }
         }
 
@@ -533,7 +534,7 @@ class Factory
                 array_sum(
                     array_map(
                         function ($v) use ($mean) {
-                            return pow($v - $mean, 2);
+                            return ($v - $mean) ** 2;
                         },
                         $marks
                     )
