@@ -177,7 +177,6 @@ abstract class AbstractAssessment implements IAssessable
     public function __construct()
     {
         $this->setAllParticipants(new Collection());
-        $this->responses = new GenericCollection($this->getResponseClass());
         $this->feedbacks = new GenericCollection($this->getFeedbackClass());
         $this->setCurriculumNodes(new Collection());
     }
