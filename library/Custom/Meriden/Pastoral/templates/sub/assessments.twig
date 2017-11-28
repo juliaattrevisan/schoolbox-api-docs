@@ -40,8 +40,8 @@
                 </a>
             </td>
             <td>{{ workItem.pretty_mark | replace({'%': ''}) }}</td>
-            <td>{{ workItem.distribution.continuous.mean.pretty_mark }}</td>
-            <td>{{ workItem.distribution.continuous.sd.pretty_mark }}</td>
+            <td>{{ workItem.distribution.continuous.mean.mark | number_format(1) }}</td>
+            <td>{{ workItem.distribution.continuous.sd.mark | number_format(1) }}</td>
             <td>{{ workItem.assessment.dueAt|date('j F') }}</td>
         </tr>
     {% endif %}
