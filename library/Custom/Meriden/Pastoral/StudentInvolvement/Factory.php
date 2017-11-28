@@ -519,7 +519,7 @@ class Factory
             );
         }
 
-        // And get the original too
+        // And get the original too (plus all participants)
         $assessments->add($this->assessmentDataSource->findByIdForReview($baseAssessment->getId()));
 
         $distribution = [
