@@ -9,7 +9,7 @@
 
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
-use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder\Model as Folder;
 
@@ -92,8 +92,9 @@ class Involvement
     public function moveToNamedGrade($key, $assessmentName)
     {
         foreach ($this->grades as $gradeId => $grade) {
-            if ($grade['assessment'] instanceof SubmissionBox) {
-                $name = $grade['assessment']->getName();
+            $assessment = $grade['assessment']['object'];
+            if ($assessment instanceof IAssessable) {
+                $name = $assessment->getTitle();
                 if (strcasecmp($name, $assessmentName) === 0) {
                     $this->setNamedGrade($key, $grade);
                     unset($this->grades[$gradeId]);
