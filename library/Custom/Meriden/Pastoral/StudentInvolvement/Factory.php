@@ -500,7 +500,7 @@ class Factory
         // Get cohort for this class
         // Original implementation searched on assessment name,
         // but we can use unit spec ID here.
-        $assessments    = [];
+        $assessments    = $this->assessmentDataSource->createCollection();
         $specAssessment = $baseAssessment->getSpecificationAssessment();
         if ($specAssessment) {
             $cohortFolderIds = [];
@@ -517,9 +517,10 @@ class Factory
                     'work_type'          => self::WORK_TYPE_ASSESSMENT_TASK,
                 ]
             );
-        } else {
-            $assessments[] = $this->assessmentDataSource->findByIdForReview($baseAssessment->getId());
         }
+
+        // And get the original too
+        $assessments->add($this->assessmentDataSource->findByIdForReview($baseAssessment->getId()));
 
         $distribution = [
             'grouped'    => [],
