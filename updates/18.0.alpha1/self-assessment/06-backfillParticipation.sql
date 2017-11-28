@@ -1,3 +1,5 @@
+DELETE FROM `participation`;
+
 -- Find all submission box returns and create a participation record for the owner (student) of each return
 
 INSERT INTO       `participation`
@@ -14,10 +16,12 @@ SELECT DISTINCT   `participation_plan`.`id`,                -- Participation pla
 FROM              `submission_box`
 JOIN              `student_submission` ON `student_submission`.`box_id` = `submission_box`.`id`
 JOIN              `participation_plan` ON `participation_plan`.`assessment_id` = `submission_box`.`assessment_id`
-LEFT JOIN         `participation` ON `participation`.`participation_plan_id` = `participation_plan`.`id` AND `participation`.`user_id` = `student_submission`.`owner`
+LEFT JOIN         `participation` ON `participation`.`participation_plan_id` = `participation_plan`.`id` AND
+                                     `participation`.`user_id` = `student_submission`.`owner`
 WHERE             `participation`.`participation_plan_id` IS NULL AND
                   `submission_box`.`deleted` = 0
-GROUP BY          `student_submission`.`owner`;
+GROUP BY          `participation_plan`.`id`,
+                  `student_submission`.`owner`;
 
 -- Find all quiz attempts and create a participation record for the student
 
@@ -35,10 +39,12 @@ SELECT DISTINCT   `participation_plan`.`id`,                -- Participation pla
 FROM              `assess_attempt`
 JOIN              `assess` ON `assess`.`assess_id` = `assess_attempt`.`assess_id`
 JOIN              `participation_plan` ON `participation_plan`.`assessment_id` = `assess`.`assessment_id`
-LEFT JOIN         `participation` ON `participation`.`participation_plan_id` = `participation_plan`.`id` AND `participation`.`user_id` = `assess_attempt`.`user_id`
+LEFT JOIN         `participation` ON `participation`.`participation_plan_id` = `participation_plan`.`id` AND
+                                     `participation`.`user_id` = `assess_attempt`.`user_id`
 WHERE             `participation`.`participation_plan_id` IS NULL AND
                   `assess_attempt`.`deleted_at` IS NULL
-GROUP BY          `assess_attempt`.`user_id`;
+GROUP BY          `participation_plan`.`id`,
+                  `assess_attempt`.`user_id`;
 
 -- Find all task completions and create a participation record for the student
 
@@ -56,7 +62,9 @@ SELECT DISTINCT   `participation_plan`.`id`,                -- Participation pla
 FROM              `task_completion`
 JOIN              `task` ON `task`.`id` = `task_completion`.`task_id`
 JOIN              `participation_plan` ON `participation_plan`.`assessment_id` = `task`.`assessment_id`
-LEFT JOIN         `participation` ON `participation`.`participation_plan_id` = `participation_plan`.`id` AND `participation`.`user_id` = `task_completion`.`student_id`
+LEFT JOIN         `participation` ON `participation`.`participation_plan_id` = `participation_plan`.`id`
+                                     AND `participation`.`user_id` = `task_completion`.`student_id`
 WHERE             `participation`.`participation_plan_id` IS NULL AND
                   `task_completion`.`deleted_at` IS NULL
-GROUP BY          `task_completion`.`student_id`;
+GROUP BY          `participation_plan`.`id`,
+                  `task_completion`.`student_id`;
