@@ -8,6 +8,12 @@ use Schoolbox\Config\ConfigMapper;
 
 class Controller extends Base
 {
+    /**
+     *  Renders the feature tours admin page
+     *
+     *  @api   GET /adminv2/feature-tours
+     */
+
     public function render()
     {
         $twigData = [
@@ -19,6 +25,12 @@ class Controller extends Base
         );
     }
 
+
+    /**
+     *  Updates the tours_enabled config
+     *
+     *  @api   POST /adminv2/feature-tours
+     */
 
     public function updateConfig()
     {
