@@ -664,16 +664,6 @@ interface IAssessable extends ISoftDeletable
      */
     public function setAllParticipants(Collection $allParticipants);
 
-    /**
-     * @return Collection|IResponse[]
-     */
-    public function getResponses();
-
-    /**
-     * @param Collection|IResponse[] $responses
-     * @return $this
-     */
-    public function setResponses(Collection $responses);
 
     /**
      * Return the IResponse implementation class for this IAssessable
