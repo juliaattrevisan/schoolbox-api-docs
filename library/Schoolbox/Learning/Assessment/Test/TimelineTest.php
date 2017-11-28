@@ -387,17 +387,14 @@ class TimelineTest extends TestCase
             ->setAssessable($assessment)
             ->setPublishedAt(null);
 
-        $assessment->setResponses((new Collection())
-            ->add($response1)
-            ->add($response2)
-            ->add($response3)
-        )->setFeedbacks((new Collection())
+        $assessment->setFeedbacks((new Collection())
             ->add($floating1)
             ->add($floating2)
             ->add($floating3)
         );
 
         $participant = new Participant(new User(), $assessment);
+        $participant->getAllResponses()->add($response1)->add($response2)->add($response3);
 
 
         /* Compare these
