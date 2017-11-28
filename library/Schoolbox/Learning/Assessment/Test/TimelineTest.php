@@ -86,7 +86,7 @@ class TimelineTest extends TestCase
 
         $participant = new Participant(new User(), $assessment);
         $participant->getAllResponses()->add($response1);
-        $participant->setAllFeedbacks($participant->getAllFeedbacks()->merge($assessment->getFeedbacks()));
+        $participant->getAllFeedbacks()->add($feedback1);
 
         /* Compare these
          */
@@ -132,7 +132,7 @@ class TimelineTest extends TestCase
 
         $participant = new Participant(new User(), $assessment);
         $participant->getAllResponses()->add($response1);
-        $participant->setAllFeedbacks($participant->getAllFeedbacks()->merge($assessment->getFeedbacks()));
+        $participant->getAllFeedbacks()->add($feedback1)->add($feedback2);
 
         /* Compare these
          */
@@ -197,8 +197,7 @@ class TimelineTest extends TestCase
 
         $participant = new Participant(new User(), $assessment);
         $participant->getAllResponses()->add($response1)->add($response2)->add($response3);
-        $participant->setAllFeedbacks($participant->getAllFeedbacks()->merge($assessment->getFeedbacks()));
-
+        $participant->getAllFeedbacks()->add($feedback1)->add($feedback2)->add($feedback3);
 
         /* Compare these
          */
@@ -286,15 +285,9 @@ class TimelineTest extends TestCase
             ->setAssessable($assessment)
             ->setPublishedAt(new \Alaress_Date_Format('2016-11-01 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $assessment->setFeedbacks((new Collection())
-            ->add($floating1)
-            ->add($floating2)
-            ->add($floating3)
-        );
-
         $participant = new Participant(new User(), $assessment);
         $participant->getAllResponses()->add($response1)->add($response2)->add($response3);
-        $participant->setAllFeedbacks($participant->getAllFeedbacks()->merge($assessment->getFeedbacks()));
+        $participant->getAllFeedbacks()->add($floating1)->add($floating2)->add($floating3);
 
         /* Compare these
          *
@@ -387,14 +380,9 @@ class TimelineTest extends TestCase
             ->setAssessable($assessment)
             ->setPublishedAt(null);
 
-        $assessment->setFeedbacks((new Collection())
-            ->add($floating1)
-            ->add($floating2)
-            ->add($floating3)
-        );
-
         $participant = new Participant(new User(), $assessment);
         $participant->getAllResponses()->add($response1)->add($response2)->add($response3);
+        $participant->getAllFeedbacks()->add($floating1)->add($floating2)->add($floating3);
 
 
         /* Compare these
