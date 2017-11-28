@@ -11,6 +11,7 @@ CREATE TABLE `user_professionaldevelopment`(
 
 ALTER TABLE `user_professionaldevelopment` ADD CONSTRAINT `fk_user_id` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`);
 
-INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`, `hidden`, `required`) VALUES ('enable_professional_development', '0', 'Enable Professional Development', 'Lets staff members maintain their Professional Development details', '3', '1', 'true', 'false', 'false');
+-- Disabled in SA-5378
+-- INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`, `hidden`, `required`) VALUES ('enable_professional_development', '0', 'Enable Professional Development', 'Lets staff members maintain their Professional Development details', '3', '1', 'true', 'false', 'false');
 
 INSERT INTO `error` (`id`, `message`) VALUES ('200', 'Please provide a valid Professional Development Number and Registration State.');
