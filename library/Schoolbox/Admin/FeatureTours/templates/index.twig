@@ -6,7 +6,7 @@
         <section>
             <div class="columns">
                 <form method="post" action="{{ routeLookup('featureTours.updateConfig') }}">
-                    <label>Enabled<span data-tooltip class="hint has-tip tip-bottom" title="Enable/Disable Feature Tours">?</span></label>
+                    <label>Enabled<span data-tooltip class="hint has-tip tip-bottom" title="Enable or disable all feature tours system-wide.">?</span></label>
                     <span class="switch">
                         <input id="enabled" type="checkbox" name="enabled" {% if toursEnabled %} checked {% endif %}/>
                         <label for="enabled">
