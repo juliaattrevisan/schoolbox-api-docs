@@ -70,6 +70,13 @@ class Factory
     private $access;
 
     /**
+     * Data source for fetching users who have access to a folder.
+     *
+     * @var UserAccessMapper
+     */
+    private $userAccessMapper;
+
+    /**
      * Constructor
      *
      * @param Gateway              $gateway
@@ -79,6 +86,7 @@ class Factory
      * @param RubricMapper         $rubricMapper
      * @param User                 $currentUser
      * @param Access               $access
+     * @param UserAccessMapper     $userAccessMapper
      */
     public function __construct(
         Gateway $gateway,
@@ -87,7 +95,8 @@ class Factory
         AssessmentDataSource $assessmentDataSource,
         RubricMapper $rubricMapper,
         User $currentUser,
-        Access $access
+        Access $access,
+        UserAccessMapper $userAccessMapper
     ) {
         // Set up required mappers, DB access, etc. here.
         $this->gateway              = $gateway;
@@ -97,6 +106,7 @@ class Factory
         $this->rubricMapper         = $rubricMapper;
         $this->currentUser          = $currentUser;
         $this->access               = $access;
+        $this->userAccessMapper     = $userAccessMapper;
     }
 
     /**
@@ -143,7 +153,7 @@ class Factory
         $folder = $tutorGroup->getFolder();
         if ($folder instanceof Folder) {
             $tutorGroup->setCoordinators(
-                UserAccessMapper::getInstance()->findUsersInCategory(
+                $this->userAccessMapper->findUsersInCategory(
                     $folder,
                     Role::STAFF,
                     UserAccess::ACCESS_WRITE,
