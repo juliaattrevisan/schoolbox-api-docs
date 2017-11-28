@@ -192,14 +192,14 @@ class Factory extends NullableContext\Factory
         // Divide folders into immediate contexts, and indirect contexts via a unit-impl
         /** @var GenericCollection $directFolders */
         $directFolders = $involvedFolders->filter(function (Folder\Model $folder) use ($inClass, $inGroup) {
-            $isClass = $folder->getCodes()->count();
+            $isClass = $folder->isClass() || $folder->wasClass();
             $isGroup = $folder->getGroup();
             return ($isClass && $inClass) || ($isGroup && $inGroup);
         })->indexBy('id');
 
         /** @var GenericCollection $indirectFolders */
         $indirectFolders = $involvedFolders->filter(function (Folder\Model $folder) use ($inUnitImplImportedToClass, $inUnitImplImportedToGroup) {
-            $isClass = $folder->getCodes()->count();
+            $isClass = $folder->isClass() || $folder->wasClass();
             $isGroup = $folder->getGroup();
             return ($isClass && $inUnitImplImportedToClass) || ($isGroup && $inUnitImplImportedToGroup);
         })->indexBy('id');
