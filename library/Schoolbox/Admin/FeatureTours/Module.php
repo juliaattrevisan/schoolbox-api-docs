@@ -1,4 +1,5 @@
 <?php
+
 namespace Schoolbox\Admin\FeatureTours;
 
 use \Alaress\Module\Module as BaseModule;
@@ -9,19 +10,20 @@ use Twig\Error\LoaderError;
 
 class Module extends BaseModule
 {
+
     protected $basename = "featureTours";
+
 
     public function registerRoutes()
     {
         $route = '';
-
         $perms = new IsSuperuser();
 
         $this->register('GET', $route, 'render', $perms);
-
         $this->register('POST', $route, 'updateConfig', $perms);
 
     }
+
 
     /**
      * @param IChainLoader $templateLoader
@@ -32,6 +34,7 @@ class Module extends BaseModule
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
+
     /**
      * Initializes controller classes into the dependency injector.
      *
@@ -40,7 +43,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(Controller::class)
         );
     }

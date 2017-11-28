@@ -5,16 +5,16 @@
         <h2 class="subheader">Feature Tours</h2>
         <section>
             <div class="columns">
-                <form method="post" action="{{ routeLookup('featureTours.updateConfig')}}">
+                <form method="post" action="{{ routeLookup('featureTours.updateConfig') }}">
                     <label>Enabled<span data-tooltip class="hint has-tip tip-bottom" title="Enable/Disable Feature Tours">?</span></label>
                     <span class="switch">
-                        <input id="enabled" type="checkbox" name="enabled" {% if toursEnabled  %} checked {% endif %}/>
+                        <input id="enabled" type="checkbox" name="enabled" {% if toursEnabled %} checked {% endif %}/>
                         <label for="enabled">
                             <span>On</span>
                             <span>Off</span>
                         </label>
                     </span>
-                    <input type="submit" value="Save" />
+                    <input type="submit" value="Save"/>
                 </form>
             </div>
         </section>
