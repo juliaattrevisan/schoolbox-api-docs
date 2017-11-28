@@ -17,7 +17,7 @@ class Controller extends Base
     public function render()
     {
         $twigData = [
-            'toursEnabled' => ConfigMapper::getInstance()->get('enable_feature_tours'),
+            'toursEnabled' => ConfigMapper::getInstance()->get('tours_enabled'),
         ];
 
         $this->getResponse()->content->set(
