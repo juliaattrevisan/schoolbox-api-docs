@@ -447,7 +447,7 @@ class Gateway
         $query .= " WHERE " . implode(' AND ', $pb->getWhere())
             . " ORDER BY studsub.sub_code ASC, studsub.class ASC";
 
-        return $this->database->executeQuery($query, $pb->getParams())->fetchAll();
+        return $this->database->executeQuery($query, $pb->getParams())->fetch();
     }
 
     /**
