@@ -170,16 +170,21 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         foreach ($responses as $response) {
             $assessmentId = $response->getAssessable()->getId();
 
-            /* Add the $response to a stack which we can count later
-             * Initialise a new tuple for an (assessment, responses[]) combo if it doesn't already exist
+            /* Increment response count
+             *
+             * Initialise a new tuple for an (assessment, responses[]) combo if it doesn't already exist - this
+             * is the most recent response. All other ones are older, due to sorting callback used previously
              */
             if (isset($assessments[$assessmentId])) {
-                $assessments[$assessmentId]['responses'][] = $response;
+                $assessments[$assessmentId]['responses']['count']++;
             }
             else {
                 $assessments[$assessmentId] = [
                     'assessment' => $allAssessments[$assessmentId],
-                    'responses' => [$response]
+                    'responses' => [
+                        'count' => 1,
+                        'mostRecent' => $response->getSubmittedAt()
+                    ]
                 ];
             }
         }
