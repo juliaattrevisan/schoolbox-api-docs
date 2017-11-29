@@ -99,7 +99,6 @@ class Factory
         Access $access,
         UserAccessMapper $userAccessMapper
     ) {
-        // Set up required mappers, DB access, etc. here.
         $this->gateway              = $gateway;
         $this->userMapper           = $userMapper;
         $this->folderMapper         = $folderMapper;
@@ -111,7 +110,9 @@ class Factory
     }
 
     /**
-     * Builds a TutorGroup object
+     * Builds a TutorGroup object for a given year and student.
+     *
+     * This is used as a data store for the year level eReport.
      *
      * @param int  $year
      * @param User $student
@@ -137,6 +138,7 @@ class Factory
                 )
             );
 
+        // Add grades for the tutor group class page
         $tutorGroupCode   = $tutorGroup->getTutorGroup();
         $folderWithGrades = $this->getFolderWithGrades($tutorGroupCode['code'], $student);
         $tutorGroup
@@ -166,7 +168,9 @@ class Factory
     }
 
     /**
-     * Builds a Subject object
+     * Builds a Subject object for a given year, student and subject.
+     *
+     * This is used as a data store for the subject eReport.
      *
      * @param int    $year
      * @param User   $student
@@ -187,6 +191,7 @@ class Factory
             ->setYear($year)
             ->setSubjectCode($subjectCode);
 
+        // Add grades for the class page
         $folderWithGrades = $this->getFolderWithGrades($subjectCode, $student);
         $subject
             ->setFolder($folderWithGrades['folder'])
@@ -372,7 +377,23 @@ class Factory
      * @param Folder $folder
      * @param User   $student
      *
-     * @return array
+     * @return array {
+     *  assessment:  IAssessable
+     *  rubric:      array {
+     *    groups: {
+     *      criteria: {
+     *        name: string
+     *          descriptors: {
+     *            selected: bool
+     *            text:     string
+     *        }
+     *      }
+     *    }
+     *  }
+     *  pretty_mark: string
+     *  mark:        float
+     *  comment:     string
+     * }
      */
     protected function getGrades(Folder $folder, User $student)
     {
@@ -459,7 +480,9 @@ class Factory
      *
      * @param array $subject
      *
-     * @return array
+     * @return array {
+     *  teachers: User[]
+     * }
      */
     protected function augmentSubjectWithTeacher(array $subject)
     {
@@ -478,7 +501,14 @@ class Factory
      * @param array          $grade
      * @param array|Folder[] $cohortFolders
      *
-     * @return array
+     * @return array {
+     *   grouped: array(string, array)
+     *   continuous: array {
+     *     marks: float[]
+     *     mean:  float
+     *     sd:    float
+     *   }
+     * }
      */
     public function buildDistribution($grade, $cohortFolders)
     {
