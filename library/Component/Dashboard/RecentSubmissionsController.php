@@ -174,11 +174,13 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
              *
              * Initialise a new tuple for an (assessment, responses[]) combo if it doesn't already exist - this
              * is the most recent response. All other ones are older, due to sorting callback used previously
+             *
+             * Exclude Responses which are related to non-existent Assessments
              */
             if (isset($assessments[$assessmentId])) {
                 $assessments[$assessmentId]['responses']['count']++;
             }
-            else {
+            elseif (isset($allAssessments[$assessmentId])) {
                 $assessments[$assessmentId] = [
                     'assessment' => $allAssessments[$assessmentId],
                     'responses' => [
