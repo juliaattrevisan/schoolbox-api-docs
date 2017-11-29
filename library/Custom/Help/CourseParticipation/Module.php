@@ -18,7 +18,6 @@ use Schoolbox\Mail\TwigEmailFactory;
 use Schoolbox\Permission\SiteAccess;
 use Schoolbox\MapperFactory;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\ProfessionalDevelopment;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User\Password\MailService;
 use Schoolbox\User\Password\Reset;
@@ -101,7 +100,6 @@ class Module extends Alaress\Module\Module
             'userAccessMapper' => $mapperFactory->getLazy(UserAccessMapper::class),
             'tokenMapper'      => $mapperFactory->getLazy(SiteAccess\Mapper::class),
             'folderMapper'     => $mapperFactory->getLazy(Folder\Mapper::class),
-            'pdMapper'         => $mapperFactory->getLazy(ProfessionalDevelopment\Mapper::class),
             'mailService'      => $injector->lazyNew(MailService::class),
             'portraitDir'      => $injector->lazy(function () use ($injector) {
                 return $injector->get('config')->get('portrait_dir');

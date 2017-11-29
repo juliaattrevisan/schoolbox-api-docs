@@ -22,7 +22,6 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\SiteAccess;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\ProfessionalDevelopment;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\RoleMapper;
@@ -53,11 +52,6 @@ class Controller extends Base
     private $codeMapper;
 
     /**
-     * @var ProfessionalDevelopment\Mapper
-     */
-    private $pdMapper;
-
-    /**
      * @var Handler
      */
     private $handler;
@@ -69,7 +63,6 @@ class Controller extends Base
      * @param Folder\Mapper                  $folderMapper
      * @param User\Password\MailService      $mailService
      * @param string                         $portraitDir
-     * @param ProfessionalDevelopment\Mapper $pdMapper
      * @throws Mapper\DefinitionException
      */
     public function __construct(
@@ -77,21 +70,18 @@ class Controller extends Base
         SiteAccess\Mapper $tokenMapper,
         Folder\Mapper $folderMapper,
         User\Password\MailService $mailService,
-        $portraitDir,
-        ProfessionalDevelopment\Mapper $pdMapper
+        $portraitDir
     ) {
         $this->userAccessMapper = $userAccessMapper;
         $this->tokenMapper      = $tokenMapper;
         $this->folderMapper     = $folderMapper;
         $this->codeMapper       = $folderMapper->getJoinMapper('codes');
-        $this->pdMapper         = $pdMapper;
 
         // TODO rejig for DI
         $this->handler = new Handler(
             $this->userAccessMapper,
             $this->tokenMapper,
             $this->folderMapper,
-            $this->pdMapper,
             $mailService,
             $portraitDir
         );
@@ -122,10 +112,6 @@ class Controller extends Base
             $school = $code->getSiteSchoolCode();
             $data['hashes'][$school] = $this->handler->computeAccessToken($now, $school, $code->getAccessToken());
         }
-
-        /* Add list of Professional Development Registration States
-         */
-        $data['pdStates'] = $this->pdMapper->getStates();
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@helpCourseParticipation/apitest.twig', $data));
     }
