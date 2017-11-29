@@ -71,7 +71,7 @@ class Module extends RestfulModule
         /* Apply route permissions here as you add them to initRoutes()
          * Note that if the perms change you need to log out/log in to refresh
          */
-        $this->addRoutePermission($authorizer, 'getResultForTeam', $resultAccess);
+        $this->addRoutePermission($authorizer, 'getResultForTeam|getList', $resultAccess);
 
         /* Superusers can see this
          * Sports Admin can see this
@@ -86,7 +86,7 @@ class Module extends RestfulModule
             )
         );
 
-        $this->addRoutePermission($authorizer, 'getCreateFormForTeam|createEntity|getModifyForm|updateEntity|deleteEntity', $resultModifyFormAccess);
+        $this->addRoutePermission($authorizer, 'getCreateFormForTeam|getModifyForm|getCreateForm|getEntity|createEntity|updateEntity|deleteEntity', $resultModifyFormAccess);
     }
 
     /**
