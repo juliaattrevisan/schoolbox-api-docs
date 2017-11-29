@@ -206,13 +206,16 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
             $definition = $factory->buildDefinition($filter);
             $definition->normalisePageOptions($pageFilter, $user->getRole()->getType());
 
+            // Note that we *do* need to pass all URL overrides to each filter's panel component.
+            // This is because the nullable context filters need to check for inserted folders so they can
+            // load the related nullable context (eg UnitImport, Project etc)
             $filterComponents[$class] = $factory->buildComponent(
                 $definition,
                 $user,
                 $pageFilter,
                 $selections[$filter->getId()],
                 $viewee,
-                $overrides[$filter->getId()]
+                $overrides
             );
         }
         return new Panel($route, $filterComponents);

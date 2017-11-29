@@ -62,7 +62,7 @@ class Factory extends NullableContext\Factory
      * @param Filter\Page\Model                               $pageFilter
      * @param null|GenericCollection|Filter\Selection\Model[] $selections Indexed selection.key
      * @param null|User                                       $viewee
-     * @param null|GenericCollection|Filter\Selection\Model[] $overrides  Indexed selection.key
+     * @param GenericCollection|Collection[]|Filter\Selection\Model[][] $overrides  Indexed filter.id, selection.key
      * @return Filter\IComponent|Component
      * @throws \InvalidArgumentException If neither $selections or $overrides are supplied
      */
@@ -72,9 +72,16 @@ class Factory extends NullableContext\Factory
         Filter\Page\Model $pageFilter,
         ?GenericCollection $selections,
         ?User $viewee,
-        ?GenericCollection $overrides
+        GenericCollection $overrides
     ): Filter\IComponent {
-        return new Component($definition, $user, $pageFilter, $selections, $overrides, $this->getSelectionMapper());
+        return new Component(
+            $definition,
+            $user,
+            $pageFilter,
+            $selections,
+            $overrides[$pageFilter->getFilter()->getId()],
+            $this->getSelectionMapper()
+        );
     }
 
 

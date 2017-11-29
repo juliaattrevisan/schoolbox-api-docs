@@ -7,7 +7,6 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext;
 
-use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 
@@ -21,10 +20,10 @@ abstract class Factory extends Filter\AbstractFactory
      * into the nullable context filters so that assessments in those nullable contexts on the inserted
      * folder can be matched by the nullable context filters.
      *
-     * @param Collection|GenericCollection[]|Filter\Selection\Model[][] $overrides Indexed by filter.id, selection.key
+     * @param GenericCollection|GenericCollection[]|Filter\Selection\Model[][] $overrides Indexed by filter.id, selection.key
      * @return int[]
      */
-    protected function parseFolderIds(Collection $overrides)
+    protected function parseFolderIds(GenericCollection $overrides): array
     {
         $folderFilters = Filter\Mapper::getInstance()->findByClass([
             Filter\Filters\Assessment\Folder\TeacherInvolved\Definition::class,

@@ -43,12 +43,12 @@ interface IFactory
      * * may insert items (so long as logic - eg permissions - permit)
      * * if non-null, ignore $selections
      *
-     * @param IDefinition                              $definition They type of filter we are building
-     * @param User                                     $user
-     * @param Page\Model                               $pageFilter
-     * @param null|GenericCollection|Selection\Model[] $selections Indexed selection.key
-     * @param null|User                                $viewee
-     * @param null|GenericCollection|Selection\Model[] $overrides  Indexed selection.key
+     * @param IDefinition                                               $definition They type of filter we are building
+     * @param User                                                      $user
+     * @param Page\Model                                                $pageFilter
+     * @param null|GenericCollection|Selection\Model[]                  $selections Indexed selection.key
+     * @param null|User                                                 $viewee
+     * @param GenericCollection|GenericCollection[]|Selection\Model[][] $overrides  Indexed filter.id, selection.key
      * @return IComponent
      */
     public function buildComponent(
@@ -57,7 +57,7 @@ interface IFactory
         Page\Model $pageFilter,
         ?GenericCollection $selections,
         ?User $viewee,
-        ?GenericCollection $overrides
+        GenericCollection $overrides
     ): IComponent;
 
 

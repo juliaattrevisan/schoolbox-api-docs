@@ -72,12 +72,12 @@ class Factory extends NullableContext\Factory
 
 
     /**
-     * @param Filter\IDefinition     $definition
-     * @param User                   $user
-     * @param Filter\Page\Model      $pageFilter
-     * @param null|GenericCollection|Filter\Selection\Model[] $selections Indexed selection.key
-     * @param null|User                                       $viewee
-     * @param null|GenericCollection|Filter\Selection\Model[] $overrides  Indexed selection.key
+     * @param Filter\IDefinition                                               $definition
+     * @param User                                                             $user
+     * @param Filter\Page\Model                                                $pageFilter
+     * @param null|GenericCollection|Filter\Selection\Model[]                  $selections Indexed selection.key
+     * @param null|User                                                        $viewee
+     * @param GenericCollection|GenericCollection[]|Filter\Selection\Model[][] $overrides  Indexed filter.id, selection.key
      * @return Filter\IComponent
      * @throws \InvalidArgumentException If $viewee is NULL or neither $selections or $overrides are supplied
      * @throws \UnexpectedValueException
@@ -88,7 +88,7 @@ class Factory extends NullableContext\Factory
         Filter\Page\Model $pageFilter,
         ?GenericCollection $selections,
         ?User $viewee,
-        ?GenericCollection $overrides
+        GenericCollection $overrides
     ): Filter\IComponent {
         if (null === $viewee) {
             throw new \InvalidArgumentException('Viewee cannot be null for UnitImportSpec filter');
@@ -124,8 +124,8 @@ class Factory extends NullableContext\Factory
         /* If we inserted an extra folder/s, we need to also insert any units imported to that folder,
          * otherwise any assessments inside units imported to the extra folder will never be visible.
          */
-        $extraFolderIds = $overrides ? $this->parseFolderIds($overrides) : [];
-        if (count($extraFolderIds)) {
+        $extraFolderIds = $this->parseFolderIds($overrides);
+        if (\count($extraFolderIds)) {
             $extraFolders = $this->folderMapper->findByColumn('id', $extraFolderIds);
             $folders      = $folders->mergeUnique($extraFolders, 'id');
         }
@@ -147,13 +147,13 @@ class Factory extends NullableContext\Factory
         // Was course imported to a class? ?
         /** @var CourseImpl\Model[] $courseImplsOnClasses */
         $courseImplsOnClasses = $courseImpls->filter(function (CourseImpl\Model $courseImpl) {
-            return $courseImpl->getFolder()->getCodes()->count();
+            return $courseImpl->getFolder()->isClass() || $courseImpl->getFolder()->wasClass();
         })->indexBy('id');
 
         // Was course imported to a group? ?
         /** @var CourseImpl\Model[] $courseImplsOnGroups */
         $courseImplsOnGroups = $courseImpls->filter(function (CourseImpl\Model $courseImpl) {
-            return $courseImpl->getFolder()->getGroup();
+            return $courseImpl->getFolder()->isGroup();
         })->indexBy('id');
 
         // Get all unitSpecs imported to classes
@@ -178,7 +178,7 @@ class Factory extends NullableContext\Factory
             $user,
             $pageFilter,
             $selections,
-            $overrides,
+            $overrides[$pageFilter->getFilter()->getId()],
             $this->getSelectionMapper(),
             $unitSpecsImportedToFolders,
             $unitSpecsImportedToClasses,

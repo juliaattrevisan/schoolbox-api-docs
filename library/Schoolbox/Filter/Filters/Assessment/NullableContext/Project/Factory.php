@@ -83,12 +83,12 @@ class Factory extends NullableContext\Factory
      * * reside in the contexts set by admin
      * * are linked to folders taught by the $viewee
      *
-     * @param Filter\IDefinition                              $definition
-     * @param User                                            $user
-     * @param Filter\Page\Model                               $pageFilter
-     * @param null|GenericCollection|Filter\Selection\Model[] $selections Indexed selection.key
-     * @param null|User                                       $viewee
-     * @param null|GenericCollection|Filter\Selection\Model[] $overrides  Indexed selection.key
+     * @param Filter\IDefinition                                               $definition
+     * @param User                                                             $user
+     * @param Filter\Page\Model                                                $pageFilter
+     * @param null|GenericCollection|Filter\Selection\Model[]                  $selections Indexed selection.key
+     * @param null|User                                                        $viewee
+     * @param GenericCollection|GenericCollection[]|Filter\Selection\Model[][] $overrides  Indexed filter.id, selection.key
      * @return Filter\IComponent
      * @throws DefinitionException If unable to find a joined mapper
      * @throws Mapper\Exception If unable to hydrate a row
@@ -101,7 +101,7 @@ class Factory extends NullableContext\Factory
         Filter\Page\Model $pageFilter,
         ?GenericCollection $selections,
         ?User $viewee,
-        ?GenericCollection $overrides
+        GenericCollection $overrides
     ): Filter\IComponent {
         if (null === $viewee) {
             throw new \InvalidArgumentException('$viewee cannot be null');
@@ -111,7 +111,7 @@ class Factory extends NullableContext\Factory
             $user,
             $pageFilter,
             $selections,
-            $overrides,
+            $overrides[$pageFilter->getFilter()->getId()],
             $this->getSelectionMapper(),
             $this->getProjects($pageFilter, $viewee, $overrides)
         );
@@ -134,15 +134,15 @@ class Factory extends NullableContext\Factory
 
 
     /**
-     * @param Filter\Page\Model                               $pageFilter
-     * @param User                                            $viewee
-     * @param null|GenericCollection|Filter\Selection\Model[] $overrides Indexed selection.key
+     * @param Filter\Page\Model                                                $pageFilter
+     * @param User                                                             $viewee
+     * @param GenericCollection|GenericCollection[]|Filter\Selection\Model[][] $overrides Indexed by filter.id, selection.key
      * @return GenericCollection|Project\Model[]
      * @throws DefinitionException If unable to find a joined mapper
      * @throws Mapper\Exception If unable to hydrate a row
      * @throws \UnexpectedValueException
      */
-    private function getProjects(Filter\Page\Model $pageFilter, User $viewee, ?GenericCollection $overrides)
+    private function getProjects(Filter\Page\Model $pageFilter, User $viewee, GenericCollection $overrides)
     {
         // Determine which folders we are ultimately interested in getting projects from:
         $options             = $pageFilter->getOptions();
@@ -192,14 +192,14 @@ class Factory extends NullableContext\Factory
         // Divide folders into immediate contexts, and indirect contexts via a unit-impl
         /** @var GenericCollection $directFolders */
         $directFolders = $involvedFolders->filter(function (Folder\Model $folder) use ($inClass, $inGroup) {
-            $isClass = $folder->getCodes()->count();
+            $isClass = $folder->isClass() || $folder->wasClass();
             $isGroup = $folder->getGroup();
             return ($isClass && $inClass) || ($isGroup && $inGroup);
         })->indexBy('id');
 
         /** @var GenericCollection $indirectFolders */
         $indirectFolders = $involvedFolders->filter(function (Folder\Model $folder) use ($inUnitImplImportedToClass, $inUnitImplImportedToGroup) {
-            $isClass = $folder->getCodes()->count();
+            $isClass = $folder->isClass() || $folder->wasClass();
             $isGroup = $folder->getGroup();
             return ($isClass && $inUnitImplImportedToClass) || ($isGroup && $inUnitImplImportedToGroup);
         })->indexBy('id');
@@ -207,7 +207,7 @@ class Factory extends NullableContext\Factory
         /* If we inserted an extra folder/s, we need to also insert any projects on that folder,
          * otherwise any assessments inside projects in the extra folder will never be visible.
          */
-        $extraFolderIds = $overrides ? $this->parseFolderIds($overrides) : [];
+        $extraFolderIds = $this->parseFolderIds($overrides);
         if (\count($extraFolderIds)) {
             // An inserted folder may be neither a class or group, so look for project
             // on it directly, and via an unitImpl.
