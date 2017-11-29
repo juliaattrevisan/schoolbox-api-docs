@@ -5,13 +5,11 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Professional Development</h2>
-        <section>
-            {% include '@professionaldevelopment/form.twig' with {
-                userId: user.id,
-                pd: pd,
-                pdStates: pdStates
-            } only %}
-        </section>
+        {% include '@professionaldevelopment/form.twig' with {
+            userId: user.id,
+            pd: pd,
+            pdStates: pdStates
+        } only %}
     </div>
 </div>
 {% endblock %}
