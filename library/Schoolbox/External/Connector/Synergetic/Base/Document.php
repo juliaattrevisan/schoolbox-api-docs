@@ -174,7 +174,7 @@ class Document extends Base implements IDocument
                     $query .= ' AND d.SourceDate >= :date3 ';
 
                     $params = array_merge($params, [
-                        'date2' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT),
+                        'date3' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT),
                     ]);
                 }
 
