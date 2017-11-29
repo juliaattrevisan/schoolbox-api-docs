@@ -86,6 +86,7 @@ class Renderer extends Handler
                 $this->getPage()->setVar('pastoral_block');
                 $this->getPage()->setVar('eportfolio_block');
                 $this->getPage()->setVar('boarder_leave_block');
+                $this->getPage()->setVar('academic_reports_block');
 
                 /* Hide Due Work link from parents, if Due Work access is restricted
                  */
@@ -97,13 +98,12 @@ class Renderer extends Handler
                     $this->getPage()->parse('due_work_block', 'due_work');
                 }
 
-                if (!Config::get('external_document_report_enabled')) {
-                    $this->getPage()->setVar('academic_reports_block', '');
-                } elseif (!$groupHandler->isStudent($user['id']) || !$groupHandler->isStaff() || !$groupHandler->isParentOfChild($user['id'])) {
-                    $this->getPage()->setVar('academic_reports_block', '');
-                } else {
+                if (Config::get('external_document_report_enabled')
+                    && $groupHandler->isStudent($user['id'])
+                    && ($groupHandler->isStaff() || $groupHandler->isParentOfChild($user['id']))
+                ) {
                     $this->getPage()->parse('academic_reports_block', 'academic_reports');
-                }                
+                }
 
                 if ($groupHandler->isParent() && Config::get('restrict_parent_grades')) {
                     $this->getPage()->setVar('grades_button_block', '');
