@@ -3,7 +3,7 @@ Usage:
     assessments: IAssessable[],
 #}
 <ul class="information-list">
-    {% for current in assessments %}
+    {% for current in results %}
         <li class="list-item" data-equalizer>
             <div class="small-2 columns">
                 {% set responseType = current.assessment is quiz ? 'attempt' : 'submission' %}

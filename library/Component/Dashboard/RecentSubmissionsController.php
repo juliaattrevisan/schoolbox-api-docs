@@ -45,10 +45,11 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
 
     /**
      * Sorted by most recent student response first
+     * A set of tuples (assessment, responseData)
      *
-     * @var Collection|DueWork[]|Quiz[]
+     * @var array
      */
-    private $assessments;
+    private $results;
 
 
     public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage)
@@ -165,7 +166,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
 
         /* Correlate each Response to its hydrated Assessment instance
          */
-        $assessments = [];
+        $results = [];
 
         foreach ($responses as $response) {
             $assessmentId = $response->getAssessable()->getId();
@@ -177,11 +178,11 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
              *
              * Exclude Responses which are related to non-existent Assessments
              */
-            if (isset($assessments[$assessmentId])) {
-                $assessments[$assessmentId]['responses']['count']++;
+            if (isset($results[$assessmentId])) {
+                $results[$assessmentId]['responses']['count']++;
             }
             elseif (isset($allAssessments[$assessmentId])) {
-                $assessments[$assessmentId] = [
+                $results[$assessmentId] = [
                     'assessment' => $allAssessments[$assessmentId],
                     'responses' => [
                         'count' => 1,
@@ -193,9 +194,9 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
 
         /* Store the result
          */
-        $this->assessments = $assessments;
+        $this->results = $results;
 
-        return count($this->assessments) > 0;
+        return count($this->results) > 0;
     }
 
 
@@ -210,7 +211,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
             $templateHandle,
             '@learning/component/recentSubmissions.twig',
             [
-                'assessments' => $this->assessments,
+                'results' => $this->results,
             ]
         );
     }
