@@ -21,7 +21,6 @@ class Module extends BaseModule
 
         $this->register('GET', $route, 'render', $perms);
         $this->register('POST', $route, 'updateConfig', $perms);
-
     }
 
 
