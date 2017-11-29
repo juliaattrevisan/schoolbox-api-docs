@@ -132,6 +132,9 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         }
         $quizAttempts = $this->attemptDataSource->findByPredicates($pb);
 
+        /* Responses' submittedAt values determine the order of assessments that show in this component
+         * Sort the Responses first using the callback
+         */
         /** @var GenericCollection|IResponse[] $responses */
         $responses = (new GenericCollection(IResponse::class))
             ->merge($studentSubmissions)
@@ -140,40 +143,52 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
                 return $b->getSubmittedAt()->compare($a->getSubmittedAt());
             });
 
-        // Group IResponses by IAssessable
-
+        /* Find all the Assessments for which Responses have been found
+         */
         $assessmentIds = [];
         $limit         = $this->getConfig('sizeNoAll');
 
         foreach ($responses as $response) {
             $assessmentId                 = $response->getAssessable()->getId();
             $assessmentIds[$assessmentId] = $assessmentId;
+
             if (count($assessmentIds) >= $limit) {
                 break;
             }
         }
 
+        /* Load a hashtable of Assessments. Assessment instances aren't hydrated in each Response
+         * for performance reasons, so we'll need to do a manual lookup and assignment
+         */
         /** @var IAssessable[]|GenericCollection $assessables */
-        $assessables = $this->assessmentMapperProxy->findAllByIds($assessmentIds)->indexBy('id');
+        $allAssessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds)->indexBy('id');
+
+        /* Correlate each Response to its hydrated Assessment instance
+         */
+        $assessments = [];
 
         foreach ($responses as $response) {
             $assessmentId = $response->getAssessable()->getId();
-            if (isset($assessables[$assessmentId])) {
-                $assessables[$assessmentId]->getResponses()->add($response);
+
+            /* Add the $response to a stack which we can count later
+             * Initialise a new tuple for an (assessment, responses[]) combo if it doesn't already exist
+             */
+            if (isset($assessments[$assessmentId])) {
+                $assessments[$assessmentId]['responses'][] = $response;
+            }
+            else {
+                $assessments[$assessmentId] = [
+                    'assessment' => $allAssessments[$assessmentId],
+                    'responses' => [$response]
+                ];
             }
         }
 
-        // Sort by most recent first, in most recent first
-        $assessables->sortByCallback(function ($assessmentA, $assessmentB) {
-            /** @var IAssessable $assessmentA */
-            /** @var IAssessable $assessmentB */
-            $dateA = $assessmentA->getResponses()[0]->getSubmittedAt();
-            $dateB = $assessmentB->getResponses()[0]->getSubmittedAt();
-            return $dateB->compare($dateA);
-        });
+        /* Store the result
+         */
+        $this->assessments = $assessments;
 
-        $this->assessments = $assessables;
-        return $assessables->count() > 0;
+        return count($this->assessments) > 0;
     }
 
 

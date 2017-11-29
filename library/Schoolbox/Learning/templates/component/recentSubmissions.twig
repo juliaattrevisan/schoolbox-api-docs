@@ -3,19 +3,19 @@ Usage:
     assessments: IAssessable[],
 #}
 <ul class="information-list">
-    {% for assessment in assessments %}
+    {% for current in assessments %}
         <li class="list-item" data-equalizer>
             <div class="small-2 columns">
-                {% set responseType = assessment is quiz ? 'attempt' : 'submission' %}
-                <p class='counter' title="{{ assessment.responses | length }} new {{ responseType }}{% if assessment.responses | length > 1%}s{% endif %}">{{ assessment.responses | length }}</p>
+                {% set responseType = current.assessment is quiz ? 'attempt' : 'submission' %}
+                <p class='counter' title="{{ current.responses | length }} new {{ responseType }}{% if current.responses | length > 1%}s{% endif %}">{{ current.responses | length }}</p>
             </div>
             <div class="card small-10" data-equalizer-watch>
-                <h3><a href="{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) }}">{{ assessment.title }}</a></h3>
+                <h3><a href="{{ routeLookup('learningAssessment.getStatus', {assessmentId: current.assessment.id}) }}">{{ current.assessment.title }}</a></h3>
 
                 <p class="meta">
-                    Last {{ responseType }} {{ assessment.responses.first.submittedAt.relativeTime }} in
+                    Last {{ responseType }} {{ current.responses[0].submittedAt.relativeTime }} in
 
-                    {% set context = assessment.context %}
+                    {% set context = current.assessment.context %}
 
                     {% if context is folder %}
                         <a href="/homepage/{{ context.id }}">{{ context.title }}</a>
