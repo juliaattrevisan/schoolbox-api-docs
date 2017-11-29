@@ -11,7 +11,8 @@
             assessmentId: currentFeedback.assessable.id,
             studentId: currentFeedback.response.submittedOnBehalfOf.id,
             responseId: responseId,
-            response: currentFeedback.response
+            response: currentFeedback.response,
+            participant: participant
         }) %}
         {% set tooltip = 'Resume Inline ' ~ locale.grading.proper %}
     {% endif %}

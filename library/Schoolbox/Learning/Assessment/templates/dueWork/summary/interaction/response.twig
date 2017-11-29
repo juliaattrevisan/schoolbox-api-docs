@@ -1,10 +1,30 @@
-{# If staff, try going to Inline Grader #}
-{% if currentUser.role.isStaff %}
-    {% set url = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessmentId: currentInteraction.assessable.id, studentId: participant.user.id, responseId: currentInteraction.id, response: currentInteraction}) %}
-    {% set tooltip = 'View in Inline Grader' %}
-{% elseif currentUser.role.isStudent and not currentInteraction.isSubmitted%}
-    {% set url = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', {assessmentId: currentInteraction.assessable.id, studentId: participant.user.id, assessment: currentInteraction.assessable, participant: participant}) %}
-    {% set tooltip = 'Resume Submission' %}
+{# if submitted, try going to inline grader #}
+{% if currentInteraction.isSubmitted %}
+    {% set url = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {
+        assessmentId: currentInteraction.assessable.id,
+        studentId:    participant.user.id,
+        responseId:   currentInteraction.id,
+        response:     currentInteraction,
+        participant:  participant
+    }) %}
+    {% if url %}
+        {% set tooltip = 'View in Inline Grader' %}
+    {% endif %}
+{# else this is a draft #}
+{% else %}
+    {# does it belong to current user? #}
+    {% if currentInteraction.submittedOnBehalfOf.id == USER.id %}
+        {# try to resume at 'submit response' page #}
+        {% set url = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', {
+            assessmentId: currentInteraction.assessable.id,
+            studentId:    participant.user.id,
+            assessment:   currentInteraction.assessable,
+            participant:  participant
+        }) %}
+        {% if url %}
+            {% set tooltip = 'Resume Submission' %}
+        {% endif %}
+    {% endif %}
 {% endif %}
 
 {% set deleteRoute = routeLookupIfAuthorized('learningDueWorkResponse.deleteParticularResponse', {assessment: currentInteraction.assessable, assessmentId: currentInteraction.assessable.id, participant: participant, studentId: participant.user.id, responseId: currentInteraction.id, response: currentInteraction}) %}
