@@ -16,7 +16,7 @@
             {% else %}
                 {% if currentMatch.name | length %}
                     <h3>
-                        <del class="icon icon-archive" title="This match's season is archived."></del>{{ currentMatch.name }}
+                        <del class="icon" title="This match's season is archived."></del>{{ currentMatch.name }}
                     </h3>
                     <p class="meta">{{ matchHeading.generateWithResultLink(currentMatch) }}</p>
                 {% else %}
