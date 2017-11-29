@@ -8,6 +8,7 @@
 namespace Schoolbox\External\Connector\Synergetic\Base;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Alaress_Date_Format;
 use DateTime;
@@ -28,11 +29,10 @@ class Document extends Base implements IDocument
 
     /**
      * Constructor
-     *
      * Performs normal setup stuff, and also determines which schema to use
      * based on database version.
      *
-     * @param IConfigLoader $config
+     * @param IConfigLoader    $config
      * @param IConnector|array $databaseExternal
      */
     public function __construct(IConfigLoader $config, $databaseExternal)
@@ -55,6 +55,7 @@ class Document extends Base implements IDocument
         if ($externalPing->getVersion() == "68") {
             return "media";
         }
+
         return "SynergyOneMedia.dbo";
     }
 
@@ -62,6 +63,7 @@ class Document extends Base implements IDocument
      * @inheritdoc
      *
      * @param User $student
+     *
      * @return array
      */
     public function getAcademicReportsForStudent(User $student)
@@ -99,7 +101,7 @@ class Document extends Base implements IDocument
             $query .= ' AND sra.CreatedDate >= :date1';
 
             $params = array_merge($params, [
-                'date1' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+                'date1' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT),
             ]);
         }
 
@@ -126,7 +128,7 @@ class Document extends Base implements IDocument
                 $query .= ' AND d.SourceDate >= :date2 ';
 
                 $params = array_merge($params, [
-                    'date2' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+                    'date2' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT),
                 ]);
             }
 
@@ -139,43 +141,86 @@ class Document extends Base implements IDocument
                     $bindings['bindings']
                 )
             );
+
+            try {
+                // Check if we have permission to the `pvDocumentReferences` view. This will fail into the exception
+                // block and stop us from adding the query and breaking the feature if permission to this table is
+                // not available.
+
+                // TODO: Remove external query to check for access once all schools have added the appropriate permission
+
+                $this->databaseExternal->executeQuery("SELECT 1 FROM {$this->schema}.pvDocumentReferences");
+
+                // If that query worked we can assume they have updated their DB permissions and use this extra source
+
+                $bindings = $this->buildBindingsForClassifications('pvd');
+
+                $query .= "
+                    UNION
+                    
+                    SELECT      d.tDocumentsSeq AS ID,
+                                d.Description,
+                                YEAR(d.SourceDate) AS FileYear,
+                                CONVERT(VARCHAR(20), SourceDate, 20) as CreatedDate,
+                                'tDocuments' AS Source
+                    FROM        {$this->schema}.pvDocumentReferences dr
+                    INNER JOIN  {$this->schema}.tDocuments d ON d.tDocumentsSeq = dr.tDocumentsSeq
+                    WHERE       dr.ID = :id3
+                ";
+
+                $params['id3'] = $student->getExternalId();
+
+                if ($date !== false) {
+                    $query .= ' AND d.SourceDate >= :date3 ';
+
+                    $params = array_merge($params, [
+                        'date3' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT),
+                    ]);
+                }
+
+                $query .= "AND d.ClassificationCode IN ({$bindings['placeholders']})";
+
+                $params = array_merge(
+                    $params,
+                    array_map(
+                        'trim',
+                        $bindings['bindings']
+                    )
+                );
+            } catch (AlaressDatabaseException $e) {
+                // There was no access to the 'pvDocumentReferences' views. Fail silently without adding the SQL
+                // that references this table.
+            }
         }
 
         $query .= "
-            ORDER BY    FileYear DESC, 
-                        CreatedDate DESC
+            ORDER BY FileYear DESC, CreatedDate DESC
         ";
 
         // Get all documents for the student
 
-        $iterator = $this->databaseExternal->executeQueryIterator($query, $params);
+        $documentsQuery = $this->databaseExternal->executeQuery($query, $params);
+        $documents = $documentsQuery->fetchAll();
 
-        // Return the results in an array in the format that is required by the historical code we are using
+        $documentsUnique = [];
 
-        $reports = [];
-
-        foreach ($iterator as $row) {
-            $reportId    = $row['ID'];
-            $year        = $row['FileYear'];
-            $description = $row['Description'];
-            $source      = $row['Source'];
-
-            $reports[$year][$reportId] = [
-                'description' => $description,
-                'date'        => Alaress_Date_Format::newDatabaseDate($row['CreatedDate']),
-                'source'      => $source
-            ];
+        foreach ($documents as &$document) {
+            if (!isset($documentsUnique["{$document["Source"]}.{$document["ID"]}"])) {
+                $document["CreatedDate"] = Alaress_Date_Format::newDatabaseDate($document["CreatedDate"]);
+                $documentsUnique["{$document["Source"]}.{$document["ID"]}"] = $document;
+            }
         }
 
-        return $reports;
+        return $documentsUnique;
     }
 
     /**
      * @inheritdoc
      *
-     * @param User $student
+     * @param User   $student
      * @param string $documentId
      * @param string $source
+     *
      * @return array
      */
     public function downloadAcademicReportForStudent(User $student, $documentId, $source)
@@ -188,7 +233,7 @@ class Document extends Base implements IDocument
 
         $params = [
             'id'         => $student->getExternalId(),
-            'documentId' => $documentId
+            'documentId' => $documentId,
         ];
 
         // Create query to get the document from the database
@@ -224,12 +269,11 @@ class Document extends Base implements IDocument
                 $query .= ' AND d.SourceDate >= :date';
 
                 $params = array_merge($params, [
-                    'date' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+                    'date' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT),
                 ]);
             }
 
             // Check this document is in one of the classifications in config
-
 
             $query .= " AND d.ClassificationCode IN ({$bindings['placeholders']})";
 
@@ -240,7 +284,6 @@ class Document extends Base implements IDocument
                     $bindings['bindings']
                 )
             );
-
         } elseif ($source == 'StudentReportsArchive') {
             // Loading from school reports archive table
 
@@ -265,10 +308,9 @@ class Document extends Base implements IDocument
                 $query .= ' AND sra.CreatedDate >= :date ';
 
                 $params = array_merge($params, [
-                    'date' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+                    'date' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT),
                 ]);
             }
-
         } else {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
         }
@@ -296,20 +338,23 @@ class Document extends Base implements IDocument
     /**
      * Builds placeholders and bindings for document classifications.
      *
+     * @param string $suffix Suffix for bindings
+     *
      * @return array Empty if there's no document classifications.
      *               Otherwise:
      *               bindings:     the parameters to bind to a query
      *               placeholders: the IN part of a query
      */
-    private function buildBindingsForClassifications()
+    private function buildBindingsForClassifications($suffix = '')
     {
         $classificationCodes = array_filter(
             explode(",", trim($this->config->get('external_document_docman_categories')))
         );
 
         if (count($classificationCodes) > 0) {
-            return PredicateBuilder::getArrayBindings($classificationCodes, 'classificationCode');
+            return PredicateBuilder::getArrayBindings($classificationCodes, 'classificationCode' . $suffix);
         }
+
         return [];
     }
 }

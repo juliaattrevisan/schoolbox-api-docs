@@ -429,7 +429,7 @@ class Healthcheck
             'AttendanceMaster',
             'tAttendances',
             'IndividualPlans',
-            'StudentYears'
+            'StudentYears',
         ];
 
         // Pastoral Care Tables (Only If Module Enabled)
@@ -463,7 +463,8 @@ class Healthcheck
                     'StudentReportsArchiveLink',
                     'StudentReportsArchive',
                     'tDocuments',
-                    'DocumentReferences'
+                    'DocumentReferences',
+                    'pvDocumentReferences',
                 ],
                 $db,
                 $schema
