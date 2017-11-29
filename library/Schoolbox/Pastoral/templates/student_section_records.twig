@@ -51,7 +51,7 @@
                                         
                                     {% else %}
 
-                                        {% set recordId = record.parent_id %}
+                                        {% set recordId = record.id %}
 
                                         <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': studentId, 'recordId': recordId}) }}">
                                             <h3>{{ record.heading }}</h3>
