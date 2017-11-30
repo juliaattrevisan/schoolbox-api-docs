@@ -18,8 +18,8 @@
 
             /* Custom text
              */
-            nextLabel: 'Next <i class="icon-next"></i>',
-            prevLabel: '<i class="icon-previous"></i> Back',
+            nextLabel: 'Next',
+            prevLabel: 'Back',
             skipLabel: '&times;',
 
             /* Always scroll to tooltip
@@ -38,27 +38,19 @@
              */
             steps: [
                 {
-                    element: document.querySelector('#first'),
+                    element: document.querySelector('#first-tour'),
                     intro: "Access your component settings, collapse the component or remove the component from the page."
                 },
                 {
-                    element: document.querySelector('#logo-dashboard-large'),
-                    intro: "You can return to your dashboard at any time by clicking your School logo."
+                    element: document.querySelector('#second-tour'),
+                    intro: "You can highlight almost any element you wish."
                 },
                 {
-                    element: document.querySelector('#nav'),
+                    element: document.querySelector('#third-tour'),
                     intro: "This side navigation contains convenient links to your stuff, like groups and homepages and things."
                 },
                 {
-                    element: document.querySelector('#top-menu'),
-                    intro: "This top menu identifies some major things that help further your career. Class work, timetables and calendars can be found here."
-                },
-                {
-                    element: document.querySelector('#right-menu'),
-                    intro: "Notifications appear here. The bulb lights up when you've received new messages."
-                },
-                {
-                    element: document.querySelector('#end'),
+                    element: document.querySelector('#end-tour'),
                     intro: "That's it! Feel free to continue exploring Schoolbox.",
                     tooltipClass: 'lastNode'
                 }
@@ -107,16 +99,16 @@
     </div>
 </div>
 
-<div class="row">
+<div class="row" id="end-tour">
     <div class="small-12 medium-6 island">
         <ul class="component-titlebar" style="background-color:#d0d0d0">
             <li class="actions-small-3">
                 <div class="list-item">
                     <div class="small-12 card">
-                        <h2><a href="">Glamorous</a></h2>
+                        <h2><a href="">Using Schoolbox</a></h2>
                     </div>
                 </div>
-                <nav id="first">
+                <nav id="first-tour">
                     <a data-target="settings" data-state="closed" href="#" class="icon-settings settings edit" title="Settings"></a>
                     <a data-collapser="true" href="#" class="icon-up-arrow collapse" title="Collapse Content"></a>
                     <a data-target="delete" data-state="closed" href="#" class="icon-close" title="Close"></a>
@@ -125,7 +117,7 @@
         </ul>
         <section>
             <div class="content">
-                <article><p><iframe width="560" height="315" src="https://www.youtube.com/embed/q0SyUgw98tE" frameborder="0" allowfullscreen></iframe></p></article>
+                <article id="second-tour"><iframe width="560" height="315" src="https://www.youtube.com/embed/BszORyOVAZY?rel=0&amp;showinfo=0" frameborder="0" allowfullscreen></iframe></article>
             </div>
             <div class="component-action">
                 <section>
@@ -150,7 +142,7 @@
                 </nav>
             </li>
         </ul>
-        <section>
+        <section id="third-tour">
             <div class="empty-state">
                 <i class="icon-group"></i>
                 <p>You are not a member of any group.<br /> You can join <a href="/group/join">new groups</a> now to get started.</p>
