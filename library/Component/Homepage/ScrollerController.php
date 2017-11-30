@@ -7,6 +7,7 @@
  * @version     SVN: $Id$
  */
 use \Schoolbox\Permission\Access\UserAccess;
+use \Schoolbox\Resource\File\Model;
 
 class Component_Homepage_ScrollerController extends Component_Homepage_ControllerAbstract
 {
@@ -28,6 +29,9 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
 
         // Load images for the current homepage
         $allFiles = $this->getFolderMapper()->findImages($this->getSource(), 0);
+
+        // Sort in a human way
+        $allFiles = $allFiles->sortByCallback( function (Model $a, Model $b) {return strnatcasecmp($a->getTitle(), $b->getTitle());} );
 
         // Have update form to back to this homepage, not the gallery's homepage
         $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->getSource()->getId());
