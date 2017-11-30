@@ -85,4 +85,16 @@ class LockedChecker
         // No term? Or term is archived?
         return !$dueInTerm || !$dueInTerm->getId() || $dueInTerm->getArchived();
     }
+
+    /**
+     * Is the assessment due in an archived term, or no term at all?
+     *
+     * @param IAssessable $assessment
+     * @return bool
+     * @throws \InvalidArgumentException If due date is null.
+     */
+    public function isLockedForDeletion(IAssessable $assessment)
+    {
+        return $this->isDueInArchivedTerm($assessment);
+    }
 }

@@ -16,6 +16,7 @@ use OutOfBoundsException;
 use Schoolbox\Learning\Authorizer\Rule\CanRespondToAssessment;
 use Schoolbox\Learning\Authorizer\Rule\CanSeeAssessment;
 use Schoolbox\Learning\Authorizer\Rule\IsAssessmentOpen;
+use Schoolbox\Learning\Authorizer\Rule\IsDeletionUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsParticipant;
 use Schoolbox\Learning\Authorizer\Rule\ParticipantHasNoInteractions;
@@ -93,6 +94,13 @@ class Module extends BaseModule
         $canWriteAndNotSpec = $this->buildAuthRuleCanWriteAndNotSpec();
         $canAckSubmission   = $this->buildAuthRuleCanAcknowledgeSubmission();
 
+        $canDelete = new Rule\Any(
+            new Rule\All(
+                $canWrite,
+                new IsDeletionUnLocked(new LockedChecker($this->getTermMapper()))
+            )
+        );
+
         // pluralise for REST
         $contextTypes = AssessmentContextType::getStringValuesAsRegex(function ($name) { return $name.'s'; });
 
@@ -112,7 +120,7 @@ class Module extends BaseModule
         $this->register('POST',     "$assRoute",                        'postUpdateAssessment',     $canWrite,              $preloadAssessment); // a || c
         $this->register('PATCH',    "$assRoute",                        'patchUpdateAssessment',    $canWrite,              $preloadAssessment); // a || c
         $this->register('GET',      "$assRoute/modify",                 'getUpdateAssessmentForm',  $canWrite,              $preloadAssessment); // a || c
-        $this->register('POST',     "$assRoute/delete",                 'postDeleteAssessment',     $canWrite,              $preloadAssessment); // a || c
+        $this->register('POST',     "$assRoute/delete",                 'postDeleteAssessment',     $canDelete,              $preloadAssessment); // a || c
         $this->register('GET',      "$assRoute/status",                 'getStatus',                $canWriteAndNotSpec,    $preloadAssessment); // a || c
         $this->register('GET',      "$assRoute/overview",               'getOverview',              $canWrite,              $preloadAssessment); // a || c
         $this->register('GET',      "$assRoute/overview/export",        'downloadOverview',         $canWrite,              $preloadAssessment); // a || c
