@@ -18,7 +18,6 @@
 namespace Schoolbox\Learning\Assessment\Task;
 
 use InvalidArgumentException;
-use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Participant;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
