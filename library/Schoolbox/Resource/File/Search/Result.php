@@ -41,9 +41,9 @@ class Result extends Base
                 MATCH(f.realname, f.description, f.comment) AGAINST ({$sanitiser->getKeyword()}) AS `score`
             FROM
                 `{$mapper->getTable()}` `f`
-                LEFT JOIN {$mapper->getJoinSql('hash', 'f', 's')}
+                JOIN {$mapper->getJoinSql('hash', 'f', 's')}
                 LEFT JOIN {$mapper->getJoinMapper('hash')->getJoinSql('allowedFileExtension', 's', 'e', true)}
-                LEFT JOIN {$mapper->getJoinSql('owner', 'f', 'o', true)}
+                JOIN {$mapper->getJoinSql('owner', 'f', 'o', true)}
                 INNER JOIN {$mapper->getJoinSql('category', 'f', 'c')}
             WHERE
                 f.deleted_at IS NULL
@@ -63,6 +63,7 @@ class Result extends Base
             $mime = $mapper->getJoinMapper('hash')->hydrateJoin($row, 'allowedFileExtension', 'e');
             $owner = $mapper->hydrateJoin($row, 'owner', 'o');
             $folder = $mapper->hydrateJoin($row, 'category', 'c');
+
 
             $storage->setMimetype($mime);
             $file->setStorage($storage);
@@ -89,9 +90,9 @@ class Result extends Base
                 c.id
             FROM
                 `{$mapper->getTable()}` `f`
-                LEFT JOIN {$mapper->getJoinSql('hash', 'f', 's')}
+                JOIN {$mapper->getJoinSql('hash', 'f', 's')}
                 LEFT JOIN {$mapper->getJoinMapper('hash')->getJoinSql('allowedFileExtension', 's', 'e', true)}
-                LEFT JOIN {$mapper->getJoinSql('owner', 'f', 'o')}
+                JOIN {$mapper->getJoinSql('owner', 'f', 'o', true)}
                 INNER JOIN {$mapper->getJoinSql('category', 'f', 'c')}
             WHERE
                 f.deleted_at IS NULL
