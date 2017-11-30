@@ -17,7 +17,6 @@ use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use \Schoolbox\Collection;
-use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use \Schoolbox\User;
