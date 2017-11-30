@@ -664,16 +664,6 @@ interface IAssessable extends ISoftDeletable
      */
     public function setAllParticipants(Collection $allParticipants);
 
-    /**
-     * @return Collection|IResponse[]
-     */
-    public function getResponses();
-
-    /**
-     * @param Collection|IResponse[] $responses
-     * @return $this
-     */
-    public function setResponses(Collection $responses);
 
     /**
      * Return the IResponse implementation class for this IAssessable
@@ -682,16 +672,6 @@ interface IAssessable extends ISoftDeletable
      */
     public function getResponseClass();
 
-    /**
-     * @return Collection|IFeedback[]
-     */
-    public function getFeedbacks();
-
-    /**
-     * @param Collection|IFeedback[] $feedbacks
-     * @return $this
-     */
-    public function setFeedbacks(Collection $feedbacks);
 
     /**
      * Return the IFeedback implementation class for this IAssessable

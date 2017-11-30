@@ -18,7 +18,6 @@
 namespace Schoolbox\Learning\Assessment\Task;
 
 use InvalidArgumentException;
-use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Participant;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
@@ -32,8 +31,6 @@ use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
  * When a student self-assesses a task, it will generate an IResponse only, with a mark of 'incomplete' or 'self-assessed'.
  * When a teacher assesses a student, it will generate both an IResponse and an IFeedback, with a mark of 'incomplete' or 'teacher-assessed'.
  *
- * @method TaskFeedback[]|GenericCollection getFeedbacks()
- * @method TaskResponse[]|GenericCollection getResponses()
  */
 class Model extends AbstractAssessment
 {

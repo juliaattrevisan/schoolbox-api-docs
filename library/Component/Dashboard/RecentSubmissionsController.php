@@ -45,10 +45,11 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
 
     /**
      * Sorted by most recent student response first
+     * A set of tuples (assessment, responseData)
      *
-     * @var Collection|DueWork[]|Quiz[]
+     * @var array
      */
-    private $assessments;
+    private $results;
 
 
     public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage)
@@ -132,6 +133,9 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         }
         $quizAttempts = $this->attemptDataSource->findByPredicates($pb);
 
+        /* Responses' submittedAt values determine the order of assessments that show in this component
+         * Sort the Responses first using the callback
+         */
         /** @var GenericCollection|IResponse[] $responses */
         $responses = (new GenericCollection(IResponse::class))
             ->merge($studentSubmissions)
@@ -140,40 +144,59 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
                 return $b->getSubmittedAt()->compare($a->getSubmittedAt());
             });
 
-        // Group IResponses by IAssessable
-
+        /* Find all the Assessments for which Responses have been found
+         */
         $assessmentIds = [];
         $limit         = $this->getConfig('sizeNoAll');
 
         foreach ($responses as $response) {
             $assessmentId                 = $response->getAssessable()->getId();
             $assessmentIds[$assessmentId] = $assessmentId;
+
             if (count($assessmentIds) >= $limit) {
                 break;
             }
         }
 
+        /* Load a hashtable of Assessments. Assessment instances aren't hydrated in each Response
+         * for performance reasons, so we'll need to do a manual lookup and assignment
+         */
         /** @var IAssessable[]|GenericCollection $assessables */
-        $assessables = $this->assessmentMapperProxy->findAllByIds($assessmentIds)->indexBy('id');
+        $allAssessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds)->indexBy('id');
+
+        /* Correlate each Response to its hydrated Assessment instance
+         */
+        $results = [];
 
         foreach ($responses as $response) {
             $assessmentId = $response->getAssessable()->getId();
-            if (isset($assessables[$assessmentId])) {
-                $assessables[$assessmentId]->getResponses()->add($response);
+
+            /* Increment response count
+             *
+             * Initialise a new tuple for an (assessment, responses[]) combo if it doesn't already exist - this
+             * is the most recent response. All other ones are older, due to sorting callback used previously
+             *
+             * Exclude Responses which are related to non-existent Assessments
+             */
+            if (isset($results[$assessmentId])) {
+                $results[$assessmentId]['responses']['num']++;
+            }
+            elseif (isset($allAssessments[$assessmentId])) {
+                $results[$assessmentId] = [
+                    'assessment' => $allAssessments[$assessmentId],
+                    'responses' => [
+                        'num' => 1,
+                        'mostRecent' => $response->getSubmittedAt()
+                    ]
+                ];
             }
         }
 
-        // Sort by most recent first, in most recent first
-        $assessables->sortByCallback(function ($assessmentA, $assessmentB) {
-            /** @var IAssessable $assessmentA */
-            /** @var IAssessable $assessmentB */
-            $dateA = $assessmentA->getResponses()[0]->getSubmittedAt();
-            $dateB = $assessmentB->getResponses()[0]->getSubmittedAt();
-            return $dateB->compare($dateA);
-        });
+        /* Store the result
+         */
+        $this->results = $results;
 
-        $this->assessments = $assessables;
-        return $assessables->count() > 0;
+        return count($this->results) > 0;
     }
 
 
@@ -188,7 +211,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
             $templateHandle,
             '@learning/component/recentSubmissions.twig',
             [
-                'assessments' => $this->assessments,
+                'results' => $this->results,
             ]
         );
     }

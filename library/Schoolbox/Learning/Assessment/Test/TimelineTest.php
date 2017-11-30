@@ -49,10 +49,8 @@ class TimelineTest extends TestCase
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 10:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setSubmittedAt(new \Alaress_Date_Format('2016-11-04 10:45:00', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $assessment->setResponses((new Collection())->add($response1));
-
         $participant = new Participant($student, $assessment);
-        $participant->setAllResponses($participant->getAllResponses()->merge($assessment->getResponses()));
+        $participant->getAllResponses()->add($response1);
 
         /* Compare these
          */
@@ -86,13 +84,9 @@ class TimelineTest extends TestCase
 
         $response1->getAllFeedback()->add($feedback1);
 
-        $assessment->setResponses((new Collection())
-            ->add($response1)
-        );
-
         $participant = new Participant(new User(), $assessment);
-        $participant->setAllResponses($participant->getAllResponses()->merge($assessment->getResponses()));
-        $participant->setAllFeedbacks($participant->getAllFeedbacks()->merge($assessment->getFeedbacks()));
+        $participant->getAllResponses()->add($response1);
+        $participant->getAllFeedbacks()->add($feedback1);
 
         /* Compare these
          */
@@ -136,13 +130,9 @@ class TimelineTest extends TestCase
             ->add($feedback2)
         );
 
-        $assessment->setResponses((new Collection())
-            ->add($response1)
-        );
-
         $participant = new Participant(new User(), $assessment);
-        $participant->setAllResponses($participant->getAllResponses()->merge($assessment->getResponses()));
-        $participant->setAllFeedbacks($participant->getAllFeedbacks()->merge($assessment->getFeedbacks()));
+        $participant->getAllResponses()->add($response1);
+        $participant->getAllFeedbacks()->add($feedback1)->add($feedback2);
 
         /* Compare these
          */
@@ -205,16 +195,9 @@ class TimelineTest extends TestCase
 
         $response1->getAllFeedback()->add($feedback3);
 
-        $assessment->setResponses((new Collection())
-            ->add($response1)
-            ->add($response2)
-            ->add($response3)
-        );
-
         $participant = new Participant(new User(), $assessment);
-        $participant->setAllResponses($participant->getAllResponses()->merge($assessment->getResponses()));
-        $participant->setAllFeedbacks($participant->getAllFeedbacks()->merge($assessment->getFeedbacks()));
-
+        $participant->getAllResponses()->add($response1)->add($response2)->add($response3);
+        $participant->getAllFeedbacks()->add($feedback1)->add($feedback2)->add($feedback3);
 
         /* Compare these
          */
@@ -302,19 +285,9 @@ class TimelineTest extends TestCase
             ->setAssessable($assessment)
             ->setPublishedAt(new \Alaress_Date_Format('2016-11-01 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $assessment->setResponses((new Collection())
-            ->add($response1)
-            ->add($response2)
-            ->add($response3)
-        )->setFeedbacks((new Collection())
-            ->add($floating1)
-            ->add($floating2)
-            ->add($floating3)
-        );
-
         $participant = new Participant(new User(), $assessment);
-        $participant->setAllResponses($participant->getAllResponses()->merge($assessment->getResponses()));
-        $participant->setAllFeedbacks($participant->getAllFeedbacks()->merge($assessment->getFeedbacks()));
+        $participant->getAllResponses()->add($response1)->add($response2)->add($response3);
+        $participant->getAllFeedbacks()->add($floating1)->add($floating2)->add($floating3);
 
         /* Compare these
          *
@@ -407,17 +380,9 @@ class TimelineTest extends TestCase
             ->setAssessable($assessment)
             ->setPublishedAt(null);
 
-        $assessment->setResponses((new Collection())
-            ->add($response1)
-            ->add($response2)
-            ->add($response3)
-        )->setFeedbacks((new Collection())
-            ->add($floating1)
-            ->add($floating2)
-            ->add($floating3)
-        );
-
         $participant = new Participant(new User(), $assessment);
+        $participant->getAllResponses()->add($response1)->add($response2)->add($response3);
+        $participant->getAllFeedbacks()->add($floating1)->add($floating2)->add($floating3);
 
 
         /* Compare these

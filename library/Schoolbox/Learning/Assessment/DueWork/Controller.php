@@ -917,7 +917,6 @@ class Controller extends Assessment\Controller
 
         $this->dueWorkResponseMapper->save($response);
         $participant->getAllResponses()[$response->getId()] = $response;
-        $assessment->getResponses()[$response->getId()]     = $response;
 
         return $response;
     }

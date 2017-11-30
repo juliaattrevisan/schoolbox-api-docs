@@ -229,17 +229,7 @@ class Module extends BaseModule
         // Load Participants into relevant Assessments
         $this->getParticipantDataSource()->loadParticipationIntoAssessmentCollection($dueAssessments);
         foreach ($dueAssessments as $assessment) {
-
             $unitImplsInTerm->setOffset($assessment->getContext()->getId(), $assessment->getContext());
-
-            foreach ($assessment->getAllParticipants() as $participant) {
-                foreach ($participant->getAllFeedbacks() as $feedback) {
-                    $assessment->getFeedbacks()->setOffset($feedback->getId(), $feedback);
-                }
-                foreach ($participant->getAllResponses() as $response) {
-                    $assessment->getResponses()->setOffset($response->getId(), $response);
-                }
-            }
         }
 
 

@@ -7,6 +7,7 @@
 namespace Schoolbox\Learning\Assessment\Test;
 
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Summator\Average;
 use Schoolbox\Learning\Assessment\Summator\ISummator;
 use Schoolbox\Learning\Assessment\Summator\Maximum;
@@ -418,9 +419,13 @@ class FactoryTest extends TestCase
         $attempt = new QuizAttempt();
         $feedback = new QuizFeedback();
 
+        $participant = new Participant($this->getDummyQuizAttempter(), $quiz);
+        $participant->getAllResponses()->add($attempt);
+        $participant->getAllFeedbacks()->add($feedback);
+
+        $quiz->getAllParticipants()->add($participant);
+
         // Link them all together
-        $quiz->getResponses()->add($attempt);
-        $quiz->getFeedbacks()->add($feedback);
         $feedback->setResponse($attempt);
         $feedback->setAssessable($quiz);
         $attempt->getAllFeedback()->add($feedback);
@@ -447,5 +452,16 @@ class FactoryTest extends TestCase
         $attempt->setMarksGiven($marksGiven);
 
         return $quiz;
+    }
+
+    /**
+     * Generate a dummy User instance
+     * This person "attempted the quiz"
+     *
+     * @return mixed
+     */
+    private function getDummyQuizAttempter()
+    {
+        return (new \Schoolbox\User())->setId(19);
     }
 }

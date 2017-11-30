@@ -17,7 +17,6 @@ use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use \Schoolbox\Collection;
-use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use \Schoolbox\User;
@@ -114,15 +113,6 @@ abstract class AbstractAssessment implements IAssessable
      */
     private $markScheme;
 
-    /**
-     * @var Collection|IResponse[]
-     */
-    private $responses;
-
-    /**
-     * @var Collection|IFeedback[]
-     */
-    private $feedbacks;
 
     /**
      * The UnitSpec, UnitImpl, Project or Folder where this Assessment resides.
@@ -182,8 +172,6 @@ abstract class AbstractAssessment implements IAssessable
     public function __construct()
     {
         $this->setAllParticipants(new Collection());
-        $this->responses = new GenericCollection($this->getResponseClass());
-        $this->feedbacks = new GenericCollection($this->getFeedbackClass());
         $this->setCurriculumNodes(new Collection());
     }
 
@@ -836,42 +824,6 @@ abstract class AbstractAssessment implements IAssessable
     public function setMarkScheme(IMarkScheme $markScheme)
     {
         $this->markScheme = $markScheme;
-        return $this;
-    }
-
-    /**
-     * @return Collection|IResponse[]
-     */
-    public function getResponses()
-    {
-        return $this->responses;
-    }
-
-    /**
-     * @param Collection|IResponse[] $responses
-     * @return $this
-     */
-    public function setResponses(Collection $responses)
-    {
-        $this->responses = $responses;
-        return $this;
-    }
-
-    /**
-     * @return Collection|IFeedback[]
-     */
-    public function getFeedbacks()
-    {
-        return $this->feedbacks;
-    }
-
-    /**
-     * @param Collection|IFeedback[] $feedbacks
-     * @return $this
-     */
-    public function setFeedbacks(Collection $feedbacks)
-    {
-        $this->feedbacks = $feedbacks;
         return $this;
     }
 
