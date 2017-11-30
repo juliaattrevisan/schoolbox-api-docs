@@ -70,7 +70,7 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
             $j = 0;
 
             foreach ($allItems as $currentItem) {
-                if ($currentItem->getFile()->getMimetype()) {
+                if ($currentItem->getFile() && $currentItem->getFile()->getMimetype()) {
                     $this->setVar(
                         array(
                             'LIST_ITEM_ID'         => $currentItem->getId(),
