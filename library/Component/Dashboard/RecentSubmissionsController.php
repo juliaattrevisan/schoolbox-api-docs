@@ -179,13 +179,13 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
              * Exclude Responses which are related to non-existent Assessments
              */
             if (isset($results[$assessmentId])) {
-                $results[$assessmentId]['responses']['count']++;
+                $results[$assessmentId]['responses']['num']++;
             }
             elseif (isset($allAssessments[$assessmentId])) {
                 $results[$assessmentId] = [
                     'assessment' => $allAssessments[$assessmentId],
                     'responses' => [
-                        'count' => 1,
+                        'num' => 1,
                         'mostRecent' => $response->getSubmittedAt()
                     ]
                 ];

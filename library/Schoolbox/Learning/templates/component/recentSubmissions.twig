@@ -7,7 +7,7 @@ Usage:
         <li class="list-item" data-equalizer>
             <div class="small-2 columns">
                 {% set responseType = current.assessment is quiz ? 'attempt' : 'submission' %}
-                <p class='counter' title="{{ current.responses.count }} new {{ responseType }}{% if current.responses.count > 1%}s{% endif %}">{{ current.responses.count }}</p>
+                <p class='counter' title="{{ current.responses.num }} new {{ responseType }}{% if current.responses.num > 1%}s{% endif %}">{{ current.responses.num }}</p>
             </div>
             <div class="card small-10" data-equalizer-watch>
                 <h3><a href="{{ routeLookup('learningAssessment.getStatus', {assessmentId: current.assessment.id}) }}">{{ current.assessment.title }}</a></h3>
