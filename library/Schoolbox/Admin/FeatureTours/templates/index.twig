@@ -3,21 +3,33 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Feature Tours</h2>
-        <section>
-            <div class="columns">
-                <form method="post" action="{{ routeLookup('featureTours.updateConfig') }}">
-                    <label>Enabled<span data-tooltip class="hint has-tip tip-bottom" title="Enable or disable all feature tours system-wide.">?</span></label>
-                    <span class="switch">
-                        <input id="enabled" type="checkbox" name="enabled" {% if toursEnabled %} checked {% endif %}/>
-                        <label for="enabled">
-                            <span>On</span>
-                            <span>Off</span>
-                        </label>
-                    </span>
-                    <input type="submit" value="Save"/>
-                </form>
+
+        <form method="post" action="{{ routeLookup('featureTours.updateConfig') }}">
+            <section>
+                <fieldset class="content">
+
+                    <div class="small-12 columns">
+                        <label for="tours-enabled">Enabled<span data-tooltip class="hint has-tip tip-bottom" title="Enable or disable all feature tours system-wide.">?</span></label>
+                        <span class="switch">
+                            <input id="tours-enabled" type="checkbox" name="enabled" {% if toursEnabled %} checked {% endif %}/>
+                            <label for="tours-enabled">
+                                <span>On</span>
+                                <span>Off</span>
+                            </label>
+                        </span>
+                    </div>
+
+                </fieldset>
+            </section>
+
+            <div class="row">
+                <div class="small-12 column">
+                    <input type="submit" name="submit" value="Save">
+                </div>
             </div>
-        </section>
+
+        </form>
+
     </div>
 </div>
 
