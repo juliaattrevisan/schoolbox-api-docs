@@ -95,6 +95,7 @@ class Module extends BaseModule
         $canAckSubmission   = $this->buildAuthRuleCanAcknowledgeSubmission();
 
         $canDelete = new Rule\Any(
+            $isSuper,
             new Rule\All(
                 $canWrite,
                 new IsDeletionUnLocked(new LockedChecker($this->getTermMapper()))
