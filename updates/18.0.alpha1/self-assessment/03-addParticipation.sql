@@ -7,7 +7,7 @@ CREATE TABLE `participation`
   `user_id`                 INT(4) UNSIGNED NOT NULL,
   `created_at`              DATETIME NOT NULL,
   `updated_at`              DATETIME NOT NULL,
-  `deleted_at`              DATETIME
+  `excluded_at`             DATETIME
 );
 
 -- Add foreign key to `user` table
