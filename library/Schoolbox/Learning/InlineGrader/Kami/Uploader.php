@@ -128,19 +128,23 @@ class Uploader
      */
     public function upload(bool $retryFailed, int $batchSize, int $maxSkips): UploadResults
     {
+        $this->log->info('Initiating upload');
+
         $results            = new UploadResults();
         $successiveFailures = 0;
         $kamiCount          = $this->getKamiCount($retryFailed);
 
         // Keep going till we upload everything, or error out
         while (true) {
-            // Get the next batch
-            $kamiModels = $this->getKamiModels($results->getCountTotal(), $batchSize, $retryFailed);
+            // Get the next batch (use offset if dry-run to simulate queue head being removed)
+            $offset     = $this->dryRun ? $results->getCountTotal() : 0;
+            $kamiModels = $this->getKamiModels($offset, $batchSize, $retryFailed);
 
             if (!$kamiModels->count()) {
                 $this->log->notice('No kami documents left to upload.');
                 break;
             }
+            $this->log->notice("Processing next batch of {$kamiModels->count()} models");
 
             foreach ($kamiModels as $kamiModel) {
                 $this->logStartingUpload($results, $kamiCount, $kamiModel);
