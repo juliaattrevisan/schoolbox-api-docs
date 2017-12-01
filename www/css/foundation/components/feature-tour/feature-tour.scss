@@ -1,7 +1,7 @@
 .introjs-overlay {
-	@include easy-transition(all 0.3s ease-out);
 	background: $reveal-overlay-bg;
 	z-index: 999999;
+	@include easy-transition(all 0.3s ease-out);
 }
 
 .introjs-tooltip {
@@ -29,18 +29,14 @@
 	opacity: 0;
 }
 
-.introjs-relativePosition {
-	position: relative;
-}
-
 .introjs-helperLayer {
 	position: absolute;
 	z-index: 9999998;
-	background-color: #FFF;
+	background-color: $white;
 	background-color: rgba(255,255,255,.67);
 	border: 1px solid rgba(255,255,255,.6);
-	@include easy-transition(all 0.3s ease-out);
 	animation: pulse 1.5s infinite;
+	@include easy-transition(all 0.3s ease-out);
 }
 
 @-webkit-keyframes pulse {
@@ -65,10 +61,10 @@
 
 .introjs-tooltipReferenceLayer {
 	background-color: transparent;
-	@include easy-transition(all 0.3s ease-out);
 	position: absolute;
 	visibility: hidden;
 	z-index: 9999999;
+	@include easy-transition(all 0.3s ease-out);
 }
 
 .introjs-arrow {
@@ -76,67 +72,43 @@
 	content: '';
 	position: absolute;
 	&.top {
-		top: -16px;
-		border-top-color:transparent;
-		border-right-color:transparent;
-		border-bottom-color:white;
-		border-left-color:transparent;
+		top: -1rem;
+		border-color: transparent transparent $white transparent;
 	}
 	&.top-right {
-		top: -16px;
-		right: 16px;
-		border-top-color:transparent;
-		border-right-color:transparent;
-		border-bottom-color:white;
-		border-left-color:transparent;
+		top: -1rem;
+		right: 1rem;
+		border-color: transparent transparent $white transparent;
 	}
 	&.top-middle {
-		top: -16px;
+		top: -1rem;
 		left: 50%;
 		margin-left: -5px;
-		border-top-color:transparent;
-		border-right-color:transparent;
-		border-bottom-color:white;
-		border-left-color:transparent;
+		border-color: transparent transparent $white transparent;
 	}
 	&.right {
-		right: -16px;
-		top: 16px;
-		border-top-color:transparent;
-		border-right-color:transparent;
-		border-bottom-color:transparent;
-		border-left-color:white;
+		right: -1rem;
+		top: 1rem;
+		border-color: transparent transparent transparent $white;
 	}
 	&.right-bottom {
-		bottom:16px;
-		right: -16px;
-		border-top-color:transparent;
-		border-right-color:transparent;
-		border-bottom-color:transparent;
-		border-left-color:white;
+		bottom: 1rem;
+		right: -1rem;
+		border-color: transparent transparent transparent $white;
 	}
 	&.bottom {
-		bottom: -16px;
-		border-top-color:white;
-		border-right-color:transparent;
-		border-bottom-color:transparent;
-		border-left-color:transparent;
+		bottom: -1rem;
+		border-color: $white transparent transparent transparent;
 	}
 	&.left {
-		left: -16px;
-		top: 16px;
-		border-top-color:transparent;
-		border-right-color:white;
-		border-bottom-color:transparent;
-		border-left-color:transparent;
+		left: -1rem;
+		top: 1rem;
+		border-color: transparent $white transparent transparent;
 	}
 	&.left-bottom {
-		left: -16px;
-		bottom:16px;
-		border-top-color:transparent;
-		border-right-color:white;
-		border-bottom-color:transparent;
-		border-left-color:transparent;
+		left: -1rem;
+		bottom: 1rem;
+		border-color: transparent $white transparent transparent;
 	}
 }
 
@@ -157,35 +129,28 @@
 	}
 }
 
-.introjs-hidden,
-.introjs-hidehint{
-	display: none !important;
-}
-
 .introjs-bullets {
 	text-align: center;
-}
-
-.introjs-bullets ul {
-	clear: both;
-	margin: 1.5rem auto;
-	padding: 0;
-	display: inline-block;
-	li {
-		list-style: none;
-		float: left;
-		margin: 0 6px;
-		a {
-			@include border-radius(10px);
-			display: block;
-			width: 0.75rem;
-			height: 0.75rem;
-			background: #ccc;
-			text-decoration: none;
-			cursor: pointer;
-			&:hover,
-			&.active{
-				background: $accent-foreground;
+	ul {
+		clear: both;
+		margin: 1.5rem auto;
+		padding: 0;
+		li {
+			display: inline-block;
+			list-style: none;
+			margin: 0 6px;
+			a {
+				@include border-radius(10px);
+				display: block;
+				width: 0.75rem;
+				height: 0.75rem;
+				background: $iron;
+				text-decoration: none;
+				cursor: pointer;
+				&:hover,
+				&.active{
+					background: $accent-foreground;
+				}
 			}
 		}
 	}
@@ -199,7 +164,7 @@
 }
 
 .introjs-tooltiptext{
-	padding-right: 1.5rem;
+	padding-right: 2rem;
 	font-size: $paragraph-font-size;
 }
 
@@ -210,9 +175,7 @@
 
 .introjs-nextbutton,
 .introjs-prevbutton {
-	@include flex;
-	justify-content: center;
-	float: left;
+	display: inline-block;
 	width: 49.8%;
 }
 
@@ -238,4 +201,13 @@
 	&:hover{
 		color: $accent-foreground;
 	}
+}
+
+.introjs-relativePosition {
+	position: relative;
+}
+
+.introjs-hidden,
+.introjs-hidehint{
+	display: none !important;
 }
