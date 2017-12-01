@@ -252,7 +252,8 @@ class Factory
                 $this->getMaxMark(),
                 $this->getRubricData(),
                 $this->getAttachedFiles(),
-                $this->getSelfAssessable()
+                $this->getSelfAssessable(),
+                $this->getSelfReflectable()
             );
 
         } elseif ($assessment instanceof Task) {
