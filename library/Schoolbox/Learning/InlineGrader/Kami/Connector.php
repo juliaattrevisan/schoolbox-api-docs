@@ -34,21 +34,21 @@ class Connector implements IConnector
 
     // Intentional trailing slash (@see http://docs.guzzlephp.org/en/stable/quickstart.html#creating-a-client)
     // Correspond to API paths. @see http://docs.kamiembeddingapi.apiary.io
-    const BASE_URI = 'https://api.notablepdf.com/';
+    public const BASE_URI = 'https://api.notablepdf.com/';
 
-    const PATH_UPLOAD_DOCUMENT_MULTIPART = 'upload/embed/documents';
-    const PATH_LIST_DOCUMENTS = 'embed/documents';
-    const PATH_GET_DOCUMENT = 'embed/documents/';
-    const PATH_DELETE_DOCUMENT = 'embed/documents/';
+    public const PATH_UPLOAD_DOCUMENT_MULTIPART = 'upload/embed/documents';
+    public const PATH_LIST_DOCUMENTS = 'embed/documents';
+    public const PATH_GET_DOCUMENT = 'embed/documents/';
+    public const PATH_DELETE_DOCUMENT = 'embed/documents/';
 
-    const CONFIG_KEY_KAMI_API_KEY = 'kami_api_key';
+    public const CONFIG_KEY_KAMI_API_KEY = 'kami_api_key';
 
     // How long should view sessions last for by default?
-    const DEFAULT_SESSION_EXPIRY_HOURS = 1;
+    public const DEFAULT_SESSION_EXPIRY_HOURS = 1;
 
     // Export types
-    const EXPORT_TYPE_ANNOTATION = 'annotation'; // Annotations embedded into the document as PDF Annotations.
-    const EXPORT_TYPE_INLINE = 'inline';         // Annotations drawn into the document. Mostly useful for printing.
+    public const EXPORT_TYPE_ANNOTATION = 'annotation'; // Annotations embedded into the document as PDF Annotations.
+    public const EXPORT_TYPE_INLINE = 'inline';         // Annotations drawn on to document. Useful for printing.
 
     /**
      * @var IConfigLoader
