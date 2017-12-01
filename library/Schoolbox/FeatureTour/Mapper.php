@@ -29,7 +29,9 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-        $this->registerCallback(self::CALLBACK_PRESAVE, function (Model $model) { return $this->preSave($model); });
+        $this->registerCallback(self::CALLBACK_PRESAVE, function (Model $model) {
+            return $this->preSave($model);
+        });
     }
 
 
@@ -51,5 +53,4 @@ class Mapper extends \Schoolbox\Mapper
 
         return true;
     }
-
 }

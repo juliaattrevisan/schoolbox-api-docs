@@ -12,7 +12,6 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 
-
 class Model
 {
     use CreatedAtDate;
@@ -120,6 +119,4 @@ class Model
         $this->active = $active;
         return $this;
     }
-
-
 }
