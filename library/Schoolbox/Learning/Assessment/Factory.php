@@ -26,7 +26,7 @@ use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 
-use \Schoolbox\Learning\Assessment\DueWork\Decorator\DueWorkTrait as DueWorkTrait;
+use \Schoolbox\Learning\Assessment\DueWork\Decorator\DueWorkTrait;
 use \Schoolbox\Learning\Assessment\DueWork\Decorator\Decorator as DueWorkDecorator;
 
 use \Schoolbox\Learning\Assessment\Quiz\Decorator\QuizTrait as QuizTrait;
@@ -154,7 +154,8 @@ class Factory
         $this->setUseRubric(trim($post['useRubric']));
         $this->setMarkPerCapability(trim($post['markPerCapability']));
         $this->setMaxMark(trim($post['maxMark']));
-        $this->setSelfAssessable($post['selfAssessable']);
+        $this->setSelfAssessable((bool)$post['selfAssessable']);
+        $this->setSelfReflectable((bool)$post['selfReflectable']);
 
         $this->setRubricData($post[$post['formField']]);
 

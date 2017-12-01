@@ -35,6 +35,8 @@ class Decorator implements DecoratorInterface
      * @param $maxMark
      * @param $rubricData
      * @param $attachedFiles
+     * @param $selfAssessable
+     * @param $selfReflectable
      */
     public function __construct(
         $acceptOnline,

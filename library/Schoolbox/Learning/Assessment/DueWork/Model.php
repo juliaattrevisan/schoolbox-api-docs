@@ -643,9 +643,9 @@ class Model extends AbstractAssessment
     /**
      * @return bool
      */
-    public function getSelfReflectable(): bool
+    public function getSelfReflectable()
     {
-        return $this->isSelfReflectable();
+        return $this->selfReflectable;
     }
 
     /**

@@ -236,7 +236,7 @@ trait DueWorkTrait
     /**
      * @return bool
      */
-    public function getSelfReflectable(): bool
+    public function getSelfReflectable()
     {
         return $this->selfReflectable;
     }
