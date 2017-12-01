@@ -95,14 +95,13 @@
     <input type="number" name="weight" value="{{ assessment.weight }}">
 </label>
 
-<label for="selfAssessable">Allow students to self-assess</label>
-<div class="switch round">
-    <input type="checkbox" value="1" {% if assessment.selfAssessable %}checked{% endif %} id="selfAssessable" name="selfAssessable">
-    <label for="selfAssessable">
-        <span class="icon-approve"></span>
-        <span class="icon-cancel"></span>
-    </label>
-</div>
+<label>Self-Reflection
+    <select name="self-reflection">
+        <option value="None">None</option>
+        <option value="Self-Relfect" {% if assessment.selfReflectable %}selected{% endif %}>Self-Reflect</option>
+        <option value="Self-Reflect + Self-Assess" {% if assessment.selfAssessable %}selected{% endif %} >Self-Reflect + Self-Assess</option>
+    </select>
+</label>
 
 {% import 'sub/visibility.twig' as visibility %}
 {{ visibility.dropdown(markVisibility, availableVisibilities) }}
