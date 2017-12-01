@@ -51,6 +51,7 @@ class DueWork implements IAssessmentTypeTranslator
                 ->setMarkType(new DueWorkModel\MarkType())
                 ->setGradeGroup(new DueWorkModel\GradeLevel\Group\Model())
                 ->setSelfAssessable($assessment->getSelfAssessable())
+                ->setSelfReflectable($assessment->getSelfReflectable())
             ;
 
             // Convert a mark type into fields
@@ -139,6 +140,12 @@ class DueWork implements IAssessmentTypeTranslator
                 $assessable->setSelfAssessable(false);
             }
 
+            if ($model->getSelfReflectable()) {
+                $assessable->setSelfReflectable(true);
+            } else {
+                $assessable->setSelfReflectable(false);
+            }
+            
             // Convert attachments
             foreach ($model->getAttachments() as $attachment) {
                 $assessable->getAttachedFiles()->add(
