@@ -145,7 +145,7 @@ class DueWork implements IAssessmentTypeTranslator
             } else {
                 $assessable->setSelfReflectable(false);
             }
-            
+
             // Convert attachments
             foreach ($model->getAttachments() as $attachment) {
                 $assessable->getAttachedFiles()->add(
