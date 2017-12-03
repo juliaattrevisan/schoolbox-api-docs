@@ -10,7 +10,7 @@ namespace Schoolbox\Learning\Authorizer\Rule;
 use Schoolbox\Learning\Assessment\IAssessable;
 
 /**
- * Authorisation rule to check whether an assessment is locked from interactions (ie response or feedback)
+ * Authorisation rule to check whether an assessment is locked from deletion
  *
  * Does NOT short-circuit for SuperUsers - the module should combine Rules to achieve that effect if desired.
  */

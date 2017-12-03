@@ -87,11 +87,10 @@ class LockedChecker
     }
 
     /**
-     * Is the assessment due in an archived term, or no term at all?
+     * Can we delete this assessment?
      *
      * @param IAssessable $assessment
      * @return bool
-     * @throws \InvalidArgumentException If due date is null.
      */
     public function isLockedForDeletion(IAssessable $assessment)
     {
