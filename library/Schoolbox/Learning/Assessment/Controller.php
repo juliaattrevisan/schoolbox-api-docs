@@ -126,6 +126,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $data['curriculumNodes'] = $assessment->getCurriculumNodes();
 
         $template = "@learningAssessment/update.twig";
+        $whatever = $assessment->getContext()->isSpecificationContext();
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
     }
 
