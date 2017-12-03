@@ -132,7 +132,7 @@ class Module extends BaseModule
         return new Rule\HasHomepageAccess(
             UserAccess::ACCESS_WRITE,
             function ($params) {
-                if ($params['response'] instanceof IResponse) {
+                if ($params['response'] instanceof IResponse && $params['response']->getAssessable()) {
                     return $params['response']->getAssessable()->getContext()->getFolder()->getId();
                 }
                 if ($params['assessment'] instanceof IAssessable) {
