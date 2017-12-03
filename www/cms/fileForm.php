@@ -290,17 +290,13 @@ function outputException(Exception $e, IFile $file, $ajax = false) {
     // Output errors
     if ($e->getCode() == \Schoolbox\File\Exception::CODE_MIMETYPE_NOT_FOUND) {
         $code = 11;
-        $msg  = "Your file, '{$file->getFilename()}' is not a valid filetype";
-
     } elseif ($e->getCode() == \Schoolbox\File\Exception::CODE_FILE_TOO_LARGE) {
         $code = 10;
-        $msg  = 'The size of the uploaded file exceeds the file size restrictions of '
-            . Alaress_Byte_Format::bytesToString($file->getMimetype()->getActualMaxFileSize()) . '.';
-
     } else {
         $code = 9;
-        $msg  = $e->getMessage();
     }
+
+    $msg  = $e->getMessage();
 
     if ($ajax) {
         http_response_code(400);
