@@ -7,7 +7,7 @@ INSERT INTO       `participation`
                       `created_at`,
                       `updated_at`
                   )
-SELECT DISTINCT   `participation_plan`.`id`,                -- Participation plan
+SELECT            `participation_plan`.`id`,                -- Participation plan
                   `student_submission`.`owner`,             -- Owner/student
                   MIN(`student_submission`.`created_at`),   -- Created timestamp (first un-deleted submission date)
                   MIN(`student_submission`.`created_at`)    -- Updated timestamp
@@ -30,7 +30,7 @@ INSERT INTO       `participation`
                       `created_at`,
                       `updated_at`
                   )
-SELECT DISTINCT   `participation_plan`.`id`,                -- Participation plan
+SELECT            `participation_plan`.`id`,                -- Participation plan
                   `assess_attempt`.`user_id`,               -- Student
                   MIN(`assess_attempt`.`start`),            -- Created timestamp (first un-deleted attempt date)
                   MIN(`assess_attempt`.`start`)             -- Updated timestamp
@@ -53,7 +53,7 @@ INSERT INTO       `participation`
                       `created_at`,
                       `updated_at`
                   )
-SELECT DISTINCT   `participation_plan`.`id`,                -- Participation plan
+SELECT            `participation_plan`.`id`,                -- Participation plan
                   `task_completion`.`student_id`,           -- Student
                   MIN(`task_completion`.`completion_date`), -- Created timestamp (first un-deleted completion date)
                   MIN(`task_completion`.`completion_date`)  -- Updated timestamp
