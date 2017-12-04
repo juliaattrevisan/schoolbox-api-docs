@@ -32,8 +32,8 @@
                                 <div class="list-item">
                                     <div class="card small-1">
                                     <span class="switch">
-                                        <input id="tours-enable-{{ tour.uuid }}" type="checkbox" name="enabled" {% if tour.active %}checked{% endif %}/>
-                                        <label for="tours-enable-{{ tour.uuid }}">
+                                        <input id="tour-enable-{{ tour.uuid }}" type="checkbox" name="tour-enable[]" value="{{ tour.uuid }}" {% if tour.active %}checked{% endif %}/>
+                                        <label for="tour-enable-{{ tour.uuid }}">
                                             <span>On</span>
                                             <span>Off</span>
                                         </label>

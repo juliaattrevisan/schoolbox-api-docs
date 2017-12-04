@@ -35,6 +35,7 @@ class Controller extends Base
      */
     public function updateConfig()
     {
+        // Update global config
         /** @var Config $config */
         $config = ConfigMapper::getInstance()->findOneByColumn("name", "tours_enabled");
 
@@ -45,6 +46,17 @@ class Controller extends Base
         }
 
         ConfigMapper::getInstance()->save($config);
+
+        // Save active states for tours
+        $uuids = [];
+        if (isset($this->getRequest()->post['tour-enable'])) {
+            foreach ($this->getRequest()->post['tour-enable'] as $tourID) {
+                $uuids[] = $tourID;
+            }
+        }
+        FeatureTourMapper::getInstance()->updateActiveTours($uuids);
+
+        // Redirect back to the same page
         $this->getResponse()->redirect->afterPost($this->getRouteIfAuthorized('featureTours.render'));
     }
 }

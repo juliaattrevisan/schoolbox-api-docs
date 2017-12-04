@@ -8,6 +8,8 @@
 
 namespace Schoolbox\FeatureTour;
 
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
+
 class Mapper extends \Schoolbox\Mapper
 {
 
@@ -52,5 +54,33 @@ class Mapper extends \Schoolbox\Mapper
         $model->setUuid($this->database->query('SELECT UUID()')->fetchColumn());
 
         return true;
+    }
+
+
+    /**
+     * Update an array of tours to active, and all others to inactive
+     *
+     * @param array $uuids
+     */
+    public function updateActiveTours(array $uuids)
+    {
+        if (count($uuids)) {
+            $predicate = PredicateBuilder::getArrayBindings($uuids, 'uuid');
+            $query = "
+                UPDATE  {$this->getTable()}
+                SET     `active` = CASE WHEN `uuid` IN ({$predicate['placeholders']}) THEN 1 ELSE 0 END;
+            ";
+            $bindings = $predicate['bindings'];
+        } else {
+            // Nothing in the uuids array - set all tours to inactive
+            $query = "
+                UPDATE  {$this->getTable()}
+                SET     `active` = 0;
+            ";
+            $bindings = null;
+        }
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($bindings);
     }
 }
