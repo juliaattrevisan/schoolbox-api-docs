@@ -21,8 +21,7 @@
 
                 </fieldset>
 
-
-                <fieldset class="content">
+                <fieldset class="content {% if not toursEnabled %}hide{% endif %}" id="available-tours">
 
                     <legend>Available Tours</legend>
 
@@ -89,4 +88,15 @@
 
     </div>
 </div>
+
+<script>
+    // On change of global enable/disable - toggle show/hide of options
+    $('#tours-enabled').change(function() {
+        if ($(this).is(':checked')) {
+            $('#available-tours').removeClass('hide');
+        } else {
+            $('#available-tours').addClass('hide');
+        }
+    });
+</script>
 
