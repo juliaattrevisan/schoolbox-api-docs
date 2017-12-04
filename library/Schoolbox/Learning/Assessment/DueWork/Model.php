@@ -643,16 +643,18 @@ class Model extends AbstractAssessment
     /**
      * @return bool
      */
-    public function getSelfReflectable()
+    public function getSelfReflectable() : bool
     {
         return $this->selfReflectable;
     }
 
     /**
      * @param bool $selfReflectable
+     * @return static
      */
     public function setSelfReflectable(bool $selfReflectable)
     {
         $this->selfReflectable = $selfReflectable;
+        return $this;
     }
 }

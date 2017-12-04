@@ -940,9 +940,11 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
 
     /**
      * @param bool $selfReflectable
+     * @return static
      */
     public function setSelfReflectable(bool $selfReflectable)
     {
         $this->selfReflectable = $selfReflectable;
+        return $this;
     }
 }

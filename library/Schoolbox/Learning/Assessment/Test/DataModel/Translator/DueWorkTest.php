@@ -88,6 +88,8 @@ class DueWorkTest extends TestCase
             )
             ->setMarkScheme(new None())
             ->setUseRubric(true)
+            ->setSelfAssessable(true)
+            ->setSelfReflectable(true)
         ;
 
         /** @var DueWorkModel $dueWorkModel */
@@ -141,7 +143,9 @@ class DueWorkTest extends TestCase
                 (new DueWork())
                     ->setContext($context)
                     ->setMarkScheme(new None())
-                    ->setWorkType(new WorkType()),
+                    ->setWorkType(new WorkType())
+                    ->setSelfAssessable(true)
+                    ->setSelfReflectable(true),
                 DueWorkModel\MarkType::TYPE_NONE,
                 null,
                 null,
@@ -150,7 +154,9 @@ class DueWorkTest extends TestCase
                 (new DueWork())
                     ->setContext($context)
                     ->setMarkScheme(new Percentage())
-                    ->setWorkType(new WorkType()),
+                    ->setWorkType(new WorkType())
+                    ->setSelfAssessable(true)
+                    ->setSelfReflectable(true),
                 DueWorkModel\MarkType::TYPE_PERCENT,
                 null,
                 null,
@@ -159,7 +165,9 @@ class DueWorkTest extends TestCase
                 (new DueWork())
                     ->setContext($context)
                     ->setMarkScheme((new TotalMarkWholeNumber(10)))
-                    ->setWorkType(new WorkType()),
+                    ->setWorkType(new WorkType())
+                    ->setSelfAssessable(true)
+                    ->setSelfReflectable(true),
                 DueWorkModel\MarkType::TYPE_TOTAL,
                 10,
                 null,
@@ -174,7 +182,9 @@ class DueWorkTest extends TestCase
                                 new DueWorkModel\GradeLevel\Model()
                             )
                     ))
-                    ->setWorkType(new WorkType()),
+                    ->setWorkType(new WorkType())
+                    ->setSelfAssessable(true)
+                    ->setSelfReflectable(true),
                 DueWorkModel\MarkType::TYPE_LETTER,
                 null,
                 7,
@@ -218,7 +228,9 @@ class DueWorkTest extends TestCase
                 (new DueWork())
                     ->setContext($context)
                     ->setAcceptsMultiple()
-                    ->setWorkType(new WorkType()),
+                    ->setWorkType(new WorkType())
+                    ->setSelfAssessable(true)
+                    ->setSelfReflectable(true),
                  true,
                  true,
             ],
@@ -226,7 +238,9 @@ class DueWorkTest extends TestCase
                 (new DueWork())
                     ->setContext($context)
                     ->setAcceptsSingle()
-                    ->setWorkType(new WorkType()),
+                    ->setWorkType(new WorkType())
+                    ->setSelfAssessable(true)
+                    ->setSelfReflectable(true),
                 true,
                 false,
             ],
@@ -234,7 +248,9 @@ class DueWorkTest extends TestCase
                 (new DueWork())
                     ->setContext($context)
                     ->setAcceptsNone()
-                    ->setWorkType(new WorkType()),
+                    ->setWorkType(new WorkType())
+                    ->setSelfAssessable(true)
+                    ->setSelfReflectable(true),
                 false,
                 false,
             ],
@@ -305,8 +321,10 @@ class DueWorkTest extends TestCase
                 ->add($storage3)
             )
             ->setMarkType($this->buildMarkType())
+            ->setSelfAssessable(true)
+            ->setSelfReflectable(true)
         ;
-
+        
         /** @var DueWork $dueWork */
         $dueWork = $this->translator->translateToDomainModel($dueWorkModel);
 
@@ -353,7 +371,9 @@ class DueWorkTest extends TestCase
                     ->setAssessmentModel($assessmentModel)
                     ->setAcceptOnline(true)
                     ->setAcceptMultiple(true)
-                    ->setMarkType($this->buildMarkType()),
+                    ->setMarkType($this->buildMarkType())
+                    ->setSelfAssessable(true)
+                    ->setSelfReflectable(true),
                 true,
                 true,
             ],
@@ -362,7 +382,9 @@ class DueWorkTest extends TestCase
                     ->setAssessmentModel($assessmentModel)
                     ->setAcceptOnline(true)
                     ->setAcceptMultiple(false)
-                    ->setMarkType($this->buildMarkType()),
+                    ->setMarkType($this->buildMarkType())
+                    ->setSelfAssessable(true)
+                    ->setSelfReflectable(true),
                 true,
                 false,
             ],
@@ -371,7 +393,9 @@ class DueWorkTest extends TestCase
                     ->setAssessmentModel($assessmentModel)
                     ->setAcceptOnline(false)
                     ->setAcceptMultiple(false)
-                    ->setMarkType($this->buildMarkType()),
+                    ->setMarkType($this->buildMarkType())
+                    ->setSelfAssessable(true)
+                    ->setSelfReflectable(true),
                 false,
                 false,
             ],
@@ -380,7 +404,9 @@ class DueWorkTest extends TestCase
                     ->setAssessmentModel($assessmentModel)
                     ->setAcceptOnline(false)
                     ->setAcceptMultiple(true)
-                    ->setMarkType($this->buildMarkType()),
+                    ->setMarkType($this->buildMarkType())
+                    ->setSelfAssessable(true)
+                    ->setSelfReflectable(true),
                 false,
                 false,
             ],
@@ -421,7 +447,9 @@ class DueWorkTest extends TestCase
             [
                 (new DueWorkModel())
                     ->setAssessmentModel($assessmentModel)
-                    ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_NONE)),
+                    ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_NONE))
+                    ->setSelfAssessable(true)
+                    ->setSelfReflectable(true),
                 None::class,
                 null,
                 null,
@@ -429,7 +457,9 @@ class DueWorkTest extends TestCase
             [
                 (new DueWorkModel())
                     ->setAssessmentModel($assessmentModel)
-                    ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_PERCENT)),
+                    ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_PERCENT))
+                    ->setSelfAssessable(true)
+                    ->setSelfReflectable(true),
                 Percentage::class,
                 null,
                 null,
@@ -440,7 +470,9 @@ class DueWorkTest extends TestCase
                     ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_LETTER))
                     ->setGradeGroup((new DueWorkModel\GradeLevel\Group\Model())->setId(1)->addGradeLevel(
                         new DueWorkModel\GradeLevel\Model()
-                    )),
+                    ))
+                    ->setSelfAssessable(true)
+                    ->setSelfReflectable(true),
                 LetterGrade::class,
                 null,
                 1,
@@ -449,7 +481,9 @@ class DueWorkTest extends TestCase
                 (new DueWorkModel())
                     ->setAssessmentModel($assessmentModel)
                     ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_TOTAL))
-                    ->setMaxMark(15),
+                    ->setMaxMark(15)
+                    ->setSelfAssessable(true)
+                    ->setSelfReflectable(true),
                 TotalMarkWholeNumber::class,
                 15,
                 null
