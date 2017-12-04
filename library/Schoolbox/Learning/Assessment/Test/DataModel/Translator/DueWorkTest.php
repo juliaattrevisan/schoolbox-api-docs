@@ -324,7 +324,7 @@ class DueWorkTest extends TestCase
             ->setSelfAssessable(true)
             ->setSelfReflectable(true)
         ;
-        
+
         /** @var DueWork $dueWork */
         $dueWork = $this->translator->translateToDomainModel($dueWorkModel);
 

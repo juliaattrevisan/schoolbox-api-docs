@@ -106,7 +106,8 @@ class DueWork implements IAssessmentTypeTranslator
                 ->setMaxMark($model->getMaxMark())
                 ->setGradeGroup($model->getGradeGroup())
                 ->setMarkVisibility($model->getMarkVisibility())
-
+                ->setSelfAssessable($model->getSelfAssessable())
+                ->setSelfReflectable($model->getSelfReflectable())
             ;
 
             // Has Rubric?
@@ -132,18 +133,6 @@ class DueWork implements IAssessmentTypeTranslator
                 }
             } else {
                 $assessable->setAcceptsNone();
-            }
-
-            if ($model->getSelfAssessable()) {
-                $assessable->setSelfAssessable(true);
-            } else {
-                $assessable->setSelfAssessable(false);
-            }
-
-            if ($model->getSelfReflectable()) {
-                $assessable->setSelfReflectable(true);
-            } else {
-                $assessable->setSelfReflectable(false);
             }
 
             // Convert attachments
