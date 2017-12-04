@@ -39,14 +39,16 @@
     <div class="small-12 columns">
         <h1>Update {{ assessment.title }}</h1>
     </div>
-    <nav>
-        <a href="#" class="icon-more" data-dropdown="header-options" title="Actions"></a>
-    </nav>
-    <ul id="header-options" class="f-dropdown" data-dropdown-content="" aria-hidden="true">
-        <li>
-            <a class="icon-delete" title="Delete Activity" data-delete>Delete Activity</a>
-        </li>
-    </ul>
+    {% if routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id, assessment: assessment}) %}
+        <nav>
+            <a href="#" class="icon-more" data-dropdown="header-options" title="Actions"></a>
+        </nav>
+        <ul id="header-options" class="f-dropdown" data-dropdown-content="" aria-hidden="true">
+            <li>
+                    <a class="icon-delete" title="Delete Activity" data-delete>Delete Activity</a>
+            </li>
+        </ul>
+    {% endif %}
 </div>
 
 <div class="row">

@@ -85,4 +85,19 @@ class LockedChecker
         // No term? Or term is archived?
         return !$dueInTerm || !$dueInTerm->getId() || $dueInTerm->getArchived();
     }
+
+    /**
+     * Can we delete this assessment?
+     *
+     * @param IAssessable $assessment
+     * @return bool
+     */
+    public function isLockedForDeletion(IAssessable $assessment)
+    {
+        if ($assessment->getContext()->isSpecificationContext()) {
+            // Assessment Specifications can be deleted at any time
+            return true;
+        }
+        return $this->isDueInArchivedTerm($assessment);
+    }
 }
