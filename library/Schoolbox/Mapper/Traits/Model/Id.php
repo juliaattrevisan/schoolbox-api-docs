@@ -21,7 +21,7 @@ trait Id
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }

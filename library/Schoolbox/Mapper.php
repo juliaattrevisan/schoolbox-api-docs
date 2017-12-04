@@ -40,6 +40,7 @@ use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerFactoryFactory;
 use Serializable;
 use Traversable;
+use TypeError;
 use UnderflowException;
 
 abstract class Mapper implements IMapper, Serializable
@@ -118,6 +119,7 @@ abstract class Mapper implements IMapper, Serializable
     const COLUMN_JOIN_READONLY     = 16;
     const COLUMN_JOIN_REVERSE      = 32;
     const COLUMN_SOFTDELETE        = 64;
+    const COLUMN_IDENTIFIER_UUID   = 128;
 
     /**
      * @var IDatabase|IQuoter
@@ -1022,6 +1024,10 @@ abstract class Mapper implements IMapper, Serializable
         // boolean options
         if ($options & self::COLUMN_IDENTIFIER) {
             $map['identifier'] = true;
+        }
+        if ($options & self::COLUMN_IDENTIFIER_UUID) {
+            $map['identifier'] = true;
+            $map['identifier_uuid'] = true;
         }
         if ($options & self::COLUMN_CREATED_TIMESTAMP) {
             $map['created_timestamp'] = true;
@@ -2667,7 +2673,24 @@ abstract class Mapper implements IMapper, Serializable
         if (isset($id_column)) {
             // retrieve the objects as they currently exist so we can perform a diff if we need to
             // we first have to dehydrate to ensure we don't attempt queries with objects as parameters
-            $collectionIds = array_filter($collection->map(function ($model) { return $this->dehydrate($model)[$this->getIdentifierColumn()]; })->getAll());
+
+                $collectionIds = array_filter($collection->map(function ($model) {
+                    try {
+                        return $this->dehydrate($model)[$this->getIdentifierColumn()];
+                    } catch (TypeError $e) {
+                        // If this was anything other than a UUID column, throw the type error as normal
+                        if (!isset($this->map[$this->getIdentifierColumn()]['identifier_uuid'])) {
+                            throw $e;
+                        }
+
+                        // If this is a UUID- we let it get away with a type error and set it to a blank string
+                        $this->setModelProperty($model, $this->getIdentifierColumn(), '');
+
+                        // Return false so the array_filter() call removes it from the collection
+                        return false;
+                    }
+                })->getAll());
+
             foreach ($this->findByColumn($id_column, $collectionIds, ['deleted' => true, 'cache' => false]) as $obj) {
                 // index by ID
                 $existingObjects[$this->getModelProperty($obj, $id_property)] = $obj;
@@ -2692,11 +2715,22 @@ abstract class Mapper implements IMapper, Serializable
                             $pdoMethods[$i] = null;
                             break;
                     }
+
                     if ($id_property) {
-                        if (!$this->getModelProperty($model, $id_property)) {
+                        // Check if this is an insert and the identifier column is a UUID
+                        if (isset($this->map[$id_property]['identifier_uuid']) && $pdoMethods[$i] === self::METHOD_CREATE) {
+                            // We just created a new UUID, retrieve if from the database session variable set by trigger
+                            $statementUuid = $this->database->prepare('SELECT @last_uuid');
+                            $statementUuid->execute();
+                            $lastUuid = $statementUuid->fetchColumn();
+
+                            // Force it into the models ID property
+                            $this->setModelProperty($model, $id_property, $lastUuid);
+                        } elseif (!$this->getModelProperty($model, $id_property)) {
                             $new_id = $this->database->lastInsertId();
                             $this->setModelProperty($model, $id_property, $new_id);
                         }
+
                         $affectedIDs[] = $this->getModelProperty($model, $id_property);
                     }
 
@@ -3464,6 +3498,7 @@ abstract class Mapper implements IMapper, Serializable
             }
             $propertyName = $map['property'];
             $columnName   = $map['column'];
+
             $result[$columnName] = $this->getModelProperty($model, $propertyName);
         }
         return $result;
