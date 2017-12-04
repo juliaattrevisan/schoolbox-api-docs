@@ -35,7 +35,7 @@ class Model implements ISoftDeletable
     /**
      * @return string
      */
-    public function getUuid(): string
+    public function getUuid(): ?string
     {
         return $this->uuid;
     }
