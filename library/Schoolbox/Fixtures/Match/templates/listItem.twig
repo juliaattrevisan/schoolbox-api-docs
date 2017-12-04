@@ -3,23 +3,21 @@
 <li class="actions-small-2" data-match>
     <div class="list-item">
         <div class="small-12 card">
+            {% if currentMatch.name | length %}
 
-            {% if not currentMatch.season.archived %}
-                {% if currentMatch.name %}
-                    <h3>{{ matchHeading.generateWithResultLink(currentMatch) }}</h3>
-                    <p class="meta">{{ currentMatch.name }}</p>
-                {% else %}
-                    <h3>{{ matchHeading.generateWithResultLink(currentMatch) }}</h3>
+                {%  if currentMatch.homeTeam.id and currentMatch.awayTeam.id %}
+                    <h3>{{ currentMatch.name }}</h3>
+                {% elseif currentMatch.homeTeam.id %}
+                    <h3><a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: currentMatch.id, teamId: currentMatch.homeTeam.id}) }}">{{ currentMatch.name }}</a></h3>
+                {% elseif currentMatch.awayTeam.id  %}
+                    <h3><a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: currentMatch.id, teamId: currentMatch.awayTeam.id}) }}">{{ currentMatch.name }}</a></h3>
                 {% endif %}
+
             {% else %}
-                {% if currentMatch.name %}
-                    <h3><del class="icon icon-archive" title="This match's season is archived."></del>{{ matchHeading.generateWithResultLink(currentMatch) }}</h3>
-                    <p class="meta">{{ currentMatch.name }}</p>
-                {% else %}
-                    <h3>{{ matchHeading.generateWithResultLink(currentMatch) }}</h3>
-                {% endif %}
+                <h3>{{ matchHeading.generateWithResultLink(currentMatch) }}</h3>
             {% endif %}
 
+            <p class="meta">{{ matchHeading.generateWithResultLink(currentMatch) }}</p>
             <p class="meta">{{ currentMatch.startAt.getLong }}</p>
         </div>
     </div>
