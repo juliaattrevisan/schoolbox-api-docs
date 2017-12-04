@@ -72,11 +72,15 @@
         var okayButton   = $('<a href="#" class="button submit" />').text(settings.confirmLabel).on('click.confirmDialog', function(e) {
             e.preventDefault();
             settings.confirmEvent(element);
+            // Don't trigger cancelEvent if I pressed OK
+            modal.off('close.fndtn.reveal.cancel');
             modal.foundation('reveal', 'close');
         });
         var cancelButton = $('<a href="#" class="button" />').text(settings.cancelLabel).on('click.confirmDialog', function(e) {
             e.preventDefault();
-            settings.cancelEvent(element);
+            // Cancel button doesn't trigger cancelEvent directly;
+            // closing the modal does.
+            // This is so clicking the X, or pressing ESC, triggers the cancel.
             modal.foundation('reveal', 'close');
         });
 
@@ -99,6 +103,11 @@
             .append(ul)
             .append('<a class="close-reveal-modal" aria-label="Close">&#215;</a>');
         modal.appendTo($('body'));
-        modal.foundation('reveal', 'reflow').foundation('reveal', 'open');
+        modal
+            .foundation('reveal', 'reflow')
+            .foundation('reveal', 'open')
+            .on('close.fndtn.reveal', function() {
+                settings.cancelEvent(element);
+            });
     }
 })(jQuery);
