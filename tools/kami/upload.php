@@ -46,11 +46,11 @@ spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Kami Uploader',
     [
-        'verbose'     => $options['v'] ?? null,
+        'verbose'     => [true,true,true],//$options['v'] ?? null,
         'errors'      => E_ALL,
         'dryRun'      => isset($options['dry-run']),
         'retryFailed' => isset($options['retry-failed']),
-        'batchSize'   => isset($options['batch-size']) ? (int)$options['batch-size'] : DEFAULT_BATCH_SIZE,
+        'batchSize'   => 1,//isset($options['batch-size']) ? (int)$options['batch-size'] : DEFAULT_BATCH_SIZE,
         'maxAttempts' => isset($options['max-attempts']) ? (int)$options['max-attempts'] : DEFAULT_MAX_ATTEMPTS,
         'maxSkips'    => isset($options['max-skips']) ? (int)$options['max-skips'] : DEFAULT_MAX_SKIPS,
         'baseBackOff' => isset($options['base-back-off']) ? (int)$options['base-back-off'] : DEFAULT_BASE_JITTER_BACK_OFF,
