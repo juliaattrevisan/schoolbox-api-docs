@@ -8,11 +8,12 @@
 
 namespace Schoolbox\FeatureTour;
 
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 
-class Model
+class Model implements ISoftDeletable
 {
     use CreatedAtDate;
     use UpdatedAtDate;
