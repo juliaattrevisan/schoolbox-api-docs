@@ -19,133 +19,50 @@ use Alaress_Date_Format;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
-/**
- * Class Model
- *
- * @package Schoolbox\Assessment\Participation\Plan
- */
 class Model implements ISoftDeletable
 {
+
     use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;
     use ModelTrait\DeletedAtDate;
 
     /**
-     * @var Alaress_Date_Format
-     */
-    protected $publishDate;
-
-    /**
-     * @var Alaress_Date_Format
-     */
-    protected $openDate;
-
-    /**
-     * @var Alaress_Date_Format
-     */
-    protected $dueDate;
-
-    /**
-     * @var Alaress_Date_Format
-     */
-    protected $closeDate;
-
-    /**
      * @var Assessment\Model
      *
      */
-    protected $assessment;
-
-    /**
-     * @var string
-     */
-    protected $description;
+    private $assessment;
 
     /**
      * @var boolean
      */
-    protected $isDynamic;
+    private $isDynamic;
 
     /**
-     * @return Alaress_Date_Format
+     * @var string
      */
-    public function getCreatedAt(): Alaress_Date_Format
-    {
-        return $this->createdAt;
-    }
+    private $description;
 
     /**
-     * @param Alaress_Date_Format $createdAt
+     * @var null|Alaress_Date_Format
      */
-    public function setCreatedAt(Alaress_Date_Format $createdAt)
-    {
-        $this->createdAt = $createdAt;
-    }
+    private $publishDate;
 
     /**
-     * @return Alaress_Date_Format
+     * @var null|Alaress_Date_Format
      */
-    public function getPublishDate(): Alaress_Date_Format
-    {
-        return $this->publishDate;
-    }
+    private $openDate;
 
     /**
-     * @param Alaress_Date_Format $publishDate
+     * @var null|Alaress_Date_Format
      */
-    public function setPublishDate(Alaress_Date_Format $publishDate)
-    {
-        $this->publishDate = $publishDate;
-    }
+    private $dueDate;
 
     /**
-     * @return Alaress_Date_Format
+     * @var null|Alaress_Date_Format
      */
-    public function getOpenDate(): Alaress_Date_Format
-    {
-        return $this->openDate;
-    }
+    private $closeDate;
 
-    /**
-     * @param Alaress_Date_Format $openDate
-     */
-    public function setOpenDate(Alaress_Date_Format $openDate)
-    {
-        $this->openDate = $openDate;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getDueDate(): Alaress_Date_Format
-    {
-        return $this->dueDate;
-    }
-
-    /**
-     * @param Alaress_Date_Format $dueDate
-     */
-    public function setDueDate(Alaress_Date_Format $dueDate)
-    {
-        $this->dueDate = $dueDate;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getCloseDate(): Alaress_Date_Format
-    {
-        return $this->closeDate;
-    }
-
-    /**
-     * @param Alaress_Date_Format $closeDate
-     */
-    public function setCloseDate(Alaress_Date_Format $closeDate)
-    {
-        $this->closeDate = $closeDate;
-    }
 
     /**
      * @return Assessment\Model
@@ -155,6 +72,7 @@ class Model implements ISoftDeletable
         return $this->assessment;
     }
 
+
     /**
      * @param Assessment\Model $assessment
      */
@@ -163,21 +81,6 @@ class Model implements ISoftDeletable
         $this->assessment = $assessment;
     }
 
-    /**
-     * @return string
-     */
-    public function getDescription(): string
-    {
-        return $this->description;
-    }
-
-    /**
-     * @param string $description
-     */
-    public function setDescription($description)
-    {
-        $this->description = $description;
-    }
 
     /**
      * @return boolean
@@ -187,12 +90,102 @@ class Model implements ISoftDeletable
         return $this->isDynamic;
     }
 
+
     /**
      * @param boolean $isDynamic
      */
-    public function setIsDynamic($isDynamic)
+    public function setIsDynamic(boolean $isDynamic)
     {
-        $this->is_dynamic = $isDynamic;
+        $this->isDynamic = $isDynamic;
     }
 
+
+    /**
+     * @return null|string
+     */
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+
+    /**
+     * @param null|string $description
+     */
+    public function setDescription(?string $description)
+    {
+        $this->description = $description;
+    }
+
+
+    /**
+     * @return null|Alaress_Date_Format
+     */
+    public function getPublishDate(): ?Alaress_Date_Format
+    {
+        return $this->publishDate;
+    }
+
+
+    /**
+     * @param null|Alaress_Date_Format $publishDate
+     */
+    public function setPublishDate(?Alaress_Date_Format $publishDate)
+    {
+        $this->publishDate = $publishDate;
+    }
+
+
+    /**
+     * @return null|Alaress_Date_Format
+     */
+    public function getOpenDate(): ?Alaress_Date_Format
+    {
+        return $this->openDate;
+    }
+
+
+    /**
+     * @param null|Alaress_Date_Format $openDate
+     */
+    public function setOpenDate(?Alaress_Date_Format $openDate)
+    {
+        $this->openDate = $openDate;
+    }
+
+
+    /**
+     * @return null|Alaress_Date_Format
+     */
+    public function getDueDate(): ?Alaress_Date_Format
+    {
+        return $this->dueDate;
+    }
+
+
+    /**
+     * @param null|Alaress_Date_Format $dueDate
+     */
+    public function setDueDate(?Alaress_Date_Format $dueDate)
+    {
+        $this->dueDate = $dueDate;
+    }
+
+
+    /**
+     * @return null|Alaress_Date_Format
+     */
+    public function getCloseDate(): ?Alaress_Date_Format
+    {
+        return $this->closeDate;
+    }
+
+
+    /**
+     * @param null|Alaress_Date_Format $closeDate
+     */
+    public function setCloseDate(?Alaress_Date_Format $closeDate)
+    {
+        $this->closeDate = $closeDate;
+    }
 }
