@@ -106,7 +106,7 @@
                                         </div>
 
                                         <div class="small-12 large-4 columns grade">
-                                            {% set feedback = assessment.participant(student).findAuthoritativeVisibleFeedback(currentUser) %}
+                                            {% set feedback = assessment.participantIfExtant(student).findAuthoritativeVisibleFeedback(currentUser) %}
                                             {% if feedback %}
                                                 <div class="{{ urgency.marks(feedback.normalisedMark) }}"><span>{{ feedback.humanReadableMark }}</span></div>
                                                 <p class="comment">{{ feedback.comment | nl2br }}</p>
