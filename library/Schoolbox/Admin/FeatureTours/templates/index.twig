@@ -3,21 +3,79 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Feature Tours</h2>
-        <section>
-            <div class="columns">
-                <form method="post" action="{{ routeLookup('featureTours.updateConfig') }}">
-                    <label>Enabled<span data-tooltip class="hint has-tip tip-bottom" title="Enable or disable all feature tours system-wide.">?</span></label>
-                    <span class="switch">
-                        <input id="enabled" type="checkbox" name="enabled" {% if toursEnabled %} checked {% endif %}/>
-                        <label for="enabled">
-                            <span>On</span>
-                            <span>Off</span>
-                        </label>
-                    </span>
-                    <input type="submit" value="Save"/>
-                </form>
+
+        <form method="post" action="{{ routeLookup('featureTours.updateConfig') }}">
+            <section>
+                <fieldset class="content">
+
+                    <div class="small-12 columns">
+                        <label for="tours-enabled">Enabled<span data-tooltip class="hint has-tip tip-bottom" title="Enable or disable all feature tours system-wide.">?</span></label>
+                        <span class="switch">
+                            <input id="tours-enabled" type="checkbox" name="enabled" {% if toursEnabled %}checked{% endif %}/>
+                            <label for="tours-enabled">
+                                <span>On</span>
+                                <span>Off</span>
+                            </label>
+                        </span>
+                    </div>
+
+                </fieldset>
+
+                <fieldset class="content {% if not toursEnabled %}hide{% endif %}" id="available-tours">
+
+                    <legend>Available Tours</legend>
+
+                    <ul class="information-list">
+
+                        {% for tour in tours %}
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="card small-1">
+                                    <span class="switch">
+                                        <input id="tour-enable-{{ tour.uuid }}" type="checkbox" name="tour-enable[]" value="{{ tour.uuid }}" {% if tour.active %}checked{% endif %}/>
+                                        <label for="tour-enable-{{ tour.uuid }}">
+                                            <span>On</span>
+                                            <span>Off</span>
+                                        </label>
+                                    </span>
+                                    </div>
+                                    <div class="card small-11">
+                                        <h3>{{ tour.title }}</h3>
+                                        <p class="meta" title="Will be seen by Staff">
+                                            Staff
+                                        </p>
+                                    </div>
+                                </div>
+                                <nav>
+                                    <a href="#" class="icon-eye no-text" title="Preview Tour"></a>
+                                </nav>
+                            </li>
+                        {% endfor %}
+
+                    </ul>
+                </fieldset>
+
+            </section>
+
+            <div class="row">
+                <div class="small-12 column">
+                    <input type="submit" name="submit" value="Save">
+                </div>
             </div>
-        </section>
+
+        </form>
+
     </div>
 </div>
+
+<script>
+    // On change of global enable/disable - toggle show/hide of options
+    $('#tours-enabled').change(function() {
+        if ($(this).is(':checked')) {
+            $('#available-tours').removeClass('hide');
+        } else {
+            $('#available-tours').addClass('hide');
+        }
+    });
+</script>
 
