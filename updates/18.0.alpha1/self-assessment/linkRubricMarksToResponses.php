@@ -53,6 +53,9 @@
  * On linking rubric mark to feedback, published date is not updaTed for neither of them.
  * If a rubric mark gets propagated forward, it's published date is set to the linked feedback's published date.
  *
+ * - Drafts and published
+ * Don't mix one with another, link published with published, drafts with drafts
+ *
  */
 
 use Alaress\Database\Connector\IConnector;
@@ -92,9 +95,11 @@ $kernel->run(/**
             FROM rubric_mark rm
             JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
             JOIN rubric_level rl ON rl.id = rd.level_id
-            GROUP BY rm.student_id, rl.box_id;
+            GROUP BY rm.student_id, rl.box_id
             '
         )->fetchAll();
+
+        $countBrokenRubricMarks = 0;
 
         // Dealing with published only for now
         // Loop participants and find published descriptor sets
@@ -103,11 +108,12 @@ $kernel->run(/**
             // All rubric marks, newest to oldest
             $rubricMarks = $db->executeQuery(
                 '
-            SELECT COUNT(rm.id), rm.student_id, rl.box_id, rm.created_at, rm.published_at
+            SELECT COUNT(rm.id) as records, rm.student_id, rm.return_id, rl.box_id, rm.created_at, rm.published_at, COUNT(DISTINCT rd.criterion_id) as criterion
             FROM rubric_mark rm
             JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
             JOIN rubric_level rl ON rl.id = rd.level_id
             WHERE rm.student_id = :student_id
+            AND rm.return_id IS NULL
             AND rm.published_at IS NOT NULL
             AND rl.box_id = :box_id
             GROUP BY rm.published_at
@@ -140,6 +146,18 @@ $kernel->run(/**
 
             foreach ($rubricMarks as $rubricMark) {
 
+                // Validate your descriptors sets
+                if ($rubricMark['criterion'] != $rubricMark['records']) {
+                    var_Dump($rubricMark);
+                    $log->warning(sprintf('Invalid descriptors for student_id %d box_id %d and published date %d
+                            - Skipping!',
+                            $rubricMark['student_id'], $rubricMark['box_id'], $rubricMark['published_at'])
+                    );
+                    $countBrokenRubricMarks ++;
+                    continue;
+
+                }
+
                 $rubricMarkPublishedDate = new Alaress_Date_Format($rubricMark['published_at'], Alaress_Date_Format::DATABASE_FORMAT);
 
                 foreach ($feedbacks as $feedback) {
@@ -160,7 +178,42 @@ $kernel->run(/**
 
             }
 
+//            Get me all drafts
+//            $draftRubricMarks = $db->executeQuery(
+//                '
+//            SELECT COUNT(rm.id), rm.student_id, rl.box_id, rm.created_at
+//            FROM rubric_mark rm
+//            JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
+//            JOIN rubric_level rl ON rl.id = rd.level_id
+//            WHERE rm.student_id = :student_id
+//            AND rm.published_at IS NULL
+//            AND rl.box_id = :box_id
+//            GROUP BY rm.created_at
+//            ORDER BY rm.created_at DESC;
+//            ',
+//                [
+//                    'student_id' => $participant['student_id'],
+//                    'box_id'     => $participant['box_id'],
+//                ]
+//
+//            )->fetchAll();
+//
+//            if (count($draftRubricMarks) > 0) {
+//                $draftFeedbacks = $db->executeQuery(
+//                    '
+//                    SELECT sr.id, sr.created_at
+//                    FROM submission_return sr
+//                    JOIN submission_box sb ON sb.id = sr.box_id
+//                    WHERE sr.owner = :student_id AND sr.box_id = :box_id AND sr.published_at IS NOT NULL
+//                    ORDER BY sr.created_at ASC;
+//                ');
+//
+//                //
+//            }
+
         }
+
+        $log->warning(sprintf('Broken descriptor sets: %d', $countBrokenRubricMarks));
 
     });
 
