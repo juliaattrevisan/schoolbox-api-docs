@@ -46,6 +46,12 @@ class Connector
      */
     const PLAGSCAN_MODE_INTERACTIVE = 7;
 
+
+    /**
+     * Maximum time that we allow plagscan to upload files
+     */
+    const PLAGSCAN_TIMEOUT = 360;
+
     /**
      * Api url where stuff is sent
      *
@@ -130,7 +136,7 @@ class Connector
         try {
             $client = new Client([
                 "base_uri"    => $this->getApiUrl(),
-                "timeout"     => 20.0,
+                "timeout"     => self::PLAGSCAN_TIMEOUT,
                 "http_errors" => false,
             ]);
         } catch (TransferException $e) {
@@ -211,7 +217,7 @@ class Connector
 
         $client = new Client([
             "base_uri"    => $this->getApiUrl(),
-            "timeout"     => 20.0,
+            "timeout"     => self::PLAGSCAN_TIMEOUT,
             "http_errors" => false,
         ]);
 
@@ -390,7 +396,7 @@ class Connector
 
         $client = new Client([
             "base_uri"    => $this->getApiUrl(),
-            "timeout"     => 20.0,
+            "timeout"     => self::PLAGSCAN_TIMEOUT,
             "http_errors" => false,
         ]);
 
@@ -423,7 +429,7 @@ class Connector
 
         $client = new Client([
             "base_uri"    => $this->getApiUrl(),
-            "timeout"     => 20.0,
+            "timeout"     => self::PLAGSCAN_TIMEOUT,
             "http_errors" => false,
         ]);
 
@@ -456,7 +462,7 @@ class Connector
 
         $client = new Client([
             "base_uri"    => $this->getApiUrl(),
-            "timeout"     => 20.0,
+            "timeout"     => self::PLAGSCAN_TIMEOUT,
             "http_errors" => false,
         ]);
 
