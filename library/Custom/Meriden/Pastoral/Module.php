@@ -17,8 +17,11 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use House;
 use HouseMapper;
-use Schoolbox\Assessment\Grades;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\External\SubjectMapper;
+use Schoolbox\Learning\Assessment\DueWork\RubricContext;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
@@ -121,12 +124,24 @@ class Module extends BaseModule
 
         $injector->params[StudentInvolvement\Factory::class]['gateway']
             = $injector->lazyNew(StudentInvolvement\Gateway::class);
-        $injector->params[StudentInvolvement\Factory::class]['categoryMapper']
+        $injector->params[StudentInvolvement\Factory::class]['folderMapper']
             = $this->getMapperFactory()->getLazy(Folder\Mapper::class);
         $injector->params[StudentInvolvement\Factory::class]['userMapper']
             = $this->getMapperFactory()->getLazy(UserMapper::class);
-        $injector->params[StudentInvolvement\Factory::class]['gradesService']
-            = Grades::getInstance();
+        $injector->params[StudentInvolvement\Factory::class]['assessmentDataSource']
+            = $injector->lazyGet('assessmentDataSource');
+        $injector->params[StudentInvolvement\Factory::class]['rubricMapper']
+            = $this->getMapperFactory()->getLazy(RubricMapper::class);
+        $injector->params[StudentInvolvement\Factory::class]['rubricContext']
+            = $injector->lazyNew(
+                RubricContext::class,
+                [$this->getMapperFactory()->getLazy(RubricMapper::class)]
+            );
+        $injector->params[StudentInvolvement\Factory::class]['currentUser']
+            = $injector->lazyGet('user');
+        $injector->params[StudentInvolvement\Factory::class]['access'] = Access::getInstance();
+        $injector->params[StudentInvolvement\Factory::class]['userAccessMapper']
+            = $this->getMapperFactory()->getLazy(UserAccessMapper::class);
 
         $injector->params[StudentInvolvement\Gateway::class]['database']
             = $injector->lazyGet('databaseExternal');

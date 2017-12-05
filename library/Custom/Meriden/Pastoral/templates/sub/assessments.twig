@@ -27,15 +27,7 @@
 {% set first = true %}
 {% for workItem in work %}
     {# Is this work item shown to the logged in user? #}
-    {% if workItem.assessment %}
-        {% set showMark = workItem.assessment.isMarkShownToRole(user.role) %}
-    {% elseif workItem.quiz %}
-        {% set showMark = workItem.quiz.isMarkShownToRole(user.role) %}
-    {% else %}
-        {% set showMark = false %}
-    {% endif %}
-
-    {% if showMark %}
+    {% if workItem.distribution and workItem.assessment.isFeedbackVisibleToUser(USER) %}
         {# Is this the first row that's getting displayed? show the header and that #}
         {% if first %}
             {% set first = false %}
@@ -43,28 +35,14 @@
         {% endif %}
         <tr>
             <td>
-                {% if workItem.assessment %}
-                    <a href="/learning/assessments/{{ workItem.assessment.id }}/{{ student.id }}">
-                        {{ workItem.assessment.name }}
-                    </a>
-                {% elseif workItem.quiz %}
-                    <a href="/assess/attempts/{{ workItem.quiz.id }}/{{ student.id }}">
-                        {{ workItem.quiz.title }}
-                    </a>
-                {% else %}
-                    Unknown
-                {% endif %}
+                <a href="/learning/assessments/{{ workItem.assessment.id }}/{{ student.id }}">
+                    {{ workItem.assessment.title }}
+                </a>
             </td>
             <td>{{ workItem.pretty_mark | replace({'%': ''}) }}</td>
-            <td>{{ workItem.distribution.continuous.mean.pretty_mark }}</td>
-            <td>{{ workItem.distribution.continuous.sd.pretty_mark }}</td>
-            <td>
-                {% if workItem.assessment %}
-                    {{ workItem.assessment.dueDate|date('j F') }}
-                {% elseif workItem.quiz %}
-                    {{ workItem.quiz.finish|date('j F') }}
-                {% endif %}
-            </td>
+            <td>{{ workItem.distribution.continuous.mean.mark | number_format(1) }}</td>
+            <td>{{ workItem.distribution.continuous.sd.mark | number_format(1) }}</td>
+            <td>{{ workItem.assessment.dueAt|date('j F') }}</td>
         </tr>
     {% endif %}
 {% endfor %}

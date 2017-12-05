@@ -168,7 +168,6 @@ class Controller extends Base
             $subject = $this->getStudentInvolvementFactory()->buildSubject($year, $student, $subjectCode);
         }
         return array(
-            'user'   => $this->getSession()->getAuthUser(),
             'report' => array(
                 'student'          => $student,
                 'tutorGroupReport' => $tutorGroup,

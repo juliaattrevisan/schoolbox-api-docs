@@ -3,26 +3,26 @@
 {# Is each individual term accessible by current user? #}
 {% set display1 =
     (report.subjectReport.namedGrades.endeavourGrade1
-    and report.subjectReport.namedGrades.endeavourGrade1.assessment.isMarkShownToRole(user.role))
+    and report.subjectReport.namedGrades.endeavourGrade1.assessment.isFeedbackVisibleToUser(USER))
 %}
 {% set display2 =
     (report.subjectReport.namedGrades.endeavourGrade2
-    and report.subjectReport.namedGrades.endeavourGrade2.assessment.isMarkShownToRole(user.role))
+    and report.subjectReport.namedGrades.endeavourGrade2.assessment.isFeedbackVisibleToUser(USER))
 %}
 {% set display3 =
     (report.subjectReport.namedGrades.endeavourGrade3
-    and report.subjectReport.namedGrades.endeavourGrade3.assessment.isMarkShownToRole(user.role))
+    and report.subjectReport.namedGrades.endeavourGrade3.assessment.isFeedbackVisibleToUser(USER))
 %}
 {% set display4 =
     (report.subjectReport.namedGrades.endeavourGrade4
-    and report.subjectReport.namedGrades.endeavourGrade4.assessment.isMarkShownToRole(user.role))
+    and report.subjectReport.namedGrades.endeavourGrade4.assessment.isFeedbackVisibleToUser(USER))
 %}
 {% set displaySeparate = display1 or display2 or display3 or display4 %}
 
 {# Is the rubric accessible by current user? #}
 {% set displayRubric =
     (report.subjectReport.namedGrades.endeavourGrades
-    and report.subjectReport.namedGrades.endeavourGrades.assessment.isMarkShownToRole(user.role))
+    and report.subjectReport.namedGrades.endeavourGrades.assessment.isFeedbackVisibleToUser(USER))
 %}
 
 {% if displaySeparate or displayRubric %}

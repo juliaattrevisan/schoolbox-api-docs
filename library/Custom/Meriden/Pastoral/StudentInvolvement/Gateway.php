@@ -21,22 +21,30 @@ class Gateway
      * This may be injected later, as it's `config.external_tass_company_code`,
      * but this is not required.
      */
-    const COMPANY_CODE = '01';
+    private const COMPANY_CODE = '01';
 
     /**
      * Tutor group codes in TASS.
      */
-    const TUTOR_GROUPS = ['9994', '9995', '9996', '9997', '9998', '9999'];
+    private const TUTOR_GROUPS = ['9994', '9995', '9996', '9997', '9998', '9999'];
 
     /**
      * Subjects excluded from a student's list of subjects.
      */
-    const EXCLUDED_SUBJECTS = ['9994', '9995', '9996', '9997', '9998', '9999', '0107', '0074', '4099', '0093', '0103'];
+    private const EXCLUDED_SUBJECTS = ['9994', '9995', '9996', '9997', '9998', '9999', '0107', '0074', '4099', '0093', '0103'];
 
-    const ACTIVITY_TYPE_AWARD = 'C';
-    const ACTIVITY_TYPE_COCURRICULAR = 'B';
-    const ACTIVITY_TYPE_SERVICE = 'O';
-    const ACTIVITY_TYPE_POSITIONS_OF_OFFICE = 'A';
+    private const ACTIVITY_TYPE_AWARD = 'C';
+    private const ACTIVITY_TYPE_COCURRICULAR = 'B';
+    private const ACTIVITY_TYPE_SERVICE = 'O';
+    private const ACTIVITY_TYPE_POSITIONS_OF_OFFICE = 'A';
+
+    private const ABSENCE_TYPE_LATE = 'LFS';
+    private const ABSENCE_TYPE_DETENTION = 'DET';
+    private const ABSENCE_TYPE_ENDORSED_LEAVE = 'AFS';
+    private const ABSENCE_TYPES_AWAY = ['AFS', 'APD', 'AAM', 'APM', 'EDP'];
+
+    private const REASON_CODES_AWAY_OR_LATE = ['A', 'L', 'S'];
+    private const REASON_CODES_ENDORSED_LEAVE = ['M'];
 
     /**
      * @var IConnector
@@ -151,19 +159,16 @@ class Gateway
         $resultSet = $this->queryDays(
             $year,
             $student,
-            ['AFS', 'APD', 'AAM', 'APM', 'EDP'],
-            ['A', 'L', 'S']
+            self::ABSENCE_TYPES_AWAY,
+            self::REASON_CODES_AWAY_OR_LATE
         );
         $count     = 0;
         foreach ($resultSet as $row) {
             switch ($row['absent_type']) {
-                case 'AFS':
+                case self::ABSENCE_TYPE_ENDORSED_LEAVE:
                     $count += 1;
                     break;
-                case 'APD':
-                case 'AAM':
-                case 'APM':
-                case 'EDP':
+                default:
                     $count += 0.5;
                     break;
             }
@@ -184,8 +189,8 @@ class Gateway
         $resultSet = $this->queryDays(
             $year,
             $student,
-            ['LFS'],
-            ['A', 'L', 'S']
+            [self::ABSENCE_TYPE_LATE],
+            self::REASON_CODES_AWAY_OR_LATE
         );
         return count($resultSet);
     }
@@ -203,7 +208,7 @@ class Gateway
         $resultSet = $this->queryDays(
             $year,
             $student,
-            ['DET']
+            [self::ABSENCE_TYPE_DETENTION]
         );
         return count($resultSet);
     }
@@ -221,8 +226,8 @@ class Gateway
         $resultSet = $this->queryDays(
             $year,
             $student,
-            ['AFS'],
-            ['M']
+            [self::ABSENCE_TYPE_ENDORSED_LEAVE],
+            self::REASON_CODES_ENDORSED_LEAVE
         );
         return count($resultSet);
     }
@@ -442,7 +447,7 @@ class Gateway
         $query .= " WHERE " . implode(' AND ', $pb->getWhere())
             . " ORDER BY studsub.sub_code ASC, studsub.class ASC";
 
-        return $this->database->executeQuery($query, $pb->getParams())->fetchAll();
+        return $this->database->executeQuery($query, $pb->getParams())->fetch();
     }
 
     /**
@@ -585,7 +590,7 @@ class Gateway
 
         $pb = new PredicateBuilder($this->database, 'studsub');
         $pb = $pb->equals('st.sub_code', $code)
-                 ->equals('ss.class', $class)
+                 ->notEquals('ss.class', $class)
                  ->equals('st.cmpy_code', self::COMPANY_CODE);
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere());
