@@ -5,20 +5,22 @@
  * @link      http://www.alaress.com.au/
  */
 
-/**
- * Created by PhpStorm.
- * User: natalie.bakhtadze
- * Date: 27/11/17
- * Time: 3:11 PM
- */
-
 namespace Schoolbox\Assessment\Participant\Plan;
 
+use Schoolbox\Assessment\Participant;
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Alaress_Date_Format;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
+/**
+ * Represents the 'data model' version of a participation plan.
+ *
+ * This distinction between 'domain object' and 'data model' plan is that:
+ * - a 'domain object' plan is composed of an IAssessable and collection of 'domain object' Participants.
+ * - a 'data model' plan is composed of a DataModel\Assessment and collection of DataModel\Participants.
+ */
 class Model implements ISoftDeletable
 {
 
@@ -63,6 +65,17 @@ class Model implements ISoftDeletable
      */
     private $closeDate;
 
+    /**
+     * @var Participant\Model[]|GenericCollection
+     */
+    private $participants;
+
+
+    public function __construct()
+    {
+        $this->participants = new GenericCollection(Participant\Model::class);
+    }
+
 
     /**
      * @return Assessment\Model
@@ -75,10 +88,12 @@ class Model implements ISoftDeletable
 
     /**
      * @param Assessment\Model $assessment
+     * @return $this
      */
-    public function setAssessment(Assessment\Model $assessment)
+    public function setAssessment(Assessment\Model $assessment): self
     {
         $this->assessment = $assessment;
+        return $this;
     }
 
 
@@ -93,10 +108,12 @@ class Model implements ISoftDeletable
 
     /**
      * @param bool $isDynamic
+     * @return $this
      */
-    public function setIsDynamic(bool $isDynamic)
+    public function setIsDynamic(bool $isDynamic): self
     {
         $this->isDynamic = $isDynamic;
+        return $this;
     }
 
 
@@ -111,10 +128,12 @@ class Model implements ISoftDeletable
 
     /**
      * @param null|string $description
+     * @return $this
      */
-    public function setDescription(?string $description)
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
+        return $this;
     }
 
 
@@ -129,10 +148,12 @@ class Model implements ISoftDeletable
 
     /**
      * @param null|Alaress_Date_Format $publishDate
+     * @return $this
      */
-    public function setPublishDate(?Alaress_Date_Format $publishDate)
+    public function setPublishDate(?Alaress_Date_Format $publishDate): self
     {
         $this->publishDate = $publishDate;
+        return $this;
     }
 
 
@@ -147,10 +168,12 @@ class Model implements ISoftDeletable
 
     /**
      * @param null|Alaress_Date_Format $openDate
+     * @return $this
      */
-    public function setOpenDate(?Alaress_Date_Format $openDate)
+    public function setOpenDate(?Alaress_Date_Format $openDate): self
     {
         $this->openDate = $openDate;
+        return $this;
     }
 
 
@@ -165,10 +188,12 @@ class Model implements ISoftDeletable
 
     /**
      * @param null|Alaress_Date_Format $dueDate
+     * @return $this
      */
-    public function setDueDate(?Alaress_Date_Format $dueDate)
+    public function setDueDate(?Alaress_Date_Format $dueDate): self
     {
         $this->dueDate = $dueDate;
+        return $this;
     }
 
 
@@ -183,9 +208,31 @@ class Model implements ISoftDeletable
 
     /**
      * @param null|Alaress_Date_Format $closeDate
+     * @return $this
      */
-    public function setCloseDate(?Alaress_Date_Format $closeDate)
+    public function setCloseDate(?Alaress_Date_Format $closeDate): self
     {
         $this->closeDate = $closeDate;
+        return $this;
+    }
+
+
+    /**
+     * @return Participant\Model[]|GenericCollection
+     */
+    public function getParticipants(): GenericCollection
+    {
+        return $this->participants;
+    }
+
+
+    /**
+     * @param Participant\Model[]|GenericCollection $participants
+     * @return $this
+     */
+    public function setParticipants(GenericCollection $participants): self
+    {
+        $this->participants->replaceWith($participants);
+        return $this;
     }
 }

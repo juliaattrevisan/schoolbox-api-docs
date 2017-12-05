@@ -13,6 +13,7 @@ namespace Schoolbox\Learning\Assessment;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
@@ -20,13 +21,14 @@ use \Schoolbox\User;
 use \Schoolbox\Collection;
 use Alaress_Date_Format;
 use \DomainException;
-use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
+use Schoolbox\Learning\Assessment\WorkType;
+use Schoolbox\Curriculum\Node;
 
 interface IAssessable extends ISoftDeletable
 {
-    const MARK_VISIBILITY_PRIVATE = 0;
-    const MARK_VISIBILITY_STUDENT = 1;
-    const MARK_VISIBILITY_PARENT_STUDENT = 2;
+    public const MARK_VISIBILITY_PRIVATE = 0;
+    public const MARK_VISIBILITY_STUDENT = 1;
+    public const MARK_VISIBILITY_PARENT_STUDENT = 2;
 
     /**
      * Creates a clone of this assessment.
@@ -599,16 +601,16 @@ interface IAssessable extends ISoftDeletable
     public function setSequence($sequence);
 
     /**
-     * @return null|WorkType
+     * @return null|WorkType\Model
      */
     public function getWorkType();
 
 
     /**
-     * @param null|WorkType $workType
+     * @param null|WorkType\Model $workType
      * @return static
      */
-    public function setWorkType(WorkType $workType = null);
+    public function setWorkType(WorkType\Model $workType = null);
 
     /**
      * @return GradeGroup|null
@@ -666,6 +668,19 @@ interface IAssessable extends ISoftDeletable
 
 
     /**
+     * @return Plan[]|GenericCollection
+     */
+    public function getPlans(): GenericCollection;
+
+
+    /**
+     * @param Plan[]|GenericCollection $plans
+     * @return $this
+     */
+    public function setPlans(GenericCollection $plans): self;
+
+
+    /**
      * Return the IResponse implementation class for this IAssessable
      *
      * @return string
@@ -683,17 +698,17 @@ interface IAssessable extends ISoftDeletable
     /**
      * A collection of Curriculum Nodes
      *
-     * @return Collection
+     * @return Node\Model[]|GenericCollection
      */
     public function getCurriculumNodes();
 
     /**
      * Set a collection of Curriculum Nodes
      *
-     * @param Collection $curriculumNodes
+     * @param Node\Model[]|GenericCollection $curriculumNodes
      * @return $this
      */
-    public function setCurriculumNodes(Collection $curriculumNodes);
+    public function setCurriculumNodes(GenericCollection $curriculumNodes);
 
     /**
      * Created date

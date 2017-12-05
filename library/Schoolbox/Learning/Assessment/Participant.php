@@ -9,17 +9,21 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use \Schoolbox\User;
 use \DomainException;
 
 class Participant
 {
+    use ModelTrait\Id;
+    use ModelTrait\CreatedAtDate;
+    use ModelTrait\UpdatedAtDate;
+
     /**
      * The User to whom all these Responses and Feedbacks are relevant
      *
@@ -28,11 +32,11 @@ class Participant
     private $user;
 
     /**
-     * The Assessment which these Responses and Feedbacks relate to
+     * The Plan this participant is in.
      *
-     * @var IAssessable
+     * @var Plan
      */
-    private $assessable;
+    private $plan;
 
     /**
      * A Collection of IResponse instances that Students spawn
@@ -52,15 +56,14 @@ class Participant
      * Participant constructor.
      *
      * @param User $user
-     * @param IAssessable $assessable
+     * @param Plan $plan
      */
-    public function __construct(User $user, IAssessable $assessable)
+    public function __construct(User $user, Plan $plan)
     {
-        $this->setUser($user);
-        $this->setAssessable($assessable);
-
-        $this->allResponses = new GenericCollection($assessable->getResponseClass());
-        $this->allFeedbacks = new GenericCollection($assessable->getFeedbackClass());
+        $this->user         = $user;
+        $this->plan         = $plan;
+        $this->allResponses = new GenericCollection($plan->getAssessable()->getResponseClass());
+        $this->allFeedbacks = new GenericCollection($plan->getAssessable()->getFeedbackClass());
     }
 
     /**
@@ -76,7 +79,7 @@ class Participant
     public function isResponseRequired()
     {
         try {
-            return $this->assessable->isResponseRequired($this);
+            return $this->plan->getAssessable()->isResponseRequired($this);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             if (function_exists('newrelic_notice_error')) {
@@ -100,7 +103,7 @@ class Participant
     public function isFeedbackRequired()
     {
         try {
-            return $this->assessable->isFeedbackRequired($this);
+            return $this->plan->getAssessable()->isFeedbackRequired($this);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             if (function_exists('newrelic_notice_error')) {
@@ -120,7 +123,7 @@ class Participant
     public function isReviewComplete()
     {
         try {
-            return $this->assessable->isReviewComplete($this);
+            return $this->plan->getAssessable()->isReviewComplete($this);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             if (function_exists('newrelic_notice_error')) {
@@ -143,7 +146,7 @@ class Participant
     public function hasSubmittedResponse()
     {
         try {
-            return $this->assessable->hasSubmittedResponse($this);
+            return $this->plan->getAssessable()->hasSubmittedResponse($this);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             if (function_exists('newrelic_notice_error')) {
@@ -166,7 +169,7 @@ class Participant
     public function hasPublishedFeedback()
     {
         try {
-            return $this->assessable->hasPublishedFeedback($this);
+            return $this->plan->getAssessable()->hasPublishedFeedback($this);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             if (function_exists('newrelic_notice_error')) {
@@ -189,7 +192,7 @@ class Participant
      */
     public function hasMark()
     {
-        return $this->assessable->hasMark($this);
+        return $this->plan->getAssessable()->hasMark($this);
     }
 
 
@@ -302,7 +305,7 @@ class Participant
     public function getNormalisedMark($publishedOnly)
     {
         try {
-            return $this->assessable->getNormalisedMark($this, $publishedOnly);
+            return $this->plan->getAssessable()->getNormalisedMark($this, $publishedOnly);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             if (function_exists('newrelic_notice_error')) {
@@ -322,7 +325,7 @@ class Participant
     public function getHumanReadableMark($publishedOnly)
     {
         try {
-            return $this->assessable->getHumanReadableMark($this, $publishedOnly);
+            return $this->plan->getAssessable()->getHumanReadableMark($this, $publishedOnly);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             if (function_exists('newrelic_notice_error')) {
@@ -342,7 +345,7 @@ class Participant
     public function getAuthoritativeResponse($publishedOnly)
     {
         try {
-            return $this->assessable->getAuthoritativeResponse($this, $publishedOnly);
+            return $this->plan->getAssessable()->getAuthoritativeResponse($this, $publishedOnly);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             if (function_exists('newrelic_notice_error')) {
@@ -361,7 +364,7 @@ class Participant
     public function getAuthoritativeFeedback($publishedOnly)
     {
         try {
-            return $this->assessable->getAuthoritativeFeedback($this, $publishedOnly);
+            return $this->plan->getAssessable()->getAuthoritativeFeedback($this, $publishedOnly);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             if (function_exists('newrelic_notice_error')) {
@@ -385,18 +388,41 @@ class Participant
 
     /**
      * @param User $user
+     * @return $this
      */
     public function setUser($user)
     {
         $this->user = $user;
+        return $this;
     }
+
+
+    /**
+     * @return Plan
+     */
+    public function getPlan(): Plan
+    {
+        return $this->plan;
+    }
+
+
+    /**
+     * @param Plan $plan
+     * @return $this
+     */
+    public function setPlan(Plan $plan): self
+    {
+        $this->plan = $plan;
+        return $this;
+    }
+
 
     /**
      * @return IAssessable
      */
     public function getAssessable()
     {
-        return $this->assessable;
+        return $this->plan->getAssessable();
     }
 
     /**
@@ -405,7 +431,7 @@ class Participant
      */
     public function setAssessable(IAssessable $assessable)
     {
-        $this->assessable = $assessable;
+        $this->plan->setAssessable($assessable);
         return $this;
     }
 

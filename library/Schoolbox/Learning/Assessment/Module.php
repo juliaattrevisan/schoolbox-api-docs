@@ -171,7 +171,7 @@ class Module extends BaseModule
 
             $access = $this->getAccess()->getFolderAccess($student, $assessment->getContext()->getFolder()->getId());
 
-            /* Allow the currently logged in user to accesss the student's Assessment Summary
+            /* Allow the currently logged in user to access the student's Assessment Summary
              *
              * This allows write-accessors to view a typically read-access page ie. when a teacher
              * wants to preview a task's summary screen (see SA-2193)
@@ -179,7 +179,9 @@ class Module extends BaseModule
              * This pretends the teacher is a participant
              */
             if ($access >= UserAccess::ACCESS_WRITE) {
-                $participant = new Participant($student, $assessment);
+                $plan = new Plan();
+                $plan->setAssessable($assessment);
+                $participant = new Participant($student, (new Plan())->setAssessable($assessment));
 
                 /* Suck down all the responses from $assessment and put them into $participant
                  */

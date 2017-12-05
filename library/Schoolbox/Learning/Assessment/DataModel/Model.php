@@ -9,7 +9,7 @@ namespace Schoolbox\Learning\Assessment\DataModel;
 
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
-use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
 use Schoolbox\Assessment\Course\Task;
@@ -23,6 +23,8 @@ use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
+use Schoolbox\Assessment\Participant\Plan;
+use Schoolbox\Curriculum\Node;
 
 /**
  * Class Model
@@ -196,24 +198,27 @@ class Model implements ISoftDeletable
     /**
      * A collection of Curriculum Nodes
      *
-     * @var Collection
+     * @var Node\Model[]|GenericCollection
      */
     private $curriculumNodes;
+
+    /** @var Plan\Model[]|GenericCollection */
+    private $plans;
 
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->publishDate = new Alaress_Date_NullDate();
-        $this->openDate    = new Alaress_Date_NullDate();
-        $this->dueDate     = new Alaress_Date_NullDate();
-        $this->closeDate   = new Alaress_Date_NullDate();
-        $this->createdAt   = new Alaress_Date_NullDate();
-        $this->updatedAt   = new Alaress_Date_NullDate();
-        $this->deletedAt   = new Alaress_Date_NullDate();
-
-        $this->setCurriculumNodes(new Collection());
+        $this->publishDate     = new Alaress_Date_NullDate();
+        $this->openDate        = new Alaress_Date_NullDate();
+        $this->dueDate         = new Alaress_Date_NullDate();
+        $this->closeDate       = new Alaress_Date_NullDate();
+        $this->createdAt       = new Alaress_Date_NullDate();
+        $this->updatedAt       = new Alaress_Date_NullDate();
+        $this->deletedAt       = new Alaress_Date_NullDate();
+        $this->curriculumNodes = new GenericCollection(Node\Model::class);
+        $this->plans           = new GenericCollection(Plan\Model::class);
     }
 
     function __clone()
@@ -735,7 +740,7 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return Collection
+     * @return Node\Model[]|GenericCollection
      */
     public function getCurriculumNodes()
     {
@@ -743,12 +748,30 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Collection $curriculumNodes
+     * @param Node\Model[]|GenericCollection $curriculumNodes
      * @return $this
      */
-    public function setCurriculumNodes(Collection $curriculumNodes)
+    public function setCurriculumNodes(GenericCollection $curriculumNodes)
     {
-        $this->curriculumNodes = $curriculumNodes;
+        $this->curriculumNodes->replaceWith($curriculumNodes);
+        return $this;
+    }
+
+    /**
+     * @return Plan\Model[]|GenericCollection
+     */
+    public function getPlans()
+    {
+        return $this->plans;
+    }
+
+    /**
+     * @param Plan\Model[]|GenericCollection $plans
+     * @return $this
+     */
+    public function setPlans(GenericCollection $plans)
+    {
+        $this->plans->replaceWith($plans);
         return $this;
     }
 }
