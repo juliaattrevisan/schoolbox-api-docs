@@ -10,6 +10,10 @@ CREATE TABLE `participation`
   `excluded_at`             DATETIME
 );
 
+-- Add unique index to plan_id+user_id (ie a user can only be in any given plan 0 or 1 times)
+ALTER TABLE participation
+  ADD UNIQUE INDEX idx_participation_plan_id_user_id (participation_plan_id, user_id);
+
 -- Add foreign key to `user` table
 
 ALTER TABLE     `participation`
