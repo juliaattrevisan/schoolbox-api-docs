@@ -432,13 +432,21 @@ class Controller extends Base\Base
         try {
             $this->validateCourseData(null, trim($post['name']), trim($post['parent']));
 
+            $templateID = $this->getConfigLoader()->get('course_builder_default_course_page_template');
+
+            try {
+                $template = HomepageTemplateMapper::getInstance()->findOneByColumn('id', $templateID);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $template = null;
+            }
+
             // Create new CourseFolder
             $courseFolder = $this->persistFolder([
                 'name'            => trim($post['name']),
                 'parent'          => trim($post['parent']),
                 'curriculumCodes' => explode(',', $post['curriculumCodes'][0]),
                 'inherit'         => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
-                'template'        => $this->getConfigLoader()->get('course_builder_default_course_page_template'),
+                'template'        => $template,
                 'group'           => $rolePermissions,
                 'recursive'       => false, // LEAVE THIS
                 'code'            => null,  // LEAVE THIS
