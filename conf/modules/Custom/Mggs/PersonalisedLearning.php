@@ -8,9 +8,10 @@
 namespace Config\Modules\Custom\Mggs;
 
 use Alaress\Application\Kernel;
+use Aura\Di\Exception\ServiceNotFound;
 use Config\Modules\ModuleConfigInterface;
 use Schoolbox\Learning\Mastery\Module as MasteryModule;
-use Schoolbox\Learning\Personalised\Module as PersonalisedLearningModule;
+use Custom\Mggs\Learning\Personalised\Module as PersonalisedLearningModule;
 
 /**
  * Configuration for the (currently) MGGS-specific personalised learning and mastery pages.
@@ -22,6 +23,7 @@ class PersonalisedLearning implements ModuleConfigInterface
      *
      * @param Kernel $kernel
      *
+     * @throws ServiceNotFound
      * @return void
      */
     public function configure($kernel)

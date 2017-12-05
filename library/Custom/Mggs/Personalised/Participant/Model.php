@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Personalised\Participant;
+namespace Custom\Mggs\Learning\Personalised\Participant;
 
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;

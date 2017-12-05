@@ -5,10 +5,12 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Personalised;
+namespace Custom\Mggs\Learning\Personalised;
 
-use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
+use Aura\Di\Exception\ServiceNotFound;
+use Aura\Web\Exception\InvalidStatusCode;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DataModel\Translator as AssessmentTranslator;
@@ -84,6 +86,8 @@ class Controller extends Base
      *
      * @api   GET /learning/personalised/:studentId/
      * @param User $student
+     *
+     * @throws ServiceNotFound
      */
     public function getPersonalisedForStudent(User $student)
     {
@@ -157,6 +161,8 @@ class Controller extends Base
      * Gets the resource calendar for this student (at this time).
      *
      * @param User $student
+     *
+     * @throws MapperException
      */
     public function getCalendarForStudent(User $student)
     {
@@ -205,6 +211,9 @@ class Controller extends Base
      *                      Format: timestamps
      *
      * @param User $student
+     *
+     * @throws InvalidStatusCode
+     * @throws MapperException
      */
     public function postUpdateParticipation(User $student)
     {
@@ -283,6 +292,8 @@ class Controller extends Base
      *
      * @param string $resultString
      * @param int    $code
+     *
+     * @throws InvalidStatusCode
      */
     protected function buildJsonResponse($resultString, $code = 200)
     {
