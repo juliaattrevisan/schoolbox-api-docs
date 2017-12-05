@@ -34,7 +34,7 @@ class Model implements ISoftDeletable
     private $assessment;
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $isDynamic;
 
@@ -83,18 +83,18 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function getIsDynamic(): boolean
+    public function getIsDynamic(): bool
     {
         return $this->isDynamic;
     }
 
 
     /**
-     * @param boolean $isDynamic
+     * @param bool $isDynamic
      */
-    public function setIsDynamic(boolean $isDynamic)
+    public function setIsDynamic(bool $isDynamic)
     {
         $this->isDynamic = $isDynamic;
     }

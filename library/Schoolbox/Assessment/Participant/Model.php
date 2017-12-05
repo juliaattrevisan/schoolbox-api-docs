@@ -30,7 +30,7 @@ class Model
     private $user;
 
     /**
-     * @var null|\Alaress_Date_Format
+     * @var null|Alaress_Date_Format
      */
     private $excludedAt;
 
