@@ -100,7 +100,7 @@ class Factory extends FolderFilter\Factory
             $selections,
             $folderOverrides,
             $this->getSelectionMapper(),
-            $folders->sortBy('name', 'ASC')
+            $folders->sortBy('name', 'ASC', null, true)
         );
     }
 

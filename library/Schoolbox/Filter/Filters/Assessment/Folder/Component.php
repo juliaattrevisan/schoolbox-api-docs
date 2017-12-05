@@ -18,6 +18,8 @@ class Component extends Filter\BaseComponent
 {
 
     /**
+     * Indexed by folder.id
+     *
      * @var GenericCollection|Folder\Model[]
      */
     private $folders;
@@ -30,7 +32,7 @@ class Component extends Filter\BaseComponent
      * @param null|GenericCollection|Filter\Selection\Model[] $userSelections
      * @param null|GenericCollection|Filter\Selection\Model[] $urlOverrides
      * @param Filter\Selection\Mapper                         $filterSelectionMapper
-     * @param Collection|GenericCollection|Folder\Model[]     $folders
+     * @param Collection|GenericCollection|Folder\Model[]     $folders Indexed by folder.id
      * @throws \InvalidArgumentException If neither $userSelections or $urlOverrides are supplied
      */
     public function __construct(
@@ -56,12 +58,6 @@ class Component extends Filter\BaseComponent
     {
         $availableSelections = $this->getFilterSelectionMapper()->createCollection();
         $roleType            = $this->getUser()->getRole()->getType();
-        $isUserConfigurable  = $this->getPageFilter()->getUserConfigurable();
-
-        // Had admin configured Groups and/or Classes to be available for current user's role type?
-        // (if not user configurable, set to always available - filtering applied by roleDefault)
-        $isGroupsAvailable  = $abstractOptions[Definition::KEY_GROUPS]->getAvailable();
-        $isClassesAvailable = $abstractOptions[Definition::KEY_CLASSES]->getAvailable();
 
         // Had admin configured Groups and/or Classes to be selected for current user's role type?
         $selectGroups  = $abstractOptions[Definition::KEY_GROUPS]->getDefaults()[$roleType]->getSelected();
@@ -70,28 +66,29 @@ class Component extends Filter\BaseComponent
         $urlOverrides = $this->getUrlOverrides();
 
         foreach ($this->folders as $folder) {
-
-            /* Should the folder be available?
-             * - if not user configurable, set to always available - filtering applied by roleDefault
-             * - is group and groups are available
-             * - is/was class and classes are available
-             */
-            $available = !$isUserConfigurable || ($isGroupsAvailable && $folder->isGroup())
-                || ($isClassesAvailable && ($folder->isClass() || $folder->wasClass()));
-            if (!$available) {
-                continue;
-            }
             $key        = (string)$folder->getId();
+            /* The factory will have injected folders where the:
+             * - folder is injected via URL overrides
+             * - folder is a class, and admin has configured taught classes to be available
+             * - user has group WRITE+ perm to the folder and admin configured groups to be available
+             *
+             * We may have cases where a teacher has WRITE+ access to a group (via userAccess) that does not
+             * exist (in userGroups). In this case, the relevant folder will be injected, but isGroup() will be false.
+             *
+             * Therefore if a folder was not injected, and is not a class, assume it is/was a group (whether due to
+             * userGroups or userAccess).
+             * TODO remove this when we can guarantee this data inconsistency to not exist: SA-5448
+             */
+            $isClass    = $folder->isClass() || $folder->wasClass();
             $isInjected = $urlOverrides && $urlOverrides->offsetExists($key);
+            $isGroup    = !$isClass && !$isInjected;
 
-            /* Folder is available. Should it be selected?
+            /* Should folder be selected?
              * - if injected via URL override
              * - is group and roleDefault for group is true
              * - is/was class and roleDefault for class is true
              */
-            $selected = $isInjected || ($selectGroups && $folder->isGroup())
-                || ($selectClasses && ($folder->isClass() || $folder->wasClass()));
-
+            $selected = $isInjected || ($selectGroups && $isGroup) || ($selectClasses && $isClass);
             $availableSelections[$key] = $this->createSelection($key, $selected);
         }
         return $availableSelections;
