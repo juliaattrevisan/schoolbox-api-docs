@@ -57,10 +57,10 @@
     {% endif %}
 
     {# Progress icon #}
-    {% set pStatusClass = participant.responseRequired ? statusIncomplete : (participant.reviewRequired ? statusPending : statusReviewed) %}
+    {% set pStatusClass = participant.responseRequired ? statusIncomplete : (participant.reviewComplete ? statusReviewed : statusPending) %}
 
     {# Progress icon tool tip #}
-    {% set pTooltip     = participant.responseRequired ? labelIncomplete  : (participant.reviewRequired ? labelPending  : labelReviewed)  %}
+    {% set pTooltip     = participant.responseRequired ? labelIncomplete  : (participant.reviewComplete ? labelReviewed  : labelPending)  %}
     {% set pTooltip     = latestResponse and not latestResponse.isSubmitted ? 'Review will be required when this attempt is finished' : pTooltip %}
 
     {% set pStatusText %}
