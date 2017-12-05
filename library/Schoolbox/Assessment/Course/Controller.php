@@ -437,7 +437,7 @@ class Controller extends Base\Base
             try {
                 $template = HomepageTemplateMapper::getInstance()->findOneByColumn('id', $templateID);
             } catch (\Schoolbox\Mapper\Exception $e) {
-                $template = null;
+                $templateID = null;
             }
 
             // Create new CourseFolder
@@ -446,7 +446,7 @@ class Controller extends Base\Base
                 'parent'          => trim($post['parent']),
                 'curriculumCodes' => explode(',', $post['curriculumCodes'][0]),
                 'inherit'         => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
-                'template'        => $template,
+                'template'        => $templateID,
                 'group'           => $rolePermissions,
                 'recursive'       => false, // LEAVE THIS
                 'code'            => null,  // LEAVE THIS
