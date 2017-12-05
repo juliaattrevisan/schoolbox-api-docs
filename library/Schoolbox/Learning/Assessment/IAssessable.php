@@ -652,9 +652,9 @@ interface IAssessable extends ISoftDeletable
     public function setCreator($creator);
 
     /**
-     * Get a Collection of Participant instances
+     * Get a Collection of Participant instances, indexed by user.id
      *
-     * @return Collection|Participant[]
+     * @return Collection|Participant[] (indexed by user.id)
      */
     public function getAllParticipants();
 
@@ -678,6 +678,16 @@ interface IAssessable extends ISoftDeletable
      * @return $this
      */
     public function setPlans(GenericCollection $plans): self;
+
+
+    /**
+     * Returns this assessments dynamic plan if it has one.
+     *
+     * A dynamic plan is augmented with current class/group members from the assessment's folder context.
+     *
+     * @return null|Plan
+     */
+    public function getDynamicPlan(): ?Plan;
 
 
     /**
@@ -708,7 +718,7 @@ interface IAssessable extends ISoftDeletable
      * @param Node\Model[]|GenericCollection $curriculumNodes
      * @return $this
      */
-    public function setCurriculumNodes(GenericCollection $curriculumNodes);
+    public function setCurriculumNodes(GenericCollection $curriculumNodes): self;
 
     /**
      * Created date

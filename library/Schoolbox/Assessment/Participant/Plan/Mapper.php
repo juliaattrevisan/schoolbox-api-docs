@@ -7,9 +7,14 @@
 
 namespace Schoolbox\Assessment\Participant\Plan;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
+/**
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
+ */
 class Mapper extends BaseMapper
 {
 

@@ -25,7 +25,6 @@ use Schoolbox\Permission\Access\UserAccess;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Error;
-use Schoolbox\Learning\Assessment\DueWork\Feedback;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackMapperProxy;

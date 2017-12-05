@@ -17,9 +17,14 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use \Schoolbox\User;
 use \DomainException;
+use Alaress_Date_Format;
 
+/**
+ * The 'domain' version of a participant
+ */
 class Participant
 {
+
     use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;
@@ -38,6 +43,13 @@ class Participant
      */
     private $plan;
 
+
+    /**
+     * @var null|Alaress_Date_Format
+     */
+    private $excludedAt;
+
+
     /**
      * A Collection of IResponse instances that Students spawn
      *
@@ -52,6 +64,7 @@ class Participant
      */
     private $allFeedbacks;
 
+
     /**
      * Participant constructor.
      *
@@ -65,6 +78,7 @@ class Participant
         $this->allResponses = new GenericCollection($plan->getAssessable()->getResponseClass());
         $this->allFeedbacks = new GenericCollection($plan->getAssessable()->getFeedbackClass());
     }
+
 
     /**
      * Does the student still need to submit a response ?
@@ -223,15 +237,16 @@ class Participant
         $mostRecentSubmittedResponse = null;
 
         /** @var IResponse $response */
-        foreach($this->allResponses as $response){
-            if($response->isSubmitted()){
-                if(!$mostRecentSubmittedResponse || $response->getSubmittedAt()->gt($mostRecentSubmittedResponse->getSubmittedAt())){
+        foreach ($this->allResponses as $response) {
+            if ($response->isSubmitted()) {
+                if (!$mostRecentSubmittedResponse || $response->getSubmittedAt()->gt($mostRecentSubmittedResponse->getSubmittedAt())) {
                     $mostRecentSubmittedResponse = $response;
                 }
             }
         }
         return $mostRecentSubmittedResponse;
     }
+
 
     /**
      * Find the authoritative Feedback for an Assessment for this Participant
@@ -254,6 +269,7 @@ class Participant
         return $mostRecentFeedback;
     }
 
+
     /**
      * Find the authoritative published Feedback for an Assessment for this Participant
      *
@@ -269,11 +285,12 @@ class Participant
         /** @var IFeedback $feedback */
         foreach ($this->allFeedbacks as $feedback) {
             if ($feedback->isPublished() && (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt()))) {
-                    $mostRecentFeedback = $feedback;
+                $mostRecentFeedback = $feedback;
             }
         }
         return $mostRecentFeedback;
     }
+
 
     /**
      * Find the authoritative published AND visible Feedback for an Assessment for this Participant
@@ -355,6 +372,7 @@ class Participant
         }
     }
 
+
     /**
      * Get the IFeedback responsible for the participant's assessment mark
      *
@@ -385,6 +403,7 @@ class Participant
     {
         return $this->user;
     }
+
 
     /**
      * @param User $user
@@ -418,12 +437,33 @@ class Participant
 
 
     /**
+     * @return null|Alaress_Date_Format
+     */
+    public function getExcludedAt(): ?Alaress_Date_Format
+    {
+        return $this->excludedAt;
+    }
+
+
+    /**
+     * @param null|Alaress_Date_Format $excludedAt
+     * @return $this
+     */
+    public function setExcludedAt(?Alaress_Date_Format $excludedAt): self
+    {
+        $this->excludedAt = $excludedAt;
+        return $this;
+    }
+
+
+    /**
      * @return IAssessable
      */
     public function getAssessable()
     {
         return $this->plan->getAssessable();
     }
+
 
     /**
      * @param IAssessable $assessable
@@ -435,6 +475,7 @@ class Participant
         return $this;
     }
 
+
     /**
      * @return GenericCollection|IResponse[]
      */
@@ -442,6 +483,7 @@ class Participant
     {
         return $this->allResponses;
     }
+
 
     /**
      * @param GenericCollection|IResponse[] $allResponses
@@ -454,6 +496,7 @@ class Participant
         return $this;
     }
 
+
     /**
      * @return GenericCollection|IFeedback[]
      */
@@ -461,6 +504,7 @@ class Participant
     {
         return $this->allFeedbacks;
     }
+
 
     /**
      * @param GenericCollection|IFeedback[] $allFeedbacks

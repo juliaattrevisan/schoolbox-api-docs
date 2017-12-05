@@ -17,6 +17,7 @@ use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use \Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use \Schoolbox\User;
@@ -25,6 +26,7 @@ use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use \Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
+use Schoolbox\Curriculum\Node;
 
 abstract class AbstractAssessment implements IAssessable
 {
@@ -85,13 +87,6 @@ abstract class AbstractAssessment implements IAssessable
     private $defaultOpenSpan;
 
     /**
-     * A Collection of Participant instances
-     *
-     * @var Collection|Participant[]
-     */
-    private $allParticipants;
-
-    /**
      * The person who created this Assessable
      *
      * @var User
@@ -138,11 +133,6 @@ abstract class AbstractAssessment implements IAssessable
      */
     private $markVisibility;
 
-    /**
-     * Cache to assist in finding Participants for User object
-     * @var array
-     */
-    private $participantCache = [];
 
     /**
      * 1-based, not 0-based, to enable the mapper to recognise when it needs auto-assign a value.
@@ -162,17 +152,22 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * A collection of Curriculum Nodes
      *
-     * @var Collection
+     * @var Node\Model[]|GenericCollection
      */
     private $curriculumNodes;
+
+    /**
+     * @var Plan[]|GenericCollection
+     */
+    private $plans;
 
     /**
      * Assessable constructor.
      */
     public function __construct()
     {
-        $this->setAllParticipants(new Collection());
-        $this->setCurriculumNodes(new Collection());
+        $this->curriculumNodes = new GenericCollection(Node\Model::class);
+        $this->plans           = new GenericCollection(Plan::class);
     }
 
     /**
@@ -187,7 +182,9 @@ abstract class AbstractAssessment implements IAssessable
 
         /* Explicitly dump away all the Participants
          */
-        $this->setAllParticipants(new Collection());
+        foreach($this->plans as $plan){
+            $plan->setParticipants($plan->getParticipants()->emptyClone());
+        }
 
         /* TODO: Dump away all the attached files?
          */
@@ -261,17 +258,13 @@ abstract class AbstractAssessment implements IAssessable
      * @param User $user
      * @return Participant|null
      */
-    protected function findParticipantIfExtant(User $user )
+    protected function findParticipantIfExtant(User $user): ?Participant
     {
         $userId = $user->getId();
 
-        /** @var Participant $currentParticipant */
-        foreach ($this->getAllParticipants() as $i => $currentParticipant) {
-            if ($currentParticipant->getUser()
-                                   ->getId() == $userId
-            ) {
-                $this->participantCache[$userId] = $i;
-                return $currentParticipant;
+        foreach ($this->plans as $plan) {
+            if($plan->getParticipants()->offsetExists($userId)){
+                return $plan->getParticipants()[$userId];
             }
         }
 
@@ -478,7 +471,7 @@ abstract class AbstractAssessment implements IAssessable
     public function getCountResponses(bool $includeDrafts = false): int
     {
         $count = 0;
-        foreach ($this->allParticipants as $participant) {
+        foreach ($this->getAllParticipants() as $participant) {
             if ($includeDrafts) {
                 $count += $participant->getAllResponses()->count();
             } else {
@@ -504,7 +497,7 @@ abstract class AbstractAssessment implements IAssessable
     public function getCountFeedbacks(bool $includeDrafts = false): int
     {
         $count = 0;
-        foreach ($this->allParticipants as $participant) {
+        foreach ($this->getAllParticipants() as $participant) {
             if ($includeDrafts) {
                 $count += $participant->getAllFeedbacks()->count();
             } else {
@@ -754,21 +747,30 @@ abstract class AbstractAssessment implements IAssessable
     }
 
     /**
-     * @return Collection|Participant[]
+     * Returns all Participants in this IAssessable, indexed by user.id
+     *
+     * @return Collection|Participant[] Indexed by user.id
      */
     public function getAllParticipants()
     {
-        return $this->allParticipants;
+        $participants = new GenericCollection(Participant::class);
+        foreach($this->plans as $plan){
+            foreach($plan->getParticipants() as $participant){
+                // Note we cannot index by participant.id, as that may be NULL
+                $participants[$participant->getUser()->getId()] = $participant;
+            }
+        }
+        return $participants;
     }
+
 
     /**
      * @param Collection $allParticipants
-     * @return $this
+     * @throws \BadMethodCallException
      */
     public function setAllParticipants(Collection $allParticipants)
     {
-        $this->allParticipants = $allParticipants;
-        return $this;
+        throw new \BadMethodCallException('TODO - port assessments to plans');
     }
 
     /**
@@ -928,22 +930,55 @@ abstract class AbstractAssessment implements IAssessable
     }
 
     /**
-     * @return Collection
+     * @return Node\Model[]|GenericCollection
      */
-    public function getCurriculumNodes()
+    public function getCurriculumNodes(): GenericCollection
     {
         return $this->curriculumNodes;
     }
 
     /**
-     * @param Collection $curriculumNodes
+     * @param Node\Model[]|GenericCollection $curriculumNodes
      * @return $this
      */
-    public function setCurriculumNodes(Collection $curriculumNodes)
+    public function setCurriculumNodes(GenericCollection $curriculumNodes): IAssessable
     {
-        $this->curriculumNodes = $curriculumNodes;
+        $this->curriculumNodes->replaceWith($curriculumNodes);
         return $this;
     }
+
+    /**
+     * @return Plan[]|GenericCollection
+     */
+    public function getPlans(): GenericCollection
+    {
+        return $this->plans;
+    }
+
+    /**
+     * @param Plan[]|GenericCollection $plans
+     * @return $this
+     */
+    public function setPlans(GenericCollection $plans): IAssessable
+    {
+        $this->plans->replaceWith($plans);
+        return $this;
+    }
+
+
+    /**
+     * @return null|Plan
+     */
+    public function getDynamicPlan(): ?Plan
+    {
+        foreach ($this->plans as $plan) {
+            if ($plan->getIsDynamic()) {
+                return $plan;
+            }
+        }
+        return null;
+    }
+
 
     /**
      * @inheritdoc

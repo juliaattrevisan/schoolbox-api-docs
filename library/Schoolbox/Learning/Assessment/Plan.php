@@ -67,6 +67,8 @@ class Plan
     private $closeDate;
 
     /**
+     * Indexed by user.id
+     *
      * @var Participant[]|GenericCollection
      */
     private $participants;
@@ -223,7 +225,7 @@ class Plan
 
 
     /**
-     * @return Participant|GenericCollection
+     * @return Participant[]|GenericCollection
      */
     public function getParticipants(): GenericCollection
     {

@@ -179,9 +179,10 @@ class Module extends BaseModule
              * This pretends the teacher is a participant
              */
             if ($access >= UserAccess::ACCESS_WRITE) {
-                $plan = new Plan();
-                $plan->setAssessable($assessment);
-                $participant = new Participant($student, (new Plan())->setAssessable($assessment));
+                $plan = new Plan($assessment);
+                $assessment->getPlans()->add($plan);
+                $participant = new Participant($student, $plan);
+                $plan->getParticipants()->add($participant);
 
                 /* Suck down all the responses from $assessment and put them into $participant
                  */

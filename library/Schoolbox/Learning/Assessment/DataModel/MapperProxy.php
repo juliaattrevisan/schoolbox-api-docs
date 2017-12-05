@@ -8,8 +8,8 @@ namespace Schoolbox\Learning\Assessment\DataModel;
 
 use Alaress\Database\Predicate\Builder;
 use Alaress_Date_Format;
-use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper as DueWorkMapper;
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Term\Model as Term;
@@ -18,7 +18,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkObject;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Project as ProjectObject;
@@ -646,18 +646,18 @@ class MapperProxy
         if ($subObject instanceof Task) {
             TaskMapper::getInstance()->save($subObject);
 
-        } elseif ($subObject instanceof DueWork) {
+        } elseif ($subObject instanceof SubmissionBox) {
             // Legacy DueWork SitePage Controllers require that we preserve this field
             $subObject->setCategory($assessable->getBaseContext()->getFolder());
 
-            DueWorkMapper::getInstance()->save($subObject);
+            SubmissionBoxMapper::getInstance()->save($subObject);
 
             // Save the Rubric
-            /** @var DueWorkModel $dueWork */
+            /** @var DueWorkObject $dueWork */
             $dueWork = $assessable;
             if ($dueWork->getRubric() && $dueWork->getUseRubric()) {
                 $dueWork->getRubric()->setSubmissionBox($subObject);
-                DueWork\Rubric\RubricMapper::getInstance()->save($dueWork->getRubric(), $subObject);
+                SubmissionBox\Rubric\RubricMapper::getInstance()->save($dueWork->getRubric(), $subObject);
             }
 
         } elseif ($subObject instanceof Quiz) {
@@ -706,8 +706,8 @@ class MapperProxy
             if ($subObject instanceof Task) {
                 $mapper = TaskMapper::getInstance();
 
-            } elseif ($subObject instanceof DueWork) {
-                $mapper = DueWorkMapper::getInstance();
+            } elseif ($subObject instanceof SubmissionBox) {
+                $mapper = SubmissionBoxMapper::getInstance();
 
             } elseif ($subObject instanceof Quiz) {
                 $mapper = QuizMapper::getInstance();
@@ -948,21 +948,13 @@ class MapperProxy
      *
      * @param IAssessable $assessable
      * @param User        $user
-     * @param bool        $includeResponses
-     * @param bool        $includeFeedbacks
      * @return IAssessable
      */
-    public function loadParticipantsIntoAssessment(
-        IAssessable $assessable,
-        User $user = null,
-        $includeResponses = true,
-        $includeFeedbacks = true
-    ) {
+    public function loadParticipantsIntoAssessment(IAssessable $assessable, User $user = null): IAssessable
+    {
         $this->participantDataSource->loadParticipationIntoAssessment(
             $assessable,
-            $user,
-            $includeResponses,
-            $includeFeedbacks
+            $user
         );
         return $assessable;
     }
@@ -978,15 +970,11 @@ class MapperProxy
      */
     public function loadParticipantsIntoAssessmentCollection(
         Collection $collection,
-        User $user = null,
-        $includeResponses = true,
-        $includeFeedbacks = true
+        User $user = null
     ) {
         $this->participantDataSource->loadParticipationIntoAssessmentCollection(
             $collection,
-            $user,
-            $includeResponses,
-            $includeFeedbacks
+            $user
         );
         return $collection;
     }
