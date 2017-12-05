@@ -46,7 +46,7 @@ spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Kami Uploader',
     [
-        'verbose'     => [true,true,true],//$options['v'] ?? null,
+        'verbose'     => $options['v'] ?? null,
         'errors'      => E_ALL,
         'dryRun'      => isset($options['dry-run']),
         'retryFailed' => isset($options['retry-failed']),
