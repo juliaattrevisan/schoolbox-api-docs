@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Assessment\Participant;
 
-use Alaress\Database\Wrapper\Db2\PDO;
+use PDO;
 use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
@@ -33,7 +33,12 @@ class Mapper extends BaseMapper
         $this->uses('excluded_at', self::TYPE_DATETIME);
     }
 
-    protected function getSelectString()
+
+    /**
+     * @return string
+     * @throws BaseMapper\DefinitionException
+     */
+    protected function getSelectString(): string
     {
         return "
             SELECT {$this->getColumnString('p')},
