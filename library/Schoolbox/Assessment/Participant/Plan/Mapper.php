@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Participation\Plan;
+namespace Schoolbox\Assessment\Participant\Plan;
 
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
@@ -15,7 +15,7 @@ class Mapper extends BaseMapper
 
     public function mapping(): void
     {
-        $this->hasTable('participation_plan');
+        $this->hasTable('participant_plan');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('assessment_id', Assessment\Mapper::class, 'id', null, null, 'assessment', 'assessment');

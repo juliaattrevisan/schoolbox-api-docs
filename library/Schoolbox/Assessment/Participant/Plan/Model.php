@@ -12,7 +12,7 @@
  * Time: 3:11 PM
  */
 
-namespace Schoolbox\Assessment\Participation\Plan;
+namespace Schoolbox\Assessment\Participant\Plan;
 
 use Schoolbox\ISoftDeletable;
 use Alaress_Date_Format;

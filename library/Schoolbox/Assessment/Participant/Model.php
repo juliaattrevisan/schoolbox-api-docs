@@ -5,10 +5,10 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Participation;
+namespace Schoolbox\Assessment\Participant;
 
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
-use Schoolbox\Assessment\Participation\Plan;
+use Schoolbox\Assessment\Participant\Plan;
 use Schoolbox\User;
 use Alaress_Date_Format;
 

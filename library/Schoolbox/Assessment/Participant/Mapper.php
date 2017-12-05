@@ -5,21 +5,21 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Participation;
+namespace Schoolbox\Assessment\Participant;
 
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
-use Schoolbox\Assessment\Participation\Plan;
+use Schoolbox\Assessment\Participant\Plan;
 
 class Mapper extends BaseMapper
 {
 
     public function mapping(): void
     {
-        $this->hasTable('participation');
+        $this->hasTable('participant');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('participation_plan_id', Plan\Mapper::class, 'id', null, null, 'plan', 'plan');
+        $this->joins('participant_plan_id', Plan\Mapper::class, 'id', null, null, 'plan', 'plan');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
