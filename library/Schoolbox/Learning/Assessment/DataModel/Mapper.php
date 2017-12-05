@@ -768,6 +768,10 @@ class Mapper extends BaseMapper
             }
         }
 
+        if (!\count($specificationIds)) {
+            return $modelList;
+        }
+
         // Fetch (even deleted specs are required)
         $specifications = $this->findByColumn('id', $specificationIds, ['deleted' => true])->indexBy('id');
 
