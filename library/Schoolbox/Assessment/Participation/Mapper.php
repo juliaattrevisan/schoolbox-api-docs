@@ -9,23 +9,20 @@ namespace Schoolbox\Assessment\Participation;
 
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
-use Schoolbox\Assessment\Participation\Plan\Mapper as ParticipationPlanMapper;
+use Schoolbox\Assessment\Participation\Plan;
 
 class Mapper extends BaseMapper
 {
 
-    public function mapping()
+    public function mapping(): void
     {
-
         $this->hasTable('participation');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('participation_plan_id', ParticipationPlanMapper::class, 'id', null, null, 'participationPlan', 'participationPlan');
+        $this->joins('participation_plan_id', Plan\Mapper::class, 'id', null, null, 'plan', 'plan');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
-        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-
+        $this->uses('excluded_at', self::TYPE_DATETIME);
     }
-
 }

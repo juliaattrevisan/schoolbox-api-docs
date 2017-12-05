@@ -7,52 +7,53 @@
 
 namespace Schoolbox\Assessment\Participation;
 
-use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
-use Schoolbox\Assessment\Participation\Plan as ParticipationPlan;
+use Schoolbox\Assessment\Participation\Plan;
 use Schoolbox\User;
+use Alaress_Date_Format;
 
-/**
- * Class Model
- *
- * @package Schoolbox\Assessment\Participation
- */
-class Model implements ISoftDeletable
+class Model
 {
 
     use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;
-    use ModelTrait\DeletedAtDate;
 
     /**
-     *
-     *
-     * @var ParticipationPlan\Model
+     * @var Plan\Model
      */
-    protected $participationPlan;
+    private $plan;
 
     /**
      * @var User
      */
-    protected $user;
+    private $user;
+
+    /**
+     * @var null|\Alaress_Date_Format
+     */
+    private $excludedAt;
 
 
     /**
-     * @return ParticipationPlan\Model
+     * @return Plan\Model
      */
-    public function getParticipationPlan(): ParticipationPlan\Model
+    public function getPlan(): Plan\Model
     {
-        return $this->participationPlan;
+        return $this->plan;
     }
 
+
     /**
-     * @param ParticipationPlan\Model $participationPlan
+     * @param Plan\Model $plan
+     * @return $this
      */
-    public function setParticipationPlan($participationPlan)
+    public function setPlan(Plan\Model $plan): self
     {
-        $this->participationPlan = $participationPlan;
+        $this->plan = $plan;
+        return $this;
     }
+
 
     /**
      * @return User
@@ -62,12 +63,34 @@ class Model implements ISoftDeletable
         return $this->user;
     }
 
+
     /**
      * @param User $user
+     * @return $this
      */
-    public function setUser(User $user)
+    public function setUser(User $user): self
     {
         $this->user = $user;
+        return $this;
     }
 
+
+    /**
+     * @return null|Alaress_Date_Format
+     */
+    public function getExcludedAt(): ?Alaress_Date_Format
+    {
+        return $this->excludedAt;
+    }
+
+
+    /**
+     * @param null|Alaress_Date_Format $excludedAt
+     * @return $this
+     */
+    public function setExcludedAt(?Alaress_Date_Format $excludedAt): self
+    {
+        $this->excludedAt = $excludedAt;
+        return $this;
+    }
 }
