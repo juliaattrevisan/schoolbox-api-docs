@@ -91,146 +91,62 @@ $kernel->run(/**
         )->fetchAll();
 
         // One to one, published
+        // TODO decide if I should break the logic of the next step
         if (count($rubricMarks) == 1 && count($feedbacks) == 1) {
 
             linkReturnToMark($db, $log, $feedbacks[0], $rubricMarks[0]);
 
         }
 
-        // One to multi, published
-        elseif (count($rubricMarks) == 1 && count($feedbacks) > 1) {
+        // One to multi or multi to multi, published
+        elseif (count($rubricMarks) >= 1 && count($feedbacks) > 1) {
+//            continue;
+//
+//            var_dump($rubricMarks);
+//            var_dump($feedbacks);
 
             // try matching by date
 
-
-
-//            $rubricMarkPublishedDate = new Alaress_Date_Format($rubricMarks[0]['published_at'], Alaress_Date_Format::DATABASE_FORMAT);
-//
-//            $latest = true;
-//
             $propagate = false;
+            $feedbackId = null;
 
-            foreach ($feedbacks as $feedback) {
+#       RubricMarks     [1]   [0]
+#       ------------------------------>
+#       Feedbacks    (0)    (1)   (2)
 
-                if (($feedback['published_at'] == $rubricMarks[0]['published_date']) && !$propagate) {
-                    linkReturnToMark($db, $log, $feedback, $rubricMarks[0]);
-                    $propagate = true;
+            foreach ($rubricMarks as $rubricMark) {
+
+                $rubricMarkPublishedDate = new Alaress_Date_Format($rubricMark['published_at'], Alaress_Date_Format::DATABASE_FORMAT);
+
+
+                foreach ($feedbacks as $feedback) {
+
+                    $feedbackPublishedDate = new Alaress_Date_Format($feedback['published_at'], Alaress_Date_Format::DATABASE_FORMAT);
+
+                    if (($rubricMarkPublishedDate->compare($feedbackPublishedDate) <= 0) && !$propagate) {
+                        linkReturnToMark($db, $log, $feedback, $rubricMark);
+                        $propagate = true;
+                        $feedbackId = $feedback['id'];
+                    } elseif ($propagate && $feedbackId != $feedback['id']) {
+                        propagateRubricMarkForward($db, $log, $rubricMark, $feedback);
+                    } else {
+                        // do nothing;
+                    }
+
                 }
-                elseif ($propagate) {
-                    propagateRubricMarkForward($db, $log, $rubricMarks[0], $feedback);
-                }
-
-                else {
-                    // do nothing;
-                }
-
-
-
-
-//
-//                $feedbackPublishedDate = new Alaress_Date_Format($feedback['published_at'], Alaress_Date_Format::DATABASE_FORMAT);
-//
-//
-//                if ($feedbackPublishedDate->compare($rubricMarkPublishedDate) >= 0) {
-//
-//                    if ($latest) {
-//                        linkReturnToMark($db, $log, $feedback, $rubricMarks[0]);
-//                        $latest = false;
-//                        continue;
-//                    }
-//
-//                    var_dump($rubricMarks);
-//                    var_dump($feedbacks);
-//
-//                    propagateRubricMarkForward($db, $log, $rubricMarks[0], $feedback);
-//
-//                } else {
-//                    continue;
-//                }
-
-
-
-//            $feedbacksMatched = array_values(array_filter($feedbacks, function($row) use ($rubricMarkPublished) { return $row['published_at'] == $published; }));
-//
-//            if (count($feedbacksMatched) == 1) {
-//                linkReturnToMark($db, $log, $feedbacksMatched[0], $rubricMarks[0]);
-//            }
-//
-//            // More than one feedback have matched for any reason? Try to link to any non-deleted
-//            elseif (count($feedbacksMatched) > 1) {
-//                $linked = false;
-//                foreach ($feedbacksMatched as $feedback) {
-//                    if ($feedback['deleted_at'] == NULL) {
-//                        linkReturnToMark($db, $log, $feedback, $rubricMarks[0]);
-//                        $linked = true;
-//                        continue;
-//                    }
-//                }
-//                // No luck? Link to any deleted and forget about it.
-//                if (!$linked) {
-//                    linkReturnToMark($db, $log, $feedbacksMatched[0], $rubricMarks[0]);
-//                }
-//            }
-//
-//            // No feedback matched by publish date? Link to latest non-deleted.
-//            // TODO: Should I bother finding the closest by the publish date?
-//            else {
-//                $linked = false;
-//                foreach ($feedbacks as $feedback) {
-//                    if (!$feedback['deleted_at']) {
-//                        linkReturnToMark($db, $log, $feedback, $rubricMarks[0]);
-//                        $linked = true;
-//                        continue;
-//                    }
-//                }
-//                // No luck? Link to latest deleted and forget about it.
-//                if (!$linked) {
-//                    linkReturnToMark($db, $log, $feedbacksMatched[0], $rubricMarks[0]);
-//                }
-//            }
 
             }
+
         }
 
         // Multi to one
         // Link latest rubric mark, forget about the rest.
         elseif (count($rubricMarks) > 1 && count($feedbacks) == 1) {
-continue;
+            continue;
             linkReturnToMark($db, $log, $feedbacks[0], $rubricMarks[0]);
 
         }
 
-        // Multi to multi
-        elseif (count($rubricMarks) > 1 && count($feedbacks) > 1) {
-continue;
-            $linkedDates = [];
-            // Try finding match by publish date
-            foreach ($rubricMarks as $r => $rubricMark) {
-                foreach ($feedbacks as $f => $feedback) {
-                    if ($rubricMark['published_at'] == $feedback['published_at']) {
-                        linkReturnToMark($db, $log, $feedback, $rubricMark);
-                        unset($rubricMarks[$r]);
-                        unset($feedbacks[$f]);
-                        $linkedDates[] = $feedback['published_at'];
-
-                    }
-                }
-            }
-
-            if (empty($rubricMarks)) {
-                continue;
-            }
-            elseif (count($rubricMarks) == 1 || count($feedbacks) == 1) {
-//                var_dump($linkedDates);
-//
-//                var_dump($rubricMarks);
-//                var_dump($feedbacks);
-
-
-            }
-//            var_dump($rubricMarks);
-//            var_dump($feedbacks);
-        }
 
         // Only drafts are left there to deal with
         else {
@@ -244,40 +160,64 @@ continue;
 
 // Id setter
 // TODO: should I update publish times to clean the data?
-function linkReturnToMark ($db, $log, $feedback, $descriptorsSet) {
+function linkReturnToMark ($db, $log, $feedback, $rubricMark) {
     $db->executeQuery(
         '
                 UPDATE rubric_mark rm
                 JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
                 JOIN rubric_level rl ON rl.id = rd.level_id
                 SET return_id = :feedback_id
-                WHERE rm.student_id = :student_id AND rm.published_at = :published_at AND rl.box_id = :box_id;
+                WHERE rm.student_id = :student_id 
+                AND rm.published_at = :published_at 
+                AND rl.box_id = :box_id 
+                AND rm.return_id IS NULL;
                 ',
         [
             'feedback_id' => $feedback['id'],
-            'student_id' => $descriptorsSet['student_id'],
-            'published_at' => $descriptorsSet['published_at'],
-            'box_id' => $descriptorsSet['box_id']
+            'student_id' => $rubricMark['student_id'],
+            'published_at' => $rubricMark['published_at'],
+            'box_id' => $rubricMark['box_id']
         ]
     );
+
 }
 
 function propagateRubricMarkForward ($db, $log, $rubricMark, $feedback) {
 
+    $feedbackAlreadyLinked = $db->executeQuery(
+        '
+        SELECT id FROM rubric_mark
+        WHERE return_id = :feedback_id
+        ',
+        [
+            'feedback_id' => $feedback['id']
+        ]
+    )->fetchAll();
+
+    if (count($feedbackAlreadyLinked) > 0) {
+        return;
+    }
     $descriptors = $db->executeQuery(
         '
         SELECT descriptor_id FROM rubric_mark rm
         JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
         JOIN rubric_level rl ON rl.id = rd.level_id
-        WHERE rm.student_id = :student_id AND rm.published_at = :published_at AND rl.box_id = :box_id;
+        WHERE rm.student_id = :student_id 
+        AND rm.published_at = :published_at 
+        AND rl.box_id = :box_id
+        AND rm.return_id IS NULL;
         ',
         [
             'student_id' => $rubricMark['student_id'],
             'published_at' => $rubricMark['published_at'],
-            'box_id' => $feedback['box_id']
+            'box_id' => $rubricMark['box_id']
         ]
+
     )->fetchAll();
-var_dump($descriptors);
+
+//    var_dump($rubricMark);
+//    var_dump($feedback);
+
     foreach ($descriptors as $descriptor) {
         $db->executeQuery(
           '
@@ -295,6 +235,38 @@ var_dump($descriptors);
         );
     }
 
+}
+
+function propagateFeedbackForward ($db, $log, $rubricMark, $feedback)
+{
+
+    $newFeedback = $db->executeQuery(
+        '
+          INSERT INTO submission_return (box_id, maker, owner, created_at, published_at)
+          (
+              SELECT box_id, maker, owner, created_at, published_at
+              FROM submission_return
+              WHERE id=:id
+          )
+        ',
+        [
+            'id' => $feedback['id']
+        ]
+    )->fetchAll();
+
+//    var_dump($newFeedback);
+
+    $db->executeQuery(
+        '
+                UPDATE rubric_mark rm
+                SET return_id = :feedback_id
+                WHERE rm.id = :id 
+                ',
+        [
+            'feedback_id' => $feedback['id'],
+            'box_id' => $rubricMark['box_id']
+        ]
+    );
 }
 
 function checkIfDeletedIsValid ($db, $log) {
