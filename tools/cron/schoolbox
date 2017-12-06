@@ -19,7 +19,10 @@ MAILTO="support@schoolbox.com.au"
 0 1 * * 0	root	/usr/share/schoolbox/tools/clean-cache-dir.sh >> /var/log/schoolbox/cache-cleanup.log 2>&1
 
 # Plagscan callback - every hour
-0 * * * *	root	php /usr/share/schoolbox/tools/plagscan/scan.php >> /var/log/schoolbox/plagscan.log 2>&1
+0 * * * *	www-data	php /usr/share/schoolbox/tools/plagscan/scan.php >> /var/log/schoolbox/plagscan.log 2>&1
+
+# Plagscan file upload - every day
+0 4 * * 0,3	www-data	php /usr/share/schoolbox/tools/plagscan/submit.php >> /var/log/schoolbox/plagscan.log 2>&1
 
 # Etherpad - sync back to MySQL - every hour
 0 * * * *	root	php /usr/share/schoolbox/tools/etherpad-sync.php >> /var/log/schoolbox/etherpad-sync.log 2>&1
