@@ -17,9 +17,11 @@ use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant as ParticipantObject;
 use Schoolbox\Learning\Assessment\Plan as PlanObject;
 use Schoolbox\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Plan;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
@@ -75,6 +77,9 @@ class DataSource
      */
     protected $cacheForFolder;
 
+    /** @var Aggregator */
+    private $aggregator;
+
 
     /**
      * Constructor
@@ -98,6 +103,7 @@ class DataSource
         $this->responseDataSource = $responseDataSource;
         $this->feedbackDataSource = $feedbackDataSource;
         $this->cacheForFolder     = new Collection();
+        $this->aggregator         = new Aggregator();
     }
 
 
@@ -112,8 +118,9 @@ class DataSource
      *
      * @param IAssessable $assessment
      * @param null|User   $user
-     * @throws UnexpectedValueException
-     * @throws DomainException
+     * @throws UnexpectedValueException If unable to merge student collections
+     * @throws DomainException If user has interaction but not participant record
+     * @throws DefinitionException If unable to locate a specified mapper join
      */
     public function loadParticipationIntoAssessment(IAssessable $assessment, User $user = null): void
     {
@@ -131,8 +138,9 @@ class DataSource
      *
      * @param Collection|IAssessable[] $assessments
      * @param User                     $user
-     * @throws UnexpectedValueException
-     * @throws DomainException
+     * @throws UnexpectedValueException If unable to merge student collections
+     * @throws DomainException If user has interaction but not participant record
+     * @throws DefinitionException If unable to locate a specified mapper join
      */
     public function loadParticipationIntoAssessmentCollection(Collection $assessments, User $user = null): void
     {
@@ -142,6 +150,13 @@ class DataSource
 
         // Load participants for all assessments, plus activities in projects
         $this->findForAssessmentCollection($assessableWithDescendants, $user);
+
+        // Insert project participant objects into any project
+        foreach ($assessableWithDescendants as $assessable) {
+            if ($assessable instanceof Project) {
+                $this->aggregator->aggregate($assessable);
+            }
+        }
     }
 
 
@@ -158,8 +173,9 @@ class DataSource
      *
      * @param IAssessable[]|GenericCollection $assessments Indexed by assessment.id
      * @param null|User                       $user
-     * @throws UnexpectedValueException
+     * @throws UnexpectedValueException If unable to merge student collections
      * @throws DomainException If user has interaction but not participant record
+     * @throws DefinitionException If unable to locate a specified mapper join
      */
     protected function findForAssessmentCollection(GenericCollection $assessments, User $user = null): void
     {
@@ -192,7 +208,7 @@ class DataSource
 
     /**
      * @param PlanObject[]|GenericCollection $dynamicPlans
-     * @throws UnexpectedValueException
+     * @throws UnexpectedValueException If unable to merge student collections
      */
     private function loadDynamicPlanParticipants(GenericCollection $dynamicPlans): void
     {
@@ -210,11 +226,11 @@ class DataSource
             // It's acceptable to findAllStudents in a loop for now, because the list is cached
             foreach ($this->findAllStudentsForAssessment($assessment) as $user) {
                 // Is this user already an explicit participant?
-                if($explicitParticipants->keyExists($user->getId())){
+                if ($explicitParticipants->keyExists($user->getId())) {
                     continue;
                 }
                 // Is this user excluded?
-                if($excludedUsers && $excludedUsers->keyExists($user->getId())){
+                if ($excludedUsers && $excludedUsers->keyExists($user->getId())) {
                     continue;
                 }
                 $dynamicPlan->getParticipants()[$user->getId()] = new ParticipantObject($user, $dynamicPlan);
@@ -238,16 +254,16 @@ class DataSource
             }
             foreach ($assessmentResponses as $response) {
                 //Ensure response user is fully hydrated
-                $responseUser = $this->userMapper->findByIdWithFallback($response->getSubmittedOnBehalfOf()->getId());
+                $responseUser    = $this->userMapper->findByIdWithFallback($response->getSubmittedOnBehalfOf()->getId());
                 $participantUser = $assessable->getParticipantIfExtant($responseUser);
                 if (!$participantUser) {
-                    throw new DomainException(sprintf(
-                            'User (id: %s) has a response (id: %s) for assessment (id: %s) but no participant record',
-                            $responseUser->getId(),
-                            $response->getId(),
-                            $assessable->getId()
-                        )
+                    $msg = sprintf(
+                        'User (id: %s) has a response (id: %s) for assessment (id: %s) but no participant record',
+                        $responseUser->getId(),
+                        $response->getId(),
+                        $assessable->getId()
                     );
+                    throw new DomainException($msg);
                 }
                 $participantUser->getAllResponses()[$response->getId()] = $response;
             }
@@ -258,8 +274,6 @@ class DataSource
     /**
      * @param IAssessable[]|GenericCollection $assessments
      * @param IFeedback[][]|Collection        $allFeedback
-     *
-     * @throws UnexpectedValueException
      * @throws DomainException If a feedback is encountered for a user who is not an assessment participant
      */
     private function loadFeedbacks(GenericCollection $assessments, Collection $allFeedback): void
@@ -272,17 +286,17 @@ class DataSource
             foreach ($assessmentFeedback as $feedback) {
 
                 //Ensure response user is fully hydrated
-                $feedbackUser = $this->userMapper->findByIdWithFallback($feedback->getReviewee()->getId());
+                $feedbackUser    = $this->userMapper->findByIdWithFallback($feedback->getReviewee()->getId());
                 $participantUser = $assessment->getParticipantIfExtant($feedbackUser);
 
                 if (!$participantUser) {
-                    throw new DomainException(sprintf(
-                            'User (id: %s) has a feedback (id: %s) for assessment (id: %s) but no participant record',
-                            $feedbackUser->getId(),
-                            $feedback->getId(),
-                            $assessment->getId()
-                        )
+                    $msg = sprintf(
+                        'User (id: %s) has a feedback (id: %s) for assessment (id: %s) but no participant record',
+                        $feedbackUser->getId(),
+                        $feedback->getId(),
+                        $assessment->getId()
                     );
+                    throw new DomainException($msg);
                 }
                 $participantUser->getAllFeedbacks()->add($feedback);
 
@@ -290,7 +304,7 @@ class DataSource
                 // If so, use it to find the actual response, and associate them together.
                 // (Assume that the stub response lives in the same assessment!)
                 $stubResponse = $feedback->getResponse();
-                if ($stubResponse instanceof IResponse && $stubResponse->getId()) {
+                if ($stubResponse && $stubResponse->getId()) {
                     $stubResponseId = $stubResponse->getId();
 
                     foreach ($participantUser->getAllResponses() as $response) {
@@ -314,7 +328,7 @@ class DataSource
      * @param ParticipantObject $b
      * @return int
      */
-    public function sortCallback(ParticipantObject $a, ParticipantObject $b)
+    public function sortCallback(ParticipantObject $a, ParticipantObject $b): int
     {
         $lastCmp = strcasecmp($a->getUser()->getLastname(), $b->getUser()->getLastname());
         if ($lastCmp != 0) {
@@ -336,7 +350,7 @@ class DataSource
      *
      * @param IAssessable $assessment
      * @return Collection|User[]
-     * @throws \UnexpectedValueException If unable to merge student collections
+     * @throws UnexpectedValueException If unable to merge student collections
      */
     protected function findAllStudentsForAssessment(IAssessable $assessment)
     {
@@ -371,6 +385,7 @@ class DataSource
         return $this->cacheForFolder[$folder->getId()];
     }
 
+
     /**
      * Recursively walks the assessment tree and merges them into a flat collection
      *
@@ -379,7 +394,7 @@ class DataSource
      */
     private function mergeSubAssessments(GenericCollection $merged, GenericCollection $tree): void
     {
-        foreach($tree as $assessable){
+        foreach ($tree as $assessable) {
             $merged[$assessable->getId()] = $assessable;
             if ($assessable instanceof Project) {
                 $this->mergeSubAssessments($merged, $assessable->getAssessables());
@@ -393,56 +408,56 @@ class DataSource
      *
      * @param IAssessable[]|GenericCollection $assessables Indexed by assessment.id
      * @return PlanObject[]|GenericCollection Indexed by plan.id
+     * @throws DefinitionException If unable to locate a specified mapper join
      */
     private function loadPlansAndParticipants(GenericCollection $assessables): GenericCollection
     {
         $dynamicPlans = new GenericCollection(PlanObject::class);
 
         // Find all participant and plan models for the assessments
-        $participantMapper = Participant\Mapper::getInstance();
-        $participantModels = $participantMapper->findByColumn('pp.assessment_id', $assessables->keys());
+        $planMapper = Participant\Plan\Mapper::getInstance();
+        $planModels = $planMapper->findPlansAndParticipantsForAssessments($assessables->keys());
 
-        foreach($participantModels as $participantModel){
-            $planModel  = $participantModel->getPlan();
+        foreach ($planModels as $planModel) {
             $assessable = $assessables[$planModel->getAssessment()->getId()];
 
-            // Does this assessable not contain this plan?
-            $planObject = $assessable->getPlans()[$planModel->getId()];
-            if(!$planObject){
-                // Create a Plan Domain Object
-                $planObject = new PlanObject($assessable);
-                $assessable->getPlans()[$planModel->getId()] = $planObject;
-
-                // Copy all attributes from data model to domain object
-                $planObject
-                    ->setId($planModel->getId())
-                    ->setIsDynamic($planModel->getIsDynamic())
-                    ->setDescription($planModel->getDescription())
-                    ->setPublishDate($planModel->getPublishDate())
-                    ->setOpenDate($planModel->getOpenDate())
-                    ->setDueDate($planModel->getDueDate())
-                    ->setCloseDate($planModel->getCloseDate())
-                    ->setCreatedAt($planModel->getCreatedAt())
-                    ->setUpdatedAt($planModel->getUpdatedAt())
-                    ->setDeletedAt($planModel->getDeletedAt());
-
-                // And store it if dynamic so we can later insert class/group members dynamically
-                if($planObject->getIsDynamic()){
-                    $dynamicPlans[$planObject->getId()] = $planObject;
-                }
-            }
-
-            // Create a Participant Domain object
-            $participantObject = new ParticipantObject($participantModel->getUser(), $planObject);
-            $planObject->getParticipants()[$participantModel->getUser()->getId()] = $participantObject;
+            // Create a Plan Domain Object
+            $planObject                                  = new PlanObject($assessable);
+            $assessable->getPlans()[$planModel->getId()] = $planObject;
 
             // Copy all attributes from data model to domain object
-            $participantObject
-                ->setId($participantModel->getId())
-                ->setCreatedAt($participantModel->getCreatedAt())
-                ->setUpdatedAt($participantModel->getUpdatedAt())
-                ->setExcludedAt($participantModel->getExcludedAt());
+            $planObject
+                ->setId($planModel->getId())
+                ->setIsDynamic($planModel->getIsDynamic())
+                ->setDescription($planModel->getDescription())
+                ->setPublishDate($planModel->getPublishDate())
+                ->setOpenDate($planModel->getOpenDate())
+                ->setDueDate($planModel->getDueDate())
+                ->setCloseDate($planModel->getCloseDate())
+                ->setCreatedAt($planModel->getCreatedAt())
+                ->setUpdatedAt($planModel->getUpdatedAt())
+                ->setDeletedAt($planModel->getDeletedAt());
+
+            // And store it if dynamic so we can later insert class/group members dynamically
+            if ($planObject->getIsDynamic()) {
+                $dynamicPlans[$planObject->getId()] = $planObject;
+            }
+
+            foreach ($planModel->getParticipants() as $participantModel) {
+                // Create a Participant Domain object
+                $user                                          = $participantModel->getUser();
+                $participantObject                             = new ParticipantObject($user, $planObject);
+                $planObject->getParticipants()[$user->getId()] = $participantObject;
+
+                // Copy all attributes from data model to domain object
+                $participantObject
+                    ->setId($participantModel->getId())
+                    ->setCreatedAt($participantModel->getCreatedAt())
+                    ->setUpdatedAt($participantModel->getUpdatedAt())
+                    ->setExcludedAt($participantModel->getExcludedAt());
+            }
         }
+
         return $dynamicPlans;
     }
 }

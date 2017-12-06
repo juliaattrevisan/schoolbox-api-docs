@@ -35,6 +35,8 @@ class Mapper extends BaseMapper
 
 
     /**
+     * By default, hydrate the participants' plans too.
+     *
      * @return string
      * @throws BaseMapper\DefinitionException
      */
@@ -51,7 +53,7 @@ class Mapper extends BaseMapper
 
     /**
      * @param PDOStatement $statement
-     * @return GenericCollection
+     * @return Model[]|GenericCollection
      * @throws BaseMapper\DefinitionException
      */
     protected function hydrateSelect(PDOStatement $statement): GenericCollection
@@ -62,7 +64,7 @@ class Mapper extends BaseMapper
         $collection = $this->createCollection();
 
         /** @noinspection PhpAssignmentInConditionInspection */
-        while($row = $statement->fetch(PDO::FETCH_ASSOC)){
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $participant = $this->hydrate($row, 'p');
             $participant->setPlan($planMapper->hydrate($row, 'pp'));
             $collection[$participant->getId()] = $participant;

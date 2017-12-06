@@ -380,7 +380,7 @@ class ProjectTest extends TestCase
                 (new ProjectModel())
                     ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
                     ->setAssessmentModel($assessmentModel)
-                    ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_NONE))
+                    ->setMarkType($this->buildMarkType())
                     ->setGradeGroup((new GradeGroup())),
                 None::class,
                 null

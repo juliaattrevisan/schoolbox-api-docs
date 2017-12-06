@@ -182,7 +182,7 @@ class Module extends BaseModule
                 $plan = new Plan($assessment);
                 $assessment->getPlans()->add($plan);
                 $participant = new Participant($student, $plan);
-                $plan->getParticipants()->add($participant);
+                $plan->getParticipants()[$student->getId()] = $participant;
 
                 /* Suck down all the responses from $assessment and put them into $participant
                  */

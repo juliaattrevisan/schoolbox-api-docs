@@ -8,7 +8,6 @@
 namespace Schoolbox\Learning\Assessment\Test;
 
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
@@ -382,16 +381,6 @@ class TotalMarkFractionalTest extends TestCase
             'config'      => null,
             'deleted_at'  => null,
         ];
-        $question3 = [
-            'question_id' => 3,
-            'section_id'  => 1,
-            'sequence'    => 3,
-            'type_id'     => 1,
-            'marks'       => 1.0,
-            'question'    => '<p><span>What is Jerome\'s (Vincent\'s) life expectancy?</span></p>',
-            'config'      => null,
-            'deleted_at'  => null,
-        ];
 
         $response1 = [
             'response_id'        => 1,
@@ -423,7 +412,9 @@ class TotalMarkFractionalTest extends TestCase
         $attempt = new QuizAttempt();
         $feedback = new QuizFeedback();
 
-        $participant = new Participant($this->getDummyQuizAttempter(), $quiz);
+        $linker      = new ParticipantLinker();
+        $plan        = $linker->createAndLinkPlan($quiz);
+        $participant = $linker->createAndLinkParticipant($this->getDummyQuizAttempter(), $plan);
         $participant->getAllResponses()->add($attempt);
         $participant->getAllFeedbacks()->add($feedback);
 

@@ -13,9 +13,8 @@
 namespace Schoolbox\Learning\Assessment\Test;
 
 use PHPUnit\Framework\TestCase;
-use \Schoolbox\Learning\Assessment\Project as Project;
+use \Schoolbox\Learning\Assessment\Project;
 use \Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
-use \Schoolbox\Learning\Assessment\Summator\Sum as SummatorSum;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;

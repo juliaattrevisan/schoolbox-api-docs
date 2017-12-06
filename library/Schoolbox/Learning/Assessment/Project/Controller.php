@@ -12,6 +12,7 @@ use Alaress_Date_Format;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception as Application;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
@@ -96,78 +97,29 @@ class Controller extends Assessment\Controller
         // Calculate summary totals for display purposes
         $participants = $assessment->getAllParticipants();
 
-        /* The number of assessments that have been completed by
-         * their respective total number of participants
-         */
-        $participantCounts = [
-            'completed' => [],
-            'totalAssessments' => $assessment->getAssessables()->count()
-        ];
-
-        /* The number of participants who have completed their
-         * respective total number of assessments
-         */
-        $assessmentCounts = [
-            'completed' => [],
-            'totalParticipants' => $participants->count()
-        ];
-
-        /* A tally per-participant
-         */
-        foreach ($participants as $currentParticipant) {
-            $participantCounts['completed'][$currentParticipant->getUser()->getId()] = 0;
+        $assessmentStats = new GenericCollection(Assessment\Statistics::class);
+        $assessmentStats[$assessment->getId()] = new Assessment\Statistics($assessment);
+        foreach($assessment->getAssessables() as $subAssessable){
+            $assessmentStats[$subAssessable->getId()] = new Assessment\Statistics($subAssessable);
         }
 
-        /* A tally per-assessment
-         */
-        foreach ($assessment->getAssessables() as $currentAssessment) {
-
-            /* Initialise count of IResponses for $currentAssessment
-             */
-            $assessmentCounts['completed'][$currentAssessment->getId()] = 0;
-
-            /* Count the number of IResponses submitted by each participant in $currentAssessment
-             * and update both tallies
-             */
-            foreach ($currentAssessment->getAllParticipants() as $currentParticipant) {
-
-                /* Special case for Tasks
-                 *
-                 * Find out if self-assessed tasks are currently in the state of Completed since
-                 * Students can revert from Completed to Incomplete (orange diamond to grey square)
-                 *
-                 * Second half of the if() clause determines when a teacher marks a task as complete
-                 * even if the student hasn't marked it as complete by themselves ie. teacher transitions
-                 * from grey square to green circle on behalf of the student
-                 */
-                if ($currentAssessment instanceof Task) {
-                    if ($currentAssessment->isFeedbackRequired($currentParticipant) || $currentAssessment->isReviewComplete($currentParticipant)) {
-                        $assessmentCounts['completed'][$currentAssessment->getId()]++;
-                        $participantCounts['completed'][$currentParticipant->getUser()->getId()]++;
-                    }
-                }
-                elseif ($currentParticipant->getAllResponses()->count()) {
-
-                    /* $currentParticipant has an IResponse for $currentAssessment
-                     */
-                    $assessmentCounts['completed'][$currentAssessment->getId()]++;
-                    $participantCounts['completed'][$currentParticipant->getUser()->getId()]++;
-                }
-            }
+        $participantStats = new GenericCollection(Assessment\ParticipantStatistics::class);
+        foreach($participants as $participant){
+            $participantStats[$participant->getUser()->getId()] = new Assessment\ParticipantStatistics($participant);
         }
 
         $twigData = [
             'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]),
             'baseContext'       => $assessment->getBaseContext(),
             'assessment'        => $assessment,
-            'participantCounts' => $participantCounts,
-            'assessmentCounts'  => $assessmentCounts,
+            'assessmentStats'   => $assessmentStats,
+            'participantStats'  => $participantStats,
             'returnUrl'         => Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL))
         ];
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                "@learningAssessment/project/status/staff.twig",
+                '@learningAssessment/project/status/staff.twig',
                 $twigData
             )
         );

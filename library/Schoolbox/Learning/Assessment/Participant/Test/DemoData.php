@@ -10,6 +10,8 @@ namespace Schoolbox\Learning\Assessment\Participant\Test;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
 use InvalidArgumentException;
+use Schoolbox\Learning\Assessment\Test\ParticipantLinker;
+use UnexpectedValueException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -30,6 +32,7 @@ use Schoolbox\User;
  */
 class DemoData
 {
+
     /**
      * A cache of User objects, indexed by the first letter of their name, capitalised, eg 'A' for 'Andy', 'B' for Barry
      *
@@ -43,6 +46,7 @@ class DemoData
      * @var User[]|GenericCollection<User>
      */
     private static $teacherCache;
+
 
     /**
      * Generates a DueWork with the following participation:
@@ -68,8 +72,9 @@ class DemoData
      *
      * @param int $id - The ID to assign to the assessment
      * @return DueWork
+     * @throws InvalidArgumentException If an unrecognised $userChar is attempted
      */
-    public static function getDueWork($id)
+    public static function getDueWork($id): DueWork
     {
         $dueWork = (new DueWork())
             ->setId($id)
@@ -83,15 +88,15 @@ class DemoData
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(-21))
             ->setDeletedAt(new Alaress_Date_NullDate());
 
+        $linker      = new ParticipantLinker();
+        $dueWorkPlan = $linker->createAndLinkPlan($dueWork);
 
         // User A - no interaction
-        $participantA = new Participant(self::getDemoStudent('A'), $dueWork);
-        $dueWork->getAllParticipants()->add($participantA);
+        $linker->createAndLinkParticipant(self::getDemoStudent('A'), $dueWorkPlan);
 
 
         // User B - draft response
-        $participantB = new Participant(self::getDemoStudent('B'), $dueWork);
-        $dueWork->getAllParticipants()->add($participantB);
+        $participantB = $linker->createAndLinkParticipant(self::getDemoStudent('B'), $dueWorkPlan);
 
         $responseB = (new Response())
             ->setSubmittedAt(new Alaress_Date_NullDate())
@@ -100,8 +105,7 @@ class DemoData
 
 
         // User C - submitted response
-        $participantC = new Participant(self::getDemoStudent('C'), $dueWork);
-        $dueWork->getAllParticipants()->add($participantC);
+        $participantC = $linker->createAndLinkParticipant(self::getDemoStudent('C'), $dueWorkPlan);
 
         $responseC = (new Response())
             ->setSubmittedAt(Alaress_Date_Format::now())
@@ -110,8 +114,7 @@ class DemoData
 
 
         // User D - submitted response then draft response
-        $participantD = new Participant(self::getDemoStudent('D'), $dueWork);
-        $dueWork->getAllParticipants()->add($participantD);
+        $participantD = $linker->createAndLinkParticipant(self::getDemoStudent('D'), $dueWorkPlan);
 
         $responseD1 = (new Response())
             ->setSubmittedAt(Alaress_Date_Format::now())
@@ -125,8 +128,7 @@ class DemoData
 
 
         // User E - draft feedback
-        $participantE = new Participant(self::getDemoStudent('E'), $dueWork);
-        $dueWork->getAllParticipants()->add($participantE);
+        $participantE = $linker->createAndLinkParticipant(self::getDemoStudent('E'), $dueWorkPlan);
 
         $feedbackE = (new Feedback())
             ->setPublishedAt(new Alaress_Date_NullDate())
@@ -135,8 +137,7 @@ class DemoData
 
 
         // User F - published feedback
-        $participantF = new Participant(self::getDemoStudent('F'), $dueWork);
-        $dueWork->getAllParticipants()->add($participantF);
+        $participantF = $linker->createAndLinkParticipant(self::getDemoStudent('F'), $dueWorkPlan);
 
         $feedbackF = (new Feedback())
             ->setPublishedAt(Alaress_Date_Format::now())
@@ -145,8 +146,7 @@ class DemoData
 
 
         // User G - published feedback then draft feedback
-        $participantG = new Participant(self::getDemoStudent('G'), $dueWork);
-        $dueWork->getAllParticipants()->add($participantG);
+        $participantG = $linker->createAndLinkParticipant(self::getDemoStudent('G'), $dueWorkPlan);
 
         $feedbackG1 = (new Feedback())
             ->setPublishedAt(Alaress_Date_Format::now())
@@ -160,8 +160,7 @@ class DemoData
 
 
         // User H - submitted response with draft floating feedback
-        $participantH = new Participant(self::getDemoStudent('H'), $dueWork);
-        $dueWork->getAllParticipants()->add($participantH);
+        $participantH = $linker->createAndLinkParticipant(self::getDemoStudent('H'), $dueWorkPlan);
 
         $responseH = (new Response())
             ->setSubmittedAt(Alaress_Date_Format::now())
@@ -175,8 +174,7 @@ class DemoData
 
 
         // User I - submitted response with later published floating feedback
-        $participantI = new Participant(self::getDemoStudent('I'), $dueWork);
-        $dueWork->getAllParticipants()->add($participantI);
+        $participantI = $linker->createAndLinkParticipant(self::getDemoStudent('I'), $dueWorkPlan);
 
         $responseI = (new Response())
             ->setSubmittedAt(Alaress_Date_Format::now())
@@ -190,8 +188,7 @@ class DemoData
 
 
         // User J - submitted response with later draft linked feedback
-        $participantJ = new Participant(self::getDemoStudent('J'), $dueWork);
-        $dueWork->getAllParticipants()->add($participantJ);
+        $participantJ = $linker->createAndLinkParticipant(self::getDemoStudent('J'), $dueWorkPlan);
 
         $responseJ = (new Response())
             ->setSubmittedAt(Alaress_Date_Format::now())
@@ -207,8 +204,7 @@ class DemoData
 
 
         // User K - submitted response with published linked feedback
-        $participantK = new Participant(self::getDemoStudent('K'), $dueWork);
-        $dueWork->getAllParticipants()->add($participantK);
+        $participantK = $linker->createAndLinkParticipant(self::getDemoStudent('K'), $dueWorkPlan);
 
         $responseK = (new Response())
             ->setSubmittedAt(Alaress_Date_Format::now())
@@ -224,8 +220,7 @@ class DemoData
 
 
         // User L - submitted response with published linked feedback, then draft response
-        $participantL = new Participant(self::getDemoStudent('L'), $dueWork);
-        $dueWork->getAllParticipants()->add($participantL);
+        $participantL = $linker->createAndLinkParticipant(self::getDemoStudent('L'), $dueWorkPlan);
 
         $responseL1 = (new Response())
             ->setSubmittedAt(Alaress_Date_Format::now())
@@ -246,8 +241,7 @@ class DemoData
 
 
         // User M - submitted response with published floating feedback, then later draft response
-        $participantM = new Participant(self::getDemoStudent('M'), $dueWork);
-        $dueWork->getAllParticipants()->add($participantM);
+        $participantM = $linker->createAndLinkParticipant(self::getDemoStudent('M'), $dueWorkPlan);
 
         $responseM1 = (new Response())
             ->setSubmittedAt(Alaress_Date_Format::now())
@@ -266,8 +260,7 @@ class DemoData
 
 
         // User N - submitted response with published floating feedback, then later submitted response
-        $participantN = new Participant(self::getDemoStudent('N'), $dueWork);
-        $dueWork->getAllParticipants()->add($participantN);
+        $participantN = $linker->createAndLinkParticipant(self::getDemoStudent('N'), $dueWorkPlan);
 
         $responseN1 = (new Response())
             ->setSubmittedAt(Alaress_Date_Format::now())
@@ -285,8 +278,7 @@ class DemoData
         $participantN->getAllResponses()->add($responseN2);
 
         // User O - draft floating feedback, then later draft response
-        $participantO = new Participant(self::getDemoStudent('O'), $dueWork);
-        $dueWork->getAllParticipants()->add($participantO);
+        $participantO = $linker->createAndLinkParticipant(self::getDemoStudent('O'), $dueWorkPlan);
 
         $feedbackO = (new Feedback())
             ->setPublishedAt(new Alaress_Date_NullDate())
@@ -300,8 +292,7 @@ class DemoData
 
 
         // User P - draft floating feedback, then later submitted response
-        $participantP = new Participant(self::getDemoStudent('P'), $dueWork);
-        $dueWork->getAllParticipants()->add($participantP);
+        $participantP = $linker->createAndLinkParticipant(self::getDemoStudent('P'), $dueWorkPlan);
 
         $feedbackP = (new Feedback())
             ->setPublishedAt(new Alaress_Date_NullDate())
@@ -315,8 +306,7 @@ class DemoData
 
 
         // User Q - published floating feedback, then later draft response
-        $participantQ = new Participant(self::getDemoStudent('Q'), $dueWork);
-        $dueWork->getAllParticipants()->add($participantQ);
+        $participantQ = $linker->createAndLinkParticipant(self::getDemoStudent('Q'), $dueWorkPlan);
 
         $feedbackQ = (new Feedback())
             ->setPublishedAt(Alaress_Date_Format::now())
@@ -330,8 +320,7 @@ class DemoData
 
 
         // User R - published floating feedback, then later submitted response
-        $participantR = new Participant(self::getDemoStudent('R'), $dueWork);
-        $dueWork->getAllParticipants()->add($participantR);
+        $participantR = $linker->createAndLinkParticipant(self::getDemoStudent('R'), $dueWorkPlan);
 
         $feedbackR = (new Feedback())
             ->setPublishedAt(Alaress_Date_Format::now())
@@ -346,6 +335,7 @@ class DemoData
         return $dueWork;
     }
 
+
     /**
      * Generates a DueWork with the following participation:
      *
@@ -358,8 +348,9 @@ class DemoData
      *
      * @param int $id - The ID to assign to the assessment
      * @return Quiz
+     * @throws InvalidArgumentException If an unrecognised $userChar is attempted
      */
-    public static function getQuiz($id)
+    public static function getQuiz($id): Quiz
     {
         $quiz = (new Quiz())
             ->setId($id)
@@ -371,15 +362,16 @@ class DemoData
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(-21))
             ->setDeletedAt(new Alaress_Date_NullDate());
 
+        $linker      = new ParticipantLinker();
+        $quizPlan = $linker->createAndLinkPlan($quiz);
+
 
         // User A - no interaction
-        $participantA = new Participant(self::getDemoStudent('A'), $quiz);
-        $quiz->getAllParticipants()->add($participantA);
+        $linker->createAndLinkParticipant(self::getDemoStudent('A'), $quizPlan);
 
 
         // User B - attempt not finished
-        $participantB = new Participant(self::getDemoStudent('B'), $quiz);
-        $quiz->getAllParticipants()->add($participantB);
+        $participantB = $linker->createAndLinkParticipant(self::getDemoStudent('B'), $quizPlan);
 
         $responseB = (new Attempt())
             ->setSubmittedAt(new Alaress_Date_NullDate());
@@ -387,8 +379,7 @@ class DemoData
 
 
         // User C - attempt finished but not reviewed
-        $participantC = new Participant(self::getDemoStudent('C'), $quiz);
-        $quiz->getAllParticipants()->add($participantC);
+        $participantC = $linker->createAndLinkParticipant(self::getDemoStudent('C'), $quizPlan);
 
         $responseC = (new Attempt())
             ->setSubmittedAt(Alaress_Date_Format::now());
@@ -396,8 +387,7 @@ class DemoData
 
 
         // User D - attempt reviewed
-        $participantD = new Participant(self::getDemoStudent('D'), $quiz);
-        $quiz->getAllParticipants()->add($participantD);
+        $participantD = $linker->createAndLinkParticipant(self::getDemoStudent('D'), $quizPlan);
 
         $responseD = (new Attempt())
             ->setSubmittedAt(Alaress_Date_Format::now());
@@ -411,8 +401,7 @@ class DemoData
 
 
         // User E - attempt reviewed, then attempt not finished
-        $participantE = new Participant(self::getDemoStudent('E'), $quiz);
-        $quiz->getAllParticipants()->add($participantE);
+        $participantE = $linker->createAndLinkParticipant(self::getDemoStudent('E'), $quizPlan);
 
         $responseE1 = (new Attempt())
             ->setSubmittedAt(Alaress_Date_Format::now());
@@ -430,8 +419,7 @@ class DemoData
 
 
         // User F - attempt reviewed, then attempt finished but not reviewed
-        $participantF = new Participant(self::getDemoStudent('F'), $quiz);
-        $quiz->getAllParticipants()->add($participantF);
+        $participantF = $linker->createAndLinkParticipant(self::getDemoStudent('F'), $quizPlan);
 
         $responseF1 = (new Attempt())
             ->setSubmittedAt(Alaress_Date_Format::now());
@@ -450,6 +438,7 @@ class DemoData
         return $quiz;
     }
 
+
     /**
      * Generates a self-assessable Task with the following participation:
      *
@@ -465,25 +454,29 @@ class DemoData
      *
      * @param int $id - The ID to assign to the task
      * @return Task
+     * @throws InvalidArgumentException If an unrecognised $userChar is attempted
      */
-    public static function getSelfAssessableTask($id)
+    public static function getSelfAssessableTask($id): Task
     {
         $task = (new Task())
             ->setId($id)
             ->setTitle('A self-assessable task')
             ->setIsSelfAssessable(true)
             ->setPublishAt(Alaress_Date_Format::now()->addDays(-7))
-            ->setDueAt(Alaress_Date_Format::now()->addDays(+7));
+            ->setDueAt(Alaress_Date_Format::now()->addDays(+7))
+            ->setCreatedAt(Alaress_Date_Format::now()->addDays(-21))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(-21))
+            ->setDeletedAt(new Alaress_Date_NullDate());
 
+        $linker   = new ParticipantLinker();
+        $taskPlan = $linker->createAndLinkPlan($task);
 
         // Student A - no response
-        $participantA = new Participant(self::getDemoStudent('A'), $task);
-        $task->getAllParticipants()->add($participantA);
+        $linker->createAndLinkParticipant(self::getDemoStudent('A'), $taskPlan);
 
 
         // User B - self-assessed as incomplete
-        $participantB = new Participant(self::getDemoStudent('B'), $task);
-        $task->getAllParticipants()->add($participantB);
+        $participantB = $linker->createAndLinkParticipant(self::getDemoStudent('B'), $taskPlan);
 
         $responseB = (new TaskResponse())
             ->setId(21)
@@ -498,8 +491,7 @@ class DemoData
 
 
         // User C - self-assessed as complete
-        $participantC = new Participant(self::getDemoStudent('C'), $task);
-        $task->getAllParticipants()->add($participantC);
+        $participantC = $linker->createAndLinkParticipant(self::getDemoStudent('C'), $taskPlan);
 
         $responseC = (new TaskResponse())
             ->setId(31)
@@ -514,8 +506,7 @@ class DemoData
 
 
         // User D - teacher-assessed as incomplete
-        $participantD = new Participant(self::getDemoStudent('D'), $task);
-        $task->getAllParticipants()->add($participantD);
+        $participantD = $linker->createAndLinkParticipant(self::getDemoStudent('D'), $taskPlan);
 
         $responseD = (new TaskResponse())
             ->setId(41)
@@ -534,8 +525,7 @@ class DemoData
 
 
         // User E - teacher-assessed as complete
-        $participantE = new Participant(self::getDemoStudent('E'), $task);
-        $task->getAllParticipants()->add($participantE);
+        $participantE = $linker->createAndLinkParticipant(self::getDemoStudent('E'), $taskPlan);
 
         $responseE = (new TaskResponse())
             ->setId(51)
@@ -554,8 +544,7 @@ class DemoData
 
 
         // User F - self-assessed as complete, then teacher-assessed as incomplete
-        $participantF = new Participant(self::getDemoStudent('F'), $task);
-        $task->getAllParticipants()->add($participantF);
+        $participantF = $linker->createAndLinkParticipant(self::getDemoStudent('F'), $taskPlan);
 
         $responseF1 = (new TaskResponse())
             ->setId(61)
@@ -585,8 +574,7 @@ class DemoData
 
 
         // User G - self-assessed as incomplete, then teacher-assessed as complete
-        $participantG = new Participant(self::getDemoStudent('G'), $task);
-        $task->getAllParticipants()->add($participantG);
+        $participantG = $linker->createAndLinkParticipant(self::getDemoStudent('G'), $taskPlan);
 
         $responseG1 = (new TaskResponse())
             ->setId(71)
@@ -615,8 +603,7 @@ class DemoData
         $participantG->getAllFeedbacks()->add($feedbackG2);
 
         // User H - teacher-assessed as complete, then teacher-assessed as incomplete
-        $participantH = new Participant(self::getDemoStudent('H'), $task);
-        $task->getAllParticipants()->add($participantH);
+        $participantH = $linker->createAndLinkParticipant(self::getDemoStudent('H'), $taskPlan);
 
         $responseH1 = (new TaskResponse())
             ->setId(81)
@@ -650,8 +637,7 @@ class DemoData
 
 
         // User I - teacher-assessed as incomplete, then student-assessed as complete
-        $participantI = new Participant(self::getDemoStudent('I'), $task);
-        $task->getAllParticipants()->add($participantI);
+        $participantI = $linker->createAndLinkParticipant(self::getDemoStudent('I'), $taskPlan);
 
         $responseI1 = (new TaskResponse())
             ->setId(91)
@@ -683,6 +669,7 @@ class DemoData
         return $task;
     }
 
+
     /**
      * Generates a non-self-assessable Task with the following participation:
      *
@@ -694,6 +681,7 @@ class DemoData
      *
      * @param int $id - The ID to assign to the task
      * @return Task
+     * @throws InvalidArgumentException If an unrecognised $userChar is attempted
      */
     public static function getNonSelfAssessableTask($id)
     {
@@ -702,17 +690,20 @@ class DemoData
             ->setTitle('A task that is NOT self-assessable.')
             ->setIsSelfAssessable(false)
             ->setPublishAt(Alaress_Date_Format::now()->addDays(-7))
-            ->setDueAt(Alaress_Date_Format::now()->addDays(+7));
+            ->setDueAt(Alaress_Date_Format::now()->addDays(+7))
+            ->setCreatedAt(Alaress_Date_Format::now()->addDays(-21))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(-21))
+            ->setDeletedAt(new Alaress_Date_NullDate());
 
+        $linker   = new ParticipantLinker();
+        $taskPlan = $linker->createAndLinkPlan($task);
 
         // Student A - no response
-        $participantA = new Participant(self::getDemoStudent('A'), $task);
-        $task->getAllParticipants()->add($participantA);
+        $linker->createAndLinkParticipant(self::getDemoStudent('A'), $taskPlan);
 
 
         // User B - teacher-assessed as incomplete
-        $participantB = new Participant(self::getDemoStudent('B'), $task);
-        $task->getAllParticipants()->add($participantB);
+        $participantB = $linker->createAndLinkParticipant(self::getDemoStudent('B'), $taskPlan);
 
         $responseB = (new TaskResponse())
             ->setId(21)
@@ -730,8 +721,7 @@ class DemoData
         $participantB->getAllFeedbacks()->add($feedbackB);
 
         // User C - teacher-assessed as complete
-        $participantC = new Participant(self::getDemoStudent('C'), $task);
-        $task->getAllParticipants()->add($participantC);
+        $participantC = $linker->createAndLinkParticipant(self::getDemoStudent('C'), $taskPlan);
 
         $responseC = (new TaskResponse())
             ->setId(31)
@@ -750,8 +740,7 @@ class DemoData
 
 
         // User D - teacher-assessed as complete, then teacher-assessed as incomplete
-        $participantD = new Participant(self::getDemoStudent('D'), $task);
-        $task->getAllParticipants()->add($participantD);
+        $participantD = $linker->createAndLinkParticipant(self::getDemoStudent('D'), $taskPlan);
 
         $responseD1 = (new TaskResponse())
             ->setId(41)
@@ -784,8 +773,7 @@ class DemoData
         $participantD->getAllFeedbacks()->add($feedbackD2);
 
         // User E - teacher-assessed as incomplete, then teacher-assessed as complete
-        $participantE = new Participant(self::getDemoStudent('E'), $task);
-        $task->getAllParticipants()->add($participantE);
+        $participantE = $linker->createAndLinkParticipant(self::getDemoStudent('E'), $taskPlan);
 
         $responseE1 = (new TaskResponse())
             ->setId(51)
@@ -819,6 +807,7 @@ class DemoData
 
         return $task;
     }
+
 
     /**
      * Generates a Project with the following sub-assessments:
@@ -887,11 +876,14 @@ class DemoData
      *
      * @param ISummator $summator
      * @return Project
+     * @throws InvalidArgumentException If an unrecognised $userChar is attempted
+     * @throws UnexpectedValueException If unable to merge collections
      */
-    public static function getProject(ISummator $summator = null)
+    public static function getProject(ISummator $summator = null): Project
     {
         $project = (new Project($summator))
-            ->setId(1);
+            ->setId(1)
+            ->setTitle('aProject');
 
         $project->getAssessables()
                 ->add(self::getSelfAssessableTask(2))
@@ -899,15 +891,8 @@ class DemoData
                 ->add(self::getQuiz(4))
                 ->add(self::getDueWork(5));
 
-        // Load the project participants
-        foreach ($project->getAssessables() as $subAssessable) {
-            foreach ($subAssessable->getAllParticipants() as $subParticipant) {
-                // Does project contain this user yet?
-                if (!$project->isParticipant($subParticipant->getUser())) {
-                    $project->getAllParticipants()->add((new Participant($subParticipant->getUser(), $project)));
-                }
-            }
-        }
+        $aggregator = new Participant\Aggregator();
+        $aggregator->aggregate($project);
 
         return $project;
     }
@@ -916,10 +901,11 @@ class DemoData
     /**
      * @param string $userChar - a single char representing their first name, eg 'A', 'B', etc
      * @return User
+     * @throws InvalidArgumentException If an unrecognised $userChar is passed
      */
-    public static function getDemoStudent($userChar)
+    public static function getDemoStudent(string $userChar): User
     {
-        if (is_null(self::$studentCache)) {
+        if (null === self::$studentCache) {
             self::$studentCache = new GenericCollection(User::class);
         }
 
@@ -928,7 +914,7 @@ class DemoData
             return self::$studentCache[$userChar];
         }
 
-        $user = (new User())->setId($userChar);
+        $user = (new User())->setId(\ord($userChar));
         switch ($userChar) {
             case 'A':
                 $user->setFirstname('Andrew (Student)');
@@ -991,13 +977,15 @@ class DemoData
         return $user;
     }
 
+
     /**
      * @param string $userChar - a single char representing their first name, eg 'T', etc
      * @return User
+     * @throws InvalidArgumentException If an unrecognised $userChar is passed
      */
-    public static function getDemoTeacher($userChar)
+    public static function getDemoTeacher(string $userChar): User
     {
-        if (is_null(self::$teacherCache)) {
+        if (null === self::$teacherCache) {
             self::$teacherCache = new GenericCollection(User::class);
         }
 
@@ -1006,7 +994,7 @@ class DemoData
             return self::$teacherCache[$userChar];
         }
 
-        $user = (new User())->setId($userChar);
+        $user = (new User())->setId(\ord($userChar));
         switch ($userChar) {
             case 'T':
                 $user->setFirstname('Trevor (Teacher)');

@@ -14,38 +14,27 @@
 namespace Schoolbox\Learning\Assessment\Test;
 
 use PHPUnit\Framework\TestCase;
-use \Schoolbox\Collection;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
-use \Schoolbox\User;
-use \Schoolbox\Resource\Storage\Model as Storage;
-
-use \Schoolbox\Learning\Assessment\Participant;
-use \Schoolbox\Learning\Assessment\Project as Project;
-
-use \Schoolbox\Learning\Assessment\Summator\ISummator;
-use \Schoolbox\Learning\Assessment\Summator\Average as SummatorAverage;
-use \Schoolbox\Learning\Assessment\Summator\WeightedAverage as SummatorWeightedAverage;
-use \Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
-use \Schoolbox\Learning\Assessment\Summator\Minimum as SummatorMinimum;
-
-use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use \Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkSubmission;
-use \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as DueWorkSubmissionFilePlagscan;
-use \Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
-use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
-use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
+use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Summator\ISummator;
+use Schoolbox\Learning\Assessment\Summator\Average as SummatorAverage;
+use Schoolbox\Learning\Assessment\Summator\WeightedAverage as SummatorWeightedAverage;
+use Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
+use Schoolbox\Learning\Assessment\Summator\Minimum as SummatorMinimum;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkSubmission;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
-
-use \Schoolbox\Learning\Assessment\Task\Model as Task;
-use \Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
-use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
-
-use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
-use \Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
-use \Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
+use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
 
 class SummatorTest extends TestCase
 {
@@ -74,20 +63,29 @@ class SummatorTest extends TestCase
     public function testUnweightedAverage0()
     {
         $project = $this->spawnProject(new SummatorAverage());
-        $project->setAssessables((new GenericCollection(IAssessable::class)));
+        $project->setAssessables(new GenericCollection(IAssessable::class));
+
+        $plan        = $this->getLinker()->createAndLinkPlan($project);
+        $participant = $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+
 
         /* Most Recent Published Average is null
          */
-        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(null, $project->getNormalisedMark($participant, true));
 
         /* Most Recent Average is null
          */
-        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(null, $project->getNormalisedMark($participant, false));
     }
+
 
     /**
      * Test the unweighted average
      * when there is no feedback
+     *
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
+     * @throws \DomainException
      */
     public function testUnweightedAverage1()
     {
@@ -116,12 +114,16 @@ class SummatorTest extends TestCase
         $this->assertEquals(null, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
 
         // Quiz auto-marked to 60.0 (this constitutes a draft mark)
-        $this->assertEquals(60.0, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(60.0, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * Test the unweighted average
      * when there is nothing published
+     *
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
     public function testUnweightedAverage2()
     {
@@ -158,7 +160,7 @@ class SummatorTest extends TestCase
 
         /* Most Recent Published Average is null (nothing to calculate)
          */
-        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(null, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
 
         /* Most Recent Average is
          *      = [98 + null + 77 + 100 + (100 * 12/20)] / 4
@@ -166,12 +168,16 @@ class SummatorTest extends TestCase
          *      = 335/4
          *      = 83.75
          */
-        $this->assertEquals(83.75, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(83.75, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * Test the unweighted average
      * when there's one of each type with published and unpublished feedback
+     *
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
     public function testUnweightedAverage3()
     {
@@ -192,19 +198,23 @@ class SummatorTest extends TestCase
          *      = [100 + 60] / 2
          *      = 80
          */
-        $this->assertEquals(80, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(80, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
 
         /* Most Recent Average is
          *      = [100 + (100 * 12/20)] / 2
          *      = [100 + 60] / 2
          *      = 80 (most recent feedback also happens to be most recent published feedback)
          */
-        $this->assertEquals(80, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(80, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * Test the unweighted average
      * when there's more than one of a particular type with published and unpublished feedback
+     *
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
     public function testUnweightedAverage4()
     {
@@ -228,19 +238,23 @@ class SummatorTest extends TestCase
          *      = [177 + 60] / 3
          *      = 79
          */
-        $this->assertEquals(79, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(79, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
 
         /* Most Recent Average is
          *      = [null + 77 + 100 + (100 * 5/20)] / 3
          *      = [177 + 60] / 3
          *      = 79 (most recent feedback also happens to be most recent published feedback)
          */
-        $this->assertEquals(79, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(79, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * Test the unweighted average
      * when there's more than one of a particular type with published and unpublished feedback
+     *
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
     public function testUnweightedAverage5()
     {
@@ -265,19 +279,24 @@ class SummatorTest extends TestCase
          *      = [275 + 60] / 4
          *      = 83.75
          */
-        $this->assertEquals(83.75, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(83.75, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
 
         /* Most Recent Average is
          *      = [98 + 77 + 100 + (100 * 12/20)] / 4
          *      = [275 + 60] / 4
          *      = 83.75
          */
-        $this->assertEquals(83.75, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(83.75, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * Test the weighted average
      * when there is no feedback
+     *
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
+     * @throws \DomainException
      */
     public function testWeightedAverage1()
     {
@@ -303,15 +322,19 @@ class SummatorTest extends TestCase
 
         /* Most Recent Published Weighted Average is null (nothing to calculate)
          */
-        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(null, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
 
         // Quiz is auto-marked to 60.0 (this constitutes a draft-mark)
-        $this->assertEquals(60.0, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(60.0, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * Test the weighted average
      * when there is nothing published
+     *
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
     public function testWeightedAverage2()
     {
@@ -347,7 +370,7 @@ class SummatorTest extends TestCase
 
         /* Most Recent Published Weighted Average is null (nothing to calculate)
          */
-        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(null, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
 
         /* Most Recent Weighted Average is
          *      = [(98*6) + (null*0) + (77*10) + (100*5) + ((100 * 12/20)*8)] / 29
@@ -355,12 +378,16 @@ class SummatorTest extends TestCase
          *      = 2338 / 29
          *      = 80.620689655
          */
-        $this->assertEquals(80.620689655, $project->getNormalisedMark(new Participant($this->hodes, $project), false), '', $this->delta);
+        $this->assertEquals(80.620689655, $project->getNormalisedMark($project->getParticipant($this->hodes), false), '', $this->delta);
     }
+
 
     /**
      * Test the weighted average
      * when there's one of each type with published and unpublished feedback
+     *
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
     public function testWeightedAverage3()
     {
@@ -382,7 +409,7 @@ class SummatorTest extends TestCase
          *      = 980 / 13
          *      = 75.38461538462
          */
-        $this->assertEquals(75.38461538462, $project->getNormalisedMark(new Participant($this->hodes, $project), true), '', $this->delta);
+        $this->assertEquals(75.38461538462, $project->getNormalisedMark($project->getParticipant($this->hodes), true), '', $this->delta);
 
         /* Most Recent Weighted Average is
          *      = [(100*5) + ((100 * 12/20)*8)] / 13
@@ -390,12 +417,16 @@ class SummatorTest extends TestCase
          *      = 980 / 13
          *      = 75.38461538462
          */
-        $this->assertEquals(75.38461538462, $project->getNormalisedMark(new Participant($this->hodes, $project), false), '', $this->delta);
+        $this->assertEquals(75.38461538462, $project->getNormalisedMark($project->getParticipant($this->hodes), false), '', $this->delta);
     }
+
 
     /**
      * Test the weighted average
      * when there's more than one of a particular type with published and unpublished feedback
+     *
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
     public function testWeightedAverage4()
     {
@@ -420,7 +451,7 @@ class SummatorTest extends TestCase
          *      = 1750 / 23
          *      = 76.08695652174
          */
-        $this->assertEquals(76.08695652174, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(76.08695652174, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
 
         /* Most Recent Weighted Average is
          *      = [(77*10) + (100*5) + ((100 * 12/20)*8)] / 23
@@ -428,12 +459,16 @@ class SummatorTest extends TestCase
          *      = 1750 / 23
          *      = 76.08695652174
          */
-        $this->assertEquals(76.08695652174, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(76.08695652174, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * Test the weighted average
      * when there's more than one of a particular type with published and unpublished feedback
+     *
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
     public function testWeightedAverage5()
     {
@@ -459,7 +494,7 @@ class SummatorTest extends TestCase
          *      = 2338 / 29
          *      = 80.62068965517
          */
-        $this->assertEquals(80.62068965517, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(80.62068965517, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
 
         /* Most Recent Weighted Average is
          *      = [(98*6) + (77*10) + (100*5) + ((100 * 12/20)*8)] / 29
@@ -467,13 +502,15 @@ class SummatorTest extends TestCase
          *      = 2338 / 29
          *      = 80.62068965517
         */
-        $this->assertEquals(80.62068965517, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(80.62068965517, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
 
     /** Really go to town */
 
     /**
      * A real belting
+     *
+     * @throws \UnexpectedValueException
      */
     public function testWeightedAverage10() {
         $project = $this->spawnProject(new SummatorWeightedAverage());
@@ -502,12 +539,15 @@ class SummatorTest extends TestCase
         *       = 3866/58
         *       = 66.655172414
         */
-        $this->assertEquals(65.962962963, $project->getNormalisedMark(new Participant($this->hodes, $project), true), '', $this->delta);
-        $this->assertEquals(66.655172414, $project->getNormalisedMark(new Participant($this->hodes, $project), false), '', $this->delta);
+        $this->assertEquals(65.962962963, $project->getNormalisedMark($project->getParticipant($this->hodes), true), '', $this->delta);
+        $this->assertEquals(66.655172414, $project->getNormalisedMark($project->getParticipant($this->hodes), false), '', $this->delta);
     }
+
 
     /**
      * A real belting
+     *
+     * @throws \UnexpectedValueException
      */
     public function testWeightedAverage11() {
         $project = $this->spawnProject(new SummatorWeightedAverage());
@@ -532,12 +572,15 @@ class SummatorTest extends TestCase
          * Most Recent Published Weighted Average is: 0
          * Most Recent Weighted Average is: 0
          */
-        $this->assertEquals(0.00000000000, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
-        $this->assertEquals(0.00000000000, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(0.00000000000, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
+        $this->assertEquals(0.00000000000, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * A real belting
+     *
+     * @throws \UnexpectedValueException
      */
     public function testWeightedAverage12() {
         $project = $this->spawnProject(new SummatorWeightedAverage());
@@ -570,12 +613,15 @@ class SummatorTest extends TestCase
          *      = 76*4/4
          *      = 76
          */
-        $this->assertEquals(0, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
-        $this->assertEquals(76.00000000000, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(0, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
+        $this->assertEquals(76.00000000000, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * A real belting
+     *
+     * @throws \UnexpectedValueException
      */
     public function testWeightedAverage13() {
         $project = $this->spawnProject(new SummatorWeightedAverage());
@@ -603,12 +649,15 @@ class SummatorTest extends TestCase
          *      = 76*4/4
          *      = 76
          */
-        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
-        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(null, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
+        $this->assertEquals(null, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * A real belting
+     *
+     * @throws \UnexpectedValueException
      */
     public function testWeightedAverage14() {
         $project = $this->spawnProject(new SummatorWeightedAverage());
@@ -638,13 +687,18 @@ class SummatorTest extends TestCase
          *      = 76*4/4
          *      = 76
          */
-        $this->assertEquals(0, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
-        $this->assertEquals(76.00000000000, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(0, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
+        $this->assertEquals(76.00000000000, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * Test the maximum
      * when there is no feedback
+     *
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
+     * @throws \DomainException
      */
     public function testMaximum1()
     {
@@ -670,15 +724,19 @@ class SummatorTest extends TestCase
 
         /* Most Recent Published Maximum is null (nothing to calculate)
          */
-        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(null, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
 
         // Quiz is auto-marked to 60.0 (this constitutes a draft-mark)
-        $this->assertEquals(60.0, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(60.0, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * Test the maximum
      * when there is nothing published
+     *
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
     public function testMaximum2()
     {
@@ -714,16 +772,20 @@ class SummatorTest extends TestCase
 
         /* Most Recent Published Maximum
          */
-        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(null, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
 
         /* Most Recent Maximum
          */
-        $this->assertEquals(100, $project->getNormalisedMark(new Participant($this->hodes, $project), false), '', $this->delta);
+        $this->assertEquals(100, $project->getNormalisedMark($project->getParticipant($this->hodes), false), '', $this->delta);
     }
+
 
     /**
      * Test the maximum
      * when there's one of each type with published and unpublished feedback
+     *
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
     public function testMaximum3()
     {
@@ -741,16 +803,20 @@ class SummatorTest extends TestCase
 
         /* Most Recent Published Maximum
          */
-        $this->assertEquals(77, $project->getNormalisedMark(new Participant($this->hodes, $project), true), '', $this->delta);
+        $this->assertEquals(77, $project->getNormalisedMark($project->getParticipant($this->hodes), true), '', $this->delta);
 
         /* Most Recent Maximum
          */
-        $this->assertEquals(77, $project->getNormalisedMark(new Participant($this->hodes, $project), false), '', $this->delta);
+        $this->assertEquals(77, $project->getNormalisedMark($project->getParticipant($this->hodes), false), '', $this->delta);
     }
+
 
     /**
      * Test the maximum
      * when there's more than one of a particular type with published and unpublished feedback
+     *
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
     public function testMaximum4()
     {
@@ -771,16 +837,20 @@ class SummatorTest extends TestCase
 
         /* Most Recent Published Maximum
          */
-        $this->assertEquals(98, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(98, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
 
         /* Most Recent Maximum
          */
-        $this->assertEquals(98, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(98, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * Test the maximum
      * when there's more than one of a particular type with published and unpublished feedback
+     *
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
     public function testMaximum5()
     {
@@ -802,17 +872,19 @@ class SummatorTest extends TestCase
 
         /* Most Recent Published Maximum
          */
-        $this->assertEquals(100, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(100, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
 
         /* Most Recent Maximum
         */
-        $this->assertEquals(100, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(100, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
 
     /** Really go to town */
 
     /**
      * A real belting
+     *
+     * @throws \UnexpectedValueException
      */
     public function testMaximum6() {
         $project = $this->spawnProject(new SummatorMaximum());
@@ -827,12 +899,15 @@ class SummatorTest extends TestCase
          * Due Work 7: Weight 22, NormalisedMark: P,96 UP,96
          */
 
-        $this->assertEquals(96, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
-        $this->assertEquals(96, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(96, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
+        $this->assertEquals(96, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * A real belting
+     *
+     * @throws \UnexpectedValueException
      */
     public function testMaximum7() {
         $project = $this->spawnProject(new SummatorMaximum());
@@ -852,12 +927,15 @@ class SummatorTest extends TestCase
          * Due Work 6: Weight  0, NormalisedMark: P,null UP,null
          * Due Work 7: Weight  0, NormalisedMark: P,96 UP,96
          */
-        $this->assertEquals(96, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
-        $this->assertEquals(96, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(96, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
+        $this->assertEquals(96, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * A real belting
+     *
+     * @throws \UnexpectedValueException
      */
     public function testMaximum8() {
         $project = $this->spawnProject(new SummatorMaximum());
@@ -879,12 +957,15 @@ class SummatorTest extends TestCase
          * Due Work 6: Weight  0, NormalisedMark: P,null UP,null
          * Due Work 7: Weight  0, NormalisedMark: P,96 UP,96
          */
-        $this->assertEquals(96, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
-        $this->assertEquals(96, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(96, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
+        $this->assertEquals(96, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * A real belting
+     *
+     * @throws \UnexpectedValueException
      */
     public function testMaximum9() {
         $project = $this->spawnProject(new SummatorMaximum());
@@ -916,12 +997,15 @@ class SummatorTest extends TestCase
          * Due Work 6: Weight  null, NormalisedMark: P,null UP,null
          * Due Work 7: Weight  null, NormalisedMark: P,null UP,96
          */
-        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
-        $this->assertEquals(96, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(null, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
+        $this->assertEquals(96, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * A real belting
+     *
+     * @throws \UnexpectedValueException
      */
     public function testMaximum10() {
         $project = $this->spawnProject(new SummatorMaximum());
@@ -943,12 +1027,15 @@ class SummatorTest extends TestCase
          * Due Work 6: Weight  null, NormalisedMark: P,null UP,null
          * Due Work 7: Weight  null, NormalisedMark: P,null UP,96
          */
-        $this->assertEquals(96, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
-        $this->assertEquals(96, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(96, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
+        $this->assertEquals(96, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * A more intricate mixture
+     *
+     * @throws \UnexpectedValueException
      */
     public function testMaximum11()
     {
@@ -969,11 +1056,6 @@ class SummatorTest extends TestCase
                 ->setId(2)
                 ->setName($typeName))
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $dueWork))
-                ->add(new Participant($this->bsalem, $dueWork))
-                ->add(new Participant($this->sberryhill, $dueWork))
-                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(20)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -981,6 +1063,12 @@ class SummatorTest extends TestCase
             ->setCloseAt($this->thirtyDaysFromNow)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
+
+        $plan = $this->getLinker()->createAndLinkPlan($dueWork);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
 
         /* Freefloating Feedback
          *
@@ -1014,12 +1102,15 @@ class SummatorTest extends TestCase
         $project = $this->spawnProject(new SummatorMaximum());
         $project->setAssessables((new GenericCollection(IAssessable::class))->add($dueWork));
 
-        $this->assertEquals(44, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
-        $this->assertEquals(55, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(44, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
+        $this->assertEquals(55, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * A more intricate mixture
+     *
+     * @throws \UnexpectedValueException
      */
     public function testMaximum12()
     {
@@ -1040,11 +1131,6 @@ class SummatorTest extends TestCase
                 ->setId(2)
                 ->setName($typeName))
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $dueWork1))
-                ->add(new Participant($this->bsalem, $dueWork1))
-                ->add(new Participant($this->sberryhill, $dueWork1))
-                ->add(new Participant($this->asaxon, $dueWork1)))
             ->setWeight(20)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -1052,6 +1138,12 @@ class SummatorTest extends TestCase
             ->setCloseAt($this->thirtyDaysFromNow)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
+
+        $plan = $this->getLinker()->createAndLinkPlan($dueWork1);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
 
         /* Freefloating Feedback
          *
@@ -1100,11 +1192,6 @@ class SummatorTest extends TestCase
                 ->setId(2)
                 ->setName($typeName))
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $dueWork2))
-                ->add(new Participant($this->bsalem, $dueWork2))
-                ->add(new Participant($this->sberryhill, $dueWork2))
-                ->add(new Participant($this->asaxon, $dueWork2)))
             ->setWeight(20)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -1112,6 +1199,12 @@ class SummatorTest extends TestCase
             ->setCloseAt($this->thirtyDaysFromNow)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
+
+        $plan = $this->getLinker()->createAndLinkPlan($dueWork2);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
 
         /* Freefloating Feedback
          *
@@ -1181,14 +1274,18 @@ class SummatorTest extends TestCase
         $project = $this->spawnProject(new SummatorMaximum());
         $project->setAssessables((new GenericCollection(IAssessable::class))->add($dueWork1)->add($dueWork2));
 
-        $this->assertEquals(44, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
-        $this->assertEquals(73, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(44, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
+        $this->assertEquals(73, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
 
 
     /**
      * Test the minimum
      * when there is no feedback
+     *
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
+     * @throws \DomainException
      */
     public function testMinimum1()
     {
@@ -1214,15 +1311,19 @@ class SummatorTest extends TestCase
 
         /* Most Recent Published Minimum is null (nothing to calculate)
          */
-        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(null, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
 
         // Quiz is auto-marked to 60.0 (this constitutes a draft-mark)
-        $this->assertEquals(60.0, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(60.0, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * Test the minimum
      * when there is nothing published
+     *
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
     public function testMinimum2()
     {
@@ -1258,17 +1359,21 @@ class SummatorTest extends TestCase
 
         /* Most Recent Published Minimum
          */
-        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(null, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
 
         /* Most Recent Minimum
          * Minimum of (98, null, 77, 100, 60)
          */
-        $this->assertEquals(60, $project->getNormalisedMark(new Participant($this->hodes, $project), false), '', $this->delta);
+        $this->assertEquals(60, $project->getNormalisedMark($project->getParticipant($this->hodes), false), '', $this->delta);
     }
+
 
     /**
      * Test the minimum
      * when there's one of each type with published and unpublished feedback
+     *
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
     public function testMinimum3()
     {
@@ -1284,18 +1389,22 @@ class SummatorTest extends TestCase
          *      12/20 = 60 (Quiz 99762)
          *      77 (Due Work 7889)
          */
-        $this->assertEquals(60, $project->getNormalisedMark(new Participant($this->hodes, $project), true), '', $this->delta);
+        $this->assertEquals(60, $project->getNormalisedMark($project->getParticipant($this->hodes), true), '', $this->delta);
 
         /* Most Recent Minimum
          *      12/20 = 60 (Quiz 99762)
          *      77 (Due Work 7889)
          */
-        $this->assertEquals(60, $project->getNormalisedMark(new Participant($this->hodes, $project), false), '', $this->delta);
+        $this->assertEquals(60, $project->getNormalisedMark($project->getParticipant($this->hodes), false), '', $this->delta);
     }
+
 
     /**
      * Test the minimum
      * when there's more than one of a particular type with published and unpublished feedback
+     *
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
     public function testMinimum4()
     {
@@ -1309,16 +1418,20 @@ class SummatorTest extends TestCase
          *      77 (Due Work 7889)
          *      98 (Due Work 9912)
          */
-        $this->assertEquals(77, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(77, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
 
         /* Most Recent Minimum
          */
-        $this->assertEquals(77, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(77, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * Test the minimum
      * when there's more than one of a particular type with published and unpublished feedback
+     *
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
     public function testMinimum5()
     {
@@ -1334,17 +1447,19 @@ class SummatorTest extends TestCase
          *      98 (Due Work 9912)
          *      100 (Due Work 4236)
          */
-        $this->assertEquals(77, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(77, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
 
         /* Most Recent Minimum
         */
-        $this->assertEquals(77, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(77, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
 
     /** Really go to town */
 
     /**
      * A real belting
+     *
+     * @throws \UnexpectedValueException
      */
     public function testMinimum6() {
         $project = $this->spawnProject(new SummatorMinimum());
@@ -1358,12 +1473,15 @@ class SummatorTest extends TestCase
          * Due Work 6: Weight  4, NormalisedMark: P,null UP,null
          * Due Work 7: Weight 22, NormalisedMark: P,96 UP,96
          */
-        $this->assertEquals(18, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
-        $this->assertEquals(18, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(18, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
+        $this->assertEquals(18, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * A real belting
+     *
+     * @throws \UnexpectedValueException
      */
     public function testMinimum7() {
         $project = $this->spawnProject(new SummatorMinimum());
@@ -1383,12 +1501,15 @@ class SummatorTest extends TestCase
          * Due Work 6: Weight  0, NormalisedMark: P,null UP,null
          * Due Work 7: Weight  0, NormalisedMark: P,96 UP,96
          */
-        $this->assertEquals(18, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
-        $this->assertEquals(18, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(18, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
+        $this->assertEquals(18, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * A real belting
+     *
+     * @throws \UnexpectedValueException
      */
     public function testMinimum8() {
         $project = $this->spawnProject(new SummatorMinimum());
@@ -1410,12 +1531,15 @@ class SummatorTest extends TestCase
          * Due Work 6: Weight  0, NormalisedMark: P,null UP,null
          * Due Work 7: Weight  0, NormalisedMark: P,96 UP,96
          */
-        $this->assertEquals(18, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
-        $this->assertEquals(18, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(18, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
+        $this->assertEquals(18, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * A real belting
+     *
+     * @throws \UnexpectedValueException
      */
     public function testMinimum9() {
         $project = $this->spawnProject(new SummatorMinimum());
@@ -1447,12 +1571,15 @@ class SummatorTest extends TestCase
          * Due Work 6: Weight  null, NormalisedMark: P,null UP,null
          * Due Work 7: Weight  null, NormalisedMark: P,null UP,96
          */
-        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
-        $this->assertEquals(18, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(null, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
+        $this->assertEquals(18, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * A real belting
+     *
+     * @throws \UnexpectedValueException
      */
     public function testMinimum10() {
         $project = $this->spawnProject(new SummatorMinimum());
@@ -1486,12 +1613,15 @@ class SummatorTest extends TestCase
          * Due Work 6: Weight  null, NormalisedMark: P,null UP,null
          * Due Work 7: Weight  null, NormalisedMark: P,null UP,96
          */
-        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
-        $this->assertEquals(18, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(null, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
+        $this->assertEquals(18, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * A more intricate mixture
+     *
+     * @throws \UnexpectedValueException
      */
     public function testMinimum11()
     {
@@ -1512,11 +1642,6 @@ class SummatorTest extends TestCase
                 ->setId(2)
                 ->setName($typeName))
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $dueWork))
-                ->add(new Participant($this->bsalem, $dueWork))
-                ->add(new Participant($this->sberryhill, $dueWork))
-                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(20)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -1524,6 +1649,12 @@ class SummatorTest extends TestCase
             ->setCloseAt($this->thirtyDaysFromNow)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
+
+        $plan = $this->getLinker()->createAndLinkPlan($dueWork);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
 
         /* Freefloating Feedback
          *
@@ -1557,12 +1688,15 @@ class SummatorTest extends TestCase
         $project = $this->spawnProject(new SummatorMinimum());
         $project->setAssessables((new GenericCollection(IAssessable::class))->add($dueWork));
 
-        $this->assertEquals(44, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
-        $this->assertEquals(55, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(44, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
+        $this->assertEquals(55, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * A more intricate mixture
+     *
+     * @throws \UnexpectedValueException
      */
     public function testMinimum12()
     {
@@ -1583,11 +1717,6 @@ class SummatorTest extends TestCase
                 ->setId(2)
                 ->setName($typeName))
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $dueWork))
-                ->add(new Participant($this->bsalem, $dueWork))
-                ->add(new Participant($this->sberryhill, $dueWork))
-                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(20)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -1595,6 +1724,12 @@ class SummatorTest extends TestCase
             ->setCloseAt($this->thirtyDaysFromNow)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
+
+        $plan = $this->getLinker()->createAndLinkPlan($dueWork);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
 
         /* Freefloating Feedback
          *
@@ -1643,11 +1778,6 @@ class SummatorTest extends TestCase
                 ->setId(2)
                 ->setName($typeName))
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $dueWork2))
-                ->add(new Participant($this->bsalem, $dueWork2))
-                ->add(new Participant($this->sberryhill, $dueWork2))
-                ->add(new Participant($this->asaxon, $dueWork2)))
             ->setWeight(20)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -1655,6 +1785,12 @@ class SummatorTest extends TestCase
             ->setCloseAt($this->thirtyDaysFromNow)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
+
+        $plan = $this->getLinker()->createAndLinkPlan($dueWork2);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
 
         /* Freefloating Feedback
          *
@@ -1722,14 +1858,16 @@ class SummatorTest extends TestCase
         $project = $this->spawnProject(new SummatorMinimum());
         $project->setAssessables((new GenericCollection(IAssessable::class))->add($dueWork)->add($dueWork2));
 
-        $this->assertEquals(41, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
-        $this->assertEquals(55, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        $this->assertEquals(41, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
+        $this->assertEquals(55, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
     }
+
 
     /**
      * Mass produce a giant Due Work set
      *
      * @return GenericCollection
+     * @throws \UnexpectedValueException
      */
     public function massProduce()
     {
@@ -1752,11 +1890,6 @@ class SummatorTest extends TestCase
                 ->setId(2)
                 ->setName($typeName))
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $dueWork))
-                ->add(new Participant($this->bsalem, $dueWork))
-                ->add(new Participant($this->sberryhill, $dueWork))
-                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(20)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -1764,6 +1897,12 @@ class SummatorTest extends TestCase
             ->setCloseAt($this->thirtyDaysFromNow)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
+
+        $plan = $this->getLinker()->createAndLinkPlan($dueWork);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
 
         /* Freefloating Feedback
          *
@@ -1801,11 +1940,6 @@ class SummatorTest extends TestCase
                 ->setId(2)
                 ->setName($typeName))
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $dueWork))
-                ->add(new Participant($this->bsalem, $dueWork))
-                ->add(new Participant($this->sberryhill, $dueWork))
-                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(11)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -1813,6 +1947,12 @@ class SummatorTest extends TestCase
             ->setCloseAt($this->thirtyDaysFromNow)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
+
+        $plan = $this->getLinker()->createAndLinkPlan($dueWork);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
 
         $submission = new DueWorkSubmission();
         $submission
@@ -1890,11 +2030,6 @@ class SummatorTest extends TestCase
                 ->setId(3)
                 ->setName($typeName))
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $dueWork))
-                ->add(new Participant($this->bsalem, $dueWork))
-                ->add(new Participant($this->sberryhill, $dueWork))
-                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(1)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -1902,6 +2037,12 @@ class SummatorTest extends TestCase
             ->setCloseAt($this->thirtyDaysFromNow)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
+
+        $plan = $this->getLinker()->createAndLinkPlan($dueWork);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
 
         $submission = new DueWorkSubmission();
         $submission
@@ -1961,11 +2102,6 @@ class SummatorTest extends TestCase
                 ->setId(3)
                 ->setName($typeName))
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $dueWork))
-                ->add(new Participant($this->bsalem, $dueWork))
-                ->add(new Participant($this->sberryhill, $dueWork))
-                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(4)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -1973,6 +2109,12 @@ class SummatorTest extends TestCase
             ->setCloseAt($this->thirtyDaysFromNow)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
+
+        $plan = $this->getLinker()->createAndLinkPlan($dueWork);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
 
         $submission = new DueWorkSubmission();
         $submission
@@ -2002,11 +2144,6 @@ class SummatorTest extends TestCase
                 ->setId(5)
                 ->setName($typeName))
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $dueWork))
-                ->add(new Participant($this->bsalem, $dueWork))
-                ->add(new Participant($this->sberryhill, $dueWork))
-                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(4)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -2014,6 +2151,12 @@ class SummatorTest extends TestCase
             ->setCloseAt($this->thirtyDaysFromNow)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
+
+        $plan = $this->getLinker()->createAndLinkPlan($dueWork);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
 
         $submission = new DueWorkSubmission();
         $submission
@@ -2054,11 +2197,6 @@ class SummatorTest extends TestCase
                 ->setId(5)
                 ->setName($typeName))
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $dueWork))
-                ->add(new Participant($this->bsalem, $dueWork))
-                ->add(new Participant($this->sberryhill, $dueWork))
-                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(4)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -2066,6 +2204,12 @@ class SummatorTest extends TestCase
             ->setCloseAt($this->thirtyDaysFromNow)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
+
+        $plan = $this->getLinker()->createAndLinkPlan($dueWork);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
 
         $collection->add($dueWork);
 
@@ -2088,11 +2232,6 @@ class SummatorTest extends TestCase
                 ->setId(1)
                 ->setName($typeName))
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $dueWork))
-                ->add(new Participant($this->bsalem, $dueWork))
-                ->add(new Participant($this->sberryhill, $dueWork))
-                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(22)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -2100,6 +2239,12 @@ class SummatorTest extends TestCase
             ->setCloseAt($this->thirtyDaysFromNow)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
+
+        $plan = $this->getLinker()->createAndLinkPlan($dueWork);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
 
         /* Freefloating Feedback
          *
@@ -2212,11 +2357,6 @@ class SummatorTest extends TestCase
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $project))
-                ->add(new Participant($this->bsalem, $project))
-                ->add(new Participant($this->sberryhill, $project))
-                ->add(new Participant($this->asaxon, $project)))
             ->setPublishAt($this->tomorrow)
             ->setOpenAt($this->tomorrow)
             ->setDueAt($this->fiftyDaysFromNow)
@@ -2224,13 +2364,21 @@ class SummatorTest extends TestCase
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
 
+        $plan = $this->getLinker()->createAndLinkPlan($project);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
+
         return $project;
     }
+
 
     /**
      * Spawn another Due Work
      *
      * @return DueWork
+     * @throws \UnexpectedValueException
      */
     protected function spawnDueWork3()
     {
@@ -2248,11 +2396,6 @@ class SummatorTest extends TestCase
                 ->setId(2)
                 ->setName($typeName))
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $dueWork))
-                ->add(new Participant($this->bsalem, $dueWork))
-                ->add(new Participant($this->sberryhill, $dueWork))
-                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(6)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -2260,6 +2403,12 @@ class SummatorTest extends TestCase
             ->setCloseAt($this->thirtyDaysFromNow)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
+
+        $plan = $this->getLinker()->createAndLinkPlan($dueWork);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
 
         /* Freefloating Feedback
          *
@@ -2282,10 +2431,12 @@ class SummatorTest extends TestCase
         return $dueWork;
     }
 
+
     /**
      * Spawn another Due Work
      *
      * @return DueWork
+     * @throws \UnexpectedValueException
      */
     protected function spawnDueWork2()
     {
@@ -2303,11 +2454,6 @@ class SummatorTest extends TestCase
                 ->setId(2)
                 ->setName($typeName))
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $dueWork))
-                ->add(new Participant($this->bsalem, $dueWork))
-                ->add(new Participant($this->sberryhill, $dueWork))
-                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(10)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -2315,6 +2461,12 @@ class SummatorTest extends TestCase
             ->setCloseAt($this->thirtyDaysFromNow)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
+
+        $plan = $this->getLinker()->createAndLinkPlan($dueWork);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
 
         /* Freefloating Feedback
          *
@@ -2337,10 +2489,12 @@ class SummatorTest extends TestCase
         return $dueWork;
     }
 
+
     /**
      * Spawn a Due Work
      *
      * @return DueWork
+     * @throws \UnexpectedValueException
      */
     protected function spawnDueWork()
     {
@@ -2358,11 +2512,6 @@ class SummatorTest extends TestCase
                 ->setId(1)
                 ->setName($typeName))
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $dueWork))
-                ->add(new Participant($this->bsalem, $dueWork))
-                ->add(new Participant($this->sberryhill, $dueWork))
-                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(5)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -2370,6 +2519,12 @@ class SummatorTest extends TestCase
             ->setCloseAt($this->thirtyDaysFromNow)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
+
+        $plan = $this->getLinker()->createAndLinkPlan($dueWork);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
 
         $submission = new DueWorkSubmission();
         $submission
@@ -2437,8 +2592,12 @@ class SummatorTest extends TestCase
         return $dueWork;
     }
 
+
     /**
      * Spawn a Task
+     *
+     * @throws \InvalidArgumentException
+     * @throws \UnexpectedValueException
      */
     protected function spawnTask()
     {
@@ -2452,10 +2611,6 @@ class SummatorTest extends TestCase
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->celia)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $task))
-                ->add(new Participant($this->sberryhill, $task))
-                ->add(new Participant($this->asaxon, $task)))
             ->setWeight(4)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->thirteenDaysFromNow)
@@ -2464,7 +2619,12 @@ class SummatorTest extends TestCase
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
 
-        $response = (new TaskResponse());
+        $plan = $this->getLinker()->createAndLinkPlan($task);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
+
+        $response = new TaskResponse();
         $response
             ->setId(883)
             ->setAssessable($task)
@@ -2484,6 +2644,7 @@ class SummatorTest extends TestCase
         return $task;
     }
 
+
     /**
      * Spawn a Quiz.
      * * Quiz has 5 questions each of 5 marks, for total of 25.0
@@ -2492,6 +2653,7 @@ class SummatorTest extends TestCase
      * For now, since we are not updating the Quiz DB schema, a QuizAttempt has 0:1 QuizFeedback
      *
      * @return Quiz
+     * @throws \UnexpectedValueException
      */
     protected function spawnQuiz()
     {
@@ -2529,11 +2691,6 @@ class SummatorTest extends TestCase
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $quiz))
-                ->add(new Participant($this->bsalem, $quiz))
-                ->add(new Participant($this->sberryhill, $quiz))
-                ->add(new Participant($this->asaxon, $quiz)))
             ->setWeight(8)
             ->setPublishAt($this->twentyDaysFromNow)
             ->setOpenAt($this->twentyDaysFromNow)
@@ -2542,7 +2699,13 @@ class SummatorTest extends TestCase
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
 
-        $attempt = (new QuizAttempt);
+        $plan = $this->getLinker()->createAndLinkPlan($quiz);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
+
+        $attempt = new QuizAttempt();
         $attempt
             ->setId(8655)
             ->setAssessable($quiz)

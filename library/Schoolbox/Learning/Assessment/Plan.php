@@ -225,6 +225,8 @@ class Plan
 
 
     /**
+     * Returns this plan's participants *INDEXED BY user.id*
+     *
      * @return Participant[]|GenericCollection
      */
     public function getParticipants(): GenericCollection
@@ -234,6 +236,8 @@ class Plan
 
 
     /**
+     * IMPORTANT: The participants must be indexed by user.id
+     *
      * @param Participant|GenericCollection $participants
      * @return $this
      */

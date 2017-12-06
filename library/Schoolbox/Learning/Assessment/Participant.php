@@ -457,6 +457,18 @@ class Participant
 
 
     /**
+     * Is this an exclusion record?
+     *
+     * @return bool
+     */
+    public function isExcluded(): bool
+    {
+        // Excluded if a non-null date.
+        return $this->excludedAt instanceof Alaress_Date_Format && !$this->excludedAt->isNull();
+    }
+
+
+    /**
      * @return IAssessable
      */
     public function getAssessable()

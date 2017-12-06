@@ -11,27 +11,7 @@
 
 namespace Schoolbox\Learning\Assessment\Test;
 
-use \Schoolbox\Collection;
 use \Schoolbox\User;
-use \Schoolbox\Resource\Storage\Model as Storage;
-
-use \Schoolbox\Learning\Assessment\Participant;
-use \Schoolbox\Learning\Assessment\Project as Project;
-
-use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use \Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkSubmission;
-use \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan as DueWorkSubmissionFilePlagscan;
-use \Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
-use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
-use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
-
-use \Schoolbox\Learning\Assessment\Task\Model as Task;
-use \Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
-use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
-
-use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
-use \Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
-use \Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
 
 trait Defaults
 {
@@ -115,6 +95,9 @@ trait Defaults
      */
     protected $sixtyDaysFromNow;
 
+    /** @var ParticipantLinker */
+    private $linker;
+
     /**
      * The Bestiary
      */
@@ -144,6 +127,17 @@ trait Defaults
         $this->fortyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(40);
         $this->fiftyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(50);
         $this->sixtyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(60);
+
+        $this->linker = new ParticipantLinker();
+    }
+
+
+    /**
+     * @return ParticipantLinker
+     */
+    protected function getLinker(): ParticipantLinker
+    {
+        return $this->linker;
     }
 
 }

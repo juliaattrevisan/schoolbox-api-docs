@@ -221,6 +221,8 @@ interface IAssessable extends ISoftDeletable
     /**
      * Is this user a participant in this assessable?
      *
+     * Excluded users are not participants.
+     *
      * @param User $user
      * @return bool
      */
@@ -658,13 +660,13 @@ interface IAssessable extends ISoftDeletable
      */
     public function getAllParticipants();
 
+
     /**
-     * Set a Collection of Participant instances
+     * Get all users who are participating in this IAssessable, indexed by user.id
      *
-     * @param Collection|Participant[] $allParticipants
-     * @return $this
+     * @return User[]|GenericCollection Indexed by user.id
      */
-    public function setAllParticipants(Collection $allParticipants);
+    public function getParticipantUsers(): GenericCollection;
 
 
     /**

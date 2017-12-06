@@ -16,19 +16,30 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Plan;
 use Schoolbox\Learning\Assessment\Timeline\Full as Timeline;
 use \Schoolbox\User;
 
 class TimelineTest extends TestCase
 {
+    /** @var ParticipantLinker */
+    private $linker;
+
+    public function setUp()
+    {
+        $this->linker = new ParticipantLinker();
+    }
+
 
     /**
      * No Responses
      * No Feedbacks
+     *
+     * @throws \PHPUnit\Framework\Exception
      */
     public function testEmptyStacks()
     {
-        $this->assertCount(0, (new Timeline(new Participant(new User(), new DueWork())))->getForParent());
+        $this->assertCount(0, (new Timeline(new Participant(new User(), new Plan(new DueWork()))))->getForParent());
     }
 
     /**
@@ -49,7 +60,8 @@ class TimelineTest extends TestCase
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 10:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setSubmittedAt(new \Alaress_Date_Format('2016-11-04 10:45:00', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $participant = new Participant($student, $assessment);
+        $plan        = $this->linker->createAndLinkPlan($assessment);
+        $participant = $this->linker->createAndLinkParticipant($student, $plan);
         $participant->getAllResponses()->add($response1);
 
         /* Compare these
@@ -84,7 +96,8 @@ class TimelineTest extends TestCase
 
         $response1->getAllFeedback()->add($feedback1);
 
-        $participant = new Participant(new User(), $assessment);
+        $plan        = $this->linker->createAndLinkPlan($assessment);
+        $participant = $this->linker->createAndLinkParticipant(new User(), $plan);
         $participant->getAllResponses()->add($response1);
         $participant->getAllFeedbacks()->add($feedback1);
 
@@ -130,7 +143,8 @@ class TimelineTest extends TestCase
             ->add($feedback2)
         );
 
-        $participant = new Participant(new User(), $assessment);
+        $plan        = $this->linker->createAndLinkPlan($assessment);
+        $participant = $this->linker->createAndLinkParticipant(new User(), $plan);
         $participant->getAllResponses()->add($response1);
         $participant->getAllFeedbacks()->add($feedback1)->add($feedback2);
 
@@ -195,7 +209,8 @@ class TimelineTest extends TestCase
 
         $response1->getAllFeedback()->add($feedback3);
 
-        $participant = new Participant(new User(), $assessment);
+        $plan        = $this->linker->createAndLinkPlan($assessment);
+        $participant = $this->linker->createAndLinkParticipant(new User(), $plan);
         $participant->getAllResponses()->add($response1)->add($response2)->add($response3);
         $participant->getAllFeedbacks()->add($feedback1)->add($feedback2)->add($feedback3);
 
@@ -285,7 +300,8 @@ class TimelineTest extends TestCase
             ->setAssessable($assessment)
             ->setPublishedAt(new \Alaress_Date_Format('2016-11-01 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $participant = new Participant(new User(), $assessment);
+        $plan        = $this->linker->createAndLinkPlan($assessment);
+        $participant = $this->linker->createAndLinkParticipant(new User(), $plan);
         $participant->getAllResponses()->add($response1)->add($response2)->add($response3);
         $participant->getAllFeedbacks()->add($floating1)->add($floating2)->add($floating3);
 
@@ -380,7 +396,8 @@ class TimelineTest extends TestCase
             ->setAssessable($assessment)
             ->setPublishedAt(null);
 
-        $participant = new Participant(new User(), $assessment);
+        $plan        = $this->linker->createAndLinkPlan($assessment);
+        $participant = $this->linker->createAndLinkParticipant(new User(), $plan);
         $participant->getAllResponses()->add($response1)->add($response2)->add($response3);
         $participant->getAllFeedbacks()->add($floating1)->add($floating2)->add($floating3);
 

@@ -586,7 +586,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      * @param string $column - a column on which to test uniqueness (ie. an ID)
      *                         If omitted, the entire object will be tested and may return an error "Fatal error: Nesting level too deep - recursive dependency?"
      *
-     * @return Collection
+     * @return static
      */
     public function mergeUnique(Collection $other, $column = null)
     {

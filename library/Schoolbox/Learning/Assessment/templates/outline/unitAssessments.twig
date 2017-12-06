@@ -64,11 +64,9 @@
                          # Others: see due date
                          #}
                         {% if canWrite %}
-                            {% if assessment is not project %}
-                                <p class="meta">
-                                    <span class="{{ urgency.marks(completionGradient) }}">{{ completionCount }}/{{ studentCount }} students completed</span>
-                                </p>
-                            {% endif %}
+                            <p class="meta">
+                                <span class="{{ urgency.marks(completionGradient) }}">{{ completionCount }}/{{ studentCount }} students completed</span>
+                            </p>
                         {% else %}
                             <p class="meta spaced">
                                 <span class="unit-task-due-date">{{ dueDate.dueDate(assessment, USER) }}</span>

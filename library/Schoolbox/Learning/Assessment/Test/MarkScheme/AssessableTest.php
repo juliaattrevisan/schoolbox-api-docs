@@ -9,11 +9,10 @@ namespace Schoolbox\Learning\Assessment\Test\MarkScheme;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
-use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkSubmission;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Plan;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
 use Schoolbox\Learning\Assessment\Summator\Average;
@@ -26,6 +25,7 @@ use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Test\ParticipantLinker;
 use Schoolbox\Learning\MarkScheme\Completion;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\None;
@@ -35,7 +35,9 @@ use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeLevel;
 use Schoolbox\User;
-use \InvalidArgumentException;
+use InvalidArgumentException;
+use Alaress_Date_Format;
+use Alaress_Date_NullDate;
 
 /**
  * Tests IAssessable:
@@ -49,7 +51,7 @@ use \InvalidArgumentException;
  */
 class AssessableTest extends TestCase
 {
-    const FAVOR_FLOATING = false;
+    public const FAVOR_FLOATING = false;
     /**
      * Cache so we can re-use User objects
      *
@@ -59,6 +61,21 @@ class AssessableTest extends TestCase
 
     /** @var User[] */
     private $teacherCache = [];
+
+    /** @var ParticipantLinker */
+    private $linker;
+
+
+    /**
+     * @param null|string $name
+     * @param array       $data
+     * @param string      $dataName
+     */
+    public function __construct(?string $name = null, array $data = [], string $dataName = '')
+    {
+        parent::__construct($name, $data, $dataName);
+        $this->linker = new ParticipantLinker();
+    }
 
 
     /**
@@ -350,15 +367,17 @@ class AssessableTest extends TestCase
         $this->assertEquals($expected, $actual, $message);
     }
 
+
     /**
      * @dataProvider provider_project_Min_getNorm
      * @param Project $project
-     * @param User $student
-     * @param string $expected
+     * @param User    $student
+     * @param string  $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_Minimum_None_getNorm(Project $project, User $student, $expected)
     {
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
@@ -366,16 +385,18 @@ class AssessableTest extends TestCase
         $this->assertEquals($expected, $actual, $message, 0.1);
     }
 
+
     /**
      * @dataProvider provider_project_Min_getNorm_publishedOnly
      * @param Project $project
-     * @param User $student
-     * @param string $expected
+     * @param User    $student
+     * @param string  $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_Minimum_None_getNorm_publishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Minimum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
@@ -383,16 +404,18 @@ class AssessableTest extends TestCase
         $this->assertEquals($expected, $actual, $message, 0.1);
     }
 
+
     /**
      * @dataProvider provider_project_Min_getNorm
      * @param Project $project
-     * @param User $student
-     * @param string $expected
+     * @param User    $student
+     * @param string  $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_Minimum_LetterGrade_getNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new Minimum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
@@ -405,11 +428,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_Minimum_LetterGrade_getNorm_publishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Minimum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
@@ -422,11 +446,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_Minimum_Percent_getNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new Minimum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
@@ -440,11 +465,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_Minimum_Percent_getNorm_publishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Minimum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
@@ -457,11 +483,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_Maximum_None_getNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new Maximum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
@@ -474,11 +501,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_Maximum_None_getNorm_publishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Maximum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
@@ -491,11 +519,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_Maximum_LetterGrade_getNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new Maximum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
@@ -508,11 +537,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_Maximum_LetterGrade_getNorm_publishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Maximum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
@@ -525,11 +555,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_Maximum_Percent_getNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new Maximum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
@@ -542,11 +573,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_Maximum_Percent_getNorm_publishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Maximum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
@@ -559,11 +591,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_Average_None_getNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new Average());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
@@ -576,11 +609,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_Average_None_getNorm_publishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Average());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
@@ -593,11 +627,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_Average_LetterGrade_getNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new Average());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
@@ -610,11 +645,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_Average_LetterGrade_getNorm_publishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Average());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
@@ -627,11 +663,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_Average_Percent_getNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new Average());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
@@ -644,11 +681,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_Average_Percent_getNorm_publishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Average());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
@@ -661,11 +699,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_WeightedAverage_None_getNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new WeightedAverage());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
@@ -678,11 +717,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_WeightedAverage_None_getNorm_publishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new WeightedAverage());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
@@ -695,11 +735,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_WeightedAverage_LetterGrade_getNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new WeightedAverage());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
@@ -712,11 +753,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_WeightedAverage_LetterGrade_getNorm_publishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new WeightedAverage());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
@@ -729,11 +771,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_WeightedAverage_Percent_getNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new WeightedAverage());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
@@ -746,11 +789,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_WeightedAverage_Percent_getNorm_publishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new WeightedAverage());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
@@ -763,11 +807,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_Minimum_None_getHR(Project $project, User $student, $expected)
     {
         $project->setSummator(new Minimum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
@@ -780,11 +825,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_Minimum_None_getHR_publishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Minimum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
@@ -849,11 +895,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_Maximum_None_getHR(Project $project, User $student, $expected)
     {
         $project->setSummator(new Maximum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
@@ -866,11 +913,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_Maximum_None_getHR_publishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Maximum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
@@ -935,11 +983,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_Average_None_getHR(Project $project, User $student, $expected)
     {
         $project->setSummator(new Average());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
@@ -952,11 +1001,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_Average_None_getHR_publishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Average());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
@@ -1021,11 +1071,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_WeightedAverage_None_getHR(Project $project, User $student, $expected)
     {
         $project->setSummator(new WeightedAverage());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
@@ -1038,11 +1089,12 @@ class AssessableTest extends TestCase
      * @param Project $project
      * @param User $student
      * @param string $expected
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
     public function test_Project_WeightedAverage_None_getHR_publishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new WeightedAverage());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
@@ -1105,7 +1157,12 @@ class AssessableTest extends TestCase
 
     // ============= Data Providers =============
 
-    public function provider_task_completion_getHR()
+
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_task_completion_getHR(): array
     {
         $task = $this->getDummyTask();
         return [
@@ -1116,7 +1173,12 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_task_completion_getHR_publishedOnly()
+
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_task_completion_getHR_publishedOnly(): array
     {
         $task = $this->getDummyTask();
         return [
@@ -1127,7 +1189,12 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_quiz_totalMarkFraction_getHR()
+
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_quiz_totalMarkFraction_getHR(): array
     {
         $quiz = $this->getDummyQuiz();
         $quiz->setMarkScheme(new TotalMarkFractional());
@@ -1139,19 +1206,22 @@ class AssessableTest extends TestCase
                 [$quiz, $this->getDummyStudent(4), '2 / 2'],
                 [$quiz, $this->getDummyStudent(5), '2 / 2'],
             ];
-        } else {
-            return [
-                [$quiz, $this->getDummyStudent(1), null],
-                [$quiz, $this->getDummyStudent(2), '1 / 2'],
-                [$quiz, $this->getDummyStudent(3), '1 / 2'],
-                [$quiz, $this->getDummyStudent(4), '2 / 2'],
-                [$quiz, $this->getDummyStudent(5), '2 / 2'],
-            ];
         }
-
+        return [
+            [$quiz, $this->getDummyStudent(1), null],
+            [$quiz, $this->getDummyStudent(2), '1 / 2'],
+            [$quiz, $this->getDummyStudent(3), '1 / 2'],
+            [$quiz, $this->getDummyStudent(4), '2 / 2'],
+            [$quiz, $this->getDummyStudent(5), '2 / 2'],
+        ];
     }
 
-    public function provider_quiz_totalMarkFraction_getHR_publishedOnly()
+
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_quiz_totalMarkFraction_getHR_publishedOnly(): array
     {
         $quiz = $this->getDummyQuiz();
         $quiz->setMarkScheme(new TotalMarkFractional());
@@ -1164,7 +1234,12 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_quiz_totalMarkFraction_getNorm()
+
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_quiz_totalMarkFraction_getNorm(): array
     {
         $quiz = $this->getDummyQuiz();
         $quiz->setMarkScheme(new TotalMarkFractional());
@@ -1177,20 +1252,22 @@ class AssessableTest extends TestCase
                 [$quiz, $this->getDummyStudent(4), 100.0],
                 [$quiz, $this->getDummyStudent(5), 100.0],
             ];
-        } else {
-            return [
-                [$quiz, $this->getDummyStudent(1), null],
-                [$quiz, $this->getDummyStudent(2), 50.0],
-                [$quiz, $this->getDummyStudent(3), 50.0],
-                [$quiz, $this->getDummyStudent(4), 100.0],
-                [$quiz, $this->getDummyStudent(5), 100.0],
-            ];
         }
-
+        return [
+            [$quiz, $this->getDummyStudent(1), null],
+            [$quiz, $this->getDummyStudent(2), 50.0],
+            [$quiz, $this->getDummyStudent(3), 50.0],
+            [$quiz, $this->getDummyStudent(4), 100.0],
+            [$quiz, $this->getDummyStudent(5), 100.0],
+        ];
     }
 
 
-    public function provider_quiz_totalMarkFraction_getNorm_publishedOnly()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_quiz_totalMarkFraction_getNorm_publishedOnly(): array
     {
         $quiz = $this->getDummyQuiz();
         $quiz->setMarkScheme(new TotalMarkFractional());
@@ -1204,10 +1281,14 @@ class AssessableTest extends TestCase
     }
 
 
-    public function provider_dueWork_None_getHR()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_dueWork_None_getHR(): array
     {
         $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
         $dueWork->setMarkScheme(new TotalMarkWholeNumber($dueWork->getMaxMark()));
         return [
             [$dueWork, $this->getDummyStudent(1), null],
@@ -1222,10 +1303,15 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_dueWork_None_getHR_publishedOnly()
+
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_dueWork_None_getHR_publishedOnly(): array
     {
         $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
         $dueWork->setMarkScheme(new TotalMarkWholeNumber($dueWork->getMaxMark()));
         return [
             [$dueWork, $this->getDummyStudent(1), null],
@@ -1240,10 +1326,15 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_dueWork_Percent_getHR()
+
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_dueWork_Percent_getHR(): array
     {
         $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $dueWork->setMarkScheme(new Percentage());
         return [
             [$dueWork, $this->getDummyStudent(1), null],
@@ -1258,10 +1349,15 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_dueWork_Percent_getHR_publishedOnly()
+
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_dueWork_Percent_getHR_publishedOnly(): array
     {
         $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $dueWork->setMarkScheme(new Percentage());
         return [
             [$dueWork, $this->getDummyStudent(1), null],
@@ -1276,10 +1372,15 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_dueWork_TotalMark_getHR()
+
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_dueWork_TotalMark_getHR(): array
     {
         $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_TOTAL));
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_TOTAL));
         $dueWork->setMarkScheme(new TotalMarkWholeNumber($dueWork->getMaxMark()));
         return [
             [$dueWork, $this->getDummyStudent(1), null],
@@ -1294,10 +1395,15 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_dueWork_TotalMark_getHR_publishedOnly()
+
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_dueWork_TotalMark_getHR_publishedOnly(): array
     {
         $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_TOTAL));
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_TOTAL));
         $dueWork->setMarkScheme(new TotalMarkWholeNumber($dueWork->getMaxMark()));
         return [
             [$dueWork, $this->getDummyStudent(1), null],
@@ -1312,10 +1418,15 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_dueWork_LetterGrade_getHR()
+
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_dueWork_LetterGrade_getHR(): array
     {
         $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $dueWork->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
         return [
             [$dueWork, $this->getDummyStudent(1), null],
@@ -1330,10 +1441,15 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_dueWork_LetterGrade_getHR_publishedOnly()
+
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_dueWork_LetterGrade_getHR_publishedOnly(): array
     {
         $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $dueWork->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
         return [
             [$dueWork, $this->getDummyStudent(1), null],
@@ -1349,10 +1465,14 @@ class AssessableTest extends TestCase
     }
 
 
-    public function provider_dueWork_None_getNorm()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_dueWork_None_getNorm(): array
     {
         $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
         $dueWork->setMarkScheme(new None());
         return [
             [$dueWork, $this->getDummyStudent(1), null],
@@ -1367,10 +1487,15 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_dueWork_None_getNorm_publishedOnly()
+
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_dueWork_None_getNorm_publishedOnly(): array
     {
         $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
         $dueWork->setMarkScheme(new None());
         return [
             [$dueWork, $this->getDummyStudent(1), null],
@@ -1385,10 +1510,15 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_dueWork_Percent_getNorm()
+
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_dueWork_Percent_getNorm(): array
     {
         $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $dueWork->setMarkScheme(new Percentage());
         return [
             [$dueWork, $this->getDummyStudent(1), null],
@@ -1403,10 +1533,14 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_dueWork_Percent_getNorm_publishedOnly()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_dueWork_Percent_getNorm_publishedOnly(): array
     {
         $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $dueWork->setMarkScheme(new Percentage());
         return [
             [$dueWork, $this->getDummyStudent(1), null],
@@ -1421,10 +1555,14 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_dueWork_TotalMark_getNorm()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_dueWork_TotalMark_getNorm(): array
     {
         $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_TOTAL));
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_TOTAL));
         $dueWork->setMarkScheme(new TotalMarkWholeNumber($dueWork->getMaxMark()));
         return [
             [$dueWork, $this->getDummyStudent(1), null],
@@ -1439,10 +1577,14 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_dueWork_TotalMark_getNorm_publishedOnly()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_dueWork_TotalMark_getNorm_publishedOnly(): array
     {
         $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_TOTAL));
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_TOTAL));
         $dueWork->setMarkScheme(new TotalMarkWholeNumber($dueWork->getMaxMark()));
         return [
             [$dueWork, $this->getDummyStudent(1), null],
@@ -1457,10 +1599,14 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_dueWork_LetterGrade_getNorm()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_dueWork_LetterGrade_getNorm(): array
     {
         $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $dueWork->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
         return [
             [$dueWork, $this->getDummyStudent(1), null],
@@ -1475,10 +1621,14 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_dueWork_LetterGrade_getNorm_publishedOnly()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_dueWork_LetterGrade_getNorm_publishedOnly(): array
     {
         $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $dueWork->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
         return [
             [$dueWork, $this->getDummyStudent(1), null],
@@ -1493,7 +1643,11 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_project_Min_getNorm()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_project_Min_getNorm(): array
     {
         $project = $this->getDummyProject();
         $project->setSummator(new Minimum());
@@ -1510,7 +1664,11 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_project_Min_getNorm_publishedOnly()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_project_Min_getNorm_publishedOnly(): array
     {
         $project = $this->getDummyProject();
         $project->setSummator(new Minimum());
@@ -1527,7 +1685,11 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_project_Max_getNorm()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_project_Max_getNorm(): array
     {
         $project = $this->getDummyProject();
         $project->setSummator(new Maximum());
@@ -1543,22 +1705,25 @@ class AssessableTest extends TestCase
                 [$project, $this->getDummyStudent(8), 50.0],
                 [$project, $this->getDummyStudent(9), 100.0],
             ];
-        } else {
-            return [
-                [$project, $this->getDummyStudent(1), null],
-                [$project, $this->getDummyStudent(2), 50.0],
-                [$project, $this->getDummyStudent(3), 50.0],
-                [$project, $this->getDummyStudent(4), 100.0],
-                [$project, $this->getDummyStudent(5), 100.0],
-                [$project, $this->getDummyStudent(6), 50.0],
-                [$project, $this->getDummyStudent(7), 100.0],
-                [$project, $this->getDummyStudent(8), 50.0],
-                [$project, $this->getDummyStudent(9), 100.0],
-            ];
         }
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), 50.0],
+            [$project, $this->getDummyStudent(3), 50.0],
+            [$project, $this->getDummyStudent(4), 100.0],
+            [$project, $this->getDummyStudent(5), 100.0],
+            [$project, $this->getDummyStudent(6), 50.0],
+            [$project, $this->getDummyStudent(7), 100.0],
+            [$project, $this->getDummyStudent(8), 50.0],
+            [$project, $this->getDummyStudent(9), 100.0],
+        ];
     }
 
-    public function provider_project_Max_getNorm_publishedOnly()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_project_Max_getNorm_publishedOnly(): array
     {
         $project = $this->getDummyProject();
         $project->setSummator(new Maximum());
@@ -1575,7 +1740,11 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_project_Average_getNorm()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_project_Average_getNorm(): array
     {
         $project = $this->getDummyProject();
         $project->setSummator(new Average());
@@ -1591,22 +1760,25 @@ class AssessableTest extends TestCase
                 [$project, $this->getDummyStudent(8), 50.0],
                 [$project, $this->getDummyStudent(9), 100.0],
             ];
-        } else {
-            return [
-                [$project, $this->getDummyStudent(1), null],
-                [$project, $this->getDummyStudent(2), 50.0],
-                [$project, $this->getDummyStudent(3), 50.0],
-                [$project, $this->getDummyStudent(4), 75.0],
-                [$project, $this->getDummyStudent(5), 100.0],
-                [$project, $this->getDummyStudent(6), 50.0],
-                [$project, $this->getDummyStudent(7), 100.0],
-                [$project, $this->getDummyStudent(8), 50.0],
-                [$project, $this->getDummyStudent(9), 100.0],
-            ];
         }
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), 50.0],
+            [$project, $this->getDummyStudent(3), 50.0],
+            [$project, $this->getDummyStudent(4), 75.0],
+            [$project, $this->getDummyStudent(5), 100.0],
+            [$project, $this->getDummyStudent(6), 50.0],
+            [$project, $this->getDummyStudent(7), 100.0],
+            [$project, $this->getDummyStudent(8), 50.0],
+            [$project, $this->getDummyStudent(9), 100.0],
+        ];
     }
 
-    public function provider_project_Average_getNorm_publishedOnly()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_project_Average_getNorm_publishedOnly(): array
     {
         $project = $this->getDummyProject();
         $project->setSummator(new Average());
@@ -1623,7 +1795,11 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_project_WeightedAverage_getNorm()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_project_WeightedAverage_getNorm(): array
     {
         $project = $this->getDummyProject();
         $project->setSummator(new WeightedAverage());
@@ -1639,22 +1815,25 @@ class AssessableTest extends TestCase
                 [$project, $this->getDummyStudent(8), 50.0],
                 [$project, $this->getDummyStudent(9), 100.0],
             ];
-        } else {
-            return [
-                [$project, $this->getDummyStudent(1), null],
-                [$project, $this->getDummyStudent(2), 50.0],
-                [$project, $this->getDummyStudent(3), 50.0],
-                [$project, $this->getDummyStudent(4), 60.0],
-                [$project, $this->getDummyStudent(5), 100.0],
-                [$project, $this->getDummyStudent(6), 50.0],
-                [$project, $this->getDummyStudent(7), 100.0],
-                [$project, $this->getDummyStudent(8), 50.0],
-                [$project, $this->getDummyStudent(9), 100.0],
-            ];
         }
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), 50.0],
+            [$project, $this->getDummyStudent(3), 50.0],
+            [$project, $this->getDummyStudent(4), 60.0],
+            [$project, $this->getDummyStudent(5), 100.0],
+            [$project, $this->getDummyStudent(6), 50.0],
+            [$project, $this->getDummyStudent(7), 100.0],
+            [$project, $this->getDummyStudent(8), 50.0],
+            [$project, $this->getDummyStudent(9), 100.0],
+        ];
     }
 
-    public function provider_project_WeightedAverage_getNorm_publishedOnly()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_project_WeightedAverage_getNorm_publishedOnly(): array
     {
         $project = $this->getDummyProject();
         $project->setSummator(new WeightedAverage());
@@ -1672,7 +1851,11 @@ class AssessableTest extends TestCase
     }
 
 
-    public function provider_project_None()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_project_None(): array
     {
         $project = $this->getDummyProject();
         return [
@@ -1688,11 +1871,15 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_project_Min_LetterGrade_getHR()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_project_Min_LetterGrade_getHR(): array
     {
         $project = $this->getDummyProject();
         $project->setSummator(new Minimum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
         return [
             [$project, $this->getDummyStudent(1), null],
@@ -1707,11 +1894,15 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_project_Min_LetterGrade_getHR_publishedOnly()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_project_Min_LetterGrade_getHR_publishedOnly(): array
     {
         $project = $this->getDummyProject();
         $project->setSummator(new Minimum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
         return [
             [$project, $this->getDummyStudent(1), null],
@@ -1726,11 +1917,15 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_project_Min_Percentage_getHR()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_project_Min_Percentage_getHR(): array
     {
         $project = $this->getDummyProject();
         $project->setSummator(new Minimum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
         return [
             [$project, $this->getDummyStudent(1), null],
@@ -1745,11 +1940,15 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_project_Min_Percentage_getHR_publishedOnly()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_project_Min_Percentage_getHR_publishedOnly(): array
     {
         $project = $this->getDummyProject();
         $project->setSummator(new Minimum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
         return [
             [$project, $this->getDummyStudent(1), null],
@@ -1764,11 +1963,15 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_project_Max_LetterGrade_getHR()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_project_Max_LetterGrade_getHR(): array
     {
         $project = $this->getDummyProject();
         $project->setSummator(new Maximum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
         if(self::FAVOR_FLOATING){
             return [
@@ -1782,27 +1985,29 @@ class AssessableTest extends TestCase
                 [$project, $this->getDummyStudent(8), 'Acceptable'],
                 [$project, $this->getDummyStudent(9), 'Excellent'],
             ];
-        } else {
-            return [
-                [$project, $this->getDummyStudent(1), null],
-                [$project, $this->getDummyStudent(2), 'Acceptable'],
-                [$project, $this->getDummyStudent(3), 'Acceptable'],
-                [$project, $this->getDummyStudent(4), 'Excellent'],
-                [$project, $this->getDummyStudent(5), 'Excellent'],
-                [$project, $this->getDummyStudent(6), 'Acceptable'],
-                [$project, $this->getDummyStudent(7), 'Excellent'],
-                [$project, $this->getDummyStudent(8), 'Acceptable'],
-                [$project, $this->getDummyStudent(9), 'Excellent'],
-            ];
         }
-
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), 'Acceptable'],
+            [$project, $this->getDummyStudent(3), 'Acceptable'],
+            [$project, $this->getDummyStudent(4), 'Excellent'],
+            [$project, $this->getDummyStudent(5), 'Excellent'],
+            [$project, $this->getDummyStudent(6), 'Acceptable'],
+            [$project, $this->getDummyStudent(7), 'Excellent'],
+            [$project, $this->getDummyStudent(8), 'Acceptable'],
+            [$project, $this->getDummyStudent(9), 'Excellent'],
+        ];
     }
 
-    public function provider_project_Max_LetterGrade_getHR_publishedOnly()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_project_Max_LetterGrade_getHR_publishedOnly(): array
     {
         $project = $this->getDummyProject();
         $project->setSummator(new Maximum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
         return [
             [$project, $this->getDummyStudent(1), null],
@@ -1817,11 +2022,15 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_project_Max_Percentage_getHR()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_project_Max_Percentage_getHR(): array
     {
         $project = $this->getDummyProject();
         $project->setSummator(new Maximum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
         if(self::FAVOR_FLOATING){
             return [
@@ -1835,26 +2044,29 @@ class AssessableTest extends TestCase
                 [$project, $this->getDummyStudent(8), '50 %'],
                 [$project, $this->getDummyStudent(9), '100 %'],
             ];
-        } else {
-            return [
-                [$project, $this->getDummyStudent(1), null],
-                [$project, $this->getDummyStudent(2), '50 %'],
-                [$project, $this->getDummyStudent(3), '50 %'],
-                [$project, $this->getDummyStudent(4), '100 %'],
-                [$project, $this->getDummyStudent(5), '100 %'],
-                [$project, $this->getDummyStudent(6), '50 %'],
-                [$project, $this->getDummyStudent(7), '100 %'],
-                [$project, $this->getDummyStudent(8), '50 %'],
-                [$project, $this->getDummyStudent(9), '100 %'],
-            ];
         }
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), '50 %'],
+            [$project, $this->getDummyStudent(3), '50 %'],
+            [$project, $this->getDummyStudent(4), '100 %'],
+            [$project, $this->getDummyStudent(5), '100 %'],
+            [$project, $this->getDummyStudent(6), '50 %'],
+            [$project, $this->getDummyStudent(7), '100 %'],
+            [$project, $this->getDummyStudent(8), '50 %'],
+            [$project, $this->getDummyStudent(9), '100 %'],
+        ];
     }
 
-    public function provider_project_Max_Percentage_getHR_publishedOnly()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_project_Max_Percentage_getHR_publishedOnly(): array
     {
         $project = $this->getDummyProject();
         $project->setSummator(new Maximum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
         return [
             [$project, $this->getDummyStudent(1), null],
@@ -1869,11 +2081,15 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_project_Average_LetterGrade_getHR()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_project_Average_LetterGrade_getHR(): array
     {
         $project = $this->getDummyProject();
         $project->setSummator(new Average());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
         if(self::FAVOR_FLOATING){
             return [
@@ -1887,27 +2103,29 @@ class AssessableTest extends TestCase
                 [$project, $this->getDummyStudent(8), 'Acceptable'],
                 [$project, $this->getDummyStudent(9), 'Excellent'],
             ];
-        } else {
-            return [
-                [$project, $this->getDummyStudent(1), null],
-                [$project, $this->getDummyStudent(2), 'Acceptable'],
-                [$project, $this->getDummyStudent(3), 'Acceptable'],
-                [$project, $this->getDummyStudent(4), 'Very Good'],
-                [$project, $this->getDummyStudent(5), 'Excellent'],
-                [$project, $this->getDummyStudent(6), 'Acceptable'],
-                [$project, $this->getDummyStudent(7), 'Excellent'],
-                [$project, $this->getDummyStudent(8), 'Acceptable'],
-                [$project, $this->getDummyStudent(9), 'Excellent'],
-            ];
         }
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), 'Acceptable'],
+            [$project, $this->getDummyStudent(3), 'Acceptable'],
+            [$project, $this->getDummyStudent(4), 'Very Good'],
+            [$project, $this->getDummyStudent(5), 'Excellent'],
+            [$project, $this->getDummyStudent(6), 'Acceptable'],
+            [$project, $this->getDummyStudent(7), 'Excellent'],
+            [$project, $this->getDummyStudent(8), 'Acceptable'],
+            [$project, $this->getDummyStudent(9), 'Excellent'],
+        ];
+     }
 
-    }
-
-    public function provider_project_Average_LetterGrade_getHR_publishedOnly()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_project_Average_LetterGrade_getHR_publishedOnly(): array
     {
         $project = $this->getDummyProject();
         $project->setSummator(new Average());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
         return [
             [$project, $this->getDummyStudent(1), null],
@@ -1922,11 +2140,15 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_project_Average_Percent_getHR()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_project_Average_Percent_getHR(): array
     {
         $project = $this->getDummyProject();
         $project->setSummator(new Average());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
         if(self::FAVOR_FLOATING){
             return [
@@ -1940,27 +2162,29 @@ class AssessableTest extends TestCase
                 [$project, $this->getDummyStudent(8), '50 %'],
                 [$project, $this->getDummyStudent(9), '100 %'],
             ];
-        } else {
-            return [
-                [$project, $this->getDummyStudent(1), null],
-                [$project, $this->getDummyStudent(2), '50 %'],
-                [$project, $this->getDummyStudent(3), '50 %'],
-                [$project, $this->getDummyStudent(4), '75 %'],
-                [$project, $this->getDummyStudent(5), '100 %'],
-                [$project, $this->getDummyStudent(6), '50 %'],
-                [$project, $this->getDummyStudent(7), '100 %'],
-                [$project, $this->getDummyStudent(8), '50 %'],
-                [$project, $this->getDummyStudent(9), '100 %'],
-            ];
         }
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), '50 %'],
+            [$project, $this->getDummyStudent(3), '50 %'],
+            [$project, $this->getDummyStudent(4), '75 %'],
+            [$project, $this->getDummyStudent(5), '100 %'],
+            [$project, $this->getDummyStudent(6), '50 %'],
+            [$project, $this->getDummyStudent(7), '100 %'],
+            [$project, $this->getDummyStudent(8), '50 %'],
+            [$project, $this->getDummyStudent(9), '100 %'],
+        ];
+     }
 
-    }
-
-    public function provider_project_Average_Percent_getHR_publishedOnly()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_project_Average_Percent_getHR_publishedOnly(): array
     {
         $project = $this->getDummyProject();
         $project->setSummator(new Average());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
         return [
             [$project, $this->getDummyStudent(1), null],
@@ -1975,11 +2199,15 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_project_WeightedAverage_LetterGrade_getHR()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_project_WeightedAverage_LetterGrade_getHR(): array
     {
         $project = $this->getDummyProject();
         $project->setSummator(new WeightedAverage());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
         if(self::FAVOR_FLOATING){
             return [
@@ -1993,27 +2221,29 @@ class AssessableTest extends TestCase
                 [$project, $this->getDummyStudent(8), 'Acceptable'],
                 [$project, $this->getDummyStudent(9), 'Excellent'],
             ];
-        } else {
-            return [
-                [$project, $this->getDummyStudent(1), null],
-                [$project, $this->getDummyStudent(2), 'Acceptable'],
-                [$project, $this->getDummyStudent(3), 'Acceptable'],
-                [$project, $this->getDummyStudent(4), 'Good'],
-                [$project, $this->getDummyStudent(5), 'Excellent'],
-                [$project, $this->getDummyStudent(6), 'Acceptable'],
-                [$project, $this->getDummyStudent(7), 'Excellent'],
-                [$project, $this->getDummyStudent(8), 'Acceptable'],
-                [$project, $this->getDummyStudent(9), 'Excellent'],
-            ];
         }
-
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), 'Acceptable'],
+            [$project, $this->getDummyStudent(3), 'Acceptable'],
+            [$project, $this->getDummyStudent(4), 'Good'],
+            [$project, $this->getDummyStudent(5), 'Excellent'],
+            [$project, $this->getDummyStudent(6), 'Acceptable'],
+            [$project, $this->getDummyStudent(7), 'Excellent'],
+            [$project, $this->getDummyStudent(8), 'Acceptable'],
+            [$project, $this->getDummyStudent(9), 'Excellent'],
+        ];
     }
 
-    public function provider_project_WeightedAverage_LetterGrade_getHR_publishedOnly()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_project_WeightedAverage_LetterGrade_getHR_publishedOnly(): array
     {
         $project = $this->getDummyProject();
         $project->setSummator(new WeightedAverage());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
         return [
             [$project, $this->getDummyStudent(1), null],
@@ -2028,11 +2258,15 @@ class AssessableTest extends TestCase
         ];
     }
 
-    public function provider_project_WeightedAverage_Percent_getHR()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_project_WeightedAverage_Percent_getHR(): array
     {
         $project = $this->getDummyProject();
         $project->setSummator(new WeightedAverage());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
         if(self::FAVOR_FLOATING){
             return [
@@ -2046,26 +2280,29 @@ class AssessableTest extends TestCase
                 [$project, $this->getDummyStudent(8), '50 %'],
                 [$project, $this->getDummyStudent(9), '100 %'],
             ];
-        } else {
-            return [
-                [$project, $this->getDummyStudent(1), null],
-                [$project, $this->getDummyStudent(2), '50 %'],
-                [$project, $this->getDummyStudent(3), '50 %'],
-                [$project, $this->getDummyStudent(4), '60 %'],
-                [$project, $this->getDummyStudent(5), '100 %'],
-                [$project, $this->getDummyStudent(6), '50 %'],
-                [$project, $this->getDummyStudent(7), '100 %'],
-                [$project, $this->getDummyStudent(8), '50 %'],
-                [$project, $this->getDummyStudent(9), '100 %'],
-            ];
         }
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), '50 %'],
+            [$project, $this->getDummyStudent(3), '50 %'],
+            [$project, $this->getDummyStudent(4), '60 %'],
+            [$project, $this->getDummyStudent(5), '100 %'],
+            [$project, $this->getDummyStudent(6), '50 %'],
+            [$project, $this->getDummyStudent(7), '100 %'],
+            [$project, $this->getDummyStudent(8), '50 %'],
+            [$project, $this->getDummyStudent(9), '100 %'],
+        ];
     }
 
-    public function provider_project_WeightedAverage_Percent_getHR_publishedOnly()
+    /**
+     * @return array
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
+     */
+    public function provider_project_WeightedAverage_Percent_getHR_publishedOnly(): array
     {
         $project = $this->getDummyProject();
         $project->setSummator(new WeightedAverage());
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
         return [
             [$project, $this->getDummyStudent(1), null],
@@ -2091,8 +2328,10 @@ class AssessableTest extends TestCase
      * In all cases, QuizReviews are unpublished
      *
      * @return Task
+     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    private function getDummyTask()
+    private function getDummyTask(): Task
     {
         $task = (new Task())
             ->setId(1)
@@ -2106,10 +2345,11 @@ class AssessableTest extends TestCase
 
         $teacher = $this->getDummyTeacher(101);
 
-        $participant1 = $this->getDummyParticipant($student1->getId(), $task);
-        $participant2 = $this->getDummyParticipant($student2->getId(), $task);
-        $participant3 = $this->getDummyParticipant($student3->getId(), $task);
-        $participant4 = $this->getDummyParticipant($student4->getId(), $task);
+        $plan = $this->linker->createAndLinkPlan($task);
+        $participant1 = $this->getDummyParticipant($student1->getId(), $plan);
+        $participant2 = $this->getDummyParticipant($student2->getId(), $plan);
+        $participant3 = $this->getDummyParticipant($student3->getId(), $plan);
+        $participant4 = $this->getDummyParticipant($student4->getId(), $plan);
 
         $task->getAllParticipants()
             ->add($participant1)
@@ -2172,6 +2412,7 @@ class AssessableTest extends TestCase
         return $task;
     }
 
+
     /**
      * Generate a Quiz with attached Attempts, Feedbacks, + Participants
      * The quiz logically has 1 section with 3 questions worth 1 mark each.
@@ -2187,8 +2428,9 @@ class AssessableTest extends TestCase
      * Quiz does not yet have a MarkType or MarkScheme attached, that is caller's responsibility
      *
      * @return Quiz
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    private function getDummyQuiz()
+    private function getDummyQuiz(): Quiz
     {
         // Create everything
         $quiz = (new Quiz())
@@ -2201,11 +2443,12 @@ class AssessableTest extends TestCase
         $student4 = $this->getDummyStudent(4);
         $student5 = $this->getDummyStudent(5);
 
-        $participant1 = $this->getDummyParticipant($student1->getId(), $quiz);
-        $participant2 = $this->getDummyParticipant($student2->getId(), $quiz);
-        $participant3 = $this->getDummyParticipant($student3->getId(), $quiz);
-        $participant4 = $this->getDummyParticipant($student4->getId(), $quiz);
-        $participant5 = $this->getDummyParticipant($student5->getId(), $quiz);
+        $plan = $this->linker->createAndLinkPlan($quiz);
+        $participant1 = $this->getDummyParticipant($student1->getId(), $plan);
+        $participant2 = $this->getDummyParticipant($student2->getId(), $plan);
+        $participant3 = $this->getDummyParticipant($student3->getId(), $plan);
+        $participant4 = $this->getDummyParticipant($student4->getId(), $plan);
+        $participant5 = $this->getDummyParticipant($student5->getId(), $plan);
 
         // student 1: no attempts
 
@@ -2348,6 +2591,7 @@ class AssessableTest extends TestCase
         return $quiz;
     }
 
+
     /**
      * Generate a DueWork with attached Attempts, Feedbacks, + Participants
      *
@@ -2368,8 +2612,9 @@ class AssessableTest extends TestCase
      * * student 9: 0 submission + 1 published floating feedback (50.0) + 1 later unpublished floating feedback (100.0)
      *
      * @return DueWork
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    private function getDummyDueWork()
+    private function getDummyDueWork(): DueWork
     {
         // Create everything
         $dueWork = (new DueWork())
@@ -2387,15 +2632,16 @@ class AssessableTest extends TestCase
         $student8 = $this->getDummyStudent(8);
         $student9 = $this->getDummyStudent(9);
 
-        $participant1 = $this->getDummyParticipant($student1->getId(), $dueWork);
-        $participant2 = $this->getDummyParticipant($student2->getId(), $dueWork);
-        $participant3 = $this->getDummyParticipant($student3->getId(), $dueWork);
-        $participant4 = $this->getDummyParticipant($student4->getId(), $dueWork);
-        $participant5 = $this->getDummyParticipant($student5->getId(), $dueWork);
-        $participant6 = $this->getDummyParticipant($student6->getId(), $dueWork);
-        $participant7 = $this->getDummyParticipant($student7->getId(), $dueWork);
-        $participant8 = $this->getDummyParticipant($student8->getId(), $dueWork);
-        $participant9 = $this->getDummyParticipant($student9->getId(), $dueWork);
+        $plan = $this->linker->createAndLinkPlan($dueWork);
+        $participant1 = $this->getDummyParticipant($student1->getId(), $plan);
+        $participant2 = $this->getDummyParticipant($student2->getId(), $plan);
+        $participant3 = $this->getDummyParticipant($student3->getId(), $plan);
+        $participant4 = $this->getDummyParticipant($student4->getId(), $plan);
+        $participant5 = $this->getDummyParticipant($student5->getId(), $plan);
+        $participant6 = $this->getDummyParticipant($student6->getId(), $plan);
+        $participant7 = $this->getDummyParticipant($student7->getId(), $plan);
+        $participant8 = $this->getDummyParticipant($student8->getId(), $plan);
+        $participant9 = $this->getDummyParticipant($student9->getId(), $plan);
 
         // student 1: no attempts
 
@@ -2623,8 +2869,9 @@ class AssessableTest extends TestCase
      *            DueW: 0 submission + 1 published floating feedback (50.0) + 1 later unpublished floating feedback (100.0)
      *
      * @return Project
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function getDummyProject()
+    public function getDummyProject(): Project
     {
         $project = (new Project())
             ->setId(4)
@@ -2639,56 +2886,56 @@ class AssessableTest extends TestCase
             ->add($dueWork)
             ->add($quiz);
 
-        $project->setAllParticipants((new Collection())
-                ->add(new Participant($this->getDummyStudent(1), $project) )
-                ->add(new Participant($this->getDummyStudent(2), $project) )
-                ->add(new Participant($this->getDummyStudent(3), $project) )
-                ->add(new Participant($this->getDummyStudent(4), $project) )
-                ->add(new Participant($this->getDummyStudent(5), $project) )
-                ->add(new Participant($this->getDummyStudent(6), $project) )
-                ->add(new Participant($this->getDummyStudent(7), $project) )
-                ->add(new Participant($this->getDummyStudent(8), $project) )
-                ->add(new Participant($this->getDummyStudent(9), $project) )
-        );
+        $plan = $this->linker->createAndLinkPlan($project);
+        $this->linker->createAndLinkParticipant($this->getDummyStudent(1), $plan);
+        $this->linker->createAndLinkParticipant($this->getDummyStudent(2), $plan);
+        $this->linker->createAndLinkParticipant($this->getDummyStudent(3), $plan);
+        $this->linker->createAndLinkParticipant($this->getDummyStudent(4), $plan);
+        $this->linker->createAndLinkParticipant($this->getDummyStudent(5), $plan);
+        $this->linker->createAndLinkParticipant($this->getDummyStudent(6), $plan);
+        $this->linker->createAndLinkParticipant($this->getDummyStudent(7), $plan);
+        $this->linker->createAndLinkParticipant($this->getDummyStudent(8), $plan);
+        $this->linker->createAndLinkParticipant($this->getDummyStudent(9), $plan);
 
         return $project;
     }
 
 
     /**
-     * @param int $markTypeId
+     * @param string $markSlug
      * @return MarkType
+     * @throws InvalidArgumentException If an unrecognised mark slug is passed
      */
-    private function getDummyMarkType($markTypeId)
+    private function getDummyMarkType(string $markSlug): MarkType
     {
         $data = [
-            [1, 'Percentage (%)', 'percent', 'This should be a whole percentage between 0 and 100.', 1],
-            [2, 'Letter Grade', 'letter', 'Se1ect a letter grade from the list.', 1],
-            [3, 'Total Mark', 'raw', 'This should be a mark between 0 and {MAX_MARK}. It may be a whole number or a decimal.', 1],
-            [4, 'Free Type (legacy support)', 'free', 'Should be a letter (A), score (15/20), or percentage (88%).', 0],
-            [5, 'Rubric', 'rubric', 'To mark the Rubric you <b>must</b> select one result for each criterion. Simply click the squares to select the results.', 0],
-            [6, 'None', 'none', 'This due work is not marked.', 1],
-            [7, 'Completion', 'completion', 'Either \'Completed\' or \'Not Completed\'', 0],
+            [MarkType::SLUG_PERCENT, 'Percentage (%)', 1, 'This should be a whole percentage between 0 and 100.', 1],
+            [MarkType::SLUG_LETTER, 'Letter Grade', 2, 'Se1ect a letter grade from the list.', 1],
+            [MarkType::SLUG_TOTAL, 'Total Mark', 3, 'This should be a mark between 0 and {MAX_MARK}. It may be a whole number or a decimal.', 1],
+            [MarkType::SLUG_FREE, 'Free Type (legacy support)', 4, 'Should be a letter (A), score (15/20), or percentage (88%).', 0],
+            [MarkType::SLUG_RUBRIC, 'Rubric', 5, 'To mark the Rubric you <b>must</b> select one result for each criterion. Simply click the squares to select the results.', 0],
+            [MarkType::SLUG_NONE, 'None', 6, 'This due work is not marked.', 1],
+            [MarkType::SLUG_COMPLETION, 'Completion', 7, 'Either \'Completed\' or \'Not Completed\'', 0],
         ];
 
         foreach ($data as $row) {
-            if ($row[0] == $markTypeId) {
+            if ($row[0] === $markSlug) {
                 return (new MarkType())
-                    ->setId($row[0])
+                    ->setId($row[2])
                     ->setName($row[1])
-                    ->setSlug($row[2])
+                    ->setSlug($row[1])
                     ->setComment($row[3])
                     ->setEnabled($row[4]);
             }
         }
-        throw new InvalidArgumentException("Unknown markType id: $markTypeId");
+        throw new InvalidArgumentException("Unknown markType slug: $markSlug");
     }
 
 
     /**
      * @return GradeGroup
      */
-    private function getDummyLetterGradeGroup()
+    private function getDummyLetterGradeGroup(): GradeGroup
     {
         $data = [
             [
@@ -2747,19 +2994,22 @@ class AssessableTest extends TestCase
 
     /**
      * @param int $userId
-     * @param IAssessable $assessable
+     * @param Plan $plan
      * @return Participant
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    private function getDummyParticipant($userId, IAssessable $assessable)
+    private function getDummyParticipant($userId, Plan $plan): Participant
     {
-        return new Participant($this->getDummyStudent($userId), $assessable);
+        return $this->linker->createAndLinkParticipant($this->getDummyStudent($userId), $plan);
     }
+
 
     /**
      * @param int $userId
      * @return User
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    private function getDummyStudent($userId)
+    private function getDummyStudent($userId): User
     {
         // Use cache if possible
         if (isset($this->studentCache[$userId]) && $this->studentCache[$userId] instanceof User) {
@@ -2805,8 +3055,9 @@ class AssessableTest extends TestCase
     /**
      * @param int $userId {101, 102}
      * @return User
+     * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    private function getDummyTeacher($userId)
+    private function getDummyTeacher($userId): User
     {
         // Use cache if possible
         if (isset($this->teacherCache[$userId]) && $this->teacherCache[$userId] instanceof User) {
@@ -2835,7 +3086,7 @@ class AssessableTest extends TestCase
     private function getDummyDate($dateString = null)
     {
         return null === $dateString
-            ? new \Alaress_Date_NullDate()
-            : new \Alaress_Date_Format($dateString, \Alaress_Date_Format::DATABASE_FORMAT);
+            ? new Alaress_Date_NullDate()
+            : new Alaress_Date_Format($dateString, Alaress_Date_Format::DATABASE_FORMAT);
     }
 }

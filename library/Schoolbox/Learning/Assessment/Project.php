@@ -24,6 +24,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecific
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\Summator\ISummator;
 use Schoolbox\Resource\Folder\Model as Folder;
+use BadMethodCallException;
 
 class Project extends AbstractAssessment implements AssessmentContext
 {
@@ -651,5 +652,24 @@ class Project extends AbstractAssessment implements AssessmentContext
     public function getBaseContext()
     {
         return $this->getContext();
+    }
+
+
+    /**
+     * Project-specific method to get all users who are participating in this project and its sub-assessments
+     *
+     * @return User[]|GenericCollection Indexed by user.id
+     * @throws \UnexpectedValueException If unable to merge collections
+     */
+    public function getParticipantUsers(): GenericCollection
+    {
+        // Base case
+        $participatingUsers = parent::getParticipantUsers();
+
+        // Recursive case
+        foreach($this->assessables as $subAssessable){
+            $participatingUsers = $participatingUsers->mergeUnique($subAssessable->getParticipantUsers(), 'id');
+        }
+        return $participatingUsers;
     }
 }
