@@ -8,16 +8,16 @@
 /**
  *
  * - Linking rubric marks
- * There is one simple rule, link a rubric mark to a feedback with the same or later published date.
+ * There is one simple rule: link a rubric mark to a feedback with the same or later published date.
  * Don't link rubric marks back, as we don't know if a feedback in the past
- * will make sense in the context of the linked rubric.
+ * will make sense in the context of the linked rubric mark.
  *
  *
  * - Propagating rubric marks
  * Once participation gets a rubric mark, it becomes a no-return point and every following feedback
- * should have a rubric mark associated with it. If there is no rubric mark available to be linked
+ * will need to have a rubric mark associated with it. If there is no rubric mark available to be linked
  * to such feedback in the historical data, the immediate previous rubric mark gets propagated forward
- * and linked to it.
+ * and gets linked to it.
  *
  *
  * - Orphan rubric marks
@@ -40,9 +40,9 @@
  * - Deleted feedbacks
  * Currently there is no way to delete a rubric mark from SB.
  * There are cases where these rubric marks get linked to deleted feedbacks.
- * In the one below, users currently see the rubric mark and some other feedback from the past,
- * not associated with that mark. When we will eventually start displaying marks with their feedbacks,
- * those marks will disappear from the users views, as being linked to deleted feedback.
+ * In the case below, users currently see the rubric mark and some other feedback from the past,
+ * not associated with that mark. When we will eventually start displaying marks coupled their feedbacks,
+ * those marks will disappear from the users views, since they are linked to deleted feedbacks.
  *
  * R:         [P]
  * ------------|------> t
@@ -50,7 +50,7 @@
  *
  *
  * - Published dates
- * On linking rubric mark to feedback, published date is not updaTed for neither of them.
+ * On linking rubric mark to feedback, published date is not updated for neither of them.
  * If a rubric mark gets propagated forward, it's published date is set to the linked feedback's published date.
  *
  *
@@ -64,8 +64,14 @@
  * If those descriptors are close enough by creation date and don't share the same criterion,
  * it is safe to link them into the same feedback.
  *
- * - Linking drafts
  *
+ * - Linking drafts
+ * There should be only one draft feedback per participation at any given time.
+ * If we have more than one draft rubric mark though, that will either mean
+ * that record creation time differs for descriptor records of the same feedback, or that our data is broken.
+ * We will try to check the first scenario and combine those records into one feedback.
+ * If that fails, only the latest rubric mark draft will get linked to a latest draft feedback
+ * if it was created at the same time or after rubric mark creation. If not, another orphan will be created.
  *
  *
  */
@@ -87,7 +93,16 @@ $kernel = new Schoolbox\Application\Daemon\Kernel(
     ]
 );
 
-$kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, $opts) {
+$kernel->run(
+/**
+ * @param Di\Container  $di
+ * @param LoopInterface $loop
+ * @param Logger        $log
+ * @param               $opts
+ *
+ * @throws Di\Exception\ServiceNotFound
+ */
+    function (Di\Container $di, LoopInterface $loop, Logger $log, $opts) {
     $db       = $di->get('databaseInternal');
     $migrator = new LinkRubricMarkToFeedback($db, $log);
     $migrator->run();
@@ -117,12 +132,21 @@ class LinkRubricMarkToFeedback
         $this->log = $log;
     }
 
+    /**
+     * Run the migration
+     */
     public function run()
     {
         $this->migrateByParticipation();
         $this->printLog();
+        exit(0);
     }
 
+    /**
+     * Gets participation records per student per submission box
+     *
+     * @return array
+     */
     private function getParticipation()
     {
         $participants = $this->db->executeQuery(
@@ -138,6 +162,9 @@ class LinkRubricMarkToFeedback
         return $participants;
     }
 
+    /**
+     * Links published, then drafts for each participation
+     */
     private function migrateByParticipation()
     {
 
@@ -152,9 +179,13 @@ class LinkRubricMarkToFeedback
 
     }
 
+    /**
+     * Links published rubric marks to published feedbacks
+     *
+     * @param $participant
+     */
     private function migratePublished($participant)
     {
-
 
         // All rubric marks, newest to oldest
         $rubricMarks = $this->db->executeQuery(
@@ -231,9 +262,14 @@ class LinkRubricMarkToFeedback
         }
     }
 
+    /**
+     * Links draft rubric marks to draft feedbacks
+     *
+     * @param $participant
+     */
     private function migrateDrafts($participant)
     {
-        // Get me drafts, if there are any, newest to oldest
+        // Get me drafts if there are any, newest to oldest
         $draftRubricMarks = $this->db->executeQuery(
             '
                 SELECT COUNT(rm.id), rm.student_id, rl.box_id, rm.created_at, COUNT(DISTINCT rd.criterion_id)
@@ -303,7 +339,12 @@ class LinkRubricMarkToFeedback
         }
     }
 
-    // Linking rubric mark to feedback
+    /**
+     * Sets return_id for published
+     *
+     * @param $feedback
+     * @param $rubricMark
+     */
     private function linkPublished($feedback, $rubricMark)
     {
         $this->db->executeQuery(
@@ -327,6 +368,12 @@ class LinkRubricMarkToFeedback
 
     }
 
+    /**
+     * Sets return_id for drafts
+     *
+     * @param $feedback
+     * @param $rubricMark
+     */
     private function linkDrafts($feedback, $rubricMark)
     {
 
@@ -351,6 +398,14 @@ class LinkRubricMarkToFeedback
 
     }
 
+    /**
+     * Propagates rubric mark forward and links feadback to it
+     *
+     * @param $rubricMark
+     * @param $feedback
+     *
+     * @return bool
+     */
     private function propagateRubricMarkForward($rubricMark, $feedback)
     {
 
@@ -408,6 +463,12 @@ class LinkRubricMarkToFeedback
 
     }
 
+    /**
+     * Combines records that differ by time but still belong to the same feedback
+     * @param $draftRubricMarks
+     *
+     * @return array
+     */
     private function combineDrafts($draftRubricMarks)
     {
 
@@ -454,6 +515,8 @@ class LinkRubricMarkToFeedback
     }
 
     /**
+     * Check if descriptors you think belong to the same feedback don't belong to the same criterion
+     *
      * @param $db
      * @param $log
      * @param $rubricMarks
@@ -494,9 +557,12 @@ class LinkRubricMarkToFeedback
         return $criterions;
     }
 
+    /**
+     * Print log
+     */
     private function printLog()
     {
-
+        // TODO need more logging
         $this->log->notice(sprintf('Broken descriptor sets: %d', $this->countBrokenRubricMarks));
         $this->log->notice(sprintf('Total propagated rubric marks: %d', $this->countPropagatedRubricMarks));
 
