@@ -53,8 +53,20 @@
  * On linking rubric mark to feedback, published date is not updaTed for neither of them.
  * If a rubric mark gets propagated forward, it's published date is set to the linked feedback's published date.
  *
+ *
  * - Drafts and published
  * Don't mix one with another, link published with published, drafts with drafts
+ *
+ *
+ * - Combining descriptor records for drafts
+ * We can't trust creation date 100%.
+ * There are cases where records in return_mark table have different created_at date, but they still belong to the same feedback.
+ * If those descriptors are close enough by creation date and don't share the same criterion,
+ * it is safe to link them into the same feedback.
+ *
+ * - Linking drafts
+ *
+ *
  *
  */
 
@@ -99,7 +111,8 @@ $kernel->run(/**
             '
         )->fetchAll();
 
-        $countBrokenRubricMarks = 0;
+        $countBrokenRubricMarks     = 0;
+        $countPropagatedRubricMarks = 0;
 
         // Dealing with published only for now
         // Loop participants and find published descriptor sets
@@ -108,7 +121,7 @@ $kernel->run(/**
             // All rubric marks, newest to oldest
             $rubricMarks = $db->executeQuery(
                 '
-            SELECT COUNT(rm.id) as records, rm.student_id, rm.return_id, rl.box_id, rm.created_at, rm.published_at, COUNT(DISTINCT rd.criterion_id) as criterion
+            SELECT COUNT(rm.id) AS records, rm.student_id, rm.return_id, rl.box_id, rm.created_at, rm.published_at, COUNT(DISTINCT rd.criterion_id) AS criterion
             FROM rubric_mark rm
             JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
             JOIN rubric_level rl ON rl.id = rd.level_id
@@ -148,12 +161,11 @@ $kernel->run(/**
 
                 // Validate your descriptors sets
                 if ($rubricMark['criterion'] != $rubricMark['records']) {
-                    var_Dump($rubricMark);
                     $log->warning(sprintf('Invalid descriptors for student_id %d box_id %d and published date %d
                             - Skipping!',
                             $rubricMark['student_id'], $rubricMark['box_id'], $rubricMark['published_at'])
                     );
-                    $countBrokenRubricMarks ++;
+                    $countBrokenRubricMarks++;
                     continue;
 
                 }
@@ -165,68 +177,112 @@ $kernel->run(/**
                     $feedbackPublishedDate = new Alaress_Date_Format($feedback['published_at'], Alaress_Date_Format::DATABASE_FORMAT);
 
                     if (($rubricMarkPublishedDate->compare($feedbackPublishedDate) <= 0) && !$propagate) {
-                        linkReturnToMark($db, $log, $feedback, $rubricMark);
+                        linkPublished($db, $log, $feedback, $rubricMark);
                         $propagate  = true;
                         $feedbackId = $feedback['id'];
                     } elseif ($propagate && $feedbackId != $feedback['id']) {
-                        propagateRubricMarkForward($db, $log, $rubricMark, $feedback);
+                        if (propagateRubricMarkForward($db, $log, $rubricMark, $feedback)) {
+                            $countPropagatedRubricMarks++;
+                        };
                     } else {
-                        // do nothing;
+                        break;
                     }
 
                 }
 
             }
 
-//            Get me all drafts
-//            $draftRubricMarks = $db->executeQuery(
-//                '
-//            SELECT COUNT(rm.id), rm.student_id, rl.box_id, rm.created_at
-//            FROM rubric_mark rm
-//            JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
-//            JOIN rubric_level rl ON rl.id = rd.level_id
-//            WHERE rm.student_id = :student_id
-//            AND rm.published_at IS NULL
-//            AND rl.box_id = :box_id
-//            GROUP BY rm.created_at
-//            ORDER BY rm.created_at DESC;
-//            ',
-//                [
-//                    'student_id' => $participant['student_id'],
-//                    'box_id'     => $participant['box_id'],
-//                ]
-//
-//            )->fetchAll();
-//
-//            if (count($draftRubricMarks) > 0) {
-//                $draftFeedbacks = $db->executeQuery(
-//                    '
-//                    SELECT sr.id, sr.created_at
-//                    FROM submission_return sr
-//                    JOIN submission_box sb ON sb.id = sr.box_id
-//                    WHERE sr.owner = :student_id AND sr.box_id = :box_id AND sr.published_at IS NOT NULL
-//                    ORDER BY sr.created_at ASC;
-//                ');
-//
-//                //
-//            }
+            // Get me drafts, if there are any, newest to oldest
+            $draftRubricMarks = $db->executeQuery(
+                '
+                SELECT COUNT(rm.id), rm.student_id, rl.box_id, rm.created_at, COUNT(DISTINCT rd.criterion_id)
+                FROM rubric_mark rm
+                JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
+                JOIN rubric_level rl ON rl.id = rd.level_id
+                WHERE rm.student_id = :student_id
+                AND rm.published_at IS NULL
+                AND rl.box_id = :box_id
+                GROUP BY rm.created_at
+                ORDER BY rm.created_at DESC;
+                ',
+                [
+                    'student_id' => $participant['student_id'],
+                    'box_id'     => $participant['box_id'],
+                ]
+
+            )->fetchAll();
+
+            if (count($draftRubricMarks) > 0) {
+
+                if ($draftRubricMarks > 1) {
+
+                    $combineDrafts = combineDrafts($db, $log, $draftRubricMarks);
+                    if (!empty($combineDrafts)) {
+                        $draftRubricMarks = $combineDrafts;
+                    } else {
+
+                        $log->warning('More than 1 draft found for the participation. Skipping!');
+//                    var_dump($draftRubricMarks);
+//                    var_dump($draftFeedbacks);
+                        break;
+                    }
+                }
+
+                // There is not much sense in getting multiple draft feedbacks to link the rubric mark to,
+                // as it is invalid to have multiple draft feedbacks simultaneously.
+                // Get latest feedback and check if it has been created with or after the rubric mark
+                $draftFeedbacks = $db->executeQuery(
+                    '
+                    SELECT sr.id, sr.created_at
+                    FROM submission_return sr
+                    JOIN submission_box sb ON sb.id = sr.box_id
+                    WHERE sr.owner = :student_id AND sr.box_id = :box_id AND sr.published_at IS NULL
+                    ORDER BY sr.created_at DESC
+                    LIMIT 1;
+                ',
+                    [
+                        'student_id' => $participant['student_id'],
+                        'box_id'     => $participant['box_id'],
+                    ])->fetchAll();
+
+                if (!empty($draftFeedbacks[0])) {
+
+                    $draftRubricMarkCreatedDate = new Alaress_Date_Format($draftRubricMarks[0]['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
+                    $draftFeedbackCreatedDate = new Alaress_Date_Format($draftFeedbacks[0]['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
+
+                    // Respect that delta you allowed for combined drafts
+                    if ($draftRubricMarkCreatedDate->compare($draftFeedbackCreatedDate->addSeconds(120)) <= 0) {
+
+                        //Link your rubric marks (single or combined) to that feedback
+                        foreach ($draftRubricMarks as $draftRubricMark) {
+
+                            linkDrafts($db, $log, $draftFeedbacks[0], $draftRubricMark);
+
+                        }
+
+                    }
+                }
+
+
+
+            }
 
         }
 
         $log->warning(sprintf('Broken descriptor sets: %d', $countBrokenRubricMarks));
+        $log->notice(sprintf('Total propagated rubric marks: %d', $countPropagatedRubricMarks));
 
     });
 
-// Id setter
-// TODO: should I update publish times to clean the data? NO!
-function linkReturnToMark($db, $log, $feedback, $rubricMark)
+// Linking rubric mark to feedback
+function linkPublished($db, $log, $feedback, $rubricMark)
 {
     $db->executeQuery(
         '
                 UPDATE rubric_mark rm
                 JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
                 JOIN rubric_level rl ON rl.id = rd.level_id
-                SET return_id = :feedback_id
+                SET rm.return_id = :feedback_id
                 WHERE rm.student_id = :student_id 
                 AND rm.published_at = :published_at 
                 AND rl.box_id = :box_id 
@@ -236,6 +292,30 @@ function linkReturnToMark($db, $log, $feedback, $rubricMark)
             'feedback_id'  => $feedback['id'],
             'student_id'   => $rubricMark['student_id'],
             'published_at' => $rubricMark['published_at'],
+            'box_id'       => $rubricMark['box_id'],
+        ]
+    );
+
+}
+
+function linkDrafts($db, $log, $feedback, $rubricMark)
+{
+
+    $db->executeQuery(
+        '
+                UPDATE rubric_mark rm
+                JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
+                JOIN rubric_level rl ON rl.id = rd.level_id
+                SET rm.return_id = :feedback_id
+                WHERE rm.student_id = :student_id
+                AND rm.created_at = :created_at
+                AND rl.box_id = :box_id
+                AND rm.return_id IS NULL;
+                ',
+        [
+            'feedback_id'  => $feedback['id'],
+            'student_id'   => $rubricMark['student_id'],
+            'created_at'   => $rubricMark['created_at'],
             'box_id'       => $rubricMark['box_id'],
         ]
     );
@@ -256,8 +336,9 @@ function propagateRubricMarkForward($db, $log, $rubricMark, $feedback)
     )->fetchAll();
 
     if (count($feedbackAlreadyLinked) > 0) {
-        return;
+        return false;
     }
+
     $descriptors = $db->executeQuery(
         '
         SELECT descriptor_id FROM rubric_mark rm
@@ -277,6 +358,7 @@ function propagateRubricMarkForward($db, $log, $rubricMark, $feedback)
     )->fetchAll();
 
     foreach ($descriptors as $descriptor) {
+
         $db->executeQuery(
             '
           INSERT INTO rubric_mark (return_id, student_id, descriptor_id, created_at, published_at, valid)
@@ -293,4 +375,96 @@ function propagateRubricMarkForward($db, $log, $rubricMark, $feedback)
         );
     }
 
+    return (true);
+
+}
+
+function combineDrafts($db, $log, $draftRubricMarks)
+{
+
+    $combinedDrafts     = [];
+    $combinedCriterions = [];
+
+    $latestCreatedDate = new Alaress_Date_Format($draftRubricMarks[0]['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
+
+    foreach ($draftRubricMarks as $i => $draftRubricMark) {
+
+        // Validate descriptors within same rubric mark.
+        // If the latest draft rubric mark is broken, give up on linking this participation drafts, the data is too messed up.
+
+        $rubricMarkCriterions = validateDescriptorCombination($db, $log, $draftRubricMark);
+
+        if ($rubricMarkCriterions == false) {
+            $log->warning('Too bad');
+            break;
+        } elseif ($i == 0) {
+            //We've got at least one good draft
+            $combinedDrafts[]     = $draftRubricMark;
+            $combinedCriterions[] = $rubricMarkCriterions;
+        } else {
+
+            $createdDate = new Alaress_Date_Format($draftRubricMark['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
+
+            // Check if creation dates are relatively close
+            // TODO will 2 minutes delta do?
+            if ($createdDate->diffInSeconds($latestCreatedDate) > 120) {
+                break;
+            }
+
+            // Check if criterions won't overlap
+            foreach ($rubricMarkCriterions as $rubricMarkCriterion) {
+                if (in_array($rubricMarkCriterion, $combinedCriterions)) {
+                    break;
+                }
+            }
+
+            // All good? Group them together
+            $combinedDrafts[] = $draftRubricMark;
+        }
+
+    }
+
+    return $combinedDrafts;
+
+}
+
+/**
+ * @param $db
+ * @param $log
+ * @param $rubricMarks
+ *
+ * @return array|bool
+ */
+function validateDescriptorCombination($db, $log, $rubricMarks)
+{
+
+    $criterions = $db->executeQuery(
+        '
+            SELECT rd.criterion_id FROM rubric_mark rm
+            JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
+            JOIN rubric_level rl ON rl.id = rd.level_id
+            WHERE rm.student_id = :student_id
+            AND rm.created_at = :created_at
+            AND rl.box_id = :box_id;
+        ',
+        [
+            'student_id' => $rubricMarks['student_id'],
+            'created_at' => $rubricMarks['created_at'],
+            'box_id'     => $rubricMarks['box_id'],
+        ]
+    )->fetchAll(PDO::FETCH_COLUMN);
+
+    $uniqueCriterions = array_map("unserialize", array_unique(array_map("serialize", $criterions)));
+
+    if (count($uniqueCriterions) != count($criterions)) {
+
+        $log->error(sprintf('Records for student_id %d, box_id %d, created at %s can not be combined into one draft',
+                $rubricMarks['student_id'], $rubricMarks['box_id'], $rubricMarks['created_at'])
+        );
+
+        return false;
+
+    }
+
+    return $criterions;
 }
