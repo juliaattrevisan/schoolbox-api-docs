@@ -125,11 +125,12 @@ $url = new Url($topic['name'], '');
 
 $owner = UserMapper::getInstance()->findByIdWithFallback($article['item_owner']);
 $deletedAt = $owner->getDeletedAt();
-if (isset($deletedAt)) {
-    // don't render a link to the soft-deleted user
+if ($deletedAt instanceof \Alaress_Date_NullDate) {
+    // render the link
     $this->parse('poster_link_open_block', 'poster_link_open');
     $this->parse('poster_link_close_block', 'poster_link_close');
 } else {
+    // don't render a link to the soft-deleted user
     $this->setVar('poster_link_open_block', '');
     $this->setVar('poster_link_close_block', '');
 }
