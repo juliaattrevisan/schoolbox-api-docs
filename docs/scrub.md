@@ -42,6 +42,14 @@ Twig-based locations are a bit more advanced - it does some stuff for you. Howev
 {{ model.description | purify }}
 ```
 
+## Scrub methods
+- `html`: Keeps existing HTML formatting while stripping out potentially harmful Javascript. Useful for content from CKEditor or any source where user-specified HTML formatting is possible.
+- `text`: Escapes HTML and produces plain text output, including HTML tags as plain text.
+- `html2text`: Produces plain text output with any HTML tags completely removed. Useful for truncated text where HTML formatting would be broken (such as news blurbs generated from the news body).
+- `xml`: Sanitises data for output as XML
+- `csv`: Sanitises data for output as CSV
+- `smartQuotes`: Converts smart quotes to ordinary quotes
+
 ## Try it for yourself
 You can set up an example specimen to try it out. In www, create a `test.php` file:
 
