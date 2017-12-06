@@ -7,6 +7,7 @@
 namespace Schoolbox\Learning\Assessment\DataModel;
 use Alaress\Database\Predicate\Builder;
 use Alaress_Date_Format;
+use PDOException;
 use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -18,6 +19,7 @@ use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Project;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Plan;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Quiz;
@@ -67,6 +69,8 @@ class Mapper extends BaseMapper
         $this->joinsReverseSingle('assessment_id', SubmissionBoxMapper::class, 'duework', 'duework');
         $this->joinsReverseSingle('assessment_id', Quiz\Mapper::class, 'quiz', 'quiz');
         $this->joinsReverseSingle('assessment_id', Project\Mapper::class, 'project', 'project');
+
+
 
         // Context joins (where does this assessment live?)
         // * folder (via assessment_folder)
@@ -151,6 +155,7 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'setSequence'));
         $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'validateOpenSpan'));
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCurriculumNodes']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'createDynamicPlanIfNew']);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteQuiz'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteTask'));
@@ -208,6 +213,39 @@ class Mapper extends BaseMapper
         $curriculumNodeMapper
             ->deleteRelations($assessment->getId())
             ->insertRelations($assessment->getCurriculumNodes(), $assessment->getId());
+    }
+
+
+    /**
+     * @param Model      $assessment
+     * @param Model|null $previous
+     * @throws PDOException
+     * @return bool
+     */
+    protected function createDynamicPlanIfNew(Model $assessment, Model $previous = null)
+    {
+        if ($previous) {
+            // this is a modify; do nothing
+            return true;
+        }
+
+        // I am aware that I've singletonned this in, but this will shortly be updated when a later ticket exposes the
+        // ability for teachers to customise participation. This is purely a stop-gap to retain existing functionality.
+        try {
+            // create a dyna-plan so class enrolments are still picked up
+            $planMap = \Schoolbox\Assessment\Participant\Plan\Mapper::getInstance();
+            $planMap->save(
+                $planMap->createModel()
+                    ->setAssessment($assessment)
+                    ->setIsDynamic(true)
+            );
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            return false;
+        } catch (\UnexpectedValueException $e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

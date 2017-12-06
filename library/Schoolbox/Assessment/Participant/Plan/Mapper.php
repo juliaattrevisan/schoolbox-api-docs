@@ -18,6 +18,7 @@ use PDO;
 /**
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
+ * @method Model createModel($id = null)
  */
 class Mapper extends BaseMapper
 {
