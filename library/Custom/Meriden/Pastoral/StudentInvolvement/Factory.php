@@ -635,4 +635,20 @@ class Factory
         }
         return $distribution;
     }
+
+    /**
+     * Does draft feedback contribute to grades for this report year?
+     *
+     * It contributes for 2017 and earlier, because teachers are used to having
+     * feedback flow through to the eReport without having to publish it.
+     *
+     * This workflow will change in 2018.
+     *
+     * @param int $reportYear
+     * @return bool
+     */
+    private function doesDraftFeedbackContribute($reportYear) : bool
+    {
+        return $reportYear < 2018;
+    }
 }
