@@ -103,6 +103,8 @@ class Controller extends Component_Dashboard_ControllerAbstract
          */
         foreach ($this->headlineList as $topicId => $topicItems) {
             foreach ($topicItems as $itemCurrent) {
+                $scrubbedHtml = Scrub::html($itemCurrent['item_body']);
+                $strippedContent = strip_tags($scrubbedHtml, '<img><video>');
 
                 $item = [
                     'id' => $itemCurrent['item_id'],
@@ -110,7 +112,8 @@ class Controller extends Component_Dashboard_ControllerAbstract
                     // We only want to show a read-more link if the body of the news article is not blank (but we need to trim all the junk
                     // HTML (eg. "<p>&nbsp;</p>"... "<ul></ul>") that CKeditor tends to leave behind when someone clears out the editor in the
                     // WYSIWYG view)
-                    'showLink' => !empty(trim(strip_tags(Scrub::html2text($itemCurrent['item_body'])))),
+
+                    'showLink' => !empty(trim($strippedContent)),
 
                     'blurb' => empty(trim(strip_tags(Scrub::html2text($itemCurrent['item_blurb'])))) ? '<p>' . TextFormatter::cutSentence(Scrub::html2text($itemCurrent['item_body']), 300) . '</p>' : Scrub::html($itemCurrent['item_blurb']),
                     'date' => new \Alaress_Date_Format($itemCurrent['item_datetime_posted'], \Alaress_Date_Format::DATABASE_FORMAT),
