@@ -237,38 +237,6 @@ function propagateRubricMarkForward ($db, $log, $rubricMark, $feedback) {
 
 }
 
-function propagateFeedbackForward ($db, $log, $rubricMark, $feedback)
-{
-
-    $newFeedback = $db->executeQuery(
-        '
-          INSERT INTO submission_return (box_id, maker, owner, created_at, published_at)
-          (
-              SELECT box_id, maker, owner, created_at, published_at
-              FROM submission_return
-              WHERE id=:id
-          )
-        ',
-        [
-            'id' => $feedback['id']
-        ]
-    )->fetchAll();
-
-//    var_dump($newFeedback);
-
-    $db->executeQuery(
-        '
-                UPDATE rubric_mark rm
-                SET return_id = :feedback_id
-                WHERE rm.id = :id 
-                ',
-        [
-            'feedback_id' => $feedback['id'],
-            'box_id' => $rubricMark['box_id']
-        ]
-    );
-}
-
 function checkIfDeletedIsValid ($db, $log) {
     $db->executeQuery(
         '
