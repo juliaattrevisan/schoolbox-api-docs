@@ -223,7 +223,7 @@ class LinkRubricMarkToFeedback
         )->fetchAll();
 
         $propagate  = false;
-        $feedbackId = null;
+        $linkedFeedbackIds = [];
 
         foreach ($rubricMarks as $rubricMark) {
 
@@ -242,13 +242,18 @@ class LinkRubricMarkToFeedback
 
             foreach ($feedbacks as $feedback) {
 
+                // If you reached the feedback that's already been linked, break.
+                if (in_array($feedback['id'], $linkedFeedbackIds)) {
+                    break;
+                }
+
                 $feedbackPublishedDate = new Alaress_Date_Format($feedback['published_at'], Alaress_Date_Format::DATABASE_FORMAT);
 
                 if (($rubricMarkPublishedDate->compare($feedbackPublishedDate) <= 0) && !$propagate) {
                     $this->linkPublished($feedback, $rubricMark);
                     $propagate  = true;
                     $feedbackId = $feedback['id'];
-                } elseif ($propagate && $feedbackId != $feedback['id']) {
+                } elseif ($propagate) {
                     $this->propagateRubricMarkForward($rubricMark, $feedback);
                 } else {
                     continue;
