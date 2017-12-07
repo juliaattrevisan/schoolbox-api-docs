@@ -254,7 +254,7 @@ class LinkRubricMarkToFeedback
                         $this->countPropagatedRubricMarks++;
                     };
                 } else {
-                    break;
+                    continue;
                 }
 
             }
@@ -485,8 +485,8 @@ class LinkRubricMarkToFeedback
             $rubricMarkCriterions = $this->validateDescriptorCombination($draftRubricMark);
 
             if ($rubricMarkCriterions == false) {
-                $this->log->warning('Too bad');
-                break;
+                // Stop there, return what you've already got
+                return $combinedDrafts;
             } elseif ($i == 0) {
                 //We've got at least one good draft
                 $combinedDrafts[]     = $draftRubricMark;
@@ -495,7 +495,6 @@ class LinkRubricMarkToFeedback
                 $createdDate = new Alaress_Date_Format($draftRubricMark['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
 
                 // Check if creation dates are relatively close
-                // TODO will 2 minutes delta do?
                 if ($createdDate->diffInSeconds($latestCreatedDate) > self::TIME_DELTA) {
                     break;
                 }
