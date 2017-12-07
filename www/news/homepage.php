@@ -76,8 +76,8 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 	$this->setTab('resources');
 
     /* Default DateTime */
-	$publishedDate = new Alaress_Date_Format(time(), 'U');
-	$expiryDate = new Alaress_Date_Format(strtotime(Cfg::get('homepage_news_expiry')), 'U');
+    $publishedDate = Alaress_Date_Format::now();
+    $expiryDate    = Alaress_Date_Format::now()->modify(Config::get('news_default_expiry'))->endOfDay();
 
     /* Set default output */
 	$output = array(	'ACTION'				=> 'Create',
@@ -87,8 +87,8 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 						'CATEGORY_ID'			=> $this->arg[1],
 						'CATEGORY_NAME'			=> scrub::Text($folder->getName()),
 						'delete_button_block'	=> '',
-		                'DATETIME_PUBLISHED' => $publishedDate->startOfDay()->getLocal(),
-		                'DATETIME_EXPIRES' => $expiryDate->endOfDay()->getLocal(),
+		                'DATETIME_PUBLISHED' => $publishedDate->getLocal(),
+		                'DATETIME_EXPIRES' => $expiryDate->getLocal(),
 					);
 						
 	$this->setVar($output);
