@@ -618,9 +618,8 @@ class CohortAnalysis
      */
     protected function isExcludedBySubmissionTypeFilter(IAssessable $assessment)
     {
-        // Exclude if we are filtering results, and this assessment is a dueWork that does not match the filter.
-        // Quizzes are never excluded (for now - at some point SubmissionType should be promoted to IAssessable)
-        return $this->submissionTypeResultFilter && $assessment instanceof DueWork && $assessment->getWorkType()->getId() !== $this->submissionTypeResultFilter->getId();
+        // Exclude if we are filtering results, and this assessment does not match the filter.
+        return $this->submissionTypeResultFilter &&  !($assessment->getWorkType() && $assessment->getWorkType()->getId() === $this->submissionTypeResultFilter->getId());
     }
 
 
