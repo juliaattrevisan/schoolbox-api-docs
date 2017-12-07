@@ -5,7 +5,6 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 class Alaress_Rss_Cache extends Alaress_Cache_Abstract {
 
@@ -30,7 +29,7 @@ class Alaress_Rss_Cache extends Alaress_Cache_Abstract {
 	/**
 	 * Load contents from the cache in SimpleXML object
 	 *
-	 * @return void
+	 * @return SimpleXMLElement
 	 */
 	public function load() {
 		libxml_use_internal_errors(true);

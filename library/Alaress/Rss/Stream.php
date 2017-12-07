@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Alaress_Rss_Stream
  *
@@ -12,217 +13,249 @@
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-class Alaress_Rss_Stream {
-	private $source = null;
-	private $limit = 6;
-	private $output = array();
+class Alaress_Rss_Stream
+{
+    /**
+     * URL of RSS feed to fetch
+     * @var string
+     */
+    private $source;
 
-	/* This can be dynamically chosen based on structure
-	 * of input data. Choose strategy in the setup
-	 */
-	private $rssStrategy = null;
+    /**
+     * Limit of RSS items to fetch
+     * @var int
+     */
+    private $limit = 6;
 
-	/**
-	 * Constructor
-	 *
-	 * Optionally takes a source url as an input. You can override
-	 * this by using setSource() after instantiation
-	 *
-	 * @param null $source
-	 */
-	public function __construct($source = null) {
-		if ($source !== null) {
-			$this->setSource($source);
-		}
-	}
+    /**
+     * Contains all feed items
+     * @var array
+     */
+    private $output = [];
 
-	/**
-	 * Configure the class which manages interpretation of RSS feeds
-	 *
-	 * @return void
-	 */
-	public function setup() {
-		if ($this->getSource() != null) {
+    /** This can be dynamically chosen based on structure
+     * of input data. Choose strategy in the setup
+     *
+     * @param Alaress_Rss_Strategy_Interface
+     */
+    private $rssStrategy;
 
-			/* The Xml class already uses caching
-			 */
-			$this->setInput(new Xml($this->getSource()));
+    /**
+     * Constructor
+     *
+     * Optionally takes a source url as an input. You can override
+     * this by using setSource() after instantiation
+     *
+     * @param null|string $source
+     */
+    public function __construct($source = null)
+    {
+        if ($source !== null) {
+            $this->setSource($source);
+        }
+    }
 
-			/* If there was data, try to interpret it
-			 */
-			if (count($this->getInput()->xml)) {
+    /**
+     * Configure the class which manages interpretation of RSS feeds
+     *
+     * @return bool
+     */
+    public function setup()
+    {
+        if ($this->getSource() != null) {
 
-				/* Decide if the feed is an ATOM feed or a regular RSS 2.0
-				 */
-				if ($this->isInputAtom()) {
-					$this->setRssStrategy(new Alaress_Rss_Strategy_Atom());
-				}
-				else {
-					$this->setRssStrategy(new Alaress_Rss_Strategy_Rss20());
-				}
-			}
+            /* The Xml class already uses caching
+             */
+            $this->setInput(new Xml($this->getSource()));
 
-			return false;
-		}
-	}
+            /* If there was data, try to interpret it
+             */
+            if (count($this->getInput()->xml)) {
 
-	/**
-	 * Decide if the feed is an ATOM feed
-	 *
-	 * @return bool
-	 */
-	private function isInputAtom() {
-		foreach($this->getInput()->xml->link as $currentLink) {
-			if (strstr($currentLink->attributes()->type, 'atom+xml')) {
-				return true;
-			}
-		}
+                /* Decide if the feed is an ATOM feed or a regular RSS 2.0
+                 */
+                if ($this->isInputAtom()) {
+                    $this->setRssStrategy(new Alaress_Rss_Strategy_Atom());
+                } else {
+                    $this->setRssStrategy(new Alaress_Rss_Strategy_Rss20());
+                }
+            }
+        }
+        return false;
+    }
 
-		return false;
-	}
+    /**
+     * Decide if the feed is an ATOM feed
+     *
+     * @return bool
+     */
+    private function isInputAtom()
+    {
 
-	/**
-	 * Get an RSS stream if a source was provided
-	 *
-	 * @return void
-	 */
-	public function stream() {
-		if ($this->getSource() != null) {
-			$this->setup();
+        foreach($this->getInput()->xml->getNamespaces() as $namespace) {
+            if ('http://www.w3.org/2005/Atom' === $namespace) {
+                return true;
+            }
+        }
 
-			/* If a strategy was devised, stream it
-			 */
-			if ($this->getRssStrategy() != null) {
-				$this->setOutput($this->getRssStrategy()->get($this->getInput(), $this->getLimit()));
-			}
-		}
-	}
+        foreach ($this->getInput()->xml->link as $currentLink) {
+            if (false !== stripos($currentLink->attributes()->type, 'atom+xml')) {
+                return true;
+            }
+        }
 
-	/**
-	 * Get an RSS stream title
-	 *
-	 * @return string
-	 */
-	public function getTitle() {
-		if (($this->getSource() != null) && ($this->getRssStrategy() != null)) {
-			return $this->getRssStrategy()->getTitle($this->getInput());
-		}
+        return false;
+    }
 
-		return 'Please enter a feed URL';
-	}
+    /**
+     * Get an RSS stream if a source was provided
+     *
+     */
+    public function stream()
+    {
+        if ($this->getSource() != null) {
+            $this->setup();
 
-	/**
-	 * Get an RSS stream link
-	 *
-	 * @return string
-	 */
-	public function getLink() {
-		if (($this->getSource() != null) && ($this->getRssStrategy() != null)) {
-			return $this->getRssStrategy()->getLink($this->getInput());
-		}
+            /* If a strategy was devised, stream it
+             */
+            if ($this->getRssStrategy() != null) {
+                $this->setOutput($this->getRssStrategy()->get($this->getInput(), $this->getLimit()));
+            }
+        }
+    }
 
-		return '';
-	}
+    /**
+     * Get an RSS stream title
+     *
+     * @return string
+     */
+    public function getTitle()
+    {
+        if (($this->getSource() != null) && ($this->getRssStrategy() != null)) {
+            return $this->getRssStrategy()->getTitle($this->getInput());
+        }
 
-	/* Getters/Setters
-	 */
+        return 'Please enter a feed URL';
+    }
 
-	/**
-	 * Set output contents
-	 *
-	 * @param  $val
-	 * @return void
-	 */
-	private function setOutput($val) {
-		$this->output = $val;
-	}
+    /**
+     * Get an RSS stream link
+     *
+     * @return string
+     */
+    public function getLink()
+    {
+        if (($this->getSource() != null) && ($this->getRssStrategy() != null)) {
+            return $this->getRssStrategy()->getLink($this->getInput());
+        }
 
-	/**
-	 * Get output contents
-	 *
-	 * @return array
-	 */
-	public function getOutput() {
-		return $this->output;
-	}
+        return '';
+    }
 
-	/**
-	 * Set RSS handling class
-	 *
-	 * @param  $val
-	 * @return void
-	 */
-	private function setRssStrategy($val) {
-		$this->rssStrategy = $val;
-	}
+    /* Getters/Setters
+     */
 
-	/**
-	 * Get RSS handling class
-	 *
-	 * @return null
-	 */
-	private function getRssStrategy() {
-		return $this->rssStrategy;
-	}
+    /**
+     * Set output contents
+     *
+     * @param  $val
+     */
+    private function setOutput($val)
+    {
+        $this->output = $val;
+    }
 
-	/**
-	 * Set the limit
-	 *
-	 * @param  $val
-	 * @return void
-	 */
-	public function setLimit($val) {
-		$this->limit = $val;
-	}
+    /**
+     * Get output contents
+     *
+     * @return array
+     */
+    public function getOutput()
+    {
+        return $this->output;
+    }
 
-	/**
-	 * Get the limit
-	 *
-	 * @return int
-	 */
-	private function getLimit() {
-		return $this->limit;
-	}
+    /**
+     * Set RSS handling class
+     *
+     * @param  Alaress_Rss_Strategy_Interface $val
+     */
+    private function setRssStrategy(Alaress_Rss_Strategy_Interface $val)
+    {
+        $this->rssStrategy = $val;
+    }
 
-	/**
-	 * Set source url
-	 *
-	 * Silently enforce http:// protocol
-	 *
-	 * @param  $val
-	 * @return void
-	 */
-	public function setSource($val) {
-		$source = str_replace('feed://', 'http://', $val);
+    /**
+     * Get RSS handling class
+     *
+     * @return Alaress_Rss_Strategy_Interface
+     */
+    private function getRssStrategy()
+    {
+        return $this->rssStrategy;
+    }
 
-		$this->source = $source;
-	}
+    /**
+     * Set the limit
+     *
+     * @param  int $val
+     */
+    public function setLimit($val)
+    {
+        $this->limit = $val;
+    }
 
-	/**
-	 * Get source url
-	 *
-	 * @return string
-	 */
-	private function getSource() {
-		return $this->source;
-	}
+    /**
+     * Get the limit
+     *
+     * @return int
+     */
+    private function getLimit()
+    {
+        return $this->limit;
+    }
 
-	/**
-	 * Set the contents of the input rss stream
-	 *
-	 * @param  $val
-	 * @return void
-	 */
-	private function setInput($val) {
-		$this->input = $val;
-	}
+    /**
+     * Set source url
+     *
+     * Silently enforce http:// protocol
+     *
+     * @param  string $val
+     */
+    public function setSource($val)
+    {
+        $source = str_replace('feed://', 'http://', $val);
 
-	/**
-	 * Get the contents of the input rss stream
-	 *
-	 * @return
-	 */
-	private function getInput() {
-		return $this->input;
-	}
+        $this->source = $source;
+    }
+
+    /**
+     * Get source url
+     *
+     * @return string
+     */
+    private function getSource()
+    {
+        return $this->source;
+    }
+
+    /**
+     * Set the contents of the input rss stream
+     *
+     * @param  \Xml $val
+     */
+    private function setInput(\Xml $val)
+    {
+        $this->input = $val;
+    }
+
+    /**
+     * Get the contents of the input rss stream
+     *
+     * @return \Xml
+     */
+    private function getInput()
+    {
+        return $this->input;
+    }
 }

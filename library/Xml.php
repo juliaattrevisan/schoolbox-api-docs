@@ -11,18 +11,25 @@
  * @version     SVN: $Id$
  */
 class Xml {
-    public $xml = null;
-	private $cache = null;
+    /**
+     * Stores the XML
+     * @var SimpleXMLElement
+     */
+    public $xml;
+
+    /**
+     * @var Alaress_Rss_Cache
+     */
+	private $cache;
 
 	/**
 	 * Constructor
 	 *
-	 * @param  $url
-	 * @param int $cache_time
+	 * @param  string $url
 	 */
     public function __construct($url) {
 		if (empty($url)) {
-			return false;
+			return;
 		}
 
 
@@ -39,17 +46,17 @@ class Xml {
             $this->setXml($this->getCache()->load());
         }
 		catch (Exception $e) {
-            return false;
+            return;
         }
     }
 
 	/**
 	 * Set xml
 	 *
-	 * @param  $val
+	 * @param  SimpleXMLElement $val
 	 * @return void
 	 */
-	private function setXml($val) {
+	private function setXml(SimpleXMLElement $val) {
 		$this->xml = $val;
 	}
 
