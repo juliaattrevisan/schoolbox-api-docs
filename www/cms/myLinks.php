@@ -2,12 +2,15 @@
 
 $this->setFile(TEMPLATE_content, 'cms/myLinks.html');
 $this->setBlock(TEMPLATE_content, 'myLink', 'myLink_block');
+$this->setBlock(TEMPLATE_content, 'empty_state', 'empty_state_block');
+
 
 $myLinksHandler = new MyLinks();
 
 $allLinks = $myLinksHandler->getAllByField('owner', $_SESSION['id']);
 
 if (is_array($allLinks)) {
+    $this->setVar('empty_state_block', '');
 	foreach($allLinks as $currentLink) {
 		$this->setVar(array(
 			'MYLINK_URL' => $currentLink['url'],
@@ -20,4 +23,5 @@ if (is_array($allLinks)) {
 }
 else {
 	$this->setVar('myLink_block', '');
+	$this->parse('empty_state_block', 'empty_state');
 }
