@@ -172,8 +172,8 @@ if (is_array($items)) {
             // Determine whether to render a link to the poster's profile
             $owner = UserMapper::getInstance()->findByIdWithFallback($article['item_owner']);
             $poster = "Unknown";
-            // Check if the user object is empty, which it will be for hard-deleted users
-            if (!empty(array($owner))) {
+            $userId = $owner->getId();
+            if (isset($userId)) {
                 $deletedAt = $owner->getDeletedAt();
                 if ($deletedAt instanceof \Alaress_Date_NullDate) {
                     // render a user profile link only if user hasn't been soft-deleted

@@ -130,7 +130,7 @@ $this->setVar('poster_link_open_block', '');
 $this->setVar('poster_link_close_block', '');
 
 $userId = $owner->getId();
-if (isset($userId)) {
+if (!isset($userId)) {
     $owner = UserMapper::getInstance()->getUnknownUser();
 } else {
     $deletedAt = $owner->getDeletedAt();
