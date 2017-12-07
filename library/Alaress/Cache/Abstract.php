@@ -1,4 +1,8 @@
 <?php
+
+use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Exception\ClientException as GuzzleException;
+
 /**
  * Alaress_Cache_Abstract
  *
@@ -228,27 +232,14 @@ abstract class Alaress_Cache_Abstract {
 			$url = $this->getUrl();
 		}
 
-		$streamHandle = @fopen($url, 'r', false, $context);
-		$cacheHandle = @fopen($this->getCachedFile(), 'w');
+		$httpClient = new GuzzleClient();
 
-		/* Could not open stream source for reading
-		 * This will leave intended cache file size at 0 bytes
-		 */
-		if (!$streamHandle) {
-			return false;
+		try {
+		    $httpClient->get($url, ['headers'=>['User-Agent' => 'Mozilla/5.0 (Schoolbox)'], 'save_to' => $this->getCachedFile()]);
+		} catch (GuzzleException $e) {
+		    return false;
 		}
-
-		/* Verbose debugging
-		 */
-		//$this->notifyObservers('Writing new ' . get_class($this) . ' file: ' . $this->getCachedFile());
-
-		while (!feof($streamHandle)) {
-			fwrite($cacheHandle, fread($streamHandle, 8192), 8192);
-		}
-
-		fclose($streamHandle);
-		fclose($cacheHandle);
-	}
+    }
 
 	/**
 	 * Create an empty file to indicate that a stream retrieval is in progress
