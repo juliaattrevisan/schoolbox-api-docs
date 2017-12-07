@@ -116,7 +116,8 @@ class Mapper extends BaseMapper
                 $participant = null;
             }
             if ($participant) {
-                $user                                    = $participant->getUser();
+                $user = $participant->getUser();
+                // Indexed by user.id to optimise participant traversals
                 $plan->getParticipants()[$user->getId()] = $participant;
             }
             $plans[$plan->getId()] = $plan;
