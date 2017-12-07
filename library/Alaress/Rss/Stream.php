@@ -11,7 +11,6 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 class Alaress_Rss_Stream {
 	private $source = null;
@@ -58,18 +57,8 @@ class Alaress_Rss_Stream {
 				if ($this->isInputAtom()) {
 					$this->setRssStrategy(new Alaress_Rss_Strategy_Atom());
 				}
-				else if ($this->isInputRss20()) {
-					$this->setRssStrategy(new Alaress_Rss_Strategy_Rss20());
-				}
 				else {
-					/* Special case for feedburner: needs to use LastRSS to
-					 * interpret the content, for some reason Xml won't do it
-					 */
-					$lastRss = new Alaress_Rss_Strategy_LastRss();
-
-					$this->setInput($lastRss->get($this->getSource()));
-
-					$this->setRssStrategy(new Alaress_Rss_Strategy_Feedburner());
+					$this->setRssStrategy(new Alaress_Rss_Strategy_Rss20());
 				}
 			}
 
@@ -87,32 +76,6 @@ class Alaress_Rss_Stream {
 			if (strstr($currentLink->attributes()->type, 'atom+xml')) {
 				return true;
 			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Decide if the feed is an RSS 2.0 feed
-	 *
-	 * @return bool
-	 */
-	private function isInputRss20() {
-		if (isset($this->getInput()->xml) && ($this->getInput()->xml->attributes()->version == '2.0')) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Decide if the feed is an RSS 2.0 feed
-	 *
-	 * @return bool
-	 */
-	private function isInputFeedburner() {
-		if (isset($this->getInput()->xml) && ($this->getInput()->xml->attributes()->version == '2.0')) {
-			return true;
 		}
 
 		return false;
