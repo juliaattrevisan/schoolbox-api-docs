@@ -92,7 +92,7 @@ class Alaress_Rss_Stream
     private function isInputAtom()
     {
 
-        foreach($this->getInput()->xml->getNamespaces() as $namespace) {
+        foreach ($this->getInput()->xml->getNamespaces() as $namespace) {
             if ('http://www.w3.org/2005/Atom' === $namespace) {
                 return true;
             }

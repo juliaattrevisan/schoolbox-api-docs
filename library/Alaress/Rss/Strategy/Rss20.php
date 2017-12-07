@@ -20,7 +20,7 @@ class Alaress_Rss_Strategy_Rss20 implements Alaress_Rss_Strategy_Interface
      * title, link, description, publish date
      *
      * @param  \Xml $input
-     * @param  int $limit
+     * @param  int  $limit
      * @return array
      */
     public function get(\Xml $input, $limit)
