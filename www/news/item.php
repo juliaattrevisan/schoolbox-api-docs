@@ -129,8 +129,8 @@ $owner = UserMapper::getInstance()->findByIdWithFallback($article['item_owner'])
 $this->setVar('poster_link_open_block', '');
 $this->setVar('poster_link_close_block', '');
 
-// findByIdWithFallback returns an empty object if object has been hard-deleted
-if (!$owner) {
+$userId = $owner->getId();
+if (isset($userId)) {
     $owner = UserMapper::getInstance()->getUnknownUser();
 } else {
     $deletedAt = $owner->getDeletedAt();
