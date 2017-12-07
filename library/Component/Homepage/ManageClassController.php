@@ -83,8 +83,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $classActionsHeading = "Class Actions";
         } elseif ($isUnitPage) {
             $classActionsHeading = "Unit Actions";
-        }
-        elseif($isCoursePage) {
+        } elseif ($isCoursePage) {
             $classActionsHeading = "Course Actions";
         } elseif ($isGroupPage) {
             $classActionsHeading = "Group Actions";
@@ -165,14 +164,12 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
 
         // Output course modify link if course page
         if ($isCoursePage) {
-            $this->setVar('PAGE_COURSE_ID', $this->getContext()->getCourseSpecification()->getId());
+            $this->setVar('PAGE_COURSE_ID', (string)$this->getContext()->getCourseSpecification()->getId());
             $this->parse('course_link_block', 'course_link');
             $hasClassActions = true;
         } else {
             $this->setVar('course_link_block', '');
-
         }
-
 
         return $hasClassActions;
     }
