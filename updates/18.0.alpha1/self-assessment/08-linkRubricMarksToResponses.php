@@ -71,7 +71,7 @@
  * that record creation time differs for descriptor records of the same feedback, or that our data is broken.
  * We will try to check the first scenario and combine those records into one feedback.
  * If that fails, only the latest rubric mark draft will get linked to a latest draft feedback
- * if it was created at the same time or after rubric mark creation. If not, another orphan will be created.
+ * if it was created at the same time or after rubric mark creation. If not, this rubric mark will become an orphan.
  *
  *
  */
@@ -103,10 +103,10 @@ $kernel->run(
  * @throws Di\Exception\ServiceNotFound
  */
     function (Di\Container $di, LoopInterface $loop, Logger $log, $opts) {
-    $db       = $di->get('databaseInternal');
-    $migrator = new LinkRubricMarkToFeedback($db, $log);
-    $migrator->run();
-});
+        $db       = $di->get('databaseInternal');
+        $migrator = new LinkRubricMarkToFeedback($db, $log);
+        $migrator->run();
+    });
 
 class LinkRubricMarkToFeedback
 {
@@ -115,6 +115,9 @@ class LinkRubricMarkToFeedback
 
     private $countBrokenRubricMarks = 0;
     private $countPropagatedRubricMarks = 0;
+    private $countLinkedPublishedFeedbacks = 0;
+    private $countLinkedDraftFeedbacks = 0;
+    private $countCombinedDrafts = 0;
 
     /** @var IConnector */
     private $db;
@@ -123,8 +126,8 @@ class LinkRubricMarkToFeedback
     private $log;
 
     /**
-     * @param Base   $db
-     * @param Logger $log
+     * @param IConnector $db
+     * @param Logger     $log
      */
     public function __construct(IConnector $db, Logger $log)
     {
@@ -139,7 +142,6 @@ class LinkRubricMarkToFeedback
     {
         $this->migrateByParticipation();
         $this->printLog();
-        exit(0);
     }
 
     /**
@@ -167,7 +169,6 @@ class LinkRubricMarkToFeedback
      */
     private function migrateByParticipation()
     {
-
         // Dealing with published only for now
         // Loop participants and find published descriptor sets
         foreach ($this->getParticipation() as $i => $participant) {
@@ -176,7 +177,6 @@ class LinkRubricMarkToFeedback
             $this->migrateDrafts($participant);
 
         }
-
     }
 
     /**
@@ -186,7 +186,6 @@ class LinkRubricMarkToFeedback
      */
     private function migratePublished($participant)
     {
-
         // All rubric marks, newest to oldest
         $rubricMarks = $this->db->executeQuery(
             '
@@ -230,7 +229,7 @@ class LinkRubricMarkToFeedback
 
             // Validate your descriptors sets
             if ($rubricMark['criterion'] != $rubricMark['records']) {
-                $this->log->warning(sprintf('Invalid descriptors for student_id %d box_id %d and published date %d
+                $this->log->warning(sprintf('Invalid descriptors for student_id %d box_id %d and published date %s
                             - Skipping!',
                         $rubricMark['student_id'], $rubricMark['box_id'], $rubricMark['published_at'])
                 );
@@ -250,15 +249,11 @@ class LinkRubricMarkToFeedback
                     $propagate  = true;
                     $feedbackId = $feedback['id'];
                 } elseif ($propagate && $feedbackId != $feedback['id']) {
-                    if ($this->propagateRubricMarkForward($rubricMark, $feedback)) {
-                        $this->countPropagatedRubricMarks++;
-                    };
+                    $this->propagateRubricMarkForward($rubricMark, $feedback);
                 } else {
                     continue;
                 }
-
             }
-
         }
     }
 
@@ -296,6 +291,7 @@ class LinkRubricMarkToFeedback
                 $combineDrafts = $this->combineDrafts($draftRubricMarks);
                 if (!empty($combineDrafts)) {
                     $draftRubricMarks = $combineDrafts;
+                    $this->log->notice('More than 1 draft record appears to belong to the same feedback');
                 } else {
                     $this->log->warning('More than 1 draft found for the participation. Skipping!');
 
@@ -366,6 +362,7 @@ class LinkRubricMarkToFeedback
             ]
         );
 
+        $this->countLinkedPublishedFeedbacks++;
     }
 
     /**
@@ -376,7 +373,6 @@ class LinkRubricMarkToFeedback
      */
     private function linkDrafts($feedback, $rubricMark)
     {
-
         $this->db->executeQuery(
             '
                 UPDATE rubric_mark rm
@@ -396,6 +392,7 @@ class LinkRubricMarkToFeedback
             ]
         );
 
+        $this->countLinkedDraftFeedbacks++;
     }
 
     /**
@@ -408,7 +405,6 @@ class LinkRubricMarkToFeedback
      */
     private function propagateRubricMarkForward($rubricMark, $feedback)
     {
-
         $feedbackAlreadyLinked = $this->db->executeQuery(
             '
                 SELECT id FROM rubric_mark
@@ -459,19 +455,19 @@ class LinkRubricMarkToFeedback
             );
         }
 
+        $this->countPropagatedRubricMarks++;
         return (true);
-
     }
 
     /**
      * Combines records that differ by time but still belong to the same feedback
+     *
      * @param $draftRubricMarks
      *
      * @return array
      */
     private function combineDrafts($draftRubricMarks)
     {
-
         $combinedDrafts     = [];
         $combinedCriterions = [];
 
@@ -486,7 +482,7 @@ class LinkRubricMarkToFeedback
 
             if ($rubricMarkCriterions == false) {
                 // Stop there, return what you've already got
-                return $combinedDrafts;
+                break;
             } elseif ($i == 0) {
                 //We've got at least one good draft
                 $combinedDrafts[]     = $draftRubricMark;
@@ -510,6 +506,8 @@ class LinkRubricMarkToFeedback
                 $combinedDrafts[] = $draftRubricMark;
             }
         }
+
+        $this->countCombinedDrafts++;
         return $combinedDrafts;
     }
 
@@ -545,7 +543,7 @@ class LinkRubricMarkToFeedback
 
         if (count($uniqueCriterions) != count($criterions)) {
 
-            $this->log->error(sprintf('Records for student_id %d, box_id %d, created at %s can not be combined into one draft',
+            $this->log->warning(sprintf('Records for student_id %d, box_id %d, created at %s can not be combined into one draft',
                     $rubricMarks['student_id'], $rubricMarks['box_id'], $rubricMarks['created_at'])
             );
 
@@ -564,6 +562,9 @@ class LinkRubricMarkToFeedback
         // TODO need more logging
         $this->log->notice(sprintf('Broken descriptor sets: %d', $this->countBrokenRubricMarks));
         $this->log->notice(sprintf('Total propagated rubric marks: %d', $this->countPropagatedRubricMarks));
+        $this->log->notice(sprintf('Total published feedbacks linked: %d', $this->countLinkedPublishedFeedbacks));
+        $this->log->notice(sprintf('Total draft feedbacks linked: %d', $this->countLinkedDraftFeedbacks));
+        $this->log->notice(sprintf('Total combined draft records: %d', $this->countCombinedDrafts));
 
     }
 }
