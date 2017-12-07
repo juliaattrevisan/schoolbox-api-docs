@@ -10,6 +10,7 @@
  */
 
 use \Schoolbox\Permission\Access\UserAccess;
+use \Schoolbox\UserMapper;
 
 $this->setFile(TEMPLATE_content, 'news/news_list.html');
 $this->setBlock(TEMPLATE_content, 'add_news', 'add_news_block');
@@ -163,18 +164,28 @@ if (is_array($items)) {
             /* The usual stuff
              */
             $fullname = Scrub::text($userHandler->formatName($article));
-            $owner = "<a href=\"/search/user/{$article['uid']}\">$fullname</a>";
 
             $formatter = new TextFormatter();
 
             $postDate = new Alaress_Date_Format($article['item_datetime_published'], Alaress_Date_Format::DATABASE_FORMAT);
+
+            // Determine whether to render a link to the poster's profile
+            $owner = UserMapper::getInstance()->findByIdWithFallback($article['item_owner']);
+            $poster = "Unknown";
+            if ($owner) {
+                $deletedAt = $owner->getDeletedAt();
+                if ($deletedAt instanceof \Alaress_Date_NullDate) {
+                    // render a user profile link only if user hasn't been soft-deleted
+                    $poster = "<a href=\"/search/user/{$article['uid']}\">$fullname</a>";
+                }
+            }
 
             $output = array(
                 'NEWS_ID' => $article['item_id'],
                 'NEWS_URL' => '/news/item/' . $article['item_id'],
                 'NEWS_MODIFY_URL' => '/news/modify/'.$article['item_id'],
                 'NEWS_TITLE' => Scrub::text($article['item_heading']),
-                'POSTER' => $owner,
+                'POSTER' => $poster,
                 'DATETIME' => $postDate->getLong(),
                 'NEWS_SHORT' => empty($article['item_blurb'])
                     ? '<p>'.TextFormatter::cutSentence(Scrub::html2text($article['item_body']), 300).'</p>'
