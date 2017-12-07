@@ -123,27 +123,21 @@ if (!$topic) {
 
 $url = new Url($topic['name'], '');
 
-$owner = UserMapper::getInstance()->findByIdWithFallback($article['item_owner']);
-
-// phplib weirdness - gets overridden if user is found to exist
-$this->setVar('poster_link_open_block', '');
-$this->setVar('poster_link_close_block', '');
-
-$userId = $owner->getId();
-if (!isset($userId)) {
-    $owner = UserMapper::getInstance()->getUnknownUser();
-} else {
-    $deletedAt = $owner->getDeletedAt();
-    if ($deletedAt instanceof \Alaress_Date_NullDate) {
-        // render a user profile link only if user hasn't been soft-deleted
-        $this->parse('poster_link_open_block', 'poster_link_open');
-        $this->parse('poster_link_close_block', 'poster_link_close');
-    }
+try {
+    // User exists - link to their profile
+    $owner = UserMapper::getInstance()->findById($article['item_owner']);
+    $this->parse('poster_link_open_block', 'poster_link_open');
+    $this->parse('poster_link_close_block', 'poster_link_close');
+} catch (\Schoolbox\Mapper\Exception $e) {
+    // User has been deleted - don't show a link
+    $this->setVar('poster_link_open_block', '');
+    $this->setVar('poster_link_close_block', '');
 }
 
 $d = new Alaress_Date_Format($article['item_datetime_published'], Alaress_Date_Format::DATABASE_FORMAT);
 $e = new Alaress_Date_Format($article['item_datetime_expires'], Alaress_Date_Format::DATABASE_FORMAT);
 
+$owner = UserMapper::getInstance()->findByIdWithFallback($article['item_owner']);
 $output = array(
     'NEWS_ID' => $article['item_id'],
     'NEWS_TITLE' => Scrub::text($article['item_heading']),

@@ -11,6 +11,7 @@
 
 use \Schoolbox\Permission\Access\UserAccess;
 use \Schoolbox\UserMapper;
+use \Schoolbox\Mapper\Exception;
 
 $this->setFile(TEMPLATE_content, 'news/news_list.html');
 $this->setBlock(TEMPLATE_content, 'add_news', 'add_news_block');
@@ -170,17 +171,16 @@ if (is_array($items)) {
             $postDate = new Alaress_Date_Format($article['item_datetime_published'], Alaress_Date_Format::DATABASE_FORMAT);
 
             // Determine whether to render a link to the poster's profile
-            $owner = UserMapper::getInstance()->findByIdWithFallback($article['item_owner']);
-            $poster = "Unknown";
-            $userId = $owner->getId();
-            if (isset($userId)) {
-                $deletedAt = $owner->getDeletedAt();
-                if ($deletedAt instanceof \Alaress_Date_NullDate) {
-                    // render a user profile link only if user hasn't been soft-deleted
-                    $poster = "<a href=\"/search/user/{$article['uid']}\">$fullname</a>";
-                } else {
-                    $poster = "$fullname";
-                }
+            $poster = "<a href=\"/search/user/{$article['uid']}\">$fullname</a>";
+            try {
+                // User exists - link to their profile
+                $owner = UserMapper::getInstance()->findById($article['item_owner']);
+            } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+                // User has been soft-deleted - don't link to their profile
+                $poster = "$fullname";
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // User has been hard-deleted - don't show a link and use placeholder name
+                $poster = "Unknown User";
             }
 
             $output = array(
