@@ -100,6 +100,15 @@ class Model implements ISoftDeletable
     /**
      * @return bool
      */
+    public function isDynamic(): bool
+    {
+        return $this->isDynamic;
+    }
+
+
+    /**
+     * @return bool
+     */
     public function getIsDynamic(): bool
     {
         return $this->isDynamic;
