@@ -91,6 +91,7 @@ Usage:
             <a href="/resources/{{ courseSpec.folder.id }}/" class="icon-folder">Course Resources</a>
         {% endif %}
         </li>
+        <li><a href="/submission//rubricCriteria/{{ courseSpec.folder.id }}" class="icon-criteria">Manage Rubric {{ locale.rubricGroup.properPlural }}</a></li>
         <li><a href="{{ routeLookup('learningAnalytics.course', {courseSpecId: courseSpec.id}) }}" class="icon-poll">Learning Analytics</a></li>
         <li><a href="{{ routeLookup('course.modifyCourse', {id: courseSpec.id}) }}" class="icon-modify">Modify</a></li>
             {# Course delete: standard folder delete -#}

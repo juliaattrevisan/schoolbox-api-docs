@@ -68,6 +68,8 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $isClassPage  = $this->getContext()->isClass();
         $wasClassPage = $this->getContext()->wasClass();
         $isUnitPage   = $this->getContext()->hasUnitSpecification();
+        $isCoursePage = $this->getContext()->hasCourseSpecification();
+
 
         // If context is not a group, unit or class, render nothing
         if (!$isGroupPage && !$isClassPage && !$wasClassPage && !$isUnitPage) {
@@ -81,6 +83,9 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $classActionsHeading = "Class Actions";
         } elseif ($isUnitPage) {
             $classActionsHeading = "Unit Actions";
+        }
+        elseif($isCoursePage) {
+            $classActionsHeading = "Course Actions";
         } elseif ($isGroupPage) {
             $classActionsHeading = "Group Actions";
         }
@@ -93,10 +98,16 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
          */
         $hasClassActions = false;
 
+        // If context is not a group, unit or class, render nothing
+        if (!$isGroupPage && !$isClassPage && !$isUnitPage && !$isCoursePage) {
+            return false;
+        }
+
         $this->setBlock($templateHandle, 'student_grades', 'student_grades_block');
         $this->setBlock($templateHandle, 'class_list', 'class_list_block');
         $this->setBlock($templateHandle, 'markbook_link', 'markbook_link_block');
         $this->setBlock($templateHandle, 'manage_criteria', 'manage_criteria_block');
+        $this->setBlock($templateHandle, 'course_link', 'course_link_block');
 
         // Determine the term for the grades link
         $currentTerm = $this->termMapper->findForToday();
@@ -151,6 +162,17 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         } else {
             $this->setVar('manage_criteria_block');
         }
+
+        // Output course modify link if course page
+        if ($isCoursePage) {
+            $this->setVar('PAGE_COURSE_ID', $this->getContext()->getCourseSpecification()->getId());
+            $this->parse('course_link_block', 'course_link');
+            $hasClassActions = true;
+        } else {
+            $this->setVar('course_link_block', '');
+
+        }
+
 
         return $hasClassActions;
     }

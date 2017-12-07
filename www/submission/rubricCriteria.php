@@ -63,9 +63,9 @@ $this->setVar([
     'CATEGORY_NAME' => Scrub::text($folder->getName()),
 ]);
 
-$criteriaName = $this->getDi()->get('l10n')->translate('rubricCriterion', true, true);
+$criteriaName = $this->getDi()->get('l10n')->translate('rubricGroup', true, true);
 
-$title = 'Manage ' . $criteriaName . ' for ' . Scrub::text($folder->getName());
+$title = 'Manage Rubric ' . $criteriaName . ' for ' . Scrub::text($folder->getName());
 $this->setTitle($title);
 $this->setVar('PAGE_TITLE', $title);
 
