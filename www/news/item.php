@@ -124,15 +124,21 @@ if (!$topic) {
 $url = new Url($topic['name'], '');
 
 $owner = UserMapper::getInstance()->findByIdWithFallback($article['item_owner']);
-$deletedAt = $owner->getDeletedAt();
-if ($deletedAt instanceof \Alaress_Date_NullDate) {
-    // render the link
-    $this->parse('poster_link_open_block', 'poster_link_open');
-    $this->parse('poster_link_close_block', 'poster_link_close');
+
+// phplib weirdness - gets overridden if user is found to exist
+$this->setVar('poster_link_open_block', '');
+$this->setVar('poster_link_close_block', '');
+
+// findByIdWithFallback returns an empty object if object has been hard-deleted
+if (!$owner) {
+    $owner = UserMapper::getInstance()->getUnknownUser();
 } else {
-    // don't render a link to the soft-deleted user
-    $this->setVar('poster_link_open_block', '');
-    $this->setVar('poster_link_close_block', '');
+    $deletedAt = $owner->getDeletedAt();
+    if ($deletedAt instanceof \Alaress_Date_NullDate) {
+        // render a user profile link only if user hasn't been soft-deleted
+        $this->parse('poster_link_open_block', 'poster_link_open');
+        $this->parse('poster_link_close_block', 'poster_link_close');
+    }
 }
 
 $d = new Alaress_Date_Format($article['item_datetime_published'], Alaress_Date_Format::DATABASE_FORMAT);
