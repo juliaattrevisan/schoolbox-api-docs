@@ -165,12 +165,12 @@ class Mapper extends BaseMapper
     public function verifyTitle(Model $model)
     {
         if (strlen($model->getTitle()) === 0) {
-            throw new UnexpectedValueException('A term must have a title.');
+            throw new UnexpectedValueException('This term must have a title.');
         }
         if (!$this->isUnique(['title' => $model->getTitle()], $model->getId())) {
             throw new UnexpectedValueException(
                 sprintf(
-                    'A term with title "%s" already exists.',
+                    'A term with the title "%s" already exists, you must have a unique title',
                     $model->getTitle()
                 )
             );
@@ -188,17 +188,17 @@ class Mapper extends BaseMapper
     public function verifyCode(Model $model)
     {
         if (strlen($model->getCode()) === 0) {
-            throw new UnexpectedValueException('A term must have a code.');
+            throw new UnexpectedValueException('This term must have a code.');
         }
         if (!preg_match('/^[a-z0-9\\-_]+$/i', $model->getCode())) {
             throw new UnexpectedValueException(
-                'A code may only contain alphanumeric, hyphen and underscore characters.'
+                'You may only use contain alphanumeric, hyphen and underscore characters in your code.'
             );
         }
         if (!$this->isUnique(['code' => $model->getCode()], $model->getId())) {
             throw new UnexpectedValueException(
                 sprintf(
-                    'A term with code "%s" already exists.',
+                    'A term with this code "%s" already exists, you must have a unique code',
                     $model->getCode()
                 )
             );
@@ -216,13 +216,13 @@ class Mapper extends BaseMapper
     public function verifyDates(Model $model)
     {
         if (!($model->getStart() instanceof Alaress_Date_Format && !$model->getStart()->isNull())) {
-            throw new UnexpectedValueException('Term start must be a valid date.');
+            throw new UnexpectedValueException('The term start date is not a valid date.');
         }
         if (!($model->getDisplayFinish() instanceof Alaress_Date_Format && !$model->getDisplayFinish()->isNull())) {
-            throw new UnexpectedValueException('Term finish must be a valid date.');
+            throw new UnexpectedValueException('The term end date is not a valid date.');
         }
         if ($model->getStart()->gte($model->getDisplayFinish())) {
-            throw new UnexpectedValueException('Term start must be before term finish.');
+            throw new UnexpectedValueException('The term start must be before term finish.');
         }
         return true;
     }
@@ -268,7 +268,7 @@ class Mapper extends BaseMapper
         if ($row !== false) {
             throw new RangeException(
                 sprintf(
-                    'This term overlaps term "%s" (%s).',
+                    'Terms must not overlap other terms. This term is overlapping "%s" (%s).',
                     $row['title'],
                     $row['code']
                 )
