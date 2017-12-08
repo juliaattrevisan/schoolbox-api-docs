@@ -62,14 +62,17 @@
             var label       = $('#save-label');
             if ($(this).is('[data-interaction="reject"]')) {
                 label.toastActivate({text: 'Declining request...'});
+                $successMsg = "Request has been declined.";
             } else {
-                label.toastActivate({text: 'Accepting', css: 'success'});
+                label.toastActivate({text: 'Accepting request...'});
+                $successMsg = "Request has been accepted.";
+
             }
             // loading dialog
             $.get(this.href)
                     .done(function(response) {
                         // success stuff. Reload memberlist and waitlist
-                        label.toastTimeout({text: 'Request has been declined.', css: 'success'});
+                        label.toastTimeout({text: $successMsg, css: 'success'});
                         label.one('hide.toastTimeout', function() {
                             var $response = $(response);
                             waitingList.empty().append($response.find('#waitingList').children());
@@ -122,8 +125,10 @@
             // loading dialog
             if (this.value == 0) {
                 label.toastActivate({text: 'Removing from group...'});
+                $successMsg = "Removed from group.";
             } else {
-                label.toastActivate({text: 'Updating'});
+                label.toastActivate({text: 'Updating...'});
+                $successMsg = "Permissions updated.";
             }
             // Disable all other inputs
             var data   = form.serializeArray();
@@ -154,7 +159,7 @@
 
             $.ajax({url: form.attr('action'), method: form.attr('method'), data: data})
                     .done(function(response) {
-                        label.toastTimeout({text: 'Removed from group.', css: 'success'});
+                        label.toastTimeout({text: $successMsg, css: 'success'});
                         label.one('toastTimeout', function() {
                             var $response = $(response);
 
