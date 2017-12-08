@@ -253,6 +253,7 @@ class LinkRubricMarkToFeedback
 
                 // If you reached the feedback that's already been linked, break.
                 if (in_array($feedback['id'], $linkedFeedbackIds)) {
+                    $this->log->debug('All subsequent feedbacks have already been linked: skipping');
                     break;
                 }
 
@@ -267,10 +268,12 @@ class LinkRubricMarkToFeedback
                 );
 
                 if (($rubricMarkPublishedDate->compare($feedbackPublishedDate) <= 0) && !$propagate) {
+                    $this->log->debug('Linking mark to feedback: subsequent feedbacks for this mark will be propagated to');
                     $this->linkPublished($feedback, $rubricMark);
                     $propagate  = true;
                     $feedbackId = $feedback['id'];
                 } elseif ($propagate) {
+                    $this->log->debug('Propagating mark to feedback');
                     $this->propagateRubricMarkForward($rubricMark, $feedback);
                 } else {
                     continue;
@@ -362,16 +365,29 @@ class LinkRubricMarkToFeedback
                 $draftRubricMarkCreatedDate = new Alaress_Date_Format($draftRubricMarks[0]['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
                 $draftFeedbackCreatedDate   = new Alaress_Date_Format($draftFeedbacks[0]['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
 
+                $this->log->debug(
+                    sprintf(
+                        'Mark created %s; Feedback created %s',
+                        $draftRubricMarks[0]['created_at'],
+                        $draftFeedbacks[0]['created_at']
+                    )
+                );
+
                 // Respect that delta you allowed for combined drafts
                 if ($draftRubricMarkCreatedDate->compare($draftFeedbackCreatedDate->addSeconds(self::TIME_DELTA)) <= 0) {
 
                     //Link your rubric marks (single or combined) to that feedback
+                    $this->log->debug('Linking mark to feedback');
                     foreach ($draftRubricMarks as $draftRubricMark) {
 
                         $this->linkDrafts($draftFeedbacks[0], $draftRubricMark);
 
                     }
+                } else {
+                    $this->log->debug('Mark was created after feedback: not linking');
                 }
+            } else {
+                $this->log->notice('No draft feedbacks to link to marks');
             }
         }
     }
