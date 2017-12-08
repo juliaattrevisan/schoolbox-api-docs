@@ -225,6 +225,15 @@ class LinkRubricMarkToFeedback
         $propagate  = false;
         $linkedFeedbackIds = [];
 
+        $this->log->info(
+            sprintf(
+                'Student:box %d:%d: %d published marks, %d published feedbacks',
+                $participant['student_id'],
+                $participant['box_id'],
+                count($rubricMarks),
+                count($feedbacks)
+            )
+        );
         foreach ($rubricMarks as $rubricMark) {
 
             // Validate your descriptors sets
@@ -248,6 +257,14 @@ class LinkRubricMarkToFeedback
                 }
 
                 $feedbackPublishedDate = new Alaress_Date_Format($feedback['published_at'], Alaress_Date_Format::DATABASE_FORMAT);
+
+                $this->log->debug(
+                    sprintf(
+                        'Mark published %s; Feedback published %s',
+                        $rubricMark['published_at'],
+                        $feedback['published_at']
+                    )
+                );
 
                 if (($rubricMarkPublishedDate->compare($feedbackPublishedDate) <= 0) && !$propagate) {
                     $this->linkPublished($feedback, $rubricMark);
@@ -291,6 +308,15 @@ class LinkRubricMarkToFeedback
 
         if (count($draftRubricMarks) > 0) {
 
+            $this->log->info(
+                sprintf(
+                    'Student:box %d:%d: %d draft marks',
+                    $participant['student_id'],
+                    $participant['box_id'],
+                    count($draftRubricMarks)
+                )
+            );
+
             if ($draftRubricMarks > 1) {
 
                 $combineDrafts = $this->combineDrafts($draftRubricMarks);
@@ -320,6 +346,16 @@ class LinkRubricMarkToFeedback
                     'student_id' => $participant['student_id'],
                     'box_id'     => $participant['box_id'],
                 ])->fetchAll();
+
+            $this->log->info(
+                sprintf(
+                    'Student:box %d:%d: %d combined draft marks, %d draft feedbacks',
+                    $participant['student_id'],
+                    $participant['box_id'],
+                    count($draftRubricMarks),
+                    count($draftFeedbacks)
+                )
+            );
 
             if (!empty($draftFeedbacks[0])) {
 
