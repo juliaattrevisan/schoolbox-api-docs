@@ -260,7 +260,7 @@ class LinkRubricMarkToFeedback
 
                 $this->log->debug(
                     sprintf(
-                        'Mark published %s; Feedback published %s',
+                        'Mark published %s, Feedback published %s',
                         $rubricMark['published_at'],
                         $feedback['published_at']
                     )
@@ -275,7 +275,7 @@ class LinkRubricMarkToFeedback
                     $this->log->debug('Propagating mark to feedback');
                     $this->propagateRubricMarkForward($rubricMark, $feedback);
                 } else {
-                    $this->log->debug('Mark is published after feedback: not linking or propagating');
+                    $this->log->debug('Not linking or propagating mark: mark is published after feedback');
                     continue;
                 }
             }
@@ -367,7 +367,7 @@ class LinkRubricMarkToFeedback
 
                 $this->log->debug(
                     sprintf(
-                        'Mark created %s; Feedback created %s',
+                        'Mark created %s, Feedback created %s',
                         $draftRubricMarks[0]['created_at'],
                         $draftFeedbacks[0]['created_at']
                     )
@@ -384,7 +384,7 @@ class LinkRubricMarkToFeedback
 
                     }
                 } else {
-                    $this->log->debug('Mark was created after feedback: not linking');
+                    $this->log->debug('Not linking mark: mark was created after feedback');
                 }
             } else {
                 $this->log->notice('No draft feedbacks to link to marks');
