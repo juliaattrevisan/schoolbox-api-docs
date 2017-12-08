@@ -270,7 +270,7 @@ class LinkRubricMarkToFeedback
                     $this->log->debug('Linking mark to feedback: subsequent feedbacks for this mark will be propagated to');
                     $this->linkPublished($feedback, $rubricMark);
                     $propagate  = true;
-                    $feedbackId = $feedback['id'];
+                    $linkedFeedbackIds[] = $feedback['id'];
                 } elseif ($propagate) {
                     $this->log->debug('Propagating mark to feedback');
                     $this->propagateRubricMarkForward($rubricMark, $feedback);
@@ -320,7 +320,7 @@ class LinkRubricMarkToFeedback
                 )
             );
 
-            if ($draftRubricMarks > 1) {
+            if (count($draftRubricMarks) > 1) {
 
                 $combineDrafts = $this->combineDrafts($draftRubricMarks);
                 if (!empty($combineDrafts)) {
@@ -374,7 +374,7 @@ class LinkRubricMarkToFeedback
                 );
 
                 // Respect that delta you allowed for combined drafts
-                if ($draftRubricMarkCreatedDate->compare($draftFeedbackCreatedDate->addSeconds(self::TIME_DELTA)) <= 0) {
+                if ($draftFeedbackCreatedDate->diffInSeconds($draftRubricMarkCreatedDate) <= self::TIME_DELTA) {
 
                     //Link your rubric marks (single or combined) to that feedback
                     $this->log->debug('Linking mark to feedback');
