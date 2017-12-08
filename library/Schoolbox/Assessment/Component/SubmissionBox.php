@@ -174,6 +174,9 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
     /** @var bool */
     protected $selfAssessable;
 
+    /** @var bool */
+    protected $selfReflectable;
+
     public function __construct()
     {
         $this->setAttachments(new Collection());
@@ -915,5 +918,33 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
     public function isSelfAssessable()
     {
         return $this->selfAssessable;
+    }
+
+    /**
+     * @deprecated mapper method
+     * @return boolean
+     */
+    public function getSelfReflectable()
+    {
+        return $this->isSelfReflectable();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSelfReflectable(): bool
+    {
+        return $this->selfReflectable;
+    }
+
+
+    /**
+     * @param bool $selfReflectable
+     * @return static
+     */
+    public function setSelfReflectable(bool $selfReflectable)
+    {
+        $this->selfReflectable = $selfReflectable;
+        return $this;
     }
 }

@@ -51,6 +51,7 @@ class DueWork implements IAssessmentTypeTranslator
                 ->setMarkType(new DueWorkModel\MarkType())
                 ->setGradeGroup(new DueWorkModel\GradeLevel\Group\Model())
                 ->setSelfAssessable($assessment->getSelfAssessable())
+                ->setSelfReflectable($assessment->getSelfReflectable())
             ;
 
             // Convert a mark type into fields
@@ -105,7 +106,8 @@ class DueWork implements IAssessmentTypeTranslator
                 ->setMaxMark($model->getMaxMark())
                 ->setGradeGroup($model->getGradeGroup())
                 ->setMarkVisibility($model->getMarkVisibility())
-
+                ->setSelfAssessable($model->getSelfAssessable())
+                ->setSelfReflectable($model->getSelfReflectable())
             ;
 
             // Has Rubric?
@@ -131,12 +133,6 @@ class DueWork implements IAssessmentTypeTranslator
                 }
             } else {
                 $assessable->setAcceptsNone();
-            }
-
-            if ($model->getSelfAssessable()) {
-                $assessable->setSelfAssessable(true);
-            } else {
-                $assessable->setSelfAssessable(false);
             }
 
             // Convert attachments

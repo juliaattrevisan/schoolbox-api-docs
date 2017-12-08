@@ -35,6 +35,8 @@ class Decorator implements DecoratorInterface
      * @param $maxMark
      * @param $rubricData
      * @param $attachedFiles
+     * @param $selfAssessable
+     * @param boolean $selfReflectable
      */
     public function __construct(
         $acceptOnline,
@@ -45,7 +47,8 @@ class Decorator implements DecoratorInterface
         $maxMark,
         $rubricData,
         $attachedFiles,
-        $selfAssessable
+        $selfAssessable,
+        $selfReflectable
     )
     {
         $this->setAcceptOnline(trim($acceptOnline));
@@ -57,6 +60,7 @@ class Decorator implements DecoratorInterface
         $this->setRubricData($rubricData);
         $this->setAttachedFiles($attachedFiles);
         $this->setSelfAssessable($selfAssessable);
+        $this->setSelfReflectable($selfReflectable);
     }
 
     /**
@@ -97,6 +101,7 @@ class Decorator implements DecoratorInterface
         $assessment->setUseRubric($this->getUseRubric());
         $assessment->setMarkPerCapability($this->getMarkPerCapability());
         $assessment->setSelfAssessable($this->getSelfAssessable());
+        $assessment->setSelfReflectable($this->getSelfReflectable());
 
 
 

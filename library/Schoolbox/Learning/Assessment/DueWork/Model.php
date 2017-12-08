@@ -102,6 +102,13 @@ class Model extends AbstractAssessment
     protected $selfAssessable;
 
     /**
+     * Students may self-reflect their submission to the Due Work, if selfReflectable is true
+     *
+     * @var bool
+     */
+    protected $selfReflectable;
+
+    /**
      * Model constructor.
      */
     public function __construct()
@@ -631,5 +638,23 @@ class Model extends AbstractAssessment
     public function isSelfAssessable()
     {
         return $this->selfAssessable;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getSelfReflectable() : bool
+    {
+        return $this->selfReflectable;
+    }
+
+    /**
+     * @param bool $selfReflectable
+     * @return static
+     */
+    public function setSelfReflectable(bool $selfReflectable)
+    {
+        $this->selfReflectable = $selfReflectable;
+        return $this;
     }
 }

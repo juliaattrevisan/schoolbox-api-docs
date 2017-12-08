@@ -76,6 +76,8 @@ class ProjectTest extends TestCase
                     ->setTitle('Sub-work')
                     ->setSequence(3)
                     ->setWorkType(new WorkType())
+                    ->setSelfAssessable(true)
+                    ->setSelfReflectable(true)
                 );
 
         /** @var ProjectModel $projectModel */
@@ -257,6 +259,8 @@ class ProjectTest extends TestCase
                 ->setOwner($this->teacher2)
                 ->setAssessmentModel((new AssessmentModel())->setId(3))
                 ->setMarkType($this->buildMarkType())
+                ->setSelfReflectable(true)
+                ->setSelfAssessable(true)
             );
 
         /** @var Project $project */
@@ -503,10 +507,14 @@ class ProjectTest extends TestCase
                                                  (new DueWorkModel())
                                                      ->setId(3)
                                                      ->setMarkType($this->buildMarkType())
+                                                     ->setSelfAssessable(true)
+                                                     ->setSelfReflectable(true)
                                              )
                                      )
                              )
                              ->setMarkType($this->buildMarkType())
+                             ->setSelfReflectable(true)
+                             ->setSelfAssessable(true)
                      );
 
         /** @var Project $project */
@@ -600,6 +608,8 @@ class ProjectTest extends TestCase
                                 ->setWorkType(new WorkType())
                         )
                         ->setWorkType(new WorkType())
+                        ->setSelfReflectable(true)
+                        ->setSelfAssessable(true)
                 );
 
         /** @var ProjectModel $projectModel */
