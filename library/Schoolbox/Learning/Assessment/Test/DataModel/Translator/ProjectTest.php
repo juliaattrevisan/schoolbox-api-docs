@@ -507,6 +507,8 @@ class ProjectTest extends TestCase
                                                  (new DueWorkModel())
                                                      ->setId(3)
                                                      ->setMarkType($this->buildMarkType())
+                                                     ->setSelfAssessable(true)
+                                                     ->setSelfReflectable(true)
                                              )
                                      )
                              )
