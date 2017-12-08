@@ -5,9 +5,8 @@
 }
 
 .introjs-tooltip {
-	background-color: $white;
-	position: absolute;
-	visibility: visible;
+	box-sizing: border-box;
+	border-radius: 0;
 	padding: 1rem;
 	min-width: 350px;
 	max-width: 500px;
@@ -19,21 +18,8 @@
 	@include transform(none);
 }
 
-.introjs-showElement {
-	z-index: 9999999 !important;
-}
-
-.introjs-disableInteraction {
-	z-index: 99999999 !important;
-	position: absolute;
-	opacity: 0;
-}
-
 .introjs-helperLayer {
-	position: absolute;
-	z-index: 9999998;
-	background-color: $white;
-	background-color: rgba(255,255,255,.67);
+	border-radius: 0;
 	border: 1px solid rgba(255,255,255,.6);
 	animation: pulse 1.5s infinite;
 	@include easy-transition(all 0.3s ease-out);
@@ -60,10 +46,7 @@
 }
 
 .introjs-tooltipReferenceLayer {
-	background-color: transparent;
-	position: absolute;
-	visibility: hidden;
-	z-index: 9999999;
+	box-sizing: border-box;
 	@include easy-transition(all 0.3s ease-out);
 }
 
@@ -114,10 +97,16 @@
 
 .introjs-button {
 	@include button-dimensions();
-	font-size: $base-font-size;
+	box-sizing: border-box;
+	background-color: $content-ui-background;
+	background-image: none;
+	border: 0;
+	text-shadow: none;
+	font: $base-font-size/normal sans-serif;
+	background-image: none;
+	margin: 0;
 	line-height: 1.375rem;
 	color: $content-ui-foreground;
-	background-color: $content-ui-background;
 	outline: none;
 	display: block;
 	text-align: center;
@@ -125,7 +114,12 @@
 	&:hover {
 		color: $content-ui-foreground;
 		background-color: $content-ui-hover;
+		border-color: transparent;
+		box-shadow: none;
 		text-decoration: none !important;
+	}
+	&:focus, &:active{
+		background-image: none;
 	}
 }
 
@@ -180,7 +174,9 @@
 }
 
 .introjs-donebutton,
-.introjs-fullbutton {
+.introjs-fullbutton,
+.introjs-nextbutton.introjs-fullbutton{
+	border-radius: 0;
 	width: 100%;
 }
 
@@ -189,6 +185,9 @@
 }
 
 .introjs-skipbutton:not(.introjs-donebutton) {
+	box-sizing: border-box;
+	border-radius: 0;
+	border: 0;
 	position: absolute;
 	top: 3px;
 	right: 6px;
@@ -198,8 +197,10 @@
 	padding: 0;
 	margin: 0;
 	outline: none;
+	text-shadow: none;
 	&:hover{
 		color: $accent-foreground;
+		box-shadow: none;
 	}
 }
 
