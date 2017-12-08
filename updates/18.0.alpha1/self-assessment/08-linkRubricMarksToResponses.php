@@ -275,6 +275,7 @@ class LinkRubricMarkToFeedback
                     $this->log->debug('Propagating mark to feedback');
                     $this->propagateRubricMarkForward($rubricMark, $feedback);
                 } else {
+                    $this->log->debug('Mark is published after feedback: not linking or propagating');
                     continue;
                 }
             }
