@@ -80,7 +80,6 @@ use Alaress\Database\Connector\IConnector;
 use Aura\Di;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
-use Alaress_Date_Format;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
