@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
  * Perform Schoolbox User/Synergetic synchronisations
@@ -25,10 +26,9 @@ $databaseExternal = $di->get('databaseExternal');
 /** @var ConfigLoader $configLoader */
 $configLoader = $di->get('config');
 
-$healthCheck = new Healthcheck($databaseExternal, $configLoader);
-
 echo "[" . date('Y-m-d H:i:s') . "] Running health check script\n";
 
+$healthCheck = new Healthcheck($databaseExternal, $configLoader);
 $results = $healthCheck->run();
 
 echo "{$results['log']}\n\n{$results['error']}";
