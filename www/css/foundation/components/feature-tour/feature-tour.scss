@@ -1,6 +1,5 @@
 .introjs-overlay {
 	background: $reveal-overlay-bg;
-	@include easy-transition(all 0.3s ease-out);
 }
 
 .introjs-tooltip {
@@ -21,7 +20,6 @@
 	border-radius: 0;
 	border: 1px solid rgba(255,255,255,.6);
 	animation: pulse 1.5s infinite;
-	@include easy-transition(all 0.3s ease-out);
 }
 
 @-webkit-keyframes pulse {
@@ -46,7 +44,6 @@
 
 .introjs-tooltipReferenceLayer {
 	box-sizing: border-box;
-	@include easy-transition(all 0.3s ease-out);
 }
 
 .introjs-arrow {
