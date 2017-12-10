@@ -38,8 +38,8 @@ class Synchronise_Base_Hydrator_Default implements Synchronise_Base_IHydrator {
         $newUser['campus']               = array(self::DEFAULT_CAMPUS);
         $newUser['group_id']             = self::DEFAULT_ADMIN_GROUP;
         $newUser['su']                   = false;
-        $newUser['house']                = 0;
-        $newUser['residential_house_id'] = 0;
+        $newUser['house']                = null;
+        $newUser['residential_house_id'] = null;
         $newUser['eportfolio_enabled']   = true;
         $newUser['enabled']              = null;
         return $newUser;
