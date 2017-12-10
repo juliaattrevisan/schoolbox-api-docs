@@ -8,10 +8,27 @@
  * @version     SVN: $Id$
  */
 
-echo "[".date('Y-m-d H:i:s')."] Running health check script\n";
+use Alaress\Database\Connector\IConnector;
+use Aura\Di\Container as DependencyInjector;
+use Schoolbox\Application\WebRequest\Kernel;
+use Schoolbox\Config\Loader as ConfigLoader;
 
-require_once(dirname(__FILE__) . '/../library/Bootstrap.php');
+echo "[" . date('Y-m-d H:i:s') . "] Running health check script\n";
 
-$sync = new Healthcheck();
+/** @var Kernel $kernel */
+$kernel = require_once(dirname(__FILE__) . '/../library/Bootstrap.php');
 
-echo $sync->run();
+/** @var DependencyInjector $di */
+$di = $kernel->getDependencyInjector();
+
+/** @var IConnector $databaseExternal */
+$databaseExternal = $di->get('databaseExternal');
+
+/** @var ConfigLoader $configLoader */
+$configLoader = $di->get('config');
+
+$healthCheck = new Healthcheck($databaseExternal, $configLoader);
+
+$results = $healthCheck->run();
+
+echo "{$results['log']}\n\n{$results['error']}";
