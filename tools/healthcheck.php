@@ -13,8 +13,6 @@ use Aura\Di\Container as DependencyInjector;
 use Schoolbox\Application\WebRequest\Kernel;
 use Schoolbox\Config\Loader as ConfigLoader;
 
-echo "[" . date('Y-m-d H:i:s') . "] Running health check script\n";
-
 /** @var Kernel $kernel */
 $kernel = require_once(dirname(__FILE__) . '/../library/Bootstrap.php');
 
@@ -28,6 +26,8 @@ $databaseExternal = $di->get('databaseExternal');
 $configLoader = $di->get('config');
 
 $healthCheck = new Healthcheck($databaseExternal, $configLoader);
+
+echo "[" . date('Y-m-d H:i:s') . "] Running health check script\n";
 
 $results = $healthCheck->run();
 
