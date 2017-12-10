@@ -45,9 +45,7 @@ class External_Schoolpro_Class implements External_ClassInterface
                 ],
             ];
 
-            $result = $this->getConnector()->executeStoredProcedureIterator($vars[0], $vars[1]);
-
-            foreach ($result as $currentStudent) {
+            foreach ($this->getConnector()->executeStoredProcedureIterator($vars[0], $vars[1]) as $currentStudent) {
                 $student = [
                     'synergy_id'              => $currentStudent['ID'],
                     'firstname'               => $currentStudent['Firstname'],
