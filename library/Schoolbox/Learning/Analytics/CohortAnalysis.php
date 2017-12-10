@@ -25,7 +25,6 @@ use Schoolbox\Resource\Folder\Log\Mapper as FolderLogMapper;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Assessment\WorkType;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Assessment\Term;
 
 /**
@@ -34,7 +33,6 @@ use Schoolbox\Assessment\Term;
  * Object that bundles up all the learning analysis you might want to do against a cohort.
  *
  * A COHORT is defined as: a set of participants involved in any unit imported from any one course specification at a specific point in time.
- *
  *
  * @package Schoolbox\Learning\Analytics
  */
@@ -618,9 +616,8 @@ class CohortAnalysis
      */
     protected function isExcludedBySubmissionTypeFilter(IAssessable $assessment)
     {
-        // Exclude if we are filtering results, and this assessment is a dueWork that does not match the filter.
-        // Quizzes are never excluded (for now - at some point SubmissionType should be promoted to IAssessable)
-        return $this->submissionTypeResultFilter && $assessment instanceof DueWork && $assessment->getWorkType()->getId() !== $this->submissionTypeResultFilter->getId();
+        // Exclude if we are filtering results, and this assessment does not match the filter.
+        return $this->submissionTypeResultFilter &&  !($assessment->getWorkType() && $assessment->getWorkType()->getId() === $this->submissionTypeResultFilter->getId());
     }
 
 
