@@ -59,11 +59,11 @@ class Mapper extends BaseMapper
                 // Hydrate author
 
                 /** @var UserMapper $authorUserMapper */
-                $authorUserMapper = $this->getJoinMapper('authorUser');
+                $authorUserMapper = $this->getJoinMapper('author');
 
-                /** @var User $authorUser */
-                $authorUser = $authorUserMapper->hydrate($row, 'a');
-                $model->setAuthor($authorUser);
+                /** @var User $author */
+                $author = $authorUserMapper->hydrate($row, 'a');
+                $model->setAuthor($author);
 
                 // Add hydrated record to results
 
@@ -116,11 +116,11 @@ class Mapper extends BaseMapper
         // --------------------------------------------------------------------------------------------------------
 
         $audiencedRoleClause = "
-            `tour`.`id` IN 
+            `tour`.`uuid` IN 
             (
                 SELECT  `tar`.`tour_uuid` 
                 FROM    `tour_audience_role` `tar`
-                WHERE   `tar`.`role_uuid` = (:roleId) AND `tar`.`deleted_at` IS NULL
+                WHERE   `tar`.`role_id` = (:roleId) AND `tar`.`deleted_at` IS NULL
             )
         ";
 
