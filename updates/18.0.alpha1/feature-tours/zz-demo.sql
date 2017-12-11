@@ -65,3 +65,35 @@ END;
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
+
+-- Staff dashboard feature tour trigger
+
+SET @sql :=
+
+CASE WHEN EXISTS (SELECT * FROM `config` WHERE `name` = 'site_location' AND `value` = 'demo') THEN
+
+  '
+      INSERT INTO   `tour_trigger`
+      (
+                    `uuid`,
+                    `author_user_id`,
+                    `tour_uuid`,
+                    `selector`,
+                    `event`,
+                    `url_regex`
+      )
+      SELECT        UUID(),
+                    19,
+                    @tourStaff,
+                    ''window'',
+                    ''load'',
+                    ''192.168.36.10/''
+  '
+
+ELSE ''
+
+END;
+
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
