@@ -121,7 +121,7 @@ class Mapper extends BaseMapper
             (
                 SELECT  `tar`.`tour_uuid` 
                 FROM    `tour_audience_role` `tar`
-                WHERE   `tar`.`role_id` = (:roleId) AND `tar`.`deleted_at` IS NULL
+                WHERE   `tar`.`role_id` = (:roleId)
             )
         ";
 
