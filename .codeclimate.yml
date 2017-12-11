@@ -1,4 +1,6 @@
-exclude_paths:
+version: "2"
+
+exclude_patterns:
 - "vendor/"
 - "**/tests/**/*"
 - "test/"
@@ -12,13 +14,39 @@ exclude_paths:
 - "!www/css/**/*"
 - "tools/"
 
-engines:
-  duplication:
-    enabled: true
-    config:
-      languages:
-      - javascript:
-      - php:
+#checks:
+#  argument-count:
+#    config:
+#      threshold: 4
+#  complex-logic:
+#    config:
+#      threshold: 4
+#  file-lines:
+#    config:
+#      threshold: 250
+#  method-complexity:
+#    config:
+#      threshold: 5
+#  method-count:
+#    config:
+#      threshold: 20
+#  method-lines:
+#    config:
+#      threshold: 25
+#  nested-control-flow:
+#    config:
+#      threshold: 4
+#  return-statements:
+#    config:
+#      threshold: 4
+#  similar-code:
+#    config:
+#      threshold: # language-specific defaults. an override will affect all languages.
+#  identical-code:
+#    config:
+#      threshold: # language-specific defaults. an override will affect all languages.
+
+plugins:
   phpcodesniffer:
     enabled: true
     checks:
@@ -39,7 +67,5 @@ engines:
       rulesets: "cleancode"
   scss-lint:
     enabled: true
-ratings:
-  paths:
-  - "**.php"
-  - "**.scss"
+  sonar-php:
+    enabled: true
