@@ -21,7 +21,7 @@ class Sync extends Base implements ISync
     public function findAllStudents()
     {
         $studentIterator = $this->databaseExternal->executeQueryIterator("
-            
+
             SELECT          vStudents.StudentID                           AS student_id,
                             NetworkLogin                                  AS network_login,
                             vStudents.StudentTitle                        AS student_title,
@@ -30,12 +30,12 @@ class Sync extends Base implements ISync
                             vStudents.StudentSurname                      AS student_surname,
                             StudentGender                                 AS student_gender,
                             StudentEmail                                  AS student_home_email,
-                            
-                            CASE 
-                                WHEN Community.DefaultEmailCode = 'O' THEN Community.OccupEmail 
-                                ELSE Community.Email 
+
+                            CASE
+                                WHEN Community.DefaultEmailCode = 'O' THEN Community.OccupEmail
+                                ELSE Community.Email
                             END AS student_default_email,
-                            
+
                             StudentOccupEmail                             AS student_work_email,
                             vStudents.StudentYearLevel                    AS student_year_level,
                             vStudents.StudentHouse                        AS student_house,
@@ -44,10 +44,18 @@ class Sync extends Base implements ISync
                             StudentCampus                                 AS student_campus
             FROM            dbo.vStudents vStudents
             LEFT JOIN       Community ON Community.ID = StudentID
-            WHERE           FileSemester = (SELECT FileSemester FROM FileSemesters WHERE SystemCurrentFlag = 1) AND 
+            WHERE           FileSemester = (SELECT FileSemester FROM FileSemesters WHERE SystemCurrentFlag = 1) AND
                             FileYear = (SELECT FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1)
             ORDER BY        vStudents.StudentID ASC
         ");
+
+        /**
+         * CustomOverrride
+         */
+        $customView = trim($this->config->get('external_custom_ups_student'));
+        if(strlen($customView) > 0) {
+            $this->databaseExternal->executeQueryIterator('SELECT DISTINCT * FROM '.$customView.';');
+        }
 
         return new Iterator\Student($studentIterator);
     }
@@ -69,7 +77,7 @@ class Sync extends Base implements ISync
         $contactTypeBindings2 = $this->databaseExternal->prepareInBindings($contactTypes);
 
         $guardianIterator = $this->databaseExternal->executeQueryIterator("
-            
+
             SELECT DISTINCT cp.NetworkLogin                               AS student_contact_network_login,
                             s.StudentContactID                            AS student_contact_id,
                             s.StudentContactTitle                         AS student_contact_title,
@@ -89,11 +97,11 @@ class Sync extends Base implements ISync
             FROM            dbo.vStudentContactAllAddress s
             INNER JOIN      dbo.Community cp ON s.StudentContactID = cp.ID
             WHERE           s.StudentContactType IN ({$contactTypeBindings1['sql']}) AND
-                            FileSemester = (SELECT FileSemester FROM FileSemesters WHERE SystemCurrentFlag = 1) AND 
+                            FileSemester = (SELECT FileSemester FROM FileSemesters WHERE SystemCurrentFlag = 1) AND
                             FileYear = (SELECT FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1)
-            
+
             UNION ALL
-            
+
             SELECT DISTINCT cs.NetworkLogin                               AS student_contact_network_login,
                             s.StudentContactSpouseID                      AS student_contact_id,
                             s.StudentContactSpouseTitle                   AS student_contact_title,
@@ -113,16 +121,24 @@ class Sync extends Base implements ISync
             FROM            dbo.vStudentContactAllAddress s
             INNER JOIN      dbo.Community cs ON s.StudentContactSpouseID = cs.ID
             WHERE           s.StudentContactType IN ({$contactTypeBindings2['sql']}) AND
-                            FileSemester = (SELECT FileSemester FROM FileSemesters WHERE SystemCurrentFlag = 1) AND 
+                            FileSemester = (SELECT FileSemester FROM FileSemesters WHERE SystemCurrentFlag = 1) AND
                             FileYear = (SELECT FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1)
 
             ORDER BY        student_contact_id ASC
-            
+
         ", array_merge(
                 $contactTypeBindings1['bindings'],
                 $contactTypeBindings2['bindings']
             )
         );
+
+        /**
+         * CustomOverrride
+         */
+        $customView = trim($this->config->get('external_custom_ups_parent'));
+        if(strlen($customView) > 0) {
+            $this->databaseExternal->executeQueryIterator('SELECT DISTINCT * FROM '.$customView.';');
+        }
 
         return new Iterator\Guardian($guardianIterator);
     }
@@ -133,7 +149,7 @@ class Sync extends Base implements ISync
     public function findAllStaff()
     {
         $staffIterator = $this->databaseExternal->executeQueryIterator("
-            
+
             SELECT          vStaff.StaffID                                AS staff_id,
                             Community.NetworkLogin                        AS network_login,
                             ActiveFlag                                    AS active_flag,
@@ -160,10 +176,18 @@ class Sync extends Base implements ISync
                             (JobPositions.StaffJobPositionStartDate < GETDATE() OR JobPositions.StaffJobPositionStartDate IS NULL) AND
                             (JobPositions.StaffJobPositionEndDate > GETDATE() OR JobPositions.StaffJobPositionEndDate IS NULL)
             LEFT JOIN       dbo.vCommunityAddresses vCommunity ON vStaff.StaffID = vCommunity.ID
-            WHERE           ActiveFlag = 1 AND 
+            WHERE           ActiveFlag = 1 AND
                             vStaff.StaffRegistrationType != 'STDNT'
             ORDER BY        vStaff.StaffID ASC
         ");
+
+        /**
+         * CustomOverrride
+         */
+        $customView = trim($this->config->get('external_custom_ups_staff'));
+        if(strlen($customView) > 0) {
+            $this->databaseExternal->executeQueryIterator('SELECT DISTINCT * FROM :customView ;',['customView' => $customView]);
+        }
 
         return new Iterator\Staff($staffIterator);
     }
