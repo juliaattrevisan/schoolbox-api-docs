@@ -1,3 +1,5 @@
+-- Audience feature tours to a Schoolbox user role
+
 CREATE TABLE `tour_audience_role`
 (
   `id`                INT               AUTO_INCREMENT    PRIMARY KEY,
@@ -13,3 +15,10 @@ CREATE TABLE `tour_audience_role`
 CREATE INDEX `tour_audience_role_author_user_idx`	on `tour_audience_role` (`author_user_id`);
 CREATE INDEX `tour_audience_role_tour_uuid_idx`	on `tour_audience_role` (`author_user_id`);
 CREATE INDEX `tour_audience_role_role_id_idx` on `tour_audience_role` (`role_id`);
+
+-- Additional feature tour permissions should be added via additional pivot tables
+--
+-- e.g. `tour_audience_campus`
+--      `tour_audience_year_level`
+--      ...
+--      `tour_audience_xxxxxxxxxx`
