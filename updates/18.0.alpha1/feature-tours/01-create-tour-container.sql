@@ -10,4 +10,4 @@ CREATE TABLE `tour`
   `deleted_at`        DATETIME          NULL
 );
 
-CREATE INDEX `tour_author_user_idx`	on `tour` (`author_user_id`);
+CREATE INDEX `tour_author_user_id_idx`	on `tour` (`author_user_id`);
