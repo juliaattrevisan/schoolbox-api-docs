@@ -606,6 +606,8 @@ class ProjectTest extends TestCase
                                 ->setId(3)
                                 ->setTitle('Sub-work')
                                 ->setWorkType(new WorkType())
+                                ->setSelfReflectable(true)
+                                ->setSelfAssessable(true)
                         )
                         ->setWorkType(new WorkType())
                         ->setSelfReflectable(true)
