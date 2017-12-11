@@ -22,7 +22,7 @@ class Mapper extends BaseMapper
     {
         $this->hasTable('tour');
         $this->hasModel(Model::class);
-        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('uuid', self::TYPE_STRING, self::COLUMN_IDENTIFIER);
         $this->joins('author_user_id', UserMapper::class, 'id', null, null, 'author', 'author');
         $this->uses('title', self::TYPE_STRING);
         $this->uses('description', self::TYPE_STRING);
