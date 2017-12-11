@@ -74,7 +74,7 @@ class Sync extends Base implements ISync
          */
         $customView = trim($this->config->get('external_custom_ups_student'));
         if(strlen($customView) > 0) {
-            $this->databaseExternal->executeQueryIterator('SELECT DISTINCT * FROM '.$customView.';');
+            $iterator = $this->databaseExternal->executeQueryIterator('SELECT DISTINCT * FROM '.$customView.';');
         }
 
         return new Iterator\Student($iterator);
@@ -220,7 +220,7 @@ class Sync extends Base implements ISync
          */
         $customView = trim($this->config->get('external_custom_ups_parent'));
         if(strlen($customView) > 0) {
-            $this->databaseExternal->executeQueryIterator('SELECT DISTINCT * FROM '.$customView.';');
+            $iterator = $this->databaseExternal->executeQueryIterator('SELECT DISTINCT * FROM '.$customView.';');
         }
 
         return new Iterator\Guardian($iterator);
@@ -285,7 +285,7 @@ class Sync extends Base implements ISync
          */
         $customView = trim($this->config->get('external_custom_ups_staff'));
         if(strlen($customView) > 0) {
-            $this->databaseExternal->executeQueryIterator('SELECT DISTINCT * FROM '.$customView.';');
+            $iterator = $this->databaseExternal->executeQueryIterator('SELECT DISTINCT * FROM '.$customView.';');
         }
 
         return new Iterator\Staff($iterator);
