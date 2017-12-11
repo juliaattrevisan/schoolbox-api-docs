@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Usage\All;
 
+use Alaress_Date_Format;
 use Database;
 
 class UsageMapper
@@ -164,7 +165,6 @@ class UsageMapper
             'myfile_dir' => 'My Files',
             'portrait_dir' => 'Cache',
             'returns_dir' => 'Returns',
-            'storage_dir' => 'Storage',
             'stream_dir' => 'Cache',
             'submission_dir' => 'Submissions',
             'thumbnail_dir' => 'Cache',
@@ -180,7 +180,7 @@ class UsageMapper
             SELECT `name`,`value`
             FROM `config`
             WHERE `name` LIKE '%dir'
-            AND `name` != 'template_dir'
+            AND `name` NOT IN ('template_dir', 'storage_dir')
             ORDER BY `name`
         ";
 
@@ -215,6 +215,18 @@ class UsageMapper
                 $collection->getBy('name', $key)->add($bits[0]);
             }
         }
+
+        // Special handling for storage, as it's too big to `du` sensibly
+        // Assume it's kept up to date with OTFS
+        $storageStatement = $this->database->prepare("
+            SELECT SUM(filesize) AS filesize
+            FROM storage
+            WHERE expired_at IS NULL OR expired_at >= :now
+        ");
+        $storageStatement->execute([
+            'now' => Alaress_Date_Format::now()->getUsingFormat(Alaress_Date_Format::DATABASE_FORMAT),
+        ]);
+        $collection->getBy('name', 'Storage')->add($storageStatement->fetchColumn());
 
         /* Big slices go first
          */
