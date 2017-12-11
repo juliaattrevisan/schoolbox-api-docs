@@ -41,52 +41,57 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Routing', [
 $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array $opts) {
 
     $di->get('stomp')->connect()->then(function (Client $client) use ($di, $loop, $log, $opts) {
+        try {
+            $log->info('Connected to STOMP', [ 'char' => '+' ]);
 
-        $log->info('Connected to STOMP', [ 'char' => '+' ]);
+            // the list of instances this particular daemon will listen for
+            $instances = [ INSTANCE_ID ];
 
-        // the list of instances this particular daemon will listen for
-        $instances = [ INSTANCE_ID ];
+            // daemon-version: no dependencies required
+            $txrx = new RouteTXRX();
 
-        // daemon-version: no dependencies required
-        $txrx = new RouteTXRX();
+            /** @var ClientInterface $redis */
+            $redis = $di->get('redis');
 
-        /** @var ClientInterface $redis */
-        $redis = $di->get('redis');
+            /** @var AMQPInterface $amqp */
+            $amqp = $di->get('amqp');
 
-        /** @var AMQPInterface $amqp */
-        $amqp = $di->get('amqp');
+            // also listen for signals
+            $asyncRedis  = new Async\Client($di->get('config')->get('redis_url'), $loop);
+            $dispatcher  = new Dispatcher($loop, new DispatchResponder($log), $log, new DispatchStrategy($opts['flags']));
 
-        // also listen for signals
-        $asyncRedis  = new Async\Client($di->get('config')->get('redis_url'), $loop);
-        $dispatcher  = new Dispatcher($loop, new DispatchResponder($log), $log, new DispatchStrategy($opts['flags']));
+            $cache = new Routing\Cache\Redis\ReadCache($redis, $log);
 
-        $cache = new Routing\Cache\Redis\ReadCache($redis, $log);
+            // ensure endpoints exist
+            foreach ($instances as $instance) {
+                // this holds and traverses all our subscription data
+                $router = new Router(new SubscriptionDictionary('.'));
+                $routeBroker = new Routing\Broker($instance, $amqp, $redis, $client);
 
-        // ensure endpoints exist
-        foreach ($instances as $instance) {
-            // this holds and traverses all our subscription data
-            $router = new Router(new SubscriptionDictionary('.'));
-            $routeBroker = new Routing\Broker($instance, $amqp, $redis, $client);
+                $q = $routeBroker->getQueue();
+                $t = "routed.$instance.*";
 
-            $q = $routeBroker->getQueue();
-            $t = "routed.$instance.*";
+                $amqp->declareQueue($q);
 
-            $amqp->declareQueue($q);
+                $cache->readIntoRouter($instance, $router);
 
-            $cache->readIntoRouter($instance, $router);
+                $transaction = new DispatchTransaction($loop, $dispatcher, DispatchStrategy::TASK_ROUTE,
+                    Subscription\Handler::TRANSACTION_CACHE_TIMEOUT,
+                    Subscription\Handler::TRANSACTION_COUNT_LIMIT
+                );
 
-            $transaction = new DispatchTransaction($loop, $dispatcher, DispatchStrategy::TASK_ROUTE,
-                Subscription\Handler::TRANSACTION_CACHE_TIMEOUT,
-                Subscription\Handler::TRANSACTION_COUNT_LIMIT
-            );
+                $handler = new Subscription\Handler(new Subscription\Resolver($router), $log, $txrx, $transaction, $cache);
 
-            $handler = new Subscription\Handler(new Subscription\Resolver($router), $log, $txrx, $transaction, $cache);
+                $routeBroker->registerConsumer($handler);
+                $log->info("Consuming amqp://$q");
 
-            $routeBroker->registerConsumer($handler);
-            $log->info("Consuming amqp://$q");
-
-            $asyncRedis->psubscribe($t, $handler);
-            $log->info("Listening on redis://$t");
+                $asyncRedis->psubscribe($t, $handler);
+                $log->info("Listening on redis://$t");
+            }
+        } catch (\Throwable $e) {
+            $loop->stop();
+            $log->alert($e->getMessage(), [ $e ]);
+            throw $e;
         }
     });
 });

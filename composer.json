@@ -53,6 +53,7 @@
         "react/stomp": "dev-master",
         "react/dns": "0.4.*",
         "react/socket-client": "~0.7.0",
+        "sentry/sentry": "1.7.*",
         "mtdowling/cron-expression": "~2.0.0",
         "tijsverkoyen/css-to-inline-styles": "2.2.0",
         "html2text/html2text": "~4.1.0",
