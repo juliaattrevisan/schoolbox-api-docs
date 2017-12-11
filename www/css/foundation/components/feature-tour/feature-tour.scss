@@ -1,61 +1,11 @@
-.introjs-overlay {
-  background: $reveal-overlay-bg;
-}
-
+// ----------------------------------------------------------------
+// Tooltip
+// ----------------------------------------------------------------
 .introjs-tooltip {
   border-radius: 0;
   box-sizing: border-box;
   min-width: 350px;
   padding: 1rem;
-
-  // Leave "Done" as the last and final option
-  &.lastNode {
-    .introjs-nextbutton,
-    .introjs-prevbutton {
-      display: none;
-    }
-  }
-}
-
-.introjs-helperLayer {
-  animation: pulse 1.5s infinite;
-  border: 1px solid rgba($white, .6);
-  border-radius: 0;
-}
-
-@-webkit-keyframes pulse {
-  0% {
-    -webkit-box-shadow: 0 0 0 0 rgba($white, .7);
-  }
-
-  70% {
-    -webkit-box-shadow: 0 0 0 1rem rgba($white, 0);
-  }
-
-  100% {
-    -webkit-box-shadow: 0 0 0 0 rgba($white, 0);
-  }
-}
-
-@keyframes pulse {
-  0% {
-    -moz-box-shadow: 0 0 0 0 rgba($white, .7);
-    box-shadow: 0 0 0 0 rgba($white, .7);
-  }
-
-  70% {
-    -moz-box-shadow: 0 0 0 1rem rgba($white, 0);
-    box-shadow: 0 0 0 1rem rgba($white, 0);
-  }
-
-  100% {
-    -moz-box-shadow: 0 0 0 0 rgba($white, 0);
-    box-shadow: 0 0 0 0 rgba($white, 0);
-  }
-}
-
-.introjs-tooltipReferenceLayer {
-  box-sizing: border-box;
 }
 
 .introjs-arrow {
@@ -108,6 +58,64 @@
   }
 }
 
+.introjs-tooltiptext {
+  font-size: $paragraph-font-size;
+  padding-right: 2rem;
+}
+
+
+// ----------------------------------------------------------------
+// Highlighted area
+// ----------------------------------------------------------------
+.introjs-overlay {
+  background: $reveal-overlay-bg;
+}
+
+.introjs-helperLayer {
+  animation: pulse 1.5s infinite;
+  border: 1px solid rgba($white, .6);
+  border-radius: 0;
+}
+
+@-webkit-keyframes pulse {
+  0% {
+    -webkit-box-shadow: 0 0 0 0 rgba($white, .7);
+  }
+
+  70% {
+    -webkit-box-shadow: 0 0 0 1rem rgba($white, 0);
+  }
+
+  100% {
+    -webkit-box-shadow: 0 0 0 0 rgba($white, 0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    -moz-box-shadow: 0 0 0 0 rgba($white, .7);
+    box-shadow: 0 0 0 0 rgba($white, .7);
+  }
+
+  70% {
+    -moz-box-shadow: 0 0 0 1rem rgba($white, 0);
+    box-shadow: 0 0 0 1rem rgba($white, 0);
+  }
+
+  100% {
+    -moz-box-shadow: 0 0 0 0 rgba($white, 0);
+    box-shadow: 0 0 0 0 rgba($white, 0);
+  }
+}
+
+.introjs-tooltipReferenceLayer {
+  box-sizing: border-box;
+}
+
+
+// ----------------------------------------------------------------
+// Buttons
+// ----------------------------------------------------------------
 .introjs-tooltipbuttons {
   display: flex;
 }
@@ -139,31 +147,6 @@
   }
 }
 
-.introjs-bullets ul {
-  margin: 1.5rem auto;
-
-  li {
-    display: inline-block;
-    margin: 0 6px;
-
-    a {
-      background: $iron;
-      height: .75rem;
-      width: .75rem;
-
-      &:hover,
-      &.active {
-        background: $accent-foreground;
-      }
-    }
-  }
-}
-
-.introjs-tooltiptext {
-  font-size: $paragraph-font-size;
-  padding-right: 2rem;
-}
-
 .introjs-nextbutton,
 .introjs-prevbutton {
   flex: 1 auto;
@@ -182,6 +165,18 @@
   }
 }
 
+// Hide the previous and next buttons on the last step, leaving just the 'done' button
+.introjs-tooltip.lastNode {
+  .introjs-nextbutton,
+  .introjs-prevbutton {
+    display: none;
+  }
+}
+
+
+// ----------------------------------------------------------------
+// Restyling the skip button to an X top right
+// ----------------------------------------------------------------
 .introjs-skipbutton:not(.introjs-donebutton) {
   background: transparent;
   color: $oil;
@@ -195,5 +190,29 @@
 
   &:hover {
     color: $accent-foreground;
+  }
+}
+
+
+// ----------------------------------------------------------------
+// Bullets
+// ----------------------------------------------------------------
+.introjs-bullets ul {
+  margin: 1.5rem auto;
+
+  li {
+    display: inline-block;
+    margin: 0 6px;
+
+    a {
+      background: $iron;
+      height: .75rem;
+      width: .75rem;
+
+      &:hover,
+      &.active {
+        background: $accent-foreground;
+      }
+    }
   }
 }
