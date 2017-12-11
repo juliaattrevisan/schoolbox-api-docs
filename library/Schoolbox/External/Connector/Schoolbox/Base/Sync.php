@@ -48,6 +48,14 @@ class Sync extends Base implements ISync
             ORDER BY u.synergy_id ASC
         ";
 
+        /**
+         * CustomOverrride
+         */
+        $customView = trim($this->config->get('external_custom_ups_student'));
+        if(strlen($customView) > 0) {
+            $query = 'SELECT DISTINCT * FROM '.$customView.';';
+        }
+
         return new Iterator\Student(
             $this->databaseExternal->executeQueryIterator($query)
         );
@@ -89,6 +97,14 @@ class Sync extends Base implements ISync
             ORDER BY p.synergy_id ASC
         ";
 
+        /**
+         * CustomOverrride
+         */
+        $customView = trim($this->config->get('external_custom_ups_parent'));
+        if(strlen($customView) > 0) {
+            $query = 'SELECT DISTINCT * FROM '.$customView.';';
+        }
+
         return new Iterator\Guardian(
             $this->databaseExternal->executeQueryIterator($query)
         );
@@ -117,8 +133,8 @@ class Sync extends Base implements ISync
                 ''                   AS staff_house,
                 ''                   AS staff_department,
                 u.year               AS staff_year_level,
-                ''                   AS staff_year_level_description                
-                
+                ''                   AS staff_year_level_description
+
             FROM `user` `u`
             INNER JOIN userCampus uc        ON u.id = uc.uid
             INNER JOIN luCampus c           ON uc.campus = c.id
@@ -126,6 +142,14 @@ class Sync extends Base implements ISync
             WHERE g.group_type = 'staff'
             ORDER BY u.synergy_id ASC
         ";
+
+        /**
+         * CustomOverrride
+         */
+        $customView = trim($this->config->get('external_custom_ups_staff'));
+        if(strlen($customView) > 0) {
+            $query = 'SELECT DISTINCT * FROM '.$customView.';';
+        }
 
         return new Iterator\Staff(
             $this->databaseExternal->executeQueryIterator($query)
