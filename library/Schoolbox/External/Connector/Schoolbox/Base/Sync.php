@@ -27,7 +27,7 @@ class Sync extends Base implements ISync
         if(strlen($customView) > 0) {
             return new Iterator\Student(
                 $this->databaseExternal->executeQueryIterator(
-                    'SELECT DISTINCT * FROM '.$customView.';'
+                    'SELECT DISTINCT * FROM '.$this->databaseExternal->quoteIdentifier($customView).';'
                 )
             );
         }
@@ -77,7 +77,7 @@ class Sync extends Base implements ISync
         if(strlen($customView) > 0) {
             return new Iterator\Guardian(
                 $this->databaseExternal->executeQueryIterator(
-                    'SELECT DISTINCT * FROM '.$customView.';'
+                    'SELECT DISTINCT * FROM '.$this->databaseExternal->quoteIdentifier($customView).';'
                 )
             );
         }
@@ -130,7 +130,7 @@ class Sync extends Base implements ISync
         if(strlen($customView) > 0) {
             return new Iterator\Staff(
                 $this->databaseExternal->executeQueryIterator(
-                    'SELECT DISTINCT * FROM '.$customView.';'
+                    'SELECT DISTINCT * FROM '.$this->databaseExternal->quoteIdentifier($customView).';'
                 )
             );
         }
