@@ -114,6 +114,7 @@ class LinkRubricMarkToFeedback
 
     private $countBrokenRubricMarks = 0;
     private $countPropagatedRubricMarks = 0;
+    private $logPropagatedRubricMarks = '';
     private $countLinkedPublishedFeedbacks = 0;
     private $countLinkedDraftFeedbacks = 0;
     private $countCombinedDrafts = 0;
@@ -193,7 +194,6 @@ class LinkRubricMarkToFeedback
             JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
             JOIN rubric_level rl ON rl.id = rd.level_id
             WHERE rm.student_id = :student_id
-            AND rm.return_id IS NULL
             AND rm.published_at IS NOT NULL
             AND rl.box_id = :box_id
             GROUP BY rm.published_at
@@ -208,21 +208,18 @@ class LinkRubricMarkToFeedback
         // All possible feedbacks, deleted or not, oldest to newest
         $feedbacks = $this->db->executeQuery(
             '
-            SELECT sr.id, sr.created_at, sr.updated_at, sr.deleted_at AS "DELETED", sr.published_at
+            SELECT sr.id, rm.return_id, sr.created_at, sr.updated_at, sr.deleted_at AS "DELETED", sr.published_at
             FROM submission_return sr
             JOIN submission_box sb ON sb.id = sr.box_id
+            LEFT JOIN rubric_mark rm ON sr.id = rm.return_id
             WHERE sr.owner = :student_id AND sr.box_id = :box_id AND sr.published_at IS NOT NULL
             ORDER BY sr.published_at ASC;
-            ;
             ',
             [
                 'student_id' => $participant['student_id'],
                 'box_id'     => $participant['box_id'],
             ]
         )->fetchAll();
-
-        $propagate  = false;
-        $linkedFeedbackIds = [];
 
         $this->log->info(
             sprintf(
@@ -233,49 +230,44 @@ class LinkRubricMarkToFeedback
                 count($feedbacks)
             )
         );
+
         foreach ($rubricMarks as $rubricMark) {
-
             // Validate your descriptors sets
-            if ($rubricMark['criterion'] != $rubricMark['records']) {
-                $this->log->warning(sprintf('Invalid descriptors for student_id %d box_id %d and published date %s
-                            - Skipping!',
-                        $rubricMark['student_id'], $rubricMark['box_id'], $rubricMark['published_at'])
-                );
-                $this->countBrokenRubricMarks++;
+            if (!$this->validateDescriptorSet($rubricMark)) {
                 continue;
-
             }
 
-            $rubricMarkPublishedDate = new Alaress_Date_Format($rubricMark['published_at'], Alaress_Date_Format::DATABASE_FORMAT);
+            // For each rubric mark, get all feedbacks that have same or later published date
+            $candidateFeedbacks = array_filter($feedbacks, function ($feedback) use ($rubricMark) {
 
-            foreach ($feedbacks as $feedback) {
-
-                // If you reached the feedback that's already been linked, break.
-                if (in_array($feedback['id'], $linkedFeedbackIds)) {
-                    $this->log->debug('All subsequent feedbacks have already been linked: skipping');
-                    break;
-                }
-
-                $feedbackPublishedDate = new Alaress_Date_Format($feedback['published_at'], Alaress_Date_Format::DATABASE_FORMAT);
-
+                $rubricMarkPublishedDate = new Alaress_Date_Format($rubricMark['published_at'], Alaress_Date_Format::DATABASE_FORMAT);
+                $feedbackPublishedDate   = new Alaress_Date_Format($feedback['published_at'], Alaress_Date_Format::DATABASE_FORMAT);
                 $this->log->debug(
                     sprintf(
-                        'Mark published %s, Feedback published %s',
+                        'Mark published %s; Feedback published %s',
                         $rubricMark['published_at'],
                         $feedback['published_at']
                     )
                 );
+                if ($rubricMarkPublishedDate->compare($feedbackPublishedDate) <= 0) {
+                    return $feedback;
+                }
+            });
+            // Reindex candidates
+            $candidateFeedbacks = array_values($candidateFeedbacks);
+            foreach ($candidateFeedbacks as $k => $candidateFeedback) {
 
-                if (($rubricMarkPublishedDate->compare($feedbackPublishedDate) <= 0) && !$propagate) {
-                    $this->log->debug('Linking mark to feedback: subsequent feedbacks for this mark will be propagated to');
-                    $this->linkPublished($feedback, $rubricMark);
-                    $propagate  = true;
-                    $linkedFeedbackIds[] = $feedback['id'];
-                } elseif ($propagate) {
+                // Only link feedbacks if they haven't been linked yet
+                // Link the first (oldest) one
+                if ($k == 0 &&  $candidateFeedback['return_id'] == null) {
+                    $this->linkPublished($candidateFeedback, $rubricMark);
+                }
+                // Propagate for the rest
+                elseif ($k > 0 &&  $candidateFeedback['return_id'] == null) {
                     $this->log->debug('Propagating mark to feedback');
-                    $this->propagateRubricMarkForward($rubricMark, $feedback);
-                } else {
-                    $this->log->debug('Not linking or propagating mark: mark is published after feedback');
+                    $this->propagateRubricMarkForward($candidateFeedback, $rubricMark);
+                }
+                else {
                     continue;
                 }
             }
@@ -406,9 +398,9 @@ class LinkRubricMarkToFeedback
                 JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
                 JOIN rubric_level rl ON rl.id = rd.level_id
                 SET rm.return_id = :feedback_id
-                WHERE rm.student_id = :student_id 
-                AND rm.published_at = :published_at 
-                AND rl.box_id = :box_id 
+                WHERE rm.student_id = :student_id
+                AND rm.published_at = :published_at
+                AND rl.box_id = :box_id
                 AND rm.return_id IS NULL;
                 ',
             [
@@ -460,31 +452,19 @@ class LinkRubricMarkToFeedback
      *
      * @return bool
      */
-    private function propagateRubricMarkForward($rubricMark, $feedback)
+    private function propagateRubricMarkForward($feedback, $rubricMark)
     {
-        $feedbackAlreadyLinked = $this->db->executeQuery(
-            '
-                SELECT id FROM rubric_mark
-                WHERE return_id = :feedback_id
-                ',
-            [
-                'feedback_id' => $feedback['id'],
-            ]
-        )->fetchAll();
-
-        if (count($feedbackAlreadyLinked) > 0) {
-            return false;
-        }
+        $propogatedRecords = [];
 
         $descriptors = $this->db->executeQuery(
             '
                 SELECT descriptor_id FROM rubric_mark rm
                 JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
                 JOIN rubric_level rl ON rl.id = rd.level_id
-                WHERE rm.student_id = :student_id 
-                AND rm.published_at = :published_at 
+                WHERE rm.student_id = :student_id
+                AND rm.published_at = :published_at
                 AND rl.box_id = :box_id
-                AND rm.return_id IS NULL;
+                AND rm.return_id IS NOT NULL;
                 ',
             [
                 'student_id'   => $rubricMark['student_id'],
@@ -499,8 +479,8 @@ class LinkRubricMarkToFeedback
             $this->db->executeQuery(
                 '
                     INSERT INTO rubric_mark (return_id, student_id, descriptor_id, created_at, published_at, valid)
-                    VALUES 
-                    (:return_id, :student_id, :descriptor_id, :created_at, :published_at, 1)
+                    VALUES
+                    (:return_id, :student_id, :descriptor_id, :created_at, :published_at, 1);
                     ',
                 [
                     'return_id'     => $feedback['id'],
@@ -510,9 +490,11 @@ class LinkRubricMarkToFeedback
                     'published_at'  => $feedback['published_at'],
                 ]
             );
+            $propogatedRecords[] = $this->db->lastInsertId();
         }
-
+        $this->logPropagatedRubricMark = sprintf('[%d: %s]', $feedback['id'], implode($propogatedRecords, ','));
         $this->countPropagatedRubricMarks++;
+        $this->countLinkedPublishedFeedbacks++;
         return (true);
     }
 
@@ -569,6 +551,24 @@ class LinkRubricMarkToFeedback
     }
 
     /**
+     * Check if descriptors you think belong to the same feedback are not of the same criterion
+     * @param $rubricMark
+     *
+     * @return bool
+     */
+    private function validateDescriptorSet($rubricMark) {
+        if ($rubricMark['criterion'] != $rubricMark['records']) {
+            $this->log->warning(sprintf('Invalid descriptors for student_id %d box_id %d and published date %s
+                            - Skipping!',
+                    $rubricMark['student_id'], $rubricMark['box_id'], $rubricMark['published_at'])
+            );
+            $this->countBrokenRubricMarks++;
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Check if descriptors you think belong to the same feedback don't belong to the same criterion
      *
      * @param $db
@@ -579,7 +579,6 @@ class LinkRubricMarkToFeedback
      */
     private function validateDescriptorCombination($rubricMarks)
     {
-
         $criterions = $this->db->executeQuery(
             '
             SELECT rd.criterion_id FROM rubric_mark rm
@@ -618,7 +617,7 @@ class LinkRubricMarkToFeedback
     {
         // TODO need more logging
         $this->log->notice(sprintf('Broken descriptor sets: %d', $this->countBrokenRubricMarks));
-        $this->log->notice(sprintf('Total propagated rubric marks: %d', $this->countPropagatedRubricMarks));
+        $this->log->notice(sprintf('Total propagated rubric marks: %d %s', $this->countPropagatedRubricMarks, $this->logPropagatedRubricMarks));
         $this->log->notice(sprintf('Total published feedbacks linked: %d', $this->countLinkedPublishedFeedbacks));
         $this->log->notice(sprintf('Total draft feedbacks linked: %d', $this->countLinkedDraftFeedbacks));
         $this->log->notice(sprintf('Total combined draft records: %d', $this->countCombinedDrafts));
