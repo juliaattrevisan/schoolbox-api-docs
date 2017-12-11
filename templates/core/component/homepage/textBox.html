@@ -66,26 +66,14 @@
 
                         $('#textBoxForm{TEXTBOX_ID}').alaressValidate({
                             rules: {
-                                textBoxHeading: {
-                                    required: {
-                                        param: true,
-                                        depends: function(element) {
-                                            return !CKEDITOR.instances['textBoxBody{TEXTBOX_ID}'].getData().length;
-                                        }
-                                    }
-                                },
                                 textBoxBody: {
                                     ckeRequired: {
                                         param: true,
-                                        depends: function(element) {
-                                            return !$(element).parents('form').find('input[name=textBoxHeading]').val().length;
-                                        }
                                     }
                                 }
                             },
                             messages: {
-                                textBoxHeading: "Please enter a heading or content for your text box",
-                                textBoxBody: ""
+                                textBoxBody: "Please enter content."
                             }
                         });
                     });
