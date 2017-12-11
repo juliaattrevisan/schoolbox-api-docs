@@ -125,6 +125,36 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Find all tours relevant to a particular user and the supplied URL
+     *
+     * @param User   $user The user for whom we are retrieving the tours
+     * @param string $url  The URL to be used to filter the returned tours
+     *
+     * @return GenericCollection
+     */
+    public function findByUserForUrl(User $user, string $url): GenericCollection
+    {
+        $userQuery = $this->getUserFilterQuery($user);
+
+        // We have the basic audience query, onto this we need to append the regular expression URL filter
+
+        $userQuery['bindings']['url'] = $url;
+
+        $sql = " 
+            {$this->getSelectString()} 
+            INNER JOIN  `tour_trigger` ON `tour_trigger`.`tour_uuid` = `tour`.`uuid` AND
+                        `tour_trigger`.`deleted_at` IS NULL
+            WHERE       {$userQuery['query']} AND 
+                        :url REGEXP `tour_trigger`.`url_regex`
+        ";
+
+        $statement = $this->getDatabase()->prepare($sql);
+        $statement->execute($userQuery['bindings']);
+
+        return $this->hydrateSelect($statement);
+    }
+
+    /**
      * Find all tours relevant to a particular user
      *
      * @param User $user
