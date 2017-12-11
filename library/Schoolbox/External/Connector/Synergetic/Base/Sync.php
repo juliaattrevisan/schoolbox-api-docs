@@ -20,6 +20,18 @@ class Sync extends Base implements ISync
      */
     public function findAllStudents()
     {
+        /**
+         * CustomOverrride
+         */
+        $customView = trim($this->config->get('external_custom_ups_student'));
+        if(strlen($customView) > 0) {
+            return new Iterator\Student(
+                $this->databaseExternal->executeQueryIterator(
+                    'SELECT DISTINCT * FROM '.$customView.';'
+                )
+            );
+        }
+
         $studentIterator = $this->databaseExternal->executeQueryIterator("
 
             SELECT          vStudents.StudentID                           AS student_id,
@@ -49,14 +61,6 @@ class Sync extends Base implements ISync
             ORDER BY        vStudents.StudentID ASC
         ");
 
-        /**
-         * CustomOverrride
-         */
-        $customView = trim($this->config->get('external_custom_ups_student'));
-        if(strlen($customView) > 0) {
-            $studentIterator = $this->databaseExternal->executeQueryIterator('SELECT DISTINCT * FROM '.$customView.';');
-        }
-
         return new Iterator\Student($studentIterator);
     }
 
@@ -65,6 +69,18 @@ class Sync extends Base implements ISync
      */
     public function findAllParents()
     {
+        /**
+         * CustomOverrride
+         */
+        $customView = trim($this->config->get('external_custom_ups_parent'));
+        if(strlen($customView) > 0) {
+            return new Iterator\Guardian(
+                $this->databaseExternal->executeQueryIterator(
+                    'SELECT DISTINCT * FROM '.$customView.';'
+                )
+            );
+        }
+
         $contactTypes = trim($this->config->get('external_synergetic_student_contact_types'));
 
         if (empty($contactTypes)) {
@@ -132,14 +148,6 @@ class Sync extends Base implements ISync
             )
         );
 
-        /**
-         * CustomOverrride
-         */
-        $customView = trim($this->config->get('external_custom_ups_parent'));
-        if(strlen($customView) > 0) {
-            $guardianIterator = $this->databaseExternal->executeQueryIterator('SELECT DISTINCT * FROM '.$customView.';');
-        }
-
         return new Iterator\Guardian($guardianIterator);
     }
 
@@ -148,6 +156,18 @@ class Sync extends Base implements ISync
      */
     public function findAllStaff()
     {
+        /**
+         * CustomOverrride
+         */
+        $customView = trim($this->config->get('external_custom_ups_staff'));
+        if(strlen($customView) > 0) {
+            return new Iterator\Staff(
+                $this->databaseExternal->executeQueryIterator(
+                    'SELECT DISTINCT * FROM '.$customView.';'
+                )
+            );
+        }
+
         $staffIterator = $this->databaseExternal->executeQueryIterator("
 
             SELECT          vStaff.StaffID                                AS staff_id,
@@ -180,14 +200,6 @@ class Sync extends Base implements ISync
                             vStaff.StaffRegistrationType != 'STDNT'
             ORDER BY        vStaff.StaffID ASC
         ");
-
-        /**
-         * CustomOverrride
-         */
-        $customView = trim($this->config->get('external_custom_ups_staff'));
-        if(strlen($customView) > 0) {
-            $staffIterator = $this->databaseExternal->executeQueryIterator('SELECT DISTINCT * FROM '.$customView.';');
-        }
 
         return new Iterator\Staff($staffIterator);
     }
