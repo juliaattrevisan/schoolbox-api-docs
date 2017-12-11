@@ -31,6 +31,7 @@ $data = [
         '/form-progressive' => 'Form Progressive',
         '/tables' => 'Tables',
         '/lists' => 'Lists',
+        '/feature-tour' => 'Feature Tour',
         '/reveal' => 'Reveal',
         '/redux' => 'Sample Entities',
         '/reference' => 'Visibility Classes'

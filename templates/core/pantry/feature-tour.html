@@ -1,0 +1,152 @@
+<!-- BEGIN custom_head -->
+<script src="/javascript/components/intro.js/minified/intro.min.js"></script>
+<script>
+    $(function() {
+        var intro = introJs();
+
+        intro.setOptions({
+
+            /* Hide obnoxious red dot
+             */
+            showStepNumbers: false,
+
+            /* Hide the Next button at the end
+             * Hide the Prev button at the start
+             */
+            hidePrev: true,
+            hideNext: true,
+
+            /* Custom text
+             */
+            nextLabel: 'Next',
+            prevLabel: 'Back',
+            skipLabel: '&times;',
+
+            /* Always scroll to tooltip
+             */
+            scrollTo: 'tooltip',
+
+            /* Can't interact with highlighted elements
+             */
+            disableInteraction: true,
+
+            /* Prevent accidental closing
+             */
+            exitOnOverlayClick: false,
+
+            /* Programmatic node data
+             */
+            steps: [
+                {
+                    element: document.querySelector('#first-tour'),
+                    intro: "Access your component settings, collapse the component or remove the component from the page."
+                },
+                {
+                    element: document.querySelector('#second-tour'),
+                    intro: "You can highlight almost any element you wish."
+                },
+                {
+                    element: document.querySelector('#third-tour'),
+                    intro: "Empty states indicate there isnt any content to show for this component."
+                },
+                {
+                    element: document.querySelector('#end-tour'),
+                    intro: "That's it! Feel free to continue exploring Schoolbox.",
+                    tooltipClass: 'lastNode'
+                }
+            ]
+        });
+        // Start feature tour button
+        $('#tour-start').on('click', function() {
+            intro.start();
+        });
+    });
+</script>
+<!-- END custom_head -->
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Pantry - Feature Tour</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <ul class="sub-nav">
+            <li><a href="/pantry">Generic Content</a></li>
+            <li><a href="/pantry/buttons">Buttons</a></li>
+            <li><a href="/pantry/colours">Colours</a></li>
+            <li><a href="/pantry/icons">Icons</a></li>
+            <li><a href="/pantry/typography">Typography</a></li>
+            <li><a href="/pantry/editor">Editor</a></li>
+            <li><a href="/pantry/layout">Layouts</a></li>
+            <li><a href="/pantry/form">Form</a></li>
+            <li><a href="/pantry/form-progressive">Form Progressive</a></li>
+            <li><a href="/pantry/tables">Tables</a></li>
+            <li><a href="/pantry/lists">Lists</a></li>
+            <li class="active"><a href="/pantry/feature-tour">Feature Tour</a></li>
+            <li><a href="/pantry/reveal">Reveal</a></li>
+            <li><a href="/pantry/redux">Sample Entities</a></li>
+            <li><a href="/pantry/reference">Visibility Classes</a></li>
+        </ul>
+    </div>
+</div>
+
+<div class="row" id="end-tour">
+    <div class="small-12 island">
+        <section>
+            <div class="content">
+                <a href="#" id="tour-start" class="button expand">Start the tour</a>
+            </div>
+        </section>
+    </div>
+    <div class="small-12 medium-6 island">
+        <ul class="component-titlebar" style="background-color:#d0d0d0">
+            <li class="actions-small-3">
+                <div class="list-item">
+                    <div class="small-12 card">
+                        <h2><a href="">Using Schoolbox</a></h2>
+                    </div>
+                </div>
+                <nav id="first-tour">
+                    <a data-target="settings" data-state="closed" href="#" class="icon-settings settings edit" title="Settings"></a>
+                    <a data-collapser="true" href="#" class="icon-up-arrow collapse" title="Collapse Content"></a>
+                    <a data-target="delete" data-state="closed" href="#" class="icon-close" title="Close"></a>
+                </nav>
+            </li>
+        </ul>
+        <section>
+            <div class="content">
+                <article id="second-tour"><iframe width="560" height="315" src="https://www.youtube.com/embed/BszORyOVAZY?rel=0&amp;showinfo=0" frameborder="0" allowfullscreen></iframe></article>
+            </div>
+            <div class="component-action">
+                <section>
+                    <a href="/homepage/43/textBoxModify/196#go-to196" class="button">Modify</a>
+                    <a href="/textbox/textBoxForm.php?delete=4&amp;originID=43" data-delete="" class="button">Delete</a>
+                </section>
+            </div>
+        </section>
+    </div>
+    <div class="small-12 medium-6 columns">
+        <ul class="component-titlebar" style="background-color:#d0d0d0">
+            <li class="actions-small-3">
+                <div class="list-item">
+                    <div class="small-12 card">
+                        <h2><a href="">Empty Component</a></h2>
+                    </div>
+                </div>
+                <nav>
+                    <a data-target="settings" data-state="closed" href="#" class="icon-settings settings edit" title="Settings"></a>
+                    <a data-collapser="true" href="#" class="icon-up-arrow collapse" title="Collapse Content"></a>
+                    <a data-target="delete" data-state="closed" href="#" class="icon-close" title="Close"></a>
+                </nav>
+            </li>
+        </ul>
+        <section id="third-tour">
+            <div class="empty-state">
+                <i class="icon-group"></i>
+                <p>You are not a member of any group.<br /> You can join <a href="/group/join">new groups</a> now to get started.</p>
+            </div>
+        </section>
+    </div>
+</div>
