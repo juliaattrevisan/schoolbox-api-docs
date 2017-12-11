@@ -7,38 +7,38 @@
 	border-radius: 0;
 	padding: 1rem;
 	min-width: 350px;
-	max-width: 500px;
-}
-
-.introjs-fixParent {
-	z-index: auto !important;
-	opacity: 1.0 !important;
-	@include transform(none);
 }
 
 .introjs-helperLayer {
 	border-radius: 0;
-	border: 1px solid rgba(255,255,255,.6);
+	border: 1px solid rgba(255, 255, 255, .6);
 	animation: pulse 1.5s infinite;
 }
 
 @-webkit-keyframes pulse {
-	0% { -webkit-box-shadow: 0 0 0 0 rgba(255,255,255,.7); }
-	70% { -webkit-box-shadow: 0 0 0 1rem rgba(255,255,255,0); }
-	100% { -webkit-box-shadow: 0 0 0 0 rgba(255,255,255,0); }
-}
-@keyframes pulse {
 	0% {
-		-moz-box-shadow: 0 0 0 0 rgba(255,255,255,.7);
-		box-shadow: 0 0 0 0 rgba(255,255,255,.7);
+		-webkit-box-shadow: 0 0 0 0 rgba(255, 255, 255, .7);
 	}
 	70% {
-		-moz-box-shadow: 0 0 0 1rem rgba(255,255,255,0);
-		box-shadow: 0 0 0 1rem rgba(255,255,255,0);
+		-webkit-box-shadow: 0 0 0 1rem rgba(255, 255, 255, 0);
 	}
 	100% {
-		-moz-box-shadow: 0 0 0 0 rgba(255,255,255,0);
-		box-shadow: 0 0 0 0 rgba(255,255,255,0);
+		-webkit-box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+	}
+}
+
+@keyframes pulse {
+	0% {
+		-moz-box-shadow: 0 0 0 0 rgba(255, 255, 255, .7);
+		box-shadow: 0 0 0 0 rgba(255, 255, 255, .7);
+	}
+	70% {
+		-moz-box-shadow: 0 0 0 1rem rgba(255, 255, 255, 0);
+		box-shadow: 0 0 0 1rem rgba(255, 255, 255, 0);
+	}
+	100% {
+		-moz-box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+		box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
 	}
 }
 
@@ -48,8 +48,6 @@
 
 .introjs-arrow {
 	border: 8px solid white;
-	content: '';
-	position: absolute;
 	&.top {
 		top: -1rem;
 		border-color: transparent transparent $white transparent;
@@ -91,19 +89,21 @@
 	}
 }
 
+.introjs-tooltipbuttons{
+	display: flex;
+}
+
 .introjs-button {
 	@include button-dimensions();
 	box-sizing: border-box;
 	background-color: $content-ui-background;
 	background-image: none;
 	border: 0;
+	border-radius: 0;
 	text-shadow: none;
-	font: $base-font-size/normal -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-	background-image: none;
-	margin: 0;
+	font: $base-font-size/normal $font-family-sans-serif;
 	line-height: 1.375rem;
 	color: $content-ui-foreground;
-	outline: none;
 	display: block;
 	text-align: center;
 
@@ -112,9 +112,8 @@
 		background-color: $content-ui-hover;
 		border-color: transparent;
 		box-shadow: none;
-		text-decoration: none !important;
 	}
-	&:focus, &:active{
+	&:focus, &:active {
 		background-image: none;
 	}
 }
@@ -125,12 +124,11 @@
 		display: inline-block;
 		margin: 0 6px;
 		a {
-			@include border-radius(10px);
 			width: 0.75rem;
 			height: 0.75rem;
 			background: $iron;
 			&:hover,
-			&.active{
+			&.active {
 				background: $accent-foreground;
 			}
 		}
@@ -139,42 +137,37 @@
 
 /* Leave "Done" as the last and final option
  */
-.introjs-tooltip.lastNode .introjs-prevbutton,
-.introjs-tooltip.lastNode .introjs-nextbutton {
-	display: none;
+.introjs-tooltip.lastNode {
+	.introjs-nextbutton,
+	.introjs-prevbutton {
+		display: none;
+	}
 }
 
-.introjs-tooltiptext{
+.introjs-tooltiptext {
 	padding-right: 2rem;
 	font-size: $paragraph-font-size;
 }
 
-.introjs-button [class^="icon-"],
-.introjs-button [class*=" icon-"] {
-	color: inherit;
-}
-
 .introjs-nextbutton,
 .introjs-prevbutton {
-	display: inline-block;
-	width: 49.8%;
+	flex: 1 auto;
 }
 
-.introjs-donebutton,
-.introjs-fullbutton,
-.introjs-nextbutton.introjs-fullbutton{
-	border-radius: 0;
+.introjs-donebutton {
 	width: 100%;
+	margin-right: 0;
 }
 
-.introjs-nextbutton{
+.introjs-nextbutton {
 	margin-left: 1px;
 }
 
-.introjs-skipbutton:not(.introjs-donebutton) {
-	box-sizing: border-box;
+.introjs-nextbutton.introjs-fullbutton{
 	border-radius: 0;
-	border: 0;
+}
+
+.introjs-skipbutton:not(.introjs-donebutton) {
 	position: absolute;
 	top: 3px;
 	right: 6px;
@@ -183,19 +176,8 @@
 	color: $oil;
 	padding: 0;
 	margin: 0;
-	outline: none;
 	text-shadow: none;
-	&:hover{
+	&:hover {
 		color: $accent-foreground;
-		box-shadow: none;
 	}
-}
-
-.introjs-relativePosition {
-	position: relative;
-}
-
-.introjs-hidden,
-.introjs-hidehint{
-	display: none !important;
 }
