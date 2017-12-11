@@ -702,9 +702,9 @@
                                                     </div>
                                                 </div>
                                                 <nav>
-                                                    <a class="icon-email"
-                                                       href="{{ session.mailhandle }}{{ group.owner.email }}"
-                                                       title="Email {{ group.owner.name }}"></a>
+                                                    {% if not teacher.email is empty %}
+                                                        <a class="icon-email" href="{{ session.mailhandle }}{{ group.owner.email }}" title="Email {{ group.owner.email }}"></a>
+                                                    {% endif %}
                                                 </nav>
                                             </li>
                                         {% endif %}
