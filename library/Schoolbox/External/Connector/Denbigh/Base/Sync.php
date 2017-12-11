@@ -20,6 +20,18 @@ class Sync extends Base implements ISync
      */
     public function findAllStudents()
     {
+        /**
+         * CustomOverrride
+         */
+        $customView = trim($this->config->get('external_custom_ups_student'));
+        if(strlen($customView) > 0) {
+            return new Iterator\Student(
+                $this->databaseExternal->executeQueryIterator(
+                    'SELECT DISTINCT * FROM '.$customView.';'
+                )
+            );
+        }
+
         $query = "
             SELECT
                 denbighID      AS student_id,
@@ -51,6 +63,18 @@ class Sync extends Base implements ISync
      */
     public function findAllParents()
     {
+        /**
+         * CustomOverrride
+         */
+        $customView = trim($this->config->get('external_custom_ups_parent'));
+        if(strlen($customView) > 0) {
+            return new Iterator\Guardian(
+                $this->databaseExternal->executeQueryIterator(
+                    'SELECT DISTINCT * FROM '.$customView.';'
+                )
+            );
+        }
+
         $query = "
             SELECT
                 par.loginID      AS student_contact_network_login,
@@ -88,6 +112,18 @@ class Sync extends Base implements ISync
      */
     public function findAllStaff()
     {
+        /**
+         * CustomOverrride
+         */
+        $customView = trim($this->config->get('external_custom_ups_staff'));
+        if(strlen($customView) > 0) {
+            return new Iterator\Staff(
+                $this->databaseExternal->executeQueryIterator(
+                    'SELECT DISTINCT * FROM '.$customView.';'
+                )
+            );
+        }
+
         $query = "
             SELECT
                 p.denbighID      AS staff_id,
@@ -107,8 +143,8 @@ class Sync extends Base implements ISync
                 ''               AS staff_house,
                 ''               AS staff_department,
                 ''               AS staff_year_level,
-                ''               AS staff_year_level_description                
-                
+                ''               AS staff_year_level_description
+
             FROM Staff s
             LEFT JOIN People p ON s.peopleDenbighID = p.denbighID
         ";
