@@ -1,0 +1,49 @@
+{% spaceless %}
+        <script>
+            $(function() {
+
+                {# Create an array to hold the tours that could be executed on the current page #}
+
+                window.tours = [];
+
+                {% for trigger in triggers %}
+                    window.tours['{{ trigger.tour.uuid }}'] = {
+                        uuid:           '{{ trigger.tour.uuid | e('js') }}',
+                        title:          '{{ trigger.tour.title | e('js') }}',
+                        description:    '{{ trigger.tour.description | e('js') }}',
+                        active:         '{{ trigger.tour.active | e('js') }}'
+                    };
+                {% endfor %}
+
+                {# Create a function to execute any tour by its UUID #}
+
+                window.tourStart = function(tourUuid) {
+
+                    {# Make sure the tour actually exists #}
+
+                    var tour = window.tours[tourUuid];
+
+                    if (typeof(tour) !== 'undefined') {
+
+                        {# TODO: Implement IntroJS feature tour here #}
+
+                        alert(tour.title + '(' + tour.uuid + ')');
+
+                    } else {
+
+                        {# Tour did not exist, should probably log this somewhere #}
+
+                        console.log('Unknown feature tour requested: ' + tourUuid);
+                    }
+                };
+
+                {# Setup all of the triggers for the tours on the page #}
+
+                {% for trigger in triggers %}
+                    $({{ trigger.tourJavascriptSelector | e('js') }}).on('{{ trigger.tourJavascriptEvent | e('js') }}', function() {
+                        window.tourStart('{{ trigger.tour.uuid }}');
+                    });
+                {% endfor %}
+            });
+        </script>
+{% endspaceless %}
