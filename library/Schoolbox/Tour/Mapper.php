@@ -8,6 +8,7 @@
 namespace Schoolbox\Tour;
 
 use PDOStatement;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -71,5 +72,76 @@ class Mapper extends BaseMapper
         }
 
         return $collection;
+    }
+
+    /**
+     * Find all tours relevant to a particular user
+     *
+     * @param User $user
+     *
+     * @return GenericCollection
+     */
+    public function findByUser(User $user): GenericCollection
+    {
+        $userQuery = $this->getUserFilterQuery($user);
+
+        $statement = $this->getDatabase()->prepare("{$this->getSelectString()} WHERE {$userQuery['sql']}");
+        $statement->execute($userQuery['bindings']);
+
+        return $this->hydrateSelect($statement);
+    }
+
+    /**
+     * Find all tours relevant to a particular user
+     *
+     * @param User $user
+     *
+     * @return array
+     */
+    private function getUserFilterQuery(User $user): array
+    {
+        $predicates = [];
+        $bindings   = [];
+
+        // --------------------------------------------------------------------------------------------------------
+        // Only want un-deleted tours
+        // --------------------------------------------------------------------------------------------------------
+
+        $tourNotDeletedClause = $this->getPredicateBuilder()
+                                        ->isNull('tour.deleted_at')
+                                        ->getWhere()[0];
+
+        // --------------------------------------------------------------------------------------------------------
+        // Tours where user is in a selected role
+        // --------------------------------------------------------------------------------------------------------
+
+        $audiencedRoleClause = "
+            `tour`.`id` IN 
+            (
+                SELECT  `tar`.`tour_uuid` 
+                FROM    `tour_audience_role` `tar`
+                WHERE   `tar`.`role_uuid` = (:roleId) AND `tar`.`deleted_at` IS NULL
+            )
+        ";
+
+        $predicates[]       = $audiencedRoleClause;
+        $bindings['roleId'] = $user->getRole()->getId();
+
+        // --------------------------------------------------------------------------------------------------------
+        // Add additional audience predicates outside of MVP below
+        // --------------------------------------------------------------------------------------------------------
+
+        // ...
+        
+        // --------------------------------------------------------------------------------------------------------
+        // Concatenate all of the predicates into an OR query and return the SQL in an array along with bindings
+        // --------------------------------------------------------------------------------------------------------
+
+        $query = "({$tourNotDeletedClause} AND (" . implode(" OR ", $predicates) . "))";
+
+        return [
+            'query'    => $query,
+            'bindings' => $bindings,
+        ];
     }
 }
