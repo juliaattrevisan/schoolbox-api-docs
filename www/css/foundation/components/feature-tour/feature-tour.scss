@@ -1,199 +1,199 @@
 .introjs-overlay {
-    background: $reveal-overlay-bg;
+  background: $reveal-overlay-bg;
 }
 
 .introjs-tooltip {
-    border-radius: 0;
-    box-sizing: border-box;
-    min-width: 350px;
-    padding: 1rem;
+  border-radius: 0;
+  box-sizing: border-box;
+  min-width: 350px;
+  padding: 1rem;
 }
 
 .introjs-helperLayer {
-    animation: pulse 1.5s infinite;
-    border: 1px solid rgba($white, .6);
-    border-radius: 0;
+  animation: pulse 1.5s infinite;
+  border: 1px solid rgba($white, .6);
+  border-radius: 0;
 }
 
 @-webkit-keyframes pulse {
-    0% {
-        -webkit-box-shadow: 0 0 0 0 rgba($white, .7);
-    }
+  0% {
+    -webkit-box-shadow: 0 0 0 0 rgba($white, .7);
+  }
 
-    70% {
-        -webkit-box-shadow: 0 0 0 1rem rgba($white, 0);
-    }
+  70% {
+    -webkit-box-shadow: 0 0 0 1rem rgba($white, 0);
+  }
 
-    100% {
-        -webkit-box-shadow: 0 0 0 0 rgba($white, 0);
-    }
+  100% {
+    -webkit-box-shadow: 0 0 0 0 rgba($white, 0);
+  }
 }
 
 @keyframes pulse {
-    0% {
-        -moz-box-shadow: 0 0 0 0 rgba($white, .7);
-        box-shadow: 0 0 0 0 rgba($white, .7);
-    }
+  0% {
+    -moz-box-shadow: 0 0 0 0 rgba($white, .7);
+    box-shadow: 0 0 0 0 rgba($white, .7);
+  }
 
-    70% {
-        -moz-box-shadow: 0 0 0 1rem rgba($white, 0);
-        box-shadow: 0 0 0 1rem rgba($white, 0);
-    }
+  70% {
+    -moz-box-shadow: 0 0 0 1rem rgba($white, 0);
+    box-shadow: 0 0 0 1rem rgba($white, 0);
+  }
 
-    100% {
-        -moz-box-shadow: 0 0 0 0 rgba($white, 0);
-        box-shadow: 0 0 0 0 rgba($white, 0);
-    }
+  100% {
+    -moz-box-shadow: 0 0 0 0 rgba($white, 0);
+    box-shadow: 0 0 0 0 rgba($white, 0);
+  }
 }
 
 .introjs-tooltipReferenceLayer {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .introjs-arrow {
-    border: 8px solid $white;
-    &.top {
-        border-color: transparent transparent $white;
-        top: -1rem;
-    }
+  border: 8px solid $white;
+  &.top {
+    border-color: transparent transparent $white;
+    top: -1rem;
+  }
 
-    &.top-right {
-        border-color: transparent transparent $white;
-        right: 1rem;
-        top: -1rem;
-    }
+  &.top-right {
+    border-color: transparent transparent $white;
+    right: 1rem;
+    top: -1rem;
+  }
 
-    &.top-middle {
-        border-color: transparent transparent $white;
-        left: 50%;
-        margin-left: -5px;
-        top: -1rem;
-    }
+  &.top-middle {
+    border-color: transparent transparent $white;
+    left: 50%;
+    margin-left: -5px;
+    top: -1rem;
+  }
 
-    &.right {
-        border-color: transparent transparent transparent $white;
-        right: -1rem;
-        top: 1rem;
-    }
+  &.right {
+    border-color: transparent transparent transparent $white;
+    right: -1rem;
+    top: 1rem;
+  }
 
-    &.right-bottom {
-        border-color: transparent transparent transparent $white;
-        bottom: 1rem;
-        right: -1rem;
-    }
+  &.right-bottom {
+    border-color: transparent transparent transparent $white;
+    bottom: 1rem;
+    right: -1rem;
+  }
 
-    &.bottom {
-        border-color: $white transparent transparent;
-        bottom: -1rem;
-    }
+  &.bottom {
+    border-color: $white transparent transparent;
+    bottom: -1rem;
+  }
 
-    &.left {
-		border-color: transparent $white transparent transparent;
-        left: -1rem;
-        top: 1rem;
-    }
+  &.left {
+    border-color: transparent $white transparent transparent;
+    left: -1rem;
+    top: 1rem;
+  }
 
-    &.left-bottom {
-		border-color: transparent $white transparent transparent;
-		bottom: 1rem;
-        left: -1rem;
-    }
+  &.left-bottom {
+    border-color: transparent $white transparent transparent;
+    bottom: 1rem;
+    left: -1rem;
+  }
 }
 
 .introjs-tooltipbuttons {
-    display: flex;
+  display: flex;
 }
 
 .introjs-button {
-	background-color: $content-ui-background;
-	background-image: none;
-	border: 0;
-	border-radius: 0;
-	box-sizing: border-box;
-	color: $content-ui-foreground;
-	display: block;
-	font: $base-font-size / normal $font-family-sans-serif;
-	line-height: 1.375rem;
-	text-align: center;
-	text-shadow: none;
-    @include button-dimensions();
+  background-color: $content-ui-background;
+  background-image: none;
+  border: 0;
+  border-radius: 0;
+  box-sizing: border-box;
+  color: $content-ui-foreground;
+  display: block;
+  font: $base-font-size / normal $font-family-sans-serif;
+  line-height: 1.375rem;
+  text-align: center;
+  text-shadow: none;
+  @include button-dimensions();
 
-    &:hover {
-        background-color: $content-ui-hover;
-        border-color: transparent;
-        box-shadow: none;
-		color: $content-ui-foreground;
-    }
+  &:hover {
+    background-color: $content-ui-hover;
+    border-color: transparent;
+    box-shadow: none;
+    color: $content-ui-foreground;
+  }
 
-    &:focus,
-	&:active {
-        background-image: none;
-    }
+  &:focus,
+  &:active {
+    background-image: none;
+  }
 }
 
 .introjs-bullets ul {
-    margin: 1.5rem auto;
+  margin: 1.5rem auto;
 
-    li {
-        display: inline-block;
-        margin: 0 6px;
+  li {
+    display: inline-block;
+    margin: 0 6px;
 
-        a {
-			background: $iron;
-			height: .75rem;
-            width: .75rem;
+    a {
+      background: $iron;
+      height: .75rem;
+      width: .75rem;
 
-            &:hover,
-            &.active {
-                background: $accent-foreground;
-            }
-        }
+      &:hover,
+      &.active {
+        background: $accent-foreground;
+      }
     }
+  }
 }
 
 // Leave "Done" as the last and final option
 .introjs-tooltip.lastNode {
-    .introjs-nextbutton,
-    .introjs-prevbutton {
-        display: none;
-    }
+  .introjs-nextbutton,
+  .introjs-prevbutton {
+    display: none;
+  }
 }
 
 .introjs-tooltiptext {
-	font-size: $paragraph-font-size;
-    padding-right: 2rem;
+  font-size: $paragraph-font-size;
+  padding-right: 2rem;
 }
 
 .introjs-nextbutton,
 .introjs-prevbutton {
-    flex: 1 auto;
+  flex: 1 auto;
 }
 
 .introjs-donebutton {
-    width: 100%;
-    margin-right: 0;
+  width: 100%;
+  margin-right: 0;
 }
 
 .introjs-nextbutton {
-    margin-left: 1px;
+  margin-left: 1px;
 }
 
 .introjs-nextbutton.introjs-fullbutton {
-    border-radius: 0;
+  border-radius: 0;
 }
 
 .introjs-skipbutton:not(.introjs-donebutton) {
-	background: transparent;
-	color: $oil;
-	font-size: 2rem;
-	margin: 0;
-	padding: 0;
-    position: absolute;
-	right: 6px;
-    top: 3px;
-	text-shadow: none;
+  background: transparent;
+  color: $oil;
+  font-size: 2rem;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  right: 6px;
+  top: 3px;
+  text-shadow: none;
 
-    &:hover {
-        color: $accent-foreground;
-    }
+  &:hover {
+    color: $accent-foreground;
+  }
 }
