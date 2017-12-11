@@ -11,16 +11,16 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\Author;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
-use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\JavascriptEvent;
 use Schoolbox\Mapper\Traits\Model\JavascriptSelector;
 use Schoolbox\Mapper\Traits\Model\Tour;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\UrlRegex;
+use Schoolbox\Mapper\Traits\Model\Uuid;
 
 class Model implements ISoftDeletable
 {
-    use Id;
+    use Uuid;
     use Author;
     use Tour;
     use JavascriptSelector;

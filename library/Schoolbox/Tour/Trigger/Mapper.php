@@ -26,7 +26,7 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
         $this->uses('uuid', self::TYPE_STRING, self::COLUMN_IDENTIFIER);
         $this->joins('author_user_id', UserMapper::class, 'id', null, null, 'author', 'author');
-        $this->joins('tour_uuid', TourMapper::class, 'id', null, null, 'tour', 'tour');
+        $this->joins('tour_uuid', TourMapper::class, 'uuid', null, null, 'tour', 'tour');
         $this->uses('selector', self::TYPE_STRING, null, 'javascriptSelector');
         $this->uses('event', self::TYPE_STRING, null, 'javascriptEvent');
         $this->uses('url_regex', self::TYPE_STRING);
@@ -65,7 +65,7 @@ class Mapper extends BaseMapper
                 // Hydrate author
 
                 /** @var UserMapper $authorUserMapper */
-                $authorUserMapper = $this->getJoinMapper('authorUser');
+                $authorUserMapper = $this->getJoinMapper('author');
 
                 /** @var User $author */
                 $author = $authorUserMapper->hydrate($row, 'a');
