@@ -106,7 +106,7 @@ class Component_Renderer
         Component_Homepage_ControllerAbstract $component
     ) {
         $templateTarget = "component_position_{$component->getInstance()->getPosition()}";
-        $templateHandle = TEMPLATE_content;
+        $templateHandle = 'component_' . $component->getInstance()->getId();
 
         $component->setup($folder);
 
@@ -147,7 +147,7 @@ class Component_Renderer
         Component_Eportfolio_ControllerAbstract $component
     ) {
         $templateTarget = "component_position_{$component->getInstance()->getPosition()}";
-        $templateHandle = TEMPLATE_content;
+        $templateHandle = 'component_' . $component->getInstance()->getId();
 
         $component->setup($eportfolioPage);
         if ($component->execute() !== false) {
