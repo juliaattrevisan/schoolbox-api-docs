@@ -207,6 +207,7 @@ class DueWork_Rubric_Handler
             SELECT `grouping`, `id`, `name`
             FROM `rubric_criterion`
             WHERE {$whereClause}
+            AND deleted_at IS NULL
             ORDER BY `grouping` ASC, `name` ASC
         ");
         $stmt->execute($pb->getParams());
