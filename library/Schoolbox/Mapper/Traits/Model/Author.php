@@ -14,24 +14,24 @@ use Schoolbox\User;
 trait Author
 {
     /**
-     * @var User
+     * @var User|null
      */
     protected $author;
 
     /**
-     * @return User
+     * @return User|null
      */
-    public function getAuthor()
+    public function getAuthor(): ?User
     {
         return $this->author;
     }
 
     /**
-     * @param User $author
+     * @param User|null $author
      *
-     * @return $this
+     * @return self|$this
      */
-    public function setAuthor($author)
+    public function setAuthor(?User $author): self
     {
         $this->author = $author;
         return $this;

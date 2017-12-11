@@ -12,26 +12,24 @@ namespace Schoolbox\Mapper\Traits\Model;
 trait Uuid
 {
     /**
-     * UUID row identifier
-     *
-     * @var string
+     * @var string|null
      */
     protected $uuid;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getUuid()
+    public function getUuid(): ?string
     {
         return $this->uuid;
     }
 
     /**
-     * @param string $uuid
+     * @param string|null $uuid
      *
-     * @return $this
+     * @return self
      */
-    public function setUuid($uuid)
+    public function setUuid(?string $uuid): self
     {
         $this->uuid = $uuid;
         return $this;

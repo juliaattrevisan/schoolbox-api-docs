@@ -12,26 +12,24 @@ namespace Schoolbox\Mapper\Traits\Model;
 trait Title
 {
     /**
-     * TITLE row identifier
-     *
-     * @var string
+     * @var string|null
      */
     protected $title;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getTitle()
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
     /**
-     * @param string $title
+     * @param string|null $title
      *
-     * @return $this
+     * @return self
      */
-    public function setTitle($title)
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
         return $this;

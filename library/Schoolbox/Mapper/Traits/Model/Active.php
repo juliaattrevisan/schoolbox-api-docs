@@ -12,26 +12,24 @@ namespace Schoolbox\Mapper\Traits\Model;
 trait Active
 {
     /**
-     * ACTIVE row identifier
-     *
-     * @var bool
+     * @var bool|null
      */
     protected $active;
 
     /**
-     * @return bool
+     * @return bool|null
      */
-    public function getActive()
+    public function getActive(): ?bool
     {
         return $this->active;
     }
 
     /**
-     * @param bool $active
+     * @param bool|null $active
      *
-     * @return $this
+     * @return self|$this
      */
-    public function setActive($active)
+    public function setActive(?bool $active): self
     {
         $this->active = $active;
         return $this;

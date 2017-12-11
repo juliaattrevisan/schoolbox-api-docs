@@ -12,26 +12,24 @@ namespace Schoolbox\Mapper\Traits\Model;
 trait Description
 {
     /**
-     * DESCRIPTION row identifier
-     *
-     * @var string
+     * @var string|null
      */
     protected $description;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
     /**
-     * @param string $description
+     * @param string|null $description
      *
-     * @return $this
+     * @return self
      */
-    public function setDescription($description)
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
         return $this;
