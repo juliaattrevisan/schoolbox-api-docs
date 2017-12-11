@@ -35,24 +35,22 @@
             </ul>
             <div id="unit-{{ unitSpec.id }}" data-start_date="{{ unitImpl.openDate.localShort }}" data-finish_date="{{ unitImpl.dueDate.localShort }}" class="hide">
                 <div class="row">
-                    <div class="small-12 island">
-                        <section>
-                            {% if unitAssessmentCount %}
-                                {% include '@course/import/assessmentRows.twig' with {
-                                    assessmentPairs: assessmentPairs,
-                                    inputPrefix:     'unit[' ~ unitSpec.id ~ '][a]',
-                                    depth:           0,
-                                    unitAction:      unitAction,
-                                    project:         null,
-                                    hideRows:        false,
-                                    unitSpec:        unitSpec,
-                                    unitImpl:        unitImpl
-                                } only %}
-                            {% else %}
-                                <p class="content">This {{ locale.unit }} contains no coursework.</p>
-                            {% endif %}
-                        </section>
-                    </div>
+                    <section>
+                        {% if unitAssessmentCount %}
+                            {% include '@course/import/assessmentRows.twig' with {
+                                assessmentPairs: assessmentPairs,
+                                inputPrefix:     'unit[' ~ unitSpec.id ~ '][a]',
+                                depth:           0,
+                                unitAction:      unitAction,
+                                project:         null,
+                                hideRows:        false,
+                                unitSpec:        unitSpec,
+                                unitImpl:        unitImpl
+                            } only %}
+                        {% else %}
+                            <p class="content">This {{ locale.unit }} contains no coursework.</p>
+                        {% endif %}
+                    </section>
                 </div>
             </div>
         </section>
