@@ -5,8 +5,9 @@ use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Menu\Side\Renderer as MenuSideRender;
 use Schoolbox\Menu\Top\Renderer as MenuTopRenderer;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\UserMapper;
+use Schoolbox\Tour\Renderer as TourRenderer;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class SitePage extends Page
 {
@@ -601,6 +602,17 @@ class SitePage extends Page
             } catch (Twig_Error_Loader $e) {
                 // This can happen if rendering an error message where the error happens before the menu module has loaded
                 $this->setVar('MENU_TOP', '');
+            }
+
+            // Render appropriate tour trigger scripts into every page
+
+            try {
+                $tourRenderer = new TourRenderer();
+                $tourContents = $tourRenderer->render($this->getTwig(), $this->user, $_SERVER['REQUEST_URI']);
+                $this->setVar('TOUR_SCRIPTS', $tourContents);
+            } catch (Twig_Error_Loader $e) {
+                // If something went wrong do not render any tour script
+                $this->setVar('TOUR_SCRIPTS', '');
             }
 
             $this->parse('banner_logged_in_block', 'banner_logged_in');
