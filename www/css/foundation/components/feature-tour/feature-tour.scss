@@ -7,6 +7,14 @@
   box-sizing: border-box;
   min-width: 350px;
   padding: 1rem;
+
+  // Leave "Done" as the last and final option
+  &.lastNode {
+    .introjs-nextbutton,
+    .introjs-prevbutton {
+      display: none;
+    }
+  }
 }
 
 .introjs-helperLayer {
@@ -151,14 +159,6 @@
   }
 }
 
-// Leave "Done" as the last and final option
-.introjs-tooltip.lastNode {
-  .introjs-nextbutton,
-  .introjs-prevbutton {
-    display: none;
-  }
-}
-
 .introjs-tooltiptext {
   font-size: $paragraph-font-size;
   padding-right: 2rem;
@@ -176,10 +176,10 @@
 
 .introjs-nextbutton {
   margin-left: 1px;
-}
 
-.introjs-nextbutton.introjs-fullbutton {
-  border-radius: 0;
+  &.introjs-fullbutton {
+    border-radius: 0;
+  }
 }
 
 .introjs-skipbutton:not(.introjs-donebutton) {
