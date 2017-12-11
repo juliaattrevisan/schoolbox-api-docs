@@ -22,77 +22,99 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
         if (!$this->isExternalIdValid($synID)) {
             return [];
         }
-        $currentYear     = $this->getCurrentYear();
-        $currentSemester = $this->getCurrentSemester();
-        $query   = "SELECT
-                    vStudents.StudentID,
-                    vStudents.StudentGiven1,
-                    vStudents.StudentSurname,
-                    CONVERT(nvarchar(30), vStudents.StudentBirthDate, ".self::FORMAT_ISO8601." ) as StudentBirthDate,
-                    vStudents.StudentTutorName,
-                    vStudents.StudentHeadOfHouse,
-                    House.HeadOfHouseID,
-                    vStudents.StudentFormStaffName,
-                    vStudents.StudentTutorDescription,
-                    luForm.ID as TeacherFormID,
-                    vStudents.StudentForm,
-                    luTutor.ID as TeacherTutorID,
-                    vStudents.StudentTutor,
-                    luForm.Description as FormDescription,
-                    vStudents.StudentHouseDescription,
-                    vStudents.StudentHouse,
-                    vStudents.StudentYearLevel,
-                    vStudents.StudentYearLevelCoordinator,
-                    luYearLevel.YearLevelCoordID,
-                    vStudents.StudentLockerBook,
-                    vStudents.StudentEmergencyName,
-                    vStudents.StudentEmergencyPhone,
-                    vStudents.StudentEmergencyPhoneAlt,
-                    vStudents.StudentEmergency2Name,
-                    vStudents.StudentEmergency2Phone,
-                    vStudents.StudentEmergency2PhoneAlt,
-                    vStudents.StudentEmergency3Name,
-                    vStudents.StudentEmergency3Phone,
-                    vStudents.StudentEmergency3PhoneAlt,
-                    vStudents.StudentMedicalAlert,
-                    vStudents.StudentSpecialNeedsFlag,
-                    vStudents.StudentStudiesCode,
-                    AlertMessage,
-                    vStudents.StudentBoarder,
-                    vStudents.StudentsComment as Comment,
-                    uStudentProgressiveAbsenceCount.AbsenceFullDaysForYear,
-                    uStudentProgressiveAbsenceCount.LateStartDaysForYear,
-                    uStudentProgressiveAbsenceCount.EarlyLeaveDaysForYear,                        
-                        (
+
+        if($this->config->get('external_learning_plans')) {
+            $learningPlanQuery = "(
                             SELECT    COUNT(*) 
                             FROM      dbo.IndividualPlans IEP
                             WHERE     IEP.ID = vStudents.ID AND
                             StartDate <= CURRENT_TIMESTAMP AND
                             (EndDate >= CURRENT_TIMESTAMP OR EndDate IS NULL)
-                        ) AS countIndividualEducationPlans  
-                FROM dbo.vStudents vStudents
-                    LEFT JOIN CommunityAlerts
-                        ON CommunityAlerts.ID = StudentID
-                        AND (CommunityAlerts.AlertDateFrom IS NULL OR CommunityAlerts.AlertDateFrom <= CAST(GETDATE() AS date))
-                        AND (CommunityAlerts.AlertDateTo IS NULL OR CommunityAlerts.AlertDateTo >= CAST(GETDATE() AS date))
-                    LEFT JOIN luForm ON vStudents.StudentForm = luForm.Code
-                    LEFT JOIN luTutor ON vStudents.StudentTutor = luTutor.Code
-                    LEFT JOIN luYearLevel ON vStudents.StudentCampus = luYearLevel.Campus
-                        AND vStudents.StudentYearLevel = luYearLevel.Code
-                    LEFT JOIN luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
-                    LEFT JOIN uStudentProgressiveAbsenceCount ON uStudentProgressiveAbsenceCount.ID = vStudents.StudentID
-                        AND uStudentProgressiveAbsenceCount.FileYear = '" . $this->getDatabase()->quote($currentYear) . "'
-                WHERE
-                    vStudents.StudentID = '" . $this->getDatabase()->quote($synID) . "'
-                    AND vStudents.FileSemester='" . $this->getDatabase()->quote($currentSemester) . "'
-                    AND vStudents.FileYear='" . $this->getDatabase()->quote($currentYear) . "'
+                        ) AS countIndividualEducationPlans";
+        } else {
+            $learningPlanQuery = "0 AS countIndividualEducationPlans";
+        }
+
+        $query   = "
+            SELECT
+                vStudents.StudentID,
+                vStudents.StudentGiven1,
+                vStudents.StudentSurname,
+                CONVERT(nvarchar(30), vStudents.StudentBirthDate, ".self::FORMAT_ISO8601." ) as StudentBirthDate,
+                vStudents.StudentTutorName,
+                vStudents.StudentHeadOfHouse,
+                House.HeadOfHouseID,
+                vStudents.StudentFormStaffName,
+                vStudents.StudentTutorDescription,
+                luForm.ID as TeacherFormID,
+                vStudents.StudentForm,
+                luTutor.ID as TeacherTutorID,
+                vStudents.StudentTutor,
+                luForm.Description as FormDescription,
+                vStudents.StudentHouseDescription,
+                vStudents.StudentHouse,
+                vStudents.StudentYearLevel,
+                vStudents.StudentYearLevelCoordinator,
+                luYearLevel.YearLevelCoordID,
+                vStudents.StudentLockerBook,
+                vStudents.StudentEmergencyName,
+                vStudents.StudentEmergencyPhone,
+                vStudents.StudentEmergencyPhoneAlt,
+                vStudents.StudentEmergency2Name,
+                vStudents.StudentEmergency2Phone,
+                vStudents.StudentEmergency2PhoneAlt,
+                vStudents.StudentEmergency3Name,
+                vStudents.StudentEmergency3Phone,
+                vStudents.StudentEmergency3PhoneAlt,
+                vStudents.StudentMedicalAlert,
+                vStudents.StudentSpecialNeedsFlag,
+                vStudents.StudentStudiesCode,
+                AlertMessage,
+                vStudents.StudentBoarder,
+                vStudents.StudentsComment as Comment,
+                uStudentProgressiveAbsenceCount.AbsenceFullDaysForYear,
+                uStudentProgressiveAbsenceCount.LateStartDaysForYear,
+                uStudentProgressiveAbsenceCount.EarlyLeaveDaysForYear,
+                $learningPlanQuery
+            FROM        dbo.vStudents vStudents
+            LEFT JOIN   CommunityAlerts ON 
+                            CommunityAlerts.ID = StudentID AND 
+                            (
+                                CommunityAlerts.AlertDateFrom IS NULL OR 
+                                CommunityAlerts.AlertDateFrom <= CAST(GETDATE() AS DATE)
+                            ) AND 
+                            (
+                                CommunityAlerts.AlertDateTo IS NULL OR 
+                                CommunityAlerts.AlertDateTo >= CAST(GETDATE() AS DATE)
+                            )
+            LEFT JOIN   luForm ON vStudents.StudentForm = luForm.Code
+            LEFT JOIN   luTutor ON vStudents.StudentTutor = luTutor.Code
+            LEFT JOIN   luYearLevel ON 
+                            vStudents.StudentCampus = luYearLevel.Campus AND 
+                            vStudents.StudentYearLevel = luYearLevel.Code
+            LEFT JOIN   luHouse House ON 
+                            StudentCampus = House.Campus AND 
+                            StudentHouse = House.Code
+
+            JOIN        FileSemesters Semester ON
+                            Semester.FileSemester = vStudents.FileSemester AND
+                            Semester.FileYear = vStudents.FileYear AND
+                            Semester.SystemCurrentFlag = 1
+            LEFT JOIN   uStudentProgressiveAbsenceCount ON uStudentProgressiveAbsenceCount.ID = vStudents.StudentID
+                            AND uStudentProgressiveAbsenceCount.FileYear = vStudents.FileYear
+            WHERE       vStudents.StudentID = :externalId
         ";
 
-		$student = [];
+        $student = [];
 
-        foreach ($this->getDatabase()->getAll($query) ?: array() as $row) {
+        $iteratorStudents = $this->getConnector()->executeQueryIterator($query, ['externalId' => $synID]);
+
+        foreach ($iteratorStudents as $row) {
+
+            // There might be multiple records, if this is the first one populate the bulk of the details
+
             if (empty($student)) {
-                // fill in student record
+
                 $student = $row;
 
                 if ($student['StudentBirthDate'] && $birthDate = strtotime($student['StudentBirthDate'])) {
@@ -100,27 +122,28 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
                 } else {
                     $student['StudentBirthDate'] = false;
                 }
-                $student['AlertMessage'] = array($student['AlertMessage']);
+
+                $student['AlertMessage'] = [
+                    $student['AlertMessage']
+                ];
+
             } else {
-                // join subsequent alerts
+
+                // Additional records will only different by their alert message, we just append these to the
+                // existing student record
+
                 $student['AlertMessage'][] = $row['AlertMessage'];
             }
         }
 
-        /* Implode with newlines if you were returned a list of
-         * AlertMessages to join - otherwise do nothing to it
-         */
-		if (!empty($student) && is_array($student['AlertMessage'])) {
-			$student['AlertMessage'] = implode(
-				"\n",
-				array_unique(array_filter($student['AlertMessage']))
-			);
-		}
+        // Implode all of the alert messages down to a single message seperate by line breaks
 
-        $student = array_map(function($value) {
-            return trim(str_replace('Not Selected', '', $value));
-        }, $student);
+        if (!empty($student) && is_array($student['AlertMessage'])) {
+            $student['AlertMessage'] = implode("\n", array_unique(array_filter($student['AlertMessage'])));
+        }
 
-        return $student;
+        // Remove Synergetic's annoying 'Not Selected' default value for lookups
+
+        return $this->clearInvalidValues($student);
     }
 }
