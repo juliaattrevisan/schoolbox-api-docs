@@ -17,6 +17,7 @@ use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use \Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use \Schoolbox\User;
@@ -25,9 +26,11 @@ use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use \Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
+use Schoolbox\Curriculum\Node;
 
 abstract class AbstractAssessment implements IAssessable
 {
+
     use Id;
     use CreatedAtDate;
     use UpdatedAtDate;
@@ -85,13 +88,6 @@ abstract class AbstractAssessment implements IAssessable
     private $defaultOpenSpan;
 
     /**
-     * A Collection of Participant instances
-     *
-     * @var Collection|Participant[]
-     */
-    private $allParticipants;
-
-    /**
      * The person who created this Assessable
      *
      * @var User
@@ -138,11 +134,6 @@ abstract class AbstractAssessment implements IAssessable
      */
     private $markVisibility;
 
-    /**
-     * Cache to assist in finding Participants for User object
-     * @var array
-     */
-    private $participantCache = [];
 
     /**
      * 1-based, not 0-based, to enable the mapper to recognise when it needs auto-assign a value.
@@ -162,18 +153,25 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * A collection of Curriculum Nodes
      *
-     * @var Collection
+     * @var Node\Model[]|GenericCollection
      */
     private $curriculumNodes;
+
+    /**
+     * @var Plan[]|GenericCollection
+     */
+    private $plans;
+
 
     /**
      * Assessable constructor.
      */
     public function __construct()
     {
-        $this->setAllParticipants(new Collection());
-        $this->setCurriculumNodes(new Collection());
+        $this->curriculumNodes = new GenericCollection(Node\Model::class);
+        $this->plans           = new GenericCollection(Plan::class);
     }
+
 
     /**
      * George Cloney
@@ -187,7 +185,9 @@ abstract class AbstractAssessment implements IAssessable
 
         /* Explicitly dump away all the Participants
          */
-        $this->setAllParticipants(new Collection());
+        foreach ($this->plans as $plan) {
+            $plan->setParticipants($plan->getParticipants()->emptyClone());
+        }
 
         /* TODO: Dump away all the attached files?
          */
@@ -196,6 +196,7 @@ abstract class AbstractAssessment implements IAssessable
         $this->setUpdatedAt($this->getUpdatedAt() instanceof Alaress_Date_Format ? clone $this->getUpdatedAt() : new Alaress_Date_NullDate());
         $this->setDeletedAt($this->getDeletedAt() instanceof Alaress_Date_Format ? clone $this->getDeletedAt() : new Alaress_Date_NullDate());
     }
+
 
     /**
      * Clones this object in preparation for persisting as a copy of this object.
@@ -220,10 +221,13 @@ abstract class AbstractAssessment implements IAssessable
      * @param User $user
      * @return bool
      */
-    public function isParticipant(User $user)
+    public function isParticipant(User $user): bool
     {
-        return ($this->findParticipantIfExtant($user) instanceof Participant);
+        $candidate = $this->findParticipantIfExtant($user);
+
+        return $candidate instanceof Participant && !$candidate->isExcluded();
     }
+
 
     /**
      * Find a reference to a particular Participant in this Assessable
@@ -239,7 +243,10 @@ abstract class AbstractAssessment implements IAssessable
         if ($participant instanceof Participant) {
             return $participant;
         }
-        throw new \UnexpectedValueException("{$user->getFullName()} {$user->getId()} is not a participant of {$this->getTitle()}");
+        $fullName = "{$user->getFirstname()} {$user->getLastname()}";
+        throw new \UnexpectedValueException(
+            "{$fullName} (id: {$user->getId()}) is not a participant of {$this->getTitle()} (id: {$this->getId()})"
+        );
     }
 
 
@@ -261,17 +268,12 @@ abstract class AbstractAssessment implements IAssessable
      * @param User $user
      * @return Participant|null
      */
-    protected function findParticipantIfExtant(User $user )
+    protected function findParticipantIfExtant(User $user): ?Participant
     {
         $userId = $user->getId();
-
-        /** @var Participant $currentParticipant */
-        foreach ($this->getAllParticipants() as $i => $currentParticipant) {
-            if ($currentParticipant->getUser()
-                                   ->getId() == $userId
-            ) {
-                $this->participantCache[$userId] = $i;
-                return $currentParticipant;
+        foreach ($this->plans as $plan) {
+            if ($plan->getParticipants()->offsetExists($userId)) {
+                return $plan->getParticipants()[$userId];
             }
         }
 
@@ -346,7 +348,7 @@ abstract class AbstractAssessment implements IAssessable
      */
     protected function assertSameAssessment(Participant $participant)
     {
-        if($this->id !== $participant->getAssessable()->getId()){
+        if ($this->id !== $participant->getAssessable()->getId()) {
             $otherId = $participant->getAssessable()->getId();
             throw new \DomainException("Participant assessment ({$otherId}) must match this assessment ({$this->id}) to ensure assessment-type-specific logic is reliably invoked");
         }
@@ -387,8 +389,9 @@ abstract class AbstractAssessment implements IAssessable
     {
         $this->assertSameAssessment($participant);
 
-        return  $participant->hasPublishedFeedback() && !$participant->isFeedbackRequired();
+        return $participant->hasPublishedFeedback() && !$participant->isFeedbackRequired();
     }
+
 
     /**
      * @inheritdoc
@@ -397,13 +400,14 @@ abstract class AbstractAssessment implements IAssessable
     {
         $this->assertSameAssessment($participant);
 
-        foreach($participant->getAllResponses() as $response){
-            if($response->isSubmitted()){
+        foreach ($participant->getAllResponses() as $response) {
+            if ($response->isSubmitted()) {
                 return true;
             }
         }
         return false;
     }
+
 
     /**
      * @inheritdoc
@@ -412,13 +416,14 @@ abstract class AbstractAssessment implements IAssessable
     {
         $this->assertSameAssessment($participant);
 
-        foreach($participant->getAllFeedbacks() as $feedback){
-            if($feedback->isPublished()){
+        foreach ($participant->getAllFeedbacks() as $feedback) {
+            if ($feedback->isPublished()) {
                 return true;
             }
         }
         return false;
     }
+
 
     /**
      * @inheritdoc
@@ -430,6 +435,7 @@ abstract class AbstractAssessment implements IAssessable
         // Default case
         return $this->hasPublishedFeedback($participant);
     }
+
 
     /**
      * @inheritdoc
@@ -478,7 +484,7 @@ abstract class AbstractAssessment implements IAssessable
     public function getCountResponses(bool $includeDrafts = false): int
     {
         $count = 0;
-        foreach ($this->allParticipants as $participant) {
+        foreach ($this->getAllParticipants() as $participant) {
             if ($includeDrafts) {
                 $count += $participant->getAllResponses()->count();
             } else {
@@ -504,7 +510,7 @@ abstract class AbstractAssessment implements IAssessable
     public function getCountFeedbacks(bool $includeDrafts = false): int
     {
         $count = 0;
-        foreach ($this->allParticipants as $participant) {
+        foreach ($this->getAllParticipants() as $participant) {
             if ($includeDrafts) {
                 $count += $participant->getAllFeedbacks()->count();
             } else {
@@ -535,6 +541,7 @@ abstract class AbstractAssessment implements IAssessable
         }
     }
 
+
     /**
      * @inheritdoc
      */
@@ -542,6 +549,7 @@ abstract class AbstractAssessment implements IAssessable
     {
         return $this->getContext()->isSpecificationContext();
     }
+
 
     /**
      * @inheritdoc
@@ -551,17 +559,18 @@ abstract class AbstractAssessment implements IAssessable
         return $this->getContext()->isImplementationContext();
     }
 
+
     /**
      * Verify the given dates are all non-null and all in the given sequence
      *
-     * @param Alaress_Date_Format[] $dates, indexed by their display name, sequenced in expected order
+     * @param Alaress_Date_Format[] $dates Indexed by their display name, sequenced in expected order
      * @throws InvalidArgumentException if any value is absent, or values are out of order
      * @return void
      */
     protected function assertDateSequence(array $dates)
     {
         /** @var Alaress_Date_Format $previousAdf */
-        $previousAdf = null;
+        $previousAdf   = null;
         $previousLabel = '';
 
         foreach ($dates as $label => $adf) {
@@ -574,10 +583,11 @@ abstract class AbstractAssessment implements IAssessable
             }
 
             // cache the previous iteration
-            $previousAdf = $adf;
+            $previousAdf   = $adf;
             $previousLabel = $label;
         }
     }
+
 
     /**
      * @inheritdoc
@@ -599,6 +609,7 @@ abstract class AbstractAssessment implements IAssessable
         return $this->title;
     }
 
+
     /**
      * @param string $title
      * @return $this
@@ -609,6 +620,7 @@ abstract class AbstractAssessment implements IAssessable
         return $this;
     }
 
+
     /**
      * @return string
      */
@@ -616,6 +628,7 @@ abstract class AbstractAssessment implements IAssessable
     {
         return $this->description;
     }
+
 
     /**
      * @param string $description
@@ -627,6 +640,7 @@ abstract class AbstractAssessment implements IAssessable
         return $this;
     }
 
+
     /**
      * @return Alaress_Date_Format
      */
@@ -634,6 +648,7 @@ abstract class AbstractAssessment implements IAssessable
     {
         return $this->publishAt;
     }
+
 
     /**
      * @param Alaress_Date_Format $publishAt
@@ -645,6 +660,7 @@ abstract class AbstractAssessment implements IAssessable
         return $this;
     }
 
+
     /**
      * @return \Alaress_Date_Format
      */
@@ -652,6 +668,7 @@ abstract class AbstractAssessment implements IAssessable
     {
         return $this->openAt;
     }
+
 
     /**
      * @param Alaress_Date_Format $openAt
@@ -663,6 +680,7 @@ abstract class AbstractAssessment implements IAssessable
         return $this;
     }
 
+
     /**
      * @return Alaress_Date_Format
      */
@@ -670,6 +688,7 @@ abstract class AbstractAssessment implements IAssessable
     {
         return $this->dueAt;
     }
+
 
     /**
      * @param Alaress_Date_Format $dueAt
@@ -681,6 +700,7 @@ abstract class AbstractAssessment implements IAssessable
         return $this;
     }
 
+
     /**
      * @return \Alaress_Date_Format
      */
@@ -688,6 +708,7 @@ abstract class AbstractAssessment implements IAssessable
     {
         return $this->closeAt;
     }
+
 
     /**
      * @param Alaress_Date_Format $closeAt
@@ -699,6 +720,7 @@ abstract class AbstractAssessment implements IAssessable
         return $this;
     }
 
+
     /**
      * @return int
      */
@@ -706,6 +728,7 @@ abstract class AbstractAssessment implements IAssessable
     {
         return $this->weight;
     }
+
 
     /**
      * @param float $weight
@@ -717,6 +740,7 @@ abstract class AbstractAssessment implements IAssessable
         return $this;
     }
 
+
     /**
      * @return int
      */
@@ -724,6 +748,7 @@ abstract class AbstractAssessment implements IAssessable
     {
         return $this->defaultOpenSpan;
     }
+
 
     /**
      * @param int $defaultOpenSpan
@@ -735,6 +760,7 @@ abstract class AbstractAssessment implements IAssessable
         return $this;
     }
 
+
     /**
      * @return User
      */
@@ -742,6 +768,7 @@ abstract class AbstractAssessment implements IAssessable
     {
         return $this->creator;
     }
+
 
     /**
      * @param User $creator
@@ -753,23 +780,45 @@ abstract class AbstractAssessment implements IAssessable
         return $this;
     }
 
+
     /**
-     * @return Collection|Participant[]
+     * Returns all Participants in this IAssessable, indexed by user.id
+     *
+     * @return Collection|Participant[] Indexed by user.id
      */
     public function getAllParticipants()
     {
-        return $this->allParticipants;
+        $participants = new GenericCollection(Participant::class);
+        foreach ($this->plans as $plan) {
+            foreach ($plan->getParticipants() as $participant) {
+                // Note we cannot index by participant.id, as that may be NULL
+                $participants[$participant->getUser()->getId()] = $participant;
+            }
+        }
+        return $participants;
     }
 
+
     /**
-     * @param Collection $allParticipants
-     * @return $this
+     * Get all users who are participating in this IAssessable, indexed by user.id
+     *
+     * @return User[]|GenericCollection Indexed by user.id
      */
-    public function setAllParticipants(Collection $allParticipants)
+    public function getParticipantUsers(): GenericCollection
     {
-        $this->allParticipants = $allParticipants;
-        return $this;
+        $participatingUsers = new GenericCollection(User::class);
+        foreach ($this->plans as $plan) {
+            foreach ($plan->getParticipants() as $participant) {
+                if ($participant->isExcluded()) {
+                    continue;
+                }
+                $user                               = $participant->getUser();
+                $participatingUsers[$user->getId()] = $user;
+            }
+        }
+        return $participatingUsers;
     }
+
 
     /**
      * @return MarkType
@@ -778,6 +827,7 @@ abstract class AbstractAssessment implements IAssessable
     {
         return $this->markType;
     }
+
 
     /**
      * @param MarkType $markType
@@ -789,6 +839,7 @@ abstract class AbstractAssessment implements IAssessable
         return $this;
     }
 
+
     /**
      * @return GradeGroup|null
      */
@@ -796,6 +847,7 @@ abstract class AbstractAssessment implements IAssessable
     {
         return $this->gradeGroup;
     }
+
 
     /**
      * Default behaviour is not to permit nulls. Sub-classes can override this (eg Quiz + Task)
@@ -809,6 +861,7 @@ abstract class AbstractAssessment implements IAssessable
         return $this;
     }
 
+
     /**
      * @return IMarkScheme
      */
@@ -816,6 +869,7 @@ abstract class AbstractAssessment implements IAssessable
     {
         return $this->markScheme;
     }
+
 
     /**
      * @param IMarkScheme $markScheme
@@ -827,6 +881,7 @@ abstract class AbstractAssessment implements IAssessable
         return $this;
     }
 
+
     /**
      * @param AssessmentContext $context
      * @return static
@@ -837,13 +892,15 @@ abstract class AbstractAssessment implements IAssessable
         return $this;
     }
 
+
     /**
-     * @return AssessmentContext|null
+     * @return AssessmentContext
      */
     public function getContext()
     {
         return $this->context;
     }
+
 
     /** Retrieves the parent context of this project
      *
@@ -854,6 +911,7 @@ abstract class AbstractAssessment implements IAssessable
         return $this->getContext()->getBaseContext();
     }
 
+
     /**
      * @return int
      */
@@ -861,6 +919,7 @@ abstract class AbstractAssessment implements IAssessable
     {
         return $this->markVisibility;
     }
+
 
     /**
      * @param int $markVisibility
@@ -872,6 +931,7 @@ abstract class AbstractAssessment implements IAssessable
         return $this;
     }
 
+
     /**
      * @return null|IAssessable
      */
@@ -879,6 +939,7 @@ abstract class AbstractAssessment implements IAssessable
     {
         return $this->specificationAssessment;
     }
+
 
     /**
      * @param IAssessable|null $specification
@@ -890,6 +951,7 @@ abstract class AbstractAssessment implements IAssessable
         return $this;
     }
 
+
     /**
      * @return int
      */
@@ -897,6 +959,7 @@ abstract class AbstractAssessment implements IAssessable
     {
         return $this->sequence;
     }
+
 
     /**
      * @param int $sequence
@@ -907,6 +970,7 @@ abstract class AbstractAssessment implements IAssessable
         $this->sequence = $sequence;
         return $this;
     }
+
 
     /**
      * @return null|WorkType
@@ -927,23 +991,60 @@ abstract class AbstractAssessment implements IAssessable
         return $this;
     }
 
+
     /**
-     * @return Collection
+     * @return Node\Model[]|GenericCollection
      */
-    public function getCurriculumNodes()
+    public function getCurriculumNodes(): GenericCollection
     {
         return $this->curriculumNodes;
     }
 
+
     /**
-     * @param Collection $curriculumNodes
+     * @param Node\Model[]|GenericCollection $curriculumNodes
      * @return $this
      */
-    public function setCurriculumNodes(Collection $curriculumNodes)
+    public function setCurriculumNodes(GenericCollection $curriculumNodes): IAssessable
     {
-        $this->curriculumNodes = $curriculumNodes;
+        $this->curriculumNodes->replaceWith($curriculumNodes);
         return $this;
     }
+
+
+    /**
+     * @return Plan[]|GenericCollection
+     */
+    public function getPlans(): GenericCollection
+    {
+        return $this->plans;
+    }
+
+
+    /**
+     * @param Plan[]|GenericCollection $plans
+     * @return $this
+     */
+    public function setPlans(GenericCollection $plans): IAssessable
+    {
+        $this->plans->replaceWith($plans);
+        return $this;
+    }
+
+
+    /**
+     * @return null|Plan
+     */
+    public function getDynamicPlan(): ?Plan
+    {
+        foreach ($this->plans as $plan) {
+            if ($plan->getIsDynamic()) {
+                return $plan;
+            }
+        }
+        return null;
+    }
+
 
     /**
      * @inheritdoc
@@ -952,6 +1053,7 @@ abstract class AbstractAssessment implements IAssessable
     {
         return IResponse::class;
     }
+
 
     /**
      * @inheritdoc

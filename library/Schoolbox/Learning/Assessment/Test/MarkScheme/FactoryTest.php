@@ -4,15 +4,14 @@
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\Test;
 
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Summator\Average;
 use Schoolbox\Learning\Assessment\Summator\ISummator;
 use Schoolbox\Learning\Assessment\Summator\Maximum;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
-use Schoolbox\Learning\Assessment\Summator\Sum;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\MarkScheme\None;
@@ -33,13 +32,17 @@ use Schoolbox\Learning\Assessment\Project;
 use InvalidArgumentException;
 use DomainException;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
+use Schoolbox\User;
 
 class FactoryTest extends TestCase
 {
+
     /**
      * @dataProvider provider_task_markTypeInvalid
      * @param Task $task
      * @expectedException DomainException
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws DomainException
      */
     public function test_task_markTypeInvalid(Task $task)
     {
@@ -47,22 +50,29 @@ class FactoryTest extends TestCase
         $factory->spawnMarkSchemeFor($task);
     }
 
+
     /**
      * @dataProvider provider_task_markTypeValid
-     * @param Task $task
+     * @param Task   $task
      * @param string $expectedMarkScheme
+     * @throws \PHPUnit\Framework\Exception
+     * @throws DomainException If MarkType is invalid for the assessment
+     * @throws InvalidArgumentException If assessment class not registered
      */
     public function test_task_markTypeValid(Task $task, $expectedMarkScheme)
     {
-        $factory = new MarkSchemeFactory();
+        $factory    = new MarkSchemeFactory();
         $markScheme = $factory->spawnMarkSchemeFor($task);
         $this->assertInstanceOf($expectedMarkScheme, $markScheme);
     }
+
 
     /**
      * @dataProvider provider_quiz_markTypeInvalid
      * @param Quiz $quiz
      * @expectedException DomainException
+     * @throws DomainException If MarkType is invalid for the assessment
+     * @throws InvalidArgumentException If assessment class not registered
      */
     public function test_quiz_markTypeInvalid(Quiz $quiz)
     {
@@ -70,22 +80,29 @@ class FactoryTest extends TestCase
         $factory->spawnMarkSchemeFor($quiz);
     }
 
+
     /**
      * @dataProvider provider_quiz_markTypeValid
-     * @param Quiz $quiz
+     * @param Quiz   $quiz
      * @param string $expectedMarkScheme
+     * @throws DomainException If MarkType is invalid for the assessment
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws \PHPUnit\Framework\Exception
      */
     public function test_quiz_markTypeValid(Quiz $quiz, $expectedMarkScheme)
     {
-        $factory = new MarkSchemeFactory();
+        $factory    = new MarkSchemeFactory();
         $markScheme = $factory->spawnMarkSchemeFor($quiz);
         $this->assertInstanceOf($expectedMarkScheme, $markScheme);
     }
+
 
     /**
      * @dataProvider provider_dueWOrk_markTypeInvalid
      * @param DueWork $dueWork
      * @expectedException DomainException
+     * @throws DomainException If MarkType is invalid for the assessment
+     * @throws InvalidArgumentException If assessment class not registered
      */
     public function test_dueWork_markTypeInvalid(DueWork $dueWork)
     {
@@ -93,22 +110,29 @@ class FactoryTest extends TestCase
         $factory->spawnMarkSchemeFor($dueWork);
     }
 
+
     /**
      * @dataProvider provider_dueWork_markTypeValid
      * @param DueWork $dueWork
-     * @param string $expectedMarkScheme
+     * @param string  $expectedMarkScheme
+     * @throws DomainException If MarkType is invalid for the assessment
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws \PHPUnit\Framework\Exception
      */
     public function test_dueWork_markTypeValid(DueWork $dueWork, $expectedMarkScheme)
     {
-        $factory = new MarkSchemeFactory();
+        $factory    = new MarkSchemeFactory();
         $markScheme = $factory->spawnMarkSchemeFor($dueWork);
         $this->assertInstanceOf($expectedMarkScheme, $markScheme);
     }
+
 
     /**
      * @dataProvider provider_project_markTypeInvalid
      * @param Project $project
      * @expectedException DomainException
+     * @throws DomainException If MarkType is invalid for the assessment
+     * @throws InvalidArgumentException If assessment class not registered
      */
     public function test_project_markTypeInvalid($project)
     {
@@ -116,24 +140,30 @@ class FactoryTest extends TestCase
         $factory->spawnMarkSchemeFor($project);
     }
 
+
     /**
      * @dataProvider provider_project_markTypeValid
      * @param Project $project
-     * @param string $expectedMarkScheme
+     * @param string  $expectedMarkScheme
+     * @throws DomainException If MarkType is invalid for the assessment
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws \PHPUnit\Framework\Exception
      */
     public function test_project_markTypeValid($project, $expectedMarkScheme)
     {
-        $factory = new MarkSchemeFactory();
+        $factory    = new MarkSchemeFactory();
         $markScheme = $factory->spawnMarkSchemeFor($project);
         $this->assertInstanceOf($expectedMarkScheme, $markScheme);
     }
 
     // ==================== Data Providers ====================
 
+
     /**
      * @return Task[][]
+     * @throws InvalidArgumentException If $slug is not recognised
      */
-    public function provider_task_markTypeInvalid()
+    public function provider_task_markTypeInvalid(): array
     {
         return [
             [(new Task())->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT))],
@@ -145,20 +175,24 @@ class FactoryTest extends TestCase
         ];
     }
 
+
     /**
      * @return Task[][]
+     * @throws InvalidArgumentException If $slug is not recognised
      */
-    public function provider_task_markTypeValid()
+    public function provider_task_markTypeValid(): array
     {
         return [
             [(new Task())->setMarkType($this->getDummyMarkType(MarkType::TYPE_COMPLETION)), Completion::class],
         ];
     }
 
+
     /**
      * @return Quiz[][]
+     * @throws InvalidArgumentException If $slug is not recognised
      */
-    public function provider_quiz_markTypeInvalid()
+    public function provider_quiz_markTypeInvalid(): array
     {
         return [
             [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT))],
@@ -170,20 +204,24 @@ class FactoryTest extends TestCase
         ];
     }
 
+
     /**
      * @return Quiz[][]
+     * @throws InvalidArgumentException If $slug is not recognised
      */
-    public function provider_quiz_markTypeValid()
+    public function provider_quiz_markTypeValid(): array
     {
         return [
             [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_TOTAL)), TotalMarkFractional::class],
         ];
     }
 
+
     /**
      * @return DueWork[][]
+     * @throws InvalidArgumentException If $slug is not recognised
      */
-    public function provider_dueWork_markTypeInvalid()
+    public function provider_dueWork_markTypeInvalid(): array
     {
         return [
             [(new DueWork())->setMarkType($this->getDummyMarkType(MarkType::TYPE_FREE))],
@@ -192,26 +230,33 @@ class FactoryTest extends TestCase
         ];
     }
 
+
     /**
      * @return DueWork[][]
+     * @throws InvalidArgumentException If $slug is not recognised
      */
-    public function provider_dueWork_markTypeValid()
+    public function provider_dueWork_markTypeValid(): array
     {
         return [
             [(new DueWork())->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT)), Percentage::class],
-            [(new DueWork())->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER))->setGradeGroup($this->getDummyLetterGradeGroup()), LetterGrade::class],
+            [
+                (new DueWork())->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER))->setGradeGroup($this->getDummyLetterGradeGroup()),
+                LetterGrade::class,
+            ],
             [(new DueWork())->setMarkType($this->getDummyMarkType(MarkType::TYPE_TOTAL))->setMaxMark(50), TotalMarkWholeNumber::class],
             [(new DueWork())->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE)), None::class],
         ];
     }
 
+
     /**
      * @return Project[][]
+     * @throws InvalidArgumentException If $slug is not recognised
      */
-    public function provider_project_markTypeInvalid()
+    public function provider_project_markTypeInvalid(): array
     {
         $projects = [];
-        foreach($this->getSummators() as $summator){
+        foreach ($this->getSummators() as $summator) {
             $projects[] = [(new Project($summator))->setMarkType($this->getDummyMarkType(MarkType::TYPE_TOTAL))];
             $projects[] = [(new Project($summator))->setMarkType($this->getDummyMarkType(MarkType::TYPE_FREE))];
             $projects[] = [(new Project($summator))->setMarkType($this->getDummyMarkType(MarkType::TYPE_RUBRIC))];
@@ -220,15 +265,17 @@ class FactoryTest extends TestCase
         return $projects;
     }
 
+
     /**
      * @return array $projects
-     * @var Project $projects[][0]
-     * @var IMarkScheme $projects[][1]
+     * @var Project     $projects [][0]
+     * @var IMarkScheme $projects [][1]
+     * @throws InvalidArgumentException If $slug is not recognised
      */
-    public function provider_project_markTypeValid()
+    public function provider_project_markTypeValid(): array
     {
         $projects = [];
-        foreach($this->getSummators() as $summator){
+        foreach ($this->getSummators() as $summator) {
             // Percentage
             $project = new Project($summator);
             $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
@@ -252,7 +299,7 @@ class FactoryTest extends TestCase
     /**
      * @return ISummator[]
      */
-    private function getSummators()
+    private function getSummators(): array
     {
         return [
             new Average(),
@@ -262,56 +309,58 @@ class FactoryTest extends TestCase
         ];
     }
 
+
     /**
      * @param int $id
      * @return MarkType
+     * @throws InvalidArgumentException If $id is not recognised
      */
-    private function getDummyMarkType($id)
+    private function getDummyMarkType(int $id): MarkType
     {
         $markType = new MarkType();
         $markType->setId($id);
 
         switch ($id) {
-            case 1:
+            case MarkType::TYPE_PERCENT:
                 return $markType
                     ->setName('Percentage (%)')
-                    ->setSlug('percent')
+                    ->setSlug(MarkType::SLUG_PERCENT)
                     ->setComment('This should be a whole percentage between 0 and 100.')
                     ->setEnabled(true);
-            case 2:
+            case MarkType::TYPE_LETTER:
                 return $markType
                     ->setName('Letter Grade')
-                    ->setSlug('letter')
+                    ->setSlug(MarkType::SLUG_LETTER)
                     ->setComment('Se1ect a letter grade from the list.')
                     ->setEnabled(true);
-            case 3:
+            case MarkType::TYPE_TOTAL:
                 return $markType
                     ->setName('Total Mark')
-                    ->setSlug('raw')
+                    ->setSlug(MarkType::SLUG_TOTAL)
                     ->setComment('This should be a mark between 0 and {MAX_MARK}. It may be a whole number or a decimal.')
                     ->setEnabled(true);
-            case 4:
+            case MarkType::TYPE_FREE:
                 return $markType
                     ->setName('Free Type (legacy support)')
-                    ->setSlug('free')
+                    ->setSlug(MarkType::SLUG_FREE)
                     ->setComment('Should be a letter (A), score (15/20), or percentage (88%).')
                     ->setEnabled(false);
-            case 5:
+            case MarkType::TYPE_RUBRIC:
                 return $markType
                     ->setName('Rubric')
-                    ->setSlug('rubric')
+                    ->setSlug(MarkType::SLUG_RUBRIC)
                     ->setComment('To mark the Rubric you <b>must</b> select one result for each criterion. Simply click the squares to select the results.')
                     ->setEnabled(false);
-            case 6:
+            case MarkType::TYPE_NONE:
                 return $markType
                     ->setName('None')
-                    ->setSlug('none')
+                    ->setSlug(MarkType::SLUG_NONE)
                     ->setComment('This due work is not marked.')
                     ->setEnabled(true);
-            case 7:
+            case MarkType::TYPE_COMPLETION:
                 return $markType
                     ->setName('Completion')
-                    ->setSlug('completion')
+                    ->setSlug(MarkType::SLUG_COMPLETION)
                     ->setComment("Either 'Completed' or 'Not Completed'")
                     ->setEnabled(false);
             default:
@@ -319,17 +368,18 @@ class FactoryTest extends TestCase
         }
     }
 
+
     /**
      * @return GradeGroup
      */
-    private function getDummyLetterGradeGroup()
+    private function getDummyLetterGradeGroup(): GradeGroup
     {
         $gradeGroup = new GradeGroup();
         $gradeGroup->setId(3);
         $gradeGroup->setName('Competency');
 
         $levelDatums = [
-            ['13', '0',  '20', 'Needs Attention'],
+            ['13', '0', '20', 'Needs Attention'],
             ['14', '40', '53', 'Acceptable'],
             ['15', '60', '68', 'Good'],
             ['16', '75', '88', 'Very Good'],
@@ -347,6 +397,7 @@ class FactoryTest extends TestCase
         }
         return $gradeGroup;
     }
+
 
     /**
      * Generate a Quiz with attached Attempts, Feedbacks, Questions + Responses
@@ -378,16 +429,6 @@ class FactoryTest extends TestCase
             'config'      => null,
             'deleted_at'  => null,
         ];
-        $question3 = [
-            'question_id' => 3,
-            'section_id'  => 1,
-            'sequence'    => 3,
-            'type_id'     => 1,
-            'marks'       => 1.0,
-            'question'    => '<p><span>What is Jerome\'s (Vincent\'s) life expectancy?</span></p>',
-            'config'      => null,
-            'deleted_at'  => null,
-        ];
 
         $response1 = [
             'response_id'        => 1,
@@ -415,11 +456,13 @@ class FactoryTest extends TestCase
             'deleted_at'         => null,
         ];
 
-        $quiz = new Quiz();
-        $attempt = new QuizAttempt();
+        $quiz     = new Quiz();
+        $attempt  = new QuizAttempt();
         $feedback = new QuizFeedback();
 
-        $participant = new Participant($this->getDummyQuizAttempter(), $quiz);
+        $linker      = new ParticipantLinker();
+        $plan        = $linker->createAndLinkPlan($quiz);
+        $participant = $linker->createAndLinkParticipant($this->getDummyQuizAttempter(), $plan);
         $participant->getAllResponses()->add($attempt);
         $participant->getAllFeedbacks()->add($feedback);
 
@@ -432,19 +475,19 @@ class FactoryTest extends TestCase
         $attempt->setAssessable($quiz);
 
         // Inject data
-        $responses = [
+        $responses  = [
             [
-                'mark' => $response1['mark'],
+                'mark'      => $response1['mark'],
                 'available' => $question1['marks'],
             ],
             [
-                'mark' => $response2['mark'],
+                'mark'      => $response2['mark'],
                 'available' => $question2['marks'],
             ],
         ];
         $marksGiven = $marksAvailable = 0;
-        foreach($responses as $response){
-            $marksGiven += $response['mark'];
+        foreach ($responses as $response) {
+            $marksGiven     += $response['mark'];
             $marksAvailable += $response['available'];
         }
 
@@ -454,6 +497,7 @@ class FactoryTest extends TestCase
         return $quiz;
     }
 
+
     /**
      * Generate a dummy User instance
      * This person "attempted the quiz"
@@ -462,6 +506,6 @@ class FactoryTest extends TestCase
      */
     private function getDummyQuizAttempter()
     {
-        return (new \Schoolbox\User())->setId(19);
+        return (new User())->setId(19);
     }
 }

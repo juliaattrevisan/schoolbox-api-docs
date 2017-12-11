@@ -22,6 +22,7 @@ class Statistics
     private $assessment;
 
     // null prior to determination, then int.
+    private $cacheCountParticipants;
     private $cacheCountResponseRequired;
     private $cacheCountFeedbackRequired;
     private $cacheCountReviewComplete;
@@ -45,6 +46,7 @@ class Statistics
      */
     public function clearCachedCounts()
     {
+        $this->cacheCountParticipants         = null;
         $this->cacheCountResponseRequired     = null;
         $this->cacheCountFeedbackRequired     = null;
         $this->cacheCountReviewComplete       = null;
@@ -59,9 +61,12 @@ class Statistics
      *
      * @return int
      */
-    public function getCountParticipants()
+    public function getCountParticipants(): int
     {
-        return $this->assessment->getAllParticipants()->count();
+        if (null === $this->cacheCountParticipants) {
+            $this->cacheCountParticipants = $this->assessment->getAllParticipants()->count();
+        }
+        return $this->cacheCountParticipants;
     }
 
 

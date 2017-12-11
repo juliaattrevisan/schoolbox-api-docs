@@ -1,6 +1,6 @@
--- Create participation plan table
+-- Create participant plan table
 
-CREATE TABLE `participation_plan`
+CREATE TABLE `participant_plan`
 (
   `id`                      INT(10) UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   `assessment_id`           INT(10) UNSIGNED NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE `participation_plan`
 
 -- Add foreign key to 'assessment' table
 
-ALTER TABLE     `participation_plan`
-ADD CONSTRAINT  `participation_plan_assessment_id_fk`
+ALTER TABLE     `participant_plan`
+ADD CONSTRAINT  `participant_plan_assessment_id_fk`
 FOREIGN KEY     (`assessment_id`)
 REFERENCES      `assessment` (`id`);

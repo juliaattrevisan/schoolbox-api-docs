@@ -10,6 +10,7 @@ namespace Schoolbox\Test;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Plan;
 use Schoolbox\Learning\Assessment\Task\Model as TaskAssessable;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -122,7 +123,7 @@ class CollectionTest extends TestCase
     {
         return [
             [new User()],
-            [new Participant(new User(), new TaskAssessable())],
+            [new Participant(new User(), new Plan(new TaskAssessable()))],
             [new TaskAssessable()],
         ];
     }

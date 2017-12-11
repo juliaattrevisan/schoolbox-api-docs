@@ -9,17 +9,26 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use \Schoolbox\User;
 use \DomainException;
+use Alaress_Date_Format;
 
+/**
+ * The 'domain' version of a participant
+ */
 class Participant
 {
+
+    use ModelTrait\Id;
+    use ModelTrait\CreatedAtDate;
+    use ModelTrait\UpdatedAtDate;
+
     /**
      * The User to whom all these Responses and Feedbacks are relevant
      *
@@ -28,11 +37,18 @@ class Participant
     private $user;
 
     /**
-     * The Assessment which these Responses and Feedbacks relate to
+     * The Plan this participant is in.
      *
-     * @var IAssessable
+     * @var Plan
      */
-    private $assessable;
+    private $plan;
+
+
+    /**
+     * @var null|Alaress_Date_Format
+     */
+    private $excludedAt;
+
 
     /**
      * A Collection of IResponse instances that Students spawn
@@ -48,20 +64,21 @@ class Participant
      */
     private $allFeedbacks;
 
+
     /**
      * Participant constructor.
      *
      * @param User $user
-     * @param IAssessable $assessable
+     * @param Plan $plan
      */
-    public function __construct(User $user, IAssessable $assessable)
+    public function __construct(User $user, Plan $plan)
     {
-        $this->setUser($user);
-        $this->setAssessable($assessable);
-
-        $this->allResponses = new GenericCollection($assessable->getResponseClass());
-        $this->allFeedbacks = new GenericCollection($assessable->getFeedbackClass());
+        $this->user         = $user;
+        $this->plan         = $plan;
+        $this->allResponses = new GenericCollection($plan->getAssessable()->getResponseClass());
+        $this->allFeedbacks = new GenericCollection($plan->getAssessable()->getFeedbackClass());
     }
+
 
     /**
      * Does the student still need to submit a response ?
@@ -76,7 +93,7 @@ class Participant
     public function isResponseRequired()
     {
         try {
-            return $this->assessable->isResponseRequired($this);
+            return $this->plan->getAssessable()->isResponseRequired($this);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             if (function_exists('newrelic_notice_error')) {
@@ -100,7 +117,7 @@ class Participant
     public function isFeedbackRequired()
     {
         try {
-            return $this->assessable->isFeedbackRequired($this);
+            return $this->plan->getAssessable()->isFeedbackRequired($this);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             if (function_exists('newrelic_notice_error')) {
@@ -120,7 +137,7 @@ class Participant
     public function isReviewComplete()
     {
         try {
-            return $this->assessable->isReviewComplete($this);
+            return $this->plan->getAssessable()->isReviewComplete($this);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             if (function_exists('newrelic_notice_error')) {
@@ -143,7 +160,7 @@ class Participant
     public function hasSubmittedResponse()
     {
         try {
-            return $this->assessable->hasSubmittedResponse($this);
+            return $this->plan->getAssessable()->hasSubmittedResponse($this);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             if (function_exists('newrelic_notice_error')) {
@@ -166,7 +183,7 @@ class Participant
     public function hasPublishedFeedback()
     {
         try {
-            return $this->assessable->hasPublishedFeedback($this);
+            return $this->plan->getAssessable()->hasPublishedFeedback($this);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             if (function_exists('newrelic_notice_error')) {
@@ -189,7 +206,7 @@ class Participant
      */
     public function hasMark()
     {
-        return $this->assessable->hasMark($this);
+        return $this->plan->getAssessable()->hasMark($this);
     }
 
 
@@ -220,15 +237,16 @@ class Participant
         $mostRecentSubmittedResponse = null;
 
         /** @var IResponse $response */
-        foreach($this->allResponses as $response){
-            if($response->isSubmitted()){
-                if(!$mostRecentSubmittedResponse || $response->getSubmittedAt()->gt($mostRecentSubmittedResponse->getSubmittedAt())){
+        foreach ($this->allResponses as $response) {
+            if ($response->isSubmitted()) {
+                if (!$mostRecentSubmittedResponse || $response->getSubmittedAt()->gt($mostRecentSubmittedResponse->getSubmittedAt())) {
                     $mostRecentSubmittedResponse = $response;
                 }
             }
         }
         return $mostRecentSubmittedResponse;
     }
+
 
     /**
      * Find the authoritative Feedback for an Assessment for this Participant
@@ -251,6 +269,7 @@ class Participant
         return $mostRecentFeedback;
     }
 
+
     /**
      * Find the authoritative published Feedback for an Assessment for this Participant
      *
@@ -266,11 +285,12 @@ class Participant
         /** @var IFeedback $feedback */
         foreach ($this->allFeedbacks as $feedback) {
             if ($feedback->isPublished() && (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt()))) {
-                    $mostRecentFeedback = $feedback;
+                $mostRecentFeedback = $feedback;
             }
         }
         return $mostRecentFeedback;
     }
+
 
     /**
      * Find the authoritative published AND visible Feedback for an Assessment for this Participant
@@ -302,7 +322,7 @@ class Participant
     public function getNormalisedMark($publishedOnly)
     {
         try {
-            return $this->assessable->getNormalisedMark($this, $publishedOnly);
+            return $this->plan->getAssessable()->getNormalisedMark($this, $publishedOnly);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             if (function_exists('newrelic_notice_error')) {
@@ -322,7 +342,7 @@ class Participant
     public function getHumanReadableMark($publishedOnly)
     {
         try {
-            return $this->assessable->getHumanReadableMark($this, $publishedOnly);
+            return $this->plan->getAssessable()->getHumanReadableMark($this, $publishedOnly);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             if (function_exists('newrelic_notice_error')) {
@@ -342,7 +362,7 @@ class Participant
     public function getAuthoritativeResponse($publishedOnly)
     {
         try {
-            return $this->assessable->getAuthoritativeResponse($this, $publishedOnly);
+            return $this->plan->getAssessable()->getAuthoritativeResponse($this, $publishedOnly);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             if (function_exists('newrelic_notice_error')) {
@@ -351,6 +371,7 @@ class Participant
             return null;
         }
     }
+
 
     /**
      * Get the IFeedback responsible for the participant's assessment mark
@@ -361,7 +382,7 @@ class Participant
     public function getAuthoritativeFeedback($publishedOnly)
     {
         try {
-            return $this->assessable->getAuthoritativeFeedback($this, $publishedOnly);
+            return $this->plan->getAssessable()->getAuthoritativeFeedback($this, $publishedOnly);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             if (function_exists('newrelic_notice_error')) {
@@ -383,21 +404,78 @@ class Participant
         return $this->user;
     }
 
+
     /**
      * @param User $user
+     * @return $this
      */
     public function setUser($user)
     {
         $this->user = $user;
+        return $this;
     }
+
+
+    /**
+     * @return Plan
+     */
+    public function getPlan(): Plan
+    {
+        return $this->plan;
+    }
+
+
+    /**
+     * @param Plan $plan
+     * @return $this
+     */
+    public function setPlan(Plan $plan): self
+    {
+        $this->plan = $plan;
+        return $this;
+    }
+
+
+    /**
+     * @return null|Alaress_Date_Format
+     */
+    public function getExcludedAt(): ?Alaress_Date_Format
+    {
+        return $this->excludedAt;
+    }
+
+
+    /**
+     * @param null|Alaress_Date_Format $excludedAt
+     * @return $this
+     */
+    public function setExcludedAt(?Alaress_Date_Format $excludedAt): self
+    {
+        $this->excludedAt = $excludedAt;
+        return $this;
+    }
+
+
+    /**
+     * Is this an exclusion record?
+     *
+     * @return bool
+     */
+    public function isExcluded(): bool
+    {
+        // Excluded if a non-null date.
+        return $this->excludedAt instanceof Alaress_Date_Format && !$this->excludedAt->isNull();
+    }
+
 
     /**
      * @return IAssessable
      */
     public function getAssessable()
     {
-        return $this->assessable;
+        return $this->plan->getAssessable();
     }
+
 
     /**
      * @param IAssessable $assessable
@@ -405,9 +483,10 @@ class Participant
      */
     public function setAssessable(IAssessable $assessable)
     {
-        $this->assessable = $assessable;
+        $this->plan->setAssessable($assessable);
         return $this;
     }
+
 
     /**
      * @return GenericCollection|IResponse[]
@@ -416,6 +495,7 @@ class Participant
     {
         return $this->allResponses;
     }
+
 
     /**
      * @param GenericCollection|IResponse[] $allResponses
@@ -428,6 +508,7 @@ class Participant
         return $this;
     }
 
+
     /**
      * @return GenericCollection|IFeedback[]
      */
@@ -435,6 +516,7 @@ class Participant
     {
         return $this->allFeedbacks;
     }
+
 
     /**
      * @param GenericCollection|IFeedback[] $allFeedbacks

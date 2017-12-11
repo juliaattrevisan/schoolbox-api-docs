@@ -193,7 +193,7 @@ class DueWorkTest extends TestCase
     }
 
     /**
-    /**
+    * /**
      * Test translation of mark scheme.
      *
      * @dataProvider getTestTranslateMarkSchemeToDataModelData
@@ -447,7 +447,7 @@ class DueWorkTest extends TestCase
             [
                 (new DueWorkModel())
                     ->setAssessmentModel($assessmentModel)
-                    ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_NONE))
+                    ->setMarkType($this->buildMarkType())
                     ->setSelfAssessable(true)
                     ->setSelfReflectable(true),
                 None::class,

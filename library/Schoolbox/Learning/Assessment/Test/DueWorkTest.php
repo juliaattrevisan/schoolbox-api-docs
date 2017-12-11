@@ -11,27 +11,27 @@
 namespace Schoolbox\Learning\Assessment\Test;
 
 use PHPUnit\Framework\TestCase;
-use \Schoolbox\Collection;
-use \Schoolbox\User;
-use \Schoolbox\Resource\Storage\Model as Storage;
-
-use \Schoolbox\Learning\Assessment\Participant;
-
-use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use \Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkSubmission;
+use Schoolbox\Collection;
+use Schoolbox\User;
+use Schoolbox\Resource\Storage\Model as Storage;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkSubmission;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as DueWorkSubmissionFile;
-use \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as DueWorkSubmissionFilePlagscan;
-use \Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
-use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
-use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as DueWorkSubmissionFilePlagscan;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 
 class DueWorkTest extends TestCase
 {
     use Defaults;
 
+
     /**
      * Test that Due Work initialises into a usable state
+     *
+     * @throws \PHPUnit\Framework\Exception
      */
     public function testInit()
     {
@@ -77,11 +77,6 @@ class DueWorkTest extends TestCase
                 ->setId(1)
                 ->setName($typeName))
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $dueWork))
-                ->add(new Participant($this->bsalem, $dueWork))
-                ->add(new Participant($this->sberryhill, $dueWork))
-                ->add(new Participant($this->asaxon, $dueWork)))
             ->setAttachedFiles((new Collection())
                 ->add((new DueWorkFile())
                     ->setId($files[0]['id'])
@@ -98,14 +93,24 @@ class DueWorkTest extends TestCase
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
 
+        $plan = $this->getLinker()->createAndLinkPlan($dueWork);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
+
         return $dueWork;
     }
+
+
     /**
      * Test that Due Work basic details can be manufactured meaningfully
+     *
+     * @throws \PHPUnit\Framework\Exception
+     * @throws \UnexpectedValueException
      */
     public function testBuild()
     {
-        $id = 2;
         $title = 'Enter the Realm of Terroarrrr';
         $description = 'Diablo was found in the land of terroarrrrr! Find him, and whack him!';
         $typeName = 'Essay';
@@ -149,9 +154,7 @@ class DueWorkTest extends TestCase
 
         /* Files
          */
-        for ($i = 0; $i < count($files); $i++) {
-            $currentFile = $files[$i];
-
+        foreach ($files as $i => $currentFile) {
             $this->assertEquals($currentFile['id'], $dueWork->getAttachedFiles()->getOffset($i)->getId());
             $this->assertEquals($currentFile['hash'], $dueWork->getAttachedFiles()->getOffset($i)->getHash());
             $this->assertEquals($currentFile['filename'], $dueWork->getAttachedFiles()->getOffset($i)->getFilename());
@@ -268,9 +271,7 @@ class DueWorkTest extends TestCase
 
         /* Files
          */
-        for ($i = 0; $i < count($submissionFiles); $i++) {
-            $currentFile = $submissionFiles[$i];
-
+        foreach ($submissionFiles as $i => $currentFile) {
             $this->assertEquals($currentFile['id'], $submission->getAllFiles()->getOffset($i)->getId());
             $this->assertEquals($currentFile['hash'], $submission->getAllFiles()->getOffset($i)->getStorage()->getHash());
             $this->assertEquals($currentFile['filename'], $submission->getAllFiles()->getOffset($i)->getFilename());
@@ -333,9 +334,7 @@ class DueWorkTest extends TestCase
 
         /* Files
          */
-        for ($i = 0; $i < count($feedbackFiles); $i++) {
-            $currentFile = $feedbackFiles[$i];
-
+        foreach ($feedbackFiles as $i => $currentFile) {
             $this->assertEquals($currentFile['id'], $feedback->getAllFiles()->getOffset($i)->getId());
             $this->assertEquals($currentFile['hash'], $feedback->getAllFiles()->getOffset($i)->getStorage()->getHash());
             $this->assertEquals($currentFile['filename'], $feedback->getAllFiles()->getOffset($i)->getFilename());
@@ -349,9 +348,13 @@ class DueWorkTest extends TestCase
         $this->assertEquals(null, $feedback->getDeletedAt());
     }
 
+
     /**
      * Test that Due Work can contain Responses and Feedback meaningfully
      * including the shortcut that Feedbacks have to their Due Work
+     *
+     * @throws \UnexpectedValueException
+     * @throws \PHPUnit\Framework\Exception
      */
     public function testResponseWithFeedback()
     {
@@ -474,8 +477,11 @@ class DueWorkTest extends TestCase
         $this->assertEquals(4223, $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->getOffset(1)->getId());
     }
 
+
     /**
      * Test that Due Work Feedback Marks are stored correctly
+     *
+     * @throws \UnexpectedValueException
      */
     public function testMostRecentFeedbacks()
     {
@@ -601,8 +607,11 @@ class DueWorkTest extends TestCase
         $this->assertEquals(3385, $dueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getId());
     }
 
+
     /**
      * Test that Due Work Feedback Marks are stored correctly
+     *
+     * @throws \UnexpectedValueException
      */
     public function testMostRecentPublishedFeedbacks()
     {
@@ -738,8 +747,11 @@ class DueWorkTest extends TestCase
         $this->assertEquals(100, $dueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getNormalisedMark());
     }
 
+
     /**
      * What happens if you update an already-published feedback?
+     *
+     * @throws \UnexpectedValueException
      */
     public function testUpdateFeedbackAfterPublish()
     {
@@ -824,4 +836,5 @@ class DueWorkTest extends TestCase
          */
         $this->assertEquals(37, $dueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getNormalisedMark());
     }
+
 }

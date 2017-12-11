@@ -25,18 +25,24 @@ class QuizTest extends TestCase
 {
     use Defaults;
 
+
     /**
      * Test that Quiz initialises into a usable state
+     *
+     * @throws \PHPUnit\Framework\Exception
      */
     public function testInit()
     {
         $quiz = new Quiz();
-
         $this->assertInstanceOf(Collection::class, $quiz->getAllParticipants());
     }
 
+
     /**
      * Test that Quiz basic details can be manufactured meaningfully
+     *
+     * @throws \PHPUnit\Framework\Exception
+     * @throws \UnexpectedValueException
      */
     public function testBuild()
     {
@@ -50,17 +56,18 @@ class QuizTest extends TestCase
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $quiz))
-                ->add(new Participant($this->bsalem, $quiz))
-                ->add(new Participant($this->sberryhill, $quiz))
-                ->add(new Participant($this->asaxon, $quiz)))
             ->setPublishAt($this->twentyDaysFromNow)
             ->setOpenAt($this->twentyDaysFromNow)
             ->setDueAt($this->thirtyDaysFromNow)
             ->setCloseAt($this->fortyDaysFromNow)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
+
+        $quizPlan = $this->getLinker()->createAndLinkPlan($quiz);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $quizPlan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $quizPlan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $quizPlan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $quizPlan);
 
         /* Details
          */
@@ -92,8 +99,11 @@ class QuizTest extends TestCase
         $this->assertEquals(null, $quiz->getDeletedAt());
     }
 
+
     /**
      * Test that Quiz Responses can be manufactured meaningfully
+     *
+     * @throws \UnexpectedValueException
      */
     public function testResponses()
     {
@@ -107,11 +117,6 @@ class QuizTest extends TestCase
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $quiz))
-                ->add(new Participant($this->bsalem, $quiz))
-                ->add(new Participant($this->sberryhill, $quiz))
-                ->add(new Participant($this->asaxon, $quiz)))
             ->setPublishAt($this->twentyDaysFromNow)
             ->setOpenAt($this->twentyDaysFromNow)
             ->setDueAt($this->thirtyDaysFromNow)
@@ -119,7 +124,13 @@ class QuizTest extends TestCase
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
 
-        $attempt = (new QuizAttempt);
+        $quizPlan = $this->getLinker()->createAndLinkPlan($quiz);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $quizPlan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $quizPlan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $quizPlan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $quizPlan);
+
+        $attempt = new QuizAttempt();
         $attempt
             ->setId(8655)
             ->setAssessable($quiz)
@@ -146,8 +157,11 @@ class QuizTest extends TestCase
         $this->assertEquals(null, $attempt->getDeletedAt());
     }
 
+
     /**
      * Test that Quiz Feedback can be manufactured meaningfully
+     *
+     * @throws \UnexpectedValueException
      */
     public function testFeedback()
     {
@@ -161,17 +175,18 @@ class QuizTest extends TestCase
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $quiz))
-                ->add(new Participant($this->bsalem, $quiz))
-                ->add(new Participant($this->sberryhill, $quiz))
-                ->add(new Participant($this->asaxon, $quiz)))
             ->setPublishAt($this->twentyDaysFromNow)
             ->setOpenAt($this->twentyDaysFromNow)
             ->setDueAt($this->thirtyDaysFromNow)
             ->setCloseAt($this->fortyDaysFromNow)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
+
+        $quizPlan = $this->getLinker()->createAndLinkPlan($quiz);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $quizPlan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $quizPlan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $quizPlan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $quizPlan);
 
         $feedback = new QuizReview();
         $feedback
@@ -201,9 +216,13 @@ class QuizTest extends TestCase
         $this->assertEquals(null, $feedback->getDeletedAt());
     }
 
+
     /**
      * Test that Quiz can contain Responses and Feedback meaningfully
      * including the shortcut that Feedbacks have to their Quiz
+     *
+     * @throws \UnexpectedValueException
+     * @throws \PHPUnit\Framework\Exception
      */
     public function testResponseWithFeedback()
     {
@@ -217,11 +236,6 @@ class QuizTest extends TestCase
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $quiz))
-                ->add(new Participant($this->bsalem, $quiz))
-                ->add(new Participant($this->sberryhill, $quiz))
-                ->add(new Participant($this->asaxon, $quiz)))
             ->setPublishAt($this->twentyDaysFromNow)
             ->setOpenAt($this->twentyDaysFromNow)
             ->setDueAt($this->thirtyDaysFromNow)
@@ -229,7 +243,13 @@ class QuizTest extends TestCase
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
 
-        $attempt = (new QuizAttempt);
+        $quizPlan = $this->getLinker()->createAndLinkPlan($quiz);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $quizPlan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $quizPlan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $quizPlan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $quizPlan);
+
+        $attempt = new QuizAttempt();
         $attempt
             ->setId(8655)
             ->setAssessable($quiz)
@@ -308,9 +328,12 @@ class QuizTest extends TestCase
         $this->assertCount(4, $quiz->getParticipant($this->bsalem)->getAllFeedbacks());
     }
 
+
     /**
      * Test that Tasks can contain Responses and Feedback meaningfully
      * including the shortcut that Feedbacks have to their Task
+     *
+     * @throws \UnexpectedValueException
      */
     public function testMostRecentPublishedFeedback()
     {
@@ -324,17 +347,18 @@ class QuizTest extends TestCase
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $quiz))
-                ->add(new Participant($this->bsalem, $quiz))
-                ->add(new Participant($this->sberryhill, $quiz))
-                ->add(new Participant($this->asaxon, $quiz)))
             ->setPublishAt($this->twentyDaysFromNow)
             ->setOpenAt($this->twentyDaysFromNow)
             ->setDueAt($this->thirtyDaysFromNow)
             ->setCloseAt($this->fortyDaysFromNow)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
+
+        $quizPlan = $this->getLinker()->createAndLinkPlan($quiz);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $quizPlan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $quizPlan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $quizPlan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $quizPlan);
 
         $responses = [
             [
@@ -405,8 +429,11 @@ class QuizTest extends TestCase
         $this->assertEquals(35.0, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback()->getNormalisedMark());
     }
 
+
     /**
      * What happens if you update an already-published feedback?
+     *
+     * @throws \UnexpectedValueException
      */
     public function testUpdateFeedbackAfterPublish()
     {
@@ -420,11 +447,6 @@ class QuizTest extends TestCase
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $quiz))
-                ->add(new Participant($this->bsalem, $quiz))
-                ->add(new Participant($this->sberryhill, $quiz))
-                ->add(new Participant($this->asaxon, $quiz)))
             ->setPublishAt($this->twentyDaysFromNow)
             ->setOpenAt($this->twentyDaysFromNow)
             ->setDueAt($this->thirtyDaysFromNow)
@@ -432,7 +454,13 @@ class QuizTest extends TestCase
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
 
-        $attempt = (new QuizAttempt);
+        $quizPlan = $this->getLinker()->createAndLinkPlan($quiz);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $quizPlan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $quizPlan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $quizPlan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $quizPlan);
+
+        $attempt = new QuizAttempt();
         $attempt
             ->setId(8655)
             ->setAssessable($quiz)

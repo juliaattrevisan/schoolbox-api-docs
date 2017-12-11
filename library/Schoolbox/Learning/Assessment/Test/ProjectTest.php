@@ -12,45 +12,40 @@
 namespace Schoolbox\Learning\Assessment\Test;
 
 use PHPUnit\Framework\TestCase;
-use \Schoolbox\Collection;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use \Schoolbox\User;
-use \Schoolbox\Resource\Folder\Model as Folder;
-use \Schoolbox\Resource\Storage\Model as Storage;
-
-use \Schoolbox\Learning\Assessment\Participant;
-use \Schoolbox\Learning\Assessment\Project as Project;
-
-use \Schoolbox\Learning\Assessment\Summator\Average as SummatorAverage;
-use \Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
-use \Schoolbox\Learning\Assessment\Summator\Minimum as SummatorMinimum;
-
-use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use \Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkSubmission;
+use Schoolbox\User;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Storage\Model as Storage;
+use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Summator\Average as SummatorAverage;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkSubmission;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as DueWorkSubmissionFile;
-use \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as DueWorkSubmissionFilePlagscan;
-use \Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
-use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
-use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as DueWorkSubmissionFilePlagscan;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
-
-use \Schoolbox\Learning\Assessment\Task\Model as Task;
-use \Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
-use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
-
-use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
-use \Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
-use \Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
+use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
 
 class ProjectTest extends TestCase
 {
     use Defaults;
 
+
     /**
      * Test that Project initialises into a usable state
+     *
+     * @throws \PHPUnit\Framework\Exception
      */
     public function testInit()
     {
@@ -60,8 +55,12 @@ class ProjectTest extends TestCase
         $this->assertInstanceOf(SummatorAverage::class, $project->getSummator());
     }
 
+
     /**
      * Test that project is in the specification context, if it's in a unit spec.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \PHPUnit\Framework\AssertionFailedError
      */
     public function testInSpecification()
     {
@@ -72,8 +71,12 @@ class ProjectTest extends TestCase
         $this->assertTrue($project->isSpecificationContext());
     }
 
+
     /**
      * Test that project is in the implementation context, if it's in a folder.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \PHPUnit\Framework\AssertionFailedError
      */
     public function testInFolder()
     {
@@ -84,8 +87,12 @@ class ProjectTest extends TestCase
         $this->assertFalse($project->isSpecificationContext());
     }
 
+
     /**
      * Test that project is in the implementation context, if it's in a unit impl.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \PHPUnit\Framework\AssertionFailedError
      */
     public function testInImplementation()
     {
@@ -96,9 +103,12 @@ class ProjectTest extends TestCase
         $this->assertFalse($project->isSpecificationContext());
     }
 
+
     /**
      * Test that Project basic details can be manufactured meaningfully
      *
+     * @throws \PHPUnit\Framework\Exception
+     * @throws \UnexpectedValueException
      */
     public function testBuild()
     {
@@ -112,17 +122,18 @@ class ProjectTest extends TestCase
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $project))
-                ->add(new Participant($this->bsalem, $project))
-                ->add(new Participant($this->sberryhill, $project))
-                ->add(new Participant($this->asaxon, $project)))
             ->setPublishAt($this->tomorrow)
             ->setOpenAt($this->tomorrow)
             ->setDueAt($this->fiftyDaysFromNow)
             ->setCloseAt($this->fiftyDaysFromNow)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
+
+        $plan = $this->getLinker()->createAndLinkPlan($project);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
 
         /* Details
          */
@@ -154,10 +165,15 @@ class ProjectTest extends TestCase
         $this->assertEquals(null, $project->getDeletedAt());
     }
 
+
     /**
      * Spawn a Project composite
      *
      * A giant project instantiation consisting of a due work, task, quiz
+     *
+     * @throws \PHPUnit\Framework\Exception
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
     public function testAssessables()
     {
@@ -171,17 +187,18 @@ class ProjectTest extends TestCase
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $project))
-                ->add(new Participant($this->bsalem, $project))
-                ->add(new Participant($this->sberryhill, $project))
-                ->add(new Participant($this->asaxon, $project)))
             ->setPublishAt($this->tomorrow)
             ->setOpenAt($this->tomorrow)
             ->setDueAt($this->fiftyDaysFromNow)
             ->setCloseAt($this->fiftyDaysFromNow)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
+
+        $plan = $this->getLinker()->createAndLinkPlan($project);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
 
         $task = $this->spawnTask();
         $dueWork = $this->spawnDueWork();
@@ -220,10 +237,12 @@ class ProjectTest extends TestCase
         $this->assertEquals(60, $projectQuiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback()->getNormalisedMark());
     }
 
+
     /**
      * Spawn a Due Work
      *
      * @return DueWork
+     * @throws \UnexpectedValueException
      */
     protected function spawnDueWork()
     {
@@ -282,11 +301,6 @@ class ProjectTest extends TestCase
                 ->setId(1)
                 ->setName($typeName))
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $dueWork))
-                ->add(new Participant($this->bsalem, $dueWork))
-                ->add(new Participant($this->sberryhill, $dueWork))
-                ->add(new Participant($this->asaxon, $dueWork)))
             ->setAttachedFiles((new Collection())
                 ->add((new DueWorkFile())
                     ->setId($files[0]['id'])
@@ -302,6 +316,12 @@ class ProjectTest extends TestCase
             ->setCloseAt($this->thirtyDaysFromNow)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
+
+        $plan = $this->getLinker()->createAndLinkPlan($dueWork);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
 
         $submission = new DueWorkSubmission();
         $submission
@@ -396,8 +416,12 @@ class ProjectTest extends TestCase
         return $dueWork;
     }
 
+
     /**
      * Spawn a Task
+     *
+     * @throws \InvalidArgumentException
+     * @throws \UnexpectedValueException
      */
     protected function spawnTask()
     {
@@ -411,10 +435,6 @@ class ProjectTest extends TestCase
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->celia)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $task))
-                ->add(new Participant($this->sberryhill, $task))
-                ->add(new Participant($this->asaxon, $task)))
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->thirteenDaysFromNow)
             ->setDueAt($this->fourteenDaysFromNow)
@@ -422,7 +442,12 @@ class ProjectTest extends TestCase
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
 
-        $response = (new TaskResponse());
+        $plan = $this->getLinker()->createAndLinkPlan($task);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
+
+        $response = new TaskResponse();
         $response
             ->setId(883)
             ->setAssessable($task)
@@ -443,10 +468,12 @@ class ProjectTest extends TestCase
         return $task;
     }
 
+
     /**
      * Spawn a Quiz
      *
      * @return Quiz
+     * @throws \UnexpectedValueException
      */
     protected function spawnQuiz()
     {
@@ -460,11 +487,6 @@ class ProjectTest extends TestCase
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes, $quiz))
-                ->add(new Participant($this->bsalem, $quiz))
-                ->add(new Participant($this->sberryhill, $quiz))
-                ->add(new Participant($this->asaxon, $quiz)))
             ->setPublishAt($this->twentyDaysFromNow)
             ->setOpenAt($this->twentyDaysFromNow)
             ->setDueAt($this->thirtyDaysFromNow)
@@ -472,7 +494,13 @@ class ProjectTest extends TestCase
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
 
-        $attempt = (new QuizAttempt);
+        $plan = $this->getLinker()->createAndLinkPlan($quiz);
+        $this->getLinker()->createAndLinkParticipant($this->hodes, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->bsalem, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
+        $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
+
+        $attempt = new QuizAttempt();
         $attempt
             ->setId(8655)
             ->setAssessable($quiz)

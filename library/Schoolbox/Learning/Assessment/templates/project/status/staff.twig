@@ -1,3 +1,13 @@
+{# Renders a project status page for staff.
+Data:
+    'breadcrumbs'       string[][]
+    'baseContext'       AssessmentContext
+    'assessment'        IAssessable
+    'assessmentStats'   Assessment\Statistics[] Indexed by assessment.id
+    'participantStats'  ParticipantStatistics[] Indexed by user.id
+    'returnUrl'         string
+#}
+
 <script type="text/javascript">
     $(function() {
         // Setup sortable
@@ -97,6 +107,7 @@
                                 data-assessment-list
                                 data-action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'projects', contextId: assessment.id, context: context}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
                                 {% for assessable in assessment.assessables %}
+                                    {% set stats = assessmentStats[assessable.id] %}
                                     {% import '@learningAssessment/project/macro/icon.twig' as icon %}
 
                                     <li data-assessment="{{ assessable.id }}" data-assessment-title="{{ assessable.title }}">
@@ -123,7 +134,7 @@
 
                                                     {% if assessable.getDueAt.isNull == false %}
                                                         <p class="meta">
-                                                            {{ assessmentCounts.completed[assessable.id] }}/{{ assessmentCounts.totalParticipants }} students completed
+                                                            {{ stats.countParticipants - stats.countResponseRequired }}/{{ stats.countParticipants }} students completed
                                                         </p>
                                                     {% endif %}
                                                 </div>
@@ -199,7 +210,8 @@
                                                         </h3>
                                                     </a>
                                                     <p class="meta">
-                                                        {{ participantCounts.completed[participant.user.id] }}/{{ participantCounts.totalAssessments }} activities completed
+                                                        {% set stats = participantStats[participant.user.id] %}
+                                                        {{ stats.countAssessments - stats.countResponseRequired }}/{{ stats.countAssessments }} activities completed
                                                     </p>
                                                 </div>
                                             </div>

@@ -380,7 +380,7 @@ class ProjectTest extends TestCase
                 (new ProjectModel())
                     ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
                     ->setAssessmentModel($assessmentModel)
-                    ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_NONE))
+                    ->setMarkType($this->buildMarkType())
                     ->setGradeGroup((new GradeGroup())),
                 None::class,
                 null
@@ -606,6 +606,8 @@ class ProjectTest extends TestCase
                                 ->setId(3)
                                 ->setTitle('Sub-work')
                                 ->setWorkType(new WorkType())
+                                ->setSelfReflectable(true)
+                                ->setSelfAssessable(true)
                         )
                         ->setWorkType(new WorkType())
                         ->setSelfReflectable(true)
