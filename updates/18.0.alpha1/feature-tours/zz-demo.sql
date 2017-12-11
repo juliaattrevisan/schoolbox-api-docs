@@ -87,7 +87,7 @@ CASE WHEN EXISTS (SELECT * FROM `config` WHERE `name` = 'site_location' AND `val
                     @tourStaff,
                     ''window'',
                     ''load'',
-                    ''192.168.36.10/''
+                    ''/''
   '
 
 ELSE ''
