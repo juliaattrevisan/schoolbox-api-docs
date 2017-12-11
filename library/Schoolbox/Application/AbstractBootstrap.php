@@ -836,8 +836,8 @@ abstract class AbstractBootstrap implements BootstrapInterface
         );
 
         // install sentry
-        $sentryToken   = SENTRY_TOKEN;
-        $sentryProject = SENTRY_PROJECT;
+        $sentryToken   = \defined('SENTRY_TOKEN') ? SENTRY_TOKEN : '';
+        $sentryProject = \defined('SENTRY_PROJECT') ? SENTRY_PROJECT : '';
 
         if (\strlen($sentryToken) && \strlen($sentryProject)) {
             try {
