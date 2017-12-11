@@ -10,6 +10,7 @@
 
 .introjs-arrow {
   border: 8px solid $white;
+  
   &.top {
     border-color: transparent transparent $white;
     top: -1rem;
@@ -127,7 +128,6 @@
   border-radius: 0;
   box-sizing: border-box;
   color: $content-ui-foreground;
-  display: block;
   font: $base-font-size / normal $font-family-sans-serif;
   line-height: 1.375rem;
   text-align: center;
