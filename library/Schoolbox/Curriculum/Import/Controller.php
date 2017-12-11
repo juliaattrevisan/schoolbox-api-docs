@@ -110,7 +110,7 @@ class Controller extends Base
         if ($thisArea instanceof LearningArea\Model && $thisLevel instanceof LearningLevel\Model) {
             /** @var Node\Model $rootNode */
             try {
-                $rootNode = $this->getNodeMapper()->findOneByColumn('reference', $thisArea->getReference());
+                $rootNode = $this->getNodeMapper()->findOneByColumn('reference', $thisArea->getReference(), ["deleted" => false]);
             }
             catch (\Schoolbox\Mapper\Exception $e) {
                 $rootNode = $this->getNodeMapper()->createModel();

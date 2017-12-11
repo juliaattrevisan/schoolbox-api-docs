@@ -44,7 +44,8 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
     {
         try {
             //Avoid saving duplicates if possible
-            $this->findOneByColumn('reference', $model->getReference());
+            $result = $this->findOneByColumn('reference', $model->getReference(), ["deleted" => false]);
+            $model->setId($result->getId());
         }
         catch(\Schoolbox\Mapper\Exception $e) {
             $this->save($model);
