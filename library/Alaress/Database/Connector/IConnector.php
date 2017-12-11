@@ -94,14 +94,13 @@ interface IConnector extends IQuoter
     public function executeQuery($sql, $parameters = null);
 
     /**
-     * Convenience method to prepare and execute a query with the supplied parameters and return a
-     * ready to use iterator
+     * Retrieve an iterator for a SQL query
      *
      * @param string $sql
      * @param null|array $parameters
      * @return IIterator
      */
-    public function executeQueryIterator($sql, $parameters = null);
+    public function getQueryIterator($sql, $parameters = null);
 
     /**
      * Prepare database function call
@@ -148,8 +147,7 @@ interface IConnector extends IQuoter
     public function executeStoredProcedure($procedure, $inputs = null, &$outputs = null, &$return = null);
 
     /**
-     * Convenience method to prepare and execute a stored procedure with the supplied parameters and
-     * return a ready to use iterator
+     * Retrieve an iterator for a stored procedure
      *
      * @param string $procedure
      * @param null|array &$inputs
@@ -157,7 +155,7 @@ interface IConnector extends IQuoter
      * @param null|array &$return
      * @return IIterator
      */
-    public function executeStoredProcedureIterator($procedure, $inputs = null, &$outputs = null, &$return = null);
+    public function getStoredProcedureIterator($procedure, $inputs = null, &$outputs = null, &$return = null);
 
     /**
      * Return last inserted record ID

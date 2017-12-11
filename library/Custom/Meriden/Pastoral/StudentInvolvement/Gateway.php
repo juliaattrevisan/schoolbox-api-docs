@@ -555,7 +555,7 @@ class Gateway
 
         // Reduce to one result
         $result = [];
-        foreach ($this->database->executeQueryIterator($query, $pb->getParams()) as $singleResult) {
+        foreach ($this->database->getQueryIterator($query, $pb->getParams()) as $singleResult) {
             if (empty($result)) {
                 $result             = $singleResult;
                 $result['tch_code'] = [];

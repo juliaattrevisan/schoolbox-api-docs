@@ -93,7 +93,7 @@ class StoredProcedure extends Base
      * @return IIterator
      * @throws DomainException if this has output or return parameters
      */
-    public function executeIterator($values = null)
+    public function getIterator($values = null)
     {
         if (!empty($this->parameters['output']) || !empty($this->parameters['return'])) {
             throw new DomainException(
@@ -101,7 +101,7 @@ class StoredProcedure extends Base
                 'Use `execute()` instead, or remove output and return values.'
             );
         }
-        return parent::executeIterator($values);
+        return parent::getIterator($values);
     }
 
     /**

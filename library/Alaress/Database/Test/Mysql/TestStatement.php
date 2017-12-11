@@ -126,7 +126,7 @@ class TestStatement extends TestCase
      */
     public function testStatementIterator()
     {
-        $iterator = $this->schoolbox->executeQueryIterator(
+        $iterator = $this->schoolbox->getQueryIterator(
             'SELECT `lastname` FROM `user` WHERE `lastname` = :lastname',
             ['lastname' => 'Rhodes']
         );

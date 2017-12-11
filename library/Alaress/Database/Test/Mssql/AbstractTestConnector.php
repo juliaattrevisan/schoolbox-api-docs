@@ -60,7 +60,7 @@ abstract class AbstractTestConnector extends TestCase
         /** @var IConnector $connectorReconstituted */
         $connectorReconstituted = unserialize($connectorSerialized);
 
-        $iterator = $connectorReconstituted->executeQueryIterator(
+        $iterator = $connectorReconstituted->getQueryIterator(
             'SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname',
             ['Surname' => 'rhodes']
         );

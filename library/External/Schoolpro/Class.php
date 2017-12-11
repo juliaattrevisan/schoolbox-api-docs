@@ -45,7 +45,7 @@ class External_Schoolpro_Class implements External_ClassInterface
                 ],
             ];
 
-            foreach ($this->getConnector()->executeStoredProcedureIterator($vars[0], $vars[1]) as $currentStudent) {
+            foreach ($this->getConnector()->getStoredProcedureIterator($vars[0], $vars[1]) as $currentStudent) {
                 $student = [
                     'synergy_id'              => $currentStudent['ID'],
                     'firstname'               => $currentStudent['Firstname'],
@@ -68,7 +68,7 @@ class External_Schoolpro_Class implements External_ClassInterface
 
             /* Get the medical data for him too
              */
-            $medicalResult = $this->getConnector()->executeStoredProcedureIterator(
+            $medicalResult = $this->getConnector()->getStoredProcedureIterator(
                 'sbGetStudentMedicalConditions',
                 [
                     'pUserName'  => 'alaress',
@@ -118,7 +118,7 @@ class External_Schoolpro_Class implements External_ClassInterface
                 ],
             ];
 
-            $result = $this->getConnector()->executeStoredProcedureIterator($vars[0], $vars[1]);
+            $result = $this->getConnector()->getStoredProcedureIterator($vars[0], $vars[1]);
             foreach ($result as $currentTeacher) {
                 $allTeachers[] = $currentTeacher['ID'];
             }

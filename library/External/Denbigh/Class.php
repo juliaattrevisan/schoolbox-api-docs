@@ -41,7 +41,7 @@ class External_Denbigh_Class implements External_ClassInterface
         $predicate = PredicateBuilder::getArrayBindings($classCodes, 'classCode');
 
         /** @noinspection SqlDialectInspection */
-        $studentIterator = $this->externalDatabase->executeQueryIterator(
+        $studentIterator = $this->externalDatabase->getQueryIterator(
             "
                 SELECT      p.denbighID, 
                             p.surname, 

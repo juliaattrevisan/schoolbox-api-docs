@@ -78,7 +78,7 @@ class TestConnector extends TestCase
         /** @var IConnector $connectorReconstituted */
         $connectorReconstituted = unserialize($connectorSerialized);
 
-        $iterator = $connectorReconstituted->executeQueryIterator(
+        $iterator = $connectorReconstituted->getQueryIterator(
             'SELECT * FROM USERS WHERE NAME_LAST = :nameLast',
             ['nameLast' => 'Bailey']
         );

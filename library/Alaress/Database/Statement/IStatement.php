@@ -131,7 +131,7 @@ interface IStatement
      * @return IIterator
      * @throws Exception
      */
-    public function executeIterator($values = null);
+    public function getIterator($values = null);
 
     /**
      * Returns the data type name as a string for debugging display purposes only, should be no

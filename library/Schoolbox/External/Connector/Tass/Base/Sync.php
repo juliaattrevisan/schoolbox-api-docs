@@ -40,7 +40,7 @@ class Sync extends Base implements ISync
      */
     public function findAllStudents()
     {
-        $iterator = $this->databaseExternal->executeQueryIterator(
+        $iterator = $this->databaseExternal->getQueryIterator(
             "
                 SELECT
                     s.stud_code      AS student_id,
@@ -215,7 +215,7 @@ class Sync extends Base implements ISync
      */
     public function findAllStaff()
     {
-        $iterator = $this->databaseExternal->executeQueryIterator
+        $iterator = $this->databaseExternal->getQueryIterator
         (
             "
                 SELECT DISTINCT

@@ -70,7 +70,7 @@ class External_Isams_Timetable implements External_TimetableInterface
             WHERE CampusCode = :campus_code AND DayID = :day_id
             ORDER BY DayID, CAST(StartTime AS TIME)
 	    ";
-        $periods = $this->getConnector()->executeQueryIterator($query, [
+        $periods = $this->getConnector()->getQueryIterator($query, [
             'campus_code'   => $campus->getExtTimetableCode(),
             'day_id'        => $dayId
         ]);
@@ -322,7 +322,7 @@ class External_Isams_Timetable implements External_TimetableInterface
                     )
         ";
 
-        $iterator = $this->getConnector()->executeQueryIterator($queryTimetable, [
+        $iterator = $this->getConnector()->getQueryIterator($queryTimetable, [
             'day_id'            => $dayId,
             'campus_code'       => $campus->getExtTimetableCode(),
             'external_user_id'  => $externalUserId
@@ -403,7 +403,7 @@ class External_Isams_Timetable implements External_TimetableInterface
             ORDER BY V_Days.intOrder, V_Periods.intOrder
         ";
 
-        $iterator = $this->getConnector()->executeQueryIterator($queryTimetable, [
+        $iterator = $this->getConnector()->getQueryIterator($queryTimetable, [
             'external_user_id'  => $externalUserId,
             'campus_code'       => $campus->getExtTimetableCode()
         ]);

@@ -145,7 +145,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             );
         }
 
-        $lessonIterator = $queryTimetable->executeIterator([
+        $lessonIterator = $queryTimetable->getIterator([
             'externalUserId' => $externalUserId,
         ]);
 
@@ -308,7 +308,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             );
         }
 
-        $lessonIterator = $queryTimetable->executeIterator([
+        $lessonIterator = $queryTimetable->getIterator([
             'externalUserId' => $externalUserId,
             'dayNumber'      => $dayNumber,
         ]);

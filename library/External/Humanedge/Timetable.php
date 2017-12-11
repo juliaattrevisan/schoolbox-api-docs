@@ -47,7 +47,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
         $db       = $this->loadAPlusDatabase();
         $dayCount = $db->executeQuery("SELECT COUNT(*) FROM tblDay WHERE deleted = 0")->fetchColumn();
         $periods  = [];
-        $result   = $db->executeQueryIterator("
+        $result   = $db->getQueryIterator("
             SELECT
                 p.Name,
                 CONVERT(varchar(15),CAST(ISNULL(pd.StartTime, p.StartTime) AS TIME),100) as StartTime,
@@ -302,7 +302,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
             $timetable[$x]['periodEnd']      = $timetabledef['end'][$x];
             $timetable[$x]['class']          = [];
         }
-        foreach ($db->executeQueryIterator($query, $params) as $timetabledClass) {
+        foreach ($db->getQueryIterator($query, $params) as $timetabledClass) {
             // Account for classes which extend multiple periods
             $periodSpan = range(
                 $timetabledClass['PeriodNumber'],
@@ -486,7 +486,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
             // Fill in each day with blanks
             $timetable[$x]['day']            = array_fill(1, $timetabledef['dayCount'], []);
         }
-        foreach ($db->executeQueryIterator($query, $params) as $timetabledClass) {
+        foreach ($db->getQueryIterator($query, $params) as $timetabledClass) {
             // Account for classes which extend multiple periods
             $periodSpan = range(
                 $timetabledClass['PeriodNumber'],

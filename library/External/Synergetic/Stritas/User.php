@@ -107,7 +107,7 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
 
         $student = [];
 
-        $iteratorStudents = $this->getConnector()->executeQueryIterator($query, ['externalId' => $synID]);
+        $iteratorStudents = $this->getConnector()->getQueryIterator($query, ['externalId' => $synID]);
 
         foreach ($iteratorStudents as $row) {
 

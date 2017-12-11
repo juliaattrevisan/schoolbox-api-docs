@@ -177,7 +177,7 @@ class MSSQL
      */
     public function getIterator($sql_q)
     {
-        return $this->connector->executeQueryIterator($sql_q);
+        return $this->connector->getQueryIterator($sql_q);
     }
 
     /**

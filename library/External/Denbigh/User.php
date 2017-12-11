@@ -49,7 +49,7 @@ class External_Denbigh_User implements External_UserInterface
         $predicate = PredicateBuilder::getArrayBindings($parentIds, 'externalId');
 
         /** @noinspection SqlDialectInspection */
-        $parentIterator = $this->externalDatabase->executeQueryIterator(
+        $parentIterator = $this->externalDatabase->getQueryIterator(
             "
                 SELECT        Family.email
                 FROM          Schoolbox_Students
@@ -326,7 +326,7 @@ class External_Denbigh_User implements External_UserInterface
     public function getStudentContactList($externalId)
     {
         /** @noinspection SqlDialectInspection */
-        $contactIterator = $this->externalDatabase->executeQueryIterator(
+        $contactIterator = $this->externalDatabase->getQueryIterator(
             "
                 SELECT        pe_p.denbighID, 
                               pe_p.surname, 

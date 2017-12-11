@@ -92,7 +92,7 @@ try {
             $log->info("{$countDocuments} documents pending migration");
 
             do {
-                $documents = $database->executeQueryIterator(
+                $documents = $database->getQueryIterator(
                     "
                         SELECT      `p`.`id`,
                                     `p`.`html`,

@@ -19,7 +19,7 @@ class Sync extends BaseSync
      */
     public function findAllStudents()
     {
-        $iterator = $this->databaseExternal->executeQueryIterator("
+        $iterator = $this->databaseExternal->getQueryIterator("
             SELECT
                 vStudents.StudentID            AS student_id,
                 ca.AttributeValue              AS network_login,

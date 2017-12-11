@@ -140,7 +140,7 @@ class External_Schoolpro_User implements External_UserInterface
                 ]
             ];
 
-            $medicalResult = $this->getConnector()->executeStoredProcedureIterator($medicalVars[0], $medicalVars[1]);
+            $medicalResult = $this->getConnector()->getStoredProcedureIterator($medicalVars[0], $medicalVars[1]);
 
             /* These arrive in a variety of formats
              */
@@ -305,7 +305,7 @@ class External_Schoolpro_User implements External_UserInterface
                 ]
             ];
 
-            $result = $this->getConnector()->executeStoredProcedureIterator($vars[0], $vars[1]);
+            $result = $this->getConnector()->getStoredProcedureIterator($vars[0], $vars[1]);
 
             $subjectList = array();
 
@@ -329,7 +329,7 @@ class External_Schoolpro_User implements External_UserInterface
                 ]
             ];
 
-            $result = $this->getConnector()->executeStoredProcedureIterator($vars[0], $vars[1]);
+            $result = $this->getConnector()->getStoredProcedureIterator($vars[0], $vars[1]);
 
             $subjectList = array();
 
@@ -370,7 +370,7 @@ class External_Schoolpro_User implements External_UserInterface
             ]
         ];
 
-        $result = $this->getConnector()->executeStoredProcedureIterator($vars[0], $vars[1]);
+        $result = $this->getConnector()->getStoredProcedureIterator($vars[0], $vars[1]);
 
         $allStudents = array();
 

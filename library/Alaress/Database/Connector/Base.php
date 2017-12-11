@@ -334,11 +334,11 @@ class Base implements Serializable, IConnector
     /**
      * @inheritdoc
      */
-    public function executeQueryIterator($sql, $parameters = null)
+    public function getQueryIterator($sql, $parameters = null)
     {
         /** @var IQuery $statement */
         $statement = $this->prepareQuery($sql, $parameters);
-        return $statement->executeIterator();
+        return $statement->getIterator();
     }
 
     /**
@@ -355,11 +355,11 @@ class Base implements Serializable, IConnector
     /**
      * @inheritdoc
      */
-    public function executeStoredProcedureIterator($procedure, $inputs = null, &$outputs = null, &$return = null)
+    public function getStoredProcedureIterator($procedure, $inputs = null, &$outputs = null, &$return = null)
     {
         /** @var IStoredProcedure $statement */
         $statement = $this->prepareStoredProcedure($procedure, $inputs, $outputs, $return);
-        return $statement->executeIterator();
+        return $statement->getIterator();
     }
 
     /**
