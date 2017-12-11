@@ -835,6 +835,35 @@ abstract class AbstractBootstrap implements BootstrapInterface
             )
         );
 
+        // install sentry
+        $sentryToken   = SENTRY_TOKEN;
+        $sentryProject = SENTRY_PROJECT;
+
+        if (\strlen($sentryToken) && \strlen($sentryProject)) {
+            try {
+                /** @var \Schoolbox\Instance $sb */
+                $sb = $di->get('instance');
+
+                // fall back to site_location if site_school_code not set
+                $options = [
+                    'environment' => $sb->getType(),
+                    'tags'        => [
+                        'php_version'      => PHP_VERSION,
+                        'site_version'     => $sb->getVersion(),
+                        'site_school_code' => $sb->getSchoolCode() ?: $sb->getLocation()
+                    ]
+                ];
+
+                $raven = new \Raven_Client("https://{$sentryToken}@sentry.io/{$sentryProject}", $options);
+                $raven->install();
+            } catch (\Raven_Exception $e) {
+                // do nothing; sentry is not installed
+            } catch (Di\Exception\ServiceNotFound $e) {
+                // do nothing; sentry is not installed
+            }
+        }
+
+
         // load dependencies into the kernel itself
         $this->kernel->setDependencyInjector($di);
     }
