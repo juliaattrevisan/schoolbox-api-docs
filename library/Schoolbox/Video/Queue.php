@@ -203,9 +203,10 @@ class Queue extends ResourceVideo
         /* Process video to 512kb in libx264 format for mobile and html5 streaming */
         $processString = "nice $executable -y -i " . escapeshellarg($sourceFile) .
             " -c:v libx264 $scale -preset slow -b:v {$this->videoBitrate}k -pix_fmt yuv420p -b:a {$this->audioBitrate}k -r 24 -ar:a 44100" .
-            " -timelimit " . escapeshellarg($this->processTimeout) . ' ' .
-            ($strict ? '-strict -2 ' : '') .
-            '-ac 2 ' . escapeshellarg($this->getVideoLocation()) . ' 2>&1';
+            " -timelimit " . escapeshellarg($this->processTimeout) .
+            ' -nostats' .
+            ($strict ? ' -strict -2' : '') .
+            ' -ac 2 ' . escapeshellarg($this->getVideoLocation()) . ' 2>&1';
 
         exec($processString, $message, $return);
         $this->setMessage($processString . "\n" . implode("\n", $message));
@@ -236,10 +237,12 @@ class Queue extends ResourceVideo
         $thumbnailString  = "nice $executable -y -i " . escapeshellarg($sourceFile) .
             ' -f image2 -ss ' . $thumbnailSeconds .
             ' -vf '.$thumbScale.'crop=64:64'.
+            ' -nostats' .
             ' -frames:v 1 ' .
             escapeshellarg($this->getThumbnailLocation()) . ' 2>&1';
         $posterString     = "nice $executable -y -i " . escapeshellarg($sourceFile) .
             ' -f image2 -ss ' . $thumbnailSeconds .
+            ' -nostats' .
             ' -frames:v 1 ' .
             escapeshellarg($this->getPosterLocation()) . ' 2>&1';
 
