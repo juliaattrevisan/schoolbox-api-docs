@@ -29,6 +29,8 @@ $(function () {
         window.tours = [];
 
         $(tours).each(function(i, tour) {
+            console.log('Loading tour: ' + tour.title + ' (' + tour.uuid + ')')
+
             window.tours[tour.uuid] = tour;
 
             $(tour.triggers).each(function(j, trigger) {
@@ -36,13 +38,20 @@ $(function () {
                 // Otherwise schedule it to start on the specified selector/event combination.
 
                 if (trigger.selector === null && trigger.event === null) {
+                    console.log('Triggering immediately');
+
                     window.tourStart(tour.uuid);
                 } else {
+                    console.log('Triggering on: $("' + trigger.selector + '").' + trigger.event + ' event');
+
                     $(trigger.selector).on(trigger.event, function() {
                         window.tourStart(tour.uuid);
                     });
                 }
             });
         });
+
+        $(document).trigger('tourReady');
+        console.log('All tours ready');
     });
 });
