@@ -20,18 +20,6 @@ class Sync extends Base implements ISync
      */
     public function findAllStudents()
     {
-        /**
-         * CustomOverrride
-         */
-        $customView = trim($this->config->get('external_custom_ups_student'));
-        if(strlen($customView) > 0) {
-            return new Iterator\Student(
-                $this->databaseExternal->executeQueryIterator(
-                    'SELECT DISTINCT * FROM '.$this->databaseExternal->quoteIdentifier($customView).';'
-                )
-            );
-        }
-
         $query = "
             SELECT
                 u.synergy_id         AS student_id,
@@ -70,18 +58,6 @@ class Sync extends Base implements ISync
      */
     public function findAllParents()
     {
-        /**
-         * CustomOverrride
-         */
-        $customView = trim($this->config->get('external_custom_ups_parent'));
-        if(strlen($customView) > 0) {
-            return new Iterator\Guardian(
-                $this->databaseExternal->executeQueryIterator(
-                    'SELECT DISTINCT * FROM '.$this->databaseExternal->quoteIdentifier($customView).';'
-                )
-            );
-        }
-
         $query = "
             SELECT
                 p.username           AS student_contact_network_login,
@@ -123,18 +99,6 @@ class Sync extends Base implements ISync
      */
     public function findAllStaff()
     {
-        /**
-         * CustomOverrride
-         */
-        $customView = trim($this->config->get('external_custom_ups_staff'));
-        if(strlen($customView) > 0) {
-            return new Iterator\Staff(
-                $this->databaseExternal->executeQueryIterator(
-                    'SELECT DISTINCT * FROM '.$this->databaseExternal->quoteIdentifier($customView).';'
-                )
-            );
-        }
-
         $query = "
             SELECT
                 u.synergy_id         AS staff_id,
@@ -153,8 +117,8 @@ class Sync extends Base implements ISync
                 ''                   AS staff_house,
                 ''                   AS staff_department,
                 u.year               AS staff_year_level,
-                ''                   AS staff_year_level_description
-
+                ''                   AS staff_year_level_description                
+                
             FROM `user` `u`
             INNER JOIN userCampus uc        ON u.id = uc.uid
             INNER JOIN luCampus c           ON uc.campus = c.id

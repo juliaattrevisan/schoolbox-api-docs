@@ -27,18 +27,6 @@ class Sync extends Base implements ISync
      */
     public function findAllStudents()
     {
-        /**
-         * CustomOverrride
-         */
-        $customView = trim($this->config->get('external_custom_ups_student'));
-        if(strlen($customView) > 0) {
-            return new Iterator\Student(
-                $this->databaseExternal->executeQueryIterator(
-                    'SELECT DISTINCT * FROM '.$this->databaseExternal->quoteIdentifier($customView).';'
-                )
-            );
-        }
-
         $query =
         "
             SELECT
@@ -73,21 +61,9 @@ class Sync extends Base implements ISync
      */
     public function findAllParents()
     {
-        /**
-         * CustomOverrride
-         */
-        $customView = trim($this->config->get('external_custom_ups_parent'));
-        if(strlen($customView) > 0) {
-            return new Iterator\Guardian(
-                $this->databaseExternal->executeQueryIterator(
-                    'SELECT DISTINCT * FROM '.$this->databaseExternal->quoteIdentifier($customView).';'
-                )
-            );
-        }
-
         $query =
         "
-            SELECT DISTINCT
+            SELECT DISTINCT 
                         c.ContactID                 AS student_contact_network_login,
                         c.ContactID                 AS student_contact_id,
                         c.Title                     AS student_contact_title,
@@ -104,16 +80,16 @@ class Sync extends Base implements ISync
                         p.ForeName                  AS student_preferred,
                         p.Surname                   AS student_surname,
                         p.YearGroupID               AS student_year_level,
-                        p.YearGroup                 as student_year_level_description
+                        p.YearGroup                 as student_year_level_description            
             FROM        VLPupilContact              pc
             LEFT JOIN   VLContact                   c on c.ContactID = pc.ContactID
             LEFT JOIN   ContactMaster               cm on c.ContactID = cm.ContactID
             LEFT JOIN   VLContactEmail              ce on ce.ContactID = pc.ContactID
             LEFT JOIN   ContactEmailInformation     cei ON cei.ContactID = pc.ContactID AND cei.PrimaryEmail = 1
-            LEFT JOIN   VLContactTelephone          ct on ct.ContactID = pc.ContactID
+            LEFT JOIN   VLContactTelephone          ct on ct.ContactID = pc.ContactID 
             LEFT JOIN   V_PupilBasicInformation     p ON p.PupilID = pc.PupilID
-            WHERE       pc.IsContactParental = 1
-            AND         pc.ContactID <> ''
+            WHERE       pc.IsContactParental = 1 
+            AND         pc.ContactID <> ''            
         ";
 
         return new Iterator\Guardian(
@@ -126,18 +102,6 @@ class Sync extends Base implements ISync
      */
     public function findAllStaff()
     {
-        /**
-         * CustomOverrride
-         */
-        $customView = trim($this->config->get('external_custom_ups_staff'));
-        if(strlen($customView) > 0) {
-            return new Iterator\Staff(
-                $this->databaseExternal->executeQueryIterator(
-                    'SELECT DISTINCT * FROM '.$this->databaseExternal->quoteIdentifier($customView).';'
-                )
-            );
-        }
-
         $query =
         "
             SELECT      spd.StaffID           as staff_id,
@@ -151,24 +115,24 @@ class Sync extends Base implements ISync
                         CASE WHEN seiw.EmailAddress IS NOT NULL THEN seiw.EmailAddress ELSE seiwb.EmailAddress END AS default_email,
                         CASE WHEN seiw.EmailAddress IS NOT NULL THEN seiw.EmailAddress ELSE seiwb.EmailAddress END AS work_email,
                         ''                    AS staff_campus,
-
-                        CASE WHEN
-                          IsStaffPartTime = 1 THEN 'Part Time'
-                          ELSE 'Full Time'
+                        
+                        CASE WHEN 
+                          IsStaffPartTime = 1 THEN 'Part Time' 
+                          ELSE 'Full Time' 
                         END AS staff_category_type,
-
-                        CASE WHEN
-                          IsTeacher = 1 THEN 'Teaching'
-                          ELSE 'Non Teaching'
+                        
+                        CASE WHEN 
+                          IsTeacher = 1 THEN 'Teaching' 
+                          ELSE 'Non Teaching' 
                         END AS staff_category,
-
+			            
 			            ''                    AS staff_house,
 			            cat.Description	      AS staff_position,
                         ''                    AS staff_department,
                         ''                    AS staff_year_level,
-                        ''                    AS staff_year_level_description
-
-
+                        ''                    AS staff_year_level_description                
+                        
+                        
             FROM        StaffPersonalDetails  spd
             JOIN        CurrentStaff cs ON cs.StaffID = spd.StaffID
             LEFT JOIN   StaffTelephones stw ON stw.StaffID = spd.StaffID AND stw.TelephoneType = 'W'
@@ -176,7 +140,7 @@ class Sync extends Base implements ISync
             LEFT JOIN   StaffEmailInformation seiwb ON seiwb.StaffID = spd.StaffID and seiwb.PrimaryEmail = 1 AND seiwb.EmailType = '2'
             LEFT JOIN   LookupDetails cat ON cat.LookupID = '1203' AND cat.LookupDetailsID = spd.StaffCategory
             LEFT JOIN   LookupDetails title ON title.LookupID = '3012' AND title.LookupDetailsID = spd.Title
-            ORDER BY    spd.SurName,
+            ORDER BY    spd.SurName, 
                         spd.ForeName
         ";
 

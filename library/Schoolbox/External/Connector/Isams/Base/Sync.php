@@ -32,18 +32,6 @@ class Sync extends Base implements ISync
      */
     public function findAllStudents()
     {
-        /**
-         * CustomOverrride
-         */
-        $customView = trim($this->config->get('external_custom_ups_student'));
-        if(strlen($customView) > 0) {
-            return new Iterator\Student(
-                $this->databaseExternal->executeQueryIterator(
-                    'SELECT DISTINCT * FROM '.$this->databaseExternal->quoteIdentifier($customView).';'
-                )
-            );
-        }
-
         $query =
         "
             SELECT
@@ -75,21 +63,9 @@ class Sync extends Base implements ISync
      */
     public function findAllParents()
     {
-        /**
-         * CustomOverrride
-         */
-        $customView = trim($this->config->get('external_custom_ups_parent'));
-        if(strlen($customView) > 0) {
-            return new Iterator\Guardian(
-                $this->databaseExternal->executeQueryIterator(
-                    'SELECT DISTINCT * FROM '.$this->databaseExternal->quoteIdentifier($customView).';'
-                )
-            );
-        }
-
         $query =
         "
-            SELECT DISTINCT
+            SELECT DISTINCT 
                         V_Parent.Username               AS student_contact_network_login,
                         ParentID                        AS student_contact_id,
                         V_Parent.Title                  AS student_contact_title,
@@ -99,14 +75,14 @@ class Sync extends Base implements ISync
                         ''                              AS student_contact_home_email,
                         CISEmail                        AS student_contact_default_email,
                         ''                              AS student_contact_work_email,
-                        V_Student.campus                AS student_campus,
+                        V_Student.campus                AS student_campus,                        
                         ''                              AS student_campus,
                         ''                              AS student_house,
                         ''                              AS student_gender,
                         V_Student.StudentFirstname      AS student_preferred,
                         V_Student.StudentSurname        AS student_surname,
                         V_Student.Grade                 AS student_year_level,
-                        V_Student.Grade                 AS student_year_level_description
+                        V_Student.Grade                 AS student_year_level_description            
             FROM        V_Parent
             JOIN        V_Student ON V_Student.StudentID = V_Parent.StudentID
             WHERE       V_Parent.Relationship IN ('Caregiver', 'Father', 'Guardian', 'Legal Guardian', 'Mother', 'Primary Contact')
@@ -121,18 +97,6 @@ class Sync extends Base implements ISync
      */
     public function findAllStaff()
     {
-        /**
-         * CustomOverrride
-         */
-        $customView = trim($this->config->get('external_custom_ups_staff'));
-        if(strlen($customView) > 0) {
-            return new Iterator\Staff(
-                $this->databaseExternal->executeQueryIterator(
-                    'SELECT DISTINCT * FROM '.$this->databaseExternal->quoteIdentifier($customView).';'
-                )
-            );
-        }
-
         $query =
         "
             SELECT      V_Staff.StaffID                     AS staff_id,
@@ -151,7 +115,7 @@ class Sync extends Base implements ISync
                         ''                                  AS staff_position,
                         ''                                  AS staff_department,
                         ''                                  AS staff_year_level,
-                        ''                                  AS staff_year_level_description
+                        ''                                  AS staff_year_level_description                
             FROM        V_Staff
             LEFT JOIN   V_StaffDirectory ON V_StaffDirectory.StaffID = V_Staff.StaffID
             ORDER BY    V_Staff.StaffID

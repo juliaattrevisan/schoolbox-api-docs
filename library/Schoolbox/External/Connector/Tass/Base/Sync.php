@@ -40,18 +40,6 @@ class Sync extends Base implements ISync
      */
     public function findAllStudents()
     {
-        /**
-         * CustomOverrride
-         */
-        $customView = trim($this->config->get('external_custom_ups_student'));
-        if(strlen($customView) > 0) {
-            return new Iterator\Student(
-                $this->databaseExternal->executeQueryIterator(
-                    'SELECT DISTINCT * FROM '.$this->databaseExternal->quoteIdentifier($customView).';'
-                )
-            );
-        }
-
         $iterator = $this->databaseExternal->executeQueryIterator(
             "
                 SELECT
@@ -89,18 +77,6 @@ class Sync extends Base implements ISync
      */
     public function findAllParents()
     {
-        /**
-         * CustomOverrride
-         */
-        $customView = trim($this->config->get('external_custom_ups_parent'));
-        if(strlen($customView) > 0) {
-            return new Iterator\Guardian(
-                $this->databaseExternal->executeQueryIterator(
-                    'SELECT DISTINCT * FROM '.$this->databaseExternal->quoteIdentifier($customView).';'
-                )
-            );
-        }
-
         /* If Tass Comm rules are enabled then locate the guardian relationship
          * from there as well
          */
@@ -175,9 +151,9 @@ class Sync extends Base implements ISync
                 AND   (pd.deceased_flg != 'Y' OR pd.deceased_flg IS NULL)
                 AND   ((CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') IS NULL)
                 OR    (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0))
-
+    
                 UNION ALL
-
+    
                 SELECT DISTINCT
                     CASE
                         WHEN
@@ -222,7 +198,7 @@ class Sync extends Base implements ISync
                 AND   (pd.deceased_flg != 'Y' OR pd.deceased_flg IS NULL)
                 AND   ((CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') IS NULL)
                 OR    (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0))
-
+    
                 ORDER BY student_contact_id ASC
             ",
             [
@@ -239,18 +215,6 @@ class Sync extends Base implements ISync
      */
     public function findAllStaff()
     {
-        /**
-         * CustomOverrride
-         */
-        $customView = trim($this->config->get('external_custom_ups_staff'));
-        if(strlen($customView) > 0) {
-            return new Iterator\Staff(
-                $this->databaseExternal->executeQueryIterator(
-                    'SELECT DISTINCT * FROM '.$this->databaseExternal->quoteIdentifier($customView).';'
-                )
-            );
-        }
-
         $iterator = $this->databaseExternal->executeQueryIterator
         (
             "
@@ -294,7 +258,7 @@ class Sync extends Base implements ISync
                 FROM tel_vw_telemf AS t
                 LEFT JOIN teacher AS te ON t.emp_code = te.emp_code AND t.cust_code = te.cmpy_code
                 LEFT JOIN tchdept AS td ON te.tch_code = td.tch_code
-                LEFT JOIN portalusers AS p ON prodcode='TIA' AND t.cust_code = p.cmpy_code AND (t.emp_code = p.portal_code OR te.tch_code = p.portal_code)
+                LEFT JOIN portalusers AS p ON prodcode='TIA' AND t.cust_code = p.cmpy_code AND (t.emp_code = p.portal_code OR te.tch_code = p.portal_code) 
                 WHERE t.cust_code = :companyCode
             ",
             ['companyCode' => $this->companyCode]
