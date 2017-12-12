@@ -1,6 +1,7 @@
 CREATE TABLE `tour`
 (
   `uuid`              VARCHAR(36)       PRIMARY KEY NOT NULL,
+  `tour_step_uuid`    VARCHAR(36)       NULL,
   `author_user_id`    INT(4) UNSIGNED   NULL,
   `title`             VARCHAR(512)      NOT NULL,
   `description`       TEXT              NOT NULL,
