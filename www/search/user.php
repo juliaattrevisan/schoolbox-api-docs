@@ -383,13 +383,13 @@ function renderStudent(
     $allTeacherEmails = implode(',', array_filter($emails));
 
     $pd = null;
-    if (Config::get('site_location') == 'help' ) {
+    if (\Config::get('site_location') === 'help') {
         /* Load Professional Development details if they exist
          */
         try {
             $pd = $pdMapper->findOneByColumn('user_id', $user['uid']);
         } catch (MapperException $e) {
-
+            // noop
         }
     }
 
