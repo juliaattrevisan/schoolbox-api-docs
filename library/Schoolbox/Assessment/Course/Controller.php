@@ -433,10 +433,7 @@ class Controller extends Base\Base
             $this->validateCourseData(null, trim($post['name']), trim($post['parent']));
 
             $templateID = $this->getConfigLoader()->get('course_builder_default_course_page_template');
-
-            try {
-                $template = HomepageTemplateMapper::getInstance()->findOneByColumn('id', $templateID);
-            } catch (\Schoolbox\Mapper\Exception $e) {
+            if ($this->getHomepageTemplateMapper()->countByColumn('id', $templateID) === 0) {
                 $templateID = null;
             }
 
@@ -683,9 +680,7 @@ class Controller extends Base\Base
             }
 
             $templateID = $this->getConfigLoader()->get('course_builder_default_unit_page_template');
-            try {
-                $template = HomepageTemplateMapper::getInstance()->findOneByColumn('id', $templateID);
-            } catch (\Schoolbox\Mapper\Exception $e) {
+            if ($this->getHomepageTemplateMapper()->countByColumn('id', $templateID) === 0) {
                 $templateID = null;
             }
 
