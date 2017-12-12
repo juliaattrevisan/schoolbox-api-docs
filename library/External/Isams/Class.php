@@ -90,7 +90,7 @@ class External_Isams_Class implements External_ClassInterface
         $subCodeArray = array_filter(explode(",", $subCode));
 
         foreach ($subCodeArray as &$code) {
-            $code = "'" . $this->database->quote($code) . "'";
+            $code = "'" . $this->quote($code) . "'";
         }
 
         return "V_Class.classcode IN (" . implode($subCodeArray, ',') . ")";
