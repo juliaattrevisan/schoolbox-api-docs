@@ -18,9 +18,9 @@
           var lbl = $('#text-{COMPONENT_HANDLE}');
           var nodeId = parseInt(metadata.nodeId);
 
-          src.val(url);
           // If user selected current page, then set label to 'Local', otherwise set to selected folder's name
-          lbl.attr('href', url).html(nodeId && nodeId === pageFolderId ? 'Local' : filename);
+          src.val(nodeId === pageFolderId ? '' : url);
+          lbl.attr('href', url).html(nodeId === pageFolderId ? 'Local' : filename);
 
           // Update a select box.
           // How that's done depends on exactly what type it is: textbox or tile
