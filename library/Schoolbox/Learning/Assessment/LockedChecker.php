@@ -96,7 +96,7 @@ class LockedChecker
     {
         if ($assessment->getContext()->isSpecificationContext()) {
             // Assessment Specifications can be deleted at any time
-            return true;
+            return false;
         }
         return $this->isDueInArchivedTerm($assessment);
     }
