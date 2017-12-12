@@ -55,7 +55,7 @@ plugins:
       Generic Files LineLength TooLong:
         enabled: false
   phan:
-    enabled: true
+    enabled: false
     config:
       file_extensions: "php"
       ignore_undeclared: true
