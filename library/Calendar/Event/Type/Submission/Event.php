@@ -14,20 +14,22 @@
 
 namespace Calendar\Event\Type\Submission;
 use Calendar\Event\Type\EventBase;
-use Calendar\Event\Type\EventInterface;
+use Custom\Mggs\Calendar\Event\Type\Submission as Mggs;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Model as Folder;
 
-class Event extends EventBase implements EventInterface {
+class Event extends EventBase {
 
     /**
      * Renderer classes
      */
-    protected $renderClasses = array(   'javascript'    => Renderer\Javascript::class,
-                                        'html'          => Renderer\Html::class,
-                                        'vcal'          => Renderer\VObject::class,
-                                        'csv'           => Renderer\Csv::class,
-    );
+    protected $renderClasses = [
+        'javascript'     => Renderer\Javascript::class,
+        'html'           => Renderer\Html::class,
+        'vcal'           => Renderer\VObject::class,
+        'csv'            => Renderer\Csv::class,
+        'pbl-javascript' => Mggs\Renderer\Javascript::class
+    ];
 
 
     /* Contextual: The owner of the submission box
