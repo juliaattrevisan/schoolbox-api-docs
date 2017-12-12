@@ -432,13 +432,18 @@ class Controller extends Base\Base
         try {
             $this->validateCourseData(null, trim($post['name']), trim($post['parent']));
 
+            $templateID = $this->getConfigLoader()->get('course_builder_default_course_page_template');
+            if ($this->getHomepageTemplateMapper()->countByColumn('id', $templateID) === 0) {
+                $templateID = null;
+            }
+
             // Create new CourseFolder
             $courseFolder = $this->persistFolder([
                 'name'            => trim($post['name']),
                 'parent'          => trim($post['parent']),
                 'curriculumCodes' => explode(',', $post['curriculumCodes'][0]),
                 'inherit'         => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
-                'template'        => $this->getConfigLoader()->get('course_builder_default_course_page_template'),
+                'template'        => $templateID,
                 'group'           => $rolePermissions,
                 'recursive'       => false, // LEAVE THIS
                 'code'            => null,  // LEAVE THIS
@@ -674,6 +679,11 @@ class Controller extends Base\Base
                 $rolePermissions[$courseConfig->getRoleId()] = $courseConfig->getPermission();
             }
 
+            $templateID = $this->getConfigLoader()->get('course_builder_default_unit_page_template');
+            if ($this->getHomepageTemplateMapper()->countByColumn('id', $templateID) === 0) {
+                $templateID = null;
+            }
+
             $folder = $this->persistFolder([
                 // the basics (note lack of ID and Codes)
                 'name'     => $name,
@@ -681,7 +691,7 @@ class Controller extends Base\Base
 
                 // configurable things
                 'inherit'  => $this->getConfigLoader()->get('course_builder_default_unit_page_inherit'),
-                'template' => $this->getConfigLoader()->get('course_builder_default_unit_page_template'),
+                'template' => $templateID,
                 'group'    => $rolePermissions,
 
                 // leave these always off
