@@ -40,11 +40,13 @@ $(function () {
             window.tours[tour.uuid] = tour;
 
             $(tour.triggers).each(function(j, trigger) {
-                console.log('Triggering on: $("' + trigger.selector + '").' + trigger.event + ' event');
+                if (trigger.selector !== null && trigger.event !== null) {
+                    console.log('Triggering on: $("' + trigger.selector + '").' + trigger.event + ' event');
 
-                $(trigger.selector).on(trigger.event, function() {
-                    window.tourStart(tour.uuid);
-                });
+                    $(trigger.selector).on(trigger.event, function () {
+                        window.tourStart(tour.uuid);
+                    });
+                }
             });
         });
 
