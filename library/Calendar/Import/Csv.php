@@ -215,6 +215,7 @@ class Csv extends Base {
             $event->setType($event_type);
             $event->setAttendance($attendance);
             $event->setCampusCollection($allCampuses);
+            $event->setSource($this->getSource());
 
             /* If a publish date is specified, use it; otherwise leave as empty
              */

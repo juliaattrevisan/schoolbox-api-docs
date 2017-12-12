@@ -12,7 +12,7 @@ use Aura\Di;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 
-$fields = ['campus:', 'role:', 'file:', 'owner:'];
+$fields = ['campus:', 'role:', 'file:', 'owner:', 'source:'];
 $opts = require __DIR__ . '/../../conf/core/require-cli.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
@@ -56,12 +56,17 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
         $file = $opts['file'];
     }
 
+    //Mandatory options
     if (empty($opts['campus']) || empty($opts['role']) || empty($opts['file'] || empty($opts['owner']))) {
         die('');
     }
 
-    $fauxPost['categoryList'] = null;
+    if (isset($opts['source'])) {
+        $fauxPost['source'] = $opts['source'];
+    }
 
+    //Not used in this context
+    $fauxPost['categoryList'] = null;
 
     $bulkHandler = new Bulk_Calendar($file, $fauxPost, $fauxSesh);
     $bulkHandler->addCalendar();

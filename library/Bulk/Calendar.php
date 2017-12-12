@@ -21,7 +21,6 @@ class Bulk_Calendar extends Bulk_Abstract {
         parent::__construct($file);
         $this->post = $post;
         $this->session = $session;
-
     }
     
     /**
@@ -31,6 +30,16 @@ class Bulk_Calendar extends Bulk_Abstract {
 	 */
 	public function addCalendar() {
 		if (is_file($this->getFile())) {
+
+		    if ($this->post['source'] != null) {
+		        //Delete old events
+                try {
+                    Event\Source\Mapper::getInstance()->deleteEventsFromSource($this->post['source']);
+                } catch (Schoolbox\Mapper\DefinitionException $e) {
+
+                }
+            }
+
             /* Calendar Owner overrideco
              */
             if (isset($this->post['userid']) && is_numeric($this->post['userid'])) {

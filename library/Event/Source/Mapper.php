@@ -14,6 +14,13 @@ use Schoolbox\Calendar\Relation\CategoryMapper;
 use Schoolbox\Calendar\Relation\PersonalMapper;
 use Schoolbox\Mapper as BaseMapper;
 
+/**
+ * Class Mapper
+ *
+ * @package Event\Source
+ * @method Model createModel($id = null)
+ */
+
 class Mapper extends BaseMapper
 {
     /**
