@@ -28,9 +28,11 @@ class CustomSync extends Base implements ISync
         $customView = trim($this->config->get('external_custom_ups_student'));
         if (\strlen($customView) > 0) {
             return new Iterator\Student(
-                $this->databaseExternal->executeQueryIterator(
-                    'SELECT DISTINCT * FROM ' . $this->databaseExternal->quoteIdentifier($customView) . ';'
-                )
+                $this->databaseExternal->executeQueryIterator("
+                    SELECT DISTINCT *
+                    FROM {$this->databaseExternal->quoteIdentifier($customView)}
+                    ORDER BY student_id ASC
+                ")
             );
         }
         throw new RuntimeException('No custom view has been configured for student sync');
@@ -46,9 +48,11 @@ class CustomSync extends Base implements ISync
         $customView = trim($this->config->get('external_custom_ups_parent'));
         if (\strlen($customView) > 0) {
             return new Iterator\Guardian(
-                $this->databaseExternal->executeQueryIterator(
-                    'SELECT DISTINCT * FROM ' . $this->databaseExternal->quoteIdentifier($customView) . ';'
-                )
+                $this->databaseExternal->executeQueryIterator("
+                    SELECT DISTINCT *
+                    FROM {$this->databaseExternal->quoteIdentifier($customView)}
+                    ORDER BY student_contact_id ASC
+                ")
             );
         }
         throw new RuntimeException('No custom view has been configured for parent sync');
@@ -64,9 +68,11 @@ class CustomSync extends Base implements ISync
         $customView = trim($this->config->get('external_custom_ups_staff'));
         if (\strlen($customView) > 0) {
             return new Iterator\Staff(
-                $this->databaseExternal->executeQueryIterator(
-                    'SELECT DISTINCT * FROM ' . $this->databaseExternal->quoteIdentifier($customView) . ';'
-                )
+                $this->databaseExternal->executeQueryIterator("
+                    SELECT DISTINCT *
+                    FROM {$this->databaseExternal->quoteIdentifier($customView)}
+                    ORDER BY staff_id ASC
+                ")
             );
         }
         throw new RuntimeException('No custom view has been configured for staff sync');
