@@ -225,15 +225,14 @@ try {
                  * Very similar to file event handler, but filename is contained in a data element instead.
                  */
                 container.find(config.useFolderSelector).click(function (event) {
-                    var url, name, self;
-
                     event.preventDefault();
 
-                    self = $j(this);
-                    url  = self.attr('href');
-                    name = self.data('filename_html');
+                    var self     = $j(this),
+                        url      = self.attr('href'),
+                        name     = self.data('filename_html'),
+                        metadata = {nodeId: self.data('nodeId')};
 
-                    config.submitCallback(url, name, undefined);
+                    config.submitCallback(url, name, metadata);
 
                     if (config.modal) {
                         modal.foundation('reveal', 'close');

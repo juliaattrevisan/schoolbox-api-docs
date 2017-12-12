@@ -6,19 +6,21 @@
 
     $('#launch-browser-{COMPONENT_HANDLE}').on('click', function(e) {
       e.preventDefault();
-      var self = $(this);
+      var pageFolderId = parseInt('{ID}');
 
       $('#resource-browser').socialstreamBrowser({
         title: 'Choose a source',
         categoryId: Number('{COMPONENT_CONFIG_SRC_CID}') || Number('{ID}'),
         mimeFilter: false,
-        submitCallback: function(url, filename) {
+        submitCallback: function(url, filename, metadata) {
 
           var src = $('#src-{COMPONENT_HANDLE}');
           var lbl = $('#text-{COMPONENT_HANDLE}');
+          var nodeId = parseInt(metadata.nodeId);
 
           src.val(url);
-          lbl.attr('href', url).html(filename);
+          // If user selected current page, then set label to 'Local', otherwise set to selected folder's name
+          lbl.attr('href', url).html(nodeId && nodeId === pageFolderId ? 'Local' : filename);
 
           // Update a select box.
           // How that's done depends on exactly what type it is: textbox or tile
