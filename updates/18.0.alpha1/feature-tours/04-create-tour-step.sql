@@ -35,8 +35,8 @@ CREATE TABLE `tour_step_tooltip`
   `updated_at`        DATETIME          NULL,
   `deleted_at`        DATETIME          NULL,
 
-  CONSTRAINT `tour_tooltip_user_id_fk` FOREIGN KEY (`author_user_id`) REFERENCES `user` (`id`),
-  CONSTRAINT `tour_tooltip_tour_step_uuid_fk` FOREIGN KEY (`tour_step_uuid`) REFERENCES `tour_step` (`uuid`)
+  CONSTRAINT `tour_step_tooltip_user_id_fk` FOREIGN KEY (`author_user_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `tour_step_tooltip_tour_step_uuid_fk` FOREIGN KEY (`tour_step_uuid`) REFERENCES `tour_step` (`uuid`)
 );
 
 CREATE INDEX `tour_step_tooltip_user_id_idx` ON `tour_step_tooltip` (`author_user_id`);
