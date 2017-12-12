@@ -670,7 +670,7 @@ class Healthcheck
         $list[] = 'V_TimetableSchedule';
         $list[] = 'V_TimetableStructure';
 
-        $tables = array_merge($tables, $this->customUPSTest());
+        $list = array_merge($list, $this->customUPSTest());
         $this->selectTest($list);
     }
 }
