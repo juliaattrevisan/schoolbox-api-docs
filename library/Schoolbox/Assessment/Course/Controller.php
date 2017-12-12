@@ -682,6 +682,13 @@ class Controller extends Base\Base
                 $rolePermissions[$courseConfig->getRoleId()] = $courseConfig->getPermission();
             }
 
+            $templateID = $this->getConfigLoader()->get('course_builder_default_unit_page_template');
+            try {
+                $template = HomepageTemplateMapper::getInstance()->findOneByColumn('id', $templateID);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $templateID = null;
+            }
+
             $folder = $this->persistFolder([
                 // the basics (note lack of ID and Codes)
                 'name'     => $name,
@@ -689,7 +696,7 @@ class Controller extends Base\Base
 
                 // configurable things
                 'inherit'  => $this->getConfigLoader()->get('course_builder_default_unit_page_inherit'),
-                'template' => $this->getConfigLoader()->get('course_builder_default_unit_page_template'),
+                'template' => $templateID,
                 'group'    => $rolePermissions,
 
                 // leave these always off
