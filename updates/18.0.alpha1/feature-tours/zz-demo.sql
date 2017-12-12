@@ -85,8 +85,8 @@ CASE WHEN EXISTS (SELECT * FROM `config` WHERE `name` = 'site_location' AND `val
       SELECT        UUID(),
                     19,
                     @tourStaff,
-                    '''',
-                    '''',
+                    ''tour-guide'',
+                    ''ready'',
                     ''/''
   '
 

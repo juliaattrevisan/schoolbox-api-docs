@@ -24,6 +24,12 @@ $(function () {
             }
         };
 
+        // Create a custom tour element that we can trigger events on
+
+        var tourGuide = document.registerElement('tour-guide');
+        var tour = new tourGuide();
+        document.body.appendChild(tour);
+
         // Load all tours for this page/user into global array and setup triggers for them
 
         window.tours = [];
@@ -34,24 +40,17 @@ $(function () {
             window.tours[tour.uuid] = tour;
 
             $(tour.triggers).each(function(j, trigger) {
-                // If no event/selector was specified, start the tour immediately.
-                // Otherwise schedule it to start on the specified selector/event combination.
+                console.log('Triggering on: $("' + trigger.selector + '").' + trigger.event + ' event');
 
-                if (trigger.selector === null && trigger.event === null) {
-                    console.log('Triggering immediately');
-
+                $(trigger.selector).on(trigger.event, function() {
                     window.tourStart(tour.uuid);
-                } else {
-                    console.log('Triggering on: $("' + trigger.selector + '").' + trigger.event + ' event');
-
-                    $(trigger.selector).on(trigger.event, function() {
-                        window.tourStart(tour.uuid);
-                    });
-                }
+                });
             });
         });
 
-        $(document).trigger('tourReady');
+        // Trigger ready event
+
+        $(tour).trigger('ready');
         console.log('All tours ready');
     });
 });
