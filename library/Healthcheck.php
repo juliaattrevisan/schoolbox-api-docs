@@ -272,32 +272,6 @@ class Healthcheck
     /** @noinspection PhpUnusedPrivateMethodInspection */
     public function edumateTest()
     {
-        $tables = [
-            'studsub',
-            'student',
-            'tchsub',
-            'subtab',
-            'ttperiod',
-            'ttdays',
-            'ttcalendar',
-            'ttmast',
-            'paraddress',
-            'house',
-            'teacher',
-            'parent',
-            'pia_sfaccess',
-            'tchdept',
-            'portalusers',
-            'studboard',
-            'tel_vw_telemf',
-            'ttparms',
-            'family',
-            'persondefs',
-            'studcommrules',
-        ];
-
-        $this->selectTest($tables, null, null, "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
-
         $db2inst1Tables = [
             'schoolbox_classes',
             'schoolbox_parents',
