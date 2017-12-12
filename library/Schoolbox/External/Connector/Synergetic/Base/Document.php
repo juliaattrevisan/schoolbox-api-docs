@@ -259,6 +259,37 @@ class Document extends Base implements IDocument
                 AND       d.tDocumentsSeq = :documentId
             ";
 
+
+            try {
+                // Check if we have permission to the `pvDocumentReferences` view. This will fail into the exception
+                // block and stop us from adding the query and breaking the feature if permission to this table is
+                // not available.
+
+                // TODO: Remove external query to check for access once all schools have added the appropriate permission
+
+                $this->databaseExternal->executeQuery("SELECT 1 FROM {$this->schema}.pvDocumentReferences");
+
+                // If that query worked we can assume they have updated their DB permissions and use this extra source
+
+                $bindings = $this->buildBindingsForClassifications('pvd');
+
+                $query = "
+                    
+                    SELECT      d.Document,
+                                d.DocumentType,
+                                d.Description
+                    FROM        {$this->schema}.pvDocumentReferences dr
+                    INNER JOIN  {$this->schema}.tDocuments d ON d.tDocumentsSeq = dr.tDocumentsSeq
+                    WHERE       dr.ID = :id
+                    AND         d.tDocumentsSeq = :documentId
+                ";
+
+            } catch (AlaressDatabaseException $e) {
+                // There was no access to the 'pvDocumentReferences' views. Fail silently without adding the SQL
+                // that references this table.
+            }
+
+
             // Add date filter (if we find a parseable date in the config)
 
             $minimumDateString = $this->config->get('external_document_report_minimum_date');
