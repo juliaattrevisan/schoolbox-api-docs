@@ -4,7 +4,7 @@ CREATE TABLE `tour_step`
 (
   `uuid`              VARCHAR(36)       PRIMARY KEY NOT NULL,
   `tour_uuid`         VARCHAR(36)       NOT NULL,
-  `next_step_uuid`    VARCHAR(36)       NOT NULL,
+  `next_step_uuid`    VARCHAR(36)       NULL,
   `author_user_id`    INT(4) UNSIGNED   NOT NULL,
   `type`              ENUM('tooltip')   NOT NULL,
   `created_at`        DATETIME          NULL,

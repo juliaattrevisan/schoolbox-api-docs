@@ -80,14 +80,189 @@ CASE WHEN EXISTS (SELECT * FROM `config` WHERE `name` = 'site_location' AND `val
                     `tour_uuid`,
                     `selector`,
                     `event`,
-                    `url_regex`
+                    `url_regex`,
+                    `created_at`,
+                    `updated_at`,
+                    `deleted_at`
       )
       SELECT        UUID(),
                     19,
                     @tourStaff,
                     ''tour-guide'',
                     ''ready'',
-                    ''/''
+                    ''/'',
+                    ''1980-04-07 00:00:00'',
+                    ''1980-04-07 00:00:00'',
+                    NULL
+  '
+
+ELSE ''
+
+END;
+
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- Staff dashboard feature tour steps
+
+SET @step1Uuid = UUID();
+SET @step2Uuid = UUID();
+
+SET @sql :=
+
+CASE WHEN EXISTS (SELECT * FROM `config` WHERE `name` = 'site_location' AND `value` = 'demo') THEN
+
+  '
+      INSERT INTO   `tour_step`
+      (
+                    `uuid`,
+                    `tour_uuid`,
+                    `next_step_uuid`,
+                    `author_user_id`,
+                    `type`,
+                    `created_at`,
+                    `updated_at`,
+                    `deleted_at`
+      )
+      SELECT        @step2Uuid,
+                    @tourStaff,
+                    null,
+                    19,
+                    ''tooltip'',
+                    ''1980-04-07 00:00:00'',
+                    ''1980-04-07 00:00:00'',
+                    NULL
+  '
+
+ELSE ''
+
+END;
+
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @sql :=
+
+CASE WHEN EXISTS (SELECT * FROM `config` WHERE `name` = 'site_location' AND `value` = 'demo') THEN
+
+  '
+      INSERT INTO   `tour_step`
+      (
+                    `uuid`,
+                    `tour_uuid`,
+                    `next_step_uuid`,
+                    `author_user_id`,
+                    `type`,
+                    `created_at`,
+                    `updated_at`,
+                    `deleted_at`
+      )
+      SELECT        @step1Uuid,
+                    @tourStaff,
+                    @step2Uuid,
+                    19,
+                    ''tooltip'',
+                    ''1980-04-07 00:00:00'',
+                    ''1980-04-07 00:00:00'',
+                    NULL
+  '
+
+ELSE ''
+
+END;
+
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- Staff dashboard feature tour tooltips
+
+SET @sql :=
+
+CASE WHEN EXISTS (SELECT * FROM `config` WHERE `name` = 'site_location' AND `value` = 'demo') THEN
+
+  '
+      INSERT INTO   `tour_step_tooltip`
+      (
+                    `uuid`,
+                    `tour_step_uuid`,
+                    `author_user_id`,
+                    `title`,
+                    `body`,
+                    `selector`,
+                    `css_class`,
+                    `created_at`,
+                    `updated_at`,
+                    `deleted_at`
+      )
+      SELECT        UUID(),
+                    @step1Uuid,
+                    19,
+                    ''Whale'',
+                    ''This is a whale'',
+                    ''.logo'',
+                    null,
+                    ''1980-04-07 00:00:00'',
+                    ''1980-04-07 00:00:00'',
+                    NULL
+  '
+
+ELSE ''
+
+END;
+
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @sql :=
+
+CASE WHEN EXISTS (SELECT * FROM `config` WHERE `name` = 'site_location' AND `value` = 'demo') THEN
+
+  '
+      INSERT INTO   `tour_step_tooltip`
+      (
+                    `uuid`,
+                    `tour_step_uuid`,
+                    `author_user_id`,
+                    `title`,
+                    `body`,
+                    `selector`,
+                    `css_class`,
+                    `created_at`,
+                    `updated_at`,
+                    `deleted_at`
+      )
+      SELECT        UUID(),
+                    @step2Uuid,
+                    19,
+                    ''Wrong Way! Turn Back!'',
+                    ''This is a dead-end...'',
+                    ''#tile-10'',
+                    ''danger'',
+                    ''1980-04-07 00:00:00'',
+                    ''1980-04-07 00:00:00'',
+                    NULL
+  '
+
+ELSE ''
+
+END;
+
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- Update tour with first step
+
+SET @sql :=
+
+CASE WHEN EXISTS (SELECT * FROM `config` WHERE `name` = 'site_location' AND `value` = 'demo') THEN
+
+  '
+      UPDATE `tour` SET `tour_step_uuid` = @step1Uuid
   '
 
 ELSE ''
