@@ -25,7 +25,7 @@ class Mapper extends BaseMapper
         $this->hasTable('tour_step');
         $this->hasModel(Model::class);
         $this->uses('uuid', self::TYPE_STRING, self::COLUMN_IDENTIFIER);
-        $this->joins('tour', TourMapper::class, 'uuid', null, null, 'tour', 'tour');
+        $this->joins('tour_uuid', TourMapper::class, 'uuid', null, null, 'tour', 'tour');
         $this->joins('author_user_id', UserMapper::class, 'id', null, null, 'author', 'author');
         $this->uses('type', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
