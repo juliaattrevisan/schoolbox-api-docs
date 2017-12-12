@@ -335,7 +335,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
 		";
 
         $statement = $this->database->prepare($query);
-        $statement->bindParam(":eventId", $event->getId());
+        $statement->bindValue(":eventId", $event->getId());
         $statement->execute();
 
         $query = "
@@ -344,7 +344,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
 		";
 
         $statement = $this->database->prepare($query);
-        $statement->bindParam(":eventId", $event->getId());
+        $statement->bindValue(":eventId", $event->getId());
         $statement->execute();
     }
 
@@ -409,8 +409,8 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
 			";
 
             $statement = $this->database->prepare($query);
-            $statement->bindParam(":eventId", $event->getId());
-            $statement->bindParam(":campusId", $campusId);
+            $statement->bindValue(":eventId", $event->getId());
+            $statement->bindValue(":campusId", $campusId);
             $statement->execute();
         }
     }

@@ -9,23 +9,38 @@
  */
 class Bulk_Calendar extends Bulk_Abstract {
 
-	/**
+    private $post;
+    private $session;
+
+    /**
+     * Constructor
+     *
+     * @param $file
+     */
+    public function __construct($file, $post, $session) {
+        parent::__construct($file);
+        $this->post = $post;
+        $this->session = $session;
+
+    }
+    
+    /**
 	 * Wrapper for uploading a calendar file which could be in either format
 	 *
 	 * @return array
 	 */
 	public function addCalendar() {
 		if (is_file($this->getFile())) {
-            /* Calendar Owner override
+            /* Calendar Owner overrideco
              */
-            if (isset($_POST['userid']) && is_numeric($_POST['userid'])) {
+            if (isset($this->post['userid']) && is_numeric($this->post['userid'])) {
                 $userMapper = new \Schoolbox\UserMapper();
-                $user = $userMapper->findById($_POST['userid']);
+                $user = $userMapper->findById($this->post['userid']);
                 $author = $user;
             }
             else {
-                $user = $_SESSION['user'];
-                $author = $_SESSION['user'];
+                $user = $this->session['user'];
+                $author = $this->session['user'];
             }
 
 			/* Set up specified campus list
@@ -36,16 +51,16 @@ class Bulk_Calendar extends Bulk_Abstract {
 			$campusList = array();
 			$categoryList = array();
 
-			if (is_array($_POST['userGroup'])) {
-				$groupList = $_POST['userGroup'];
+			if (is_array($this->post['userGroup'])) {
+				$groupList = $this->post['userGroup'];
 			}
 
-			if (is_array($_POST['campusList'])) {
-				$campusList = $_POST['campusList'];
+			if (is_array($this->post['campusList'])) {
+				$campusList = $this->post['campusList'];
 			}
 
-			if (is_array($_POST['categoryList'])) {
-				$categoryList = $_POST['categoryList'];
+			if (is_array($this->post['categoryList'])) {
+				$categoryList = $this->post['categoryList'];
 			}
 
 			/* Use factory to spawn a builder

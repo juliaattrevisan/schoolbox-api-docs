@@ -16,7 +16,7 @@ $nav->parse($this, 'calendar');
 /* Two types of upload.. either single user.. or via csv file..
  */
 if (isset($_FILES['bulkadd']['tmp_name']) && $_FILES['bulkadd']['tmp_name']) {
-    $bulkHandler = new Bulk_Calendar($_FILES['bulkadd']['tmp_name']);
+    $bulkHandler = new Bulk_Calendar($_FILES['bulkadd']['tmp_name'], $_POST, $_SESSION);
     $allEvents = $bulkHandler->addCalendar();
 
     if ($allEvents && count($allEvents)) {
