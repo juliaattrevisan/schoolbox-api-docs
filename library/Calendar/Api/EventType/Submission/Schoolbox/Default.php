@@ -106,7 +106,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
             $folder = $assessment->getBaseContext()->getFolder();
             $color  = $folder->getColour();
             if ($color instanceof \Alaress\Color\Color) {
-                $event->setColour($color);
+                $event->setColour($color->getAsRgba());
             } else {
                 $event->setColour($this->getEventColor($folder, $eventType));
             }
