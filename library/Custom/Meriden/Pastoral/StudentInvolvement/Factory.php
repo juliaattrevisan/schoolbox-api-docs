@@ -415,7 +415,7 @@ class Factory
 
             $participant = $assessment->getParticipantIfExtant($student);
             if ($participant) {
-                $feedback = $participant->getAuthoritativeFeedback(true);
+                $feedback = $participant->getAuthoritativeFeedback($publishedOnly);
                 if ($feedback) {
 
                     // Load rubrics into assessment whilst here
