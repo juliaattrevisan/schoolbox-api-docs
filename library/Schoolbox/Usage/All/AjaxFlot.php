@@ -14,9 +14,9 @@ class AjaxFlot
     /**
 	 * An instance of UsageMapper
 	 *
-	 * @var null
+	 * @var UsageMapper
 	 */
-    private $mapper = null;
+    private $mapper;
 
     /**
 	 * Constructor
@@ -166,7 +166,7 @@ class AjaxFlot
     /**
 	 * Set mapper
 	 *
-	 * @param null $mapper
+	 * @param UsageMapper $mapper
 	 */
     private function setMapper($mapper)
     {
@@ -176,7 +176,7 @@ class AjaxFlot
     /**
 	 * Get mapper
 	 *
-	 * @return null
+	 * @return UsageMapper
 	 */
     public function getMapper()
     {
