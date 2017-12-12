@@ -8,7 +8,6 @@
 namespace Schoolbox\Tour\Step\Tooltip;
 
 use PDOStatement;
-use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Tour\Step\Mapper as TourStepMapper;
 use Schoolbox\Tour\Step\Model as TourStep;
@@ -72,14 +71,13 @@ class Mapper extends BaseMapper
                 $author = $authorUserMapper->hydrate($row, 'a');
                 $model->setAuthor($author);
 
-                // Hydrate tour
+                // Hydrate tour step
 
                 /** @var TourStepMapper $tourStepMapper */
                 $tourStepMapper = $this->getJoinMapper('tourStep');
 
                 /** @var TourStep $tourStep */
                 $tourStep = $tourStepMapper->hydrate($row, 's');
-
                 $model->setTourStep($tourStep);
 
                 // Add hydrated record to results

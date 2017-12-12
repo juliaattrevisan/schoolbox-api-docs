@@ -11,6 +11,8 @@ use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Tour\Step\Mapper as TourStepMapper;
+use Schoolbox\Tour\Step\Model as TourStep;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -32,6 +34,8 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
 
         $this->uses('uuid', self::TYPE_STRING, self::COLUMN_IDENTIFIER);
+        $this->joins('author_user_id', UserMapper::class, 'id', null, null, 'author', 'author');
+        $this->joins('tour_step_uuid', TourStepMapper::class, 'uuid', null, null, 'tourStep', 'tourStep');
         $this->uses('title', self::TYPE_STRING);
         $this->uses('description', self::TYPE_STRING);
         $this->uses('active', self::TYPE_BOOLEAN);
@@ -73,9 +77,11 @@ class Mapper extends BaseMapper
     {
         return "
             SELECT      {$this->getColumnString()},
-                        {$this->getJoinColumnString('author', 'a')}
+                        {$this->getJoinColumnString('author', 'a')},
+                        {$this->getJoinColumnString('tourStep', 's')}
             FROM        {$this->getTable()}
             LEFT JOIN   {$this->getJoinSql('author', '', 'a', true)}
+            LEFT JOIN   {$this->getJoinSql('tourStep', '', 's', true)}
         ";
     }
 
@@ -97,6 +103,15 @@ class Mapper extends BaseMapper
                 // Hydrate author
 
                 $model->setAuthor($authorUserMapper->hydrate($row, 'a'));
+
+                // Hydrate tour step
+
+                /** @var TourStepMapper $tourStepMapper */
+                $tourStepMapper = $this->getJoinMapper('tourStep');
+
+                /** @var TourStep $tourStep */
+                $tourStep = $tourStepMapper->hydrate($row, 's');
+                $model->setTourStep($tourStep);
 
                 // Add hydrated record to results
 
@@ -171,8 +186,8 @@ class Mapper extends BaseMapper
         // --------------------------------------------------------------------------------------------------------
 
         $tourNotDeletedClause = $this->getPredicateBuilder()
-                                        ->isNull('tour.deleted_at')
-                                        ->getWhere()[0];
+                                     ->isNull('tour.deleted_at')
+                                     ->getWhere()[0];
 
         // --------------------------------------------------------------------------------------------------------
         // Tours where user is in a selected role
@@ -195,7 +210,7 @@ class Mapper extends BaseMapper
         // --------------------------------------------------------------------------------------------------------
 
         // ...
-        
+
         // --------------------------------------------------------------------------------------------------------
         // Concatenate all of the predicates into an OR query and return the SQL in an array along with bindings
         // --------------------------------------------------------------------------------------------------------

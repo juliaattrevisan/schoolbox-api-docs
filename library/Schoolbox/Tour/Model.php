@@ -12,6 +12,7 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\Uuid;
+use Schoolbox\Tour\Step\Model as TourStep;
 use Schoolbox\User;
 
 class Model implements ISoftDeletable
@@ -40,6 +41,11 @@ class Model implements ISoftDeletable
      * @var string|null
      */
     protected $title;
+
+    /**
+     * @var TourStep|null
+     */
+    protected $tourStep;
 
     /**
      * @return User|null
@@ -118,6 +124,14 @@ class Model implements ISoftDeletable
     }
 
     /**
+     * @return bool|null
+     */
+    public function isActive(): ?bool
+    {
+        return $this->getActive();
+    }
+
+    /**
      * @param bool|null $active
      *
      * @return self|$this
@@ -128,4 +142,24 @@ class Model implements ISoftDeletable
 
         return $this;
     }
+
+    /**
+     * @return TourStep|null
+     */
+    public function getTourStep(): ?TourStep
+    {
+        return $this->tourStep;
+    }
+
+    /**
+     * @param TourStep|null $tourStep
+     *
+     * @return self|$this
+     */
+    public function setTourStep(?TourStep $tourStep): self
+    {
+        $this->tourStep = $tourStep;
+        return $this;
+    }
+
 }
