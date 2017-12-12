@@ -90,6 +90,9 @@ class Mapper extends BaseMapper
      */
     public function findPlansAndParticipantsForAssessments(array $assessmentIds): GenericCollection
     {
+        if (!\count($assessmentIds)) {
+            return $this->createCollection();
+        }
         $column = "{$this->getTable()}.assessment_id";
         return $this->findPlansAndParticipants($this->getPredicateBuilder()->equals($column, $assessmentIds));
     }
