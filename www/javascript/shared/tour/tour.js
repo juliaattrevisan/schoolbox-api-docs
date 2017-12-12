@@ -40,7 +40,7 @@ $(function () {
             window.tours[tour.uuid] = tour;
 
             $(tour.triggers).each(function(j, trigger) {
-                if (trigger.selector !== null && trigger.event !== null) {
+                if (trigger.selector && trigger.event) {
                     console.log('Triggering on: $("' + trigger.selector + '").' + trigger.event + ' event');
 
                     $(trigger.selector).on(trigger.event, function () {
