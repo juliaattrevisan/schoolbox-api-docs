@@ -45,10 +45,6 @@ $calendarApi           = new Calendar_Api_EventType_Submission_Schoolbox_ForDueW
 );
 $renderer              = new Calendar\Event\Collection\Renderer($calendarApi, (int)$_GET['start'], (int)$_GET['end'], $user, $this, $viewer);
 
-// Render it
-echo "[";
-echo $renderer->renderAll('javascript');
-/* Final null element to help keep IE happy
- */
-echo "{}]";
+// final null element to help keep IE happy
+printf('[%s{}]', $renderer->renderAll('javascript'));
 exit;
