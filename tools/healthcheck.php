@@ -31,4 +31,8 @@ echo "[" . date('Y-m-d H:i:s') . "] Running health check script\n";
 $healthCheck = new Healthcheck($databaseExternal, $configLoader);
 $results = $healthCheck->run();
 
-echo "{$results['log']}\n\n{$results['error']}";
+echo $results['log'];
+
+if(isset($results['errors']) && count($results['errors']) > 0 ) {
+    echo "\n".implode("\n",$results['errors'])."\n";
+}
