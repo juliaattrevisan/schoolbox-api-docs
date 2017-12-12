@@ -81,7 +81,7 @@ SPARQL
             }
 
             try {
-                $area = $this->getAreaMapper()->findOneByColumn('reference', $row->doc->getUri());
+                $area = $this->getAreaMapper()->findOneByColumn('reference', $row->doc->getUri(), ["deleted" => false]);
             } catch(\Schoolbox\Mapper\Exception $e) {
                 $area = new LearningArea\Model();
             }
@@ -125,7 +125,7 @@ SPARQL
         foreach ($this->getClient()->query($sparql) as $row) {
 
             try {
-                $level = $this->getLevelMapper()->findOneByColumn('reference', $row->level->getUri());
+                $level = $this->getLevelMapper()->findOneByColumn('reference', $row->level->getUri(), ["deleted" => false]);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $level = new LearningLevel\Model();
                 $level
