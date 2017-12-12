@@ -604,17 +604,6 @@ class SitePage extends Page
                 $this->setVar('MENU_TOP', '');
             }
 
-            // Render appropriate tour trigger scripts into every page
-
-            try {
-                $tourRenderer = new TourRenderer();
-                $tourContents = $tourRenderer->render($this->getTwig(), $this->user, $_SERVER['REQUEST_URI']);
-                $this->setVar('TOUR_SCRIPTS', $tourContents);
-            } catch (Twig_Error_Loader $e) {
-                // If something went wrong do not render any tour script
-                $this->setVar('TOUR_SCRIPTS', '');
-            }
-
             $this->parse('banner_logged_in_block', 'banner_logged_in');
         } else {
             $this->setVar('MENU_SIDE', '');
