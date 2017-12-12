@@ -28,6 +28,8 @@ use Aura\Di;
 use GuzzleHttp;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Collection;
+use Schoolbox\External\Connector\CompositeSync;
+use Schoolbox\External\Connector\CustomSync;
 use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\Instance;
 use Schoolbox\L10n\Mapper as L10nMapper;
@@ -544,12 +546,18 @@ abstract class AbstractBootstrap implements BootstrapInterface
                         /** @var array|IConnector $databaseExternal */
                         $databaseExternal = $di->get('databaseExternal');
 
+                        $customSync = new CustomSync($config, $databaseExternal);
+
                         $factory = new ExternalConnectorFactory();
-                        return $factory->build(
+                        $defaultSync = $factory->build(
                             $config,
                             $databaseExternal,
                             ExternalConnectorFactory::EXTERNAL_SYNC
                         );
+
+                        return (new CompositeSync())
+                            ->addSubSync($customSync)
+                            ->addSubSync($defaultSync);
                     }),
                     'userMapper'     => $di->lazyNew(SyncUserMapper::class),
                     'logger'         => $di->lazyGet('ups.logger'),

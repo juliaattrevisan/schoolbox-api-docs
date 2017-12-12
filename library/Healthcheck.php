@@ -74,7 +74,7 @@ class Healthcheck
         if (!$this->connector->beginTransaction()) {
             // Transactions not supported
 
-            $this->log .= "ERROR: Database ({$connector->getDatabase()}) does not support transactions";
+            $this->log .= "ERROR: Database ({$this->connector->getDatabase()}) does not support transactions";
             $transactionsSupported = false;
         }
 
@@ -86,7 +86,7 @@ class Healthcheck
                 if (!$connector->beginTransaction()) {
                     // Transactions not supported
 
-                    $this->log .= 'ERROR: Database ({$connector->getDatabase()}) does not support transactions';
+                    $this->log .= "ERROR: Database ({$connector->getDatabase()}) does not support transactions";
                     $transactionsSupported = false;
                 }
             }
@@ -247,37 +247,31 @@ class Healthcheck
         unset($outputValues);
     }
 
+    /** @noinspection PhpUnusedPrivateMethodInspection */
+    public function customUPSTest()
+    {
+        $tables = array();
+        $staff = trim($this->configMapper->get('external_custom_ups_staff'));
+        if (strlen($staff) > 0) {
+            $tables[] = $staff;
+        }
+        $student = trim($this->configMapper->get('external_custom_ups_student'));
+        if (strlen($student) > 0) {
+            $tables[] = $student;
+        }
+        $parent = trim($this->configMapper->get('external_custom_ups_parent'));
+        if (strlen($parent) > 0) {
+            $tables[] = $parent;
+        }
+
+        return $tables;
+    }
+
     // Connector specific test functions, ignore any unused function warnings as these are called dynamically
 
     /** @noinspection PhpUnusedPrivateMethodInspection */
     public function edumateTest()
     {
-        $tables = [
-            'studsub',
-            'student',
-            'tchsub',
-            'subtab',
-            'ttperiod',
-            'ttdays',
-            'ttcalendar',
-            'ttmast',
-            'paraddress',
-            'house',
-            'teacher',
-            'parent',
-            'pia_sfaccess',
-            'tchdept',
-            'portalusers',
-            'studboard',
-            'tel_vw_telemf',
-            'ttparms',
-            'family',
-            'persondefs',
-            'studcommrules',
-        ];
-
-        $this->selectTest($tables, null, null, "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
-
         $db2inst1Tables = [
             'schoolbox_classes',
             'schoolbox_parents',
@@ -317,6 +311,7 @@ class Healthcheck
             'UM'
         ];
 
+        $tables = array_merge($tables, $this->customUPSTest());
         $this->selectTest($tables);
     }
 
@@ -348,6 +343,8 @@ class Healthcheck
             'eventcatdefs',
             'eventtype'
         ];
+
+        $tables = array_merge($tables, $this->customUPSTest());
         $this->selectTest($tables);
     }
 
@@ -368,6 +365,7 @@ class Healthcheck
             'IDENTITY'
         ];
 
+        $tables = array_merge($tables, $this->customUPSTest());
         $this->selectTest($tables);
 
         $procedures = [
@@ -445,6 +443,7 @@ class Healthcheck
             ]);
         }
 
+        $tables = array_merge($tables, $this->customUPSTest());
         $this->selectTest($tables);
 
         // External Document Reports
@@ -531,6 +530,7 @@ class Healthcheck
             'vw_Contact_Addresses',
         ];
 
+        $tables = array_merge($tables, $this->customUPSTest());
         $this->selectTest($tables);
 
         /**
@@ -580,6 +580,7 @@ class Healthcheck
             'vw_Contact_Addresses',
         ];
 
+        $tables = array_merge($tables, $this->customUPSTest());
         $this->selectTest($tables);
 
 
@@ -655,6 +656,7 @@ class Healthcheck
             "YearGroupSubjectDivision",
         ];
 
+        $tables = array_merge($tables, $this->customUPSTest());
         $this->selectTest($tables);
     }
 
@@ -667,6 +669,8 @@ class Healthcheck
         $list[] = 'V_Student';
         $list[] = 'V_TimetableSchedule';
         $list[] = 'V_TimetableStructure';
+
+        $list = array_merge($list, $this->customUPSTest());
         $this->selectTest($list);
     }
 }
