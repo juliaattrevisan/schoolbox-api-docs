@@ -38,6 +38,10 @@
              */
             steps: [
                 {
+                    element: document.querySelector('#left-off-canvas-toggle'),
+                    intro: "This step will only show for mobile, as this skips any steps on elements that aren't visible."
+                },
+                {
                     element: document.querySelector('#first-tour'),
                     intro: "Access your component settings, collapse the component or remove the component from the page."
                 },
@@ -51,10 +55,13 @@
                 },
                 {
                     element: document.querySelector('#end-tour'),
-                    intro: "That's it! Feel free to continue exploring Schoolbox.",
-                    tooltipClass: 'lastNode'
+                    intro: "That's it! Feel free to continue exploring Schoolbox."
+                },
+                {
+                    element: document.querySelector('#sasquatch'),
+                    intro: "This step will never display, because #sasquatch doesn't exist... on this page..."
                 }
-            ]
+            ].filter(function(obj) { return $(obj.element).is(':visible'); }) // Filter out elements that aren't visible
         });
         // Start feature tour button
         $('#tour-start').on('click', function() {
