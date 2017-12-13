@@ -1,13 +1,13 @@
 <?php
 /**
- * Nesa
+ * Nesa Report
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Help;
+namespace Schoolbox\Help\Nesa;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Collection;

@@ -54,6 +54,9 @@ class Controller extends Base
     }
 
 
+    /**
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
     public function postNesa()
     {
         /** @var AssessmentMapperProxy $assessmentMapperProxy */
