@@ -42,8 +42,15 @@ class Controller extends Base
         /** @var AssessmentMapperProxy $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
+        /* Course Specification Id
+         * This comes from the /course/modify screen, as is an integer in the url
+         */
+        $courseSpecificationId = 6;
+
+
+
         $nesa = (new Nesa(
-            6,
+            $courseSpecificationId,
             [21, 22],
             [120, 121],
             [91, 92, 93],
