@@ -466,7 +466,7 @@ class LinkRubricMarkToFeedback
 
         $descriptors = $this->db->executeQuery(
             '
-                SELECT descriptor_id FROM rubric_mark rm
+                SELECT descriptor_id, valid FROM rubric_mark rm
                 JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
                 JOIN rubric_level rl ON rl.id = rd.level_id
                 WHERE rm.student_id = :student_id
@@ -488,7 +488,7 @@ class LinkRubricMarkToFeedback
                 '
                     INSERT INTO rubric_mark (return_id, student_id, descriptor_id, created_at, published_at, valid)
                     VALUES
-                    (:return_id, :student_id, :descriptor_id, :created_at, :published_at, 1);
+                    (:return_id, :student_id, :descriptor_id, :created_at, :published_at, :valid);
                     ',
                 [
                     'return_id'     => $feedback['id'],
@@ -496,6 +496,8 @@ class LinkRubricMarkToFeedback
                     'descriptor_id' => $descriptor['descriptor_id'],
                     'created_at'    => $feedback['created_at'],
                     'published_at'  => $feedback['published_at'],
+                    'valid'         => $descriptor['valid'],
+
                 ]
             );
             $propogatedRecords[] = $this->db->lastInsertId();
