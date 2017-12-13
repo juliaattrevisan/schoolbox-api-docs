@@ -156,21 +156,19 @@ class Nesa
                     if (\in_array($criterionId, $criteria, true)) {
                         $tempDescriptor = [];
 
-                        foreach ($criterionData['descriptors'] as $descriptorId => $descriptorData) {
-                            if (\in_array($descriptorId, $descriptors, true)) {
+                        foreach ($criterionData['descriptors'] as $levelId => $levelData) {
 
-                                /* Only collate the ones we selected
-                                 */
-                                if ($descriptorData['selected']) {
-                                    $tempDescriptor[$descriptorId] = [
-                                        'text' => $descriptorData['text']
-                                    ];
-                                }
-                                else {
-                                    $tempDescriptor[$descriptorId] = [
-                                        'text' => ''
-                                    ];
-                                }
+                            /* Only collate the ones we selected
+                             */
+                            if ($levelData['selected']) {
+                                $tempDescriptor[$levelData['id']] = [
+                                    'text' => $levelData['text']
+                                ];
+                            }
+                            else {
+                                $tempDescriptor[$levelData['id']] = [
+                                    'text' => ''
+                                ];
                             }
                         }
 

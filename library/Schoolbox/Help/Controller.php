@@ -88,8 +88,7 @@ class Controller extends Base
 
         $allDescriptorUsages = Rubric\DescriptorMapper::getInstance()->findByColumn('criterion_id', $ids);
 
-
-        new \Alaress_Probe($allSpecCrits, $allCriterionUsages, $allDescriptorUsages);
+//        new \Alaress_Probe($allSpecCrits, $allCriterionUsages, $allDescriptorUsages);
 
 
 
