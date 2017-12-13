@@ -90,26 +90,30 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, 'markbook_link', 'markbook_link_block');
         $this->setBlock($templateHandle, 'manage_criteria', 'manage_criteria_block');
 
+        // Determine the term for the grades link
+        $currentTermCode = $this->termMapper->findForToday()->getCode();
+        $this->setVar('WORK_TERM', $currentTermCode);
+
         // Show markbook link to staff on class or group pages
         if ($isStaffOrSuper && ($isGroupPage || $isClassPage || $wasClassPage)) {
             $this->parse('markbook_link_block', 'markbook_link');
             $hasClassActions = true;
+            // If was a class, don't filter by term, else filter to current term.
+            $this->setVar('MARKBOOK_TERM', $wasClassPage ? '' : "/term/$currentTermCode");
         } else {
             $this->setVar('markbook_link_block');
         }
 
-        // Determine the term for the grades link
-        $this->setVar('WORK_TERM', $this->termMapper->findForToday()->getCode());
 
         $involvedInGroup = $isGroupPage && $this->userAccessMapper->involvedInGroup(
-            $this->getUser(),
-            $this->getContext()->getId()
-        );
+                $this->getUser(),
+                $this->getContext()->getId()
+            );
 
         $involvedInClass = $isClassPage && $this->userAccessMapper->involvedInSubject(
-            $this->getUser(),
-            $this->getContext()->getCodeString()
-        );
+                $this->getUser(),
+                $this->getContext()->getCodeString()
+            );
 
         /* Output student grades link to students (other users with READ access may be able to see this page) */
         if (($involvedInGroup || $involvedInClass) && UserAccess::ACCESS_READ === $this->getContentPermission()) {
