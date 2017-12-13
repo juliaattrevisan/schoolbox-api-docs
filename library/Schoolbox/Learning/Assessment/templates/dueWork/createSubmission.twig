@@ -214,9 +214,9 @@ Data:
                         <textarea id="editor-body" name="body" rows="20">{{ editorContents }}</textarea>
 
                         {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
-                    </section>
 
-                    {% include '@learningAssessment/dueWork/createSubmission/callToAction.twig' with {student: student, assessment: assessment} %}
+                        {% include '@learningAssessment/dueWork/createSubmission/callToAction.twig' with {student: student, assessment: assessment} %}
+                    </section>
 
                     <div class="toast" data-alert data-save-draft></div>
                 </form>
