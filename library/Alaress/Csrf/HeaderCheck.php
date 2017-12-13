@@ -45,20 +45,21 @@ class HeaderCheck
     }
 
     /**
-     * Do the source and target headers match?
+     * Verify the request origin.
      *
-     * Source header:
-     * * Origin, or Referer if not set
+     * The origin is valid if the source and target origin match.
      *
-     * Target header: either one of:
+     * Source origin:
+     * * Headers: Origin, or Referer if Origin is not set
+     *
+     * Target origin: either one of:
      * * `$this->host` value
-     * * Host, or X-Forwarded-Host if not set
+     * * Headers: Host, or X-Forwarded-Host if Host is not set
      *
      * @return bool
      */
-    public function check() : bool
+    public function verfiyRequestOrigin() : bool
     {
-        // Valid sources: origin or referer header
         $sources = array_filter(
             array_map(
                 [$this, 'getHostName',],
@@ -68,7 +69,6 @@ class HeaderCheck
             )
         );
 
-        // Valid targets: can be configured; otherwise host or x-forwarded-host
         $targets = array_filter(
             array_map(
                 [$this, 'getHostName',],

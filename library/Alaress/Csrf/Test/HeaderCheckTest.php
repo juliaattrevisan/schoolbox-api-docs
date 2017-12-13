@@ -110,7 +110,7 @@ class HeaderCheckTest extends PHPUnit_Framework_TestCase
     public function testHeadersOnly(array $serverVars, bool $expectedResult)
     {
         $check = new HeaderCheck($serverVars);
-        $this->assertEquals($expectedResult, $check->check());
+        $this->assertEquals($expectedResult, $check->verfiyRequestOrigin());
     }
 
 
@@ -176,6 +176,6 @@ class HeaderCheckTest extends PHPUnit_Framework_TestCase
     public function testHeadersAndValidHost(array $serverVars, ?string $validHost, bool $expectedResult)
     {
         $check = new HeaderCheck($serverVars, $validHost);
-        $this->assertEquals($expectedResult, $check->check());
+        $this->assertEquals($expectedResult, $check->verfiyRequestOrigin());
     }
 }
