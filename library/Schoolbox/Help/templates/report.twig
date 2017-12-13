@@ -1,0 +1,13 @@
+<div class="row">
+    <div class="small-12 columns">
+        <h1>NESA Report</h1>
+        <section>
+            <table>
+                <th>User</th>
+                {% for descriptor in descriptors %}
+                <th>{{ descriptor }}</th>
+                {% endfor %}
+            </table>
+        </section>
+    </div>
+</div>

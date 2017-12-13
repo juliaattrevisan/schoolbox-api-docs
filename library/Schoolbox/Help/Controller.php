@@ -70,8 +70,9 @@ class Controller extends Base
             UnitImplementationMapper::getInstance()
         ))->generate();
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@help/nesa.twig', [
-            'report' => $report
+        $this->getResponse()->content->set($this->buildHtmlOutput('@help/report.twig', [
+            'report' => $report,
+            'descriptors' => $this->getRequest()->post['descriptors']
         ]));
     }
 }
