@@ -25,6 +25,7 @@ class Controller extends Base
      */
     private $errorMapper;
 
+
     /**
      * Controller constructor.
      * @param Error\Mapper $errorMapper
@@ -34,6 +35,7 @@ class Controller extends Base
         $this->errorMapper = $errorMapper;
     }
 
+
     /**
      * NESA Report
      *
@@ -41,8 +43,6 @@ class Controller extends Base
      */
     public function getNesa()
     {
-        /** @var AssessmentMapperProxy $assessmentMapperProxy */
-        $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
         /* Course Specification Id
          * This comes from the /course/modify screen, as is an integer in the url
@@ -59,44 +59,43 @@ class Controller extends Base
          * These are cloned per course import so we need to specifically get all usages of the original
          * There seems to be no relation between the cloned criteria and their original progenitor
          */
-        $ids = [];
+        $parentIds = [];
 
         foreach ($allUnitSpecifications as $currentUnitSpecification) {
-            $ids[] = $currentUnitSpecification->getFolder()->getId();
+            $parentIds[] = $currentUnitSpecification->getFolder()->getId();
         }
 
-        $allSpecCrits = CriterionMapper::getInstance()->findByColumn('parent_id', $ids);
+        $allSpecCrits = CriterionMapper::getInstance()->findByColumn('parent_id', $parentIds);
 
-        /* Now find all their usages in the folders that contain a course implementation of $courseSpecificationId
+        /* Now find all the descriptors contained in the spec
          */
-        $ids = [];
+        $criterionIds = [];
 
-        foreach ($allSpecCrits as $currentCrit) {
-            $ids[] = $currentCrit->getGrouping();
+        foreach ($allSpecCrits as $currentSpecCrit) {
+            $criterionIds[] = $currentSpecCrit->getId();
         }
 
-        $allCriterionUsages = CriterionMapper::getInstance()->findByColumn('grouping', $ids);
+        $allSpecDescriptors = Rubric\DescriptorMapper::getInstance()->findByColumn('criterion_id', $criterionIds);
 
-        /* Now we can find all the descriptors that were in play, in all the implemented units of
-         * $courseSpecificationId
+        /* $allSpecDescriptors is now a list of all the descriptors used in the course spec.
+         * From here we can choose which descriptors we want to include in the report
          */
-        $ids = [];
-
-        foreach ($allSpecCrits as $currentCrit) {
-            $ids[] = $currentCrit->getId();
-        }
-
-        $allDescriptorUsages = Rubric\DescriptorMapper::getInstance()->findByColumn('criterion_id', $ids);
-
-//        new \Alaress_Probe($allSpecCrits, $allCriterionUsages, $allDescriptorUsages);
+        $this->getResponse()->content->set($this->buildHtmlOutput('@help/selection.twig', [
+            'descriptors' => $allSpecDescriptors
+        ]));
+    }
 
 
+    public function postNesa()
+    {
+        /** @var AssessmentMapperProxy $assessmentMapperProxy */
+        $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
         $nesa = (new Nesa(
             $courseSpecificationId,
-            [21, 22],
-            [120, 121],
-            [91, 92, 93],
+            [ 21, 22 ],
+            [ 120, 121 ],
+            [ 91, 92, 93 ],
             Rubric\RubricMapper::getInstance(),
             $assessmentMapperProxy,
             CourseImplementationMapper::getInstance(),
