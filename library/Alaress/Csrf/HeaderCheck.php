@@ -54,8 +54,8 @@ class HeaderCheck
                 [$this, 'getHostName',],
                 [
                     $this->host,
-                    $_SERVER['HTTP_HOST'] ?? null,
-                    $_SERVER['HTTP_X_FORWARDED_HOST'] ?? null,
+                    $this->serverVars['HTTP_HOST'] ?? null,
+                    $this->serverVars['HTTP_X_FORWARDED_HOST'] ?? null,
                 ]
             )
         );
