@@ -43,45 +43,13 @@ class Controller extends Base
      */
     public function getNesa()
     {
-
         /* Course Specification Id
          * This comes from the /course/modify screen, as is an integer in the url
          */
         $courseSpecificationId = 6;
 
-        /* Find all the unit specifications. We'll use those to figure out what Rubric Criteria records exist
-         * for the course spec, then accumulate all their ids
-         */
-        $allUnitSpecifications = UnitSpecificationMapper::getInstance()->findAllByCourseId($courseSpecificationId);
-
-        /* Find all the criteria used in each unit specification
-         *
-         * These are cloned per course import so we need to specifically get all usages of the original
-         * There seems to be no relation between the cloned criteria and their original progenitor
-         */
-        $parentIds = [];
-
-        foreach ($allUnitSpecifications as $currentUnitSpecification) {
-            $parentIds[] = $currentUnitSpecification->getFolder()->getId();
-        }
-
-        $allSpecCrits = CriterionMapper::getInstance()->findByColumn('parent_id', $parentIds);
-
-        /* Now find all the descriptors contained in the spec
-         */
-        $criterionIds = [];
-
-        foreach ($allSpecCrits as $currentSpecCrit) {
-            $criterionIds[] = $currentSpecCrit->getId();
-        }
-
-        $allSpecDescriptors = Rubric\DescriptorMapper::getInstance()->findByColumn('criterion_id', $criterionIds);
-
-        /* $allSpecDescriptors is now a list of all the descriptors used in the course spec.
-         * From here we can choose which descriptors we want to include in the report
-         */
         $this->getResponse()->content->set($this->buildHtmlOutput('@help/selection.twig', [
-            'descriptors' => $allSpecDescriptors
+            'descriptors' => (new NesaSelector($courseSpecificationId))->generate()
         ]));
     }
 

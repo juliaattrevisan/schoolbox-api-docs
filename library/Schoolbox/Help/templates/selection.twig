@@ -5,7 +5,7 @@
         <section>
             <table>
                 <thead>
-                    <th>Descriptor ID</th>
+                    <th></th>
                     <th>Capability</th>
                     <th>Indicator</th>
                     <th>Descriptor</th>
@@ -13,7 +13,10 @@
 
                 {% for id, data in descriptors  %}
                 <tr>
-                    <td>{{ data.id }}</td>
+                    <td>
+                        <input id="descriptor-{{ data.id }}" type="checkbox" value="{{ data.description }}" />
+                        <label for="descriptor-{{ data.id }}" class="checkbox-label"></label>
+                    </td>
                     <td>{{ data.criterion.grouping }}</td>
                     <td>{{ data.criterion.name }}</td>
                     <td>{{ data.description }}</td>
