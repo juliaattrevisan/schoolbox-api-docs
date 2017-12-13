@@ -12,31 +12,46 @@
                 </thead>
                 <tbody>
                     {% for row in report %}
-                        {% for capabilities in row.groups %}
-                            {% for indicatorId, indicator in capabilities.criteria %}
-                                <tr>
-                                    <td>{{ row.user.fullname }} {{ row.user.id }}</td>
-                                    <td>{{ row.assessmentId }}</td>
+                    <tr>
+                        <td>{{ row.user.fullname }} {{ row.user.id }}</td>
+                        <td>{{ row.assessmentId }}</td>
 
-                                    {% for descriptor in descriptors %}
-                                    <td style="text-align:center">
-                                        {# When a Capability was selected, but nothing attempted
-                                         # This renders as empty as the info was never traversed and collected
-                                         # Default to "N"
-                                         #}
-                                        {% if indicator.descriptors[descriptor].text == 'Y' %}
-                                            <span style="background-color:#aea;display:block;padding:3px;font-weight:bold;">{{ indicator.descriptors[descriptor].text }}</span>
-                                        {% else %}
-                                            <span style="background-color:#fdd;display:block;padding:3px;font-weight:bold;">N</span>
+
+                        {# Render data in the same order as headings #}
+
+                        {% for descriptor in descriptors %}
+                        <td style="text-align:center">
+                            {% set content = '<span style="background-color:#fdd;display:block;padding:3px;font-weight:bold;">N</span>' %}
+
+                            {% for capability in row.groups %}
+                                {% for indicatorId, indicator in capability.criteria %}
+                                    {% for descriptorId, descriptorData in indicator.descriptors %}
+                                        {% if descriptorId == descriptor %}
+                                            {% set foundDescriptor = true %}
+
+                                            {# When a Capability was selected, but nothing attempted
+                                             # This renders as empty as the info was never traversed and collected
+                                             # Default to "N"
+                                             #}
+                                            {% if indicator.descriptors[descriptor].text == 'Y' %}
+                                                {% set content = '<span style="background-color:#aea;display:block;padding:3px;font-weight:bold;">Y</span>' %}
+                                            {% endif %}
                                         {% endif %}
-                                    </td>
                                     {% endfor %}
-                                </tr>
+                                {% endfor %}
                             {% endfor %}
+
+                            {{ content | raw }}
+                        </td>
                         {% endfor %}
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </section>
     </div>
 </div>
+
+
+
+

@@ -211,7 +211,7 @@ class Report
             }
         }
 
-//        new \Alaress_Probe($data);
+        new \Alaress_Probe($data);
         return $data;
     }
 }
