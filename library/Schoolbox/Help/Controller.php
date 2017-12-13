@@ -65,9 +65,7 @@ class Controller extends Base
 
         $report = (new Nesa\Report(
             self::NESA_COURSE_SPEC_ID,
-            [ 21, 22 ],
-            [ 120, 121 ],
-            [ 91, 92, 93 ],
+            $this->getRequest()->post['descriptors'],
             Rubric\RubricMapper::getInstance(),
             $assessmentMapperProxy,
             CourseImplementationMapper::getInstance(),

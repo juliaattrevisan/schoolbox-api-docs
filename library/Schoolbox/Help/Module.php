@@ -37,6 +37,7 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '/nesa', 'getNesa', $updatePD, null);
+        $this->register('POST', '/nesa', 'postNesa', $updatePD, null);
     }
 
     /**

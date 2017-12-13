@@ -62,9 +62,7 @@ class Report
      * Nesa constructor.
      *
      * @param int                        $courseSpecId
-     * @param array                      $groups   an array of identifiers for Rubric Groups (Capabilities)
-     * @param array                      $criteria an array of identifiers for Rubric Criteria (Indicators)
-     * @param array                      $descriptors
+     * @param array                      $descriptors   An array of descriptor text
      * @param Rubric\RubricMapper        $rubricMapper
      * @param AssessmentMapperProxy      $assessmentMapperProxy
      * @param CourseImplementationMapper $courseImplementationMapper
@@ -72,8 +70,6 @@ class Report
      */
     public function __construct(
         int $courseSpecId,
-        array $groups,
-        array $criteria,
         array $descriptors,
         Rubric\RubricMapper $rubricMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
@@ -81,8 +77,6 @@ class Report
         UnitImplementationMapper $unitImplementationMapper
     ) {
         $this->courseSpecId = $courseSpecId;
-        $this->groups = $groups;
-        $this->criteria = $criteria;
         $this->descriptors = $descriptors;
         $this->rubricMapper = $rubricMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
@@ -131,7 +125,6 @@ class Report
         return $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($allAssessments, null, false, true);
     }
 
-
     /**
      * Investigate a particular participant and find out what they got for a particular assessment
      * Store the ultra-basics in an array and return that for future rendering
@@ -139,12 +132,10 @@ class Report
      * @param User        $user
      * @param IAssessable $assessment
      * @param array       $rubric
-     * @param array       $groups
-     * @param array       $criteria
-     * @param array       $descriptors
+     * @param array       $descriptors Report upon these descriptors
      * @return array
      */
-    private function investigate(User $user, IAssessable $assessment, array $rubric, array $groups, array $criteria, array $descriptors)
+    private function investigate(User $user, IAssessable $assessment, array $rubric, array $descriptors)
     {
         $tempGroup = [];
 
@@ -221,8 +212,6 @@ class Report
                     $currentParticipant->getUser(),
                     $currentAssessment,
                     $context['rubric'],
-                    $this->groups,
-                    $this->criteria,
                     $this->descriptors
                 );
             }
