@@ -179,7 +179,15 @@ class DataSource
      */
     protected function findForAssessmentCollection(GenericCollection $assessments, User $user = null): void
     {
-        $dynamicPlans = $this->loadPlansAndParticipants($assessments);
+        $this->loadPlansAndParticipants($assessments);
+
+        $dynamicPlans = new GenericCollection(PlanObject::class);
+        foreach ($assessments as $assessment) {
+            $dynamicPlan = $assessment->getDynamicPlan();
+            if ($dynamicPlan){
+                $dynamicPlans->add($dynamicPlan);
+            }
+        }
 
         $this->loadDynamicPlanParticipants($dynamicPlans);
 
@@ -407,13 +415,10 @@ class DataSource
      * Loads all Plans and Participants into the Assessables, and returns the set of dynamic plans
      *
      * @param IAssessable[]|GenericCollection $assessables Indexed by assessment.id
-     * @return PlanObject[]|GenericCollection Indexed by plan.id
      * @throws DefinitionException If unable to locate a specified mapper join
      */
-    private function loadPlansAndParticipants(GenericCollection $assessables): GenericCollection
+    private function loadPlansAndParticipants(GenericCollection $assessables): void
     {
-        $dynamicPlans = new GenericCollection(PlanObject::class);
-
         // Find all participant and plan models for the assessments
         $planMapper = Participant\Plan\Mapper::getInstance();
         $planModels = $planMapper->findPlansAndParticipantsForAssessments($assessables->keys());
@@ -438,10 +443,6 @@ class DataSource
                 ->setUpdatedAt($planModel->getUpdatedAt())
                 ->setDeletedAt($planModel->getDeletedAt());
 
-            // And store it if dynamic so we can later insert class/group members dynamically
-            if ($planObject->getIsDynamic()) {
-                $dynamicPlans[$planObject->getId()] = $planObject;
-            }
 
             foreach ($planModel->getParticipants() as $participantModel) {
                 // Create a Participant Domain object
@@ -457,7 +458,5 @@ class DataSource
                     ->setExcludedAt($participantModel->getExcludedAt());
             }
         }
-
-        return $dynamicPlans;
     }
 }

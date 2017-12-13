@@ -10,6 +10,7 @@ use Alaress_Date_Format;
 use DomainException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
+use Schoolbox\Learning\Assessment\Participant\DataSource;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -78,6 +79,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         // build a stub
         $assessment = AssessmentType::stringToObject($type, $context);
+
+        // create a dynamic plan on the assessment to get started
+        $assessment->getPlans()->add((new Plan($assessment))->setIsDynamic(true));
+        /** @var DataSource $dataSource */
+        $dataSource = $this->getDi()->get('participantDataSource');
+        $dataSource->loadParticipationIntoAssessment($assessment);
 
         $data = $this->getAssessmentAsTwigArray($context, $assessment);
 
