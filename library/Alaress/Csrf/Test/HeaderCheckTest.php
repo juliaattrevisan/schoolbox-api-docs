@@ -7,12 +7,12 @@
 namespace Alaress\Csrf\Test;
 
 use Alaress\Csrf\HeaderCheck;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Tests for CSRF header checks.
  */
-class HeaderCheckTest extends PHPUnit_Framework_TestCase
+class HeaderCheckTest extends TestCase
 {
     /**
      * Data provider for `testHeadersOnly`.
