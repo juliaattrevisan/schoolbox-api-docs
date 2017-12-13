@@ -19,15 +19,15 @@
                                     <td>{{ row.assessmentId }}</td>
 
                                     {% for descriptor in descriptors %}
-                                    <td>
+                                    <td style="text-align:center">
                                         {# When a Capability was selected, but nothing attempted
                                          # This renders as empty as the info was never traversed and collected
                                          # Default to "N"
                                          #}
-                                        {% if indicator.descriptors[descriptor].text == '' %}
-                                            N
+                                        {% if indicator.descriptors[descriptor].text == 'Y' %}
+                                            <span style="background-color:#aea;display:block;padding:3px;font-weight:bold;">{{ indicator.descriptors[descriptor].text }}</span>
                                         {% else %}
-                                            {{ indicator.descriptors[descriptor].text }}
+                                            <span style="background-color:#fdd;display:block;padding:3px;font-weight:bold;">N</span>
                                         {% endif %}
                                     </td>
                                     {% endfor %}
