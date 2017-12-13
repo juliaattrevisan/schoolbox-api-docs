@@ -25,6 +25,9 @@ $groupMapper = GroupMapper::getInstance();
 $categoryId = $_REQUEST['categoryID'];
 $currentUser = $userMapper->findById($_SESSION["id"]);
 
+// If we're on this page, we can assume we're an admin.
+$currentUserPermission = UserAccess::ACCESS_FULL;
+
 try {
 	$folder = $catMapper->findById($categoryId);
 } catch (\Schoolbox\Mapper\Exception $e) {
@@ -37,7 +40,7 @@ if(!is_numeric($categoryId)) {
 }
 
 /* Check access */
-if($groupHandler->getPermission($categoryId) < FULL_ACCESS) {
+if($groupHandler->getPermission($categoryId) < UserAccess::ACCESS_FULL) {
 	error(19);
 }
 
@@ -194,7 +197,10 @@ if (!empty($_POST['accessLevel'])) {
 
 				$ua->setAccessLevel(UserAccess::ACCESS_WRITE);
 				$uaMapper->save($ua);
-			} catch (Schoolbox\Mapper\Exception $e) {
+
+                // If we've given admin rights to another user, we no longer have them, so update this variable
+                $currentUserPermission = UserAccess::ACCESS_WRITE;
+            } catch (Schoolbox\Mapper\Exception $e) {
 				// just ignore it, this kingdom had no king
 				$ua->setUser(new User())
 					->setServiceIdentifier($folder->getId());
@@ -263,11 +269,7 @@ if(isset($_POST['bulkAdd'])) {
 	}
 }
 
-// Force a refresh of permissions without caching
-
-$permission = $groupHandler->getPermission($categoryId, 0, false);
-
-if ($permission < FULL_ACCESS)
+if ($currentUserPermission < UserAccess::ACCESS_FULL)
 {
     // If the user has less then full permission they can no longer stay on the modify group page
 
