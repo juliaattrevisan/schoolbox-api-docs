@@ -935,7 +935,7 @@ class Event implements ISoftDeletable
     /**
      * @return string
      */
-    public function getSource(): string
+    public function getSource(): ?string
     {
         return $this->source;
     }
@@ -944,7 +944,7 @@ class Event implements ISoftDeletable
     /**
      * @param string $source
      */
-    public function setSource(string $source)
+    public function setSource(string $source = null)
     {
         $this->source = $source;
     }

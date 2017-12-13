@@ -432,6 +432,8 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $source->setUpdatedAt($event->getUpdatedAt());
         $source->setEvent($event);
 
+        $sourceMapper->save($source);
+
     }
 
 
