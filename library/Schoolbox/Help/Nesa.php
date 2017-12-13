@@ -17,6 +17,12 @@ class Nesa
 {
 
     /**
+     * Teacher Course
+     * Course specification id
+     */
+    public const COURSE_SPEC_ID = 6;
+
+    /**
      * @var array
      */
     private $groups;
@@ -63,4 +69,6 @@ class Nesa
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->courseImplementationMapper = $courseImplementationMapper;
     }
+
+
 }
