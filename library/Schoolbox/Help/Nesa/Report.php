@@ -128,6 +128,7 @@ class Report
     private function investigate(User $user, IAssessable $assessment, array $rubric, array $descriptors)
     {
         $tempGroup = [];
+        $condensed = [];
 
         foreach ($rubric['groups'] as $groupId => $groupData) {
             $tempCriterion = [];
@@ -138,18 +139,26 @@ class Report
                 foreach ($criterionData['descriptors'] as $levelId => $levelData) {
 
                     /* Only collate the ones we selected
+                     * Condense this as well, for rendering
+                     * The hierarchy is useful for debugging and visualisation
                      */
                     if (\in_array($levelData['text'], $descriptors, true)) {
                         if ($levelData['selected']) {
-                            $tempDescriptor[$levelData['text']] = [
+                            $val = [
                                 'id' => $levelData['id'],
                                 'text' => 'Y'
                             ];
+
+                            $tempDescriptor[$levelData['text']] = $val;
+                            $condensed[$levelData['text']] = $val;
                         } else {
-                            $tempDescriptor[$levelData['text']] = [
+                            $val = [
                                 'id' => $levelData['id'],
                                 'text' => 'N'
                             ];
+
+                            $tempDescriptor[$levelData['text']] = $val;
+                            $condensed[$levelData['text']] = $val;
                         }
                     }
                 }
@@ -170,7 +179,8 @@ class Report
             'name' => $assessment->getTitle(),
             'user' => $user,
             'assessmentId' => $assessment->getId(),
-            'groups' => $tempGroup
+            'condensed' => $condensed,
+            'groups' => $tempGroup,
         ];
 
         return $tempAssessment;
@@ -210,7 +220,7 @@ class Report
                 );
             }
         }
-
+new \Alaress_Probe($data);
         return $data;
     }
 }
