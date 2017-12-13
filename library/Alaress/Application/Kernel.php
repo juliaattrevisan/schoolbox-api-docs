@@ -62,6 +62,7 @@ abstract class Kernel {
         $this->boot->registerExceptionHandling();
         $this->boot->registerShutdownHandling();
         $this->boot->installDependencies();
+        $this->boot->runMiddleware();
 
 		return true;
 	}

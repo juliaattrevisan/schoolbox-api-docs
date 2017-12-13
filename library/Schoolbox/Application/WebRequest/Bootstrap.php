@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Application\WebRequest;
 
+use Alaress\Csrf\HeaderCheck;
 use Alaress\DebugBar\DataCollector\RouteCollector;
 use Alaress\DebugBar\DataCollector\TidewaysCollector;
 use Alaress\DebugBar\DataCollector\XhprofCollector;
@@ -21,6 +22,7 @@ use Config;
 use Database;
 use Schoolbox\Application\AbstractBootstrap;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 
 
 class Bootstrap extends AbstractBootstrap {
@@ -202,6 +204,34 @@ class Bootstrap extends AbstractBootstrap {
         }
 
     }
+
+
+    /**
+     * Web requests require CSRF protection: that belongs in middleware.
+     */
+    public function runMiddleware()
+    {
+        // Ghetto CSRF middleware. Reject request if:
+        // * It's not a GET (Note HTTP_X_HTTP_METHOD_OVERRIDE can change the request method!)
+        // * It's not a deliberately allowed request (none known yet)
+        // * Its headers don't match
+        $requestMethod = $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] ?? $_SERVER['REQUEST_METHOD'];
+        if ($requestMethod !== 'GET') {
+            /** @var IConfigLoader $config */
+            $di        = $this->getKernel()->getDependencyInjector();
+            $config    = $di->get('config');
+            $fqdn      = trim($config->get('site_hostname').".".$config->get('site_domain'), ';.');
+            $csrfCheck = new HeaderCheck($_SERVER, $fqdn);
+            if (!$csrfCheck->verfiyRequestOrigin()) {
+                // Let's just say 403 Forbidden for now
+                // TODO replace the call to Sitepage::error() method
+                /** @var \SitePage $page */
+                $page = $di->get('layoutEngine');
+                $page->error('', '', 403);
+            }
+        }
+    }
+
 
     /**
      * Shutdown handler for either exceptions or fatal errors

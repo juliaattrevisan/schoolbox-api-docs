@@ -136,4 +136,12 @@ class Bootstrap extends AbstractBootstrap {
 
     }
 
+
+    /**
+     * No middleware in daemonland.
+     */
+    public function runMiddleware()
+    {
+        // noop in daemonland
+    }
 }
