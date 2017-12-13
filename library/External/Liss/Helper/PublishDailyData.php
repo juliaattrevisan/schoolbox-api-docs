@@ -89,7 +89,7 @@ class PublishDailyData
             'startDateTime' => new \Alaress_Date_Format($startDateTime, \Alaress_Date_Format::DATABASE_FORMAT),
             'endDateTime' => new \Alaress_Date_Format($endDateTime, \Alaress_Date_Format::DATABASE_FORMAT),
             'period' => trim($currentEvent->me['struct']['Period']->me['string']),
-            'edvalGuid' => trim($currentEvent->me['struct']['Guid']->me['string']),
+            'guid' => trim($currentEvent->me['struct']['Guid']->me['string']),
             'detail' => '',
             'students' => [],
 
@@ -124,11 +124,11 @@ class PublishDailyData
      * Save a corresponding eventSource so we know from whence this event came
      *
      * @param Event  $event
-     * @param string $edvalGuid
+     * @param string $guid
      * @throws MapperException
      * @throws \PDOException
      */
-    public function saveEventSource(Event $event, $edvalGuid)
+    public function saveEventSource(Event $event, $guid)
     {
         $eventSourceMapper = EventSourceMapper::getInstance();
 
@@ -136,7 +136,7 @@ class PublishDailyData
         $eventSource = EventSourceMapper::getInstance()->createModel();
         $eventSource->setEvent($event);
         $eventSource->setSourceName($this->generateSourceName());
-        $eventSource->setEdvalGuid($edvalGuid);
+        $eventSource->setGuid($guid);
         $eventSourceMapper->save($eventSource);
     }
 
