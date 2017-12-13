@@ -303,10 +303,9 @@ class Healthcheck
         return $tables;
     }
 
-    // Connector specific test functions, ignore any unused function warnings as these are called dynamically
+    // Connector specific test functions
 
-    /** @noinspection PhpUnusedPrivateMethodInspection */
-    public function edumateTest()
+    public function edumateTest(): void
     {
         $db2inst1Tables = [
             'schoolbox_classes',
@@ -324,8 +323,7 @@ class Healthcheck
         $this->selectTest($db2inst1Tables, null, 'db2inst1', "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
     }
 
-    /** @noinspection PhpUnusedPrivateMethodInspection */
-    private function mazeTest()
+    private function mazeTest(): void
     {
         $tables = [
             'DF',
@@ -351,8 +349,8 @@ class Healthcheck
         $this->selectTest($tables);
     }
 
-    /** @noinspection PhpUnusedPrivateMethodInspection */
-    private function tassTest() {
+    private function tassTest(): void
+    {
         $tables = [
             'studsub',
             'student',
@@ -384,8 +382,8 @@ class Healthcheck
         $this->selectTest($tables);
     }
 
-    /** @noinspection PhpUnusedPrivateMethodInspection */
-    private function pcschoolsTest()
+
+    private function pcschoolsTest(): void
     {
         $tables = [
             'TIMEFILE',
@@ -411,8 +409,7 @@ class Healthcheck
         $this->procedureTest($procedures);
     }
 
-    /** @noinspection PhpUnusedPrivateMethodInspection */
-    private function synergeticTest()
+    private function synergeticTest(): void
     {
         $tables = [
             'Addresses',
@@ -531,8 +528,7 @@ class Healthcheck
         $this->functionTest($functions);
     }
 
-    /** @noinspection PhpUnusedPrivateMethodInspection */
-    private function schoolproTest()
+    private function schoolproTest(): void
     {
         $procedures = [
             'sbGetParent',
@@ -555,8 +551,8 @@ class Healthcheck
         $this->procedureTest($procedures);
     }
 
-    /** @noinspection PhpUnusedPrivateMethodInspection */
-    private function humanedgeTest()
+
+    private function humanedgeTest(): void
     {
         $tables = [
             'Contact',
@@ -605,8 +601,8 @@ class Healthcheck
          */
     }
 
-    /** @noinspection PhpUnusedPrivateMethodInspection */
-    private function schooledgeTest()
+
+    private function schooledgeTest(): void
     {
         $tables = [
             'Contact',
@@ -649,8 +645,9 @@ class Healthcheck
         );
     }
 
-    /** @noinspection PhpUnusedPrivateMethodInspection */
-    private function doublefirstTest() {
+
+    private function doublefirstTest(): void
+    {
         $tables = [
             "AttendanceBreaks",
             "AttendancePeriods",
