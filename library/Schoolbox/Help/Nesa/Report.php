@@ -28,16 +28,6 @@ class Report
     private $courseSpecId;
 
     /**
-     * @var array
-     */
-    private $groups;
-
-    /**
-     * @var array
-     */
-    private $criteria;
-
-    /**
      * @var Rubric\RubricMapper
      */
     private $rubricMapper;
@@ -218,7 +208,6 @@ class Report
             }
         }
 
-        new \Alaress_Probe($data);
         return $data;
     }
 }
