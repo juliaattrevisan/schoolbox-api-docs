@@ -74,6 +74,14 @@
  * if it was created at the same time or after rubric mark creation. If not, this rubric mark will become an orphan.
  *
  *
+ * - Valid descriptor
+ * Validity of a descriptor is not taken into the consideration.
+ *
+ *
+ * - Student submission vs floating
+ * Rubric marks are linked and propagated to any type of feedback,
+ * whether it is linked to any student submission or is a floating feedback.
+ *
  */
 
 use Alaress\Database\Connector\IConnector;
@@ -150,9 +158,9 @@ class LinkRubricMarkToFeedback
      *
      * @return array
      */
-    private function getParticipation()
+    private function getParticipations()
     {
-        $participants = $this->db->executeQuery(
+        $participations = $this->db->executeQuery(
             '
             SELECT rm.student_id, rl.box_id
             FROM rubric_mark rm
@@ -162,7 +170,7 @@ class LinkRubricMarkToFeedback
             '
         )->fetchAll();
 
-        return $participants;
+        return $participations;
     }
 
     /**
@@ -171,11 +179,11 @@ class LinkRubricMarkToFeedback
     private function migrateByParticipation()
     {
         // Dealing with published only for now
-        // Loop participants and find published descriptor sets
-        foreach ($this->getParticipation() as $i => $participant) {
+        // Loop participations and find published descriptor sets
+        foreach ($this->getParticipations() as $i => $participation) {
 
-            $this->migratePublished($participant);
-            $this->migrateDrafts($participant);
+            $this->migratePublished($participation);
+            $this->migrateDrafts($participation);
 
         }
     }
@@ -183,50 +191,21 @@ class LinkRubricMarkToFeedback
     /**
      * Links published rubric marks to published feedbacks
      *
-     * @param $participant
+     * @param $participation
      */
-    private function migratePublished($participant)
+    private function migratePublished($participation)
     {
         // All rubric marks, newest to oldest
-        $rubricMarks = $this->db->executeQuery(
-            '
-            SELECT COUNT(rm.id) AS records, rm.student_id, rm.return_id, rl.box_id, rm.created_at, rm.published_at, COUNT(DISTINCT rd.criterion_id) AS criterion
-            FROM rubric_mark rm
-            JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
-            JOIN rubric_level rl ON rl.id = rd.level_id
-            WHERE rm.student_id = :student_id
-            AND rm.published_at IS NOT NULL
-            AND rl.box_id = :box_id
-            GROUP BY rm.published_at
-            ORDER BY rm.published_at DESC;
-            ',
-            [
-                'student_id' => $participant['student_id'],
-                'box_id'     => $participant['box_id'],
-            ]
-        )->fetchAll();
+        $rubricMarks = $this->fetchPublishedRubricMarks($participation);
 
         // All possible feedbacks, deleted or not, oldest to newest
-        $feedbacks = $this->db->executeQuery(
-            '
-            SELECT sr.id, rm.return_id, sr.created_at, sr.updated_at, sr.deleted_at AS "DELETED", sr.published_at
-            FROM submission_return sr
-            JOIN submission_box sb ON sb.id = sr.box_id
-            LEFT JOIN rubric_mark rm ON sr.id = rm.return_id
-            WHERE sr.owner = :student_id AND sr.box_id = :box_id AND sr.published_at IS NOT NULL
-            ORDER BY sr.published_at ASC;
-            ',
-            [
-                'student_id' => $participant['student_id'],
-                'box_id'     => $participant['box_id'],
-            ]
-        )->fetchAll();
+        $feedbacks = $this->fetchPublishedFeedbacks($participation);
 
         $this->log->info(
             sprintf(
                 'Student:box %d:%d: %d published marks, %d published feedbacks',
-                $participant['student_id'],
-                $participant['box_id'],
+                $participation['student_id'],
+                $participation['box_id'],
                 count($rubricMarks),
                 count($feedbacks)
             )
@@ -284,35 +263,18 @@ class LinkRubricMarkToFeedback
     /**
      * Links draft rubric marks to draft feedbacks
      *
-     * @param $participant
+     * @param $participation
      */
-    private function migrateDrafts($participant)
+    private function migrateDrafts($participation)
     {
-        // Get me drafts if there are any, newest to oldest
-        $draftRubricMarks = $this->db->executeQuery(
-            '
-                SELECT COUNT(rm.id) AS records, rm.student_id, rm.return_id, rl.box_id, rm.created_at, COUNT(DISTINCT rd.criterion_id) AS criterion
-                FROM rubric_mark rm
-                JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
-                JOIN rubric_level rl ON rl.id = rd.level_id
-                WHERE rm.student_id = :student_id
-                AND rm.published_at IS NULL
-                AND rl.box_id = :box_id
-                GROUP BY rm.created_at
-                ORDER BY rm.created_at DESC;
-                ',
-            [
-                'student_id' => $participant['student_id'],
-                'box_id'     => $participant['box_id'],
-            ]
-        )->fetchAll();
+        $draftRubricMarks = $this->fetchDraftRubricMarks($participation);
 
         if (count($draftRubricMarks) > 0) {
             $this->log->info(
                 sprintf(
                     'Student:box %d:%d: %d draft marks',
-                    $participant['student_id'],
-                    $participant['box_id'],
+                    $participation['student_id'],
+                    $participation['box_id'],
                     count($draftRubricMarks)
                 )
             );
@@ -320,26 +282,13 @@ class LinkRubricMarkToFeedback
             // There is not much sense in getting multiple draft feedbacks to link the rubric mark to,
             // as it is invalid to have multiple draft feedbacks simultaneously.
             // Get latest feedback and check if it has been created with or after the rubric mark
-            $draftFeedbacks = $this->db->executeQuery(
-                '
-                    SELECT sr.id, rm.return_id, sr.created_at
-                    FROM submission_return sr
-                    JOIN submission_box sb ON sb.id = sr.box_id
-                    LEFT JOIN rubric_mark rm ON sr.id = rm.return_id
-                    WHERE sr.owner = :student_id AND sr.box_id = :box_id AND sr.published_at IS NULL
-                    ORDER BY sr.created_at DESC
-                    LIMIT 1;
-                ',
-                [
-                    'student_id' => $participant['student_id'],
-                    'box_id'     => $participant['box_id'],
-                ])->fetchAll();
+            $draftFeedbacks = $this->fetchDraftFeedbacks($participation);
 
             $this->log->info(
                 sprintf(
                     'Student:box %d:%d: %d combined draft marks, %d draft feedbacks',
-                    $participant['student_id'],
-                    $participant['box_id'],
+                    $participation['student_id'],
+                    $participation['box_id'],
                     count($draftRubricMarks),
                     count($draftFeedbacks)
                 )
@@ -350,6 +299,7 @@ class LinkRubricMarkToFeedback
                 if ($draftRubricMarks[0]['return_id'] != null || $draftFeedbacks[0]['return_id'] != null) {
                     // Draft rubric mark or feedback has already been linked, get out
                     $this->log->debug('Latest draft rubric mark or feedback have already been linked, skipping');
+
                     return;
                 }
 
@@ -361,6 +311,7 @@ class LinkRubricMarkToFeedback
                         $this->logCombinedDraftFeedbacks[] = $draftFeedbacks[0]['id'];
                     } else {
                         $this->log->warning('More than 1 draft found for the participation. Skipping!');
+
                         return;
                     }
                 }
@@ -392,6 +343,121 @@ class LinkRubricMarkToFeedback
                 $this->log->notice('No draft feedbacks to link to marks');
             }
         }
+    }
+
+    /**
+     * Return all published rubric marks for a participation, order from latest to oldest
+     *
+     * @param $participation
+     *
+     * @return array
+     */
+    private function fetchPublishedRubricMarks($participation)
+    {
+        $rubricMarks = $this->db->executeQuery(
+            '
+            SELECT COUNT(rm.id) AS records, rm.student_id, rm.return_id, rl.box_id, rm.created_at, rm.published_at, COUNT(DISTINCT rd.criterion_id) AS criterion
+            FROM rubric_mark rm
+            JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
+            JOIN rubric_level rl ON rl.id = rd.level_id
+            WHERE rm.student_id = :student_id
+            AND rm.published_at IS NOT NULL
+            AND rl.box_id = :box_id
+            GROUP BY rm.published_at
+            ORDER BY rm.published_at DESC;
+            ',
+            [
+                'student_id' => $participation['student_id'],
+                'box_id'     => $participation['box_id'],
+            ]
+        )->fetchAll();
+
+        return $rubricMarks;
+    }
+
+    /**
+     * Return all published rubric marks for a participation, order from oldest to latest
+     *
+     * @param $participation
+     *
+     * @return array
+     */
+    private function fetchPublishedFeedbacks($participation)
+    {
+        $feedbacks = $this->db->executeQuery(
+            '
+            SELECT sr.id, rm.return_id, sr.created_at, sr.updated_at, sr.deleted_at AS "DELETED", sr.published_at
+            FROM submission_return sr
+            JOIN submission_box sb ON sb.id = sr.box_id
+            LEFT JOIN rubric_mark rm ON sr.id = rm.return_id
+            WHERE sr.owner = :student_id AND sr.box_id = :box_id AND sr.published_at IS NOT NULL
+            ORDER BY sr.published_at ASC;
+            ',
+            [
+                'student_id' => $participation['student_id'],
+                'box_id'     => $participation['box_id'],
+            ]
+        )->fetchAll();
+
+        return $feedbacks;
+    }
+
+    /**
+     * Return all draft rubric marks for a participation, order from latest to oldest
+     *
+     * @param $participation
+     *
+     * @return array
+     */
+    private function fetchDraftRubricMarks($participation)
+    {
+
+        $draftRubricMarks = $this->db->executeQuery(
+            '
+                SELECT COUNT(rm.id) AS records, rm.student_id, rm.return_id, rl.box_id, rm.created_at, COUNT(DISTINCT rd.criterion_id) AS criterion
+                FROM rubric_mark rm
+                JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
+                JOIN rubric_level rl ON rl.id = rd.level_id
+                WHERE rm.student_id = :student_id
+                AND rm.published_at IS NULL
+                AND rl.box_id = :box_id
+                GROUP BY rm.created_at
+                ORDER BY rm.created_at DESC;
+                ',
+            [
+                'student_id' => $participation['student_id'],
+                'box_id'     => $participation['box_id'],
+            ]
+        )->fetchAll();
+
+        return $draftRubricMarks;
+    }
+
+    /**
+     * Return all feedbacks for a participation order from latest to oldest
+     *
+     * @param $participation
+     *
+     * @return array
+     */
+    private function fetchDraftFeedbacks($participation)
+    {
+        $draftFeedbacks = $this->db->executeQuery(
+            '
+                    SELECT sr.id, rm.return_id, sr.created_at
+                    FROM submission_return sr
+                    JOIN submission_box sb ON sb.id = sr.box_id
+                    LEFT JOIN rubric_mark rm ON sr.id = rm.return_id
+                    WHERE sr.owner = :student_id AND sr.box_id = :box_id AND sr.published_at IS NULL
+                    ORDER BY sr.created_at DESC
+                    LIMIT 1;
+                ',
+            [
+                'student_id' => $participation['student_id'],
+                'box_id'     => $participation['box_id'],
+            ])->fetchAll();
+
+        return $draftFeedbacks;
     }
 
     /**
@@ -537,7 +603,7 @@ class LinkRubricMarkToFeedback
                 // We've got at least one good draft
                 $combinedDrafts[]     = $draftRubricMark;
                 $combinedCriterions[] = $rubricMarkCriterions;
-                $latestCreatedDate = new Alaress_Date_Format($draftRubricMarks[0]['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
+                $latestCreatedDate    = new Alaress_Date_Format($draftRubricMarks[0]['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
             } else {
                 $createdDate = new Alaress_Date_Format($draftRubricMark['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
 
@@ -554,12 +620,13 @@ class LinkRubricMarkToFeedback
                 }
 
                 // Combine
-                $combinedDrafts[] = $draftRubricMark;
+                $combinedDrafts[]     = $draftRubricMark;
                 $combinedCriterions[] = $rubricMarkCriterions;
             }
         }
 
         $this->countCombinedDrafts += count($combinedDrafts) > 1 ? count($combinedDrafts) : 0;
+
         return $combinedDrafts;
     }
 
