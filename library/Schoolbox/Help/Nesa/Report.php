@@ -141,12 +141,14 @@ class Report
                      */
                     if (\in_array($levelData['text'], $descriptors, true)) {
                         if ($levelData['selected']) {
-                            $tempDescriptor[$levelData['id']] = [
-                                'text' => $levelData['text']
+                            $tempDescriptor[$levelData['text']] = [
+                                'id' => $levelData['id'],
+                                'text' => 'Y'
                             ];
                         } else {
-                            $tempDescriptor[$levelData['id']] = [
-                                'text' => ''
+                            $tempDescriptor[$levelData['text']] = [
+                                'id' => $levelData['id'],
+                                'text' => 'N'
                             ];
                         }
                     }

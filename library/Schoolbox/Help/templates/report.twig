@@ -3,10 +3,30 @@
         <h1>NESA Report</h1>
         <section>
             <table>
-                <th>User</th>
-                {% for descriptor in descriptors %}
-                <th>{{ descriptor }}</th>
-                {% endfor %}
+                <thead>
+                    <th>User</th>
+                    <th>Assessment</th>
+                    {% for descriptor in descriptors %}
+                        <th>{{ descriptor }}</th>
+                    {% endfor %}
+                </thead>
+                <tbody>
+                    {% for assessmentId, people in report %}
+                        {% for person in people %}
+                            <tr>
+                                <td>{{ person.user }}</td>
+                                <td>{{ assessmentId }}</td>
+                                {% for capabilities in person.groups %}
+                                    {% for indicatorId, indicators in capabilities.criteria %}
+                                        {% for descriptorId, resultDescriptor in indicators.descriptors %}
+                                            <td>{{ resultDescriptor.text }}</td>
+                                        {% endfor %}
+                                    {% endfor %}
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    {% endfor %}
+                </tbody>
             </table>
         </section>
     </div>
