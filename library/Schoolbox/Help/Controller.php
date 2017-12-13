@@ -21,6 +21,12 @@ class Controller extends Base
 {
 
     /**
+     * Course Specification Id
+     * This comes from the /course/modify screen, as is an integer in the url
+     */
+    public const NESA_COURSE_SPEC_ID = 6;
+
+    /**
      * @var Error\Mapper
      */
     private $errorMapper;
@@ -43,13 +49,8 @@ class Controller extends Base
      */
     public function getNesa()
     {
-        /* Course Specification Id
-         * This comes from the /course/modify screen, as is an integer in the url
-         */
-        $courseSpecificationId = 6;
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@help/selection.twig', [
-            'descriptors' => (new Nesa\Selector($courseSpecificationId))->generate()
+            'descriptors' => (new Nesa\Selector(self::NESA_COURSE_SPEC_ID))->generate()
         ]));
     }
 
@@ -62,8 +63,8 @@ class Controller extends Base
         /** @var AssessmentMapperProxy $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
-        $nesa = (new Nesa(
-            $courseSpecificationId,
+        $report = (new Nesa\Report(
+            self::NESA_COURSE_SPEC_ID,
             [ 21, 22 ],
             [ 120, 121 ],
             [ 91, 92, 93 ],
@@ -74,7 +75,7 @@ class Controller extends Base
         ))->generate();
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@help/nesa.twig', [
-
+            'report' => $report
         ]));
     }
 }
