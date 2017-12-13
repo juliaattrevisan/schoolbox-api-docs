@@ -14,6 +14,11 @@ use PHPUnit_Framework_TestCase;
  */
 class HeaderCheckTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * Data provider for `testHeadersOnly`.
+     *
+     * @return array
+     */
     public function providerForTestHeadersOnly()
     {
         return [
@@ -105,6 +110,72 @@ class HeaderCheckTest extends PHPUnit_Framework_TestCase
     public function testHeadersOnly(array $serverVars, bool $expectedResult)
     {
         $check = new HeaderCheck($serverVars);
+        $this->assertEquals($expectedResult, $check->check());
+    }
+
+
+    /**
+     * Data provider for `testHeadersAndValidHost`.
+     *
+     * @return array
+     */
+    public function providerForHeadersAndValidHost()
+    {
+        return [
+            'validOrigin' => [
+                'serverVars' => [
+                    'HTTP_ORIGIN' => 'http://192.168.36.10/adminv2/menu-top',
+                ],
+                'validHost' => '192.168.36.10',
+                'expectedResult' => true,
+            ],
+            'validReferer' => [
+                'serverVars' => [
+                    'HTTP_REFERER' => 'http://192.168.36.10/adminv2/menu-top',
+                ],
+                'validHost' => '192.168.36.10',
+                'expectedResult' => true,
+            ],
+            'invalidOrigin' => [
+                'serverVars' => [
+                    'HTTP_ORIGIN' => 'http://google.com',
+                ],
+                'validHost' => '192.168.36.10',
+                'expectedResult' => false,
+            ],
+            'preferValidHostToHeaderHost' => [
+                'serverVars' => [
+                    'HTTP_ORIGIN'           => 'http://192.168.36.10/adminv2/menu-top',
+                    'HTTP_HOST'             => 'google.com',
+                ],
+                'validHost' => '192.168.36.10',
+                'expectedResult' => true,
+            ],
+            'invalidReferer' => [
+                'serverVars' => [
+                    'HTTP_REFERER' => 'http://google.com',
+                ],
+                'validHost' => '192.168.36.10',
+                'expectedResult' => false,
+            ],
+            'noSource' => [
+                'serverVars' => [],
+                'validHost' => '192.168.36.10',
+                'expectedResult' => false,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider providerForHeadersAndValidHost
+     *
+     * @param array       $serverVars
+     * @param null|string $validHost
+     * @param bool        $expectedResult
+     */
+    public function testHeadersAndValidHost(array $serverVars, ?string $validHost, bool $expectedResult)
+    {
+        $check = new HeaderCheck($serverVars, $validHost);
         $this->assertEquals($expectedResult, $check->check());
     }
 }
