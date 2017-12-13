@@ -232,42 +232,48 @@ class LinkRubricMarkToFeedback
         );
 
         foreach ($rubricMarks as $rubricMark) {
+
             // Validate your descriptors sets
             if (!$this->validateDescriptorSet($rubricMark)) {
                 continue;
             }
 
-            // For each rubric mark, get all feedbacks that have same or later published date
-            $candidateFeedbacks = array_filter($feedbacks, function ($feedback) use ($rubricMark) {
+            $propagate  = false;
+            $rubricMarkPublishedDate = new Alaress_Date_Format($rubricMark['published_at'], Alaress_Date_Format::DATABASE_FORMAT);
 
-                $rubricMarkPublishedDate = new Alaress_Date_Format($rubricMark['published_at'], Alaress_Date_Format::DATABASE_FORMAT);
-                $feedbackPublishedDate   = new Alaress_Date_Format($feedback['published_at'], Alaress_Date_Format::DATABASE_FORMAT);
+            foreach ($feedbacks as $k => $feedback) {
+                // This feedback is already linked, skip
+                if ($feedback['return_id'] > 0) {
+                    if ($feedback['return_id'] == $rubricMark['return_id']) {
+                        $propagate = true;
+                    }
+                    $this->log->debug('Feedback has already been linked, skipping');
+                    continue;
+                }
+
+                $feedbackPublishedDate = new Alaress_Date_Format($feedback['published_at'], Alaress_Date_Format::DATABASE_FORMAT);
+
                 $this->log->debug(
                     sprintf(
-                        'Mark published %s; Feedback published %s',
+                        'Mark published %s, Feedback published %s',
                         $rubricMark['published_at'],
                         $feedback['published_at']
                     )
                 );
-                if ($rubricMarkPublishedDate->compare($feedbackPublishedDate) <= 0) {
-                    return $feedback;
-                }
-            });
-            // Reindex candidates
-            $candidateFeedbacks = array_values($candidateFeedbacks);
-            foreach ($candidateFeedbacks as $k => $candidateFeedback) {
 
-                // Only link feedbacks if they haven't been linked yet
-                // Link the first (oldest) one
-                if ($k == 0 &&  $candidateFeedback['return_id'] == null) {
-                    $this->linkPublished($candidateFeedback, $rubricMark);
-                }
-                // Propagate for the rest
-                elseif ($k > 0 &&  $candidateFeedback['return_id'] == null) {
+                if (($rubricMarkPublishedDate->compare($feedbackPublishedDate) <= 0) && !$propagate) {
+                    $this->log->debug('Linking mark to feedback: subsequent feedbacks for this mark will be propagated to');
+                    $this->linkPublished($feedback, $rubricMark);
+                    $propagate  = true;
+                    // Mark feedback as linked
+                    $feedbacks[$k]['return_id'] = $feedback['id'];
+                } elseif ($propagate) {
                     $this->log->debug('Propagating mark to feedback');
-                    $this->propagateRubricMarkForward($candidateFeedback, $rubricMark);
-                }
-                else {
+                    $this->propagateRubricMarkForward($feedback, $rubricMark);
+                    // Mark feedback as linked
+                    $feedbacks[$k]['return_id'] = $feedback['id'];
+                } else {
+                    $this->log->debug('Not linking or propagating mark: mark is published after feedback');
                     continue;
                 }
             }
