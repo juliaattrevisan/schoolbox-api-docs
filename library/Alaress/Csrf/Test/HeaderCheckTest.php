@@ -45,7 +45,7 @@ class HeaderCheckTest extends PHPUnit_Framework_TestCase
                 ],
                 'expectedResult' => true,
             ],
-            'preferOriginToReferer' => [
+            'preferMatchingOriginToReferer' => [
                 'serverVars' => [
                     'HTTP_ORIGIN'  => 'http://192.168.36.10/adminv2/menu-top',
                     'HTTP_REFERER' => 'http://google.com',
@@ -53,13 +53,29 @@ class HeaderCheckTest extends PHPUnit_Framework_TestCase
                 ],
                 'expectedResult' => true,
             ],
-            'preferHostToForwardedHost' => [
+            'preferMatchingHostToForwardedHost' => [
                 'serverVars' => [
                     'HTTP_ORIGIN'           => 'http://192.168.36.10/adminv2/menu-top',
                     'HTTP_HOST'             => '192.168.36.10',
                     'HTTP_X_FORWARDED_HOST' => 'google.com',
                 ],
                 'expectedResult' => true,
+            ],
+            'preferNonMatchingOriginToReferer' => [
+                'serverVars' => [
+                    'HTTP_ORIGIN'  => 'http://google.com',
+                    'HTTP_REFERER' => 'http://192.168.36.10/adminv2/menu-top',
+                    'HTTP_HOST'    => '192.168.36.10',
+                ],
+                'expectedResult' => false,
+            ],
+            'preferNonMatchingHostToForwardedHost' => [
+                'serverVars' => [
+                    'HTTP_ORIGIN'           => 'http://192.168.36.10/adminv2/menu-top',
+                    'HTTP_HOST'             => 'google.com',
+                    'HTTP_X_FORWARDED_HOST' => '192.168.36.10',
+                ],
+                'expectedResult' => false,
             ],
         ];
     }

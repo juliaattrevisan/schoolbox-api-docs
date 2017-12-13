@@ -42,8 +42,7 @@ class HeaderCheck
             array_map(
                 [$this, 'getHostName',],
                 [
-                    $this->serverVars['HTTP_ORIGIN'] ?? null,
-                    $this->serverVars['HTTP_REFERER'] ?? null,
+                    $this->serverVars['HTTP_ORIGIN'] ?? $this->serverVars['HTTP_REFERER'] ?? null,
                 ]
             )
         );
@@ -54,8 +53,7 @@ class HeaderCheck
                 [$this, 'getHostName',],
                 [
                     $this->host,
-                    $this->serverVars['HTTP_HOST'] ?? null,
-                    $this->serverVars['HTTP_X_FORWARDED_HOST'] ?? null,
+                    $this->serverVars['HTTP_HOST'] ?? $this->serverVars['HTTP_X_FORWARDED_HOST'] ?? null,
                 ]
             )
         );
