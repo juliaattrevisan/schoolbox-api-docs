@@ -212,11 +212,13 @@ class Bootstrap extends AbstractBootstrap {
     public function runMiddleware()
     {
         // Ghetto CSRF middleware. Reject request if:
-        // * It's not a GET (Note HTTP_X_HTTP_METHOD_OVERRIDE can change the request method!)
+        // * It's not a GET request
+        // ** Disregard X-Http-Method-Override, as that can be set by client
         // * It's not a deliberately allowed request (none known yet)
+        // ** In general: any request that authenticates via token instead of
+        //    via session should be allowed
         // * Its headers don't match
-        $requestMethod = $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] ?? $_SERVER['REQUEST_METHOD'];
-        if ($requestMethod !== 'GET') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
             /** @var IConfigLoader $config */
             $di        = $this->getKernel()->getDependencyInjector();
             $config    = $di->get('config');
