@@ -3,7 +3,7 @@
 use Schoolbox\Resource\Category\NewsMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
-use Schoolbox\Error\Mapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 $groupHandler = new Group;
 $newsHandler = new CategoryNews;
@@ -48,7 +48,7 @@ $subjectNewsMapper = new NewsMapper();
 try {
     $news = $subjectNewsMapper->findById($this->arg[1]);
 } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-    $this->error(173);
+    error(ErrorMapper::ERROR_POST_NOT_FOUND);
 }
 
 if ($news->getOwner() == $_SESSION['id'] || $groupHandler->getPermission($category->getId()) >= WRITE_ACCESS) {
