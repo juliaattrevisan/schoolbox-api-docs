@@ -16,10 +16,12 @@ use Custom\Mggs\Personalised\Participant;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DataModel\Translator as AssessmentTranslator;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder;
 use Schoolbox\User;
+use Schoolbox\Learning\Course\DataModel\Implementation;
 
 /**
  * Controller for the personalised learning screen.
@@ -27,7 +29,7 @@ use Schoolbox\User;
 class Controller extends Base
 {
     /**
-     * @var FolderMapper
+     * @var Folder\Mapper
      */
     protected $folderMapper;
 
@@ -49,13 +51,13 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param FolderMapper         $folderMapper
+     * @param Folder\Mapper        $folderMapper
      * @param AssessmentDataSource $assessmentDataSource
      * @param Participant\Mapper   $participantMapper
      * @param AssessmentTranslator $assessmentTranslator
      */
     public function __construct(
-        FolderMapper $folderMapper,
+        Folder\Mapper $folderMapper,
         AssessmentDataSource $assessmentDataSource,
         Participant\Mapper $participantMapper,
         AssessmentTranslator $assessmentTranslator
@@ -126,41 +128,50 @@ class Controller extends Base
                 continue;
             }
 
-            // Resource for folder
-            $resultSet[] = [
-                'id'          => $folder->getId(),
-                'title'       => $folder->getTitle(),
-                'folderTitle' => $folder->getTitle(),
-            ];
+            // TODO singleton
+            $unitMapper = Implementation\Unit\Mapper::getInstance();
 
-            $baseResult = [
-                'parentId'    => $folder->getId(),
-                'folderId'    => $folder->getId(),
-                'folderTitle' => $folder->getTitle(),
-            ];
+            try {
+                $units = $unitMapper->findByPredicates(
+                    $unitMapper->getPredicateBuilder()
+                        ->equals(
+                            'course_implementation_id',
+                            $unitMapper->getJoinMapper('course')->findByColumn('folder_id', $folder->getId())->getPropertyValues('id')
+                        )
+                );
+            } catch (\UnderflowException $e) {
+                // no units
+                continue;
+            }
 
-            // Resources for: units, content areas, projects, activities
-            $resultSet[] = [
-                'id'    => $folder->getId().'-unit',
-                'title' => 'Units',
-            ] + $baseResult;
-            $resultSet[] = [
-                'id'    => $folder->getId().'-contentArea',
-                'title' => 'Content Areas',
-            ] + $baseResult;
-            $resultSet[] = [
-                'id'    => $folder->getId().'-project',
-                'title' => 'Projects',
-            ] + $baseResult;
-            $resultSet[] = [
-                'id'    => $folder->getId().'-activity',
-                'title' => 'Activities',
-            ] + $baseResult;
+            foreach ($units as $unit) {
+
+                /** @var Project[] $projects */
+                $projects = $this->assessmentDataSource->findAllByContext($unit)->filter(function (IAssessable $assessment) {
+                    return $assessment instanceof Project;
+                });
+
+                $resultSet[] = $this->makeResource($folder, $unit, 0, 'Content Areas');
+
+                foreach ($projects as $project) {
+                    $resultSet[] = $this->makeResource($folder, $unit, $project->getId(), $project->getTitle());
+                }
+            }
+
         }
 
         $this->getResponse()->content->set($this->buildJsonOutput($resultSet));
     }
 
+    private function makeResource(Folder\Model $folder, Implementation\Unit\Model $unit, $projectId, $projectName)
+    {
+        return [
+            'id'      => sprintf('%d-%d-%d', $folder->getId(), $unit->getId(), $projectId),
+            'subject' => $folder->getNameWithCodes(),
+            'unit'    => $unit->getTitle(),
+            'mastery' => $projectName
+        ];
+    }
 
     /**
      * Gets the resource calendar for this student (at this time).
