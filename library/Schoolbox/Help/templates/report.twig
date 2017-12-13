@@ -1,3 +1,13 @@
+{% macro demonstrated(value) %}
+    <span style="background-color:#aea;display:block;padding:3px;font-weight:bold;">Y</span>
+{% endmacro %}
+
+{% macro notDemonstrated(value) %}
+    <span style="background-color:#fdd;display:block;padding:3px;font-weight:bold;">N</span>
+{% endmacro %}
+
+{% import _self as macro %}
+
 <div class="row">
     <div class="small-12 columns">
         <h1>NESA Report</h1>
@@ -21,27 +31,30 @@
 
                         {% for descriptor in descriptors %}
                         <td style="text-align:center">
-                            {% set content = '<span style="background-color:#fdd;display:block;padding:3px;font-weight:bold;">N</span>' %}
+                            {% set outcome = false %}
 
                             {% for capability in row.groups %}
                                 {% for indicatorId, indicator in capability.criteria %}
                                     {% for descriptorId, descriptorData in indicator.descriptors %}
                                         {% if descriptorId == descriptor %}
-                                            {% set foundDescriptor = true %}
 
-                                            {# When a Capability was selected, but nothing attempted
-                                             # This renders as empty as the info was never traversed and collected
-                                             # Default to "N"
-                                             #}
+                                            {# Only render success in one way #}
                                             {% if indicator.descriptors[descriptor].text == 'Y' %}
-                                                {% set content = '<span style="background-color:#aea;display:block;padding:3px;font-weight:bold;">Y</span>' %}
+                                                {% set outcome = true %}
                                             {% endif %}
                                         {% endif %}
                                     {% endfor %}
                                 {% endfor %}
                             {% endfor %}
 
-                            {{ content | raw }}
+                            {# When a Capability was selected, but no descriptors chosen
+                             # This usually renders as empty as the info was never traversed and collected
+                             #}
+                            {% if outcome %}
+                                {{ macro.demonstrated('Y') }}
+                            {% else %}
+                                {{ macro.notDemonstrated('N') }}
+                            {% endif %}
                         </td>
                         {% endfor %}
                     </tr>
