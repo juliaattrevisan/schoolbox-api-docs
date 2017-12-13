@@ -238,7 +238,7 @@ class LinkRubricMarkToFeedback
                 continue;
             }
 
-            $propagate  = false;
+            $propagate               = false;
             $rubricMarkPublishedDate = new Alaress_Date_Format($rubricMark['published_at'], Alaress_Date_Format::DATABASE_FORMAT);
 
             foreach ($feedbacks as $k => $feedback) {
@@ -247,7 +247,7 @@ class LinkRubricMarkToFeedback
                     if ($feedback['return_id'] == $rubricMark['return_id']) {
                         $propagate = true;
                     }
-                    $this->log->debug('Feedback has already been linked, skipping');
+                    $this->log->debug('Published feedback has already been linked, skipping');
                     continue;
                 }
 
@@ -264,7 +264,7 @@ class LinkRubricMarkToFeedback
                 if (($rubricMarkPublishedDate->compare($feedbackPublishedDate) <= 0) && !$propagate) {
                     $this->log->debug('Linking mark to feedback: subsequent feedbacks for this mark will be propagated to');
                     $this->linkPublished($feedback, $rubricMark);
-                    $propagate  = true;
+                    $propagate = true;
                     // Mark feedback as linked
                     $feedbacks[$k]['return_id'] = $feedback['id'];
                 } elseif ($propagate) {
@@ -290,7 +290,7 @@ class LinkRubricMarkToFeedback
         // Get me drafts if there are any, newest to oldest
         $draftRubricMarks = $this->db->executeQuery(
             '
-                SELECT COUNT(rm.id), rm.student_id, rl.box_id, rm.created_at, COUNT(DISTINCT rd.criterion_id)
+                SELECT COUNT(rm.id) AS records, rm.student_id, rm.return_id, rl.box_id, rm.created_at, COUNT(DISTINCT rd.criterion_id) AS criterion
                 FROM rubric_mark rm
                 JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
                 JOIN rubric_level rl ON rl.id = rd.level_id
@@ -304,11 +304,9 @@ class LinkRubricMarkToFeedback
                 'student_id' => $participant['student_id'],
                 'box_id'     => $participant['box_id'],
             ]
-
         )->fetchAll();
 
         if (count($draftRubricMarks) > 0) {
-
             $this->log->info(
                 sprintf(
                     'Student:box %d:%d: %d draft marks',
@@ -318,27 +316,15 @@ class LinkRubricMarkToFeedback
                 )
             );
 
-            if (count($draftRubricMarks) > 1) {
-
-                $combineDrafts = $this->combineDrafts($draftRubricMarks);
-                if (!empty($combineDrafts)) {
-                    $draftRubricMarks = $combineDrafts;
-                    $this->log->notice('More than 1 draft record appears to belong to the same feedback');
-                } else {
-                    $this->log->warning('More than 1 draft found for the participation. Skipping!');
-
-                    return;
-                }
-            }
-
             // There is not much sense in getting multiple draft feedbacks to link the rubric mark to,
             // as it is invalid to have multiple draft feedbacks simultaneously.
             // Get latest feedback and check if it has been created with or after the rubric mark
             $draftFeedbacks = $this->db->executeQuery(
                 '
-                    SELECT sr.id, sr.created_at
+                    SELECT sr.id, rm.return_id, sr.created_at
                     FROM submission_return sr
                     JOIN submission_box sb ON sb.id = sr.box_id
+                    LEFT JOIN rubric_mark rm ON sr.id = rm.return_id
                     WHERE sr.owner = :student_id AND sr.box_id = :box_id AND sr.published_at IS NULL
                     ORDER BY sr.created_at DESC
                     LIMIT 1;
@@ -360,30 +346,47 @@ class LinkRubricMarkToFeedback
 
             if (!empty($draftFeedbacks[0])) {
 
-                $draftRubricMarkCreatedDate = new Alaress_Date_Format($draftRubricMarks[0]['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
+                if ($draftRubricMarks[0]['return_id'] != null || $draftFeedbacks[0]['return_id'] != null) {
+                    // Draft rubric mark or feedback has already been linked, get out
+                    $this->log->debug('Latest draft rubric mark or feedback have already been linked, skipping');
+                    return;
+                }
+
+                if (count($draftRubricMarks) > 1) {
+                    $combinedDrafts = $this->combineDrafts($draftRubricMarks);
+                    if (!empty($combinedDrafts)) {
+                        $draftRubricMarks = $combinedDrafts;
+                        $this->log->notice('More than 1 draft record appears to belong to the same feedback');
+                    } else {
+                        $this->log->warning('More than 1 draft found for the participation. Skipping!');
+                        return;
+                    }
+                }
+
+                // In case of combined drafts, use the earliest create date
+                $draftRubricMarkCreatedDate = new Alaress_Date_Format(end($draftRubricMarks)['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
                 $draftFeedbackCreatedDate   = new Alaress_Date_Format($draftFeedbacks[0]['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
 
                 $this->log->debug(
                     sprintf(
                         'Mark created %s, Feedback created %s',
-                        $draftRubricMarks[0]['created_at'],
+                        end($draftRubricMarks)['created_at'],
                         $draftFeedbacks[0]['created_at']
                     )
                 );
 
                 // Respect that delta you allowed for combined drafts
-                if ($draftFeedbackCreatedDate->diffInSeconds($draftRubricMarkCreatedDate) <= self::TIME_DELTA) {
-
+                if ($draftRubricMarkCreatedDate->compare($draftFeedbackCreatedDate) <= 0) {
                     //Link your rubric marks (single or combined) to that feedback
                     $this->log->debug('Linking mark to feedback');
+                    $this->countLinkedDraftFeedbacks++;
                     foreach ($draftRubricMarks as $draftRubricMark) {
-
                         $this->linkDrafts($draftFeedbacks[0], $draftRubricMark);
-
                     }
                 } else {
                     $this->log->debug('Not linking mark: mark was created after feedback');
                 }
+
             } else {
                 $this->log->notice('No draft feedbacks to link to marks');
             }
@@ -447,7 +450,6 @@ class LinkRubricMarkToFeedback
             ]
         );
 
-        $this->countLinkedDraftFeedbacks++;
     }
 
     /**
@@ -501,11 +503,13 @@ class LinkRubricMarkToFeedback
         $this->logPropagatedRubricMark = sprintf('[%d: %s]', $feedback['id'], implode($propogatedRecords, ','));
         $this->countPropagatedRubricMarks++;
         $this->countLinkedPublishedFeedbacks++;
+
         return (true);
     }
 
     /**
      * Combines records that differ by time but still belong to the same feedback
+     * Feedbacks shouldn't share the same criterions
      *
      * @param $draftRubricMarks
      *
@@ -516,22 +520,21 @@ class LinkRubricMarkToFeedback
         $combinedDrafts     = [];
         $combinedCriterions = [];
 
-        $latestCreatedDate = new Alaress_Date_Format($draftRubricMarks[0]['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
-
         foreach ($draftRubricMarks as $i => $draftRubricMark) {
-
             // Validate descriptors within same rubric mark.
             // If the latest draft rubric mark is broken, give up on linking this participation drafts, the data is too messed up.
+            $rubricMarkCriterions = $this->getDraftRubricMarkCriterions($draftRubricMark);
 
-            $rubricMarkCriterions = $this->validateDescriptorCombination($draftRubricMark);
-
-            if ($rubricMarkCriterions == false) {
-                // Stop there, return what you've already got
+            if (!$this->validateDescriptorSet($draftRubricMark)) {
+                // Stop there, return what you've already got, if you've got
                 break;
-            } elseif ($i == 0) {
-                //We've got at least one good draft
+            }
+
+            if ($i == 0) {
+                // We've got at least one good draft
                 $combinedDrafts[]     = $draftRubricMark;
                 $combinedCriterions[] = $rubricMarkCriterions;
+                $latestCreatedDate = new Alaress_Date_Format($draftRubricMarks[0]['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
             } else {
                 $createdDate = new Alaress_Date_Format($draftRubricMark['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
 
@@ -547,30 +550,35 @@ class LinkRubricMarkToFeedback
                     }
                 }
 
-                // All good? Group them together
+                // Combine
                 $combinedDrafts[] = $draftRubricMark;
+                $combinedCriterions[] = $rubricMarkCriterions;
             }
         }
 
-        $this->countCombinedDrafts++;
+        $this->countCombinedDrafts += count($combinedDrafts) > 1 ? count($combinedDrafts) : 0;
         return $combinedDrafts;
     }
 
     /**
      * Check if descriptors you think belong to the same feedback are not of the same criterion
+     *
      * @param $rubricMark
      *
      * @return bool
      */
-    private function validateDescriptorSet($rubricMark) {
+    private function validateDescriptorSet($rubricMark)
+    {
         if ($rubricMark['criterion'] != $rubricMark['records']) {
             $this->log->warning(sprintf('Invalid descriptors for student_id %d box_id %d and published date %s
                             - Skipping!',
                     $rubricMark['student_id'], $rubricMark['box_id'], $rubricMark['published_at'])
             );
             $this->countBrokenRubricMarks++;
+
             return false;
         }
+
         return true;
     }
 
@@ -579,11 +587,11 @@ class LinkRubricMarkToFeedback
      *
      * @param $db
      * @param $log
-     * @param $rubricMarks
+     * @param $rubricMark
      *
      * @return array|bool
      */
-    private function validateDescriptorCombination($rubricMarks)
+    private function getDraftRubricMarkCriterions($rubricMark)
     {
         $criterions = $this->db->executeQuery(
             '
@@ -595,23 +603,11 @@ class LinkRubricMarkToFeedback
             AND rl.box_id = :box_id;
             ',
             [
-                'student_id' => $rubricMarks['student_id'],
-                'created_at' => $rubricMarks['created_at'],
-                'box_id'     => $rubricMarks['box_id'],
+                'student_id' => $rubricMark['student_id'],
+                'created_at' => $rubricMark['created_at'],
+                'box_id'     => $rubricMark['box_id'],
             ]
         )->fetchAll(PDO::FETCH_COLUMN);
-
-        $uniqueCriterions = array_map("unserialize", array_unique(array_map("serialize", $criterions)));
-
-        if (count($uniqueCriterions) != count($criterions)) {
-
-            $this->log->warning(sprintf('Records for student_id %d, box_id %d, created at %s can not be combined into one draft',
-                    $rubricMarks['student_id'], $rubricMarks['box_id'], $rubricMarks['created_at'])
-            );
-
-            return false;
-
-        }
 
         return $criterions;
     }
@@ -621,12 +617,10 @@ class LinkRubricMarkToFeedback
      */
     private function printLog()
     {
-        // TODO need more logging
         $this->log->notice(sprintf('Broken descriptor sets: %d', $this->countBrokenRubricMarks));
         $this->log->notice(sprintf('Total propagated rubric marks: %d %s', $this->countPropagatedRubricMarks, $this->logPropagatedRubricMarks));
         $this->log->notice(sprintf('Total published feedbacks linked: %d', $this->countLinkedPublishedFeedbacks));
         $this->log->notice(sprintf('Total draft feedbacks linked: %d', $this->countLinkedDraftFeedbacks));
-        $this->log->notice(sprintf('Total combined draft records: %d', $this->countCombinedDrafts));
-
+        $this->log->notice(sprintf('Total combined draft rubric marks: %d', $this->countCombinedDrafts));
     }
 }
