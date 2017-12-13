@@ -76,31 +76,41 @@ class Controller extends Base
 
 
     /**
-     * Redirect to the markbook for the specified class and current term
+     * Redirect to the markbook for the specified class
      *
      * @param int       $folderId
      * @param User|null $viewee
      * @throws RouteNotFound If unable to generate the redirect route
      */
-    public function getMarkbookForClass($folderId, User $viewee = null)
+    public function getMarkbookForClass(int $folderId, User $viewee = null)
     {
-        $currentTerm = $this->termMapper->findForToday();
-        $this->getMarkbookForClassAndTerm($folderId, $currentTerm, $viewee);
+        $this->buildMarkbookRedirect($folderId, null, $viewee ?: $this->getUser());
     }
 
 
     /**
-     * Redirect to the markbook for the specified class and term
+     * Redirect to the markbook for the specified class and filter to a term
      *
      * @param int        $folderId
      * @param Term\Model $term
      * @param null|User  $viewee
      * @throws RouteNotFound If unable to generate the redirect route
      */
-    public function getMarkbookForClassAndTerm($folderId, Term\Model $term, User $viewee = null)
+    public function getMarkbookForClassAndTerm(int $folderId, Term\Model $term, User $viewee = null)
     {
-        $user  = $viewee ?: $this->getUser();
-        $route = $this->getRouter()->generate('learningMarkbook.getMarkbook', ['userId' => $user->getId()]);
+        $this->buildMarkbookRedirect($folderId, $term, $viewee ?: $this->getUser());
+    }
+
+
+    /**
+     * @param int             $folderId
+     * @param null|Term\Model $term
+     * @param User            $viewee
+     * @throws RouteNotFound If unable to generate the redirect route
+     */
+    private function buildMarkbookRedirect(int $folderId, ?Term\Model $term, User $viewee)
+    {
+        $route = $this->getRouter()->generate('learningMarkbook.getMarkbook', ['userId' => $viewee->getId()]);
 
         $filterMapper    = Filter\Mapper::getInstance();
         $selectionMapper = Filter\Selection\Mapper::getInstance();
@@ -112,7 +122,7 @@ class Controller extends Base
 
             if (Filter\Filters\Assessment\Folder\TeacherInvolved\Definition::class === $filter->getClass()) {
                 $selections[$filter->getId()][$folderId] = $this->createSelectionModel($selectionMapper, $filter, (string)$folderId);
-            } elseif (Filter\Filters\Assessment\Term\Due\Definition::class === $filter->getClass()) {
+            } elseif ($term && Filter\Filters\Assessment\Term\Due\Definition::class === $filter->getClass()) {
                 $selections[$filter->getId()][$term->getId()] = $this->createSelectionModel($selectionMapper, $filter, (string)$term->getId());
             }
         }
