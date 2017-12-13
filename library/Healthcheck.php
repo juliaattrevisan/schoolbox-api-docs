@@ -11,7 +11,6 @@
  */
 
 use Alaress\Database\Connector\IConnector;
-use Alaress\Database\Statement\Base as BaseStatement;
 use Schoolbox\IConfigLoader;
 
 class Healthcheck
@@ -30,9 +29,6 @@ class Healthcheck
 
     /** @var IConnector[] $secondaryConnectors Array of secondary database connectors */
     private $secondaryConnectors = [];
-
-    /** @var array This is an array used to hold the output parameters of procedure calls */
-    private $outputParameters = [];
 
     /** @var IConfigLoader  */
     private $configMapper;
