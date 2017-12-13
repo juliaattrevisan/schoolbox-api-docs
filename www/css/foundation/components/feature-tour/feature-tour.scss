@@ -155,6 +155,12 @@
 .introjs-donebutton {
   width: 100%;
   margin-right: 0;
+
+  // Hide the previous and next buttons on the last step, leaving just the 'done' button
+  &+ .introjs-nextbutton,
+  &+ .introjs-prevbutton {
+    display: none;
+  }
 }
 
 .introjs-nextbutton {
@@ -162,14 +168,6 @@
 
   &.introjs-fullbutton {
     border-radius: 0;
-  }
-}
-
-// Hide the previous and next buttons on the last step, leaving just the 'done' button
-.introjs-tooltip.lastNode {
-  .introjs-nextbutton,
-  .introjs-prevbutton {
-    display: none;
   }
 }
 
