@@ -51,7 +51,11 @@ class Healthcheck
     /**
      * This method is designed to provide information about the permissions of the External database
      *
-     * @throws PDOException
+     * @throws PDOException Thrown if:
+     *                       - db driver does not support transactions,
+     *                       - we attempt to begin a transaction when already in a transaction
+     *                       - we attempt to rollback a transaction when not in a transaction
+     * @throws LogicException If configured external database type is not recognised
      */
     public function run(): void
     {
@@ -76,10 +80,7 @@ class Healthcheck
             $this->log .= "ERROR: Database ({$this->connector->getDatabase()}) does not support transactions";
             $transactionsSupported = false;
         }
-        if($this->connector->inTransaction()){
-            $this->connector->rollback();
-        }
-
+        $this->rollbackIfInTransaction($this->connector);
 
         /** @var IConnector $connector */
         foreach ($this->secondaryConnectors as $connector) {
@@ -92,9 +93,7 @@ class Healthcheck
                     $this->log .= "ERROR: Database ({$connector->getDatabase()}) does not support transactions";
                     $transactionsSupported = false;
                 }
-                if($connector->inTransaction()){
-                    $connector->rollback();
-                }
+                $this->rollbackIfInTransaction($connector);
             }
         }
 
@@ -122,6 +121,9 @@ class Healthcheck
 
     /**
      * Execute external database tests
+     *
+     * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
+     * @throws LogicException If configured external database type is not recognised
      */
     private function externalTest(): void
     {
@@ -160,19 +162,32 @@ class Healthcheck
             case 'schooledge':
                 $this->schooledgeTest();
                 break;
+            case 'isams':
+                $this->isamsTest();
+                break;
+            default:
+                throw new LogicException("Unrecognised external type: {$this->externalType}");
         }
     }
+
 
     /**
      * Test a query against each database object in the supplied array
      *
-     * @param array $objects
-     * @param string $db If provided, run against this instead of the default DB
-     * @param string $schema If provided, run against this instead of the default schema
-     * @param string $query If provided, run against this instead of default select first query
+     * @param array  $objects
+     * @param string $db                If provided, run against this instead of the default DB
+     * @param string $schema            If provided, run against this instead of the default schema
+     * @param string $query             If provided, run against this instead of default select first query
+     * @param bool   $wrapInTransaction Should the query execution be wrapped in a transaction?
+     * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
      */
-    private function selectTest($objects, $db = null, $schema = null, $query = "SELECT TOP 1 * FROM :object")
-    {
+    private function selectTest(
+        $objects,
+        $db = null,
+        $schema = null,
+        $query = "SELECT TOP 1 * FROM :object",
+        bool $wrapInTransaction = false
+    ): void {
         sort($objects);
 
         $methods = (explode(' ', trim($query)));
@@ -200,6 +215,9 @@ class Healthcheck
             $sql = str_replace(':object', $objectParam, $query);
             $statement = $this->connector->prepareQuery($sql);
 
+            if ($wrapInTransaction) {
+                $this->beginIfNotInTransaction($this->connector);
+            }
             try {
                 $statement->execute();
                 $this->log .= "OK\n";
@@ -207,6 +225,37 @@ class Healthcheck
                 $this->log .= "FAILED\n";
                 $this->errors[] = "$sql\n{$e->getMessage()}";
             }
+            if ($wrapInTransaction) {
+                $this->rollbackIfInTransaction($this->connector);
+            }
+        }
+    }
+
+
+    /**
+     * Attempts to being a transaction if one is not in progress
+     *
+     * @param IConnector $connector
+     * @throws PDOException If the driver does not support transactions
+     */
+    private function beginIfNotInTransaction(IConnector $connector): void
+    {
+        if (!$connector->inTransaction()) {
+            $connector->beginTransaction();
+        }
+    }
+
+
+    /**
+     * Attempts to rollback a transaction if one is in progress
+     *
+     * @param IConnector $connector
+     * @throws PDOException If the driver does not support transactions
+     */
+    private function rollbackIfInTransaction(IConnector $connector): void
+    {
+        if ($connector->inTransaction()) {
+            $connector->rollBack();
         }
     }
 
@@ -215,7 +264,7 @@ class Healthcheck
      *
      * @param array $objects
      */
-    private function functionTest($objects)
+    private function functionTest($objects): void
     {
         $this->executeTest($objects, 'FUNCTION');
     }
@@ -225,7 +274,7 @@ class Healthcheck
      *
      * @param array $objects
      */
-    private function procedureTest($objects)
+    private function procedureTest($objects): void
     {
         $this->executeTest($objects, 'EXECUTE');
     }
@@ -241,9 +290,8 @@ class Healthcheck
      *
      * @param array  $objects
      * @param string $objectType The type of object to test; this only affects logs.
-     * @throws PDOException
      */
-    private function executeTest($objects, $objectType)
+    private function executeTest($objects, $objectType): void
     {
         sort($objects);
 
@@ -254,9 +302,6 @@ class Healthcheck
             $this->log .= str_pad(str_pad($objectType, 15). $object, 50);
 
             try {
-                if(!$this->connector->inTransaction()) {
-                    $this->connector->beginTransaction();
-                }
                 $statement->execute(['proc' => $object]);
                 $result = $statement->fetchColumn();
                 $statement->close();
@@ -277,14 +322,16 @@ class Healthcheck
                 $this->errors[] = $error;
                 $this->log .= "FAILED\n";
             }
-            if($this->connector->inTransaction()) {
-                $this->connector->rollBack();
-            }
         }
     }
 
-    /** @noinspection PhpUnusedPrivateMethodInspection */
-    public function customUPSTest()
+
+    /**
+     * Returns the names of any database views configured for use by the UPS system
+     *
+     * @return string[]
+     */
+    public function customUPSTest(): array
     {
         $tables = array();
         $staff = trim($this->configMapper->get('external_custom_ups_staff'));
@@ -305,6 +352,10 @@ class Healthcheck
 
     // Connector specific test functions
 
+
+    /**
+     * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
+     */
     public function edumateTest(): void
     {
         $db2inst1Tables = [
@@ -323,6 +374,9 @@ class Healthcheck
         $this->selectTest($db2inst1Tables, null, 'db2inst1', "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
     }
 
+    /**
+     * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
+     */
     private function mazeTest(): void
     {
         $tables = [
@@ -349,6 +403,10 @@ class Healthcheck
         $this->selectTest($tables);
     }
 
+
+    /**
+     * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
+     */
     private function tassTest(): void
     {
         $tables = [
@@ -382,7 +440,9 @@ class Healthcheck
         $this->selectTest($tables);
     }
 
-
+    /**
+     * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
+     */
     private function pcschoolsTest(): void
     {
         $tables = [
@@ -409,6 +469,10 @@ class Healthcheck
         $this->procedureTest($procedures);
     }
 
+
+    /**
+     * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
+     */
     private function synergeticTest(): void
     {
         $tables = [
@@ -505,7 +569,7 @@ class Healthcheck
 
         // Community Portal Password Update
 
-        $this->selectTest(['CommunityLogins'], null, null, "UPDATE :object SET Password = '' WHERE 1 = 0");
+        $this->selectTest(['CommunityLogins'], null, null, "UPDATE :object SET Password = '' WHERE 1 = 0", true);
 
         // Stored Procedures
 
@@ -552,6 +616,9 @@ class Healthcheck
     }
 
 
+    /**
+     * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
+     */
     private function humanedgeTest(): void
     {
         $tables = [
@@ -602,6 +669,9 @@ class Healthcheck
     }
 
 
+    /**
+     * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
+     */
     private function schooledgeTest(): void
     {
         $tables = [
@@ -646,6 +716,9 @@ class Healthcheck
     }
 
 
+    /**
+     * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
+     */
     private function doublefirstTest(): void
     {
         $tables = [
@@ -693,8 +766,11 @@ class Healthcheck
         $this->selectTest($tables);
     }
 
-    /** @noinspection PhpUnusedPrivateMethodInspection */
-    private function isamsCheckTables()
+
+    /**
+     * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
+     */
+    private function isamsTest(): void
     {
         $list[] = 'V_Class';
         $list[] = 'V_Parent';
