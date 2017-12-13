@@ -96,10 +96,10 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
 
         // Show markbook link to staff on class or group pages
         if ($isStaffOrSuper && ($isGroupPage || $isClassPage || $wasClassPage)) {
-            $this->parse('markbook_link_block', 'markbook_link');
-            $hasClassActions = true;
             // If was a class, don't filter by term, else filter to current term.
             $this->setVar('MARKBOOK_TERM', $wasClassPage ? '' : "/term/$currentTermCode");
+            $this->parse('markbook_link_block', 'markbook_link');
+            $hasClassActions = true;
         } else {
             $this->setVar('markbook_link_block');
         }
