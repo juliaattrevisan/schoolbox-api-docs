@@ -122,15 +122,18 @@ class Nesa
             $allAssessments = $allAssessments->merge($assessments);
         }
 
-        return $allAssessments;
+        /* Load participants into assessments
+         */
+        return $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($allAssessments, null, false, true);
     }
-
-
 
 
     public function generate()
     {
         $allAssessments = $this->findAssessments();
+
+        foreach ($allAssessments as $currentAssessment) {
+        }
 
         new \Alaress_Probe($allAssessments);
     }
