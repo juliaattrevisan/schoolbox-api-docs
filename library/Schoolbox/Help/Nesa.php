@@ -22,7 +22,7 @@ class Nesa
      * Teacher Course
      * Course specification id
      */
-    public const COURSE_SPEC_ID = 6;
+    private $courseSpecId;
 
     /**
      * @var array
@@ -58,6 +58,7 @@ class Nesa
     /**
      * Nesa constructor.
      *
+     * @param int                        $courseSpecId
      * @param array                      $groups   an array of identifiers for Rubric Groups (Capabilities)
      * @param array                      $criteria an array of identifiers for Rubric Criteria (Indicators)
      * @param Rubric\RubricMapper        $rubricMapper
@@ -66,6 +67,7 @@ class Nesa
      * @param UnitImplementationMapper   $unitImplementationMapper
      */
     public function __construct(
+        int $courseSpecId,
         array $groups,
         array $criteria,
         Rubric\RubricMapper $rubricMapper,
@@ -73,6 +75,7 @@ class Nesa
         CourseImplementationMapper $courseImplementationMapper,
         UnitImplementationMapper $unitImplementationMapper
     ) {
+        $this->courseSpecId = $courseSpecId;
         $this->groups = $groups;
         $this->criteria = $criteria;
         $this->rubricMapper = $rubricMapper;
@@ -109,7 +112,7 @@ class Nesa
      */
     private function findAssessments()
     {
-        $allUnitImplementations = $this->findUnitImplementations(self::COURSE_SPEC_ID);
+        $allUnitImplementations = $this->findUnitImplementations($this->courseSpecId);
 
         $allAssessments = new Collection();
 

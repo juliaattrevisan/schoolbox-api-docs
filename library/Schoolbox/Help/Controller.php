@@ -43,6 +43,7 @@ class Controller extends Base
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
         $nesa = (new Nesa(
+            6,
             [21],
             [115, 116, 117, 118, 119],
             Rubric\RubricMapper::getInstance(),
