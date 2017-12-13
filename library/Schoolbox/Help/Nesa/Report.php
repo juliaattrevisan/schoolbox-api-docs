@@ -149,41 +149,37 @@ class Nesa
         $tempGroup = [];
 
         foreach ($rubric['groups'] as $groupId => $groupData) {
-            if (\in_array($groupId, $groups, true)) {
-                $tempCriterion = [];
+            $tempCriterion = [];
 
-                foreach ($groupData['criteria'] as $criterionId => $criterionData) {
-                    if (\in_array($criterionId, $criteria, true)) {
-                        $tempDescriptor = [];
+            foreach ($groupData['criteria'] as $criterionId => $criterionData) {
+                $tempDescriptor = [];
 
-                        foreach ($criterionData['descriptors'] as $levelId => $levelData) {
+                foreach ($criterionData['descriptors'] as $levelId => $levelData) {
 
-                            /* Only collate the ones we selected
-                             */
-                            if ($levelData['selected']) {
-                                $tempDescriptor[$levelData['id']] = [
-                                    'text' => $levelData['text']
-                                ];
-                            }
-                            else {
-                                $tempDescriptor[$levelData['id']] = [
-                                    'text' => ''
-                                ];
-                            }
-                        }
-
-                        $tempCriterion[$criterionId] = [
-                            'name' => $criterionData['name'],
-                            'descriptors' => $tempDescriptor
+                    /* Only collate the ones we selected
+                     */
+                    if ($levelData['selected']) {
+                        $tempDescriptor[$levelData['id']] = [
+                            'text' => $levelData['text']
+                        ];
+                    }
+                    else {
+                        $tempDescriptor[$levelData['id']] = [
+                            'text' => ''
                         ];
                     }
                 }
 
-                $tempGroup[] = [
-                    'name' => $groupData['name'],
-                    'criteria' => $tempCriterion
+                $tempCriterion[$criterionId] = [
+                    'name' => $criterionData['name'],
+                    'descriptors' => $tempDescriptor
                 ];
             }
+
+            $tempGroup[] = [
+                'name' => $groupData['name'],
+                'criteria' => $tempCriterion
+            ];
         }
 
         $tempAssessment = [
