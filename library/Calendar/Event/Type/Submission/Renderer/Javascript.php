@@ -42,9 +42,6 @@ class Javascript extends Base
             'custom'     => $this->deriveCustom()
         ];
 
-        if ($this->getEvent()->getResourceId()) {
-            $event['resourceId'] = $this->getEvent()->getResourceId();
-        }
 
         return json_encode($event, JSON_PARTIAL_OUTPUT_ON_ERROR) . ',';
     }
@@ -65,7 +62,7 @@ class Javascript extends Base
             $start .= ' ' . $event->getStartTime()->getDatabaseTime();
         }
 
-        return [
+        $data = [
             'title' => $event->getTitle(),
             'start' => $start,
             'end' => '',
@@ -87,6 +84,12 @@ class Javascript extends Base
             'color' => $event->getColour(),
             'className' => $event->getEventClasses(),
         ];
+
+        if ($this->getEvent()->getResourceId()) {
+            $data['resourceId'] = $this->getEvent()->getResourceId();
+        }
+
+        return $data;
     }
 
 

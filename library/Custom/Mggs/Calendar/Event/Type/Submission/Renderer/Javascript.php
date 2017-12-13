@@ -11,6 +11,7 @@ namespace Custom\Mggs\Calendar\Event\Type\Submission\Renderer;
 use Calendar;
 use Calendar\Event\Type\EventBase;
 use Group;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\User;
 use SitePage;
 
@@ -78,6 +79,20 @@ class Javascript extends \Calendar\Event\Type\Submission\Renderer\Javascript
             $start = $dueDate->getDatabase();
         }
 
+        $context = $event->getAssessment()->getContext();
+
+        if ($context instanceof Project) {
+            // resourceId is class-unit-project
+            $contextId = $context->getContext()->getId();
+            $projectId = $context->getId();
+        } else {
+            // resourceId is class-unit-0
+            $contextId = $context->getId();
+            $projectId = 0;
+        }
+
+        $resourceId = sprintf('%d-%d-%d', $event->getCategory()->getId(), $contextId, $projectId);
+
         return [
             'title' => $event->getTitle(),
             'start' => $start,
@@ -99,6 +114,7 @@ class Javascript extends \Calendar\Event\Type\Submission\Renderer\Javascript
              */
             'color'     => $event->getColour(),
             'className' => $event->getEventClasses(),
+            'resourceId' => $resourceId
         ];
     }
 
@@ -117,10 +133,17 @@ class Javascript extends \Calendar\Event\Type\Submission\Renderer\Javascript
         ];
 
         // has this student completed this assessment?
-        $meta['completed'] = '/* hmmm */';
+        $meta['completed'] = true;
 
         return $meta;
     }
 
+    protected function deriveStyles()
+    {
+        $styles = parent::deriveStyles();
 
+        // TODO if student has completed, add a class for reducing its visibility
+
+        return $styles;
+    }
 }
