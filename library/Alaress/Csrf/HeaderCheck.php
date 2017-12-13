@@ -8,6 +8,12 @@ declare(strict_types=1);
 
 namespace Alaress\Csrf;
 
+/**
+ * CSRF header check.
+ *
+ * Implements the CSRF header check as prescribed in
+ * https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)_Prevention_Cheat_Sheet#Verifying_Same_Origin_with_Standard_Headers
+ */
 class HeaderCheck
 {
     /**
@@ -18,12 +24,20 @@ class HeaderCheck
     private $serverVars;
 
     /**
-     * Hard-coded hostname
+     * A host that will always be considered valid.
      *
      * @var string|null
      */
     private $host;
 
+    /**
+     * Constructor
+     *
+     * @param array       $serverVars Server vars, usually from `$_SERVER`.
+     *                                Contains HTTP headers in `HTTP_*` keys.
+     * @param null|string $host       If set, this host is always considered
+     *                                valid if it matches a source.
+     */
     public function __construct(array $serverVars, ?string $host = null)
     {
         $this->serverVars = $serverVars;
@@ -32,6 +46,13 @@ class HeaderCheck
 
     /**
      * Do the source and target headers match?
+     *
+     * Source header:
+     * * Origin, or Referer if not set
+     *
+     * Target header: either one of:
+     * * `$this->host` value
+     * * Host, or X-Forwarded-Host if not set
      *
      * @return bool
      */
@@ -58,6 +79,7 @@ class HeaderCheck
             )
         );
 
+        // Check each combination; if any match, we have a match
         foreach ($sources as $source) {
             foreach ($targets as $target) {
                 if ($source === $target) {
