@@ -149,15 +149,16 @@ class Report
 
                     /* Only collate the ones we selected
                      */
-                    if ($levelData['selected']) {
-                        $tempDescriptor[$levelData['id']] = [
-                            'text' => $levelData['text']
-                        ];
-                    }
-                    else {
-                        $tempDescriptor[$levelData['id']] = [
-                            'text' => ''
-                        ];
+                    if (\in_array($levelData['text'], $descriptors, true)) {
+                        if ($levelData['selected']) {
+                            $tempDescriptor[$levelData['id']] = [
+                                'text' => $levelData['text']
+                            ];
+                        } else {
+                            $tempDescriptor[$levelData['id']] = [
+                                'text' => ''
+                            ];
+                        }
                     }
                 }
 
