@@ -36,7 +36,7 @@ if (is_numeric($_GET['delete'])) {
         $post = $postMapper->findById($_GET['delete']);
     }
     catch(\Schoolbox\Mapper\Exception $e){
-        error(ErrorMapper::ERROR_SOCIAL_STREAM_NOT_FOUND);
+        error(ErrorMapper::ERROR_POST_NOT_FOUND);
     }
 
     /* Determine permissions

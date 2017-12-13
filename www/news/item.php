@@ -10,6 +10,7 @@
 
 use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 // Check there's actually a news ID in the URL
 if (!is_numeric($this->arg[0])) {
@@ -24,7 +25,7 @@ $newsHandler = new News();
 $article = null;
 
 if (!($article = $newsHandler->getByID($this->arg[0]))) {
-    $this->pageNotFound();
+    error(ErrorMapper::ERROR_POST_NOT_FOUND);
 }
 
 /* Check user has permission to see this news item
@@ -94,9 +95,9 @@ if (!empty($article['userList'])) {
     }
 }
 
-// Error out is user didn't pass any of the checks
+// Error out if user didn't pass any of the checks
 if (!$isSuperuser && !$isOwner && !$isModerator && !$hasNormalAccess && !$hasIndividualAccess) {
-    error(19);
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 $this->setFile(TEMPLATE_content, 'news/item.html');
@@ -115,7 +116,7 @@ $topic = $newsHandler->getTopicByID($article['item_topic_id']);
 
 if (!$topic) {
     // Topic was deleted
-    error(180);
+    error(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
 }
 
 $url = new Url($topic['name'], '');

@@ -3,7 +3,7 @@
 use Schoolbox\Resource\Category\NewsMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
-use Schoolbox\Error\Mapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 $groupHandler = new Group;
 $newsHandler = new CategoryNews;
@@ -23,11 +23,11 @@ $this->setVar(array(
 try {
     $category = $categoryMapper->findById($this->arg[0]);
 } catch (\Exception $e) {
-    $this->error(2);
+    $this->error(ErrorMapper::ERROR_INFORMATION_MISSING);
 }
 
 if($groupHandler->getPermission($category->getId()) < READ_ACCESS) {
-    error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
+    $this->error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 $output = array('CATEGORY_NAME'	=> Scrub::text($category->getName()),
@@ -45,7 +45,11 @@ if ($groupHandler->getPermission($category->getId()) >= WRITE_ACCESS) {
 
 $subjectNewsMapper = new NewsMapper();
 
-$news = $subjectNewsMapper->findById($this->arg[1]);
+try {
+    $news = $subjectNewsMapper->findById($this->arg[1]);
+} catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+    $this->error(ErrorMapper::ERROR_POST_NOT_FOUND);
+}
 
 if ($news->getOwner() == $_SESSION['id'] || $groupHandler->getPermission($category->getId()) >= WRITE_ACCESS) {
     $this->parse('can_modify_block', 'can_modify');
@@ -56,13 +60,13 @@ if ($news->getOwner() == $_SESSION['id'] || $groupHandler->getPermission($catego
 }
 
 $output = array(
-    "NEWS_ID"       => $news->getId(),
-    "NEWS_HEADING"	=> Scrub::text($news->getHeading()),
-    "NEWS_BODY"		=> Scrub::html($news->getBody()),
-    "EMAIL_CONTACT"	=> "", //"<a href=\"/search/user/{$news['uid']}\">$poster</a>",
-    "PUBLISH_DATE"	=> $news->getPublishDate()->getShort(),
-    "AUTHOR"        => $news->getOwner()->formatName(),
-    "AUTHOR_ID"     => $news->getOwner()->getId(),
+    "NEWS_ID" => $news->getId(),
+    "NEWS_HEADING" => Scrub::text($news->getHeading()),
+    "NEWS_BODY" => Scrub::html($news->getBody()),
+    "EMAIL_CONTACT" => "", //"<a href=\"/search/user/{$news['uid']}\">$poster</a>",
+    "PUBLISH_DATE" => $news->getPublishDate()->getShort(),
+    "AUTHOR" => $news->getOwner()->formatName(),
+    "AUTHOR_ID" => $news->getOwner()->getId(),
     "AUTHOR_EXTERNAL_ID" => $news->getOwner()->getExternalId()
 );
 
