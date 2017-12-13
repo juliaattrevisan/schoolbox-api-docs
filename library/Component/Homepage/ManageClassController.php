@@ -9,7 +9,11 @@
 use \Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Resource\Folder;
 
+/**
+ * @method Folder\Model getContext()
+ */
 class Component_Homepage_ManageClassController extends Component_Homepage_ControllerAbstract
 {
     /**
@@ -52,12 +56,20 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      */
     public function renderTemplate($templateHandle)
     {
-        $isGroupPage = $this->getContext()->isGroup();
-        $isClassPage = $this->getContext()->isClass();
-        $isUnitPage = $this->getContext()->hasUnitSpecification();
+        $isGroupPage    = $this->getContext()->isGroup();
+        $isClassPage    = $this->getContext()->isClass();
+        $wasClassPage   = $this->getContext()->wasClass();
+        $isUnitPage     = $this->getContext()->hasUnitSpecification();
+
+        // If context is not a group, unit or class, render nothing
+        if (!$isGroupPage && !$isClassPage && !$wasClassPage && !$isUnitPage) {
+            return false;
+        }
+
+        $isStaffOrSuper = $this->getUser()->getRole()->isStaff() || $this->getUser()->isSuperuser();
 
         $classActionsHeading = "Actions";
-        if ($isClassPage) {
+        if ($isClassPage || $wasClassPage) {
             $classActionsHeading = "Class Actions";
         } elseif ($isUnitPage) {
             $classActionsHeading = "Unit Actions";
@@ -73,21 +85,17 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
          */
         $hasClassActions = false;
 
-        // If context is not a group, unit or class, render nothing
-        if (!$isGroupPage && !$isClassPage && !$isUnitPage) {
-            return false;
-        }
-
-        $this->setBlock($templateHandle, 'class_list', 'class_list_block');
-        $this->setBlock($templateHandle, 'class_mark', 'class_mark_block');
         $this->setBlock($templateHandle, 'student_grades', 'student_grades_block');
-        $this->setBlock('class_mark', 'markbook_link', 'markbook_link_block');
+        $this->setBlock($templateHandle, 'class_list', 'class_list_block');
+        $this->setBlock($templateHandle, 'markbook_link', 'markbook_link_block');
+        $this->setBlock($templateHandle, 'manage_criteria', 'manage_criteria_block');
 
-        // Hide markbook link on unit pages that aren't groups
-        if ($isUnitPage && !$isGroupPage) {
-            $this->setVar('markbook_link_block', '');
-        } else {
+        // Show markbook link to staff on class or group pages
+        if ($isStaffOrSuper && ($isGroupPage || $isClassPage || $wasClassPage)) {
             $this->parse('markbook_link_block', 'markbook_link');
+            $hasClassActions = true;
+        } else {
+            $this->setVar('markbook_link_block');
         }
 
         // Determine the term for the grades link
@@ -119,12 +127,18 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $hasClassActions = true;
         }
 
-        // Render link to markbook and/or criteria if user is staff and has WRITE+ perm
-        if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE && $this->getUser()->getRole()->isStaff()) {
-            $this->parse('class_mark_block', 'class_mark');
+        /*
+         * Render link to manage criteria if:
+         * - folder is current class, group, or unit (ignore ex-classes)
+         * - user is staff, and
+         * - has WRITE+ perm
+         */
+        if (($isClassPage || $isGroupPage || $isUnitPage) && $this->getContentPermission() >= UserAccess::ACCESS_WRITE
+            && $this->getUser()->getRole()->isStaff()) {
+            $this->parse('manage_criteria_block', 'manage_criteria');
             $hasClassActions = true;
         } else {
-            $this->setVar('class_mark_block', '');
+            $this->setVar('manage_criteria_block');
         }
 
         return $hasClassActions;
