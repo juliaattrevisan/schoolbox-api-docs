@@ -159,7 +159,10 @@ class Controller extends Base
             return;
         }
 
-        foreach ($this->folderMapper->findForUser($student) as $folder) {
+        // Only get subjects from external if student's timetable isn't hidden.
+        // I don't get this logic as class list != timetable, but apparently
+        // it's important. ¯\_(ツ)_/¯
+        foreach ($this->folderMapper->findForUser($student, !$student->getHideTimetable()) as $folder) {
             // Load teachers for this subject (if this subject has them)
             $teachers = [];
             if (count($folder->getCodes()) > 0) {
