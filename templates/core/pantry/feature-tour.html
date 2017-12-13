@@ -2,70 +2,68 @@
 <script src="/javascript/components/intro.js/minified/intro.min.js"></script>
 <script>
     $(function() {
-        var intro = introJs();
 
-        intro.setOptions({
-
-            /* Hide obnoxious red dot
-             */
-            showStepNumbers: false,
-
-            /* Hide the Next button at the end
-             * Hide the Prev button at the start
-             */
-            hidePrev: true,
-            hideNext: true,
-
-            /* Custom text
-             */
-            nextLabel: 'Next',
-            prevLabel: 'Back',
-            skipLabel: '&times;',
-
-            /* Always scroll to tooltip
-             */
-            scrollTo: 'tooltip',
-
-            /* Can't interact with highlighted elements
-             */
-            disableInteraction: true,
-
-            /* Prevent accidental closing
-             */
-            exitOnOverlayClick: false,
-
-            /* Programmatic node data
-             */
-            steps: [
-                {
-                    element: document.querySelector('#left-off-canvas-toggle'),
-                    intro: "This step will only show for mobile, as this skips any steps on elements that aren't visible."
-                },
-                {
-                    element: document.querySelector('#first-tour'),
-                    intro: "Access your component settings, collapse the component or remove the component from the page."
-                },
-                {
-                    element: document.querySelector('#second-tour'),
-                    intro: "You can highlight almost any element you wish."
-                },
-                {
-                    element: document.querySelector('#third-tour'),
-                    intro: "Empty states indicate there isnt any content to show for this component."
-                },
-                {
-                    element: document.querySelector('#end-tour'),
-                    intro: "That's it! Feel free to continue exploring Schoolbox."
-                },
-                {
-                    element: document.querySelector('#sasquatch'),
-                    intro: "This step will never display, because #sasquatch doesn't exist... on this page..."
-                }
-            ].filter(function(obj) { return $(obj.element).is(':visible'); }) // Filter out elements that aren't visible
-        });
-        // Start feature tour button
+        // On 'start tour' click - initialise introjs and start the tour
+        // Initialisation should only happen until it's about to start, because of the filter that gets applied to the steps
         $('#tour-start').on('click', function() {
-            intro.start();
+
+            var pantryTour = introJs();
+
+            pantryTour.setOptions({
+
+                // Hide obnoxious red dot
+                showStepNumbers: false,
+
+                // Hide the Next button at the end
+                // Hide the Prev button at the start
+                hidePrev: true,
+                hideNext: true,
+
+                // Custom text
+                nextLabel: 'Next',
+                prevLabel: 'Back',
+                skipLabel: '&times;',
+
+                // Always scroll to tooltip
+                scrollTo: 'tooltip',
+
+                // Can't interact with highlighted elements
+                disableInteraction: true,
+
+                // Prevent accidental closing
+                exitOnOverlayClick: false,
+
+                // The tooltips for the tour, filtering out any that aren't visible
+                steps: [
+                    {
+                        element: document.querySelector('#left-off-canvas-toggle'),
+                        intro: "This step will only show for mobile, as this skips any steps on elements that aren't visible."
+                    },
+                    {
+                        element: document.querySelector('#first-tour'),
+                        intro: "Access your component settings, collapse the component or remove the component from the page."
+                    },
+                    {
+                        element: document.querySelector('#second-tour'),
+                        intro: "You can highlight almost any element you wish."
+                    },
+                    {
+                        element: document.querySelector('#third-tour'),
+                        intro: "Empty states indicate there isnt any content to show for this component."
+                    },
+                    {
+                        element: document.querySelector('#end-tour'),
+                        intro: "That's it! Feel free to continue exploring Schoolbox."
+                    },
+                    {
+                        element: document.querySelector('#sasquatch'),
+                        intro: "This step will never display, because #sasquatch doesn't exist... on this page..."
+                    }
+                ].filter(function(obj) { return $(obj.element).is(':visible'); })
+            });
+
+            // Start the tour
+            pantryTour.start();
         });
     });
 </script>
