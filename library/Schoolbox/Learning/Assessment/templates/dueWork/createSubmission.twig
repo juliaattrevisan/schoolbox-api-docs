@@ -215,7 +215,9 @@ Data:
 
                         {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
                     </section>
-                    <input type="submit" value="Submit for Assessment {% if USER.id != student.id %}On Behalf Of {{ student.formatName }}{% endif %}" data-action-save />
+
+                    {% include '@learningAssessment/dueWork/createSubmission/callToAction.twig' with {student: student, assessment: assessment} %}
+
                     <div class="toast" data-alert data-save-draft></div>
                 </form>
             </div>

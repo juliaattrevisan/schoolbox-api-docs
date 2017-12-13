@@ -1,0 +1,12 @@
+{# The CTA is different for self-reflectable work. #}
+{% if assessment.selfReflectable or assessment.selfAssessable %}
+    <div class="small-12 column no-pad">
+        <div class="component-action">
+            <section>
+                <a class="button" href="#">Reflect on my work</a>
+            </section>
+        </div>
+    </div>
+{% else %}
+    <input type="submit" value="Submit for Assessment {% if USER.id != student.id %}On Behalf Of {{ student.formatName }}{% endif %}" data-action-save />
+{% endif %}
