@@ -12,6 +12,7 @@ namespace Schoolbox\Help;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\DueWork\RubricContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 
@@ -128,13 +129,27 @@ class Nesa
     }
 
 
+    /**
+     * Investigate all the assessments and their participants and harvest all the rubric selections
+     */
     public function generate()
     {
+        /* Get all the assessments in the Teacher Course and hydrate with all their participants
+         * Hopefully that is performantly bearable
+         */
         $allAssessments = $this->findAssessments();
 
+        /* Investigate each assessment for each participant to see what everyone got
+         * We need to load the rubric data separately
+         */
         foreach ($allAssessments as $currentAssessment) {
-        }
+            $currentAssessment->setRubric($this->rubricMapper->findByDueWork($currentAssessment));
 
-        new \Alaress_Probe($allAssessments);
+            foreach ($currentAssessment->getAllParticipants() as $currentParticipant) {
+                $context = (new RubricContext($this->rubricMapper))->generateMarkable($currentAssessment, $currentParticipant->getUser());
+
+                new \Alaress_Probe($context);
+            }
+        }
     }
 }
