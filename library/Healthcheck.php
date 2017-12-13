@@ -11,7 +11,6 @@
  */
 
 use Alaress\Database\Connector\IConnector;
-use Alaress\Database\Statement\Base as BaseStatement;
 use Schoolbox\IConfigLoader;
 
 class Healthcheck
@@ -31,9 +30,6 @@ class Healthcheck
     /** @var IConnector[] $secondaryConnectors Array of secondary database connectors */
     private $secondaryConnectors = [];
 
-    /** @var array This is an array used to hold the output parameters of procedure calls */
-    private $outputParameters = [];
-
     /** @var IConfigLoader  */
     private $configMapper;
 
@@ -51,11 +47,20 @@ class Healthcheck
         $this->externalType = $configMapper->get('external_type');
     }
 
+
     /**
      * This method is designed to provide information about the permissions of the External database
+     *
+     * @throws PDOException
      */
-    public function run()
+    public function run(): void
     {
+        // Make sure all databases connected correctly
+        if ($this->connector === null) {
+            $this->log .= "ERROR: Unable to connect to database '{$this->connector->getDatabase()}' (Hostname: {$this->connector->getHostname()})\n";
+            return;
+        }
+
         // To prevent doing anything unintended to the clients external SIS DB we need to wrap the healthcheck
         // in a transaction which we will rollback- thus we should only proceed if transaction support is
         // available on all external connections
@@ -63,13 +68,7 @@ class Healthcheck
         /** @var bool $transactionsSupported */
         $transactionsSupported = true;
 
-        // Make sure all databases connected correctly
-
-        if ($this->connector == null) {
-            $this->log .= "ERROR: Unable to connect to database '{$this->connector->getDatabase()}' (Hostname: {$this->connector->getHostname()})\n";
-        }
-
-        // Attempt to being transactions on all connections
+        // Attempt to begin transactions on all connections
 
         if (!$this->connector->beginTransaction()) {
             // Transactions not supported
@@ -77,6 +76,10 @@ class Healthcheck
             $this->log .= "ERROR: Database ({$this->connector->getDatabase()}) does not support transactions";
             $transactionsSupported = false;
         }
+        if($this->connector->inTransaction()){
+            $this->connector->rollback();
+        }
+
 
         /** @var IConnector $connector */
         foreach ($this->secondaryConnectors as $connector) {
@@ -89,46 +92,75 @@ class Healthcheck
                     $this->log .= "ERROR: Database ({$connector->getDatabase()}) does not support transactions";
                     $transactionsSupported = false;
                 }
+                if($connector->inTransaction()){
+                    $connector->rollback();
+                }
             }
         }
 
         // Only proceed if database transactions could be successfully started on all connectors
-
         if ($transactionsSupported) {
-
-            $testFunctionName = "{$this->externalType}Test";
-
-            if (method_exists($this, $testFunctionName)) {
-                $this->log .= str_pad(str_pad("METHOD", 15) . "DATABASE OBJECT", 50) . "TEST RESULT\n";
-                $this->log .= "------------------------------------------------------------------------------------------------------------------\n";
-                $this->$testFunctionName();
-            } else {
-                $this->errors[] = "Sorry, no health check is currently available for this external connector.";
-            }
+            $this->externalTest();
         }
+    }
 
-        // Rollback any transactions we were able to start so we don't end up inserting anything into the SIS
 
-        if ($this->connector->inTransaction()) {
-            $this->connector->rollback();
-        }
-
-        /** @var IConnector $connector */
-        foreach ($this->secondaryConnectors as $connector) {
-            if ($connector != null) {
-                if ($connector->inTransaction()) {
-                    $connector->rollBack();
-                }
-            }
-        };
-
-        // Return the results
-
+    /**
+     * Return the results
+     *
+     * @return array
+     */
+    public function results(): array
+    {
         return [
-            'log' => trim($this->log),
-            'errors' => $this->errors,
-            'externalType' => $this->externalType
+            'log'          => trim($this->log),
+            'errors'       => $this->errors,
+            'externalType' => $this->externalType,
         ];
+    }
+
+
+    /**
+     * Execute external database tests
+     */
+    private function externalTest(): void
+    {
+        if(in_array($this->externalType, ['schoolbox', 'denbigh'], true)){
+            $this->errors[] = 'Sorry, no health check is currently available for this external connector.';
+            return;
+        }
+        $this->log .= str_pad(str_pad('METHOD', 15) . 'DATABASE OBJECT', 50) . "TEST RESULT\n";
+        $this->log .= "------------------------------------------------------------------------------------------------------------------\n";
+
+        switch($this->externalType){
+            case 'synergetic':
+                $this->synergeticTest();
+                break;
+            case 'tass':
+                $this->tassTest();
+                break;
+            case 'edumate':
+                $this->edumateTest();
+                break;
+            case 'schoolpro':
+                $this->schoolproTest();
+                break;
+            case 'maze':
+                $this->mazeTest();
+                break;
+            case 'pcschools':
+                $this->pcschoolsTest();
+                break;
+            case 'humanedge':
+                $this->humanedgeTest();
+                break;
+            case 'doublefirst':
+                $this->doublefirstTest();
+                break;
+            case 'schooledge':
+                $this->schooledgeTest();
+                break;
+        }
     }
 
     /**
@@ -198,6 +230,7 @@ class Healthcheck
         $this->executeTest($objects, 'EXECUTE');
     }
 
+
     /**
      * Test object execution against each database object in the supplied array.
      *
@@ -208,12 +241,11 @@ class Healthcheck
      *
      * @param array  $objects
      * @param string $objectType The type of object to test; this only affects logs.
+     * @throws PDOException
      */
     private function executeTest($objects, $objectType)
     {
         sort($objects);
-
-        $outputValues = [];
 
         $statement = $this->connector->prepareQuery("SELECT HAS_PERMS_BY_NAME(:proc, 'OBJECT', 'EXECUTE')");
 
@@ -222,6 +254,9 @@ class Healthcheck
             $this->log .= str_pad(str_pad($objectType, 15). $object, 50);
 
             try {
+                if(!$this->connector->inTransaction()) {
+                    $this->connector->beginTransaction();
+                }
                 $statement->execute(['proc' => $object]);
                 $result = $statement->fetchColumn();
                 $statement->close();
@@ -242,9 +277,10 @@ class Healthcheck
                 $this->errors[] = $error;
                 $this->log .= "FAILED\n";
             }
+            if($this->connector->inTransaction()) {
+                $this->connector->rollBack();
+            }
         }
-
-        unset($outputValues);
     }
 
     /** @noinspection PhpUnusedPrivateMethodInspection */
@@ -267,10 +303,9 @@ class Healthcheck
         return $tables;
     }
 
-    // Connector specific test functions, ignore any unused function warnings as these are called dynamically
+    // Connector specific test functions
 
-    /** @noinspection PhpUnusedPrivateMethodInspection */
-    public function edumateTest()
+    public function edumateTest(): void
     {
         $db2inst1Tables = [
             'schoolbox_classes',
@@ -288,8 +323,7 @@ class Healthcheck
         $this->selectTest($db2inst1Tables, null, 'db2inst1', "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
     }
 
-    /** @noinspection PhpUnusedPrivateMethodInspection */
-    private function mazeTest()
+    private function mazeTest(): void
     {
         $tables = [
             'DF',
@@ -315,8 +349,8 @@ class Healthcheck
         $this->selectTest($tables);
     }
 
-    /** @noinspection PhpUnusedPrivateMethodInspection */
-    private function tassTest() {
+    private function tassTest(): void
+    {
         $tables = [
             'studsub',
             'student',
@@ -348,8 +382,8 @@ class Healthcheck
         $this->selectTest($tables);
     }
 
-    /** @noinspection PhpUnusedPrivateMethodInspection */
-    private function pcschoolsTest()
+
+    private function pcschoolsTest(): void
     {
         $tables = [
             'TIMEFILE',
@@ -375,8 +409,7 @@ class Healthcheck
         $this->procedureTest($procedures);
     }
 
-    /** @noinspection PhpUnusedPrivateMethodInspection */
-    private function synergeticTest()
+    private function synergeticTest(): void
     {
         $tables = [
             'Addresses',
@@ -495,8 +528,7 @@ class Healthcheck
         $this->functionTest($functions);
     }
 
-    /** @noinspection PhpUnusedPrivateMethodInspection */
-    private function schoolproTest()
+    private function schoolproTest(): void
     {
         $procedures = [
             'sbGetParent',
@@ -519,8 +551,8 @@ class Healthcheck
         $this->procedureTest($procedures);
     }
 
-    /** @noinspection PhpUnusedPrivateMethodInspection */
-    private function humanedgeTest()
+
+    private function humanedgeTest(): void
     {
         $tables = [
             'Contact',
@@ -569,8 +601,8 @@ class Healthcheck
          */
     }
 
-    /** @noinspection PhpUnusedPrivateMethodInspection */
-    private function schooledgeTest()
+
+    private function schooledgeTest(): void
     {
         $tables = [
             'Contact',
@@ -613,8 +645,9 @@ class Healthcheck
         );
     }
 
-    /** @noinspection PhpUnusedPrivateMethodInspection */
-    private function doublefirstTest() {
+
+    private function doublefirstTest(): void
+    {
         $tables = [
             "AttendanceBreaks",
             "AttendancePeriods",
