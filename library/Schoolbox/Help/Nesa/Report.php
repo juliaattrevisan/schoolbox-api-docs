@@ -18,7 +18,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplement
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\User;
 
-class Nesa
+class Report
 {
 
     /**
