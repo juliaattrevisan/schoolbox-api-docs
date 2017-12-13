@@ -13,8 +13,10 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\RubricContext;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
+use Schoolbox\User;
 
 class Nesa
 {
@@ -62,6 +64,7 @@ class Nesa
      * @param int                        $courseSpecId
      * @param array                      $groups   an array of identifiers for Rubric Groups (Capabilities)
      * @param array                      $criteria an array of identifiers for Rubric Criteria (Indicators)
+     * @param array                      $descriptors
      * @param Rubric\RubricMapper        $rubricMapper
      * @param AssessmentMapperProxy      $assessmentMapperProxy
      * @param CourseImplementationMapper $courseImplementationMapper
@@ -71,6 +74,7 @@ class Nesa
         int $courseSpecId,
         array $groups,
         array $criteria,
+        array $descriptors,
         Rubric\RubricMapper $rubricMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
         CourseImplementationMapper $courseImplementationMapper,
@@ -79,12 +83,12 @@ class Nesa
         $this->courseSpecId = $courseSpecId;
         $this->groups = $groups;
         $this->criteria = $criteria;
+        $this->descriptors = $descriptors;
         $this->rubricMapper = $rubricMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->courseImplementationMapper = $courseImplementationMapper;
         $this->unitImplementationMapper = $unitImplementationMapper;
     }
-
 
     /**
      * Find all the Unit Implementations for Teacher Course
@@ -106,7 +110,6 @@ class Nesa
 
         return $allUnitImplementations;
     }
-
 
     /**
      * Find all the assessments in the Teacher Course from all Unit Implementations everywhere
@@ -130,10 +133,79 @@ class Nesa
 
 
     /**
+     * Investigate a particular participant and find out what they got for a particular assessment
+     * Store the ultra-basics in an array and return that for future rendering
+     *
+     * @param User        $user
+     * @param IAssessable $assessment
+     * @param array       $rubric
+     * @param array       $groups
+     * @param array       $criteria
+     * @param array       $descriptors
+     * @return array
+     */
+    private function investigate(User $user, IAssessable $assessment, array $rubric, array $groups, array $criteria, array $descriptors)
+    {
+        $tempGroup = [];
+
+        foreach ($rubric['groups'] as $groupId => $groupData) {
+            if (\in_array($groupId, $groups, true)) {
+                $tempCriterion = [];
+
+                foreach ($groupData['criteria'] as $criterionId => $criterionData) {
+                    if (\in_array($criterionId, $criteria, true)) {
+                        $tempDescriptor = [];
+
+                        foreach ($criterionData['descriptors'] as $descriptorId => $descriptorData) {
+                            if (\in_array($descriptorId, $descriptors, true)) {
+
+                                /* Only collate the ones we selected
+                                 */
+                                if ($descriptorData['selected']) {
+                                    $tempDescriptor[$descriptorId] = [
+                                        'text' => $descriptorData['text']
+                                    ];
+                                }
+                                else {
+                                    $tempDescriptor[$descriptorId] = [
+                                        'text' => ''
+                                    ];
+                                }
+                            }
+                        }
+
+                        $tempCriterion[$criterionId] = [
+                            'name' => $criterionData['name'],
+                            'descriptors' => $tempDescriptor
+                        ];
+                    }
+                }
+
+                $tempGroup[] = [
+                    'name' => $groupData['name'],
+                    'criteria' => $tempCriterion
+                ];
+            }
+        }
+
+        $tempAssessment = [
+            'name' => $assessment->getTitle(),
+            'user' => $user->getFullname(),
+            'groups' => $tempGroup
+        ];
+
+        return $tempAssessment;
+    }
+
+    /**
      * Investigate all the assessments and their participants and harvest all the rubric selections
      */
     public function generate()
     {
+        /* The output
+         */
+        $data = [];
+
         /* Get all the assessments in the Teacher Course and hydrate with all their participants
          * Hopefully that is performantly bearable
          */
@@ -148,8 +220,21 @@ class Nesa
             foreach ($currentAssessment->getAllParticipants() as $currentParticipant) {
                 $context = (new RubricContext($this->rubricMapper))->generateMarkable($currentAssessment, $currentParticipant->getUser());
 
-                new \Alaress_Probe($context);
+                /* Investigate the context for the user and assessment and find the chosen descriptors that
+                 * exist in the set of rubric groups and criteria
+                 */
+                $data[$currentAssessment->getId()][] = $this->investigate(
+                    $currentParticipant->getUser(),
+                    $currentAssessment,
+                    $context['rubric'],
+                    $this->groups,
+                    $this->criteria,
+                    $this->descriptors
+                );
             }
         }
+
+        new \Alaress_Probe($data);
+        return $data;
     }
 }

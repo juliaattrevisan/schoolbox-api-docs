@@ -44,8 +44,9 @@ class Controller extends Base
 
         $nesa = (new Nesa(
             6,
-            [21],
-            [115, 116, 117, 118, 119],
+            [21, 22],
+            [120, 121],
+            [91, 92, 93],
             Rubric\RubricMapper::getInstance(),
             $assessmentMapperProxy,
             CourseImplementationMapper::getInstance(),
