@@ -10,6 +10,7 @@
 
 use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 // Check there's actually a news ID in the URL
 if (!is_numeric($this->arg[0])) {
@@ -24,7 +25,7 @@ $newsHandler = new News();
 $article = null;
 
 if (!($article = $newsHandler->getByID($this->arg[0]))) {
-    $this->pageNotFound();
+    error(ErrorMapper::ERROR_POST_NOT_FOUND);
 }
 
 /* Check user has permission to see this news item
