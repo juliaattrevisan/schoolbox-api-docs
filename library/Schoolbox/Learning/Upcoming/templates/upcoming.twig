@@ -4,8 +4,10 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
 <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.print.css" media="print" />
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar-scheduler/dist/scheduler.min.css" />
 <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
 <script type="text/javascript" src="/javascript/components/schoolbox-fullcalendar.min.js?v={SITE_VERSION}"></script>
+<script type="text/javascript" src="/javascript/components/fullcalendar-scheduler/dist/scheduler.min.js"></script>
 <script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
 <script type="text/javascript">
 
@@ -85,12 +87,64 @@
                 listViewButton: false
             },
             fullCalendar: {
-                defaultDate: moment('{{ date|escape('js') }}'),
+                defaultDate: moment('2017-08-01'),
                 height: height,
                 defaultView: anchor || 'month',
                 // Event limit: could be configured from session but leave global for now
-                eventLimit: false,
+                eventLimit: 4,
                 firstDay: Number('{{ config.calendar_start_day|escape('js') }}'),
+                schedulerLicenseKey: '{{ config.fullcalendar_scheduler_license_key }}',
+                defaultView: 'timelineTerm',
+                views: {
+                    timelineTerm: {
+                        eventLimit: 1,
+                        type: 'timeline',
+                        duration: { weeks: 22 },
+                        slotDuration: { weeks: 1 },
+                        slotLabelFormat: { weeks: 1 },
+                        slotLabelInterval: { weeks: 1 },
+                        buttonText: 'Semester',
+                        slotWidth: 24,
+                    }
+                },
+                eventAfterAllRender: function (view) {
+                    if (view.type !== 'timelineTerm') {
+                        // if not on timeline view, do nothing
+                        return true;
+                    }
+
+                    console.log('sdbfswd');
+
+                },
+                resources: {
+                    dataType: 'json',
+                    url:      '{{ routeLookup('learningPersonalised.getResourcesForStudent', {studentId: student.id}) }}'
+                },
+
+                resourceAreaWidth: '40%',
+                resourceColumns: [
+                    {
+                        group: true,
+                        labelText: 'Subject',
+                        field: 'subject'
+                    },
+                    {
+                        group: true,
+                        labelText: 'Unit',
+                        field: 'unit'
+                    },
+                    {
+                        labelText: '',
+                        field: 'mastery'
+                    }
+                ],
+
+
+                header: {
+                    left: 'prevWindow,today,nextWindow',
+                    center: 'title',
+                    right: 'timelineTerm,month,basicWeek'
+                },
 
                 /**
                  * When an event is drawn on the calendar
@@ -126,14 +180,21 @@
                 },
 
                 /**
-                 * Nothing's movable here
-                 *
+                 * @param dropLocation
                  * @param event
-                 * @param delta
-                 * @param revertFunc
                  */
-                eventDrop: function(event, delta, revertFunc) {
-                    revertFunc();
+                eventAllow: function (dropLocation, event) {
+                    if (!'bounds' in event.data.meta) {
+                        // no bound specified, let anything happen
+                        return true;
+                    }
+
+                    var bounds      = event.data.meta.bounds,
+                        target      = dropLocation.start,
+                        insideOpen  = target.isSameOrAfter(bounds.open),
+                        insideClose = target.isSameOrBefore(moment(bounds.due + ' 23:59:59'));
+
+                    return insideOpen && insideClose;
                 },
 
                 /**
@@ -143,7 +204,7 @@
                 windowResize: function(view) {
                     var wHeight = $(window).height();
                     var calTop = c.dom.offset().top;
-                    c.dom.fullCalendar('option','contentHeight',wHeight - calTop - 60)
+                    c.dom.fullCalendar('option','contentHeight', wHeight - calTop - 120)
                 },
 
                 /**
@@ -370,7 +431,11 @@
             <div class="small-12">
                 <h3 class="note"></h3>
                 <ul class="meta">
-                    <li class="icon-calendar date"></li>
+                    <li class="icon-calendar">
+                        <span class="date"></span>
+                        <a href="#">change</a>
+                        <em>(you can also change the date by dragging the assessment around the calendar)</em>
+                    </li>
                     <li class="icon-staff-students" data-event-modal-field="post-by">Posted by <a class="author" href="#" data-is-user-link="1"></a></li>
                     <li class="icon-staff-students" data-event-modal-field="reviewedBy">Reviewed by <a class="reviewer" href="#" data-is-user-link="1"></a></li>
                 </ul>
