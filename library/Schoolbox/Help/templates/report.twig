@@ -11,20 +11,18 @@
                     {% endfor %}
                 </thead>
                 <tbody>
-                    {% for assessmentId, people in report %}
-                        {% for person in people %}
-                            <tr>
-                                <td>{{ person.user }}</td>
-                                <td>{{ assessmentId }}</td>
-                                {% for capabilities in person.groups %}
-                                    {% for indicatorId, indicators in capabilities.criteria %}
-                                        {% for descriptorId, resultDescriptor in indicators.descriptors %}
-                                            <td>{{ resultDescriptor.text }}</td>
-                                        {% endfor %}
+                    {% for row in report %}
+                        <tr>
+                            <td>{{ row.user.fullname }} {{ row.user.id }}</td>
+                            <td>{{ row.assessmentId }}</td>
+                            {% for capabilities in row.groups %}
+                                {% for indicatorId, indicators in capabilities.criteria %}
+                                    {% for descriptorId, resultDescriptor in indicators.descriptors %}
+                                        <td>{{ resultDescriptor.text }}</td>
                                     {% endfor %}
                                 {% endfor %}
-                            </tr>
-                        {% endfor %}
+                            {% endfor %}
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>

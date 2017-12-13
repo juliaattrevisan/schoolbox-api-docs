@@ -168,7 +168,8 @@ class Report
 
         $tempAssessment = [
             'name' => $assessment->getTitle(),
-            'user' => $user->getFullname(),
+            'user' => $user,
+            'assessmentId' => $assessment->getId(),
             'groups' => $tempGroup
         ];
 
@@ -201,7 +202,7 @@ class Report
                 /* Investigate the context for the user and assessment and find the chosen descriptors that
                  * exist in the set of rubric groups and criteria
                  */
-                $data[$currentAssessment->getId()][] = $this->investigate(
+                $data[] = $this->investigate(
                     $currentParticipant->getUser(),
                     $currentAssessment,
                     $context['rubric'],
@@ -210,6 +211,7 @@ class Report
             }
         }
 
+        new \Alaress_Probe($data);
         return $data;
     }
 }
