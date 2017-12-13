@@ -89,18 +89,8 @@ class Healthcheck
         }
 
         // Only proceed if database transactions could be successfully started on all connectors
-
         if ($transactionsSupported) {
-
-            $testFunctionName = "{$this->externalType}Test";
-
-            if (method_exists($this, $testFunctionName)) {
-                $this->log .= str_pad(str_pad("METHOD", 15) . "DATABASE OBJECT", 50) . "TEST RESULT\n";
-                $this->log .= "------------------------------------------------------------------------------------------------------------------\n";
-                $this->$testFunctionName();
-            } else {
-                $this->errors[] = "Sorry, no health check is currently available for this external connector.";
-            }
+            $this->externalTest();
         }
 
         // Rollback any transactions we were able to start so we don't end up inserting anything into the SIS
@@ -125,6 +115,50 @@ class Healthcheck
             'errors' => $this->errors,
             'externalType' => $this->externalType
         ];
+    }
+
+
+    /**
+     * Execute external database tests
+     */
+    private function externalTest(): void
+    {
+        if(in_array($this->externalType, ['schoolbox', 'denbigh'], true)){
+            $this->errors[] = 'Sorry, no health check is currently available for this external connector.';
+            return;
+        }
+        $this->log .= str_pad(str_pad('METHOD', 15) . 'DATABASE OBJECT', 50) . "TEST RESULT\n";
+        $this->log .= "------------------------------------------------------------------------------------------------------------------\n";
+
+        switch($this->externalType){
+            case 'synergetic':
+                $this->synergeticTest();
+                break;
+            case 'tass':
+                $this->tassTest();
+                break;
+            case 'edumate':
+                $this->edumateTest();
+                break;
+            case 'schoolpro':
+                $this->schoolproTest();
+                break;
+            case 'maze':
+                $this->mazeTest();
+                break;
+            case 'pcschools':
+                $this->pcschoolsTest();
+                break;
+            case 'humanedge':
+                $this->humanedgeTest();
+                break;
+            case 'doublefirst':
+                $this->doublefirstTest();
+                break;
+            case 'schooledge':
+                $this->schooledgeTest();
+                break;
+        }
     }
 
     /**
