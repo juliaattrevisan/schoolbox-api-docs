@@ -6,7 +6,6 @@
         $(function() {
             $('#component{COMPONENT_INSTANCE_ID}').find('[data-delete]').click(function (event) {
                 event.preventDefault();
-
                 var element = $(this);
                 $(this).confirmDialog({
                     text: 'Are you sure you want to delete this content permanently?',
@@ -16,7 +15,6 @@
                 });
             });
         });
-
     </script>
     {CONFIGURATION}
 
@@ -63,7 +61,6 @@
                             targetElements: $('textarea[name=textBoxBody]'),
                             file_browser_category_id : {ID}
                         });
-
                         $('#textBoxForm{TEXTBOX_ID}').alaressValidate({
                             rules: {
                                 textBoxHeading: {
@@ -122,8 +119,8 @@
                 <!-- BEGIN modify_text -->
                 <div class="component-action">
                     <section>
-                            <a href="/homepage/{ID}/textBoxModify/{COMPONENT_INSTANCE_ID}#go-to{COMPONENT_INSTANCE_ID}" class="button">Modify</a>
-                            <a href="/textbox/textBoxForm.php?delete={TEXTBOX_ID}&originID={ID}" data-delete class="button">Delete</a>
+                        <a href="/homepage/{ID}/textBoxModify/{COMPONENT_INSTANCE_ID}#go-to{COMPONENT_INSTANCE_ID}" class="button">Modify</a>
+                        <a href="/textbox/textBoxForm.php?delete={TEXTBOX_ID}&originID={ID}" data-delete class="button">Delete</a>
                     </section>
                 </div>
                 <!-- END modify_text -->
@@ -135,9 +132,3 @@
         </div>
     </div>
 </div>
-
-
-
-
-
-

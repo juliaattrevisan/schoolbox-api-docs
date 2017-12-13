@@ -237,7 +237,7 @@
      */
     $.validator.addMethod('ckeRequired', function(value, element) {
         var textboxId = $(element).attr('id');
-        return $.trim($(CKEDITOR.instances[textboxId].getData()).text()).length > 0;
+        return $.trim($(CKEDITOR.instances[textboxId].getData())).length > 0;
     }, 'This field is required');
 
     /* Check if a required field is blank/contains only whitespace */
