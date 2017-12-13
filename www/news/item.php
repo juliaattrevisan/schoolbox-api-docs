@@ -95,9 +95,9 @@ if (!empty($article['userList'])) {
     }
 }
 
-// Error out is user didn't pass any of the checks
+// Error out if user didn't pass any of the checks
 if (!$isSuperuser && !$isOwner && !$isModerator && !$hasNormalAccess && !$hasIndividualAccess) {
-    error(19);
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 $this->setFile(TEMPLATE_content, 'news/item.html');
@@ -116,7 +116,7 @@ $topic = $newsHandler->getTopicByID($article['item_topic_id']);
 
 if (!$topic) {
     // Topic was deleted
-    error(180);
+    error(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
 }
 
 $url = new Url($topic['name'], '');

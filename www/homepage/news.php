@@ -23,11 +23,11 @@ $this->setVar(array(
 try {
     $category = $categoryMapper->findById($this->arg[0]);
 } catch (\Exception $e) {
-    $this->error(2);
+    $this->error(ErrorMapper::ERROR_INFORMATION_MISSING);
 }
 
 if($groupHandler->getPermission($category->getId()) < READ_ACCESS) {
-    error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
+    $this->error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 $output = array('CATEGORY_NAME'	=> Scrub::text($category->getName()),
@@ -48,7 +48,7 @@ $subjectNewsMapper = new NewsMapper();
 try {
     $news = $subjectNewsMapper->findById($this->arg[1]);
 } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-    error(ErrorMapper::ERROR_POST_NOT_FOUND);
+    $this->error(ErrorMapper::ERROR_POST_NOT_FOUND);
 }
 
 if ($news->getOwner() == $_SESSION['id'] || $groupHandler->getPermission($category->getId()) >= WRITE_ACCESS) {
