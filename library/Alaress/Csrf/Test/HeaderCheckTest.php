@@ -6,6 +6,7 @@
 
 namespace Alaress\Csrf\Test;
 
+use Alaress\Csrf\HeaderCheck;
 use PHPUnit_Framework_TestCase;
 
 /**
@@ -71,6 +72,7 @@ class HeaderCheckTest extends PHPUnit_Framework_TestCase
      */
     public function testHeadersOnly(array $serverVars, bool $expectedResult)
     {
-
+        $check = new HeaderCheck($serverVars);
+        $this->assertEquals($expectedResult, $check->check());
     }
 }
