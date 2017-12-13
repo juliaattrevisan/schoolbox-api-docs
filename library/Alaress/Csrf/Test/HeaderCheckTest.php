@@ -10,7 +10,7 @@ use Alaress\Csrf\HeaderCheck;
 use PHPUnit_Framework_TestCase;
 
 /**
- * Tests for headerchecks
+ * Tests for CSRF header checks.
  */
 class HeaderCheckTest extends PHPUnit_Framework_TestCase
 {
@@ -112,7 +112,6 @@ class HeaderCheckTest extends PHPUnit_Framework_TestCase
         $check = new HeaderCheck($serverVars);
         $this->assertEquals($expectedResult, $check->verfiyRequestOrigin());
     }
-
 
     /**
      * Data provider for `testHeadersAndValidHost`.
