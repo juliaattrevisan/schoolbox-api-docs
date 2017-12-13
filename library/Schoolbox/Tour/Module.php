@@ -38,14 +38,6 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(IChainLoader $templateLoader)
-    {
-        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function initControllers(ContainerInterface $injector)
     {
         $mappers = [
