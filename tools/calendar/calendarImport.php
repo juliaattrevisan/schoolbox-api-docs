@@ -63,6 +63,7 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
 
     if (isset($opts['source'])) {
         $fauxPost['source'] = $opts['source'];
+        $log->notice("Events with source ".$opts['source']." will be deleted .\n");
     }
 
     //Not used in this context

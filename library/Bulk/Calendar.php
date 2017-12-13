@@ -31,10 +31,13 @@ class Bulk_Calendar extends Bulk_Abstract {
 	public function addCalendar() {
 		if (is_file($this->getFile())) {
 
+            $source = null;
 		    if ($this->post['source'] != null) {
+		        $source = $this->post['source'];
+
 		        //Delete old events
                 try {
-                    Event\Source\Mapper::getInstance()->deleteEventsFromSource($this->post['source']);
+                    Event\Source\Mapper::getInstance()->deleteEventsFromSource($source);
                 } catch (Schoolbox\Mapper\DefinitionException $e) {
 
                 }
@@ -74,7 +77,7 @@ class Bulk_Calendar extends Bulk_Abstract {
 
 			/* Use factory to spawn a builder
 			 */
-			$factory = new \Calendar\Import\Factory($user->getId(), $author->getId(), $categoryList, $groupList, $campusList, \Schoolbox\Calendar\Event::ACCESS_CAMPUS, $this->getFile());
+			$factory = new \Calendar\Import\Factory($user->getId(), $author->getId(), $categoryList, $groupList, $campusList, \Schoolbox\Calendar\Event::ACCESS_CAMPUS, $this->getFile(), $source);
 			$strategy = $factory->build();
 			$strategy->load();
 
