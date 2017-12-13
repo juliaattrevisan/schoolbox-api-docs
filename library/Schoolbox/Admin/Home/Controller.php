@@ -255,7 +255,8 @@ class Controller extends Base
             /** @var IConnector $databaseExternal */
             $databaseExternal = $this->getDi()->get('databaseExternal');
             $healthCheck = new Healthcheck($databaseExternal, $configMapper);
-            $output = $healthCheck->run();
+            $healthCheck->run();
+            $output = $healthCheck->results();
         } catch (AlaressDatabaseException $e) {
             $output = [
                 'errors' => [

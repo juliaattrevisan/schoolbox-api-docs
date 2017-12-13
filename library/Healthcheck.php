@@ -51,23 +51,22 @@ class Healthcheck
     /**
      * This method is designed to provide information about the permissions of the External database
      *
-     * @return array
      * @throws PDOException
      */
-    public function run(): array
+    public function run(): void
     {
+        // Make sure all databases connected correctly
+        if ($this->connector === null) {
+            $this->log .= "ERROR: Unable to connect to database '{$this->connector->getDatabase()}' (Hostname: {$this->connector->getHostname()})\n";
+            return;
+        }
+
         // To prevent doing anything unintended to the clients external SIS DB we need to wrap the healthcheck
         // in a transaction which we will rollback- thus we should only proceed if transaction support is
         // available on all external connections
 
         /** @var bool $transactionsSupported */
         $transactionsSupported = true;
-
-        // Make sure all databases connected correctly
-
-        if ($this->connector == null) {
-            $this->log .= "ERROR: Unable to connect to database '{$this->connector->getDatabase()}' (Hostname: {$this->connector->getHostname()})\n";
-        }
 
         // Attempt to begin transactions on all connections
 
@@ -103,12 +102,20 @@ class Healthcheck
         if ($transactionsSupported) {
             $this->externalTest();
         }
+    }
 
-        // Return the results
+
+    /**
+     * Return the results
+     *
+     * @return array
+     */
+    public function results(): array
+    {
         return [
-            'log' => trim($this->log),
-            'errors' => $this->errors,
-            'externalType' => $this->externalType
+            'log'          => trim($this->log),
+            'errors'       => $this->errors,
+            'externalType' => $this->externalType,
         ];
     }
 
