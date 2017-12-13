@@ -77,6 +77,22 @@ class HeaderCheckTest extends PHPUnit_Framework_TestCase
                 ],
                 'expectedResult' => false,
             ],
+            'noSource' => [
+                'serverVars' => [
+                    'HTTP_HOST' => '192.168.36.10',
+                ],
+                'expectedResult' => false,
+            ],
+            'noTarget' => [
+                'serverVars' => [
+                    'HTTP_ORIGIN' => 'http://192.168.36.10/adminv2/menu-top',
+                ],
+                'expectedResult' => false,
+            ],
+            'noSourceOrTarget' => [
+                'serverVars' => [],
+                'expectedResult' => false,
+            ],
         ];
     }
 
