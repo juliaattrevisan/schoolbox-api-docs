@@ -104,8 +104,10 @@ class Nesa
     }
 
 
-
-    public function generate()
+    /**
+     * Find all the assessments in the Teacher Course from all Unit Implementations everywhere
+     */
+    private function findAssessments()
     {
         $allUnitImplementations = $this->findUnitImplementations(self::COURSE_SPEC_ID);
 
@@ -117,6 +119,16 @@ class Nesa
             $allAssessments = $allAssessments->merge($assessments);
         }
 
-//        new \Alaress_Probe($allAssessments);
+        return $allAssessments;
+    }
+
+
+
+
+    public function generate()
+    {
+        $allAssessments = $this->findAssessments();
+
+        new \Alaress_Probe($allAssessments);
     }
 }
