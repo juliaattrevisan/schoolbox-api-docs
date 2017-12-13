@@ -49,7 +49,7 @@ class Controller extends Base
         $courseSpecificationId = 6;
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@help/selection.twig', [
-            'descriptors' => (new NesaSelector($courseSpecificationId))->generate()
+            'descriptors' => (new Nesa\Selector($courseSpecificationId))->generate()
         ]));
     }
 

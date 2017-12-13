@@ -1,20 +1,22 @@
 <?php
 /**
- * NesaSelector
+ * Nesa Selector
+ *
+ * Generate a list of Descriptors that were used in a particular Course Specification
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Help;
+namespace Schoolbox\Help\Nesa;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
-class NesaSelector
+class Selector
 {
 
     /**
