@@ -31,13 +31,13 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        $updatePD = new Rule\All(
+        $nesa = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\IsSuperuser()
         );
 
-        $this->register('GET', '/nesa', 'getNesa', $updatePD, null);
-        $this->register('POST', '/nesa', 'postNesa', $updatePD, null);
+        $this->register('GET', '/nesa', 'getNesa', $nesa, null);
+        $this->register('POST', '/nesa', 'postNesa', $nesa, null);
     }
 
     /**
