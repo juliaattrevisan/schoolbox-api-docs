@@ -6,6 +6,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
 use \Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Assessment\Term;
@@ -16,6 +17,7 @@ use Schoolbox\Resource\Folder;
  */
 class Component_Homepage_ManageClassController extends Component_Homepage_ControllerAbstract
 {
+
     /**
      * @var UserAccessMapper
      */
@@ -33,6 +35,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      */
     private $externalDbEnabled;
 
+
     /**
      * Prepares data for the render function. Business logic.
      *
@@ -49,17 +52,22 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         return true;
     }
 
+
     /**
      * Renders the data into the SitePage. Presentation logic.
+     *
      * @param String $templateHandle
      * @return boolean
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws RuntimeException
      */
     public function renderTemplate($templateHandle)
     {
-        $isGroupPage    = $this->getContext()->isGroup();
-        $isClassPage    = $this->getContext()->isClass();
-        $wasClassPage   = $this->getContext()->wasClass();
-        $isUnitPage     = $this->getContext()->hasUnitSpecification();
+        $isGroupPage  = $this->getContext()->isGroup();
+        $isClassPage  = $this->getContext()->isClass();
+        $wasClassPage = $this->getContext()->wasClass();
+        $isUnitPage   = $this->getContext()->hasUnitSpecification();
 
         // If context is not a group, unit or class, render nothing
         if (!$isGroupPage && !$isClassPage && !$wasClassPage && !$isUnitPage) {
@@ -91,13 +99,12 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, 'manage_criteria', 'manage_criteria_block');
 
         // Determine the term for the grades link
-        $currentTermCode = $this->termMapper->findForToday()->getCode();
-        $this->setVar('WORK_TERM', $currentTermCode);
+        $currentTerm = $this->termMapper->findForToday();
+        $this->setVar('WORK_TERM', $currentTerm->getCode());
 
         // Show markbook link to staff on class or group pages
         if ($isStaffOrSuper && ($isGroupPage || $isClassPage || $wasClassPage)) {
-            // If was a class, don't filter by term, else filter to current term.
-            $this->setVar('MARKBOOK_TERM', $wasClassPage ? '' : "/term/$currentTermCode");
+            $this->setVar('MARKBOOK_LINK', $this->buildMarkbookLink($wasClassPage, $currentTerm));
             $this->parse('markbook_link_block', 'markbook_link');
             $hasClassActions = true;
         } else {
@@ -146,5 +153,27 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         }
 
         return $hasClassActions;
+    }
+
+
+    /**
+     * If homepage was a class, don't filter markbook by term, else filter to just the current term.
+     *
+     * @param bool       $wasClassPage
+     * @param Term\Model $currentTerm
+     * @return string
+     * @throws RuntimeException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    private function buildMarkbookLink(bool $wasClassPage, Term\Model $currentTerm): string
+    {
+        $classArg = ['folderId' => $this->getContext()->getId()];
+        if ($wasClassPage) {
+            return $this->getRouter()->generate('learningMarkbook.getMarkbookForClass', $classArg);
+        }
+
+        $classAndTermArgs = array_merge($classArg, ['termCode' => $currentTerm->getCode()]);
+        return $this->getRouter()->generate('learningMarkbook.getMarkbookForClassAndTerm', $classAndTermArgs);
     }
 }
