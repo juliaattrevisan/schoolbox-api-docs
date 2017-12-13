@@ -118,6 +118,7 @@ class LinkRubricMarkToFeedback
     private $countLinkedPublishedFeedbacks = 0;
     private $countLinkedDraftFeedbacks = 0;
     private $countCombinedDrafts = 0;
+    private $logCombinedDraftFeedbacks = [];
 
     /** @var IConnector */
     private $db;
@@ -357,6 +358,7 @@ class LinkRubricMarkToFeedback
                     if (!empty($combinedDrafts)) {
                         $draftRubricMarks = $combinedDrafts;
                         $this->log->notice('More than 1 draft record appears to belong to the same feedback');
+                        $this->logCombinedDraftFeedbacks[] = $draftFeedbacks[0]['id'];
                     } else {
                         $this->log->warning('More than 1 draft found for the participation. Skipping!');
                         return;
@@ -375,7 +377,6 @@ class LinkRubricMarkToFeedback
                     )
                 );
 
-                // Respect that delta you allowed for combined drafts
                 if ($draftRubricMarkCreatedDate->compare($draftFeedbackCreatedDate) <= 0) {
                     //Link your rubric marks (single or combined) to that feedback
                     $this->log->debug('Linking mark to feedback');
@@ -462,7 +463,7 @@ class LinkRubricMarkToFeedback
      */
     private function propagateRubricMarkForward($feedback, $rubricMark)
     {
-        $propogatedRecords = [];
+        $propagatedRecords = [];
 
         $descriptors = $this->db->executeQuery(
             '
@@ -500,9 +501,9 @@ class LinkRubricMarkToFeedback
 
                 ]
             );
-            $propogatedRecords[] = $this->db->lastInsertId();
+            $propagatedRecords[] = $this->db->lastInsertId();
         }
-        $this->logPropagatedRubricMark = sprintf('[%d: %s]', $feedback['id'], implode($propogatedRecords, ','));
+        $this->logPropagatedRubricMarks = sprintf('[%d: %s]', $feedback['id'], implode($propagatedRecords, ','));
         $this->countPropagatedRubricMarks++;
         $this->countLinkedPublishedFeedbacks++;
 
@@ -623,6 +624,6 @@ class LinkRubricMarkToFeedback
         $this->log->notice(sprintf('Total propagated rubric marks: %d %s', $this->countPropagatedRubricMarks, $this->logPropagatedRubricMarks));
         $this->log->notice(sprintf('Total published feedbacks linked: %d', $this->countLinkedPublishedFeedbacks));
         $this->log->notice(sprintf('Total draft feedbacks linked: %d', $this->countLinkedDraftFeedbacks));
-        $this->log->notice(sprintf('Total combined draft rubric marks: %d', $this->countCombinedDrafts));
+        $this->log->notice(sprintf('Total combined draft rubric marks: %d for feedbacks %s', $this->countCombinedDrafts, implode($this->logCombinedDraftFeedbacks, ',')));
     }
 }
