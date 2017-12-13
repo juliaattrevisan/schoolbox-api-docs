@@ -47,10 +47,14 @@ class Healthcheck
         $this->externalType = $configMapper->get('external_type');
     }
 
+
     /**
      * This method is designed to provide information about the permissions of the External database
+     *
+     * @return array
+     * @throws PDOException
      */
-    public function run()
+    public function run(): array
     {
         // To prevent doing anything unintended to the clients external SIS DB we need to wrap the healthcheck
         // in a transaction which we will rollback- thus we should only proceed if transaction support is
@@ -65,7 +69,7 @@ class Healthcheck
             $this->log .= "ERROR: Unable to connect to database '{$this->connector->getDatabase()}' (Hostname: {$this->connector->getHostname()})\n";
         }
 
-        // Attempt to being transactions on all connections
+        // Attempt to begin transactions on all connections
 
         if (!$this->connector->beginTransaction()) {
             // Transactions not supported
@@ -73,6 +77,10 @@ class Healthcheck
             $this->log .= "ERROR: Database ({$this->connector->getDatabase()}) does not support transactions";
             $transactionsSupported = false;
         }
+        if($this->connector->inTransaction()){
+            $this->connector->rollback();
+        }
+
 
         /** @var IConnector $connector */
         foreach ($this->secondaryConnectors as $connector) {
@@ -85,6 +93,9 @@ class Healthcheck
                     $this->log .= "ERROR: Database ({$connector->getDatabase()}) does not support transactions";
                     $transactionsSupported = false;
                 }
+                if($connector->inTransaction()){
+                    $connector->rollback();
+                }
             }
         }
 
@@ -93,23 +104,7 @@ class Healthcheck
             $this->externalTest();
         }
 
-        // Rollback any transactions we were able to start so we don't end up inserting anything into the SIS
-
-        if ($this->connector->inTransaction()) {
-            $this->connector->rollback();
-        }
-
-        /** @var IConnector $connector */
-        foreach ($this->secondaryConnectors as $connector) {
-            if ($connector != null) {
-                if ($connector->inTransaction()) {
-                    $connector->rollBack();
-                }
-            }
-        };
-
         // Return the results
-
         return [
             'log' => trim($this->log),
             'errors' => $this->errors,
@@ -228,6 +223,7 @@ class Healthcheck
         $this->executeTest($objects, 'EXECUTE');
     }
 
+
     /**
      * Test object execution against each database object in the supplied array.
      *
@@ -238,12 +234,11 @@ class Healthcheck
      *
      * @param array  $objects
      * @param string $objectType The type of object to test; this only affects logs.
+     * @throws PDOException
      */
     private function executeTest($objects, $objectType)
     {
         sort($objects);
-
-        $outputValues = [];
 
         $statement = $this->connector->prepareQuery("SELECT HAS_PERMS_BY_NAME(:proc, 'OBJECT', 'EXECUTE')");
 
@@ -252,6 +247,9 @@ class Healthcheck
             $this->log .= str_pad(str_pad($objectType, 15). $object, 50);
 
             try {
+                if(!$this->connector->inTransaction()) {
+                    $this->connector->beginTransaction();
+                }
                 $statement->execute(['proc' => $object]);
                 $result = $statement->fetchColumn();
                 $statement->close();
@@ -272,9 +270,10 @@ class Healthcheck
                 $this->errors[] = $error;
                 $this->log .= "FAILED\n";
             }
+            if($this->connector->inTransaction()) {
+                $this->connector->rollBack();
+            }
         }
-
-        unset($outputValues);
     }
 
     /** @noinspection PhpUnusedPrivateMethodInspection */
