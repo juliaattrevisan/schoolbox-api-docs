@@ -28,6 +28,12 @@ class Report
     private $courseSpecId;
 
     /**
+     * Indicators to examine
+     * @var array
+     */
+    private $indicators;
+
+    /**
      * @var Rubric\RubricMapper
      */
     private $rubricMapper;
@@ -52,7 +58,7 @@ class Report
      * Nesa constructor.
      *
      * @param int                        $courseSpecId
-     * @param array                      $descriptors   An array of descriptor text
+     * @param array                      $indicators   An array of indicator text
      * @param Rubric\RubricMapper        $rubricMapper
      * @param AssessmentMapperProxy      $assessmentMapperProxy
      * @param CourseImplementationMapper $courseImplementationMapper
@@ -60,14 +66,14 @@ class Report
      */
     public function __construct(
         int $courseSpecId,
-        array $descriptors,
+        array $indicators,
         Rubric\RubricMapper $rubricMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
         CourseImplementationMapper $courseImplementationMapper,
         UnitImplementationMapper $unitImplementationMapper
     ) {
         $this->courseSpecId = $courseSpecId;
-        $this->descriptors = $descriptors;
+        $this->indicators = $indicators;
         $this->rubricMapper = $rubricMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->courseImplementationMapper = $courseImplementationMapper;
@@ -122,10 +128,10 @@ class Report
      * @param User        $user
      * @param IAssessable $assessment
      * @param array       $rubric
-     * @param array       $descriptors Report upon these descriptors
+     * @param array       $indicators Report upon these indicators
      * @return array
      */
-    private function investigate(User $user, IAssessable $assessment, array $rubric, array $descriptors)
+    private function investigate(User $user, IAssessable $assessment, array $rubric, array $indicators)
     {
         $tempGroup = [];
         $condensed = [];
@@ -134,15 +140,16 @@ class Report
             $tempCriterion = [];
 
             foreach ($groupData['criteria'] as $criterionId => $criterionData) {
+
                 $tempDescriptor = [];
 
-                foreach ($criterionData['descriptors'] as $levelId => $levelData) {
+                if (\in_array($criterionData['name'], $indicators, true)) {
+                    foreach ($criterionData['descriptors'] as $levelId => $levelData) {
 
-                    /* Only collate the ones we selected
-                     * Condense this as well, for rendering
-                     * The hierarchy is useful for debugging and visualisation
-                     */
-                    if (\in_array($levelData['text'], $descriptors, true)) {
+                        /* Only collate the ones we selected
+                         * Condense this as well, for rendering
+                         * The hierarchy is useful for debugging and visualisation
+                         */
                         if ($levelData['selected']) {
                             $val = [
                                 'id' => $levelData['id'],
@@ -150,7 +157,10 @@ class Report
                             ];
 
                             $tempDescriptor[$levelData['text']] = $val;
-                            $condensed[$levelData['text']] = $val;
+
+                            /* Indicator in the heading; descriptor text in the cell
+                             */
+                            $condensed[$criterionData['name']] = $levelData['text'];
                         } else {
                             $val = [
                                 'id' => $levelData['id'],
@@ -158,15 +168,14 @@ class Report
                             ];
 
                             $tempDescriptor[$levelData['text']] = $val;
-                            $condensed[$levelData['text']] = $val;
                         }
                     }
-                }
 
-                $tempCriterion[$criterionId] = [
-                    'name' => $criterionData['name'],
-                    'descriptors' => $tempDescriptor
-                ];
+                    $tempCriterion[$criterionId] = [
+                        'name' => $criterionData['name'],
+                        'descriptors' => $tempDescriptor
+                    ];
+                }
             }
 
             $tempGroup[] = [
@@ -218,7 +227,7 @@ class Report
                     $currentParticipant->getUser(),
                     $currentAssessment,
                     $context['rubric'],
-                    $this->descriptors
+                    $this->indicators
                 );
 
                 /* Store first stack of condensed descriptor data for this user into a hashtable
@@ -231,10 +240,10 @@ class Report
                     ];
                 }
                 else {
-                    $existingDescriptors = $condensedData[$current['user']->getId()]['condensed'];
-                    $additionalDescriptors = $current['condensed'];
+                    $existingIndicators = $condensedData[$current['user']->getId()]['condensed'];
+                    $additionalIndicators = $current['condensed'];
 
-                    $condensedData[$current['user']->getId()]['condensed'] = array_merge($existingDescriptors, $additionalDescriptors);
+                    $condensedData[$current['user']->getId()]['condensed'] = array_merge($existingIndicators, $additionalIndicators);
                 }
             }
         }

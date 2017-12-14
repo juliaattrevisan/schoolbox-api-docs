@@ -71,16 +71,17 @@ class Controller extends Base
 
         $report = (new Nesa\Report(
             self::NESA_COURSE_SPEC_ID,
-            $this->getRequest()->post['descriptors'],
+            $this->getRequest()->post['indicators'],
             Rubric\RubricMapper::getInstance(),
             $assessmentMapperProxy,
             CourseImplementationMapper::getInstance(),
             UnitImplementationMapper::getInstance()
         ))->generate();
 
+        new \Alaress_Probe($report);
         $this->getResponse()->content->set($this->buildHtmlOutput('@help/report.twig', [
             'report' => $report,
-            'descriptors' => $this->getRequest()->post['descriptors']
+            'indicators' => array_filter(array_unique($this->getRequest()->post['indicators']))
         ]));
     }
 }

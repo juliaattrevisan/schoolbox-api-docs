@@ -15,8 +15,8 @@
                 {% for id, data in descriptors  %}
                 <tr>
                     <td>
-                        <input id="descriptor-{{ data.id }}" name='descriptors[]' type="checkbox" value="{{ data.description }}" />
-                        <label for="descriptor-{{ data.id }}" class="checkbox-label"></label>
+                        <input id="indicator-{{ loop.index0 }}" name='indicators[]' type="checkbox" value="{{ data.criterion.name }}" />
+                        <label for="indicator-{{ loop.index0 }}" class="checkbox-label"></label>
                     </td>
                     <td>{{ data.criterion.grouping }}</td>
                     <td>{{ data.criterion.name }}</td>
