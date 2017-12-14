@@ -114,6 +114,23 @@ Data:
             });
         };
 
+        /**
+         * Can this form be submitted?
+         *
+         * At least one of below must be true:
+         * * There's content in the inline editor
+         * * There's at least one file uploaded
+         * * The "Submitted in person" checkbox is checked
+         *
+         * @return Boolean
+         */
+        var allowSubmit = function() {
+            var inlineLen = CKEDITOR.instances['editor-body'].getData().length,
+                filesLen = $('#files-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length,
+                submittedInPersonCheckbox = form.find('#editor-submittedInPerson');
+            return (Boolean)(inlineLen || filesLen || submittedInPersonCheckbox.prop('checked'));
+        };
+
         /* Spawn editors
          */
         $.fn.alaressEditor({
@@ -132,15 +149,20 @@ Data:
 
         var confirmDialog = $('#confirm-dialog');
 
+        $("[data-action-self-reflect]").click(function(e) {
+            if (!allowSubmit()) {
+                // prevent self-reflection without SOMETHING to reflect upon
+                e.preventDefault();
+                emptyDialog.foundation('reveal', 'open');
+            }
+        });
+
         $("[data-action-save]").click(function (e) {
             var form = $(this).closest('form'),
                 dialog = confirmDialog,
-                submit = form.find(':submit'),
-                inlineLen = CKEDITOR.instances['editor-body'].getData().length,
-                filesLen = $('#files-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length,
-                submittedInPersonCheckbox = form.find('#editor-submittedInPerson');
+                submit = form.find(':submit');
 
-            if (!inlineLen && !filesLen && !submittedInPersonCheckbox.prop('checked')) {
+            if (!allowSubmit()) {
                 // prevent submission without SOMETHING to submit
                 e.preventDefault();
                 emptyDialog.foundation('reveal', 'open');
@@ -243,6 +265,7 @@ Data:
                             <section>
                                 <a class="button"
                                    href="{{ routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: student.id }) }}"
+                                   data-action-self-reflect
                                 >Reflect on my work</a>
                             </section>
                         </div>
@@ -251,7 +274,10 @@ Data:
                     </section>
 
                     {% if not requiresReflection %}
-                        <input type="submit" value="Submit for Assessment {% if isSubmitOnBehalfOf %}On Behalf Of {{ student.formatName }}{% endif %}" data-action-save />
+                        <input type="submit"
+                               value="Submit for Assessment
+                               {% if isSubmitOnBehalfOf %}On Behalf Of {{ student.formatName }}{% endif %}"
+                               data-action-save />
                     {% endif %}
 
                     <div class="toast" data-alert data-save-draft></div>
