@@ -212,16 +212,10 @@ return [17167];//array_slice($ids, 0, 100);
      */
     private function investigate(User $user, IAssessable $assessment, array $rubric, array $indicators)
     {
-        $tempGroup = [];
         $condensed = [];
 
         foreach ($rubric['groups'] as $groupId => $groupData) {
-            $tempCriterion = [];
-
             foreach ($groupData['criteria'] as $criterionId => $criterionData) {
-
-                $tempDescriptor = [];
-
                 if (\in_array($criterionData['name'], $indicators, true)) {
                     foreach ($criterionData['descriptors'] as $levelId => $levelData) {
 
@@ -230,47 +224,39 @@ return [17167];//array_slice($ids, 0, 100);
                          * The hierarchy is useful for debugging and visualisation
                          */
                         if ($levelData['selected']) {
-                            $val = [
-                                'id' => $levelData['id'],
-                                'text' => 'Y'
-                            ];
+                            if ($levelData['text'] === 'Not shown.') {
 
-                            $tempDescriptor[$levelData['text']] = $val;
+                                /* User did not demonstrate what was required
+                                 */
+                                $val = [
+                                    'text' => $levelData['text'],
+                                    'outcome' => 'N'
+                                ];
+                            }
+                            else {
+
+                                /* User demonstrated what was required
+                                 */
+                                $val = [
+                                    'text' => $levelData['text'],
+                                    'outcome' => 'Y'
+                                ];
+                            }
 
                             /* Indicator in the heading; descriptor text in the cell
                              */
-                            $condensed[$criterionData['name']] = $levelData['text'];
-                        } else {
-                            $val = [
-                                'id' => $levelData['id'],
-                                'text' => 'N'
-                            ];
-
-                            $tempDescriptor[$levelData['text']] = $val;
+                            $condensed[$criterionData['name']] = $val;
                         }
                     }
-
-                    $tempCriterion[$criterionId] = [
-                        'name' => $criterionData['name'],
-                        'descriptors' => $tempDescriptor
-                    ];
                 }
             }
-
-            $tempGroup[] = [
-                'name' => $groupData['name'],
-                'criteria' => $tempCriterion
-            ];
         }
 
-        $tempAssessment = [
+        return [
             'name' => $assessment->getTitle(),
             'user' => $user,
             'assessmentId' => $assessment->getId(),
             'condensed' => $condensed,
-            'groups' => $tempGroup,
         ];
-
-        return $tempAssessment;
     }
 }

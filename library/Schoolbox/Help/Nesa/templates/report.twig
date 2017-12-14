@@ -1,22 +1,56 @@
 {% macro demonstrated(value, tooltip) %}
-    <span style="background-color:#aea;display:block;padding:3px;font-weight:bold;" title="{{ tooltip }}">Y</span>
+    <span class="demonstrated" title="{{ tooltip }}">{{ value }}</span>
 {% endmacro %}
 
 {% macro notDemonstrated(value, tooltip) %}
-    <span style="background-color:#fdd;display:block;padding:3px;font-weight:bold;" title="{{ tooltip }}">N</span>
+    <span class="not-demonstrated" title="{{ tooltip }}">{{ value }}</span>
+{% endmacro %}
+
+{% macro undecided(value, tooltip) %}
+    <span class="undecided" title="{{ tooltip }}">{{ value }}</span>
 {% endmacro %}
 
 {% import _self as macro %}
+<style type="text/css">
+    th:first-child {
+        width: 20%;
+    }
 
+    th.center,
+    td.center {
+        text-align: center;
+    }
+
+    .demonstrated {
+        background-color: #aea;
+        display: block;
+        padding: 3px;
+        font-weight: bold;
+    }
+
+    .not-demonstrated {
+        background-color: #fdd;
+        display: block;
+        padding: 3px;
+        font-weight: bold;
+    }
+
+    .undecided {
+        background-color: #eee;
+        display: block;
+        padding: 3px;
+        font-weight: bold;
+    }
+</style>
 <div class="row">
     <div class="small-12 columns">
         <h1>NESA Report</h1>
         <section>
             <table>
                 <thead>
-                    <th style="width:20%">User</th>
+                    <th>User</th>
                     {% for indicator in indicators %}
-                        <th style="text-align:center">{{ indicator }}</th>
+                        <th class="center">{{ indicator }}</th>
                     {% endfor %}
                 </thead>
                 <tbody>
@@ -28,11 +62,14 @@
 
                         {% for indicator in indicators %}
 
-                        <td style="text-align:center">
-                            {% if row.condensed[indicator]|length %}
-                                {{ macro.demonstrated('Y', row.condensed[indicator]) }}
-                            {% else %}
+                        <td class="center">
+
+                            {% if row.condensed[indicator].outcome == 'Y' %}
+                                {{ macro.demonstrated('Y', row.condensed[indicator].text) }}
+                            {% elseif row.condensed[indicator].outcome == 'N' %}
                                 {{ macro.notDemonstrated('N', row.condensed[indicator]) }}
+                            {% else %}
+                                {{ macro.undecided('-', row.condensed[indicator]) }}
                             {% endif %}
                         </td>
                         {% endfor %}
