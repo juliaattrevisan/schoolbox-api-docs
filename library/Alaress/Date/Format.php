@@ -224,7 +224,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public static function newNaturalDate($naturalLanguage)
     {
         // compensate for natural language
-        $parseable = self::denaturalise($naturalLanguage);
+        $parseable = self::denaturalise(strtolower($naturalLanguage));
 
         $datetime = DateTime::createFromFormat('', $parseable);
 
