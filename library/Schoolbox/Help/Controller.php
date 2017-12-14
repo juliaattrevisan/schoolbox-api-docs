@@ -23,7 +23,7 @@ class Controller extends Base
      * Course Specification Id
      * This comes from the /course/modify screen, as is an integer in the url
      */
-    public const NESA_COURSE_SPEC_ID = 6;
+    public const NESA_COURSE_SPEC_ID = 23;
 
     /**
      * @var Error\Mapper

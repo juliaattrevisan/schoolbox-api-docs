@@ -13,9 +13,14 @@
                 </thead>
 
                 {% for id, data in descriptors  %}
+                    {% if data.criterion.grouping == 'Australian Professional Teaching Standards' %}
+                        {% set checked = 'checked="checked"' %}
+                    {% else %}
+                        {% set checked = '' %}
+                    {% endif %}
                 <tr>
                     <td>
-                        <input id="indicator-{{ loop.index0 }}" name='indicators[]' type="checkbox" value="{{ data.criterion.name }}" />
+                        <input id="indicator-{{ loop.index0 }}" name='indicators[]' type="checkbox" value="{{ data.criterion.name }}" {{ checked }}/>
                         <label for="indicator-{{ loop.index0 }}" class="checkbox-label"></label>
                     </td>
                     <td>{{ data.criterion.grouping }}</td>
