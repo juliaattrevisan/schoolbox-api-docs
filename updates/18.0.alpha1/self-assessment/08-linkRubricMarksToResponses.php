@@ -692,6 +692,15 @@ class LinkRubricMarkToFeedback
     {
         $this->log->notice(sprintf('Broken descriptor sets: %d', $this->countBrokenRubricMarks));
         $this->log->notice(sprintf('Total propagated rubric marks: %d', $this->countPropagatedRubricMarks));
+
+        // Report the first added mark
+        $markIdSets = array_column($this->logPropagatedRubricMarks, 'markIds');
+        $markIds    = array_reduce($markIdSets, 'array_merge', []);
+        if (count($markIds)) {
+            $this->log->notice(sprintf('First added rubric mark: #%d', min($markIds)));
+        }
+
+        // Report every mark added
         foreach ($this->logPropagatedRubricMarks as $propagatedRubricMark) {
             $this->log->debug(
                 sprintf(
