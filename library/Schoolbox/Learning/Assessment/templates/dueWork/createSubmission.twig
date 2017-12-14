@@ -223,7 +223,9 @@ Data:
                         {% if requiresReflection %}
                         <div class="component-action">
                             <section>
-                                <a class="button" href="#">Reflect on my work</a>
+                                <a class="button"
+                                   href="{{ routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: student.id }) }}"
+                                >Reflect on my work</a>
                             </section>
                         </div>
                         {% endif %}
