@@ -29,9 +29,9 @@
                         <input id="indicator-{{ loop.index0 }}" name='indicators[]' type="checkbox" value="{{ data.criterion.name }}" {{ checked }}/>
                         <label for="indicator-{{ loop.index0 }}" class="checkbox-label"></label>
                     </td>
-                    <td>{{ data.criterion.grouping }}</td>
-                    <td>{{ data.criterion.name }}</td>
-                    <td>{{ data.description }}</td>
+                    <td style="width:33%">{{ data.criterion.grouping }}</td>
+                    <td style="width:33%">{{ data.criterion.name }}</td>
+                    <td style="width:33%">{{ data.description }}</td>
                 </tr>
                 {% endfor %}
             </table>
