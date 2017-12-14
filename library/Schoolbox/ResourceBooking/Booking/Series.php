@@ -278,7 +278,7 @@ class Series
                             ->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING));
                     }
                     $relatedBooking
-                        ->setName($relatedItems[$relatedResource->getId()]['name'])
+                        ->setName($item->getName())
                         ->setNotes($relatedItems[$relatedResource->getId()]['notes']);
 
                     // Open resource: automatically confirm
