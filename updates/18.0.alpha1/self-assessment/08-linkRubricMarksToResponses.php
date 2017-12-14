@@ -386,7 +386,7 @@ class LinkRubricMarkToFeedback
     {
         $feedbacks = $this->db->executeQuery(
             '
-            SELECT sr.id, rm.return_id, sr.created_at, sr.updated_at, sr.deleted_at AS "DELETED", sr.published_at
+            SELECT DISTINCT sr.id, rm.return_id, sr.created_at, sr.updated_at, sr.deleted_at AS "DELETED", sr.published_at
             FROM submission_return sr
             JOIN submission_box sb ON sb.id = sr.box_id
             LEFT JOIN rubric_mark rm ON sr.id = rm.return_id
