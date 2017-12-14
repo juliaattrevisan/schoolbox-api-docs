@@ -204,8 +204,15 @@ Data:
         <div class="row">
             <div class="small-12 columns">
                 <div class="alert-box">
-                    To submit your work you may upload files or optionally use the editor to type directly.
-                    Content you create will automatically save to draft, but will <strong>not be submitted</strong> until you press the submit button and confirm on the following screen.
+                    {% if requiresReflection %}
+                        To submit your work you may upload files or optionally use the editor to type directly.
+                        Content you create will automatically save to draft, but will <strong>not be submitted</strong>
+                        until you finish your reflection on your work.
+                    {% else %}
+                        To submit your work you may upload files or optionally use the editor to type directly.
+                        Content you create will automatically save to draft, but will <strong>not be submitted</strong>
+                        until you press the Submit For Assessment button.
+                    {% endif %}
                 </div>
             </div>
         </div>
