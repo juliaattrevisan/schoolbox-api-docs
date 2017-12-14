@@ -16,6 +16,9 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplem
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
+ini_set('max_execution_time', 300);
+ini_set('memory_limit', -1);
+
 class Controller extends Base
 {
 
