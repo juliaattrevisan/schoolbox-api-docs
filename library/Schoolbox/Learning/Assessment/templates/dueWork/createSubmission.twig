@@ -213,10 +213,12 @@ Data:
             <div class="small-12 island">
                 <form id="editor-form" method="post" action="{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: assessment.id, studentId: student.id }) }}" enctype="multipart/form-data">
                     <input type="hidden" name="responseId" value="{{ response.id }}"/>
-                    <section class="content">
-                        <textarea id="editor-body" name="body" rows="20">{{ editorContents }}</textarea>
+                    <section>
+                        <div class="content">
+                            <textarea id="editor-body" name="body" rows="20">{{ editorContents }}</textarea>
 
-                        {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                        </div>
 
                         {% if requiresReflection %}
                         <div class="component-action">
