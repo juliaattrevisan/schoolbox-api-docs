@@ -643,9 +643,13 @@ class LinkRubricMarkToFeedback
     private function validateDescriptorSet($rubricMark)
     {
         if ($rubricMark['criterion'] != $rubricMark['records']) {
-            $this->log->warning(sprintf('Invalid descriptors for student_id %d box_id %d and published date %s
-                            - Skipping!',
-                    $rubricMark['student_id'], $rubricMark['box_id'], $rubricMark['published_at'])
+            $this->log->warning(
+                sprintf(
+                    'Invalid descriptors for student_id %d box_id %d and published date %s - Skipping!',
+                    $rubricMark['student_id'],
+                    $rubricMark['box_id'],
+                    $rubricMark['published_at']
+                )
             );
             $this->countBrokenRubricMarks++;
 
