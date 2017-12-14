@@ -112,16 +112,14 @@ class Mapper extends BaseMapper
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $plan = $this->hydrate($row);
-            try {
+
+            // Did the query join onto participants?
+            if (array_key_exists('p.id', $row)) {
                 $participant = $participantMapper->hydrate($row, 'p');
-            } catch (BaseMapper\Exception $e) {
-                // This only occurs in debug mode when we are hydrating a query that did not join onto participants.
-                $participant = null;
-            }
-            if ($participant) {
-                $user = $participant->getUser();
-                // Indexed by user.id to optimise participant traversals
-                $plan->getParticipants()[$user->getId()] = $participant;
+                if ($participant) {
+                    // Indexed by user.id to optimise participant traversals
+                    $plan->getParticipants()[$participant->getUser()->getId()] = $participant;
+                }
             }
             $plans[$plan->getId()] = $plan;
         }
