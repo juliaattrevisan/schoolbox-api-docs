@@ -33,14 +33,47 @@ class Controller extends Base
      */
     private $errorMapper;
 
+    /**
+     * @var CourseSpecificationMapper
+     */
+    private $courseSpecificationMapper;
+
+    /**
+     * @var CourseImplementationMapper
+     */
+    private $courseImplementationMapper;
+
+    /**
+     * @var Folder\Mapper
+     */
+    private $folderMapper;
+
+    /**
+     * @var Rubric\RubricMapper
+     */
+    private $rubricMapper;
+
 
     /**
      * Controller constructor.
-     * @param Error\Mapper $errorMapper
+     * @param Error\Mapper               $errorMapper
+     * @param CourseSpecificationMapper  $courseSpecificationMapper
+     * @param CourseImplementationMapper $courseImplementationMapper
+     * @param Folder\Mapper              $folderMapper
+     * @param Rubric\RubricMapper        $rubricMapper
      */
-    public function __construct(Error\Mapper $errorMapper)
+    public function __construct(
+        Error\Mapper $errorMapper,
+        CourseSpecificationMapper $courseSpecificationMapper,
+        CourseImplementationMapper $courseImplementationMapper,
+        Folder\Mapper $folderMapper,
+        Rubric\RubricMapper $rubricMapper)
     {
         $this->errorMapper = $errorMapper;
+        $this->courseSpecificationMapper = $courseSpecificationMapper;
+        $this->courseImplementationMapper = $courseImplementationMapper;
+        $this->folderMapper = $folderMapper;
+        $this->rubricMapper = $rubricMapper;
     }
 
 
@@ -53,13 +86,13 @@ class Controller extends Base
      */
     public function getNesa()
     {
-        $courseSpecification = CourseSpecificationMapper::getInstance()->findById(self::NESA_COURSE_SPEC_ID);
+        $courseSpecification = $this->courseSpecificationMapper->findById(self::NESA_COURSE_SPEC_ID);
 
         /* Find all the folders that use this course implementation so we can chooze on the ui
          */
         $allFolders = new Collection();
 
-        $allCourseImplementations = CourseImplementationMapper::getInstance()->findAllByCourseSpecificationId(self::NESA_COURSE_SPEC_ID);
+        $allCourseImplementations = $this->courseImplementationMapper->findAllByCourseSpecificationId(self::NESA_COURSE_SPEC_ID);
 
         foreach ($allCourseImplementations as $currentCourseImplementation) {
             $allFolders->add($currentCourseImplementation->getFolder());
@@ -84,7 +117,7 @@ class Controller extends Base
     public function postNesa()
     {
         try {
-            $folder = Folder\Mapper::getInstance()->findById($this->getRequest()->post['folderId']);
+            $folder = $this->folderMapper->findById($this->getRequest()->post['folderId']);
         }
         catch (MapperException $e) {
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_CATEGORY_DELETED);
@@ -98,7 +131,7 @@ class Controller extends Base
         $dataSet = (new Nesa\Acquisition(
             self::NESA_COURSE_SPEC_ID,
             $this->getRequest()->post['indicators'],
-            Rubric\RubricMapper::getInstance(),
+            $this->rubricMapper,
             $assessmentMapperProxy
         ))->generate($folder->getId());
 
