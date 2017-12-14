@@ -14,6 +14,7 @@ use React\EventLoop\LoopInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Help\Nesa;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
 
@@ -45,29 +46,33 @@ HELP;
 $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array $options) {
     $folderId = $options['folder'];
 
+    $indicators = [
+        'Student engagement (3.4)',
+        'Select and use resources. (3.4)',
+        'Engage with professional teaching networks and broader communities. (7.4)',
+        'Content selection and organisation. (2.2)',
+        'Engage with colleagues and improve practice. (6.3)',
+        'Information and communication technology (ICT) (2.6)',
+        'Evaluate and improve teaching programs (3.6)'
+    ];
+
+    /** @var AssessmentMapperProxy $assessmentMapperProxy */
+    $assessmentMapperProxy = $di->get('assessmentDataSource');
+
     /* If a folder was specified, accumulate the rubric data for this folder only
      * Otherwise process everyone
      */
     if ($folderId) {
-
-        /** @var AssessmentMapperProxy $assessmentMapperProxy */
-        $assessmentMapperProxy = $di->get('assessmentDataSource');
-
         $dataSet = (new Nesa\Acquisition(
-            [
-                'Student engagement (3.4)',
-                'Select and use resources. (3.4)',
-                'Engage with professional teaching networks and broader communities. (7.4)',
-                'Content selection and organisation. (2.2)',
-                'Engage with colleagues and improve practice. (6.3)',
-                'Information and communication technology (ICT) (2.6)',
-                'Evaluate and improve teaching programs (3.6)'
-            ],
+            $indicators,
             Rubric\RubricMapper::getInstance(),
             $assessmentMapperProxy
         ))->generate($folderId);
 
         $resultFragment = json_encode($dataSet);
+
+        /* Save it to the db
+         */
 
         $log->critical("Acquiring {$folderId}: {$resultFragment}");
     }
@@ -77,6 +82,24 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         }
         else {
             $log->critical("Acquiring all folders");
+
+            $allCourseImplementations = CourseImplementationMapper::getInstance()
+                ->findAllByCourseSpecificationId(Nesa\Acquisition::NESA_COURSE_SPEC_ID);
+
+            foreach ($allCourseImplementations as $currentCourseImplementation) {
+                $dataSet = (new Nesa\Acquisition(
+                    $indicators,
+                    Rubric\RubricMapper::getInstance(),
+                    $assessmentMapperProxy
+                ))->generate($currentCourseImplementation->getFolder()->getId());
+
+                $resultFragment = json_encode($dataSet);
+
+                /* Save it to the db
+                 */
+
+                $log->critical("Acquiring {$folderId}: {$resultFragment}");
+            }
         }
     }
 
