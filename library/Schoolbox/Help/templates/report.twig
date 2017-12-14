@@ -15,7 +15,6 @@
             <table>
                 <thead>
                     <th>User</th>
-                    <th>Assessment</th>
                     {% for descriptor in descriptors %}
                         <th style="text-align:center">{{ descriptor }}</th>
                     {% endfor %}
@@ -24,7 +23,6 @@
                     {% for row in report %}
                     <tr>
                         <td>{{ row.user.fullname }} {{ row.user.id }}</td>
-                        <td>{{ row.assessmentId }}</td>
 
                         {# Render data in the same order as headings #}
 
