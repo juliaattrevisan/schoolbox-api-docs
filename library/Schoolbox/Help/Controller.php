@@ -78,7 +78,6 @@ class Controller extends Base
             UnitImplementationMapper::getInstance()
         ))->generate();
 
-        new \Alaress_Probe($report);
         $this->getResponse()->content->set($this->buildHtmlOutput('@help/report.twig', [
             'report' => $report,
             'indicators' => array_filter(array_unique($this->getRequest()->post['indicators']))
