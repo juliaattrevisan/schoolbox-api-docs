@@ -52,7 +52,7 @@ class Controller extends Base
     {
         $courseSpecification = CourseSpecificationMapper::getInstance()->findById(self::NESA_COURSE_SPEC_ID);
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@help/selection.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@help/selector.twig', [
             'course' => $courseSpecification,
             'descriptors' => (new Nesa\Selector(self::NESA_COURSE_SPEC_ID))->generate()
         ]));
