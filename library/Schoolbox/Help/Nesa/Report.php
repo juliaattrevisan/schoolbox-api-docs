@@ -15,9 +15,6 @@ use Schoolbox\Learning\Assessment\DataModel\Mapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\RubricContext;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\DueWork;
-use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\User;
 
 class Report
@@ -46,21 +43,12 @@ class Report
     private $assessmentMapperProxy;
 
     /**
-     * @var CourseImplementationMapper
-     */
-    private $courseImplementationMapper;
-
-    /**
-     * @var UnitImplementationMapper
-     */
-    private $unitImplementationMapper;
-
-    /**
      * Query used to get all the Assessments in every Implementation of Course Spec Id :courseSpecId
      *
      * - The help course consists of multiple projects, which contain assessments
      * - The rubrics only apply to Due Works so we join on submission_box to exclude all other types
      * - Some assessment records contain 0000-00-00 in their created_at field (ignore these, laravel dies)
+     * - Get the assessments for $folderId, for performance reasons we have to proces one folder at a time
      *
      * @var string
      */
@@ -75,6 +63,7 @@ class Report
         INNER JOIN assessment a ON pa.`assessment_id` = a.`id`
         INNER JOIN submission_box sb ON sb.`assessment_id` = a.`id`  
         WHERE cs.id = :courseSpecId
+        AND ci.folder_id = :folderId
         AND cs.deleted_at IS NULL
         AND ci.deleted_at IS NULL
         AND cui.deleted_at IS NULL
@@ -90,23 +79,17 @@ class Report
      * @param array                      $indicators   An array of indicator text
      * @param Rubric\RubricMapper        $rubricMapper
      * @param AssessmentMapperProxy      $assessmentMapperProxy
-     * @param CourseImplementationMapper $courseImplementationMapper
-     * @param UnitImplementationMapper   $unitImplementationMapper
      */
     public function __construct(
         int $courseSpecId,
         array $indicators,
         Rubric\RubricMapper $rubricMapper,
-        AssessmentMapperProxy $assessmentMapperProxy,
-        CourseImplementationMapper $courseImplementationMapper,
-        UnitImplementationMapper $unitImplementationMapper
+        AssessmentMapperProxy $assessmentMapperProxy
     ) {
         $this->courseSpecId = $courseSpecId;
         $this->indicators = $indicators;
         $this->rubricMapper = $rubricMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
-        $this->courseImplementationMapper = $courseImplementationMapper;
-        $this->unitImplementationMapper = $unitImplementationMapper;
     }
 
 
@@ -114,13 +97,15 @@ class Report
      * Find all the assessment ids that spawned from $courseSpecId
      * Use a custom query, otherwise it's just too slow
      *
+     * @param $folderId
      * @return array
      */
-    private function findAssessmentIds()
+    private function findAssessmentIds($folderId)
     {
         $assessmentMapper = Mapper::getInstance();
         $statement = $assessmentMapper->getDatabase()->prepare($this->query);
         $statement->execute([
+            'folderId' => $folderId,
             'courseSpecId' => $this->courseSpecId
         ]);
 
@@ -129,7 +114,7 @@ class Report
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $ids[] = $row['id'];
         }
-return [17167];//array_slice($ids, 0, 100);
+
         return $ids;
     }
 
@@ -137,14 +122,15 @@ return [17167];//array_slice($ids, 0, 100);
     /**
      * Find all the Unit Implementations for Teacher Course
      *
-     * Find all the assessments in the Teacher Course from all Unit Implementations everywhere
+     * Find all the assessments in the Teacher Course from all Unit Implementations everywhere for $folderId
+     * Due to performance reasons, I have to find results per folder (otherwise too much data)
+     *
      * Investigate all the assessments and their participants and harvest all the rubric selections
      *
-     * Progressively dump vars that aren't needed to save some rams
-     *
+     * @param $folderId
      * @return Collection|\Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model[]
      */
-    public function generate()
+    public function generate($folderId)
     {
         /* A condensed version of the output stack that discards the capability/indicator hierarchy
          * and provides you the descriptor outputs, dumping them into a hashtable
@@ -153,7 +139,7 @@ return [17167];//array_slice($ids, 0, 100);
 
         /* All the assessments to investigate
          */
-        $assessmentIds = $this->findAssessmentIds();
+        $assessmentIds = $this->findAssessmentIds($folderId);
 
         $allAssessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
         $allAssessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($allAssessments, null, false, false);

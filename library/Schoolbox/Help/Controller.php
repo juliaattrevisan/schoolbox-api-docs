@@ -69,6 +69,8 @@ class Controller extends Base
      */
     public function postNesa()
     {
+        $folderId = 1858;
+
         /** @var AssessmentMapperProxy $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
@@ -76,10 +78,8 @@ class Controller extends Base
             self::NESA_COURSE_SPEC_ID,
             $this->getRequest()->post['indicators'],
             Rubric\RubricMapper::getInstance(),
-            $assessmentMapperProxy,
-            CourseImplementationMapper::getInstance(),
-            UnitImplementationMapper::getInstance()
-        ))->generate();
+            $assessmentMapperProxy
+        ))->generate($folderId);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@help/report.twig', [
             'report' => $report,
