@@ -45,7 +45,7 @@ if (is_array($newsList)) {
     foreach ($newsList as $news) {
         $poster = $userHandler->formatName($news);
 
-        $postedDate = new Alaress_Date_Format($news['posted'], 'U');
+        $postedDate = new Alaress_Date_Format($news['published'], 'U');
 
         $output = array(
             "NEWS_ID"           => $news['id'],
