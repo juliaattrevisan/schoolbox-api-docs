@@ -17,7 +17,7 @@
                     <th>User</th>
                     <th>Assessment</th>
                     {% for descriptor in descriptors %}
-                        <th>{{ descriptor }}</th>
+                        <th style="text-align:center">{{ descriptor }}</th>
                     {% endfor %}
                 </thead>
                 <tbody>
@@ -26,31 +26,11 @@
                         <td>{{ row.user.fullname }} {{ row.user.id }}</td>
                         <td>{{ row.assessmentId }}</td>
 
-
                         {# Render data in the same order as headings #}
 
                         {% for descriptor in descriptors %}
                         <td style="text-align:center">
-                            {% set outcome = false %}
-
-                            {% for capability in row.groups %}
-                                {% for indicatorId, indicator in capability.criteria %}
-                                    {% for descriptorId, descriptorData in indicator.descriptors %}
-                                        {% if descriptorId == descriptor %}
-
-                                            {# Only render success in one way #}
-                                            {% if indicator.descriptors[descriptor].text == 'Y' %}
-                                                {% set outcome = true %}
-                                            {% endif %}
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endfor %}
-                            {% endfor %}
-
-                            {# When a Capability was selected, but no descriptors chosen
-                             # This usually renders as empty as the info was never traversed and collected
-                             #}
-                            {% if outcome %}
+                            {% if row.condensed[descriptor].text == 'Y' %}
                                 {{ macro.demonstrated('Y') }}
                             {% else %}
                                 {{ macro.notDemonstrated('N') }}

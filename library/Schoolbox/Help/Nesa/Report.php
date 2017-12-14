@@ -191,9 +191,11 @@ class Report
      */
     public function generate()
     {
-        /* The output
+
+        /* A condensed version of the output stack that discards the capability/indicator hierarchy
+         * and provides you the descriptor outputs, dumping them into a hashtable
          */
-        $data = [];
+        $condensedData = [];
 
         /* Get all the assessments in the Teacher Course and hydrate with all their participants
          * Hopefully that is performantly bearable
@@ -212,15 +214,31 @@ class Report
                 /* Investigate the context for the user and assessment and find the chosen descriptors that
                  * exist in the set of rubric groups and criteria
                  */
-                $data[] = $this->investigate(
+                $current = $this->investigate(
                     $currentParticipant->getUser(),
                     $currentAssessment,
                     $context['rubric'],
                     $this->descriptors
                 );
+
+                /* Store first stack of condensed descriptor data for this user into a hashtable
+                 * Otherwise merge into existing
+                 */
+                if (!isset($condensedData[$current['user']->getId()])) {
+                    $condensedData[$current['user']->getId()] = [
+                        'user' => $current['user'],
+                        'condensed' => $current['condensed']
+                    ];
+                }
+                else {
+                    $existingDescriptors = $condensedData[$current['user']->getId()]['condensed'];
+                    $additionalDescriptors = $current['condensed'];
+
+                    $condensedData[$current['user']->getId()]['condensed'] = array_merge($existingDescriptors, $additionalDescriptors);
+                }
             }
         }
-new \Alaress_Probe($data);
-        return $data;
+
+        return $condensedData;
     }
 }
