@@ -1654,13 +1654,9 @@ $train-line-unvisited-color: $content-ui-background;
 
 article {
     @extend .clearfix;
-}
-// Scroll WYSIWYG content areas when wide tables exist.
-@media #{$medium-down} {
-    article {
-        overflow-x: auto;
-        overflow-y: hidden;
-    }
+    // Scroll WYSIWYG content areas when wide tables exist.
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 /**
