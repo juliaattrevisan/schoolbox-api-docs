@@ -18,6 +18,7 @@
 
 {# child templates may override #}
 {% set routeModify = routeModify ?: routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment})  %}
+{% set responseHistory = responseHistory ?: locale.submissionHistory.proper %}
 
 
 <script src="/javascript/shared/submissions/jquery.combobox.js" type="text/javascript"></script>
@@ -97,7 +98,6 @@
                 {% set pStatusText      = '' %}
                 {% set pStatusClass     = '' %}
                 {% set pTooltip         = '' %}
-                {% set responseHistory  = locale.submissionHistory.proper %}
 
                 {% block config %}
                 <li data-status="{{ pStatusClass }}" data-participant="{{ participant.user.id }}" data-participant-name="{{ participant.user.fullName }}">
