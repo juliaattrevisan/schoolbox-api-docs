@@ -16,6 +16,8 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
 
 /**
  * Class MarkMapper
@@ -40,6 +42,7 @@ class MarkMapper extends Mapper
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
 
+        $this->joins('return_id', SubmissionReturnMapper::class, 'id', self::TYPE_MODEL, null, 'feedback', 'submission_return');
         $this->joins('student_id', UserMapper::class, 'id', null, null, null, 'user');
         $this->joins('descriptor_id', DescriptorMapper::class, 'id', null, null, null, 'descriptor');
 
@@ -59,9 +62,11 @@ class MarkMapper extends Mapper
     {
         return "
             SELECT  {$this->getColumnString()},
+                    {$this->getJoinColumnString('submission_return', 'r')},
                     {$this->getJoinColumnString('user', 'u')},
                     {$this->getJoinColumnString('descriptor', 'd')}
             FROM {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('submission_return', '', 'r')}
             LEFT JOIN {$this->getJoinSql('user', '', 'u')}
             LEFT JOIN {$this->getJoinSql('descriptor', '', 'd')}
         ";
@@ -75,6 +80,7 @@ class MarkMapper extends Mapper
     protected function hydrateSelect(PDOStatement $statement)
     {
         $marks = $this->createCollection();
+        $feedback = $this->getJoinMapper('submission_return')->createModel();
         $students = $this->getJoinMapper('user')->createCollection();
         $descriptors = $this->getJoinMapper('descriptor')->createCollection();
 
@@ -82,6 +88,8 @@ class MarkMapper extends Mapper
         $descriptorKey = "d.{$this->getJoinMapper('descriptor')->getIdentifierColumn()}";
 
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
+
+            /** @var IFeedback $feedback */
 
             $userId = $r[$studentKey];
             if(!$students->offsetExists($userId)){
@@ -98,6 +106,7 @@ class MarkMapper extends Mapper
             $descriptor = $descriptors->getOffset($descriptorId);
 
             $mark = $this->hydrate($r);
+            $mark->setFeedback($feedback);
             $mark->setStudent($student);
             $mark->setDescriptor($descriptor);
             $marks->add($mark);

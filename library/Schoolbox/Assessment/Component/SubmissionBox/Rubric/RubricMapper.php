@@ -22,6 +22,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\IMapper;
 use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\AssessmentContext;
@@ -713,10 +714,11 @@ class RubricMapper
      * Save rubrics selections for a particular Participant
      *
      * @param Participant $participant
+     * @param IFeedback   $feedback
      * @param bool[]      $descriptors key = descriptor.id, val = whether it is checked
      * @param bool        $isDraft Whether these are draft marks
      */
-    public function saveForParticipant(Participant $participant, array $descriptors = [], $isDraft)
+    public function saveForParticipant(Participant $participant, array $descriptors = [], $isDraft, IFeedback $feedback)
     {
         $descriptorMapper   = DescriptorMapper::getInstance();
         $markMapper         = MarkMapper::getInstance();
@@ -734,6 +736,7 @@ class RubricMapper
 
             $marksToSave->add(
                 $markMapper->createModel()
+                    ->setFeedback($feedback)
                     ->setStudent($participant->getUser())
                     ->setDescriptor($descriptorMapper->createModel($descriptorId))
                     ->setPublishedAt($publishedAt)

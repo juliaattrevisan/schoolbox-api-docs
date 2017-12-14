@@ -93,8 +93,8 @@ class Controller extends Base
         $post = $this->getRequest()->post->getArrayCopy();
 
         try {
-            $this->processFeedback($participant, $mostRecentFeedback, $post);
-            $this->processRubric($participant, $post);
+            $feedback = $this->processFeedback($participant, $mostRecentFeedback, $post);
+            $this->processRubric($participant, $post, $feedback);
         }
         catch (RangeException $e) {
             $this->sendError('Invalid mark provided');
@@ -170,8 +170,9 @@ class Controller extends Base
      *
      * @param Participant $participant
      * @param array       $post
+     * @param IFeedback   $feedback
      */
-    protected function processRubric(Participant $participant, array $post)
+    protected function processRubric(Participant $participant, array $post, IFeedback $feedback)
     {
         if(!$participant->getAssessable() instanceof DueWork\Model){
             return;
@@ -184,7 +185,7 @@ class Controller extends Base
         // Did we just give some rubric marks?
         if (is_array($post['rubric'])) {
             $rubMap = RubricMapper::getInstance();
-            $rubMap->saveForParticipant($participant, $post['rubric']['descriptors'], $isDraft);
+            $rubMap->saveForParticipant($participant, $post['rubric']['descriptors'], $isDraft, $feedback);
         }
         // Else did we just publish draft marks via the status page?
         elseif(!$isDraft){
@@ -205,8 +206,8 @@ class Controller extends Base
         $mostRecentFeedback = $participant->findMostRecentFeedback();
 
         try {
-            $this->processFeedback($participant, $mostRecentFeedback, $this->getRequest()->post, $response);
-            $this->processRubric($participant, $this->getRequest()->post->getArrayCopy());
+            $feedback = $this->processFeedback($participant, $mostRecentFeedback, $this->getRequest()->post, $response);
+            $this->processRubric($participant, $this->getRequest()->post->getArrayCopy(), $feedback);
         }
         catch (RangeException $e) {
             $this->sendError('Invalid mark provided');
