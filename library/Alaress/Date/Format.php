@@ -415,14 +415,14 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
                     // I have a datetime, but it's not what I expected. Warn the user.
                     // This date will also fail isValid()
                     $this->warnings = $errors['warnings'];
-                    /*trigger_error(
+                    trigger_error(
                         sprintf(
                             'LaravelDate creation raised %d warnings: (%s)',
                             $errors['warning_count'],
                             implode(', ', $errors['warnings'])
                         ),
                         E_USER_WARNING
-                    );*/
+                    );
                 }
 
                 // Did I specify a timezone? If not, set it to the default
