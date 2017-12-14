@@ -657,4 +657,14 @@ class Model extends AbstractAssessment
         $this->selfReflectable = $selfReflectable;
         return $this;
     }
+
+    /**
+     * Alias for `getSelfReflectable()`
+     *
+     * @return bool
+     */
+    public function isSelfReflectable() : ?bool
+    {
+        return $this->selfReflectable;
+    }
 }

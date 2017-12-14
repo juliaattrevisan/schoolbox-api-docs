@@ -65,8 +65,10 @@ class CanSelfAssess implements IAuthorizationRule
         }
 
         // Error out if assessment is not self-assessable
-        if (!$assessment->isSelfAssessable()) {
-            throw new Unauthorized('', ErrorMapper::ERROR_NO_SELF_ASSESS);
+        if (!($assessment->isSelfAssessable())) {
+            if ($assessment instanceof DueWorkModel && !$assessment->isSelfReflectable()) {
+                throw new Unauthorized('', ErrorMapper::ERROR_NO_SELF_ASSESS);
+            }
         }
 
         // Check logged in user is the participant
