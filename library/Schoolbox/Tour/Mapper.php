@@ -50,6 +50,9 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
+        /** @var UserMapper $authorUserMapper */
+        $authorUserMapper = $this->getJoinMapper('author');
+
         $collection = $this->createCollection();
 
         foreach ($statement as $row) {
@@ -58,9 +61,6 @@ class Mapper extends BaseMapper
 
             if ($model instanceof Model) {
                 // Hydrate author
-
-                /** @var UserMapper $authorUserMapper */
-                $authorUserMapper = $this->getJoinMapper('author');
 
                 /** @var User $author */
                 $author = $authorUserMapper->hydrate($row, 'a');
