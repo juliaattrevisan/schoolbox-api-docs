@@ -1,5 +1,7 @@
 <?php
 /**
+ * help.schoolbox.com.au
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -16,9 +18,6 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplement
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder;
-
-ini_set('max_execution_time', 300);
-ini_set('memory_limit', -1);
 
 class Controller extends Base
 {
