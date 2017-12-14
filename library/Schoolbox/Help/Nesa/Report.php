@@ -55,6 +55,33 @@ class Report
      */
     private $unitImplementationMapper;
 
+    /**
+     * Query used to get all the Assessments in every Implementation of Course Spec Id :courseSpecId
+     *
+     * - The help course consists of multiple projects, which contain assessments
+     * - The rubrics only apply to Due Works so we join on submission_box to exclude all other types
+     * - Some assessment records contain 0000-00-00 in their created_at field (ignore these, laravel dies)
+     *
+     * @var string
+     */
+    private $query = '
+        SELECT a.id
+        FROM course_specification cs
+        INNER JOIN course_implementation ci ON ci.`course_specification_id` = cs.`id`
+        INNER JOIN course_unit_implementation cui ON cui.`course_implementation_id` = ci.`id`
+        INNER JOIN assessment_course_unit_implementation acui ON acui.course_unit_implementation_id = cui.`id`
+        INNER JOIN project p ON acui.`assessment_id` = p.`assessment_id`
+        INNER JOIN project_assessment pa ON pa.`project_id` = p.`id`
+        INNER JOIN assessment a ON pa.`assessment_id` = a.`id`
+        INNER JOIN submission_box sb ON sb.`assessment_id` = a.`id`  
+        WHERE cs.id = :courseSpecId
+        AND cs.deleted_at IS NULL
+        AND ci.deleted_at IS NULL
+        AND cui.deleted_at IS NULL
+        AND p.deleted_at IS NULL
+        AND a.deleted_at IS NULL
+        AND a.created_at != "0000-00-00 00:00:00"
+    ';
 
     /**
      * Nesa constructor.
@@ -82,6 +109,31 @@ class Report
         $this->unitImplementationMapper = $unitImplementationMapper;
     }
 
+
+    /**
+     * Find all the assessment ids that spawned from $courseSpecId
+     * Use a custom query, otherwise it's just too slow
+     *
+     * @return array
+     */
+    private function findAssessmentIds()
+    {
+        $assessmentMapper = Mapper::getInstance();
+        $statement = $assessmentMapper->getDatabase()->prepare($this->query);
+        $statement->execute([
+            'courseSpecId' => $this->courseSpecId
+        ]);
+
+        $ids = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $ids[] = $row['id'];
+        }
+return [17167];//array_slice($ids, 0, 100);
+        return $ids;
+    }
+
+
     /**
      * Find all the Unit Implementations for Teacher Course
      *
@@ -94,80 +146,56 @@ class Report
      */
     public function generate()
     {
-        $assessmentMapper = Mapper::getInstance();
-        var_dump($assessmentMapper->findByColumn('uis.id', $this->courseSpecId)->map(function($a) { return $a->getId(); }));
-        exit;
-
-
         /* A condensed version of the output stack that discards the capability/indicator hierarchy
          * and provides you the descriptor outputs, dumping them into a hashtable
          */
         $condensedData = [];
 
-        $allCourseImplementations = $this->courseImplementationMapper->findAllByCourseSpecificationId($this->courseSpecId);
+        /* All the assessments to investigate
+         */
+        $assessmentIds = $this->findAssessmentIds();
 
-        foreach($allCourseImplementations as $currentCourseImplementation) {
-            $allUnitImplementations = $this->unitImplementationMapper->findAllByCourseId($currentCourseImplementation->getId());
+        $allAssessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
+        $allAssessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($allAssessments, null, false, false);
 
-            /* Load participants into this assessment
-             */
-            foreach ($allUnitImplementations as $currentUnitImplementation) {
-                $allAssessments = $this->assessmentMapperProxy->findAllByUnitImplementationId($currentUnitImplementation->getId());
-//
-//                /* Investigate, collate, then discard
-//                 */
-//                foreach ($allAssessments as $currentAssessment) {
-//                    $assessment = $this->assessmentMapperProxy->loadParticipantsIntoAssessment($currentAssessment, null, false, false);
-//
-//                    if ($assessment instanceof DueWork\Model) {
-//                        $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
-//
-//                        foreach ($assessment->getAllParticipants() as $currentParticipant) {
-//                            $context = (new RubricContext($this->rubricMapper))
-//                                        ->generateMarkable($assessment, $currentParticipant->getUser());
-//
-//                            /* Investigate the context for the user and assessment and find the chosen descriptors that
-//                             * exist in the set of rubric groups and criteria
-//                             */
-//                            $current = $this->investigate(
-//                                $currentParticipant->getUser(),
-//                                $assessment,
-//                                $context['rubric'],
-//                                $this->indicators
-//                            );
-//
-//                            /* Store first stack of condensed descriptor data for this user into a hashtable
-//                             * Otherwise merge into existing
-//                             */
-//                            if (!isset($condensedData[$current['user']->getId()])) {
-//                                $condensedData[$current['user']->getId()] = [
-//                                    'user' => [
-//                                        'id' => $current['user']->getId(),
-//                                        'firstname' => $current['user']->getFirstname(),
-//                                        'lastname' => $current['user']->getLastname(),
-//                                        'fullname' => $current['user']->getFullname()
-//                                    ],
-//                                    'condensed' => $current['condensed']
-//                                ];
-//                            } else {
-//                                $existingIndicators = $condensedData[$current['user']->getId()]['condensed'];
-//                                $additionalIndicators = $current['condensed'];
-//
-//                                $condensedData[$current['user']->getId()]['condensed'] = array_merge($existingIndicators, $additionalIndicators);
-//                            }
-//                        }
-//                    }
-//
-//                    unset($assessment);
-//                }
-//
-//                unset($allAssessments);
+        foreach ($allAssessments as $assessment) {
+            $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
+
+            foreach ($assessment->getAllParticipants() as $currentParticipant) {
+                $context = (new RubricContext($this->rubricMapper))
+                            ->generateMarkable($assessment, $currentParticipant->getUser());
+
+                /* Investigate the context for the user and assessment and find the chosen descriptors that
+                 * exist in the set of rubric groups and criteria
+                 */
+                $current = $this->investigate(
+                    $currentParticipant->getUser(),
+                    $assessment,
+                    $context['rubric'],
+                    $this->indicators
+                );
+
+                /* Store first stack of condensed descriptor data for this user into a hashtable
+                 * Otherwise merge into existing
+                 */
+                if (!isset($condensedData[$current['user']->getId()])) {
+                    $condensedData[$current['user']->getId()] = [
+                        'user' => [
+                            'id' => $current['user']->getId(),
+                            'firstname' => $current['user']->getFirstname(),
+                            'lastname' => $current['user']->getLastname(),
+                            'fullname' => $current['user']->getFullname()
+                        ],
+                        'condensed' => $current['condensed']
+                    ];
+                } else {
+                    $existingIndicators = $condensedData[$current['user']->getId()]['condensed'];
+                    $additionalIndicators = $current['condensed'];
+
+                    $condensedData[$current['user']->getId()]['condensed'] = array_merge($existingIndicators, $additionalIndicators);
+                }
             }
-
-            unset($allUnitImplementations);
         }
-
-        unset($allCourseImplementations);
 
         return $condensedData;
     }
