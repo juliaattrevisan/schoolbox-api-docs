@@ -87,6 +87,13 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
                 ->findAllByCourseSpecificationId(Nesa\Acquisition::NESA_COURSE_SPEC_ID);
 
             foreach ($allCourseImplementations as $currentCourseImplementation) {
+                $folderId = $currentCourseImplementation->getFolder()->getId();
+                $folderName = $currentCourseImplementation->getFolder()->getTitle();
+
+                $log->critical("Acquiring {$folderId} {$folderName}");
+
+                $start = microtime(true);
+
                 $dataSet = (new Nesa\Acquisition(
                     $indicators,
                     Rubric\RubricMapper::getInstance(),
@@ -98,7 +105,11 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
                 /* Save it to the db
                  */
 
-                $log->critical("Acquiring {$folderId}: {$resultFragment}");
+                $end = microtime(true);
+
+                $duration = ($end - $start);
+
+                $log->critical("Acquired {$folderId} {$folderName} in {$duration} sec");
             }
         }
     }
