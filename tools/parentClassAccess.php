@@ -3,13 +3,17 @@
 
 require_once __DIR__ . '/../library/Bootstrap.php';
 
+use Alaress\Redis;
 use \Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
 use \Schoolbox\Role;
-use \Schoolbox\UserMapper as UserMapper;
-use \Schoolbox\Permission\Access\UserAccessMapper as UserAccessMapper;
+use \Schoolbox\UserMapper;
+use \Schoolbox\Permission\Access\UserAccessMapper;
 use \Schoolbox\Permission\Access\UserAccess as UserAccessModel;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Alaress\Lumberjack\Logger;
+use Schoolbox\Realtime\Routing\Subscription\Loader;
+use Schoolbox\Notif\Queue\Bindings;
 
 /**
  * Retrieve all parents of students in the specified subject
@@ -43,6 +47,9 @@ $folderMapper = FolderMapper::getInstance();
 $externalUser = new \External_User();
 $classHandler = new \External_Class();
 
+// suppress the route cache mutations
+$userAccessMapper->unregisterCallbacks();
+
 $log = new Logger(STDOUT, STDERR);
 
 $options = getopt("f:", ['students', 'dry-run']);
@@ -61,13 +68,14 @@ $loadStudents = isset($options['students']);
 $dryRun       = isset($options['dry-run']);
 
 /**
- * @param UserMapper $userMapper
+ * @param UserMapper       $userMapper
  * @param UserAccessMapper $userAccessMapper
- * @param Logger $log
- * @param int $externalId
- * @param string $role
- * @param int $folderId
- * @param bool $dryRun
+ * @param Logger           $log
+ * @param int              $externalId
+ * @param string           $role
+ * @param int              $folderId
+ * @param bool             $dryRun
+ * @throws PDOException
  */
 function loadUserAccess($userMapper, $userAccessMapper, $log, $externalId, $role, $folderId, $dryRun)
 {
@@ -101,13 +109,15 @@ function loadUserAccess($userMapper, $userAccessMapper, $log, $externalId, $role
         }
     } catch (MapperException $e) {
         $log->error("\tError:    External {$role} user ID not found {$externalId}");
+    } catch (UnexpectedValueException $e) {
+        $log->error("\tError:    {$e->getMessage()}");
     }
 }
 
 $folders = [];
 $classes = [];
 
-$handle = fopen($options['f'], "r");
+$handle = fopen($options['f'], 'rb');
 
 if ($handle) {
     while (($row = fgetcsv($handle)) !== false) {
@@ -127,7 +137,7 @@ if ($handle) {
     fclose($handle);
 } else {
     // Couldn't read file
-    $log->error("Could not locate file to import.");
+    $log->error('Could not locate file to import.');
     exit;
 }
 
@@ -208,4 +218,20 @@ foreach ($classes as $folderId => $codes) {
             }
         }
     }
+}
+
+$redis = Redis::getClientInstance();
+
+// manually refresh the binding cache
+$factory = (new Loader\Factory($redis, $log))
+    ->setGenerator(new Bindings\Generator())
+    ->setUserMapper($userMapper);
+
+$cache = new WriteCache($redis, $log, $factory);
+
+// do it.
+try {
+    $cache->cacheAllUsers(INSTANCE_ID);
+} catch (UnderflowException $e) {
+    $log->notice($e->getMessage(), [ $e ]);
 }
