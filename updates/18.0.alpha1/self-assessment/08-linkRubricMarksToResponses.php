@@ -122,7 +122,7 @@ class LinkRubricMarkToFeedback
 
     private $countBrokenRubricMarks = 0;
     private $countPropagatedRubricMarks = 0;
-    private $logPropagatedRubricMarks = '';
+    private $logPropagatedRubricMarks = [];
     private $countLinkedPublishedFeedbacks = 0;
     private $countLinkedDraftFeedbacks = 0;
     private $countCombinedDrafts = 0;
@@ -569,7 +569,10 @@ class LinkRubricMarkToFeedback
             );
             $propagatedRecords[] = $this->db->lastInsertId();
         }
-        $this->logPropagatedRubricMarks = sprintf('[%d: %s]', $feedback['id'], implode($propagatedRecords, ','));
+        $this->logPropagatedRubricMarks[] = [
+            'feedbackId' => $feedback['id'],
+            'markIds'    => $propagatedRecords,
+        ];
         $this->countPropagatedRubricMarks++;
         $this->countLinkedPublishedFeedbacks++;
 
@@ -688,7 +691,16 @@ class LinkRubricMarkToFeedback
     private function printLog()
     {
         $this->log->notice(sprintf('Broken descriptor sets: %d', $this->countBrokenRubricMarks));
-        $this->log->notice(sprintf('Total propagated rubric marks: %d %s', $this->countPropagatedRubricMarks, $this->logPropagatedRubricMarks));
+        $this->log->notice(sprintf('Total propagated rubric marks: %d', $this->countPropagatedRubricMarks));
+        foreach ($this->logPropagatedRubricMarks as $propagatedRubricMark) {
+            $this->log->debug(
+                sprintf(
+                    'Feedback %d: [%s]',
+                    $propagatedRubricMark['feedbackId'],
+                    implode($propagatedRubricMark['markIds'], ',')
+                )
+            );
+        }
         $this->log->notice(sprintf('Total published feedbacks linked: %d', $this->countLinkedPublishedFeedbacks));
         $this->log->notice(sprintf('Total draft feedbacks linked: %d', $this->countLinkedDraftFeedbacks));
         $this->log->notice(sprintf('Total combined draft rubric marks: %d for feedbacks %s', $this->countCombinedDrafts, implode($this->logCombinedDraftFeedbacks, ',')));
