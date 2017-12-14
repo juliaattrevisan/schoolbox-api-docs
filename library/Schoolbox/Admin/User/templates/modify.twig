@@ -364,9 +364,9 @@
                             </div>
                             <div class="small-4 card end">
                                 <select name="type" form="serviceCloneForm" required>
-                                    <option value="1">Read</option>
-                                    <option value="2">Write</option>
-                                    <option value="3">Moderate</option>
+                                    <option id="read" value="1">Read</option>
+                                    <option id="write" value="2">Write</option>
+                                    <option id="moderate" value="3">Moderate</option>
                                 </select>
                             </div>
                             <div class="small-12 card">
@@ -549,6 +549,23 @@
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript">
     $(function () {
+
+        {# Hide Read and Write permission options in dropdown for certain services #}
+
+        $("#serviceSelect").change(function(e) {
+            var selectedServiceId = $(e.target).val();
+            var moderateOnlyServices = ["7", "9", "10"]; // TODO magic numbers are bad
+
+            if (moderateOnlyServices.indexOf(selectedServiceId) !== -1) {
+                $("#read").hide().removeAttr("selected");
+                $("#write").hide()
+                $("#moderate").attr("selected", 1);
+            } else {
+                $("#read").show().attr("selected", 1);
+                $("#write").show()
+                $("#moderate").removeAttr("selected");
+            }
+        });
 
         {# Validate user details#}
 
