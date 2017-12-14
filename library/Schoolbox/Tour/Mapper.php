@@ -13,6 +13,13 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+/**
+ * Class Mapper
+ *
+ * @method Model createModel($id = null)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @package Schoolbox\Tour
+ */
 class Mapper extends BaseMapper
 {
     /**
@@ -62,9 +69,7 @@ class Mapper extends BaseMapper
             if ($model instanceof Model) {
                 // Hydrate author
 
-                /** @var User $author */
-                $author = $authorUserMapper->hydrate($row, 'a');
-                $model->setAuthor($author);
+                $model->setAuthor($authorUserMapper->hydrate($row, 'a'));
 
                 // Add hydrated record to results
 
