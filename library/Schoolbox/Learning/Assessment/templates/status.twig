@@ -97,6 +97,7 @@
                 {% set pStatusText      = '' %}
                 {% set pStatusClass     = '' %}
                 {% set pTooltip         = '' %}
+                {% set responseHistory  = locale.submissionHistory.proper %}
 
                 {% block config %}
                 <li data-status="{{ pStatusClass }}" data-participant="{{ participant.user.id }}" data-participant-name="{{ participant.user.fullName }}">
@@ -121,7 +122,7 @@
                                         <li><a class="icon-task" href="{{ pActionResponses }}" title="View submission for {{ participant.user.firstName }}">View {% if fbUrl %}and {{ locale.grades }} {% endif %}submission</a></li>
                                     {% endif %}
                                     {% if pActionSummary %}
-                                        <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s history">{{ locale.submissionHistory.proper }}</a></li>
+                                        <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s history">{{ responseHistory }}</a></li>
                                     {% endif %}
                                     {% block extra_nav_items %}{% endblock %}
                                 {% endspaceless -%}

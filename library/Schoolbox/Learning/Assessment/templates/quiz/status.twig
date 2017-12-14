@@ -48,6 +48,7 @@
     {% set latestResponse    = participant.findMostRecentResponse %}
     {% set latestFeedback    = latestResponse.findMostRecentFeedback %}
     {% set multipleResponses = participant.allResponses | length > 1 %}
+    {% set responseHistory   = locale.attemptHistory.proper %}
 
     {% set isPublished  = latestFeedback.published %}
     {% set canPublish   = latestFeedback and not isPublished %}
