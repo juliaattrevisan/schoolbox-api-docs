@@ -79,7 +79,7 @@ class UserAccessMapper extends Mapper
         $this->hasModel(UserAccess::class);
 
         $this->joins('uid', UserMapper::class, 'id', null, null, 'user', 'user');
-        $this->uses('service', self::TYPE_INTEGER, null);
+        $this->uses('service', self::TYPE_INTEGER);
         $this->uses('sid', self::TYPE_INTEGER, null, 'serviceIdentifier');
         $this->uses('type', self::TYPE_INTEGER, null, 'accessLevel');
 
@@ -87,6 +87,19 @@ class UserAccessMapper extends Mapper
         $this->registerCallback(self::CALLBACK_POSTDELETE, [ $this, 'calculateUserSubscription' ]);
     }
 
+
+    /**
+     * Removes any registered callbacks on this mapper
+     *
+     * @return $this
+     */
+    public function unregisterCallbacks(): self
+    {
+        $this->callback_queue[self::CALLBACK_POSTSAVE]   = [];
+        $this->callback_queue[self::CALLBACK_POSTDELETE] = [];
+
+        return $this;
+    }
 
     /**
      * We don't actually care about *how* the user's access has changed (added, removed, etc), only that it has.
