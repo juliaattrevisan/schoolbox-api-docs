@@ -557,11 +557,11 @@
             var moderateOnlyServices = ["7", "9", "10"]; // TODO magic numbers are bad
 
             if (moderateOnlyServices.indexOf(selectedServiceId) !== -1) {
-                $("#read").hide().removeAttr("selected");
+                $("#read").hide();
                 $("#write").hide()
                 $("#moderate").attr("selected", 1);
             } else {
-                $("#read").show().attr("selected", 1);
+                $("#read").show();
                 $("#write").show()
                 $("#moderate").removeAttr("selected");
             }
