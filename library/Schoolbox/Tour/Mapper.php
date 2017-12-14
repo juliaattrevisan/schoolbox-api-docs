@@ -91,7 +91,7 @@ class Mapper extends BaseMapper
     {
         $userQuery = $this->getUserFilterQuery($user);
 
-        $statement = $this->getDatabase()->prepare("{$this->getSelectString()} WHERE {$userQuery['sql']}");
+        $statement = $this->getDatabase()->prepare("{$this->getSelectString()} WHERE {$userQuery['query']}");
         $statement->execute($userQuery['bindings']);
 
         return $this->hydrateSelect($statement);
