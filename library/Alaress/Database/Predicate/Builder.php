@@ -125,11 +125,13 @@ class Builder implements IBuilder
     public function addColumnList(array $columnList)
     {
         foreach ($columnList as $columnName => $columnValue) {
-            $split = preg_split('/\\s+/', $columnName, 2);
-            if (count($split) > 1) {
-                $this->addPredicate($split[0], $columnValue, $split[1]);
-            } else {
-                $this->addPredicate($columnName, $columnValue);
+            if($columnValue !== null) {
+                $split = preg_split('/\\s+/', $columnName, 2);
+                if (count($split) > 1) {
+                    $this->addPredicate($split[0], $columnValue, $split[1]);
+                } else {
+                    $this->addPredicate($columnName, $columnValue);
+                }
             }
         }
 
