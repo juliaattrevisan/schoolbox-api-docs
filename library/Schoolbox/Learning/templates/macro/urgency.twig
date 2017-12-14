@@ -8,11 +8,9 @@
 {% macro datetime(assessable, user) %}
 {% spaceless %}
 
-{% if assessable.isParticipant(user) %}
-    {% if assessable.participant(user).allResponses|length == 0 %}
-        {% set urgency = (assessable.dueAt.unixTimestamp - date().format('U')) / 86400 %}
-        gradient-{{ max(0, min(10, urgency))|round(0, 'floor') }}
-    {% endif %}
+{% if assessable.participant(user).allResponses|length == 0 %}
+    {% set urgency = (assessable.dueAt.unixTimestamp - date().format('U')) / 86400 %}
+    gradient-{{ max(0, min(10, urgency))|round(0, 'floor') }}
 {% endif %}
 
 {% endspaceless %}
