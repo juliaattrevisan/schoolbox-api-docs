@@ -1,9 +1,9 @@
-{% macro demonstrated(value) %}
-    <span style="background-color:#aea;display:block;padding:3px;font-weight:bold;">Y</span>
+{% macro demonstrated(value, tooltip) %}
+    <span style="background-color:#aea;display:block;padding:3px;font-weight:bold;" title="{{ tooltip }}">Y</span>
 {% endmacro %}
 
-{% macro notDemonstrated(value) %}
-    <span style="background-color:#fdd;display:block;padding:3px;font-weight:bold;">N</span>
+{% macro notDemonstrated(value, tooltip) %}
+    <span style="background-color:#fdd;display:block;padding:3px;font-weight:bold;" title="{{ tooltip }}">N</span>
 {% endmacro %}
 
 {% import _self as macro %}
@@ -30,9 +30,9 @@
 
                         <td style="text-align:center">
                             {% if row.condensed[indicator]|length %}
-                                {{ macro.demonstrated('Y') }}
+                                {{ macro.demonstrated('Y', row.condensed[indicator]) }}
                             {% else %}
-                                {{ macro.notDemonstrated('N') }}
+                                {{ macro.notDemonstrated('N', row.condensed[indicator]) }}
                             {% endif %}
                         </td>
                         {% endfor %}
