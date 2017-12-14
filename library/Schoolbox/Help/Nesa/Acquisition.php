@@ -1,6 +1,8 @@
 <?php
 /**
- * Nesa Report
+ * Nesa Report Data Acquisition
+ *
+ * Get the rubric outcomes assigned to each participation
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
@@ -17,7 +19,7 @@ use Schoolbox\Learning\Assessment\DueWork\RubricContext;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
 
-class Report
+class Acquisition
 {
 
     /**
@@ -132,10 +134,9 @@ class Report
      */
     public function generate($folderId)
     {
-        /* A condensed version of the output stack that discards the capability/indicator hierarchy
-         * and provides you the descriptor outputs, dumping them into a hashtable
+        /* Results of investigation into each user's assessment participation
          */
-        $condensedData = [];
+        $raw = [];
 
         /* All the assessments to investigate
          */
@@ -154,36 +155,16 @@ class Report
                 /* Investigate the context for the user and assessment and find the chosen descriptors that
                  * exist in the set of rubric groups and criteria
                  */
-                $current = $this->investigate(
+                $raw[] = $this->investigate(
                     $currentParticipant->getUser(),
                     $assessment,
                     $context['rubric'],
                     $this->indicators
                 );
-
-                /* Store first stack of condensed descriptor data for this user into a hashtable
-                 * Otherwise merge into existing
-                 */
-                if (!isset($condensedData[$current['user']->getId()])) {
-                    $condensedData[$current['user']->getId()] = [
-                        'user' => [
-                            'id' => $current['user']->getId(),
-                            'firstname' => $current['user']->getFirstname(),
-                            'lastname' => $current['user']->getLastname(),
-                            'fullname' => $current['user']->getFullname()
-                        ],
-                        'condensed' => $current['condensed']
-                    ];
-                } else {
-                    $existingIndicators = $condensedData[$current['user']->getId()]['condensed'];
-                    $additionalIndicators = $current['condensed'];
-
-                    $condensedData[$current['user']->getId()]['condensed'] = array_merge($existingIndicators, $additionalIndicators);
-                }
             }
         }
 
-        return $condensedData;
+        return $raw;
     }
 
     /**

@@ -94,13 +94,21 @@ class Controller extends Base
         /** @var AssessmentMapperProxy $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
-        $report = (new Nesa\Report(
+        /* Acquire NESA data for $folder and the chosen indicators
+         */
+        $dataSet = (new Nesa\Acquisition(
             self::NESA_COURSE_SPEC_ID,
             $this->getRequest()->post['indicators'],
             Rubric\RubricMapper::getInstance(),
             $assessmentMapperProxy
         ))->generate($folder->getId());
 
+        /* Process the $dataSet into a visual report
+         */
+        $report = (new Nesa\Aggregation($dataSet))->generate();
+
+        /* The usual output
+         */
         $this->getResponse()->content->set($this->buildHtmlOutput('@help/report.twig', [
             'report' => $report,
             'folder' => $folder,
