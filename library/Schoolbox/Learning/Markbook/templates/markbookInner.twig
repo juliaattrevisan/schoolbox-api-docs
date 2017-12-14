@@ -157,12 +157,30 @@
                             {% if assessment.isParticipant(student) %}
                                 {% set participant = assessment.getParticipant(student) %}
                                 {% if assessment is task %}
-                                    {# An icon that shows if the student has attempted the task or not #}
-                                    {% include '@learningAssessment/fragments/progressTick.twig' with {
-                                        assessment: assessment,
-                                        participant: participant,
-                                        writable: writable[assessment.id]
-                                    } only %}
+                                    <form action="{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: assessment.id, participant: participant, studentId: participant.user.id}) }}"
+                                          method="POST"
+                                          class="progress-tick-form"
+                                          data-progress-tick-form="{{ assessment.isSelfAssessable ? 'selfAssessed' : 'teacherAssessed' }}">
+                                        {% if participant.isResponseRequired %}
+                                            <a href="#"
+                                               disabled
+                                               class="no-text progress-tick"
+                                               title="Incomplete"
+                                               data-progress-tick-status="incomplete"></a>
+                                        {% elseif participant.isFeedbackRequired %}
+                                            <a href="#"
+                                               disabled
+                                               class="no-text progress-tick pending"
+                                               title="Self-assessed"
+                                               data-progress-tick-status="selfAssessed"></a>
+                                        {% elseif participant.isReviewComplete %}
+                                            <a href="#"
+                                               disabled
+                                               class="no-text progress-tick reviewed"
+                                               title="Completed"
+                                               data-progress-tick-status="teacherAssessed"></a>
+                                        {% endif %}
+                                    </form>
                                 {% else %}
                                     {% set normalisedMark = participant.normalisedMark(false) %}
                                     {% set label = participant.hasSubmittedResponse and not participant.hasPublishedFeedback
