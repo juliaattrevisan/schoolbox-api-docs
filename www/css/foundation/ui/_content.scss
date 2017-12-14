@@ -1655,6 +1655,13 @@ $train-line-unvisited-color: $content-ui-background;
 article {
     @extend .clearfix;
 }
+// Scroll WYSIWYG content areas when wide tables exist.
+@media #{$medium-down} {
+    article {
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+}
 
 /**
  * Foundation kills margins on lists inside lists (ul li ul)
