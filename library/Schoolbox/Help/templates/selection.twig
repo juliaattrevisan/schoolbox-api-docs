@@ -1,31 +1,30 @@
 <div class="row">
-    <div class="small-12 island">
+    <div class="small-12 columns">
         <h1>NESA Report</h1>
 
-        <section>
-            <form action="{{ routeLookup('help.postNesa') }}" method="post">
-                <table>
-                    <thead>
-                        <th></th>
-                        <th>Capability</th>
-                        <th>Indicator</th>
-                        <th>Descriptor</th>
-                    </thead>
+        <h2 class="subheader">{{ course.title }}</h2>
+        <form action="{{ routeLookup('help.postNesa') }}" method="post">
+            <table>
+                <thead>
+                    <th></th>
+                    <th>Capability</th>
+                    <th>Indicator</th>
+                    <th>Descriptor</th>
+                </thead>
 
-                    {% for id, data in descriptors  %}
-                    <tr>
-                        <td>
-                            <input id="descriptor-{{ data.id }}" name='descriptors[]' type="checkbox" value="{{ data.description }}" />
-                            <label for="descriptor-{{ data.id }}" class="checkbox-label"></label>
-                        </td>
-                        <td>{{ data.criterion.grouping }}</td>
-                        <td>{{ data.criterion.name }}</td>
-                        <td>{{ data.description }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-                <input type="submit" value="Generate" />
-            </form>
-        </section>
+                {% for id, data in descriptors  %}
+                <tr>
+                    <td>
+                        <input id="descriptor-{{ data.id }}" name='descriptors[]' type="checkbox" value="{{ data.description }}" />
+                        <label for="descriptor-{{ data.id }}" class="checkbox-label"></label>
+                    </td>
+                    <td>{{ data.criterion.grouping }}</td>
+                    <td>{{ data.criterion.name }}</td>
+                    <td>{{ data.description }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            <input type="submit" value="Generate" />
+        </form>
     </div>
 </div>

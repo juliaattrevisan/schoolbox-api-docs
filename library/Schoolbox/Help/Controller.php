@@ -13,6 +13,7 @@ use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
 class Controller extends Base
@@ -41,19 +42,26 @@ class Controller extends Base
 
 
     /**
-     * NESA Report
+     * NESA Report rubric selection
+     *
+     * Selection of capabilities, indicators, descriptors which are used to configure a report output
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getNesa()
     {
+        $courseSpecification = CourseSpecificationMapper::getInstance()->findById(self::NESA_COURSE_SPEC_ID);
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@help/selection.twig', [
+            'course' => $courseSpecification,
             'descriptors' => (new Nesa\Selector(self::NESA_COURSE_SPEC_ID))->generate()
         ]));
     }
 
 
     /**
+     * NESA Report generation
+     *
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function postNesa()
