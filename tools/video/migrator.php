@@ -18,8 +18,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MapperFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Model as Storage;
-use Schoolbox\Video\Mapper as VideoMapper;
-use Schoolbox\Video\Model as Video;
+use Schoolbox\Video\Queue;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -52,9 +51,6 @@ try {
             $log->critical("Unknown service requested");
             exit;
         }
-
-        /** @var VideoMapper $videoMapper */
-        $videoMapper = $mapperFactory->get(VideoMapper::class);
 
         /** @var ConfigMapper $configMapper */
         $configMapper = $mapperFactory->get(ConfigMapper::class);
@@ -128,7 +124,7 @@ try {
         // Videos need to be migrated first so that the thumbnails/posters have something to be associated with
 
         $log->info("Processing videos...");
-        $results = uploadArrayToStorage($log, $videos, $storageMapper, $videoMapper, VideoMapper::TYPE_VIDEO);
+        $results = uploadArrayToStorage($log, $videos, $storageMapper, Queue::TYPE_VIDEO);
 
         $success += $results["success"];
         $failed  += $results["failed"];
@@ -138,7 +134,7 @@ try {
         // ------------------------------------------------------------------------------------------------------------
 
         $log->info("Processing posters...");
-        $results = uploadArrayToStorage($log, $posters, $storageMapper, $videoMapper, VideoMapper::TYPE_POSTER);
+        $results = uploadArrayToStorage($log, $posters, $storageMapper, Queue::TYPE_POSTER);
 
         $success += $results["success"];
         $failed  += $results["failed"];
@@ -148,7 +144,7 @@ try {
         // ------------------------------------------------------------------------------------------------------------
 
         $log->info("Processing thumbnails...");
-        $results = uploadArrayToStorage($log, $thumbnails, $storageMapper, $videoMapper, VideoMapper::TYPE_THUMBNAIL);
+        $results = uploadArrayToStorage($log, $thumbnails, $storageMapper, Queue::TYPE_THUMBNAIL);
 
         $success += $results["success"];
         $failed  += $results["failed"];
@@ -185,12 +181,11 @@ try {
  * @param LoggerInterface $log
  * @param array           $filenames
  * @param StorageMapper   $storageMapper
- * @param VideoMapper     $videoMapper
  * @param string          $type
  *
  * @return array
  */
-function uploadArrayToStorage(LoggerInterface $log, array $filenames, StorageMapper $storageMapper, VideoMapper $videoMapper, $type)
+function uploadArrayToStorage(LoggerInterface $log, array $filenames, StorageMapper $storageMapper, $type)
 {
     $log->info("");
 
@@ -206,7 +201,7 @@ function uploadArrayToStorage(LoggerInterface $log, array $filenames, StorageMap
         $log->info("    - Source File:            {$filename}");
         $log->info(getDisplayFileSize($filename));
 
-        if (uploadToStorage($log, $filename, $storageMapper, $videoMapper, $type)) {
+        if (uploadToStorage($log, $filename, $storageMapper, $type)) {
             $success++;
         } else {
             $log->error("    - Failed:                 {$filename}");
@@ -230,12 +225,11 @@ function uploadArrayToStorage(LoggerInterface $log, array $filenames, StorageMap
  * @param LoggerInterface $log
  * @param string          $filename
  * @param StorageMapper   $storageMapper
- * @param VideoMapper     $videoMapper
  * @param string          $type
  *
  * @return bool
  */
-function uploadToStorage(LoggerInterface $log, $filename, StorageMapper $storageMapper, VideoMapper $videoMapper, $type)
+function uploadToStorage(LoggerInterface $log, $filename, StorageMapper $storageMapper, $type)
 {
     // ----------------------------------------------------------------------------------------------------------------
     // Retrieve existing video storage object
@@ -244,7 +238,7 @@ function uploadToStorage(LoggerInterface $log, $filename, StorageMapper $storage
     // Extract the hash from the filename
 
     try {
-        if ($type == VideoMapper::TYPE_VIDEO) {
+        if ($type == Queue::TYPE_VIDEO) {
             $filenameArray = explode(".mp4", $filename);
         } else {
             $filenameArray = explode("-", $filename);
@@ -269,7 +263,7 @@ function uploadToStorage(LoggerInterface $log, $filename, StorageMapper $storage
         // Sadly the storage system requires that any file uploaded fakes a PHP file upload and thus is located in the
         // system temp folder- so we have to move the file there for no good reason
 
-        if ($type == VideoMapper::TYPE_VIDEO) {
+        if ($type == Queue::TYPE_VIDEO) {
             $filenameTemp = getTempFilename(basename($filename), "mp4");
         } else {
             $filenameTemp = getTempFilename(basename($filename), "jpg");
@@ -277,7 +271,7 @@ function uploadToStorage(LoggerInterface $log, $filename, StorageMapper $storage
 
         rename($filename, $filenameTemp);
 
-        if ($type == VideoMapper::TYPE_VIDEO) {
+        if ($type == Queue::TYPE_VIDEO) {
             // If the file doesn't exist in storage, create it- and update the size in the corresponding storage row
 
             if (!$videoStorage->getFilesystem()->has($videoStorage->getPath())) {
@@ -286,57 +280,21 @@ function uploadToStorage(LoggerInterface $log, $filename, StorageMapper $storage
                 $storageMapper->save($videoStorage);
             }
         } else {
-            // Thumbnails and posters can just be uploaded as per normal because they have never been stored
-            // inside the storage architecture before
+            $filenameImage = "{$videoStorage->getPath()}-{$type}";
 
-            $storageObject = $storageMapper->accept("{$videoStorage->getFilename()}-{$type}.jpg", $filenameTemp);
+            $log->info("    - Uploaded Filename:      {$videoStorage->getPath()}-{$type}");
+
+            if ($videoStorage->getFilesystem()->has($filenameImage)) {
+                $videoStorage->getFilesystem()->update($filenameImage, file_get_contents($filenameTemp));
+            } else {
+                $videoStorage->getFilesystem()->write($filenameImage, file_get_contents($filenameTemp));
+            }
         }
     } catch (MapperException $e) {
         $log->error("    - Failed:                 Unable to upload to storage");
 
         return false;
     }
-
-    // ----------------------------------------------------------------------------------------------------------------
-    // Create/update video record that links the video to its thumbnail/poster
-    // ----------------------------------------------------------------------------------------------------------------
-
-    // Try to retrieve existing video record
-
-    try {
-        /** @var Video $video */
-        $video = $videoMapper->findOneByColumn('video_hash', $hash);
-    } catch (MapperException $e) {
-        // There was no existing video record, we need to create a new one
-
-        try {
-            $video = $videoMapper->createModel();
-            $video->setVideo($videoStorage);
-        } catch (MapperException $e) {
-            $log->error("    - Failed:                 Unable to create new video record");
-
-            return false;
-        }
-    }
-
-    if (isset($storageObject) && $storageObject instanceof Storage) {
-        switch ($type) {
-            case VideoMapper::TYPE_POSTER:
-                $video->setPoster($storageObject);
-                break;
-
-            case VideoMapper::TYPE_THUMBNAIL:
-                $video->setThumbnail($storageObject);
-                break;
-
-            default:
-                $log->error("    - Failed:                 Unknown migration type specified ({$type})");
-
-                return false;
-        }
-    }
-
-    $videoMapper->save($video);
 
     return true;
 }

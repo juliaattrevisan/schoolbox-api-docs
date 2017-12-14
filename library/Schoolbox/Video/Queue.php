@@ -18,18 +18,20 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
-use Schoolbox\Video\Mapper as VideoMapper;
-use Schoolbox\Video\Model as Video;
 
 class Queue extends ResourceVideo
 {
     use CreatedAtDate;
     use UpdatedAtDate;
 
+    const TYPE_VIDEO     = 'video';
+    const TYPE_POSTER    = 'poster';
+    const TYPE_THUMBNAIL = 'thumbnail';
+
     /** Define external application names we will use */
-    const APPLICATION_AVCONV  = 'avconv';
+    const APPLICATION_AVCONV = 'avconv';
     const APPLICATION_AVPROBE = 'ffprobe';
-    const APPLICATION_FFMPEG  = 'ffmpeg';
+    const APPLICATION_FFMPEG = 'ffmpeg';
     const APPLICATION_FFPROBE = 'ffprobe';
 
     /** Maximum allowed timeout for processing video, 1 day */
@@ -75,14 +77,12 @@ class Queue extends ResourceVideo
     /** @var array Array of temporary files created during transcode */
     private $temporaryFiles = [];
 
+    /** @noinspection PhpUndefinedClassInspection */
     /** @var LoggerInterface $log Allow transcode logging */
     private $log = null;
 
     /** @var StorageMapper $storageMapper */
     private $storageMapper;
-
-    /** @var VideoMapper $videoMapper */
-    private $videoMapper;
 
     /**
      * Queue constructor
@@ -94,7 +94,6 @@ class Queue extends ResourceVideo
         // Grab mappers
 
         $this->storageMapper = StorageMapper::getInstance();
-        $this->videoMapper   = VideoMapper::getInstance();
 
         // Grab transcoding configuration
 
@@ -119,9 +118,11 @@ class Queue extends ResourceVideo
      *
      * @param LoggerInterface|null $logger Optional logger for debugging purposes
      *
-     * @returns bool
-     * @throws RuntimeException
+     * @return bool
+     *
      * @throws MapperException
+     * @throws \League\Flysystem\FileExistsException
+     * @throws \League\Flysystem\FileNotFoundException
      */
     public function process(LoggerInterface $logger = null)
     {
@@ -182,9 +183,10 @@ class Queue extends ResourceVideo
     /**
      * Take audio file and transcode into MP3 for playback via HTML5 <audio> tag
      *
-     * @returns bool
-     * @throws RuntimeException
+     * @return bool
+     *
      * @throws MapperException
+     * @throws \League\Flysystem\FileNotFoundException
      */
     public function processAudio()
     {
@@ -245,8 +247,10 @@ class Queue extends ResourceVideo
      * Takes existing file and transcode into web format and creates thumbnail
      *
      * @return bool
-     * @throws RuntimeException
+     *
      * @throws MapperException
+     * @throws \League\Flysystem\FileExistsException
+     * @throws \League\Flysystem\FileNotFoundException
      */
     public function processVideo()
     {
@@ -352,7 +356,7 @@ class Queue extends ResourceVideo
             // Upload thumbnail to storage
 
             $this->log("Uploading video thumbnail");
-            $thumbnail = $this->uploadPreviewImage($filenameTranscodeThumbnail, VideoMapper::TYPE_THUMBNAIL);
+            $this->uploadPreviewImage($filenameTranscodeThumbnail, self::TYPE_THUMBNAIL);
 
             // Create poster
 
@@ -373,30 +377,9 @@ class Queue extends ResourceVideo
             // Upload poster to storage
 
             $this->log("Uploading video poster");
-            $poster = $this->uploadPreviewImage($filenameTranscodePoster, VideoMapper::TYPE_POSTER);
+            $this->uploadPreviewImage($filenameTranscodePoster, self::TYPE_POSTER);
         } else {
             $this->log("Skipping thumbnail and poster generation");
-        }
-
-        // ------------------------------------------------------------------------------------------------------------
-        // Create record in 'video' table to link the video and its preview images
-        // ------------------------------------------------------------------------------------------------------------
-
-        try {
-            /** @var Video $video */
-            $video = $this->videoMapper->createModel();
-            $video->setVideo($this->getStorage());
-
-            // Set thumbnails if we generated them
-
-            if (isset($poster) && isset($thumbnail))  {
-                $video->setPoster($poster);
-                $video->setThumbnail($thumbnail);
-            }
-
-            $this->videoMapper->save($video);
-        } catch (MapperException $e) {
-            throw new RuntimeException("Error creating video record: {$e->getMessage()}");
         }
 
         return true;
@@ -407,14 +390,16 @@ class Queue extends ResourceVideo
     // ----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Upload the transcode over top of the existing file in storage
+     * @param $filename
      *
-     * @param string $filename
+     * @throws MapperException
+     * @throws \League\Flysystem\FileNotFoundException
      */
-    private function uploadTranscode($filename) {
-        $this->log("Uploading transcode to storage");
-        $this->storage->getFilesystem()->update($this->storage->getPath(), file_get_contents($filename));
-        $this->storage->setSize(filesize($filename));
+    private function uploadTranscode($filename)
+    {
+        $this->log("Overwriting storage with transcoded file");
+        $this->getStorage()->getFilesystem()->update($this->getStorage()->getPath(), file_get_contents($filename));
+        $this->getStorage()->setSize(filesize($filename));
         $this->storageMapper->save($this->storage);
 
         $this->log("Deleting local transcode file");
@@ -485,28 +470,25 @@ class Queue extends ResourceVideo
      * @param string $fileName Local filename to be uploaded
      * @param string $size     Size constant
      *
-     * @return Storage
+     * @throws \League\Flysystem\FileExistsException
+     * @throws \League\Flysystem\FileNotFoundException
      */
     private function uploadPreviewImage(string $fileName, string $size)
     {
-        $baseName = mb_pathinfo($this->getStorage()->getBasename(), PATHINFO_FILENAME) . "-{$size}.jpg";
+        $imageFilename = $this->getStorage()->getPath() . "-{$size}";
 
-        $filenameTemp = $this->getTempFilename(
-            mb_pathinfo($fileName, PATHINFO_FILENAME),
-            "jpg"
-        );
+        // If it already exists we have to update, otherwise write
 
-        rename($fileName, $filenameTemp);
-
-        try {
-            return $this->storageMapper->accept($baseName, $filenameTemp);
-        } catch (MapperException $e) {
-            throw new RuntimeException("Error creating OTFS storage object: {$e->getMessage()}");
-        } finally {
-            // Remove the thumbnail
-            $this->log("Deleting temporary {$size} file from disk.");
-            unlink($filenameTemp);
+        if ($this->getStorage()->getFilesystem()->has($imageFilename)) {
+            $this->getStorage()->getFilesystem()->update($imageFilename, file_get_contents($fileName));
+        } else {
+            $this->getStorage()->getFilesystem()->write($imageFilename, file_get_contents($fileName));
         }
+
+        // Remove the thumbnail
+
+        $this->log("Deleting temporary {$size} file from disk.");
+        unlink($fileName);
     }
 
     // ----------------------------------------------------------------------------------------------------------------
@@ -697,6 +679,7 @@ class Queue extends ResourceVideo
     {
         // Make sure we actually have an instance of a logger before we try and log anything
 
+        /** @noinspection PhpUndefinedClassInspection */
         if ($this->log instanceof LoggerInterface) {
             $this->log->info("    - {$message}");
         }

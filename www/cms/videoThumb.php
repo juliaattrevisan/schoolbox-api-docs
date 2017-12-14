@@ -15,13 +15,18 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Video\Factory\Thumbnail as VideoThumbnailFactory;
-use Schoolbox\Video\Mapper as VideoMapper;
-use Schoolbox\Video\Model as Video;
+use Schoolbox\Video\Queue as VideoQueue;
 use Schoolbox\Video\QueueMapper;
 
 $type = $_GET['type'];
 $id   = $_GET['id'];
 $size = $_GET['size'];
+
+// If no size was specified, assume thumbnail
+
+if (strlen($size) === 0) {
+    $size = VideoQueue::TYPE_THUMBNAIL;
+}
 
 // TODO: Destroy these shenanigans
 
@@ -41,7 +46,6 @@ if (isset($_GET['hash'])) {
 
 if (isset($type) && isset($id)) {
     $page          = new SitePage;
-    $videoMapper   = VideoMapper::getInstance();
     $storageMapper = StorageMapper::getInstance();
 
     try {
@@ -64,26 +68,36 @@ if (isset($type) && isset($id)) {
     } catch (Exception $e) {
         // If anything goes wrong, display sad mountain
         SitePage::redirectToBrokenImageOfSize(64, 64, 500);
+        // Stop storm complaining
+        exit;
     }
 
     try {
         // Try to find a video record with associated poster and thumbnail links
 
-        /** @var Video $video */
-        $video = $videoMapper->findOneByColumn('video_hash', $videoQueue->getStorage()->getHash());
+        $imageFilename = "{$videoQueue->getStorage()->getPath()}-{$size}";
 
-        if ($size == VideoMapper::TYPE_POSTER) {
-            $preview = $video->getPoster();
-        } else {
-            $preview = $video->getThumbnail();
+        /** @var \League\Flysystem\FilesystemInterface $filesystem */
+        $filesystem = $videoQueue->getStorage()->getFilesystem();
+
+        if ($filesystem->has($imageFilename)) {
+            /** \League\Flysystem\File $image */
+            $image = $filesystem->get($imageFilename);
+
+            header('Cache-Control: max-age=10800, private');
+            header('Expires: ' . date(DATE_RFC822, strtotime(' 2 day')));
+            header('Pragma: private');
+            header('Content-Type: image/jpeg');
+            /** @noinspection PhpUndefinedMethodInspection */
+            header("Content-Length: {$image->getSize()}");
+            /** @noinspection PhpUndefinedMethodInspection */
+            echo $image->read();
+            exit;
         }
 
-        header('Cache-Control: max-age=10800, private');
-        header('Expires: ' . date(DATE_RFC822, strtotime(' 2 day')));
-        header('Pragma: private');
-        header('Content-Type: image/jpeg');
-        header("Content-Length: {$preview->getSize()}");
-        echo $preview->read();
+        // No thumbnail found in storage
+
+        SitePage::redirectToBrokenImageOfSize(64, 64, 500);
         exit;
     } catch (MapperException $e) {
         // No video record could be found, try local file system
@@ -94,7 +108,7 @@ if (isset($type) && isset($id)) {
 
         $fileName = "{$configMapper->get("video_dir")}/{$videoQueue->getStorage()->getHash()}";
 
-        if ($size == VideoMapper::TYPE_POSTER) {
+        if ($size == VideoQueue::TYPE_POSTER) {
             $fileName .= "-poster.jpg";
         } else {
             $fileName .= "-64.jpg";
@@ -117,7 +131,7 @@ if (isset($type) && isset($id)) {
             header('Expires: ' . date(DATE_RFC822, strtotime(' 2 day')));
             header('Pragma: private');
             header('Content-Type: image/jpeg');
-            header("Content-Length: $fileSize");
+            header("Content-Length: {$fileSize}");
             readfile($fileName);
             exit;
         }
