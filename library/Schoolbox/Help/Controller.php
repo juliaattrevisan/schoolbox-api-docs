@@ -9,13 +9,13 @@ namespace Schoolbox\Help;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+use Schoolbox\Collection;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder;
-
 
 ini_set('max_execution_time', 300);
 ini_set('memory_limit', -1);
@@ -58,13 +58,15 @@ class Controller extends Base
 
         /* Find all the folders that use this course implementation so we can chooze on the ui
          */
-        $allFolders = [];
+        $allFolders = new Collection();
 
         $allCourseImplementations = CourseImplementationMapper::getInstance()->findAllByCourseSpecificationId(self::NESA_COURSE_SPEC_ID);
 
         foreach ($allCourseImplementations as $currentCourseImplementation) {
-            $allFolders[] = $currentCourseImplementation->getFolder();
+            $allFolders->add($currentCourseImplementation->getFolder());
         }
+
+        $allFolders = $allFolders->sortBy('title', 'asc');
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@help/selector.twig', [
             'course' => $courseSpecification,
