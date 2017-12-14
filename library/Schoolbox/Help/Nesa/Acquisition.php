@@ -21,12 +21,11 @@ use Schoolbox\User;
 
 class Acquisition
 {
-
     /**
-     * Teacher Course
-     * Course specification id
+     * Course Specification Id
+     * This comes from the /course/modify screen, as is an integer in the url
      */
-    private $courseSpecId;
+    public const NESA_COURSE_SPEC_ID = 23;
 
     /**
      * Indicators to examine
@@ -77,18 +76,16 @@ class Acquisition
     /**
      * Nesa constructor.
      *
-     * @param int                        $courseSpecId id of course spec for Teacher Course
      * @param array                      $indicators   An array of indicator text
      * @param Rubric\RubricMapper        $rubricMapper
      * @param AssessmentMapperProxy      $assessmentMapperProxy
      */
     public function __construct(
-        int $courseSpecId,
         array $indicators,
         Rubric\RubricMapper $rubricMapper,
         AssessmentMapperProxy $assessmentMapperProxy
     ) {
-        $this->courseSpecId = $courseSpecId;
+        $this->courseSpecId = self::NESA_COURSE_SPEC_ID;
         $this->indicators = $indicators;
         $this->rubricMapper = $rubricMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;

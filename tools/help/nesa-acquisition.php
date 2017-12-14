@@ -11,7 +11,11 @@
 use Aura\Di;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+use Schoolbox\Help\Nesa;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Mapper\Exception as MapperException;
+
 
 $fields  = ['help', 'folder:'];
 $options = require_once __DIR__ . '/../../conf/core/require-cli.php';
@@ -43,7 +47,27 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
      * Otherwise process everyone
      */
     if ($folderId) {
-        $log->critical("Acquiring {$folderId}");
+
+        /** @var AssessmentMapperProxy $assessmentMapperProxy */
+        $assessmentMapperProxy = $di->get('assessmentDataSource');
+
+        $dataSet = (new Nesa\Acquisition(
+            [
+                'Student engagement (3.4)',
+                'Select and use resources. (3.4)',
+                'Engage with professional teaching networks and broader communities. (7.4)',
+                'Content selection and organisation. (2.2)',
+                'Engage with colleagues and improve practice. (6.3)',
+                'Information and communication technology (ICT) (2.6)',
+                'Evaluate and improve teaching programs (3.6)'
+            ],
+            Rubric\RubricMapper::getInstance(),
+            $assessmentMapperProxy
+        ))->generate($folderId);
+
+        $resultFragment = json_encode($dataSet);
+
+        $log->critical("Acquiring {$folderId}: {$resultFragment}");
     }
     else {
         $log->critical("Acquiring all folders");

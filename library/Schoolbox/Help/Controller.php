@@ -23,12 +23,6 @@ class Controller extends Base
 {
 
     /**
-     * Course Specification Id
-     * This comes from the /course/modify screen, as is an integer in the url
-     */
-    public const NESA_COURSE_SPEC_ID = 23;
-
-    /**
      * @var Error\Mapper
      */
     private $errorMapper;
@@ -86,13 +80,13 @@ class Controller extends Base
      */
     public function getNesa()
     {
-        $courseSpecification = $this->courseSpecificationMapper->findById(self::NESA_COURSE_SPEC_ID);
+        $courseSpecification = $this->courseSpecificationMapper->findById(Nesa\Acquisition::NESA_COURSE_SPEC_ID);
 
         /* Find all the folders that use this course implementation so we can chooze on the ui
          */
         $allFolders = new Collection();
 
-        $allCourseImplementations = $this->courseImplementationMapper->findAllByCourseSpecificationId(self::NESA_COURSE_SPEC_ID);
+        $allCourseImplementations = $this->courseImplementationMapper->findAllByCourseSpecificationId(Nesa\Acquisition::NESA_COURSE_SPEC_ID);
 
         foreach ($allCourseImplementations as $currentCourseImplementation) {
             $allFolders->add($currentCourseImplementation->getFolder());
@@ -103,7 +97,7 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@help/selector.twig', [
             'course' => $courseSpecification,
             'allFolders' => $allFolders,
-            'descriptors' => (new Nesa\Selector(self::NESA_COURSE_SPEC_ID))->generate()
+            'descriptors' => (new Nesa\Selector(Nesa\Acquisition::NESA_COURSE_SPEC_ID))->generate()
         ]));
     }
 
@@ -129,7 +123,6 @@ class Controller extends Base
         /* Acquire NESA data for $folder and the chosen indicators
          */
         $dataSet = (new Nesa\Acquisition(
-            self::NESA_COURSE_SPEC_ID,
             $this->getRequest()->post['indicators'],
             $this->rubricMapper,
             $assessmentMapperProxy
