@@ -134,12 +134,13 @@ Data:
 
         $("[data-action-save]").click(function (e) {
             var form = $(this).closest('form'),
-                    dialog = confirmDialog,
-                    submit = form.find(':submit'),
-                    inlineLen = CKEDITOR.instances['editor-body'].getData().length,
-                    filesLen = $('#files-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length;
+                dialog = confirmDialog,
+                submit = form.find(':submit'),
+                inlineLen = CKEDITOR.instances['editor-body'].getData().length,
+                filesLen = $('#files-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length,
+                submittedInPersonCheckbox = form.find('#editor-submittedInPerson');
 
-            if (!inlineLen && !filesLen) {
+            if (!inlineLen && !filesLen && !submittedInPersonCheckbox.prop('checked')) {
                 // prevent submission without SOMETHING to submit
                 e.preventDefault();
                 emptyDialog.foundation('reveal', 'open');
