@@ -4,12 +4,6 @@
 
         <h2 class="subheader">{{ course.title }}</h2>
         <form action="{{ routeLookup('help.postNesa') }}" method="post">
-            <select name="folderId">
-                {% for folder in allFolders %}
-                <option value="{{ folder.id }}">{{ folder.name }}</option>
-                {% endfor %}
-            </select>
-
             <table>
                 <thead>
                     <th></th>

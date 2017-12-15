@@ -11,14 +11,11 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
-use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
 use Twig_Loader_Chain;
 
@@ -74,10 +71,7 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
-            'courseImplementationMapper' => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
             'courseSpecificationMapper' => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
-            'folderMapper' => $this->getMapperFactory()->getLazy(FolderMapper::class),
             'rubricMapper' => $this->getMapperFactory()->getLazy(RubricMapper::class),
             'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class)
         ];

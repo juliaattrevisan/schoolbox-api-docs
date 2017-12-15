@@ -11,13 +11,12 @@ namespace Schoolbox\Help;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
-use Schoolbox\Collection;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Folder;
+
+ini_set('max_execution_time', 300);
 
 class Controller extends Base
 {
@@ -33,16 +32,6 @@ class Controller extends Base
     private $courseSpecificationMapper;
 
     /**
-     * @var CourseImplementationMapper
-     */
-    private $courseImplementationMapper;
-
-    /**
-     * @var Folder\Mapper
-     */
-    private $folderMapper;
-
-    /**
      * @var Rubric\RubricMapper
      */
     private $rubricMapper;
@@ -52,21 +41,15 @@ class Controller extends Base
      * Controller constructor.
      * @param Error\Mapper               $errorMapper
      * @param CourseSpecificationMapper  $courseSpecificationMapper
-     * @param CourseImplementationMapper $courseImplementationMapper
-     * @param Folder\Mapper              $folderMapper
      * @param Rubric\RubricMapper        $rubricMapper
      */
     public function __construct(
         Error\Mapper $errorMapper,
         CourseSpecificationMapper $courseSpecificationMapper,
-        CourseImplementationMapper $courseImplementationMapper,
-        Folder\Mapper $folderMapper,
         Rubric\RubricMapper $rubricMapper)
     {
         $this->errorMapper = $errorMapper;
         $this->courseSpecificationMapper = $courseSpecificationMapper;
-        $this->courseImplementationMapper = $courseImplementationMapper;
-        $this->folderMapper = $folderMapper;
         $this->rubricMapper = $rubricMapper;
     }
 
@@ -82,25 +65,11 @@ class Controller extends Base
     {
         $courseSpecification = $this->courseSpecificationMapper->findById(Nesa\Acquisition::NESA_COURSE_SPEC_ID);
 
-        /* Find all the folders that use this course implementation so we can chooze on the ui
-         */
-        $allFolders = new Collection();
-
-        $allCourseImplementations = $this->courseImplementationMapper->findAllByCourseSpecificationId(Nesa\Acquisition::NESA_COURSE_SPEC_ID);
-
-        foreach ($allCourseImplementations as $currentCourseImplementation) {
-            $allFolders->add($currentCourseImplementation->getFolder());
-        }
-
-        $allFolders = $allFolders->sortBy('title', 'asc');
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@help/selector.twig', [
             'course' => $courseSpecification,
-            'allFolders' => $allFolders,
             'descriptors' => (new Nesa\Selector(Nesa\Acquisition::NESA_COURSE_SPEC_ID))->generate()
         ]));
     }
-
 
     /**
      * NESA Report generation
@@ -110,23 +79,22 @@ class Controller extends Base
      */
     public function postNesa()
     {
-        try {
-            $folder = $this->folderMapper->findById($this->getRequest()->post['folderId']);
-        }
-        catch (MapperException $e) {
-            throw $this->errorMapper->generateException(Error\Mapper::ERROR_CATEGORY_DELETED);
-        }
-
         /** @var AssessmentMapperProxy $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+
+        /* Find all the folders that have users with Professional Development details
+         */
+        $prefilter = new Nesa\Prefilter();
+        $involvement = $prefilter->findInvolvement();
 
         /* Acquire NESA data for $folder and the chosen indicators
          */
         $dataSet = (new Nesa\Acquisition(
+            $involvement,
             $this->getRequest()->post['indicators'],
             $this->rubricMapper,
             $assessmentMapperProxy
-        ))->generate($folder->getId());
+        ))->generate();
 
         /* Process the $dataSet into a visual report
          */
@@ -136,7 +104,6 @@ class Controller extends Base
          */
         $this->getResponse()->content->set($this->buildHtmlOutput('@help/report.twig', [
             'report' => $report,
-            'folder' => $folder,
             'indicators' => array_filter(array_unique($this->getRequest()->post['indicators']))
         ]));
     }
