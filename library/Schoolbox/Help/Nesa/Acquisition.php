@@ -54,7 +54,7 @@ class Acquisition
      * @var string
      */
     private $query = '
-        SELECT a.id
+        SELECT a.id, ci.folder_id
         FROM course_specification cs
         INNER JOIN course_implementation ci ON ci.`course_specification_id` = cs.`id`
         INNER JOIN course_unit_implementation cui ON cui.`course_implementation_id` = ci.`id`
@@ -64,7 +64,7 @@ class Acquisition
         INNER JOIN assessment a ON pa.`assessment_id` = a.`id`
         INNER JOIN submission_box sb ON sb.`assessment_id` = a.`id`  
         WHERE cs.id = :courseSpecId
-        AND ci.folder_id = :folderId
+        AND FIND_IN_SET (ci.folder_id, :folderIds)
         AND cs.deleted_at IS NULL
         AND ci.deleted_at IS NULL
         AND cui.deleted_at IS NULL
@@ -73,18 +73,24 @@ class Acquisition
         AND a.created_at != "0000-00-00 00:00:00"
     ';
 
+
     /**
      * Nesa constructor.
      *
-     * @param array                      $indicators   An array of indicator text
-     * @param Rubric\RubricMapper        $rubricMapper
-     * @param AssessmentMapperProxy      $assessmentMapperProxy
+     * $involvement limits the number of Participants and Folders to hydrate
+     *
+     * @param array                 $involvement An array containing folder-user relations
+     * @param array                 $indicators An array of indicator text
+     * @param Rubric\RubricMapper   $rubricMapper
+     * @param AssessmentMapperProxy $assessmentMapperProxy
      */
     public function __construct(
+        array $involvement,
         array $indicators,
         Rubric\RubricMapper $rubricMapper,
         AssessmentMapperProxy $assessmentMapperProxy
     ) {
+        $this->involvement = $involvement;
         $this->courseSpecId = self::NESA_COURSE_SPEC_ID;
         $this->indicators = $indicators;
         $this->rubricMapper = $rubricMapper;
@@ -96,22 +102,24 @@ class Acquisition
      * Find all the assessment ids that spawned from $courseSpecId
      * Use a custom query, otherwise it's just too slow
      *
-     * @param $folderId
+     * @param array $folderIds
      * @return array
      */
-    private function findAssessmentIds($folderId)
+    private function findAssessmentIds(array $folderIds)
     {
         $assessmentMapper = Mapper::getInstance();
         $statement = $assessmentMapper->getDatabase()->prepare($this->query);
         $statement->execute([
-            'folderId' => $folderId,
+            'folderIds' => implode(',', $folderIds),//$folderIds,
             'courseSpecId' => $this->courseSpecId
         ]);
 
         $ids = [];
 
+        /* A tuple of (assessmentId, folderId)
+         */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $ids[] = $row['id'];
+            $ids[$row['id']] = $row['folder_id'];
         }
 
         return $ids;
@@ -121,28 +129,36 @@ class Acquisition
     /**
      * Find all the Unit Implementations for Teacher Course
      *
-     * Find all the assessments in the Teacher Course from all Unit Implementations everywhere for $folderId
-     * Due to performance reasons, I have to find results per folder (otherwise too much data)
+     * Find all the Assessments in the Teacher Course from all Unit Implementations that have people containing
+     * Professional Development details
      *
-     * Investigate all the assessments and their participants and harvest all the rubric selections
+     * Populate a particular subset of Participants
      *
-     * @param $folderId
      * @return Collection|\Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model[]
      */
-    public function generate($folderId)
+    public function generate()
     {
         /* Results of investigation into each user's assessment participation
          */
         $raw = [];
 
-        /* All the assessments to investigate
+        /* All the assessments to investigate, filtered by previously-determined involvement
          */
-        $assessmentIds = $this->findAssessmentIds($folderId);
+        $assessmentIdsInFolders = $this->findAssessmentIds(array_keys($this->involvement));
 
-        $allAssessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
-        $allAssessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($allAssessments, null, false, false);
+        $allAssessments = $this->assessmentMapperProxy->findAllByIds(array_keys($assessmentIdsInFolders));
 
-        foreach ($allAssessments as $assessment) {
+        foreach ($allAssessments as $currentAssessment) {
+
+            /* Load very specific participation from hashtable
+             */
+            $folderId = $assessmentIdsInFolders[$currentAssessment->getId()];
+            $people = new Collection($this->involvement[$folderId]);
+
+            $assessment = $this->assessmentMapperProxy->loadParticularParticipantsIntoAssessment($currentAssessment, $people, false, false);
+
+            /* Summon rubrics
+             */
             $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
 
             foreach ($assessment->getAllParticipants() as $currentParticipant) {
