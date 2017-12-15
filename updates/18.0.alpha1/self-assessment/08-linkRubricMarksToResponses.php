@@ -71,7 +71,7 @@
  * that record creation time differs for descriptor records of the same feedback, or that our data is broken.
  * We will try to check the first scenario and combine those records into one feedback.
  * If that fails, only the latest rubric mark draft will get linked to a latest draft feedback
- * if it was created at the same time or after rubric mark creation. If not, this rubric mark will become an orphan.
+ * if it was updated at the same time or after rubric mark creation. If not, this rubric mark will become an orphan.
  *
  *
  * - Valid descriptor
@@ -318,13 +318,13 @@ class LinkRubricMarkToFeedback
 
                 // In case of combined drafts, use the earliest create date
                 $draftRubricMarkCreatedDate = new Alaress_Date_Format(end($draftRubricMarks)['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
-                $draftFeedbackCreatedDate   = new Alaress_Date_Format($draftFeedbacks[0]['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
+                $draftFeedbackCreatedDate   = new Alaress_Date_Format($draftFeedbacks[0]['updated_at'], Alaress_Date_Format::DATABASE_FORMAT);
 
                 $this->log->debug(
                     sprintf(
-                        'Mark created %s, Feedback created %s',
+                        'Mark created %s, Feedback updated %s',
                         end($draftRubricMarks)['created_at'],
-                        $draftFeedbacks[0]['created_at']
+                        $draftFeedbacks[0]['updated_at']
                     )
                 );
 
@@ -336,7 +336,7 @@ class LinkRubricMarkToFeedback
                         $this->linkDrafts($draftFeedbacks[0], $draftRubricMark);
                     }
                 } else {
-                    $this->log->debug('Not linking mark: mark was created after feedback');
+                    $this->log->debug('Not linking mark: mark was created after feedback last updated');
                 }
 
             } else {
@@ -444,12 +444,12 @@ class LinkRubricMarkToFeedback
     {
         $draftFeedbacks = $this->db->executeQuery(
             '
-                    SELECT sr.id, rm.return_id, sr.created_at
+                    SELECT sr.id, rm.return_id, sr.updated_at
                     FROM submission_return sr
                     JOIN submission_box sb ON sb.id = sr.box_id
                     LEFT JOIN rubric_mark rm ON sr.id = rm.return_id
                     WHERE sr.owner = :student_id AND sr.box_id = :box_id AND sr.published_at IS NULL
-                    ORDER BY sr.created_at DESC
+                    ORDER BY sr.updated_at DESC
                     LIMIT 1;
                 ',
             [
