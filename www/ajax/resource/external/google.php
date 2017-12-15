@@ -30,7 +30,7 @@ if (function_exists('apache_request_headers')) {
     $headers['Authorization'] = $_SERVER['HTTP_AUTHORIZATION'];
 }
 $proxy   = new Proxy\Server($conf);
-$grive   = new GDriveFetcher(sys_get_temp_dir(), $proxy->curl_init(), $headers['Authorization']);
+$grive   = new GDriveFetcher(sys_get_temp_dir(), $proxy->curlInit(), $headers['Authorization']);
 $mapper  = Storage\Mapper::getInstance();
 $files   = array();
 
