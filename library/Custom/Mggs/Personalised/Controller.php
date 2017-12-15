@@ -5,12 +5,14 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Custom\Mggs\Learning\Personalised;
+namespace Custom\Mggs\Personalised;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Web\Exception\InvalidStatusCode;
+use Custom\Mggs\Personalised\Event;
+use Custom\Mggs\Personalised\Participant;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DataModel\Translator as AssessmentTranslator;
@@ -64,10 +66,12 @@ class Controller extends Base
         $this->assessmentTranslator = $assessmentTranslator;
     }
 
+
     /**
      * Redirects to the personalised learning screen for the current user.
      *
      * @api GET /learning/personalised/
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function getPersonalised()
     {

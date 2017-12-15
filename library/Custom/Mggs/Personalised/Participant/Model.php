@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Custom\Mggs\Learning\Personalised\Participant;
+namespace Custom\Mggs\Personalised\Participant;
 
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;

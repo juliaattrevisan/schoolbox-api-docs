@@ -11,7 +11,7 @@ use Alaress\Application\Kernel;
 use Aura\Di\Exception\ServiceNotFound;
 use Config\Modules\ModuleConfigInterface;
 use Schoolbox\Learning\Mastery\Module as MasteryModule;
-use Custom\Mggs\Learning\Personalised\Module as PersonalisedLearningModule;
+use Custom\Mggs\Personalised;
 
 /**
  * Configuration for the (currently) MGGS-specific personalised learning and mastery pages.
@@ -33,7 +33,7 @@ class PersonalisedLearning implements ModuleConfigInterface
             $masteryModule = new MasteryModule($di);
             $masteryModule ->init("/learning/mastery");
 
-            $personalisedLearningModule = new PersonalisedLearningModule($di);
+            $personalisedLearningModule = new Personalised\Module($di);
             $personalisedLearningModule->init("/learning/personalised");
         }
     }
