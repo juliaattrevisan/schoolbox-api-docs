@@ -176,6 +176,9 @@ class Server
 
     /**
      * Wrapper method for CURL resource creation, automatically sets proxy information
+     * and enables `CURLOPT_RETURNTRANSFER` and `CURLOPT_HEADER`.
+     *
+     * @todo make this method name not snake_case
      *
      * @param null $hostname
      * @return resource
@@ -185,32 +188,18 @@ class Server
         $c = curl_init($hostname);
 
         if ($this->usesProxy()) {
-            // global boolean
-            curl_setopt($c, CURLOPT_HTTPPROXYTUNNEL, false);
-
-            // currently constant values, may need to be overridden in future
-            curl_setopt($c, CURLOPT_PROXYAUTH, self::PROXY_AUTH_METHOD);
-            curl_setopt($c, CURLOPT_PROXYTYPE, self::PROXY_TYPE);
-            curl_setopt($c, CURLOPT_FOLLOWLOCATION, 1);
+            curl_setopt_array($c, $this->buildCurlOptions());
             curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($c, CURLOPT_HEADER, 1);
-            curl_setopt($c, CURLOPT_TIMEOUT, self::PROXY_DEFAULT_TIMEOUT);
-
-            // configuration values
-            curl_setopt($c, CURLOPT_PROXY, $this->getHost());
-            curl_setopt($c, CURLOPT_PROXYPORT, $this->getPort());
-
-            if ($this->isAuthenticated()) {
-                curl_setopt($c, CURLOPT_PROXYUSERPWD, $this->getUserPwd());
-            }
-
         }
 
         return $c;
     }
 
     /**
-     * Build a list of cURL options.
+     * Build a list of cURL options for the proxy.
+     *
+     * Does not set `CURLOPT_RETURNTRANSFER` or `CURLOPT_HEADER`
      *
      * @return array
      */
