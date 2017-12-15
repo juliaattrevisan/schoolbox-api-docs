@@ -15,6 +15,8 @@ use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\ProfessionalDevelopment\Mapper as ProfessionalDevelopmentMapper;
 
 ini_set('max_execution_time', 300);
 
@@ -86,7 +88,11 @@ class Controller extends Base
 
         /* Find all the folders that have users with Professional Development details
          */
-        $prefilter = new Nesa\Prefilter();
+        $prefilter = new Nesa\Prefilter(
+            ProfessionalDevelopmentMapper::getInstance(),
+            UserAccessMapper::getInstance()
+        );
+
         $involvement = $prefilter->findInvolvement();
 
         /* Acquire NESA data for $folder and the chosen indicators

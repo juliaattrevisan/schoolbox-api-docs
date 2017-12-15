@@ -21,6 +21,28 @@ use Schoolbox\ProfessionalDevelopment;
 
 class Prefilter
 {
+    /**
+     * @var ProfessionalDevelopment\Mapper
+     */
+    private $pdMapper;
+
+    /**
+     * @var UserAccessMapper
+     */
+    private $userAccessMapper;
+
+    /**
+     * Prefilter constructor.
+     * @param ProfessionalDevelopment\Mapper $pdMapper
+     * @param UserAccessMapper               $userAccessMapper
+     */
+    public function __construct(
+        ProfessionalDevelopment\Mapper $pdMapper,
+        UserAccessMapper $userAccessMapper
+    ) {
+        $this->pdMapper = $pdMapper;
+        $this->userAccessMapper = $userAccessMapper;
+    }
 
     /**
      * Find all the users who have Professional Development details
@@ -33,10 +55,10 @@ class Prefilter
     {
         $involvement = [];
 
-        $users = ProfessionalDevelopment\Mapper::getInstance()->findAll();
+        $users = $this->pdMapper->findAll();
 
         foreach ($users as $currentUser) {
-            $accesses = UserAccessMapper::getInstance()->findAllGroupsForUser($currentUser->getUser());
+            $accesses = $this->userAccessMapper->findAllGroupsForUser($currentUser->getUser());
 
             /** @var UserAccess $currentAccess */
             foreach ($accesses as $currentAccess) {
