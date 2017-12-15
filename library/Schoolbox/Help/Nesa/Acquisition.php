@@ -200,9 +200,8 @@ class Acquisition
                 if (\in_array($criterionData['name'], $indicators, true)) {
                     foreach ($criterionData['descriptors'] as $levelId => $levelData) {
 
-                        /* Only collate the ones we selected
-                         * Condense this as well, for rendering
-                         * The hierarchy is useful for debugging and visualisation
+                        /* Only collate the ones we selected; condense this for rendering
+                         * array key 'outcome' used for rendering 3 states: demonstrated, not demonstrated, unknown
                          */
                         if ($levelData['selected']) {
                             if ($levelData['text'] === 'Not shown.') {
