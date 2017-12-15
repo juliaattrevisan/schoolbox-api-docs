@@ -3,10 +3,10 @@
 CREATE TABLE `tour_step`
 (
   `uuid`              VARCHAR(36)       PRIMARY KEY NOT NULL,
-  `tour_uuid`         VARCHAR(36)       NOT NULL,
-  `next_step_uuid`    VARCHAR(36)       NULL,
-  `author_user_id`    INT(4) UNSIGNED   NOT NULL,
-  `type`              ENUM('tooltip')   NOT NULL,
+  `tour_uuid`         VARCHAR(36)       NOT NULL,                 -- Mandatory, step has to belong to a tour
+  `next_step_uuid`    VARCHAR(36)       NULL,                     -- Not mandatory, could be final step
+  `author_user_id`    INT(4) UNSIGNED   NULL,                     -- Not mandatory, Alaress created tours will not have an author ID
+  `type`              ENUM('tooltip')   NOT NULL,                 -- Will be expanded to (tooltip, modal, redirect, etc)
   `created_at`        DATETIME          NOT NULL,
   `updated_at`        DATETIME          NOT NULL,
   `deleted_at`        DATETIME          NULL,
@@ -25,12 +25,12 @@ CREATE INDEX `tour_step_tour_next_step_uuid_idx` ON `tour_step` (`next_step_uuid
 CREATE TABLE `tour_step_tooltip`
 (
   `uuid`              VARCHAR(36)       PRIMARY KEY NOT NULL,
-  `tour_step_uuid`    VARCHAR(36)       NOT NULL,
-  `author_user_id`    INT(4) UNSIGNED   NOT NULL,
-  `title`             VARCHAR(255)      NULL,
-  `body`              TEXT              NULL,
-  `selector`          VARCHAR(255)      NULL,
-  `css_class`         VARCHAR(255)      NULL,
+  `tour_step_uuid`    VARCHAR(36)       NOT NULL,                 -- Mandatory, can't have a tooltip floating without a corresponding step
+  `author_user_id`    INT(4) UNSIGNED   NULL,                     -- Not mandatory, Alaress created tooltips will not have an author ID
+  `title`             VARCHAR(255)      NULL,                     -- Current has no purpose currently- for future use in an admin builder interface
+  `body`              TEXT              NULL,                     -- Contents of the tooltip
+  `selector`          VARCHAR(255)      NOT NULL,                 -- Tooltips must have a selector (no floating centered tooltips)
+  `css_class`         VARCHAR(255)      NULL,                     -- Optional CSS class override for tooltip
   `created_at`        DATETIME          NOT NULL,
   `updated_at`        DATETIME          NOT NULL,
   `deleted_at`        DATETIME          NULL,

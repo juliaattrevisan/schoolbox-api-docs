@@ -3,11 +3,11 @@
 CREATE TABLE `tour_trigger`
 (
   `uuid`              VARCHAR(36)       PRIMARY KEY,
-  `author_user_id`    INT(4) UNSIGNED   NOT NULL,
-  `tour_uuid`         VARCHAR(36)       NOT NULL,
-  `selector`          VARCHAR(255)      NULL,
-  `event`             VARCHAR(255)      NULL,
-  `url_regex`         VARCHAR(255)      NULL,
+  `author_user_id`    INT(4) UNSIGNED   NOT NULL,     -- Mandatory, schools have to create these so users should exist
+  `tour_uuid`         VARCHAR(36)       NOT NULL,     -- Mandatory, can't have a step without it pointing to a tour
+  `selector`          VARCHAR(255)      NOT NULL,     -- Mandatory, can't trigger without a selector
+  `event`             VARCHAR(255)      NOT NULL,     -- Mandatory, can't trigger without an event
+  `url_regex`         VARCHAR(255)      NULL,         -- Optional, if blank trigger will fire on every URL
   `created_at`        DATETIME          NOT NULL,
   `updated_at`        DATETIME          NOT NULL,
   `deleted_at`        DATETIME          NULL,
