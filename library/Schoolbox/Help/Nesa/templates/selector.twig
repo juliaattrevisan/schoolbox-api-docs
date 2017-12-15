@@ -2,8 +2,9 @@
     <div class="small-12 island">
         <h1>NESA Report</h1>
 
-        <h2 class="subheader">{{ course.title }}</h2>
+
         <form action="{{ routeLookup('help.postNesa') }}" method="post">
+            <h2 class="subheader">Options</h2>
             <section class="content">
 
             {# Default NSW #}
@@ -20,9 +21,11 @@
             </section>
 
             <section class="content">
-                <input id="include-accredited" name="include-accredited" type="checkbox" value="1" />
+                <input id="include-accredited" name="includeAccredited" type="checkbox" value="1" />
                 <label for="include-accredited" class="checkbox-label">Include already accredited teachers</label>
             </section>
+
+            <h2 class="subheader">{{ course.title }}</h2>
 
             <table>
                 <thead>
