@@ -118,7 +118,7 @@
 
 // small behaves a little differently to the other viewports
 @media #{$small-only} {
-	.list-item {
+	form .list-item {
 		// restore guttering
 		padding-right: 0.5rem;
 		padding-left: 0.5rem;
