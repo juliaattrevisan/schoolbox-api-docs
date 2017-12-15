@@ -1,6 +1,6 @@
 <?php
 /**
- * Nesa Selector
+ * NESA Rubric Selector
  *
  * Generate a list of Descriptors that were used in a particular Course Specification
  *

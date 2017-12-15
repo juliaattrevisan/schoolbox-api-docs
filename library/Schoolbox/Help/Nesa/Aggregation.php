@@ -14,7 +14,8 @@ namespace Schoolbox\Help\Nesa;
 class Aggregation
 {
     /**
-     * Report constructor.
+     * Aggregation constructor.
+     *
      * @param array $dataSet an array of investigation results from Acquisition
      */
     public function __construct(array $dataSet) {
@@ -26,7 +27,7 @@ class Aggregation
      *
      * @return array
      */
-    public function generate()
+    public function generate() :array
     {
         /* A condensed version of the output stack that discards the capability/indicator hierarchy
          * and provides you the descriptor outputs, dumping them into a hashtable

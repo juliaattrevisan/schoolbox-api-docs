@@ -1,6 +1,6 @@
 <?php
 /**
- * Prefilter
+ * NESA User Involvement Prefilter
  *
  * Find the users who have Professional Development details and return a list of folders that they're in.
  * We can intersect this with Acquisition's Course Implementation list to minimise the number of locations

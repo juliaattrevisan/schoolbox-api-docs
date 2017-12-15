@@ -1,6 +1,6 @@
 <?php
 /**
- * Nesa Report Data Acquisition
+ * NESA Report Data Acquisition
  *
  * Get the rubric outcomes assigned to each participation
  *
@@ -105,7 +105,7 @@ class Acquisition
      * @param array $folderIds
      * @return array
      */
-    private function findAssessmentIds(array $folderIds)
+    private function findAssessmentIds(array $folderIds) :array
     {
         $assessmentMapper = Mapper::getInstance();
         $statement = $assessmentMapper->getDatabase()->prepare($this->query);
@@ -125,7 +125,6 @@ class Acquisition
         return $ids;
     }
 
-
     /**
      * Find all the Unit Implementations for Teacher Course
      *
@@ -134,9 +133,9 @@ class Acquisition
      *
      * Populate a particular subset of Participants
      *
-     * @return Collection|\Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model[]
+     * @return array
      */
-    public function generate()
+    public function generate() :array
     {
         /* Results of investigation into each user's assessment participation
          */
@@ -146,6 +145,8 @@ class Acquisition
          */
         $assessmentIdsInFolders = $this->findAssessmentIds(array_keys($this->involvement));
 
+        /* This might have to convert to request-in-loop findById() if this data set becomes too big
+         */
         $allAssessments = $this->assessmentMapperProxy->findAllByIds(array_keys($assessmentIdsInFolders));
 
         foreach ($allAssessments as $currentAssessment) {
@@ -190,7 +191,7 @@ class Acquisition
      * @param array       $indicators Report upon these indicators
      * @return array
      */
-    private function investigate(User $user, IAssessable $assessment, array $rubric, array $indicators)
+    private function investigate(User $user, IAssessable $assessment, array $rubric, array $indicators) :array
     {
         $condensed = [];
 
