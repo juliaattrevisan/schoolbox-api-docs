@@ -60,17 +60,16 @@ class Report
         $this->rubricMapper = $rubricMapper;
     }
 
-
     /**
      * Generate report contents in a view-agnostic manner
      *
-     * @param array $state
-     * @param int   $unaccreditedOnly
-     * @param array $indicators
+     * @param array    $state
+     * @param int|null $unaccreditedOnly
+     * @param array    $indicators
      * @return array
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function generate(array $state, int $unaccreditedOnly, array $indicators)
+    public function generate(array $state, ?int $unaccreditedOnly, array $indicators)
     {
         $assessmentMapperProxy = $this->assessmentMapperProxy;
 
