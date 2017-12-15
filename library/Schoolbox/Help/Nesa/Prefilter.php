@@ -73,10 +73,10 @@ class Prefilter
      *
      * @return array
      */
-    public function findInvolvement()
+    public function findInvolvement(array $states)
     {
         /** @var Collection $users */
-        $users = $this->pdMapper->findAll();
+        $users = $this->pdMapper->findByColumn('registration_state', $states);
 
         /* Store folder-user relations and a hashtable of Professional Development records
          * This will save us some db calls later when we assemble data in Acquisition

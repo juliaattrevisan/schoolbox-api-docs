@@ -14,7 +14,7 @@
                     {% set checked = '' %}
                 {% endif %}
 
-                <input id="state-{{ state }}" type="checkbox" value="{{ state }}" {{ checked }}/>
+                <input id="state-{{ state }}" name="state[]" type="checkbox" value="{{ state }}" {{ checked }}/>
                 <label for="state-{{ state }}" class="checkbox-label">{{ state }}</label>
             {% endfor %}
             </section>
