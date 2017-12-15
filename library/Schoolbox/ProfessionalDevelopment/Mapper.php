@@ -120,4 +120,13 @@ class Mapper extends BaseMapper
 
         return $states;
     }
+
+
+    /**
+     * Get a list of states that have people registered in them
+     */
+    public function getAvailableStates()
+    {
+        return $this->findDistinct('registration_state');
+    }
 }

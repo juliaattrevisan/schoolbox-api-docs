@@ -19,7 +19,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificat
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\ProfessionalDevelopment\Mapper as ProfessionalDevelopmentMapper;
+use Schoolbox\ProfessionalDevelopment;
 
 ini_set('max_execution_time', 300);
 
@@ -41,21 +41,28 @@ class Controller extends Base
      */
     private $rubricMapper;
 
+    /**
+     * @var ProfessionalDevelopment\Mapper
+     */
+    private $pdMapper;
 
     /**
      * Controller constructor.
-     * @param Error\Mapper               $errorMapper
-     * @param CourseSpecificationMapper  $courseSpecificationMapper
-     * @param Rubric\RubricMapper        $rubricMapper
+     * @param Error\Mapper                   $errorMapper
+     * @param CourseSpecificationMapper      $courseSpecificationMapper
+     * @param Rubric\RubricMapper            $rubricMapper
+     * @param ProfessionalDevelopment\Mapper $pdMapper
      */
     public function __construct(
         Error\Mapper $errorMapper,
         CourseSpecificationMapper $courseSpecificationMapper,
-        Rubric\RubricMapper $rubricMapper)
-    {
+        Rubric\RubricMapper $rubricMapper,
+        ProfessionalDevelopment\Mapper $pdMapper
+    ) {
         $this->errorMapper = $errorMapper;
         $this->courseSpecificationMapper = $courseSpecificationMapper;
         $this->rubricMapper = $rubricMapper;
+        $this->pdMapper = $pdMapper;
     }
 
 
@@ -79,6 +86,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@help/selector.twig', [
             'course' => $courseSpecification,
+            'states' => $this->pdMapper->getAvailableStates(),
             'descriptors' => $selector->generate()
         ]));
     }
@@ -99,7 +107,7 @@ class Controller extends Base
         /* Find all the folders that have users with Professional Development details
          */
         $prefilter = new Nesa\Prefilter(
-            ProfessionalDevelopmentMapper::getInstance(),
+            ProfessionalDevelopment\Mapper::getInstance(),
             UserAccessMapper::getInstance()
         );
 
