@@ -162,7 +162,7 @@ class Controller extends Base
             $this->rubricMapper
         ))->generate(
             $this->getRequest()->post['state'],
-            $this->getRequest()->post['unaccreditedOnly'],
+            (int)$this->getRequest()->post['unaccreditedOnly'],
             $this->getRequest()->post['indicators']
         );
 
