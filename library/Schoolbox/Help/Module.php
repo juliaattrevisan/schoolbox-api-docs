@@ -39,6 +39,7 @@ class Module extends BaseModule
 
         $this->register('GET', '/nesa', 'getNesa', $nesa, null);
         $this->register('POST', '/nesa', 'postNesa', $nesa, null);
+        $this->register('POST', '/nesa', 'postAccredit', $nesa, null);
     }
 
     /**
