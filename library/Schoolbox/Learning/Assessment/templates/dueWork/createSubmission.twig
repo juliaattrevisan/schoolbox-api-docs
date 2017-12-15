@@ -269,8 +269,7 @@ Data:
                                data-action-self-reflect="{{ routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: student.id }) }}" />
                     {%- else -%}
                         <input type="submit"
-                               value="Submit for Assessment
-                               {% if isSubmitOnBehalfOf %}On Behalf Of {{ student.formatName }}{% endif %}"
+                               value="{% if isSubmitOnBehalfOf %}Submit on behalf of {{ student.formatName }}{% else %}Submit for assessment{% endif %}"
                                data-action-save />
                     {%- endif -%}
 
