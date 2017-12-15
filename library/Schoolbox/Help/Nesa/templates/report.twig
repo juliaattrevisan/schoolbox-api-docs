@@ -48,11 +48,12 @@
         $('[data-accredit]').on('click', function(event) {
             event.preventDefault();
 
+            var self = $(this);
+
             $.post($(this).attr('href'), {userId: $(this).attr('data-accredit')})
                 .success(function(response) {
-                    var result = $.parseJSON(response);
-
-                    if (result.success) {
+                    if (response.status == 1) {
+                        self.removeClass().addClass('icon-approve');
                     }
                 });
         });
