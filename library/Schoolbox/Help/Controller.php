@@ -111,7 +111,10 @@ class Controller extends Base
             UserAccessMapper::getInstance()
         );
 
-        $involvement = $prefilter->findInvolvement($this->getRequest()->post['state']);
+        $involvement = $prefilter->findInvolvement(
+            $this->getRequest()->post['state'],
+            $this->getRequest()->post['includeAccredited']
+        );
 
         /* Acquire NESA data for $folder and the chosen indicators
          */
