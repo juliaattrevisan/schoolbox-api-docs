@@ -6,6 +6,7 @@
  * @version     SVN: $Id$
  */
 use \Schoolbox\Permission\Access\UserAccess;
+use \Schoolbox\Resource\File\Model;
 
 class Component_Homepage_ImageGalleryController extends Component_Homepage_ControllerAbstract
 {
@@ -30,6 +31,7 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
         }
         return true;
     }
+
 
     /**
      * Renders the data into the SitePage. Presentation logic.
@@ -62,6 +64,9 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
                 'size' => $this->getConfig('size')
             ]
         );
+
+        // Sort in a human way
+        $allImages = $allImages->sortByCallback( function (Model $a, Model $b) {return strnatcasecmp($a->getTitle(), $b->getTitle());} );
 
         $this->setVar([
             'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName(),
