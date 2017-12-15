@@ -8,13 +8,17 @@
 namespace Schoolbox\Tour\Step;
 
 use PDOStatement;
-use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Tour\Mapper as TourMapper;
-use Schoolbox\Tour\Model as Tour;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+/**
+ * Class Mapper
+ *
+ * @method Model createModel($id = null)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @package Schoolbox\Tour\Step
+ */
 class Mapper extends BaseMapper
 {
     /**
@@ -55,31 +59,18 @@ class Mapper extends BaseMapper
     {
         $collection = $this->createCollection();
 
+        /** @var UserMapper $authorUserMapper */
+        $authorUserMapper = $this->getJoinMapper('author');
+
+        /** @var TourMapper $tourMapper */
+        $tourMapper = $this->getJoinMapper('tour');
+
         foreach ($statement as $row) {
-            /** @var Model $model */
             $model = $this->hydrate($row);
 
             if ($model instanceof Model) {
-                // Hydrate author
-
-                /** @var UserMapper $authorUserMapper */
-                $authorUserMapper = $this->getJoinMapper('author');
-
-                /** @var User $author */
-                $author = $authorUserMapper->hydrate($row, 'a');
-                $model->setAuthor($author);
-
-                // Hydrate tour
-
-                /** @var TourMapper $tourMapper */
-                $tourMapper = $this->getJoinMapper('tour');
-
-                /** @var Tour $tour */
-                $tour = $tourMapper->hydrate($row, 't');
-                $model->setTour($tour);
-
-                // Add hydrated record to results
-
+                $model->setAuthor($authorUserMapper->hydrate($row, 'a'));
+                $model->setTour($tourMapper->hydrate($row, 't'));
                 $collection->add($model);
             }
         }

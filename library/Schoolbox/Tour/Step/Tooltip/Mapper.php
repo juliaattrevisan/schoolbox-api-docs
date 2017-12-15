@@ -10,10 +10,15 @@ namespace Schoolbox\Tour\Step\Tooltip;
 use PDOStatement;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Tour\Step\Mapper as TourStepMapper;
-use Schoolbox\Tour\Step\Model as TourStep;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+/**
+ * Class Mapper
+ *
+ * @method Model createModel($id = null)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @package Schoolbox\Tour\Step\Tooltip
+ */
 class Mapper extends BaseMapper
 {
     /**
@@ -45,7 +50,7 @@ class Mapper extends BaseMapper
                         {$this->getJoinColumnString('author', 'a')},
                         {$this->getJoinColumnString('tourStep', 's')}
             FROM        {$this->getTable()}
-            INNER JOIN  {$this->getJoinSql('tourStep', '', 's'}
+            INNER JOIN  {$this->getJoinSql('tourStep', '', 's')}
             LEFT JOIN   {$this->getJoinSql('author', '', 'a', true)}
         ";
     }
@@ -57,31 +62,18 @@ class Mapper extends BaseMapper
     {
         $collection = $this->createCollection();
 
+        /** @var UserMapper $authorUserMapper */
+        $authorUserMapper = $this->getJoinMapper('author');
+
+        /** @var TourStepMapper $tourStepMapper */
+        $tourStepMapper = $this->getJoinMapper('tourStep');
+
         foreach ($statement as $row) {
-            /** @var Model $model */
             $model = $this->hydrate($row);
 
             if ($model instanceof Model) {
-                // Hydrate author
-
-                /** @var UserMapper $authorUserMapper */
-                $authorUserMapper = $this->getJoinMapper('author');
-
-                /** @var User $author */
-                $author = $authorUserMapper->hydrate($row, 'a');
-                $model->setAuthor($author);
-
-                // Hydrate tour step
-
-                /** @var TourStepMapper $tourStepMapper */
-                $tourStepMapper = $this->getJoinMapper('tourStep');
-
-                /** @var TourStep $tourStep */
-                $tourStep = $tourStepMapper->hydrate($row, 's');
-                $model->setTourStep($tourStep);
-
-                // Add hydrated record to results
-
+                $model->setAuthor($authorUserMapper->hydrate($row, 'a'));
+                $model->setTourStep($tourStepMapper->hydrate($row, 's'));
                 $collection->add($model);
             }
         }

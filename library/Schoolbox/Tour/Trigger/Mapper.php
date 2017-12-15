@@ -9,12 +9,18 @@ namespace Schoolbox\Tour\Trigger;
 
 use PDOStatement;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Tour\Mapper as TourMapper;
 use Schoolbox\Tour\Model as Tour;
-use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+/**
+ * Class Mapper
+ *
+ * @method Model createModel($id = null)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @package Schoolbox\Tour\Trigger
+ */
 class Mapper extends BaseMapper
 {
     /**
@@ -57,33 +63,18 @@ class Mapper extends BaseMapper
     {
         $collection = $this->createCollection();
 
+        /** @var TourMapper $tourMapper */
+        $tourMapper = $this->getJoinMapper('tour');
+
+        /** @var UserMapper $authorUserMapper */
+        $authorUserMapper = $this->getJoinMapper('author');
+
         foreach ($statement as $row) {
-            /** @var Model $model */
             $model = $this->hydrate($row);
 
             if ($model instanceof Model) {
-                // Hydrate author
-
-                /** @var UserMapper $authorUserMapper */
-                $authorUserMapper = $this->getJoinMapper('author');
-
-                /** @var User $author */
-                $author = $authorUserMapper->hydrate($row, 'a');
-
-                $model->setAuthor($author);
-
-                // Hydrate tour
-
-                /** @var TourMapper $tourMapper */
-                $tourMapper = $this->getJoinMapper('tour');
-
-                /** @var Tour $tour */
-                $tour = $tourMapper->hydrate($row, 't');
-
-                $model->setTour($tour);
-
-                // Add hydrated object to results collection
-
+                $model->setAuthor($authorUserMapper->hydrate($row, 'a'));
+                $model->setTour($tourMapper->hydrate($row, 't'));
                 $collection->add($model);
             }
         }
@@ -94,8 +85,8 @@ class Mapper extends BaseMapper
     /**
      * Find all triggers matching the supplied URL and tour
      *
-     * @param Tour $tour
-     * @param string  $url
+     * @param Tour   $tour
+     * @param string $url
      *
      * @return GenericCollection
      */
@@ -105,8 +96,8 @@ class Mapper extends BaseMapper
 
         $statement = $this->getDatabase()->prepare($sql);
         $statement->execute([
-            'url'       => $url,
-            'tourUuid'  => $tour->getUuid(),
+            'url'      => $url,
+            'tourUuid' => $tour->getUuid(),
         ]);
 
         return $this->hydrateSelect($statement);

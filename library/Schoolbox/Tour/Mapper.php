@@ -12,7 +12,6 @@ use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Tour\Step\Mapper as TourStepMapper;
-use Schoolbox\Tour\Step\Model as TourStep;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -90,31 +89,20 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
+        $collection = $this->createCollection();
+
         /** @var UserMapper $authorUserMapper */
         $authorUserMapper = $this->getJoinMapper('author');
 
-        $collection = $this->createCollection();
+        /** @var TourStepMapper $tourStepMapper */
+        $tourStepMapper = $this->getJoinMapper('tourStep');
 
         foreach ($statement as $row) {
-            /** @var Model $model */
             $model = $this->hydrate($row);
 
             if ($model instanceof Model) {
-                // Hydrate author
-
                 $model->setAuthor($authorUserMapper->hydrate($row, 'a'));
-
-                // Hydrate tour step
-
-                /** @var TourStepMapper $tourStepMapper */
-                $tourStepMapper = $this->getJoinMapper('tourStep');
-
-                /** @var TourStep $tourStep */
-                $tourStep = $tourStepMapper->hydrate($row, 's');
-                $model->setTourStep($tourStep);
-
-                // Add hydrated record to results
-
+                $model->setTourStep($tourStepMapper->hydrate($row, 's'));
                 $collection->add($model);
             }
         }
