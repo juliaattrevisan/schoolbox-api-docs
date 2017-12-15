@@ -59,10 +59,11 @@
             <table>
                 <thead>
                     <th>User</th>
-                    <td>PD Number</td>
+                    <th>PD Number</th>
                     {% for indicator in indicators %}
                         <th class="center">{{ indicator }}</th>
                     {% endfor %}
+                    <th>Action</th>
                 </thead>
                 <tbody>
                     {% for row in report %}
@@ -85,6 +86,17 @@
                             {% endif %}
                         </td>
                         {% endfor %}
+                        <td class="actions-small-1">
+                            <nav>
+                                {% set accreditRoute = routeLookupIfAuthorized('professionaldevelopment.postAccredit', {
+                                    userId: row.user.id
+                                }) %}
+
+                                {% if accreditRoute %}
+                                    <a href="{{ accreditRoute }}" class="icon-favourite" title="Accredit {{ row.user.fullname }}"></a>
+                                {% endif %}
+                            </nav>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
