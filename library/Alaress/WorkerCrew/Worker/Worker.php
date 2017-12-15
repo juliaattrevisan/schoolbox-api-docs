@@ -65,17 +65,11 @@ class Worker extends PipeWriter
     {
         // if the process has already terminated, these closures won't do anything (so suppress warnings)
         foreach ($this->pipes as &$p) {
-            try {
-                fclose($p);
-            } catch(Exception $e) {
-                // ignore
-            }
+            /** @noinspection PhpUsageOfSilenceOperatorInspection */
+            @fclose($p);
         }
-        try {
-            pclose($this->pp);
-        } catch(Exception $e) {
-            // ignore
-        }
+        /** @noinspection PhpUsageOfSilenceOperatorInspection */
+        @pclose($this->pp);
     }
 
 
