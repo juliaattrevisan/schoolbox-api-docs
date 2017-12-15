@@ -1,7 +1,7 @@
 <?php
 
 use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\Exception\ClientException as GuzzleException;
+use GuzzleHttp\Exception\RequestException as RequestException;
 
 /**
  * Alaress_Cache_Abstract
@@ -232,11 +232,12 @@ abstract class Alaress_Cache_Abstract {
 			$url = $this->getUrl();
 		}
 
-		$httpClient = new GuzzleClient();
+		$httpClient = new GuzzleClient(['curl' => Proxy\Server::getInstance()->guzzle_init()]);
+
 
 		try {
 		    $httpClient->get($url, ['headers'=>['User-Agent' => 'Mozilla/5.0 (Schoolbox)'], 'save_to' => $this->getCachedFile()]);
-		} catch (GuzzleException $e) {
+		} catch (RequestException $e) {
 		    return false;
 		}
     }
