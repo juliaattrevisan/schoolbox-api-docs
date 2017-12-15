@@ -309,7 +309,11 @@ class Healthcheck
                 // I want to be able to query if the object exists or not;
                 // however, all attempts at doing so have failed.
                 if (empty($result)) {
-                    $this->log .= "FAILED - object does not exist, or user does not have EXECUTE permission on it\n";
+                    $this->errors[] = sprintf(
+                        'Object "%s" does not exist, or user does not have EXECUTE permission on it',
+                        $object
+                    );
+                    $this->log .= "FAILED\n";
                 } else {
                     $this->log .= "OK\n";
                 }
