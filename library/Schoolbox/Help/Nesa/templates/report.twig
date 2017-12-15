@@ -42,6 +42,23 @@
         font-weight: bold;
     }
 </style>
+
+<script type="text/javascript">
+    $(function() {
+        $('[data-accredit]').on('click', function(event) {
+            event.preventDefault();
+
+            $.post($(this).attr('href'), {userId: $(this).attr('data-accredit')})
+                .success(function(response) {
+                    var result = $.parseJSON(response);
+
+                    if (result.success) {
+                    }
+                });
+        });
+    });
+</script>
+
 <div class="row">
     <div class="small-12 columns">
         <h1>NESA Report</h1>
@@ -93,7 +110,7 @@
                                 }) %}
 
                                 {% if accreditRoute %}
-                                    <a href="{{ accreditRoute }}" class="icon-favourite" title="Accredit {{ row.user.fullname }}"></a>
+                                    <a href="{{ accreditRoute }}" class="icon-favourite" title="Accredit {{ row.user.fullname }}" data-accredit="{{ row.user.id }}"></a>
                                 {% endif %}
                             </nav>
                         </td>

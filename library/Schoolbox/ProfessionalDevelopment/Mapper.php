@@ -27,7 +27,7 @@ class Mapper extends BaseMapper
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->uses('number', self::TYPE_STRING);
         $this->uses('registration_state', self::TYPE_STRING);
-        $this->uses('accredited_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('accredited_at', self::TYPE_DATETIME);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
