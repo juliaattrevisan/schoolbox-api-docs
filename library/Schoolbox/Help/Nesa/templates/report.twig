@@ -135,17 +135,20 @@
 
 {# For CSV generation #}
 
-<form action="{{ routeLookup('help.postNesaCsv') }}" method="post">
-    <input type="text" name="unaccreditedOnly" value="{{ unaccreditedOnly }}" />
+<div class="row">
+    <div class="small-12 columns">
+        <form action="{{ routeLookup('help.postNesaCsv') }}" method="post">
+            <input type="hidden" name="unaccreditedOnly" value="{{ unaccreditedOnly }}" />
 
-    {% for indicator in indicators %}
-    <input type="text" name="indicators[]" value="{{ indicator }}" />
-    {% endfor %}
+            {% for indicator in indicators %}
+                <input type="hidden" name="indicators[]" value="{{ indicator }}" />
+            {% endfor %}
 
-    {% for state in states %}
-    <input type="text" name="state[]" value="{{ state }}" />
-    {% endfor %}
+            {% for state in states %}
+                <input type="hidden" name="state[]" value="{{ state }}" />
+            {% endfor %}
 
-    <input type="submit" value="Generate CSV" />
-</form>
-
+            <input type="submit" value="Generate CSV" />
+        </form>
+    </div>
+</div>
