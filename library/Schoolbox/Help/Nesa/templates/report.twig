@@ -49,12 +49,21 @@
             event.preventDefault();
 
             var self = $(this);
+            var username = self.attr('data-accredit-name');
+
+            var toast = $('#accreditation-toast');
+            toast.toastActivate({text: 'Accreditting ' + username + '...'});
 
             $.post($(this).attr('href'), {userId: $(this).attr('data-accredit')})
                 .success(function(response) {
                     if (response.status == 1) {
                         self.removeClass().addClass('icon-approve');
                     }
+
+                    toast.toastTimeout({text: username + ' accredited.', css: 'success'});
+                })
+                .error(function() {
+                    toast.toastTimeout({text: 'Could not accredit ' + username, css: 'alert'});
                 });
         });
     });
@@ -69,7 +78,6 @@
                 {% for state in states %}
                     {{ state }}{% if not loop.last %},{% endif %}
                 {% endfor %}
-
             </li>
         </ul>
 
@@ -111,7 +119,7 @@
                                 }) %}
 
                                 {% if accreditRoute %}
-                                    <a href="{{ accreditRoute }}" class="icon-favourite" title="Accredit {{ row.user.fullname }}" data-accredit="{{ row.user.id }}"></a>
+                                    <a href="{{ accreditRoute }}" class="icon-favourite" title="Accredit {{ row.user.fullname }}" data-accredit-name="{{ row.user.fullname }}" data-accredit="{{ row.user.id }}"></a>
                                 {% endif %}
                             </nav>
                         </td>
@@ -123,6 +131,6 @@
     </div>
 </div>
 
-
+<div id="accreditation-toast" class="toast"></div>
 
 
