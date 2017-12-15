@@ -7,8 +7,8 @@ CREATE TABLE `tour_step`
   `next_step_uuid`    VARCHAR(36)       NULL,
   `author_user_id`    INT(4) UNSIGNED   NOT NULL,
   `type`              ENUM('tooltip')   NOT NULL,
-  `created_at`        DATETIME          NULL,
-  `updated_at`        DATETIME          NULL,
+  `created_at`        DATETIME          NOT NULL,
+  `updated_at`        DATETIME          NOT NULL,
   `deleted_at`        DATETIME          NULL,
 
   CONSTRAINT `tour_step_author_user_id_fk` FOREIGN KEY (`author_user_id`) REFERENCES `user` (`id`),
@@ -31,8 +31,8 @@ CREATE TABLE `tour_step_tooltip`
   `body`              TEXT              NULL,
   `selector`          VARCHAR(255)      NULL,
   `css_class`         VARCHAR(255)      NULL,
-  `created_at`        DATETIME          NULL,
-  `updated_at`        DATETIME          NULL,
+  `created_at`        DATETIME          NOT NULL,
+  `updated_at`        DATETIME          NOT NULL,
   `deleted_at`        DATETIME          NULL,
 
   CONSTRAINT `tour_step_tooltip_user_id_fk` FOREIGN KEY (`author_user_id`) REFERENCES `user` (`id`),

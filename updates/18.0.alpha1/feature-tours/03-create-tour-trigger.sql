@@ -8,8 +8,8 @@ CREATE TABLE `tour_trigger`
   `selector`          VARCHAR(255)      NULL,
   `event`             VARCHAR(255)      NULL,
   `url_regex`         VARCHAR(255)      NULL,
-  `created_at`        DATETIME          NULL,
-  `updated_at`        DATETIME          NULL,
+  `created_at`        DATETIME          NOT NULL,
+  `updated_at`        DATETIME          NOT NULL,
   `deleted_at`        DATETIME          NULL,
   
   CONSTRAINT `tour_trigger_user_id_fk` FOREIGN KEY (`author_user_id`) REFERENCES `user` (`id`),
