@@ -79,6 +79,8 @@ class Controller extends Base
      */
     public function postNesa()
     {
+        $start = microtime(true);
+
         /** @var AssessmentMapperProxy $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
@@ -100,10 +102,13 @@ class Controller extends Base
          */
         $report = (new Nesa\Aggregation($dataSet))->generate();
 
+        $end = microtime(true);
+
         /* The usual output
          */
         $this->getResponse()->content->set($this->buildHtmlOutput('@help/report.twig', [
             'report' => $report,
+            'duration' => round($end - $start),
             'indicators' => array_filter(array_unique($this->getRequest()->post['indicators']))
         ]));
     }
