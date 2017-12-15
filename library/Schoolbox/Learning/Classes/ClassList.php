@@ -151,19 +151,17 @@ class ClassList
         foreach ($courseImplsPerClass as $folderId => $courseImpls) {
 
             $courseSpecsPerFolder[$folderId] = $this->courseSpecMapper->createCollection();
-            $hasUnitsInTerm = false;
+            $termContainsUnits               = false;
 
             foreach ($courseImpls as $courseImpl) {
                 foreach ($courseImpl->getUnits() as $unitImpl) {
-                    if ($unitImpl->getOpenDate()->compareDateOnly($term->getStart()) >= 0) {
-                        if ($term->getActualFinish()->isNull() || $unitImpl->getDueDate()->compareDateOnly($term->getActualFinish()) <= 0) {
-                            $hasUnitsInTerm = true;
-                            break;
-                        }
+                    if ($term->contains($unitImpl->getOpenDate()) || $term->contains($unitImpl->getDueDate())) {
+                        $termContainsUnits = true;
+                        break;
                     }
                 }
 
-                if ($hasUnitsInTerm) {
+                if ($termContainsUnits) {
                     $courseSpecId = $courseImpl->getSpecification()->getId();
                     $courseSpecsPerFolder[$folderId][$courseSpecId] = $courseImpl->getSpecification();
                 }
