@@ -150,10 +150,12 @@ Data:
         var confirmDialog = $('#confirm-dialog');
 
         $("[data-action-self-reflect]").click(function(e) {
+            e.preventDefault();
             if (!allowSubmit()) {
                 // prevent self-reflection without SOMETHING to reflect upon
-                e.preventDefault();
                 emptyDialog.foundation('reveal', 'open');
+            } else {
+                window.location.href = $(this).data('actionSelfReflect');
             }
         });
 
@@ -259,26 +261,18 @@ Data:
                                 {% endif %}
                             </label>
                         </div>
-
-                        {% if requiresReflection %}
-                        <div class="component-action">
-                            <section>
-                                <a class="button"
-                                   href="{{ routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: student.id }) }}"
-                                   data-action-self-reflect
-                                >Reflect on my work</a>
-                            </section>
-                        </div>
-                        {% endif %}
-
                     </section>
 
-                    {% if not requiresReflection %}
+                    {%- if requiresReflection -%}
+                        <input type="submit"
+                               value="Reflect on my work"
+                               data-action-self-reflect="{{ routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: student.id }) }}" />
+                    {%- else -%}
                         <input type="submit"
                                value="Submit for Assessment
                                {% if isSubmitOnBehalfOf %}On Behalf Of {{ student.formatName }}{% endif %}"
                                data-action-save />
-                    {% endif %}
+                    {%- endif -%}
 
                     <div class="toast" data-alert data-save-draft></div>
                 </form>
