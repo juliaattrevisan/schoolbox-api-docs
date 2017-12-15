@@ -124,7 +124,7 @@ class Controller extends Base
 
         // Should be a single result
         try {
-            $resultIterator->seek(0);
+            $resultIterator->rewind();
         } catch (OutOfBoundsException $e){
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
         }
