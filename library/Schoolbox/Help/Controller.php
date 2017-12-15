@@ -126,6 +126,10 @@ class Controller extends Base
 
         $end = microtime(true);
 
+        /* There are dupes but we only match on text content
+         */
+        $indicators = array_filter(array_unique($this->getRequest()->post['indicators']));
+
         /* The usual output
          */
         $this->getResponse()->content->set($this->buildHtmlOutput('@help/report.twig', [
@@ -133,7 +137,7 @@ class Controller extends Base
             'duration' => round($end - $start),
             'states' => $this->getRequest()->post['state'],
             'unaccreditedOnly' => $this->getRequest()->post['unaccreditedOnly'],
-            'indicators' => array_filter(array_unique($this->getRequest()->post['indicators']))
+            'indicators' => $indicators
         ]));
     }
 
@@ -162,11 +166,25 @@ class Controller extends Base
             $this->getRequest()->post['indicators']
         );
 
-        /* The usual output
+        /* There are dupes but we only match on text content
          */
-        $this->getResponse()->content->set($this->buildHtmlOutput('@help/csv.twig', [
-            'report' => $report,
-            'indicators' => array_filter(array_unique($this->getRequest()->post['indicators']))
-        ]));
+        $indicators = array_filter(array_unique($this->getRequest()->post['indicators']));
+
+        /* Render it out
+         */
+        $content = (new Nesa\Csv())->generate($report, $indicators);
+
+        $headers = $this->getResponse()->headers;
+        $headers->set('Pragma', ' ');
+        $headers->set('Cache-Control', ' ');
+        $headers->set('Content-Type', 'text/csv');
+        $headers->set('Content-Length', strlen($content));
+
+        $headers->set('Content-Disposition', "attachment; filename=\"nesa.csv\"");
+
+        $this->getResponse()->content->set([
+            'format' => 'file',
+            'data'   => $content
+        ]);
     }
 }
