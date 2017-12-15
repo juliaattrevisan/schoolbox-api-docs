@@ -5,11 +5,11 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Custom\Mggs\Learning\Personalised\Event;
+namespace Custom\Mggs\Personalised\Event;
 
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
-use Custom\Mggs\Learning\Personalised\Participant;
+use Custom\Mggs\Personalised\Participant;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
@@ -68,6 +68,7 @@ class Factory
      * @return Collection|array[]
      *
      * @throws RouteNotFound
+     * @throws \UnexpectedValueException If user is not a participant of this Assessment
      */
     public function buildFromAssessment(IAssessable $assessable, User $student, Collection $participation = null)
     {
@@ -155,6 +156,7 @@ class Factory
         ];
     }
 
+
     /**
      * Helper for building an event
      *
@@ -166,6 +168,7 @@ class Factory
      * @return array
      *
      * @throws RouteNotFound
+     * @throws \UnexpectedValueException If user is not a participant of this Assessment
      */
     protected function buildAssessableEvent(
         IAssessable $assessable,

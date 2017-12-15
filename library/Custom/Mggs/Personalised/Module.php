@@ -5,15 +5,18 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Custom\Mggs\Learning\Personalised;
+namespace Custom\Mggs\Personalised;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
+use Custom\Mggs\Personalised\Participant;
+use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
+use InvalidArgumentException;
 
 /**
  * Sub-module for a student's personalised learning view.
@@ -106,24 +109,21 @@ class Module extends BaseModule
      */
 
     /**
-     * @return UserMapper
+     * @return UserMapper|Mapper
+     * @throws InvalidArgumentException
      */
     protected function getUserMapper()
     {
-        /** @var UserMapper $userMapper */
-        $userMapper = $this->getMapperFactory()->get(UserMapper::class);
-
-        return $userMapper;
+        return $this->getMapperFactory()->get(UserMapper::class);
     }
 
+
     /**
-     * @return Participant\Mapper
+     * @return Participant\Mapper|Mapper
+     * @throws InvalidArgumentException
      */
     protected function getParticipantMapper()
     {
-        /** @var Participant\Mapper $participantMapper */
-        $participantMapper = $this->getMapperFactory()->get(Participant\Mapper::class);
-
-        return $participantMapper;
+        return $this->getMapperFactory()->get(Participant\Mapper::class);
     }
 }

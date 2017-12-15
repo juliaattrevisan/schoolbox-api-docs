@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Custom\Mggs\Learning\Personalised\Participant;
+namespace Custom\Mggs\Personalised\Participant;
 
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper as BaseMapper;
