@@ -47,6 +47,12 @@
         <h1>NESA Report</h1>
         <ul class="meta">
             <li class="icon-timetable">Took approx. {{ duration }} seconds</li>
+            <li class="icon-weather">States:
+                {% for state in states %}
+                    {{ state }}{% if not loop.last %},{% endif %}
+                {% endfor %}
+
+            </li>
         </ul>
 
         <section>

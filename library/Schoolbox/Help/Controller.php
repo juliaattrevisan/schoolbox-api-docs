@@ -133,6 +133,7 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@help/report.twig', [
             'report' => $report,
             'duration' => round($end - $start),
+            'states' => $this->getRequest()->post['state'],
             'indicators' => array_filter(array_unique($this->getRequest()->post['indicators']))
         ]));
     }
