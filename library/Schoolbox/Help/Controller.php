@@ -91,16 +91,18 @@ class Controller extends Base
         ]));
     }
 
+
     /**
-     * NESA Report generation
+     * Generate the NESA report data
      *
-     * @throws \Schoolbox\Application\Exception\Exception
+     * Used to view the browser version and also populates the csv
+     * This way both outputs are derived from the same data source
+     *
+     * @return array
+     * @throws MapperException
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function postNesa()
-    {
-        $start = microtime(true);
-
+    private function generateNesaReport() {
         /** @var AssessmentMapperProxy $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
@@ -127,7 +129,20 @@ class Controller extends Base
 
         /* Process the $dataSet into a visual report
          */
-        $report = (new Nesa\Aggregation($dataSet))->generate();
+        return (new Nesa\Aggregation($dataSet))->generate();
+    }
+
+    /**
+     * NESA Report generation
+     *
+     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function postNesa()
+    {
+        $start = microtime(true);
+
+        $report = $this->generateNesaReport();
 
         $end = microtime(true);
 
@@ -149,10 +164,18 @@ class Controller extends Base
      *
      * I can't trust the url to preserve the contents of the indicators chosen, which must be transmitted
      * in plaintest on the url (no id integers to rely upon)
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function postNesaCsv()
     {
-        new \Alaress_Probe($this->getRequest()->post);
-        die();
+        $report = $this->generateNesaReport();
+
+        /* The usual output
+         */
+        $this->getResponse()->content->set($this->buildHtmlOutput('@help/csv.twig', [
+            'report' => $report,
+            'indicators' => array_filter(array_unique($this->getRequest()->post['indicators']))
+        ]));
     }
 }
