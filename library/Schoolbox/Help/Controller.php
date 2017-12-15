@@ -47,22 +47,31 @@ class Controller extends Base
     private $pdMapper;
 
     /**
+     * @var UserAccessMapper
+     */
+    private $userAccessMapper;
+
+
+    /**
      * Controller constructor.
      * @param Error\Mapper                   $errorMapper
      * @param CourseSpecificationMapper      $courseSpecificationMapper
      * @param Rubric\RubricMapper            $rubricMapper
      * @param ProfessionalDevelopment\Mapper $pdMapper
+     * @param UserAccessMapper               $userAccessMapper
      */
     public function __construct(
         Error\Mapper $errorMapper,
         CourseSpecificationMapper $courseSpecificationMapper,
         Rubric\RubricMapper $rubricMapper,
-        ProfessionalDevelopment\Mapper $pdMapper
+        ProfessionalDevelopment\Mapper $pdMapper,
+        UserAccessMapper $userAccessMapper
     ) {
         $this->errorMapper = $errorMapper;
         $this->courseSpecificationMapper = $courseSpecificationMapper;
         $this->rubricMapper = $rubricMapper;
         $this->pdMapper = $pdMapper;
+        $this->userAccessMapper = $userAccessMapper;
     }
 
 
@@ -91,47 +100,6 @@ class Controller extends Base
         ]));
     }
 
-
-    /**
-     * Generate the NESA report data
-     *
-     * Used to view the browser version and also populates the csv
-     * This way both outputs are derived from the same data source
-     *
-     * @return array
-     * @throws MapperException
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     */
-    private function generateNesaReport() {
-        /** @var AssessmentMapperProxy $assessmentMapperProxy */
-        $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
-
-        /* Find all the folders that have users with Professional Development details
-         */
-        $prefilter = new Nesa\Prefilter(
-            ProfessionalDevelopment\Mapper::getInstance(),
-            UserAccessMapper::getInstance()
-        );
-
-        $involvement = $prefilter->findInvolvement(
-            $this->getRequest()->post['state'],
-            $this->getRequest()->post['unaccreditedOnly']
-        );
-
-        /* Acquire NESA data for $folder and the chosen indicators
-         */
-        $dataSet = (new Nesa\Acquisition(
-            $involvement,
-            $this->getRequest()->post['indicators'],
-            $this->rubricMapper,
-            $assessmentMapperProxy
-        ))->generate();
-
-        /* Process the $dataSet into a visual report
-         */
-        return (new Nesa\Aggregation($dataSet))->generate();
-    }
-
     /**
      * NESA Report generation
      *
@@ -142,7 +110,19 @@ class Controller extends Base
     {
         $start = microtime(true);
 
-        $report = $this->generateNesaReport();
+        /** @var AssessmentMapperProxy $assessmentMapperProxy */
+        $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+
+        $report = (new Nesa\Report(
+            $assessmentMapperProxy,
+            $this->pdMapper,
+            $this->userAccessMapper,
+            $this->rubricMapper
+        ))->generate(
+            $this->getRequest()->post['state'],
+            $this->getRequest()->post['unaccreditedOnly'],
+            $this->getRequest()->post['indicators']
+        );
 
         $end = microtime(true);
 
@@ -157,7 +137,6 @@ class Controller extends Base
         ]));
     }
 
-
     /**
      * Generate a csv from the NESA Report screen
      * Recycled the same vars used to construct the report
@@ -169,7 +148,7 @@ class Controller extends Base
      */
     public function postNesaCsv()
     {
-        $report = $this->generateNesaReport();
+        $report = (new Nesa\Report())->generate();
 
         /* The usual output
          */
