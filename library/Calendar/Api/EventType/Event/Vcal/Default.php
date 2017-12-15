@@ -146,6 +146,11 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
         $currentConfig = $this->loadConnectorConfiguration();
         $decodedConfig = $currentConfig->decodeConfig();
 
+        /* Check URL is set */
+        if(!$decodedConfig->getUrl()) {
+            return new Collection();
+        }
+
         /* Check permissions - if you can view these events according to the Permissions
          * settings then accumulate the events. Otherwise ignore them.
          * (Superusers can view all events, so skip permissions on those)
@@ -156,14 +161,16 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
                 $this->getUser()->getRole()->getId()
             )
         ) {
-            /* Load calendar from locker cache
-             * Cache step 1: cache load of VCAL file from URL
-             */
-            $cache  = new Calendar_Api_Cache();
-            $source = $cache->init($decodedConfig->getUrl())->getStreamContents();
+
             /* Parse it all
              */
             try {
+                /* Load calendar from locker cache
+                * Cache step 1: cache load of VCAL file from URL
+                */
+                $cache  = new Calendar_Api_Cache();
+                $source = $cache->init($decodedConfig->getUrl())->getStreamContents();
+
                 // Cache step 2: Expand VCAL into event collection.
                 // The expanded events depend on the start and end time, not
                 // just the VCAL file.
