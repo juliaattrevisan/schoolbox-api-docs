@@ -12,8 +12,11 @@ namespace Schoolbox\Help;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Error;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\DescriptorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\ProfessionalDevelopment\Mapper as ProfessionalDevelopmentMapper;
@@ -67,9 +70,16 @@ class Controller extends Base
     {
         $courseSpecification = $this->courseSpecificationMapper->findById(Nesa\Acquisition::NESA_COURSE_SPEC_ID);
 
+        $selector = new Nesa\Selector(
+            Nesa\Acquisition::NESA_COURSE_SPEC_ID,
+            UnitSpecificationMapper::getInstance(),
+            CriterionMapper::getInstance(),
+            DescriptorMapper::getInstance()
+        );
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@help/selector.twig', [
             'course' => $courseSpecification,
-            'descriptors' => (new Nesa\Selector(Nesa\Acquisition::NESA_COURSE_SPEC_ID))->generate()
+            'descriptors' => $selector->generate()
         ]));
     }
 

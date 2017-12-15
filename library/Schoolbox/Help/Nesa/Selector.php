@@ -13,20 +13,46 @@ namespace Schoolbox\Help\Nesa;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\DescriptorMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
 class Selector
 {
+    /**
+     * @var int
+     */
+    private $courseSpecificationId;
+
+    /**
+     * @var UnitSpecificationMapper
+     */
+    private $unitSpecificationMapper;
+
+    /**
+     * @var CriterionMapper
+     */
+    private $criterionMapper;
+
 
     /**
      * NesaSelector constructor.
      *
-     * @param int $courseSpecificationId The Teacher Course upon which we report
+     * @param int                     $courseSpecificationId The Teacher Course upon which we report
+     * @param UnitSpecificationMapper $unitSpecificationMapper
+     * @param CriterionMapper         $criterionMapper
+     * @param DescriptorMapper $rubricDescriptorMapper
      */
-    public function __construct(int $courseSpecificationId)
-    {
+    public function __construct(
+        int $courseSpecificationId,
+        UnitSpecificationMapper $unitSpecificationMapper,
+        CriterionMapper $criterionMapper,
+        DescriptorMapper $rubricDescriptorMapper
+    ) {
         $this->courseSpecificationId = $courseSpecificationId;
+        $this->unitSpecificationMapper = $unitSpecificationMapper;
+        $this->criterionMapper = $criterionMapper;
+        $this->rubricDescriptorMapper = $rubricDescriptorMapper;
     }
 
     /**
@@ -39,7 +65,7 @@ class Selector
         /* Find all the unit specifications. We'll use those to figure out what Rubric Criteria records exist
          * for the course spec, then accumulate all their ids
          */
-        $allUnitSpecifications = UnitSpecificationMapper::getInstance()->findAllByCourseId($this->courseSpecificationId);
+        $allUnitSpecifications = $this->unitSpecificationMapper->findAllByCourseId($this->courseSpecificationId);
 
         /* Find all the criteria used in each unit specification
          *
@@ -52,7 +78,7 @@ class Selector
             $parentIds[] = $currentUnitSpecification->getFolder()->getId();
         }
 
-        $allSpecCrits = CriterionMapper::getInstance()->findByColumn('parent_id', $parentIds);
+        $allSpecCrits = $this->criterionMapper->findByColumn('parent_id', $parentIds);
 
         /* Now find all the descriptors contained in the spec
          */
@@ -62,7 +88,7 @@ class Selector
             $criterionIds[] = $currentSpecCrit->getId();
         }
 
-        $allSpecDescriptors = Rubric\DescriptorMapper::getInstance()->findByColumn('criterion_id', $criterionIds);
+        $allSpecDescriptors = $this->rubricDescriptorMapper->findByColumn('criterion_id', $criterionIds);
 
         /* $allSpecDescriptors is now a list of all the descriptors used in the course spec.
          * From here we can choose which descriptors we want to include in the report
