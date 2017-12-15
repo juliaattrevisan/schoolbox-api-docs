@@ -355,7 +355,7 @@
 {% endblock pd %}
 
 <div class="row">
-    <div class="small-12 {% if showClasses %}xlarge-6 xlarge-push-6{% else %}xlarge-12{% endif %} columns">
+    <div class="small-12 {% if showClasses %}medium-6 medium-push-6{% else %}xlarge-12{% endif %} columns">
         {% if showContacts and contacts|length > 0 %}
             <div class="row">
                 {% block contacts_island %}
@@ -582,7 +582,7 @@
         {% endblock emergencyContacts_island %}
     </div>
 
-    <div class="small-12 {% if showContacts %}xlarge-6 xlarge-pull-6{% else %}xlarge-12{% endif %} columns">
+    <div class="small-12 {% if showContacts %}medium-6 medium-pull-6{% else %}xlarge-12{% endif %} columns manc">
         {% if showClasses %}
             {% if showSubjects %}
                 {% for group, subjectGroup in subjects %}
