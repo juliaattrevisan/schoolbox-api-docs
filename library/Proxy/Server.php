@@ -216,18 +216,22 @@ class Server
      */
     public function guzzle_init()
     {
-        $guzzle = [
-            CURLOPT_HTTPPROXYTUNNEL => false,
-            CURLOPT_PROXYAUTH       => self::PROXY_AUTH_METHOD,
-            CURLOPT_PROXYTYPE       => self::PROXY_TYPE,
-            CURLOPT_FOLLOWLOCATION  => 1,
-            CURLOPT_TIMEOUT         => self::PROXY_DEFAULT_TIMEOUT,
-            CURLOPT_PROXY           => $this->getHost(),
-            CURLOPT_PROXYPORT       => $this->getPort(),
-        ];
+        $guzzle = [];
 
-        if ($this->isAuthenticated()) {
-            $guzzle[CURLOPT_PROXYUSERPWD] = $this->getUserPwd();
+        if ($this->usesProxy()) {
+            $guzzle = [
+                CURLOPT_HTTPPROXYTUNNEL => false,
+                CURLOPT_PROXYAUTH       => self::PROXY_AUTH_METHOD,
+                CURLOPT_PROXYTYPE       => self::PROXY_TYPE,
+                CURLOPT_FOLLOWLOCATION  => 1,
+                CURLOPT_TIMEOUT         => self::PROXY_DEFAULT_TIMEOUT,
+                CURLOPT_PROXY           => $this->getHost(),
+                CURLOPT_PROXYPORT       => $this->getPort(),
+            ];
+
+            if ($this->isAuthenticated()) {
+                $guzzle[CURLOPT_PROXYUSERPWD] = $this->getUserPwd();
+            }
         }
 
         return $guzzle;
