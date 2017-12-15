@@ -210,11 +210,11 @@ class Server
     }
 
     /**
-     * Wrapper for providing CURL proxy options to Guzzle
+     * Build a list of cURL options.
      *
      * @return array
      */
-    public function guzzle_init()
+    public function buildCurlOptions()
     {
         $guzzle = [];
 

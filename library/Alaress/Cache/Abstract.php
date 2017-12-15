@@ -231,7 +231,7 @@ abstract class Alaress_Cache_Abstract
             $url = $this->getUrl();
         }
 
-        $httpClient = new GuzzleClient(['curl' => Proxy\Server::getInstance()->guzzle_init()]);
+        $httpClient = new GuzzleClient(['curl' => Proxy\Server::getInstance()->buildCurlOptions()]);
 
         try {
             $httpClient->get($url, ['headers' => ['User-Agent' => 'Mozilla/5.0 (Schoolbox)'], 'save_to' => $this->getCachedFile()]);
