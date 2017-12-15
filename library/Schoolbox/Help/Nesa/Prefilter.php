@@ -72,21 +72,21 @@ class Prefilter
      * Store them in a hashtable so we can look up users in a folder later, in Acquisition
      *
      * @param array    $states
-     * @param int|null $includeAccredited
+     * @param int|null $unaccreditedOnly
      * @return array
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function findInvolvement(array $states, ?int $includeAccredited)
+    public function findInvolvement(array $states, ?int $unaccreditedOnly)
     {
         /** @var Collection $users */
-        if ($includeAccredited) {
-            $users = $this->pdMapper->findByColumn('registration_state', $states);
-        }
-        else {
+        if ($unaccreditedOnly) {
             $users = $this->pdMapper->findByColumnList([
                 'registration_state' => $states,
                 'accredited_at' => null
             ]);
+        }
+        else {
+            $users = $this->pdMapper->findByColumn('registration_state', $states);
         }
 
         /* Store folder-user relations and a hashtable of Professional Development records

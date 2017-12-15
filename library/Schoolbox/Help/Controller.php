@@ -113,7 +113,7 @@ class Controller extends Base
 
         $involvement = $prefilter->findInvolvement(
             $this->getRequest()->post['state'],
-            $this->getRequest()->post['includeAccredited']
+            $this->getRequest()->post['unaccreditedOnly']
         );
 
         /* Acquire NESA data for $folder and the chosen indicators
