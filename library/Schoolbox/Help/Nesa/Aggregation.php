@@ -11,6 +11,8 @@
 
 namespace Schoolbox\Help\Nesa;
 
+use Schoolbox\User;
+
 class Aggregation
 {
     /**
@@ -39,21 +41,24 @@ class Aggregation
             /* Store first stack of condensed descriptor data for this user into a hashtable
              * Otherwise merge into existing
              */
-            if (!isset($condensedData[$current['user']->getId()])) {
-                $condensedData[$current['user']->getId()] = [
+            /** @var User $user */
+            $user = $current['user'];
+
+            if (!isset($condensedData[$user->getId()])) {
+                $condensedData[$user->getId()] = [
                     'user' => [
-                        'id' => $current['user']->getId(),
-                        'firstname' => $current['user']->getFirstname(),
-                        'lastname' => $current['user']->getLastname(),
-                        'fullname' => $current['user']->getFullname()
+                        'id' => $user->getId(),
+                        'firstname' => $user->getFirstname(),
+                        'lastname' => $user->getLastname(),
+                        'fullname' => $user->getFullname()
                     ],
                     'condensed' => $current['condensed']
                 ];
             } else {
-                $existingIndicators = $condensedData[$current['user']->getId()]['condensed'];
+                $existingIndicators = $condensedData[$user->getId()]['condensed'];
                 $additionalIndicators = $current['condensed'];
 
-                $condensedData[$current['user']->getId()]['condensed'] = array_merge($existingIndicators, $additionalIndicators);
+                $condensedData[$user->getId()]['condensed'] = array_merge($existingIndicators, $additionalIndicators);
             }
         }
 
