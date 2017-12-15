@@ -140,12 +140,4 @@ class Controller extends Base
             'indicators' => array_filter(array_unique($this->getRequest()->post['indicators']))
         ]));
     }
-
-
-    /**
-     * Update someone's accreditation
-     */
-    public function postAccredit()
-    {
-    }
 }

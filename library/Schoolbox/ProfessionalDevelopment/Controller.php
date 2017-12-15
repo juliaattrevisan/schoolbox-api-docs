@@ -62,4 +62,13 @@ class Controller extends Base
          */
         throw $this->errorMapper->generateException(Error\Mapper::ERROR_INVALID_PD_DETAILS);
     }
+
+
+
+    /**
+     * Update someone's accreditation
+     */
+    public function postAccredit()
+    {
+    }
 }

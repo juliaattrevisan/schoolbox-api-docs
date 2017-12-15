@@ -39,9 +39,16 @@ class Module extends BaseModule
             )
         );
 
+        $nesa = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\IsSuperuser()
+        );
+
         $preloadUser = function ($params) { return $this->preloadUser($params); };
+        $preloadProfessionalDevelopment = function ($params) { return $this->preloadProfessionalDevelopment($params); };
 
         $this->register('POST', '/update/{userId}', 'postUpdate', $updatePD, $preloadUser);
+        $this->register('POST', '/accredit/{userId}', 'postAccredit', $nesa, $preloadProfessionalDevelopment);
     }
 
     /**
@@ -56,6 +63,30 @@ class Module extends BaseModule
     {
         try {
             $user = $this->getUserMapper()->findById($params['userId']);
+        }
+        catch (MapperException $e) {
+            throw new NotFound(ErrorMapper::ERROR_USER_NOT_FOUND);
+        }
+
+        return [
+            'user' => $user,
+        ];
+    }
+
+    /**
+     * Preload the Professional Development
+     *
+     * @param array $params
+     * @return array
+     * @throws InvalidArgumentException
+     * @throws NotFound
+     */
+    private function preloadProfessionalDevelopment(array $params) :array
+    {
+        try {
+            $pd = $this->getProfessionalDevelopmentMapper()->findOneByColumn('user_id', $params['userId']);
+
+            $user = $this->getUserMapper()->findById($pd->getUser()->getId());
         }
         catch (MapperException $e) {
             throw new NotFound(ErrorMapper::ERROR_USER_NOT_FOUND);
@@ -119,5 +150,14 @@ class Module extends BaseModule
     protected function getErrorMapper()
     {
         return $this->getMapperFactory()->get(ErrorMapper::class);
+    }
+
+    /**
+     * @return Mapper|\Schoolbox\ProfessionalDevelopment\Mapper
+     * @throws \InvalidArgumentException If cannot find mapper class
+     */
+    protected function getProfessionalDevelopmentMapper()
+    {
+        return $this->getMapperFactory()->get(\Schoolbox\ProfessionalDevelopment\Mapper::class);
     }
 }
