@@ -5,9 +5,17 @@
         <h2 class="subheader">{{ course.title }}</h2>
         <form action="{{ routeLookup('help.postNesa') }}" method="post">
             <section class="content">
+
+            {# Default NSW #}
             {% for state in states %}
-            <input id="state-{{ state }}" type="checkbox" value="{{ state }}"/>
-            <label for="state-{{ state }}" class="checkbox-label">{{ state }}</label>
+                {% if state == 'NSW' %}
+                    {% set checked = 'checked="checked"' %}
+                {% else %}
+                    {% set checked = '' %}
+                {% endif %}
+
+                <input id="state-{{ state }}" type="checkbox" value="{{ state }}" {{ checked }}/>
+                <label for="state-{{ state }}" class="checkbox-label">{{ state }}</label>
             {% endfor %}
             </section>
 
