@@ -43,8 +43,8 @@ class Mapper extends BaseMapper
                         {$this->getJoinColumnString('author', 'a')},
                         {$this->getJoinColumnString('tour', 't')}
             FROM        {$this->getTable()}
+            INNER JOIN  {$this->getJoinSql('tour', '', 't', true)}
             LEFT JOIN   {$this->getJoinSql('author', '', 'a', true)}
-            LEFT JOIN   {$this->getJoinSql('tour', '', 't', true)}
         ";
     }
 
