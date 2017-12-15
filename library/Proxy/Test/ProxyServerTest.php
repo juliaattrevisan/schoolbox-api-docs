@@ -346,7 +346,7 @@ class ProxyServerTest extends TestCase
 
     protected function curl($https = false)
     {
-        $ch = $this->proxyServer->curl_init($https ? self::HTTPS_URL : self::HTTP_URL);
+        $ch = $this->proxyServer->curlInit($https ? self::HTTPS_URL : self::HTTP_URL);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_VERBOSE, 0);
         curl_setopt($ch, CURLOPT_HEADER, 0);

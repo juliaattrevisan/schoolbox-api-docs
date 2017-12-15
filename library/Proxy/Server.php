@@ -178,12 +178,10 @@ class Server
      * Wrapper method for CURL resource creation, automatically sets proxy information
      * and enables `CURLOPT_RETURNTRANSFER` and `CURLOPT_HEADER`.
      *
-     * @todo make this method name not snake_case
-     *
      * @param null $hostname
      * @return resource
      */
-    public function curl_init($hostname = null)
+    public function curlInit($hostname = null)
     {
         $c = curl_init($hostname);
 

@@ -200,7 +200,7 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
      */
     protected function rq($path)
     {
-        $ch = Proxy\Server::getInstance()->curl_init($this->getTenant()->getBaseUri().$path);
+        $ch = Proxy\Server::getInstance()->curlInit($this->getTenant()->getBaseUri().$path);
 
         curl_setopt_array($ch, [
             CURLOPT_HTTPHEADER     => [ 'Authorization: Bearer ' . $this->oAuthToken ],
@@ -267,7 +267,7 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
             throw new OutOfBoundsException("Could not open target");
         }
 
-        $ch = Proxy\Server::getInstance()->curl_init($url);
+        $ch = Proxy\Server::getInstance()->curlInit($url);
 
         curl_setopt_array($ch, [
             CURLOPT_FILE       => $fp,
