@@ -17,6 +17,7 @@ use Schoolbox\Learning\Assessment\DataModel\Mapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\RubricContext;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\ProfessionalDevelopment;
 use Schoolbox\User;
 
 class Acquisition
@@ -75,14 +76,14 @@ class Acquisition
 
 
     /**
-     * Nesa constructor.
+     * Acquisition constructor.
      *
      * $involvement limits the number of Participants and Folders to hydrate
      *
-     * @param array                 $involvement An array containing folder-user relations
-     * @param array                 $indicators An array of indicator text
-     * @param Rubric\RubricMapper   $rubricMapper
-     * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @param array                          $involvement An array containing folder-user relations
+     * @param array                          $indicators An array of indicator text
+     * @param Rubric\RubricMapper            $rubricMapper
+     * @param AssessmentMapperProxy          $assessmentMapperProxy
      */
     public function __construct(
         array $involvement,
@@ -143,7 +144,7 @@ class Acquisition
 
         /* All the assessments to investigate, filtered by previously-determined involvement
          */
-        $assessmentIdsInFolders = $this->findAssessmentIds(array_keys($this->involvement));
+        $assessmentIdsInFolders = $this->findAssessmentIds(array_keys($this->involvement['hierarchy']));
 
         /* This might have to convert to request-in-loop findById() if this data set becomes too big
          */
@@ -154,7 +155,7 @@ class Acquisition
             /* Load very specific participation from hashtable
              */
             $folderId = $assessmentIdsInFolders[$currentAssessment->getId()];
-            $people = new Collection($this->involvement[$folderId]);
+            $people = new Collection($this->involvement['hierarchy'][$folderId]);
 
             $assessment = $this->assessmentMapperProxy->loadParticularParticipantsIntoAssessment($currentAssessment, $people, false, false);
 
@@ -188,10 +189,14 @@ class Acquisition
      * @param User        $user
      * @param IAssessable $assessment
      * @param array       $rubric
-     * @param array       $indicators Report upon these indicators
+     * @param array       $indicators
      * @return array
      */
-    private function investigate(User $user, IAssessable $assessment, array $rubric, array $indicators) :array
+    private function investigate(
+        User $user,
+        IAssessable $assessment,
+        array $rubric,
+        array $indicators) :array
     {
         $condensed = [];
 
@@ -235,6 +240,7 @@ class Acquisition
         return [
             'name' => $assessment->getTitle(),
             'user' => $user,
+            'number' => $this->involvement['pd'][$user->getId()],
             'assessmentId' => $assessment->getId(),
             'condensed' => $condensed,
         ];

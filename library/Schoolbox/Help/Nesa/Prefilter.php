@@ -14,6 +14,7 @@
 
 namespace Schoolbox\Help\Nesa;
 
+use Schoolbox\Collection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\ProfessionalDevelopment;
@@ -44,6 +45,27 @@ class Prefilter
         $this->userAccessMapper = $userAccessMapper;
     }
 
+
+    /**
+     * Cache all the Professional Development details into a hashtable
+     * Dehydrate some of this data to be as lean as possible
+     *
+     * @param Collection $allPd
+     * @return array
+     */
+    private function loadProfessionalDevelopment(Collection $allPd) :array
+    {
+        $pdHashtable = [];
+
+        /** @var ProfessionalDevelopment\Model $currentPd */
+        foreach ($allPd as $currentPd) {
+            $pdHashtable[$currentPd->getUser()->getId()] = $currentPd->getNumber();
+        }
+
+        return $pdHashtable;
+    }
+
+
     /**
      * Find all the users who have Professional Development details
      *
@@ -53,9 +75,16 @@ class Prefilter
      */
     public function findInvolvement()
     {
-        $involvement = [];
-
+        /** @var Collection $users */
         $users = $this->pdMapper->findAll();
+
+        /* Store folder-user relations and a hashtable of Professional Development records
+         * This will save us some db calls later when we assemble data in Acquisition
+         */
+        $involvement = [
+            'hierarchy' => [],
+            'pd' => $this->loadProfessionalDevelopment($users)
+        ];
 
         foreach ($users as $currentUser) {
             $accesses = $this->userAccessMapper->findAllGroupsForUser($currentUser->getUser());
@@ -65,7 +94,7 @@ class Prefilter
                 $folderId = $currentAccess->getServiceIdentifier();
                 $userId = $currentAccess->getUser()->getId();
 
-                $involvement[$folderId][$userId] = $currentAccess->getUser();
+                $involvement['hierarchy'][$folderId][$userId] = $currentAccess->getUser();
             }
         }
 

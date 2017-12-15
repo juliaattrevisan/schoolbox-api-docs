@@ -48,6 +48,7 @@ class Aggregation
                 $condensedData[$user->getId()] = [
                     'user' => [
                         'id' => $user->getId(),
+                        'number' => $current['number'],
                         'firstname' => $user->getFirstname(),
                         'lastname' => $user->getLastname(),
                         'fullname' => $user->getFullname()
