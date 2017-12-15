@@ -148,7 +148,19 @@ class Controller extends Base
      */
     public function postNesaCsv()
     {
-        $report = (new Nesa\Report())->generate();
+        /** @var AssessmentMapperProxy $assessmentMapperProxy */
+        $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+
+        $report = (new Nesa\Report(
+            $assessmentMapperProxy,
+            $this->pdMapper,
+            $this->userAccessMapper,
+            $this->rubricMapper
+        ))->generate(
+            $this->getRequest()->post['state'],
+            $this->getRequest()->post['unaccreditedOnly'],
+            $this->getRequest()->post['indicators']
+        );
 
         /* The usual output
          */
