@@ -133,4 +133,19 @@
 
 <div id="accreditation-toast" class="toast"></div>
 
+{# For CSV generation #}
+
+<form action="{{ routeLookup('help.postNesaCsv') }}" method="post">
+    <input type="text" name="unaccreditedOnly" value="{{ unaccreditedOnly }}" />
+
+    {% for indicator in indicators %}
+    <input type="text" name="indicators[]" value="{{ indicator }}" />
+    {% endfor %}
+
+    {% for state in states %}
+    <input type="text" name="state[]" value="{{ state }}" />
+    {% endfor %}
+
+    <input type="submit" value="Generate CSV" />
+</form>
 

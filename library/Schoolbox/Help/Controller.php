@@ -137,7 +137,22 @@ class Controller extends Base
             'report' => $report,
             'duration' => round($end - $start),
             'states' => $this->getRequest()->post['state'],
+            'unaccreditedOnly' => $this->getRequest()->post['unaccreditedOnly'],
             'indicators' => array_filter(array_unique($this->getRequest()->post['indicators']))
         ]));
+    }
+
+
+    /**
+     * Generate a csv from the NESA Report screen
+     * Recycled the same vars used to construct the report
+     *
+     * I can't trust the url to preserve the contents of the indicators chosen, which must be transmitted
+     * in plaintest on the url (no id integers to rely upon)
+     */
+    public function postNesaCsv()
+    {
+        new \Alaress_Probe($this->getRequest()->post);
+        die();
     }
 }
