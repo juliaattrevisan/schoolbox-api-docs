@@ -7,6 +7,20 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+// sitepage context is required
+use Psr\Log\NullLogger;
+use Schoolbox\Realtime\Routing\Cache\WritableCache;
+
+
+if (empty($this)) {
+    require_once __DIR__ . '/../../../../library/Bootstrap.php';
+    // go away
+    error(2);
+}
+
+/** @var SitePage $this */
+
 SitePage::extendExecutionTime(300);
 
 $userMapper = new \Schoolbox\UserBulkMapper();
@@ -54,6 +68,17 @@ if (isset($_POST['updateUsers'])) {
 
         $modified = $userCollection;
     }
+}
+
+try {
+    // drop a silent logger in here
+    $this->getDi()->values['logger'] = new NullLogger();
+
+    /** @var WritableCache $cache */
+    $cache = $this->getDi()->get('subscriptionCache');
+    $cache->cacheAllUsers(INSTANCE_ID);
+} catch (\RuntimeException|\Aura\Di\Exception $e) {
+    $userMapper->log($e->getMessage(), [ $e ]);
 }
 
 /* Show some confirmation stuff
