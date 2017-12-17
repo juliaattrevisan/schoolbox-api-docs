@@ -9,16 +9,11 @@
 
 namespace Schoolbox\Permission\Access;
 
-use Alaress\Redis;
-use Monolog\Logger;
 use PDO;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Queue\Bindings\Generator;
-use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
-use Schoolbox\Realtime\Routing\Subscription\Loader\Factory;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
@@ -49,20 +44,8 @@ class UserAccessMapper extends Mapper
      */
     protected function postSetup()
     {
-        /** @var UserMapper $map */
-        $map   = $this->getJoinMapper('user');
-        $redis = Redis::getClientInstance();
-        $gen   = new Generator();
-        $log   = new Logger('');
-
-        if ($redis) {
-            // redis will return null in unit test context, and so we compensate...
-            $factory = (new Factory($redis, $log))
-                ->setGenerator($gen)
-                ->setUserMapper($map);
-
-            $this->cache = new WriteCache($redis, $log, $factory);
-        }
+        /** @var WritableCache $cache */
+        $this->cache = self::getDi()->get('subscriptionCache');
     }
 
 

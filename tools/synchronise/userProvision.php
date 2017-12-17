@@ -11,14 +11,10 @@
 
 use Alaress\Lumberjack\CompositeLoggerInterface;
 use Aura\Di;
-use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use Schoolbox\Sync\Provisioner\Provisioner;
-use Schoolbox\Notif\Queue\Bindings;
-use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
-use Schoolbox\Realtime\Routing\Subscription\Loader\Factory;
-use Schoolbox\UserMapper;
 
 
 $options = getopt("vr:", array('perform-update', 'instance::'));
@@ -78,15 +74,8 @@ $kernel->run(
 
         if ($opts['perform']) {
             // we need to manually refresh the routing cache now
-            $gen   = new Bindings\Generator();
-            /** @var ClientInterface $redis */
-            $redis = $di->get('redis');
-
-            $factory = (new Factory($redis, $log))
-                ->setGenerator($gen)
-                ->setUserMapper($di->get('mapperFactory')->get(UserMapper::class));
-
-            $cache = new WriteCache($redis, $log, $factory);
+            /** @var WritableCache $cache */
+            $cache = $di->get('subscriptionCache');
 
             $cache->cacheAllUsers($instanceId);
         }

@@ -14,16 +14,8 @@
  */
 
 use Aura\Di;
-use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use Schoolbox\MapperFactory;
-use Schoolbox\Notif\Queue\Bindings\Generator;
-use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
-use Schoolbox\Realtime\Routing\Subscription;
-use Schoolbox\RoleMapper;
-use Schoolbox\UserMapper;
 
 $fields = [ 'userId:' ];
 
@@ -44,28 +36,7 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $lo
         $opts['instance'] = INSTANCE_ID;
     }
 
-    /** @var ClientInterface $redis */
-    $redis = $di->get('redis');
-
-    /** @var MapperFactory $mf */
-    $mf = $di->get('mapperFactory');
-
-    /** @var UserMapper $userMapper */
-    $userMapper = $mf->get(UserMapper::class);
-
-    $generator = new Generator(
-        $di->get('externalUser'),
-        $mf->get(UserMapper::class),
-        $mf->get(RoleMapper::class),
-        $mf->get(UserAccessMapper::class),
-        $mf->get(Schoolbox\Resource\Folder\Mapper::class)
-    );
-
-    $loaderFactory = (new Subscription\Loader\Factory($redis, $log))
-        ->setUserMapper($userMapper)
-        ->setGenerator($generator);
-
-    $cache = new WriteCache($redis, $log, $loaderFactory);
+    $cache = $di->get('subscriptionCache');
 
     if ($opts['userId']) {
         $cache->cacheUser($opts['instance'], $opts['userId']);

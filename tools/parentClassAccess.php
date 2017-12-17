@@ -1,19 +1,18 @@
 #!/usr/bin/php
 <?php
 
-require_once __DIR__ . '/../library/Bootstrap.php';
+/** @var Kernel $kernel */
+$kernel = require_once __DIR__ . '/../library/Bootstrap.php';
 
-use Alaress\Redis;
+use Alaress\Application\Kernel;
 use \Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
+use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use \Schoolbox\Role;
 use \Schoolbox\UserMapper;
 use \Schoolbox\Permission\Access\UserAccessMapper;
 use \Schoolbox\Permission\Access\UserAccess as UserAccessModel;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Alaress\Lumberjack\Logger;
-use Schoolbox\Realtime\Routing\Subscription\Loader;
-use Schoolbox\Notif\Queue\Bindings;
 
 /**
  * Retrieve all parents of students in the specified subject
@@ -220,14 +219,10 @@ foreach ($classes as $folderId => $codes) {
     }
 }
 
-$redis = Redis::getClientInstance();
+$kernel->getDependencyInjector()->values['logger'] = $log;
 
-// manually refresh the binding cache
-$factory = (new Loader\Factory($redis, $log))
-    ->setGenerator(new Bindings\Generator())
-    ->setUserMapper($userMapper);
-
-$cache = new WriteCache($redis, $log, $factory);
+/** @var WritableCache $cache */
+$cache = $kernel->get('subscriptionCache');
 
 // do it.
 try {
