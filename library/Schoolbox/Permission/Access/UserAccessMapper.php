@@ -55,11 +55,14 @@ class UserAccessMapper extends Mapper
         $gen   = new Generator();
         $log   = new Logger('');
 
-        $factory = (new Factory($redis, $log))
-            ->setGenerator($gen)
-            ->setUserMapper($map);
+        if ($redis) {
+            // redis will return null in unit test context, and so we compensate...
+            $factory = (new Factory($redis, $log))
+                ->setGenerator($gen)
+                ->setUserMapper($map);
 
-        $this->cache = new WriteCache($redis, $log, $factory);
+            $this->cache = new WriteCache($redis, $log, $factory);
+        }
     }
 
 
@@ -115,7 +118,9 @@ class UserAccessMapper extends Mapper
             return;
         }
 
-        $this->cache->cacheUser(INSTANCE_ID, $model->getUser()->getId());
+        if ($this->cache) {
+            $this->cache->cacheUser(INSTANCE_ID, $model->getUser()->getId());
+        }
     }
 
 
