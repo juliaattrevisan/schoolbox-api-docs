@@ -13,7 +13,10 @@ use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Module\RestfulModule;
 use Schoolbox\Module\StandardModuleTrait;
 use Alaress\Authorizer\Rule;
+use Schoolbox\Learning\Authorizer\Rule\IsModificationUnLocked;
+use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Role;
+use Schoolbox\Assessment\Term;
 
 /**
  * The Purpose of this class is to:
@@ -79,15 +82,32 @@ class Module extends RestfulModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $ruleRegexp = '(getQuizSummary|postAttemptDelete)';
-        $this->addRoutePermission($authorizer, $ruleRegexp,
-            new Rule\All(
-                new Rule\IsLoggedIn(),
-                new Rule\Any(
-                    new Rule\HasRole(Role::STAFF),
-                    new Rule\IsSuperuser()
-                )
+        $canWrite = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\HasRole(Role::STAFF),
+                new Rule\IsSuperuser()
             )
         );
+
+        $canModify = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\All(
+                $canWrite,
+                new IsModificationUnLocked(new LockedChecker($this->getTermMapper()))
+            )
+        );
+
+        $this->addRoutePermission($authorizer, 'postAttemptDelete', $canWrite);
+        $this->addRoutePermission($authorizer, 'getQuizSummary', $canModify);
+    }
+
+    /**
+     * @return Mapper|Term\Mapper
+     * @throws \InvalidArgumentException If unable to find mapper class
+     */
+    private function getTermMapper()
+    {
+        return $this->getMapperFactory()->get(Term\Mapper::class);
     }
 }
