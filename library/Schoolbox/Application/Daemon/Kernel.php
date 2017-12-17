@@ -70,6 +70,7 @@ class Kernel extends \Alaress\Application\Kernel
         $this->name = $name;
 
         $this->loop = $this->di->values['react.loop'] = Factory::create();
+        $this->di->values['logger'] = $this->logger();
 
         foreach (posix_getrlimit() as $key => $value) {
             list ($strength, $attr) = explode(' ', $key);
