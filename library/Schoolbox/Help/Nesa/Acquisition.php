@@ -111,7 +111,14 @@ class Acquisition
          */
         $pb = new \Alaress\Database\Predicate\Builder($this->userMapper->getDatabase(), 'upd');
         $pb->equals('registration_state', $this->states);
-        $where = $pb->getWhere()[0];
+
+        /* Show only unaccredited users
+         */
+        if ($this->unaccreditedOnly) {
+            $pb->equals('accredited_at', null);
+        }
+
+        $where = implode(' AND ', $pb->getWhere());
 
         $query = "
             SELECT u.id AS user_id, upd.number, a.id AS assessment_id, ci.folder_id
