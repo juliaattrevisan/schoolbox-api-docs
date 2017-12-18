@@ -51,7 +51,7 @@ class Controller extends Base
     /**
      * Controller constructor.
      * @param Error\Mapper                   $errorMapper
-     * @param Specification\Mapper      $courseSpecificationMapper
+     * @param Specification\Mapper           $courseSpecificationMapper
      * @param Rubric\RubricMapper            $rubricMapper
      * @param ProfessionalDevelopment\Mapper $pdMapper
      * @param UserMapper                     $userMapper
