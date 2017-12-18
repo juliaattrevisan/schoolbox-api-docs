@@ -10,14 +10,13 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 use PDO;
 use PDOStatement;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Learning\Assessment\IFeedback;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
 
 /**
  * Class MarkMapper
@@ -42,7 +41,7 @@ class MarkMapper extends Mapper
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
 
-        $this->joins('return_id', SubmissionReturnMapper::class, 'id', self::TYPE_MODEL, null, 'feedback', 'submission_return');
+        $this->joins('return_id', ReturnedWorkMapper::class, 'id', self::TYPE_MODEL, null, 'submissionReturn', 'submission_return');
         $this->joins('student_id', UserMapper::class, 'id', null, null, null, 'user');
         $this->joins('descriptor_id', DescriptorMapper::class, 'id', null, null, null, 'descriptor');
 
@@ -79,8 +78,9 @@ class MarkMapper extends Mapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
+        /** @var ReturnedWorkMapper $submissionReturnMapper */
+        $submissionReturnMapper = $this->getJoinMapper('submission_return');
         $marks = $this->createCollection();
-        $feedback = $this->getJoinMapper('submission_return')->createModel();
         $students = $this->getJoinMapper('user')->createCollection();
         $descriptors = $this->getJoinMapper('descriptor')->createCollection();
 
@@ -88,8 +88,6 @@ class MarkMapper extends Mapper
         $descriptorKey = "d.{$this->getJoinMapper('descriptor')->getIdentifierColumn()}";
 
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
-
-            /** @var IFeedback $feedback */
 
             $userId = $r[$studentKey];
             if(!$students->offsetExists($userId)){
@@ -106,7 +104,7 @@ class MarkMapper extends Mapper
             $descriptor = $descriptors->getOffset($descriptorId);
 
             $mark = $this->hydrate($r);
-            $mark->setFeedback($feedback);
+            $mark->setSubmissionReturn($submissionReturnMapper->hydrate($r, 'r'));
             $mark->setStudent($student);
             $mark->setDescriptor($descriptor);
             $marks->add($mark);

@@ -713,12 +713,12 @@ class RubricMapper
     /**
      * Save rubrics selections for a particular Participant
      *
-     * @param Participant $participant
-     * @param IFeedback   $feedback
-     * @param bool[]      $descriptors key = descriptor.id, val = whether it is checked
-     * @param bool        $isDraft Whether these are draft marks
+     * @param Participant                $participant
+     * @param bool[]                     $descriptors key = descriptor.id, val = whether it is checked
+     * @param bool                       $isDraft     Whether these are draft marks
+     * @param SubmissionBox\ReturnedWork $returnedWork
      */
-    public function saveForParticipant(Participant $participant, array $descriptors = [], $isDraft, IFeedback $feedback)
+    public function saveForParticipant(Participant $participant, array $descriptors = [], $isDraft, SubmissionBox\ReturnedWork $returnedWork)
     {
         $descriptorMapper   = DescriptorMapper::getInstance();
         $markMapper         = MarkMapper::getInstance();
@@ -736,7 +736,7 @@ class RubricMapper
 
             $marksToSave->add(
                 $markMapper->createModel()
-                    ->setFeedback($feedback)
+                    ->setSubmissionReturn($returnedWork)
                     ->setStudent($participant->getUser())
                     ->setDescriptor($descriptorMapper->createModel($descriptorId))
                     ->setPublishedAt($publishedAt)

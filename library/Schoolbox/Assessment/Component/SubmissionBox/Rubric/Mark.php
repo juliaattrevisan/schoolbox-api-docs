@@ -8,7 +8,7 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
-use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\User;
@@ -26,8 +26,8 @@ class Mark
     use Id;
     use CreatedAtDate;
 
-    /** @var IFeedback */
-    private $feedback;
+    /** @var null|ReturnedWork */
+    private $submissionReturn;
 
     /** @var User */
     private $student;
@@ -43,20 +43,20 @@ class Mark
 
 
     /**
-     * @return IFeedback
+     * @return null|ReturnedWork
      */
-    public function getFeedback()
+    public function getSubmissionReturn(): ?ReturnedWork
     {
-        return $this->feedback;
+        return $this->submissionReturn;
     }
 
     /**
-     * @param IFeedback $feedback
-     * @return static
+     * @param null|ReturnedWork $submissionReturn
+     * @return $this
      */
-    public function setFeedback(IFeedback $feedback)
+    public function setSubmissionReturn(?ReturnedWork $submissionReturn)
     {
-        $this->feedback = $feedback;
+        $this->submissionReturn = $submissionReturn;
         return $this;
     }
 

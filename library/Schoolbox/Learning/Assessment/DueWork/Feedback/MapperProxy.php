@@ -30,6 +30,7 @@ use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
  * wraps a traditional Mapper to interface with the database.
  *
  * @method SubmissionReturnMapper getMapper()
+ * @method DueWorkDataObject\ReturnedWork transformDomainObject($mapperModel)
  */
 class MapperProxy extends Mapper\AbstractMapperProxy
 {

@@ -31,6 +31,9 @@ class Controller extends Base
     /** @var IFeedbackDataSource */
     protected $feedbackDataSource;
 
+    /** @var MapperProxy */
+    private $feedbackMapperProxy;
+
     /** @var ParticipantDataSource */
     protected $participantDataSource;
 
@@ -52,13 +55,14 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param IFeedbackDataSource $feedbackDataSource
+     * @param IFeedbackDataSource   $feedbackDataSource
      * @param ParticipantDataSource $participantDataSource
-     * @param AssessmentDataSource $assessmentDataSource
-     * @param ResponseDataSource $responseDataSource
-     * @param UserMapper $userMapper
-     * @param Rubric\MarkMapper $rubricMarkMapper
-     * @param ReturnedWorkMapper $returnedWorkMapper
+     * @param AssessmentDataSource  $assessmentDataSource
+     * @param ResponseDataSource    $responseDataSource
+     * @param UserMapper            $userMapper
+     * @param Rubric\MarkMapper     $rubricMarkMapper
+     * @param ReturnedWorkMapper    $returnedWorkMapper
+     * @param MapperProxy           $feedbackMapperProxy
      */
     public function __construct(
         IFeedbackDataSource $feedbackDataSource,
@@ -67,15 +71,17 @@ class Controller extends Base
         ResponseDataSource $responseDataSource,
         UserMapper $userMapper,
         Rubric\MarkMapper $rubricMarkMapper,
-        ReturnedWorkMapper $returnedWorkMapper
+        ReturnedWorkMapper $returnedWorkMapper,
+        MapperProxy $feedbackMapperProxy
     ) {
-        $this->feedbackDataSource = $feedbackDataSource;
+        $this->feedbackDataSource    = $feedbackDataSource;
         $this->participantDataSource = $participantDataSource;
-        $this->assessmentDataSource = $assessmentDataSource;
-        $this->responseDataSource = $responseDataSource;
-        $this->userMapper = $userMapper;
-        $this->rubricMarkMapper = $rubricMarkMapper;
-        $this->returnedWorkMapper = $returnedWorkMapper;
+        $this->assessmentDataSource  = $assessmentDataSource;
+        $this->responseDataSource    = $responseDataSource;
+        $this->userMapper            = $userMapper;
+        $this->rubricMarkMapper      = $rubricMarkMapper;
+        $this->returnedWorkMapper    = $returnedWorkMapper;
+        $this->feedbackMapperProxy   = $feedbackMapperProxy;
     }
 
     /**
@@ -177,6 +183,8 @@ class Controller extends Base
         if(!$participant->getAssessable() instanceof DueWork\Model){
             return;
         }
+        $returnedWork = $this->feedbackMapperProxy->transformDomainObject($feedback);
+
         /** @var DueWork\Model $dueWork */
         $dueWork = $participant->getAssessable();
 
@@ -185,7 +193,7 @@ class Controller extends Base
         // Did we just give some rubric marks?
         if (is_array($post['rubric'])) {
             $rubMap = RubricMapper::getInstance();
-            $rubMap->saveForParticipant($participant, $post['rubric']['descriptors'], $isDraft, $feedback);
+            $rubMap->saveForParticipant($participant, $post['rubric']['descriptors'], $isDraft, $returnedWork);
         }
         // Else did we just publish draft marks via the status page?
         elseif(!$isDraft){
