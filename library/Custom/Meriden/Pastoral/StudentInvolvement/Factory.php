@@ -140,7 +140,8 @@ class Factory
 
         // Add grades for the tutor group class page
         $tutorGroupCode   = $tutorGroup->getTutorGroup();
-        $folderWithGrades = $this->getFolderWithGrades($tutorGroupCode['code'], $student);
+        $publishedOnly    = !$this->doesDraftFeedbackContribute($year);
+        $folderWithGrades = $this->getFolderWithGrades($tutorGroupCode['code'], $student, $publishedOnly);
         $tutorGroup
             ->setSubjectCode($tutorGroupCode['code'])
             ->setFolder($folderWithGrades['folder'])
@@ -192,7 +193,8 @@ class Factory
             ->setSubjectCode($subjectCode);
 
         // Add grades for the class page
-        $folderWithGrades = $this->getFolderWithGrades($subjectCode, $student);
+        $publishedOnly    = !$this->doesDraftFeedbackContribute($year);
+        $folderWithGrades = $this->getFolderWithGrades($subjectCode, $student, $publishedOnly);
         $subject
             ->setFolder($folderWithGrades['folder'])
             ->setCohortFolders($this->getCohortFolders($folderWithGrades['folder'], $subjectCode))
@@ -208,7 +210,7 @@ class Factory
         // Add grade distributions, only for assessments which have them
         $newGrades = [];
         foreach ($subject->getGrades() as $key => $grade) {
-            $distribution = $this->buildDistribution($grade, $subject->getCohortFolders());
+            $distribution = $this->buildDistribution($grade, $subject->getCohortFolders(), $publishedOnly);
             if (!empty($distribution)) {
                 $grade['distribution'] = $distribution;
             }
@@ -221,7 +223,8 @@ class Factory
         if (!empty($courseGrade)) {
             $courseGrade['distribution'] = $this->buildDistribution(
                 $courseGrade,
-                $subject->getCohortFolders()
+                $subject->getCohortFolders(),
+                $publishedOnly
             );
             $subject->setNamedGrade('courseGrade', $courseGrade);
         }
@@ -287,18 +290,19 @@ class Factory
      *
      * @param string $subjectCode
      * @param User   $student
+     * @param bool  $publishedOnly
      *
      * @return array {
      *  folder: Folder
      *  grades: array
      * }
      */
-    protected function getFolderWithGrades($subjectCode, User $student)
+    protected function getFolderWithGrades($subjectCode, User $student, bool $publishedOnly)
     {
         try {
             // Find by category code, and figure out if they're involved.
             $folder = $this->folderMapper->findByCode($subjectCode);
-            $involvement = $this->getStudentInvolvement($folder, $student);
+            $involvement = $this->getStudentInvolvement($folder, $student, $publishedOnly);
             if ($involvement) {
                 return [
                     'folder' => $folder,
@@ -316,7 +320,7 @@ class Factory
         // To do this, every matching category has to be checked.
         $archivedFolders = $this->folderMapper->findAllByArchivedCode($subjectCode);
         foreach ($archivedFolders as $archivedFolder) {
-            $involvement = $this->getStudentInvolvement($archivedFolder, $student);
+            $involvement = $this->getStudentInvolvement($archivedFolder, $student, $publishedOnly);
             if ($involvement) {
                 return [
                     'folder' => $archivedFolder,
@@ -341,12 +345,13 @@ class Factory
      *
      * @param Folder $folder
      * @param User   $student
+     * @param bool   $publishedOnly
      *
      * @return array {
      *  grades: array (if the student is involved)
      * }
      */
-    protected function getStudentInvolvement(Folder $folder, User $student)
+    protected function getStudentInvolvement(Folder $folder, User $student, bool $publishedOnly)
     {
         // Is $student a member of $folder (by class code?)
         foreach ($student->getSubjectCollection() as $subject) {
@@ -355,14 +360,14 @@ class Factory
                     // Student is involved, even if they have no grades.
                     // Try to get them anyway.
                     return [
-                        'grades' => $this->getGrades($folder, $student),
+                        'grades' => $this->getGrades($folder, $student, $publishedOnly),
                     ];
                 }
             }
         }
 
         // If not, has $student got a grade in this folder?
-        $grades = $this->getGrades($folder, $student);
+        $grades = $this->getGrades($folder, $student, $publishedOnly);
         if (!empty($grades)) {
             return [
                 'grades' => $grades,
@@ -376,6 +381,7 @@ class Factory
      *
      * @param Folder $folder
      * @param User   $student
+     * @param bool   $publishedOnly
      *
      * @return array {
      *  assessment:  IAssessable
@@ -395,7 +401,7 @@ class Factory
      *  comment:     string
      * }
      */
-    protected function getGrades(Folder $folder, User $student)
+    protected function getGrades(Folder $folder, User $student, bool $publishedOnly)
     {
         $allGrades = [];
 
@@ -409,7 +415,7 @@ class Factory
 
             $participant = $assessment->getParticipantIfExtant($student);
             if ($participant) {
-                $feedback = $participant->getAuthoritativeFeedback(true);
+                $feedback = $participant->getAuthoritativeFeedback($publishedOnly);
                 if ($feedback) {
 
                     // Load rubrics into assessment whilst here
@@ -500,6 +506,7 @@ class Factory
      *
      * @param array          $grade
      * @param array|Folder[] $cohortFolders
+     * @param bool           $publishedOnly
      *
      * @return array {
      *   grouped: array(string, array)
@@ -510,7 +517,7 @@ class Factory
      *   }
      * }
      */
-    public function buildDistribution($grade, $cohortFolders)
+    public function buildDistribution($grade, $cohortFolders, bool $publishedOnly)
     {
         // Only interested in distribution of due works that are assessment tasks
         $baseAssessment = $grade['assessment'];
@@ -557,11 +564,11 @@ class Factory
             $studentMarks = [];
             foreach ($assessment->getAllParticipants() as $participant) {
                 // Only add mark if not null?
-                $normMark = $participant->getNormalisedMark(true);
+                $normMark = $participant->getNormalisedMark($publishedOnly);
                 if (isset($normMark)) {
                     $studentMarks[$participant->getUser()->getId()] = [
                         'mark'        => $normMark,
-                        'pretty_mark' => $participant->getHumanReadableMark(true),
+                        'pretty_mark' => $participant->getHumanReadableMark($publishedOnly),
                     ];
                 }
             }
@@ -634,5 +641,21 @@ class Factory
             ];
         }
         return $distribution;
+    }
+
+    /**
+     * Does draft feedback contribute to grades for this report year?
+     *
+     * It contributes for 2017 and earlier, because teachers are used to having
+     * feedback flow through to the eReport without having to publish it.
+     *
+     * This workflow will change in 2018.
+     *
+     * @param int $reportYear
+     * @return bool
+     */
+    private function doesDraftFeedbackContribute($reportYear) : bool
+    {
+        return $reportYear < 2018;
     }
 }
