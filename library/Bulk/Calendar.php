@@ -9,18 +9,25 @@
  */
 class Bulk_Calendar extends Bulk_Abstract {
 
-    private $post;
-    private $session;
+    private $source;
+    private $owner;
+    private $categoryList;
+    private $groupList;
+    private $campusList;
+
 
     /**
      * Constructor
      *
      * @param $file
      */
-    public function __construct($file, $post, $session) {
+    public function __construct($file, $source = null, $owner = null, $categoryList = null, $groupList = null, $campusList = null) {
         parent::__construct($file);
-        $this->post = $post;
-        $this->session = $session;
+        $this->source = $source;
+        $this->owner = $owner;
+        $this->categoryList = $categoryList;
+        $this->groupList = $groupList;
+        $this->campusList = $campusList;
     }
     
     /**
@@ -31,53 +38,26 @@ class Bulk_Calendar extends Bulk_Abstract {
 	public function addCalendar() {
 		if (is_file($this->getFile())) {
 
-            $source = null;
-		    if ($this->post['source'] != null) {
-		        $source = $this->post['source'];
-
+		    if ($this->source != null) {
 		        //Delete old events
-                try {
-                    Event\Source\Mapper::getInstance()->deleteEventsFromSource($source);
-                } catch (Schoolbox\Mapper\DefinitionException $e) {
-
-                }
+                Event\Source\Mapper::getInstance()->deleteEventsFromSource($this->source);
             }
 
             /* Calendar Owner overrideco
              */
-            if (isset($this->post['userid']) && is_numeric($this->post['userid'])) {
+            if ($this->owner != null && is_numeric($this->owner)) {
                 $userMapper = new \Schoolbox\UserMapper();
-                $user = $userMapper->findById($this->post['userid']);
+                $user = $userMapper->findById($this->owner);
                 $author = $user;
             }
             else {
-                $user = $this->session['user'];
-                $author = $this->session['user'];
+                $user = $_SESSION['user'];
+                $author = $_SESSION['user'];
             }
-
-			/* Set up specified campus list
-			 * Set up specified group list
-			 * Set up specified category list
-			 */
-			$groupList = array();
-			$campusList = array();
-			$categoryList = array();
-
-			if (is_array($this->post['userGroup'])) {
-				$groupList = $this->post['userGroup'];
-			}
-
-			if (is_array($this->post['campusList'])) {
-				$campusList = $this->post['campusList'];
-			}
-
-			if (is_array($this->post['categoryList'])) {
-				$categoryList = $this->post['categoryList'];
-			}
 
 			/* Use factory to spawn a builder
 			 */
-			$factory = new \Calendar\Import\Factory($user->getId(), $author->getId(), $categoryList, $groupList, $campusList, \Schoolbox\Calendar\Event::ACCESS_CAMPUS, $this->getFile(), $source);
+			$factory = new \Calendar\Import\Factory($user->getId(), $author->getId(), $this->categoryList, $this->groupList, $this->campusList, \Schoolbox\Calendar\Event::ACCESS_CAMPUS, $this->getFile(), $this->source);
 			$strategy = $factory->build();
 			$strategy->load();
 

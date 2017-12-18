@@ -35,19 +35,19 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
     if (!isset($opts['campus'])) {
         $log->error("No campus specified.\n");
     } else {
-        $fauxPost['campusList'] = explode(',',$opts['campus']);
+        $campusList = explode(',',$opts['campus']);
     }
 
     if (!isset($opts['role'])) {
         $log->error("No role specified.\n");
     } else {
-        $fauxPost['userGroup'] = explode(',', $opts['role']);
+        $groupList = explode(',', $opts['role']);
     }
 
-    if (!isset($opts['owner'])) {
-        $log->error("No owner specified.\n");
+    if (!isset($opts['owner']) && is_numeric($opts['owner'])) {
+        $log->error("No owner id specified.\n");
     } else {
-        $fauxPost['userid'] = $opts['owner'];
+        $ownerId = $opts['owner'];
     }
 
     if (!file_exists($opts['file'])) {
@@ -56,21 +56,29 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
         $file = $opts['file'];
     }
 
-    //Mandatory options
+    //Mandatory options check
     if (empty($opts['campus']) || empty($opts['role']) || empty($opts['file'] || empty($opts['owner']))) {
-        die('');
+        exit(1);
     }
 
+    //Optional options
     if (isset($opts['source'])) {
-        $fauxPost['source'] = $opts['source'];
+        $source = $opts['source'];
         $log->notice("Events with source ".$opts['source']." will be deleted .\n");
+    } else {
+        $source = null;
     }
 
     //Not used in this context
-    $fauxPost['categoryList'] = null;
+    $categoryList = null;
 
-    $bulkHandler = new Bulk_Calendar($file, $fauxPost, $fauxSesh);
-    $bulkHandler->addCalendar();
+    $bulkHandler = new Bulk_Calendar($file, $source, $ownerId, $categoryList, $groupList, $campusList);
+
+    try {
+        $bulkHandler->addCalendar();
+    } catch (Schoolbox\Mapper\DefinitionException $e) {
+
+    }
 
 });
 

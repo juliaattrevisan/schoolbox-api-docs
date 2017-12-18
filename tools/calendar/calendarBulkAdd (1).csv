@@ -1,0 +1,5 @@
+Start Date,Start Time,Finish Date,Finish Time,All Day,Name,Detail,Location,Type,Publish Date,Attendance
+10/04/2012,15:30,10/04/2012,16:10,0,First Event,The first event,Sydney,1,11/04/2012,1
+15/05/2012,17:45,15/05/2012,18:45,0,Second Event,The second event,Melbourne,2,,1
+12/12/2012,,12/12/2012,,1,Third Event,The third event,Brisbane,3,,0
+12/12/2012,,12/12/2012,,1,Fourth Event,The fourth event,Adelaide,1,,0

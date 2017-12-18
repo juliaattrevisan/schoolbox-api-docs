@@ -16,7 +16,26 @@ $nav->parse($this, 'calendar');
 /* Two types of upload.. either single user.. or via csv file..
  */
 if (isset($_FILES['bulkadd']['tmp_name']) && $_FILES['bulkadd']['tmp_name']) {
-    $bulkHandler = new Bulk_Calendar($_FILES['bulkadd']['tmp_name'], $_POST, $_SESSION);
+
+    if (isset($_POST['userid'])) {
+        $ownerId = $_POST['userid'];
+    } else {
+        $ownerId = null;
+    }
+
+    if (isset($_POST['userGroup'])) {
+        $groupList = $_POST['userGroup'];
+    } else {
+        $groupList = null;
+    }
+
+    if (isset($_POST['campusList'])) {
+        $campusList = $_POST['campusList'];
+    } else {
+        $campusList = null;
+    }
+
+    $bulkHandler = new Bulk_Calendar($_FILES['bulkadd']['tmp_name'], null, $ownerId, null, $groupList, $campusList);
     $allEvents = $bulkHandler->addCalendar();
 
     if ($allEvents && count($allEvents)) {

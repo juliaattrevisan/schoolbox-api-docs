@@ -230,11 +230,13 @@ class Csv extends Base {
 
             /* Assign Category relations
              */
-            foreach($this->getCategoryList() as $currentCategory) {
-                $category = new Category();
-                $category->setEventId($event->getId());
-                $category->setCategoryId($currentCategory);
-                $categoryRelationMapper->save($category);
+            if ($this->categoryList != null) {
+                foreach($this->getCategoryList() as $currentCategory) {
+                    $category = new Category();
+                    $category->setEventId($event->getId());
+                    $category->setCategoryId($currentCategory);
+                    $categoryRelationMapper->save($category);
+                }
             }
 
             /* Assign Role relations
