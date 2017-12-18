@@ -71,9 +71,6 @@ if (isset($_POST['updateUsers'])) {
 }
 
 try {
-    // drop a silent logger in here
-    $this->getDi()->values['logger'] = new NullLogger();
-
     /** @var WritableCache $cache */
     $cache = $this->getDi()->get('subscriptionCache');
     $cache->cacheAllUsers(INSTANCE_ID);
