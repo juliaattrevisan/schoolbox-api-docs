@@ -102,7 +102,7 @@ class Mapper extends BaseMapper
 
             /* Hard-delete the events themselves
              */
-            $deleteEvents = EventMapper::getInstance()->findByColumn('id', $eventIds);
+            $deleteEvents = EventMapper::getInstance()->findByColumn('id', $eventIds, ['deleted' => true]);
             EventMapper::getInstance()->hardDelete($deleteEvents);
 
         }
