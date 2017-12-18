@@ -26,7 +26,7 @@
 {# Tasks have inline interaction #}
 {% if writable %}
     {% set postRoute = routeLookup('learningAssessment.postCreateResponse', {assessmentId: assessment.id, participant: participant, studentId: participant.user.id}) %}
-{% else if canInteract %}
+{% elseif canInteract %}
     {% set postRoute = routeLookupIfAuthorized('learningAssessment.postCreateResponse', {assessmentId: assessment.id, participant: participant, studentId: participant.user.id}) %}
 {% endif %}
 
