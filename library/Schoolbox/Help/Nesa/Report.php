@@ -37,9 +37,9 @@ class Report
     /**
      * Report constructor.
      *
-     * @param DataModel\MapperProxy          $assessmentMapperProxy
-     * @param Rubric\RubricMapper            $rubricMapper
-     * @param UserMapper                     $userMapper
+     * @param DataModel\MapperProxy $assessmentMapperProxy
+     * @param Rubric\RubricMapper   $rubricMapper
+     * @param UserMapper            $userMapper
      */
     public function __construct(
         DataModel\MapperProxy $assessmentMapperProxy,
