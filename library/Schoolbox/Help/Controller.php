@@ -140,7 +140,7 @@ class Controller extends Base
          */
         $this->getResponse()->content->set($this->buildHtmlOutput('@help/report.twig', [
             'report' => $report,
-            'duration' => round($end - $start),
+            'duration' => number_format($end - $start, 2),
             'states' => $this->getRequest()->post['state'],
             'unaccreditedOnly' => $this->getRequest()->post['unaccreditedOnly'],
             'indicators' => $indicators
