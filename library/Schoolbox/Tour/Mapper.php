@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Tour;
 
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
@@ -175,5 +176,32 @@ class Mapper extends BaseMapper
             'query'    => $query,
             'bindings' => $bindings,
         ];
+    }
+
+    /**
+     * Update an array of tours to active, and all others to inactive
+     *
+     * @param array $uuids
+     */
+    public function updateActiveTours(array $uuids)
+    {
+        if (count($uuids)) {
+            $predicate = PredicateBuilder::getArrayBindings($uuids, 'uuid');
+            $query = "
+                UPDATE  {$this->getTable()}
+                SET     `active` = CASE WHEN `uuid` IN ({$predicate['placeholders']}) THEN 1 ELSE 0 END;
+            ";
+            $bindings = $predicate['bindings'];
+        } else {
+            // Nothing in the uuids array - set all tours to inactive
+            $query = "
+                UPDATE  {$this->getTable()}
+                SET     `active` = 0;
+            ";
+            $bindings = null;
+        }
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($bindings);
     }
 }
