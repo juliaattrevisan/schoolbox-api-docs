@@ -284,7 +284,7 @@ abstract class Base {
 	}
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getSource()
     {
@@ -292,7 +292,7 @@ abstract class Base {
     }
 
     /**
-     * @param mixed $source
+     * @param string $source
      */
     public function setSource($source)
     {
