@@ -77,6 +77,7 @@ class Controller extends Base
      *
      * Selection of capabilities, indicators, descriptors which are used to configure a report output
      *
+     * @throws \Schoolbox\Application\Exception\Exception
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getNesa()
