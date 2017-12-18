@@ -154,7 +154,7 @@ class Mapper extends BaseMapper
             {$this->getSelectString()} 
             INNER JOIN  {$this->getJoinSql('trigger', '', 't')}
             WHERE       {$userQuery['query']} AND 
-                        :url REGEXP `tour_trigger`.`url_regex` AND
+                        :url REGEXP `t`.`url_regex` AND
                         `tour`.`active` = 1
         ";
 
