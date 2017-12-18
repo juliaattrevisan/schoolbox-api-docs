@@ -60,7 +60,7 @@ class Report
      * @return array
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function generate(array $states, int $unaccreditedOnly, array $indicators)
+    public function generate(array $states, int $unaccreditedOnly, array $indicators) :array
     {
         $assessmentMapperProxy = $this->assessmentMapperProxy;
 
