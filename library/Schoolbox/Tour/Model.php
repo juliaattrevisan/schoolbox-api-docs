@@ -124,14 +124,6 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return bool|null
-     */
-    public function isActive(): ?bool
-    {
-        return $this->getActive();
-    }
-
-    /**
      * @param bool|null $active
      *
      * @return self|$this
