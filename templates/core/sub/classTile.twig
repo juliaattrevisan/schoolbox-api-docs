@@ -3,7 +3,7 @@
         'term':       Term
         'class':      Folder
         'classType':  string
-        'courses':    CourseSpecification[]
+        'courses':    string[] CourseSpec titles indexed by courseSpec.id
     } only %}
 #}
 
@@ -27,9 +27,9 @@
                 <li><a href="/resource/folder/modify/{{ class.id }} " class="icon-modify">Modify</a></li>
                 {% if courses | length %}
                     <li class="separator">Analytics</li>
-                    {% for courseSpec in courses %}
-                        {% set url = routeLookup('learningAnalytics.folderWithTerm', {courseSpecId: courseSpec.id, folderId: class.id, termCode: term.code}) %}
-                        <li><a href="{{ url }}" class="icon-poll">{{ courseSpec.title }}</a></li>
+                    {% for courseSpecId, courseSpecTitle in courses %}
+                        {% set url = routeLookup('learningAnalytics.folderWithTerm', {courseSpecId: courseSpecId, folderId: class.id, termCode: term.code}) %}
+                        <li><a href="{{ url }}" class="icon-poll">{{ courseSpecTitle }}</a></li>
                     {% endfor %}
                 {% endif %}
 

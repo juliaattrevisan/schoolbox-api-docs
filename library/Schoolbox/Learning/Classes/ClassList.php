@@ -8,17 +8,15 @@
 namespace Schoolbox\Learning\Classes;
 
 use Alaress_Date_Format;
-use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
-use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use Timetable_ColourMapper;
+use UnexpectedValueException;
 
 /**
  * Generates a list of classes, along with the courses imported to those classes, suitable
@@ -29,57 +27,54 @@ use Timetable_ColourMapper;
  */
 class ClassList
 {
+
     /** @var User */
     private $user;
 
-    /** @var FolderMapper */
+    /** @var Folder\Mapper */
     private $folderMapper;
 
     /** @var Timetable_ColourMapper */
     private $timetableColourMapper;
 
-    /** @var CourseSpecification\Mapper */
-    private $courseSpecMapper;
+    /** @var Folder\ClassListFactory */
+    private $classListFactory;
 
-    /** @var CourseImplementation\Mapper */
-    private $courseImplMapper;
 
     /**
-     * @param User $user
-     * @param FolderMapper $folderMapper
-     * @param Timetable_ColourMapper $timetableColourMapper
-     * @param CourseSpecification\Mapper $courseSpecMapper
-     * @param CourseImplementation\Mapper $courseImplMapper
+     * @param User                    $user
+     * @param Folder\Mapper           $folderMapper
+     * @param Timetable_ColourMapper  $timetableColourMapper
+     * @param Folder\ClassListFactory $classListFactory
      */
     public function __construct(
         User $user,
-        FolderMapper $folderMapper,
+        Folder\Mapper $folderMapper,
         Timetable_ColourMapper $timetableColourMapper,
-        CourseSpecification\Mapper $courseSpecMapper,
-        CourseImplementation\Mapper $courseImplMapper
+        Folder\ClassListFactory $classListFactory
     ) {
-        $this->user = $user;
-        $this->folderMapper = $folderMapper;
+        $this->user                  = $user;
+        $this->folderMapper          = $folderMapper;
         $this->timetableColourMapper = $timetableColourMapper;
-        $this->courseSpecMapper = $courseSpecMapper;
-        $this->courseImplMapper = $courseImplMapper;
+        $this->classListFactory      = $classListFactory;
     }
+
 
     /**
      * Returns a set of of classes, along with subsidiary data, suitable for
      * rendering on the classes component or page
      *
-     * @param Term $term
+     * @param Term\Model          $term
      * @param Alaress_Date_Format $now
      * @return array
      * @var Term                          return['term']
-     * @var Collection|Folder[]           return['classList']
+     * @var Collection|Folder\Model[]     return['classList']
      * @var string[]                      return['classTypes'] Indexed by folder.id
-     * @var CourseSpecification\Model[][] return['courses'] Grouped by folder.id
+     * @var string[][]                    return['courses'] Grouped by folder.id, courseSpec.id
      * @throws DefinitionException
-     * @throws MapperException
+     * @throws UnexpectedValueException
      */
-    public function getClassList(Term $term, Alaress_Date_Format $now)
+    public function getClassList(Term\Model $term, Alaress_Date_Format $now)
     {
         $classTypes    = [];
         $folderList    = $this->folderMapper->createCollection();
@@ -94,7 +89,7 @@ class ClassList
             foreach ($this->user->getSubjectCollection() as $subject) {
                 try {
                     $folder                       = $this->folderMapper->findByCode($subject['code']);
-                    $folderList                   = $folderList->mergeUnique(new GenericCollection(Folder::class, [$folder]), 'id');
+                    $folderList                   = $folderList->mergeUnique(new GenericCollection(Folder\Model::class, [$folder]), 'id');
                     $classTypes[$folder->getId()] = $subject['classType'];
                 } catch (MapperException $e) {
                     // Not found
@@ -107,7 +102,7 @@ class ClassList
         if ($this->user->getRole()->isStaff()) {
             $folderList = $folderList->mergeUnique($this->folderMapper->findFoldersWithFeedbacksFromTeacher($this->user, $term), 'id');
         } elseif ($this->user->getRole()->isStudent()) {
-            /** @var GenericCollection|Folder[] $folderList */
+            /** @var GenericCollection|Folder\Model[] $folderList */
             $folderList = $folderList->mergeUnique($this->folderMapper->findFoldersWithResponses($this->user, $term), 'id');
             $folderList = $folderList->mergeUnique($this->folderMapper->findFoldersWithFeedbackToStudent($this->user, $term), 'id');
         }
@@ -117,72 +112,46 @@ class ClassList
         $this->applyFolderColours($folderList);
 
         return [
-            'term' => $term,
-            'classList' => $folderList,
+            'term'       => $term,
+            'classList'  => $folderList,
             'classTypes' => $classTypes,
-            'courses' => $courseSpecs,
+            'courses'    => $courseSpecs,
         ];
     }
 
+
     /**
-     * Returns a sets of CourseSpecs, grouped by class folder
+     * Returns a sets of CourseSpecs titles, indexed by class folder.id, courseSpec.id
      *
-     * Filters to only return CourseSpecs that have units imported to class folder for specified term
+     * Filters to only return CourseSpecs that have assessments imported to class folder that
+     * are due in the specified term
      *
-     * @param GenericCollection|Folder[] $folderList
-     * @param Term $term
-     * @return Collection|CourseSpecification\Model[][] Grouped by folder.id
+     * @param GenericCollection|Folder\Model[] $folderList
+     * @param Term\Model                       $term
+     * @return string[][] CourseSpec titles, indexed by folder.id, courseSpec.id
      */
-    protected function getCourseSpecsHavingUnitsInTerm(GenericCollection $folderList, Term $term)
+    private function getCourseSpecsHavingUnitsInTerm(GenericCollection $folderList, Term\Model $term): array
     {
-        $courseSpecsPerFolder = new Collection();
-
-        // Get course implementations, then group by Folder
-        $courseImpls = $this->courseImplMapper->findByFolderId($folderList->getColumnValues('id'));
-
-        /** @var CourseImplementation\Model[][] $courseImplsPerClass */
-        $courseImplsPerClass = $courseImpls->groupByCallback(function (CourseImplementation\Model $courseImpl) {
-            return $courseImpl->getFolder()->getId();
-        });
-
-        // If a course import has unit implementations that are within the specified term, add the course spec to the folder.
-
-        /** @var CourseImplementation\Model[] $courseImpls */
-        foreach ($courseImplsPerClass as $folderId => $courseImpls) {
-
-            $courseSpecsPerFolder[$folderId] = $this->courseSpecMapper->createCollection();
-            $termContainsUnits               = false;
-
-            foreach ($courseImpls as $courseImpl) {
-                foreach ($courseImpl->getUnits() as $unitImpl) {
-                    if ($term->contains($unitImpl->getOpenDate()) || $term->contains($unitImpl->getDueDate())) {
-                        $termContainsUnits = true;
-                        break;
-                    }
-                }
-
-                if ($termContainsUnits) {
-                    $courseSpecId = $courseImpl->getSpecification()->getId();
-                    $courseSpecsPerFolder[$folderId][$courseSpecId] = $courseImpl->getSpecification();
-                }
-            }
-        }
-
-        return $courseSpecsPerFolder;
+        return $this->classListFactory->findFoldersWithDueImportedAssessments(
+            $folderList->getPropertyValues('id'),
+            $term->getStart(),
+            $term->getActualFinish()
+        );
     }
+
 
     /**
      * If a folder does not have a colour, sets its colour from the configured timetable colours
      *
-     * @param GenericCollection|Folder[] $folderList
+     * @param GenericCollection|Folder\Model[] $folderList
      */
-    protected function applyFolderColours(GenericCollection $folderList)
+    protected function applyFolderColours(GenericCollection $folderList): void
     {
         // Get Timetable colours to use as random colours for null set folders
-        $colourList = $this->timetableColourMapper->findAll();
+        $colourList  = $this->timetableColourMapper->findAll();
         $colourIndex = 0;
 
-        /** @var Folder $folder */
+        /** @var Folder\Model $folder */
         foreach ($folderList as $folder) {
             if (!$folder->getColour()) {
 

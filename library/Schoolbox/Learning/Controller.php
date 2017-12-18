@@ -11,7 +11,6 @@ use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -19,18 +18,17 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Statistics;
 use Schoolbox\Learning\Classes\ClassList;
 use Schoolbox\Mapper\DefinitionException;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\User;
 use Schoolbox\Assessment\Term\Model as Term;
 use Timetable_ColourMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
-use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use \Alaress_Date_Format;
 use Schoolbox\Filter;
 use Schoolbox\Mapper;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
+use Schoolbox\Resource\Folder;
+use UnexpectedValueException;
 
 class Controller extends Base
 {
@@ -47,18 +45,9 @@ class Controller extends Base
      * @var AssessmentMapperProxy
      */
     private $assessmentMapperProxy;
-    /**
-     * @var RubricMapper
 
     /** @var Timetable_ColourMapper */
     private $timetableColourMapper;
-
-    /** @var CourseImplementationMapper */
-    private $courseImplementationMapper;
-
-    /** @var CourseSpecificationMapper */
-    private $courseSpecificationMapper;
-
 
     /** @var Filter\Selection\Mapper */
     private $filterSelectionMapper;
@@ -67,35 +56,35 @@ class Controller extends Base
     /** @var AssessmentFilters\IdFinder */
     private $assessmentIdFinder;
 
+    /** @var Folder\ClassListFactory */
+    private $classListFactory;
+
 
     /**
      * @param AssessmentMapperProxy      $assessmentMapperProxy
      * @param FolderMapper               $folderMapper
      * @param TermMapper                 $termMapper
      * @param Timetable_ColourMapper     $timetableColourMapper
-     * @param CourseImplementationMapper $courseImplementationMapper
-     * @param CourseSpecificationMapper  $courseSpecificationMapper
      * @param Filter\Selection\Mapper    $filterSelectionMapper
      * @param AssessmentFilters\IdFinder $assessmentIdFinder
+     * @param Folder\ClassListFactory    $classListFactory
      */
     public function __construct(
         AssessmentMapperProxy $assessmentMapperProxy,
         FolderMapper $folderMapper,
         TermMapper $termMapper,
         Timetable_ColourMapper $timetableColourMapper,
-        CourseImplementationMapper $courseImplementationMapper,
-        CourseSpecificationMapper $courseSpecificationMapper,
         Filter\Selection\Mapper $filterSelectionMapper,
-        AssessmentFilters\IdFinder $assessmentIdFinder
+        AssessmentFilters\IdFinder $assessmentIdFinder,
+        Folder\ClassListFactory $classListFactory
     ) {
         $this->assessmentMapperProxy      = $assessmentMapperProxy;
         $this->termMapper                 = $termMapper;
         $this->folderMapper               = $folderMapper;
         $this->timetableColourMapper      = $timetableColourMapper;
-        $this->courseImplementationMapper = $courseImplementationMapper;
-        $this->courseSpecificationMapper  = $courseSpecificationMapper;
         $this->filterSelectionMapper      = $filterSelectionMapper;
         $this->assessmentIdFinder         = $assessmentIdFinder;
+        $this->classListFactory           = $classListFactory;
     }
 
 
@@ -317,7 +306,7 @@ class Controller extends Base
      * @param Term $term
      * @throws ServiceNotFound If unable to find HTML builder
      * @throws DefinitionException
-     * @throws MapperException
+     * @throws UnexpectedValueException
      */
     public function getClasses(Term $term)
     {
@@ -332,15 +321,14 @@ class Controller extends Base
                 'term'       => $term,
                 'classList'  => $this->folderMapper->createCollection(),
                 'classTypes' => [],
-                'courses'    => new Collection(),
+                'courses'    => [],
             ];
         } else {
             $classList = new ClassList(
                 $this->getUser(),
                 $this->folderMapper,
                 $this->timetableColourMapper,
-                $this->courseSpecificationMapper,
-                $this->courseImplementationMapper
+                $this->classListFactory
             );
             $gridData  = $classList->getClassList($term, $now);
         }
