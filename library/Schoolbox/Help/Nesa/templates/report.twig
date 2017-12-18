@@ -1,17 +1,3 @@
-{% macro demonstrated(value, tooltip) %}
-    <span class="demonstrated" title="{{ tooltip }}">{{ value }}</span>
-{% endmacro %}
-
-{% macro notDemonstrated(value, tooltip) %}
-    <span class="not-demonstrated" title="{{ tooltip }}">{{ value }}</span>
-{% endmacro %}
-
-{% macro undecided(value, tooltip) %}
-    <span class="undecided" title="{{ tooltip }}">{{ value }}</span>
-{% endmacro %}
-
-{% import _self as macro %}
-
 {# Where to put these styles?
  # Normally I'd put them into Skin Config but I don't really want to lose them
  #}
@@ -110,12 +96,12 @@
                         <td class="center">
                             {% if row.condensed[indicator].outcome is defined %}
                                 {% if row.condensed[indicator].outcome %}
-                                    {{ macro.demonstrated('Y', row.condensed[indicator].text) }}
+                                    <span class="demonstrated" title="{{ row.condensed[indicator].text }}">Y</span>
                                 {% else %}
-                                    {{ macro.notDemonstrated('N', row.condensed[indicator]) }}
+                                    <span class="not-demonstrated" title="{{ row.condensed[indicator].text }}">N</span>
                                 {% endif %}
                             {% else %}
-                                {{ macro.undecided('-', row.condensed[indicator]) }}
+                                <span class="undecided" title="">-</span>
                             {% endif %}
                         </td>
                         {% endfor %}
