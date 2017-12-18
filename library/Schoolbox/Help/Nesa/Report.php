@@ -51,15 +51,15 @@ class Report
         $this->userMapper = $userMapper;
     }
 
+
     /**
      * Generate report contents in a view-agnostic manner
      * Acquire NESA data for $folder and the chosen indicators
      *
-     * @param array    $states
-     * @param int      $unaccreditedOnly
-     * @param array    $indicators
+     * @param array $states
+     * @param int   $unaccreditedOnly
+     * @param array $indicators
      * @return array
-     * @throws \Schoolbox\Mapper\Exception
      */
     public function generate(array $states, int $unaccreditedOnly, array $indicators) :array
     {

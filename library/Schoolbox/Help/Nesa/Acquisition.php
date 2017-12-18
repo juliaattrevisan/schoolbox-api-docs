@@ -176,9 +176,8 @@ class Acquisition
      * Professional Development details
      *
      * Populate a particular subset of Participants
+     *
      * @return array
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     public function generate() :array
     {
