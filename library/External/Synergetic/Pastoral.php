@@ -923,8 +923,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $params = [
             'studentExternalId' => $studentExternalId,
             'itemDate' => $pastoral->getCreatedAt()->getDatabase(),
-            'publicBody' => substr($pastoral->getBodyPublic(), 0, 2000),
-            'privateBody' => substr($pastoral->getBodyPrivate(), 0, 2000),
+            'publicBody' => substr(strip_tags($pastoral->getBodyPublic()), 0, 2000),
+            'privateBody' => substr(strip_tags($pastoral->getBodyPrivate()), 0, 2000),
             'pastoralTypeCode' => substr($pastoralTypeCode, 0, 15),
             'pastoralSubTypeCode' => substr($pastoralSubTypeCode, 0, 15),
             'classificationCode' => substr($documentClassificationCode, 0, 15),
