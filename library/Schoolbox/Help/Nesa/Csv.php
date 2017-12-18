@@ -36,7 +36,7 @@ class Csv
 
         /* Empty row - used to reset $data
          */
-        $emptyRow = array_fill(0, count($headings), null);
+        $emptyRow = array_fill(0, \count($headings), null);
 
         /* Replicated logic from twig template
          * Can't assume ordering of these indicators so do it via hashtable lookup
