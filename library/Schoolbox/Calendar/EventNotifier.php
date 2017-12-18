@@ -147,7 +147,7 @@ class EventNotifier extends AbstractModuleNotifier
             ->setSeverity(Logger::INFO);
 
         if ($event->getAccess() == Event::ACCESS_CAMPUS) {
-            $bob->addFilter('campus', $event->getCampusCollection()->getColumnValues('campusId'));
+            $bob->addFilter('campus', $event->getCampusCollection()->getPropertyValues('id'));
         }
 
         return $bob;
