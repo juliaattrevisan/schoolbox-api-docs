@@ -152,7 +152,7 @@ class Controller extends Base
      * Recycled the same vars used to construct the report
      *
      * I can't trust the url to preserve the contents of the indicators chosen, which must be transmitted
-     * in plaintest on the url (no id integers to rely upon)
+     * in plaintext on the url (no id integers to rely upon)
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
