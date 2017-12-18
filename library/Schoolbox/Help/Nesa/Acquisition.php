@@ -93,6 +93,9 @@ class Acquisition
      * Find all the assessment ids that spawned from $courseSpecId
      * Use a custom query, otherwise it's just too slow
      *
+     * Returns a pair of hashtable; (assessmentId, folderId) tuples
+     * and (user_id, pdNumber) tuples
+     *
      * @return array
      */
     private function findInvolvement() :array
@@ -111,6 +114,15 @@ class Acquisition
          */
         $pb = new \Alaress\Database\Predicate\Builder($this->userMapper->getDatabase(), 'upd');
         $pb->equals('registration_state', $this->states);
+        $pb->equals('cs.id', $this->courseSpecId);
+        $pb->equals('cs.deleted_at', null);
+        $pb->equals('ci.deleted_at', null);
+        $pb->equals('cui.deleted_at', null);
+        $pb->equals('p.deleted_at', null);
+        $pb->equals('a.deleted_at', null);
+        $pb->notEquals('a.created_at', '0000-00-00 00:00:00');
+        $pb->equals('u.deleted_at', null);
+        $pb->equals('sb.use_rubric', 1);
 
         /* Show only unaccredited users
          */
@@ -118,7 +130,7 @@ class Acquisition
             $pb->equals('accredited_at', null);
         }
 
-        $where = implode(' AND ', $pb->getWhere());
+        $where = implode("\nAND ", $pb->getWhere());
 
         $query = "
             SELECT u.id AS user_id, upd.number, a.id AS assessment_id, ci.folder_id
@@ -133,16 +145,7 @@ class Acquisition
             INNER JOIN project_assessment pa ON pa.`project_id` = p.`id`
             INNER JOIN assessment a ON pa.`assessment_id` = a.`id`
             INNER JOIN submission_box sb ON sb.`assessment_id` = a.`id`
-            WHERE cs.id = :courseSpecId
-            AND {$where}
-            AND cs.deleted_at IS NULL
-            AND ci.deleted_at IS NULL
-            AND cui.deleted_at IS NULL
-            AND p.deleted_at IS NULL
-            AND a.deleted_at IS NULL
-            AND a.created_at != '0000-00-00 00:00:00'
-            AND u.deleted_at IS NULL
-            AND sb.use_rubric = 1
+            WHERE {$where}
             ORDER BY u.lastname
         ";
 
@@ -150,7 +153,6 @@ class Acquisition
         $statement = $assessmentMapper->getDatabase()->prepare($query);
         $statement->execute(array_merge([
             'homepageService' => UserAccess::SERVICE_HOMEPAGE,
-            'courseSpecId' => $this->courseSpecId
         ], $pb->getParams()));
 
         $involvement = [];
