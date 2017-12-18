@@ -35,8 +35,9 @@ class Controller extends Base
     }
 
     /**
-     * Retrieve all tours for the requested page
+     * Retrieve all tours for the requested URL
      *
+     * @api   GET /tours/url/{url}
      * @param string $url
      */
     public function getTours($url)
