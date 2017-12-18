@@ -81,6 +81,7 @@
             </li>
         </ul>
 
+        {% if report|length %}
         <section>
             <table>
                 <thead>
@@ -129,9 +130,17 @@
                 </tbody>
             </table>
         </section>
+        {% else %}
+        <div class="empty-state">
+            <i class="icon-progress"></i>
+            <p>There are no users who match the criteria you've chosen.</p>
+            <p>You should <a href="{{ routeLookup('help.getNesa') }}">refine your selection criteria</a>.</p>
+        </div>
+        {% endif %}
     </div>
 </div>
 
+{% if report|length %}
 <div id="accreditation-toast" class="toast"></div>
 
 {# For CSV generation #}
@@ -153,3 +162,4 @@
         </form>
     </div>
 </div>
+{% endif %}
