@@ -41,8 +41,8 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $mappers = [
-            'tourMapper'        => $injector->get('mapperFactory')->getLazy(TourMapper::getInstance()),
-            'tourTriggerMapper' => $injector->get('mapperFactory')->getLazy(TourTriggerMapper::getInstance()),
+            'tourMapper'        => $injector->get('mapperFactory')->getLazy(TourMapper::class),
+            'tourTriggerMapper' => $injector->get('mapperFactory')->getLazy(TourTriggerMapper::class),
         ];
 
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));
