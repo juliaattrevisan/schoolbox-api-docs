@@ -247,10 +247,6 @@ Data:
                     <input type="hidden" name="responseId" value="{{ response.id }}"/>
                     <section>
                         <div class="content">
-                            <textarea id="editor-body" name="body" rows="20">{{ editorContents }}</textarea>
-
-                            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
-
                             {# Submitted my own work checkbox #}
                             <input id="editor-submittedInPerson" name="submitted_in_person" type="checkbox" />
                             <label for="editor-submittedInPerson" class="checkbox-label">
@@ -260,6 +256,8 @@ Data:
                                     I have submitted my work in person, and don't need to upload or use the editor
                                 {% endif %}
                             </label>
+                            <textarea id="editor-body" name="body" rows="20">{{ editorContents }}</textarea>
+                            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
                         </div>
                     </section>
 
