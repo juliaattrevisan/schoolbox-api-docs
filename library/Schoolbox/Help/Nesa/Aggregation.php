@@ -59,7 +59,20 @@ class Aggregation
                 $existingIndicators = $condensedData[$user->getId()]['condensed'];
                 $additionalIndicators = $current['condensed'];
 
-                $condensedData[$user->getId()]['condensed'] = array_merge($existingIndicators, $additionalIndicators);
+                /* Check the contents of $additionalIndicators to see if any "N" (Not Shown) outcomes exist there
+                 * as well as in $existingIndicators; don't merge "N" outcomes if there's a "Y" in existence already
+                 */
+                foreach ($current['condensed'] as $key => $data) {
+                    if (array_key_exists($key, $existingIndicators)) {
+                        if ($existingIndicators[$key]['outcome'] === 'Y') {
+                            unset($additionalIndicators[$key]);
+                        }
+                    }
+                }
+
+                if (\count($additionalIndicators)) {
+                    $condensedData[$user->getId()]['condensed'] = array_merge($existingIndicators, $additionalIndicators);
+                }
             }
         }
 
