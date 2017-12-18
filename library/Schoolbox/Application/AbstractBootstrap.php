@@ -846,15 +846,12 @@ abstract class AbstractBootstrap implements BootstrapInterface
 
         // notificaton routing cache
 
-        /** @var MapperFactory $mf */
-        $mf = $di->get('mapperFactory');
-
         $di->params[\Schoolbox\Notif\Queue\Bindings\Generator::class] = [
             'xUserHandler'      => $di->lazyGet('externalUser'),
-            'userMapper'        => $mf->getLazy(UserMapper::class),
-            'roleMapper'        => $mf->getLazy(\Schoolbox\RoleMapper::class),
-            'userAccessMapper'  => $mf->getLazy(UserAccessMapper::class),
-            'categoryMapper'    => $mf->getLazy(\Schoolbox\Resource\Folder\Mapper::class)
+            'userMapper'        => $mapperFactory->getLazy(UserMapper::class),
+            'roleMapper'        => $mapperFactory->getLazy(\Schoolbox\RoleMapper::class),
+            'userAccessMapper'  => $mapperFactory->getLazy(UserAccessMapper::class),
+            'categoryMapper'    => $mapperFactory->getLazy(\Schoolbox\Resource\Folder\Mapper::class)
         ];
 
         $di->params[\Schoolbox\Realtime\Routing\Subscription\Loader\Factory::class] = [
@@ -863,7 +860,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
         ];
 
         $di->setters[\Schoolbox\Realtime\Routing\Subscription\Loader\Factory::class] = [
-            'setUserMapper' => $mf->getLazy(UserMapper::class),
+            'setUserMapper' => $mapperFactory->getLazy(UserMapper::class),
             'setGenerator'  => $di->lazyNew(\Schoolbox\Notif\Queue\Bindings\Generator::class)
         ];
 
