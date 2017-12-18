@@ -114,6 +114,23 @@ Data:
             });
         };
 
+        /**
+         * Can this form be submitted?
+         *
+         * At least one of below must be true:
+         * * There's content in the inline editor
+         * * There's at least one file uploaded
+         * * The "Submitted in person" checkbox is checked
+         *
+         * @return Boolean
+         */
+        var allowSubmit = function() {
+            var inlineLen = CKEDITOR.instances['editor-body'].getData().length,
+                filesLen = $('#files-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length,
+                submittedInPersonCheckbox = form.find('#editor-submittedInPerson');
+            return (Boolean)(inlineLen || filesLen || submittedInPersonCheckbox.prop('checked'));
+        };
+
         /* Spawn editors
          */
         $.fn.alaressEditor({
@@ -132,14 +149,22 @@ Data:
 
         var confirmDialog = $('#confirm-dialog');
 
+        $("[data-action-self-reflect]").click(function(e) {
+            e.preventDefault();
+            if (!allowSubmit()) {
+                // prevent self-reflection without SOMETHING to reflect upon
+                emptyDialog.foundation('reveal', 'open');
+            } else {
+                window.location.href = $(this).data('actionSelfReflect');
+            }
+        });
+
         $("[data-action-save]").click(function (e) {
             var form = $(this).closest('form'),
-                    dialog = confirmDialog,
-                    submit = form.find(':submit'),
-                    inlineLen = CKEDITOR.instances['editor-body'].getData().length,
-                    filesLen = $('#files-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length;
+                dialog = confirmDialog,
+                submit = form.find(':submit');
 
-            if (!inlineLen && !filesLen) {
+            if (!allowSubmit()) {
                 // prevent submission without SOMETHING to submit
                 e.preventDefault();
                 emptyDialog.foundation('reveal', 'open');
@@ -183,6 +208,9 @@ Data:
 
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 
+{% set isSubmitOnBehalfOf = USER.id != student.id %}
+{% set requiresReflection = not isSubmitOnBehalfOf and (assessment.selfReflectable or assessment.selfAssessable) %}
+
 <div class="row">
     <div class="small-12 island">
         <h1>{{ assessment.title }}</h1>
@@ -201,8 +229,15 @@ Data:
         <div class="row">
             <div class="small-12 columns">
                 <div class="alert-box">
-                    To submit your work you may upload files or optionally use the editor to type directly.
-                    Content you create will automatically save to draft, but will <strong>not be submitted</strong> until you press the submit button and confirm on the following screen.
+                    {% if requiresReflection %}
+                        To submit your work you may upload files or optionally use the editor to type directly.
+                        Content you create will automatically save to draft, but will <strong>not be submitted</strong>
+                        until you finish your reflection on your work.
+                    {% else %}
+                        To submit your work you may upload files or optionally use the editor to type directly.
+                        Content you create will automatically save to draft, but will <strong>not be submitted</strong>
+                        until you press the Submit For Assessment button.
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -210,12 +245,32 @@ Data:
             <div class="small-12 island">
                 <form id="editor-form" method="post" action="{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: assessment.id, studentId: student.id }) }}" enctype="multipart/form-data">
                     <input type="hidden" name="responseId" value="{{ response.id }}"/>
-                    <section class="content">
-                        <textarea id="editor-body" name="body" rows="20">{{ editorContents }}</textarea>
-
-                        {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                    <section>
+                        <div class="content">
+                            {# Submitted my own work checkbox #}
+                            <input id="editor-submittedInPerson" name="submitted_in_person" type="checkbox" />
+                            <label for="editor-submittedInPerson" class="checkbox-label">
+                                {% if isSubmitOnBehalfOf %}
+                                    {{ student.firstName }} has submitted their work in person
+                                {% else %}
+                                    I have submitted my work in person, and don't need to upload or use the editor
+                                {% endif %}
+                            </label>
+                            <textarea id="editor-body" name="body" rows="20">{{ editorContents }}</textarea>
+                            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                        </div>
                     </section>
-                    <input type="submit" value="Submit for Assessment {% if USER.id != student.id %}On Behalf Of {{ student.formatName }}{% endif %}" data-action-save />
+
+                    {%- if requiresReflection -%}
+                        <input type="submit"
+                               value="Reflect on my work"
+                               data-action-self-reflect="{{ routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: student.id }) }}" />
+                    {%- else -%}
+                        <input type="submit"
+                               value="{% if isSubmitOnBehalfOf %}Submit on behalf of {{ student.formatName }}{% else %}Submit for assessment{% endif %}"
+                               data-action-save />
+                    {%- endif -%}
+
                     <div class="toast" data-alert data-save-draft></div>
                 </form>
             </div>
