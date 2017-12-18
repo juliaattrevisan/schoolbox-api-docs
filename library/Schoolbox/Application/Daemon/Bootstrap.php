@@ -17,6 +17,11 @@ use Schoolbox\Application\AbstractBootstrap;
 use Schoolbox\Config\ConfigMapper;
 
 
+/**
+ * Class Bootstrap
+ * @package Schoolbox\Application\Daemon
+ * @method Kernel getKernel()
+ */
 class Bootstrap extends AbstractBootstrap {
 
 	/**
@@ -134,6 +139,7 @@ class Bootstrap extends AbstractBootstrap {
             );
         }));
 
+        $di->values['logger'] = $this->getKernel()->logger();
     }
 
 }
