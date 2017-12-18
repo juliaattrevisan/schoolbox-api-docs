@@ -53,6 +53,7 @@ class Report
 
     /**
      * Generate report contents in a view-agnostic manner
+     * Acquire NESA data for $folder and the chosen indicators
      *
      * @param array    $states
      * @param int      $unaccreditedOnly
@@ -62,16 +63,12 @@ class Report
      */
     public function generate(array $states, int $unaccreditedOnly, array $indicators) :array
     {
-        $assessmentMapperProxy = $this->assessmentMapperProxy;
-
-        /* Acquire NESA data for $folder and the chosen indicators
-         */
         $dataSet = (new Acquisition(
             $states,
             $unaccreditedOnly,
             $indicators,
             $this->rubricMapper,
-            $assessmentMapperProxy,
+            $this->assessmentMapperProxy,
             $this->userMapper
         ))->generate();
 
