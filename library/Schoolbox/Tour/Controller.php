@@ -57,36 +57,34 @@ class Controller extends Base
 
         /** @var Model $tour */
         foreach ($tours as $tour) {
-            if ($tour->isActive()) {
-                // Grab all of the triggers for this tour
+            // Grab all of the triggers for this tour
 
-                $tourTriggers = $this->tourTriggerMapper->findForUrl($tour, $url);
+            $tourTriggers = $this->tourTriggerMapper->findForUrl($tour, $url);
 
-                // Create an array to store the selectors/events
+            // Create an array to store the selectors/events
 
-                $triggerArray = [];
+            $triggerArray = [];
 
-                /** @var TourTrigger $tourTrigger */
-                foreach ($tourTriggers as $tourTrigger) {
+            /** @var TourTrigger $tourTrigger */
+            foreach ($tourTriggers as $tourTrigger) {
 
-                    // Add the selector/event to the return data
+                // Add the selector/event to the return data
 
-                    $triggerArray[] = [
-                        'selector' => $tourTrigger->getJavascriptSelector(),
-                        'event'    => $tourTrigger->getJavascriptEvent(),
-                    ];
-                }
+                $triggerArray[] = [
+                    'selector' => $tourTrigger->getJavascriptSelector(),
+                    'event'    => $tourTrigger->getJavascriptEvent(),
+                ];
+            }
 
-                // Only add if one or more triggers was found
+            // Only add if one or more triggers was found
 
-                if (count($triggerArray) > 0) {
-                    $data[] = [
-                        'uuid'        => $tour->getUuid(),
-                        'title'       => $tour->getTitle(),
-                        'description' => $tour->getDescription(),
-                        'triggers'    => $triggerArray,
-                    ];
-                }
+            if (count($triggerArray) > 0) {
+                $data[] = [
+                    'uuid'        => $tour->getUuid(),
+                    'title'       => $tour->getTitle(),
+                    'description' => $tour->getDescription(),
+                    'triggers'    => $triggerArray,
+                ];
             }
         }
 
