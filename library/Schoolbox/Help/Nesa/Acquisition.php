@@ -12,10 +12,10 @@
 namespace Schoolbox\Help\Nesa;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
-use Schoolbox\Learning\Assessment\DataModel\Mapper;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\Learning\Assessment\DueWork\RubricContext;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -46,7 +46,7 @@ class Acquisition
     private $rubricMapper;
 
     /**
-     * @var AssessmentMapperProxy
+     * @var DataModel\MapperProxy
      */
     private $assessmentMapperProxy;
 
@@ -64,7 +64,7 @@ class Acquisition
      * @param int                   $unaccreditedOnly
      * @param array                 $indicators An array of indicator text
      * @param Rubric\RubricMapper   $rubricMapper
-     * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @param DataModel\MapperProxy $assessmentMapperProxy
      * @param UserMapper            $userMapper
      */
     public function __construct(
@@ -72,7 +72,7 @@ class Acquisition
         int $unaccreditedOnly,
         array $indicators,
         Rubric\RubricMapper $rubricMapper,
-        AssessmentMapperProxy $assessmentMapperProxy,
+        DataModel\MapperProxy $assessmentMapperProxy,
         UserMapper $userMapper
     ) {
         $this->states = $states;
@@ -149,7 +149,7 @@ class Acquisition
             ORDER BY u.lastname
         ";
 
-        $assessmentMapper = Mapper::getInstance();
+        $assessmentMapper = DataModel\Mapper::getInstance();
         $statement = $assessmentMapper->getDatabase()->prepare($query);
         $statement->execute(array_merge([
             'homepageService' => UserAccess::SERVICE_HOMEPAGE,
@@ -193,28 +193,37 @@ class Acquisition
         /* This might have to convert to request-in-loop findById() if this data set becomes too big
          */
         foreach ($hierarchy as $assessmentId => $folderData) {
-            $assessment = $this->assessmentMapperProxy->findById($assessmentId);
+            try {
+                $assessment = $this->assessmentMapperProxy->findById($assessmentId);
 
-            /* Load very specific participation from hashtable
-             */
-            $people = $this->userMapper->findByColumn('id', array_shift($folderData));
-
-            /* Summon rubrics
-             */
-            $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
-
-            foreach ($people as $person) {
-                $context = (new RubricContext($this->rubricMapper))->generateMarkable($assessment, $person);
-
-                /* Investigate the context for the user and assessment and find the chosen descriptors that
-                 * exist in the set of rubric groups and criteria.
+                /* Load very specific participation from hashtable
                  */
-                $raw[] = $this->investigate(
-                    $person,
-                    $assessment,
-                    $context['rubric'],
-                    $this->indicators
-                );
+                $people = $this->userMapper->findByColumn('id', array_shift($folderData));
+
+                /* Summon rubrics
+                 */
+                $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
+
+                foreach ($people as $person) {
+                    $context = (new RubricContext($this->rubricMapper))->generateMarkable($assessment, $person);
+
+                    /* Investigate the context for the user and assessment and find the chosen descriptors that
+                     * exist in the set of rubric groups and criteria.
+                     */
+                    $raw[] = $this->investigate(
+                        $person,
+                        $assessment,
+                        $context['rubric'],
+                        $this->indicators
+                    );
+                }
+            }
+            catch (Mapper\Exception $e) {
+
+                /* Assessment not found; rubric not found
+                 * Skip, because nothing can be done about them
+                 */
+                continue;
             }
         }
 
