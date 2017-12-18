@@ -84,7 +84,8 @@ class Controller extends Base
     public function getNesa()
     {
         /* If the hardcoded course is not found, for some reason
-         * Add an error code for this later
+         * Add an error code for this later if it becomes user-configurable
+         * For now, we hardcode this manually; is reasonable to assume it exists
          */
         try {
             $courseSpecification = $this->courseSpecificationMapper->findById(Nesa\Acquisition::NESA_COURSE_SPEC_ID);
