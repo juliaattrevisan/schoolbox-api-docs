@@ -184,27 +184,24 @@ class Acquisition
         /* This might have to convert to request-in-loop findById() if this data set becomes too big
          */
         foreach ($hierarchy as $assessmentId => $folderData) {
-            $currentAssessment = $this->assessmentMapperProxy->findById($assessmentId);
+            $assessment = $this->assessmentMapperProxy->findById($assessmentId);
 
             /* Load very specific participation from hashtable
              */
             $people = $this->userMapper->findByColumn('id', array_shift($folderData));
 
-            $assessment = $this->assessmentMapperProxy->loadParticularParticipantsIntoAssessment($currentAssessment, $people, false, false);
-
             /* Summon rubrics
              */
             $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
 
-            foreach ($assessment->getAllParticipants() as $currentParticipant) {
-                $context = (new RubricContext($this->rubricMapper))
-                            ->generateMarkable($assessment, $currentParticipant->getUser());
+            foreach ($people as $person) {
+                $context = (new RubricContext($this->rubricMapper))->generateMarkable($assessment, $person);
 
                 /* Investigate the context for the user and assessment and find the chosen descriptors that
                  * exist in the set of rubric groups and criteria.
                  */
                 $raw[] = $this->investigate(
-                    $currentParticipant->getUser(),
+                    $person,
                     $assessment,
                     $context['rubric'],
                     $this->indicators
