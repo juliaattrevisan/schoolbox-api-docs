@@ -24,7 +24,7 @@
 {% set labelReviewed   = 'Reviewed' %}
 
 {# Override default route #}
-{% set routeModify = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessment.id}) %}
+{% set routeModify = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessment.id, assessment: assessment}) %}
 {% set responseHistory = locale.attemptHistory.proper %}
 
 {% block headerOptions %}

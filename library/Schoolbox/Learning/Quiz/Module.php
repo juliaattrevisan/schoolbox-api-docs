@@ -7,6 +7,7 @@
 namespace Schoolbox\Learning\Quiz;
 
 use Alaress\Authorizer\Authorizer;
+use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
@@ -109,5 +110,18 @@ class Module extends RestfulModule
     private function getTermMapper()
     {
         return $this->getMapperFactory()->get(Term\Mapper::class);
+    }
+
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+        $matcher->add('#getQuizSummary#', function($params){
+            /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $dataSource */
+            $dataSource = $this->getInjector()->get('assessmentDataSource');
+
+            return [
+                "assessmentId"   => $params["assessmentId"],
+                "assessment"     => $dataSource->findById($params["assessmentId"])
+            ];
+        });
     }
 }

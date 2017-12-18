@@ -10,6 +10,8 @@
 
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Authorizer\Rule\IsModificationUnLocked;
+use Schoolbox\Learning\Assessment\LockedChecker;
 
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
@@ -38,6 +40,18 @@ try {
 }
 catch (\Exception $e) {
     error(117);
+}
+
+$canModify = new IsModificationUnLocked(new LockedChecker(Schoolbox\Assessment\Term\Mapper::getInstance()));
+
+/** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $dataSource */
+$dataSource = $this->getDi()->get('assessmentDataSource');
+
+try{
+    $canModify->authorize(['assessmentId' => $assess['assessment_id'], 'assessment' => $dataSource->findById($assess['assessment_id'])], $_SESSION['USER']);
+}
+catch (\Exception $e) {
+    error(Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
 }
 
 if($assess['start']) {
