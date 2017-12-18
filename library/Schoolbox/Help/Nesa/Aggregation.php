@@ -64,7 +64,7 @@ class Aggregation
                  */
                 foreach ($current['condensed'] as $key => $data) {
                     if (array_key_exists($key, $existingIndicators)) {
-                        if ($existingIndicators[$key]['outcome'] === 'Y') {
+                        if ($existingIndicators[$key]['outcome']) {
                             unset($additionalIndicators[$key]);
                         }
                     }

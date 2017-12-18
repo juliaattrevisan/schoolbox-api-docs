@@ -248,7 +248,7 @@ class Acquisition
                                  */
                                 $val = [
                                     'text' => $levelData['text'],
-                                    'outcome' => 'N'
+                                    'outcome' => false
                                 ];
                             }
                             else {
@@ -257,7 +257,7 @@ class Acquisition
                                  */
                                 $val = [
                                     'text' => $levelData['text'],
-                                    'outcome' => 'Y'
+                                    'outcome' => true
                                 ];
                             }
 

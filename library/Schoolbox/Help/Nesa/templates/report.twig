@@ -102,11 +102,12 @@
                         {% for indicator in indicators %}
 
                         <td class="center">
-
-                            {% if row.condensed[indicator].outcome == 'Y' %}
-                                {{ macro.demonstrated('Y', row.condensed[indicator].text) }}
-                            {% elseif row.condensed[indicator].outcome == 'N' %}
-                                {{ macro.notDemonstrated('N', row.condensed[indicator]) }}
+                            {% if row.condensed[indicator].outcome is defined %}
+                                {% if row.condensed[indicator].outcome %}
+                                    {{ macro.demonstrated('Y', row.condensed[indicator].text) }}
+                                {% else %}
+                                    {{ macro.notDemonstrated('N', row.condensed[indicator]) }}
+                                {% endif %}
                             {% else %}
                                 {{ macro.undecided('-', row.condensed[indicator]) }}
                             {% endif %}
