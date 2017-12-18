@@ -35,6 +35,29 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, function (Model $model) {
+            return $this->preSave($model);
+        });
+    }
+
+    /**
+     * @param Model $model
+     * @return bool
+     */
+    private function preSave(Model $model)
+    {
+        if ($model->getUuid()) {
+            // already got an ID; do nothing
+
+            // TODO consider validating that it's *actually* a UUID
+            return true;
+        }
+
+        // TODO find a way to do this without the pre-query
+        $model->setUuid($this->database->query('SELECT UUID()')->fetchColumn());
+
+        return true;
     }
 
     /**
