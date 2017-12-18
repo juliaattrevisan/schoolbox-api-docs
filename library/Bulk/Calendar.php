@@ -21,7 +21,7 @@ class Bulk_Calendar extends Bulk_Abstract {
      *
      * @param $file
      */
-    public function __construct($file, $source = null, $owner = null, $categoryList = null, $groupList = null, $campusList = null) {
+    public function __construct($file, $source, $owner, $categoryList, $groupList, $campusList) {
         parent::__construct($file);
         $this->source = $source;
         $this->owner = $owner;
