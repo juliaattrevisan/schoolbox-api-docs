@@ -12,6 +12,7 @@ use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Tour\Step\Mapper as TourStepMapper;
+use Schoolbox\Tour\Trigger\Mapper as TriggerMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -44,6 +45,12 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->joins('author_user_id', UserMapper::class, 'id', null, null, 'author', 'author');
+
+        $this->hasJoin('trigger', [
+            'mapper' => TriggerMapper::class,
+            'this_key' => 'uuid',
+            'other_key' => 'tour_uuid',
+        ]);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, function (Model $model) {
             return $this->preSave($model);
@@ -145,8 +152,7 @@ class Mapper extends BaseMapper
 
         $sql = " 
             {$this->getSelectString()} 
-            INNER JOIN  `tour_trigger` ON `tour_trigger`.`tour_uuid` = `tour`.`uuid` AND
-                        `tour_trigger`.`deleted_at` IS NULL
+            INNER JOIN  {$this->getJoinSql('trigger', '', 't')}
             WHERE       {$userQuery['query']} AND 
                         :url REGEXP `tour_trigger`.`url_regex` AND
                         `tour`.`active` = 1
