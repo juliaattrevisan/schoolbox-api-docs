@@ -62,7 +62,7 @@ class Mapper extends BaseMapper
     {
         return "
             FROM `{$this->table}`
-            LEFT JOIN {$this->getJoinSql('user', '', 'u')}
+            LEFT JOIN {$this->getJoinSql('user', '', 'u', true)}
         ";
     }
 
