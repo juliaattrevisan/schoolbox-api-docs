@@ -85,7 +85,7 @@ class Mapper extends BaseMapper
      *
      * @param User $user
      *
-     * @return GenericCollection
+     * @return GenericCollection|Model[]
      */
     public function findByUser(User $user): GenericCollection
     {
