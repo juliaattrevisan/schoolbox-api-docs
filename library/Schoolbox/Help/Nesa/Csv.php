@@ -49,8 +49,13 @@ class Csv
             foreach ($indicators as $indicator) {
                 $outcome = $currentRow['condensed'][$indicator]['outcome'];
 
-                if ($outcome) {
-                    $data[$indicator] = $outcome;
+                if (isset($currentRow['condensed'][$indicator]['outcome'])) {
+                    if ($outcome) {
+                        $data[$indicator] = 'Y';
+                    }
+                    else {
+                        $data[$indicator] = 'N';
+                    }
                 }
                 else {
                     $data[$indicator] = '';
