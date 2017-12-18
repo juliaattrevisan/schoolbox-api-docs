@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Permission\Access;
 
+use Aura\Di\Exception\ServiceNotFound;
 use PDO;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
@@ -44,8 +45,11 @@ class UserAccessMapper extends Mapper
      */
     protected function postSetup()
     {
-        /** @var WritableCache $cache */
-        $this->cache = self::getDi()->get('subscriptionCache');
+        try {
+            $this->cache = self::getDi()->get('subscriptionCache');
+        } catch (ServiceNotFound $e) {
+            // noop
+        }
     }
 
 
