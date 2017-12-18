@@ -94,6 +94,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('marker', 'm')},
+                {$this->getJoinColumnString('owner', 'o')},
                 {$this->getJoinColumnString('submission_box', 'b')},
                 {$this->getJoinColumnString('submission', 's')}
         ";
@@ -111,6 +112,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         return "
             FROM `{$this->table}`
             INNER JOIN {$this->getJoinSql('marker', '', 'm', true)}
+            INNER JOIN {$this->getJoinSql('owner', '', 'o', true)}
             INNER JOIN {$this->getJoinSql('submission_box', '', 'b', true)}
             LEFT JOIN {$this->getJoinSql('submission', '', 's', true)}
         ";
@@ -123,17 +125,15 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
      */
     protected function hydrateSelect(\PDOStatement $statement)
     {
-        $markerMapper = $this->getJoinMapper('marker');
-        $submissionMapper = $this->getJoinMapper('submission');
-
         $collection = $this->createCollection();
         $ids        = [];
 
         foreach ($statement as $row) {
             $return = $this->hydrate($row);
             $ids[]  = $return->getId();
-            $return->setSubmission($submissionMapper->hydrate($row, 's'));
-            $return->setMarker($markerMapper->hydrate($row, 'm'));
+            $return->setSubmission($this->hydrateJoin($row, 'submission', 's'));
+            $return->setMarker($this->hydrateJoin($row, 'marker','m'));
+            $return->setOwner($this->hydrateJoin($row, 'owner','o'));
 
             // Try to streamline duework+assessment creation
             /** @var SubmissionBox $dueWork */
