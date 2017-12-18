@@ -74,19 +74,10 @@ class Module extends BaseModule
         $injector->params[Controller::class] = [
             'courseSpecificationMapper' => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
             'rubricMapper' => $this->getMapperFactory()->getLazy(RubricMapper::class),
+            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
             'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class)
         ];
     }
-
-    /**
-     * @return Mapper|UserMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
-     */
-    protected function getUserMapper()
-    {
-        return $this->getMapperFactory()->get(UserMapper::class);
-    }
-
 
     /**
      * @return Mapper|ErrorMapper

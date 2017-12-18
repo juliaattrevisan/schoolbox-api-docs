@@ -18,8 +18,8 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\ProfessionalDevelopment;
+use Schoolbox\UserMapper;
 
 ini_set('max_execution_time', 300);
 
@@ -47,10 +47,9 @@ class Controller extends Base
     private $pdMapper;
 
     /**
-     * @var UserAccessMapper
+     * @var UserMapper
      */
-    private $userAccessMapper;
-
+    private $userMapper;
 
     /**
      * Controller constructor.
@@ -58,20 +57,20 @@ class Controller extends Base
      * @param CourseSpecificationMapper      $courseSpecificationMapper
      * @param Rubric\RubricMapper            $rubricMapper
      * @param ProfessionalDevelopment\Mapper $pdMapper
-     * @param UserAccessMapper               $userAccessMapper
+     * @param UserMapper                     $userMapper
      */
     public function __construct(
         Error\Mapper $errorMapper,
         CourseSpecificationMapper $courseSpecificationMapper,
         Rubric\RubricMapper $rubricMapper,
         ProfessionalDevelopment\Mapper $pdMapper,
-        UserAccessMapper $userAccessMapper
+        UserMapper $userMapper
     ) {
         $this->errorMapper = $errorMapper;
         $this->courseSpecificationMapper = $courseSpecificationMapper;
         $this->rubricMapper = $rubricMapper;
         $this->pdMapper = $pdMapper;
-        $this->userAccessMapper = $userAccessMapper;
+        $this->userMapper = $userMapper;
     }
 
 
@@ -84,7 +83,15 @@ class Controller extends Base
      */
     public function getNesa()
     {
-        $courseSpecification = $this->courseSpecificationMapper->findById(Nesa\Acquisition::NESA_COURSE_SPEC_ID);
+        /* If the hardcoded course is not found, for some reason
+         * Add an error code for this later
+         */
+        try {
+            $courseSpecification = $this->courseSpecificationMapper->findById(Nesa\Acquisition::NESA_COURSE_SPEC_ID);
+        }
+        catch (MapperException $e) {
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
+        }
 
         $selector = new Nesa\Selector(
             Nesa\Acquisition::NESA_COURSE_SPEC_ID,
@@ -115,12 +122,11 @@ class Controller extends Base
 
         $report = (new Nesa\Report(
             $assessmentMapperProxy,
-            $this->pdMapper,
-            $this->userAccessMapper,
-            $this->rubricMapper
+            $this->rubricMapper,
+            $this->userMapper
         ))->generate(
             $this->getRequest()->post['state'],
-            $this->getRequest()->post['unaccreditedOnly'],
+            (int)$this->getRequest()->post['unaccreditedOnly'],
             $this->getRequest()->post['indicators']
         );
 
@@ -157,9 +163,8 @@ class Controller extends Base
 
         $report = (new Nesa\Report(
             $assessmentMapperProxy,
-            $this->pdMapper,
-            $this->userAccessMapper,
-            $this->rubricMapper
+            $this->rubricMapper,
+            $this->userMapper
         ))->generate(
             $this->getRequest()->post['state'],
             (int)$this->getRequest()->post['unaccreditedOnly'],
