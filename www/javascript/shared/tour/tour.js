@@ -2,7 +2,7 @@ $(function () {
 
     var url = '/tour/url/' +
         encodeURIComponent(
-            atob(
+            btoa(
                 window.location.pathname
             )
         );
