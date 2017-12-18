@@ -50,6 +50,7 @@ class Controller extends Base
 
     /**
      * Controller constructor.
+     *
      * @param Error\Mapper                   $errorMapper
      * @param Specification\Mapper           $courseSpecificationMapper
      * @param Rubric\RubricMapper            $rubricMapper
@@ -182,7 +183,7 @@ class Controller extends Base
         $headers->set('Pragma', ' ');
         $headers->set('Cache-Control', ' ');
         $headers->set('Content-Type', 'text/csv');
-        $headers->set('Content-Length', strlen($content));
+        $headers->set('Content-Length', \strlen($content));
         $headers->set('Content-Disposition', "attachment; filename=\"nesa-{$today}.csv\"");
 
         $this->getResponse()->content->set([
