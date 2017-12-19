@@ -68,11 +68,9 @@ class Aggregation
                 /* Check the contents of $additionalIndicators to see if any "N" (Not Shown) outcomes exist there
                  * as well as in $existingIndicators; don't merge "N" outcomes if there's a "Y" in existence already
                  */
-                foreach ($current['condensed'] as $key => $data) {
-                    if (array_key_exists($key, $existingIndicators)) {
-                        if ($existingIndicators[$key]['outcome']) {
-                            unset($additionalIndicators[$key]);
-                        }
+                foreach ((array)$current['condensed'] as $key => $data) {
+                    if (array_key_exists($key, $existingIndicators) && $existingIndicators[$key]['outcome']) {
+                        unset($additionalIndicators[$key]);
                     }
                 }
 
