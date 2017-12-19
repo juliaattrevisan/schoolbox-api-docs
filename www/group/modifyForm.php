@@ -36,9 +36,16 @@ if(!is_numeric($categoryId)) {
 	error(2);
 }
 
+// This variable will updated later; set it to the least permission as a default value
+$currentUserPermission = UserAccess::ACCESS_DENY;
+
 /* Check access */
-if($groupHandler->getPermission($categoryId) < FULL_ACCESS) {
+if($groupHandler->getPermission($categoryId) < UserAccess::ACCESS_FULL) {
 	error(19);
+} else {
+    // By setting this manually, we're avoiding cache issues
+    // that could result from retrieving the permission from the database.
+    $currentUserPermission = UserAccess::ACCESS_FULL;
 }
 
 // Handle disbandment before anything else
@@ -194,7 +201,10 @@ if (!empty($_POST['accessLevel'])) {
 
 				$ua->setAccessLevel(UserAccess::ACCESS_WRITE);
 				$uaMapper->save($ua);
-			} catch (Schoolbox\Mapper\Exception $e) {
+
+                // If we've given admin rights to another user, we no longer have them, so update this variable
+                $currentUserPermission = UserAccess::ACCESS_WRITE;
+            } catch (Schoolbox\Mapper\Exception $e) {
 				// just ignore it, this kingdom had no king
 				$ua->setUser(new User())
 					->setServiceIdentifier($folder->getId());
@@ -263,11 +273,7 @@ if(isset($_POST['bulkAdd'])) {
 	}
 }
 
-// Force a refresh of permissions without caching
-
-$permission = $groupHandler->getPermission($categoryId, 0, false);
-
-if ($permission < FULL_ACCESS)
+if ($currentUserPermission < UserAccess::ACCESS_FULL)
 {
     // If the user has less then full permission they can no longer stay on the modify group page
 
