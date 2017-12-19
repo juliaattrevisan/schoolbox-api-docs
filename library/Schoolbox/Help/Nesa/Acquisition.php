@@ -159,7 +159,6 @@ class Acquisition
         $hierarchy = [];
 
         /* A hashtable of (assessmentId, folderId) tuples
-         * and, a hashtable of (user_id, pdNumber) tuples
          */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $hierarchy[$row['assessment_id']][$row['folder_id']][] = $row['user_id'];
