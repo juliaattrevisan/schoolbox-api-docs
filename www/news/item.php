@@ -107,6 +107,8 @@ $this->setBlock(TEMPLATE_content, 'add_news', 'add_news_block');
 $this->setBlock(TEMPLATE_content, 'topic_list', 'topic_list_block');
 $this->setBlock(TEMPLATE_content, 'previous_article', 'previous_article_block');
 $this->setBlock(TEMPLATE_content, 'next_article', 'next_article_block');
+$this->setBlock(TEMPLATE_content, 'poster_link_open', 'poster_link_open_block');
+$this->setBlock(TEMPLATE_content, 'poster_link_close', 'poster_link_close_block');
 
 $this->setTab('news');
 
@@ -121,11 +123,21 @@ if (!$topic) {
 
 $url = new Url($topic['name'], '');
 
-$owner = UserMapper::getInstance()->findByID($article['item_owner']);
+try {
+    // User exists - link to their profile
+    $owner = UserMapper::getInstance()->findById($article['item_owner']);
+    $this->parse('poster_link_open_block', 'poster_link_open');
+    $this->parse('poster_link_close_block', 'poster_link_close');
+} catch (\Schoolbox\Mapper\Exception $e) {
+    // User has been deleted - don't show a link
+    $this->setVar('poster_link_open_block', '');
+    $this->setVar('poster_link_close_block', '');
+}
 
 $d = new Alaress_Date_Format($article['item_datetime_published'], Alaress_Date_Format::DATABASE_FORMAT);
 $e = new Alaress_Date_Format($article['item_datetime_expires'], Alaress_Date_Format::DATABASE_FORMAT);
 
+$owner = UserMapper::getInstance()->findByIdWithFallback($article['item_owner']);
 $output = array(
     'NEWS_ID' => $article['item_id'],
     'NEWS_TITLE' => Scrub::text($article['item_heading']),
