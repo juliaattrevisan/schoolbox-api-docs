@@ -8,15 +8,12 @@ namespace Schoolbox\Learning;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
+use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\Exception\ServiceNotFound;
-use Eportfolio\ShowcaseMapper;
 use Schoolbox\Application\Exception as ApplicationException;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Mapper;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
-use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
@@ -28,11 +25,10 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use \Timetable_ColourMapper;
-use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Filter;
 use \Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Resource\Folder;
 
 class Module extends BaseModule
 {
@@ -170,8 +166,6 @@ class Module extends BaseModule
             'folderMapper'               => $this->getMapperFactory()->getLazy(FolderMapper::class),
             'termMapper'                 => $this->getMapperFactory()->getLazy(TermMapper::class),
             'timetableColourMapper'      => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
-            'courseImplementationMapper' => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
-            'courseSpecificationMapper'  => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
             'filterSelectionMapper'      => $this->getMapperFactory()->getLazy(FilterSelection\Mapper::class),
             'assessmentIdFinder'         => $injector->lazy(function(){
                 /** @var Filter\Mapper $filterMapper */
@@ -179,6 +173,11 @@ class Module extends BaseModule
                 return Filter\Filters\Assessment\IdFinder::getInstance(
                     $filterMapper, $this->getMapperFactory()->get(Assessment\Mapper::class)
                 );
+            }),
+            'classListFactory' => $injector->lazy(function () {
+                /** @var IConnector $database */
+                $database = $this->getInjector()->get('databaseInternal');
+                return new Folder\ClassListFactory($database);
             }),
         ];
     }

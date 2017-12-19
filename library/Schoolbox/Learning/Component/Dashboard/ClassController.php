@@ -9,16 +9,12 @@
 
 namespace Schoolbox\Learning\Component\Dashboard;
 
+use Alaress\Database\Connector\IConnector;
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
-use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Classes\ClassList;
-use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpec;
-use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Timetable_ColourMapper;
@@ -26,18 +22,19 @@ use Schoolbox\User;
 use SitePage;
 use Alaress_Date_Format;
 
+
 class ClassController extends Component_Dashboard_ControllerAbstract
 {
     /** @var Term */
     private $currentTerm;
 
-    /** @var GenericCollection|Folder[] */
+    /** @var GenericCollection|Folder\Model[] */
     private $classList;
 
     /** @var string[] */
     private $classTypes = [];
 
-    /** @var Collection|CourseSpec[][]  */
+    /** @var string[][]  CourseSpec titles, indexed by class folder.id, courseSpec.id */
     private $courseSpecs;
 
     /** @var TermMapper */
@@ -45,12 +42,6 @@ class ClassController extends Component_Dashboard_ControllerAbstract
 
     /** @var Timetable_ColourMapper */
     private $timeTableColourMapper;
-
-    /** @var CourseSpecMapper */
-    private $courseSpecMapper;
-
-    /** @var CourseImplMapper */
-    private $courseImplMapper;
 
 
     /**
@@ -68,16 +59,17 @@ class ClassController extends Component_Dashboard_ControllerAbstract
     ) {
         parent::__construct($instance, $user, $sitepage);
         $this->timeTableColourMapper = $this->getMapperFactory()->get(Timetable_ColourMapper::class);
-        $this->courseSpecMapper      = $this->getMapperFactory()->get(CourseSpecMapper::class);
-        $this->courseImplMapper      = $this->getMapperFactory()->get(CourseImplMapper::class);
         $this->termMapper            = $this->getMapperFactory()->get(TermMapper::class);
-
     }
+
 
     /**
      * Loads the grid component into its set configuration.
      *
      * @return true
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \RuntimeException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function execute()
     {
@@ -85,12 +77,15 @@ class ClassController extends Component_Dashboard_ControllerAbstract
             return false;
         }
 
+        /** @var IConnector $database */
+        $database         = $this->getSitePage()->getDi()->get('databaseInternal');
+        $classListFactory = new Folder\ClassListFactory($database);
+
         $classList = new ClassList(
             $this->getUser(),
             $this->getFolderMapper(),
             $this->timeTableColourMapper,
-            $this->courseSpecMapper,
-            $this->courseImplMapper
+            $classListFactory
         );
         $gridData = $classList->getClassList($this->termMapper->findForToday(), Alaress_Date_Format::now());
 
