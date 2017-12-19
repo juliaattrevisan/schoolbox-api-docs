@@ -6,6 +6,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
 use \Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Assessment\Term;
@@ -16,6 +17,7 @@ use Schoolbox\Resource\Folder;
  */
 class Component_Homepage_ManageClassController extends Component_Homepage_ControllerAbstract
 {
+
     /**
      * @var UserAccessMapper
      */
@@ -33,6 +35,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      */
     private $externalDbEnabled;
 
+
     /**
      * Prepares data for the render function. Business logic.
      *
@@ -49,17 +52,22 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         return true;
     }
 
+
     /**
      * Renders the data into the SitePage. Presentation logic.
+     *
      * @param String $templateHandle
      * @return boolean
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws RuntimeException
      */
     public function renderTemplate($templateHandle)
     {
-        $isGroupPage    = $this->getContext()->isGroup();
-        $isClassPage    = $this->getContext()->isClass();
-        $wasClassPage   = $this->getContext()->wasClass();
-        $isUnitPage     = $this->getContext()->hasUnitSpecification();
+        $isGroupPage  = $this->getContext()->isGroup();
+        $isClassPage  = $this->getContext()->isClass();
+        $wasClassPage = $this->getContext()->wasClass();
+        $isUnitPage   = $this->getContext()->hasUnitSpecification();
 
         // If context is not a group, unit or class, render nothing
         if (!$isGroupPage && !$isClassPage && !$wasClassPage && !$isUnitPage) {
@@ -90,26 +98,29 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, 'markbook_link', 'markbook_link_block');
         $this->setBlock($templateHandle, 'manage_criteria', 'manage_criteria_block');
 
+        // Determine the term for the grades link
+        $currentTerm = $this->termMapper->findForToday();
+        $this->setVar('WORK_TERM', $currentTerm->getCode());
+
         // Show markbook link to staff on class or group pages
         if ($isStaffOrSuper && ($isGroupPage || $isClassPage || $wasClassPage)) {
+            $this->setVar('MARKBOOK_LINK', $this->buildMarkbookLink($wasClassPage, $currentTerm));
             $this->parse('markbook_link_block', 'markbook_link');
             $hasClassActions = true;
         } else {
             $this->setVar('markbook_link_block');
         }
 
-        // Determine the term for the grades link
-        $this->setVar('WORK_TERM', $this->termMapper->findForToday()->getCode());
 
         $involvedInGroup = $isGroupPage && $this->userAccessMapper->involvedInGroup(
-            $this->getUser(),
-            $this->getContext()->getId()
-        );
+                $this->getUser(),
+                $this->getContext()->getId()
+            );
 
         $involvedInClass = $isClassPage && $this->userAccessMapper->involvedInSubject(
-            $this->getUser(),
-            $this->getContext()->getCodeString()
-        );
+                $this->getUser(),
+                $this->getContext()->getCodeString()
+            );
 
         /* Output student grades link to students (other users with READ access may be able to see this page) */
         if (($involvedInGroup || $involvedInClass) && UserAccess::ACCESS_READ === $this->getContentPermission()) {
@@ -142,5 +153,27 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         }
 
         return $hasClassActions;
+    }
+
+
+    /**
+     * If homepage was a class, don't filter markbook by term, else filter to just the current term.
+     *
+     * @param bool       $wasClassPage
+     * @param Term\Model $currentTerm
+     * @return string
+     * @throws RuntimeException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    private function buildMarkbookLink(bool $wasClassPage, Term\Model $currentTerm): string
+    {
+        $classArg = ['folderId' => $this->getContext()->getId()];
+        if ($wasClassPage) {
+            return $this->getRouter()->generate('learningMarkbook.getMarkbookForClass', $classArg);
+        }
+
+        $classAndTermArgs = array_merge($classArg, ['termCode' => $currentTerm->getCode()]);
+        return $this->getRouter()->generate('learningMarkbook.getMarkbookForClassAndTerm', $classAndTermArgs);
     }
 }

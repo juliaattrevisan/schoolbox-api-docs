@@ -5,6 +5,7 @@
  * @link        http://www.alaress.com.au
  */
 
+use Aura\Router\Router;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\MapperFactory;
@@ -123,6 +124,18 @@ abstract class Component_ControllerAbstract
             ->setErrorMapper($errorMapper)
             ->setConfigMapper($configMapper);
     }
+
+
+    /**
+     * @return Router|object
+     * @throws RuntimeException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function getRouter()
+    {
+        return $this->getSitePage()->getDi()->get('router');
+    }
+
 
     /**
      * Setup operations common to all component types.
