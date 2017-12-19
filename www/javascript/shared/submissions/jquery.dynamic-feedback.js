@@ -107,7 +107,7 @@
                 .on('keydown paste keypress', 'textarea', timeoutUpdate)
                 .on('change', ':input', timeoutUpdate)
                 .on('change', '[data-rubric-descriptor]', timeoutUpdate)
-                .on('blur', ':input:not([data-rubric-descriptor])', doASaveActionNao)
+                .on('blur', ':input:not([data-rubric-descriptor])', onFeedbackChanged)
                 .on('success.attachzone', '.attachzone', timeoutUpdate)
                 .on('removedfile.attachzone', '.attachzone', timeoutUpdate);
         }
@@ -201,7 +201,7 @@
             window.clearTimeout(tt);
 
             tt = window.setTimeout(function () {
-                doASaveActionNao.apply(input);
+                onFeedbackChanged.apply(input);
             }, 600);
 
             if ($(this).val() == $(this).data('preval')) {
@@ -214,9 +214,10 @@
         }
 
         /**
-         * Save Draft Feedback contents upon blur or after timeout
+         * Callback invoke when the user changes feedback form input.
+         * May auto-save a draft, or schedule an auto-save of a draft.
          */
-        function doASaveActionNao() {
+        function onFeedbackChanged() {
             // do a preval comparison to find out if we can skip AJAX
             // (Do not skip attachzones)
             var $this = $(this);
