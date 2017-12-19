@@ -1,11 +1,14 @@
 #!/usr/bin/php
 <?php
 
-require_once(__DIR__ . '/../../../library/Bootstrap.php');
+/** @var WebRequest\Kernel $kernel */
+$kernel = require __DIR__ . '/../../../library/Bootstrap.php';
 
 use Alaress\Csv\Reader;
 use Alaress\Lumberjack\Logger;
+use Schoolbox\Application\WebRequest;
 use Schoolbox\External\Importer;
+use Schoolbox\Realtime\Routing\Cache\WritableCache;
 
 // Manage options
 $options = getopt('v', ['perform-update', 'user::', 'structure::', 'timetable::', 'enrolment::',]);
@@ -100,6 +103,9 @@ $logger = new Logger(
     true
 );
 
+// attach the logger
+$kernel->getDependencyInjector()->values['logger'] = $logger;
+
 if (isset($options['user'])) {
     // User import does not fill down - the others do
     $logger->info('Starting user import...');
@@ -138,5 +144,13 @@ if (isset($options['enrolment'])) {
     $logger->info('Skipping enrolment import - no file provided');
 }
 
-
-
+if (isset($options['user']) || isset($options['enrolment'])) {
+    // reload the subscriptions if either users or enrolments were altered
+    try {
+        /** @var WritableCache $cache */
+        $cache = $kernel->get('subscriptionCache');
+        $cache->cacheAllUsers(INSTANCE_ID);
+    } catch (\RuntimeException|\Aura\Di\Exception $e) {
+        $userMapper->log($e->getMessage(), [ $e ]);
+    }
+}

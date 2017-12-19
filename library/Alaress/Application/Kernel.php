@@ -95,6 +95,7 @@ abstract class Kernel {
      *
      * @param string $service
      * @throws RuntimeException if the DI has not been initialised
+     * @throws Di\Exception\ServiceNotFound
      * @return mixed
      */
     public function get($service)
