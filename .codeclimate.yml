@@ -54,17 +54,6 @@ plugins:
         enabled: false
       Generic Files LineLength TooLong:
         enabled: false
-  phan:
-    enabled: false
-    config:
-      file_extensions: "php"
-      ignore_undeclared: true
-      ignore-undeclared: true
-  phpmd:
-    enabled: false
-    config:
-      file_extensions: "php"
-      rulesets: "cleancode"
   scss-lint:
     enabled: true
   sonar-php:
