@@ -44,8 +44,8 @@ class Aggregation
 
         foreach ((array)$this->dataSet['stack'] as $current) {
 
-            /* Store first stack of condensed descriptor data for this user into a hashtable
-             * Otherwise merge into existing
+            /* Store condensed descriptor data for this user into a hashtable for quick lookups when rendering
+             * Otherwise merge into existing hashtable index
              */
             /** @var User $user */
             $user = $current['user'];
