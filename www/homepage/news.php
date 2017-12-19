@@ -1,5 +1,6 @@
 <?php
 
+use Schoolbox\Resource\Category\News;
 use Schoolbox\Resource\Category\NewsMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
@@ -48,6 +49,7 @@ if ($groupHandler->getPermission($category->getId()) >= WRITE_ACCESS) {
 
 $subjectNewsMapper = new NewsMapper();
 
+/** @var News $news */
 try {
     $news = $subjectNewsMapper->findById($this->arg[1]);
 } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
@@ -66,14 +68,10 @@ if ($news->getOwner() == $_SESSION['id'] || $groupHandler->getPermission($catego
 $this->setVar('poster_link_open_block', '');
 $this->setVar('poster_link_close_block', '');
 
-$userId = $news->getOwner()->getId();
-if (isset($userId)) {
-    $deletedAt = $news->getOwner()->getDeletedAt();
-    if ($deletedAt instanceof \Alaress_Date_NullDate) {
-        // render a user profile link only if user hasn't been soft-deleted
-        $this->parse('poster_link_open_block', 'poster_link_open');
-        $this->parse('poster_link_close_block', 'poster_link_close');
-    }
+if (!$news->getOwner()->isDeleted()) {
+    // render a user profile link only if user hasn't been soft-deleted
+    $this->parse('poster_link_open_block', 'poster_link_open');
+    $this->parse('poster_link_close_block', 'poster_link_close');
 }
 
 $output = array(
