@@ -292,6 +292,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $this->deletePermissions($event);
         $this->createRoles($event);
         $this->createCampus($event);
+        $this->createSource($event);
     }
 
     /**
@@ -335,7 +336,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
 		";
 
         $statement = $this->database->prepare($query);
-        $statement->bindParam(":eventId", $event->getId());
+        $statement->bindValue(":eventId", $event->getId());
         $statement->execute();
 
         $query = "
@@ -344,7 +345,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
 		";
 
         $statement = $this->database->prepare($query);
-        $statement->bindParam(":eventId", $event->getId());
+        $statement->bindValue(":eventId", $event->getId());
         $statement->execute();
     }
 
@@ -409,10 +410,30 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
 			";
 
             $statement = $this->database->prepare($query);
-            $statement->bindParam(":eventId", $event->getId());
-            $statement->bindParam(":campusId", $campusId);
+            $statement->bindValue(":eventId", $event->getId());
+            $statement->bindValue(":campusId", $campusId);
             $statement->execute();
         }
+    }
+
+    /**
+     * Assign source to an event
+     *
+     * @param Event $event
+     * @throws Exception
+     */
+    private function createSource($event)
+    {
+        $sourceMapper = \Event\Source\Mapper::getInstance();
+
+        $source = $sourceMapper->createModel();
+        $source->setCreatedAt($event->getCreatedAt());
+        $source->setSourceName($event->getSource());
+        $source->setUpdatedAt($event->getUpdatedAt());
+        $source->setEvent($event);
+
+        $sourceMapper->save($source);
+
     }
 
 

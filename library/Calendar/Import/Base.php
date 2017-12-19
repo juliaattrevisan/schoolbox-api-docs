@@ -79,6 +79,13 @@ abstract class Base {
 	 */
 	protected $allEventTypes = null;
 
+    /**
+     * Source of import
+     *
+     * @var string
+     */
+    protected $source;
+
 	/**
 	 * Constructor
 	 *
@@ -90,7 +97,7 @@ abstract class Base {
 	 * @param $access
 	 * @param $file
 	 */
-	public function __construct($user, $author, $categoryList, $groupList, $campusList, $access, $file) {
+	public function __construct($user, $author, $categoryList, $groupList, $campusList, $access, $file, $source = null) {
 		$this->setUser($user);
 		$this->setAuthor($author);
 		$this->setCategoryList($categoryList);
@@ -98,6 +105,7 @@ abstract class Base {
 		$this->setCampusList($campusList);
 		$this->setAccess($access);
 		$this->setFile($file);
+		$this->setSource($source);
 
 		/* All the available event types
 		 */
@@ -274,4 +282,21 @@ abstract class Base {
 	protected function getAccess() {
 		return $this->access;
 	}
+
+    /**
+     * @return string
+     */
+    public function getSource()
+    {
+        return $this->source;
+    }
+
+    /**
+     * @param string $source
+     */
+    public function setSource($source)
+    {
+        $this->source = $source;
+    }
+
 }

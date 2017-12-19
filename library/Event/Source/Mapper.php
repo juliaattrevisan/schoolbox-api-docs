@@ -12,7 +12,16 @@ namespace Event\Source;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\Relation\CategoryMapper;
 use Schoolbox\Calendar\Relation\PersonalMapper;
+use Schoolbox\Calendar\Relation\CampusMapper as EventCampusMapper;
+use Schoolbox\Calendar\Relation\RoleMapper;
 use Schoolbox\Mapper as BaseMapper;
+
+/**
+ * Class Mapper
+ *
+ * @package Event\Source
+ * @method Model createModel($id = null)
+ */
 
 class Mapper extends BaseMapper
 {
@@ -27,7 +36,7 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('event_id', EventMapper::class, 'id', null, null, 'event', 'event');
         $this->uses('source_name', self::TYPE_STRING);
-        $this->uses('edval_guid', self::TYPE_STRING);
+        $this->uses('guid', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -76,6 +85,8 @@ class Mapper extends BaseMapper
              */
             PersonalMapper::getInstance()->deleteByColumn('event_id', $eventIds);
             CategoryMapper::getInstance()->deleteByColumn('event_id', $eventIds);
+            EventCampusMapper::getInstance()->deleteByColumn('event_id', $eventIds);
+            RoleMapper::getInstance()->deleteByColumn('event_id', $eventIds);
 
             /* Hard-delete the event_source records
              */
@@ -91,15 +102,9 @@ class Mapper extends BaseMapper
 
             /* Hard-delete the events themselves
              */
-            $query = "
-                DELETE FROM `event` 
-                WHERE FIND_IN_SET(id, :eventIds)
-            ";
+            $deleteEvents = EventMapper::getInstance()->findByColumn('id', $eventIds, ['deleted' => true]);
+            EventMapper::getInstance()->hardDelete($deleteEvents);
 
-            $statement = $this->database->prepare($query);
-            $statement->execute([
-                'eventIds' => implode(',', $eventIds)
-            ]);
         }
     }
 }

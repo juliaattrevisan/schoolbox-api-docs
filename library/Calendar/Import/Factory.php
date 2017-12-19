@@ -62,7 +62,14 @@ class Factory {
 	 */
 	protected $file = null;
 
-	/**
+    /**
+     * Source of import
+     *
+     * @var string
+     */
+    protected $source;
+
+    /**
 	 * Constructor
 	 *
 	 * @param $user
@@ -73,7 +80,7 @@ class Factory {
 	 * @param $access
 	 * @param $file
 	 */
-	public function __construct($user, $author, $categoryList, $groupList, $campusList, $access, $file) {
+	public function __construct($user, $author, $categoryList, $groupList, $campusList, $access, $file, $source = null) {
 		$this->setUser($user);
 		$this->setAuthor($author);
 		$this->setCategoryList($categoryList);
@@ -81,6 +88,8 @@ class Factory {
 		$this->setCampusList($campusList);
 		$this->setAccess($access);
 		$this->setFile($file);
+		$this->setSource($source);
+
 	}
 
 	/**
@@ -96,7 +105,7 @@ class Factory {
 			$classname = '\Calendar\Import\Csv';
 		}
 
-		return new $classname($this->getUser(), $this->getAuthor(), $this->getCategoryList(), $this->getGroupList(), $this->getCampusList(), $this->getAccess(), $this->getFile());
+		return new $classname($this->getUser(), $this->getAuthor(), $this->getCategoryList(), $this->getGroupList(), $this->getCampusList(), $this->getAccess(), $this->getFile(), $this->getSource());
 	}
 
 	/* Getters/Setters
@@ -227,4 +236,21 @@ class Factory {
 	protected function getAccess() {
 		return $this->access;
 	}
+
+    /**
+     * @return mixed
+     */
+    public function getSource()
+    {
+        return $this->source;
+    }
+
+
+    /**
+     * @param mixed $source
+     */
+    public function setSource($source)
+    {
+        $this->source = $source;
+    }
 }

@@ -200,6 +200,13 @@ class Event implements ISoftDeletable
     protected $endDateTime = null;
 
     /**
+     * Source of import
+     *
+     * @var string
+     */
+    protected $source;
+
+    /**
      * Implement soft delete traits
      */
     use CreatedAtDate;
@@ -924,4 +931,22 @@ class Event implements ISoftDeletable
     {
         return null;
     }
+
+    /**
+     * @return string
+     */
+    public function getSource(): ?string
+    {
+        return $this->source;
+    }
+
+
+    /**
+     * @param string $source
+     */
+    public function setSource(string $source = null)
+    {
+        $this->source = $source;
+    }
+
 }

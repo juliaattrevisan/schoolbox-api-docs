@@ -215,6 +215,7 @@ class Csv extends Base {
             $event->setType($event_type);
             $event->setAttendance($attendance);
             $event->setCampusCollection($allCampuses);
+            $event->setSource($this->getSource());
 
             /* If a publish date is specified, use it; otherwise leave as empty
              */
@@ -229,11 +230,13 @@ class Csv extends Base {
 
             /* Assign Category relations
              */
-            foreach($this->getCategoryList() as $currentCategory) {
-                $category = new Category();
-                $category->setEventId($event->getId());
-                $category->setCategoryId($currentCategory);
-                $categoryRelationMapper->save($category);
+            if ($this->categoryList != null) {
+                foreach($this->getCategoryList() as $currentCategory) {
+                    $category = new Category();
+                    $category->setEventId($event->getId());
+                    $category->setCategoryId($currentCategory);
+                    $categoryRelationMapper->save($category);
+                }
             }
 
             /* Assign Role relations
