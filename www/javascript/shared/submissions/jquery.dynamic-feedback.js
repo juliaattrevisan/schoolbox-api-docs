@@ -24,6 +24,21 @@
     var tt;
 
     /**
+     * Is a draft currently being auto-saved?
+     *
+     * @type {boolean}
+     */
+    var autoSaveInProgress = false;
+
+    /**
+     * Has the user made more changes during a draft auto-save?
+     *
+     * @type {boolean}
+     */
+    var autoSavePending = false;
+
+
+    /**
      * Plugin
      *
      * @param options
@@ -214,7 +229,7 @@
         }
 
         /**
-         * Callback invoke when the user changes feedback form input.
+         * Callback invoked when the user changes feedback form input.
          * May auto-save a draft, or schedule an auto-save of a draft.
          */
         function onFeedbackChanged() {
@@ -222,7 +237,7 @@
             // (Do not skip attachzones)
             var $this = $(this);
 
-            // Ignore if not an attach-zone or rubric mark, and the value is a previously saved
+            // Ignore if not an attach-zone or rubric mark, and the value has not changed since previously saved
             var isAttachZoneOrRubricMark = $this.is('.attachzone') || ($this.attr('name') && $this.attr('name').indexOf('rubric') === 0 );
             if (!isAttachZoneOrRubricMark && $this.val() == $this.data('preval')) {
                 return;
@@ -231,8 +246,25 @@
             // update the pre-value
             $this.data('preval', $this.val());
 
-            var $participant = $this.closest('[data-participant]'),
-                $form        = $participant.find('[data-feedback-form]'),
+            // Is an auto-save in progress?
+            if(autoSaveInProgress){
+                // Don't overlap requests, but indicate we have unsaved changes that must be auto-saved
+                autoSavePending = true;
+                return;
+            }
+
+            autoSaveDraft($this.closest('[data-participant]'));
+        }
+
+        /**
+         * Save the specified $participant's form contents as a draft feedback
+         *
+         * @param {jQuery} $participant
+         */
+        function autoSaveDraft($participant)
+        {
+            autoSaveInProgress = true;
+            var $form        = $participant.find('[data-feedback-form]'),
                 $actionBar   = $participant.find('[data-action-bar]'),
                 $btnDrafted  = $actionBar.find('[data-draft=drafted]'),
                 $btnPublish  = $actionBar.find('[data-draft=publish]');
@@ -280,6 +312,13 @@
                 })
                 .always(function () {
                     $btnPublish.removeAttr("disabled");
+                    autoSaveInProgress = false;
+                    // Did the user make more changes while the draft auto-save was in progress?
+                    if(autoSavePending){
+                        // Clear the flag and save those pending changes.
+                        autoSavePending = false;
+                        autoSaveDraft($participant);
+                    }
                 });
         }
 
