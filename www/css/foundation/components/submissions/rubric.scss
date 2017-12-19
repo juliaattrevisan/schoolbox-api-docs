@@ -18,14 +18,14 @@ table.rb {
         input[type=checkbox], input[type=radio] {
             &:checked {
                 + label {
-                    background-color: $input-border-color;
-                    color: calc-text-color($input-border-color);
+                    background-color: $content-ui-selected;
+                    color: calc-text-color($content-ui-selected);
                 }
             }
             + label {
                 &:hover {
-                    background: $input-focus-border-color;
-                    color: calc-text-color($input-focus-border-color);
+                    background: $content-ui-hover;
+                    color: calc-text-color($content-ui-hover);
                     cursor: pointer;
                 }
             }
