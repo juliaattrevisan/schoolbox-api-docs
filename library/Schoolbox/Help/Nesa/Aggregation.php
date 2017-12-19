@@ -31,12 +31,18 @@ class Aggregation
      */
     public function generate() :array
     {
+
         /* A condensed version of the output stack that discards the capability/indicator hierarchy
          * and provides you the descriptor outputs, dumping them into a hashtable
          */
         $condensedData = [];
 
-        foreach ($this->dataSet as $current) {
+        /* Combine it with the full roster of people who were found
+         * TODO: Eventually this will go away, but I think this will be useful for debugging initially
+         */
+        $pdRoster = $this->dataSet['roster'];
+
+        foreach ((array)$this->dataSet['stack'] as $current) {
 
             /* Store first stack of condensed descriptor data for this user into a hashtable
              * Otherwise merge into existing
@@ -74,8 +80,13 @@ class Aggregation
                     $condensedData[$user->getId()]['condensed'] = array_merge($existingIndicators, $additionalIndicators);
                 }
             }
+
+            $pdRoster[$user->getId()]['condensed'] = $condensedData[$user->getId()]['condensed'];
         }
 
-        return $condensedData;
+        /* Return $condensedData for a list of people who have received rubrics only
+         * Otherwise return $pdRoster for a list of everyone matching the Selection criteria
+         */
+        return $pdRoster;
     }
 }

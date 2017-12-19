@@ -90,25 +90,18 @@ class Acquisition
 
 
     /**
-     * Find all the assessment ids that spawned from $courseSpecId
-     * Use a custom query, otherwise it's just too slow
+     * Query used to get all the Assessments in every Implementation of Course Spec Id :courseSpecId
      *
-     * Returns a pair of hashtable; (assessmentId, folderId) tuples
-     * and (user_id, pdNumber) tuples
+     * - The help course consists of multiple projects, which contain assessments
+     * - The rubrics only apply to Due Works so we join on submission_box to exclude all other types
+     * - Some assessment records contain 0000-00-00 in their created_at field (ignore these, laravel dies)
+     * - Get the assessments for $folderId, for performance reasons we have to proces one folder at a time
+     * - Only get folders that have our selected people in them
      *
      * @return array
      */
-    private function findInvolvement() :array
+    private function findHierarchy() :array
     {
-
-        /* Query used to get all the Assessments in every Implementation of Course Spec Id :courseSpecId
-         *
-         * - The help course consists of multiple projects, which contain assessments
-         * - The rubrics only apply to Due Works so we join on submission_box to exclude all other types
-         * - Some assessment records contain 0000-00-00 in their created_at field (ignore these, laravel dies)
-         * - Get the assessments for $folderId, for performance reasons we have to proces one folder at a time
-         * - Only get folders that have our selected people in them
-         */
 
         /* Dynamically assemble WHERE clause
          */
@@ -160,15 +153,81 @@ class Acquisition
             'homepageService' => UserAccess::SERVICE_HOMEPAGE,
         ], $pb->getParams()));
 
-        $involvement = [];
+        $hierarchy = [];
 
         /* A hashtable of (assessmentId, folderId) tuples
          * and, a hashtable of (user_id, pdNumber) tuples
          */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $involvement['hierarchy'][$row['assessment_id']][$row['folder_id']][] = $row['user_id'];
-            $involvement['pd'][$row['user_id']] = $row['number'];
+            $hierarchy[$row['assessment_id']][$row['folder_id']][] = $row['user_id'];
         }
+
+        return $hierarchy;
+    }
+
+    /**
+     * Find all the people in the states you selected
+    * This way we can cheaply assemble the list of everyone who has received rubrics
+    * and those who haven't
+     *
+     * @return array
+    */
+    private function findRoster() :array
+    {
+
+        $pb = new \Alaress\Database\Predicate\Builder($this->userMapper->getDatabase(), 'upd');
+        $pb->equals('registration_state', $this->states);
+
+        /* Show only unaccredited users
+         */
+        if ($this->unaccreditedOnly) {
+            $pb->equals('accredited_at', null);
+        }
+
+        $where = implode("\nAND ", $pb->getWhere());
+
+        $query = "
+            SELECT u.id AS user_id, upd.number, u.firstname, u.lastname
+            FROM user_professionaldevelopment upd
+            INNER JOIN `user` u ON upd.user_id = u.`id`
+            WHERE {$where}
+            ORDER BY u.lastname
+        ";
+
+        $assessmentMapper = DataModel\Mapper::getInstance();
+        $statement = $assessmentMapper->getDatabase()->prepare($query);
+        $statement->execute($pb->getParams());
+
+        $roster = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $roster[$row['user_id']]['user'] = [
+                'id' => $row['id'],
+                'number' => $row['number'],
+                'firstname' => $row['firstname'],
+                'lastname' => $row['lastname'],
+                'fullname' => $row['firstname'] . ' ' . $row['lastname']
+            ];
+        }
+
+        return $roster;
+    }
+
+    /**
+     * Find all the assessment ids that spawned from $courseSpecId
+     * Use a custom query, otherwise it's just too slow
+     *
+     * Returns a pair of hashtable; (assessmentId, folderId) tuples
+     * and (user_id, pdNumber) tuples
+     *
+     * @return array
+     */
+    private function findInvolvement() :array
+    {
+        $involvement =  [
+            'hierarchy' => $this->findHierarchy(),
+            'roster' => $this->findRoster(),
+        ];
 
         return $involvement;
     }
@@ -188,7 +247,10 @@ class Acquisition
     {
         /* Results of investigation into each user's assessment participation
          */
-        $raw = [];
+        $raw = [
+            'stack' => [],
+            'roster' => $this->involvement['roster']
+        ];
 
         /* All the assessments to investigate, along with their participating user ids
          */
@@ -214,7 +276,7 @@ class Acquisition
                     /* Investigate the context for the user and assessment and find the chosen descriptors that
                      * exist in the set of rubric groups and criteria.
                      */
-                    $raw[] = $this->investigate(
+                    $raw['stack'][] = $this->investigate(
                         $person,
                         $assessment,
                         $context['rubric'],
@@ -292,7 +354,7 @@ class Acquisition
         return [
             'name' => $assessment->getTitle(),
             'user' => $user,
-            'number' => $this->involvement['pd'][$user->getId()],
+            'number' => $this->involvement['roster'][$user->getId()]['number'],
             'assessmentId' => $assessment->getId(),
             'condensed' => $condensed,
         ];
