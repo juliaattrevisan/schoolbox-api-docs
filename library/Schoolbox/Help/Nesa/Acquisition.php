@@ -148,8 +148,10 @@ class Acquisition
             ORDER BY u.lastname
         ";
 
-        $assessmentMapper = DataModel\Mapper::getInstance();
-        $statement = $assessmentMapper->getDatabase()->prepare($query);
+        /* Use a totally random mapper
+         */
+        $statement = $this->userMapper->getDatabase()->prepare($query);
+
         $statement->execute(array_merge([
             'homepageService' => UserAccess::SERVICE_HOMEPAGE,
         ], $pb->getParams()));
@@ -175,7 +177,6 @@ class Acquisition
     */
     private function findRoster() :array
     {
-
         $pb = new Builder($this->userMapper->getDatabase(), 'upd');
         $pb->equals('registration_state', $this->states);
 
@@ -195,8 +196,10 @@ class Acquisition
             ORDER BY u.lastname
         ";
 
-        $assessmentMapper = DataModel\Mapper::getInstance();
-        $statement = $assessmentMapper->getDatabase()->prepare($query);
+        /* Use a totally random mapper
+         */
+        $statement = $this->userMapper->getDatabase()->prepare($query);
+
         $statement->execute($pb->getParams());
 
         $roster = [];
