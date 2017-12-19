@@ -128,6 +128,12 @@ class Acquisition
 
         $where = implode("\nAND ", $pb->getWhere());
 
+        /* Could exclude further by using an exclusion on rd.description != 'Not shown.'
+         * but this only saves you a tiny fraction - initially while we test this I want to
+         * include more details to ensure we get the right data
+         *
+         * TODO: Exclude more by using rd.description != 'Not shown.'
+         */
         $query = "
             SELECT u.id AS user_id, upd.number, a.id AS assessment_id, ci.folder_id
             FROM user_professionaldevelopment upd
@@ -169,8 +175,8 @@ class Acquisition
 
     /**
      * Find all the people in the states you selected
-    * This way we can cheaply assemble the list of everyone who has received rubrics
-    * and those who haven't
+     * This way we can cheaply assemble the list of everyone who has received rubrics
+     * and those who haven't
      *
      * @return array
     */
