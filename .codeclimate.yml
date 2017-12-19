@@ -1,19 +1,5 @@
+---
 version: "2"
-
-exclude_patterns:
-- "vendor/"
-- "**/tests/**/*"
-- "test/"
-- "**/Test/**/*"
-- "javascript/components/"
-- "node_modules/"
-- "sql/"
-- "updates/"
-- "debian/"
-- "www/"
-- "!www/css/**/*"
-- "tools/"
-
 #checks:
 #  argument-count:
 #    config:
@@ -45,7 +31,6 @@ exclude_patterns:
 #  identical-code:
 #    config:
 #      threshold: # language-specific defaults. an override will affect all languages.
-
 plugins:
   phpcodesniffer:
     enabled: true
@@ -54,7 +39,26 @@ plugins:
         enabled: false
       Generic Files LineLength TooLong:
         enabled: false
+  phan:
+    enabled: true
+    config:
+      file_extensions: "php"
+      ignore_undeclared: true
+      ignore-undeclared: true
   scss-lint:
     enabled: true
   sonar-php:
     enabled: true
+exclude_patterns:
+  - "vendor/"
+  - "**/tests/**/*"
+  - "test/"
+  - "**/Test/**/*"
+  - "javascript/components/"
+  - "node_modules/"
+  - "sql/"
+  - "updates/"
+  - "debian/"
+  - "www/"
+  - "!www/css/**/*"
+  - "tools/"
