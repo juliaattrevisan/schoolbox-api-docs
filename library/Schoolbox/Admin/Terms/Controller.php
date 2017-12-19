@@ -11,6 +11,7 @@ use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Aura\Web\Request;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 /**
  * Controller for managing school terms through the admin section.
@@ -189,8 +190,7 @@ class Controller extends Base
                 'data'   => $e->getMessage(),
             ]);
         } else {
-            // ¯\_(ツ)_/¯
-            throw $e;
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FORM_SUBMIT, $e, $e->getMessage());
         }
     }
 }
