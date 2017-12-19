@@ -100,19 +100,4 @@ class LockedChecker
         }
         return $this->isDueInArchivedTerm($assessment);
     }
-
-    /**
-     * Can we modify this assessment?
-     *
-     * @param IAssessable $assessment
-     * @return bool
-     */
-    public function isLockedForModification(IAssessable $assessment)
-    {
-        if ($assessment->getContext()->isSpecificationContext()) {
-            // Assessment Specifications can be modified at any time
-            return false;
-        }
-        return $this->isDueInArchivedTerm($assessment);
-    }
 }

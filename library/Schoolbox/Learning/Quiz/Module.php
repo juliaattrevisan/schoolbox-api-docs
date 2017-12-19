@@ -14,7 +14,7 @@ use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Module\RestfulModule;
 use Schoolbox\Module\StandardModuleTrait;
 use Alaress\Authorizer\Rule;
-use Schoolbox\Learning\Authorizer\Rule\IsModificationUnLocked;
+use Schoolbox\Learning\Authorizer\Rule\IsModifyUnLocked;
 use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Role;
 use Schoolbox\Assessment\Term;
@@ -95,7 +95,7 @@ class Module extends RestfulModule
             new Rule\IsSuperuser(),
             new Rule\All(
                 $canWrite,
-                new IsModificationUnLocked(new LockedChecker($this->getTermMapper()))
+                new IsModifyUnLocked(new LockedChecker($this->getTermMapper()))
             )
         );
 

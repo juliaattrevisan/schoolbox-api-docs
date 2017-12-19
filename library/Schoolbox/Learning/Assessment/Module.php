@@ -17,7 +17,7 @@ use Schoolbox\Learning\Authorizer\Rule\CanRespondToAssessment;
 use Schoolbox\Learning\Authorizer\Rule\CanSeeAssessment;
 use Schoolbox\Learning\Authorizer\Rule\IsAssessmentOpen;
 use Schoolbox\Learning\Authorizer\Rule\IsDeletionUnLocked;
-use Schoolbox\Learning\Authorizer\Rule\IsModificationUnLocked;
+use Schoolbox\Learning\Authorizer\Rule\IsModifyUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsParticipant;
 use Schoolbox\Learning\Authorizer\Rule\ParticipantHasNoInteractions;
@@ -107,7 +107,7 @@ class Module extends BaseModule
             $isSuper,
             new Rule\All(
                 $canWrite,
-                new IsModificationUnLocked(new LockedChecker($this->getTermMapper()))
+                new IsModifyUnLocked(new LockedChecker($this->getTermMapper()))
             )
         );
 
