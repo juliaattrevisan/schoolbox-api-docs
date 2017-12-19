@@ -357,7 +357,7 @@ class Acquisition
         return [
             'name' => $assessment->getTitle(),
             'user' => $user,
-            'number' => $this->involvement['roster'][$user->getId()]['number'],
+            'number' => $this->involvement['roster'][$user->getId()]['user']['number'],
             'assessmentId' => $assessment->getId(),
             'condensed' => $condensed,
         ];
