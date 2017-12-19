@@ -56,7 +56,9 @@ try {
     $this->error(ErrorMapper::ERROR_POST_NOT_FOUND);
 }
 
-if ($news->getOwner() == $_SESSION['id'] || $groupHandler->getPermission($category->getId()) >= WRITE_ACCESS) {
+if ($news->getOwner()->getId() == $_SESSION['user']->getId()
+    || $groupHandler->getPermission($category->getId()) >= WRITE_ACCESS
+) {
     $this->parse('can_modify_block', 'can_modify');
 } else {
     $this->setVar(array(
