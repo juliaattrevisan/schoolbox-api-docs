@@ -47,7 +47,7 @@ CASE WHEN EXISTS (SELECT * FROM `config` WHERE `name` = 'site_location' AND `val
   '
       INSERT INTO   `tour_audience_role`
       (
-                    `author_user_id`,
+                    `moderator_user_id`,
                     `tour_uuid`,
                     `role_id`
       )
