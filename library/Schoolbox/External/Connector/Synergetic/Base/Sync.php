@@ -59,7 +59,7 @@ class Sync extends Base implements ISync
     {
         $contactTypes = trim($this->config->get('external_synergetic_student_contact_types'));
 
-        if (empty($contactTypes)) {
+        if ($contactTypes === '') {
             $contactTypes = "SC1,SC2";
         }
 
