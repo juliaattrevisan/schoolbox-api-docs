@@ -25,9 +25,6 @@ $groupMapper = GroupMapper::getInstance();
 $categoryId = $_REQUEST['categoryID'];
 $currentUser = $userMapper->findById($_SESSION["id"]);
 
-// If we're on this page, we can assume we're an admin.
-$currentUserPermission = UserAccess::ACCESS_FULL;
-
 try {
 	$folder = $catMapper->findById($categoryId);
 } catch (\Schoolbox\Mapper\Exception $e) {
@@ -39,9 +36,16 @@ if(!is_numeric($categoryId)) {
 	error(2);
 }
 
+// This variable will updated later; set it to the least permission as a default value
+$currentUserPermission = UserAccess::ACCESS_DENY;
+
 /* Check access */
 if($groupHandler->getPermission($categoryId) < UserAccess::ACCESS_FULL) {
 	error(19);
+} else {
+    // By setting this manually, we're avoiding cache issues
+    // that could result from retrieving the permission from the database.
+    $currentUserPermission = UserAccess::ACCESS_FULL;
 }
 
 // Handle disbandment before anything else
