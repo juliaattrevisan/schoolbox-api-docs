@@ -43,7 +43,6 @@ plugins:
     enabled: true
     config:
       file_extensions: "php"
-      ignore_undeclared: true
       ignore-undeclared: true
   scss-lint:
     enabled: true
