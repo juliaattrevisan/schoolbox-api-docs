@@ -86,7 +86,6 @@
 
         /**
          * Set up pre-values
-         * Also populate the comboboxes with Feedback States
          */
         function setupPreValues() {
             // setup pre-values
