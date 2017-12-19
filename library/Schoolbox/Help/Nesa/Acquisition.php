@@ -205,7 +205,7 @@ class Acquisition
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $roster[$row['user_id']]['user'] = [
-                'id' => $row['id'],
+                'id' => $row['user_id'],
                 'number' => $row['number'],
                 'firstname' => $row['firstname'],
                 'lastname' => $row['lastname'],
