@@ -123,6 +123,8 @@ class Acquisition
         $pb->notEquals('a.created_at', '0000-00-00 00:00:00');
         $pb->equals('u.deleted_at', null);
         $pb->equals('sb.use_rubric', 1);
+        $pb->equals('rd.deleted_at', null);
+        $pb->equals('rc.deleted_at', null);
 
         /* Show only unaccredited users
          */
@@ -136,7 +138,10 @@ class Acquisition
             SELECT u.id AS user_id, upd.number, a.id AS assessment_id, ci.folder_id
             FROM user_professionaldevelopment upd
             INNER JOIN `user` u ON upd.user_id = u.`id`
-            INNER JOIN userAccess ua ON u.id = ua.uid
+            INNER JOIN rubric_mark rm ON u.`id` = rm.student_id
+            INNER JOIN rubric_descriptor rd ON rm.`descriptor_id` = rd.`id`
+            INNER JOIN rubric_criterion rc ON rd.`criterion_id`  = rc.`id`
+            INNER JOIN userAccess ua ON ua.uid = u.`id` AND rc.parent_id = ua.`sid` AND parent_type = 'category'
             INNER JOIN course_implementation ci ON ua.sid = ci.`folder_id` AND ua.service = :homepageService
             INNER JOIN course_specification cs ON ci.`course_specification_id` = cs.`id`
             INNER JOIN course_unit_implementation cui ON cui.`course_implementation_id` = ci.`id`
