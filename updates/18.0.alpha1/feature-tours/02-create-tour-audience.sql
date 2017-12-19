@@ -3,7 +3,7 @@
 CREATE TABLE `tour_audience_role`
 (
   `id`                INT               AUTO_INCREMENT    PRIMARY KEY,
-  `moderator_user_id`    INT(4) UNSIGNED   NOT NULL,
+  `moderator_user_id` INT(4) UNSIGNED   NOT NULL,                         -- This is the 'tour moderator' that added the audience record
   `tour_uuid`         VARCHAR(36)       NOT NULL,
   `role_id`           INT(4) UNSIGNED   NOT NULL,
 
