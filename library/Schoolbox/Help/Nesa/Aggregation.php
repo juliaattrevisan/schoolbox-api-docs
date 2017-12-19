@@ -87,6 +87,6 @@ class Aggregation
         /* Return $condensedData for a list of people who have received rubrics only
          * Otherwise return $pdRoster for a list of everyone matching the Selection criteria
          */
-        return $condensedData;
+        return $pdRoster;
     }
 }
