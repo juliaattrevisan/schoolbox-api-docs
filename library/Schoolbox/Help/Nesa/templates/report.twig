@@ -111,7 +111,7 @@
                                     userId: row.user.id
                                 }) %}
 
-                                {% if accreditRoute %}
+                                {% if accreditRoute and row.condensed|length %}
                                     <a href="{{ accreditRoute }}" class="icon-favourite" title="Accredit {{ row.user.fullname }}" data-accredit-name="{{ row.user.fullname }}" data-accredit="{{ row.user.id }}"></a>
                                 {% endif %}
                             </nav>
