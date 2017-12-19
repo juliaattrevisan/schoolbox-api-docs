@@ -11,6 +11,7 @@
 
 namespace Schoolbox\Help\Nesa;
 
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\Learning\Assessment\DueWork\RubricContext;
@@ -105,7 +106,7 @@ class Acquisition
 
         /* Dynamically assemble WHERE clause
          */
-        $pb = new \Alaress\Database\Predicate\Builder($this->userMapper->getDatabase(), 'upd');
+        $pb = new Builder($this->userMapper->getDatabase(), 'upd');
         $pb->equals('registration_state', $this->states);
         $pb->equals('cs.id', $this->courseSpecId);
         $pb->equals('cs.deleted_at', null);
@@ -175,7 +176,7 @@ class Acquisition
     private function findRoster() :array
     {
 
-        $pb = new \Alaress\Database\Predicate\Builder($this->userMapper->getDatabase(), 'upd');
+        $pb = new Builder($this->userMapper->getDatabase(), 'upd');
         $pb->equals('registration_state', $this->states);
 
         /* Show only unaccredited users
@@ -314,10 +315,10 @@ class Acquisition
     {
         $condensed = [];
 
-        foreach ($rubric['groups'] as $groupId => $groupData) {
-            foreach ($groupData['criteria'] as $criterionId => $criterionData) {
+        foreach ((array)$rubric['groups'] as $groupId => $groupData) {
+            foreach ((array)$groupData['criteria'] as $criterionId => $criterionData) {
                 if (\in_array($criterionData['name'], $indicators, true)) {
-                    foreach ($criterionData['descriptors'] as $levelId => $levelData) {
+                    foreach ((array)$criterionData['descriptors'] as $levelId => $levelData) {
 
                         /* Only collate the ones we selected; condense this for rendering
                          * array key 'outcome' used for rendering 3 states: demonstrated, not demonstrated, unknown
