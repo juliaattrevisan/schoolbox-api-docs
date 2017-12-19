@@ -52,7 +52,7 @@ $subjectNewsMapper = new NewsMapper();
 /** @var News $news */
 try {
     $news = $subjectNewsMapper->findById($this->arg[1]);
-} catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+} catch (\Schoolbox\Mapper\Exception $e) {
     $this->error(ErrorMapper::ERROR_POST_NOT_FOUND);
 }
 
