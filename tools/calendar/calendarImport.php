@@ -28,7 +28,7 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
 
     $opts = $opts['fields'];
 
-    $file     = null;
+    $file = null;
 
     if (isset($opts['h']) || count($opts) == 1) {
         $log->info( "Example usage:\n".
@@ -88,7 +88,13 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
     try {
         $bulkHandler->addCalendar();
     } catch (Schoolbox\Mapper\DefinitionException $e) {
-
+        $log->error("Error.\n");
+    } catch (Schoolbox\Mapper\Exception $e) {
+        $log->error("User or campus(es) not found.\n");
+        $log->error("No events created.\n");
+    } catch (PDOException $e) {
+        $log->error("One of the supplied roles was not found.\n");
+        $log->error("No events created.\n");
     }
 
 });

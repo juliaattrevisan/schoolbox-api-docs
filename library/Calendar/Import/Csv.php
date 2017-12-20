@@ -20,6 +20,7 @@ use \Schoolbox\CampusMapper;
 use \Alaress_Date_Format;
 use Schoolbox\Notif\SilentNotif;
 use \Schoolbox\Calendar\EventTypeMapper;
+use \Schoolbox\Error\Mapper as ErrorMapper;
 use Alaress\Lumberjack\Logger;
 
 class Csv extends Base {
@@ -45,8 +46,13 @@ class Csv extends Base {
 
 		/* All the campuses selected in the ui
 		 */
-		$allCampuses = $campusMapper->findByColumn('id', $this->getCampusList());
+		$allCampuses = [];
 
+		foreach ($this->getCampusList() as $campusId) {
+            $campus = $campusMapper->findById($campusId);
+		    $allCampuses[] = $campus;
+        }
+        
 		/* Process rows
 		 */
 		$handle = fopen($this->getFile(), 'r');
