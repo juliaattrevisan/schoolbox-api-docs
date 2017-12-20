@@ -86,7 +86,7 @@ CASE WHEN EXISTS (SELECT * FROM `config` WHERE `name` = 'site_location' AND `val
                     `deleted_at`
       )
       SELECT        UUID(),
-                    19,
+                    (SELECT `id` FROM `user` WHERE `username` = ''alaress'' LIMIT 1),
                     @tourStaff,
                     ''tour-guide'',
                     ''ready'',
@@ -128,7 +128,7 @@ CASE WHEN EXISTS (SELECT * FROM `config` WHERE `name` = 'site_location' AND `val
       SELECT        @step2Uuid,
                     @tourStaff,
                     null,
-                    19,
+                    (SELECT `id` FROM `user` WHERE `username` = ''alaress'' LIMIT 1),
                     ''tooltip'',
                     ''1980-04-07 00:00:00'',
                     ''1980-04-07 00:00:00'',
@@ -162,7 +162,7 @@ CASE WHEN EXISTS (SELECT * FROM `config` WHERE `name` = 'site_location' AND `val
       SELECT        @step1Uuid,
                     @tourStaff,
                     @step2Uuid,
-                    19,
+                    (SELECT `id` FROM `user` WHERE `username` = ''alaress'' LIMIT 1),
                     ''tooltip'',
                     ''1980-04-07 00:00:00'',
                     ''1980-04-07 00:00:00'',
@@ -199,7 +199,7 @@ CASE WHEN EXISTS (SELECT * FROM `config` WHERE `name` = 'site_location' AND `val
       )
       SELECT        UUID(),
                     @step1Uuid,
-                    19,
+                    (SELECT `id` FROM `user` WHERE `username` = ''alaress'' LIMIT 1),
                     ''Whale'',
                     ''This is a whale'',
                     ''.logo'',
@@ -237,7 +237,7 @@ CASE WHEN EXISTS (SELECT * FROM `config` WHERE `name` = 'site_location' AND `val
       )
       SELECT        UUID(),
                     @step2Uuid,
-                    19,
+                    (SELECT `id` FROM `user` WHERE `username` = ''alaress'' LIMIT 1),
                     ''Wrong Way! Turn Back!'',
                     ''This is a dead-end...'',
                     ''#tile-10'',
