@@ -12,7 +12,7 @@ use Aura\Di;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 
-$fields = ['campus:', 'role:', 'file:', 'owner:', 'source:'];
+$fields = ['campus:', 'role:', 'file:', 'owner:', 'source:', 'h'];
 $opts = require __DIR__ . '/../../conf/core/require-cli.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
@@ -28,30 +28,41 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
 
     $opts = $opts['fields'];
 
-    $fauxPost = [];
-    $fauxSesh = [];
     $file     = null;
+
+    if (isset($opts['h']) || count($opts) == 1) {
+        $log->info( "Example usage:\n".
+
+                    "php /usr/share/schoolbox/tools/calendar/calendarImport.php --file import.csv --owner 1 --campus 1 --role 1\n".
+
+                    "Where import.csv matches the template at Admin->Calendar within Schoolbox.\n".
+
+                    "Optional arg --source 'sourcename'.\n".
+
+                    "When importing with a source, other items with that source will be deleted.\n");
+        exit(1);
+    }
     
     if (!isset($opts['campus'])) {
-        $log->error("No campus specified.\n");
+        $log->error("No campus specified. (Use --h for example usage)\n");
     } else {
         $campusList = explode(',',$opts['campus']);
     }
 
     if (!isset($opts['role'])) {
-        $log->error("No role specified.\n");
+        $log->error("No role specified. (Use --h for example usage)\n");
     } else {
         $groupList = explode(',', $opts['role']);
     }
 
-    if (!isset($opts['owner']) && is_numeric($opts['owner'])) {
-        $log->error("No owner id specified.\n");
+    if (!isset($opts['owner'])) {
+        $log->error("No owner id specified. (Use --h for example usage)\n");
     } else {
         $ownerId = $opts['owner'];
     }
 
     if (!file_exists($opts['file'])) {
-        $log->error("Specified file not found.\n");
+        $log->error("Specified file not found. (Use --h for example usage)\n");
     } else {
         $file = $opts['file'];
     }
