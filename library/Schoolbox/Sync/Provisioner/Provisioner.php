@@ -165,16 +165,10 @@ class Provisioner
 
                 try {
                     $externalUsers = $this->getAllExternalUsers($roleType);
-                } catch (\RuntimeException $e) {
-                    // Raise error
+                } catch (\Exception $e) {
+                    // Raise exception message, and continue as if nothing was returned
                     $this->logger->error("Cannot provision $roleType users: {$e->getMessage()}");
-                    $this->logMapper->flush($this->logger);
-                    continue;
-                } catch (InvalidArgumentException $e) {
-                    // Raise a different error
-                    $this->logger->error("Cannot provision $roleType users: $roleType is not valid");
-                    $this->logMapper->flush($this->logger);
-                    continue;
+                    $externalUsers = [];
                 }
 
                 foreach ($externalUsers as $externalUser) {
