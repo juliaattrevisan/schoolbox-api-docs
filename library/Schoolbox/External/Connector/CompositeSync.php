@@ -48,7 +48,7 @@ class CompositeSync implements ISync
                 $lastException = $e;
             }
         }
-        throw new RuntimeException('No sub-sync implements student sync', 0, $lastException);
+        throw $lastException ?? new RuntimeException('No sub-sync implements student sync');
     }
 
     /**
@@ -66,7 +66,7 @@ class CompositeSync implements ISync
                 $lastException = $e;
             }
         }
-        throw new RuntimeException('No sub-sync implements parent sync', 0, $lastException);
+        throw $lastException ?? new RuntimeException('No sub-sync implements parent sync');
     }
 
     /**
@@ -84,6 +84,6 @@ class CompositeSync implements ISync
                 $lastException = $e;
             }
         }
-        throw new RuntimeException('No sub-sync implements staff sync', 0, $lastException);
+        throw $lastException ?? new RuntimeException('No sub-sync implements staff sync');
     }
 }
