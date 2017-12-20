@@ -20,7 +20,7 @@ CASE WHEN EXISTS (SELECT * FROM `config` WHERE `name` = 'site_location' AND `val
           `deleted_at`
       ) VALUES (
           @tourStaff,
-          19,
+          (SELECT `id` FROM `user` WHERE `username` = ''alaress'' LIMIT 1),
           ''Staff Dashboard Tour'',
           ''This is a demonstration of a feature tour targeted to the staff dashboard'',
           1,
@@ -47,11 +47,11 @@ CASE WHEN EXISTS (SELECT * FROM `config` WHERE `name` = 'site_location' AND `val
   '
       INSERT INTO   `tour_audience_role`
       (
-                    `author_user_id`,
+                    `moderator_user_id`,
                     `tour_uuid`,
                     `role_id`
       )
-      SELECT        19,
+      SELECT        (SELECT `id` FROM `user` WHERE `username` = ''alaress'' LIMIT 1),
                     @tourStaff,
                     `id`
       FROM          `groups`
