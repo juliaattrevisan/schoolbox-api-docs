@@ -177,6 +177,7 @@ class RerouteOverrideMapper extends Mapper {
      * @return string
      */
     // TODO need to use this on notifications
+    // TODO remove this todo after testing notification bug
     public function isRouteMuted($routeKey, $userId = null)
     {
         return $this->getMatchingRoutes($routeKey, RoutePermission::MUTE, $userId)->count();
