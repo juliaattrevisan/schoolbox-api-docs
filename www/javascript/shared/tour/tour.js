@@ -18,7 +18,8 @@ $(function () {
             var tour = window.tours[uuid];
 
             if (typeof(tour) !== 'undefined') {
-                alert(tour.title + "\n" + tour.uuid);
+                console.log("alert('" + tour.title + "'); <--- Because alerts are too obnoxious!");
+                console.log(tour.uuid);
             } else {
                 console.log('Unknown feature tour requested: ' + uuid);
             }
