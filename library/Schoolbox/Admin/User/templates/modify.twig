@@ -553,7 +553,13 @@
         {# Hide Read and Write permission options in dropdown for certain services #}
         $("#serviceSelect").change(function(e) {
             var selectedServiceId = $(e.target).val();
-            var moderateOnlyServices = ["7", "9", "10"]; // TODO magic numbers are bad
+
+            // This doesn't fix the magic number problem exactly, but makes it easier to understand and extend.
+            var $resourceBooking = 7;
+            var $pastoralCare = 9;
+            var $fixtures = 10;
+            var moderateOnlyServices = [$resourceBooking, $pastoralCare, $fixtures];
+
             var $moderateAccess = 3;
             var $readAccess = 1;
 
