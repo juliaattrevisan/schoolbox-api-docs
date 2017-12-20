@@ -48,8 +48,8 @@ class EventConnector extends EventMapper
                 {$authorMapper->getColumnString('a')},
                 {$eventTypeMapper->getColumnString('t')},
             FROM `{$this->table}` e
-            LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
-            LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
+            JOIN {$this->getJoinSql('author', 'e', 'a',true)}
+            JOIN {$this->getJoinSql('eventType', 'e', 't')}
         ";
 
         $statement = $this->database->prepare($query);
@@ -227,9 +227,9 @@ class EventConnector extends EventMapper
                     AND eotc_metadata_staff.user_id IS NOT NULL
                 ) AS numStaff
             FROM `{$this->table}` e
-            LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
-            LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
-            LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
+            JOIN {$this->getJoinSql('author', 'e', 'a', true)}
+            JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c', true)}
+            JOIN {$this->getJoinSql('eventType', 'e', 't')}
             INNER JOIN eotc_event_metadata ON eotc_event_metadata.event_id = e.id
             INNER JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
             {$queryJoin}
