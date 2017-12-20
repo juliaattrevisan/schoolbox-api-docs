@@ -363,7 +363,7 @@
                                 </select>
                             </div>
                             <div class="small-4 card end">
-                                <select name="type" form="serviceCloneForm" required>
+                                <select name="type" id="permissionSelect" form="serviceCloneForm" required>
                                     <option id="read" value="1">Read</option>
                                     <option id="write" value="2">Write</option>
                                     <option id="moderate" value="3">Moderate</option>
@@ -551,19 +551,20 @@
     $(function () {
 
         {# Hide Read and Write permission options in dropdown for certain services #}
-
         $("#serviceSelect").change(function(e) {
             var selectedServiceId = $(e.target).val();
             var moderateOnlyServices = ["7", "9", "10"]; // TODO magic numbers are bad
+            var $moderateAccess = 3;
+            var $readAccess = 1;
 
             if (moderateOnlyServices.indexOf(selectedServiceId) !== -1) {
                 $("#read").hide();
                 $("#write").hide()
-                $("#moderate").attr("selected", 1);
+                $("#permissionSelect").val($moderateAccess);
             } else {
                 $("#read").show();
                 $("#write").show()
-                $("#moderate").removeAttr("selected");
+                $("#permissionSelect").val($readAccess);
             }
         });
 
