@@ -163,7 +163,15 @@ class Provisioner
 
                 $created = $updated = $skipped = $errors = 0;
 
-                foreach ($this->getAllExternalUsers($roleType) as $externalUser) {
+                try {
+                    $externalUsers = $this->getAllExternalUsers($roleType);
+                } catch (\Exception $e) {
+                    // Raise exception message, and continue as if nothing was returned
+                    $this->logger->error("Cannot provision $roleType users: {$e->getMessage()}");
+                    $externalUsers = [];
+                }
+
+                foreach ($externalUsers as $externalUser) {
 
                     // No user id? do nothing
                     $externalUserId = $externalUser->getId();

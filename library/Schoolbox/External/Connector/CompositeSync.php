@@ -40,14 +40,15 @@ class CompositeSync implements ISync
      */
     public function findAllStudents()
     {
+        $lastException = null;
         foreach ($this->subSyncs as $sync) {
             try {
                 return $sync->findAllStudents();
             } catch (RuntimeException $e) {
-                continue;
+                $lastException = $e;
             }
         }
-        throw new RuntimeException('No sub-sync implements student sync');
+        throw $lastException ?? new RuntimeException('No sub-sync implements student sync');
     }
 
     /**
@@ -57,14 +58,15 @@ class CompositeSync implements ISync
      */
     public function findAllParents()
     {
+        $lastException = null;
         foreach ($this->subSyncs as $sync) {
             try {
                 return $sync->findAllParents();
             } catch (RuntimeException $e) {
-                continue;
+                $lastException = $e;
             }
         }
-        throw new RuntimeException('No sub-sync implements parent sync');
+        throw $lastException ?? new RuntimeException('No sub-sync implements parent sync');
     }
 
     /**
@@ -74,13 +76,14 @@ class CompositeSync implements ISync
      */
     public function findAllStaff()
     {
+        $lastException = null;
         foreach ($this->subSyncs as $sync) {
             try {
                 return $sync->findAllStaff();
             } catch (RuntimeException $e) {
-                continue;
+                $lastException = $e;
             }
         }
-        throw new RuntimeException('No sub-sync implements staff sync');
+        throw $lastException ?? new RuntimeException('No sub-sync implements staff sync');
     }
 }
