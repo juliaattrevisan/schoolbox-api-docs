@@ -11,6 +11,7 @@
 namespace Alaress\Database\Iterator\Sqlsrv;
 
 use Alaress\Database\Iterator\Base;
+use PDOStatement;
 
 class Iterator extends Base
 {
@@ -19,6 +20,12 @@ class Iterator extends Base
      */
     public function rewind()
     {
-        // Have disabled rewinding due to performance issues with cursors being enabled
+        $this->rowIndex = -1;
+
+        if ($this->pdoStatement instanceof PDOStatement) {
+            $this->pdoStatement->closeCursor();
+        }
+
+        $this->execute();
     }
 }
