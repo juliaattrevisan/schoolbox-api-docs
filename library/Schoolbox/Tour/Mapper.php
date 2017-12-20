@@ -189,7 +189,7 @@ class Mapper extends BaseMapper
         // --------------------------------------------------------------------------------------------------------
 
         $audiencedRoleClause = "
-            `tour`.`uuid` IN 
+            {$this->getTable()}.`uuid` IN 
             (
                 SELECT  `tar`.`tour_uuid` 
                 FROM    `tour_audience_role` `tar`
