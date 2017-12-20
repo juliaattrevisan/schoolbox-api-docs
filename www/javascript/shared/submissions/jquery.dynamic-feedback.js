@@ -19,9 +19,9 @@
     /**
      * Draft-saving timeout
      *
-     * @var {number} tt
+     * @var {number}
      */
-    var tt;
+    var timeoutHandle;
 
     /**
      * Is a draft currently being auto-saved?
@@ -62,6 +62,7 @@
         function init(options, element) {
             var defaults = {
                 element: element,
+                timeoutDurationMs: 600, // After how many milliseconds should we auto-save user input
 
                 /* Label to indicate current status of action being undertaken
                  */
@@ -213,11 +214,11 @@
          */
         function timeoutUpdate() {
             var input = this;
-            window.clearTimeout(tt);
+            window.clearTimeout(timeoutHandle);
 
-            tt = window.setTimeout(function () {
+            timeoutHandle = window.setTimeout(function () {
                 onFeedbackChanged.apply(input);
-            }, 600);
+            }, config.timeoutDurationMs);
 
             if ($(this).val() == $(this).data('preval')) {
                 return;
