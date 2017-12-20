@@ -30,7 +30,7 @@ CASE WHEN EXISTS (SELECT * FROM `config` WHERE `name` = 'site_location' AND `val
       );
   '
 
-ELSE ''
+ELSE 'SELECT TRUE'
 
 END;
 
@@ -58,7 +58,7 @@ CASE WHEN EXISTS (SELECT * FROM `config` WHERE `name` = 'site_location' AND `val
       WHERE         `group_type` = ''staff'';
   '
 
-ELSE ''
+ELSE 'SELECT TRUE'
 
 END;
 
