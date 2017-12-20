@@ -88,6 +88,9 @@ class Mapper extends BaseMapper
      * @param \Schoolbox\User $user
      * @return array
      */
+    // TODO this needs to filter on groups that user has muted
+    // however this will only effect the side menu; really there should be a single place we prevent muted groups from
+    // appearing?
     public function findGroupsForUser($user) {
 
         $query = "
