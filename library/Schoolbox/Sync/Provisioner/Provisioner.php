@@ -163,7 +163,21 @@ class Provisioner
 
                 $created = $updated = $skipped = $errors = 0;
 
-                foreach ($this->getAllExternalUsers($roleType) as $externalUser) {
+                try {
+                    $externalUsers = $this->getAllExternalUsers($roleType);
+                } catch (\RuntimeException $e) {
+                    // Raise error
+                    $this->logger->error("Cannot provision $roleType users: {$e->getMessage()}");
+                    $this->logMapper->flush($this->logger);
+                    continue;
+                } catch (InvalidArgumentException $e) {
+                    // Raise a different error
+                    $this->logger->error("Cannot provision $roleType users: $roleType is not valid");
+                    $this->logMapper->flush($this->logger);
+                    continue;
+                }
+
+                foreach ($externalUsers as $externalUser) {
 
                     // No user id? do nothing
                     $externalUserId = $externalUser->getId();
