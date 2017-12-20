@@ -42,16 +42,14 @@ catch (\Exception $e) {
     error(117);
 }
 
-$canModify = new IsModifyUnLocked(new LockedChecker(Schoolbox\Assessment\Term\Mapper::getInstance()));
-
 /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $dataSource */
 $dataSource = $this->getDi()->get('assessmentDataSource');
 
-try{
-    $canModify->authorize(['assessmentId' => $assess['assessment_id'], 'assessment' => $dataSource->findById($assess['assessment_id'])], $_SESSION['USER']);
-}
-catch (\Exception $e) {
-    error(Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
+/** @var Alaress\Authorizer\Authorizer $authorizer */
+$authorizer = $this->getDi()->get('authorizer');
+if (!$authorizer->isPathAuthorizedForUser('quiz.getQuizSummary', ['assessmentId' => $assess['assessment_id'],
+                                                                  'assessment' => $dataSource->findById($assess['assessment_id']), $_SESSION['user']])) {
+    throwException(Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
 }
 
 if($assess['start']) {
