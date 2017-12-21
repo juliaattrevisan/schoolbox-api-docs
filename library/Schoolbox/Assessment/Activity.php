@@ -274,7 +274,12 @@ class Activity {
 	}
 
 	public function getTypeName() {
-		return $this->isAssessment() ? $this->getAssessment()->getWorkType()->getName() : $this->getSubmissionBox()->getAssessmentModel()->getWorkType()->getName();
+	    if ($this->isAssessment()) {
+            return $this->getAssessment()->getWorkType() ? $this->getAssessment()->getWorkType()->getName() : "";
+        } else {
+            $assessmentModel = $this->getSubmissionBox()->getAssessmentModel();
+	        return $assessmentModel->getWorkType() ? $assessmentModel->getWorkType()->getName() : "";
+        }
 	}
 
 	public function getReturnedFileId() {

@@ -38,7 +38,7 @@ if (is_numeric($_REQUEST['id']) && is_numeric($_REQUEST['uid'])) {
                 'cid'         => $assessment->getCategory()->getId(),
                 'uid'         => $_REQUEST['uid'],
                 'category'    => Scrub::text($assessment->getCategory()->getName()),
-                'typeName'    => Scrub::text($assessment->getWorkType()->getName()),
+                'typeName'    => $assessment->getWorkType() ? Scrub::text($assessment->getWorkType()->getName()) : "",
                 'name'        => Scrub::text($assessment->getTitle()),
                 'description' => '',
                 'action'      => $action,
