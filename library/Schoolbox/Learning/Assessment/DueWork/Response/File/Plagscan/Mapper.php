@@ -307,12 +307,16 @@ class Mapper extends \Schoolbox\Mapper
 
         /* Send it to plag
          */
-        $plagscanId = $this->getConnector()->transmit($file, $filename);
 
-        /* Plagscan death
-         */
-        if (empty($plagscanId)) {
-            return [];
+        try {
+            $plagscanId = $this->getConnector()->transmit($file, $filename);
+        } catch (\RuntimeException $e) {
+            // TODO sentry stuff here
+            /* Plagscan death
+             */
+            if (empty($plagscanId)) {
+                return [];
+            }
         }
 
         $plagscan->setPlagscanId($plagscanId);
