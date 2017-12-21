@@ -14,4 +14,60 @@
         </label>
     </div>
 
+    <div id="participation-settings" class="hide">
+        <ul class="information-list card-selectable" id="participants">
+            {% for participant in assessment.allParticipants %}
+                {% set user = participant.user %}
+                {% set userInclude = (not participant.excludedAt) or participant.excludedAt.null %}
+                {% set userPlanName = userInclude ? (participant.plan.name ?: '(no customisations)') : '(excluded)' %}
+
+                <li data-participant="{{ user.id }}">
+                    <input type="hidden" name="participant-include[{{ user.id }}]" id="participant-include-{{ user.id }}" value="{{ userInclude ? 1 : 0 }}">
+                    <input type="hidden" name="participant-plan[{{ user.id }}]" id="participant-plan-{{ user.id }}" value="{{ planIds[participant.plan.id] ?: 0 }}">
+                    <div data-participant-row>
+                        <div class="selector" data-participant-selector>
+                            <input id="participant-{{ user.id }}" type="checkbox" value="1" name="participant[{{ user.id }}]" data-participant-select data-user-id="{{ user.id }}" data-user-name="{{ user.fullName }}">
+                            <label for="participant-{{ user.id }}" class="checkbox-label"></label>
+                        </div>
+                        <div class="small-12 column">
+                            <div class="row">
+                                <label for="participant-{{ user.id }}" class="checkbox-label">
+                                    <div class="small-12 medium-6 columns compact card{{ userInclude ? '' : ' unselected' }}">
+                                        <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square32">
+                                        <p>{{ user.fullName }}</p>
+                                    </div>
+                                    <div class="small-12 medium-6 columns meta" data-participant-status>{{ userPlanName }}</div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+
+    </div>
+
 </fieldset>
+
+<script>
+    $(function() {
+        var $participantSettings = $('#participation-settings');
+
+
+        // ----------------------------------------------------------------
+        // Events
+        // ----------------------------------------------------------------
+
+        /**
+         * Hiding and showing settings on feature enable
+         */
+        $('#participation-enable').change(function() {
+            if ($(this).is(':checked')) {
+                $participantSettings.removeClass('hide');
+            } else {
+                $participantSettings.addClass('hide');
+            }
+        });
+
+    });
+</script>
