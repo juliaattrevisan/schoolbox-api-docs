@@ -2644,7 +2644,7 @@ abstract class Mapper implements IMapper, Serializable
         $collection  = $this->getModelAsCollection($object);
         $tbl         = $this->table;
         $colString   = $this->getColumnString();
-        $collection  = $this->populateSaveTimestamps($collection);
+        $collection  = $this->populateUuids($this->populateSaveTimestamps($collection));
         $plcString   = $this->getPlaceholderString();
         $updString   = $this->getUpdateString();
         $statement   = $this->database->prepare(
@@ -2673,23 +2673,13 @@ abstract class Mapper implements IMapper, Serializable
         if (isset($id_column)) {
             // retrieve the objects as they currently exist so we can perform a diff if we need to
             // we first have to dehydrate to ensure we don't attempt queries with objects as parameters
-
-                $collectionIds = array_filter($collection->map(function ($model) {
-                    try {
+            $collectionIds = array_filter(
+                $collection->map(
+                    function ($model) {
                         return $this->dehydrate($model)[$this->getIdentifierColumn()];
-                    } catch (TypeError $e) {
-                        // If this was anything other than a UUID column, throw the type error as normal
-                        if (!isset($this->map[$this->getIdentifierColumn()]['identifier_uuid'])) {
-                            throw $e;
-                        }
-
-                        // If this is a UUID- we let it get away with a type error and set it to a blank string
-                        $this->setModelProperty($model, $this->getIdentifierColumn(), '');
-
-                        // Return false so the array_filter() call removes it from the collection
-                        return false;
                     }
-                })->getAll());
+                )->getAll()
+            );
 
             foreach ($this->findByColumn($id_column, $collectionIds, ['deleted' => true, 'cache' => false]) as $obj) {
                 // index by ID
@@ -2715,22 +2705,11 @@ abstract class Mapper implements IMapper, Serializable
                             $pdoMethods[$i] = null;
                             break;
                     }
-
                     if ($id_property) {
-                        // Check if this is an insert and the identifier column is a UUID
-                        if (isset($this->map[$id_property]['identifier_uuid']) && $pdoMethods[$i] === self::METHOD_CREATE) {
-                            // We just created a new UUID, retrieve if from the database session variable set by trigger
-                            $statementUuid = $this->database->prepare('SELECT @last_uuid');
-                            $statementUuid->execute();
-                            $lastUuid = $statementUuid->fetchColumn();
-
-                            // Force it into the models ID property
-                            $this->setModelProperty($model, $id_property, $lastUuid);
-                        } elseif (!$this->getModelProperty($model, $id_property)) {
+                        if (!$this->getModelProperty($model, $id_property)) {
                             $new_id = $this->database->lastInsertId();
                             $this->setModelProperty($model, $id_property, $new_id);
                         }
-
                         $affectedIDs[] = $this->getModelProperty($model, $id_property);
                     }
 
@@ -3498,7 +3477,6 @@ abstract class Mapper implements IMapper, Serializable
             }
             $propertyName = $map['property'];
             $columnName   = $map['column'];
-
             $result[$columnName] = $this->getModelProperty($model, $propertyName);
         }
         return $result;
@@ -3838,6 +3816,32 @@ abstract class Mapper implements IMapper, Serializable
             foreach ($collection as $model) {
                 // Always set the update timestamp
                 $model->{$setMethod}(clone $now);
+            }
+        }
+        return $collection;
+    }
+
+
+    /**
+     * Set model UUIDs (if this mapper has a UUID) prior to saving to DB
+     *
+     * @param Collection $collection
+     * @return Collection
+     */
+    protected function populateUuids(Collection $collection): Collection
+    {
+        $idProperty = $this->getIdentifierProperty();
+        if (empty($this->map[$idProperty]['identifier_uuid'])) {
+            return $collection;
+        }
+
+        $query = $this->database->prepare('SELECT UUID()');
+        foreach ($collection as $model) {
+            $existingUuid = $this->getModelProperty($model, $idProperty);
+            if (empty($existingUuid)) {
+                $query->execute();
+                $this->setModelProperty($model, $idProperty, $query->fetchColumn());
+                $query->closeCursor();
             }
         }
         return $collection;
