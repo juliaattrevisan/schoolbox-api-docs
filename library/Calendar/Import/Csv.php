@@ -5,7 +5,6 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Calendar\Import;
@@ -20,20 +19,23 @@ use \Schoolbox\CampusMapper;
 use \Alaress_Date_Format;
 use Schoolbox\Notif\SilentNotif;
 use \Schoolbox\Calendar\EventTypeMapper;
+use \Schoolbox\Error\Mapper as ErrorMapper;
 use Alaress\Lumberjack\Logger;
 
-class Csv extends Base {
+class Csv extends Base
+{
 
-	/**
-	 * Load all events into schoolbox, generate outcome array
-	 */
-	public function load() {
-		$output = array();
+    /**
+     * Load all events into schoolbox, generate outcome array
+     */
+    public function load()
+    {
+        $output = array();
 
-		$campusMapper = new CampusMapper();
-		$eventMapper = new EventMapper();
-		$categoryRelationMapper = new CategoryMapper();
-		$roleRelationMapper = new RoleMapper();
+        $campusMapper = new CampusMapper();
+        $eventMapper = new EventMapper();
+        $categoryRelationMapper = new CategoryMapper();
+        $roleRelationMapper = new RoleMapper();
 
         // silence notifications
         $silence = new SilentNotif();
@@ -43,43 +45,60 @@ class Csv extends Base {
         $categoryRelationMapper->setNotifier($silence);
         $roleRelationMapper->setNotifier($silence);
 
-		/* All the campuses selected in the ui
-		 */
-		$allCampuses = $campusMapper->findByColumn('id', $this->getCampusList());
+        /* All the campuses selected in the ui
+         */
+        $allCampuses = [];
 
-		/* Process rows
-		 */
-		$handle = fopen($this->getFile(), 'r');
-		$headerRow = fgetcsv($handle, 0, ",");
+        foreach ($this->getCampusList() as $campusId) {
+            $campus = $campusMapper->findById($campusId);
+            $allCampuses[] = $campus;
+        }
 
-		while (($thisRow = fgetcsv($handle, 0, ",")) !== false) {
-			//
-			// We cannot determine encoding, so strip everything not ascii
-			$thisRow = array_map(
-				function($field) { return preg_replace('/[\\x80-\\xFF]/', '', $field); },
-				$thisRow
-			);
-			list(
-				$start_date,
-				$start_time,
-				$finish_date,
-				$finish_time,
-				$all_day,
-				$name,
-				$detail,
-				$location,
-				$event_type,
-				$publish_date,
-				$attendance
-				) = $thisRow;
+        /* Process rows
+         */
+        $handle = fopen($this->getFile(), 'r');
+        $headerRow = fgetcsv($handle, 0, ",");
+
+        while (($thisRow = fgetcsv($handle, 0, ",")) !== false) {
+            //
+            // We cannot determine encoding, so strip everything not ascii
+            $thisRow = array_map(
+                function ($field) {
+                    return preg_replace('/[\\x80-\\xFF]/', '', $field);
+                },
+                $thisRow
+            );
+            try {
+                list(
+                    $start_date,
+                    $start_time,
+                    $finish_date,
+                    $finish_time,
+                    $all_day,
+                    $name,
+                    $detail,
+                    $location,
+                    $event_type,
+                    $publish_date,
+                    $attendance
+                    ) = $thisRow;
+            } catch (\ErrorException $e) {
+                $output[] = array(
+                    'name'   => \Scrub::text($name),
+                    'status' => 'Not Added',
+                    'error'  => 'Not enough columns in CSV',
+                );
+
+                continue;
+            }
 
             /* Event name is mandatory
              */
             if (!strlen(trim($name))) {
                 $output[] = array(
-                    'name' => \Scrub::text($name),
+                    'name'   => \Scrub::text($name),
                     'status' => 'Not Added',
-                    'error' => 'Event name not provided',
+                    'error'  => 'Event name not provided',
                 );
 
                 continue;
@@ -89,55 +108,63 @@ class Csv extends Base {
              */
             if (!strlen(trim($start_date))) {
                 $output[] = array(
-                    'name' => \Scrub::text($name),
+                    'name'   => \Scrub::text($name),
                     'status' => 'Not Added',
-                    'error' => 'Start date not provided',
+                    'error'  => 'Start date not provided',
                 );
 
                 continue;
             }
 
-			/* Skip empty comments and no dates
-			 *
-			 * If access is 3, then the sid corresponds to campus id's
-			 * If access is 2, then the sid corresponds to group id's
-			 */
-			$start = new Alaress_Date_Format($start_date, 'd/m/Y');
-			//
-			// Finish empty? Use start date as the finish.
-			$finish = (strlen(trim($finish_date))) ?
-				new Alaress_Date_Format($finish_date, 'd/m/Y'):
-				clone $start;
+            /* Skip empty comments and no dates
+             *
+             * If access is 3, then the sid corresponds to campus id's
+             * If access is 2, then the sid corresponds to group id's
+             */
+            try {
+                $start = new Alaress_Date_Format($start_date, 'd/m/Y');
+                //
+                // Finish empty? Use start date as the finish.
+                $finish = (strlen(trim($finish_date))) ?
+                    new Alaress_Date_Format($finish_date, 'd/m/Y') :
+                    clone $start;
+            } catch (\InvalidArgumentException $e) {
+                $output[] = array(
+                    'name'   => \Scrub::text($name),
+                    'status' => 'Not Added',
+                    'error'  => 'Invalid date time supplied',
+                );
 
-			//
-			// Start or finish time empty? Default to start and end of day.
-			$start_time  = strlen(trim($start_time))  ? $start_time  : '00:00';
-			$finish_time = strlen(trim($finish_time)) ? $finish_time : '23:59';
+                continue;
+            }
 
-			//
-			// All day? if "all day" flag is set.
-			// (maybe if start_time = 00:00:00 and end_time = 23:59:59 too?)
-			$all_day =
-				in_array(trim(strtolower($all_day)), array('y', 'yes', '1'))
-				|| ($start_time === '00:00:00' && $finish_time === '23:59:59')
-			;
+            //
+            // Start or finish time empty? Default to start and end of day.
+            $start_time = strlen(trim($start_time)) ? $start_time : '00:00';
+            $finish_time = strlen(trim($finish_time)) ? $finish_time : '23:59';
 
-			/* Event Type
-			 * If one not found, report error and move on
-			 */
-			try {
-				$eventTypeMapper = new EventTypeMapper();
-				$eventType = $eventTypeMapper->findById($event_type);
-			}
-			catch (\Exception $e) {
-				$output[] = array(
-					'name' => \Scrub::text($name),
-					'status' => 'Not Added',
-					'error' => 'Event type not set',
-				);
+            //
+            // All day? if "all day" flag is set.
+            // (maybe if start_time = 00:00:00 and end_time = 23:59:59 too?)
+            $all_day =
+                in_array(trim(strtolower($all_day)), array('y', 'yes', '1'))
+                || ($start_time === '00:00:00' && $finish_time === '23:59:59');
 
-				continue;
-			}
+            /* Event Type
+             * If one not found, report error and move on
+             */
+            try {
+                $eventTypeMapper = new EventTypeMapper();
+                $eventType = $eventTypeMapper->findById($event_type);
+            } catch (\Exception $e) {
+                $output[] = array(
+                    'name'   => \Scrub::text($name),
+                    'status' => 'Not Added',
+                    'error'  => 'Event type not set',
+                );
+
+                continue;
+            }
 
             /* 24 hour time enforcement
              * Check validity of event settings e.g. datetimes
@@ -151,17 +178,15 @@ class Csv extends Base {
              */
             if (preg_match('#(00:00:00)|(23:59:59)#', $start_time)) {
                 $startDatetime = new \Alaress_Date_Format("{$start_date} {$start_time}", 'd/m/Y H:i:s');
-            }
-            /* Prescribed 24-hour format from csv, append :00 seconds
+            } /* Prescribed 24-hour format from csv, append :00 seconds
              */
             elseif (preg_match('#^((0?\d)|(1\d)|(2[0-3])):([0-5]\d)$#', $start_time)) {
                 $startDatetime = new \Alaress_Date_Format("{$start_date} {$start_time}:00", 'd/m/Y H:i:s');
-            }
-            else {
+            } else {
                 $output[] = array(
-                    'name' => \Scrub::text($name),
+                    'name'   => \Scrub::text($name),
                     'status' => 'Not Added',
-                    'error' => 'Invalid start date and/or times (use 24-hour h:m format)',
+                    'error'  => 'Invalid start date and/or times (use 24-hour h:m format)',
                 );
 
                 continue;
@@ -171,17 +196,15 @@ class Csv extends Base {
              */
             if (preg_match('#(00:00:00)|(23:59:59)#', $finish_time)) {
                 $finishDatetime = new \Alaress_Date_Format("{$finish_date} {$finish_time}", 'd/m/Y H:i:s');
-            }
-            /* Prescribed 24-hour format from csv, append :00 seconds
+            } /* Prescribed 24-hour format from csv, append :00 seconds
              */
             elseif (preg_match('#^((0?\d)|(1\d)|(2[0-3])):([0-5]\d)$#', $finish_time)) {
                 $finishDatetime = new \Alaress_Date_Format("{$finish_date} {$finish_time}:00", 'd/m/Y H:i:s');
-            }
-            else {
+            } else {
                 $output[] = array(
-                    'name' => \Scrub::text($name),
+                    'name'   => \Scrub::text($name),
                     'status' => 'Not Added',
-                    'error' => 'Invalid finish date and/or times (use 24-hour h:m format)',
+                    'error'  => 'Invalid finish date and/or times (use 24-hour h:m format)',
                 );
 
                 continue;
@@ -191,16 +214,16 @@ class Csv extends Base {
              */
             if ($startDatetime->getUnixTimestamp() > $finishDatetime->getUnixTimestamp()) {
                 $output[] = array(
-                    'name' => \Scrub::text($name),
+                    'name'   => \Scrub::text($name),
                     'status' => 'Not Added',
-                    'error' => 'Invalid date and/or times',
+                    'error'  => 'Invalid date and/or times',
                 );
 
                 continue;
             }
 
-			/* Save
-			 */
+            /* Save
+             */
 
             $event = new Event();
             $event->setOwner($this->getUser());
@@ -231,7 +254,7 @@ class Csv extends Base {
             /* Assign Category relations
              */
             if ($this->categoryList != null) {
-                foreach($this->getCategoryList() as $currentCategory) {
+                foreach ($this->getCategoryList() as $currentCategory) {
                     $category = new Category();
                     $category->setEventId($event->getId());
                     $category->setCategoryId($currentCategory);
@@ -241,7 +264,7 @@ class Csv extends Base {
 
             /* Assign Role relations
              */
-            foreach($this->getGroupList() as $currentRole) {
+            foreach ($this->getGroupList() as $currentRole) {
                 $role = new Role();
                 $role->setEventId($event->getId());
                 $role->setRoleId($currentRole);
@@ -250,24 +273,23 @@ class Csv extends Base {
 
             if (is_array($result) && count($result)) {
                 $output[] = array(
-                    'name' => \Scrub::text($event->getTitle()),
+                    'name'   => \Scrub::text($event->getTitle()),
                     'status' => 'Added',
-                    'error' => 'OK',
+                    'error'  => 'OK',
                 );
-            }
-            else {
+            } else {
                 $output[] = array(
-                    'name' => \Scrub::text($event->getTitle()),
+                    'name'   => \Scrub::text($event->getTitle()),
                     'status' => 'Not Added',
-                    'error' => 'Could not create event',
+                    'error'  => 'Could not create event',
                 );
             }
 
 
-			/* Free memory */
-			unset($publish_date, $start, $finish);
-		}
+            /* Free memory */
+            unset($publish_date, $start, $finish);
+        }
 
-		$this->setOutput($output);
-	}
+        $this->setOutput($output);
+    }
 }
