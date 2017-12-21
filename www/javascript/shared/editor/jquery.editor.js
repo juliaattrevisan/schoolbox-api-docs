@@ -235,6 +235,7 @@
 
                 /* Quicktable config for best table defaults
                  */
+                height: 120,
                 qtBorder: '0', // Border of inserted table
                 qtWidth: '100%', // Width of inserted table
                 qtCellPadding: '0', // Cell padding table
