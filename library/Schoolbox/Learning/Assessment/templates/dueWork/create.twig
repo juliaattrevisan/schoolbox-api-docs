@@ -1,8 +1,137 @@
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
-<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
-<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
-<script type="text/javascript">
+
+{# ----------------------------------------------------------- #}
+{# Basic Details #}
+{# ----------------------------------------------------------- #}
+<fieldset>
+    <label>
+        Title
+        <input type="text" name="title" value="{{ assessment.title }}" required maxlength="255"/>
+    </label>
+
+    <label>
+        Work Type
+        <select name="workType">
+            <option value="" selected>None</option>
+            {% for workType in allWorkTypes %}
+                <option value="{{ workType.id }}" {% if assessment.workType.id == workType.id %}selected="selected"{% endif %}>{{ workType.name }}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <label>
+        Description
+        <textarea name="description">{{ assessment.description }}</textarea>
+    </label>
+
+    <div class="row">
+        <div class="small-12 columns">
+            <label>Attach Files</label>
+            {% include 'sub/attachzone.twig' %}
+        </div>
+    </div>
+</fieldset>
+
+
+{# ----------------------------------------------------------- #}
+{# Submissions #}
+{# ----------------------------------------------------------- #}
+<fieldset>
+    <legend>Submissions</legend>
+    <div class="row">
+        <div class="small-12 columns">
+            <label for="acceptOnline">Accepts Online Submissions?</label>
+            <select name="acceptOnline" id="acceptOnline">
+                {% set options = {
+                0: 'None',
+                1: 'Single',
+                2: 'Multiple'
+                } %}
+                {% for index, title in options %}
+                    <option value="{{ index }}"{% if assessment.acceptOnline == index %} selected="selected"{% endif %}>{{ title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    {% include '@learningAssessment/fragments/default_open_span.twig' with {assessment: assessment} only %}
+
+    {% if context.baseContext is not unitSpecification %}
+        {% include '@learningAssessment/fragments/dates.twig' %}
+    {% endif %}
+</fieldset>
+
+
+{# ----------------------------------------------------------- #}
+{# Grading #}
+{# ----------------------------------------------------------- #}
+<fieldset>
+    <legend>{{ locale.grading.proper }}</legend>
+
+    <label>
+        Weight
+        <input type="number" name="weight" value="{{ assessment.weight }}">
+    </label>
+
+    <label>Self-Reflection
+        <select id="selfReflectDropdown">
+            <option value="None">None</option>
+            <option value="selfReflectable" {% if assessment.selfReflectable and not assessment.selfAssessable %}selected{% endif %}>Self-Reflect</option>
+            <option value="selfAssessable" {% if assessment.selfAssessable and assessment.selfReflectable %}selected{% endif %} >Self-Reflect + Self-Assess</option>
+        </select>
+    </label>
+
+    <input type="hidden" name="selfReflectable" {% if assessment.selfReflectable and not assessment.selfAssessable %}value="1"{% else %}value="0"{% endif %}>
+    <input type="hidden" name="selfAssessable" {% if assessment.selfReflectable and  assessment.selfAssessable %}value="1"{% else %}value="0"{% endif %}>
+
+    {% import 'sub/visibility.twig' as visibility %}
+    {{ visibility.dropdown(markVisibility, availableVisibilities) }}
+
+    <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
+
+    {# Letter Grade enables Grading Scheme
+     # Total Mark enables Maximum Available Marks
+     #}
+    {% set markTypeLetterGrade = 2 %}
+    {% set markTypeTotalMark = 3 %}
+
+    {% include '@learningAssessment/fragments/markType.twig' %}
+    {% include '@learningAssessment/fragments/rubric.twig' with {
+        rubric: rubric,
+        rubricAttachZone: rubricAttachZone,
+        resultSets: rubricResultSets,
+        rubricHasMarks: rubricHasMarks,
+        assessment: assessment,
+        markTypeTotalMark: markTypeTotalMark
+    } only %}
+</fieldset>
+
+
+{# ----------------------------------------------------------- #}
+{# Participation #}
+{# ----------------------------------------------------------- #}
+
+
+
+{# ----------------------------------------------------------- #}
+{# Curriculum #}
+{# ----------------------------------------------------------- #}
+{% include '@learningAssessment/fragments/curriculumCodes.twig' with {entityType: locale.dueWork.proper} %}
+
+
+{# ----------------------------------------------------------- #}
+{# Submit #}
+{# ----------------------------------------------------------- #}
+{{ mage.submitRow(actionLabel ?: 'Create', 'part-2', 'end') }}
+
+
+{# ----------------------------------------------------------- #}
+{# General Scripts #}
+{# ----------------------------------------------------------- #}
+<script src="/javascript/ckeditor/ckeditor.js"></script>
+<script src="/javascript/shared/editor/jquery.editor.js"></script>
+<script>
     $(function () {
 
         // 'Description' TextArea only
@@ -54,93 +183,11 @@
     });
 </script>
 
-<label>
-    Title
-    <input type="text" name="title" value="{{ assessment.title }}" required maxlength="255"/>
-</label>
-<label>
-    Work Type
-    <select name="workType">
-            <option value="" selected>None</option>
-        {% for workType in allWorkTypes %}
-            <option value="{{ workType.id }}" {% if assessment.workType.id == workType.id %}selected="selected"{% endif %}>{{ workType.name }}</option>
-        {% endfor %}
-    </select>
-</label>
-<label>
-    Description
-    <textarea name="description">{{ assessment.description }}</textarea>
-</label>
 
-<div class="row">
-    <div class="small-12 columns">
-        <label>Attach Files</label>
-        {% include 'sub/attachzone.twig' %}
-    </div>
-</div>
-<legend>Submissions</legend>
-<div class="row">
-    <div class="small-12 columns">
-        <label for="acceptOnline">Accepts Online Submissions?</label>
-        <select name="acceptOnline" id="acceptOnline">
-            {% set options = {
-            0: 'None',
-            1: 'Single',
-            2: 'Multiple'
-            } %}
-            {% for index, title in options %}
-                <option value="{{ index }}"{% if assessment.acceptOnline == index %} selected="selected"{% endif %}>{{ title }}</option>
-            {% endfor %}
-        </select>
-    </div>
-</div>
-
-{% include '@learningAssessment/fragments/default_open_span.twig' with {assessment: assessment} only %}
-
-{% if context.baseContext is not unitSpecification %}
-    {% include '@learningAssessment/fragments/dates.twig' %}
-{% endif %}
-
-<legend>{{ locale.grading.proper }}</legend>
-
-<label>
-    Weight
-    <input type="number" name="weight" value="{{ assessment.weight }}">
-</label>
-
-<label>Self-Reflection
-    <select id="selfReflectDropdown">
-        <option value="None">None</option>
-        <option value="selfReflectable" {% if assessment.selfReflectable and not assessment.selfAssessable %}selected{% endif %}>Self-Reflect</option>
-        <option value="selfAssessable" {% if assessment.selfAssessable and assessment.selfReflectable %}selected{% endif %} >Self-Reflect + Self-Assess</option>
-    </select>
-</label>
-
-<input type="hidden" name="selfReflectable" {% if assessment.selfReflectable and not assessment.selfAssessable %}value="1"{% else %}value="0"{% endif %}>
-<input type="hidden" name="selfAssessable" {% if assessment.selfReflectable and  assessment.selfAssessable %}value="1"{% else %}value="0"{% endif %}>
-
-{% import 'sub/visibility.twig' as visibility %}
-{{ visibility.dropdown(markVisibility, availableVisibilities) }}
-
-<input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
-
-{# Letter Grade enables Grading Scheme
- # Total Mark enables Maximum Available Marks
- #}
-{% set markTypeLetterGrade = 2 %}
-{% set markTypeTotalMark = 3 %}
-
-{% include '@learningAssessment/fragments/markType.twig' %}
-{% include '@learningAssessment/fragments/rubric.twig' with {
-    rubric: rubric,
-    rubricAttachZone: rubricAttachZone,
-    resultSets: rubricResultSets,
-    rubricHasMarks: rubricHasMarks,
-    assessment: assessment,
-    markTypeTotalMark: markTypeTotalMark
-} only %}
-
-<script type="text/javascript">
+{# ----------------------------------------------------------- #}
+{# Rubric Scripts #}
+{# ----------------------------------------------------------- #}
+<script>
     $(function () {
 
         var $maxMarkInput = $('#maxMark');
@@ -238,9 +285,3 @@
     }
 
 </script>
-
-
-{% include '@learningAssessment/fragments/curriculumCodes.twig' with {entityType: locale.dueWork.proper} %}
-
-
-{{ mage.submitRow(actionLabel ?: 'Create', 'part-2', 'end') }}

@@ -1,17 +1,8 @@
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
-<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
-<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
-<script type="text/javascript">
-    $(function () {
 
-        /* Description + Completion Message
-         */
-        $.fn.alaressEditor();
+<input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
 
-        $(document).foundation();
-    });
-</script>
 
 {# TODO 'stage' is a temp hack until this fragment gets refactored to use *extend* instead of *include* #}
 {# This activates a modal stored in the parent create.twig
@@ -30,10 +21,19 @@
 </div>
 {% endif %}
 
+
+{# ----------------------------------------------------------- #}
+{# Title #}
+{# ----------------------------------------------------------- #}
 <label>
     Title
     <input type="text" name="title" value="{{ assessment.title }}" required maxlength="255"/>
 </label>
+
+
+{# ----------------------------------------------------------- #}
+{# Work Type #}
+{# ----------------------------------------------------------- #}
 <label>
     Work Type
     <select name="workType">
@@ -43,16 +43,29 @@
         {% endfor %}
     </select>
 </label>
+
+
+{# ----------------------------------------------------------- #}
+{# Description #}
+{# ----------------------------------------------------------- #}
 <label>
     Description<span class="hint has-tip tip-top" data-tooltip title="This content will be shown to users before they begin to attempt the quiz.">?</span>
     <textarea name="description">{{ assessment.description }}</textarea>
 </label>
 
+
+{# ----------------------------------------------------------- #}
+{# Completion Message #}
+{# ----------------------------------------------------------- #}
 <label>
     Completion Message<span class="hint has-tip tip-top" data-tooltip title="This content will be shown to users when they complete the quiz.">?</span>
     <textarea name="completion_message">{{ assessment.completionMessage }}</textarea>
 </label>
 
+
+{# ----------------------------------------------------------- #}
+{# Max Attempts #}
+{# ----------------------------------------------------------- #}
 <div class="row">
     <div class="small-12 columns">
         <label>
@@ -80,29 +93,16 @@
     </div>
 </div>
 
-<script type="text/javascript">
-    $(function() {
-        var $durationPanel = $('#durationPanel');
-        var $durationInputs = $durationPanel.find('input[type=text]');
 
-        $('#hasDuration').on('click', function() {
-            var $checkbox = $(this);
-            if ($checkbox.is(':checked')) {
-                $('#durationPanel').stop().hide().removeClass('hide').fadeIn(400);
-                $durationInputs.prop('disabled', false);
-            }
-            else {
-                /* Hide panel + disable inputs
-                 */
-                $durationPanel.stop().fadeOut(400);
-                $durationInputs.prop('disabled', true);
-            }
-        });
-    });
-</script>
-
+{# ----------------------------------------------------------- #}
+{# Default Activity Duration #}
+{# ----------------------------------------------------------- #}
 {% include '@learningAssessment/fragments/default_open_span.twig' with {assessment: assessment} only %}
 
+
+{# ----------------------------------------------------------- #}
+{# Allowed Time #}
+{# ----------------------------------------------------------- #}
 <div class="row">
     <div class="small-5 medium-2 columns">
         <label for="hasDuration">Allowed Time<span class="hint has-tip tip-top" data-tooltip title="After starting a quiz, students will have this much time to complete it. Switch off for no limit.">?</span></label>
@@ -128,25 +128,79 @@
     </div>
 </div>
 
+
+{# ----------------------------------------------------------- #}
+{# Dates #}
+{# ----------------------------------------------------------- #}
 {% if context.baseContext is not unitSpecification %}
-    {% include '@learningAssessment/fragments/dates.twig' %}
+    <fieldset>
+        <legend>Submission Dates</legend>
+        {% include '@learningAssessment/fragments/dates.twig' %}
+    </fieldset>
 {% endif %}
 
-<legend>{{ locale.grading.proper }}</legend>
-<label>
-    Weight
-    <input type="number" name="weight" value="{{ assessment.weight }}">
-</label>
 
-{% import 'sub/visibility.twig' as visibility %}
-{{ visibility.dropdown(markVisibility, availableVisibilities) }}
+{# ----------------------------------------------------------- #}
+{# Grading #}
+{# ----------------------------------------------------------- #}
+<fieldset>
+    <legend>{{ locale.grading.proper }}</legend>
 
+    <label>
+        Weight
+        <input type="number" name="weight" value="{{ assessment.weight }}">
+    </label>
+
+    {% import 'sub/visibility.twig' as visibility %}
+    {{ visibility.dropdown(markVisibility, availableVisibilities) }}
+</fieldset>
+
+
+{# ----------------------------------------------------------- #}
+{# Participation #}
+{# ----------------------------------------------------------- #}
+
+
+
+{# ----------------------------------------------------------- #}
+{# Curriculum #}
+{# ----------------------------------------------------------- #}
 {% include '@learningAssessment/fragments/curriculumCodes.twig' with {entityType: 'Quiz'} %}
 
-<input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
 
-
-
-
+{# ----------------------------------------------------------- #}
+{# Submit #}
+{# ----------------------------------------------------------- #}
 {{ mage.submitRow(actionLabel ?: 'Create', 'part-2', 'end') }}
 
+
+{# ----------------------------------------------------------- #}
+{# Scripts #}
+{# ----------------------------------------------------------- #}
+<script src="/javascript/ckeditor/ckeditor.js"></script>
+<script src="/javascript/shared/editor/jquery.editor.js"></script>
+<script>
+    $(function () {
+        // Init CKEditor
+        $.fn.alaressEditor();
+
+        $(document).foundation();
+
+        var $durationPanel = $('#durationPanel');
+        var $durationInputs = $durationPanel.find('input[type=text]');
+
+        $('#hasDuration').on('click', function() {
+            var $checkbox = $(this);
+            if ($checkbox.is(':checked')) {
+                $('#durationPanel').stop().hide().removeClass('hide').fadeIn(400);
+                $durationInputs.prop('disabled', false);
+            }
+            else {
+                /* Hide panel + disable inputs
+                 */
+                $durationPanel.stop().fadeOut(400);
+                $durationInputs.prop('disabled', true);
+            }
+        });
+    });
+</script>

@@ -1,20 +1,22 @@
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
-<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
-<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
-<script type="text/javascript">
-    $(function () {
 
-        /* Description
-         */
-        $.fn.alaressEditor();
-    });
-</script>
+<input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
+<input type="hidden" name="type" value="{% if assessment.url|length %}url{% else %}attach{% endif %}"/>
 
+
+{# ----------------------------------------------------------- #}
+{# Title #}
+{# ----------------------------------------------------------- #}
 <label>
     Title
     <input type="text" name="title" value="{{ assessment.title }}" required maxlength="255"/>
 </label>
+
+
+{# ----------------------------------------------------------- #}
+{# Work Type #}
+{# ----------------------------------------------------------- #}
 <label>
     Work Type
     <select name="workType">
@@ -24,20 +26,100 @@
         {% endfor %}
     </select>
 </label>
+
+
+{# ----------------------------------------------------------- #}
+{# Description #}
+{# ----------------------------------------------------------- #}
 <label>
     Description
     <textarea name="description">{{ assessment.description }}</textarea>
 </label>
 
+
+{# ----------------------------------------------------------- #}
+{# Dates #}
+{# ----------------------------------------------------------- #}
 {% if context.baseContext is not unitSpecification %}
     {% include '@learningAssessment/fragments/dates.twig' %}
 {% endif %}
 
-<input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
-<input type="hidden" name="type" value="{% if assessment.url|length %}url{% else %}attach{% endif %}"/>
 
-<script type="text/javascript">
-    $(function() {
+{# ----------------------------------------------------------- #}
+{# Attachments #}
+{# ----------------------------------------------------------- #}
+<div id='taskEditor'>
+    <div class="row" {% if assessment.url|length %}style="display:none"{% endif %} data-attachment="attach">
+        <div class="small-9 medium-10 columns">
+            <label>Attach File</label>
+            {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
+        </div>
+        <div class="small-3 medium-2 columns no-pad">
+            <label>&nbsp;</label>
+            <a class='button icon-link' data-value='url'>Link</a>
+        </div>
+    </div>
+    <div class="row" {% if not assessment.url|length %}style="display:none"{% endif %} data-attachment="url">
+        <div class="small-9 medium-10 columns">
+            <label>
+                Link
+                <input type='text' name='url' maxlength='1024' placeholder="http://" value="{{ assessment.url }}" />
+            </label>
+        </div>
+        <div class="small-3 medium-2 columns no-pad">
+            <label>&nbsp;</label>
+            <a class='button icon-attach' data-value='attach'>Attach</a>
+        </div>
+    </div>
+</div>
+
+
+{# ----------------------------------------------------------- #}
+{# Self assess #}
+{# ----------------------------------------------------------- #}
+<div class="row">
+    <div class="small-12 columns">
+        <label for="hasSelfAssessed">Allow self-assessed?</label>
+        <div class="switch round">
+            <input name="hasSelfAssessed" id="hasSelfAssessed" type="checkbox" {% if assessment.isSelfAssessable %}checked="checked"{% endif %} />
+            <label for="hasSelfAssessed">
+                <span class="icon-approve"></span>
+                <span class="icon-cancel"></span>
+            </label>
+        </div>
+    </div>
+</div>
+
+
+{# ----------------------------------------------------------- #}
+{# Default Activity Duration #}
+{# ----------------------------------------------------------- #}
+{% include '@learningAssessment/fragments/default_open_span.twig' with {assessment: assessment} only %}
+
+
+{# ----------------------------------------------------------- #}
+{# Participation #}
+{# ----------------------------------------------------------- #}
+
+
+
+{# ----------------------------------------------------------- #}
+{# Submit #}
+{# ----------------------------------------------------------- #}
+{{ mage.submitRow(actionLabel ?: 'Create', 'part-2', 'end') }}
+
+
+{# ----------------------------------------------------------- #}
+{# Scripts #}
+{# ----------------------------------------------------------- #}
+<script src="/javascript/ckeditor/ckeditor.js"></script>
+<script src="/javascript/shared/editor/jquery.editor.js"></script>
+<script>
+    $(function () {
+        // Init CKEditor
+        $.fn.alaressEditor();
+
+        //
         $('#taskEditor').on('click', '[data-attachment] a[data-value]', function() {
             var container = $('#assessmentForm');
             var anchor = $(this);
@@ -70,45 +152,3 @@
         });
     });
 </script>
-
-
-<div id='taskEditor'>
-    <div class="row" {% if assessment.url|length %}style="display:none"{% endif %} data-attachment="attach">
-        <div class="small-9 medium-10 columns">
-            <label>Attach File</label>
-            {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
-        </div>
-        <div class="small-3 medium-2 columns no-pad">
-            <label>&nbsp;</label>
-            <a class='button icon-link' data-value='url'>Link</a>
-        </div>
-    </div>
-    <div class="row" {% if not assessment.url|length %}style="display:none"{% endif %} data-attachment="url">
-        <div class="small-9 medium-10 columns">
-            <label>
-                Link
-                <input type='text' name='url' maxlength='1024' placeholder="http://" value="{{ assessment.url }}" />
-            </label>
-        </div>
-        <div class="small-3 medium-2 columns no-pad">
-            <label>&nbsp;</label>
-            <a class='button icon-attach' data-value='attach'>Attach</a>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="small-12 columns">
-        <label for="hasSelfAssessed">Allow self-assessed?</label>
-        <div class="switch round">
-            <input name="hasSelfAssessed" id="hasSelfAssessed" type="checkbox" {% if assessment.isSelfAssessable %}checked="checked"{% endif %} />
-            <label for="hasSelfAssessed">
-                <span class="icon-approve"></span>
-                <span class="icon-cancel"></span>
-            </label>
-        </div>
-    </div>
-</div>
-
-{% include '@learningAssessment/fragments/default_open_span.twig' with {assessment: assessment} only %}
-
-{{ mage.submitRow(actionLabel ?: 'Create', 'part-2', 'end') }}
