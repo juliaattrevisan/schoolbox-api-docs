@@ -5,7 +5,7 @@ CREATE TABLE `tour`
   `title`             VARCHAR(512)      NOT NULL,
   `author_user_id`    INT(4) UNSIGNED   NULL,                   -- Not mandatory, Alaress created tours will not have an author ID
   `description`       TEXT              NULL,                   -- Optional
-  `active`            INT(1) UNSIGNED   NOT NULL,
+  `active`            INT(1) UNSIGNED   NOT NULL DEFAULT 0,
   `created_at`        DATETIME          NOT NULL,
   `updated_at`        DATETIME          NOT NULL,
   `deleted_at`        DATETIME          NULL
