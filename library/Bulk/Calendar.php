@@ -1,13 +1,14 @@
 <?php
+
 /**
  * Bulk_Calendar
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
  */
-class Bulk_Calendar extends Bulk_Abstract {
+class Bulk_Calendar extends Bulk_Abstract
+{
 
     private $source;
     private $owner;
@@ -26,7 +27,8 @@ class Bulk_Calendar extends Bulk_Abstract {
      * @param $groupList
      * @param $campusList
      */
-    public function __construct($file, $source, $owner, $categoryList, $groupList, $campusList) {
+    public function __construct($file, $source, $owner, $categoryList, $groupList, $campusList)
+    {
         parent::__construct($file);
         $this->source = $source;
         $this->owner = $owner;
@@ -34,14 +36,15 @@ class Bulk_Calendar extends Bulk_Abstract {
         $this->groupList = $groupList;
         $this->campusList = $campusList;
     }
-    
+
     /**
-	 * Wrapper for uploading a calendar file which could be in either format
-	 *
-	 * @return array
-	 */
-	public function addCalendar() {
-		if (is_file($this->getFile())) {
+     * Wrapper for uploading a calendar file which could be in either format
+     *
+     * @return array
+     */
+    public function addCalendar()
+    {
+        if (is_file($this->getFile())) {
 
             /* Calendar Owner overrideco
              */
@@ -49,8 +52,7 @@ class Bulk_Calendar extends Bulk_Abstract {
                 $userMapper = new \Schoolbox\UserMapper();
                 $user = $userMapper->findById($this->owner);
                 $author = $user;
-            }
-            else {
+            } else {
                 $user = $_SESSION['user'];
                 $author = $_SESSION['user'];
             }
@@ -60,15 +62,15 @@ class Bulk_Calendar extends Bulk_Abstract {
                 Event\Source\Mapper::getInstance()->deleteEventsFromSource($this->source);
             }
 
-			/* Use factory to spawn a builder
-			 */
-			$factory = new \Calendar\Import\Factory($user->getId(), $author->getId(), $this->categoryList, $this->groupList, $this->campusList, \Schoolbox\Calendar\Event::ACCESS_CAMPUS, $this->getFile(), $this->source);
-			$strategy = $factory->build();
-			$strategy->load();
+            /* Use factory to spawn a builder
+             */
+            $factory = new \Calendar\Import\Factory($user->getId(), $author->getId(), $this->categoryList, $this->groupList, $this->campusList, \Schoolbox\Calendar\Event::ACCESS_CAMPUS, $this->getFile(), $this->source);
+            $strategy = $factory->build();
+            $strategy->load();
 
-			return $strategy->getOutput();
-		}
+            return $strategy->getOutput();
+        }
 
-		return array();
-	}
+        return array();
+    }
 }

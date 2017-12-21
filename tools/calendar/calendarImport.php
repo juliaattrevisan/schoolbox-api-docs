@@ -13,24 +13,27 @@ use Aura\Di;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 
-$fields = ['help','campus:', 'role:', 'file:', 'owner:', 'source::'];
+$fields = ['help', 'campus:', 'role:', 'file:', 'owner:', 'source::'];
 $opts = require __DIR__ . '/../../conf/core/require-cli.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Calendar CSV Import', [
-    'verbose' => [true,true],
+$kernel = new Schoolbox\Application\Daemon\Kernel(
+    'Calendar CSV Import', [
+    'verbose' => [true, true],
     'errors'  => E_ALL,
     'fields'  => $opts,
-]);
+]
+);
 
 
 // ROUTING APP
-$kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array $opts) {
-    $opts = $opts['fields'];
+$kernel->run(
+    function (Di\Container $di, LoopInterface $loop, Logger $log, array $opts) {
+        $opts = $opts['fields'];
 
-    $file = null;
-    if (isset($opts['help']) || count($opts) == 0) {
-        echo <<<HELP
+        $file = null;
+        if (isset($opts['help']) || count($opts) == 0) {
+            echo <<<HELP
 Usage: calendarImport.php --file import.csv --owner=1 --campus=1,2 --role=1 [--source 'sourcename']
     --file:       CSV file that matches the schoolbox calendar template located in Admin->Calendar
     --owner:      The user ID of who the events should be owned by
@@ -39,64 +42,64 @@ Usage: calendarImport.php --file import.csv --owner=1 --campus=1,2 --role=1 [--s
     --source:     Optional source name, subsequent uploads will delete any events with the same source name
     
 HELP;
-        exit;
-    }
-    else {
-        if (!isset($opts['campus'])) {
-            $log->error("No campus specified. (Use --help for example usage)\n");
-            exit(1);
+            exit;
         } else {
-            $campusList = explode(',', $opts['campus']);
+            if (!isset($opts['campus'])) {
+                $log->error("No campus specified. (Use --help for example usage)\n");
+                exit(1);
+            } else {
+                $campusList = explode(',', $opts['campus']);
+            }
+
+            if (!isset($opts['role'])) {
+                $log->error("No role specified. (Use --hhelp for example usage)\n");
+                exit(1);
+            } else {
+                $groupList = explode(',', $opts['role']);
+            }
+
+            if (!isset($opts['owner'])) {
+                $log->error("No owner id specified. (Use --help for example usage)\n");
+                exit(1);
+            } else {
+                $ownerId = $opts['owner'];
+            }
+
+            if (!(isset($opts['file']) && file_exists($opts['file']))) {
+                $log->error("Specified file not found. (Use --help for example usage)\n");
+                exit(1);
+            } else {
+                $file = $opts['file'];
+            }
         }
 
-        if (!isset($opts['role'])) {
-            $log->error("No role specified. (Use --hhelp for example usage)\n");
-            exit(1);
+        //Optional options
+        if (isset($opts['source'])) {
+            $source = $opts['source'];
+            $log->warning("Events with source " . $opts['source'] . " will be deleted\n");
         } else {
-            $groupList = explode(',', $opts['role']);
+            $source = null;
         }
 
-        if (!isset($opts['owner'])) {
-            $log->error("No owner id specified. (Use --help for example usage)\n");
+        //Not used in this context
+        $categoryList = null;
+
+        $bulkHandler = new Bulk_Calendar($file, $source, $ownerId, $categoryList, $groupList, $campusList);
+
+        try {
+
+            $result = $bulkHandler->addCalendar();
+            foreach ($result as $event) {
+                $log->notice("{$event['status']} event: {$event['name']}, {$event['error']}");
+            }
+        } catch (Schoolbox\Mapper\Exception $e) {
+            $log->error("User or campus(es) not found unable to load events.\n");
             exit(1);
-        } else {
-            $ownerId = $opts['owner'];
-        }
-
-        if (!(isset($opts['file']) && file_exists($opts['file']))) {
-            $log->error("Specified file not found. (Use --help for example usage)\n");
+        } catch (PDOException $e) {
+            $log->error("One of the supplied roles was not found, unable to load events.\n");
             exit(1);
-        } else {
-            $file = $opts['file'];
         }
+
     }
-
-    //Optional options
-    if (isset($opts['source'])) {
-        $source = $opts['source'];
-        $log->warning("Events with source ".$opts['source']." will be deleted\n");
-    } else {
-        $source = null;
-    }
-
-    //Not used in this context
-    $categoryList = null;
-
-    $bulkHandler = new Bulk_Calendar($file, $source, $ownerId, $categoryList, $groupList, $campusList);
-
-    try {
-
-        $result = $bulkHandler->addCalendar();
-        foreach($result as $event) {
-            $log->notice("{$event['status']} event: {$event['name']}, {$event['error']}");
-        }
-    } catch (Schoolbox\Mapper\Exception $e) {
-        $log->error("User or campus(es) not found unable to load events.\n");
-        exit(1);
-    } catch (PDOException $e) {
-        $log->error("One of the supplied roles was not found, unable to load events.\n");
-        exit(1);
-    }
-
-});
+);
 
