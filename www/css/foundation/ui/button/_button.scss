@@ -21,8 +21,8 @@ a[disabled], a.disabled {
 .button {
     @include button-dimensions();
 	@extend .hide-for-print;
-	font-size: $base-font-size;
-	line-height: 1.375rem;
+	font-size: rem-calc(($base-font-size - 2));
+	line-height: inherit;
     color: $content-ui-foreground;
     background-color: $content-ui-background;
 
