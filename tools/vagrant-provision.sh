@@ -461,11 +461,11 @@ then
                             # Add new file to etag cache
                             echo "$etag $branch-bower.tar.gz" >> bower.etag.cache;
                             # Cleanup for purity
-                            rm -fR /vagrant/vagrantcache/node_modules 2>/dev/null;
+                            rm -fR /vagrant/vagrantcache/www/javascript/components 2>/dev/null;
                             # Extract checksum
                             tar xzf $branch-bower.tar.gz www/javascript/components/bower.checksum;
                             bowerchecksum=`awk '{print $1}' www/javascript/components/bower.checksum`;
-                            rm -fR /vagrant/vagrantcache/node_modules 2>/dev/null;
+                            rm -fR /vagrant/vagrantcache/www/javascript/components 2>/dev/null;
                             # Add new file to Javascript cache
                             echo "$bowerchecksum $branch-bower.tar.gz" >> bower.cache;
                             # Check if this is file we need
@@ -486,7 +486,7 @@ then
         then
             # Extract content
             echo "[SB][`date +%Y-%m-%d\ %X`] Found matching Javascript cache file ($bowerlocksha) '$bowerfile', now extracting";
-            rm -fR /vagrant/node_modules 2>/dev/null;
+            rm -fR /vagrant/www/javascript/components/ 2>/dev/null;
             tar xzf /vagrant/vagrantcache/$bowerfile;
         else
             # Still no luck, build from scratch with bower
