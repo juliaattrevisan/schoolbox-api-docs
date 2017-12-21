@@ -44,32 +44,31 @@ HELP;
     else {
         if (!isset($opts['campus'])) {
             $log->error("No campus specified. (Use --help for example usage)\n");
+            exit(1);
         } else {
             $campusList = explode(',', $opts['campus']);
         }
 
         if (!isset($opts['role'])) {
             $log->error("No role specified. (Use --hhelp for example usage)\n");
+            exit(1);
         } else {
             $groupList = explode(',', $opts['role']);
         }
 
         if (!isset($opts['owner'])) {
             $log->error("No owner id specified. (Use --help for example usage)\n");
+            exit(1);
         } else {
             $ownerId = $opts['owner'];
         }
 
-        if (!file_exists($opts['file'])) {
+        if (!(isset($opts['file']) && file_exists($opts['file']))) {
             $log->error("Specified file not found. (Use --help for example usage)\n");
+            exit(1);
         } else {
             $file = $opts['file'];
         }
-    }
-
-    //Mandatory options check
-    if (empty($opts['campus']) || empty($opts['role']) || empty($opts['file'] || empty($opts['owner']))) {
-        exit(1);
     }
 
     //Optional options
@@ -91,16 +90,12 @@ HELP;
         foreach($result as $event) {
             $log->notice("{$event['status']} event: {$event['name']}, {$event['error']}");
         }
-
-    } catch (Schoolbox\Mapper\DefinitionException $e) {
-        $log->error("Error.\n");
     } catch (Schoolbox\Mapper\Exception $e) {
-        $log->error("User or campus(es) not found.\n");
-        $log->error("No events created.\n");
+        $log->error("User or campus(es) not found unable to load events.\n");
+        exit(1);
     } catch (PDOException $e) {
-        var_dump($e);
-        $log->error("One of the supplied roles was not found.\n");
-        $log->error("No events created.\n");
+        $log->error("One of the supplied roles was not found, unable to load events.\n");
+        exit(1);
     }
 
 });
