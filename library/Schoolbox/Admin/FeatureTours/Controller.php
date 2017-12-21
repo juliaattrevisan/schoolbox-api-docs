@@ -5,10 +5,25 @@ namespace Schoolbox\Admin\FeatureTours;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\FeatureTour\Mapper as FeatureTourMapper;
+use Schoolbox\Tour;
 
 class Controller extends Base
 {
+    /**
+     * @var Tour\Mapper
+     */
+    private $tourMapper;
+
+    /**
+     * Controller constructor.
+     *
+     * @param Tour\Mapper $tourMapper
+     */
+    public function __construct(Tour\Mapper $tourMapper)
+    {
+        $this->tourMapper = $tourMapper;
+    }
+
     /**
      *  Renders the feature tours admin page
      *
@@ -19,7 +34,7 @@ class Controller extends Base
         $twigData = [
             'toursEnabled' => ConfigMapper::getInstance()->get('tours_enabled'),
             'pageCurrent' => 'feature-tours',
-            'tours' => FeatureTourMapper::getInstance()->findAll()
+            'tours' => $this->tourMapper->findAll()
         ];
 
         $this->getResponse()->content->set(
@@ -54,7 +69,8 @@ class Controller extends Base
                 $uuids[] = $tourID;
             }
         }
-        FeatureTourMapper::getInstance()->updateActiveTours($uuids);
+
+        $this->tourMapper->updateActiveTours($uuids);
 
         // Redirect back to the same page
         $this->getResponse()->redirect->afterPost($this->getRouteIfAuthorized('featureTours.render'));
