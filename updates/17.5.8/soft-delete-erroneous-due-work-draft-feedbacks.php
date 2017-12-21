@@ -85,7 +85,7 @@ $deletor = new class extends App
             AND box_id = :box_id
             AND published_at IS NULL
             AND deleted_at IS NULL
-            ORDER BY created_at DESC, updated_at DESC, id DESC;
+            ORDER BY updated_at DESC, created_at DESC, id DESC;
         ');
 
         $this->deleteDraftFeedbackStatement = $database->prepareQuery('
@@ -152,10 +152,10 @@ $deletor = new class extends App
             $createdAt = $row['created_at'];
             $updatedAt = $row['updated_at'];
             if (!$idx) {
-                $this->log->info(sprintf('Retaining most recent draft. Created: %s, Updated: %s, Id: %d', $createdAt, $updatedAt, $id));
+                $this->log->info(sprintf('Retaining most recent draft. Updated: %s, Created: %s, Id: %d', $createdAt, $updatedAt, $id));
                 continue;
             }
-            $this->log->info(sprintf('Deleting earlier draft.      Created: %s, Updated: %s, Id: %d', $createdAt, $updatedAt, $id));
+            $this->log->info(sprintf('Deleting earlier draft.      Updated: %s, Created: %s, Id: %d', $createdAt, $updatedAt, $id));
             $this->deleteDraftFeedbackStatement->execute(['id' => $id]);
             $this->countFeedbacksSoftDeleted++;
         }
