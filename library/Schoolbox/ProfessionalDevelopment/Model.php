@@ -39,6 +39,12 @@ class Model implements ISoftDeletable
      */
     private $registrationState;
 
+    /**
+     * The date someone was accredited
+     *
+     * @var \Alaress_Date_Format
+     */
+    private $accreditedAt;
 
     /**
      * @return User
@@ -51,7 +57,7 @@ class Model implements ISoftDeletable
 
     /**
      * @param User $user
-     * @return $this
+     * @return self
      */
     public function setUser(User $user): self
     {
@@ -71,7 +77,7 @@ class Model implements ISoftDeletable
 
     /**
      * @param string $number
-     * @return $this
+     * @return self
      */
     public function setNumber(?string $number): self
     {
@@ -91,11 +97,31 @@ class Model implements ISoftDeletable
 
     /**
      * @param string $registrationState
-     * @return $this
+     * @return self
      */
     public function setRegistrationState(?string $registrationState): self
     {
         $this->registrationState = $registrationState;
+        return $this;
+    }
+
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getAccreditedAt(): ?\Alaress_Date_Format
+    {
+        return $this->accreditedAt;
+    }
+
+
+    /**
+     * @param \Alaress_Date_Format $accreditedAt
+     * @return self
+     */
+    public function setAccreditedAt(\Alaress_Date_Format $accreditedAt): self
+    {
+        $this->accreditedAt = $accreditedAt;
         return $this;
     }
 }

@@ -943,6 +943,33 @@ class MapperProxy
         return $builder;
     }
 
+
+    /**
+     * Load a particular set of participants into the given assessment
+     *
+     * @param IAssessable $assessment
+     * @param Collection  $users
+     * @param bool        $includeResponses
+     * @param bool        $includeFeedbacks
+     * @return IAssessable
+     */
+    public function loadParticularParticipantsIntoAssessment(
+        IAssessable $assessment,
+        Collection $users,
+        $includeResponses = true,
+        $includeFeedbacks = true
+    ) {
+        foreach ($users as $user) {
+            $this->participantDataSource->loadParticipationIntoAssessment(
+                $assessment,
+                $user,
+                $includeResponses,
+                $includeFeedbacks
+            );
+        }
+        return $assessment;
+    }
+
     /**
      * Loads participants into the given assessable.
      *
