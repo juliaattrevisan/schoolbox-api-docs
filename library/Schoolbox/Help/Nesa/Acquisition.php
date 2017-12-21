@@ -30,10 +30,20 @@ class Acquisition
     public const NESA_COURSE_SPEC_ID = 23;
 
     /**
+     * @var int
+     */
+    private $courseSpecId;
+
+    /**
      * States to examine
      * @var array
      */
     private $states;
+
+    /**
+     * @var int
+     */
+    private $unaccreditedOnly;
 
     /**
      * Indicators to examine
@@ -52,9 +62,14 @@ class Acquisition
     private $assessmentMapperProxy;
 
     /**
+     * @var UserMapper
+     */
+    private $userMapper;
+
+    /**
      * @var array
      */
-    private $involvement = [];
+    private $involvement;
 
     /**
      * Acquisition constructor.

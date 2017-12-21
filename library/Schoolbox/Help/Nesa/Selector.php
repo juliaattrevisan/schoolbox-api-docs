@@ -34,6 +34,10 @@ class Selector
      */
     private $criterionMapper;
 
+    /**
+     * @var DescriptorMapper
+     */
+    private $rubricDescriptorMapper;
 
     /**
      * NesaSelector constructor.
