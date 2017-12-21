@@ -376,7 +376,7 @@ ul.az-error-list {
     overflow: hidden;
     position: relative;
     background-color: $attachzone-resting-background;
-    border: 2px dashed $attachzone-resting-color;
+    border: $input-border-width dashed $attachzone-resting-color;
     background-repeat: no-repeat;
     display: table;
     color: $attachzone-resting-color;
