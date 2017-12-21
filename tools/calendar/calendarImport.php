@@ -12,7 +12,7 @@ use Aura\Di;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 
-$fields = ['campus:', 'role:', 'file:', 'owner:', 'source:', 'h'];
+$fields = ['campus:', 'role:', 'file:', 'owner:', 'source:', 'h:'];
 $opts = require __DIR__ . '/../../conf/core/require-cli.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
@@ -33,13 +33,17 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
     if (isset($opts['h']) || count($opts) == 1) {
         $log->info( "Example usage:\n".
 
-                    "php /usr/share/schoolbox/tools/calendar/calendarImport.php --file import.csv --owner 1 --campus 1 --role 1\n".
+                    "php /usr/share/schoolbox/tools/calendar/calendarImport.php --file import.csv --owner 1 --campus 1,2 --role 1\n\n".
 
                     "Where import.csv matches the template at Admin->Calendar within Schoolbox.\n".
 
-                    "Optional arg --source 'sourcename'.\n".
+                    "You can supply a comma seperated list for both campus and role.\n\n".
 
-                    "When importing with a source, other items with that source will be deleted.\n");
+                    "Optional arg: --source 'sourcename'.\n\n".
+
+                    "When importing with a source, events will linked to that source.\n".
+
+                    "Future imports with the same source will delete all other items linked to that source.");
         exit(1);
     }
     
