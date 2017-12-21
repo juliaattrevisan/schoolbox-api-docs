@@ -741,30 +741,31 @@ class LinkRubricMarkToFeedback
     private function checkLatestMarkVisibility() {
 
         foreach ($this->getParticipations() as $i => $participation) {
-            $rubricMarks = $this->db->executeQuery(
+            $latestRubricMark = $this->db->executeQuery(
                 '
-                SELECT COUNT(rm.id) AS records, rm.student_id, rm.return_id, sr.box_id, rm.published_at, sr.deleted_at
+                SELECT rm.return_id, sr.deleted_at
                 FROM rubric_mark rm
                 LEFT JOIN submission_return sr ON rm.return_id = sr.id
                 WHERE rm.student_id = :student_id
                 AND sr.box_id = :box_id
                 AND rm.published_at IS NOT NULL
+                AND rm.valid = 1
                 GROUP BY rm.return_id
                 ORDER BY rm.published_at DESC
+                LIMIT 1;
                 ',
                     [
                         'student_id' => $participation['student_id'],
                         'box_id'     => $participation['box_id'],
                     ]
                 )->fetchAll();
-
-            if (!empty($rubricMarks[0]) && $rubricMarks[0]['deleted_at'] !== null) {
+            if (!is_null($latestRubricMark[0]['deleted_at'])) {
                 $this->log->warning(
                     sprintf(
-                        'Latest rubric mark visibility is lost for student:%d box:%d, it is linked to soft-deleted feedback %d',
-                        $rubricMarks[0]['student_id'],
-                        $rubricMarks[0]['box_id'],
-                        $rubricMarks[0]['return_id']
+                        'Latest rubric mark visibility is lost for student:%d box:%d, it is linked to the soft-deleted feedback %d',
+                        $participation['student_id'],
+                        $participation['box_id'],
+                        $latestRubricMark[0]['return_id']
                     )
                 );
             }
@@ -799,7 +800,7 @@ class LinkRubricMarkToFeedback
         $this->log->notice(sprintf('Total published feedbacks linked: %d', $this->countLinkedPublishedFeedbacks));
         $this->log->notice(sprintf('Total draft feedbacks linked: %d', $this->countLinkedDraftFeedbacks));
         $this->log->notice(sprintf('Total combined draft occurrences: %d', $this->countCombinedDrafts));
-        if ($this->logCombinedDrafts) {
+        if (count($this->logCombinedDrafts) > 0) {
             $this->log->notice(sprintf('Combined drafts details: %s', implode($this->logCombinedDrafts, ', ')));
         }
     }
