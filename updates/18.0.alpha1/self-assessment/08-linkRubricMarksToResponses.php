@@ -741,25 +741,33 @@ class LinkRubricMarkToFeedback
     private function checkLatestMarkVisibility() {
 
         foreach ($this->getParticipations() as $i => $participation) {
-            $latestRubricMark = $this->db->executeQuery(
-                '
+            $latestRubricMark = $this->db->executeQuery("
                 SELECT rm.return_id, sr.deleted_at
                 FROM rubric_mark rm
-                LEFT JOIN submission_return sr ON rm.return_id = sr.id
-                WHERE rm.student_id = :student_id
+                JOIN (
+                    -- Get latest valid published date for this participant
+                    SELECT MAX(rm.published_at) AS 'max_published_at'
+                    FROM rubric_mark rm
+                    JOIN rubric_descriptor descriptor ON rm.descriptor_id = descriptor.id
+                    JOIN rubric_level rl ON descriptor.level_id = rl.id
+                    WHERE rm.valid IS TRUE
+                    AND rm.published_at IS NOT NULL
+                    AND rm.student_id = :student_id
+                    AND rl.box_id = :box_id
+                    ) t2 ON t2.max_published_at = rm.published_at
+                JOIN submission_return sr ON rm.return_id = sr.id
+                WHERE sr.deleted_at IS NOT NULL
+                AND rm.student_id = :student_id
                 AND sr.box_id = :box_id
-                AND rm.published_at IS NOT NULL
-                AND rm.valid = 1
-                GROUP BY rm.return_id
-                ORDER BY rm.published_at DESC
-                LIMIT 1;
-                ',
+                AND rm.return_id IS NOT NULL
+                GROUP BY rm.return_id;
+                ",
                     [
                         'student_id' => $participation['student_id'],
                         'box_id'     => $participation['box_id'],
                     ]
                 )->fetchAll();
-            if (!empty($latestRubricMark[0]) && !is_null($latestRubricMark[0]['deleted_at'])) {
+            if (1 === \count($latestRubricMark)) {
                 $this->log->warning(
                     sprintf(
                         'Latest rubric mark visibility is lost for student:%d box:%d, it is linked to the soft-deleted feedback %d',
@@ -768,6 +776,8 @@ class LinkRubricMarkToFeedback
                         $latestRubricMark[0]['return_id']
                     )
                 );
+            } elseif(\count($latestRubricMark) >= 2){
+                $this->log->error('Logic error. Multiple feedbacks linked to from rubric marks with same published date');
             }
         }
     }
