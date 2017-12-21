@@ -118,6 +118,7 @@ abstract class Mapper implements IMapper, Serializable
     const COLUMN_JOIN_READONLY     = 16;
     const COLUMN_JOIN_REVERSE      = 32;
     const COLUMN_SOFTDELETE        = 64;
+    const COLUMN_IDENTIFIER_UUID   = 128;
 
     /**
      * @var IDatabase|IQuoter
@@ -1022,6 +1023,10 @@ abstract class Mapper implements IMapper, Serializable
         // boolean options
         if ($options & self::COLUMN_IDENTIFIER) {
             $map['identifier'] = true;
+        }
+        if ($options & self::COLUMN_IDENTIFIER_UUID) {
+            $map['identifier'] = true;
+            $map['identifier_uuid'] = true;
         }
         if ($options & self::COLUMN_CREATED_TIMESTAMP) {
             $map['created_timestamp'] = true;
@@ -2638,7 +2643,7 @@ abstract class Mapper implements IMapper, Serializable
         $collection  = $this->getModelAsCollection($object);
         $tbl         = $this->table;
         $colString   = $this->getColumnString();
-        $collection  = $this->populateSaveTimestamps($collection);
+        $collection  = $this->populateUuids($this->populateSaveTimestamps($collection));
         $plcString   = $this->getPlaceholderString();
         $updString   = $this->getUpdateString();
         $statement   = $this->database->prepare(
@@ -2667,7 +2672,14 @@ abstract class Mapper implements IMapper, Serializable
         if (isset($id_column)) {
             // retrieve the objects as they currently exist so we can perform a diff if we need to
             // we first have to dehydrate to ensure we don't attempt queries with objects as parameters
-            $collectionIds = array_filter($collection->map(function ($model) { return $this->dehydrate($model)[$this->getIdentifierColumn()]; })->getAll());
+            $collectionIds = array_filter(
+                $collection->map(
+                    function ($model) {
+                        return $this->dehydrate($model)[$this->getIdentifierColumn()];
+                    }
+                )->getAll()
+            );
+
             foreach ($this->findByColumn($id_column, $collectionIds, ['deleted' => true, 'cache' => false]) as $obj) {
                 // index by ID
                 $existingObjects[$this->getModelProperty($obj, $id_property)] = $obj;
@@ -3803,6 +3815,32 @@ abstract class Mapper implements IMapper, Serializable
             foreach ($collection as $model) {
                 // Always set the update timestamp
                 $model->{$setMethod}(clone $now);
+            }
+        }
+        return $collection;
+    }
+
+
+    /**
+     * Set model UUIDs (if this mapper has a UUID) prior to saving to DB
+     *
+     * @param Collection $collection
+     * @return Collection
+     */
+    protected function populateUuids(Collection $collection): Collection
+    {
+        $idProperty = $this->getIdentifierProperty();
+        if (empty($this->map[$idProperty]['identifier_uuid'])) {
+            return $collection;
+        }
+
+        $query = $this->database->prepare('SELECT UUID()');
+        foreach ($collection as $model) {
+            $existingUuid = $this->getModelProperty($model, $idProperty);
+            if (empty($existingUuid)) {
+                $query->execute();
+                $this->setModelProperty($model, $idProperty, $query->fetchColumn());
+                $query->closeCursor();
             }
         }
         return $collection;
