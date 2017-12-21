@@ -304,6 +304,7 @@ class LinkRubricMarkToFeedback
                 }
 
                 if (count($draftRubricMarks) > 1) {
+                    // See what can be combined
                     $combinedDrafts = $this->combineDrafts($draftRubricMarks);
                     if (!empty($combinedDrafts)) {
                         $draftRubricMarks = $combinedDrafts;
@@ -507,6 +508,7 @@ class LinkRubricMarkToFeedback
                 WHERE rm.student_id = :student_id
                 AND rm.created_at = :created_at
                 AND rl.box_id = :box_id
+                AND rm.published_at IS NULL
                 AND rm.return_id IS NULL;
                 ',
             [
@@ -603,34 +605,61 @@ class LinkRubricMarkToFeedback
             }
 
             if ($i == 0) {
-                // We've got at least one good draft
+                // We've got at least one draft
                 $combinedDrafts[]     = $draftRubricMark;
-                $combinedCriterions[] = $rubricMarkCriterions;
-                $latestCreatedDate    = new Alaress_Date_Format($draftRubricMarks[0]['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
+                $combinedCriterions = array_merge($combinedCriterions, $rubricMarkCriterions);
+                $latestCreateDate    = new Alaress_Date_Format($draftRubricMarks[0]['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
             } else {
                 $createdDate = new Alaress_Date_Format($draftRubricMark['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
 
-                // Check if creation dates are relatively close
-                if ($createdDate->diffInSeconds($latestCreatedDate) > self::TIME_DELTA) {
+                if ($this->canCombineByDate($createdDate, $latestCreateDate) &&
+                    $this->canCombineByCriterion($rubricMarkCriterions, $combinedCriterions)) {
+
+                    $combinedDrafts[]     = $draftRubricMark;
+                    $combinedCriterions = array_merge($combinedCriterions, $rubricMarkCriterions);
+                }
+                else {
+                    // Stop there, return what you've already got
                     break;
                 }
-
-                // Check if criterions won't overlap
-                foreach ($rubricMarkCriterions as $rubricMarkCriterion) {
-                    if (in_array($rubricMarkCriterion, $combinedCriterions)) {
-                        break;
-                    }
-                }
-
-                // Combine
-                $combinedDrafts[]     = $draftRubricMark;
-                $combinedCriterions[] = $rubricMarkCriterions;
             }
         }
 
         $this->countCombinedDrafts += count($combinedDrafts) > 1 ? count($combinedDrafts) : 0;
 
         return $combinedDrafts;
+    }
+
+    /**
+     * Check if the drafts you want to combine are close enough by creation date
+     *
+     * @param Alaress_Date_Format $currentDraftCreateDate
+     * @param Alaress_Date_Format $latestDraftCreateDate
+     *
+     * @return bool
+     */
+    private function canCombineByDate(Alaress_Date_Format $currentDraftCreateDate, Alaress_Date_Format $latestDraftCreateDate) {
+        return $currentDraftCreateDate->diffInSeconds($latestDraftCreateDate) <= self::TIME_DELTA;
+    }
+
+
+    /**
+     * Check if the drafts you want to combine are not conflicting by criterion
+     *
+     * @param array $rubricMarkCriterions
+     * @param array $combinedCriterions
+     *
+     * @return bool
+     */
+    private function canCombineByCriterion($rubricMarkCriterions, $combinedCriterions) {
+
+        foreach ($rubricMarkCriterions as $rubricMarkCriterion) {
+            if (in_array($rubricMarkCriterion, $combinedCriterions)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -666,7 +695,7 @@ class LinkRubricMarkToFeedback
      * @param $log
      * @param $rubricMark
      *
-     * @return array|bool
+     * @return int[]
      */
     private function getDraftRubricMarkCriterions($rubricMark)
     {
