@@ -94,6 +94,7 @@
         $participants.on('change', 'input[data-participant-select]', function() {
             var checkCount = $participants.find(':checked').length;
             var $customiseDropdown = $('#customise-dropdown');
+            var $participantRow = $(this).closest('li[data-participant]');
 
             if (checkCount) {
                 // Enable actions
@@ -101,6 +102,13 @@
             } else {
                 // Disable actions
                 $customiseDropdown.prop('disabled', true);
+            }
+
+            // Highlight/unhighlight row
+            if ($(this).is(':checked')) {
+                $participantRow.addClass('participant-selected');
+            } else {
+                $participantRow.removeClass('participant-selected');
             }
         });
 
