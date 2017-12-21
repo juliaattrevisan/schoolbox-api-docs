@@ -126,7 +126,7 @@ class LinkRubricMarkToFeedback
     private $countLinkedPublishedFeedbacks = 0;
     private $countLinkedDraftFeedbacks = 0;
     private $countCombinedDrafts = 0;
-    private $logCombinedDraftFeedbacks = [];
+    private $logCombinedDrafts = [];
 
     /** @var IConnector */
     private $db;
@@ -309,7 +309,6 @@ class LinkRubricMarkToFeedback
                     if (!empty($combinedDrafts)) {
                         $draftRubricMarks = $combinedDrafts;
                         $this->log->notice('More than 1 draft record appears to belong to the same feedback');
-                        $this->logCombinedDraftFeedbacks[] = $draftFeedbacks[0]['id'];
                     } else {
                         $this->log->warning('More than 1 draft found for the participation. Skipping!');
 
@@ -608,6 +607,7 @@ class LinkRubricMarkToFeedback
                 // We've got at least one draft
                 $combinedDrafts[]     = $draftRubricMark;
                 $combinedCriterions = array_merge($combinedCriterions, $rubricMarkCriterions);
+                $logDates[] = $draftRubricMark['created_at'];
                 $latestCreateDate    = new Alaress_Date_Format($draftRubricMarks[0]['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
             } else {
                 $createdDate = new Alaress_Date_Format($draftRubricMark['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
@@ -617,6 +617,8 @@ class LinkRubricMarkToFeedback
 
                     $combinedDrafts[]     = $draftRubricMark;
                     $combinedCriterions = array_merge($combinedCriterions, $rubricMarkCriterions);
+                    $logDates[] = $draftRubricMark['created_at'];
+
                 }
                 else {
                     // Stop there, return what you've already got
@@ -625,7 +627,10 @@ class LinkRubricMarkToFeedback
             }
         }
 
-        $this->countCombinedDrafts += count($combinedDrafts) > 1 ? count($combinedDrafts) : 0;
+        if (count($combinedDrafts) > 1) {
+            $this->countCombinedDrafts ++;
+            $this->logCombinedDrafts[] = sprintf('Student:box %d:%d created_at %s', $combinedDrafts[0]['student_id'], $combinedDrafts[0]['box_id'], implode($logDates, ', '));
+        }
 
         return $combinedDrafts;
     }
@@ -745,6 +750,9 @@ class LinkRubricMarkToFeedback
         }
         $this->log->notice(sprintf('Total published feedbacks linked: %d', $this->countLinkedPublishedFeedbacks));
         $this->log->notice(sprintf('Total draft feedbacks linked: %d', $this->countLinkedDraftFeedbacks));
-        $this->log->notice(sprintf('Total combined draft rubric marks: %d for feedbacks %s', $this->countCombinedDrafts, implode($this->logCombinedDraftFeedbacks, ',')));
+        $this->log->notice(sprintf('Total combined draft occurrences: %d', $this->countCombinedDrafts));
+        if ($this->logCombinedDrafts) {
+            $this->log->notice(sprintf('Combined drafts details: %s', implode($this->logCombinedDrafts, ', ')));
+        }
     }
 }
