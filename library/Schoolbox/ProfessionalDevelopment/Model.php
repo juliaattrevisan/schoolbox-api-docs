@@ -109,7 +109,7 @@ class Model implements ISoftDeletable
     /**
      * @return \Alaress_Date_Format
      */
-    public function getAccreditedAt(): \Alaress_Date_Format
+    public function getAccreditedAt(): ?\Alaress_Date_Format
     {
         return $this->accreditedAt;
     }
