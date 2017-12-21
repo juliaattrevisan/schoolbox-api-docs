@@ -124,6 +124,7 @@ class LinkRubricMarkToFeedback
     private $countPropagatedRubricMarks = 0;
     private $logPropagatedRubricMarks = [];
     private $countLinkedPublishedFeedbacks = 0;
+    private $countLinkedDeletedFeedbacks = 0;
     private $countLinkedDraftFeedbacks = 0;
     private $countCombinedDrafts = 0;
     private $logCombinedDrafts = [];
@@ -150,6 +151,7 @@ class LinkRubricMarkToFeedback
     public function run()
     {
         $this->migrateByParticipation();
+        $this->checkLatestMarkVisibility();
         $this->printLog();
     }
 
@@ -487,6 +489,8 @@ class LinkRubricMarkToFeedback
             ]
         );
 
+        $this->checkVisibilityChange($feedback);
+
         $this->countLinkedPublishedFeedbacks++;
     }
 
@@ -570,6 +574,9 @@ class LinkRubricMarkToFeedback
             );
             $propagatedRecords[] = $this->db->lastInsertId();
         }
+
+        $this->checkVisibilityChange($feedback);
+
         $this->logPropagatedRubricMarks[] = [
             'feedbackId' => $feedback['id'],
             'markIds'    => $propagatedRecords,
@@ -578,6 +585,14 @@ class LinkRubricMarkToFeedback
         $this->countLinkedPublishedFeedbacks++;
 
         return (true);
+    }
+
+
+    private function checkVisibilityChange($feedback) {
+        if ($feedback['deleted_at'] !== null) {
+            $this->countLinkedDeletedFeedbacks++;
+            $this->log->notice('Rubric mark is linked to the soft-deleted feedback %d', $feedback['id']);
+        }
     }
 
     /**
@@ -721,6 +736,39 @@ class LinkRubricMarkToFeedback
         )->fetchAll(PDO::FETCH_COLUMN);
 
         return $criterions;
+    }
+
+    private function checkLatestMarkVisibility() {
+
+        foreach ($this->getParticipations() as $i => $participation) {
+            $rubricMarks = $this->db->executeQuery(
+                '
+                SELECT COUNT(rm.id) AS records, rm.student_id, rm.return_id, sr.box_id, rm.created_at, rm.published_at, sr.deleted_at
+                FROM rubric_mark rm
+                LEFT JOIN submission_return sr ON rm.return_id = sr.id
+                WHERE rm.student_id = :student_id
+                AND sr.box_id = :box_id
+                AND rm.published_at IS NOT NULL
+                GROUP BY rm.return_id
+                ORDER BY rm.published_at DESC
+                ',
+                    [
+                        'student_id' => $participation['student_id'],
+                        'box_id'     => $participation['box_id'],
+                    ]
+                )->fetchAll();
+
+            if (!empty($rubricMarks[0]) && $rubricMarks[0]['deleted_at'] !== null) {
+                $this->log->warning(
+                    sprintf(
+                        'Latest rubric mark visibility is lost for student:%d box:%d, it is linked to soft-deleted feedback %d',
+                        $rubricMarks[0]['student_id'],
+                        $rubricMarks[0]['box_id'],
+                        $rubricMarks[0]['return_id']
+                    )
+                );
+            }
+        }
     }
 
     /**
