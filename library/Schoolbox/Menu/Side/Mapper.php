@@ -13,6 +13,8 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
+use Schoolbox\Realtime\Message\RerouteOverrideMapper as RerouteOverrideMapper;
+
 
 class Mapper extends BaseMapper
 {
@@ -105,6 +107,14 @@ class Mapper extends BaseMapper
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
 
-        return $statement->fetchAll();
+        $groups = $statement->fetchAll();
+        $filteredGroups = [];
+        foreach($groups as $group) {
+            $muted = RerouteOverrideMapper::getInstance()->isRouteMuted($group['sid'], $params['userId']);
+            if (!$muted) {
+                array_push($filteredGroups, $group);
+            }
+        }
+        return $filteredGroups;
     }
 }
