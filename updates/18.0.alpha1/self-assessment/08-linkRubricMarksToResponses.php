@@ -388,7 +388,7 @@ class LinkRubricMarkToFeedback
     {
         $feedbacks = $this->db->executeQuery(
             '
-            SELECT DISTINCT sr.id, rm.return_id, sr.created_at, sr.updated_at, sr.deleted_at AS "DELETED", sr.published_at
+            SELECT DISTINCT sr.id, rm.return_id, sr.created_at, sr.updated_at, sr.deleted_at, sr.published_at
             FROM submission_return sr
             JOIN submission_box sb ON sb.id = sr.box_id
             LEFT JOIN rubric_mark rm ON sr.id = rm.return_id
@@ -451,7 +451,7 @@ class LinkRubricMarkToFeedback
                     JOIN submission_box sb ON sb.id = sr.box_id
                     LEFT JOIN rubric_mark rm ON sr.id = rm.return_id
                     WHERE sr.owner = :student_id AND sr.box_id = :box_id AND sr.published_at IS NULL
-                    ORDER BY sr.updated_at DESC, sr.id DESC
+                    ORDER BY sr.updated_at DESC, sr.created_at DESC, sr.id DESC
                     LIMIT 1;
                 ',
             [
@@ -589,9 +589,9 @@ class LinkRubricMarkToFeedback
 
 
     private function checkVisibilityChange($feedback) {
-        if ($feedback['deleted_at'] !== null) {
+        if (!is_null($feedback['deleted_at'])) {
             $this->countLinkedDeletedFeedbacks++;
-            $this->log->notice('Rubric mark is linked to the soft-deleted feedback %d', $feedback['id']);
+            $this->log->notice(sprintf('Rubric mark is linked to the soft-deleted feedback %d', $feedback['id']));
         }
     }
 
@@ -759,7 +759,7 @@ class LinkRubricMarkToFeedback
                         'box_id'     => $participation['box_id'],
                     ]
                 )->fetchAll();
-            if (!is_null($latestRubricMark[0]['deleted_at'])) {
+            if (!empty($latestRubricMark[0]) && !is_null($latestRubricMark[0]['deleted_at'])) {
                 $this->log->warning(
                     sprintf(
                         'Latest rubric mark visibility is lost for student:%d box:%d, it is linked to the soft-deleted feedback %d',
