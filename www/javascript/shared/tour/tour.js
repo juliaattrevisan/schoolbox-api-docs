@@ -25,12 +25,6 @@ $(function () {
             }
         };
 
-        // Create a custom tour element that we can trigger events on
-
-        var tourGuide = document.registerElement('tour-guide');
-        var tour = new tourGuide();
-        document.body.appendChild(tour);
-
         // Load all tours for this page/user into global array and setup triggers for them
 
         window.tours = [];
@@ -44,16 +38,31 @@ $(function () {
                 if (trigger.selector && trigger.event) {
                     console.log('Triggering on: $("' + trigger.selector + '").' + trigger.event + ' event');
 
-                    $(trigger.selector).on(trigger.event, function () {
-                        window.tourStart(tour.uuid);
-                    });
+                    // jQuery is unable to select document/window dynamically from a variable- need to check if the
+                    // selector is one of these and use a hard coded jQuery selector instead.
+
+                    if (trigger.selector === 'document') {
+                        $(document).on(trigger.event, function () {
+                            window.tourStart(tour.uuid);
+                        });
+                    }
+                    else if (trigger.selector === 'window') {
+                        $(window).on(trigger.event, function () {
+                            window.tourStart(tour.uuid);
+                        });
+                    }
+                    else {
+                        $(trigger.selector).on(trigger.event, function () {
+                            window.tourStart(tour.uuid);
+                        });
+                    }
                 }
             });
         });
 
-        // Trigger ready event
+        // Trigger 'tourReady' on body tag
 
-        $(tour).trigger('ready');
+        $('body').trigger('tourReady');
         console.log('All tours ready');
     });
 });
