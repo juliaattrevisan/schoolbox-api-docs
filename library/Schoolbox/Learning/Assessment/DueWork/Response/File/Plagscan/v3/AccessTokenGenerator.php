@@ -95,7 +95,7 @@ class AccessTokenGenerator
                 'form_params' => $postData,
             ]);
         } catch (TransferException $e) {
-            throw new \RuntimeException('Error: Plagscan unavailable. Could not generate access token.');
+            throw new \RuntimeException('Error: Plagscan unavailable. Could not generate access token.'.$e->getMessage());
         }
 
         /* What was the outcome?

@@ -116,10 +116,15 @@ class Connector
             throw new \DomainException('Invalid file type');
         }
 
+        // Plagscan only allows files that smaller than 100MB
+        if ( $submissionFile->getSize() > 13107200 ) {
+            throw new \DomainException('File is too large');
+        }
+
         $filepath = $this->makeTempFile($submissionFile, $filename);
 
         if ($filepath === null) {
-            throw new \DomainException('Could not create temp file');
+            throw new \RuntimeException('Could not create temp file');
         }
 
         /* Temp file created, ready to transmit
@@ -140,8 +145,11 @@ class Connector
                 "http_errors" => false,
             ]);
         } catch (TransferException $e) {
+            unlink($filepath);
             throw new \RuntimeException('Error: Plagscan unavailable. Could not transmit file.');
         }
+
+        unlink($filepath);
 
         $response = $client->post("documents?access_token={$this->getAccessTokenGenerator()->generate()}", [
             "multipart" => $postData,
@@ -163,7 +171,7 @@ class Connector
         /* If you ended up here, the document can't be transmitted for various reasons
          * so just shove them out for logging purposes
          */
-        throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
+        throw new \RuntimeException("Error {$content['error']['code']}: {$content['error']['message']}");
     }
 
     /**
