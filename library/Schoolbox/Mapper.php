@@ -40,7 +40,6 @@ use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerFactoryFactory;
 use Serializable;
 use Traversable;
-use TypeError;
 use UnderflowException;
 
 abstract class Mapper implements IMapper, Serializable
