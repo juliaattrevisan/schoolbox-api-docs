@@ -75,7 +75,7 @@ HELP;
     //Optional options
     if (isset($opts['source'])) {
         $source = $opts['source'];
-        $log->notice("Events with source ".$opts['source']." will be deleted .\n");
+        $log->warning("Events with source ".$opts['source']." will be deleted\n");
     } else {
         $source = null;
     }
@@ -87,7 +87,10 @@ HELP;
 
     try {
 
-        var_dump( $bulkHandler->addCalendar());
+        $result = $bulkHandler->addCalendar();
+        foreach($result as $event) {
+            $log->notice("{$event['status']} event: {$event['name']}, {$event['error']}");
+        }
 
     } catch (Schoolbox\Mapper\DefinitionException $e) {
         $log->error("Error.\n");

@@ -43,11 +43,6 @@ class Bulk_Calendar extends Bulk_Abstract {
 	public function addCalendar() {
 		if (is_file($this->getFile())) {
 
-		    if ($this->source != null) {
-		        //Delete old events
-                Event\Source\Mapper::getInstance()->deleteEventsFromSource($this->source);
-            }
-
             /* Calendar Owner overrideco
              */
             if ($this->owner != null && is_numeric($this->owner)) {
@@ -58,6 +53,11 @@ class Bulk_Calendar extends Bulk_Abstract {
             else {
                 $user = $_SESSION['user'];
                 $author = $_SESSION['user'];
+            }
+
+            if ($this->source != null) {
+                //Delete old events
+                Event\Source\Mapper::getInstance()->deleteEventsFromSource($this->source);
             }
 
 			/* Use factory to spawn a builder

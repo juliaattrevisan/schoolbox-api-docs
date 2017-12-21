@@ -65,19 +65,29 @@ class Csv extends Base {
 				function($field) { return preg_replace('/[\\x80-\\xFF]/', '', $field); },
 				$thisRow
 			);
-			list(
-				$start_date,
-				$start_time,
-				$finish_date,
-				$finish_time,
-				$all_day,
-				$name,
-				$detail,
-				$location,
-				$event_type,
-				$publish_date,
-				$attendance
-				) = $thisRow;
+			try {
+                list(
+                    $start_date,
+                    $start_time,
+                    $finish_date,
+                    $finish_time,
+                    $all_day,
+                    $name,
+                    $detail,
+                    $location,
+                    $event_type,
+                    $publish_date,
+                    $attendance
+                    ) = $thisRow;
+            } catch (\ErrorException $e ) {
+                $output[] = array(
+                    'name' => \Scrub::text($name),
+                    'status' => 'Not Added',
+                    'error' => 'Not enough columns in CSV',
+                );
+
+                continue;
+            }
 
             /* Event name is mandatory
              */
@@ -108,12 +118,22 @@ class Csv extends Base {
 			 * If access is 3, then the sid corresponds to campus id's
 			 * If access is 2, then the sid corresponds to group id's
 			 */
-			$start = new Alaress_Date_Format($start_date, 'd/m/Y');
-			//
-			// Finish empty? Use start date as the finish.
-			$finish = (strlen(trim($finish_date))) ?
-				new Alaress_Date_Format($finish_date, 'd/m/Y'):
-				clone $start;
+			try {
+                $start = new Alaress_Date_Format($start_date, 'd/m/Y');
+                //
+                // Finish empty? Use start date as the finish.
+                $finish = (strlen(trim($finish_date))) ?
+                    new Alaress_Date_Format($finish_date, 'd/m/Y') :
+                    clone $start;
+            } catch (\InvalidArgumentException $e ) {
+                $output[] = array(
+                    'name' => \Scrub::text($name),
+                    'status' => 'Not Added',
+                    'error' => 'Invalid date time supplied',
+                );
+
+                continue;
+            }
 
 			//
 			// Start or finish time empty? Default to start and end of day.
