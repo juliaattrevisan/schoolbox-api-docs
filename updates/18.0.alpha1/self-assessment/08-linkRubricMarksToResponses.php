@@ -424,7 +424,7 @@ class LinkRubricMarkToFeedback
                 AND rm.published_at IS NULL
                 AND rl.box_id = :box_id
                 GROUP BY rm.created_at
-                ORDER BY rm.created_at DESC;
+                ORDER BY rm.created_at DESC, rm.id DESC;
                 ',
             [
                 'student_id' => $participation['student_id'],
@@ -436,7 +436,7 @@ class LinkRubricMarkToFeedback
     }
 
     /**
-     * Return all feedbacks for a participation order from latest to oldest
+     *'Returns the most recently updated draft feedback for the specified participant
      *
      * @param $participation
      *
@@ -451,7 +451,7 @@ class LinkRubricMarkToFeedback
                     JOIN submission_box sb ON sb.id = sr.box_id
                     LEFT JOIN rubric_mark rm ON sr.id = rm.return_id
                     WHERE sr.owner = :student_id AND sr.box_id = :box_id AND sr.published_at IS NULL
-                    ORDER BY sr.updated_at DESC
+                    ORDER BY sr.updated_at DESC, sr.id DESC
                     LIMIT 1;
                 ',
             [
