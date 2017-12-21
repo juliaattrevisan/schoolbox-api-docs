@@ -185,7 +185,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 
 		$bob = $this->createBuilder($comment, $author)
 		            ->setTitle(':author commented on :title in :catname')
-                    ->addTopic("{$this->getSlug()}.$commentId.commented");
+                    ->addTopic("{$this->getSlug()}.$commentId.followed");
 
 		/** @var Comment[]|Collection $commentCollection */
 		$commentCollection = $this->mapper->findByColumn('blog_id', $blog->getId());
