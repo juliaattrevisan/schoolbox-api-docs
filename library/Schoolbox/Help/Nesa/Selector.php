@@ -96,7 +96,25 @@ class Selector
 
         /* $allSpecDescriptors is now a list of all the descriptors used in the course spec.
          * From here we can choose which descriptors we want to include in the report
+         *
+         * De-dupe everything (is there a smarter way? Maybe a custom query but bleeeah)
          */
-        return $allSpecDescriptors;
+        $seenCombination = [];
+
+        $deduped = [];
+
+        foreach ($allSpecDescriptors as $descriptorId => $current) {
+            $index = "{$current->getDescription()}{$current->getCriterion()->getName()}{$current->getCriterion()->getGrouping()}";
+
+            /* Mark it as seen so we can ignore it later
+             */
+            if (!isset($seenCombination[$index])) {
+                $seenCombination[$index] = true;
+
+                $deduped[$descriptorId] = $current;
+            }
+        }
+
+        return $deduped;
     }
 }
