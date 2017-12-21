@@ -311,7 +311,8 @@ class Mapper extends \Schoolbox\Mapper
         try {
             $plagscanId = $this->getConnector()->transmit($file, $filename);
         } catch (\RuntimeException $e) {
-            // TODO sentry stuff here
+            $sentry = self::getDi()->get('sentry');
+            $sentry->captureMessage("Error: Plagscan unavailable. Could not generate access token.");
             /* Plagscan death
              */
             if (empty($plagscanId)) {
@@ -476,6 +477,8 @@ class Mapper extends \Schoolbox\Mapper
              * This allows you to re-encounter documents being checked against older versions of themselves
              * but can't do much to stop it if plagscan screws us
              */
+            $sentry = self::getDi()->get('sentry');
+            $sentry->captureMessage("Could not privatise document in Plagscan.");
         }
     }
 
