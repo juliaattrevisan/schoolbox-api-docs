@@ -129,11 +129,14 @@ var jsSrc = {
         // Random Scripts
         // Various javascripts that are so tiny they didn't get
         // their own files/plugins
-        'www/javascript/shared/miscellaneous.js'
+        'www/javascript/shared/miscellaneous.js',
 
         //Maths formulas
         //'www/javascript/math/jscurry-0.3.0.js',
         //'www/javascript/math/jqmath-0.4.0.js'
+
+        // Feature tour
+        'www/javascript/shared/tour/tour.js'
     ],
     masonry: [
         // Colour handling
