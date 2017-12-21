@@ -5,8 +5,9 @@ use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Menu\Side\Renderer as MenuSideRender;
 use Schoolbox\Menu\Top\Renderer as MenuTopRenderer;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\UserMapper;
+use Schoolbox\Tour\Renderer as TourRenderer;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class SitePage extends Page
 {

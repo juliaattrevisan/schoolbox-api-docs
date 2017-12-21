@@ -11,6 +11,8 @@ use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Tour\Step\Mapper as TourStepMapper;
+use Schoolbox\Tour\Trigger\Mapper as TriggerMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -32,6 +34,8 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
 
         $this->uses('uuid', self::TYPE_STRING, self::COLUMN_IDENTIFIER);
+        $this->joins('author_user_id', UserMapper::class, 'id', null, null, 'author', 'author');
+        $this->joins('tour_step_uuid', TourStepMapper::class, 'uuid', null, null, 'tourStep', 'tourStep');
         $this->uses('title', self::TYPE_STRING);
         $this->uses('description', self::TYPE_STRING);
         $this->uses('active', self::TYPE_BOOLEAN);
@@ -41,6 +45,12 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->joins('author_user_id', UserMapper::class, 'id', null, null, 'author', 'author');
+
+        $this->hasJoin('trigger', [
+            'mapper' => TriggerMapper::class,
+            'this_key' => 'uuid',
+            'other_key' => 'tour_uuid',
+        ]);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, function (Model $model) {
             return $this->preSave($model);
@@ -73,9 +83,11 @@ class Mapper extends BaseMapper
     {
         return "
             SELECT      {$this->getColumnString()},
-                        {$this->getJoinColumnString('author', 'a')}
+                        {$this->getJoinColumnString('author', 'a')},
+                        {$this->getJoinColumnString('tourStep', 's')}
             FROM        {$this->getTable()}
             LEFT JOIN   {$this->getJoinSql('author', '', 'a', true)}
+            LEFT JOIN   {$this->getJoinSql('tourStep', '', 's')}
         ";
     }
 
@@ -84,22 +96,20 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
+        $collection = $this->createCollection();
+
         /** @var UserMapper $authorUserMapper */
         $authorUserMapper = $this->getJoinMapper('author');
 
-        $collection = $this->createCollection();
+        /** @var TourStepMapper $tourStepMapper */
+        $tourStepMapper = $this->getJoinMapper('tourStep');
 
         foreach ($statement as $row) {
-            /** @var Model $model */
             $model = $this->hydrate($row);
 
             if ($model instanceof Model) {
-                // Hydrate author
-
                 $model->setAuthor($authorUserMapper->hydrate($row, 'a'));
-
-                // Add hydrated record to results
-
+                $model->setTourStep($tourStepMapper->hydrate($row, 's'));
                 $collection->add($model);
             }
         }
@@ -125,6 +135,36 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Find all tours relevant to a particular user and the supplied URL
+     *
+     * @param User   $user The user for whom we are retrieving the tours
+     * @param string $url  The URL to be used to filter the returned tours
+     *
+     * @return GenericCollection
+     */
+    public function findByUserForUrl(User $user, string $url): GenericCollection
+    {
+        $userQuery = $this->getUserFilterQuery($user);
+
+        // We have the basic audience query, onto this we need to append the regular expression URL filter
+
+        $userQuery['bindings']['url'] = $url;
+
+        $sql = " 
+            {$this->getSelectString()} 
+            INNER JOIN  {$this->getJoinSql('trigger', '', 't')}
+            WHERE       {$userQuery['query']} AND 
+                        :url REGEXP `t`.`url_regex` AND
+                        `tour`.`active` = 1
+        ";
+
+        $statement = $this->getDatabase()->prepare($sql);
+        $statement->execute($userQuery['bindings']);
+
+        return $this->hydrateSelect($statement);
+    }
+
+    /**
      * Find all tours relevant to a particular user
      *
      * @param User $user
@@ -141,8 +181,8 @@ class Mapper extends BaseMapper
         // --------------------------------------------------------------------------------------------------------
 
         $tourNotDeletedClause = $this->getPredicateBuilder()
-                                        ->isNull('tour.deleted_at')
-                                        ->getWhere()[0];
+                                     ->isNull('tour.deleted_at')
+                                     ->getWhere()[0];
 
         // --------------------------------------------------------------------------------------------------------
         // Tours where user is in a selected role
@@ -165,7 +205,7 @@ class Mapper extends BaseMapper
         // --------------------------------------------------------------------------------------------------------
 
         // ...
-        
+
         // --------------------------------------------------------------------------------------------------------
         // Concatenate all of the predicates into an OR query and return the SQL in an array along with bindings
         // --------------------------------------------------------------------------------------------------------

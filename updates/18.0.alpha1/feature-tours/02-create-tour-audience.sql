@@ -1,3 +1,6 @@
+-- Audience records are indexed by an integer- not a UUID. This is intentional. Alaress will never mandate that
+-- a tour be displayed to any particular audience from a central
+
 -- Audience feature tours to a Schoolbox user role
 
 CREATE TABLE `tour_audience_role`
