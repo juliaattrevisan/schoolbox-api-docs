@@ -90,7 +90,7 @@ CASE WHEN EXISTS (SELECT * FROM `config` WHERE `name` = 'site_location' AND `val
                     @tourStaff,
                     ''body'',
                     ''tourReady'',
-                    ''/'',
+                    ''^/$'',
                     ''1980-04-07 00:00:00'',
                     ''1980-04-07 00:00:00'',
                     NULL
