@@ -358,7 +358,7 @@ class LinkRubricMarkToFeedback
     {
         $rubricMarks = $this->db->executeQuery(
             '
-            SELECT COUNT(rm.id) AS records, rm.student_id, rm.return_id, rl.box_id, rm.created_at, rm.published_at, COUNT(DISTINCT rd.criterion_id) AS criterion
+            SELECT COUNT(rm.id) AS records, rm.student_id, rm.return_id, rl.box_id, rm.published_at, COUNT(DISTINCT rd.criterion_id) AS criterion
             FROM rubric_mark rm
             JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
             JOIN rubric_level rl ON rl.id = rd.level_id
@@ -743,7 +743,7 @@ class LinkRubricMarkToFeedback
         foreach ($this->getParticipations() as $i => $participation) {
             $rubricMarks = $this->db->executeQuery(
                 '
-                SELECT COUNT(rm.id) AS records, rm.student_id, rm.return_id, sr.box_id, rm.created_at, rm.published_at, sr.deleted_at
+                SELECT COUNT(rm.id) AS records, rm.student_id, rm.return_id, sr.box_id, rm.published_at, sr.deleted_at
                 FROM rubric_mark rm
                 LEFT JOIN submission_return sr ON rm.return_id = sr.id
                 WHERE rm.student_id = :student_id
