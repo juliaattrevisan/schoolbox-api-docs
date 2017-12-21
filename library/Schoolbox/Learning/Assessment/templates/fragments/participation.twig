@@ -345,6 +345,7 @@
          */
         function resetActions() {
             $participants.find('input[type=checkbox]').prop('checked', false);
+            $participants.find('li[data-participant]').removeClass('participant-selected');
         }
     });
 </script>
