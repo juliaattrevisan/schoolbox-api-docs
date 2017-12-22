@@ -140,7 +140,7 @@ var jsSrc = {
         'www/javascript/shared/tour/tour.js',
 
         // Assessment Participation
-        'www/javascript/shared/assessment/participation.twig'
+        'www/javascript/shared/assessment/participation.js'
 
     ],
     masonry: [
