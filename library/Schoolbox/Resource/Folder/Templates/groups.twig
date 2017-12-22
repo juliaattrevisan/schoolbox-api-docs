@@ -48,14 +48,14 @@
                             </nav>
                             <ul data-dropdown-content class="f-dropdown" id="class-options{{ group.id }}">
                                 {% if (userAccess[group.id].write or userAccess[group.id].admin) %}
-                                    <li><a href="/resource/folder/modify/{{ group.id }} " class="icon-modify">Modify Folder</a></li>
+                                    <li><a href="/resource/folder/modify/{{ group.id }}" class="icon-modify">Modify Folder</a></li>
                                 {% endif %}
                                 {% if userAccess[group.id].admin %}
-                                    <li><a href="/group/modify/{{ group.id }} " class="icon-group">Modify Group</a></li>
-                                    <li><a href="/statistics/homepage/{{ group.id }} " class="icon-report">View Statistics</a></li>
+                                    <li><a href="/group/modify/{{ group.id }}" class="icon-group">Modify Group</a></li>
+                                    <li><a href="/statistics/homepage/{{ group.id }}" class="icon-report">View Statistics</a></li>
                                 {% endif %}
                                 {% if (userAccess[group.id].write or userAccess[group.id].read)%}
-                                    <li><a href="/group/joinForm.php?leave={{ group.id }}&return=true" data-confirm-leave  class="icon-logout">Leave Group</a></li>
+                                    <li><a href="/group/joinForm.php?leave={{ group.id }}&return=true" data-confirm-leave class="icon-logout">Leave Group</a></li>
                                 {% endif %}
                             </ul>
                         </div>
