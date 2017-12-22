@@ -137,7 +137,11 @@ var jsSrc = {
 
         // Feature tours
         'www/javascript/components/intro.js/intro.js',
-        'www/javascript/shared/tour/tour.js'
+        'www/javascript/shared/tour/tour.js',
+
+        // Assessment Participation
+        'www/javascript/shared/assessment/participation.twig'
+
     ],
     masonry: [
         // Colour handling
