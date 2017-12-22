@@ -330,6 +330,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'markVisibility'        => $assessment->getMarkVisibility(),
             'availableVisibilities' => $this->getAvailableVisibilities(),
             'allWorkTypes'          => $this->workTypeMapper->findAll(),
+            'planIds'               => array_map(function ($i) { return $i + 1; }, array_flip($assessment->getPlans()->filterBy('isDynamic', false)->getPropertyValues('id')))
         ];
 
         $data = array_merge($data, $this->getAssessmentTwigData($assessment));

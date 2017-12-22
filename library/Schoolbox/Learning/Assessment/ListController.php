@@ -12,6 +12,7 @@ use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
 use DomainException;
 use InvalidArgumentException;
+use phpDocumentor\Reflection\DocBlock\Tags\Generic;
 use RangeException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error;
@@ -330,21 +331,135 @@ class ListController extends Web\Controller\Base
             $assessment = $assessmentFactory->produce($assessment);
 
             $transactionSummary = $this->getTransactor()->transact($assessment);
+            $assessmentId = $assessment->getId();
+
+            // assessment is saved; persist plans (retaining index)
+            $plans = $this->savePlanData($assessmentId, $postData['plans'] ?? []);
+
+            $this->saveParticipationData($plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
         }
-        catch (RangeException $e ) {
-            // cast
-            throw new DomainException($e->getMessage(), $e->getCode(), $e);
-        }
-        catch (InvalidArgumentException $e) {
-            // cast
-            throw new DomainException($e->getMessage(), $e->getCode(), $e);
-        }
-        catch (UnexpectedValueException $e) {
+        catch (RangeException|InvalidArgumentException|UnexpectedValueException|\PDOException $e) {
             // cast
             throw new DomainException($e->getMessage(), $e->getCode(), $e);
         }
 
         return $transactionSummary;
+    }
+
+
+    /**
+     * @param GenericCollection $plans
+     * @param array             $inclusionFlags
+     * @param array             $userPlanIndices
+     * @throws DomainException
+     * @throws UnexpectedValueException
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function saveParticipationData(GenericCollection $plans, array $inclusionFlags, array $userPlanIndices)
+    {
+        $partMap = \Schoolbox\Assessment\Participant\Mapper::getInstance();
+
+        // plans are saved; persistipation
+        foreach ($inclusionFlags as $userId => $userIncluded) {
+
+            $existingParticipation = $partMap->findByColumnList([
+                'participant_plan_id' => $plans->getPropertyValues('id'),
+                'user_id'             => $userId
+            ]);
+
+            if ($userIncluded) {
+                // look up the plan
+                $userPlan = $plans[$userPlanIndices[$userId]];
+
+                if (!$userPlan) {
+                    throw new DomainException("Urgh");
+                }
+
+                // this action needs to enforce the constraint of a user being in 0..1 plan
+                // TODO atomicity!!! :'(
+                $partMap->delete($existingParticipation);
+                $partMap->save($this->makeAParticipation($userId, $userPlan));
+
+            } else {
+
+                if ($existingParticipation->count() === 0) {
+                    // we need to generate a record so we have *something* to exclude
+                    $existingParticipation = $partMap->createCollection([
+                        $this->makeAParticipation($userId, $plans[0])
+                    ]);
+                }
+
+                foreach ($existingParticipation as $record) {
+                    $record->setExcludedAt(\Alaress_Date_Format::now());
+                }
+
+                $partMap->save($existingParticipation);
+            }
+        }
+    }
+
+
+    /**
+     * @param int $userId
+     * @param \Schoolbox\Assessment\Participant\Plan\Model $plan
+     * @return \Schoolbox\Assessment\Participant\Model
+     */
+    private function makeAParticipation($userId, $plan)
+    {
+        $partMap = \Schoolbox\Assessment\Participant\Mapper::getInstance();
+
+        return $partMap->createModel()
+            ->setUser(UserMapper::getInstance()->createModel($userId))
+            ->setPlan($plan);
+    }
+
+    /**
+     * @param int         $assessmentId
+     * @param array       $postPlans
+     * @return GenericCollection|\Schoolbox\Assessment\Participant\Plan\Model[]
+     * @throws UnexpectedValueException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function savePlanData(int $assessmentId, array $postPlans = [])
+    {
+        $dateFields = [ 'publish_date',  'open_date', 'due_date', 'close_date', 'created_at', 'updated_at' ];
+
+        $planMap = \Schoolbox\Assessment\Participant\Plan\Mapper::getInstance();
+
+        $existingPlans = $planMap->findByColumn('assessment_id', $assessmentId)->indexBy('id');
+
+        // preload the plans list with the dyna-plan
+        $plans = $planMap->findByColumnList([ 'is_dynamic' => true, 'assessment_id' => $assessmentId ])->reindex();
+
+        foreach ($postPlans as $planIndex => $planData) {
+            // we need to maintain this index
+
+            if (isset($existingPlans[$planData['id']])) {
+                // update existing
+                // TODO later, for now just add to the list
+                $plans[$planIndex] = $existingPlans[$planData['id']];
+            } else {
+                // create new
+                unset($planData['id']);
+                $planData['assessment_id'] = $assessmentId;
+                $planData['is_dynamic']    = false;
+                $planData['created_at']    = null;
+
+                foreach ($dateFields as $dateField) {
+                    if (array_key_exists($dateField, $planData)) {
+                        $planData[$dateField] = \Alaress_Date_Format::newLocal($planData[$dateField])->getDatabase();
+                    }
+                }
+
+                $plans[$planIndex] = $planMap->hydrate($planData);
+            }
+        }
+
+        // save all the plans
+        $planMap->save($plans);
+
+        return $plans;
     }
 
 
