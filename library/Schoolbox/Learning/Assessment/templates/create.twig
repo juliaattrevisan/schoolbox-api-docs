@@ -54,6 +54,9 @@
                      */
                     var assessmentType = $('input[name="type"]:checked').val();
                     setupAssessmentEnd(assessmentType);
+
+                    // Re-init foundation plugins
+                    $(document).foundation();
                 }
             });
 
