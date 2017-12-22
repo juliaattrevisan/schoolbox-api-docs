@@ -266,7 +266,7 @@ $(function() {
 
             // Make sure student is included now
             $participantRow.find('#participant-include-' + studentID).val(1);
-            $participantCard.removeClass('unselected');
+            $participantCard.removeClass('participant-excluded');
 
             // Update the hidden input for their plan
             $participantRow.find('#participant-plan-' + studentID).val(planIndex);
