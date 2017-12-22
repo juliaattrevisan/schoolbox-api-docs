@@ -73,12 +73,12 @@ $(function() {
         var participantSelectize = $planParticipants[0].selectize;
 
         // Disable dates if assessment doesn't accept online submissions
-        if ($('#acceptOnline').val()) {
-            $('#plan-open-date').closest('[data-plan-date-container]').removeClass('hide');
-            $('#plan-close-date').closest('[data-plan-date-container]').removeClass('hide');
-        } else {
+        if ($('#acceptOnline').val() === '0') {
             $('#plan-open-date').closest('[data-plan-date-container]').addClass('hide');
             $('#plan-close-date').closest('[data-plan-date-container]').addClass('hide');
+        } else {
+            $('#plan-open-date').closest('[data-plan-date-container]').removeClass('hide');
+            $('#plan-close-date').closest('[data-plan-date-container]').removeClass('hide');
         }
 
         // Fill the selectize with the checked students
