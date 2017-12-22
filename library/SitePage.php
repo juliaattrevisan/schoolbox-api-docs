@@ -390,6 +390,7 @@ class SitePage extends Page
             $this->setTitle();
         }
         $this->disableXssProtectionAfterForm();
+
         $this->template->pParse('finaloutput', TEMPLATE_body);
 
         return true;
@@ -424,6 +425,25 @@ class SitePage extends Page
         $this->setBlock('google_analytics', 'ga_user_events', 'ga_user_events_block');
         $this->setBlock('ga_user_events', 'ga_year_event', 'ga_year_event_block');
         $this->setBlock('ga_user_events', 'ga_impersonated', 'ga_impersonated_block');
+        $this->setBlock('headerTpl', 'tour_script', 'tour_script_block');
+
+        $toursEnabled = $config->get('tours_enabled');
+
+
+        if ($toursEnabled) {
+
+            $request = parse_url($_SERVER['REQUEST_URI']);
+            $url = $request["path"];
+            $url = str_replace(basename($_SERVER['SCRIPT_NAME']), '', $url);
+            $url = base64_encode(trim($url));
+            $url = urlencode($url);
+
+            $this->setVar('TOUR_ROUTE', $this->routeLookup('tour.getTours', ['url' => $url]));
+            $this->parse('tour_script_block', 'tour_script', true);
+        } else {
+            $this->setVar('tour_script_block', '');
+        }
+
         $optIn = $config->get('site_usage_tracking');
 
         $this->setVar([
