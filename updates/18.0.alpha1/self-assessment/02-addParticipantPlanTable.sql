@@ -5,6 +5,7 @@ CREATE TABLE `participant_plan`
   `id`                      INT(10) UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   `assessment_id`           INT(10) UNSIGNED NOT NULL,
   `is_dynamic`              TINYINT DEFAULT 0 NOT NULL,
+  `name`                    VARCHAR(256) NULL,
   `description`             TEXT,
   `publish_date`            DATETIME,
   `open_date`               DATETIME,

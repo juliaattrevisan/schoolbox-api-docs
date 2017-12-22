@@ -434,6 +434,7 @@ class DataSource
             $planObject
                 ->setId($planModel->getId())
                 ->setIsDynamic($planModel->getIsDynamic())
+                ->setName($planModel->getName())
                 ->setDescription($planModel->getDescription())
                 ->setPublishDate($planModel->getPublishDate())
                 ->setOpenDate($planModel->getOpenDate())

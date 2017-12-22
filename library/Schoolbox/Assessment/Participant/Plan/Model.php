@@ -43,6 +43,11 @@ class Model implements ISoftDeletable
     /**
      * @var string
      */
+    private $name;
+
+    /**
+     * @var string
+     */
     private $description;
 
     /**
@@ -125,6 +130,26 @@ class Model implements ISoftDeletable
     public function setIsDynamic(bool $isDynamic): self
     {
         $this->isDynamic = $isDynamic;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+
+    /**
+     * @param string|null $name
+     * @return $this
+     */
+    public function setName(?string $name)
+    {
+        $this->name = $name;
         return $this;
     }
 
