@@ -38,9 +38,10 @@ class UserBulkMapper extends UserMapper
     /**
      * Construct the log system for bulk logging
      */
-    protected function setup() {
-        $file = fopen(\Config::get('logs_dir') . '/audit.log', 'a');
-        $this->logger = new Logger($file, null, 200, [],true);
+    protected function setup()
+    {
+        $file = fopen($this->getConfigLoader()->get('logs_dir') . '/audit.log', 'a');
+        $this->logger = new Logger($file, null, 200, [], true);
     }
 
     /**
@@ -73,45 +74,35 @@ class UserBulkMapper extends UserMapper
 
         /* Augmented where
          */
-        $query .= "WHERE u.deleted_at is null";
+        $query .= 'WHERE u.deleted_at is null';
 
         if ($searchCampus != self::UNCHANGED) {
-            $query .= "
-                AND uc.campus = :searchCampus
-            ";
+            $query .= 'AND uc.campus = :searchCampus';
 
             $params['searchCampus'] = $searchCampus;
         }
 
         if ($searchRole != self::UNCHANGED) {
-            $query .= "
-                AND u.group_id = :searchRole
-            ";
+            $query .= ' AND u.group_id = :searchRole';
 
             $params['searchRole'] = $searchRole;
         }
 
         if ($searchEportfolio != self::UNCHANGED) {
-            $query .= "
-                AND u.eportfolio_enabled = :searchEportfolio
-            ";
+            $query .= ' AND u.eportfolio_enabled = :searchEportfolio';
 
             $params['searchEportfolio'] = $searchEportfolio;
         }
 
         if (strlen(trim($searchYear))) {
-            $query .= "
-                AND u.year = :searchYear
-            ";
+            $query .= ' AND u.year = :searchYear';
 
             $params['searchYear'] = $searchYear;
         }
 
         /* Always order by lastname
          */
-        $query .= "
-            ORDER BY u.lastname
-        ";
+        $query .= ' ORDER BY u.lastname';
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
@@ -148,7 +139,7 @@ class UserBulkMapper extends UserMapper
     /**
      * Update campus involvement for this user
      *
-     * @param User $user
+     * @param User  $user
      * @param array $allCampusIds
      */
     private function assignCampuses(User $user, $allCampusIds)
@@ -170,18 +161,18 @@ class UserBulkMapper extends UserMapper
      * Mass Modify 3
      *
      * @param User $user
-     * @param $allCampusIds
-     * @param $roleId
-     * @param $year
-     * @param $eportfolioEnabled
-     * @param $emailFromUsername
-     * @param $externalMailClient
-     * @param $webmail
-     * @param $enabled
-     * @param $hideContacts
-     * @param $hideTimetable
-     * @param $positionTitle
-     * @param $displayGradeGraph
+     * @param      $allCampusIds
+     * @param      $roleId
+     * @param      $year
+     * @param      $eportfolioEnabled
+     * @param      $emailFromUsername
+     * @param      $externalMailClient
+     * @param      $webmail
+     * @param      $enabled
+     * @param      $hideContacts
+     * @param      $hideTimetable
+     * @param      $positionTitle
+     * @param      $displayGradeGraph
      */
     public function bulkModifyUpdate(
         User $user,
@@ -206,10 +197,9 @@ class UserBulkMapper extends UserMapper
                 /** @var Role $role */
                 $role = RoleMapper::getInstance()->findById($roleId);
                 $user->setRole($role);
-            }
-            catch (MapperException $e) {
+            } catch (MapperException $e) {
                 $message = "{$user->getFullName()} ({$user->getId()}) was skipped - unknown role";
-                $this->log($message, []);
+                $this->log($message);
                 return;
             }
         }
@@ -282,7 +272,7 @@ class UserBulkMapper extends UserMapper
          */
         $campusInvolvementChanged = \is_array($allCampusIds)
             && \count($allCampusIds)
-            && !\in_array(self::UNCHANGED, array_values($allCampusIds),false);
+            && !\in_array(self::UNCHANGED, array_values($allCampusIds), false);
 
         if ($campusInvolvementChanged) {
             $this->assignCampuses($user, $allCampusIds);
@@ -308,7 +298,7 @@ class UserBulkMapper extends UserMapper
     public function log($message)
     {
         $this->logger->info($message);
-        $this->outputMessage .= $message."\n";
+        $this->outputMessage .= $message . "\n";
     }
 
     /* Getters/Setters
@@ -321,7 +311,6 @@ class UserBulkMapper extends UserMapper
     {
         return $this->outputMessage;
     }
-
 
 
 }
