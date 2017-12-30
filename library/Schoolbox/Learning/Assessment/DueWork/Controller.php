@@ -940,11 +940,11 @@ class Controller extends Assessment\Controller
 
         // ...append rubric-related data...
         if($assessment->getId()){
-            $getParentCriteria = $assessment->getContext() instanceof UnitSpecification;
+            $getParentCriteria = $assessment->getBaseContext() instanceof UnitSpecification;
             $editMode = true;
             $rubric = $this->rubricMapper->findByDueWork($assessment, $getParentCriteria, $editMode);
         } else {
-            $rubric = $this->rubricMapper->createForContext($assessment->getContext());
+            $rubric = $this->rubricMapper->createForContext($assessment->getBaseContext());
         }
         $assessment->setRubric($rubric);
 

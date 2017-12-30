@@ -23,11 +23,11 @@ use Schoolbox\GenericCollection;
 use Schoolbox\IMapper;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 
@@ -87,6 +87,11 @@ class RubricMapper
      */
     public function createForContext(AssessmentContext $context, array $levelNames = [])
     {
+        // Go one deeper to get unit and course
+        if ($context instanceof Project) {
+            return $this->createForContext($context->getBaseContext(), $levelNames);
+        }
+
         $folderId = $context->getFolder()->getId();
         $parentFolderId = null;
 
