@@ -51,15 +51,10 @@ function Calendar(id, bubbleId, opts) {
         },
         fullCalendar: {
             views: {
-                columnFormat: {
-                    month:      'ddd',
-                    week:       'ddd D/M',
-                    agendaWeek: 'ddd D/M',
-                    day:        'ddd D/M',
-                    agendaDay:  'ddd D/M'
+                day: {
+                    titleFormat: 'dddd, MMM D YYYY'
                 }
             },
-            columnFormat: 'ddd D/M',
             timeFormat: 'h(:mm)a',
             header: {
                 left: 'prev,today,next',
