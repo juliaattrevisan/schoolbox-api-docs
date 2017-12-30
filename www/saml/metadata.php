@@ -1,17 +1,24 @@
+
 <?php
+
 /**
- * SAMPLE Code to demonstrate how to handle a SAML assertion response.
- *
- * Your IdP will usually want your metadata, you can use this code to generate it once,
- * or expose it on a URL so your IdP can check it periodically.
+ *  SAML Metadata view
  */
 
-error_reporting(E_ALL);
-
-$settings = NULL;
-require 'settings.php';
-
-header('Content-Type: text/xml');
-
-$samlMetadata = new OneLogin_Saml_Metadata($settings);
-echo $samlMetadata->getXml();
+require_once 'saml-setup.php' ;
+try {
+    $settings = new OneLogin_Saml2_Settings($settingsInfo, true);
+    $metadata = $settings->getSPMetadata();
+    $errors = $settings->validateMetadata($metadata);
+    if (empty($errors)) {
+        header('Content-Type: text/xml');
+        echo $metadata;
+    } else {
+        throw new OneLogin_Saml2_Error(
+            'Invalid SP metadata: '.implode(', ', $errors),
+            OneLogin_Saml2_Error::METADATA_SP_INVALID
+        );
+    }
+} catch (Exception $e) {
+    echo $e->getMessage();
+}

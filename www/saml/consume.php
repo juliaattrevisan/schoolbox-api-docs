@@ -8,68 +8,67 @@
  */
 
 use Schoolbox\Error\Mapper as ErrorMapper;
-
-$settings = null;
-require 'settings.php';
+require 'saml-setup.php';
 
 $page = new SitePage(false);
+$auth = new OneLogin_Saml2_Auth($settingsInfo);
+
 
 /* Handle Single Logout commands */
-if (isset($_POST['SAMLRequest'])) {
-    SAMLDebugLog('SAMLRequest assertion received, assuming logout');
-    SAMLDebugLog(base64_decode($_POST['SAMLRequest']));
-    session_start();
-    session_destroy();
-    header('Location: ' . Config::get('saml_logout_url'));
-    exit;
+if (isset($_GET['sls'])) {
+    try {
+        $auth->processSLO();
+    } catch (OneLogin_Saml2_Error $e) {
+        error(ErrorMapper::ERROR_PROCESSING, $e->getMessage());
+    }
+
+    $errors = $auth->getErrors();
+    if (!empty($errors)) {
+        error(ErrorMapper::ERROR_PROCESSING, implode("\n", $errors));
+    }
 }
 
-if(isset($_POST['SAMLResponse'])) {
+else if(isset($_POST['SAMLResponse'])) {
     SAMLDebugLog(base64_decode($_POST['SAMLResponse']));
 
-    $token_signing_keys = array();
-    if (strlen(trim($settings->idpPublicCertificate)) > 0) {
-        $token_signing_keys[] = $settings->idpPublicCertificate;
+    if (isset($_SESSION) && isset($_SESSION['AuthNRequestID'])) {
+        $requestID = $_SESSION['AuthNRequestID'];
+    } else {
+        $requestID = null;
     }
-    if ($idp) {
-        foreach ($idp['SigningKeys'] as $key) {
-            $token_signing_keys[] = $key['X509Cert'];
+
+    try {
+        $auth->processResponse($requestID);
+    } catch (OneLogin_Saml2_Error $e) {
+        error(ErrorMapper::ERROR_PROCESSING, $e->getMessage());
+    }
+
+    $errors = $auth->getErrors();
+    if (!empty($errors)) {
+        error(ErrorMapper::ERROR_PROCESSING, implode("\n", $errors));
+    }
+
+    $sessionHandler = new Session();
+    if ($sessionHandler->create($auth->getNameId())) {
+        $page = '/';
+        if (isset($_POST['RelayState']) && preg_match('|^/|', $_POST['RelayState']) && substr($_POST['RelayState'], 0, 6) != '/login') {
+            $page = $_POST['RelayState'];
         }
+
+        SAMLDebugLog("SAML auth successful");
+        SitePage::localRedir($page);
+
+    } else {
+        $msg = 'Invalid SAML user.';
+        $errorTracker[] = $msg;
+        SAMLDebugLog($msg);
     }
-    $errorTracker = array();
-    foreach ($token_signing_keys as $token_key) {
-        $settings->idpPublicCertificate = preg_replace("/\r/m", "", $token_key);
-        try {
-            $samlResponse = new OneLogin_Saml_Response($settings, $_POST['SAMLResponse']);
 
-            if ($samlResponse->isValid()) {
-                $sessionHandler = new Session();
-                if ($sessionHandler->create($samlResponse->getNameId())) {
-                    $page = '/';
-                    if (isset($_POST['RelayState']) && preg_match('|^/|', $_POST['RelayState']) && substr($_POST['RelayState'], 0, 6) != '/login') {
-                        $page = $_POST['RelayState'];
-                    }
-
-                    SAMLDebugLog("SAML auth successful");
-                    SitePage::localRedir($page);
-
-                } else {
-                    $msg = 'Invalid SAML user.';
-                    $errorTracker[] = $msg;
-                    SAMLDebugLog($msg);
-                }
-            } else {
-                $msg = 'Invalid SAML response: Single Sign-On IDP certificate does not match certificate supplied in SAML request.';
-                $errorTracker[] = $msg;
-                SAMLDebugLog($msg);
-            }
-        } catch (Exception $e) {
-            $msg = 'Invalid SAML response: ' . Scrub::text($e->getMessage());
-            $errorTracker[] = $msg;
-            SAMLDebugLog($msg);
-        }
-    }
-    error(ErrorMapper::ERROR_PROCESSING, implode("\n", $errorTracker));
+    $_SESSION['samlUserdata'] = $auth->getAttributes();
+    $_SESSION['samlNameId'] = $auth->getNameId();
+    $_SESSION['samlNameIdFormat'] = $auth->getNameIdFormat();
+    $_SESSION['samlSessionIndex'] = $auth->getSessionIndex();
+    unset($_SESSION['AuthNRequestID']);
 }
 else {
     error(ErrorMapper::ERROR_INFORMATION_MISSING);

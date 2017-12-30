@@ -1,6 +1,5 @@
 <?php
 /**
- * SAMPLE Code to demonstrate how to initiate a SAML Authorization request
  *
  * When the user visits this URL, the browser will be redirected to the SSO
  * IdP with an authorization request. If successful, it will then be
@@ -8,17 +7,14 @@
  * details.
  */
 
-error_reporting(E_ALL);
+require 'saml-setup.php';
 
-/** @var OneLogin_Saml_Settings $settings */
-$settings = NULL;
-require 'settings.php';
-$authRequest = new OneLogin_Saml_AuthRequest($settings);
-$url = $authRequest->getRedirectUrl();
+$auth = new OneLogin_Saml2_Auth($settingsInfo);
+$returnUrl = null;
 
 // Include page as local URL (if it's set)
 if (isset($_GET['page']) && preg_match('|^/|', $_GET['page'])) {
-    $url .= '&RelayState='.urlencode($_GET['page']);
+    $returnUrl = $_GET['page'];
 }
 
-header("Location: $url");
+$auth->login($returnUrl);
