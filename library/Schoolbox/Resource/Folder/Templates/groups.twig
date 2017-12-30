@@ -41,21 +41,21 @@
                         </a>
                         <div class="card-content actions-small-1">
                             <div class="list-item">
-                                <h3><a href="/homepage/{{ group.id }}">{{ group.name }}</a></h3>
+                                <h3><a href="/homepage/{{ group.id }}" title="{{ group.name }}">{{ group.name }}</a></h3>
                             </div>
                             <nav>
                                 <a href="#" class="icon-more" data-dropdown="class-options{{ group.id }}" aria-expanded="false" title="Actions"></a>
                             </nav>
                             <ul data-dropdown-content class="f-dropdown" id="class-options{{ group.id }}">
                                 {% if (userAccess[group.id].write or userAccess[group.id].admin) %}
-                                    <li><a href="/resource/folder/modify/{{ group.id }} " class="icon-modify">Modify Folder</a></li>
+                                    <li><a href="/resource/folder/modify/{{ group.id }}" class="icon-modify">Modify Folder</a></li>
                                 {% endif %}
                                 {% if userAccess[group.id].admin %}
-                                    <li><a href="/group/modify/{{ group.id }} " class="icon-group">Modify Group</a></li>
-                                    <li><a href="/statistics/homepage/{{ group.id }} " class="icon-report">View Statistics</a></li>
+                                    <li><a href="/group/modify/{{ group.id }}" class="icon-group">Modify Group</a></li>
+                                    <li><a href="/statistics/homepage/{{ group.id }}" class="icon-report">View Statistics</a></li>
                                 {% endif %}
                                 {% if (userAccess[group.id].write or userAccess[group.id].read)%}
-                                    <li><a href="/group/joinForm.php?leave={{ group.id }}&return=true" data-confirm-leave  class="icon-logout">Leave Group</a></li>
+                                    <li><a href="/group/joinForm.php?leave={{ group.id }}&return=true" data-confirm-leave class="icon-logout">Leave Group</a></li>
                                 {% endif %}
                             </ul>
                         </div>
