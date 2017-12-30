@@ -59,29 +59,12 @@ if (isset($_POST['updateUsers'])) {
 /* Show some confirmation stuff
  */
 $this->setFile(TEMPLATE_content, 'adminv2/user/bulk/modifyResults.html');
-$this->setBlock(TEMPLATE_content, 'has_users', 'has_users_block');
-$this->setBlock('has_users', 'user', 'user_block');
+
 
 $this->setVar(
     array(
         'MODIFIED_COUNT' => $modified->count(),
-        'has_users_block' => '',
-        'user_block' => ''
+        'OUTPUT_LOG'     => nl2br(Scrub::text($userMapper->getOutputMessage())),
     )
 );
 
-if ($modified->count()) {
-    foreach ($modified as $current) {
-        $this->setVar(
-            array(
-                'USER_FIRSTNAME' => $current->getFirstname(),
-                'USER_LASTNAME' => $current->getLastname(),
-                'USER_EXTERNAL_ID' => $current->getExternalId(),
-            )
-        );
-
-        $this->parse('user_block', 'user', true);
-    }
-
-    $this->parse('has_users_block', 'has_users');
-}

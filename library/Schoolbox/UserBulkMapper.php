@@ -5,7 +5,6 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox;
@@ -21,7 +20,28 @@ class UserBulkMapper extends UserMapper
      *
      * @var int
      */
-    private $unchanged = -1;
+    private const UNCHANGED = -1;
+
+    /**
+     * After bulk processing this will contain a log of all the success and fail results
+     *
+     * @var string
+     */
+    private $outputMessage = '';
+
+    /**
+     * Bulk modify logger
+     * @var Logger
+     */
+    private $logger;
+
+    /**
+     * Construct the log system for bulk logging
+     */
+    protected function setup() {
+        $file = fopen(\Config::get('logs_dir') . '/audit.log', 'a');
+        $this->logger = new Logger($file, null, 200, [],true);
+    }
 
     /**
      * Cheesy query agglutination
@@ -55,7 +75,7 @@ class UserBulkMapper extends UserMapper
          */
         $query .= "WHERE u.deleted_at is null";
 
-        if ($searchCampus != $this->getUnchanged()) {
+        if ($searchCampus != self::UNCHANGED) {
             $query .= "
                 AND uc.campus = :searchCampus
             ";
@@ -63,7 +83,7 @@ class UserBulkMapper extends UserMapper
             $params['searchCampus'] = $searchCampus;
         }
 
-        if ($searchRole != $this->getUnchanged()) {
+        if ($searchRole != self::UNCHANGED) {
             $query .= "
                 AND u.group_id = :searchRole
             ";
@@ -71,7 +91,7 @@ class UserBulkMapper extends UserMapper
             $params['searchRole'] = $searchRole;
         }
 
-        if ($searchEportfolio != $this->getUnchanged()) {
+        if ($searchEportfolio != self::UNCHANGED) {
             $query .= "
                 AND u.eportfolio_enabled = :searchEportfolio
             ";
@@ -140,7 +160,7 @@ class UserBulkMapper extends UserMapper
         /* Apply new choices (ignore Unchanged option)
          */
         foreach ($allCampusIds as $currentCampusId) {
-            if ($currentCampusId != $this->getUnchanged()) {
+            if ($currentCampusId != self::UNCHANGED) {
                 $user->getCampusCollection()->add(CampusMapper::getInstance()->findById($currentCampusId));
             }
         }
@@ -181,14 +201,14 @@ class UserBulkMapper extends UserMapper
 
         /* Update group settings
          */
-        if ($roleId != $this->getUnchanged()) {
+        if ($roleId != self::UNCHANGED) {
             try {
                 /** @var Role $role */
                 $role = RoleMapper::getInstance()->findById($roleId);
                 $user->setRole($role);
             }
             catch (MapperException $e) {
-                $message = "{$user->getFullname()} ({$user->getId()}) was skipped - unknown role";
+                $message = "{$user->getFullName()} ({$user->getId()}) was skipped - unknown role";
                 $this->log($message, []);
                 return;
             }
@@ -212,114 +232,96 @@ class UserBulkMapper extends UserMapper
 
         /* Update eportfolio settings
          */
-        if ($eportfolioEnabled != $this->getUnchanged()) {
+        if ($eportfolioEnabled != self::UNCHANGED) {
             $user->setEportfolioEnable($eportfolioEnabled);
         }
 
         /* Update emailFromUsername settings
          */
-        if ($emailFromUsername != $this->getUnchanged()) {
+        if ($emailFromUsername != self::UNCHANGED) {
             $user->setLocalEmail($emailFromUsername);
         }
 
         /* Update externalMailClient settings
          */
-        if ($externalMailClient != $this->getUnchanged()) {
+        if ($externalMailClient != self::UNCHANGED) {
             $user->setUseInternalMail($externalMailClient);
         }
 
         /* Update webmail settings
          */
-        if ($webmail != $this->getUnchanged()) {
+        if ($webmail != self::UNCHANGED) {
             $user->setWebmail($webmail);
         }
 
         /* Update enabled settings
          */
-        if ($enabled != $this->getUnchanged()) {
+        if ($enabled != self::UNCHANGED) {
             $user->setEnabled($enabled);
         }
 
         /* Update hide contacts settings
          */
-        if ($hideContacts != $this->getUnchanged()) {
+        if ($hideContacts != self::UNCHANGED) {
             $user->setHideContacts($hideContacts);
         }
 
         /* Update hide timetable settings
          */
-        if ($hideTimetable != $this->getUnchanged()) {
+        if ($hideTimetable != self::UNCHANGED) {
             $user->setHideTimetable($hideTimetable);
         }
 
         /* Update display grade average settings
          */
-        if ($displayGradeGraph != $this->getUnchanged()) {
+        if ($displayGradeGraph != self::UNCHANGED) {
             $user->setDisplayGradeGraph($displayGradeGraph);
         }
 
         /* Update campus settings
          */
-        $campusInvolvementChanged = is_array($allCampusIds)
-            && count($allCampusIds)
-            && !in_array($this->getUnchanged(), array_values($allCampusIds));
+        $campusInvolvementChanged = \is_array($allCampusIds)
+            && \count($allCampusIds)
+            && !\in_array(self::UNCHANGED, array_values($allCampusIds),false);
 
         if ($campusInvolvementChanged) {
             $this->assignCampuses($user, $allCampusIds);
         }
 
-        $this->save($user);
+        try {
+            $this->save($user);
+            $message = "{$this->getSessionUser()->getFullName()} ({$this->getSessionUser()->getId()}) modified user {$user->getFullName()} ({$user->getId()})";
+        } catch (\UnexpectedValueException $e) {
+            $message = "{$this->getSessionUser()->getFullName()} ({$this->getSessionUser()->getId()}) failed to modified user {$user->getFullName()} ({$user->getId()}): {$e->getMessage()}";
+        } catch (Mapper\Exception $e) {
+            $message = "{$this->getSessionUser()->getFullName()} ({$this->getSessionUser()->getId()}) failed to modified user {$user->getFullName()} ({$user->getId()}): {$e->getMessage()}";
+        }
 
-        /* Logging for Samuel
-         */
-        $message = "{$_SESSION['user']->getFullname()} ({$_SESSION['user']->getId()}) modified user {$user->getFullname()} ({$user->getId()})";
-
-        $data = array(
-            $allCampusIds,
-            $roleId,
-            $year,
-            $eportfolioEnabled,
-            $emailFromUsername,
-            $externalMailClient,
-            $webmail,
-            $enabled,
-            $hideContacts,
-            $hideTimetable,
-            $positionTitle
-        );
-
-        $this->log($message, $data);
+        $this->log($message);
     }
 
     /**
      * Log to file
      *
-     * @param $data
+     * @param string $message
      */
-    public function log($message, $data)
+    public function log($message)
     {
-        $file = fopen(\Config::get('logs_dir') . '/audit.log', 'a');
-
-        $log = new Logger($file, null, 200, $data, true);
-        $log->info($message);
+        $this->logger->info($message);
+        $this->outputMessage .= $message."\n";
     }
 
     /* Getters/Setters
      */
 
     /**
-     * @param int $unchanged
+     * @return string
      */
-    private function setUnchanged($unchanged)
+    public function getOutputMessage(): string
     {
-        $this->unchanged = $unchanged;
+        return $this->outputMessage;
     }
 
-    /**
-     * @return int
-     */
-    private function getUnchanged()
-    {
-        return $this->unchanged;
-    }
+
+
 }
