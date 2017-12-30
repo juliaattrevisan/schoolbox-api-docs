@@ -73,7 +73,8 @@
         "league/flysystem-ziparchive": "^1.0",
         "phpoffice/phpexcel": "dev-master",
         "roave/security-advisories": "dev-master",
-        "zendframework/zend-uri": "~2.5.2"
+        "zendframework/zend-uri": "~2.5.2",
+        "onelogin/php-saml": "^2.12"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",
