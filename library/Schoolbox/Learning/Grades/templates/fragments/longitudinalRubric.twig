@@ -7,6 +7,66 @@
         assessments           IAssessable[]
         returnUrlSuffix       string
 #}
+<script type="text/javascript">
+    $(function() {
+        Highcharts.boxLine = function (a, b, c) {
+            var hasRenderToArg = typeof a === 'string' || a.nodeName,
+                options = arguments[hasRenderToArg ? 1 : 0],
+                defaultOptions = {
+                    chart: {
+                        renderTo: (options.chart && options.chart.renderTo) || this,
+                        height: 60,
+                        borderWidth: 0,
+                        margin: 0,
+                    },
+                    title: {
+                        text: ''
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    xAxis: {
+                        visible: false,
+                        labels: {
+                            enabled: false
+                        },
+                        title: {
+                            text: null
+                        },
+                        startOnTick: false,
+                        endOnTick: false,
+                        tickPositions: []
+                    },
+                    yAxis: {
+                        visible: false,
+                        endOnTick: false,
+                        startOnTick: false,
+                        labels: {
+                            enabled: false
+                        },
+                        title: {
+                            text: null
+                        },
+                        tickPositions: [0]
+                    },
+                    tooltip: {
+                        crosshairs: true,
+                        shared: true,
+                        valueSuffix: ''
+                    },
+                    legend: {
+                        enabled: false
+                    }
+                }
+
+            options = Highcharts.merge(defaultOptions, options);
+
+            return hasRenderToArg ?
+                new Highcharts.Chart(a, options, c) :
+                new Highcharts.Chart(options, b);
+        }
+    });
+</script>
 
 <div class="row">
     <div class="small-12 column">
@@ -43,7 +103,7 @@
                                                                     student: student,
                                                                     assessment: activityAssessment,
                                                                 }
-                                                            ) -%}
+                                                                ) -%}
                                                         {% else %}
                                                             {%- set activityHref = '' -%}
                                                         {% endif %}
@@ -64,6 +124,80 @@
                     </div>
                 {% endfor %}
             </div>
+        </section>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="small-12 column">
+        {% for capability in longitudinalRubric %}
+        <h2 class="subheader">{{ capability.name }}</h2>
+            <table>
+                {% for indicatorId,indicator in capability.indicators %}
+                <tr>
+                    <th width="15%">{{ indicator.name }}</th>
+                    <td>
+                        <div id="rubricGraph{{ indicatorId }}"></div>
+                        <script type="application/javascript">
+                            $(function() {
+
+                                var ranges = [
+                                        [1246406400000, 14.3, 27.7, 29.1, 40.2, 60.2],
+                                        [1246492800000, 14.5, 27.8, 29.1, 40.2, 60.2],
+                                        [1246579200000, 15.5, 49.6, 53, 68, 79.3],
+                                        [1246665600000, 16.7, 53.7, 60.2, 82, 95],
+                                        [1246752000000, 16.5, 60, 68, 80, 100]
+
+                                    ],
+                                    ranges2 = [
+                                        [1246406400000, 14.3, 27.7, 29.1, 40.2, 60.2],
+                                        [1246492800000, null, null,null,null,null],
+                                        [1246579200000, 15.5, 29.6, 49.3, 58.2, 64.5],
+                                        [1246665600000, 16.7, 30.7, 43, 48.3, 56.3],
+                                        [1246752000000, null, null,null,null,null]
+                                    ],
+                                    averages = [
+                                        [1246406400000, 30],
+                                        [1246492800000, 42.1],
+                                        [1246579200000, 53],
+                                        [1246665600000, 63.8],
+                                        [1246752000000, 87.4],
+                                    ],
+                                    averages2 = [
+                                        [1246406400000, 21.5],
+                                        [1246492800000, null],
+                                        [1246579200000, 23],
+                                        [1246665600000, 23.8],
+                                        [1246752000000, null]
+                                    ];
+
+                                $('#rubricGraph{{ indicatorId }}').highcharts('boxLine', {
+                                    series: [{
+                                        name: 'Marks',
+                                        data: averages,
+                                        zIndex: 1,
+                                        color: 'rgb(255, 87, 87)',
+                                    }, {
+                                        name: 'Range',
+                                        data: ranges,
+                                        type: 'boxplot',
+                                        linkedTo: ':previous',
+                                        color: Highcharts.getOptions().colors[0],
+                                        fillOpacity: 0.3,
+                                        zIndex: 0,
+                                        marker: {
+                                            enabled: false
+                                        }
+                                    }]
+                                })
+                            });
+                        </script>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% endfor %}
         </section>
     </div>
 </div>

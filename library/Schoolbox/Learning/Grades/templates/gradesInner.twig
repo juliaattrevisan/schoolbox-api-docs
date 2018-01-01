@@ -17,12 +17,6 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 
-<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
-<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts-more.js"></script>
-<script type="text/javascript" src="/javascript/shared/submissions/reportCardBoxplot.js"></script>
-<script type="text/javascript" src="/learninganalytics/js/schoolboxTheme.js"></script>
-<script type="text/javascript" src="/javascript/shared/eportfolio/jquery.eportfolio.js"></script>
-<script type="text/javascript" src="/javascript/shared/jquery.toast-timeout.js"></script>
 <script type="text/javascript">
     $(function () {
         $('[data-collapser="true"]').collapsable({
@@ -46,7 +40,7 @@
 
     <div class="row">
         <div class="small-12 island">
-            <h2 class="subheader">Assessments</h2>
+            <h2 class="subheader">Activities</h2>
             <section>
                 <ul class="action-list">
                     {% for assessment in markbook.assessments %}
