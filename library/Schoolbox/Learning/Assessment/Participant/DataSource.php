@@ -184,7 +184,7 @@ class DataSource
         $dynamicPlans = new GenericCollection(PlanObject::class);
         foreach ($assessments as $assessment) {
             $dynamicPlan = $assessment->getDynamicPlan();
-            if ($dynamicPlan){
+            if ($dynamicPlan) {
                 $dynamicPlans->add($dynamicPlan);
             }
         }
