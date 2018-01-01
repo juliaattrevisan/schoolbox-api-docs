@@ -13,6 +13,7 @@ use Schoolbox\Config\Loader as Config;
 use Schoolbox\External\Exception as ExternalException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 /**
  * Parse date/time strings to get the time only
@@ -167,6 +168,8 @@ if ($class) {
 
     } catch (ExternalException $e) {
         error(ErrorMapper::ERROR_DATE_FORMAT);
+    } catch (SchoolboxException $e) {
+        error(ErrorMapper::ERROR_ATTENDANCE_SEQUENCE);
     }
 
     // Render each row
