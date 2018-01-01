@@ -404,7 +404,7 @@ class Controller extends Base
             $participant = $assessment->getParticipantIfExtant($viewee);
             $feedback    = $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null;
 
-            if($feedback) {
+            if($feedback && !is_null($feedback->getNormalisedMark())) {
                 $graphScatter[] = (float)$feedback->getNormalisedMark();
 
                 if(!empty($feedback->getHumanReadableMark()) || !empty($feedback->getComment())) {
