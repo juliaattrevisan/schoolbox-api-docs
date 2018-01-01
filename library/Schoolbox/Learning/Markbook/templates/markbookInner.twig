@@ -11,9 +11,6 @@
 
 {% import '@learning/macro/urgency.twig' as urgency %}
 
-<script type="text/javascript" src="/javascript/shared/submissions/jquery.marksheet.js"></script>
-<script type="text/javascript" src="/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>
-<script type="text/javascript" src="/javascript/shared/jquery.ajax-form.js"></script>
 <script type="text/javascript">
     $(function() {
 
@@ -67,7 +64,7 @@
 
 <div class="row">
     <div class="small-12 island">
-
+        {% if markbook.assessments|length > 0 %}
         <table class="marksheet" data-mark-sheet>
             <thead>
                 <tr class="rotate-headers" data-headers data-hidable-columns>
@@ -181,7 +178,14 @@
                 {% endfor %}
             </tbody>
             </table>
-
+        {% else %}
+        <div class="empty-state">
+            <i class="icon-curriculum"></i>
+            <p>
+                There are no activities that match the selected filters.  Try altering the filters to broaden your search.
+            </p>
+        </div>
+        {% endif %}
         <div class="toast" data-alert data-save-progress-state></div>
     </div>
 </div>
