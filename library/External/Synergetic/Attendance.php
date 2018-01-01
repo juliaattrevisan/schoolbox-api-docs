@@ -61,7 +61,8 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
             $attendancePeriod,
             $fileYear,
             $fileSemester,
-            $this->connector
+            $this->connector,
+            $_SESSION['sid']
         );
 
         $this->setAttendanceMaster($attendanceMaster);

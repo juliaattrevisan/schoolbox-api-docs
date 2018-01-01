@@ -56,7 +56,7 @@ class Attendance_Synergetic_AttendanceMaster
      * @param int $fileSemester
      * @param IConnector $connector
      */
-    public function __construct($class, $attendanceDate, $attendanceDay, $attendancePeriod, $fileYear, $fileSemester, $connector)
+    public function __construct($class, $attendanceDate, $attendanceDay, $attendancePeriod, $fileYear, $fileSemester, $connector, $staffId)
     {
         // Store database connection
 
@@ -84,7 +84,7 @@ class Attendance_Synergetic_AttendanceMaster
             'AttendanceDate' => $attendanceDate->getDatabaseDate() . ' 00:00:00.000',
             'AttendancePeriod' => $this->getAttendancePeriod(),
             'AttendanceDayNumber' => $attendanceDay,
-            'StaffID' => $_SESSION['sid'],
+            'StaffID' => $staffId,
             'AttendedFlag' => 1,
             'TimeTableGroup' => $this->getTimetableGroup(),
             'SynWebFlag' => 1,
