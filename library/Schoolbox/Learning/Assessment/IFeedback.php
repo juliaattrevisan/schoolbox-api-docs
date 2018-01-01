@@ -70,7 +70,7 @@ interface IFeedback
      * This is essentially a value out of 100 which numerically represents
      * the human-readable mark (and vice versa)
      *
-     * @return float
+     * @return float|null
      */
     public function getNormalisedMark();
 
