@@ -17,6 +17,10 @@ class Tour extends ModuleLoader
      */
     public function configure($kernel)
     {
-        $this->loadModule($kernel, TourModule::class, "/tour");
+        $di = $kernel->getDependencyInjector();
+
+        if ($di->get('config')->get('tours_enabled')) {
+            $this->loadModule($kernel, TourModule::class, "/tour");
+        }
     }
 }
