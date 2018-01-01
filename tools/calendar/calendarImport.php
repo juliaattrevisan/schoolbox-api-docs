@@ -34,7 +34,7 @@ $kernel->run(
         $file = null;
         if (isset($opts['help']) || count($opts) == 0) {
             echo <<<HELP
-Usage: calendarImport.php --file import.csv --owner=1 --campus=1,2 --role=1 [--source 'sourcename']
+Usage: calendarImport.php --file import.csv --owner=1 --campus=1,2 --role=1 [--source='sourcename']
     --file:       CSV file that matches the schoolbox calendar template located in Admin->Calendar
     --owner:      The user ID of who the events should be owned by
     --campus:     Comma-seperated list of campus IDs that the events should be shown to
@@ -76,7 +76,7 @@ HELP;
         //Optional options
         if (isset($opts['source'])) {
             $source = $opts['source'];
-            $log->warning("Events with source " . $opts['source'] . " will be deleted\n");
+            $log->warning('Events with source "' . $source . '" will be deleted' . "\n");
         } else {
             $source = null;
         }
