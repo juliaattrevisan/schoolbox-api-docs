@@ -68,11 +68,11 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $author = \Schoolbox\UserMapper::getInstance()->getUnknownUser();
             }
-            if ($poll['pollID']) {
+            if ($poll['id']) {
                 $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
 
                 $this->setVar([
-                    'POLL_ID' => $poll['pollID'],
+                    'POLL_ID' => $poll['id'],
                     'POLL_QUESTION' => Scrub::text($poll['question']),
                     'POLL_AUTHOR_ID' => $author->getId(),
                     'POLL_AUTHOR_THUMB' => "/portrait.php?userId={$author->getExternalId()}&size=square64",
@@ -89,9 +89,9 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                     $this->setVar('owner_deleted_block', '');
                 }
 
-                $pollData = $pollHandler->getData($poll['pollID']);
+                $pollData = $pollHandler->getData($poll['id']);
 
-                if ($pollHandler->hasVoted($poll['pollID']) || !$pollHandler->open($poll['pollID']) || $this->getSitePage()->arg[1] == 'pollResults') {
+                if ($pollHandler->hasVoted($poll['id']) || !$pollHandler->open($poll['id']) || $this->getSitePage()->arg[1] == 'pollResults') {
                     /* Show poll as user has voted or the poll has closed to votes */
 
                     $this->setVar([

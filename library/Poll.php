@@ -5,7 +5,7 @@ class Poll extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 	function __construct() {
 	
 		$this->_table = "poll";
-		$this->_index = "pollID";
+		$this->_index = "id";
 		
 		parent::__construct();
 	}
@@ -15,14 +15,14 @@ class Poll extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 		return $this->db->getRow($query);
 	}
 
-	function getAllByCategory ($categoryID) {
-		$query = "SELECT * FROM poll WHERE categoryID = $categoryID ORDER BY created DESC";
+	function getAllByCategory ($folder_id) {
+		$query = "SELECT * FROM poll WHERE folder_id = $folder_id ORDER BY created DESC";
 		return $this->db->getAll($query);
 	}
 
 	function getData($pollID) {
 		$poll = $this->getByID($pollID);
-		if (!$poll['pollID'])
+		if (!$poll['id'])
 			return false;
 		$data = array();
 		$total = 0;
@@ -55,7 +55,7 @@ class Poll extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 				break;
 		}
 
-		$query = "SELECT count(*) FROM pollLog WHERE pollID = $pollID $cutoff AND userID = " . $_SESSION['id'];
+		$query = "SELECT count(*) FROM pollLog WHERE poll_id = $pollID $cutoff AND user_id = " . $_SESSION['id'];
 		$vote = $this->db->getOne($query);
 
 		if ($vote > 0)
@@ -64,7 +64,7 @@ class Poll extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 	}
 	
 	function open($pollID) {
-		$query = "SELECT count(*) FROM poll WHERE pollID = $pollID AND close > NOW()";
+		$query = "SELECT count(*) FROM poll WHERE id = $pollID AND close > NOW()";
 		$vote = $this->db->getOne($query);
 		if ($vote > 0)
 			return true;
@@ -73,9 +73,9 @@ class Poll extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 	
 	function placeVote ($pollID, $vote) {
 		if (is_numeric($pollID) && is_numeric($vote) && $vote >= 0 && $vote < 10 && !$this->hasVoted($pollID)) {
-			$query = "UPDATE poll SET result_" . $vote . " = result_" . $vote . " + 1 WHERE pollID = $pollID";
+			$query = "UPDATE poll SET result_" . $vote . " = result_" . $vote . " + 1 WHERE id = $pollID";
 			$this->db->query($query);
-			$query = "INSERT INTO pollLog SET pollID = $pollID, userID = " . $_SESSION['id']. ", created = NOW()";
+			$query = "INSERT INTO pollLog SET poll_id = $pollID, user_id = " . $_SESSION['id']. ", created = NOW()";
 			$this->db->query($query);
 			return true;
 		}
@@ -94,9 +94,24 @@ class Poll extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 	}
 	
 	function homepageClean($cid) {
-		$query = "DELETE p, l FROM  `".$this->_table."` p LEFT JOIN pollLog l ON l.pollID = p.pollID WHERE p.categoryID='$cid'";
+		$query = "DELETE p, l FROM  `".$this->_table."` p LEFT JOIN pollLog l ON l.poll_id = p.id WHERE p.folder_id='$cid'";
 		$this->db->query($query);
 	}
+
+    /**
+     * @deprecated
+     * @param $id
+     * @return bool
+     */
+    public function delete($id)
+    {
+        $query = "DELETE FROM pollLog WHERE poll_id = '$id'";
+        $this->db->query($query);
+
+        $query = "DELETE FROM poll WHERE id = '$id'";
+        return $this->db->query($query);
+
+    }
 }
 
 ?>
