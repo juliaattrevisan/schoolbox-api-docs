@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Help;
+namespace Custom\Help\Nesa;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
@@ -87,20 +87,20 @@ class Controller extends Base
          * For now, we hardcode this manually; is reasonable to assume it exists
          */
         try {
-            $courseSpecification = $this->courseSpecificationMapper->findById(Nesa\Acquisition::NESA_COURSE_SPEC_ID);
+            $courseSpecification = $this->courseSpecificationMapper->findById(Acquisition::NESA_COURSE_SPEC_ID);
         }
         catch (MapperException $e) {
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
-        $selector = new Nesa\Selector(
-            Nesa\Acquisition::NESA_COURSE_SPEC_ID,
+        $selector = new Selector(
+            Acquisition::NESA_COURSE_SPEC_ID,
             Specification\Unit\Mapper::getInstance(),
             Rubric\CriterionMapper::getInstance(),
             Rubric\DescriptorMapper::getInstance()
         );
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@help/selector.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@helpNesa/selector.twig', [
             'course' => $courseSpecification,
             'states' => $this->pdMapper->getAvailableStates(),
             'descriptors' => $selector->generate()
@@ -120,7 +120,7 @@ class Controller extends Base
         /** @var DataModel\MapperProxy $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
-        $report = (new Nesa\Report(
+        $report = (new Report(
             $assessmentMapperProxy,
             $this->rubricMapper,
             $this->userMapper
@@ -138,7 +138,7 @@ class Controller extends Base
 
         /* The usual output
          */
-        $this->getResponse()->content->set($this->buildHtmlOutput('@help/report.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@helpNesa/report.twig', [
             'report' => $report,
             'duration' => number_format($end - $start, 2),
             'states' => $this->getRequest()->post['state'],
@@ -161,7 +161,7 @@ class Controller extends Base
         /** @var DataModel\MapperProxy $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
-        $report = (new Nesa\Report(
+        $report = (new Report(
             $assessmentMapperProxy,
             $this->rubricMapper,
             $this->userMapper
@@ -177,7 +177,7 @@ class Controller extends Base
 
         /* Render it out
          */
-        $content = (new Nesa\Csv())->generate($report, $indicators);
+        $content = (new Csv())->generate($report, $indicators);
         $today = \Alaress_Date_Format::now()->getDatabaseDate();
 
         $headers = $this->getResponse()->headers;
