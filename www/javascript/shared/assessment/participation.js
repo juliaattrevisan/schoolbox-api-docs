@@ -76,7 +76,7 @@ $(function() {
         reinitCKE();
 
         // Disable dates if assessment doesn't accept online submissions
-        if ($('#acceptOnline').val() === '0') {
+        if (!$('#acceptOnline').length || $('#acceptOnline').val() === '0') {
             $('#plan-open-date').closest('[data-plan-date-container]').addClass('hide');
             $('#plan-close-date').closest('[data-plan-date-container]').addClass('hide');
         } else {
