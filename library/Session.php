@@ -173,6 +173,8 @@ class Session
      * * User found, but disabled
      * * User found, password is wrong
      *
+     * Note username is passed by reference and may be altered from email address to real username if permitted
+     *
      * @param string $username
      * @param string $password
      * @return bool Was the user authenticated?
@@ -180,7 +182,7 @@ class Session
      * @throws SchoolboxAccountDisabledException if user account is disabled
      * @throws SchoolboxNotFoundException        if user doesn't exist
      */
-    public function authenticate($username, $password)
+    public function authenticate(&$username, $password)
     {
         if (empty($username) || empty($password)) {
             throw new SchoolboxAccessDeniedException();
@@ -193,7 +195,19 @@ class Session
 
         // Cannot use findOneByColumn() as that returns deleted users which may mask extant user.
         $user = $userMapper->findByColumnList(['username' => $username], ['deleted' => false])->first();
-        if(!$user instanceof \Schoolbox\User){
+
+        // Fall back to using email address
+        if(!$user instanceof \Schoolbox\User) {
+            if (Cfg::get('auth_email_enabled')) {
+                $user = $userMapper->findByColumnList(['alt_email' => $username], ['deleted' => false])->first();
+                //Override username with actual username, rather than email address so user can proceed
+                if($user instanceof \Schoolbox\User) {
+                    $username = $user->getUsername();
+                }
+            }
+        }
+
+        if(!$user instanceof \Schoolbox\User) {
             // Log the fact that user doesn't exist
             $notif->notice("Login failure for non-existent user ".$username, array(
                 'username' => $username,

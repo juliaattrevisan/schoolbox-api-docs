@@ -34,9 +34,12 @@ if ((isset($_POST['username'])) && (isset($_POST['password']) && $_POST['passwor
         $message = Config::get('login_terms_and_conditions_error');
     } else {
         try {
+
+            $username = trim($_POST['username']);
+
             $authenticated =
-                $sessionHandler->authenticate(trim($_POST['username']), $_POST['password'])
-                && $sessionHandler->create(trim($_POST['username']), $remember);
+                $sessionHandler->authenticate($username, $_POST['password'])
+                && $sessionHandler->create($username, $remember);
         }
         catch (SchoolboxNotFoundException $e) {
             $message = 'The username or password you typed is incorrect, please try again.';
