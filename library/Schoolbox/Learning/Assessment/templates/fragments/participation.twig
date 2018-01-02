@@ -59,7 +59,7 @@
                         <div class="small-12 column">
                             <div class="row">
                                 <label for="participant-{{ user.id }}" class="checkbox-label">
-                                    <div class="small-12 medium-6 columns compact card{{ userInclude ? '' : ' unselected' }}">
+                                    <div class="small-12 medium-6 columns compact card{{ userInclude ? '' : ' participant-excluded' }}">
                                         <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square32">
                                         <p>{{ user.fullName }}</p>
                                     </div>
