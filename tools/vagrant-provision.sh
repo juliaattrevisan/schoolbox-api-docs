@@ -312,6 +312,8 @@ a2ensite schoolbox-dav.conf
 echo "[SB][`date +%Y-%m-%d\ %X`] Enabling Schoolbox nginx vhost";
 cp -f /vagrant/tools/nginx-vhost-schoolbox-websocket.conf /etc/nginx/conf.d/;
 sed -i 's/var\/log\/nginx/vagrant/g' /etc/nginx/conf.d/nginx-vhost-schoolbox-websocket.conf;
+sed -i 's/var\/lib\/schoolbox/vagrant/g' /etc/php/7.1/fpm/pool.d/schoolbox*;
+sed -i 's/www-data/vagrant/g' /etc/php/7.1/fpm/pool.d/schoolbox*;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Set up video cronjobs"
 cp -f /vagrant/tools/cron/schoolboxdev $cachedir/schoolboxdemo-latest-cron
@@ -588,6 +590,7 @@ fi
 echo "[SB][`date +%Y-%m-%d\ %X`] Ensure all services are running";
 service schoolbox-epl restart > /dev/null 2>&1;
 service apache2 restart > /dev/null 2>&1;
+service php7.1-fpm restart > /dev/null 2>&1;
 service nginx restart > /dev/null 2>&1;
 service schoolbox-scheduled restart > /dev/null 2>/dev/null &
 service schoolbox-socketd restart > /dev/null 2>/dev/null &
