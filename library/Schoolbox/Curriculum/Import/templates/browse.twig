@@ -47,17 +47,19 @@
     });
 </script>
 
-<div class="row actions-small-1">
+
+<ul class="breadcrumb">
+    <li><a href="/curriculum">Curriculum</a></li>
+    <li class="active"><a href="#">Import</a></li>
+</ul>
+
+
+<div class="row">
     <div class="list-item">
         <div class="small-12 columns">
             <h1>Import Curriculum</h1>
         </div>
     </div>
-    <nav>
-        <a href="{{ routeLookup('curriculum.browse')|escape('html_attr') }}"
-           class="icon icon-previous"
-           title="Return to Curriculum"></a>
-    </nav>
 </div>
 
 <div class="row">
@@ -66,51 +68,58 @@
             <dl class="tabs" data-tab>
                 <dd class="active"><a href="#step-1">Source</a></dd>
                 <dd><a href="#step-2" disabled class="disabled">Curriculum</a></dd>
-                <dd><a href="#step-3" disabled class="disabled">Outcomes</a></dd>
+                <dd><a href="#step-3" disabled class="disabled">Preview</a></dd>
             </dl>
-
-            <section>
-                <div class="tabs-content no-margin">
-                    <div id="step-1" class="content active">
-                        <label for="curriculumSource">Curriculum Source</label>
-                        <select name="source" id="curriculumSource">
-                            <option value="">Select a source</option>
-                            {% for item in sourceList %}
-                                <option value="{{ item.id|e('html_attr') }}"
-                                        label="{{ item.name|e('html_attr') }}"
-                                        title="{{ item.description|e('html_attr') }}"
-                                        >{{ item.name }}</option>
-                            {% endfor %}
-                        </select>
-                        <input type="submit" value="Use This Source" disabled />
-                    </div>
-                    <div id="step-2" class="content">
-                        <label for="curriculumLearningLevel">Level:</label>
-                        <select name="learningLevel" id="curriculumLearningLevel" disabled>
-                            <option value="">Select a level</option>
-                        </select>
-                        <label for="curriculumLearningArea">Learning Area</label>
-                        <select name="learningArea" id="curriculumLearningArea" disabled>
-                            <option value="">Select an area</option>
-                        </select>
-                        <input type="submit" value="Search" disabled />
-                    </div>
-                    <div id="step-3" class="content">
-                        <label for="curriculumName">Name of curriculum</label>
-                        <input type="text" name="curriculumName" id="curriculumName" value="" />
-                        <fieldset>
-                            <legend>
-                                Preview
-                                <span data-tooltip class="has-tip tip-top hint" title="You can make changes after saving your curriculum.">?</span>
-                            </legend>
-                            <article>
-                                <ul data-role="outcomes-container"></ul>
-                            </article>
+            <div class="tabs-content">
+                <div id="step-1" class="content active">
+                    <section>
+                        <fieldset class="content">
+                            <div class="small-12 column">
+                                <label for="curriculumSource">Curriculum Source</label>
+                                <select name="source" id="curriculumSource">
+                                    <option value="">Select a source</option>
+                                    {% for item in sourceList %}
+                                        <option value="{{ item.id|e('html_attr') }}"
+                                                label="{{ item.name|e('html_attr') }}"
+                                                title="{{ item.description|e('html_attr') }}"
+                                                >{{ item.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                         </fieldset>
-                        <input type="submit" value="Save Curriculum" disabled />
-                    </div>
+                    </section>
+                    <input type="submit" value="Use This Source" disabled />
                 </div>
-            </section>
+                <div id="step-2" class="content">
+                    <section>
+                        <fieldset class="content">
+                            <div class="small-12 column">
+                                <label for="curriculumLearningLevel">Level:</label>
+                                <select name="learningLevel" id="curriculumLearningLevel" disabled>
+                                    <option value="">Select a level</option>
+                                </select>
+                                <label for="curriculumLearningArea">Learning Area</label>
+                                <select name="learningArea" id="curriculumLearningArea" disabled>
+                                    <option value="">Select an area</option>
+                                </select>
+                            </div>
+                        </fieldset>
+                    </section>
+                    <input type="submit" value="Search" disabled />
+                </div>
+                <div id="step-3" class="content">
+                    <section>
+                        <fieldset class="content">
+                            <div class="small-12 column">
+                                <article>
+                                    <ul data-role="outcomes-container"></ul>
+                                </article>
+                            </div>
+                        </fieldset>
+                    </section>
+                    <input type="submit" value="Save Curriculum" disabled />
+                </div>
+            </div>
         </form>
     </div>
 </div>
