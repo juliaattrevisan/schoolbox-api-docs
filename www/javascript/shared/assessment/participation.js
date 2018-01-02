@@ -142,16 +142,16 @@ $(function() {
             } else {
                 $participantCard.addClass('participant-excluded');
                 status = '(excluded)';
-
-                // Reset plan back to 0
-                $participantRow.find('#participant-plan-' + studentID).val(0);
             }
 
             // Update the status showing for the student
             $participantRow.find('div[data-participant-status]').text(status);
 
-            // Adjust the hidden values
+            // Adjust the hidden value for include
             $('#participant-include-' + studentID).val(+include);
+
+            // Reset plan back to 0
+            $participantRow.find('#participant-plan-' + studentID).val(0);
 
         });
 

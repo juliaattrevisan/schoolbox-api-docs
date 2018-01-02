@@ -29,11 +29,11 @@
             <div class="small-12 medium-3 medium-offset-9 column" id="mass-buttons">
                 <button class="button expand dropdown" id="customise-dropdown" data-dropdown="customise-options" aria-controls="customise-options" aria-expanded="false" disabled>Actions</button>
                 <ul class="f-dropdown" id="customise-options" data-dropdown-content aria-hidden="true">
-                    <li class="separator">Student Participation</li>
-                    <li><a href="#" data-participant-change="include">Include in assessment</a></li>
-                    <li><a href="#" data-participant-change="exclude">Exclude from assessment</a></li>
 
+
+                    <li><a href="#" data-participant-change="exclude">Exclude from assessment</a></li>
                     <li class="separator">Learning Plans</li>
+                    <li><a href="#" data-participant-change="include">Default plan</a></li>
                     {% for plan in assessment.plans if not plan.isDynamic %}
                         <li><a href="#" data-plan-use="{{ loop.index }}" data-plan-name="{{ plan.name }}">{{ plan.name }}</a></li>
                     {% endfor %}
