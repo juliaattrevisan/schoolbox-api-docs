@@ -3,9 +3,11 @@
 
 {{ bread.crumbsArray(breadcrumbs) }}
 
-<script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
-<script type="text/javascript" src="/javascript/shared/assessment/validationRules.js" data-locale-grading-proper="{{ locale.grading.proper }}"></script>
-<script type="text/javascript">
+<script src="/javascript/shared/jquery.mage.js"></script>
+<script src="/javascript/shared/assessment/validationRules.js" data-locale-grading-proper="{{ locale.grading.proper }}"></script>
+<script src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script>
     $(function () {
         // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
         $('input[data-mage-next]').mage();
