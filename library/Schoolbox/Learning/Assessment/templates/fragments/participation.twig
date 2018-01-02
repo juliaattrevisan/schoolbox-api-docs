@@ -10,6 +10,7 @@
 
     <legend>Participation and Learning Plans</legend>
 
+    {# TODO: either create a global flag for custom participation to be enabled on an assessment, or turn this into an collapsable section
     <label for="participation-enable">
         Customise participation and learning plans?
         <span data-tooltip class="has-tip hint" title="Use this feature to add and remove students from participating in this assessment, or create modified versions for select students.">?</span>
@@ -21,8 +22,9 @@
             <span class="icon-cancel"></span>
         </label>
     </div>
+    #}
 
-    <div id="participation-settings" class="hide">
+    <div id="participation-settings"> {# class="hide" #}
         <div class="row">
             <div class="small-12 medium-3 medium-offset-9 column" id="mass-buttons">
                 <button class="button expand dropdown" id="customise-dropdown" data-dropdown="customise-options" aria-controls="customise-options" aria-expanded="false" disabled>Actions</button>
