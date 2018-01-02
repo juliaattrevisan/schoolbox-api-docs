@@ -55,21 +55,16 @@
                 allDaySlot: false,
                 defaultDate: calendarDate,
                 views: {
-                    timelineMonth: {
-                        slotLabelFormat: ['ddd D']
-                    },
                     timelineWeek: {
-                        slotLabelFormat: ['ddd D/M', 'h'],
                         scrollTime: '32:00',
                         slotWidth: '50'
 
                     },
                     timelineDay: {
-                        slotLabelFormat: ['ha'],
+                        titleFormat: 'dddd, MMM D YYYY',
                         scrollTime: '08:00',
                         slotWidth: '50'
                     }
-
                 },
                 height: 'auto',
                 eventLimit: {{ config.calendar_collapse_events ? 'true' : 'false' }},
