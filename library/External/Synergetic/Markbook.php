@@ -236,12 +236,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     public function updateAssessment(Activity $assessment)
     {
         $assessmentFieldValues = $this->getAssessmentFieldValues($assessment);
+        $resultType = $this->getResultType($assessment);
 
         $sql = "
             UPDATE  StaffAssessmentMarkBook 
             SET     Heading = :heading,
                     HdgAbbrev1 = :headingAbbreviation1,
-                    WeightingFactor = :weightingFactor
+                    WeightingFactor = :weightingFactor,
+                    ResultType = :resultType
             WHERE   HdgAbbrev2 = :headingAbbreviation2 AND 
                     FileYear = :fileYear AND  
                     FileSemester = :fileSemester
@@ -252,6 +254,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             'headingAbbreviation1' => $assessmentFieldValues["HdgAbbrev1"],
             'headingAbbreviation2' => $assessmentFieldValues["HdgAbbrev2"],
             'weightingFactor' => $assessmentFieldValues["WeightingFactor"],
+            'resultType' => $resultType,
             'fileYear' => $this->fileYear,
             'fileSemester' => $this->fileSemester
         ])->execute();
