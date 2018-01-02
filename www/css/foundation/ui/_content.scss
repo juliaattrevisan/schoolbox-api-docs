@@ -1273,6 +1273,7 @@ tr:hover{
 // Reveal
 .reveal-modal {
     margin-top: 10vh !important; // foundation hardcodes an inline 100px -_-
+
     &:focus {
         outline: none;
     }
@@ -1298,6 +1299,11 @@ tr:hover{
 	.close-reveal-modal {
 		right: $reveal-close-right;
 	}
+
+    form {
+        margin-left: -1rem;
+        margin-right: -1rem;
+    }
 }
 
 // Fix stupid foundation bug
