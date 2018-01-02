@@ -139,8 +139,8 @@ class Mapper extends BaseMapper
      *
      * @param User   $user The user for whom we are retrieving the tours
      * @param string $url  The URL to be used to filter the returned tours
-     *
      * @return GenericCollection
+     * @throws BaseMapper\DefinitionException
      */
     public function findByUserForUrl(User $user, string $url): GenericCollection
     {
