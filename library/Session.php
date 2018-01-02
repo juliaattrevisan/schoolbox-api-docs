@@ -173,16 +173,14 @@ class Session
      * * User found, but disabled
      * * User found, password is wrong
      *
-     * Note username is passed by reference and may be altered from email address to real username if permitted
-     *
      * @param string $username
      * @param string $password
-     * @return bool Was the user authenticated?
+     * @return \Schoolbox\User|null Was the user authenticated, if so return the user
      * @throws SchoolboxAccessDeniedException    if password doesn't match
      * @throws SchoolboxAccountDisabledException if user account is disabled
      * @throws SchoolboxNotFoundException        if user doesn't exist
      */
-    public function authenticate(&$username, $password)
+    public function authenticate($username, $password)
     {
         if (empty($username) || empty($password)) {
             throw new SchoolboxAccessDeniedException();
@@ -190,7 +188,6 @@ class Session
 
         $ip    = Session::getIP();
         $notif = Notifactory::create(Notif::TOPIC_AUTH);
-
         $userMapper = UserMapper::getInstance();
 
         // Cannot use findOneByColumn() as that returns deleted users which may mask extant user.
@@ -226,7 +223,6 @@ class Session
             ));
             throw new SchoolboxAccountDisabledException();
         }
-
 
         $result = false;
 
@@ -267,7 +263,12 @@ class Session
             $this->db->update('user', 'username', $save);
         }
 
-        return $result;
+        if($result) {
+            return $user;
+        }
+        else {
+            return null;
+        }
     }
 
     private function _authLDAP($username, $password, $ds, $ldap_user, $ldap_base, $version = 3, $referrals = 0)
