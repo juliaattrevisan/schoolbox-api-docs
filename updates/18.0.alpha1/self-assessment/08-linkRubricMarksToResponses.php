@@ -305,6 +305,11 @@ class LinkRubricMarkToFeedback
                     return;
                 }
 
+                if (!$this->validateDescriptorSet($draftRubricMarks[0])) {
+                    // Is your only/latest draft broken? Don't link and get out.
+                    return;
+                }
+
                 if (count($draftRubricMarks) > 1) {
                     // See what can be combined
                     $combinedDrafts = $this->combineDrafts($draftRubricMarks);
@@ -609,14 +614,15 @@ class LinkRubricMarkToFeedback
         $combinedCriterions = [];
 
         foreach ($draftRubricMarks as $i => $draftRubricMark) {
+
             // Validate descriptors within same rubric mark.
             // If the latest draft rubric mark is broken, give up on linking this participation drafts, the data is too messed up.
-            $rubricMarkCriterions = $this->getDraftRubricMarkCriterions($draftRubricMark);
-
             if (!$this->validateDescriptorSet($draftRubricMark)) {
                 // Stop there, return what you've already got, if you've got
                 break;
             }
+
+            $rubricMarkCriterions = $this->getDraftRubricMarkCriterions($draftRubricMark);
 
             if ($i == 0) {
                 // We've got at least one draft
@@ -694,10 +700,11 @@ class LinkRubricMarkToFeedback
         if ($rubricMark['criterion'] != $rubricMark['records']) {
             $this->log->warning(
                 sprintf(
-                    'Invalid descriptors for student_id %d box_id %d and published date %s - Skipping!',
+                    'Invalid descriptors for student_id %d box_id %d and %s date %s - Skipping!',
                     $rubricMark['student_id'],
                     $rubricMark['box_id'],
-                    $rubricMark['published_at']
+                    isset($rubricMark['published_at']) ? 'published' : 'created',
+                    $rubricMark['published_at'] ?? $rubricMark['created_at']
                 )
             );
             $this->countBrokenRubricMarks++;
