@@ -112,10 +112,11 @@ foreach ($allDocuments as $currentDocument) {
         exit(1);
     } catch (\DomainException $e) {
 
-        /* Could not transmit this file to plagscan for some reason
-         * Continue
+        /* Could not transmit this file to plagscan for some reason so remove it from the queue
          */
-        $log->error("{$prefix}: could not transmit student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}. {$e->getMessage()} (domain exception)");
+        $currentDocument->setStatus(Plagscan::STATUS_UNSCANNABLE);
+        $mapper->save($currentDocument);
+        $log->error("{$prefix}: could not transmit student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}. {$e->getMessage()}");
     } catch (\RuntimeException $e) {
 
         /* Could not transmit this file to plagscan for some reason

@@ -43,14 +43,20 @@ if ($reRetrieveMode) {
     /* Re-scan plagscan records
      */
     $log->info("Scanner running in re-retrieve mode");
-    $allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_COMPLETE);
+    $predicate = $mapper->getPredicateBuilder();
+    $predicate->equals('status', Plagscan::STATUS_COMPLETE);
+    $predicate->greaterThan('plagscan_id', 0);
+    $allDocuments = $mapper->findByPredicates($predicate);
 }
 else {
 
     /* Scan currently-pending plagscan records
      */
     $log->info("Scanner running in scan mode");
-    $allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_PROCESSING);
+    $predicate = $mapper->getPredicateBuilder();
+    $predicate->equals('status', Plagscan::STATUS_PROCESSING);
+    $predicate->greaterThan('plagscan_id', 0);
+    $allDocuments = $mapper->findByPredicates($predicate);
 }
 
 $log->info("Plagscan now processing {$allDocuments->count()} documents");
