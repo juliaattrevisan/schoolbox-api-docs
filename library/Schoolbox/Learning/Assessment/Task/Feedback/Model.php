@@ -132,7 +132,7 @@ class Model extends AbstractFeedback
      * While logically this equates to IMarkScheme::NORMALISED_MARK_MAX, for now we
      * return null to simplify mark summation logic.
      *
-     * @return float
+     * @return null
      */
     public function getNormalisedMark()
     {
@@ -144,7 +144,6 @@ class Model extends AbstractFeedback
      * Set the Normalised Mark for an IFeedback
      *
      * @param float $normalisedMark
-     * @return $this
      */
     public function setNormalisedMark($normalisedMark)
     {
@@ -168,7 +167,6 @@ class Model extends AbstractFeedback
      * Set the comment associated with this IFeedback
      *
      * @param string $comment
-     * @return $this
      */
     public function setComment($comment)
     {

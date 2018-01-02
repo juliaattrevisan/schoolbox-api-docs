@@ -137,7 +137,7 @@ abstract class AbstractFeedback implements IFeedback
     }
 
     /**
-     * @return mixed
+     * @return float|null
      */
     public function getNormalisedMark()
     {
