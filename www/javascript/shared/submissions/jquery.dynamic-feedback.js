@@ -24,18 +24,18 @@
     var timeoutHandle;
 
     /**
-     * Is a draft currently being auto-saved?
+     * Is a draft currently being auto-saved for a student?
      *
-     * @type {boolean}
+     * @type {boolean[]} Indexed by user.id
      */
-    var autoSaveInProgress = false;
+    var autoSaveInProgress = [];
 
     /**
-     * Has the user made more changes during a draft auto-save?
+     * Has a student made more changes during a draft auto-save?
      *
-     * @type {boolean}
+     * @type {boolean[]} Indexed by user.id
      */
-    var autoSavePending = false;
+    var autoSavePending = [];
 
 
     /**
@@ -247,14 +247,18 @@
             // update the pre-value
             $this.data('preval', $this.val());
 
+            var $participant = $this.closest('[data-participant]'),
+                userId       = $participant.data('participant');
+
             // Is an auto-save in progress?
-            if(autoSaveInProgress){
+            if(userId in autoSaveInProgress && autoSaveInProgress[userId]){
                 // Don't overlap requests, but indicate we have unsaved changes that must be auto-saved
-                autoSavePending = true;
+                autoSavePending[userId] = true;
                 return;
             }
 
-            autoSaveDraft($this.closest('[data-participant]'));
+            // No auto-saves currently queued for participant - so initiate a draft auto-save.
+            autoSaveDraft($participant);
         }
 
         /**
@@ -264,11 +268,14 @@
          */
         function autoSaveDraft($participant)
         {
-            autoSaveInProgress = true;
             var $form        = $participant.find('[data-feedback-form]'),
                 $actionBar   = $participant.find('[data-action-bar]'),
                 $btnDrafted  = $actionBar.find('[data-draft=drafted]'),
-                $btnPublish  = $actionBar.find('[data-draft=publish]');
+                $btnPublish  = $actionBar.find('[data-draft=publish]'),
+                userId       = $participant.data('participant');
+
+            // Register that an auto-save is in progress for this participant
+            autoSaveInProgress[userId] = true;
 
             var data = {
                 type: $form.attr('method'),
@@ -313,11 +320,11 @@
                 })
                 .always(function () {
                     $btnPublish.removeAttr("disabled");
-                    autoSaveInProgress = false;
+                    autoSaveInProgress[userId] = false;
                     // Did the user make more changes while the draft auto-save was in progress?
-                    if(autoSavePending){
+                    if(userId in autoSavePending && autoSavePending[userId]){
                         // Clear the flag and save those pending changes.
-                        autoSavePending = false;
+                        autoSavePending[userId] = false;
                         autoSaveDraft($participant);
                     }
                 });
