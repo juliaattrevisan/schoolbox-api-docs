@@ -1,5 +1,4 @@
 $(function() {
-    var $container = $('#participation-container');
     var $planDataContainer = $('#plan-data');
     var $participants = $('#participants');
     var $participantSettings = $('#participation-settings');
@@ -55,6 +54,7 @@ $(function() {
 
         var $planParticipants = $('#plan-participants');
         var $planName = $customiseModal.find('#plan-name');
+        var $planDesc = $customiseModal.find('#plan-desc');
         var $planPublishDate = $customiseModal.find('#plan-publish-date');
         var $planOpenDate = $customiseModal.find('#plan-open-date');
         var $planDueDate = $customiseModal.find('#plan-due-date');
@@ -71,6 +71,9 @@ $(function() {
             }
         });
         var participantSelectize = $planParticipants[0].selectize;
+
+        // Destroy and reinit CKEditor
+        reinitCKE();
 
         // Disable dates if assessment doesn't accept online submissions
         if ($('#acceptOnline').val() === '0') {
@@ -94,12 +97,12 @@ $(function() {
         // Clear inputs
         $planName.val('');
 
-        // Set dates to whatever is currently set on the main form
+        // Set dates & description to whatever is currently set on the main form
         $planPublishDate.val($('#publishDate').val());
         $planOpenDate.val($('#openDate').val());
         $planDueDate.val($('#dueDate').val());
         $planCloseDate.val($('#closeDate').val());
-        // CKEDITOR.instances['plan-desc'].setData('');
+        CKEDITOR.instances['plan-desc'].setData(CKEDITOR.instances['assessment-description'].getData());
 
         // Open modal
         $customiseModal.foundation('reveal', 'open', {
@@ -110,15 +113,10 @@ $(function() {
 
     /**
      * On open of the custom plan modal - destroy and re-init CKEditor
+     * This was implemented because when you go into a datepicker, then return to the custom plan modal - ckeditor breaks
      */
     $customiseModal.on('open.fndtn.reveal', function () {
-        var $planDesc = $customiseModal.find('#plan-desc');
-        if (CKEDITOR.instances['plan-desc']) {
-            CKEDITOR.instances['plan-desc'].destroy();
-        }
-        $.fn.alaressEditor({
-            targetElements: $planDesc
-        });
+        reinitCKE();
     });
 
 
@@ -281,4 +279,19 @@ $(function() {
         $participants.find('input[type=checkbox]').prop('checked', false);
         $participants.find('li[data-participant]').removeClass('participant-selected');
     }
+
+
+    /**
+     * Destroy and reinit CKEditor
+     */
+    function reinitCKE() {
+        var $planDesc = $customiseModal.find('#plan-desc');
+        if (CKEDITOR.instances['plan-desc']) {
+            CKEDITOR.instances['plan-desc'].destroy();
+        }
+        $.fn.alaressEditor({
+            targetElements: $planDesc
+        });
+    }
+
 });

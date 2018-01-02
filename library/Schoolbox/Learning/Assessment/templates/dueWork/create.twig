@@ -22,7 +22,7 @@
 
     <label>
         Description
-        <textarea name="description">{{ assessment.description }}</textarea>
+        <textarea name="assessment-description" id="assessment-description">{{ assessment.description }}</textarea>
     </label>
 
     <div class="row">
@@ -136,7 +136,7 @@
 
         // 'Description' TextArea only
         $.fn.alaressEditor({
-            targetElements: $('[name=description]')
+            targetElements: $('#assessment-description')
         });
 
         /**
