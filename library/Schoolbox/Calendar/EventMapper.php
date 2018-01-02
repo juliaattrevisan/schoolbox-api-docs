@@ -424,16 +424,17 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
      */
     private function createSource($event)
     {
-        $sourceMapper = \Event\Source\Mapper::getInstance();
+        if ($event->getSource() != NULL && $event->getSource() != ""){
+            $sourceMapper = \Event\Source\Mapper::getInstance();
 
-        $source = $sourceMapper->createModel();
-        $source->setCreatedAt($event->getCreatedAt());
-        $source->setSourceName($event->getSource());
-        $source->setUpdatedAt($event->getUpdatedAt());
-        $source->setEvent($event);
+            $source = $sourceMapper->createModel();
+            $source->setCreatedAt($event->getCreatedAt());
+            $source->setSourceName($event->getSource());
+            $source->setUpdatedAt($event->getUpdatedAt());
+            $source->setEvent($event);
 
-        $sourceMapper->save($source);
-
+            $sourceMapper->save($source);
+        }
     }
 
 
