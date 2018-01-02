@@ -106,7 +106,7 @@ class UserAccessMapper extends Mapper
         }
 
         if ($this->cache) {
-            $this->cache->cacheUser(INSTANCE_ID, $model->getUser()->getId());
+            $this->cache->cacheUsers(INSTANCE_ID, [ $model->getUser()->getId() ]);
         }
     }
 
