@@ -34,7 +34,7 @@ $deletor = new class extends App
     /**
      * Time of script invocation. Set all deleted_at dates to this value to make identification easier.
      *
-     * @var Alaress_Date_Format
+     * @var string 'Y-m-d H:i:s' format
      */
     private $now;
 
@@ -62,7 +62,7 @@ $deletor = new class extends App
 
     public function __construct()
     {
-        $this->now = Alaress_Date_Format::now();
+        $this->now = Alaress_Date_Format::now()->getDatabase();
     }
 
 
@@ -150,7 +150,7 @@ $deletor = new class extends App
      */
     private function execute()
     {
-        $this->log->info("All `submission_return`.`deleted_at` values will be set to '{$this->now->getDatabase()}'");
+        $this->log->info("All matching `submission_return`.`deleted_at` values will be set to '{$this->now}'");
 
         foreach ($this->findParticipantsWithPublishedAfterDrafts() as $participant) {
             $this->processParticipantWithLaterPublished((int)$participant['owner'], (int)$participant['box_id']);
@@ -247,14 +247,11 @@ $deletor = new class extends App
         $this->log->debug($this->findPriorDraftFeedbackStatement->rowCount() . ' prior draft feedbacks found');
 
         /** @noinspection PhpAssignmentInConditionInspection */
-        while ($row = $this->findPriorDraftFeedbackStatement->fetch()) {
-            $id        = $row['id'];
-            $createdAt = $row['created_at'];
-            $updatedAt = $row['updated_at'];
+        while ([$id, $createdAt, $updatedAt] = $this->findPriorDraftFeedbackStatement->fetch(PDO::FETCH_NUM)) {
             $this->log->debug(sprintf('Deleting earlier draft.    Updated:    %s, Created: %s, Id: %d', $createdAt, $updatedAt, $id));
             $this->deleteDraftFeedbackStatement->execute([
-                'id' => $id,
-                'deleted_at' => $this->now->getDatabase(),
+                'id'         => $id,
+                'deleted_at' => $this->now,
             ]);
             $this->countFeedbacksSoftDeleted++;
         }
@@ -292,7 +289,7 @@ $deletor = new class extends App
             $this->log->debug(sprintf('Deleting earlier draft.         Updated: %s, Created: %s, Id: %d', $createdAt, $updatedAt, $id));
             $this->deleteDraftFeedbackStatement->execute([
                 'id' => $id,
-                'deleted_at' => $this->now->getDatabase(),
+                'deleted_at' => $this->now,
             ]);
             $this->countFeedbacksSoftDeleted++;
         }
