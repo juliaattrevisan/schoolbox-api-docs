@@ -73,7 +73,7 @@ if (isset($_POST['updateUsers'])) {
 try {
     /** @var WritableCache $cache */
     $cache = $this->getDi()->get('subscriptionCache');
-    $cache->cacheAllUsers(INSTANCE_ID);
+    $cache->cacheUsers(INSTANCE_ID, $userIds);
 } catch (\RuntimeException|\Aura\Di\Exception $e) {
     $userMapper->log($e->getMessage(), [ $e ]);
 }
