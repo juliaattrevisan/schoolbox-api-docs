@@ -33,6 +33,29 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Subscription Reader', [
     'user'    => $opts['user'] ?? null
 ]);
 
+const HALP = <<<EOF
+Schoolbox Subscription Reader
+
+Usage: 
+  ./subscriptions.php [-v[v[v]]][--instance=INSTANCE_ID][--user=USER_ID][--pattern=PATTERN]
+
+Options:
+  -h, --help                    Display this help message
+  -v[v[v]]]                     Various levels of verbosity
+  --user=USER_ID                The ID of a user: that user's subscriptions will be returned 
+  --pattern=PATTERN             A subscription pattern to search: all users subscribed will be returned
+
+Example patterns to search by (quotes are not required, btw):
+  superuser                     All superusers
+  roletype.staff                All staff
+  role.ROLE_ID                  All users in role ROLE_ID
+  service.1.PAGE_ID.1           Users with read access (therefore all users) subscribed to homepage PAGE_ID
+  service.1.PAGE_ID.2           Users with write access subscribed to homepage PAGE_ID
+  service.1.PAGE_ID.1.news      Users who would receive a news article posted to homepage PAGE_ID
+
+
+EOF;
+
 
 try {
     $kernel->run(new class extends App
@@ -69,7 +92,7 @@ try {
                 } elseif ($opts['pattern']) {
                     $count = $this->findByPattern($opts['pattern']);
                 } else {
-                    $log->alert('Specify one of --user=:id or --pattern=:string');
+                    echo HALP;
                     return;
                 }
 
