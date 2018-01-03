@@ -55,7 +55,9 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract {
             private $formats = [];
 
 
-
+            /**
+             * @param IConfigLoader $conf
+             */
             public function __construct(IConfigLoader $conf)
             {
                 // cache this
