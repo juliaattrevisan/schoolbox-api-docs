@@ -71,6 +71,11 @@ class DataSource
     protected $feedbackDataSource;
 
     /**
+     * @var Participant\Plan\Mapper
+     */
+    protected $planMapper;
+
+    /**
      * A cached list of users. Indexed by folder.id, user.id
      *
      * @var Collection|GenericCollection[]|User[][]
@@ -89,19 +94,22 @@ class DataSource
      * @param UserMapper              $userMapper
      * @param ResponseDataSource      $responseDataSource
      * @param FeedbackDataSource      $feedbackDataSource
+     * @param Participant\Plan\Mapper $planMapper
      */
     public function __construct(
         External_ClassInterface $externalDb,
         UserAccessMapper $userAccessMapper,
         UserMapper $userMapper,
         ResponseDataSource $responseDataSource,
-        FeedbackDataSource $feedbackDataSource
+        FeedbackDataSource $feedbackDataSource,
+        Participant\Plan\Mapper $planMapper
     ) {
         $this->externalDb         = $externalDb;
         $this->userAccessMapper   = $userAccessMapper;
         $this->userMapper         = $userMapper;
         $this->responseDataSource = $responseDataSource;
         $this->feedbackDataSource = $feedbackDataSource;
+        $this->planMapper         = $planMapper;
         $this->cacheForFolder     = new Collection();
         $this->aggregator         = new Aggregator();
     }
@@ -420,7 +428,7 @@ class DataSource
     private function loadPlansAndParticipants(GenericCollection $assessables): void
     {
         // Find all participant and plan models for the assessments
-        $planMapper = Participant\Plan\Mapper::getInstance();
+        $planMapper = $this->planMapper;
         $planModels = $planMapper->findPlansAndParticipantsForAssessments($assessables->keys());
 
         foreach ($planModels as $planModel) {
@@ -459,5 +467,24 @@ class DataSource
                     ->setExcludedAt($participantModel->getExcludedAt());
             }
         }
+    }
+
+
+    /**
+     * @return Participant\Plan\Mapper
+     */
+    public function getPlanMapper()
+    {
+        return $this->planMapper;
+    }
+
+
+    /**
+     * @return Participant\Mapper|\Schoolbox\Mapper
+     * @throws DefinitionException
+     */
+    public function getParticipantMapper()
+    {
+        return $this->getPlanMapper()->getJoinMapper('participants');
     }
 }

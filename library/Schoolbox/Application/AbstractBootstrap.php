@@ -693,6 +693,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
             'userMapper'         => $mapperFactory->getLazy(UserMapper::class),
             'responseDataSource' => $di->lazyGet('responseDataSource'),
             'feedbackDataSource' => $di->lazyGet('feedbackDataSource'),
+            'planMapper'         => $mapperFactory->getLazy(\Schoolbox\Assessment\Participant\Plan\Mapper::class)
         ];
         $di->set('participantDataSource', $di->lazyNew(ParticipantDataSource::class));
 

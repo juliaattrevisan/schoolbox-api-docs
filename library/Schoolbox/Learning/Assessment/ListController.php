@@ -52,27 +52,34 @@ class ListController extends Web\Controller\Base
      * @var Transactor
      */
     private $transactor;
+    /**
+     * @var Participant\DataSource
+     */
+    protected $participantDataSource;
 
 
     /**
-     * @param UserMapper   $userMapper
-     * @param Error\Mapper $errorMapper
-     * @param MapperProxy  $assessmentMapper
-     * @param Access       $access
-     * @param Transactor   $transactor
+     * @param UserMapper             $userMapper
+     * @param Error\Mapper           $errorMapper
+     * @param MapperProxy            $assessmentMapper
+     * @param Access                 $access
+     * @param Transactor             $transactor
+     * @param Participant\DataSource $participantDataSource
      */
     public function __construct(
         UserMapper $userMapper,
         Error\Mapper $errorMapper,
         MapperProxy $assessmentMapper,
         Access $access,
-        Transactor $transactor
+        Transactor $transactor,
+        Participant\DataSource $participantDataSource
     ) {
         $this->setUserMapper($userMapper);
         $this->setErrorMapper($errorMapper);
         $this->setAssessmentMapper($assessmentMapper);
         $this->setAccess($access);
         $this->setTransactor($transactor);
+        $this->participantDataSource = $participantDataSource;
     }
 
 
@@ -356,7 +363,7 @@ class ListController extends Web\Controller\Base
      */
     private function saveParticipationData(GenericCollection $plans, array $inclusionFlags, array $userPlanIndices)
     {
-        $partMap = \Schoolbox\Assessment\Participant\Mapper::getInstance();
+        $partMap = $this->participantDataSource->getParticipantMapper();
 
         // plans are saved; persistipation
         foreach ($inclusionFlags as $userId => $userIncluded) {

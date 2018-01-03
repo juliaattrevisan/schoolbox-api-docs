@@ -297,15 +297,16 @@ class Module extends BaseModule
         $lc['userMapper']  = $this->getMapperFactory()->getLazy(UserMapper::class);
         $lc['errorMapper'] = $this->getMapperFactory()->getLazy(ErrorMapper::class);
         $lc['access']      = $this->getMapperFactory()->getLazy(Access::class);
-        $lc['transactor']  = $injector->get('transactor');
+        $lc['transactor']  = $injector->lazyGet('transactor');
+        $lc['participantDataSource'] = $injector->lazyGet('participantDataSource');
 
         // abstract controller
         $ac =& $injector->params[Controller::class];
         $ac['bakery'] = $injector->lazyNew(Breadcrumb\Factory::class, [
             'router' => $injector->lazyGet('router')
         ]);
-        $ac['workTypeMapper'] = $this->getMapperFactory()->getLazy(WorkTypeMapper::class);
-        $ac['termMapper']     = $this->getMapperFactory()->getLazy(Term\Mapper::class);
+        $ac['workTypeMapper']        = $this->getMapperFactory()->getLazy(WorkTypeMapper::class);
+        $ac['termMapper']            = $this->getMapperFactory()->getLazy(Term\Mapper::class);
 
         // due work specific
         $dc =& $injector->params[Assessment\DueWork\Controller::class];
