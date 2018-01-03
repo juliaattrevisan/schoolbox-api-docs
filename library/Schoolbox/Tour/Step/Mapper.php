@@ -118,7 +118,7 @@ class Mapper extends BaseMapper
                         `tour_step_tooltip`.`body` as `tooltip_body`,
                         `tour_step_tooltip`.`selector` as `tooltip_selector`,
                         `tour_step_tooltip`.`css_class` as `tooltip_css_class`
-            FROM        {$this->getTable('step')}
+            FROM        {$this->getTable()}
             LEFT JOIN   {$this->getJoinSql('tour', '', 'tour', true)}
             LEFT JOIN   `tour_step_tooltip` ON `tour_step_tooltip`.`tour_step_uuid` = `tour_step`.`uuid`
             WHERE       `tour`.`uuid` = :tourUuid AND
@@ -132,12 +132,11 @@ class Mapper extends BaseMapper
             'tourUuid' => $tourUuid
         ]);
 
-        // Storage for current step in the tour
-        $stepCurrent = null;
         // Retrieve all of the steps details in an array indexed by their UUID
         $stepsStorage = [];
+        $stepCurrent = null;
         foreach ($statement as $row) {
-            // Store the first step in the tour if we haven't yep
+            // Store the first step in the tour if we haven't yet
             if ($stepCurrent === null) {
                 $stepCurrent = $row['tour.tour_step_uuid'];
             }
@@ -154,6 +153,7 @@ class Mapper extends BaseMapper
                     break;
             }
         }
+
         // Starting with the initial step of the tour, follow the trail of UUIDs to create a correctly ordered
         // array of steps for use in the javascript code
         $steps = [];
@@ -162,6 +162,7 @@ class Mapper extends BaseMapper
             // Move onto the next step in the sequence
             $stepCurrent = $stepsStorage[$stepCurrent]['next_step_uuid'];
         }
+
         return $steps;
     }
 }
