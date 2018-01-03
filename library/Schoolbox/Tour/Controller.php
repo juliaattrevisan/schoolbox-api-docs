@@ -20,20 +20,26 @@ class Controller extends Base
     /** @var TourTriggerMapper $tourTriggerMapper */
     private $tourTriggerMapper;
 
+    /** @var Step\Mapper $tourStepMapper */
+    private $tourStepMapper;
+
 
     /**
      * Constructor
      *
      * @param TourMapper        $tourMapper
      * @param TourTriggerMapper $tourTriggerMapper
+     * @param Step\Mapper    $tourStepMapper
      */
     public function __construct(
         TourMapper $tourMapper,
-        TourTriggerMapper $tourTriggerMapper
+        TourTriggerMapper $tourTriggerMapper,
+        Step\Mapper $tourStepMapper
     )
     {
         $this->tourMapper        = $tourMapper;
         $this->tourTriggerMapper = $tourTriggerMapper;
+        $this->tourStepMapper    = $tourStepMapper;
     }
 
 
@@ -62,11 +68,9 @@ class Controller extends Base
         /** @var Model $tour */
         foreach ($tours as $tour) {
             // Grab all of the triggers for this tour
-
             $tourTriggers = $this->tourTriggerMapper->findForUrl($tour, $url);
 
             // Create an array to store the selectors/events
-
             $triggerArray = [];
 
             /** @var TourTrigger $tourTrigger */
@@ -80,33 +84,19 @@ class Controller extends Base
                 ];
             }
 
-            // Steps
-            $steps = [
-                [
-                    'element' => '.logo',
-                    'intro' => 'This is a whale'
-                ],
-                [
-                    'element' => '#tile-10',
-                    'intro' => 'This shit sucks'
-                ]
-            ];
-
             // Only add if one or more triggers was found
-
             if (count($triggerArray) > 0) {
                 $data[] = [
                     'uuid'        => $tour->getUuid(),
                     'title'       => $tour->getTitle(),
                     'description' => $tour->getDescription(),
                     'triggers'    => $triggerArray,
-                    'steps'       => $steps
+                    'steps'       => $this->tourStepMapper->getStepArray($tour->getUuid())
                 ];
             }
         }
 
         // Return results in JSON
-
         $this->getResponse()->status->set(200);
         $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
