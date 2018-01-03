@@ -51,7 +51,7 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract {
                 'date_local', 'date_time', 'date_long', 'date_short', 'date_time', 'date_only'
             ];
 
-            /** @var string */
+            /** @var string[] */
             private $formats = [];
 
 
