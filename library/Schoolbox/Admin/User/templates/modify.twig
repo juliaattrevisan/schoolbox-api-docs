@@ -555,26 +555,26 @@
             var selectedServiceId = $(e.target).val();
 
             // This doesn't fix the magic number problem exactly, but makes it easier to understand and extend.
-            var $resourceBooking = '7';
-            var $pastoralCare = '9';
-            var $fixtures = '10';
-            var $moderateOnlyServices = [$resourceBooking, $pastoralCare, $fixtures];
+            var resourceBooking = '7';
+            var pastoralCare = '9';
+            var fixtures = '10';
+            var moderateOnlyServices = [resourceBooking, pastoralCare, fixtures];
 
-            var $moderateAccess = 3;
-            var $readAccess = 1;
+            var moderateAccess = 3;
+            var readAccess = 1;
 
             // Match whole words - avoids e.g. wrongly matchly the string '10' with '11'
-            var $regex = new RegExp('\\b' + selectedServiceId + '\\b');
+            var regex = new RegExp('\\b' + selectedServiceId + '\\b');
 
             // search() allows us to match using a regex but requires a string, so we have to cast
-            if (String($moderateOnlyServices).search($regex) !== -1) {
+            if (String(moderateOnlyServices).search(regex) !== -1) {
                 $("#read").hide();
                 $("#write").hide()
-                $("#permissionSelect").val($moderateAccess);
+                $("#permissionSelect").val(moderateAccess);
             } else {
                 $("#read").show();
                 $("#write").show()
-                $("#permissionSelect").val($readAccess);
+                $("#permissionSelect").val(readAccess);
             }
         });
 
