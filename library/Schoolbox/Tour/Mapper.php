@@ -27,6 +27,8 @@ class Mapper extends BaseMapper
 {
     /**
      * @inheritdoc
+     *
+     * @throws BaseMapper\DefinitionException
      */
     protected function mapping()
     {
@@ -78,6 +80,8 @@ class Mapper extends BaseMapper
 
     /**
      * @inheritdoc
+     * @return string
+     * @throws BaseMapper\DefinitionException
      */
     protected function getSelectString()
     {
@@ -93,6 +97,10 @@ class Mapper extends BaseMapper
 
     /**
      * @inheritdoc
+     *
+     * @param PDOStatement $statement
+     * @return GenericCollection
+     * @throws BaseMapper\DefinitionException
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
@@ -121,8 +129,8 @@ class Mapper extends BaseMapper
      * Find all tours relevant to a particular user
      *
      * @param User $user
-     *
      * @return GenericCollection|Model[]
+     * @throws BaseMapper\DefinitionException
      */
     public function findByUser(User $user): GenericCollection
     {
@@ -139,8 +147,8 @@ class Mapper extends BaseMapper
      *
      * @param User   $user The user for whom we are retrieving the tours
      * @param string $url  The URL to be used to filter the returned tours
-     *
      * @return GenericCollection
+     * @throws BaseMapper\DefinitionException
      */
     public function findByUserForUrl(User $user, string $url): GenericCollection
     {
@@ -155,7 +163,7 @@ class Mapper extends BaseMapper
             INNER JOIN  {$this->getJoinSql('trigger', '', 't')}
             WHERE       {$userQuery['query']} AND 
                         :url REGEXP `t`.`url_regex` AND
-                        `tour`.`active` = 1
+                        `{$this->getTable()}`.`active` = 1
         ";
 
         $statement = $this->getDatabase()->prepare($sql);
@@ -225,7 +233,7 @@ class Mapper extends BaseMapper
      */
     public function updateActiveTours(array $uuids)
     {
-        if (count($uuids)) {
+        if (\count($uuids)) {
             $predicate = PredicateBuilder::getArrayBindings($uuids, 'uuid');
             $query = "
                 UPDATE  {$this->getTable()}

@@ -20,25 +20,29 @@ class Controller extends Base
     /** @var TourTriggerMapper $tourTriggerMapper */
     private $tourTriggerMapper;
 
+
     /**
      * Constructor
      *
-     * @param TourMapper $tourMapper
+     * @param TourMapper        $tourMapper
+     * @param TourTriggerMapper $tourTriggerMapper
      */
     public function __construct(
         TourMapper $tourMapper,
-        TourTriggerMapper $tourTrigerMapper
+        TourTriggerMapper $tourTriggerMapper
     )
     {
         $this->tourMapper        = $tourMapper;
-        $this->tourTriggerMapper = $tourTrigerMapper;
+        $this->tourTriggerMapper = $tourTriggerMapper;
     }
+
 
     /**
      * Retrieve all tours for the requested URL
      *
      * @api   GET /tours/url/{url}
      * @param string $url
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function getTours($url)
     {
