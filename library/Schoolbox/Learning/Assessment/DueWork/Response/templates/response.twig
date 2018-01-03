@@ -46,23 +46,6 @@ Usage:
         carousel: carousel,
         participant: participant
     } only %}
-    <script type="text/javascript">
-        $(function() {
-            var nextHref = findNext(tgt);
-            var nextUrl = '';
-
-            {# Use the next human's href, otherwise go back to assessment's status screen #}
-            if (nextHref.data('value') !== undefined) {
-                nextUrl = nextHref.data('value');
-            }
-            else {
-                nextUrl = '{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}';
-            }
-
-            $('#continue-button').attr('href', nextUrl);
-        });
-    </script>
-
 {% endif %}
 
 {% include '@learningDueWorkResponse/inlineGrading/meta.twig' with {

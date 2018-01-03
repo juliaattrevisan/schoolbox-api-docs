@@ -125,6 +125,22 @@
         }).trigger('change.preload');
     });
 </script>
+<script type="text/javascript">
+    $(function() {
+        var nextHref = findNext(tgt);
+        var nextUrl = '';
+
+        {# Use the next human's href, otherwise go back to assessment's status screen #}
+        if (nextHref.data('value') !== undefined) {
+            nextUrl = nextHref.data('value');
+        }
+        else {
+            nextUrl = '{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}';
+        }
+
+        $('#continue-button').attr('href', nextUrl);
+    });
+</script>
 <div class="row">
     <div class="small-12 medium-8 columns">
         <div class="avatar-switch">
