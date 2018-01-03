@@ -8,6 +8,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Tour\Renderer as TourRenderer;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Learning\Assessment\Redirect;
 
 class SitePage extends Page
 {
@@ -431,17 +432,12 @@ class SitePage extends Page
 
 
         if ($toursEnabled) {
-
-            $request = parse_url($_SERVER['REQUEST_URI']);
-            $url = $request["path"];
-            $url = str_replace(basename($_SERVER['SCRIPT_NAME']), '', $url);
-            $url = base64_encode(trim($url));
-            $url = urlencode($url);
-
-            $this->setVar('TOUR_ROUTE', $this->routeLookup('tour.getTours', ['url' => $url]));
+            $request    = parse_url($_SERVER['REQUEST_URI']);
+            $encodedUrl = Redirect::encode(str_replace(basename($_SERVER['SCRIPT_NAME']), '', $request['path']));
+            $this->setVar('TOUR_ROUTE', $this->routeLookup('tour.getTours', ['url' => $encodedUrl]));
             $this->parse('tour_script_block', 'tour_script', true);
         } else {
-            $this->setVar('tour_script_block', '');
+            $this->setVar('tour_script_block');
         }
 
         $optIn = $config->get('site_usage_tracking');

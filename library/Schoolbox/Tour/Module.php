@@ -8,11 +8,9 @@
 namespace Schoolbox\Tour;
 
 use Alaress\Module\Module as BaseModule;
-use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
-use Schoolbox\Tour\Mapper as TourMapper;
-use Schoolbox\Tour\Trigger\Mapper as TourTriggerMapper;
+use Schoolbox\Learning\Assessment\Redirect;
 
 class Module extends BaseModule
 {
@@ -41,8 +39,8 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $mappers = [
-            'tourMapper'        => $injector->get('mapperFactory')->getLazy(TourMapper::class),
-            'tourTriggerMapper' => $injector->get('mapperFactory')->getLazy(TourTriggerMapper::class),
+            'tourMapper'        => $injector->get('mapperFactory')->getLazy(Mapper::class),
+            'tourTriggerMapper' => $injector->get('mapperFactory')->getLazy(Trigger\Mapper::class),
         ];
 
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));
@@ -60,7 +58,7 @@ class Module extends BaseModule
             // Decode URL and inject into controller functions
 
             if (array_key_exists('url', $params)) {
-                $injectedValues['url'] = urldecode(base64_decode($params['url']));
+                $injectedValues['url'] = Redirect::decode($params['url']);
             }
 
             return $injectedValues;
