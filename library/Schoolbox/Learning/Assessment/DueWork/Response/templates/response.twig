@@ -90,13 +90,6 @@ Usage:
 <script type="application/javascript" src="/javascript/shared/submissions/jquery.kami-export.js"></script>
 <script type="text/javascript">
     $(function() {
-
-        {# When a different response is selected from dropdown, navigate to its URL #}
-        $('#response-selector').change(function(event) {
-            event.preventDefault();
-            window.location.href = $(this).find('option:selected').attr('data-url');
-        });
-
         // Activate export of Kami Documents
         $('[data-kami-export]').kamiExport({
             toast: $('#toaster')
@@ -104,21 +97,12 @@ Usage:
     });
 </script>
 
-{% if responseList|length > 1 %}
-<div class="row">
-    <div class="small-12 columns">
-        <select id="response-selector" title="Select a Submission">
-            {% for currentResponse in responseList %}
-                {% set viewRoute = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id, responseId: currentResponse.id, response: currentResponse, participant: participant}) %}
-
-                {% if viewRoute %}
-                <option value="{{ currentResponse.id }}" {% if currentResponse.id == response.id %}selected="selected"{% endif %} data-url="{{ viewRoute }}">#{{ loop.revindex }}. Submission at {{ currentResponse.submittedAt.local }}</option>
-                {% endif %}
-            {% endfor %}
-        </select>
-    </div>
-</div>
-{% endif %}
+{% include '@learningDueWorkResponse/inlineGrading/responseList.twig' with {
+    assessment: assessment,
+    participant: participant,
+    responseList: responseList,
+    response: response
+} only %}
 
 {% if response and file %}
     {% include '@learningDueWorkResponse/inlineGrading/strategy/' ~ subfragment.strategy with {data: subfragment.data} %}
