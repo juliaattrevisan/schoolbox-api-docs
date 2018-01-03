@@ -166,7 +166,6 @@ class Controller extends Base
             'selectedFileHash' => $this->getRequest()->query['hash'],
             'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
             'carousel' => (new StudentCarousel($this->getRouter(), $participant->getUser(), $assessment))->produce(),
-            'submissionStates' => \DueWork_ErrorMapper::getInstance()->findAll(),
 
             /* A list of all the Responses that the participant has spawned
              */
