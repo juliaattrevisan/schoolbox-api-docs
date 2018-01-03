@@ -22,7 +22,9 @@ Usage:
     interactionLocked bool                             Is the assessment due in an archived term?
  #}
 
-{# Required in both self-assess/reflect and regular staff inline grading #}
+{# Required in both self-assess/reflect and regular staff inline grading
+ # Don't remove this; it'll cause javascript Undefined errors
+ #}
 <script type="text/javascript">
     $(function() {
         var nextUrl = '';
