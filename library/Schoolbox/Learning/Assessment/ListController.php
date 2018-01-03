@@ -12,7 +12,6 @@ use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
 use DomainException;
 use InvalidArgumentException;
-use phpDocumentor\Reflection\DocBlock\Tags\Generic;
 use RangeException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error;

@@ -18,10 +18,9 @@ use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\User as User;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Term;
 
@@ -82,8 +81,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         // create a dynamic plan on the assessment to get started
         $assessment->getPlans()->add((new Plan($assessment))->setIsDynamic(true));
+
         /** @var DataSource $dataSource */
         $dataSource = $this->getDi()->get('participantDataSource');
+
         $dataSource->loadParticipationIntoAssessment($assessment);
 
         $data = $this->getAssessmentAsTwigArray($context, $assessment);
