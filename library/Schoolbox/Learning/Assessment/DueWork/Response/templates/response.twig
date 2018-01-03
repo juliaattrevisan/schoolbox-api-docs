@@ -31,24 +31,26 @@ Usage:
     });
 </script>
 
-{# Vars required in both contexts #}
+{# Vars required in both contexts
+ # These vars exist regardless of who is looking
+ #}
 {% set readonly = interactionLocked and not USER.superUser %}
 {% set deleteRoute = routeLookupIfAuthorized('learningDueWorkResponse.deleteParticularResponse', { assessmentId: assessment.id, responseId: response.id, response: response }) %}
+
+{# Common elements
+ # These ui elements exist regardless of who is looking
+ #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
 
 {# These includes vary depending on who is viewing this page:
  # * Teachers doing their usual grading
  # * Students self-reflecting
  #}
-{% import 'sub/breadcrumbs.twig' as bread %}
-{{ bread.crumbsArray(breadcrumbs) }}
-
-{% set hasCarousel = true %}
-{% if hasCarousel %}
-    {% include '@learningDueWorkResponse/inlineGrading/participantCarousel.twig' with {
-        carousel: carousel,
-        participant: participant
-    } only %}
-{% endif %}
+{% include '@learningDueWorkResponse/inlineGrading/participantCarousel.twig' with {
+    carousel: carousel,
+    participant: participant
+} only %}
 
 {% include '@learningDueWorkResponse/inlineGrading/meta.twig' with {
     locale: locale,
