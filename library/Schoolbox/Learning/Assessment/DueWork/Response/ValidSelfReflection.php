@@ -4,6 +4,8 @@
  *
  * This (assessment, user) combination is valid for self-reflection
  *
+ * TODO: Add unit tests
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
