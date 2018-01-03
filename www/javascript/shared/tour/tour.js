@@ -12,8 +12,22 @@ $(function () {
                 var tour = window.tours[uuid];
 
                 if (typeof(tour) !== 'undefined') {
-                    console.log("alert('" + tour.title + "'); <--- Because alerts are too obnoxious!");
-                    console.log(tour.uuid);
+                    var tourCurrent = introJs();
+
+                    tourCurrent.setOptions({
+                        showStepNumbers: false,
+                        hidePrev: true,
+                        hideNext: true,
+                        nextLabel: 'Next',
+                        prevLabel: 'Back',
+                        skipLabel: '&times;',
+                        scrollTo: 'tooltip',
+                        disableInteraction: true,
+                        exitOnOverlayClick: false,
+                        steps: tour.steps
+                    });
+
+                    tourCurrent.start();
                 } else {
                     console.log('Unknown feature tour requested: ' + uuid);
                 }

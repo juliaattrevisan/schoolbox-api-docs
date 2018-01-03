@@ -80,6 +80,18 @@ class Controller extends Base
                 ];
             }
 
+            // Steps
+            $steps = [
+                [
+                    'element' => '.logo',
+                    'intro' => 'This is a whale'
+                ],
+                [
+                    'element' => '#tile-10',
+                    'intro' => 'This shit sucks'
+                ]
+            ];
+
             // Only add if one or more triggers was found
 
             if (count($triggerArray) > 0) {
@@ -88,6 +100,7 @@ class Controller extends Base
                     'title'       => $tour->getTitle(),
                     'description' => $tour->getDescription(),
                     'triggers'    => $triggerArray,
+                    'steps'       => $steps
                 ];
             }
         }
