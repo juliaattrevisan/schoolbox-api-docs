@@ -1,0 +1,18 @@
+<script type="text/javascript" src='/javascript/shared/submissions/jquery.dynamic-feedback.js'></script>
+<script type="text/javascript">
+    $(function() {
+        {# nextUrl is defined in javascript in the parent #}
+
+        $.fn.dynamicFeedback({
+            {# Special behaviour of the Publish button on this screen
+             # Publishing on this screen should be synonymous with the
+             # old "Save And Continue" behaviour
+             #}
+            publishText: '{{ publishText }}',
+
+            onPublishCallback: function () {
+                window.location.href = nextUrl;
+            }
+        });
+    });
+</script>

@@ -22,16 +22,33 @@ Usage:
     interactionLocked bool                             Is the assessment due in an archived term?
  #}
 
+{# Required in both self-assess/reflect and regular staff inline grading #}
+<script type="text/javascript">
+    $(function() {
+        var nextHref = findNext(tgt);
+
+        {# Use the next human's href, otherwise go back to assessment's status screen #}
+        if (nextHref.data('value') !== undefined) {
+            var nextUrl = nextHref.data('value');
+        }
+        else {
+            var nextUrl = '{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}';
+        }
+    });
+</script>
+
 {% set readonly = interactionLocked and not USER.superUser %}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
-
 {{ bread.crumbsArray(breadcrumbs) }}
 
-{% include '@learningDueWorkResponse/inlineGrading/participantCarousel.twig' with {
-    carousel: carousel,
-    participant: participant
-} only %}
+{% set hasCarousel = true %}
+{% if hasCarousel %}
+    {% include '@learningDueWorkResponse/inlineGrading/participantCarousel.twig' with {
+        carousel: carousel,
+        participant: participant
+    } only %}
+{% endif %}
 
 {% include '@learningDueWorkResponse/inlineGrading/meta.twig' with {
     locale: locale,
@@ -43,35 +60,16 @@ Usage:
     deleteRoute: deleteRoute
 } only %}
 
+{% include '@learningDueWorkResponse/inlineGrading/dynamicFeedback.twig' with {
+    publishText: 'Publish And Continue'
+} only %}
 
 {% set deleteRoute = routeLookupIfAuthorized('learningDueWorkResponse.deleteParticularResponse', { assessmentId: assessment.id, responseId: response.id, response: response }) %}
-
-{% if not readonly %}
-    <script type="text/javascript" src='/javascript/shared/submissions/jquery.dynamic-feedback.js'></script>
-{% endif %}
 
 <script type="application/javascript" src="/javascript/shared/submissions/jquery.kami-export.js"></script>
 <script type="text/javascript">
     $(function() {
-        var nextHref = findNext(tgt);
-        var nextUrl  = nextHref.data('value') !== undefined
-            ? nextHref.data('value')
-            : '{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) }}';
         $('#continue-button').attr('href', nextUrl);
-
-        {% if not readonly %}
-        $.fn.dynamicFeedback({
-            {# Special behaviour of the Publish button on this screen
-             # Publishing on this screen should be synonymous with the
-             # old "Save And Continue" behaviour
-             #}
-            publishText: 'Publish And Continue',
-
-            onPublishCallback: function() {
-                window.location.href = nextUrl;
-            }
-        });
-        {% endif %}
 
         {# When a different response is selected from dropdown, navigate to its URL #}
         $('#response-selector').change(function(event) {
@@ -142,7 +140,6 @@ Usage:
         });
     });
 </script>
-
 
 {% if responseList|length > 1 %}
 <div class="row">
