@@ -80,7 +80,7 @@ class Splitter
             $classname = $pregClass;
 
         } else {
-            throw new ScheduleException("No notifier for model '$modelClass'.");
+            return null;
         }
 
         try {
@@ -118,14 +118,15 @@ class Splitter
      */
     public function generateTriggers(CrudEventInterface $event)
     {
-        try {
+        $eventModule = $this->getModule($event);
+
+        if($eventModule != null) {
             return $this->factory
-                ->spawn($this->getModule($event), $event)
+                ->spawn($eventModule, $event)
                 ->buildTriggers($event->getAction())
                 ->getTriggers();
-
-        } catch (ScheduleException $e) {
-            // schedule exception simply means there is no notifier, which is fine
+        } else {
+            // There is no notifier, which is fine
             return [];
         }
     }
