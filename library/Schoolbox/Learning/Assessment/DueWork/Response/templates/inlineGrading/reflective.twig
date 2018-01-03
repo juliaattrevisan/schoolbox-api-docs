@@ -60,7 +60,7 @@ Usage:
 } only %}
 
 {% include '@learningDueWorkResponse/inlineGrading/fragments/dynamicFeedback.twig' with {
-    publishText: 'Publish And Continue'
+    publishText: 'Submit'
 } only %}
 
 <div class="row">
@@ -134,7 +134,7 @@ Usage:
                         {% set buttons %}
                             <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen" {% if not isDraftFeedback %}style="display:none;"{% endif %}>Saved as Draft</span>
                             {% if not readonly %}
-                                <a class="button" data-draft="publish">Publish and Continue</a>
+                                <a class="button" data-draft="publish"></a>
                             {% endif %}
                         {% endset %}
                     {% endspaceless %}
