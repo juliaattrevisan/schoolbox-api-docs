@@ -43,6 +43,8 @@ explanation of some concepts which might not be.
 
 An item may be set up with related items - at booking time, the booker will have
 the option to create an identical booking for this item.
+When updating the purpose of a primary booking, the purpose of all related 
+bookings will be updated.
 
 ### Booking Resources
 
@@ -65,7 +67,7 @@ If a user changes tht time of their booking, it must be re-approved.
 
 If the resource has related items, the user may choose to select them - if they
 do, a separate booking item will be created for that resource at the same time.
-This item must be approved separately.
+These items must be approved separately.
 
 #### Recurring Bookings
 
