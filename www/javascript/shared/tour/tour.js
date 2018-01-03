@@ -57,14 +57,10 @@ $(function () {
             window.tours = [];
 
             $(tours).each(function (i, tour) {
-                console.log('Loading tour: ' + tour.title + ' (' + tour.uuid + ')')
-
                 window.tours[tour.uuid] = tour;
 
                 $(tour.triggers).each(function (j, trigger) {
                     if (trigger.selector && trigger.event) {
-                        console.log('Triggering on: $("' + trigger.selector + '").' + trigger.event + ' event');
-
                         // jQuery is unable to select document/window dynamically from a variable- need to check if the
                         // selector is one of these and use a hard coded jQuery selector instead.
 
@@ -90,7 +86,6 @@ $(function () {
             // Trigger 'tourReady' on body tag
 
             $('body').trigger('tourReady');
-            console.log('All tours ready');
         });
     }
 });
