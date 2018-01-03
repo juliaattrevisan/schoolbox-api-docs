@@ -21,16 +21,16 @@ class ValidSelfReflection
 {
 
     /**
-     * @var IAssessable
-     */
-    private $assessment;
-
-    /**
      * The currently-logged-in user
      *
      * @var User
      */
     private $user;
+
+    /**
+     * @var IAssessable
+     */
+    private $assessment;
 
     /**
      * @var Participant
@@ -41,14 +41,13 @@ class ValidSelfReflection
      * ValidSelfReflection constructor.
      *
      * @param User   $user  Current login
-     * @param IAssessable $assessment
      * @param Participant $participant
      * @internal param null|User $currentUser
      */
-    public function __construct(User $user, IAssessable $assessment, Participant $participant)
+    public function __construct(User $user, Participant $participant)
     {
         $this->user = $user;
-        $this->assessment = $assessment;
+        $this->assessment = $participant->getAssessable();
         $this->participant = $participant;
     }
 
@@ -75,7 +74,6 @@ class ValidSelfReflection
     {
         return $this->assessment instanceof DueWork\Model;
     }
-
 
     /**
      * The IAssessable is set to Self-Reflect
