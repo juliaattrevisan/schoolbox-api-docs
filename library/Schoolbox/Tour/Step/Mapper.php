@@ -116,7 +116,8 @@ class Mapper extends BaseMapper
                         {$this->getJoinColumnString('tour', 'tour')},
                         `tour_step_tooltip`.`uuid` as `tooltip_uuid`,
                         `tour_step_tooltip`.`body` as `tooltip_body`,
-                        `tour_step_tooltip`.`selector` as `tooltip_selector`
+                        `tour_step_tooltip`.`selector` as `tooltip_selector`,
+                        `tour_step_tooltip`.`css_class` as `tooltip_css_class`
             FROM        {$this->getTable('step')}
             LEFT JOIN   {$this->getJoinSql('tour', '', 'tour', true)}
             LEFT JOIN   `tour_step_tooltip` ON `tour_step_tooltip`.`tour_step_uuid` = `tour_step`.`uuid`
@@ -130,6 +131,7 @@ class Mapper extends BaseMapper
         $statement->execute([
             'tourUuid' => $tourUuid
         ]);
+
         // Storage for current step in the tour
         $stepCurrent = null;
         // Retrieve all of the steps details in an array indexed by their UUID
@@ -146,7 +148,7 @@ class Mapper extends BaseMapper
                         'next_step_uuid' => $row['next_step_uuid'],
                         'type' => Model::TYPE_TOOLTIP,
                         'body' => $row['tooltip_body'],
-                        'css_class' => $row['css_class'],
+                        'css_class' => $row['tooltip_css_class'],
                         'selector' => $row['tooltip_selector'],
                     ];
                     break;

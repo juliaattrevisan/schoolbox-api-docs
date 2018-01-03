@@ -26,7 +26,8 @@ $(function () {
                         if (step.type === 'tooltip') {
                             stepsToDisplay.push({
                                 intro: step.body,
-                                element: step.selector
+                                element: step.selector,
+                                tooltipClass: step.css_class
                             });
                         }
                     });
@@ -44,6 +45,7 @@ $(function () {
                         steps: stepsToDisplay
                     });
 
+                    // Fire the tour
                     tourCurrent.start();
                 } else {
                     console.log('Unknown feature tour requested: ' + uuid);
