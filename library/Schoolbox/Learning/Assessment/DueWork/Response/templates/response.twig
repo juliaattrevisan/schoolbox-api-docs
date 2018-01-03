@@ -21,21 +21,33 @@ Usage:
     rubricContext     null|array
     interactionLocked bool                             Is the assessment due in an archived term?
  #}
-{% import 'sub/breadcrumbs.twig' as bread %}
 
+{% set readonly = interactionLocked and not USER.superUser %}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
 
 {{ bread.crumbsArray(breadcrumbs) }}
 
 {% include '@learningDueWorkResponse/inlineGrading/participantCarousel.twig' with {
-    carousel:    carousel,
+    carousel: carousel,
     participant: participant
 } only %}
 
+{% include '@learningDueWorkResponse/inlineGrading/meta.twig' with {
+    locale: locale,
+    assessment: assessment,
+    participant: participant,
+    responseList: responseList,
+    response: response,
+    readonly: readonly,
+    deleteRoute: deleteRoute
+} only %}
+
+
 {% set deleteRoute = routeLookupIfAuthorized('learningDueWorkResponse.deleteParticularResponse', { assessmentId: assessment.id, responseId: response.id, response: response }) %}
-{% set readonly    = interactionLocked and not USER.superUser %}
 
 {% if not readonly %}
-<script type="text/javascript" src='/javascript/shared/submissions/jquery.dynamic-feedback.js'></script>
+    <script type="text/javascript" src='/javascript/shared/submissions/jquery.dynamic-feedback.js'></script>
 {% endif %}
 
 <script type="application/javascript" src="/javascript/shared/submissions/jquery.kami-export.js"></script>
@@ -92,33 +104,33 @@ Usage:
                         dataType: 'json',
                         type: 'POST'
                     })
-                    .done(function () {
+                        .done(function () {
 
-                        {# If there are no submissions remaining, go to next person
-                         # Otherwise just refresh screen
-                         #}
-                        var destination;
-                        if ($('#response-selector').find('option').length < 2) {
-                            destination = nextUrl;
-                        }
-                        else {
-                            {# Reload summary screen to find what is now the most
-                             # recent submission
+                            {# If there are no submissions remaining, go to next person
+                             # Otherwise just refresh screen
                              #}
-                            destination = '{{ routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id}) }}'
-                        }
+                            var destination;
+                            if ($('#response-selector').find('option').length < 2) {
+                                destination = nextUrl;
+                            }
+                            else {
+                                {# Reload summary screen to find what is now the most
+                                 # recent submission
+                                 #}
+                                destination = '{{ routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id}) }}'
+                            }
 
-                        {# Go to next available person in the carousel
-                         # If there is nobody, just visit Status screen
-                         #}
-                        window.location.href = destination;
-                    })
-                    .fail(function () {
-                        $toast.toastTimeout({
-                            text: 'Could not delete this submission',
-                            css: 'pop alert'
-                        });
-                    })
+                            {# Go to next available person in the carousel
+                             # If there is nobody, just visit Status screen
+                             #}
+                            window.location.href = destination;
+                        })
+                        .fail(function () {
+                            $toast.toastTimeout({
+                                text: 'Could not delete this submission',
+                                css: 'pop alert'
+                            });
+                        })
                 }
             });
         });
@@ -131,15 +143,6 @@ Usage:
     });
 </script>
 
-{% include '@learningDueWorkResponse/inlineGrading/meta.twig' with {
-    locale: locale,
-    assessment: assessment,
-    participant: participant,
-    responseList: responseList,
-    response: response,
-    readonly: readonly,
-    deleteRoute: deleteRoute
-} only %}
 
 {% if responseList|length > 1 %}
 <div class="row">
