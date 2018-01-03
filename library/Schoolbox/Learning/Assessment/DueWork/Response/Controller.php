@@ -209,7 +209,7 @@ class Controller extends Base
             $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/selfAssessment.twig', $data));
         }
         elseif ((new ValidSelfReflection($this->getUser(), $participant))->isSatisfied()) {
-            $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/reflective.twig', $data));
+            $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/selfReflection.twig', $data));
         }
         else {
             $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/standard.twig', $data));
