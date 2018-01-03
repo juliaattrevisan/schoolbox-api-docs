@@ -275,6 +275,17 @@ class Controller extends Assessment\Controller
 
     }
 
+    /**
+     * Projects don't have plans
+     *
+     * @param IAssessable $assessment
+     * @return array
+     */
+    protected function getPlanIds(IAssessable $assessment)
+    {
+        return [];
+    }
+
 
     /**
      * Decide which URL to send the client back to
