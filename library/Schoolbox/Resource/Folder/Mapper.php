@@ -1736,9 +1736,21 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         while($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $folderId = $row["f.{$this->getIdentifierColumn()}"];
 
-            if ($folders[$folderId] != null) {
+            if ($folders[$folderId] == null) {
                 $folder = $this->hydrate($row, 'f');
                 $folders[$folderId] = $folder;
+            } else {
+                $folder = $folders[$folderId];
+            }
+
+            // We need to index by code to de-dupe if mapper hydrates this folder somewhere else
+            $codeCollection = $folder->getCodes();
+            $code = $row['fc.code'];
+            if($code && !$codeCollection->offsetExists($code)){
+                /** @var FolderCode\Model $folderCode */
+                $folderCode = $this->hydrateJoin($row, 'codes', 'fc');
+                $codeCollection->setOffset($code, $folderCode);
+                $folderCode->setFolder($folder);
             }
         }
         return $folders;
