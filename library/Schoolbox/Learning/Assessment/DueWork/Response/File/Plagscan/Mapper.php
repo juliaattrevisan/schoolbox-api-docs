@@ -313,8 +313,7 @@ class Mapper extends \Schoolbox\Mapper
             $plagscanId = $this->getConnector()->transmit($file, $filename);
         } catch (\RuntimeException $e) {
             $sentry = self::getDi()->get('sentry');
-            // TODO confirm syntax
-            $sentry->captureException($e, array("message" => "Error: Plagscan unavailable. Could not generate access token."));
+            $sentry->captureException(new \RuntimeException("Error: Plagscan unavailable. Could not generate access token.", $e->getCode(), $e));
             /* Plagscan death
              */
             if (empty($plagscanId)) {
@@ -480,8 +479,7 @@ class Mapper extends \Schoolbox\Mapper
              * but can't do much to stop it if plagscan screws us
              */
             $sentry = self::getDi()->get('sentry');
-            // TODO confirm syntax
-            $sentry->captureException($e, array('message' => "Could not privatise document in Plagscan."));
+            $sentry->captureException(new \RuntimeException("Could not privatise document in Plagscan.", $e->getCode(), $e));
         }
     }
 
