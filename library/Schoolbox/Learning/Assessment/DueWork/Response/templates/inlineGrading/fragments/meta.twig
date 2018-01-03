@@ -9,7 +9,7 @@
  #}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 
-{% include '@learningDueWorkResponse/inlineGrading/deleteSubmission.twig' with {
+{% include '@learningDueWorkResponse/inlineGrading/fragments/deleteSubmission.twig' with {
     assessment: assessment,
     participant: participant
 } only %}

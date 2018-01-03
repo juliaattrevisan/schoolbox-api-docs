@@ -47,12 +47,12 @@ Usage:
  # * Teachers doing their usual grading
  # * Students self-reflecting
  #}
-{% include '@learningDueWorkResponse/inlineGrading/participantCarousel.twig' with {
+{% include '@learningDueWorkResponse/inlineGrading/fragments/participantCarousel.twig' with {
     carousel: carousel,
     participant: participant
 } only %}
 
-{% include '@learningDueWorkResponse/inlineGrading/meta.twig' with {
+{% include '@learningDueWorkResponse/inlineGrading/fragments/meta.twig' with {
     locale: locale,
     assessment: assessment,
     participant: participant,
@@ -62,11 +62,11 @@ Usage:
     deleteRoute: deleteRoute
 } only %}
 
-{% include '@learningDueWorkResponse/inlineGrading/dynamicFeedback.twig' with {
+{% include '@learningDueWorkResponse/inlineGrading/fragments/dynamicFeedback.twig' with {
     publishText: 'Publish And Continue'
 } only %}
 
-{% include '@learningDueWorkResponse/inlineGrading/responseList.twig' with {
+{% include '@learningDueWorkResponse/inlineGrading/fragments/responseList.twig' with {
     assessment: assessment,
     participant: participant,
     responseList: responseList,
@@ -77,7 +77,7 @@ Usage:
     {% include '@learningDueWorkResponse/inlineGrading/strategy/' ~ subfragment.strategy with {data: subfragment.data} %}
 {% endif %}
 
-{% include '@learningDueWorkResponse/inlineGrading/responseFileList.twig' with {
+{% include '@learningDueWorkResponse/inlineGrading/fragments/responseFileList.twig' with {
     assessment: assessment,
     participant: participant,
     response: response,
@@ -145,7 +145,7 @@ Usage:
                             </label>
 
                             {% if assessment.useRubric and rubricContext and not readonly %}
-                                {% include '@learningDueWorkResponse/inlineGrading/assignFromRubricButton.twig' with {
+                                {% include '@learningDueWorkResponse/inlineGrading/fragments/assignFromRubricButton.twig' with {
                                     locale: locale,
                                     rubricContext: rubricContext
                                 } only %}
