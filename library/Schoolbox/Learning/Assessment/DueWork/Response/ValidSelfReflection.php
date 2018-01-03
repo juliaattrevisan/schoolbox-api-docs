@@ -46,7 +46,6 @@ class ValidSelfReflection
      *
      * @param User   $user  Current login
      * @param Participant $participant
-     * @internal param null|User $currentUser
      */
     public function __construct(User $user, Participant $participant)
     {
