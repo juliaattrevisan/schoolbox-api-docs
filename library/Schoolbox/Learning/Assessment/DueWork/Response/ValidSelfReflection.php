@@ -96,7 +96,7 @@ class ValidSelfReflection
      */
     private function hasResponse(): bool
     {
-        return $this->participant->isResponseRequired();
+        return !$this->participant->isResponseRequired();
     }
 
     /**
