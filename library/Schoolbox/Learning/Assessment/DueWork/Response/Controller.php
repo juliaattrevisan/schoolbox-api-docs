@@ -178,7 +178,7 @@ class Controller extends Base
 
             /* For saving feedbacks
              */
-            'errors' => DueWork_ErrorMapper::getInstance()->listDisplayValues(),
+            'errors' => [],
             'participant' => $participant,
 
             /* Plagscan status
@@ -211,6 +211,11 @@ class Controller extends Base
             $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/selfReflection.twig', $data));
         }
         else {
+
+            /* Submission States only exist for Instructors
+             */
+            $data['errors'] = DueWork_ErrorMapper::getInstance()->listDisplayValues();
+
             $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/standard.twig', $data));
         }
     }

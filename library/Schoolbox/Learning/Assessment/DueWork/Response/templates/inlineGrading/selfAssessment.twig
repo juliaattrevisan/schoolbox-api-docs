@@ -107,8 +107,8 @@ publishText: 'Submit'
 
                             {% if assessment.useRubric and rubricContext and not readonly %}
                                 {% include '@learningDueWorkResponse/inlineGrading/fragments/assignFromRubricButton.twig' with {
-                                locale: locale,
-                                rubricContext: rubricContext
+                                    locale: locale,
+                                    rubricContext: rubricContext
                                 } only %}
                             {% endif %}
                         </div>
