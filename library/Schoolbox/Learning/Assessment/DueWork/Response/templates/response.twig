@@ -57,6 +57,8 @@ Usage:
             else {
                 var nextUrl = '{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}';
             }
+
+            $('#continue-button').attr('href', nextUrl);
         });
     </script>
 
@@ -87,7 +89,6 @@ Usage:
 <script type="application/javascript" src="/javascript/shared/submissions/jquery.kami-export.js"></script>
 <script type="text/javascript">
     $(function() {
-        $('#continue-button').attr('href', nextUrl);
 
         {# When a different response is selected from dropdown, navigate to its URL #}
         $('#response-selector').change(function(event) {
