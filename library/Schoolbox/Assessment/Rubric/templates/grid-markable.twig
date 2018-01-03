@@ -1,6 +1,9 @@
 {% set formField = 'rubric' %}
 {% set rubricId = 'rb-' ~ rubric.id %}
 {% set markType = markType ?: { mode: 'raw' } %}
+{% set showDescriptorValue = showDescriptorValue ? true : false %}
+{% set showGroupTotal = showGroupTotal ? true : false %}
+{% set showRubricTotal = showRubricTotal ? true : false %}
 
 <div class="scrollable">
 <table class="rb markable stack-for-medium-down" id="{{ rubricId }}">
@@ -59,7 +62,7 @@
                             <span class=rb-description>
                                 {{- descriptor.text|nl2br -}}
                             </span>
-                            {% if descriptor.value is not null %}
+                            {% if descriptor.value is not null and showDescriptorValue %}
                             <span class="rb-value">
                                 {{- descriptor.value -}}
                             </span>
@@ -76,7 +79,7 @@
     </tr>
         {% endfor %}
 
-        {% if group.total %}
+        {% if group.total and showGroupTotal %}
         <tr>
             <th data-group-summary="{{ rubricId }}-{{ group.id }}"
                 class="rb-group-summary"
@@ -91,7 +94,7 @@
 
     {% endfor %}
 
-    {% if rubric.total %}
+    {% if rubric.total and showRubricTotal %}
     <tr>
         <th data-final-summary="{{ rubricId }}"
             class="rb-final-summary"

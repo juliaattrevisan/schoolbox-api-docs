@@ -86,7 +86,10 @@ Usage:
                             {% include '@rubric/' ~ rubricTemplate with {
                                 rubric:         rubricContext.rubric,
                                 markType:       rubricContext.markType,
-                                markVisibility: participant.assessable.isFeedbackVisibleToUser(USER)
+                                markVisibility: participant.assessable.isFeedbackVisibleToUser(USER),
+                                showDescriptorValue: false,
+                                showGroupTotal: false,
+                                showRubricTotal: false
                             } only %}
                         </div>
                     {% endif %}
