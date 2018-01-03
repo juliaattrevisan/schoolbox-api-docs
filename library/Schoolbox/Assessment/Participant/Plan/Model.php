@@ -78,7 +78,7 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return string
+     * @return string|null
      */
     public function coalesceDescription(): ?string
     {
@@ -87,38 +87,51 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
     public function coalescePublishDate(): ?Alaress_Date_Format
     {
-        return $this->publishDate ?? $this->assessment->getPublishDate();
+        return $this->coalesceDate($this->publishDate, $this->assessment->getPublishDate());
     }
 
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
     public function coalesceOpenDate(): ?Alaress_Date_Format
     {
-        return $this->openDate ?? $this->assessment->getOpenDate();
+        return $this->coalesceDate($this->openDate, $this->assessment->getOpenDate());
     }
 
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
     public function coalesceDueDate(): ?Alaress_Date_Format
     {
-        return $this->dueDate ?? $this->assessment->getDueDate();
+        return $this->coalesceDate($this->dueDate, $this->assessment->getDueDate());
     }
 
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
     public function coalesceCloseDate(): ?Alaress_Date_Format
     {
-        return $this->closeDate ?? $this->assessment->getCloseDate();
+        return $this->coalesceDate($this->closeDate, $this->assessment->getCloseDate());
+    }
+
+
+    /**
+     * Returns the first non-null date, or null if both are null.
+     *
+     * @param Alaress_Date_Format|null $date1
+     * @param Alaress_Date_Format|null $date2
+     * @return Alaress_Date_Format|null
+     */
+    private function coalesceDate(?Alaress_Date_Format $date1, ?Alaress_Date_Format $date2): ?Alaress_Date_Format
+    {
+        return null === $date1 || $date1->isNull() ? $date2 : $date1;
     }
 
     // Getters/Setters

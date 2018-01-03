@@ -85,7 +85,7 @@ class Plan
 
 
     /**
-     * @return string
+     * @return string|null
      */
     public function coalesceDescription(): ?string
     {
@@ -94,38 +94,51 @@ class Plan
 
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
     public function coalescePublishDate(): ?Alaress_Date_Format
     {
-        return $this->publishDate ?? $this->assessable->getPublishAt();
+        return $this->coalesceDate($this->publishDate, $this->assessable->getPublishAt());
     }
 
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
     public function coalesceOpenDate(): ?Alaress_Date_Format
     {
-        return $this->openDate ?? $this->assessable->getOpenAt();
+        return $this->coalesceDate($this->openDate, $this->assessable->getOpenAt());
     }
 
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
     public function coalesceDueDate(): ?Alaress_Date_Format
     {
-        return $this->dueDate ?? $this->assessable->getDueAt();
+        return $this->coalesceDate($this->dueDate, $this->assessable->getDueAt());
     }
 
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
     public function coalesceCloseDate(): ?Alaress_Date_Format
     {
-        return $this->closeDate ?? $this->assessable->getCloseAt();
+        return $this->coalesceDate($this->closeDate, $this->assessable->getCloseAt());
+    }
+
+
+    /**
+     * Returns the first non-null date, or null if both are null.
+     *
+     * @param Alaress_Date_Format|null $date1
+     * @param Alaress_Date_Format|null $date2
+     * @return Alaress_Date_Format|null
+     */
+    private function coalesceDate(?Alaress_Date_Format $date1, ?Alaress_Date_Format $date2): ?Alaress_Date_Format
+    {
+        return null === $date1 || $date1->isNull() ? $date2 : $date1;
     }
 
     // Getters/Setters
