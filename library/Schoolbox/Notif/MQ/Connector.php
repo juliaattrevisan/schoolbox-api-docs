@@ -95,15 +95,9 @@ class Connector extends AMQPConnector
 
 		// attempt to extract the message body, so as to efficiently de-dupe resent messages
 		if ($data = json_decode($message, true)) {
-			try {
-			    if (!array_key_exists('message', $data)) {
-			        throw new InvalidArgumentException('No message in payload');
-                }
-
-				$instance = Instance::jsonUnserialize($data['message']);
-			} catch (InvalidArgumentException $e) {
-                // noop
-			}
+            if (array_key_exists('message', $data)) {
+                $instance = Instance::jsonUnserialize($data['message']);
+            }
 
 			if ($instance instanceof Instance) {
 				return $instance->getBaseHash();
