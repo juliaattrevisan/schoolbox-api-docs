@@ -146,6 +146,7 @@ class Mapper extends BaseMapper
                         'next_step_uuid' => $row['next_step_uuid'],
                         'type' => Model::TYPE_TOOLTIP,
                         'body' => $row['tooltip_body'],
+                        'css_class' => $row['css_class'],
                         'selector' => $row['tooltip_selector'],
                     ];
                     break;
