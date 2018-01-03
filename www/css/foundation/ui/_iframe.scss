@@ -1,5 +1,5 @@
-// iframe default dimensions
-iframe {
+// iframe default dimensions (excludes php debugbar)
+iframe:not(.phpdebugbar-widgets-iframe) {
   width: 100%;
   height: rem-calc(($base-font-size) * 25);
   border: 0;
