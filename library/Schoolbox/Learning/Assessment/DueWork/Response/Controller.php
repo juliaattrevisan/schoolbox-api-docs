@@ -201,10 +201,17 @@ class Controller extends Base
             ? $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false)
             : $rubricContext->generateMarkable($assessment, $participant->getUser());
 
-// TODO: Something to determine which template to load
 // TODO: Breadcrumbs need to be different
-//        $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/standard/response.twig', $data));
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/reflective.twig', $data));
+        /* Figure out who's actually here and what screen to show
+         */
+        $validSelfReflection = new ValidSelfReflection($this->getUser(), $participant);
+
+        if ($validSelfReflection->isSatisfied()) {
+            $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/reflective.twig', $data));
+        }
+        else {
+            $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/standard.twig', $data));
+        }
     }
 
 
