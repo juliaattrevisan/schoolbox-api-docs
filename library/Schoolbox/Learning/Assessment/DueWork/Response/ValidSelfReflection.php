@@ -28,17 +28,17 @@ class ValidSelfReflection
      *
      * @var User
      */
-    private $user;
+    protected $user;
 
     /**
      * @var IAssessable
      */
-    private $assessment;
+    protected $assessment;
 
     /**
      * @var Participant
      */
-    private $participant;
+    protected $participant;
 
     /**
      * ValidSelfReflection constructor.
@@ -58,7 +58,7 @@ class ValidSelfReflection
      *
      * @return bool
      */
-    private function isViewingOwnParticipation(): bool
+    protected function isViewingOwnParticipation(): bool
     {
         return $this->user->getId() === $this->participant->getUser()->getId();
 
@@ -72,7 +72,7 @@ class ValidSelfReflection
      *
      * @return bool
      */
-    private function isDueWork(): bool
+    protected function isDueWork(): bool
     {
         return $this->assessment instanceof DueWork\Model;
     }
@@ -94,7 +94,7 @@ class ValidSelfReflection
      *
      * @return bool
      */
-    private function hasResponse(): bool
+    protected function hasResponse(): bool
     {
         return !$this->participant->isResponseRequired();
     }
