@@ -202,11 +202,13 @@ class Controller extends Base
             : $rubricContext->generateMarkable($assessment, $participant->getUser());
 
 // TODO: Breadcrumbs need to be different
+
         /* Figure out who's actually here and what screen to show
          */
-        $validSelfReflection = new ValidSelfReflection($this->getUser(), $participant);
-
-        if ($validSelfReflection->isSatisfied()) {
+        if ((new ValidSelfAssessment($this->getUser(), $participant))->isSatisfied()) {
+            $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/selfAssessment.twig', $data));
+        }
+        elseif ((new ValidSelfReflection($this->getUser(), $participant))->isSatisfied()) {
             $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/reflective.twig', $data));
         }
         else {

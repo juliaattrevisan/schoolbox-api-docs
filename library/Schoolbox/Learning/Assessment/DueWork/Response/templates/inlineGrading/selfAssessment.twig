@@ -1,0 +1,66 @@
+{##
+ # Inline Grader for a particular Response
+ #
+ # Self-Reflection and Self-Assessment by Students
+
+This lets you create Associated Feedback along with grade, comment and assorted feedback files etc.
+
+Usage:
+    assessment        DueWork\Model                  The DueWork being assessed
+    breadcrumbs       Collection|string[][]          An array of label + URL pairs
+    response          null|DueWork\Submission
+    latestFeedback    null|DueWork\Feedback
+    attachzone        array
+    selectedFileHash  string
+    markSchemeName    string
+    carousel          StudentCarousel
+    submissionStates  Collection|DueWork_Error[]
+    responseList      Collection|DueWork\Submission
+    file              null|File\Model
+    subfragment       null|string[]
+    errors            string[]
+    participant       Participant
+    plagscanEnabled   bool
+    rubricContext     null|array
+    interactionLocked bool                             Is the assessment due in an archived term?
+ #}
+
+{# Required in both self-assess/reflect and regular staff inline grading
+ # Don't remove this; it'll cause javascript Undefined errors
+ #}
+<script type="text/javascript">
+    $(function() {
+        var nextUrl = '';
+    });
+</script>
+
+{# Vars required in both contexts
+ # These vars exist regardless of who is looking
+ #}
+{% set readonly = interactionLocked and not USER.superUser %}
+
+{# Common elements
+ # These ui elements exist regardless of who is looking
+ #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+{# These includes vary depending on who is viewing this page:
+ # * Teachers doing their usual grading
+ # * Students self-reflecting
+ #}
+{% include '@learningDueWorkResponse/inlineGrading/fragments/meta.twig' with {
+    locale: locale,
+    assessment: assessment,
+    participant: participant,
+    responseList: responseList,
+    response: response,
+    readonly: readonly,
+    deleteRoute: false
+} only %}
+
+{% include '@learningDueWorkResponse/inlineGrading/fragments/dynamicFeedback.twig' with {
+    publishText: 'Submit'
+} only %}
+
+<h1>Self Assessment</h1>
