@@ -6,7 +6,6 @@
  *
  * TODO: Add unit tests
  * TODO: Can you self-reflect on behalf of someone else, via SOBO?
- * TODO: ??????? not an interface method?
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
@@ -84,9 +83,6 @@ class ValidSelfReflection
     private function isSelfReflectable(): bool
     {
         return $this->assessment->isSelfReflectable();
-
-        /* TODO: ??????? not an interface method?
-         */
     }
 
     /**
@@ -109,9 +105,17 @@ class ValidSelfReflection
      */
     public function isSatisfied(): bool
     {
-        return $this->isViewingOwnParticipation()
-            && $this->isDueWork()
-            && $this->isSelfReflectable()
-            && $this->hasResponse();
+        /* Since I can't guarantee that the Participation's IAssessable is a DueWork\Model
+         * there's a sequential dependency that must be obeyed - the IAssessable has to be a
+         * DueWork\Model before an isSelfReflectable() check can be performed, otherwise
+         * you'll experience a fatal undefined method scenario
+         */
+        if ($this->isDueWork()) {
+            return $this->isViewingOwnParticipation()
+                && $this->isSelfReflectable()
+                && $this->hasResponse();
+        }
+
+        return false;
     }
 }
