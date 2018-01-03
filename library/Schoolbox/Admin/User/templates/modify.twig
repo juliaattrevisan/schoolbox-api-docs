@@ -316,8 +316,12 @@
                                         <input type="hidden" name="service" value="{{ permission.service }}"/>
                                         <input type="hidden" name="updateServices" value="1"/>
                                         <select name="type" data-autosubmit-service data-service="{{ permission.service }}" data-sid="{{ permission.serviceIdentifier }}">
-                                            <option value="1" {% if permission.accessLevel == 1 %}selected{% endif %}>Read</option>
-                                            <option value="2" {% if permission.accessLevel == 2 %}selected{% endif %}>Write</option>
+                                            {% if permission.service != constant('RESOURCE_BOOKING_SERVICE')
+                                            and permission.service != constant('PASTORAL_SERVICE')
+                                            and permission.service != constant('SPORTS_ADMINISTRATOR_SERVICE') %}
+                                                <option value="1" {% if permission.accessLevel == 1 %}selected{% endif %}>Read</option>
+                                                <option value="2" {% if permission.accessLevel == 2 %}selected{% endif %}>Write</option>
+                                            {% endif %}
                                             <option value="3" {% if permission.accessLevel == 3 %}selected{% endif %}>Moderate</option>
                                         </select>
                                     </form>
