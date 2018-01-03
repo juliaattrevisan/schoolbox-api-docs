@@ -116,6 +116,8 @@ abstract class Base {
     }
 
     /**
+     * @deprecated you should be injecting your dependencies from the constructor!
+     *
      * @return Di\Container
      */
     public function getDi() {
