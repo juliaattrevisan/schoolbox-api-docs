@@ -85,6 +85,53 @@ class Plan
 
 
     /**
+     * @return string
+     */
+    public function coalesceDescription(): ?string
+    {
+        return $this->description ?? $this->assessable->getDescription();
+    }
+
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function coalescePublishDate(): ?Alaress_Date_Format
+    {
+        return $this->publishDate ?? $this->assessable->getPublishAt();
+    }
+
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function coalesceOpenDate(): ?Alaress_Date_Format
+    {
+        return $this->openDate ?? $this->assessable->getOpenAt();
+    }
+
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function coalesceDueDate(): ?Alaress_Date_Format
+    {
+        return $this->dueDate ?? $this->assessable->getDueAt();
+    }
+
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function coalesceCloseDate(): ?Alaress_Date_Format
+    {
+        return $this->closeDate ?? $this->assessable->getCloseAt();
+    }
+
+    // Getters/Setters
+
+
+    /**
      * @return IAssessable
      */
     public function getAssessable(): IAssessable
