@@ -1,0 +1,160 @@
+{##
+ # Inline Grader for a particular Response
+ #
+ # Self-Reflection and Self-Assessment by Students
+
+This lets you create Associated Feedback along with grade, comment and assorted feedback files etc.
+
+Usage:
+    assessment        DueWork\Model                  The DueWork being assessed
+    breadcrumbs       Collection|string[][]          An array of label + URL pairs
+    response          null|DueWork\Submission
+    latestFeedback    null|DueWork\Feedback
+    attachzone        array
+    selectedFileHash  string
+    markSchemeName    string
+    carousel          StudentCarousel
+    submissionStates  Collection|DueWork_Error[]
+    responseList      Collection|DueWork\Submission
+    file              null|File\Model
+    subfragment       null|string[]
+    errors            string[]
+    participant       Participant
+    plagscanEnabled   bool
+    rubricContext     null|array
+    interactionLocked bool                             Is the assessment due in an archived term?
+ #}
+
+{# Required in both self-assess/reflect and regular staff inline grading
+ # Don't remove this; it'll cause javascript Undefined errors
+ #}
+<script type="text/javascript">
+    $(function() {
+        var nextUrl = '';
+    });
+</script>
+
+{# Vars required in both contexts
+ # These vars exist regardless of who is looking
+ #}
+{% set readonly = interactionLocked and not USER.superUser %}
+
+{# Common elements
+ # These ui elements exist regardless of who is looking
+ #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+{# These includes vary depending on who is viewing this page:
+ # * Teachers doing their usual grading
+ # * Students self-reflecting
+ #}
+{% include '@learningDueWorkResponse/inlineGrading/fragments/meta.twig' with {
+    locale: locale,
+    assessment: assessment,
+    participant: participant,
+    responseList: responseList,
+    response: response,
+    readonly: readonly,
+    deleteRoute: false
+} only %}
+
+{% include '@learningDueWorkResponse/inlineGrading/fragments/dynamicFeedback.twig' with {
+    publishText: 'Publish And Continue'
+} only %}
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Feedback</h2>
+    </div>
+</div>
+<div class="row mark-scheme" id="assessment-status" data-participant>
+    <div class="small-12 island">
+        <section class="content">
+
+            <form method="post" data-feedback-form action="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postResponseFeedback', {assessmentId: assessment.id, studentId: participant.user.id, responseId: response.id, participant: participant}) }}">
+                <input type="hidden" name="responseId" value="{{ response.id }}" />
+
+                <div class="row">
+
+                    {% if assessment.useRubric and rubricContext %}
+                        <div class="small-12 island">
+                            {% set rubricTemplate = readonly
+                                ? 'grid.twig'
+                                : 'grid-markable.twig'
+                            %}
+                            {% include '@rubric/' ~ rubricTemplate with {
+                                rubric:         rubricContext.rubric,
+                                markType:       rubricContext.markType,
+                                markVisibility: participant.assessable.isFeedbackVisibleToUser(USER)
+                            } only %}
+                        </div>
+                    {% endif %}
+
+                    {% if 'none' != markSchemeName | lower %}
+                        <div class="small-12 medium-3 column">
+                            <label>{{ locale.grades.proper }}
+                                {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
+                                    participant: participant,
+                                    markScheme:  assessment.markScheme,
+                                    tabIndex:    1,
+                                    errors:      errors,
+                                    readonly:    readonly
+                                } only %}
+                            </label>
+
+                            {% if assessment.useRubric and rubricContext and not readonly %}
+                                {% include '@learningDueWorkResponse/inlineGrading/fragments/assignFromRubricButton.twig' with {
+                                    locale: locale,
+                                    rubricContext: rubricContext
+                                } only %}
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
+                        {% include '@learningAssessment/dueWork/comment.twig' with {
+                            participant: participant,
+                            tabIndex:    2,
+                            readonly:    readonly
+                        } only %}
+                    </div>
+
+                    {# Maybe files may be uploaded here? #}
+                    {% if attachzone and not readonly %}
+                        <div class="small-12 columns">
+                            {% include 'sub/attachzone.twig' with {attachzone: attachzone} only %}
+                        </div>
+                    {% endif %}
+
+                    {# Action Bar #}
+                    {% set isDraftFeedback     = latestFeedback and not latestFeedback.published %}
+                    {% set isPublishedFeedback = latestFeedback and latestFeedback.published %}
+
+                    {% spaceless %}
+                        {% set buttons %}
+                            <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen" {% if not isDraftFeedback %}style="display:none;"{% endif %}>Saved as Draft</span>
+                            {% if not readonly %}
+                                <a class="button" id="continue-button">Continue</a>
+                                <a class="button"
+                                   data-draft="publish"
+                                   {% if isPublishedFeedback %}style="display:none;"{% endif %}
+                                >Publish and Continue</a>
+                            {% endif %}
+                        {% endset %}
+                    {% endspaceless %}
+
+                    {% include '@learningAssessment/fragments/actionBar.twig' with {
+                        actionStyle:  '',
+                        buttons:      buttons
+                    } only %}
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+
+<script src="/javascript/shared/submissions/jquery.combobox.js" type="text/javascript"></script>
+<div id='toaster' class="toast" data-alert data-save-draft></div>
+
+
