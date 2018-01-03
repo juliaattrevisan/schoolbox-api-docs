@@ -50,13 +50,13 @@ Usage:
  # * Students self-reflecting
  #}
 {% include '@learningDueWorkResponse/inlineGrading/fragments/meta.twig' with {
-locale: locale,
-assessment: assessment,
-participant: participant,
-responseList: responseList,
-response: response,
-readonly: readonly,
-deleteRoute: false
+    locale: locale,
+    assessment: assessment,
+    participant: participant,
+    responseList: responseList,
+    response: response,
+    readonly: readonly,
+    deleteRoute: false
 } only %}
 
 {% include '@learningDueWorkResponse/inlineGrading/fragments/dynamicFeedback.twig' with {
@@ -65,7 +65,7 @@ publishText: 'Submit'
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Feedback</h2>
+        <h2 class="subheader">Self-Assessment</h2>
     </div>
 </div>
 <div class="row mark-scheme" id="assessment-status" data-participant>
@@ -98,11 +98,11 @@ publishText: 'Submit'
                         <div class="small-12 medium-3 column">
                             <label>{{ locale.grades.proper }}
                                 {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
-                                participant: participant,
-                                markScheme:  assessment.markScheme,
-                                tabIndex:    1,
-                                errors:      errors,
-                                readonly:    readonly
+                                    participant: participant,
+                                    markScheme:  assessment.markScheme,
+                                    tabIndex:    1,
+                                    errors:      errors,
+                                    readonly:    readonly
                                 } only %}
                             </label>
 
@@ -117,9 +117,9 @@ publishText: 'Submit'
 
                     <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
                         {% include '@learningAssessment/dueWork/comment.twig' with {
-                        participant: participant,
-                        tabIndex:    2,
-                        readonly:    readonly
+                            participant: participant,
+                            tabIndex:    2,
+                            readonly:    readonly
                         } only %}
                     </div>
 
@@ -143,8 +143,8 @@ publishText: 'Submit'
                     {% endspaceless %}
 
                     {% include '@learningAssessment/fragments/actionBar.twig' with {
-                    actionStyle:  '',
-                    buttons:      buttons
+                        actionStyle:  '',
+                        buttons:      buttons
                     } only %}
                 </div>
             </form>
