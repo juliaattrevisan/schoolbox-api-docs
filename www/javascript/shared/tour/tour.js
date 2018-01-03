@@ -12,7 +12,24 @@ $(function () {
                 var tour = window.tours[uuid];
 
                 if (typeof(tour) !== 'undefined') {
+                    // Grab an instance of IntroJS
                     var tourCurrent = introJs();
+
+                    // The tour object will eventually include steps that aren't just tooltips for IntroJS to render
+                    //
+                    // For now I'm just filtering the steps to those of type 'tooltip' and creating an array of tooltips
+                    // to pass to IntroJS. In the future I *guess* we will call IntroJS on each individual tooltip step
+                    // so we can alternate between the different types appropriately.
+                    var stepsToDisplay = [];
+
+                    $(tour.steps).each(function (i, step) {
+                        if (step.type === 'tooltip') {
+                            stepsToDisplay.push({
+                                intro: step.body,
+                                element: step.selector
+                            });
+                        }
+                    });
 
                     tourCurrent.setOptions({
                         showStepNumbers: false,
@@ -24,7 +41,7 @@ $(function () {
                         scrollTo: 'tooltip',
                         disableInteraction: true,
                         exitOnOverlayClick: false,
-                        steps: tour.steps
+                        steps: stepsToDisplay
                     });
 
                     tourCurrent.start();
