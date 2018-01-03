@@ -5,6 +5,8 @@
  * This (assessment, user) combination is valid for self-reflection
  *
  * TODO: Add unit tests
+ * TODO: Can you self-reflect on behalf of someone else, via SOBO?
+ * TODO: ??????? not an interface method?
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
