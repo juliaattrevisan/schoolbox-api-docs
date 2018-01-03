@@ -128,11 +128,11 @@ Usage:
                     {% endif %}
 
                     {# Action Bar #}
-                    {% set isDraftFeedback     = latestFeedback and not latestFeedback.published %}
+                    {% set isDraftFeedback = latestFeedback and not latestFeedback.published %}
 
                     {% spaceless %}
                         {% set buttons %}
-                            <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen" {% if not isDraftFeedback %}style="display:none;"{% endif %}>Saved as Draft</span>
+                            <span class="button disabled" data-draft="drafted" title="Saved as draft" {% if not isDraftFeedback %}style="display:none;"{% endif %}>Saved as Draft</span>
                             {% if not readonly %}
                                 <a class="button" data-draft="publish"></a>
                             {% endif %}
