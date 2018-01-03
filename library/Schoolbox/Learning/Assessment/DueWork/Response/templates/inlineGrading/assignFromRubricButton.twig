@@ -1,0 +1,52 @@
+{##
+ # The Assign From Rubric button
+ #
+ # locale
+ # RubricContext rubricContext
+ #}
+<script type="text/javascript">
+    $(function () {
+
+        // cache this stuff, it doesn't change
+        var $status                 = $('#assessment-status'),
+            $markInput              = $status.find('[data-mark-input]'),
+            $assignFromRubricButton = $('#use-rubric-value'),
+            $rb                     = $('#rb-{{ rubricContext.rubric.id }}'),
+            $finalSummary           = $rb.find('[data-final-summary]');
+
+
+        function refreshAssignFromRubricButton() {
+            var currentRubricValue = $.trim($finalSummary.text());
+            var currentMarkInput   = $markInput.val();
+
+            $assignFromRubricButton.prop('disabled', currentRubricValue === currentMarkInput);
+        }
+
+
+        {##
+         # Use the rubric value in the mark input field
+         #
+         # Disabled upon load, since values are the same
+         # at this point in time. Also disables when copying
+         # the rubric mark value in.
+         #}
+        $assignFromRubricButton.on('click', function(e) {
+
+            e.preventDefault();
+            $(this).prop('disabled', true);
+
+            $status
+                .find('[data-mark-input]')
+                .val($.trim($finalSummary.text()))
+                .change();
+        });
+
+        // listen for this
+        $rb.on('change', '[data-rubric], [data-rubric-group]', refreshAssignFromRubricButton);
+        $markInput.on('change', refreshAssignFromRubricButton);
+
+        // do it on pageload anyway
+        refreshAssignFromRubricButton();
+    });
+</script>
+<p><button id="use-rubric-value" class="full-width">Assign {{ locale.grades.proper }} from Rubric</button></p>
