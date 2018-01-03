@@ -167,14 +167,15 @@ class Mapper extends \Schoolbox\Mapper
             try {
                 $this->setConnector(new Connector($this->getConfigLoader(), $plagscanClientId, $plagscanApiKey));
             }
+            // TODO what triggers a DomainException?
             catch (\DomainException $e) {
-
+                // TODO sentry here?
                 /* Could not spawn for some reason, but due to mapper usage
                  * we don't want to detonate - just quietly not use plagscan
                  */
             }
             catch (\RuntimeException $e) {
-
+                // TODO sentry here?
                 /* Could not spawn because plagscan api is down
                  */
             }
@@ -312,7 +313,8 @@ class Mapper extends \Schoolbox\Mapper
             $plagscanId = $this->getConnector()->transmit($file, $filename);
         } catch (\RuntimeException $e) {
             $sentry = self::getDi()->get('sentry');
-            $sentry->captureMessage("Error: Plagscan unavailable. Could not generate access token.");
+            // TODO confirm syntax
+            $sentry->captureException($e, array("message" => "Error: Plagscan unavailable. Could not generate access token."));
             /* Plagscan death
              */
             if (empty($plagscanId)) {
@@ -478,7 +480,8 @@ class Mapper extends \Schoolbox\Mapper
              * but can't do much to stop it if plagscan screws us
              */
             $sentry = self::getDi()->get('sentry');
-            $sentry->captureMessage("Could not privatise document in Plagscan.");
+            // TODO confirm syntax
+            $sentry->captureException($e, array('message' => "Could not privatise document in Plagscan."));
         }
     }
 
