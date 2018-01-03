@@ -78,6 +78,53 @@ class Model implements ISoftDeletable
 
 
     /**
+     * @return string
+     */
+    public function coalesceDescription(): ?string
+    {
+        return $this->description ?? $this->assessment->getDescription();
+    }
+
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function coalescePublishDate(): ?Alaress_Date_Format
+    {
+        return $this->publishDate ?? $this->assessment->getPublishDate();
+    }
+
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function coalesceOpenDate(): ?Alaress_Date_Format
+    {
+        return $this->openDate ?? $this->assessment->getOpenDate();
+    }
+
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function coalesceDueDate(): ?Alaress_Date_Format
+    {
+        return $this->dueDate ?? $this->assessment->getDueDate();
+    }
+
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function coalesceCloseDate(): ?Alaress_Date_Format
+    {
+        return $this->closeDate ?? $this->assessment->getCloseDate();
+    }
+
+    // Getters/Setters
+
+
+    /**
      * @return Assessment\Model
      */
     public function getAssessment(): Assessment\Model
