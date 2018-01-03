@@ -8,6 +8,12 @@
  # string deleteRoute
  #}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
+
+{% include '@learningDueWorkResponse/inlineGrading/deleteSubmission.twig' with {
+    assessment: assessment,
+    participant: participant
+} only %}
+
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 columns">

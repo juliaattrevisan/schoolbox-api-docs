@@ -79,14 +79,6 @@ Usage:
     publishText: 'Publish And Continue'
 } only %}
 
-
-{% if deleteRoute %}
-    {% include '@learningDueWorkResponse/inlineGrading/deleteSubmission.twig' with {
-        assessment: assessment,
-        participant: participant
-    } only %}
-{% endif %}
-
 <script type="application/javascript" src="/javascript/shared/submissions/jquery.kami-export.js"></script>
 <script type="text/javascript">
     $(function() {
