@@ -29,6 +29,7 @@ class Mapper extends BaseMapper
         $this->hasTable('tour_step');
         $this->hasModel(Model::class);
         $this->uses('uuid', self::TYPE_STRING, self::COLUMN_IDENTIFIER_UUID);
+        $this->joins('next_step_uuid', Mapper::class, 'uuid', null, null, 'tourStep', 'tourStep');
         $this->joins('tour_uuid', TourMapper::class, 'uuid', null, null, 'tour', 'tour');
         $this->joins('author_user_id', UserMapper::class, 'id', null, null, 'author', 'author');
         $this->uses('type', self::TYPE_STRING);
@@ -99,5 +100,65 @@ class Mapper extends BaseMapper
         }
 
         return $collection;
+    }
+
+    /**
+     * Return an array of steps ready for injection into Javascript code
+     *
+     * @param string $tourUuid
+     *
+     * @return array
+     */
+    public function getStepArray(string $tourUuid): array
+    {
+        $query = "
+            SELECT      {$this->getColumnString()},
+                        {$this->getJoinColumnString('tour', 'tour')},
+                        `tour_step_tooltip`.`uuid` as `tooltip_uuid`,
+                        `tour_step_tooltip`.`body` as `tooltip_body`,
+                        `tour_step_tooltip`.`selector` as `tooltip_selector`
+            FROM        {$this->getTable('step')}
+            LEFT JOIN   {$this->getJoinSql('tour', '', 'tour', true)}
+            LEFT JOIN   `tour_step_tooltip` ON `tour_step_tooltip`.`tour_step_uuid` = `tour_step`.`uuid`
+            WHERE       `tour`.`uuid` = :tourUuid AND
+                        `tour`.`active` = 1 AND
+                        `tour`.`deleted_at` IS NULL AND
+                        `tour_step`.`deleted_at` IS NULL AND
+                        `tour_step_tooltip`.`deleted_at` IS NULL 
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute([
+            'tourUuid' => $tourUuid
+        ]);
+        // Storage for current step in the tour
+        $stepCurrent = null;
+        // Retrieve all of the steps details in an array indexed by their UUID
+        $stepsStorage = [];
+        foreach ($statement as $row) {
+            // Store the first step in the tour if we haven't yep
+            if ($stepCurrent === null) {
+                $stepCurrent = $row['tour.tour_step_uuid'];
+            }
+            switch ($row['type']) {
+                case Model::TYPE_TOOLTIP:
+                    $stepsStorage[$row['uuid']] = [
+                        'uuid' => $row['uuid'],
+                        'next_step_uuid' => $row['next_step_uuid'],
+                        'type' => Model::TYPE_TOOLTIP,
+                        'body' => $row['tooltip_body'],
+                        'selector' => $row['tooltip_selector'],
+                    ];
+                    break;
+            }
+        }
+        // Starting with the initial step of the tour, follow the trail of UUIDs to create a correctly ordered
+        // array of steps for use in the javascript code
+        $steps = [];
+        while ($stepCurrent !== null) {
+            $steps[] = $stepsStorage[$stepCurrent];
+            // Move onto the next step in the sequence
+            $stepCurrent = $stepsStorage[$stepCurrent]['next_step_uuid'];
+        }
+        return $steps;
     }
 }

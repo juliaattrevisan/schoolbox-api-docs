@@ -42,6 +42,11 @@ class Model implements ISoftDeletable
     protected $type;
 
     /**
+     * @var Model|null
+     */
+    protected $tourStep;
+
+    /**
      * @return User|null
      */
     public function getAuthor(): ?User
@@ -95,6 +100,24 @@ class Model implements ISoftDeletable
     public function setType(?string $type): self
     {
         $this->type = $type;
+        return $this;
+    }
+
+    /**
+     * @return Model|null
+     */
+    public function getTourStep(): ?Model
+    {
+        return $this->tourStep;
+    }
+    /**
+     * @param Model|null $tourStep
+     *
+     * @return self|$this
+     */
+    public function setTourStep(?Model $tourStep): self
+    {
+        $this->tourStep = $tourStep;
         return $this;
     }
 }
