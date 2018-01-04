@@ -137,10 +137,7 @@ var jsSrc = {
 
         // Feature tours
         'www/javascript/components/intro.js/intro.js',
-        'www/javascript/shared/tour/tour.js',
-
-        // Assessment Participation
-        'www/javascript/shared/assessment/participation.js'
+        'www/javascript/shared/tour/tour.js'
 
     ],
     masonry: [
