@@ -17,6 +17,8 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessment;
+use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfReflection;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
@@ -822,16 +824,35 @@ class Controller extends Assessment\Controller
             $rs->content->set($this->buildJsonOutput($result));
 
         } else {
-            // redirect after saving to Due Work Summary For Particular Student
-            $rs->redirect->to(
-                $this->getRouter()->generate(
-                    'learningAssessment.getSummary',
-                    [
-                        'assessmentId' => $assessment->getId(),
-                        'studentId'    => $participant->getUser()->getId(),
-                    ]
-                )
-            );
+            $selfAssessed = (new ValidSelfAssessment($this->getUser(), $participant))->isSatisfied();
+            $selfReflected = (new ValidSelfReflection($this->getUser(), $participant))->isSatisfied();
+
+            /* Go to the next step of Self-Assessment/Self-Reflection if appropriate
+             */
+            if ($selfAssessed || $selfReflected) {
+                $rs->redirect->to(
+                    $this->getRouter()->generate(
+                        'learningDueWorkResponse.getParticularResponse',
+                        [
+                            'assessmentId' => $assessment->getId(),
+                            'studentId'    => $participant->getUser()->getId(),
+                            'responseId'   => $response->getId()
+                        ]
+                    )
+                );
+            }
+            else {
+                // redirect after saving to Due Work Summary For Particular Student
+                $rs->redirect->to(
+                    $this->getRouter()->generate(
+                        'learningAssessment.getSummary',
+                        [
+                            'assessmentId' => $assessment->getId(),
+                            'studentId'    => $participant->getUser()->getId(),
+                        ]
+                    )
+                );
+            }
         }
     }
 
