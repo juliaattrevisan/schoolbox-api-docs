@@ -118,6 +118,17 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_COMPLETE_BEFORE_SELF_ASSESS);
         }
 
+        /* For the last bread node
+         */
+        $breadcrumbNode = 'Self Assessment/Reflection';
+
+        if ($selfAssessedWithResponse) {
+            $breadcrumbNode = $this->getDi()->get('sitePage')->getLocalisedTerm('selfAssessment', false, true);
+        }
+        elseif ($selfReflectedWithResponse) {
+            $breadcrumbNode = $this->getDi()->get('sitePage')->getLocalisedTerm('selfReflection', false, true);
+        }
+
         // The zone which contains the files
         $latestFeedback    = $participant->findMostRecentFeedback();
         $attachZoneFactory = new Attachzone\Factory();
@@ -131,8 +142,8 @@ class Controller extends Base
 
             // TODO: Breadcrumbs need to be different
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
-                ->add([ $assessment->getTitle(), $this->getRouter()->generate('learningAssessment.getStatus',['assessmentId' => $assessment->getId()]) ])
-                ->add(['Inline Grader', '']),
+                ->add([ $assessment->getTitle(), $this->getRouter()->generate('learningAssessment.getSummary',['assessmentId' => $assessment->getId(), 'studentId' => $participant->getUser()->getId()]) ])
+                ->add([$breadcrumbNode, '']),
             'response' => $response,
             'latestFeedback' => $latestFeedback,
             'attachzone' => $attachZone->getTwigContext(),
