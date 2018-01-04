@@ -94,9 +94,11 @@ class ValidSelfReflection
      *
      * @return bool
      */
-    protected function hasResponse(): bool
+    protected function hasDraftResponse(): bool
     {
-        return !$this->participant->isResponseRequired();
+        $mostRecentResponse = $this->participant->findMostRecentResponse();
+
+        return $mostRecentResponse && !$mostRecentResponse->isSubmitted();
     }
 
     /**
@@ -113,7 +115,7 @@ class ValidSelfReflection
         if ($this->isDueWork()) {
             return $this->isViewingOwnParticipation()
                 && $this->isSelfReflectable()
-                && $this->hasResponse();
+                && $this->hasDraftResponse();
         }
 
         return false;

@@ -39,7 +39,7 @@ class ValidSelfAssessment extends ValidSelfReflection
         if ($this->isDueWork()) {
             return $this->isViewingOwnParticipation()
                 && $this->isSelfAssessable()
-                && $this->hasResponse();
+                && $this->hasDraftResponse();
         }
 
         return false;
