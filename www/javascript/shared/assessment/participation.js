@@ -205,19 +205,47 @@ $(function() {
 
             // Save the plan in hidden inputs
             var hiddenInputs;
+
             hiddenInputs = $(document.createElement('input')).attr('type', 'hidden').attr('name', 'plans[' + planIndex + '][id]').val('');
-            hiddenInputs = hiddenInputs.add($(document.createElement('input')).attr('type', 'hidden').attr('name', 'plans[' + planIndex + '][name]').attr('data-saved-plan', 1).val(planName));
-            hiddenInputs = hiddenInputs.add($(document.createElement('input')).attr('type', 'hidden').attr('name', 'plans[' + planIndex + '][description]').val(planDesc));
-            hiddenInputs = hiddenInputs.add($(document.createElement('input')).attr('type', 'hidden').attr('name', 'plans[' + planIndex + '][publish_date]').val(publishDate));
-            hiddenInputs = hiddenInputs.add($(document.createElement('input')).attr('type', 'hidden').attr('name', 'plans[' + planIndex + '][open_date]').val(openDate));
-            hiddenInputs = hiddenInputs.add($(document.createElement('input')).attr('type', 'hidden').attr('name', 'plans[' + planIndex + '][due_date]').val(dueDate));
-            hiddenInputs = hiddenInputs.add($(document.createElement('input')).attr('type', 'hidden').attr('name', 'plans[' + planIndex + '][close_date]').val(closeDate));
+
+            hiddenInputs = hiddenInputs.add($(document.createElement('input'))
+                                                .attr('type', 'hidden')
+                                                .attr('name', 'plans[' + planIndex + '][name]')
+                                                .attr('data-saved-plan', 1)
+                                                .val(planName));
+
+            hiddenInputs = hiddenInputs.add($(document.createElement('input'))
+                                                .attr('type', 'hidden')
+                                                .attr('name', 'plans[' + planIndex + '][description]')
+                                                .val(planDesc));
+
+            hiddenInputs = hiddenInputs.add($(document.createElement('input'))
+                                                .attr('type', 'hidden')
+                                                .attr('name', 'plans[' + planIndex + '][publish_date]')
+                                                .val(publishDate));
+
+            hiddenInputs = hiddenInputs.add($(document.createElement('input'))
+                                                .attr('type', 'hidden')
+                                                .attr('name', 'plans[' + planIndex + '][open_date]')
+                                                .val(openDate));
+
+            hiddenInputs = hiddenInputs.add($(document.createElement('input'))
+                                                .attr('type', 'hidden')
+                                                .attr('name', 'plans[' + planIndex + '][due_date]')
+                                                .val(dueDate));
+
+            hiddenInputs = hiddenInputs.add($(document.createElement('input'))
+                                                .attr('type', 'hidden')
+                                                .attr('name', 'plans[' + planIndex + '][close_date]')
+                                                .val(closeDate));
 
             // Append hidden inputs to the fieldset
             $planDataContainer.append(hiddenInputs);
 
             // Add plan to drop down
-            $('#participant-customise').closest('li').before('<li><a href="#" data-plan-use="' + planIndex + '" data-plan-name="' + planName + '">' + planName + '</a></li>');
+            $('#participant-customise')
+                .closest('li')
+                .before('<li><a href="#" data-plan-use="' + planIndex + '" data-plan-name="' + planName + '">' + planName + '</a></li>');
 
             // Update the selected students with the plan
             updatePlan($('#plan-participants')[0].selectize.getValue().split(','), planIndex, planName);

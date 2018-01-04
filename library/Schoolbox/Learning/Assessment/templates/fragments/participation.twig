@@ -13,7 +13,11 @@
     {# TODO: either create a global flag for custom participation to be enabled on an assessment, or turn this into an collapsable section
     <label for="participation-enable">
         Customise participation and learning plans?
-        <span data-tooltip class="has-tip hint" title="Use this feature to add and remove students from participating in this assessment, or create modified versions for select students.">?</span>
+        <span
+            data-tooltip class="has-tip hint"
+            title="Use this feature to add and remove students from participating in this assessment, or create modified versions for select students.">
+            ?
+        </span>
     </label>
     <div class="switch round">
         <input id="participation-enable" type="checkbox">
@@ -27,10 +31,17 @@
     <div id="participation-settings"> {# class="hide" #}
         <div class="row">
             <div class="small-12 medium-3 medium-offset-9 column" id="mass-buttons">
-                <button class="button expand dropdown" id="customise-dropdown" data-dropdown="customise-options" aria-controls="customise-options" aria-expanded="false" disabled>Actions</button>
+                <button
+                    class="button expand dropdown"
+                    id="customise-dropdown"
+                    data-dropdown="customise-options"
+                    aria-controls="customise-options"
+                    aria-expanded="false"
+                    disabled
+                >
+                    Actions
+                </button>
                 <ul class="f-dropdown" id="customise-options" data-dropdown-content aria-hidden="true">
-
-
                     <li><a href="#" data-participant-change="exclude">Exclude from assessment</a></li>
                     <li class="separator">Learning Plans</li>
                     <li><a href="#" data-participant-change="include">Default plan</a></li>
@@ -53,7 +64,13 @@
                     <input type="hidden" name="participant-plan[{{ user.id }}]" id="participant-plan-{{ user.id }}" value="{{ planIds[participant.plan.id] ?: 0 }}">
                     <div data-participant-row>
                         <div class="selector" data-participant-selector>
-                            <input id="participant-{{ user.id }}" type="checkbox" value="1" name="participant[{{ user.id }}]" data-participant-select data-user-id="{{ user.id }}" data-user-name="{{ user.fullName }}">
+                            <input
+                                    id="participant-{{ user.id }}"
+                                    type="checkbox" value="1"
+                                    name="participant[{{ user.id }}]"
+                                    data-participant-select data-user-id="{{ user.id }}"
+                                    data-user-name="{{ user.fullName }}"
+                            >
                             <label for="participant-{{ user.id }}" class="checkbox-label"></label>
                         </div>
                         <div class="small-12 column">
