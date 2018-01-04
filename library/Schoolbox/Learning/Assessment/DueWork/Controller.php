@@ -841,7 +841,7 @@ class Controller extends Assessment\Controller
             if ($selfAssessable || $selfReflectable) {
                 $rs->redirect->to(
                     $this->getRouter()->generate(
-                        'learningDueWorkResponse.getParticularResponse',
+                        'learningDueWorkResponse.getParticularResponseForSelfAssessment',
                         [
                             'assessmentId' => $assessment->getId(),
                             'studentId'    => $participant->getUser()->getId(),
