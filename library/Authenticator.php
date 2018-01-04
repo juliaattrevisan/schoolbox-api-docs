@@ -41,11 +41,14 @@ class Authenticator {
      */
     public function authenticate($username, $password, $remember = false) {
         $s = new Session();
-        $this->authenticated = $s->authenticate($username, $password);
+        $user = $s->authenticate($username, $password);
+        if($user instanceof User) {
+            $this->authenticated = true;
+        }
 
         // if successful, go ahead and create a session
         if ($this->isAuthenticated()) {
-            $this->createSession($username, $remember);
+            $this->createSession($user->getUsername(), $remember);
         } else {
             throw new SchoolboxAccessDeniedException('Username or password is incorrect');
         }

@@ -175,7 +175,7 @@ class Session
      *
      * @param string $username
      * @param string $password
-     * @return bool Was the user authenticated?
+     * @return \Schoolbox\User|null Was the user authenticated, if so return the user
      * @throws SchoolboxAccessDeniedException    if password doesn't match
      * @throws SchoolboxAccountDisabledException if user account is disabled
      * @throws SchoolboxNotFoundException        if user doesn't exist
@@ -188,12 +188,23 @@ class Session
 
         $ip    = Session::getIP();
         $notif = Notifactory::create(Notif::TOPIC_AUTH);
-
         $userMapper = UserMapper::getInstance();
 
         // Cannot use findOneByColumn() as that returns deleted users which may mask extant user.
         $user = $userMapper->findByColumnList(['username' => $username], ['deleted' => false])->first();
-        if(!$user instanceof \Schoolbox\User){
+
+        // Fall back to using email address
+        if(!$user instanceof \Schoolbox\User) {
+            if (Cfg::get('auth_email_enabled')) {
+                $user = $userMapper->findByColumnList(['alt_email' => $username], ['deleted' => false])->first();
+                //Override username with actual username, rather than email address so user can proceed
+                if($user instanceof \Schoolbox\User) {
+                    $username = $user->getUsername();
+                }
+            }
+        }
+
+        if(!$user instanceof \Schoolbox\User) {
             // Log the fact that user doesn't exist
             $notif->notice("Login failure for non-existent user ".$username, array(
                 'username' => $username,
@@ -212,7 +223,6 @@ class Session
             ));
             throw new SchoolboxAccountDisabledException();
         }
-
 
         $result = false;
 
@@ -253,7 +263,12 @@ class Session
             $this->db->update('user', 'username', $save);
         }
 
-        return $result;
+        if($result) {
+            return $user;
+        }
+        else {
+            return null;
+        }
     }
 
     private function _authLDAP($username, $password, $ds, $ldap_user, $ldap_base, $version = 3, $referrals = 0)
