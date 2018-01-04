@@ -85,32 +85,32 @@ class DueWork_Rubric_Handler
 
         // 1. Get latest published student marks
         $stmt = Database::getInstance()->prepare("
-            SELECT rm.student_id, rl.box_id AS 'sb.id', rc.id AS 'rc.id', rd.value AS 'mark'
+            SELECT sr.owner, sr.box_id AS 'sb.id', rc.id AS 'rc.id', rd.value AS 'mark'
             FROM rubric_mark rm
             JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
             JOIN rubric_criterion rc  ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
-            JOIN rubric_level rl      ON rl.id = rd.level_id AND rl.deleted_at IS NULL
-            JOIN submission_box sb    ON sb.id = rl.box_id
-            JOIN assessment a         ON  a.id = sb.assessment_id
+            JOIN submission_return sr ON sr.id = rm.return_id
+			JOIN submission_box sb    ON sb.id = sr.box_id
+			JOIN assessment a         ON  a.id = sb.assessment_id
             LEFT JOIN (
                 -- Get the latest published marks
                 SELECT
                   MAX(rm.published_at) AS 'max_published_at',
-                  rm.student_id AS 'student_id',
-                  rl.box_id AS 'sb_id',
+                  sr.owner AS 'student_id',
+                  sr.box_id AS 'sb_id',
                   rc.id AS 'rc_id'
                 FROM rubric_mark rm
                 JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
                 JOIN rubric_criterion rc  ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
-                JOIN rubric_level rl      ON rl.id = rd.level_id AND rl.deleted_at IS NULL
-                JOIN submission_box sb    ON sb.id = rl.box_id
-                JOIN assessment a         ON  a.id = sb.assessment_id
+				JOIN submission_return sr ON sr.id = rm.return_id
+                JOIN submission_box sb    ON sb.id = sr.box_id
+                JOIN assessment a         ON a.id = sb.assessment_id
                 WHERE {$whereClauseInner}
                 AND rm.valid
                 AND rm.published_at IS NOT NULL
-                GROUP BY rm.student_id, rl.box_id, rc.id
+                GROUP BY rm.student_id, sr.box_id, rc.id
             ) t ON t.max_published_at = rm.published_at AND t.student_id = rm.student_id
-                AND rl.box_id = t.sb_id AND rc.id = t.rc_id
+                AND sr.box_id = t.sb_id AND rc.id = t.rc_id
             WHERE {$whereClauseOuter}
             AND rm.valid
             AND rm.published_at IS NOT NULL;
