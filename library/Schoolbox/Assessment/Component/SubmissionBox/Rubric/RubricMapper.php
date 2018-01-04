@@ -977,7 +977,7 @@ class RubricMapper
 
         $pb
             ->equals('sb.assessment_id', $dueWorks->getColumnValues('id'))
-            ->equals('rm.student_id', $student->getId())
+            ->equals('sr.owner', $student->getId())
             ->notNull('rm.published_at')
             ->isTrue('rm.valid')
             ->isNull('rd.deleted_at')
@@ -1007,6 +1007,7 @@ class RubricMapper
             JOIN rubric_descriptor rd ON rl.id = rd.level_id
             JOIN rubric_criterion  rc ON rc.id = rd.criterion_id
             JOIN rubric_mark       rm ON rd.id = rm.descriptor_id
+            JOIN submission_return sr ON sr.id = rm.return_id
             JOIN (
                 SELECT a.id AS 'a.id', rc.id AS 'rc.id', max(rm.published_at) AS 'rm.max_published_at'
                 FROM rubric_mark       rm
@@ -1015,6 +1016,7 @@ class RubricMapper
                 JOIN rubric_level      rl ON rl.id = rd.level_id
                 JOIN submission_box    sb ON sb.id = rl.box_id
                 JOIN assessment         a ON  a.id = sb.assessment_id
+                JOIN submission_return sr ON sr.id = rm.return_id
                 WHERE {$where}
                 GROUP BY sb.assessment_id, rd.criterion_id
             ) t ON `a`.`id` = `t`.`a.id` AND `rc`.`id` = `t`.`rc.id` AND `rm`.`published_at` = `t`.`rm.max_published_at`
