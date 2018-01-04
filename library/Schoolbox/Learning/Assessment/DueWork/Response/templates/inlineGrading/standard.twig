@@ -197,33 +197,37 @@ Usage:
                         {% endblock %}
 
                         {# Maybe files may be uploaded here? #}
-                        {% if attachzone and not readonly %}
-                            <div class="small-12 columns">
-                                {% include 'sub/attachzone.twig' with {attachzone: attachzone} only %}
-                            </div>
-                        {% endif %}
+                        {% block attachzone %}
+                            {% if attachzone and not readonly %}
+                                <div class="small-12 columns">
+                                    {% include 'sub/attachzone.twig' with {attachzone: attachzone} only %}
+                                </div>
+                            {% endif %}
+                        {% endblock %}
 
                         {# Action Bar #}
                         {% set isDraftFeedback     = latestFeedback and not latestFeedback.published %}
                         {% set isPublishedFeedback = latestFeedback and latestFeedback.published %}
 
-                        {% spaceless %}
-                            {% set buttons %}
-                                <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen" {% if not isDraftFeedback %}style="display:none;"{% endif %}>Saved as Draft</span>
-                                {% if not readonly %}
-                                    <a class="button" id="continue-button">Continue</a>
-                                    <a class="button"
-                                       data-draft="publish"
-                                       {% if isPublishedFeedback %}style="display:none;"{% endif %}
-                                    >Publish and Continue</a>
-                                {% endif %}
-                            {% endset %}
-                        {% endspaceless %}
+                        {% block actionButtons %}
+                            {% spaceless %}
+                                {% set buttons %}
+                                    <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen" {% if not isDraftFeedback %}style="display:none;"{% endif %}>Saved as Draft</span>
+                                    {% if not readonly %}
+                                        <a class="button" id="continue-button">Continue</a>
+                                        <a class="button"
+                                           data-draft="publish"
+                                           {% if isPublishedFeedback %}style="display:none;"{% endif %}
+                                        >Publish and Continue</a>
+                                    {% endif %}
+                                {% endset %}
+                            {% endspaceless %}
 
-                        {% include '@learningAssessment/fragments/actionBar.twig' with {
-                            actionStyle:  '',
-                            buttons: buttons
-                        } only %}
+                            {% include '@learningAssessment/fragments/actionBar.twig' with {
+                                actionStyle:  '',
+                                buttons: buttons
+                            } only %}
+                        {% endblock %}
                     </div>
                 </form>
             </section>

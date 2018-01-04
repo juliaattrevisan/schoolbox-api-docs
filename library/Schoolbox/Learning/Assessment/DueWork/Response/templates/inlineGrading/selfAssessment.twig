@@ -70,28 +70,26 @@
                     {% endblock %}
 
                     {# Maybe files may be uploaded here? #}
-                    {% if attachzone and not readonly %}
-                        <div class="small-12 columns">
-                            {% include 'sub/attachzone.twig' with {attachzone: attachzone} only %}
-                        </div>
-                    {% endif %}
+                    {% block attachzone %}
+                        {{ parent() }}
+                    {% endblock %}
 
                     {# Action Bar #}
-                    {% set isDraftFeedback = latestFeedback and not latestFeedback.published %}
+                    {% block actionButtons %}
+                        {% spaceless %}
+                            {% set buttons %}
+                                <span class="button disabled" data-draft="drafted" title="Saved as draft" {% if not isDraftFeedback %}style="display:none;"{% endif %}>Saved as Draft</span>
+                                {% if not readonly %}
+                                    <a class="button" data-draft="publish"></a>
+                                {% endif %}
+                            {% endset %}
+                        {% endspaceless %}
 
-                    {% spaceless %}
-                        {% set buttons %}
-                            <span class="button disabled" data-draft="drafted" title="Saved as draft" {% if not isDraftFeedback %}style="display:none;"{% endif %}>Saved as Draft</span>
-                            {% if not readonly %}
-                                <a class="button" data-draft="publish"></a>
-                            {% endif %}
-                        {% endset %}
-                    {% endspaceless %}
-
-                    {% include '@learningAssessment/fragments/actionBar.twig' with {
-                        actionStyle:  '',
-                        buttons:      buttons
-                    } only %}
+                        {% include '@learningAssessment/fragments/actionBar.twig' with {
+                            actionStyle:  '',
+                            buttons: buttons
+                        } only %}
+                    {% endblock %}
                 </div>
             </form>
         </section>
