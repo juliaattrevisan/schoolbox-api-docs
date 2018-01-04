@@ -85,6 +85,27 @@ class Controller extends Base
         $this->kamiConnector      = $kamiConnector;
     }
 
+    /**
+     * Get the contents of a particular $response for the purposes of Self Assessment or Self Reflection
+     *
+     * @param DueWork     $assessment
+     * @param Participant $participant
+     * @param Model       $response
+     * @throws ApplicationException\Exception When trying to access a draft Response when you shouldn't
+     * @throws ServiceNotFound If unable to locate HTML web Output
+     * @throws \Aura\Router\Exception\RouteNotFound If cannot generate a requested route
+     * @throws \InvalidArgumentException If assessment due date is null.
+     * @throws \PDOException If something went wrong when saving the kami document's status
+     * @throws \LogicException If attempting to update the status of a kami doc that is not processing.
+     * @throws \UnexpectedValueException If unexpected status change is reported from Kami API
+     */
+    public function getParticularResponseForSelfAssessment(
+        DueWork $assessment,
+        Participant $participant,
+        Model $response = null
+    ): void
+    {
+    }
 
     /**
      * Get the contents of a particular $response
