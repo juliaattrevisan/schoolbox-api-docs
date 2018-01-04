@@ -43,7 +43,7 @@ class Mapper extends BaseMapper
                         {$this->getJoinColumnString('user', 'u')},
                         {$this->getJoinColumnString('tourStep', 't')}
             ";
-        
+
         return $x;
     }
 
