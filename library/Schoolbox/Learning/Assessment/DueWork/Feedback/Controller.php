@@ -218,7 +218,7 @@ class Controller extends Base
             $selfAssessed = (new ValidSelfAssessment($this->getUser(), $participant))->isSatisfied();
             $selfReflected = (new ValidSelfReflection($this->getUser(), $participant))->isSatisfied();
 
-            if (($selfAssessed || $selfReflected) && !$response->isSubmitted()) {
+            if (($selfAssessed || $selfReflected) && !$response->isSubmitted() && $this->getRequest()->post->get('publish')) {
                 $response->setSubmittedAt(\Alaress_Date_Format::now());
 
                 $this->responseDataSource->save($response);
