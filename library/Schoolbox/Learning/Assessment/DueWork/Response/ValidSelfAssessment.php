@@ -20,14 +20,13 @@ class ValidSelfAssessment extends ValidSelfReflection
     /**
      * The IAssessable is set to Self-Assess
      */
-    private function isSelfAssessable(): bool
+    protected function isSelfAssessable(): bool
     {
         return $this->assessment->isSelfAssessable();
     }
 
     /**
-     * The currently logged-in user can self-reflect on the specified Participant's IResponse
-     * only when the following conditions are met
+     * The user can start the self-assessment process
      */
     public function isSatisfied(): bool
     {
@@ -38,8 +37,7 @@ class ValidSelfAssessment extends ValidSelfReflection
          */
         if ($this->isDueWork()) {
             return $this->isViewingOwnParticipation()
-                && $this->isSelfAssessable()
-                && $this->hasDraftResponse();
+                && $this->isSelfAssessable();
         }
 
         return false;

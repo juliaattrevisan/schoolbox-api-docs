@@ -80,7 +80,7 @@ class ValidSelfReflection
     /**
      * The IAssessable is set to Self-Reflect
      */
-    private function isSelfReflectable(): bool
+    protected function isSelfReflectable(): bool
     {
         return $this->assessment->isSelfReflectable();
     }
@@ -102,8 +102,7 @@ class ValidSelfReflection
     }
 
     /**
-     * The currently logged-in user can self-reflect on the specified Participant's IResponse
-     * only when the following conditions are met
+     * The user can start the self-reflection process
      */
     public function isSatisfied(): bool
     {
@@ -114,8 +113,7 @@ class ValidSelfReflection
          */
         if ($this->isDueWork()) {
             return $this->isViewingOwnParticipation()
-                && $this->isSelfReflectable()
-                && $this->hasDraftResponse();
+                && $this->isSelfReflectable();
         }
 
         return false;

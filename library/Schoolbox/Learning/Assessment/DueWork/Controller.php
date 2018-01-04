@@ -18,7 +18,9 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessment;
+use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessmentWithResponse;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfReflection;
+use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfReflectionWithResponse;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
@@ -766,14 +768,15 @@ class Controller extends Assessment\Controller
         /* If we're saving the final version of the submission
          * (ie. not a draft) ram the current datetime in
          */
+        $selfAssessable = (new ValidSelfAssessment($this->getUser(), $participant))->isSatisfied();
+        $selfReflectable = (new ValidSelfReflection($this->getUser(), $participant))->isSatisfied();
+
         if ($isFinal) {
-            $selfAssessed = (new ValidSelfAssessment($this->getUser(), $participant))->isSatisfied();
-            $selfReflected = (new ValidSelfReflection($this->getUser(), $participant))->isSatisfied();
 
             /* submitted_at is determined after the next step when creating a self-assessed or self-reflected
              * response. Otherwise, proceed normally
              */
-            if (!$selfAssessed && !$selfReflected) {
+            if (!$selfAssessable && !$selfReflectable) {
                 $response->setSubmittedAt(Alaress_Date_Format::now());
             }
         }
@@ -835,7 +838,7 @@ class Controller extends Assessment\Controller
 
             /* Go to the next step of Self-Assessment/Self-Reflection if appropriate
              */
-            if ($selfAssessed || $selfReflected) {
+            if ($selfAssessable || $selfReflectable) {
                 $rs->redirect->to(
                     $this->getRouter()->generate(
                         'learningDueWorkResponse.getParticularResponse',

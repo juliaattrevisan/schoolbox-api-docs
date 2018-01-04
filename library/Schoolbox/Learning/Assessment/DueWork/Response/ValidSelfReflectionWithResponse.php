@@ -1,0 +1,40 @@
+<?php
+/**
+ * ValidSelfReflection
+ *
+ * This (assessment, user) combination is valid for self-reflection
+ *
+ * TODO: Add unit tests
+ * TODO: Can you self-reflect on behalf of someone else, via SOBO?
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2018, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Learning\Assessment\DueWork\Response;
+
+
+class ValidSelfReflectionWithResponse extends ValidSelfReflection
+{
+
+    /**
+     * The currently logged-in user can self-reflect on the specified Participant's IResponse
+     * only when the following conditions are met
+     */
+    public function isSatisfied(): bool
+    {
+        /* Since I can't guarantee that the Participation's IAssessable is a DueWork\Model
+         * there's a sequential dependency that must be obeyed - the IAssessable has to be a
+         * DueWork\Model before an isSelfReflectable() check can be performed, otherwise
+         * you'll experience a fatal undefined method scenario
+         */
+        if ($this->isDueWork()) {
+            return $this->isViewingOwnParticipation()
+                && $this->isSelfReflectable()
+                && $this->hasDraftResponse();
+        }
+
+        return false;
+    }
+}
