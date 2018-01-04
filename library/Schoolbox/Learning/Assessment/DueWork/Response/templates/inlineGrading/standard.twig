@@ -135,22 +135,30 @@ Usage:
 
                     <div class="row">
 
-                        {% if assessment.useRubric and rubricContext %}
-                            <div class="small-12 island">
-                                {% set rubricTemplate = readonly
-                                ? 'grid.twig'
-                                : 'grid-markable.twig'
-                                %}
-                                {% include '@rubric/' ~ rubricTemplate with {
-                                    rubric:         rubricContext.rubric,
-                                    markType:       rubricContext.markType,
-                                    markVisibility: participant.assessable.isFeedbackVisibleToUser(USER),
-                                    showDescriptorValue: true,
-                                    showGroupTotal: true,
-                                    showRubricTotal: true
-                                } only %}
-                            </div>
-                        {% endif %}
+                        {# Settings for the rubric grid #}
+                        {% set showDescriptorValue = true %}
+                        {% set showGroupTotal = true %}
+                        {% set showRubricTotal = true%}
+
+                        {% block rubricGrid %}
+                            {% if assessment.useRubric and rubricContext %}
+                                <div class="small-12 island">
+                                    {% set rubricTemplate = readonly
+                                    ? 'grid.twig'
+                                    : 'grid-markable.twig'
+                                    %}
+                                    {% include '@rubric/' ~ rubricTemplate with {
+                                        rubric:         rubricContext.rubric,
+                                        markType:       rubricContext.markType,
+                                        markVisibility: participant.assessable.isFeedbackVisibleToUser(USER),
+                                        showDescriptorValue: showDescriptorValue,
+                                        showGroupTotal: showGroupTotal,
+                                        showRubricTotal: showRubricTotal
+                                    } only %}
+                                </div>
+                            {% endif %}
+                        {% endblock %}
+
 
                         {% if 'none' != markSchemeName | lower %}
                             <div class="small-12 medium-3 column">

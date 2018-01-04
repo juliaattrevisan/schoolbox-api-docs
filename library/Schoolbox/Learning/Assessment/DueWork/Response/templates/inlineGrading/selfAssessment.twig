@@ -50,22 +50,13 @@
 
                 <div class="row">
 
-                    {% if assessment.useRubric and rubricContext %}
-                        <div class="small-12 island">
-                            {% set rubricTemplate = readonly
-                            ? 'grid.twig'
-                            : 'grid-markable.twig'
-                            %}
-                            {% include '@rubric/' ~ rubricTemplate with {
-                                rubric:         rubricContext.rubric,
-                                markType:       rubricContext.markType,
-                                markVisibility: participant.assessable.isFeedbackVisibleToUser(USER),
-                                showDescriptorValue: true,
-                                showGroupTotal: true,
-                                showRubricTotal: true
-                            } only %}
-                        </div>
-                    {% endif %}
+                    {% block rubricGrid %}
+                        {% set showDescriptorValue = true %}
+                        {% set showGroupTotal = true %}
+                        {% set showRubricTotal = true %}
+
+                        {{ parent() }}
+                    {% endblock %}
 
                     {% if 'none' != markSchemeName | lower %}
                         <div class="small-12 medium-3 column">
