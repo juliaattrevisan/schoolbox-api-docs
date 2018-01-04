@@ -1,0 +1,2 @@
+INSERT INTO `localisation` (`term`, `title`, `singular_form`, `plural_form`, `indefinite_article`) VALUES ('selfAssessment', 'Self Assessment', 'self assessment', 'self assessments', 'a');
+INSERT INTO `localisation` (`term`, `title`, `singular_form`, `plural_form`, `indefinite_article`) VALUES ('selfReflection', 'Self Reflection', 'self reflection', 'self reflections', 'a');
