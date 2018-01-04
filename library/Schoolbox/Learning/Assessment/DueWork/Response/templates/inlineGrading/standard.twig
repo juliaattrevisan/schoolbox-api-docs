@@ -98,13 +98,11 @@ Usage:
 {% endblock %}
 
 {# A subheading for the grading part #}
-{% block subheading %}
-    <div class="row">
-        <div class="small-12 island">
-            <h2 class="subheader">Feedback</h2>
-        </div>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">{% spaceless %}{% block subheading %}Feedback{% endblock %}{% endspaceless %}</h2>
     </div>
-{% endblock %}
+</div>
 
 {# Not the most recent response? Say so, and give a CTA to show the most recent. #}
 {% if not isMostRecentResponse %}
