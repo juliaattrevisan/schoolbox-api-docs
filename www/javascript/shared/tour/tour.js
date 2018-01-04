@@ -42,7 +42,7 @@ $(function () {
                         scrollTo: 'tooltip',
                         disableInteraction: true,
                         exitOnOverlayClick: false,
-                        steps: stepsToDisplay
+                        steps: stepsToDisplay.filter(function(obj) { return $(obj.element).is(':visible'); })
                     });
 
                     // Fire the tour
