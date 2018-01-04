@@ -167,8 +167,8 @@ class Sync extends Base implements ISync
                     LEFT(p.m_name, CHARINDEX(' ', p.m_name)) AS student_contact_preferred,
                     CASE
                         WHEN
-                            LEN(RTRIM(SUBSTRING(p.m_name, CHARINDEX(' ', p.f_name), 255))) > 0
-                        THEN RTRIM(SUBSTRING(p.m_name, CHARINDEX(' ', p.f_name), 255))
+                            LEN(RTRIM(SUBSTRING(p.m_name, CHARINDEX(' ', p.m_name), 255))) > 0
+                        THEN RTRIM(SUBSTRING(p.m_name, CHARINDEX(' ', p.m_name), 255))
                         ELSE RTRIM(p.surname)
                     END              AS student_contact_surname,
                     ''               AS student_contact_home_email,
