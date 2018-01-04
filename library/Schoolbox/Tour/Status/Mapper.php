@@ -21,6 +21,7 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends BaseMapper
 {
+
     /**
      * @inheritdoc
      */
@@ -34,16 +35,18 @@ class Mapper extends BaseMapper
         $this->uses('status', self::TYPE_STRING);
     }
 
-    protected function getSelectString() {
+
+    protected function getSelectString()
+    {
         $x = "
             SELECT      {$this->getColumnString()},
                         {$this->getJoinColumnString('user', 'u')},
                         {$this->getJoinColumnString('tourStep', 't')}
             ";
-
-        var_dump($x);
+        
         return $x;
     }
+
 
     protected function getFromString()
     {
@@ -52,9 +55,10 @@ class Mapper extends BaseMapper
             JOIN      {$this->getJoinSql("user",null, "u")}
             JOIN      {$this->getJoinSql("tourStep", null, "t")}
             ";
-        var_dump($x);
+
         return $x;
     }
+
 
     protected function hydrateSelect(PDOStatement $statement)
     {

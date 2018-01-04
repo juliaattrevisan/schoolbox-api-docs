@@ -7,17 +7,12 @@
 
 namespace Schoolbox\Tour\Status;
 
-use Schoolbox\ISoftDeletable;
-use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
-use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
-use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
-use Schoolbox\Mapper\Traits\Model\Uuid;
-use Schoolbox\Tour\Model as Tour;
 use Schoolbox\User;
 use Schoolbox\Tour\Step;
 
 class Model
 {
+
     /**
      * @var User|null
      */
@@ -55,6 +50,7 @@ class Model
     {
         $this->status = $status;
     }
+
 
     /**
      * @return null|User
@@ -108,6 +104,4 @@ class Model
     {
         $this->tourStep = $tourStep;
     }
-
-
 }
