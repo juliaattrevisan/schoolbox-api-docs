@@ -70,6 +70,7 @@ class Controller extends Assessment\Controller
      * @param QuizSectionMapper      $quizSectionMapper
      * @param QuizAttemptMapper      $quizAttemptMapper
      * @param Term\Mapper            $termMapper
+     * @param Participant\DataSource $participantDataSource
      */
     public function __construct(
         UserMapper $userMapper,
@@ -82,9 +83,10 @@ class Controller extends Assessment\Controller
         QuizMapper $quizMapper,
         QuizSectionMapper $quizSectionMapper,
         QuizAttemptMapper $quizAttemptMapper,
-        Term\Mapper $termMapper
+        Term\Mapper $termMapper,
+        Participant\DataSource $participantDataSource
     ) {
-        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $workTypeMapper, $access, $transactor, $bakery, $termMapper);
+        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $workTypeMapper, $access, $transactor, $bakery, $termMapper, $participantDataSource);
         $this->quizMapper = $quizMapper;
         $this->quizSectionMapper = $quizSectionMapper;
         $this->quizAttemptMapper = $quizAttemptMapper;

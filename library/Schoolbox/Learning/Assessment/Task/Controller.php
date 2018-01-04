@@ -48,6 +48,7 @@ class Controller extends Assessment\Controller
      * @param Assessment\Breadcrumb\Factory $bakery
      * @param TaskResponseDataSource        $taskResponseDataSource
      * @param Term\Mapper                   $termMapper
+     * @param Participant\DataSource        $participantDataSource
      */
     public function __construct(
         UserMapper $userMapper,
@@ -58,9 +59,10 @@ class Controller extends Assessment\Controller
         Transactor $transactor,
         Assessment\Breadcrumb\Factory $bakery,
         TaskResponseDataSource $taskResponseDataSource,
-        Term\Mapper $termMapper
+        Term\Mapper $termMapper,
+        Participant\DataSource $participantDataSource
     ) {
-        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $workTypeMapper, $access, $transactor, $bakery, $termMapper);
+        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $workTypeMapper, $access, $transactor, $bakery, $termMapper, $participantDataSource);
         $this->taskResponseDataSource = $taskResponseDataSource;
     }
 
