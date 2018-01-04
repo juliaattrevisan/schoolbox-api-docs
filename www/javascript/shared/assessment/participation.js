@@ -97,6 +97,13 @@ $(function() {
         // Clear inputs
         $planName.val('');
 
+        // Clear any validation errors
+        $('#plan-name-error').hide();
+        $('#plan-publish-date-error').hide();
+        $('#plan-open-date-error').hide();
+        $('#plan-due-date-error').hide();
+        $('#plan-close-date-error').hide();
+
         // Set dates & description to whatever is currently set on the main form
         $planPublishDate.val($('#publishDate').val());
         $planOpenDate.val($('#openDate').val());
