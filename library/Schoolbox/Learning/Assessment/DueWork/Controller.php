@@ -767,7 +767,15 @@ class Controller extends Assessment\Controller
          * (ie. not a draft) ram the current datetime in
          */
         if ($isFinal) {
-            $response->setSubmittedAt(Alaress_Date_Format::now());
+            $selfAssessed = (new ValidSelfAssessment($this->getUser(), $participant))->isSatisfied();
+            $selfReflected = (new ValidSelfReflection($this->getUser(), $participant))->isSatisfied();
+
+            /* submitted_at is determined after the next step when creating a self-assessed or self-reflected
+             * response. Otherwise, proceed normally
+             */
+            if (!$selfAssessed && !$selfReflected) {
+                $response->setSubmittedAt(Alaress_Date_Format::now());
+            }
         }
 
         /* Do the actual saving
@@ -824,8 +832,6 @@ class Controller extends Assessment\Controller
             $rs->content->set($this->buildJsonOutput($result));
 
         } else {
-            $selfAssessed = (new ValidSelfAssessment($this->getUser(), $participant))->isSatisfied();
-            $selfReflected = (new ValidSelfReflection($this->getUser(), $participant))->isSatisfied();
 
             /* Go to the next step of Self-Assessment/Self-Reflection if appropriate
              */
