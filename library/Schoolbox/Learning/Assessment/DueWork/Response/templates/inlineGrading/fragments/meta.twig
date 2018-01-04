@@ -30,12 +30,14 @@
             </ul>
         </div>
     </div>
-    {% if response and deleteRoute %}
-        <nav>
-            <a class="icon-more" title="" data-dropdown="header-options"></a>
-        </nav>
-        <ul id="header-options" class="f-dropdown" data-dropdown-content>
-            <li><a class="icon-delete" data-delete="{{ deleteRoute }}">Delete Submission</a></li>
-        </ul>
-    {% endif %}
+    <nav>
+        <a class="icon-more" title="" data-dropdown="header-options"></a>
+    </nav>
+
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li><a class="icon-history" href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: participant.user.id}) }}">{{ locale.submissionHistory.proper }}</a></li>
+        {% if response and deleteRoute %}
+        <li><a class="icon-delete" data-delete="{{ deleteRoute }}">Delete Submission</a></li>
+        {% endif %}
+    </ul>
 </div>
