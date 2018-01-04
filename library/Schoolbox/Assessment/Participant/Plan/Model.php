@@ -78,45 +78,55 @@ class Model implements ISoftDeletable
 
 
     /**
+     * Returns the description for this plan's participants
+     *
      * @return string|null
      */
-    public function coalesceDescription(): ?string
+    public function getDerivedDescription(): ?string
     {
         return $this->description ?? $this->assessment->getDescription();
     }
 
 
     /**
+     * Returns the publish date for this plan's participants
+     *
      * @return Alaress_Date_Format|null
      */
-    public function coalescePublishDate(): ?Alaress_Date_Format
+    public function getDerivedPublishDate(): ?Alaress_Date_Format
     {
         return $this->coalesceDate($this->publishDate, $this->assessment->getPublishDate());
     }
 
 
     /**
+     * Returns the open date for this plan's participants
+     *
      * @return Alaress_Date_Format|null
      */
-    public function coalesceOpenDate(): ?Alaress_Date_Format
+    public function getDerivedOpenDate(): ?Alaress_Date_Format
     {
         return $this->coalesceDate($this->openDate, $this->assessment->getOpenDate());
     }
 
 
     /**
+     * Returns the due date for this plan's participants
+     *
      * @return Alaress_Date_Format|null
      */
-    public function coalesceDueDate(): ?Alaress_Date_Format
+    public function getDerivedDueDate(): ?Alaress_Date_Format
     {
         return $this->coalesceDate($this->dueDate, $this->assessment->getDueDate());
     }
 
 
     /**
+     * Returns the close date for this plan's participants
+     *
      * @return Alaress_Date_Format|null
      */
-    public function coalesceCloseDate(): ?Alaress_Date_Format
+    public function getDerivedCloseDate(): ?Alaress_Date_Format
     {
         return $this->coalesceDate($this->closeDate, $this->assessment->getCloseDate());
     }

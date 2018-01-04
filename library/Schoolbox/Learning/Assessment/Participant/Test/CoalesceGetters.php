@@ -46,10 +46,10 @@ class CoalesceGetters extends TestCase
         Alaress_Date_Format $due,
         Alaress_Date_Format $close
     ): void {
-        $this->assertEquals($publish, $planObject->coalescePublishDate());
-        $this->assertEquals($open, $planObject->coalesceOpenDate());
-        $this->assertEquals($due, $planObject->coalesceDueDate());
-        $this->assertEquals($close, $planObject->coalesceCloseDate());
+        $this->assertEquals($publish, $planObject->getDerivedPublishDate());
+        $this->assertEquals($open, $planObject->getDerivedOpenDate());
+        $this->assertEquals($due, $planObject->getDerivedDueDate());
+        $this->assertEquals($close, $planObject->getDerivedCloseDate());
     }
 
 
@@ -68,10 +68,10 @@ class CoalesceGetters extends TestCase
         ?Alaress_Date_Format $due,
         ?Alaress_Date_Format $close
     ): void {
-        $this->assertEquals($publish, $planModel->coalescePublishDate());
-        $this->assertEquals($open, $planModel->coalesceOpenDate());
-        $this->assertEquals($due, $planModel->coalesceDueDate());
-        $this->assertEquals($close, $planModel->coalesceCloseDate());
+        $this->assertEquals($publish, $planModel->getDerivedPublishDate());
+        $this->assertEquals($open, $planModel->getDerivedOpenDate());
+        $this->assertEquals($due, $planModel->getDerivedDueDate());
+        $this->assertEquals($close, $planModel->getDerivedCloseDate());
     }
 
 
@@ -82,7 +82,7 @@ class CoalesceGetters extends TestCase
      */
     public function test_description_DomainObject(PlanObject $planObject, ?string $description): void
     {
-        $this->assertEquals($description, $planObject->coalesceDescription());
+        $this->assertEquals($description, $planObject->getDerivedDescription());
     }
 
 
@@ -93,7 +93,7 @@ class CoalesceGetters extends TestCase
      */
     public function test_description_DataModel(Plan\Model $planModel, ?string $description): void
     {
-        $this->assertEquals($description, $planModel->coalesceDescription());
+        $this->assertEquals($description, $planModel->getDerivedDescription());
     }
 
 

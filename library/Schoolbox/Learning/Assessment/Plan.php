@@ -85,47 +85,57 @@ class Plan
 
 
     /**
+     * Returns the description for this plan's participants
+     *
      * @return string|null
      */
-    public function coalesceDescription(): ?string
+    public function getDerivedDescription(): ?string
     {
         return $this->description ?? $this->assessable->getDescription();
     }
 
 
     /**
+     * Returns the publish date for this plan's participants
+     *
      * @return Alaress_Date_Format|null
      */
-    public function coalescePublishDate(): ?Alaress_Date_Format
+    public function getDerivedPublishDate(): ?Alaress_Date_Format
     {
-        return $this->coalesceDate($this->publishDate, $this->assessable->getPublishAt());
+        return $this->coalesceDates($this->publishDate, $this->assessable->getPublishAt());
     }
 
 
     /**
+     * Returns the open date for this plan's participants
+     *
      * @return Alaress_Date_Format|null
      */
-    public function coalesceOpenDate(): ?Alaress_Date_Format
+    public function getDerivedOpenDate(): ?Alaress_Date_Format
     {
-        return $this->coalesceDate($this->openDate, $this->assessable->getOpenAt());
+        return $this->coalesceDates($this->openDate, $this->assessable->getOpenAt());
     }
 
 
     /**
+     * Returns the due date for this plan's participants
+     *
      * @return Alaress_Date_Format|null
      */
-    public function coalesceDueDate(): ?Alaress_Date_Format
+    public function getDerivedDueDate(): ?Alaress_Date_Format
     {
-        return $this->coalesceDate($this->dueDate, $this->assessable->getDueAt());
+        return $this->coalesceDates($this->dueDate, $this->assessable->getDueAt());
     }
 
 
     /**
+     * Returns the close date for this plan's participants
+     *
      * @return Alaress_Date_Format|null
      */
-    public function coalesceCloseDate(): ?Alaress_Date_Format
+    public function getDerivedCloseDate(): ?Alaress_Date_Format
     {
-        return $this->coalesceDate($this->closeDate, $this->assessable->getCloseAt());
+        return $this->coalesceDates($this->closeDate, $this->assessable->getCloseAt());
     }
 
 
@@ -136,7 +146,7 @@ class Plan
      * @param Alaress_Date_Format|null $date2
      * @return Alaress_Date_Format|null
      */
-    private function coalesceDate(?Alaress_Date_Format $date1, ?Alaress_Date_Format $date2): ?Alaress_Date_Format
+    private function coalesceDates(?Alaress_Date_Format $date1, ?Alaress_Date_Format $date2): ?Alaress_Date_Format
     {
         return null === $date1 || $date1->isNull() ? $date2 : $date1;
     }
