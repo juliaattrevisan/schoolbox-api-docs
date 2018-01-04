@@ -135,7 +135,8 @@ var jsSrc = {
         //'www/javascript/math/jscurry-0.3.0.js',
         //'www/javascript/math/jqmath-0.4.0.js'
 
-        // Feature tour
+        // Feature tours
+        'www/javascript/components/intro.js/intro.js',
         'www/javascript/shared/tour/tour.js'
     ],
     masonry: [

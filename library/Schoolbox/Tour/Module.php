@@ -41,6 +41,7 @@ class Module extends BaseModule
         $mappers = [
             'tourMapper'        => $injector->get('mapperFactory')->getLazy(Mapper::class),
             'tourTriggerMapper' => $injector->get('mapperFactory')->getLazy(Trigger\Mapper::class),
+            'tourStepMapper'    => $injector->get('mapperFactory')->getLazy(Step\Mapper::class),
         ];
 
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));

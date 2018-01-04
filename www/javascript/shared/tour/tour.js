@@ -12,8 +12,41 @@ $(function () {
                 var tour = window.tours[uuid];
 
                 if (typeof(tour) !== 'undefined') {
-                    console.log("alert('" + tour.title + "'); <--- Because alerts are too obnoxious!");
-                    console.log(tour.uuid);
+                    // Grab an instance of IntroJS
+                    var tourCurrent = introJs();
+
+                    // The tour object will eventually include steps that aren't just tooltips for IntroJS to render
+                    //
+                    // For now I'm just filtering the steps to those of type 'tooltip' and creating an array of tooltips
+                    // to pass to IntroJS. In the future I *guess* we will call IntroJS on each individual tooltip step
+                    // so we can alternate between the different types appropriately.
+                    var stepsToDisplay = [];
+
+                    $(tour.steps).each(function (i, step) {
+                        if (step.type === 'tooltip') {
+                            stepsToDisplay.push({
+                                intro: step.body,
+                                element: step.selector,
+                                tooltipClass: step.css_class
+                            });
+                        }
+                    });
+
+                    tourCurrent.setOptions({
+                        showStepNumbers: false,
+                        hidePrev: true,
+                        hideNext: true,
+                        nextLabel: 'Next',
+                        prevLabel: 'Back',
+                        skipLabel: '&times;',
+                        scrollTo: 'tooltip',
+                        disableInteraction: true,
+                        exitOnOverlayClick: false,
+                        steps: stepsToDisplay
+                    });
+
+                    // Fire the tour
+                    tourCurrent.start();
                 } else {
                     console.log('Unknown feature tour requested: ' + uuid);
                 }
@@ -24,14 +57,10 @@ $(function () {
             window.tours = [];
 
             $(tours).each(function (i, tour) {
-                console.log('Loading tour: ' + tour.title + ' (' + tour.uuid + ')')
-
                 window.tours[tour.uuid] = tour;
 
                 $(tour.triggers).each(function (j, trigger) {
                     if (trigger.selector && trigger.event) {
-                        console.log('Triggering on: $("' + trigger.selector + '").' + trigger.event + ' event');
-
                         // jQuery is unable to select document/window dynamically from a variable- need to check if the
                         // selector is one of these and use a hard coded jQuery selector instead.
 
@@ -57,7 +86,6 @@ $(function () {
             // Trigger 'tourReady' on body tag
 
             $('body').trigger('tourReady');
-            console.log('All tours ready');
         });
     }
 });
