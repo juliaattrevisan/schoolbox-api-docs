@@ -467,18 +467,16 @@ class RubricMapper
             FROM rubric_mark rm
             JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
             JOIN rubric_level rl ON rl.id = rd.level_id
-            WHERE rl.box_id = :boxId
-            AND rm.student_id = :userId
+            LEFT JOIN submission_return sr ON sr.box_id = :boxId AND sr.owner = :userId
+            WHERE rm.valid = TRUE
             $publishedClause
-            AND rm.valid = TRUE
             AND rm.created_at = (
-              SELECT MAX(created_at)
+              SELECT MAX(rm.created_at)
               FROM rubric_mark rm
-              JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
-              JOIN rubric_level rl ON rl.id = rd.level_id AND rl.deleted_at IS NULL
-              WHERE rl.box_id = :boxId
-              AND rm.student_id = :userId
-              AND rm.valid = TRUE
+              JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
+              JOIN rubric_level rl ON rl.id = rd.level_id
+              LEFT JOIN submission_return sr ON sr.box_id = :boxId AND sr.owner = :userId
+              WHERE rm.valid = TRUE
               $publishedClause
             )
             
