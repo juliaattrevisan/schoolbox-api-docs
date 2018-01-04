@@ -16,7 +16,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 /**
  * Class MarkMapper
@@ -42,7 +41,6 @@ class MarkMapper extends Mapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
 
         $this->joins('return_id', ReturnedWorkMapper::class, 'id', self::TYPE_MODEL, null, 'submissionReturn', 'submission_return');
-        $this->joins('student_id', UserMapper::class, 'id', null, null, null, 'user');
         $this->joins('descriptor_id', DescriptorMapper::class, 'id', null, null, null, 'descriptor');
 
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
@@ -62,11 +60,9 @@ class MarkMapper extends Mapper
         return "
             SELECT  {$this->getColumnString()},
                     {$this->getJoinColumnString('submission_return', 'r')},
-                    {$this->getJoinColumnString('user', 'u')},
                     {$this->getJoinColumnString('descriptor', 'd')}
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('submission_return', '', 'r')}
-            LEFT JOIN {$this->getJoinSql('user', '', 'u')}
             LEFT JOIN {$this->getJoinSql('descriptor', '', 'd')}
         ";
     }
@@ -81,20 +77,11 @@ class MarkMapper extends Mapper
         /** @var ReturnedWorkMapper $submissionReturnMapper */
         $submissionReturnMapper = $this->getJoinMapper('submission_return');
         $marks = $this->createCollection();
-        $students = $this->getJoinMapper('user')->createCollection();
         $descriptors = $this->getJoinMapper('descriptor')->createCollection();
 
-        $studentKey = "u.{$this->getJoinMapper('user')->getIdentifierColumn()}";
         $descriptorKey = "d.{$this->getJoinMapper('descriptor')->getIdentifierColumn()}";
 
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
-
-            $userId = $r[$studentKey];
-            if(!$students->offsetExists($userId)){
-                $students->setOffset($userId, $this->hydrateJoin($r, 'user', 'u'));
-            }
-            /** @var User $student */
-            $student = $students->getOffset($userId);
 
             $descriptorId = $r[$descriptorKey];
             if(!$descriptors->offsetExists($descriptorId)){
@@ -105,7 +92,6 @@ class MarkMapper extends Mapper
 
             $mark = $this->hydrate($r);
             $mark->setSubmissionReturn($submissionReturnMapper->hydrate($r, 'r'));
-            $mark->setStudent($student);
             $mark->setDescriptor($descriptor);
             $marks->add($mark);
         }
@@ -127,7 +113,8 @@ class MarkMapper extends Mapper
                 JOIN rubric_descriptor rd ON rm.descriptor_id = rd.id
                 JOIN rubric_level   rl ON rl.id = rd.level_id
                 JOIN submission_box sb ON sb.id = rl.box_id
-                WHERE rm.student_id = :student_id
+                JOIN submission_return sr ON sr.id = rm.return_id
+                WHERE sr.owner = :student_id
                 AND sb.assessment_id = :assessment_id
                 AND rm.published_at IS NULL
         ";
@@ -157,9 +144,10 @@ class MarkMapper extends Mapper
                 JOIN rubric_descriptor rd ON rm.descriptor_id = rd.id
                 JOIN rubric_level   rl ON rl.id = rd.level_id
                 JOIN submission_box sb ON sb.id = rl.box_id
+                JOIN submission_return sr ON sr.id = rm.return_id
                 SET
                   rm.published_at = :now
-                WHERE rm.student_id = :student_id
+                WHERE sr.owner = :student_id
                 AND sb.assessment_id = :assessment_id
                 AND rm.published_at IS NULL
         ";
