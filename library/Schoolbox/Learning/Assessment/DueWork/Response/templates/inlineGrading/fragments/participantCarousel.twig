@@ -9,8 +9,8 @@
     @param Participant participant            - currently displayed participant
     @param DueWork     participant.assessable - the assessment to which this Submission belongs
  #}
-<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.js"></script>
-<script type="text/javascript">
+<script src="/javascript/components/selectize/dist/js/standalone/selectize.js"></script>
+<script>
 
     {# A global var because the Feedback form uses the carousel to determine
      # the next person to continue towards, once Feedback is published
@@ -125,7 +125,7 @@
         }).trigger('change.preload');
     });
 </script>
-<script type="text/javascript">
+<script>
     $(function() {
         var nextHref = findNext(tgt);
         var nextUrl = '';

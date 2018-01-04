@@ -9,8 +9,8 @@
  #}
 {% if response and response.allFiles.count %}
     {% if kamiEnabled %}
-        <script type="application/javascript" src="/javascript/shared/submissions/jquery.kami-export.js"></script>
-        <script type="text/javascript">
+        <script src="/javascript/shared/submissions/jquery.kami-export.js"></script>
+        <script>
             $(function() {
                 // Activate export of Kami Documents
                 $('[data-kami-export]').kamiExport({

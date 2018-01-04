@@ -2,7 +2,7 @@
 
 {# Go back to the assessment's summary screen, I guess? #}
 {% block nextUrl %}
-<script type="text/javascript">
+<script>
     var nextUrl = '{{ routeLookup("learningAssessment.getSummary", {assessmentId: assessment.id, studentId: participant.user.id}) }}';
 </script>
 {% endblock %}
