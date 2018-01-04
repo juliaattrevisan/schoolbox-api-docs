@@ -1,5 +1,12 @@
 {% extends '@learningDueWorkResponse/inlineGrading/standard.twig' %}
 
+{# Go back to the assessment's summary screen, I guess? #}
+{% block nextUrl %}
+<script type="text/javascript">
+    var nextUrl = '{{ routeLookup("learningAssessment.getSummary", {assessmentId: assessment.id, studentId: participant.user.id}) }}';
+</script>
+{% endblock %}
+
 {# No participant carousel in self-reflection #}
 {% block participantCarousel %}{% endblock %}
 

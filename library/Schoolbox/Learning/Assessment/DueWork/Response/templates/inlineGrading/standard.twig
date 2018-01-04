@@ -27,9 +27,11 @@ Usage:
 {# Required in both self-assess/reflect and regular staff inline grading
  # Don't remove this; it'll cause javascript Undefined errors
  #}
+{% block nextUrl %}
 <script type="text/javascript">
     var nextUrl = '';
 </script>
+{% endblock %}
 
 {# Vars required in both contexts
  # These vars exist regardless of who is looking
