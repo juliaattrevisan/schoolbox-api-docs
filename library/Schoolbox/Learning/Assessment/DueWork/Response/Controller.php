@@ -175,10 +175,10 @@ class Controller extends Base
 
         /* Figure out who's actually here and what screen to show
          */
-        if ((new ValidSelfAssessment($this->getUser(), $participant))->isSatisfied()) {
+        if ($selfAssessedWithResponse) {
             $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/selfAssessment.twig', $data));
         }
-        elseif ((new ValidSelfReflection($this->getUser(), $participant))->isSatisfied()) {
+        elseif ($selfReflectedWithResponse) {
             $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/selfReflection.twig', $data));
         }
     }
