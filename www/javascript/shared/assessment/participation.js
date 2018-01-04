@@ -217,7 +217,7 @@ $(function() {
             $planDataContainer.append(hiddenInputs);
 
             // Add plan to drop down
-            $('#participant-customise').before('<li><a href="#" data-plan-use="' + planIndex + '" data-plan-name="' + planName + '">' + planName + '</a></li>');
+            $('#participant-customise').closest('li').before('<li><a href="#" data-plan-use="' + planIndex + '" data-plan-name="' + planName + '">' + planName + '</a></li>');
 
             // Update the selected students with the plan
             updatePlan($('#plan-participants')[0].selectize.getValue().split(','), planIndex, planName);
