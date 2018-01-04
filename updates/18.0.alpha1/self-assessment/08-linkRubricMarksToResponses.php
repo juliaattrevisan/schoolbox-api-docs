@@ -124,9 +124,10 @@ class LinkRubricMarkToFeedback
     private $countPropagatedRubricMarks = 0;
     private $logPropagatedRubricMarks = [];
     private $countLinkedPublishedFeedbacks = 0;
+    private $countLinkedDeletedFeedbacks = 0;
     private $countLinkedDraftFeedbacks = 0;
     private $countCombinedDrafts = 0;
-    private $logCombinedDraftFeedbacks = [];
+    private $logCombinedDrafts = [];
 
     /** @var IConnector */
     private $db;
@@ -150,6 +151,7 @@ class LinkRubricMarkToFeedback
     public function run()
     {
         $this->migrateByParticipation();
+        $this->checkLatestMarkVisibility();
         $this->printLog();
     }
 
@@ -303,12 +305,17 @@ class LinkRubricMarkToFeedback
                     return;
                 }
 
+                if (!$this->validateDescriptorSet($draftRubricMarks[0])) {
+                    // Is your only/latest draft broken? Don't link and get out.
+                    return;
+                }
+
                 if (count($draftRubricMarks) > 1) {
+                    // See what can be combined
                     $combinedDrafts = $this->combineDrafts($draftRubricMarks);
                     if (!empty($combinedDrafts)) {
                         $draftRubricMarks = $combinedDrafts;
                         $this->log->notice('More than 1 draft record appears to belong to the same feedback');
-                        $this->logCombinedDraftFeedbacks[] = $draftFeedbacks[0]['id'];
                     } else {
                         $this->log->warning('More than 1 draft found for the participation. Skipping!');
 
@@ -356,7 +363,7 @@ class LinkRubricMarkToFeedback
     {
         $rubricMarks = $this->db->executeQuery(
             '
-            SELECT COUNT(rm.id) AS records, rm.student_id, rm.return_id, rl.box_id, rm.created_at, rm.published_at, COUNT(DISTINCT rd.criterion_id) AS criterion
+            SELECT COUNT(rm.id) AS records, rm.student_id, rm.return_id, rl.box_id, rm.published_at, COUNT(DISTINCT rd.criterion_id) AS criterion
             FROM rubric_mark rm
             JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
             JOIN rubric_level rl ON rl.id = rd.level_id
@@ -386,7 +393,7 @@ class LinkRubricMarkToFeedback
     {
         $feedbacks = $this->db->executeQuery(
             '
-            SELECT DISTINCT sr.id, rm.return_id, sr.created_at, sr.updated_at, sr.deleted_at AS "DELETED", sr.published_at
+            SELECT DISTINCT sr.id, rm.return_id, sr.created_at, sr.updated_at, sr.deleted_at, sr.published_at
             FROM submission_return sr
             JOIN submission_box sb ON sb.id = sr.box_id
             LEFT JOIN rubric_mark rm ON sr.id = rm.return_id
@@ -422,7 +429,7 @@ class LinkRubricMarkToFeedback
                 AND rm.published_at IS NULL
                 AND rl.box_id = :box_id
                 GROUP BY rm.created_at
-                ORDER BY rm.created_at DESC;
+                ORDER BY rm.created_at DESC, rm.id DESC;
                 ',
             [
                 'student_id' => $participation['student_id'],
@@ -434,7 +441,7 @@ class LinkRubricMarkToFeedback
     }
 
     /**
-     * Return all feedbacks for a participation order from latest to oldest
+     *'Returns the most recently updated draft feedback for the specified participant
      *
      * @param $participation
      *
@@ -449,7 +456,7 @@ class LinkRubricMarkToFeedback
                     JOIN submission_box sb ON sb.id = sr.box_id
                     LEFT JOIN rubric_mark rm ON sr.id = rm.return_id
                     WHERE sr.owner = :student_id AND sr.box_id = :box_id AND sr.published_at IS NULL
-                    ORDER BY sr.updated_at DESC
+                    ORDER BY sr.updated_at DESC, sr.created_at DESC, sr.id DESC
                     LIMIT 1;
                 ',
             [
@@ -487,6 +494,8 @@ class LinkRubricMarkToFeedback
             ]
         );
 
+        $this->checkVisibilityChange($feedback);
+
         $this->countLinkedPublishedFeedbacks++;
     }
 
@@ -507,6 +516,7 @@ class LinkRubricMarkToFeedback
                 WHERE rm.student_id = :student_id
                 AND rm.created_at = :created_at
                 AND rl.box_id = :box_id
+                AND rm.published_at IS NULL
                 AND rm.return_id IS NULL;
                 ',
             [
@@ -569,6 +579,9 @@ class LinkRubricMarkToFeedback
             );
             $propagatedRecords[] = $this->db->lastInsertId();
         }
+
+        $this->checkVisibilityChange($feedback);
+
         $this->logPropagatedRubricMarks[] = [
             'feedbackId' => $feedback['id'],
             'markIds'    => $propagatedRecords,
@@ -577,6 +590,14 @@ class LinkRubricMarkToFeedback
         $this->countLinkedPublishedFeedbacks++;
 
         return (true);
+    }
+
+
+    private function checkVisibilityChange($feedback) {
+        if (!is_null($feedback['deleted_at'])) {
+            $this->countLinkedDeletedFeedbacks++;
+            $this->log->notice(sprintf('Rubric mark is linked to the soft-deleted feedback %d', $feedback['id']));
+        }
     }
 
     /**
@@ -593,44 +614,78 @@ class LinkRubricMarkToFeedback
         $combinedCriterions = [];
 
         foreach ($draftRubricMarks as $i => $draftRubricMark) {
+
             // Validate descriptors within same rubric mark.
             // If the latest draft rubric mark is broken, give up on linking this participation drafts, the data is too messed up.
-            $rubricMarkCriterions = $this->getDraftRubricMarkCriterions($draftRubricMark);
-
             if (!$this->validateDescriptorSet($draftRubricMark)) {
                 // Stop there, return what you've already got, if you've got
                 break;
             }
 
+            $rubricMarkCriterions = $this->getDraftRubricMarkCriterions($draftRubricMark);
+
             if ($i == 0) {
-                // We've got at least one good draft
+                // We've got at least one draft
                 $combinedDrafts[]     = $draftRubricMark;
-                $combinedCriterions[] = $rubricMarkCriterions;
-                $latestCreatedDate    = new Alaress_Date_Format($draftRubricMarks[0]['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
+                $combinedCriterions = array_merge($combinedCriterions, $rubricMarkCriterions);
+                $logDates[] = $draftRubricMark['created_at'];
+                $latestCreateDate    = new Alaress_Date_Format($draftRubricMarks[0]['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
             } else {
                 $createdDate = new Alaress_Date_Format($draftRubricMark['created_at'], Alaress_Date_Format::DATABASE_FORMAT);
 
-                // Check if creation dates are relatively close
-                if ($createdDate->diffInSeconds($latestCreatedDate) > self::TIME_DELTA) {
+                if ($this->canCombineByDate($createdDate, $latestCreateDate) &&
+                    $this->canCombineByCriterion($rubricMarkCriterions, $combinedCriterions)) {
+
+                    $combinedDrafts[]     = $draftRubricMark;
+                    $combinedCriterions = array_merge($combinedCriterions, $rubricMarkCriterions);
+                    $logDates[] = $draftRubricMark['created_at'];
+
+                }
+                else {
+                    // Stop there, return what you've already got
                     break;
                 }
-
-                // Check if criterions won't overlap
-                foreach ($rubricMarkCriterions as $rubricMarkCriterion) {
-                    if (in_array($rubricMarkCriterion, $combinedCriterions)) {
-                        break;
-                    }
-                }
-
-                // Combine
-                $combinedDrafts[]     = $draftRubricMark;
-                $combinedCriterions[] = $rubricMarkCriterions;
             }
         }
 
-        $this->countCombinedDrafts += count($combinedDrafts) > 1 ? count($combinedDrafts) : 0;
+        if (count($combinedDrafts) > 1) {
+            $this->countCombinedDrafts ++;
+            $this->logCombinedDrafts[] = sprintf('Student:box %d:%d created_at %s', $combinedDrafts[0]['student_id'], $combinedDrafts[0]['box_id'], implode($logDates, ', '));
+        }
 
         return $combinedDrafts;
+    }
+
+    /**
+     * Check if the drafts you want to combine are close enough by creation date
+     *
+     * @param Alaress_Date_Format $currentDraftCreateDate
+     * @param Alaress_Date_Format $latestDraftCreateDate
+     *
+     * @return bool
+     */
+    private function canCombineByDate(Alaress_Date_Format $currentDraftCreateDate, Alaress_Date_Format $latestDraftCreateDate) {
+        return $currentDraftCreateDate->diffInSeconds($latestDraftCreateDate) <= self::TIME_DELTA;
+    }
+
+
+    /**
+     * Check if the drafts you want to combine are not conflicting by criterion
+     *
+     * @param array $rubricMarkCriterions
+     * @param array $combinedCriterions
+     *
+     * @return bool
+     */
+    private function canCombineByCriterion($rubricMarkCriterions, $combinedCriterions) {
+
+        foreach ($rubricMarkCriterions as $rubricMarkCriterion) {
+            if (in_array($rubricMarkCriterion, $combinedCriterions)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -645,10 +700,11 @@ class LinkRubricMarkToFeedback
         if ($rubricMark['criterion'] != $rubricMark['records']) {
             $this->log->warning(
                 sprintf(
-                    'Invalid descriptors for student_id %d box_id %d and published date %s - Skipping!',
+                    'Invalid descriptors for student_id %d box_id %d and %s date %s - Skipping!',
                     $rubricMark['student_id'],
                     $rubricMark['box_id'],
-                    $rubricMark['published_at']
+                    isset($rubricMark['published_at']) ? 'published' : 'created',
+                    $rubricMark['published_at'] ?? $rubricMark['created_at']
                 )
             );
             $this->countBrokenRubricMarks++;
@@ -666,7 +722,7 @@ class LinkRubricMarkToFeedback
      * @param $log
      * @param $rubricMark
      *
-     * @return array|bool
+     * @return int[]
      */
     private function getDraftRubricMarkCriterions($rubricMark)
     {
@@ -687,6 +743,50 @@ class LinkRubricMarkToFeedback
         )->fetchAll(PDO::FETCH_COLUMN);
 
         return $criterions;
+    }
+
+    private function checkLatestMarkVisibility() {
+
+        foreach ($this->getParticipations() as $i => $participation) {
+            $latestRubricMark = $this->db->executeQuery("
+                SELECT rm.return_id, sr.deleted_at
+                FROM rubric_mark rm
+                JOIN (
+                    -- Get latest valid published date for this participant
+                    SELECT MAX(rm.published_at) AS 'max_published_at'
+                    FROM rubric_mark rm
+                    JOIN rubric_descriptor descriptor ON rm.descriptor_id = descriptor.id
+                    JOIN rubric_level rl ON descriptor.level_id = rl.id
+                    WHERE rm.valid IS TRUE
+                    AND rm.published_at IS NOT NULL
+                    AND rm.student_id = :student_id
+                    AND rl.box_id = :box_id
+                    ) t2 ON t2.max_published_at = rm.published_at
+                JOIN submission_return sr ON rm.return_id = sr.id
+                WHERE sr.deleted_at IS NOT NULL
+                AND rm.student_id = :student_id
+                AND sr.box_id = :box_id
+                AND rm.return_id IS NOT NULL
+                GROUP BY rm.return_id;
+                ",
+                    [
+                        'student_id' => $participation['student_id'],
+                        'box_id'     => $participation['box_id'],
+                    ]
+                )->fetchAll();
+            if (1 === \count($latestRubricMark)) {
+                $this->log->warning(
+                    sprintf(
+                        'Latest rubric mark visibility is lost for student:%d box:%d, it is linked to the soft-deleted feedback %d',
+                        $participation['student_id'],
+                        $participation['box_id'],
+                        $latestRubricMark[0]['return_id']
+                    )
+                );
+            } elseif(\count($latestRubricMark) >= 2){
+                $this->log->error('Logic error. Multiple feedbacks linked to from rubric marks with same published date');
+            }
+        }
     }
 
     /**
@@ -716,6 +816,9 @@ class LinkRubricMarkToFeedback
         }
         $this->log->notice(sprintf('Total published feedbacks linked: %d', $this->countLinkedPublishedFeedbacks));
         $this->log->notice(sprintf('Total draft feedbacks linked: %d', $this->countLinkedDraftFeedbacks));
-        $this->log->notice(sprintf('Total combined draft rubric marks: %d for feedbacks %s', $this->countCombinedDrafts, implode($this->logCombinedDraftFeedbacks, ',')));
+        $this->log->notice(sprintf('Total combined draft occurrences: %d', $this->countCombinedDrafts));
+        if (count($this->logCombinedDrafts) > 0) {
+            $this->log->notice(sprintf('Combined drafts details: %s', implode($this->logCombinedDrafts, ', ')));
+        }
     }
 }
