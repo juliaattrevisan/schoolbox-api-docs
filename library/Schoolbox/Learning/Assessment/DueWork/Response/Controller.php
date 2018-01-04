@@ -151,7 +151,6 @@ class Controller extends Base
 
             /* For saving feedbacks
              */
-            'errors' => [],
             'participant' => $participant,
 
             /* Plagscan status
