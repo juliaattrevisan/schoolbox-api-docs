@@ -184,20 +184,15 @@ class MarkMapper extends Mapper
     public function findMarkedByAssessment($assessment_id)
     {
         $query = "
-            SELECT            rubric_mark.student_id,
-                              COUNT(*)
-            FROM              rubric_mark
-            INNER JOIN        rubric_descriptor ON
-                              rubric_descriptor.id = rubric_mark.descriptor_id
-            INNER JOIN        rubric_level ON
-                              rubric_level.id = rubric_descriptor.level_id
-            INNER JOIN        submission_box ON 
-                              submission_box.id = rubric_level.box_id
-            INNER JOIN        assessment ON 
-                              assessment.id = submission_box.assessment_id
-            WHERE             valid = 1
-                              AND assessment.id = :assessmentId
-            GROUP BY          rubric_mark.student_id
+            SELECT            sr.owner AS student_id, COUNT(rm.id)
+            FROM              rubric_mark rm
+            INNER JOIN        rubric_descriptor rd ON rd.id = rm.descriptor_id
+            INNER JOIN        rubric_level rl ON rl.id = rd.level_id
+            INNER JOIN        submission_box sb ON sb.id = rl.box_id
+            INNER JOIN        assessment a ON a.id = sb.assessment_id
+            LEFT JOIN         submission_return sr ON sr.box_id = sb.id
+            WHERE             valid = 1 AND a.id = :assessmentId
+            GROUP BY          sr.owner
         ";
         $stmt = $this->database->prepare($query);
         $stmt->execute([
