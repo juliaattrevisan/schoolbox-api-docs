@@ -29,6 +29,7 @@ class Module extends BaseModule
                 '/url/{url}' => ['getTours' => null],
             ],
             'POST' => [
+                '/url/{url}/{step}' => 'saveStatus',
             ],
         ]);
     }
@@ -42,6 +43,7 @@ class Module extends BaseModule
             'tourMapper'        => $injector->get('mapperFactory')->getLazy(Mapper::class),
             'tourTriggerMapper' => $injector->get('mapperFactory')->getLazy(Trigger\Mapper::class),
             'tourStepMapper'    => $injector->get('mapperFactory')->getLazy(Step\Mapper::class),
+            'tourStatusMapper'  => $injector->get('mapperFactory')->getLazy(Status\Mapper::class),
         ];
 
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));

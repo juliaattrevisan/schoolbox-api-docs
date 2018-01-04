@@ -29,17 +29,20 @@ class Controller extends Base
      *
      * @param TourMapper        $tourMapper
      * @param TourTriggerMapper $tourTriggerMapper
-     * @param Step\Mapper    $tourStepMapper
+     * @param Step\Mapper       $tourStepMapper
+     * @param Status\Mapper     $tourStatusMapper
      */
     public function __construct(
         TourMapper $tourMapper,
         TourTriggerMapper $tourTriggerMapper,
-        Step\Mapper $tourStepMapper
+        Step\Mapper $tourStepMapper,
+        Status\Mapper $tourStatusMapper
     )
     {
         $this->tourMapper        = $tourMapper;
         $this->tourTriggerMapper = $tourTriggerMapper;
         $this->tourStepMapper    = $tourStepMapper;
+        $this->tourStatusMapper  = $tourStatusMapper;
     }
 
 
@@ -99,5 +102,16 @@ class Controller extends Base
         // Return results in JSON
         $this->getResponse()->status->set(200);
         $this->getResponse()->content->set($this->buildJsonOutput($data));
+    }
+
+
+    /**
+     * @api POST /url/{url}/{step}
+     * @param $step
+     * @param $url
+     */
+    public function saveStatus(string $step, string $url)
+    {
+
     }
 }
