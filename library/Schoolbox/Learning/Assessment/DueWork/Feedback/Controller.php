@@ -31,9 +31,6 @@ class Controller extends Base
     /** @var IFeedbackDataSource */
     protected $feedbackDataSource;
 
-    /** @var MapperProxy */
-    private $feedbackMapperProxy;
-
     /** @var ParticipantDataSource */
     protected $participantDataSource;
 
@@ -62,7 +59,6 @@ class Controller extends Base
      * @param UserMapper            $userMapper
      * @param Rubric\MarkMapper     $rubricMarkMapper
      * @param ReturnedWorkMapper    $returnedWorkMapper
-     * @param MapperProxy           $feedbackMapperProxy
      */
     public function __construct(
         IFeedbackDataSource $feedbackDataSource,
@@ -71,8 +67,7 @@ class Controller extends Base
         ResponseDataSource $responseDataSource,
         UserMapper $userMapper,
         Rubric\MarkMapper $rubricMarkMapper,
-        ReturnedWorkMapper $returnedWorkMapper,
-        MapperProxy $feedbackMapperProxy
+        ReturnedWorkMapper $returnedWorkMapper
     ) {
         $this->feedbackDataSource    = $feedbackDataSource;
         $this->participantDataSource = $participantDataSource;
@@ -81,7 +76,6 @@ class Controller extends Base
         $this->userMapper            = $userMapper;
         $this->rubricMarkMapper      = $rubricMarkMapper;
         $this->returnedWorkMapper    = $returnedWorkMapper;
-        $this->feedbackMapperProxy   = $feedbackMapperProxy;
     }
 
     /**
@@ -183,7 +177,6 @@ class Controller extends Base
         if(!$participant->getAssessable() instanceof DueWork\Model){
             return;
         }
-        $returnedWork = $this->feedbackMapperProxy->transformDomainObject($feedback);
 
         /** @var DueWork\Model $dueWork */
         $dueWork = $participant->getAssessable();
@@ -193,7 +186,7 @@ class Controller extends Base
         // Did we just give some rubric marks?
         if (is_array($post['rubric'])) {
             $rubMap = RubricMapper::getInstance();
-            $rubMap->saveForParticipant($participant, $post['rubric']['descriptors'], $isDraft, $returnedWork);
+            $rubMap->saveForParticipant($participant, $post['rubric']['descriptors'], $isDraft, $feedback->getId());
         }
         // Else did we just publish draft marks via the status page?
         elseif(!$isDraft){
