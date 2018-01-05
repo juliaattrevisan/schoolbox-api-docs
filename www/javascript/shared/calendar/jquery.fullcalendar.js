@@ -434,8 +434,10 @@ function Calendar(id, bubbleId, opts) {
 
             // only send data to the server if we actually need to
             if(performAjax && cal.options.filter.ajax) {
-                var view = cal.dom.fullCalendar('getView').name
-                cal.post(cal.options.filter.ajax, {fList : flist, view: view}, null, false)
+                var view = cal.dom.fullCalendar('getView').name;
+                if (view) {
+                    cal.post(cal.options.filter.ajax, {fList: flist, view: view}, null, false);
+                }
             }
         }
     }
