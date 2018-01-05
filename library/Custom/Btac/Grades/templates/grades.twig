@@ -93,6 +93,7 @@
                 <section>
                     <ul class="information-list">
                         {% for assessment in assessmentTasks[folder.id] %}
+                            {% set participant = assessment.participant(student) %}
                             <li class="actions-small-2">
                                 <div class="list-item clearfix content">
                                     <div class="row">
@@ -106,7 +107,7 @@
                                         </div>
 
                                         <div class="small-12 large-4 columns grade">
-                                            {% set feedback = assessment.participantIfExtant(student).findAuthoritativeVisibleFeedback(currentUser) %}
+                                            {% set feedback = participant.findAuthoritativeVisibleFeedback(currentUser) %}
                                             {% if feedback %}
                                                 <div class="{{ urgency.marks(feedback.normalisedMark) }}"><span>{{ feedback.humanReadableMark }}</span></div>
                                                 <p class="comment">{{ feedback.comment | nl2br }}</p>
@@ -114,7 +115,7 @@
                                         </div>
 
                                         <div class="small-12 large-3 columns">
-                                            Due <span class="{{ urgency.datetime(assessment, student) }}">{{ assessment.dueAt.relativeTime }}</span>
+                                            Due <span class="{{ urgency.datetime(participant) }}">{{ assessment.dueAt.relativeTime }}</span>
                                             on {{ assessment.dueAt.dateOnly }}
                                         </div>
                                     </div>
