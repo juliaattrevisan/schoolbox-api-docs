@@ -59,10 +59,6 @@ class SelfReflectionTest extends TestCase
             ->setSelfAssessable(false)
             ->setSelfReflectable(false);
 
-        $incorrectAssessment3 = (new DueWork\Model())
-            ->setSelfAssessable(false)
-            ->setSelfReflectable(null);
-
         $incorrectAssessment4 = (new DueWork\Model())
             ->setSelfAssessable(true)
             ->setSelfReflectable('');
@@ -108,12 +104,6 @@ class SelfReflectionTest extends TestCase
                 false
             ],
 
-            'Invalid: Student starting an improperly-configured self-reflection (3)' => [
-                $student,
-                new Participant($student, new Plan($incorrectAssessment3)),
-                false
-            ],
-
             'Invalid: Student starting an improperly-configured self-reflection (4)' => [
                 $student,
                 new Participant($student, new Plan($incorrectAssessment4)),
@@ -135,12 +125,6 @@ class SelfReflectionTest extends TestCase
             'Invalid: Student starting an improperly-configured self-reflection for someone else (2)' => [
                 $student,
                 new Participant($otherStudent, new Plan($incorrectAssessment2)),
-                false
-            ],
-
-            'Invalid: Student starting an improperly-configured self-reflection for someone else (3)' => [
-                $student,
-                new Participant($otherStudent, new Plan($incorrectAssessment3)),
                 false
             ],
 
