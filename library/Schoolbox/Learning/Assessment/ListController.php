@@ -365,11 +365,13 @@ class ListController extends Web\Controller\Base
     {
         $partMap = $this->participantDataSource->getParticipantMapper();
 
+        $planIds = $plans->getPropertyValues('id');
+
         // plans are saved; persistipation
         foreach ($inclusionFlags as $userId => $userIncluded) {
 
             $existingParticipation = $partMap->findByColumnList([
-                'participant_plan_id' => $plans->getPropertyValues('id'),
+                'participant_plan_id' => $planIds,
                 'user_id'             => $userId
             ]);
 
