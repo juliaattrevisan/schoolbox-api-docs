@@ -97,6 +97,11 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
                 continue;
             }
 
+            // This may be invoked by both staff and students.
+            // Students will see their plan's dates, teachers will see the real assessment dates.
+            $participant = $assessment->getParticipantIfExtant($this->getUser());
+            $dueDate     = $participant ? $participant->getDueDate() : $assessment->getDueAt();
+
             $event = new Event();
 
             $event->setAssessment($assessment);
@@ -110,12 +115,12 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
             } else {
                 $event->setColour($this->getEventColor($folder, $eventType));
             }
-            $event->setStartTime($assessment->getDueAt());
-            $event->setEndTime($assessment->getDueAt());
+            $event->setStartTime($dueDate);
+            $event->setEndTime($dueDate);
 
             // Will only be all day if the event's date is one second before
             // midnight.
-            $event->setAllday($assessment->getDueAt()->isAtEndOfDay());
+            $event->setAllday($dueDate->isAtEndOfDay());
 
             // All assessment events can be populated identically now
             $event->setEventId($assessment->getId());
