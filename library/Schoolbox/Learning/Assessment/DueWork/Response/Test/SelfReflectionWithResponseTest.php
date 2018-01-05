@@ -1,0 +1,86 @@
+<?php
+
+/**
+ * ValidationTest
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2017, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+declare(strict_types=1);
+
+namespace Schoolbox\Learning\Assessment\DueWork\Response\Test;
+
+use PHPUnit\Framework\TestCase;
+use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfReflectionWithResponse;
+use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Plan;
+use Schoolbox\User;
+
+class SelfReflectionWithResponseTest extends TestCase
+{
+    /**
+     * @dataProvider provider_validSelfReflectable
+     * @param User        $currentUser  The user currently "logged in"
+     * @param Participant $participant  The user whose trying to start self-assessment
+     * @param int         $expected
+     */
+    public function testValidSelfAssessable(User $currentUser, Participant $participant, $expected)
+    {
+        $validation = new ValidSelfReflectionWithResponse($currentUser, $participant);
+
+        $this->assertEquals($expected, $validation->isSatisfied());
+    }
+
+    /**
+     * Data provider for testValidSelfReflectable
+     *
+     * @return array
+     */
+    public function provider_validSelfReflectable() :array {
+        $student = (new User())->setId(230);
+
+        $correctAssessment = (new DueWork\Model())
+            ->setSelfAssessable(false)
+            ->setSelfReflectable(true);
+
+        /* This participation is correctly set up to conclude Self Assessment
+         */
+        $correctParticipation = new Participant($student, new Plan($correctAssessment));
+        $correctParticipation->getAllResponses()->add(new DueWork\Response\Model());
+
+        /* This participation is incorrectly set up: no draft response exists
+         */
+        $incorrectParticipation1 = new Participant($student, new Plan($correctAssessment));
+
+        $incorrectParticipation2 = new Participant($student, new Plan($correctAssessment));
+        $incorrectParticipation2->getAllResponses()->add(
+            (new DueWork\Response\Model())->setSubmittedAt(\Alaress_Date_Format::now())
+        );
+
+        /* Test everything
+         */
+        return [
+            /* You have to be the participant
+             */
+            'Valid: Student concluding their own self-reflection' => [
+                $student,
+                $correctParticipation,
+                true
+            ],
+
+            'Invalid: No draft response exists for this participation (1)' => [
+                $student,
+                $incorrectParticipation1,
+                false
+            ],
+
+            'Invalid: No draft response exists for this participation (2)' => [
+                $student,
+                $incorrectParticipation2,
+                false
+            ],
+        ];
+    }
+}
