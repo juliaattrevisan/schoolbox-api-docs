@@ -13,7 +13,7 @@ use Alaress\Application\Kernel;
 use Config\ModuleLoader;
 use Custom\Help\Nesa\Module as NesaModule;
 
-class Nesa extends ModuleLoader {
+class Accreditation extends ModuleLoader {
 
     /**
      * Run configuration for the given module
@@ -22,6 +22,6 @@ class Nesa extends ModuleLoader {
      * @return void
      */
     public function configure($kernel) {
-        $this->loadModule($kernel, NesaModule::class, '/help/nesa');
+        $this->loadModule($kernel, NesaModule::class, '/accreditation');
     }
 }
