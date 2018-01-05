@@ -354,7 +354,7 @@ class ListController extends Web\Controller\Base
 
 
     /**
-     * @param GenericCollection $plans
+     * @param GenericCollection|\Schoolbox\Assessment\Participant\Plan\Model[] $plans
      * @param array             $inclusionFlags
      * @param array             $userPlanIndices
      * @throws DomainException
@@ -383,13 +383,14 @@ class ListController extends Web\Controller\Base
                     throw new DomainException("Urgh");
                 }
 
-                // this action needs to enforce the constraint of a user being in 0..1 plan
-                // TODO atomicity!!! :'(
-                $partMap->delete($existingParticipation);
-                $partMap->save($this->makeAParticipation($userId, $userPlan));
-
+                // only generate a record if there is ALREADY existing participation, AND the plan is NOT dynamic
+                if ($existingParticipation->count() && !$userPlan->isDynamic()) {
+                    // this action needs to enforce the constraint of a user being in 0..1 plan
+                    // TODO atomicity!!! :'(
+                    $partMap->delete($existingParticipation);
+                    $partMap->save($this->makeAParticipation($userId, $userPlan));
+                }
             } else {
-
                 if ($existingParticipation->count() === 0) {
                     // we need to generate a record so we have *something* to exclude
                     $existingParticipation = $partMap->createCollection([
