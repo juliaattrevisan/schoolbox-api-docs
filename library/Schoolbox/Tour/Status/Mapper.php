@@ -30,7 +30,7 @@ class Mapper extends BaseMapper
         $this->hasTable('tour_status');
         $this->hasModel(Model::class);
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
-        $this->joins('current_Step', StepMapper::class, 'uuid', null, null, 'tourStep', 'tourStep');
+        $this->joins('current_step', StepMapper::class, 'uuid', null, null, 'tourStep', 'tourStep');
         $this->uses('url', self::TYPE_STRING);
         $this->uses('status', self::TYPE_STRING);
     }
@@ -74,6 +74,8 @@ class Mapper extends BaseMapper
             $model->setTourStep($tourStep);
 
             new \Alaress_Probe($row, $user, $model);
+
+            $collection->add($model);
         }
 
         return $collection;

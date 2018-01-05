@@ -1,7 +1,7 @@
 $(function () {
 
     if (typeof(window.tourUrl) !== 'undefined') {
-        $.get(tourUrl).done(function (tours) {
+        $.get(window.tourUrl).done(function (tours) {
 
             // Function to initiate a joyride
 
@@ -27,7 +27,8 @@ $(function () {
                             stepsToDisplay.push({
                                 intro: step.body,
                                 element: step.selector,
-                                tooltipClass: step.css_class
+                                tooltipClass: step.css_class,
+                                uuid: step.uuid
                             });
                         }
                     });
@@ -43,6 +44,62 @@ $(function () {
                         disableInteraction: true,
                         exitOnOverlayClick: false,
                         steps: stepsToDisplay.filter(function(obj) { return $(obj.element).is(':visible'); })
+                    });
+
+                    var oldStep = null;
+                    var completed  = false;
+                    var route = '/tour/url/{url}/{step}';
+
+                    tourCurrent.onchange(function(targetElement) {
+                        var tourUrl     = btoa(window.location.pathname);
+                        var newStep     = tourCurrent._introItems[tourCurrent._currentStep].uuid;
+                        var postUrl     = route.replace("{url}", tourUrl).replace("{step}", oldStep);
+                        var status      = "Unactioned";
+
+                        //Save the status
+                        $.post(postUrl, {
+                            newStep: newStep,
+                            status: status
+                        }, function () {
+
+                        });
+
+                        oldStep         = newStep;
+                    });
+
+                    tourCurrent.oncomplete(function(targetElement) {
+                        completed = true;
+
+                        var tourUrl     = btoa(window.location.pathname);
+                        var newStep     = tourCurrent._introItems[tourCurrent._currentStep].uuid;
+                        var postUrl     = route.replace("{url}", tourUrl).replace("{step}", oldStep);
+                        var status      = "Completed";
+
+                        //Save the status
+                        $.post(postUrl, {
+                            newStep: newStep,
+                            status: status
+                        }, function () {
+
+                        });
+                    });
+
+                    tourCurrent.onexit(function(targetElement) {
+                        //onexit triggers when oncomplete triggers, so need check
+                        if(!completed) {
+                            var tourUrl = btoa(window.location.pathname);
+                            var newStep = tourCurrent._introItems[tourCurrent._currentStep].uuid;
+                            var postUrl = route.replace("{url}", tourUrl).replace("{step}", oldStep);
+                            var status = "Dismissed";
+
+                            //Save the status
+                            $.post(postUrl, {
+                                newStep: newStep,
+                                status: status
+                            }, function () {
+
+                            });
+                        }
                     });
 
                     // Fire the tour

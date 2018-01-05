@@ -8,6 +8,7 @@
 namespace Schoolbox\Tour;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\File\Exception;
 use Schoolbox\Tour\Mapper as TourMapper;
 use Schoolbox\Tour\Trigger\Mapper as TourTriggerMapper;
 use Schoolbox\Tour\Trigger\Model as TourTrigger;
@@ -22,6 +23,9 @@ class Controller extends Base
 
     /** @var Step\Mapper $tourStepMapper */
     private $tourStepMapper;
+
+    /** @var Status\Mapper $tourStatusMapper */
+    private $tourStatusMapper;
 
 
     /**
@@ -106,12 +110,33 @@ class Controller extends Base
 
 
     /**
-     * @api POST /url/{url}/{step}
-     * @param $step
+     * @api POST /url/{url}/{oldStep}
+     * @param $oldStep
      * @param $url
      */
-    public function saveStatus(string $step, string $url)
+    public function saveStatus(?string $oldStep, string $url)
     {
+        //Delete previous step
+        if($oldStep != null) {
+           try {
+               $oldTourStatus = $this->tourStatusMapper->findByColumnList(["current_step" => $oldStep, "url" => $url]);
+               $this->tourStatusMapper->delete($oldTourStatus);
+           } catch (Exception $e) {
+               //Could not find old step in db...
+           }
+        }
 
+        //Save new step
+        $newTourStatus = $this->tourStatusMapper->createModel();
+        $newTourStatus->setTourStep($_POST['newStep']);
+        $newTourStatus->setUser($_SESSION['user']);
+        $newTourStatus->setUrl($url);
+        $newTourStatus->setStatus($_POST['status']);
+
+        try {
+            $this->tourStatusMapper->save($newTourStatus);
+        } catch (Exception $e) {
+            //Attempted to save invalid data
+        }
     }
 }
