@@ -7,6 +7,7 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DueWork\Response\Test;
 
@@ -65,7 +66,7 @@ class SelfAssessmentTest extends TestCase
             ->setSelfReflectable(true);
 
         $incorrectAssessment5 = (new DueWork\Model())
-            ->setSelfAssessable('cat')
+            ->setSelfAssessable('false')
             ->setSelfReflectable(true);
 
         /* Test everything

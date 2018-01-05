@@ -624,7 +624,7 @@ class Model extends AbstractAssessment
      * @param boolean $selfAssessable
      * @return static
      */
-    public function setSelfAssessable($selfAssessable)
+    public function setSelfAssessable(bool $selfAssessable)
     {
         $this->selfAssessable = $selfAssessable;
         return $this;
