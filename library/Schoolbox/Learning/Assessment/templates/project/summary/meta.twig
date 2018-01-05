@@ -9,7 +9,7 @@
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 <ul class="meta">
     {% if assessment.baseContext is not unitSpecification %}
-        <li class="icon-calendar">{{ dueDate.dueDate(assessment, USER) }}</li>
+        <li class="icon-calendar">{{ dueDate.dueDate(assessment, student ?: USER) }}</li>
     {% endif %}
     {% if USER.role.isStaff %}
         <li class="icon-progress">Mark Calculated as {{ assessment.summator.title }}</li>
