@@ -78,6 +78,76 @@ class Model implements ISoftDeletable
 
 
     /**
+     * Returns the description for this plan's participants
+     *
+     * @return string|null
+     */
+    public function getDerivedDescription(): ?string
+    {
+        return $this->description ?? $this->assessment->getDescription();
+    }
+
+
+    /**
+     * Returns the publish date for this plan's participants
+     *
+     * @return Alaress_Date_Format|null
+     */
+    public function getDerivedPublishDate(): ?Alaress_Date_Format
+    {
+        return $this->coalesceDate($this->publishDate, $this->assessment->getPublishDate());
+    }
+
+
+    /**
+     * Returns the open date for this plan's participants
+     *
+     * @return Alaress_Date_Format|null
+     */
+    public function getDerivedOpenDate(): ?Alaress_Date_Format
+    {
+        return $this->coalesceDate($this->openDate, $this->assessment->getOpenDate());
+    }
+
+
+    /**
+     * Returns the due date for this plan's participants
+     *
+     * @return Alaress_Date_Format|null
+     */
+    public function getDerivedDueDate(): ?Alaress_Date_Format
+    {
+        return $this->coalesceDate($this->dueDate, $this->assessment->getDueDate());
+    }
+
+
+    /**
+     * Returns the close date for this plan's participants
+     *
+     * @return Alaress_Date_Format|null
+     */
+    public function getDerivedCloseDate(): ?Alaress_Date_Format
+    {
+        return $this->coalesceDate($this->closeDate, $this->assessment->getCloseDate());
+    }
+
+
+    /**
+     * Returns the first non-null date, or null if both are null.
+     *
+     * @param Alaress_Date_Format|null $date1
+     * @param Alaress_Date_Format|null $date2
+     * @return Alaress_Date_Format|null
+     */
+    private function coalesceDate(?Alaress_Date_Format $date1, ?Alaress_Date_Format $date2): ?Alaress_Date_Format
+    {
+        return null === $date1 || $date1->isNull() ? $date2 : $date1;
+    }
+
+    // Getters/Setters
+
+
+    /**
      * @return Assessment\Model
      */
     public function getAssessment(): Assessment\Model
