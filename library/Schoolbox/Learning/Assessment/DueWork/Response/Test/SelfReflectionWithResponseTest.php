@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ValidationTest
+ * SelfReflectionWithResponseTest
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
