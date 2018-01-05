@@ -5,13 +5,13 @@
  # we should call dueDate.participant, otherwise if interested in the assessment itself,
  # we should call dueDate.assessment.
  #
- # We could pass the assessment, viewer, and viewee all to a single macro, but the performance is horrendous.
+ # If you are calling from a fragment where you don't know, you can fallback to dueDate().
  #
  # TODO: attach some JS to the relative time to countdown to the due date
  #}
 
 {##
- # Display an assessment's due date for the specified viewer and viewee. One of the users may be null.
+ # Display an assessment's due date for the specified user.
  #}
 {% macro dueDate(assessable, user) %}
 {% spaceless %}
@@ -27,7 +27,7 @@
 
 
 {##
- # Display an assessment's due date for the specified participant
+ # Display a participant's due date (ie the participant's plan's due date)
  #}
 {% macro participant(participant) %}
     {% spaceless %}
