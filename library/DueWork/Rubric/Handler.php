@@ -85,7 +85,7 @@ class DueWork_Rubric_Handler
 
         // 1. Get latest published student marks
         $stmt = Database::getInstance()->prepare("
-            SELECT sr.owner, sr.box_id AS 'sb.id', rc.id AS 'rc.id', rd.value AS 'mark'
+            SELECT sr.owner, sb.id AS 'sb.id', rc.id AS 'rc.id', rd.value AS 'mark'
             FROM rubric_mark rm
             JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
             JOIN rubric_criterion rc  ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
@@ -95,9 +95,9 @@ class DueWork_Rubric_Handler
             LEFT JOIN (
                 -- Get the latest published marks
                 SELECT
-                  MAX(rm.published_at) AS 'max_published_at',
-                  sr.owner AS 'student_id',
-                  sr.box_id AS 'sb_id',
+                  sr.id AS r_id,
+                  sr.owner AS 'owner',
+                  sb.id AS 'sb_id',
                   rc.id AS 'rc_id'
                 FROM rubric_mark rm
                 JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
@@ -107,13 +107,13 @@ class DueWork_Rubric_Handler
                 JOIN assessment a         ON a.id = sb.assessment_id
                 WHERE {$whereClauseInner}
                 AND rm.valid
-                AND rm.published_at IS NOT NULL
-                GROUP BY rm.student_id, sr.box_id, rc.id
-            ) t ON t.max_published_at = rm.published_at AND t.student_id = rm.student_id
-                AND sr.box_id = t.sb_id AND rc.id = t.rc_id
+                AND sr.published_at IS NOT NULL
+                ORDER BY sr.published_at DESC
+                LIMIT 1
+            ) t ON t.r_id = rm.return_id
             WHERE {$whereClauseOuter}
             AND rm.valid
-            AND rm.published_at IS NOT NULL;
+            AND sr.published_at IS NOT NULL;
         ");
         $stmt->execute($pb->getParams());
         $studentMarks = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -133,7 +133,6 @@ class DueWork_Rubric_Handler
             ORDER BY rl.box_id, rc.id
         ");
         $stmt->execute($pb->getParams());
-
         // 3. Convert each student mark into a normalised value
         $results = [];
 
@@ -162,7 +161,7 @@ class DueWork_Rubric_Handler
             $criterionId = $row['rc.id'];
             $maxMark     = $results[$boxId][$criterionId]['maxMark'];
 
-            $results[$boxId][$criterionId]['marks'][$row['student_id']] = 100.0 * $mark / $maxMark;
+            $results[$boxId][$criterionId]['marks'][$row['owner']] = 100.0 * $mark / $maxMark;
         }
         return $results;
     }
