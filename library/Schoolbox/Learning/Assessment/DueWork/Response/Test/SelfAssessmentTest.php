@@ -60,15 +60,6 @@ class SelfAssessmentTest extends TestCase
             ->setSelfAssessable(false)
             ->setSelfReflectable(false);
 
-
-        $incorrectAssessment4 = (new DueWork\Model())
-            ->setSelfAssessable('')
-            ->setSelfReflectable(true);
-
-        $incorrectAssessment5 = (new DueWork\Model())
-            ->setSelfAssessable('false')
-            ->setSelfReflectable(true);
-
         /* Test everything
          */
         return [
@@ -106,19 +97,6 @@ class SelfAssessmentTest extends TestCase
                 false
             ],
 
-
-            'Invalid: Student starting an improperly-configured self-assessment (4)' => [
-                $student,
-                new Participant($student, new Plan($incorrectAssessment4)),
-                false
-            ],
-
-            'Invalid: Student starting an improperly-configured self-assessment (5)' => [
-                $student,
-                new Participant($student, new Plan($incorrectAssessment5)),
-                false
-            ],
-
             'Invalid: Student starting an improperly-configured self-assessment for someone else (1)' => [
                 $student,
                 new Participant($otherStudent, new Plan($incorrectAssessment1)),
@@ -128,18 +106,6 @@ class SelfAssessmentTest extends TestCase
             'Invalid: Student starting an improperly-configured self-assessment for someone else (2)' => [
                 $student,
                 new Participant($otherStudent, new Plan($incorrectAssessment2)),
-                false
-            ],
-
-            'Invalid: Student starting an improperly-configured self-assessment for someone else (4)' => [
-                $student,
-                new Participant($otherStudent, new Plan($incorrectAssessment4)),
-                false
-            ],
-
-            'Invalid: Student starting an improperly-configured self-assessment for someone else (5)' => [
-                $student,
-                new Participant($otherStudent, new Plan($incorrectAssessment5)),
                 false
             ],
 
