@@ -4,7 +4,7 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-namespace Schoolbox\Help;
+namespace Custom\Help\Nesa;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
@@ -23,7 +23,7 @@ use \Alaress\Twig\Loader\IChainLoader;
 class Module extends BaseModule
 {
     /** @var string */
-    protected $basename = 'help';
+    protected $basename = 'helpNesa';
 
     /**
      * Hook method for setting up routes via self::register()
@@ -37,9 +37,9 @@ class Module extends BaseModule
             new Rule\IsSuperuser()
         );
 
-        $this->register('GET', '/nesa', 'getNesa', $nesa, null);
-        $this->register('POST', '/nesa', 'postNesa', $nesa, null);
-        $this->register('POST', '/nesa/csv', 'postNesaCsv', $nesa, null);
+        $this->register('GET', '/report', 'getNesa', $nesa, null);
+        $this->register('POST', '/report', 'postNesa', $nesa, null);
+        $this->register('POST', '/report/csv', 'postNesaCsv', $nesa, null);
     }
 
     /**
@@ -55,7 +55,7 @@ class Module extends BaseModule
      */
     public function initTemplatePaths(IChainLoader $templateLoader)
     {
-        $this->addTemplatePath($templateLoader, __DIR__ . '/Nesa/templates');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
     /**

@@ -7,12 +7,13 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Config\Modules;
+namespace Config\Modules\Custom\Help;
 
 use Alaress\Application\Kernel;
-use Schoolbox\Help\Module;
+use Config\ModuleLoader;
+use Custom\Help\Nesa\Module as NesaModule;
 
-class Help implements ModuleConfigInterface {
+class Accreditation extends ModuleLoader {
 
     /**
      * Run configuration for the given module
@@ -21,9 +22,6 @@ class Help implements ModuleConfigInterface {
      * @return void
      */
     public function configure($kernel) {
-        $namespace = 'help';
-
-        $module = new Module($kernel->getDependencyInjector());
-        $module->init("/$namespace");
+        $this->loadModule($kernel, NesaModule::class, '/accreditation');
     }
 }

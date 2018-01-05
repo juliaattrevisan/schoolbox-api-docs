@@ -125,7 +125,7 @@
         <div class="empty-state">
             <i class="icon-progress"></i>
             <p>There are no users who match the criteria you've chosen.</p>
-            <p>You should <a href="{{ routeLookup('help.getNesa') }}">refine your selection criteria</a>.</p>
+            <p>You should <a href="{{ routeLookup('helpNesa.getNesa') }}">refine your selection criteria</a>.</p>
         </div>
         {% endif %}
     </div>
@@ -138,7 +138,7 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <form action="{{ routeLookup('help.postNesaCsv') }}" method="post">
+        <form action="{{ routeLookup('helpNesa.postNesaCsv') }}" method="post">
             <input type="hidden" name="unaccreditedOnly" value="{{ unaccreditedOnly }}" />
 
             {% for indicator in indicators %}

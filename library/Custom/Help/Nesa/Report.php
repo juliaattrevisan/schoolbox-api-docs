@@ -11,7 +11,7 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-namespace Schoolbox\Help\Nesa;
+namespace Custom\Help\Nesa;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Learning\Assessment\DataModel;
