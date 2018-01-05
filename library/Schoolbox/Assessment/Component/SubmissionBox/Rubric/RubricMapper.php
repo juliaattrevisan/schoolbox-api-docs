@@ -22,7 +22,6 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\IMapper;
 use Schoolbox\Learning\Assessment\DueWork;
-use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\AssessmentContext;
