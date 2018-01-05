@@ -414,10 +414,11 @@ class ListController extends Web\Controller\Base
      */
     private function makeAParticipation($userId, $plan)
     {
-        $partMap = \Schoolbox\Assessment\Participant\Mapper::getInstance();
+        $partMap = $this->participantDataSource->getParticipantMapper();
+        $userMap = $this->userMapper;
 
         return $partMap->createModel()
-            ->setUser(UserMapper::getInstance()->createModel($userId))
+            ->setUser($userMap->createModel($userId))
             ->setPlan($plan);
     }
 
@@ -433,7 +434,7 @@ class ListController extends Web\Controller\Base
     {
         $dateFields = [ 'publish_date',  'open_date', 'due_date', 'close_date', 'created_at', 'updated_at' ];
 
-        $planMap = \Schoolbox\Assessment\Participant\Plan\Mapper::getInstance();
+        $planMap = $this->participantDataSource->getPlanMapper();
 
         $existingPlans = $planMap->findByColumn('assessment_id', $assessmentId)->indexBy('id');
 
