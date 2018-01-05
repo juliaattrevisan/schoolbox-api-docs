@@ -130,15 +130,6 @@ class Mapper extends BaseMapper
             /** @var Plagscan\Model $plagscan */
             $plagscan = $this->hydrateJoin($row, 'plagscan', 'ps');
 
-            /* TODO - WARNING!! Intentionally throwing away data to avoid Out-Of-Mem errors
-             * @see SA-746 + SA-4174
-             * For now, if loading a plagscan via a JOIN we discard the HTML content
-             * The plagscan mapper itself will still behave as expected.
-             */
-            if ($plagscan) {
-                $plagscan->setHtml(Plagscan\Mapper::INVALID_HTML_VALUE);
-            }
-
             $submissionFile = $this->hydrate($row);
             $submissionFile
                 ->setStorage($storage)
