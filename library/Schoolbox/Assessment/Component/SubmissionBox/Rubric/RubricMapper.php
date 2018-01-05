@@ -460,24 +460,22 @@ class RubricMapper
         }
 
         $publishedClause = $publishedOnly ? 'AND rm.published_at IS NOT NULL' : '';
+        $dateOrder = $publishedOnly ? 'sr.published_at' : 'sr.created_at';
 
         // retrieve marks (descriptor selections for student)
         $stmt = $this->database->query("
             SELECT rm.descriptor_id
             FROM rubric_mark rm
-            JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
-            JOIN rubric_level rl ON rl.id = rd.level_id
-            LEFT JOIN submission_return sr ON sr.box_id = :boxId AND sr.owner = :userId
+            LEFT JOIN submission_return sr ON sr.id = rm.return_id
             WHERE rm.valid = TRUE
             $publishedClause
-            AND rm.created_at = (
-              SELECT MAX(rm.created_at)
-              FROM rubric_mark rm
-              JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
-              JOIN rubric_level rl ON rl.id = rd.level_id
-              LEFT JOIN submission_return sr ON sr.box_id = :boxId AND sr.owner = :userId
-              WHERE rm.valid = TRUE
+            AND rm.return_id = (
+              SELECT sr.id
+              FROM submission_return sr
+              WHERE sr.owner = :userId AND sr.box_id = :boxId
               $publishedClause
+              ORDER BY $dateOrder DESC
+              LIMIT 1
             )
             
         ", [
