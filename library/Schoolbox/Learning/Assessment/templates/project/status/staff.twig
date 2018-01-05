@@ -123,7 +123,7 @@ Data:
                                                         {% if route %}</a>{% endif %}
 
                                                     {% if assessable.getDueAt.isNull == false %}
-                                                        <p class="meta">{{ dueDate.dueDate(assessable, USER) }}</p>
+                                                        <p class="meta">{{ dueDate.assessment(assessable) }}</p>
                                                     {% endif %}
 
                                                     {% if assessable.weight %}

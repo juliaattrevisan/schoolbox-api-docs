@@ -48,7 +48,7 @@
     <div class="small-12 large-4 columns">
         <ul class="meta">
             {% if not assessment.dueAt.isNull %}
-                <li class="icon-calendar">{{ dueDate.dueDate(assessment, USER) }}</li>
+                <li class="icon-calendar">{{ dueDate.assessment(assessment) }}</li>
             {% endif %}
 
             <li class="{{ icon.renderClass(assessment) }}">{{ assessment.typeName }}</li>
