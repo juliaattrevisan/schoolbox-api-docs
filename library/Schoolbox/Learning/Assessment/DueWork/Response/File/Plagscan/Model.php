@@ -48,9 +48,6 @@ class Model implements IStorage, ISoftDeletable
     /** @var float $score */
     protected $score;
 
-    /** @var string $html HTML document contents */
-    protected $html;
-
     /** @var string $interactiveUrl A url to the Mode 7 Interactive Report that was introduced in Plagscan v3.0 */
     protected $interactiveUrl;
 
@@ -201,26 +198,6 @@ class Model implements IStorage, ISoftDeletable
     public function setScore($score)
     {
         $this->score = $score;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getHtml()
-    {
-        return $this->html;
-    }
-
-    /**
-     * @param string $html
-     *
-     * @return self|$this
-     */
-    public function setHtml($html)
-    {
-        $this->html = $html;
 
         return $this;
     }

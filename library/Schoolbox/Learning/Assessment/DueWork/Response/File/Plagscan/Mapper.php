@@ -30,14 +30,6 @@ use Schoolbox\User;
  */
 class Mapper extends \Schoolbox\Mapper
 {
-    /* TODO WARNING!!!
-     * This is arbitrary content to clobber the HTML field in the event it is not needed as a temp
-     * measure to avoid Out-Of-Memory errors until we migrate this field to OTFS.
-     * Mappers that join to this mapper can clobber the html field with this value and be safe
-     * from accidentally saving back to the database and losing the data.
-     * @see SA-746 + SA-4174
-     */
-    const INVALID_HTML_VALUE = 'ERROR: THIS VALUE INDICATES THE REAL HTML HAS BEEN TEMPORARILY DISCARDED. DO NOT SAVE';
 
     /**
      * An instance of the Plagscan Connector
@@ -66,14 +58,11 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('status', self::TYPE_INTEGER);
         $this->uses('score', self::TYPE_STRING);
         $this->joins('storage_hash', StorageMapper::class, 'hash', null, null, 'storage', 'storage');
-        $this->uses('html', self::TYPE_STRING);
         $this->uses('interactive_url', self::TYPE_STRING);
         $this->uses('privatised_at', self::TYPE_DATETIME);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'checkHtmlValue']);
     }
 
     /**
@@ -125,23 +114,6 @@ class Mapper extends \Schoolbox\Mapper
         }
 
         return $collection;
-    }
-
-    /**
-     * Pre-save callback to ensure we don't save a model that has
-     * temporarily had its HTML value discarded.
-     *
-     * @param Model $model
-     * @return bool
-     * @throws \DomainException If the HTML has been temporarily discarded
-     */
-    public function checkHtmlValue(Model $model)
-    {
-        // By convention we would just return false, but given the risk of data loss we'll throw an Exception to be sure
-        if (self::INVALID_HTML_VALUE === $model->getHtml()) {
-            throw new \DomainException('Unable to save - Plagscan HTML content is missing!');
-        }
-        return true;
     }
 
     /**
@@ -442,32 +414,6 @@ class Mapper extends \Schoolbox\Mapper
 
         return $plagscanDocuments;
     }
-
-
-    /**
-     * @param array    $row
-     * @param string   $alias
-     * @param callable $callback
-     * @return null|Model
-     * @throws MapperException
-     */
-    public function hydrate(array $row, $alias = '', $callback = null)
-    {
-        /* TODO - temp hack. Remove ASAP when HTML is migrated to files
-         * Due to OOM errors, the student submission mapper blanks out the HTML of plagscan docs when
-         * they are loaded as joins onto files. Due to the cache, this means that plagscan docs can be
-         * similarly affected when later loaded via this mapper. Need to turn off caching completely for
-         * plagscan docs to ensure we can still save them.
-         *
-         * @see SA-746 + SA-4174
-         */
-        $this->disableCache();
-        /** @var null|Model $model */
-        $model = parent::hydrate($row, $alias, $callback);
-        $this->enableCache();
-        return $model;
-    }
-
 
     /**
      * Privatise a particular plagscan id
