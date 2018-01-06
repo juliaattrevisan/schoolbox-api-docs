@@ -31,7 +31,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        {% include '@learningAssessment/dueWork/summary/description.twig' with {assessment: participant.assessable, user: USER} %}
+        {% include '@learningAssessment/dueWork/summary/description.twig' with {assessment: participant.assessable, participant: participant} only %}
     </div>
 </div>
 
