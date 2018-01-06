@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\User;
@@ -25,6 +26,9 @@ class Mark
     use Id;
     use CreatedAtDate;
 
+    /** @var null|ReturnedWork */
+    private $submissionReturn;
+
     /** @var User */
     private $student;
 
@@ -37,6 +41,24 @@ class Mark
     /** @var bool */
     private $valid;
 
+
+    /**
+     * @return null|ReturnedWork
+     */
+    public function getSubmissionReturn(): ?ReturnedWork
+    {
+        return $this->submissionReturn;
+    }
+
+    /**
+     * @param null|ReturnedWork $submissionReturn
+     * @return $this
+     */
+    public function setSubmissionReturn(?ReturnedWork $submissionReturn)
+    {
+        $this->submissionReturn = $submissionReturn;
+        return $this;
+    }
 
     /**
      * @return User

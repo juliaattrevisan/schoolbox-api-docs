@@ -712,15 +712,18 @@ class RubricMapper
     /**
      * Save rubrics selections for a particular Participant
      *
-     * @param Participant $participant
-     * @param bool[]      $descriptors key = descriptor.id, val = whether it is checked
-     * @param bool        $isDraft Whether these are draft marks
+     * @param Participant                $participant
+     * @param bool[]                     $descriptors key = descriptor.id, val = whether it is checked
+     * @param bool                       $isDraft     Whether these are draft marks
+     * @param int                        $returnId
      */
-    public function saveForParticipant(Participant $participant, array $descriptors = [], $isDraft)
+    public function saveForParticipant(Participant $participant, array $descriptors = [], $isDraft, $returnId)
     {
         $descriptorMapper   = DescriptorMapper::getInstance();
         $markMapper         = MarkMapper::getInstance();
         $publishedAt        = $isDraft ? new \Alaress_Date_NullDate() : Alaress_Date_Format::now();
+
+        $returnedWorkMapper = SubmissionBox\ReturnedWorkMapper::getInstance();
 
         // Blow away any previous draft marks for this student and assessment
         $markMapper->deleteDraftMarks($participant->getUser(), $participant->getAssessable());
@@ -734,6 +737,7 @@ class RubricMapper
 
             $marksToSave->add(
                 $markMapper->createModel()
+                    ->setSubmissionReturn($returnedWorkMapper->createModel($returnId))
                     ->setStudent($participant->getUser())
                     ->setDescriptor($descriptorMapper->createModel($descriptorId))
                     ->setPublishedAt($publishedAt)

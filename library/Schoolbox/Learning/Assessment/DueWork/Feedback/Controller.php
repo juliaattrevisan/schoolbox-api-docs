@@ -52,13 +52,13 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param IFeedbackDataSource $feedbackDataSource
+     * @param IFeedbackDataSource   $feedbackDataSource
      * @param ParticipantDataSource $participantDataSource
-     * @param AssessmentDataSource $assessmentDataSource
-     * @param ResponseDataSource $responseDataSource
-     * @param UserMapper $userMapper
-     * @param Rubric\MarkMapper $rubricMarkMapper
-     * @param ReturnedWorkMapper $returnedWorkMapper
+     * @param AssessmentDataSource  $assessmentDataSource
+     * @param ResponseDataSource    $responseDataSource
+     * @param UserMapper            $userMapper
+     * @param Rubric\MarkMapper     $rubricMarkMapper
+     * @param ReturnedWorkMapper    $returnedWorkMapper
      */
     public function __construct(
         IFeedbackDataSource $feedbackDataSource,
@@ -69,13 +69,13 @@ class Controller extends Base
         Rubric\MarkMapper $rubricMarkMapper,
         ReturnedWorkMapper $returnedWorkMapper
     ) {
-        $this->feedbackDataSource = $feedbackDataSource;
+        $this->feedbackDataSource    = $feedbackDataSource;
         $this->participantDataSource = $participantDataSource;
-        $this->assessmentDataSource = $assessmentDataSource;
-        $this->responseDataSource = $responseDataSource;
-        $this->userMapper = $userMapper;
-        $this->rubricMarkMapper = $rubricMarkMapper;
-        $this->returnedWorkMapper = $returnedWorkMapper;
+        $this->assessmentDataSource  = $assessmentDataSource;
+        $this->responseDataSource    = $responseDataSource;
+        $this->userMapper            = $userMapper;
+        $this->rubricMarkMapper      = $rubricMarkMapper;
+        $this->returnedWorkMapper    = $returnedWorkMapper;
     }
 
     /**
@@ -93,8 +93,8 @@ class Controller extends Base
         $post = $this->getRequest()->post->getArrayCopy();
 
         try {
-            $this->processFeedback($participant, $mostRecentFeedback, $post);
-            $this->processRubric($participant, $post);
+            $feedback = $this->processFeedback($participant, $mostRecentFeedback, $post);
+            $this->processRubric($participant, $post, $feedback);
         }
         catch (RangeException $e) {
             $this->sendError('Invalid mark provided');
@@ -170,12 +170,14 @@ class Controller extends Base
      *
      * @param Participant $participant
      * @param array       $post
+     * @param IFeedback   $feedback
      */
-    protected function processRubric(Participant $participant, array $post)
+    protected function processRubric(Participant $participant, array $post, IFeedback $feedback)
     {
         if(!$participant->getAssessable() instanceof DueWork\Model){
             return;
         }
+
         /** @var DueWork\Model $dueWork */
         $dueWork = $participant->getAssessable();
 
@@ -184,7 +186,7 @@ class Controller extends Base
         // Did we just give some rubric marks?
         if (is_array($post['rubric'])) {
             $rubMap = RubricMapper::getInstance();
-            $rubMap->saveForParticipant($participant, $post['rubric']['descriptors'], $isDraft);
+            $rubMap->saveForParticipant($participant, $post['rubric']['descriptors'], $isDraft, $feedback->getId());
         }
         // Else did we just publish draft marks via the status page?
         elseif(!$isDraft){
@@ -205,8 +207,8 @@ class Controller extends Base
         $mostRecentFeedback = $participant->findMostRecentFeedback();
 
         try {
-            $this->processFeedback($participant, $mostRecentFeedback, $this->getRequest()->post, $response);
-            $this->processRubric($participant, $this->getRequest()->post->getArrayCopy());
+            $feedback = $this->processFeedback($participant, $mostRecentFeedback, $this->getRequest()->post, $response);
+            $this->processRubric($participant, $this->getRequest()->post->getArrayCopy(), $feedback);
         }
         catch (RangeException $e) {
             $this->sendError('Invalid mark provided');

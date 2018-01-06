@@ -10,6 +10,7 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 use PDO;
 use PDOStatement;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -40,6 +41,7 @@ class MarkMapper extends Mapper
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
 
+        $this->joins('return_id', ReturnedWorkMapper::class, 'id', self::TYPE_MODEL, null, 'submissionReturn', 'submission_return');
         $this->joins('student_id', UserMapper::class, 'id', null, null, null, 'user');
         $this->joins('descriptor_id', DescriptorMapper::class, 'id', null, null, null, 'descriptor');
 
@@ -59,9 +61,11 @@ class MarkMapper extends Mapper
     {
         return "
             SELECT  {$this->getColumnString()},
+                    {$this->getJoinColumnString('submission_return', 'r')},
                     {$this->getJoinColumnString('user', 'u')},
                     {$this->getJoinColumnString('descriptor', 'd')}
             FROM {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('submission_return', '', 'r')}
             LEFT JOIN {$this->getJoinSql('user', '', 'u')}
             LEFT JOIN {$this->getJoinSql('descriptor', '', 'd')}
         ";
@@ -74,6 +78,8 @@ class MarkMapper extends Mapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
+        /** @var ReturnedWorkMapper $submissionReturnMapper */
+        $submissionReturnMapper = $this->getJoinMapper('submission_return');
         $marks = $this->createCollection();
         $students = $this->getJoinMapper('user')->createCollection();
         $descriptors = $this->getJoinMapper('descriptor')->createCollection();
@@ -98,6 +104,7 @@ class MarkMapper extends Mapper
             $descriptor = $descriptors->getOffset($descriptorId);
 
             $mark = $this->hydrate($r);
+            $mark->setSubmissionReturn($submissionReturnMapper->hydrate($r, 'r'));
             $mark->setStudent($student);
             $mark->setDescriptor($descriptor);
             $marks->add($mark);
