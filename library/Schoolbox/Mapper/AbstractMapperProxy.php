@@ -304,7 +304,7 @@ abstract class AbstractMapperProxy
      * @param object $mapperModel
      * @return object
      */
-    public function transformDomainObject($mapperModel)
+    protected function transformDomainObject($mapperModel)
     {
         return $this->transformDomainObjects(new Collection([$mapperModel]))->first();
     }
