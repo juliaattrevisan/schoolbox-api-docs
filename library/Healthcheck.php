@@ -266,7 +266,7 @@ class Healthcheck
      */
     private function functionTest($objects): void
     {
-        $this->permissionTest($objects, 'FUNCTION');
+        $this->permissionTest($objects, 'EXECUTE');
     }
 
     /**
@@ -289,20 +289,20 @@ class Healthcheck
      * TODO this works only against MSSQL; may need a method for testing other DB procs
      *
      * @param array  $objects
-     * @param string $objectType The type of object to test; this only affects logs.
+     * @param string $permission The type of permission to test for
      */
-    private function permissionTest($objects, $objectType): void
+    private function permissionTest($objects, $permission): void
     {
         sort($objects);
 
-        $statement = $this->connector->prepareQuery("SELECT HAS_PERMS_BY_NAME(:proc, 'OBJECT', 'EXECUTE')");
+        $statement = $this->connector->prepareQuery("SELECT HAS_PERMS_BY_NAME(:object, 'OBJECT', :permission)");
 
         foreach ($objects as $object) {
 
-            $this->log .= str_pad(str_pad($objectType, 15). $object, 50);
+            $this->log .= str_pad(str_pad($permission, 15). $object, 50);
 
             try {
-                $statement->execute(['proc' => $object]);
+                $statement->execute(['object' => $object, 'permission' => $permission]);
                 $result = $statement->fetchColumn();
                 $statement->close();
 
@@ -310,8 +310,9 @@ class Healthcheck
                 // however, all attempts at doing so have failed.
                 if (empty($result)) {
                     $this->errors[] = sprintf(
-                        'Object "%s" does not exist, or user does not have EXECUTE permission on it',
-                        $object
+                        'Object "%s" does not exist, or user does not have %s permission on it',
+                        $object,
+                        $permission
                     );
                     $this->log .= "FAILED\n";
                 } else {
