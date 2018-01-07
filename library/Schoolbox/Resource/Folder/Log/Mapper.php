@@ -76,13 +76,12 @@ class Mapper extends Schoolbox\Mapper
     {
         $query = "
             SELECT
-            	{$this->getColumnString('hl')}
+            	{$this->getColumnString('hl')},
+            	{$this->getJoinMapper('category')->getColumnString('c')}
             FROM `{$this->table}` hl
-            LEFT JOIN {$this->getJoinSql('category', 'hl', 'c')}
-            LEFT JOIN {$this->getJoinSql('user', 'hl', 'o')}
+            JOIN {$this->getJoinSql('category', 'hl', 'c')}
             WHERE hl.cid = :categoryId
             AND hl.user = :userId
-            AND c.deleted_at IS NULL
 		";
 
         $statement = $this->database->prepare($query);
@@ -96,13 +95,11 @@ class Mapper extends Schoolbox\Mapper
         $collection = $this->createCollection();
 
         $categoryMapper = $this->getJoinMapper('category');
-        $userMapper     = $this->getJoinMapper('user');
 
         foreach ($statement as $row) {
             $log = $this->hydrate($row, 'hl');
 
             $log->setCategory($categoryMapper->hydrate($row, 'c'));
-            $log->setUser($userMapper->hydrate($row, 'o'));
 
             $collection->add($log);
         }
