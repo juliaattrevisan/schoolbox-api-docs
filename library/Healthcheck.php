@@ -279,6 +279,25 @@ class Healthcheck
         $this->permissionTest($objects, 'EXECUTE');
     }
 
+    /**
+     * Test whether a list of tables have INSERT permission.
+     *
+     * @param array $objects
+     */
+    private function insertTest($objects): void
+    {
+        $this->permissionTest($objects, 'INSERT');
+    }
+
+    /**
+     * Test whether a list of tables have UPDATE permission.
+     *
+     * @param array $objects
+     */
+    private function updateTest($objects): void
+    {
+        $this->permissionTest($objects, 'UPDATE');
+    }
 
     /**
      * Test object execution against each database object in the supplied array.
@@ -574,7 +593,7 @@ class Healthcheck
 
         // Community Portal Password Update
 
-        $this->selectTest(['CommunityLogins'], null, null, "UPDATE :object SET Password = '' WHERE 1 = 0", true);
+        $this->updateTest(['CommunityLogins']);
 
         // Stored Procedures
 
