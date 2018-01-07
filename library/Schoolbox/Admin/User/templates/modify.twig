@@ -559,9 +559,9 @@
             var selectedServiceId = $(e.target).val();
 
             // This doesn't fix the magic number problem exactly, but makes it easier to understand and extend.
-            var resourceBooking = '7';
-            var pastoralCare = '9';
-            var fixtures = '10';
+            var resourceBooking = '{{ constant('RESOURCE_BOOKING_SERVICE') }}';
+            var pastoralCare = '{{ constant('PASTORAL_SERVICE') }}';
+            var fixtures = '{{ constant('SPORTS_ADMINISTRATOR_SERVICE') }}';
             var moderateOnlyServices = [resourceBooking, pastoralCare, fixtures];
 
             var moderateAccess = 3;
