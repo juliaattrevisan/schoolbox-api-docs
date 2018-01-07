@@ -236,7 +236,7 @@ if(isset($_POST['bulkAdd'])) {
 	$string = preg_replace('/(\r\n|\n|\r)/', ',', $_POST['bulkAdd']);
 
 	//split the list into an array
-	$list = preg_split('/[,; ]/', $string);
+	$list = preg_split('/[,;]/', $string);
 
 	$ua->setServiceIdentifier($categoryId)
 	   ->setAccessLevel(UserAccess::ACCESS_READ);
