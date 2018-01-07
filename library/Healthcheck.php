@@ -260,25 +260,34 @@ class Healthcheck
     }
 
     /**
-     * Test a list of database functions.
+     * Test a list of executables (stored procedures or functions).
      *
      * @param array $objects
      */
-    private function functionTest($objects): void
+    private function executeTest($objects): void
     {
-        $this->executeTest($objects, 'FUNCTION');
+        $this->permissionTest($objects, 'EXECUTE');
     }
 
     /**
-     * Test a list of stored procedures.
+     * Test whether a list of tables have INSERT permission.
      *
      * @param array $objects
      */
-    private function procedureTest($objects): void
+    private function insertTest($objects): void
     {
-        $this->executeTest($objects, 'EXECUTE');
+        $this->permissionTest($objects, 'INSERT');
     }
 
+    /**
+     * Test whether a list of tables have UPDATE permission.
+     *
+     * @param array $objects
+     */
+    private function updateTest($objects): void
+    {
+        $this->permissionTest($objects, 'UPDATE');
+    }
 
     /**
      * Test object execution against each database object in the supplied array.
@@ -289,20 +298,20 @@ class Healthcheck
      * TODO this works only against MSSQL; may need a method for testing other DB procs
      *
      * @param array  $objects
-     * @param string $objectType The type of object to test; this only affects logs.
+     * @param string $permission The type of permission to test for
      */
-    private function executeTest($objects, $objectType): void
+    private function permissionTest($objects, $permission): void
     {
         sort($objects);
 
-        $statement = $this->connector->prepareQuery("SELECT HAS_PERMS_BY_NAME(:proc, 'OBJECT', 'EXECUTE')");
+        $statement = $this->connector->prepareQuery("SELECT HAS_PERMS_BY_NAME(:object, 'OBJECT', :permission)");
 
         foreach ($objects as $object) {
 
-            $this->log .= str_pad(str_pad($objectType, 15). $object, 50);
+            $this->log .= str_pad(str_pad($permission, 15). $object, 50);
 
             try {
-                $statement->execute(['proc' => $object]);
+                $statement->execute(['object' => $object, 'permission' => $permission]);
                 $result = $statement->fetchColumn();
                 $statement->close();
 
@@ -310,8 +319,9 @@ class Healthcheck
                 // however, all attempts at doing so have failed.
                 if (empty($result)) {
                     $this->errors[] = sprintf(
-                        'Object "%s" does not exist, or user does not have EXECUTE permission on it',
-                        $object
+                        'Object "%s" does not exist, or user does not have %s permission on it',
+                        $object,
+                        $permission
                     );
                     $this->log .= "FAILED\n";
                 } else {
@@ -470,7 +480,7 @@ class Healthcheck
             'spSelTimetable',
         ];
 
-        $this->procedureTest($procedures);
+        $this->executeTest($procedures);
     }
 
 
@@ -572,8 +582,12 @@ class Healthcheck
         }
 
         // Community Portal Password Update
-
-        $this->selectTest(['CommunityLogins'], null, null, "UPDATE :object SET Password = '' WHERE 1 = 0", true);
+        if ($this->configMapper->get('synergetic_password_reset')) {
+            $this->updateTest(['CommunityLogins']);
+            if ($this->configMapper->get('synergetic_portal_create_account')) {
+                $this->insertTest(['CommunityLogins']);
+            }
+        }
 
         // Stored Procedures
 
@@ -589,11 +603,11 @@ class Healthcheck
             'spiCommunityEventsCurrent',
         ];
 
-        $this->procedureTest($procedures);
+        $this->executeTest($procedures);
 
         $functions = [ 'dbo.fnTimeStr' ];
 
-        $this->functionTest($functions);
+        $this->executeTest($functions);
     }
 
     private function schoolproTest(): void
@@ -616,7 +630,7 @@ class Healthcheck
             'sbGetPortraitLastUpdated',
             'sbGetPortraitFile',
         ];
-        $this->procedureTest($procedures);
+        $this->executeTest($procedures);
     }
 
 
