@@ -266,7 +266,7 @@ class Healthcheck
      */
     private function functionTest($objects): void
     {
-        $this->executeTest($objects, 'FUNCTION');
+        $this->permissionTest($objects, 'FUNCTION');
     }
 
     /**
@@ -276,7 +276,7 @@ class Healthcheck
      */
     private function procedureTest($objects): void
     {
-        $this->executeTest($objects, 'EXECUTE');
+        $this->permissionTest($objects, 'EXECUTE');
     }
 
 
@@ -291,7 +291,7 @@ class Healthcheck
      * @param array  $objects
      * @param string $objectType The type of object to test; this only affects logs.
      */
-    private function executeTest($objects, $objectType): void
+    private function permissionTest($objects, $objectType): void
     {
         sort($objects);
 
