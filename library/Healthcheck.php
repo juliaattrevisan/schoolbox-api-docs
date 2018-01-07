@@ -260,21 +260,11 @@ class Healthcheck
     }
 
     /**
-     * Test a list of database functions.
+     * Test a list of executables (stored procedures or functions).
      *
      * @param array $objects
      */
-    private function functionTest($objects): void
-    {
-        $this->permissionTest($objects, 'EXECUTE');
-    }
-
-    /**
-     * Test a list of stored procedures.
-     *
-     * @param array $objects
-     */
-    private function procedureTest($objects): void
+    private function executeTest($objects): void
     {
         $this->permissionTest($objects, 'EXECUTE');
     }
@@ -490,7 +480,7 @@ class Healthcheck
             'spSelTimetable',
         ];
 
-        $this->procedureTest($procedures);
+        $this->executeTest($procedures);
     }
 
 
@@ -613,11 +603,11 @@ class Healthcheck
             'spiCommunityEventsCurrent',
         ];
 
-        $this->procedureTest($procedures);
+        $this->executeTest($procedures);
 
         $functions = [ 'dbo.fnTimeStr' ];
 
-        $this->functionTest($functions);
+        $this->executeTest($functions);
     }
 
     private function schoolproTest(): void
@@ -640,7 +630,7 @@ class Healthcheck
             'sbGetPortraitLastUpdated',
             'sbGetPortraitFile',
         ];
-        $this->procedureTest($procedures);
+        $this->executeTest($procedures);
     }
 
 
