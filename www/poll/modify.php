@@ -12,12 +12,12 @@ if (is_numeric($this->arg[0])) {
 
     $poll = $pollHandler->getByID($this->arg[0]);
 
-    if (!isset($poll['pollID'])) {
+    if (!isset($poll['id'])) {
         error(101);
     }
 
     // check permission
-    if ($groupHandler->getPermission($poll['categoryID']) < WRITE_ACCESS) {
+    if ($groupHandler->getPermission($poll['folder_id']) < WRITE_ACCESS) {
         error(19);
     }
 
@@ -28,8 +28,8 @@ if (is_numeric($this->arg[0])) {
 
     $output = array(
         'ACTION' => 'Modify',
-        'POLL_ID' => $poll['pollID'],
-        'CATEGORY_ID' => $poll['categoryID'],
+        'POLL_ID' => $poll['id'],
+        'CATEGORY_ID' => $poll['folder_id'],
         'POLL_QUESTION' => Scrub::text($poll['question']),
         'OPTION_0' => Scrub::text($poll['option_0']),
         'OPTION_1' => Scrub::text($poll['option_1']),
@@ -54,7 +54,7 @@ if (is_numeric($this->arg[0])) {
      */
     try {
         $folderMapper = new FolderMapper();
-        $folder = $folderMapper->findById($poll['categoryID']);
+        $folder = $folderMapper->findById($poll['folder_id']);
     }
     catch (\Exception $e) {
         error(13);

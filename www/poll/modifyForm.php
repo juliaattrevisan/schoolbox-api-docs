@@ -5,29 +5,29 @@ $page = new SitePage();
 $pollHandler = new Poll();
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 
-if (is_numeric($_POST['pollID']) && is_numeric($_POST['categoryID']) && isset($_POST['vote'])) {
+if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST['vote'])) {
 
     /* Check permission
      */
-    if ($groupHandler->getPermission($_POST['categoryID']) < READ_ACCESS) {
+    if ($groupHandler->getPermission($_POST['folder_id']) < READ_ACCESS) {
         error(19);
     }
 
-    $pollHandler->placeVote($_POST['pollID'], $_POST['vote']);
+    $pollHandler->placeVote($_POST['id'], $_POST['vote']);
 
-    SitePage::localRedir("/homepage/" . $_POST['categoryID']);
-} else if ($_POST['question'] && is_numeric($_POST['categoryID'])) {
+    SitePage::localRedir("/homepage/" . $_POST['folder_id']);
+} else if ($_POST['question'] && is_numeric($_POST['folder_id'])) {
 
     /* Check permission
      */
-    if ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS) {
+    if ($groupHandler->getPermission($_POST['folder_id']) < WRITE_ACCESS) {
         error(19);
     }
 
     $date = Alaress_Date_Format::newLocalShort($_POST['close']);
 
     $poll = array(
-        'categoryID' => $_POST['categoryID'],
+        'folder_id' => $_POST['folder_id'],
         'question' => $_POST['question'],
         'option_0' => $_POST['option_0'],
         'option_1' => $_POST['option_1'],
@@ -44,14 +44,14 @@ if (is_numeric($_POST['pollID']) && is_numeric($_POST['categoryID']) && isset($_
         'close' => $date->getDatabase(),
     );
 
-    if (is_numeric($_POST['pollID'])) {
-        $poll['pollID'] = Scrub::text($_POST['pollID']);
+    if (is_numeric($_POST['id'])) {
+        $poll['id'] = Scrub::text($_POST['id']);
 
         $pollHandler->update($poll);
     } else {
         $poll['created_by'] =  $_SESSION['id'];
         $poll['created'] = Alaress_Date_Format::now()->getDatabase();
-        $poll['pollID'] = $pollHandler->create($poll);
+        $poll['id'] = $pollHandler->create($poll);
     }
 
     /* Select this poll in the component
@@ -62,31 +62,31 @@ if (is_numeric($_POST['pollID']) && is_numeric($_POST['categoryID']) && isset($_
             array(
                 'id'                      => $_POST['homepageComponentID'],
                 'module'                  => 'homepage',
-                'identifier'              => $_POST['categoryID'],
+                'identifier'              => $_POST['folder_id'],
                 'component_definition_id' => $cdm->getDefinitionId(),
             )
         );
     }
     catch (Schoolbox\Mapper\Exception $e) {
-        SitePage::localRedir("/homepage/" . $poll['categoryID']);
+        SitePage::localRedir("/homepage/" . $poll['folder_id']);
     }
 
     $confI = new Component_Config();
     $confI->setConfigDefinitionId($cdm->getId());
     $confI->setInstanceId($cim->getId());
-    $confI->setValue($poll['pollID']);
+    $confI->setValue($poll['id']);
 
     $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
     $componentConfigInstanceMapper->save($confI);
 
 
-    SitePage::localRedir('/homepage/' . Scrub::text($_POST['categoryID']));
+    SitePage::localRedir('/homepage/' . Scrub::text($_POST['folder_id']));
 } else if (is_numeric($_GET['delete'])) {
     $poll = $pollHandler->getByID($_GET['delete']);
 
     /* Check permission
      */
-    if ($groupHandler->getPermission($poll['categoryID']) < WRITE_ACCESS) {
+    if ($groupHandler->getPermission($poll['folder_id']) < WRITE_ACCESS) {
         error(19);
     }
 
@@ -102,7 +102,7 @@ if (is_numeric($_POST['pollID']) && is_numeric($_POST['categoryID']) && isset($_
             array(
                 'id'                      => $_GET['homepageComponentID'],
                 'module'                  => 'homepage',
-                'identifier'              => $poll['categoryID'],
+                'identifier'              => $poll['folder_id'],
                 'component_definition_id' => $cdm->getDefinitionId(),
             )
         );
@@ -120,5 +120,5 @@ if (is_numeric($_POST['pollID']) && is_numeric($_POST['categoryID']) && isset($_
     $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
     $componentConfigInstanceMapper->save($confI);
 
-    SitePage::localRedir("/homepage/" . $poll['categoryID']);
+    SitePage::localRedir("/homepage/" . $poll['folder_id']);
 }
