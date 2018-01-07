@@ -879,10 +879,8 @@ class External_Synergetic_User implements External_UserInterface
 
         // Get student contact types from config, and wrangle into a query
 
-        if (empty($this->config->get('external_synergetic_student_relationships')) === 0) {
-
+        if ($this->config->get('external_synergetic_student_relationships') === '') {
             // No relationships were found, use the default values we had before introducing this feature
-
             $relationships = ['SN','STSN','DR','STDR','WD','GRASN','GRADR','FOCD','HOPT','HOCD','HS','HOMES','HSS'];
         } else {
             $relationships = explode(',', $this->config->get('external_synergetic_student_relationships'));
@@ -963,10 +961,8 @@ class External_Synergetic_User implements External_UserInterface
     {
         // Get student contact types from config, and wrangle into a query
 
-        if (empty($this->config->get('external_synergetic_student_contact_types')) === 0) {
-
+        if ($this->config->get('external_synergetic_student_contact_types') === '') {
             // No relationships were found, use the default values we had before introducing this feature
-
             $studentContactTypes = ['SC1','SC2'];
         } else {
             $studentContactTypes = explode(',', $this->config->get('external_synergetic_student_contact_types'));
