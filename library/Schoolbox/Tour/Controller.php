@@ -16,6 +16,7 @@ use Schoolbox\User;
 
 class Controller extends Base
 {
+
     /** @var Mapper $tourMapper */
     private $tourMapper;
 
@@ -42,8 +43,7 @@ class Controller extends Base
         TourTriggerMapper $tourTriggerMapper,
         Step\Mapper $tourStepMapper,
         Status\Mapper $tourStatusMapper
-    )
-    {
+    ) {
         $this->tourMapper        = $tourMapper;
         $this->tourTriggerMapper = $tourTriggerMapper;
         $this->tourStepMapper    = $tourStepMapper;
@@ -70,7 +70,6 @@ class Controller extends Base
         // Grab all tours for the logged in user/url
 
         $tours = $this->tourMapper->findByUserForUrl($this->getUser(), $url);
-
 
 
         // Iterate through them and add the required information into the array
@@ -101,7 +100,7 @@ class Controller extends Base
                     'title'       => $tour->getTitle(),
                     'description' => $tour->getDescription(),
                     'triggers'    => $triggerArray,
-                    'steps'       => $this->tourStepMapper->getStepArray($tour->getUuid())
+                    'steps'       => $this->tourStepMapper->getStepArray($tour->getUuid()),
                 ];
             }
         }
@@ -122,15 +121,15 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildJsonOutput(null));
 
         //Delete previous step
-        if($oldStep != null) {
-           try {
-               /** @var User $user */
-               $user = $_SESSION["user"];
-               $oldTourStatus = $this->tourStatusMapper->findByColumnList(["current_step" => $oldStep, "url" => $url, "user_id" => $user->getId()]);
-               $this->tourStatusMapper->delete($oldTourStatus);
-           } catch (Exception $e) {
-               //Could not find old step in db...
-           }
+        if ($oldStep != null) {
+            try {
+                /** @var User $user */
+                $user          = $_SESSION["user"];
+                $oldTourStatus = $this->tourStatusMapper->findByColumnList(["current_step" => $oldStep, "url" => $url, "user_id" => $user->getId()]);
+                $this->tourStatusMapper->delete($oldTourStatus);
+            } catch (Exception $e) {
+                //Could not find old step in db...
+            }
         }
 
         //Save new step
@@ -147,9 +146,10 @@ class Controller extends Base
         }
     }
 
+
     /**
      * @api POST /tourStatus/{uuid}
-     * @param $uuid
+     * @param $tour_uuid
      */
     public function tourStatus(string $tour_uuid)
     {
@@ -160,7 +160,7 @@ class Controller extends Base
 
         //Find step that has status
         try {
-            $status = $this->tourStatusMapper->findOneByColumnList(["current_step" => $steps->getPropertyValues("uuid")]);
+            $status     = $this->tourStatusMapper->findOneByColumnList(["current_step" => $steps->getPropertyValues("uuid")]);
             $serialized = $status->jsonSerialize();
             $this->getResponse()->content->set($this->buildJsonOutput($serialized));
         } catch (\Schoolbox\Mapper\Exception $e) {

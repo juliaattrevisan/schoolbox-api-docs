@@ -53,8 +53,8 @@ class Mapper extends BaseMapper
     {
         $x = "
             FROM      {$this->table} 
-            JOIN      {$this->getJoinSql("user",null, "u")}
-            JOIN      {$this->getJoinSql("tourStep", null, "t")}
+            JOIN      {$this->getJoinSql('user','', 'u')}
+            JOIN      {$this->getJoinSql('tourStep', '', 't')}
             ";
 
         return $x;
