@@ -203,7 +203,12 @@ Usage:
          */
         function processServerSuccess(html) {
             $serverErrorFeedback.hide();
-            $reportContent.html(html);
+
+            // Use innerHTML instead of jQuery.html for performance.
+            // This means that any JS on the filter content must be loaded in
+            // the filterContentLoaded event.
+            $reportContent.get(0).innerHTML = html;
+            $reportContent.trigger('filterContentLoaded');
             $toast.toastTimeout({text: 'Success!', css: 'success'});
         }
 
