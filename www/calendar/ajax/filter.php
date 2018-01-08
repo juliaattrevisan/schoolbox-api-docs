@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-// don't bother trying if fList isn't set
+// don't bother trying if fList and view are't set
 if(!(isset($_POST['fList']) && isset($_POST['view']))) {
     http_response_code(400);
     die('Not enough data supplied');
