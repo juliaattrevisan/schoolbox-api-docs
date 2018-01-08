@@ -10,7 +10,6 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 use Alaress\Database\Predicate\Builder;
-use Alaress_Date_Format;
 use Database;
 use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -732,7 +731,6 @@ class RubricMapper
             $marksToSave->add(
                 $markMapper->createModel()
                     ->setSubmissionReturn($returnedWorkMapper->createModel($returnId))
-                    ->setStudent($participant->getUser())
                     ->setDescriptor($descriptorMapper->createModel($descriptorId))
                     ->setValid(true)
             );

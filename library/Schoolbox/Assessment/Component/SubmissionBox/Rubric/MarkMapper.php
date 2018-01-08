@@ -43,9 +43,6 @@ class MarkMapper extends Mapper
         $this->joins('return_id', ReturnedWorkMapper::class, 'id', self::TYPE_MODEL, null, 'submissionReturn', 'submission_return');
         $this->joins('descriptor_id', DescriptorMapper::class, 'id', null, null, null, 'descriptor');
 
-        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
-        $this->uses('published_at', self::TYPE_DATETIME);
-
         // This is NOT a soft-delete column. It specifically relates to when a teacher alters a rubric's structure,
         // hence marks already given are invalid because they take their value from the rubric descriptor.
         $this->uses('valid', self::TYPE_BOOLEAN);
@@ -114,45 +111,11 @@ class MarkMapper extends Mapper
 
         $statement = $this->database->prepare($query);
         $statement->execute([
-            'return_id'    => $returnId,
+            'return_id' => $returnId,
         ]);
 
         return $statement->rowCount();
     }
-
-    /**
-     * Publishes any draft marks for the specified User and DueWork
-     *
-     * @param User $user
-     * @param IAssessable $dueWork
-     * @return int How many marks were published.
-     */
-    public function publishDraftMarks(User $user, IAssessable $dueWork)
-    {
-        $now = \Alaress_Date_Format::now();
-
-        $query = "
-                UPDATE rubric_mark rm
-                JOIN rubric_descriptor rd ON rm.descriptor_id = rd.id
-                JOIN rubric_level   rl ON rl.id = rd.level_id
-                JOIN submission_box sb ON sb.id = rl.box_id
-                JOIN submission_return sr ON sr.id = rm.return_id
-                SET  rm.published_at = :now
-                WHERE sr.owner = :student_id
-                AND sb.assessment_id = :assessment_id
-                AND rm.published_at IS NULL
-        ";
-
-        $statement = $this->database->prepare($query);
-        $statement->execute([
-            'now'           => $now->getDatabase(),
-            'student_id'    => $user->getId(),
-            'assessment_id' => $dueWork->getId(),
-        ]);
-
-        return $statement->rowCount();
-    }
-
 
     /**
      * Get a list of students who have some form of rubric marked for an assessment

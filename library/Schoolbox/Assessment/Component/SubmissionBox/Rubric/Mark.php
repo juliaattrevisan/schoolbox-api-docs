@@ -9,10 +9,8 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
-use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
-use Schoolbox\User;
-use Alaress_Date_Format;
+
 
 /**
  * Class Mark
@@ -24,19 +22,12 @@ use Alaress_Date_Format;
 class Mark
 {
     use Id;
-    use CreatedAtDate;
 
     /** @var null|ReturnedWork */
     private $submissionReturn;
 
-    /** @var User */
-    private $student;
-
     /** @var Descriptor */
     private $descriptor;
-
-    /** @var Alaress_Date_Format */
-    private $publishedAt;
 
     /** @var bool */
     private $valid;
@@ -61,24 +52,6 @@ class Mark
     }
 
     /**
-     * @return User
-     */
-    public function getStudent()
-    {
-        return $this->student;
-    }
-
-    /**
-     * @param User $student
-     * @return static
-     */
-    public function setStudent(User $student)
-    {
-        $this->student = $student;
-        return $this;
-    }
-
-    /**
      * @return Descriptor
      */
     public function getDescriptor()
@@ -94,40 +67,6 @@ class Mark
     {
         $this->descriptor = $descriptor;
         return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getPublishedAt()
-    {
-        return $this->publishedAt;
-    }
-
-    /**
-     * @param Alaress_Date_Format $publishedAt
-     * @return static
-     */
-    public function setPublishedAt(Alaress_Date_Format $publishedAt)
-    {
-        $this->publishedAt = $publishedAt;
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isPublished()
-    {
-        return ($this->publishedAt instanceof Alaress_Date_Format && !$this->publishedAt->isNull());
-    }
-
-    /**
-     * @return bool
-     */
-    public function isDraft()
-    {
-        return !$this->isPublished();
     }
 
     /**
