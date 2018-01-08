@@ -253,6 +253,10 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     $record["Details"] = '';
                 }
 
+                $this->htmlConverter->setHtml($record["Details"]);
+                $record["Details"] = trim($this->htmlConverter->getText());
+                $record["Details"] = html_entity_decode($record["Details"], ENT_QUOTES);
+
                 $this->htmlConverter->setHtml($record["PrivateDetails"]);
                 $record["PrivateDetails"] = trim($this->htmlConverter->getText());
                 $record["PrivateDetails"] = html_entity_decode($record["PrivateDetails"], ENT_QUOTES);
