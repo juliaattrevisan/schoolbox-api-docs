@@ -12,6 +12,8 @@ use PDOException;
 use RangeException;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessment;
+use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfReflection;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
@@ -199,16 +201,29 @@ class Controller extends Base
      *
      * @api POST /learning/assessments/{assessmentId}/{studentId}/{responseId}/feedback
      * @param Participant $participant
-     * @param IResponse $response
+     * @param DueWork\Response\Model $response
      * @throws \Alaress\Web\Controller\Exception
      */
-    public function postResponseFeedback(Participant $participant, IResponse $response)
+    public function postResponseFeedback(Participant $participant, DueWork\Response\Model $response)
     {
         $mostRecentFeedback = $participant->findMostRecentFeedback();
 
         try {
             $feedback = $this->processFeedback($participant, $mostRecentFeedback, $this->getRequest()->post, $response);
             $this->processRubric($participant, $this->getRequest()->post->getArrayCopy(), $feedback);
+
+            /* If this is a self-assessment or self reflection, also set submitted_at on the Response
+             * when publishing the Feedback itself
+             */
+            $selfAssessed = (new ValidSelfAssessment($this->getUser(), $participant))->isSatisfied();
+            $selfReflected = (new ValidSelfReflection($this->getUser(), $participant))->isSatisfied();
+
+            if (($selfAssessed || $selfReflected) && !$response->isSubmitted()) {
+                $response->setSubmittedAt(\Alaress_Date_Format::now());
+
+                $this->responseDataSource->save($response);
+            }
+
         }
         catch (RangeException $e) {
             $this->sendError('Invalid mark provided');
