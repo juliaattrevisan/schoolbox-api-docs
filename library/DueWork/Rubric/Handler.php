@@ -108,6 +108,7 @@ class DueWork_Rubric_Handler
                 WHERE {$whereClauseInner}
                 AND rm.valid
                 AND sr.published_at IS NOT NULL
+                AND sr.deleted_at IS NULL
                 ORDER BY sr.published_at DESC
                 LIMIT 1
             ) t ON t.r_id = rm.return_id

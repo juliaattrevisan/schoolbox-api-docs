@@ -467,6 +467,7 @@ class RubricMapper
             FROM rubric_mark rm
             LEFT JOIN submission_return sr ON sr.id = rm.return_id
             WHERE rm.valid = TRUE
+            AND sr.deleted_at IS NULL
             $publishedClause
             AND rm.return_id = (
               SELECT sr.id
@@ -974,6 +975,7 @@ class RubricMapper
             ->equals('sr.owner', $student->getId())
             ->notNull('sr.published_at')
             ->isTrue('rm.valid')
+            ->isNull('sr.deleted_at')
             ->isNull('rd.deleted_at')
             ->isNull('rl.deleted_at')
             ->isNull('rc.deleted_at')

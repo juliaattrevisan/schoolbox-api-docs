@@ -133,7 +133,7 @@ class MarkMapper extends Mapper
             INNER JOIN        submission_box sb ON sb.id = rl.box_id
             INNER JOIN        assessment a ON a.id = sb.assessment_id
             LEFT JOIN         submission_return sr ON sr.box_id = sb.id
-            WHERE             valid = 1 AND a.id = :assessmentId
+            WHERE             valid = 1 AND a.id = :assessmentId AND sr.deleted_at IS NULL
             GROUP BY          sr.owner
         ";
         $stmt = $this->database->prepare($query);
