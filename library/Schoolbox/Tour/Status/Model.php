@@ -13,6 +13,16 @@ use Schoolbox\Tour\Step;
 class Model implements \JsonSerializable
 {
 
+
+    /** User has not interacted with this step/step in the joyride */
+    const STATUS_UNACTIONED = 'unactioned';
+
+    /** User has completed the joyride */
+    const STATUS_COMPLETED = 'completed';
+
+    /** User has dismissed the joyride- and presumably never wants to see the damn thing again */
+    const STATUS_DISMISSED = 'dismissed';
+
     /**
      * @var User|null
      */

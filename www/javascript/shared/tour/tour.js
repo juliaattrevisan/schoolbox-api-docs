@@ -54,7 +54,9 @@ $(function () {
                         var tourUrl     = btoa(window.location.pathname);
                         var newStep     = tourCurrent._introItems[tourCurrent._currentStep].uuid;
                         var postUrl     = saveRoute.replace("{url}", tourUrl).replace("{step}", oldStep || "");
-                        var status      = "Unactioned";
+
+                        //This matches the consts on the Status/Model - to be updated when this file is a plugin
+                        var status      = "unactioned";
 
                         //Save the status
                         $.post(postUrl, {
@@ -71,7 +73,9 @@ $(function () {
                         var tourUrl     = btoa(window.location.pathname);
                         var newStep     = tourCurrent._introItems[tourCurrent._currentStep].uuid;
                         var postUrl     = saveRoute.replace("{url}", tourUrl).replace("{step}", oldStep || "");
-                        var status      = "Completed";
+
+                        //This matches the consts on the Status/Model - to be updated when this file is a plugin
+                        var status      = "completed";
 
                         //Save the status
                         $.post(postUrl, {
@@ -86,7 +90,9 @@ $(function () {
                             var tourUrl = btoa(window.location.pathname);
                             var newStep = tourCurrent._introItems[tourCurrent._currentStep].uuid;
                             var postUrl = saveRoute.replace("{url}", tourUrl).replace("{step}", oldStep || "");
-                            var status = "Dismissed";
+
+                            //This matches the consts on the Status/Model - to be updated when this file is a plugin
+                            var status = "dismissed";
 
                             //Save the status
                             $.post(postUrl, {
