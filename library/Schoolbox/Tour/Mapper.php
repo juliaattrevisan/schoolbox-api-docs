@@ -21,6 +21,7 @@ use Schoolbox\UserMapper;
  *
  * @method Model createModel($id = null)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model findOneByColumnList($columnList, $order = [], $options = [])
  * @package Schoolbox\Tour
  */
 class Mapper extends BaseMapper
@@ -142,6 +143,7 @@ class Mapper extends BaseMapper
         return $this->hydrateSelect($statement);
     }
 
+
     /**
      * Find all tours relevant to a particular user and the supplied URL
      *
@@ -150,12 +152,11 @@ class Mapper extends BaseMapper
      * @return GenericCollection
      * @throws BaseMapper\DefinitionException
      */
-    public function findByUserForUrl(User $user, string $url): GenericCollection
+    public function findByUserForUrl(User $user, string $url, bool $repeat = false): GenericCollection
     {
         $userQuery = $this->getUserFilterQuery($user);
 
         // We have the basic audience query, onto this we need to append the regular expression URL filter
-
         $userQuery['bindings']['url'] = $url;
 
         $sql = " 
@@ -165,6 +166,19 @@ class Mapper extends BaseMapper
                         :url REGEXP `t`.`url_regex` AND
                         `{$this->getTable()}`.`active` = 1
         ";
+
+        if (!$repeat) {
+            /** @var User $user */
+            $user = $_SESSION['user'];
+            $userQuery['bindings']['user_id'] = $user->getId();
+
+            $sql = $sql. "AND
+                            tour.uuid NOT IN (
+                            SELECT tour_uuid
+                            FROM tour_step ts
+                            LEFT JOIN tour_status tst ON ts.uuid = tst.current_step
+                            WHERE tst.user_id = :user_id)";
+        }
 
         $statement = $this->getDatabase()->prepare($sql);
         $statement->execute($userQuery['bindings']);
