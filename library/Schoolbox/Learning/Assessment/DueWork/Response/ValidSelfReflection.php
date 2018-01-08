@@ -19,7 +19,6 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
 
-
 class ValidSelfReflection
 {
 

@@ -17,7 +17,6 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
 
-
 class ValidSelfAssessment extends ValidSelfReflection
 {
 

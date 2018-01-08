@@ -139,10 +139,8 @@ class Controller extends Base
 
         $data = [
             'assessment' => $assessment,
-
-            // TODO: Breadcrumbs need to be different
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
-                ->add([ $assessment->getTitle(), $this->getRouter()->generate('learningAssessment.getSummary',['assessmentId' => $assessment->getId(), 'studentId' => $participant->getUser()->getId()]) ])
+                ->add([$assessment->getTitle(), $this->getRouter()->generate('learningAssessment.getSummary',['assessmentId' => $assessment->getId(), 'studentId' => $participant->getUser()->getId()])])
                 ->add([$breadcrumbNode, '']),
             'response' => $response,
             'latestFeedback' => $latestFeedback,
