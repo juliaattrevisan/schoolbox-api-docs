@@ -77,7 +77,7 @@ class UserBulkMapper extends UserMapper
         $query .= 'WHERE u.deleted_at is null';
 
         if ($searchCampus != self::UNCHANGED) {
-            $query .= 'AND uc.campus = :searchCampus';
+            $query .= ' AND uc.campus = :searchCampus';
 
             $params['searchCampus'] = $searchCampus;
         }
