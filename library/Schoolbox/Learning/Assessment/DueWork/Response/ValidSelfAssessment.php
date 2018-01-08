@@ -14,30 +14,42 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
+use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\User;
+
+
 class ValidSelfAssessment extends ValidSelfReflection
 {
 
     /**
      * The IAssessable is set to Self-Assess
+     *
+     * @param Participant $participant
+     * @return bool
      */
-    protected function isSelfAssessable(): bool
+    protected function isSelfAssessable(Participant $participant): bool
     {
-        return $this->assessment->isSelfAssessable();
+        return $participant->getAssessable()->isSelfAssessable();
     }
+
 
     /**
      * The user can start the self-assessment process
+     *
+     * @param User        $user
+     * @param Participant $participant
+     * @return bool
      */
-    public function isSatisfied(): bool
+    public function isSatisfied(User $user, Participant $participant): bool
     {
         /* Since I can't guarantee that the Participation's IAssessable is a DueWork\Model
          * there's a sequential dependency that must be obeyed - the IAssessable has to be a
          * DueWork\Model before an isSelfAssessable() check can be performed, otherwise
          * you'll experience a fatal undefined method scenario
          */
-        if ($this->isDueWork()) {
-            return $this->isViewingOwnParticipation()
-                && $this->isSelfAssessable();
+        if ($this->isDueWork($participant)) {
+            return $this->isViewingOwnParticipation($user, $participant)
+                && $this->isSelfAssessable($participant);
         }
 
         return false;

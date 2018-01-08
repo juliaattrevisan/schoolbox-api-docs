@@ -40,50 +40,47 @@ class ValidSelfReflection
      */
     protected $participant;
 
-    /**
-     * ValidSelfReflection constructor.
-     *
-     * @param User   $user  Current login
-     * @param Participant $participant
-     */
-    public function __construct(User $user, Participant $participant)
-    {
-        $this->user = $user;
-        $this->assessment = $participant->getAssessable();
-        $this->participant = $participant;
-    }
 
     /**
      * Participant is the same as current logged-in user
      *
+     * @param User        $user
+     * @param Participant $participant
      * @return bool
      */
-    protected function isViewingOwnParticipation(): bool
+    protected function isViewingOwnParticipation(User $user, Participant $participant): bool
     {
-        return $this->user->getId() === $this->participant->getUser()->getId();
+        return $user->getId() === $participant->getUser()->getId();
 
         /* TODO: Can you self-reflect on behalf of someone else, via SOBO?
          */
     }
 
+
     /**
      * The IAssessable is a Due Work
      * Other assessment types don't support self-reflection here
      *
+     * @param Participant $participant
      * @return bool
      */
-    protected function isDueWork(): bool
+    protected function isDueWork(Participant $participant): bool
     {
-        return $this->assessment instanceof DueWork\Model;
+        return $participant->getAssessable() instanceof DueWork\Model;
     }
+
 
     /**
      * The IAssessable is set to Self-Reflect
+     *
+     * @param Participant $participant
+     * @return bool
      */
-    protected function isSelfReflectable(): bool
+    protected function isSelfReflectable(Participant $participant): bool
     {
-        return $this->assessment->isSelfReflectable();
+        return $participant->getAssessable()->isSelfReflectable();
     }
+
 
     /**
      * The Participant has at least one IResponse
@@ -92,28 +89,34 @@ class ValidSelfReflection
      * attempting a self-reflection, and only Submitted officially after that step
      * so I can't use $this->participant->hasSubmittedResponse()
      *
+     * @param Participant $participant
      * @return bool
      */
-    protected function hasDraftResponse(): bool
+    protected function hasDraftResponse(Participant $participant): bool
     {
-        $mostRecentResponse = $this->participant->findMostRecentResponse();
+        $mostRecentResponse = $participant->findMostRecentResponse();
 
         return $mostRecentResponse && !$mostRecentResponse->isSubmitted();
     }
 
+
     /**
      * The user can start the self-reflection process
+     *
+     * @param User        $user
+     * @param Participant $participant
+     * @return bool
      */
-    public function isSatisfied(): bool
+    public function isSatisfied(User $user, Participant $participant): bool
     {
         /* Since I can't guarantee that the Participation's IAssessable is a DueWork\Model
          * there's a sequential dependency that must be obeyed - the IAssessable has to be a
          * DueWork\Model before an isSelfReflectable() check can be performed, otherwise
          * you'll experience a fatal undefined method scenario
          */
-        if ($this->isDueWork()) {
-            return $this->isViewingOwnParticipation()
-                && $this->isSelfReflectable();
+        if ($this->isDueWork($participant)) {
+            return $this->isViewingOwnParticipation($user, $participant)
+                && $this->isSelfReflectable($participant);
         }
 
         return false;
