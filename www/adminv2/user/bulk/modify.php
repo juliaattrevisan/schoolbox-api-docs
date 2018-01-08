@@ -198,7 +198,7 @@ foreach ($allBoolean as $currentHideTimetable) {
 /* If there were any search results, display control options
  */
 if (!empty($_POST)) {
-    $userMapper = new \Schoolbox\UserBulkMapper();
+    $userMapper = \Schoolbox\UserBulkMapper::getInstance();
 
     $allUsers = $userMapper->bulkModifySearch(
         $_POST['search_campus'],

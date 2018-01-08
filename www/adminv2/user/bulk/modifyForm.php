@@ -9,7 +9,7 @@
  */
 SitePage::extendExecutionTime(300);
 
-$userMapper = new \Schoolbox\UserBulkMapper();
+$userMapper = \Schoolbox\UserBulkMapper::getInstance();
 
 $modified = new \Schoolbox\Collection();
 

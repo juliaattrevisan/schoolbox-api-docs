@@ -38,7 +38,7 @@ class UserBulkMapper extends UserMapper
     /**
      * Construct the log system for bulk logging
      */
-    protected function setup()
+    protected function postSetup()
     {
         $file = fopen($this->getConfigLoader()->get('logs_dir') . '/audit.log', 'a');
         $this->logger = new Logger($file, null, 200, [], true);
