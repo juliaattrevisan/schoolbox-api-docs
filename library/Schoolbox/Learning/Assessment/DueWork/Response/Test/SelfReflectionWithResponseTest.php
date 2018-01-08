@@ -30,7 +30,7 @@ class SelfReflectionWithResponseTest extends TestCase
     {
         $validation = new ValidSelfReflectionWithResponse();
 
-        $this->assertEquals($expected, $validation->isSatisfied($currentUser, $participant));
+        $this->assertEquals($expected, $validation->isSatisfiedBy($currentUser, $participant));
     }
 
     /**

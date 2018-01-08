@@ -40,7 +40,7 @@ class ValidSelfAssessment extends ValidSelfReflection
      * @param Participant $participant
      * @return bool
      */
-    public function isSatisfied(User $user, Participant $participant): bool
+    public function isSatisfiedBy(User $user, Participant $participant): bool
     {
         /* Since I can't guarantee that the Participation's IAssessable is a DueWork\Model
          * there's a sequential dependency that must be obeyed - the IAssessable has to be a

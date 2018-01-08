@@ -111,8 +111,8 @@ class Controller extends Base
          * participation setting. Learners are allowed in this section with a non-submitted Response under
          * these circumstances
          */
-        $selfAssessedWithResponse = (new ValidSelfAssessmentWithResponse())->isSatisfied($this->getUser(), $participant);
-        $selfReflectedWithResponse = (new ValidSelfReflectionWithResponse())->isSatisfied($this->getUser(), $participant);
+        $selfAssessedWithResponse = (new ValidSelfAssessmentWithResponse())->isSatisfiedBy($this->getUser(), $participant);
+        $selfReflectedWithResponse = (new ValidSelfReflectionWithResponse())->isSatisfiedBy($this->getUser(), $participant);
 
         if (!$selfAssessedWithResponse && !$selfReflectedWithResponse) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_COMPLETE_BEFORE_SELF_ASSESS);

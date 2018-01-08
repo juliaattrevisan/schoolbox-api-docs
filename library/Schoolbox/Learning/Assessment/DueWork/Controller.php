@@ -768,8 +768,8 @@ class Controller extends Assessment\Controller
         /* If we're saving the final version of the submission
          * (ie. not a draft) ram the current datetime in
          */
-        $selfAssessable = (new ValidSelfAssessment())->isSatisfied($this->getUser(), $participant);
-        $selfReflectable = (new ValidSelfReflection())->isSatisfied($this->getUser(), $participant);
+        $selfAssessable = (new ValidSelfAssessment())->isSatisfiedBy($this->getUser(), $participant);
+        $selfReflectable = (new ValidSelfReflection())->isSatisfiedBy($this->getUser(), $participant);
 
         if ($isFinal) {
 
