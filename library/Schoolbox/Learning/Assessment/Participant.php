@@ -234,21 +234,13 @@ class Participant
      *
      * @return IResponse|null
      */
-    public function findMostRecentDraftResponse()
+    public function findMostRecentDraftResponse(): ?IResponse
     {
-        /** @var IResponse $mostRecentDraftResponse */
-        $mostRecentDraftResponse = null;
-
-        /** @var IResponse $response */
-        foreach ($this->allResponses as $response) {
-            if (!$response->isSubmitted()) {
-                if (!$mostRecentDraftResponse || $response->getSubmittedAt()->gt($mostRecentDraftResponse->getSubmittedAt())) {
-                    $mostRecentDraftResponse = $response;
-                }
-            }
+        if ($this->allResponses->count()) {
+            return $this->allResponses->filterBy('submittedAt', true)->sortBy('submittedAt', 'desc')->first();
         }
 
-        return $mostRecentDraftResponse;
+        return null;
     }
 
 
