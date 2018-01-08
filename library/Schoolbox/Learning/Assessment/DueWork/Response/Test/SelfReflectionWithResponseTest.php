@@ -28,9 +28,9 @@ class SelfReflectionWithResponseTest extends TestCase
      */
     public function testValidSelfAssessable(User $currentUser, Participant $participant, $expected)
     {
-        $validation = new ValidSelfReflectionWithResponse($currentUser, $participant);
+        $validation = new ValidSelfReflectionWithResponse();
 
-        $this->assertEquals($expected, $validation->isSatisfied());
+        $this->assertEquals($expected, $validation->isSatisfied($currentUser, $participant));
     }
 
     /**
