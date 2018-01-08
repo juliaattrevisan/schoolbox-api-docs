@@ -10,7 +10,7 @@ namespace Schoolbox\Tour\Status;
 use Schoolbox\User;
 use Schoolbox\Tour\Step;
 
-class Model
+class Model implements \JsonSerializable
 {
 
     /**
@@ -103,5 +103,26 @@ class Model
     public function setTourStep($tourStep)
     {
         $this->tourStep = $tourStep;
+    }
+
+
+    /**
+     * Specify data which should be serialized to JSON
+     *
+     * @link  http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
+     */
+    public function jsonSerialize()
+    {
+        // TODO: Implement jsonSerialize() method.
+
+        return [
+            "user"      => $this->getUser(),
+            "url"       => $this->getUrl(),
+            "status"    => $this->getStatus(),
+            "tourStep"  => $this->getTourStep()
+        ];
     }
 }

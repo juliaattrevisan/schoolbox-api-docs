@@ -27,9 +27,10 @@ class Module extends BaseModule
         $this->registerRoutesArray([
             'GET'  => [
                 '/url/{url}' => ['getTours' => null],
+                '/getStatus/{tour_uuid}' => 'tourStatus'
             ],
             'POST' => [
-                '/url/{url}/{oldStep}' => 'saveStatus',
+                '/url/{url}{/oldStep}' => 'saveStatus',
             ],
         ]);
     }

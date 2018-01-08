@@ -17,6 +17,7 @@ use Schoolbox\UserMapper;
  *
  * @method Model createModel($id = null)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model findOneByColumnList($columnList, $order = [], $options = [])
  * @package Schoolbox\Tour\Step
  */
 class Mapper extends BaseMapper
@@ -72,8 +73,6 @@ class Mapper extends BaseMapper
 
             $tourStep = $this->hydrateJoin($row, "tourStep", "t");
             $model->setTourStep($tourStep);
-
-            new \Alaress_Probe($row, $user, $model);
 
             $collection->add($model);
         }

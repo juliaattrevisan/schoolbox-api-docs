@@ -12,6 +12,7 @@ use Schoolbox\File\Exception;
 use Schoolbox\Tour\Mapper as TourMapper;
 use Schoolbox\Tour\Trigger\Mapper as TourTriggerMapper;
 use Schoolbox\Tour\Trigger\Model as TourTrigger;
+use Schoolbox\User;
 
 class Controller extends Base
 {
@@ -70,6 +71,8 @@ class Controller extends Base
 
         $tours = $this->tourMapper->findByUserForUrl($this->getUser(), $url);
 
+
+
         // Iterate through them and add the required information into the array
 
         /** @var Model $tour */
@@ -116,10 +119,14 @@ class Controller extends Base
      */
     public function saveStatus(?string $oldStep, string $url)
     {
+        $this->getResponse()->content->set($this->buildJsonOutput(null));
+
         //Delete previous step
         if($oldStep != null) {
            try {
-               $oldTourStatus = $this->tourStatusMapper->findByColumnList(["current_step" => $oldStep, "url" => $url]);
+               /** @var User $user */
+               $user = $_SESSION["user"];
+               $oldTourStatus = $this->tourStatusMapper->findByColumnList(["current_step" => $oldStep, "url" => $url, "user_id" => $user->getId()]);
                $this->tourStatusMapper->delete($oldTourStatus);
            } catch (Exception $e) {
                //Could not find old step in db...
@@ -137,6 +144,28 @@ class Controller extends Base
             $this->tourStatusMapper->save($newTourStatus);
         } catch (Exception $e) {
             //Attempted to save invalid data
+        }
+    }
+
+    /**
+     * @api POST /tourStatus/{uuid}
+     * @param $uuid
+     */
+    public function tourStatus(string $tour_uuid)
+    {
+        $this->getResponse()->content->set($this->buildJsonOutput(null));
+
+        //Get all steps for tour
+        $steps = $this->tourStepMapper->findByColumnList(["tour_uuid" => $tour_uuid]);
+
+        //Find step that has status
+        try {
+            $status = $this->tourStatusMapper->findOneByColumnList(["current_step" => $steps->getPropertyValues("uuid")]);
+            $serialized = $status->jsonSerialize();
+            $this->getResponse()->content->set($this->buildJsonOutput($serialized));
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            //No status for any of the steps - we are taking the tour for the first time;
+            return;
         }
     }
 }

@@ -46,14 +46,15 @@ $(function () {
                         steps: stepsToDisplay.filter(function(obj) { return $(obj.element).is(':visible'); })
                     });
 
+                    var tourTaken = false;
                     var oldStep = null;
                     var completed  = false;
-                    var route = '/tour/url/{url}/{step}';
+                    var saveRoute = '/tour/url/{url}/{step}';
 
                     tourCurrent.onchange(function(targetElement) {
                         var tourUrl     = btoa(window.location.pathname);
                         var newStep     = tourCurrent._introItems[tourCurrent._currentStep].uuid;
-                        var postUrl     = route.replace("{url}", tourUrl).replace("{step}", oldStep);
+                        var postUrl     = saveRoute.replace("{url}", tourUrl).replace("{step}", oldStep || "");
                         var status      = "Unactioned";
 
                         //Save the status
@@ -72,7 +73,7 @@ $(function () {
 
                         var tourUrl     = btoa(window.location.pathname);
                         var newStep     = tourCurrent._introItems[tourCurrent._currentStep].uuid;
-                        var postUrl     = route.replace("{url}", tourUrl).replace("{step}", oldStep);
+                        var postUrl     = saveRoute.replace("{url}", tourUrl).replace("{step}", oldStep || "");
                         var status      = "Completed";
 
                         //Save the status
@@ -89,7 +90,7 @@ $(function () {
                         if(!completed) {
                             var tourUrl = btoa(window.location.pathname);
                             var newStep = tourCurrent._introItems[tourCurrent._currentStep].uuid;
-                            var postUrl = route.replace("{url}", tourUrl).replace("{step}", oldStep);
+                            var postUrl = saveRoute.replace("{url}", tourUrl).replace("{step}", oldStep || "");
                             var status = "Dismissed";
 
                             //Save the status
@@ -100,6 +101,14 @@ $(function () {
 
                             });
                         }
+                    });
+
+
+                    //You can retrieve the tour status as follows
+                    var getRoute    = '/tour/getStatus/{tour_uuid}';
+                    var getUrl      = getRoute.replace("{tour_uuid}", tour["uuid"]);
+
+                    $.get(getUrl, null, function (data, status) {
                     });
 
                     // Fire the tour
