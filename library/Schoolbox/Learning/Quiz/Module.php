@@ -31,7 +31,7 @@ class Module extends RestfulModule
      */
     public function __construct(ContainerInterface $injector)
     {
-        parent::__construct($injector, $injector->get('mapperFactory')->get(QuizMapper::class), 'quiz', null, 'learningQuiz');
+        parent::__construct($injector, QuizMapper::class, 'quiz', null, 'learningQuiz');
     }
 
     /**

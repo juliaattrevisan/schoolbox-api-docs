@@ -63,9 +63,14 @@ class SubmissionMapper extends BaseMapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('box_id', 'b')}
+                {$this->getJoinColumnString('box_id', 'b')},
+                {$this->getJoinColumnString('owner', 'o')},
+                {$this->getJoinColumnString('submitted_by', 'sb')}
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('box_id', '', 'b', true)}
+            INNER JOIN {$this->getJoinSql('owner', '', 'o', true)}
+            INNER JOIN {$this->getJoinSql('submitted_by', '', 'sb', true)}
+
         ";
     }
 
@@ -101,6 +106,10 @@ class SubmissionMapper extends BaseMapper
                 $result
                     ->setSubmissionBox($dueWork)
             );
+
+            $result->setSubmittedBy($this->hydrateJoin($row, 'submitted_by', 'sb'));
+            $result->setOwner($this->hydrateJoin($row, 'owner', 'o'));
+
         }
 
         // Fetch and hydrate files

@@ -773,6 +773,10 @@ class Mapper extends BaseMapper
                 $folderIds[] = $context->getFolder()->getId();
             }
         }
+
+        if (!\count($folderIds)) {
+            return $modelList;
+        }
         // Load folders in a single query
         $folders = $this->getJoinMapper('assessment_folder')->findByColumn('id', $folderIds)->indexBy('id');
         // Pass 2: assign folders to all non-project contexts

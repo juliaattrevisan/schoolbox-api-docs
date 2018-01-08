@@ -28,7 +28,7 @@ class Module extends RestfulModule
      */
     public function __construct(ContainerInterface $injector, RestfulModule $context)
     {
-        parent::__construct($injector, $injector->get('mapperFactory')->get(Mapper::class), 'divisions', $context, 'sportsfixturesDivision');
+        parent::__construct($injector, Mapper::class, 'divisions', $context, 'sportsfixturesDivision');
     }
 
     /**

@@ -80,9 +80,12 @@ class Mapper extends BaseMapper
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('user', 'r')},
+                {$this->getJoinColumnString('user', 'u')},
+
                 {$this->getJoinColumnString('quiz', 'a')}
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
             LEFT JOIN {$this->getJoinSql('reviewer', '', 'r', true)}
+            INNER JOIN {$this->getJoinSql('user', '', 'u', true)}
             INNER JOIN {$this->getJoinSql('quiz', '', 'a', true)}
         ";
     }
@@ -109,6 +112,8 @@ class Mapper extends BaseMapper
             if($reviewer instanceof User && $reviewer->getId()){
                 $attempt->setReviewer($reviewer);
             }
+
+            $attempt->setUser($this->hydrateJoin($row, 'user', 'u'));
 
             // Try to streamline quiz+assessment creation too
             /** @var Quiz $quiz */
