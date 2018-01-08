@@ -46,7 +46,6 @@ $(function () {
                         steps: stepsToDisplay.filter(function(obj) { return $(obj.element).is(':visible'); })
                     });
 
-                    var tourTaken = false;
                     var oldStep = null;
                     var completed  = false;
                     var saveRoute = '/tour/url/{url}/{step}';
@@ -61,8 +60,6 @@ $(function () {
                         $.post(postUrl, {
                             newStep: newStep,
                             status: status
-                        }, function () {
-
                         });
 
                         oldStep         = newStep;
@@ -80,8 +77,6 @@ $(function () {
                         $.post(postUrl, {
                             newStep: newStep,
                             status: status
-                        }, function () {
-
                         });
                     });
 
@@ -97,8 +92,6 @@ $(function () {
                             $.post(postUrl, {
                                 newStep: newStep,
                                 status: status
-                            }, function () {
-
                             });
                         }
                     });
@@ -109,6 +102,7 @@ $(function () {
                     var getUrl      = getRoute.replace("{tour_uuid}", tour["uuid"]);
 
                     $.get(getUrl, null, function (data, status) {
+                        //Do something with data
                     });
 
                     // Fire the tour
