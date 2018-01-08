@@ -14,7 +14,8 @@
     <script type="text/javascript">
         $(function() {
             // Save form for task completion
-            $('#component{{ component_id }}').find('form[data-progress-tick-form="selfAssessed"]').progressTickForm({
+            $('#component{{ component_id }}').find('form[data-progress-tick-form]').progressTickForm({
+                disabledSelector: 'form:not([data-progress-tick-form="selfAssessed"])',
                 transitions: {
                     incomplete:      'selfAssessed',
                     selfAssessed:    'incomplete',

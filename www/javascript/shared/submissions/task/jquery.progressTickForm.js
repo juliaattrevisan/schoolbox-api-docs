@@ -11,9 +11,15 @@
         teacherAssessed: 3
     };
 
+    // Not configurable
+    var tickSelector = 'a[data-progress-tick-status]';
+
     var defaults = {
         // Toast label
         label: false,
+
+        // Any forms which match this selector are disabled
+        disabledSelector: false,
 
         // Button title for each status
         titles: {
@@ -38,7 +44,13 @@
     $.fn.progressTickForm = function(options) {
         var config = $.extend(true, {}, defaults, options);
 
-        $(this).on('click.progressTickForm', 'a[data-progress-tick-status]', function(event) {
+        // Disable any which match the disabled selector
+        if (config.disabledSelector) {
+            $(this).filter(config.disabledSelector).find(tickSelector).prop('disabled', true);
+            $(this).find(config.disabledSelector).find(tickSelector).prop('disabled', true);
+        }
+
+        $(this).on('click.progressTickForm', tickSelector, function(event) {
             event.preventDefault();
 
             var element = $(this),

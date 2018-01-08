@@ -23,7 +23,8 @@
             });
 
             // Save form for task completion
-            $component.find('form[data-progress-tick-form="selfAssessed"]').progressTickForm({
+            $component.find('form[data-progress-tick-form]').progressTickForm({
+                disabledSelector: 'form:not([data-progress-tick-form="selfAssessed"])',
                 transitions: {
                     incomplete:      'selfAssessed',
                     selfAssessed:    'incomplete',
