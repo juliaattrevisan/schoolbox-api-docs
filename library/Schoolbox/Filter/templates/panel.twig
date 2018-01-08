@@ -4,10 +4,14 @@ A panel that displays various filters.
 Usage:
     contentId string      - the ID of the HTML element where we will replace with AJAX content
     panel     Filterpanel
+    quickload bool        - if true, fill contentId with .innerHTML instead of jQuery.html()
+                            When true, any JavaScript must be applied on the "filterContentLoaded"
+                            event of the contentId element.
 
     ? TODO convert to JS plugin that is executed against the panel element (so it can get with $this), and takes contentPanelId as single arg
 #}
 
+{% autoescape 'js' %}
 <script type="text/javascript">
 
     $(function() {
@@ -203,11 +207,11 @@ Usage:
          */
         function processServerSuccess(html) {
             $serverErrorFeedback.hide();
-
-            // Use innerHTML instead of jQuery.html for performance.
-            // This means that any JS on the filter content must be loaded in
-            // the filterContentLoaded event.
-            $reportContent.get(0).innerHTML = html;
+            if (Boolean("{{ quickload }}")) {
+                $reportContent.get(0).innerHTML = html;
+            } else {
+                $reportContent.html(html);
+            }
             $reportContent.trigger('filterContentLoaded');
             $toast.toastTimeout({text: 'Success!', css: 'success'});
         }
@@ -400,6 +404,7 @@ Usage:
     });
 
 </script>
+{% endautoescape %}
 
 {# Rip outta DOM on load, and remove 'hide' #}
 <span data-applied-filter-tab class="label filter hide"><span data-filter></span> <a href="#" data-close class="close" title="Remove filter">×</a></span>
