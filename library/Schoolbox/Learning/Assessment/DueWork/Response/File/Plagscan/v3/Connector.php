@@ -53,6 +53,12 @@ class Connector
     const PLAGSCAN_TIMEOUT = 360;
 
     /**
+     * Maximum size of files allowed for submission: 100MB
+     * @see http://blog.plagscan.com/plagscan-updates-possible-uploading-file-size/
+     */
+    const PLAGSCAN_FILESIZE_LIMIT = 104857600;
+
+    /**
      * Api url where stuff is sent
      *
      * @var string
@@ -117,7 +123,7 @@ class Connector
         }
 
         // Plagscan only allows files that smaller than 100MB
-        if ( $submissionFile->getSize() > 13107200 ) {
+        if ($submissionFile->getSize() > self::PLAGSCAN_FILESIZE_LIMIT) {
             throw new \DomainException('File is too large');
         }
 
