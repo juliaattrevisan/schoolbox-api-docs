@@ -48,7 +48,7 @@
             $('#report_actions').foundation();
 
             // Save form for task completion
-            $('form[data-progress-tick-form]').progressTickForm({
+            $(this).progressTickForm({
                 label: $('[data-save-progress-state]'),
                 transitions: {
                     incomplete:      'teacherAssessed',
