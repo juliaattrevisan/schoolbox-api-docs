@@ -125,6 +125,10 @@ class External_Isams_Timetable implements External_TimetableInterface
      */
     public function getDayNumber(CampusModel $campus, $date = 0)
     {
+        if ($date == 0) {
+            return date('w');
+        }
+
         return date('w', strtotime($date));
     }
 
