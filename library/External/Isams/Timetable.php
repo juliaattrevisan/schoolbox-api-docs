@@ -125,7 +125,7 @@ class External_Isams_Timetable implements External_TimetableInterface
      */
     public function getDayNumber(CampusModel $campus, $date = 0)
     {
-        return date('w', strototime($date));
+        return date('w', strtotime($date));
     }
 
     /** The days in Isams have no correlation to an actual calendar date- it is purely based on the day of the week
