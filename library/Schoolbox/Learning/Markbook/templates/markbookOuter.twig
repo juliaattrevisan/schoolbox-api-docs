@@ -10,8 +10,54 @@
 
 {% include filterPanel.template with {
     contentId: reportContentId,
-    panel: filterPanel
+    panel: filterPanel,
+    quickload: true,
 } only %}
 
 
 <div id="{{ reportContentId }}"></div>
+
+{% autoescape 'js' %}
+<script type="text/javascript">
+    $(function() {
+        $('#{{ reportContentId }}').on('filterContentLoaded', function() {
+            // Use datatables to do fixed headers and left column
+            // Only do this on small up
+            var $windowWidthRems = $(window).width() / parseFloat($('html').css('font-size'));
+            if ($windowWidthRems >= 40) {
+                $('[data-mark-sheet]').DataTable({
+                    scrollY: '34em', // Fairly arbitrary height, catered to a 1080p screen
+                    scrollX: true,
+                    scrollCollapse: true,
+                    paging: false,
+                    bFilter: false,
+                    bInfo: false,
+                    ordering: false,
+                    fixedColumns: {
+                        leftColumns: 1
+                    }
+                });
+            }
+
+            /* Controls for Averages and Dynamic updates for input fields
+             */
+            $('[data-mark-sheet]').marksheetAverages();
+            $('[data-mark-sheet]').marksheetInputs();
+
+            // Enable the download report menu
+            $('#report_actions').foundation();
+
+            // Save form for task completion
+            $(this).progressTickForm({
+                label: $('[data-save-progress-state]'),
+                transitions: {
+                    incomplete:      'teacherAssessed',
+                    selfAssessed:    'teacherAssessed',
+                    teacherAssessed: 'incomplete'
+                }
+            });
+        });
+
+    });
+</script>
+{% endautoescape %}
