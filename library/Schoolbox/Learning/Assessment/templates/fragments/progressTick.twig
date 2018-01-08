@@ -35,19 +35,16 @@
           data-progress-tick-form="{{ assessment.isSelfAssessable ? 'selfAssessed' : 'teacherAssessed' }}">
         {% if participant.isResponseRequired %}
             <a href="#"
-               disabled
                class="no-text progress-tick"
                title="Incomplete"
                data-progress-tick-status="incomplete"></a>
         {% elseif participant.isFeedbackRequired %}
             <a href="#"
-               disabled
                class="no-text progress-tick pending"
                title="Self-assessed"
                data-progress-tick-status="selfAssessed"></a>
         {% elseif participant.isReviewComplete %}
             <a href="#"
-               disabled
                class="no-text progress-tick reviewed"
                title="Completed"
                data-progress-tick-status="teacherAssessed"></a>
