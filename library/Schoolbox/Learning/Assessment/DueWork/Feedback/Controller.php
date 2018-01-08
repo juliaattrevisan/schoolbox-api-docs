@@ -131,8 +131,7 @@ class Controller extends Base
             // Verify that this return is for this assessment
             $submissionReturn = $this->returnedWorkMapper->findById($draftFeedbackId);
             $publishSuccess   = false;
-            $rubricSuccess    = null;
-            $countRubricMarks = 0;
+
             if ($submissionReturn->getSubmissionBox()->getAssessmentModel()->getId() === $assessment->getId()) {
                 $submissionReturn->setPublishedAt($now);
 
@@ -143,21 +142,9 @@ class Controller extends Base
                     $publishSuccess = false;
                 }
 
-                if($publishSuccess){
-                    try{
-                        $countRubricMarks = $this->rubricMarkMapper->publishDraftMarks($submissionReturn->getOwner(), $assessment);
-                        $rubricSuccess = true;
-                    } catch (PDOException $e){
-                        $rubricSuccess = false;
-                    }
-                }
             }
 
-            $results[$draftFeedbackId] = [
-                'publishSuccess'   => $publishSuccess,
-                'rubricSuccess'    => $rubricSuccess,
-                'countRubricMarks' => $countRubricMarks,
-            ];
+            $results[$draftFeedbackId] = ['publishSuccess'   => $publishSuccess];
         }
 
         $this->getResponse()->content->set(
@@ -178,19 +165,10 @@ class Controller extends Base
             return;
         }
 
-        /** @var DueWork\Model $dueWork */
-        $dueWork = $participant->getAssessable();
-
-        $isDraft = !isset($post['publish']) || !$post['publish'];
-
         // Did we just give some rubric marks?
         if (is_array($post['rubric'])) {
             $rubMap = RubricMapper::getInstance();
-            $rubMap->saveForParticipant($participant, $post['rubric']['descriptors'], $isDraft, $feedback->getId());
-        }
-        // Else did we just publish draft marks via the status page?
-        elseif(!$isDraft){
-            $this->rubricMarkMapper->publishDraftMarks($participant->getUser(), $dueWork);
+            $rubMap->saveForParticipant($participant, $post['rubric']['descriptors'], $feedback->getId());
         }
     }
 

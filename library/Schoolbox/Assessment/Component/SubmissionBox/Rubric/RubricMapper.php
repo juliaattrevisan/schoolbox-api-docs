@@ -459,7 +459,7 @@ class RubricMapper
             throw new \InvalidArgumentException("Cannot apply marks without a submission box");
         }
 
-        $publishedClause = $publishedOnly ? 'AND rm.published_at IS NOT NULL' : '';
+        $publishedClause = $publishedOnly ? 'AND sr.published_at IS NOT NULL' : '';
         $dateOrder = $publishedOnly ? 'sr.published_at' : 'sr.created_at';
 
         // retrieve marks (descriptor selections for student)
@@ -710,19 +710,17 @@ class RubricMapper
      *
      * @param Participant                $participant
      * @param bool[]                     $descriptors key = descriptor.id, val = whether it is checked
-     * @param bool                       $isDraft     Whether these are draft marks
-     * @param int                        $returnId
+     * @param int                        $returnId Feedback
      */
-    public function saveForParticipant(Participant $participant, array $descriptors = [], $isDraft, $returnId)
+    public function saveForParticipant(Participant $participant, array $descriptors = [], $returnId)
     {
         $descriptorMapper   = DescriptorMapper::getInstance();
         $markMapper         = MarkMapper::getInstance();
-        $publishedAt        = $isDraft ? new \Alaress_Date_NullDate() : Alaress_Date_Format::now();
 
         $returnedWorkMapper = SubmissionBox\ReturnedWorkMapper::getInstance();
 
-        // Blow away any previous draft marks for this student and assessment
-        $markMapper->deleteDraftMarks($participant->getUser(), $participant->getAssessable());
+        // Blow away any previous descriptor records with the feedback
+        $markMapper->deleteFeedbackMarks($returnId);
 
         $marksToSave = $markMapper->createCollection();
 
@@ -736,10 +734,10 @@ class RubricMapper
                     ->setSubmissionReturn($returnedWorkMapper->createModel($returnId))
                     ->setStudent($participant->getUser())
                     ->setDescriptor($descriptorMapper->createModel($descriptorId))
-                    ->setPublishedAt($publishedAt)
                     ->setValid(true)
             );
         }
+
         $markMapper->save($marksToSave);
     }
 
@@ -976,7 +974,7 @@ class RubricMapper
         $pb
             ->equals('sb.assessment_id', $dueWorks->getColumnValues('id'))
             ->equals('sr.owner', $student->getId())
-            ->notNull('rm.published_at')
+            ->notNull('sr.published_at')
             ->isTrue('rm.valid')
             ->isNull('rd.deleted_at')
             ->isNull('rl.deleted_at')
@@ -1007,7 +1005,7 @@ class RubricMapper
             JOIN rubric_mark       rm ON rd.id = rm.descriptor_id
             JOIN submission_return sr ON sr.id = rm.return_id
             JOIN (
-                SELECT a.id AS 'a.id', rc.id AS 'rc.id', max(rm.published_at) AS 'rm.max_published_at'
+                SELECT a.id AS 'a.id', rc.id AS 'rc.id', max(sr.published_at) AS 'sr.max_published_at'
                 FROM rubric_mark       rm
                 JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
                 JOIN rubric_criterion  rc ON rc.id = rd.criterion_id
@@ -1017,7 +1015,7 @@ class RubricMapper
                 JOIN submission_return sr ON sr.id = rm.return_id
                 WHERE {$where}
                 GROUP BY sb.assessment_id, rd.criterion_id
-            ) t ON `a`.`id` = `t`.`a.id` AND `rc`.`id` = `t`.`rc.id` AND `rm`.`published_at` = `t`.`rm.max_published_at`
+            ) t ON `a`.`id` = `t`.`a.id` AND `rc`.`id` = `t`.`rc.id` AND `sr`.`published_at` = `t`.`sr.max_published_at`
             WHERE {$where}
             ORDER BY rc.grouping ASC, rc.name ASC, a.due_date DESC;
         ");

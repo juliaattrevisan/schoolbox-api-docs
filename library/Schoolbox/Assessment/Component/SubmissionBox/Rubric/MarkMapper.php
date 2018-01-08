@@ -100,29 +100,21 @@ class MarkMapper extends Mapper
     }
 
     /**
-     * This will HARD-DELETE all draft marks for the specified user and assessable.
+     * This will HARD-DELETE all previously given marks with the feedback.
      *
-     * @param User $user
-     * @param IAssessable $dueWork
+     * @param int  $returnId
      * @return int
      */
-    public function deleteDraftMarks(User $user, IAssessable $dueWork)
+    public function deleteFeedbackMarks($returnId)
     {
         $query = "
-            DELETE rm FROM rubric_mark rm 
-                JOIN rubric_descriptor rd ON rm.descriptor_id = rd.id
-                JOIN rubric_level   rl ON rl.id = rd.level_id
-                JOIN submission_box sb ON sb.id = rl.box_id
-                JOIN submission_return sr ON sr.id = rm.return_id
-                WHERE sr.owner = :student_id
-                AND sb.assessment_id = :assessment_id
-                AND rm.published_at IS NULL
+            DELETE FROM rubric_mark 
+                WHERE return_id = :return_id;
         ";
 
         $statement = $this->database->prepare($query);
         $statement->execute([
-            'student_id'    => $user->getId(),
-            'assessment_id' => $dueWork->getId(),
+            'return_id'    => $returnId,
         ]);
 
         return $statement->rowCount();
@@ -145,8 +137,7 @@ class MarkMapper extends Mapper
                 JOIN rubric_level   rl ON rl.id = rd.level_id
                 JOIN submission_box sb ON sb.id = rl.box_id
                 JOIN submission_return sr ON sr.id = rm.return_id
-                SET
-                  rm.published_at = :now
+                SET  rm.published_at = :now
                 WHERE sr.owner = :student_id
                 AND sb.assessment_id = :assessment_id
                 AND rm.published_at IS NULL
