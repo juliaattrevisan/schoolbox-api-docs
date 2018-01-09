@@ -151,6 +151,10 @@ class Controller extends Base
              */
             'participant' => $participant,
 
+            /* I need this, otherwise Combobox dies catastrophically
+             */
+            'errors' => [],
+
             /* Plagscan status
              */
             'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
