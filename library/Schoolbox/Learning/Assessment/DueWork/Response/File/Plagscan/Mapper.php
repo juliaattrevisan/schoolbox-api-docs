@@ -167,15 +167,12 @@ class Mapper extends \Schoolbox\Mapper
             try {
                 $this->setConnector(new Connector($this->getConfigLoader(), $plagscanClientId, $plagscanApiKey));
             }
-            // TODO what triggers a DomainException?
             catch (\DomainException $e) {
-                // TODO sentry here?
                 /* Could not spawn for some reason, but due to mapper usage
                  * we don't want to detonate - just quietly not use plagscan
                  */
             }
             catch (\RuntimeException $e) {
-                // TODO sentry here?
                 /* Could not spawn because plagscan api is down
                  */
             }
