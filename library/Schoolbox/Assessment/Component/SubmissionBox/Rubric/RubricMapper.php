@@ -467,12 +467,12 @@ class RubricMapper
             FROM rubric_mark rm
             LEFT JOIN submission_return sr ON sr.id = rm.return_id
             WHERE rm.valid = TRUE
-            AND sr.deleted_at IS NULL
             $publishedClause
             AND rm.return_id = (
               SELECT sr.id
               FROM submission_return sr
               WHERE sr.owner = :userId AND sr.box_id = :boxId
+              AND sr.deleted_at IS NULL
               $publishedClause
               ORDER BY $dateOrder DESC
               LIMIT 1
