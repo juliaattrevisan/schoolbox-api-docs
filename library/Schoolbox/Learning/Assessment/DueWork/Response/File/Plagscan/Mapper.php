@@ -325,6 +325,8 @@ class Mapper extends \Schoolbox\Mapper
             $plagscan->setStatus(Plagscan::STATUS_QUEUED);
             $sentry = self::getDi()->get('sentry');
             $sentry->captureException(new \RuntimeException("Error: Plagscan unavailable. Could not generate access token.", $e->getCode(), $e));
+            // TODO is this check necessary - can't we assume plagscanID is empty if we're in the catch?
+            // TODO need to return [] in other catch as well
             if (empty($plagscanId)) {
                 return [];
             }
