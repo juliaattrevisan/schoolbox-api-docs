@@ -9,13 +9,14 @@
 
 namespace Schoolbox\Learning\Assessment\Component\Homepage;
 
+use Alaress_Date_Format;
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Visibility;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -75,7 +76,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
             ];
 
             if(!$this->getConfig('showClosed')){
-                $options['closed_before'] = \Alaress_Date_Format::now();
+                $options['closed_before'] = Alaress_Date_Format::now();
             }
 
             $this->assessments = $this->getAssessmentMapper()
@@ -88,6 +89,21 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
                     function (IAssessable $assessment) use ($visibility)
                     {
                         return $visibility->isVisibleToUser($assessment, $this->getUser(), $this->getConfig('showClosed'));
+                    }
+                )
+                ->sortByCallback(
+                    function (IAssessable $a, IAssessable $b)
+                    {
+                        // Order by participant's due date, not assessment's
+                        $aDate = $this->retrieveDateForSort($a);
+                        if (!$aDate instanceof Alaress_Date_Format || $aDate->isNull()) {
+                            return 0;
+                        }
+                        $bDate = $this->retrieveDateForSort($b);
+                        if (!$bDate instanceof Alaress_Date_Format || $bDate->isNull()) {
+                            return 0;
+                        }
+                        return $aDate->compare($bDate);
                     }
                 )
                 ->limit($this->getConfig('size') ?: null);
@@ -115,6 +131,23 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
             'readOnly'     => ($this->getContentPermission() <= UserAccess::ACCESS_READ),
             'canWrite'     => ($this->getContentPermission() >= UserAccess::ACCESS_WRITE),
         ];
+    }
+
+    /**
+     * Retrieves date for sorting out of an assessment.
+     *
+     * @param IAssessable $assessment
+     * @return Alaress_Date_Format|null
+     */
+    private function retrieveDateForSort(IAssessable $assessment): ?Alaress_Date_Format
+    {
+        if ($assessment->isParticipant($this->getUser())) {
+            $participant = $assessment->getParticipantIfExtant($this->getUser());
+            if ($participant instanceof Participant) {
+                return $participant->getPlan()->getDerivedDueDate();
+            }
+        }
+        return $assessment->getDueAt();
     }
 
     /**
