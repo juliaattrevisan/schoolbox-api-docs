@@ -86,7 +86,7 @@ class Controller extends Base
     }
 
     /**
-     * Get the contents of a particular $response for the purposes of Self Assessment or Self Reflection
+     * Get the contents of a particular $response for the purposes of Self Reflection
      *
      * @param DueWork     $assessment
      * @param Participant $participant
