@@ -170,11 +170,16 @@ class Mapper extends \Schoolbox\Mapper
             catch (\DomainException $e) {
                 /* Could not spawn for some reason, but due to mapper usage
                  * we don't want to detonate - just quietly not use plagscan
+                 * Let's send the error to sentry though
                  */
+                $sentry = self::getDi()->get('sentry');
+                $sentry->captureException($e);
             }
             catch (\RuntimeException $e) {
                 /* Could not spawn because plagscan api is down
                  */
+                $sentry = self::getDi()->get('sentry');
+                $sentry->captureException(new \RuntimeException("Error: Plagscan unavailable. Could not generate access token.", $e->getCode(), $e));
             }
         }
     }
