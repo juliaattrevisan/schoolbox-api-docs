@@ -144,7 +144,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
         if ($assessment->isParticipant($this->getUser())) {
             $participant = $assessment->getParticipantIfExtant($this->getUser());
             if ($participant instanceof Participant) {
-                return $participant->getPlan()->getDerivedDueDate();
+                return $participant->getDueDate();
             }
         }
         return $assessment->getDueAt();
