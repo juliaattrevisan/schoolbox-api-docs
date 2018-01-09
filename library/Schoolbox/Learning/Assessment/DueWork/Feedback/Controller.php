@@ -215,15 +215,13 @@ class Controller extends Base
             /* If this is a self-assessment or self reflection, also set submitted_at on the Response
              * when publishing the Feedback itself
              */
-            $selfAssessed = (new ValidSelfAssessment())->isSatisfiedBy($this->getUser(), $participant);
             $selfReflected = (new ValidSelfReflection())->isSatisfiedBy($this->getUser(), $participant);
 
-            if (($selfAssessed || $selfReflected) && !$response->isSubmitted() && $this->getRequest()->post->get('publish')) {
+            if ($selfReflected && !$response->isSubmitted() && $this->getRequest()->post->get('publish')) {
                 $response->setSubmittedAt(\Alaress_Date_Format::now());
 
                 $this->responseDataSource->save($response);
             }
-
         }
         catch (RangeException $e) {
             $this->sendError('Invalid mark provided');
