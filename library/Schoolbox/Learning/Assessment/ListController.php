@@ -380,7 +380,7 @@ class ListController extends Web\Controller\Base
                 $userPlan = $plans[$userPlanIndices[$userId]];
 
                 if (!$userPlan) {
-                    throw new DomainException("Urgh");
+                    throw new DomainException("User {$userId} was assigned index {$userPlanIndices[$userId]}, but there's no plan with that index (valid plan indices were" . json_encode($plans->keys()) . ')');
                 }
 
                 // only generate a record if there is ALREADY existing participation, AND the plan is NOT dynamic
