@@ -12,6 +12,7 @@ use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
 use DomainException;
 use InvalidArgumentException;
+use PDOException;
 use RangeException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error;
@@ -20,6 +21,8 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Mapper;
+use Schoolbox\Assessment\Participant as ParticipantModels;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as Folder;
 use Schoolbox\Role;
@@ -344,7 +347,7 @@ class ListController extends Web\Controller\Base
 
             $this->saveParticipationData($plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
         }
-        catch (RangeException|InvalidArgumentException|UnexpectedValueException|\PDOException $e) {
+        catch (RangeException|InvalidArgumentException|UnexpectedValueException|PDOException $e) {
             // cast
             throw new DomainException($e->getMessage(), $e->getCode(), $e);
         }
@@ -354,12 +357,12 @@ class ListController extends Web\Controller\Base
 
 
     /**
-     * @param GenericCollection|\Schoolbox\Assessment\Participant\Plan\Model[] $plans
+     * @param GenericCollection|ParticipantModels\Plan\Model[] $plans
      * @param array             $inclusionFlags
      * @param array             $userPlanIndices
      * @throws DomainException
      * @throws UnexpectedValueException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Mapper\Exception
      */
     private function saveParticipationData(GenericCollection $plans, array $inclusionFlags, array $userPlanIndices)
     {
@@ -405,13 +408,15 @@ class ListController extends Web\Controller\Base
                 $partMap->save($existingParticipation);
             }
         }
+
+
     }
 
 
     /**
      * @param int $userId
-     * @param \Schoolbox\Assessment\Participant\Plan\Model $plan
-     * @return \Schoolbox\Assessment\Participant\Model
+     * @param ParticipantModels\Plan\Model $plan
+     * @return ParticipantModels\Model
      */
     private function makeAParticipation($userId, $plan)
     {
@@ -426,10 +431,10 @@ class ListController extends Web\Controller\Base
     /**
      * @param int         $assessmentId
      * @param array       $postPlans
-     * @return GenericCollection|\Schoolbox\Assessment\Participant\Plan\Model[]
+     * @return GenericCollection|ParticipantModels\Plan\Model[]
      * @throws UnexpectedValueException
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws PDOException
+     * @throws Mapper\Exception
      */
     private function savePlanData(int $assessmentId, array $postPlans = [])
     {
