@@ -765,10 +765,11 @@ class Controller extends Assessment\Controller
             }
         }
 
-        /* If we're saving the final version of the submission
-         * (ie. not a draft) ram the current datetime in
+        /* If we're saving the final version of the submission (ie. not a draft) ram the current datetime in
+         * Only need to check selfReflectable. selfReflectable is a prerequisite for selfAssessment, but the
+         * behaviour is the same in both selfReflectable and selfAssessment scenarios for setting up a new
+         * draft submission.
          */
-        $selfAssessable = (new ValidSelfAssessment())->isSatisfiedBy($this->getUser(), $participant);
         $selfReflectable = (new ValidSelfReflection())->isSatisfiedBy($this->getUser(), $participant);
 
         if ($isFinal) {
@@ -776,7 +777,7 @@ class Controller extends Assessment\Controller
             /* submitted_at is determined after the next step when creating a self-assessed or self-reflected
              * response. Otherwise, proceed normally
              */
-            if (!$selfAssessable && !$selfReflectable) {
+            if (!$selfReflectable) {
                 $response->setSubmittedAt(Alaress_Date_Format::now());
             }
         }
@@ -838,7 +839,7 @@ class Controller extends Assessment\Controller
 
             /* Go to the next step of Self-Assessment/Self-Reflection if appropriate
              */
-            if ($selfAssessable || $selfReflectable) {
+            if ($selfReflectable) {
                 $rs->redirect->to(
                     $this->getRouter()->generate(
                         'learningDueWorkResponse.getParticularResponseForSelfAssessment',
