@@ -311,18 +311,22 @@ class Mapper extends \Schoolbox\Mapper
 
         try {
             $plagscanId = $this->getConnector()->transmit($file, $filename);
+            $plagscan->setPlagscanId($plagscanId);
+            $plagscan->setStatus(Plagscan::STATUS_PROCESSING);
+        } catch (\DomainException $e) {
+            // Something went unrecoverably wrong, so remove the document from the queue
+            $plagscan->setStatus(Plagscan::STATUS_UNSCANNABLE);
+            $sentry = self::getDi()->get('sentry');
+            $sentry->captureException($e);
         } catch (\RuntimeException $e) {
+            // Plagscan is unavailable or otherwise behaving unexpectedly - try again later
+            $plagscan->setStatus(Plagscan::STATUS_QUEUED);
             $sentry = self::getDi()->get('sentry');
             $sentry->captureException(new \RuntimeException("Error: Plagscan unavailable. Could not generate access token.", $e->getCode(), $e));
-            /* Plagscan death
-             */
             if (empty($plagscanId)) {
                 return [];
             }
         }
-
-        $plagscan->setPlagscanId($plagscanId);
-        $plagscan->setStatus(Plagscan::STATUS_PROCESSING);
 
         return parent::save($plagscan);
     }
