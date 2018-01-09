@@ -215,7 +215,7 @@ Data:
     <div class="small-12 island">
         <h1>{{ assessment.title }}</h1>
         <ul class="meta">
-            <li class="icon-calendar">{{ dueDate.participant(assessment.participant(student)) }}</li>
+            <li class="icon-calendar">{{ dueDate.dueDate(assessment, student) }}</li>
             <li class="icon-due-work">{{ assessment.typeName }}</li>
         </ul>
 

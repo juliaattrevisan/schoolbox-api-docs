@@ -264,7 +264,7 @@
                             <a href="/homepage/{{ upcoming.context.folder.id }}">{{ upcoming.context.folder.title }}</a>
                             {{ upcoming.typeName }}
                         </p>
-                        <p class="meta">{{ dueDate.participant(upcoming.participant(student)) }}</p>
+                        <p class="meta">{{ dueDate.dueDate(upcoming, student) }}</p>
                     </div>
                 </li>
                 {% endfor %}
