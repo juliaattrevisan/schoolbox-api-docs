@@ -115,7 +115,7 @@ class Controller extends Base
         $selfReflectedWithResponse = (new ValidSelfReflectionWithResponse())->isSatisfiedBy($this->getUser(), $participant);
 
         if (!$selfAssessedWithResponse && !$selfReflectedWithResponse) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_COMPLETE_BEFORE_SELF_ASSESS);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_COMPLETE_BEFORE_SELF_REFLECT);
         }
 
         /* For the last bread node

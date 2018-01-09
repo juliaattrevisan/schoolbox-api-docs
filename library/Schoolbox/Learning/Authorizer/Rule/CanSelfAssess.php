@@ -81,13 +81,13 @@ class CanSelfAssess implements IAuthorizationRule
         /* Error when there are no responses at all
          */
         if (!$mostRecentResponse) {
-            throw new Unauthorized('', ErrorMapper::ERROR_COMPLETE_BEFORE_SELF_ASSESS);
+            throw new Unauthorized('', ErrorMapper::ERROR_COMPLETE_BEFORE_SELF_REFLECT);
         }
 
         // Error out if participant has no Draft responses to complete
         // Nothing to do in that case
         if ($mostRecentResponse->isSubmitted()) {
-            throw new Unauthorized('', ErrorMapper::ERROR_COMPLETE_BEFORE_SELF_ASSESS);
+            throw new Unauthorized('', ErrorMapper::ERROR_COMPLETE_BEFORE_SELF_REFLECT);
         }
 
         // Assessment is self-assessable and logged in user is the participant, good to go
