@@ -99,7 +99,7 @@ class Controller extends Base
      * @throws \LogicException If attempting to update the status of a kami doc that is not processing.
      * @throws \UnexpectedValueException If unexpected status change is reported from Kami API
      */
-    public function getParticularResponseForSelfAssessment(
+    public function getParticularResponseForSelfReflection(
         DueWork $assessment,
         Participant $participant,
         Model $response
