@@ -92,7 +92,8 @@ class DueWork_Rubric_Handler
             JOIN submission_return sr ON sr.id = rm.return_id
 			JOIN submission_box sb    ON sb.id = sr.box_id
 			JOIN assessment a         ON  a.id = sb.assessment_id
-            LEFT JOIN (
+            JOIN (
+                -- ^Changed from LEFT JOIN to JOIN to allow filter out deleted feedbacks 
                 -- Get the latest published marks
                 SELECT
                   sr.id AS r_id,
