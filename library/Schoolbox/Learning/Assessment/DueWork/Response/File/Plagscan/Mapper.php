@@ -322,7 +322,7 @@ class Mapper extends \Schoolbox\Mapper
             $sentry->captureException($e);
         } catch (\RuntimeException $e) {
             // Plagscan is unavailable or otherwise behaving unexpectedly - try again later
-            $plagscan->setStatus(Plagscan::STATUS_QUEUED);
+            // Status is already queued, no need to change that
             $sentry = self::getDi()->get('sentry');
             $sentry->captureException(new \RuntimeException("Error: Plagscan unavailable. Could not generate access token.", $e->getCode(), $e));
             // TODO is this check necessary - can't we assume plagscanID is empty if we're in the catch?
