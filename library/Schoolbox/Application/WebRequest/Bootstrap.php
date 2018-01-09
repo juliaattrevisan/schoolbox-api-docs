@@ -215,11 +215,19 @@ class Bootstrap extends AbstractBootstrap {
         // Ghetto CSRF middleware. Reject request if:
         // * It's not a GET request
         // ** Disregard X-Http-Method-Override, as that can be set by client
-        // * It's not a deliberately allowed request (none known yet)
+        // * It's not a deliberately allowed request (only known example: /saml/consume.php)
         // ** In general: any request that authenticates via token instead of
         //    via session should be allowed
         // * Its headers don't match
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+
+            // Check against whitelist first
+            $whitelist = ['/saml/consume.php'];
+            if (\in_array($_SERVER['SCRIPT_NAME'], $whitelist, true)) {
+                return;
+            }
+
+            // Then verify request origin
             /** @var IConfigLoader $config */
             $di        = $this->getKernel()->getDependencyInjector();
             $config    = $di->get('config');
