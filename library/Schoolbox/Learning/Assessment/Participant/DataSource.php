@@ -420,7 +420,7 @@ class DataSource
 
 
     /**
-     * Loads all Plans and Participants into the Assessables, and returns the set of dynamic plans
+     * Loads all Plans and Participants into the Assessables
      *
      * @param IAssessable[]|GenericCollection $assessables Indexed by assessment.id
      * @throws DefinitionException If unable to locate a specified mapper join
