@@ -21,6 +21,7 @@ use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -51,6 +52,9 @@ class Controller extends Base
     /** @var ReturnedWorkMapper */
     private $returnedWorkMapper;
 
+    /** @var Plagscan\Mapper */
+    private $plagscanMapper;
+
     /**
      * Controller constructor.
      *
@@ -61,6 +65,7 @@ class Controller extends Base
      * @param UserMapper            $userMapper
      * @param Rubric\MarkMapper     $rubricMarkMapper
      * @param ReturnedWorkMapper    $returnedWorkMapper
+     * @param Plagscan\Mapper       $plagscanMapper
      */
     public function __construct(
         IFeedbackDataSource $feedbackDataSource,
@@ -69,7 +74,8 @@ class Controller extends Base
         ResponseDataSource $responseDataSource,
         UserMapper $userMapper,
         Rubric\MarkMapper $rubricMarkMapper,
-        ReturnedWorkMapper $returnedWorkMapper
+        ReturnedWorkMapper $returnedWorkMapper,
+        Plagscan\Mapper $plagscanMapper
     ) {
         $this->feedbackDataSource    = $feedbackDataSource;
         $this->participantDataSource = $participantDataSource;
@@ -78,6 +84,7 @@ class Controller extends Base
         $this->userMapper            = $userMapper;
         $this->rubricMarkMapper      = $rubricMarkMapper;
         $this->returnedWorkMapper    = $returnedWorkMapper;
+        $this->plagscanMapper        = $plagscanMapper;
     }
 
     /**
@@ -221,6 +228,34 @@ class Controller extends Base
                 $response->setSubmittedAt(\Alaress_Date_Format::now());
 
                 $this->responseDataSource->save($response);
+
+                /* Save all the plagscan stubs and records too
+                 * But this is a special flow just for self-reflection
+                 * Originated from Assessment/DueWork/Controller postCreateResponse()
+                 */
+                $plagscanMapper = $this->plagscanMapper;
+
+                foreach ($response->getAllFiles() as $currentFile) {
+                    if (!$currentFile->getEditableInline()) {
+                        $plagscanMapper->saveNewPlagscanStub($currentFile);
+                    }
+                }
+
+                $this->getResponse()->content->set([
+                    'format' => 'json',
+                    'data'   => [],
+                    'postOutput' => [
+                        function() use ($plagscanMapper, $response) {
+                            if ($response->getId()) {
+                                foreach ($response->getAllFiles() as $currentFile) {
+                                    $filename = $plagscanMapper->plagscanFilename($currentFile);
+
+                                    $plagscanMapper->saveNewPlagscan($currentFile, $filename);
+                                }
+                            }
+                        }
+                    ],
+                ]);
             }
         }
         catch (RangeException $e) {
