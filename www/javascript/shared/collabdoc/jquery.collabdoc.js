@@ -5,7 +5,6 @@
         var config = init(options, $(this));
 
         setupDimensions();
-        setupDelete();
 
         /**
          * Init
