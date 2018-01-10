@@ -60,7 +60,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
         [
             'uuid'     => '292d8471-f5b9-11e7-9503-08002751fd3c',
             'type'     => 'tooltip',
-            'selector' => '', // TODO
+            'selector' => '#switch-user',
             'content'  => "<p>The switch user section will list your other profiles within the system. It allows you to move easily between multiple accounts.</p>",
         ],
 
