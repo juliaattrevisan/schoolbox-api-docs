@@ -110,18 +110,33 @@ class Controller extends Base
         Participant $participant,
         Model $response = null
     ): void {
+
         /* Module doesn't have access to $this->getUser()
          *
          * Superusers can see draft Responses in the inline grader
          * Teachers cannot see draft Responses in the inline grader
          */
-        $mostRecentResponse = $participant->findMostRecentSubmittedResponse();
+
+        /* Self-Assessment/Self Reflection: find the most recent draft
+         * otherwise find the most recent submitted response
+         */
         if (!$response) {
-            $response             = $mostRecentResponse;
-            $isMostRecentResponse = true;
-        } else {
-            $isMostRecentResponse = ($mostRecentResponse && $mostRecentResponse->getId() == $response->getId());
+            if ($assessment->isSelfReflectable()) {
+                $response = $participant->findMostRecentDraftResponse();
+            }
+            else {
+                $response = $participant->findMostRecentSubmittedResponse();
+            }
         }
+
+//        $mostRecentResponse = $participant->findMostRecentSubmittedResponse();
+//        if (!$response) {
+//
+//            $response             = $mostRecentResponse;
+//            $isMostRecentResponse = true;
+//        } else {
+//            $isMostRecentResponse = ($mostRecentResponse && $mostRecentResponse->getId() == $response->getId());
+//        }
 
         /* If there is an an actual Latest Response, use it and subject
          * it to the usual checks.

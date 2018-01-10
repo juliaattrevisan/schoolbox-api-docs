@@ -229,6 +229,30 @@ class Participant
 
 
     /**
+     * Specifically find the most recent draft
+     * There should be no reason to have multiple drafts, unless bad/corrupted data
+     *
+     * @return IResponse|null
+     */
+    public function findMostRecentDraftResponse()
+    {
+        /** @var IResponse $mostRecentDraftResponse */
+        $mostRecentDraftResponse = null;
+
+        /** @var IResponse $response */
+        foreach ($this->allResponses as $response) {
+            if (!$response->isSubmitted()) {
+                if (!$mostRecentDraftResponse || $response->getSubmittedAt()->gt($mostRecentDraftResponse->getSubmittedAt())) {
+                    $mostRecentDraftResponse = $response;
+                }
+            }
+        }
+
+        return $mostRecentDraftResponse;
+    }
+
+
+    /**
      * @return IResponse|null
      */
     public function findMostRecentSubmittedResponse()
