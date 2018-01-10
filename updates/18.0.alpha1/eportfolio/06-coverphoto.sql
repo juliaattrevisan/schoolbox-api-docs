@@ -1,9 +1,9 @@
 DELETE eportfolio_coverphoto FROM eportfolio_coverphoto
-  LEFT JOIN user ON user.id = uid
+  LEFT JOIN user ON user.id = eportfolio_coverphoto.uid
 WHERE user.id IS NULL;
 
 DELETE eportfolio_coverphoto FROM eportfolio_coverphoto
-  LEFT JOIN storage ON storage.hash = hash
+  LEFT JOIN storage ON storage.hash = eportfolio_coverphoto.imagehash
 WHERE storage.hash IS NULL;
 
 ALTER TABLE `eportfolio_coverphoto`

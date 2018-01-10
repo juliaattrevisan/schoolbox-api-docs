@@ -5,7 +5,7 @@ WHERE eportfolio_component_blog.id IS NULL;
 
 
 UPDATE eportfolio_component_blog_comment
-  LEFT JOIN `user` ON `owner_id` = `user`.id
+  LEFT JOIN `user` ON eportfolio_component_blog_comment.`owner_id` = `user`.id
 SET owner_id = (SELECT `id` FROM `user` WHERE username LIKE 'alaress')
 WHERE `user`.id is null;
 
