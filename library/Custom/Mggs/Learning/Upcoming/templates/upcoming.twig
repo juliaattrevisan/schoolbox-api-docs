@@ -67,6 +67,8 @@
             height = 'auto';
         }
 
+        var $cal = $('#calendar')
+
         c = new Calendar('calendar', 'calendar-bubble', {
             userId: '{{ student.id|escape('js') }}',
             filter: {
@@ -98,6 +100,25 @@
                         slotWidth: 24,
                     }
                 },
+                eventDragStart: function (calEvent, dragEvent, _empty, view) {
+                    if (view.type == 'month' || view.type == 'basicWeek') {
+                        var len = view.dayGrid.dayDates.length;
+
+                        for (var i = 0; i < len; ++i) {
+                            var $cell       = $(view.dayGrid.cellEls[i]),
+                                target      = view.dayGrid.dayDates[i];
+
+                            if (!isInsideBounds(calEvent, target)) {
+                                // if OOB
+                                $cell.addClass('no-drop');
+                            }
+                        }
+                    }
+                },
+                eventDragStop: function () {
+                    $cal.find('.fc-day').removeClass('no-drop');
+                },
+
                 eventAfterAllRender: function (view) {
                     if (view.type !== 'timelineTerm') {
                         // if not on timeline view, do nothing
@@ -191,17 +212,7 @@
                  * @param event
                  */
                 eventAllow: function (dropLocation, event) {
-                    if (!'bounds' in event.data.meta) {
-                        // no bound specified, let anything happen
-                        return true;
-                    }
-
-                    var bounds      = event.data.meta.bounds,
-                        target      = dropLocation.start,
-                        insideOpen  = target.isSameOrAfter(bounds.open),
-                        insideClose = target.isSameOrBefore(moment(bounds.due + ' 23:59:59'));
-
-                    return insideOpen && insideClose;
+                    return isInsideBounds(event, dropLocation.start, dropLocation.resouceId);
                 },
 
                 /**
@@ -264,6 +275,31 @@
             },
             x: false
         }).init();
+
+        function isInsideBounds(event, target, resourceId)
+        {
+            var isInsideDates;
+
+            if (!'bounds' in event.data.meta) {
+                // no bound specified, let anything happen
+                isInsideDates = true;
+            } else {
+                var bounds        = event.data.meta.bounds,
+                    insideOpen    = target.isSameOrAfter(bounds.open),
+                    insideClose   = target.isSameOrBefore(moment(bounds.due + ' 23:59:59'));
+
+                isInsideDates = insideOpen && insideClose;
+            }
+
+            if (!event.resourceId || !resourceId) {
+                // if no resource ID given on either side, just do the date check
+                return isInsideDates;
+            }
+
+            // verify dates and resource IDs are valid
+            return isInsideDates && event.resouceId == resourceId;
+        }
+
     })
 </script>
 <!-- END custom_head -->
