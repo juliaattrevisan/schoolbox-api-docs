@@ -6,7 +6,6 @@
      * @param options
      */
     $.fn.eventModify = function (options) {
-
         /* Optional parameter
          */
         options = options || {};
@@ -246,6 +245,11 @@
                     }
                 },
                 submitHandler: function (form) {
+                    // Find the submit button for this form and disable it,
+                    // to avoid accidental multiple requests
+                    var submitButton = $(form).find('input[type="submit"]');
+                    $(submitButton).attr("disabled", true);
+
                     var multi = $('#repeat-reminder, [data-repeat-reminder]').length != 0;
                     if (multi) {
                         // series - show a dialog
