@@ -478,6 +478,11 @@ class ListController extends Web\Controller\Base
 
                 foreach ($dateFields as $dateField) {
                     if (array_key_exists($dateField, $planData)) {
+                        // if the field is falsy, make it null
+                        if (!$planData[$dateField]) {
+                            $planData[$dateField] = null;
+                        }
+
                         $planData[$dateField] = \Alaress_Date_Format::newLocal($planData[$dateField])->getDatabase();
                     }
                 }
