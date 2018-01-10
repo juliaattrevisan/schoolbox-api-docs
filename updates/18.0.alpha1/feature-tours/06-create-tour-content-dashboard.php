@@ -101,7 +101,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
         [
             'uuid'     => '4a73e905-f5b9-11e7-9503-08002751fd3c',
             'type'     => 'tooltip',
-            'selector' => '', // TODO
+            'selector' => '#top-menu',
             'content'  => "The top menu will have links set up by your school to make it easy to navigate to features or pages in the system. You can hover over the links to get more detail about each link.",
         ],
 
@@ -117,7 +117,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
         [
             'uuid'     => '539d418c-f5b9-11e7-9503-08002751fd3c',
             'type'     => 'tooltip',
-            'selector' => '', // TODO
+            'selector' => '#notifications',
             'content'  => "The bell or notifications menu on the right of the screen is used to view your instant notifications. There are many notifications you can receive such as when a user posts in a social stream on a page you are involved in or if you have been added to a group page. Text in bold denotes a link that can be clicked. The notifications found here are customised by your school.",
         ],
 

@@ -115,7 +115,7 @@
                             <img src="/images/logo.php?logo=skin_logo_square&size=normal" srcset="/images/logo.php?logo=skin_logo_square&size=normal 1x,/images/logo.php?logo=skin_logo_square&size=hidpi 2x" alt="{SITE_NAME}"/>
                         </a>
 
-                        <ul>{MENU_TOP}</ul>
+                        <ul id="top-menu">{MENU_TOP}</ul>
 
                         <form id="search" action="/search" method="get">
                             <input id="search-field" type="text" name="keyword" placeholder="Search"/>
@@ -123,7 +123,7 @@
                         </form>
                     </section>
                     <!-- BEGIN instantmessage_toggle -->
-                    <section class="right-small">
+                    <section class="right-small" id="notifications">
                         <a class="right-off-canvas-toggle icon-notifications hidden-for-xlarge-up" data-unread="{WEBSOCKET_UNREAD_COUNT}">
                             <span data-unread-count>{WEBSOCKET_UNREAD_LABEL}</span>
                         </a>
