@@ -68,7 +68,9 @@ Usage:
 {# Javascript that powers the feedback form #}
 {% block dynamicFeedback %}
     {% include '@learningDueWorkResponse/inlineGrading/fragments/dynamicFeedback.twig' with {
-        publishText: 'Publish And Continue'
+        publishText: 'Publish And Continue',
+        publishingText: 'Publishing...',
+        publishedText: 'Feedback published'
     } only %}
 {% endblock %}
 
