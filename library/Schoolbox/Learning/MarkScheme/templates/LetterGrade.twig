@@ -23,7 +23,11 @@
         readonly:    readonly
     } only %}
 {% else %}
-    {% set humanReadableMark = participant.humanReadableMark(false) %}
+    {% if feedback %}
+        {% set humanReadableMark = feedback.humanReadableMark(false) %}
+    {% else %}
+        {% set humanReadableMark = participant.humanReadableMark(false) %}
+    {% endif %}
 
     <select data-mark-input name="mark" tabindex="{{ tabIndex }}" title="Select a {{ locale.grades.proper }}">
 
