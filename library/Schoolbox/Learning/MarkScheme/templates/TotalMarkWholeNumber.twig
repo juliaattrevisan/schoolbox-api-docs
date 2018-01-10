@@ -11,6 +11,7 @@
 
 {% include '@learningMarkScheme/fragments/text-input.twig' with {
     participant: participant,
+    feedback:    feedback,
     tabIndex:    tabIndex,
     placeholder: readonly ? '(no mark given)' : 'Mark out of ' ~ markScheme.totalMark,
     limit:       markScheme.totalMark,

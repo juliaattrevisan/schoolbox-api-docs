@@ -193,10 +193,19 @@ class Module extends BaseModule
         /* If a responseId was provided, load that particular response up
          */
         if ($params['responseId']) {
-            try {
-                $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
-                $participant = $assessment->getParticipant($response->getSubmittedOnBehalfOf());
-            } catch (OutOfBoundsException $e) {
+            // Response will already be loaded in $assessment; no need to load again.
+            // As a bonus $response also contains feedbacks.
+            // We don't know the participant yet though, so find that.
+            foreach ($assessment->getAllParticipants() as $p) {
+                foreach ($p->getAllResponses() as $r) {
+                    if ($r->getId() == $params['responseId']) {
+                        $response    = $r;
+                        $participant = $p;
+                        break 2;
+                    }
+                }
+            }
+            if (!isset($participant, $response)) {
                 throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
             }
         }

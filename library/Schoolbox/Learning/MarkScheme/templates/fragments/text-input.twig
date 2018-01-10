@@ -13,6 +13,12 @@
     ]
 #}
 
+{% if feedback %}
+    {% set humanReadableMark = feedback.humanReadableMark(false) %}
+{% else %}
+    {% set humanReadableMark = participant.humanReadableMark(false) %}
+{% endif %}
+
 <input
         tabindex="{{ tabIndex }}"
         placeholder="{{ placeholder }}"
@@ -21,7 +27,7 @@
         id="mark-{{ participant.user.id }}" name="mark"
         type="text"
         maxlength="{{ maxLength }}"
-        value="{{ participant.humanReadableMark(false) }}"
+        value="{{ humanReadableMark }}"
         title="{{ inputTitle }}"
         data-mark-input
         data-combobox

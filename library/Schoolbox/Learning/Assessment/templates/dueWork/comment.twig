@@ -3,11 +3,14 @@
 
     Usage: [
         participant:  Participant
+        feedback:     IFeedback      If not set, participant.findMostRecentFeedback
         tabindex:     int
         readonly:     bool           Should textarea be rendered as readonly?
     ]
 #}
-{% set latestFeedback = participant.findMostRecentFeedback %}
+{% if feedback is null %}
+    {% set feedback = participant.findMostRecentFeedback %}
+{% endif %}
 
 <label>Comment
     <textarea
@@ -16,5 +19,5 @@
             placeholder="{% if readonly %}(no comment given){% else %}Feedback for {{ participant.user.firstName }}{% endif %}"
             rows="3"
             {% if readonly %}readonly{% endif %}
-    >{{ latestFeedback.comment }}</textarea>
+    >{{ feedback.comment }}</textarea>
 </label>

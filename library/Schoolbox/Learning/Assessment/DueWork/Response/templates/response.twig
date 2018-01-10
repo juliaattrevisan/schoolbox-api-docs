@@ -235,6 +235,18 @@ Usage:
         <h2 class="subheader">Feedback</h2>
     </div>
 </div>
+
+{# Not the most recent response? Say so, and that the feedback might not be the most recent. #}
+{% if not isMostRecentResponse %}
+    <div class="row">
+        <div class="small-12 columns">
+            <div class="alert-box warning">
+                This is not the most recent response for this due work. This feedback might be out of date.
+            </div>
+        </div>
+    </div>
+{% endif %}
+
 <div class="row mark-scheme" id="assessment-status" data-participant>
     <div class="small-12 island">
         <section class="content">
@@ -309,6 +321,7 @@ Usage:
                             <label>{{ locale.grades.proper }}
                                 {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
                                     participant: participant,
+                                    feedback:    latestFeedback,
                                     markScheme:  assessment.markScheme,
                                     tabIndex:    1,
                                     errors:      errors,
@@ -325,6 +338,7 @@ Usage:
                     <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
                         {% include '@learningAssessment/dueWork/comment.twig' with {
                             participant: participant,
+                            feedback:    latestFeedback,
                             tabIndex:    2,
                             readonly:    readonly
                         } only %}
