@@ -2,7 +2,7 @@ ALTER TABLE `myFolder`
   CHANGE COLUMN `owner` `owner` INT(11) UNSIGNED NOT NULL DEFAULT '0' ;
 
 DELETE myFolder FROM myFolder
-  LEFT JOIN user ON user.id = owner
+  LEFT JOIN user ON user.id = myFolder.owner
 WHERE user.id IS NULL;
 
 

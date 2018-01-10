@@ -2,7 +2,7 @@ ALTER TABLE `poll`
   CHANGE COLUMN `categoryID` `folder_id` INT(11) UNSIGNED NOT NULL ;
 
 DELETE poll FROM poll
- LEFT JOIN folder ON folder.id = folder_id
+ LEFT JOIN folder ON folder.id = poll.folder_id
 WHERE folder.id IS NULL;
 
 
@@ -18,7 +18,7 @@ ALTER TABLE `poll`
   CHANGE COLUMN `created_by` `created_by` INT(11) UNSIGNED NULL DEFAULT NULL ;
 
 UPDATE poll
-  LEFT JOIN `user` ON `created_by` = `user`.id
+  LEFT JOIN `user` ON poll.`created_by` = `user`.id
 SET created_by = (SELECT `id` FROM `user` WHERE username LIKE 'alaress')
 WHERE `user`.id is null;
 
@@ -39,11 +39,11 @@ ALTER TABLE `pollLog`
   CHANGE COLUMN `userID` `user_id` INT(11) UNSIGNED NOT NULL ;
 
 DELETE pollLog FROM pollLog
-  LEFT JOIN poll ON poll.id = poll_id
+  LEFT JOIN poll ON poll.id = pollLog.poll_id
 WHERE poll.id IS NULL;
 
 DELETE pollLog FROM pollLog
-  LEFT JOIN user ON user.id = user_id
+  LEFT JOIN user ON user.id = pollLog.user_id
 WHERE user.id IS NULL;
 
 ALTER TABLE `pollLog`

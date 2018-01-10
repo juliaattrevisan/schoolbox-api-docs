@@ -14,7 +14,7 @@ REFERENCES `eportfolio_page` (`page_id`)
   ON UPDATE NO ACTION;
 
 UPDATE eportfolio_component_blog
-  LEFT JOIN `user` ON `owner_id` = `user`.id
+  LEFT JOIN `user` ON eportfolio_component_blog.`owner_id` = `user`.id
 SET owner_id = (SELECT `id` FROM `user` WHERE username LIKE 'alaress')
 WHERE `user`.id is null;
 

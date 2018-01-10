@@ -2,7 +2,7 @@ ALTER TABLE `eportfolio_page`
   CHANGE COLUMN `uid` `uid` INT(11) UNSIGNED NULL DEFAULT NULL ;
 
 DELETE eportfolio_page FROM eportfolio_page
-  LEFT JOIN user ON user.id = uid
+  LEFT JOIN user ON user.id = eportfolio_page.uid
 WHERE user.id IS NULL;
 
 ALTER TABLE `eportfolio_page`
