@@ -48,7 +48,12 @@
             // Default to not ignoring validation on any fields, even if hidden
             ignore: false,
             ignoreTitle: true,
-            errorPlacement: $.alaressValidate.defaultErrorPlacement
+            errorPlacement: $.alaressValidate.defaultErrorPlacement,
+            submitHandler: function(form) {
+                var submitButton = $(form).find("input [type='submit']");
+                $(submitButton).attr("disabled", true);
+                form.submit();
+            }
         };
         var config = $.extend({}, defaults, options || {});
         return this.validate(config);
