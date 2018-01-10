@@ -14,6 +14,7 @@ use Component_Homepage_ControllerAbstract;
 use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
+use Schoolbox\Learning\Assessment\DueDateSortStrategy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -91,21 +92,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
                         return $visibility->isVisibleToUser($assessment, $this->getUser(), $this->getConfig('showClosed'));
                     }
                 )
-                ->sortByCallback(
-                    function (IAssessable $a, IAssessable $b)
-                    {
-                        // Order by participant's due date, not assessment's
-                        $aDate = $this->retrieveDateForSort($a);
-                        if (!$aDate instanceof Alaress_Date_Format || $aDate->isNull()) {
-                            return 0;
-                        }
-                        $bDate = $this->retrieveDateForSort($b);
-                        if (!$bDate instanceof Alaress_Date_Format || $bDate->isNull()) {
-                            return 0;
-                        }
-                        return $aDate->compare($bDate);
-                    }
-                )
+                ->sortByCallback(new DueDateSortStrategy($this->getUser()))
                 ->limit($this->getConfig('size') ?: null);
 
         } catch (\DomainException $e) {
