@@ -1,12 +1,14 @@
 {##
- # assessment   an IAssessable instance
- # preview     a preview array fragment that came out of PreviewFactory
+ # assessment   IAssessable
+ # preview      array        - a preview array fragment that came out of PreviewFactory
+ # participant  ?Participant - (optional) If supplied override real assessment values
  #}
 <section>
-    {% if assessment.description|length %}
-    <article class="content">
-        {{ assessment.description | purify }}
-    </article>
+    {% set description = participant ? participant.description : assessment.description %}
+    {% if description|length %}
+        <article class="content">
+            {{ description | purify }}
+        </article>
     {% endif %}
 
     {% if preview.type == 'image' %}

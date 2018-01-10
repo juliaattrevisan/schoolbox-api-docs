@@ -1,7 +1,16 @@
+{#
+Renders an assessment's description and any attached files.
+Overrides with participant-specific description if one is supplied.
+
+Data:
+    assessment  IAssessable
+    participant ?Participant - optional. If supplied override real assessment values
+#}
 <section>
-    {% if assessment.description|length %}
+    {% set description = participant ? participant.description : assessment.description  %}
+    {% if description|length %}
         <article class="content">
-            {{ assessment.description | purify }}
+            {{ description | purify }}
         </article>
     {% endif %}
 
@@ -19,7 +28,6 @@
                             </a>
                         </div>
                     </div>
-                    <nav>
                     <nav>
                         <a href="/storage/fetch.php?hash={{ currentFile.hash }}&save=1" title="Download" class="icon-download"></a>
                     </nav>
