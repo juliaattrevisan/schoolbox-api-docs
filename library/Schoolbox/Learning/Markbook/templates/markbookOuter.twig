@@ -46,16 +46,15 @@
 
             // Enable the download report menu
             $('#report_actions').foundation();
-
-            // Save form for task completion
-            $(this).progressTickForm({
-                label: $('[data-save-progress-state]'),
-                transitions: {
-                    incomplete:      'teacherAssessed',
-                    selfAssessed:    'teacherAssessed',
-                    teacherAssessed: 'incomplete'
-                }
-            });
+        }).progressTickForm({
+            // Save form for task completion: apply only to report content,
+            // allow content to handle save
+            label: $('[data-save-progress-state]'),
+            transitions: {
+                incomplete:      'teacherAssessed',
+                selfAssessed:    'teacherAssessed',
+                teacherAssessed: 'incomplete'
+            }
         });
 
     });
