@@ -223,16 +223,6 @@ class Controller extends Base
             $isMostRecentResponse = ($mostRecentResponse && $mostRecentResponse->getId() == $response->getId());
         }
 
-        /* Self-Assessment/Self Reflection: the response will be provided from the url param
-         * Assume this is the one to load. To continue with his part of self-assessment workflow check the
-         * participation setting. Learners are allowed in this section with a non-submitted Response under
-         * these circumstances
-         */
-        $selfAssessedWithResponse = (new ValidSelfAssessmentWithResponse($this->getUser(), $participant))->isSatisfied();
-        $selfReflectedWithResponse = (new ValidSelfReflectionWithResponse($this->getUser(), $participant))->isSatisfied();
-
-
-
         /* If there is an an actual Latest Response, use it and subject
          * it to the usual checks.
          *
