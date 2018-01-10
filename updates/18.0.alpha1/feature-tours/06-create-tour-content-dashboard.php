@@ -69,7 +69,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
         [
             'uuid'     => '3470d234-f5b9-11e7-9503-08002751fd3c',
             'type'     => 'tooltip',
-            'selector' => '', // TODO
+            'selector' => '#side-menu',
             'content'  => "<p>On the left hand side of the page you will find your side menu.</p><p>The links found here are customised by your school and will help you navigate to commonly used pages.</p>",
         ],
 
