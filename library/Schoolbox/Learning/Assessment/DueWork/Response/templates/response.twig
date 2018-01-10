@@ -22,7 +22,7 @@ Usage:
     interactionLocked bool                             Is the assessment due in an archived term?
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
-{% import '@learning/macro/dueDate.twig' as dueDate %}
+
 
 {{ bread.crumbsArray(breadcrumbs) }}
 
@@ -131,33 +131,15 @@ Usage:
     });
 </script>
 
-<div class="actions-small-1 row">
-    <div class="list-item">
-        <div class="small-12 columns">
-            <h1>{{ locale.grading.proper }} {{ assessment.title }}</h1>
-            <ul class="meta">
-                <li class="icon-calendar">{{ dueDate.participant(participant) }}</li>
-                <li class="icon-due-work"><a href="/homepage/{{ assessment.context.id }}">{{ assessment.context.title }}</a> {{ assessment.typeName }}</li>
-                {% if responseList|length == 1 %}
-                <li class="icon-calendar">Submitted {{ response.submittedAt.short }}</li>
-                {% endif %}
-                {% if readonly %}
-                    <li class="icon-archive">Term has been archived</li>
-                {% endif %}
-            </ul>
-        </div>
-    </div>
-    {% if response and deleteRoute %}
-    <nav>
-        <a class="icon-more" title="" data-dropdown="header-options"></a>
-    </nav>
-    <ul id="header-options" class="f-dropdown" data-dropdown-content>
-        <li><a class="icon-delete" data-delete="{{ deleteRoute }}">Delete Submission</a></li>
-    </ul>
-    {% endif %}
-</div>
-
-
+{% include '@learningDueWorkResponse/inlineGrading/meta.twig' with {
+    locale: locale,
+    assessment: assessment,
+    participant: participant,
+    responseList: responseList,
+    response: response,
+    readonly: readonly,
+    deleteRoute: deleteRoute
+} only %}
 
 {% if responseList|length > 1 %}
 <div class="row">
