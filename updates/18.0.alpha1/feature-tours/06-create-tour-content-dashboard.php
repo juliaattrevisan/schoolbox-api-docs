@@ -28,6 +28,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 
     $steps = [
         // Introduction
+        // TODO this is not showing up.
         [
             'uuid'    => '158389f5-f5b9-11e7-9503-08002751fd3c',
             'type'    => 'modal',
