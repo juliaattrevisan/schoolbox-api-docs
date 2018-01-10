@@ -1,18 +1,60 @@
 {##
- # Display the due date for an assessment activity
+ # Displays an assessment's due date.
+ #
+ # If we are interested in a specific student's interaction with the assessment,
+ # we should call dueDate.participant, otherwise if interested in the assessment itself,
+ # we should call dueDate.assessment.
+ #
+ # If you are calling from a fragment where you don't know, you can fallback to dueDate().
  #
  # TODO: attach some JS to the relative time to countdown to the due date
  #}
-{% macro dueDate(assessment, user) %}
+
+{##
+ # Display an assessment's due date for the specified user.
+ #}
+{% macro dueDate(assessable, user) %}
 {% spaceless %}
-    {% if not assessment.dueAt.isNull %}
+    {% import _self as dueDate %}
+    {% set participant = assessable.participantIfExtant(user) %}
+    {% if participant %}
+        {{ dueDate.participant(participant) }}
+    {% else %}
+        {{ dueDate.assessment(assessable) }}
+    {% endif %}
+{% endspaceless %}
+{% endmacro %}
+
+
+{##
+ # Display a participant's due date (ie the participant's plan's due date)
+ #}
+{% macro participant(participant) %}
+    {% spaceless %}
+        {# cache this for performance #}
+        {% set participantDueDate = participant.dueDate %}
         {% import '@learning/macro/urgency.twig' as urgency %}
-        <span class="{{ urgency.datetime(assessment, user) }}" title="{{ assessment.dueAt.long }}">Due
+        <span class="{{ urgency.datetime(participant) }}" title="{{ participantDueDate.long }}">Due
+            <time datetime="{{ participantDueDate }}">{{ participantDueDate.relativeDay|replace({' at 11:59pm': ''}) }}</time>
+            {% if participantDueDate.isFuture and participantDueDate.diffInDays(NOW) < 7 %}
+                (<time datetime="{{ participantDueDate }}">{{ participantDueDate.relativeTime(null, true) }} remaining</time>)
+            {% endif %}
+        </span>
+    {% endspaceless %}
+{% endmacro %}
+
+
+{##
+ # Display an assessment's real due date
+ #}
+{% macro assessment(assessment) %}
+    {% spaceless %}
+        {% import '@learning/macro/urgency.twig' as urgency %}
+        <span title="{{ assessment.dueAt.long }}">Due
             <time datetime="{{ assessment.dueAt }}">{{ assessment.dueAt.relativeDay|replace({' at 11:59pm': ''}) }}</time>
             {% if assessment.dueAt.isFuture and assessment.dueAt.diffInDays(NOW) < 7 %}
                 (<time datetime="{{ assessment.dueAt }}">{{ assessment.dueAt.relativeTime(null, true) }} remaining</time>)
             {% endif %}
         </span>
-    {% endif %}
-{% endspaceless %}
+    {% endspaceless %}
 {% endmacro %}

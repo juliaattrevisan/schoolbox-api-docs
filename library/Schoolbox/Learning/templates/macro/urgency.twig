@@ -5,15 +5,13 @@
  # (you have 10+ days to create responses) to red (you have
  # run out of time to create responses)
  #}
-{% macro datetime(assessable, user) %}
-{% spaceless %}
-
-{% if assessable.participantIfExtant(user).allResponses|length == 0 %}
-    {% set urgency = (assessable.dueAt.unixTimestamp - date().format('U')) / 86400 %}
-    gradient-{{ max(0, min(10, urgency))|round(0, 'floor') }}
-{% endif %}
-
-{% endspaceless %}
+{% macro datetime(participant) %}
+    {% spaceless %}
+        {% if participant.allResponses|length == 0 %}
+            {% set urgency = (participant.dueDate.unixTimestamp - date().format('U')) / 86400 %}
+            gradient-{{ max(0, min(10, urgency))|round(0, 'floor') }}
+        {% endif %}
+    {% endspaceless %}
 {% endmacro %}
 
 

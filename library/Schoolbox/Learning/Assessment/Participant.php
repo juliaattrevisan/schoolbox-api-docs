@@ -393,6 +393,74 @@ class Participant
     }
 
 
+    /**
+     * Returns the assessment description for this participant
+     *
+     * @return string|null
+     */
+    public function getDescription(): ?string
+    {
+        return $this->plan->getDescription() ?? $this->plan->getAssessable()->getDescription();
+    }
+
+
+    /**
+     * Returns when is the assessment published for this participant.
+     *
+     * @return Alaress_Date_Format|null
+     */
+    public function getPublishDate(): ?Alaress_Date_Format
+    {
+        return $this->coalesceDates($this->plan->getPublishDate(), $this->plan->getAssessable()->getPublishAt());
+    }
+
+
+    /**
+     * Returns when is the assessment open for this participant.
+     *
+     * @return Alaress_Date_Format|null
+     */
+    public function getOpenDate(): ?Alaress_Date_Format
+    {
+        return $this->coalesceDates($this->plan->getOpenDate(), $this->plan->getAssessable()->getOpenAt());
+    }
+
+
+    /**
+     * Returns when is the assessment due for this participant.
+     *
+     * @return Alaress_Date_Format|null
+     */
+    public function getDueDate(): ?Alaress_Date_Format
+    {
+        return $this->coalesceDates($this->plan->getDueDate(), $this->plan->getAssessable()->getDueAt());
+    }
+
+
+    /**
+     * Returns when is the assessment closed for this participant.
+     *
+     * @return Alaress_Date_Format|null
+     */
+    public function getCloseDate(): ?Alaress_Date_Format
+    {
+        return $this->coalesceDates($this->plan->getCloseDate(), $this->plan->getAssessable()->getCloseAt());
+    }
+
+
+    /**
+     * Returns the first non-null date, or null if both are null.
+     *
+     * @param Alaress_Date_Format|null $date1
+     * @param Alaress_Date_Format|null $date2
+     * @return Alaress_Date_Format|null
+     */
+    private function coalesceDates(?Alaress_Date_Format $date1, ?Alaress_Date_Format $date2): ?Alaress_Date_Format
+    {
+        return null === $date1 || $date1->isNull() ? $date2 : $date1;
+    }
+
+
     /* Getters/Setters
      */
 

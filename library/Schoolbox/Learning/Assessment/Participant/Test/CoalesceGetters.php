@@ -11,19 +11,14 @@ namespace Schoolbox\Learning\Assessment\Participant\Test;
 use PHPUnit\Framework\TestCase;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
-use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Plan as PlanObject;
-use Schoolbox\Assessment\Participant\Plan;
 use Schoolbox\Learning\Assessment\Project as ProjectObject;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkObject;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizObject;
 use Schoolbox\Learning\Assessment\Task\Model as TaskObject;
-use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
-use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
-use Schoolbox\Learning\Quiz\Model as QuizModel;
-use Schoolbox\Assessment\Course\Task as TaskModel;
-use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\User;
 
 /**
  * Tests the the Plan domain object and data model coalesce methods function as expected.
@@ -32,7 +27,7 @@ class CoalesceGetters extends TestCase
 {
 
     /**
-     * @param PlanObject          $planObject
+     * @param Participant $participant
      * @param Alaress_Date_Format $publish
      * @param Alaress_Date_Format $open
      * @param Alaress_Date_Format $due
@@ -40,60 +35,28 @@ class CoalesceGetters extends TestCase
      * @dataProvider provider_dates_domainObject
      */
     public function test_dates_DomainObject(
-        PlanObject $planObject,
+        Participant $participant,
         Alaress_Date_Format $publish,
         Alaress_Date_Format $open,
         Alaress_Date_Format $due,
         Alaress_Date_Format $close
     ): void {
-        $this->assertEquals($publish, $planObject->getDerivedPublishDate());
-        $this->assertEquals($open, $planObject->getDerivedOpenDate());
-        $this->assertEquals($due, $planObject->getDerivedDueDate());
-        $this->assertEquals($close, $planObject->getDerivedCloseDate());
+        $this->assertEquals($publish, $participant->getPublishDate());
+        $this->assertEquals($open, $participant->getOpenDate());
+        $this->assertEquals($due, $participant->getDueDate());
+        $this->assertEquals($close, $participant->getCloseDate());
     }
 
 
-    /**
-     * @param Plan\Model               $planModel
-     * @param Alaress_Date_Format|null $publish
-     * @param Alaress_Date_Format|null $open
-     * @param Alaress_Date_Format|null $due
-     * @param Alaress_Date_Format|null $close
-     * @dataProvider provider_dates_dataModel
-     */
-    public function test_dates_DataModel(
-        Plan\Model $planModel,
-        ?Alaress_Date_Format $publish,
-        ?Alaress_Date_Format $open,
-        ?Alaress_Date_Format $due,
-        ?Alaress_Date_Format $close
-    ): void {
-        $this->assertEquals($publish, $planModel->getDerivedPublishDate());
-        $this->assertEquals($open, $planModel->getDerivedOpenDate());
-        $this->assertEquals($due, $planModel->getDerivedDueDate());
-        $this->assertEquals($close, $planModel->getDerivedCloseDate());
-    }
-
 
     /**
-     * @param PlanObject  $planObject
+     * @param Participant $participant
      * @param null|string $description
      * @dataProvider provider_description_domainObject
      */
-    public function test_description_DomainObject(PlanObject $planObject, ?string $description): void
+    public function test_description_DomainObject(Participant $participant, ?string $description): void
     {
-        $this->assertEquals($description, $planObject->getDerivedDescription());
-    }
-
-
-    /**
-     * @param Plan\Model  $planModel
-     * @param null|string $description
-     * @dataProvider provider_description_dataModel
-     */
-    public function test_description_DataModel(Plan\Model $planModel, ?string $description): void
-    {
-        $this->assertEquals($description, $planModel->getDerivedDescription());
+        $this->assertEquals($description, $participant->getDescription());
     }
 
 
@@ -104,73 +67,42 @@ class CoalesceGetters extends TestCase
         foreach ($this->getAssessables() as $assessable) {
             $assessable->setDescription(null);
             $planObject = (new PlanObject($assessable))->setDescription(null);
-            $data[]     = [$planObject, null];
+            $data[]     = [new Participant(new User(), $planObject), null];
         }
 
         foreach ($this->getAssessables() as $assessable) {
             $assessable->setDescription(null);
             $planObject = (new PlanObject($assessable))->setDescription('');
-            $data[]     = [$planObject, ''];
+            $data[]     = [new Participant(new User(), $planObject), ''];
         }
 
         foreach ($this->getAssessables() as $assessable) {
             $assessable->setDescription('');
             $planObject = (new PlanObject($assessable))->setDescription(null);
-            $data[]     = [$planObject, ''];
+            $data[]     = [new Participant(new User(), $planObject), ''];
         }
 
         foreach ($this->getAssessables() as $assessable) {
             $assessable->setDescription('null');
             $planObject = (new PlanObject($assessable))->setDescription(null);
-            $data[]     = [$planObject, 'null'];
+            $data[]     = [new Participant(new User(), $planObject), 'null'];
         }
 
         foreach ($this->getAssessables() as $assessable) {
             $assessable->setDescription(null);
             $planObject = (new PlanObject($assessable))->setDescription('null');
-            $data[]     = [$planObject, 'null'];
+            $data[]     = [new Participant(new User(), $planObject), 'null'];
         }
 
         foreach ($this->getAssessables() as $assessable) {
             $assessable->setDescription('string2');
             $planObject = (new PlanObject($assessable))->setDescription('string1');
-            $data[]     = [$planObject, 'string1'];
+            $data[]     = [new Participant(new User(), $planObject), 'string1'];
         }
 
         return $data;
     }
 
-
-    public function provider_description_dataModel()
-    {
-        $data = [];
-
-        $assessment = (new Assessment\Model())->setDescription(null);
-        $planModel  = (new Plan\Model())->setDescription(null)->setAssessment($assessment);
-        $data[]     = [$planModel, null];
-
-        $assessment = (new Assessment\Model())->setDescription(null);
-        $planModel  = (new Plan\Model())->setDescription('')->setAssessment($assessment);
-        $data[]     = [$planModel, ''];
-
-        $assessment = (new Assessment\Model())->setDescription('');
-        $planModel  = (new Plan\Model())->setDescription(null)->setAssessment($assessment);
-        $data[]     = [$planModel, ''];
-
-        $assessment = (new Assessment\Model())->setDescription('null');
-        $planModel  = (new Plan\Model())->setDescription(null)->setAssessment($assessment);
-        $data[]     = [$planModel, 'null'];
-
-        $assessment = (new Assessment\Model())->setDescription(null);
-        $planModel  = (new Plan\Model())->setDescription('null')->setAssessment($assessment);
-        $data[]     = [$planModel, 'null'];
-
-        $assessment = (new Assessment\Model())->setDescription('string2');
-        $planModel  = (new Plan\Model())->setDescription('string1')->setAssessment($assessment);
-        $data[]     = [$planModel, 'string1'];
-
-        return $data;
-    }
 
 
     public function provider_dates_domainObject()
@@ -196,42 +128,7 @@ class CoalesceGetters extends TestCase
                         ->setCloseDate($this->cloneDate($planDate));
 
                     $data[] = [
-                        $planObject,
-                        null === $planDate || $planDate->isNull() ? $assessmentDate : $planDate,
-                        null === $planDate || $planDate->isNull() ? $assessmentDate : $planDate,
-                        null === $planDate || $planDate->isNull() ? $assessmentDate : $planDate,
-                        null === $planDate || $planDate->isNull() ? $assessmentDate : $planDate,
-                    ];
-                }
-            }
-        }
-        return $data;
-    }
-
-
-    public function provider_dates_dataModel()
-    {
-        $data = [];
-
-        foreach ($this->getDates() as $assessmentDate) {
-            foreach ($this->getDates() as $planDate) {
-                foreach ($this->getAssessments() as $assessment) {
-                    $assessment->setAssessmentModel(new Assessment\Model());
-                    $assessment->getAssessmentModel()
-                               ->setPublishDate($this->cloneDate($assessmentDate))
-                               ->setOpenDate($this->cloneDate($assessmentDate))
-                               ->setDueDate($this->cloneDate($assessmentDate))
-                               ->setCloseDate($this->cloneDate($assessmentDate));
-
-                    $planModel = (new Plan\Model())
-                        ->setAssessment($assessment->getAssessmentModel())
-                        ->setPublishDate($this->cloneDate($planDate))
-                        ->setOpenDate($this->cloneDate($planDate))
-                        ->setDueDate($this->cloneDate($planDate))
-                        ->setCloseDate($this->cloneDate($planDate));
-
-                    $data[] = [
-                        $planModel,
+                        new Participant(new User(), $planObject),
                         null === $planDate || $planDate->isNull() ? $assessmentDate : $planDate,
                         null === $planDate || $planDate->isNull() ? $assessmentDate : $planDate,
                         null === $planDate || $planDate->isNull() ? $assessmentDate : $planDate,
@@ -264,20 +161,6 @@ class CoalesceGetters extends TestCase
             new DueWorkObject(),
             new QuizObject(),
             new TaskObject(),
-        ];
-    }
-
-
-    /**
-     * @return IAssessableDataModel[]
-     */
-    private function getAssessments(): array
-    {
-        return [
-            new ProjectModel(),
-            new DueWorkModel(),
-            new QuizModel(),
-            new TaskModel(),
         ];
     }
 

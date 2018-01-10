@@ -61,7 +61,7 @@
                                                 <h3>{{ assessment.title }}</h3>
                                             </a>
                                             <p>
-                                                <span class="meta">{{ assessment.typeName }}</span><span class="pipe meta">{{ dueDate.dueDate(assessment, student) }}</span>
+                                                <span class="meta">{{ assessment.typeName }}</span><span class="pipe meta">{{ dueDate.participant(participant) }}</span>
                                             </p>
                                             {% include '@learningAssessment/fragments/statusLine.twig' with { assessable: assessment, student: student} only %}
                                         </div>
