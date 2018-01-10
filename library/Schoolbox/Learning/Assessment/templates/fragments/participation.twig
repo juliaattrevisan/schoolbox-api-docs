@@ -46,7 +46,7 @@
                     <li class="separator">Learning Plans</li>
                     <li><a href="#" data-participant-change="include">Default plan</a></li>
                     {% for plan in assessment.plans if not plan.isDynamic %}
-                        <li><a href="#" data-plan-use="{{ loop.index }}" data-plan-name="{{ plan.name }}">{{ plan.name }}</a></li>
+                        <li><a href="#" data-plan-use="{{ plan.id }}" data-plan-name="{{ plan.name }}">{{ plan.name }}</a></li>
                     {% endfor %}
                     <li><a href="#" id="participant-customise">Create new plan</a></li>
                 </ul>
@@ -61,7 +61,7 @@
 
                 <li data-participant="{{ user.id }}">
                     <input type="hidden" name="participant-include[{{ user.id }}]" id="participant-include-{{ user.id }}" value="{{ userInclude ? 1 : 0 }}">
-                    <input type="hidden" name="participant-plan[{{ user.id }}]" id="participant-plan-{{ user.id }}" value="{{ planIds[participant.plan.id] ?: 0 }}">
+                    <input type="hidden" name="participant-plan[{{ user.id }}]" id="participant-plan-{{ user.id }}" value="{{ participant.plan.id ?: 0 }}">
                     <div data-participant-row>
                         <div class="selector" data-participant-selector>
                             <input
@@ -93,14 +93,14 @@
     <div id="plan-data">
     {# load in the existing plans #}
     {% for plan in assessment.plans if not plan.isDynamic %}
-        {# this relies on the known twig issue where the loop index increments even if the if condition is not met #}
-        <input type="hidden" name="plans[{{ loop.index }}][id]" value="{{ plan.id }}" />
-        <input type="hidden" name="plans[{{ loop.index }}][name]" value="{{ plan.name }}" data-saved-plan />
-        <input type="hidden" name="plans[{{ loop.index }}][description]" value="{{ plan.description }}" />
-        <input type="hidden" name="plans[{{ loop.index }}][publish_date]" value="{{ plan.publishDate.local }}" />
-        <input type="hidden" name="plans[{{ loop.index }}][open_date]" value="{{ plan.openDate.local }}" />
-        <input type="hidden" name="plans[{{ loop.index }}][due_date]" value="{{ plan.dueDate.local }}" />
-        <input type="hidden" name="plans[{{ loop.index }}][close_date]" value="{{ plan.closeDate.local }}" />
+        {# we don't need the dyna-plan rendered here #}
+        <input type="hidden" name="plans[{{ plan.id }}][id]" value="{{ plan.id }}" />
+        <input type="hidden" name="plans[{{ plan.id }}][name]" value="{{ plan.name }}" data-saved-plan />
+        <input type="hidden" name="plans[{{ plan.id }}][description]" value="{{ plan.description }}" />
+        <input type="hidden" name="plans[{{ plan.id }}][publish_date]" value="{{ plan.publishDate.local }}" />
+        <input type="hidden" name="plans[{{ plan.id }}][open_date]" value="{{ plan.openDate.local }}" />
+        <input type="hidden" name="plans[{{ plan.id }}][due_date]" value="{{ plan.dueDate.local }}" />
+        <input type="hidden" name="plans[{{ plan.id }}][close_date]" value="{{ plan.closeDate.local }}" />
     {% endfor %}
     </div>
 </fieldset>

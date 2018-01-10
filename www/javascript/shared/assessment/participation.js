@@ -23,6 +23,7 @@
         var self = this;
         this.element = element;
         this.options = $.extend(true, {}, defaults, options);
+        this.newPlanCount = 0;
 
         var $planDataContainer = $('#plan-data');
         var $participants = $('#participants');
@@ -217,8 +218,11 @@
 
             // On valid - save the plan details in hidden inputs and apply to selected students
             submitHandler: function() {
+                // increment the number of "new plans" in play
+                self.newPlanCount++;
+
                 var $customiseModal = $('#participant-customise-modal');
-                var planIndex = $planDataContainer.find('[data-saved-plan]').length + 1;
+                var newPlanId = -1 * self.newPlanCount;
                 var planName = $customiseModal.find('#plan-name').val();
                 var planDesc = CKEDITOR.instances['plan-desc'].getData();
                 var publishDate = $customiseModal.find('#plan-publish-date').val();
@@ -229,37 +233,37 @@
                 // Save the plan in hidden inputs
                 var hiddenInputs;
 
-                hiddenInputs = $(document.createElement('input')).attr('type', 'hidden').attr('name', 'plans[' + planIndex + '][id]').val('');
+                hiddenInputs = $(document.createElement('input')).attr('type', 'hidden').attr('name', 'plans[' + newPlanId + '][id]').val('');
 
                 hiddenInputs = hiddenInputs.add($(document.createElement('input'))
                     .attr('type', 'hidden')
-                    .attr('name', 'plans[' + planIndex + '][name]')
+                    .attr('name', 'plans[' + newPlanId + '][name]')
                     .attr('data-saved-plan', 1)
                     .val(planName));
 
                 hiddenInputs = hiddenInputs.add($(document.createElement('input'))
                     .attr('type', 'hidden')
-                    .attr('name', 'plans[' + planIndex + '][description]')
+                    .attr('name', 'plans[' + newPlanId + '][description]')
                     .val(planDesc));
 
                 hiddenInputs = hiddenInputs.add($(document.createElement('input'))
                     .attr('type', 'hidden')
-                    .attr('name', 'plans[' + planIndex + '][publish_date]')
+                    .attr('name', 'plans[' + newPlanId + '][publish_date]')
                     .val(publishDate));
 
                 hiddenInputs = hiddenInputs.add($(document.createElement('input'))
                     .attr('type', 'hidden')
-                    .attr('name', 'plans[' + planIndex + '][open_date]')
+                    .attr('name', 'plans[' + newPlanId + '][open_date]')
                     .val(openDate));
 
                 hiddenInputs = hiddenInputs.add($(document.createElement('input'))
                     .attr('type', 'hidden')
-                    .attr('name', 'plans[' + planIndex + '][due_date]')
+                    .attr('name', 'plans[' + newPlanId + '][due_date]')
                     .val(dueDate));
 
                 hiddenInputs = hiddenInputs.add($(document.createElement('input'))
                     .attr('type', 'hidden')
-                    .attr('name', 'plans[' + planIndex + '][close_date]')
+                    .attr('name', 'plans[' + newPlanId + '][close_date]')
                     .val(closeDate));
 
                 // Append hidden inputs to the fieldset
@@ -268,10 +272,10 @@
                 // Add plan to drop down
                 $('#participant-customise')
                     .closest('li')
-                    .before('<li><a href="#" data-plan-use="' + planIndex + '" data-plan-name="' + planName + '">' + planName + '</a></li>');
+                    .before('<li><a href="#" data-plan-use="' + newPlanId + '" data-plan-name="' + planName + '">' + planName + '</a></li>');
 
                 // Update the selected students with the plan
-                updatePlan($('#plan-participants')[0].selectize.getValue().split(','), planIndex, planName);
+                updatePlan($('#plan-participants')[0].selectize.getValue().split(','), newPlanId, planName);
 
                 // Close the modal
                 $customiseModal.foundation('reveal', 'close');
@@ -289,7 +293,7 @@
         $participantSettings.on('click', 'a[data-plan-use]', function(event) {
             event.preventDefault();
 
-            var planIndex = $(this).attr('data-plan-use');
+            var planId   = $(this).attr('data-plan-use');
             var planName = $(this).attr('data-plan-name');
 
             // Update the students with the plan
@@ -297,7 +301,7 @@
             $participants.find(':checked').each(function() {
                 studentIDs.push($(this).attr('data-user-id'));
             });
-            updatePlan(studentIDs, planIndex, planName);
+            updatePlan(studentIDs, planId, planName);
 
             // Reset the checkboxes and buttons
             resetActions();
@@ -313,7 +317,7 @@
     /**
      * Update the students selected
      */
-    function updatePlan(students, planIndex, planName) {
+    function updatePlan(students, planId, planName) {
         // Update the students with the plan
         $(students).each(function(index, studentID) {
             var $participantRow = $('li[data-participant=' + studentID + ']');
@@ -327,7 +331,7 @@
             $participantCard.removeClass('participant-excluded');
 
             // Update the hidden input for their plan
-            $participantRow.find('#participant-plan-' + studentID).val(planIndex);
+            $participantRow.find('#participant-plan-' + studentID).val(planId);
         });
     }
 

@@ -329,7 +329,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'markVisibility'        => $assessment->getMarkVisibility(),
             'availableVisibilities' => $this->getAvailableVisibilities(),
             'allWorkTypes'          => $this->workTypeMapper->findAll(),
-            'planIds'               => $this->getPlanIds($assessment)
         ];
 
         $data = array_merge($data, $this->getAssessmentTwigData($assessment));
@@ -337,23 +336,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
         return $data;
     }
 
-
-    /**
-     * @param IAssessable $assessment
-     * @return array
-     */
-    protected function getPlanIds(IAssessable $assessment)
-    {
-        $ids = $assessment->getPlans()->filterBy('isDynamic', false)->getPropertyValues('id');
-
-        return array_map(
-            function ($i) {
-                // the +1 is so this array is 1-indexed rather than zero
-                return $i + 1;
-            },
-            array_flip($ids)
-        );
-    }
 
     /**
      * Return whether or not the given user is allowed to see the given participation

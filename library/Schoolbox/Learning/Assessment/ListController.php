@@ -342,7 +342,11 @@ class ListController extends Web\Controller\Base
             $transactionSummary = $this->getTransactor()->transact($assessment);
             $assessmentId = $assessment->getId();
 
-            // assessment is saved; persist plans (retaining index)
+            // assessment is saved; persist plans
+
+            // Note: in the returned collection
+            //    - any plans CREATED by this method will be NEGATIVELY INDEXED (the object has a real ID though)
+            //    - any plans UPDATED by this method will be ID INDEXED
             $plans = $this->savePlanData($assessmentId, $postData['plans'] ?? []);
 
             $this->saveParticipationData($plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
@@ -383,11 +387,11 @@ class ListController extends Web\Controller\Base
                 $userPlan = $plans[$userPlanIndices[$userId]];
 
                 if (!$userPlan) {
-                    throw new DomainException("User {$userId} was assigned index {$userPlanIndices[$userId]}, but there's no plan with that index (valid plan indices were" . json_encode($plans->keys()) . ')');
+                    throw new DomainException("User {$userId} was assigned index {$userPlanIndices[$userId]}, but there's no plan with that index (valid plan indices were " . json_encode($plans->keys()) . ')');
                 }
 
-                // only generate a record if there is ALREADY existing participation, AND the plan is NOT dynamic
-                if ($existingParticipation->count() && !$userPlan->isDynamic()) {
+                // generate a record if there is ALREADY existing participation, OR the plan is NOT dynamic
+                if ($existingParticipation->count() || !$userPlan->isDynamic()) {
                     // this action needs to enforce the constraint of a user being in 0..1 plan
                     // TODO atomicity!!! :'(
                     $partMap->delete($existingParticipation);
@@ -397,7 +401,7 @@ class ListController extends Web\Controller\Base
                 if ($existingParticipation->count() === 0) {
                     // we need to generate a record so we have *something* to exclude
                     $existingParticipation = $partMap->createCollection([
-                        $this->makeAParticipation($userId, $plans[0])
+                        $this->makeAParticipation($userId, $plans->filterBy('isDynamic', true)->first())
                     ]);
                 }
 
@@ -429,6 +433,10 @@ class ListController extends Web\Controller\Base
     }
 
     /**
+     * The return of this method will be a UNION of all plans that exist for the given assessment ID
+     * and the new plans specified by $postPlans. New plans will be persisted to the database (and thus have a real
+     * ID), but in the returned collection, they will be NEGATIVELY INDEXED, as given in $postPlans.
+     *
      * @param int         $assessmentId
      * @param array       $postPlans
      * @return GenericCollection|ParticipantModels\Plan\Model[]
@@ -445,18 +453,25 @@ class ListController extends Web\Controller\Base
         $existingPlans = $planMap->findByColumn('assessment_id', $assessmentId)->indexBy('id');
 
         // preload the plans list with the dyna-plan
-        $plans = $planMap->findByColumnList([ 'is_dynamic' => true, 'assessment_id' => $assessmentId ])->reindex();
+        $plans = $planMap->findByColumnList([ 'is_dynamic' => true, 'assessment_id' => $assessmentId ])->indexBy('id');
 
-        foreach ($postPlans as $planIndex => $planData) {
-            // we need to maintain this index
+        // obtain this reference for later
+        $dynaPlan = $plans->first();
 
-            if (isset($existingPlans[$planData['id']])) {
-                // update existing
-                // TODO later, for now just add to the list
-                $plans[$planIndex] = $existingPlans[$planData['id']];
-            } else {
-                // create new
+        // within $postPlans, any positive index is the ID of an existing plan; any negative index is a new plan
+        foreach ($postPlans as $planId => $planData) {
+            // if planId == 0, it's either the dyna-plan or invalid data, but ignorable either way
+
+            if ($planId > 0) {
+                // existing plan
+                // TODO SA-5670 (allow teachers to modify plans post-creation)
+                // for now: just add the plan to the list, ignoring any changes
+                $plans[$planId] = $existingPlans[$planId];
+
+            } elseif ($planId < 0) {
+                // new plan
                 unset($planData['id']);
+
                 $planData['assessment_id'] = $assessmentId;
                 $planData['is_dynamic']    = false;
                 $planData['created_at']    = null;
@@ -467,12 +482,16 @@ class ListController extends Web\Controller\Base
                     }
                 }
 
-                $plans[$planIndex] = $planMap->hydrate($planData);
+                // note that we are using the negative index here
+                $plans[$planId] = $planMap->hydrate($planData);
             }
         }
 
         // save all the plans
         $planMap->save($plans);
+
+        // drop the dyna-plan into index 0 as well as its ID to get around a limitation in the POST payload
+        $plans[0] = $dynaPlan;
 
         return $plans;
     }
