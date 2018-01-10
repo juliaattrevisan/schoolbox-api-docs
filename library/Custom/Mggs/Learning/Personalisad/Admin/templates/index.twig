@@ -1,0 +1,29 @@
+<div class="row">
+    <div class="island small-12">
+        <h1>My Courses</h1>
+        <form method="post" action="{{ routeLookup('mggsAdminPersonalised.postRoleInvolvement') }}">
+            <section>
+                <fieldset>
+                    <div class="row">
+                        <div class="column small-12">
+                            <fieldset class="checklist">
+                                <legend>Roles Enabled</legend>
+                                {% for role in roles %}
+                                    <input
+                                            id="role[{{ role.id }}]"
+                                            name="role[{{ role.id }}]"
+                                            type="checkbox"
+                                            value="{{ role.id }}"
+                                            {% if role.id in enabled %}checked{% endif %}
+                                    />
+                                    <label for="role[{{ role.id }}]">{{ role.name }}</label>
+                                {% endfor %}
+                            </fieldset>
+                        </div>
+                    </div>
+                </fieldset>
+            </section>
+            <input type="submit" value="Update" />
+        </form>
+    </div>
+</div>
