@@ -61,7 +61,7 @@ $(function () {
                         prevLabel: 'Back',
                         skipLabel: '&times;',
                         scrollTo: 'tooltip',
-                        disableInteraction: true,
+                        disableInteraction: false,
                         exitOnOverlayClick: false,
                         steps: stepsToDisplay.filter(function(obj) { return $(obj.element).is(':visible'); })
                     });
