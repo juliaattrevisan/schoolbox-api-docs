@@ -93,7 +93,7 @@
                 <section>
                     <ul class="information-list">
                         {% for assessment in assessmentTasks[folder.id] %}
-                            {% set participant = assessment.participant(student) %}
+                            {% set participant = assessment.participantIfExtant(student) %}
                             <li class="actions-small-2">
                                 <div class="list-item clearfix content">
                                     <div class="row">
