@@ -13,7 +13,7 @@
 {# No delete capability in self-assessment #}
 {% block meta %}
     {% include '@learningDueWorkResponse/inlineGrading/fragments/meta.twig' with {
-        title: 'Self-Assessment for',
+        title: locale.selfAssessment.proper ~ ' for',
         assessment: assessment,
         participant: participant,
         responseList: responseList,
@@ -41,15 +41,14 @@
 {# No response file list in self-assessment #}
 {% block responseFileList %}{% endblock %}
 
-{% block subheading %}
-    {{ locale.selfAssessment.singularForm }}
-{% endblock %}
+{# No subheading in self-reflection #}
+{% block subheading %}{% endblock %}
 
 {# Instructions for the self-assessment #}
 {% block instructions %}
     <div class="row">
         <div class="small-12 columns">
-            <div class="alert-box">self-assessment instructions go here</div>
+            <div class="alert-box">{{ locale.selfAssessment.proper }} instructions go here</div>
         </div>
     </div>
 {% endblock %}

@@ -56,6 +56,7 @@ Usage:
  #}
 {% block meta %}
     {% include '@learningDueWorkResponse/inlineGrading/fragments/meta.twig' with {
+        title: locale.grading.proper,
         assessment: assessment,
         participant: participant,
         responseList: responseList,
@@ -102,13 +103,15 @@ Usage:
 {% endblock %}
 
 {# A subheading for the grading part #}
+{% block subheading %}
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">{% spaceless %}{% block subheading %}Feedback{% endblock %}{% endspaceless %}</h2>
+        <h2 class="subheader">Feedback</h2>
     </div>
 </div>
+{% endblock %}
 
-{# Instructions for the inline grader screen #}
+{# No instructions for the inline grader screen #}
 {% block instructions %}{% endblock %}
 
 {# Not the most recent response? Say so, and give a CTA to show the most recent. #}
