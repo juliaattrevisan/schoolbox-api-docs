@@ -116,18 +116,17 @@ class Controller extends Base
          * Superusers can see draft Responses in the inline grader
          * Teachers cannot see draft Responses in the inline grader
          */
-
-        /* Self-Assessment/Self Reflection: find the most recent draft
-         * otherwise find the most recent submitted response
-         */
         if (!$response) {
-            if ($assessment->isSelfReflectable()) {
-                $response = $participant->findMostRecentDraftResponse();
-            }
-            else {
-                $response = $participant->findMostRecentSubmittedResponse();
-            }
+            $response = $participant->findMostRecentSubmittedResponse();
         }
+
+        /* Self-Assessment/Self Reflection: the response will be provided from the url param
+         * Assume this is the one to load. To continue with his part of self-assessment workflow check the
+         * participation setting. Learners are allowed in this section with a non-submitted Response under
+         * these circumstances
+         */
+        $selfAssessedWithResponse = (new ValidSelfAssessmentWithResponse($this->getUser(), $participant))->isSatisfied();
+        $selfReflectedWithResponse = (new ValidSelfReflectionWithResponse($this->getUser(), $participant))->isSatisfied();
 
 //        $mostRecentResponse = $participant->findMostRecentSubmittedResponse();
 //        if (!$response) {
@@ -145,8 +144,10 @@ class Controller extends Base
          * Floating Feedback ref. jleckie
          */
         if ($response) {
-            if (!$this->getUser()->isSuperuser() && $this->getUser()->getRole()->isStaff() && !$response->isSubmitted()) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            if (!$selfAssessedWithResponse && !$selfReflectedWithResponse) {
+                if (!$this->getUser()->isSuperuser() && $this->getUser()->getRole()->isStaff() && !$response->isSubmitted()) {
+                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+                }
             }
         }
 
