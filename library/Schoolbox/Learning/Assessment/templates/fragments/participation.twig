@@ -27,7 +27,7 @@
         </label>
     </div>
     #}
-
+    {% if assessment.allParticipants | length %}
     <div id="participation-settings"> {# class="hide" #}
         <div class="row">
             <div class="small-12 medium-3 medium-offset-9 column" id="mass-buttons">
@@ -103,4 +103,10 @@
         <input type="hidden" name="plans[{{ plan.id }}][close_date]" value="{{ plan.closeDate.local }}" />
     {% endfor %}
     </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="icon-users"></i>
+            <p>{{ assessment.context.folder.title }} doesn't currently contain any students, so there is no participation to customise.</p>
+        </div>
+    {% endif %}
 </fieldset>
