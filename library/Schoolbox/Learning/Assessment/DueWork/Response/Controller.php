@@ -102,9 +102,74 @@ class Controller extends Base
     public function getParticularResponseForSelfAssessment(
         DueWork $assessment,
         Participant $participant,
-        Model $response = null
+        Model $response
     ): void
     {
+
+        /* Self-Assessment/Self Reflection: the response must be provided from the url param
+         * Assume this is the one to load. To continue with his part of self-assessment workflow check the
+         * participation setting. Learners are allowed in this section with a non-submitted Response under
+         * these circumstances
+         */
+        $selfAssessedWithResponse = (new ValidSelfAssessmentWithResponse($this->getUser(), $participant))->isSatisfied();
+        $selfReflectedWithResponse = (new ValidSelfReflectionWithResponse($this->getUser(), $participant))->isSatisfied();
+
+        if (!$selfAssessedWithResponse && !$selfReflectedWithResponse) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_COMPLETE_BEFORE_SELF_ASSESS);
+        }
+
+        // The zone which contains the files
+        $latestFeedback    = $participant->findMostRecentFeedback();
+        $attachZoneFactory = new Attachzone\Factory();
+        $attachZone        = $attachZoneFactory->buildForDueWorkFeedback($latestFeedback);
+
+        // Is the page being displayed in readonly mode?
+        $isInteractionLocked = (new LockedChecker($this->termMapper))->isLockedForInteractions($assessment);
+
+        $data = [
+            'assessment' => $assessment,
+
+            // TODO: Breadcrumbs need to be different
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
+                ->add([ $assessment->getTitle(), $this->getRouter()->generate('learningAssessment.getStatus',['assessmentId' => $assessment->getId()]) ])
+                ->add(['Inline Grader', '']),
+            'response' => $response,
+            'latestFeedback' => $latestFeedback,
+            'attachzone' => $attachZone->getTwigContext(),
+            'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
+
+            /* For saving feedbacks
+             */
+            'errors' => [],
+            'participant' => $participant,
+
+            /* Plagscan status
+             */
+            'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
+            'interactionLocked' => $isInteractionLocked,
+        ];
+
+        /* Rubrics data
+        */
+        $rubricMapper = RubricMapper::getInstance();
+        if($assessment->getUseRubric()){
+            $assessment->setRubric($rubricMapper->findByDueWork($assessment));
+        }
+        $rubricContext = new RubricContext($rubricMapper);
+
+        // Should rubric be readonly or markable?
+        $data['rubricContext'] = $isInteractionLocked && !$this->getUser()->isSuperuser()
+            ? $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false)
+            : $rubricContext->generateMarkable($assessment, $participant->getUser());
+
+        /* Figure out who's actually here and what screen to show
+         */
+        if ((new ValidSelfAssessment($this->getUser(), $participant))->isSatisfied()) {
+            $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/selfAssessment.twig', $data));
+        }
+        elseif ((new ValidSelfReflection($this->getUser(), $participant))->isSatisfied()) {
+            $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/selfReflection.twig', $data));
+        }
     }
 
     /**
@@ -137,8 +202,13 @@ class Controller extends Base
          * Superusers can see draft Responses in the inline grader
          * Teachers cannot see draft Responses in the inline grader
          */
+        $mostRecentResponse = $participant->findMostRecentSubmittedResponse();
         if (!$response) {
-            $response = $participant->findMostRecentSubmittedResponse();
+
+            $response             = $mostRecentResponse;
+            $isMostRecentResponse = true;
+        } else {
+            $isMostRecentResponse = ($mostRecentResponse && $mostRecentResponse->getId() == $response->getId());
         }
 
         /* Self-Assessment/Self Reflection: the response will be provided from the url param
@@ -149,14 +219,7 @@ class Controller extends Base
         $selfAssessedWithResponse = (new ValidSelfAssessmentWithResponse($this->getUser(), $participant))->isSatisfied();
         $selfReflectedWithResponse = (new ValidSelfReflectionWithResponse($this->getUser(), $participant))->isSatisfied();
 
-//        $mostRecentResponse = $participant->findMostRecentSubmittedResponse();
-//        if (!$response) {
-//
-//            $response             = $mostRecentResponse;
-//            $isMostRecentResponse = true;
-//        } else {
-//            $isMostRecentResponse = ($mostRecentResponse && $mostRecentResponse->getId() == $response->getId());
-//        }
+
 
         /* If there is an an actual Latest Response, use it and subject
          * it to the usual checks.
@@ -165,10 +228,8 @@ class Controller extends Base
          * Floating Feedback ref. jleckie
          */
         if ($response) {
-            if (!$selfAssessedWithResponse && !$selfReflectedWithResponse) {
-                if (!$this->getUser()->isSuperuser() && $this->getUser()->getRole()->isStaff() && !$response->isSubmitted()) {
-                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-                }
+            if (!$this->getUser()->isSuperuser() && $this->getUser()->getRole()->isStaff() && !$response->isSubmitted()) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
             }
         }
 
@@ -215,7 +276,7 @@ class Controller extends Base
 
             /* For saving feedbacks
              */
-            'errors' => [],
+            'errors' => DueWork_ErrorMapper::getInstance()->listDisplayValues(),
             'participant' => $participant,
 
             /* Plagscan status
@@ -237,24 +298,7 @@ class Controller extends Base
             ? $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false)
             : $rubricContext->generateMarkable($assessment, $participant->getUser());
 
-// TODO: Breadcrumbs need to be different
-
-        /* Figure out who's actually here and what screen to show
-         */
-        if ((new ValidSelfAssessment($this->getUser(), $participant))->isSatisfied()) {
-            $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/selfAssessment.twig', $data));
-        }
-        elseif ((new ValidSelfReflection($this->getUser(), $participant))->isSatisfied()) {
-            $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/selfReflection.twig', $data));
-        }
-        else {
-
-            /* Submission States only exist for Instructors
-             */
-            $data['errors'] = DueWork_ErrorMapper::getInstance()->listDisplayValues();
-
-            $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/standard.twig', $data));
-        }
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/standard.twig', $data));
     }
 
 
