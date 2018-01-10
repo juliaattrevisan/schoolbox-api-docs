@@ -235,6 +235,18 @@ Usage:
         <h2 class="subheader">Feedback</h2>
     </div>
 </div>
+
+{# Not the most recent response? Say so, and that the feedback might not be the most recent. #}
+{% if not isMostRecentResponse %}
+    <div class="row">
+        <div class="small-12 columns">
+            <div class="alert-box">
+                This is not the most recent response for this due work. This feedback might be out of date.
+            </div>
+        </div>
+    </div>
+{% endif %}
+
 <div class="row mark-scheme" id="assessment-status" data-participant>
     <div class="small-12 island">
         <section class="content">

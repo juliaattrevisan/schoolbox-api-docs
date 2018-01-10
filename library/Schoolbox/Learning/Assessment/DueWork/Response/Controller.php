@@ -115,8 +115,12 @@ class Controller extends Base
          * Superusers can see draft Responses in the inline grader
          * Teachers cannot see draft Responses in the inline grader
          */
+        $mostRecentResponse = $participant->findMostRecentSubmittedResponse();
         if (!$response) {
-            $response = $participant->findMostRecentSubmittedResponse();
+            $response             = $mostRecentResponse;
+            $isMostRecentResponse = true;
+        } else {
+            $isMostRecentResponse = ($mostRecentResponse && $mostRecentResponse->getId() == $response->getId());
         }
 
         /* If there is an an actual Latest Response, use it and subject
@@ -156,6 +160,7 @@ class Controller extends Base
                 ->add([ $assessment->getTitle(), $this->getRouter()->generate('learningAssessment.getStatus',['assessmentId' => $assessment->getId()]) ])
                 ->add(['Inline Grader', '']),
             'response' => $response,
+            'isMostRecentResponse' => $isMostRecentResponse,
             'latestFeedback' => $latestFeedback,
             'attachzone' => $attachZone->getTwigContext(),
             'selectedFileHash' => $this->getRequest()->query['hash'],
