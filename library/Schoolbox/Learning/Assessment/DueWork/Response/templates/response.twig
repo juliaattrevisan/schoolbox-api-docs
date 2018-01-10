@@ -309,6 +309,7 @@ Usage:
                             <label>{{ locale.grades.proper }}
                                 {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
                                     participant: participant,
+                                    feedback:    latestFeedback,
                                     markScheme:  assessment.markScheme,
                                     tabIndex:    1,
                                     errors:      errors,

@@ -13,6 +13,7 @@
 {% if readonly %}
     {% include '@learningMarkScheme/fragments/text-input.twig' with {
         participant: participant,
+        feedback:    feedback,
         tabIndex:    tabIndex,
         placeholder: readonly ? '(no grade given)' : '(no grade)',
         limit:       100,
