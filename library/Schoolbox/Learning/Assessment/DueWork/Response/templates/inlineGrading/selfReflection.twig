@@ -40,64 +40,47 @@
 </div>
 {% endblock %}
 
-{% block grading %}
-<div class="row mark-scheme" id="assessment-status" data-participant>
-    <div class="small-12 island">
-        <section class="content">
+{# No rubric descriptor/group/overall totals in self-reflection #}
+{% block rubricGrid %}
+    {% set showDescriptorValue = false %}
+    {% set showGroupTotal = false %}
+    {% set showRubricTotal = false %}
 
-            <form method="post" data-feedback-form action="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postResponseFeedback', {assessmentId: assessment.id, studentId: participant.user.id, responseId: response.id, participant: participant}) }}">
-                <input type="hidden" name="responseId" value="{{ response.id }}" />
+    {{ parent() }}
+{% endblock %}
 
-                <div class="row">
+{# No grade value input in self-reflection #}
+{% block gradeValue %}{% endblock %}
 
-                    {# No rubric descriptor/group/overall totals in self-reflection #}
-                    {% block rubricGrid %}
-                        {% set showDescriptorValue = false %}
-                        {% set showGroupTotal = false %}
-                        {% set showRubricTotal = false %}
-
-                        {{ parent() }}
-                    {% endblock %}
-
-                    {# No grade value input in self-reflection #}
-                    {% block gradeValue %}{% endblock %}
-
-                    {# Provide comment input field in self-reflection, but in different size #}
-                    {% block comment %}
-                        <div class="small-12 column">
-                            {% include '@learningAssessment/dueWork/comment.twig' with {
-                                participant: participant,
-                                tabIndex: 2,
-                                readonly: readonly
-                            } only %}
-                        </div>
-                    {% endblock %}
-
-                    {# Maybe files may be uploaded here? #}
-                    {% block attachzone %}
-                        {{ parent() }}
-                    {% endblock %}
-
-                    {# Action Bar #}
-                    {% block actionButtons %}
-                        {% spaceless %}
-                            {% set buttons %}
-                                <span class="button disabled" data-draft="drafted" title="Saved as draft" {% if not isDraftFeedback %}style="display:none;"{% endif %}>Saved as Draft</span>
-                                {% if not readonly %}
-                                    <a class="button" data-draft="publish"></a>
-                                {% endif %}
-                            {% endset %}
-                        {% endspaceless %}
-
-                        {% include '@learningAssessment/fragments/actionBar.twig' with {
-                            actionStyle:  '',
-                            buttons: buttons
-                        } only %}
-                    {% endblock %}
-                </div>
-            </form>
-        </section>
+{# Provide comment input field in self-reflection, but in different size #}
+{% block comment %}
+    <div class="small-12 column">
+        {% include '@learningAssessment/dueWork/comment.twig' with {
+            participant: participant,
+            tabIndex: 2,
+            readonly: readonly
+        } only %}
     </div>
-</div>
-<script src="/javascript/shared/submissions/jquery.combobox.js" type="text/javascript"></script>
+{% endblock %}
+
+{# Maybe files may be uploaded here? #}
+{% block attachzone %}
+    {{ parent() }}
+{% endblock %}
+
+{# Action Bar #}
+{% block actionButtons %}
+    {% spaceless %}
+        {% set buttons %}
+            <span class="button disabled" data-draft="drafted" title="Saved as draft" {% if not isDraftFeedback %}style="display:none;"{% endif %}>Saved as Draft</span>
+            {% if not readonly %}
+                <a class="button" data-draft="publish"></a>
+            {% endif %}
+        {% endset %}
+    {% endspaceless %}
+
+    {% include '@learningAssessment/fragments/actionBar.twig' with {
+        actionStyle:  '',
+        buttons: buttons
+    } only %}
 {% endblock %}
