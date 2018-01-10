@@ -36,6 +36,7 @@ class Javascript extends \Calendar\Event\Type\Submission\Renderer\Javascript
 
         // regrettably, because of dynamic invocation, we have to settle for singletons in here
         $this->pblMapper = \Schoolbox\Learning\Personalised\Participant\Mapper::getInstance();
+
     }
 
 
@@ -132,8 +133,11 @@ class Javascript extends \Calendar\Event\Type\Submission\Renderer\Javascript
             'due'  => $this->getEvent()->getAssessment()->getDueAt()->getDatabaseDate()
         ];
 
+        $status = $this->getStatus();
+
         // has this student completed this assessment?
-        $meta['completed'] = true;
+        $meta['status'] = $status;
+        $meta['complete'] = $status === 'reviewed';
 
         return $meta;
     }
@@ -142,8 +146,33 @@ class Javascript extends \Calendar\Event\Type\Submission\Renderer\Javascript
     {
         $styles = parent::deriveStyles();
 
-        // TODO if student has completed, add a class for reducing its visibility
+        $styles["status-{$this->getStatus()}"] = true;
 
         return $styles;
+    }
+
+
+    /**
+     * @return string
+     * @throws \UnexpectedValueException
+     */
+    protected function getStatus()
+    {
+        // add a style for bling (if you're not a parent)
+        if ($this->getViewer()->getRole()->isParent()) {
+            return null;
+        }
+
+        $part = $this->getEvent()->getAssessment()->getParticipant($this->getUser());
+
+        if ($part->isResponseRequired()) {
+            return 'incomplete';
+        }
+
+        if ($part->isFeedbackRequired()) {
+            return 'pending';
+        }
+
+        return 'reviewed';
     }
 }
