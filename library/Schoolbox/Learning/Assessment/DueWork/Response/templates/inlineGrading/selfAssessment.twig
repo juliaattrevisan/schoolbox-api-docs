@@ -41,16 +41,23 @@
 {# No response file list in self-assessment #}
 {% block responseFileList %}{% endblock %}
 
-{# No subheading in self-reflection #}
+{# No subheading in self-assessment #}
 {% block subheading %}{% endblock %}
 
 {# Instructions for the self-assessment #}
 {% block instructions %}
-    <div class="row">
-        <div class="small-12 columns">
-            <div class="alert-box">{{ locale.selfAssessment.proper }} instructions go here</div>
-        </div>
+    {% if rubricContext.rubric %}
+        {% set text = 'rubric and'  %}
+    {% endif %}
+
+<div class="row">
+    <div class="small-12 columns">
+        <div class="alert-box">{% spaceless %}
+            Use the {{ text }} comment box below to submit a {{ locale.selfAssessment.singularForm }} before you submit this
+            work to your teacher for feedback.
+            {% endspaceless %}</div>
     </div>
+</div>
 {% endblock %}
 
 {# Show totals in self-assessment #}

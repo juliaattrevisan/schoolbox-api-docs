@@ -46,11 +46,18 @@
 
 {# Instructions for the self-reflection #}
 {% block instructions %}
-    <div class="row">
-        <div class="small-12 columns">
-            <div class="alert-box">{{ locale.selfReflection.proper }} instructions go here</div>
-        </div>
+    {% if rubricContext.rubric %}
+        {% set text = 'rubric and'  %}
+    {% endif %}
+
+<div class="row">
+    <div class="small-12 columns">
+        <div class="alert-box">{% spaceless %}
+            Use the {{ text }} comment box below to submit a {{ locale.selfReflection.singularForm }} before you submit this
+            work to your teacher for feedback.
+            {% endspaceless %}</div>
     </div>
+</div>
 {% endblock %}
 
 {# No rubric descriptor/group/overall totals in self-reflection #}
