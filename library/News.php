@@ -212,7 +212,7 @@ class News extends DeprecatedModel
         /* Prevent copies of posts appearing if they are posted to another group.
         */
 
-        if ($topic == '' || $topic == 'all') {
+        if ($topic == 'all') {
             $topicFilter = '';
         } else {
             $topicFilter = " AND newsTopic.name = ".$this->db->smartQuote($topic)." ";
