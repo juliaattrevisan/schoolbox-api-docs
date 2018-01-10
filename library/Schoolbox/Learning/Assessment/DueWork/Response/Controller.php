@@ -133,8 +133,17 @@ class Controller extends Base
 
         $file = $response ? $this->getFile($response, $this->getRequest()->query['hash']) : null;
 
+        // Work with the correct feedback for this response.
+        // * Most recent feedback for the response
+        // * Most recent for the participant
+        // * Nothing
+        $latestFeedback = null;
+        if ($response) {
+            $latestFeedback = $response->findMostRecentFeedback();
+        }
+        $latestFeedback = $latestFeedback ?? $participant->findMostRecentFeedback();
+
         // The zone which contains the files
-        $latestFeedback    = $participant->findMostRecentFeedback();
         $attachZoneFactory = new Attachzone\Factory();
         $attachZone        = $attachZoneFactory->buildForDueWorkFeedback($latestFeedback);
 
