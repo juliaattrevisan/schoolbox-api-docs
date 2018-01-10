@@ -159,28 +159,30 @@ Usage:
                             {% endif %}
                         {% endblock %}
 
+                        {# The little grades input combobox #}
+                        {% block gradeValue %}
+                            {% if 'none' != markSchemeName | lower %}
+                                <div class="small-12 medium-3 column">
+                                    <label>{{ locale.grades.proper }}
+                                        {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
+                                            participant: participant,
+                                            feedback:    latestFeedback,
+                                            markScheme:  assessment.markScheme,
+                                            tabIndex:    1,
+                                            errors:      errors,
+                                            readonly:    readonly
+                                        } only %}
+                                    </label>
 
-                        {% if 'none' != markSchemeName | lower %}
-                            <div class="small-12 medium-3 column">
-                                <label>{{ locale.grades.proper }}
-                                    {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
-                                        participant: participant,
-                                        feedback:    latestFeedback,
-                                        markScheme:  assessment.markScheme,
-                                        tabIndex:    1,
-                                        errors:      errors,
-                                        readonly:    readonly
-                                    } only %}
-                                </label>
-
-                                {% if assessment.useRubric and rubricContext and not readonly %}
-                                    {% include '@learningDueWorkResponse/inlineGrading/fragments/assignFromRubricButton.twig' with {
-                                        locale: locale,
-                                        rubricContext: rubricContext
-                                    } only %}
-                                {% endif %}
-                            </div>
-                        {% endif %}
+                                    {% if assessment.useRubric and rubricContext and not readonly %}
+                                        {% include '@learningDueWorkResponse/inlineGrading/fragments/assignFromRubricButton.twig' with {
+                                            locale: locale,
+                                            rubricContext: rubricContext
+                                        } only %}
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endblock %}
 
                         <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
                             {% include '@learningAssessment/dueWork/comment.twig' with {

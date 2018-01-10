@@ -50,6 +50,7 @@
 
                 <div class="row">
 
+                    {# No rubric descriptor/group/overall totals in self-reflection #}
                     {% block rubricGrid %}
                         {% set showDescriptorValue = false %}
                         {% set showGroupTotal = false %}
@@ -58,6 +59,8 @@
                         {{ parent() }}
                     {% endblock %}
 
+                    {# No grade value input in self-reflection #}
+                    {% block gradeValue %}{% endblock %}
 
                     <div class="small-12 column">
                         {% include '@learningAssessment/dueWork/comment.twig' with {

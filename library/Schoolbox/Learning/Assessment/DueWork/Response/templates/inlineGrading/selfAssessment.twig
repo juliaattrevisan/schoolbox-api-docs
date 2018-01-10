@@ -50,6 +50,7 @@
 
                 <div class="row">
 
+                    {# Show totals in self-assessment #}
                     {% block rubricGrid %}
                         {% set showDescriptorValue = true %}
                         {% set showGroupTotal = true %}
@@ -58,26 +59,10 @@
                         {{ parent() }}
                     {% endblock %}
 
-                    {% if 'none' != markSchemeName | lower %}
-                        <div class="small-12 medium-3 column">
-                            <label>{{ locale.grades.proper }}
-                                {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
-                                    participant: participant,
-                                    markScheme:  assessment.markScheme,
-                                    tabIndex:    1,
-                                    errors:      errors,
-                                    readonly:    readonly
-                                } only %}
-                            </label>
-
-                            {% if assessment.useRubric and rubricContext and not readonly %}
-                                {% include '@learningDueWorkResponse/inlineGrading/fragments/assignFromRubricButton.twig' with {
-                                    locale: locale,
-                                    rubricContext: rubricContext
-                                } only %}
-                            {% endif %}
-                        </div>
-                    {% endif %}
+                    {# Provide grade value input field in self-assessment #}
+                    {% block gradeValue %}
+                        {{ parent() }}
+                    {% endblock %}
 
                     <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
                         {% include '@learningAssessment/dueWork/comment.twig' with {
