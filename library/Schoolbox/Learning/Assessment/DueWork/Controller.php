@@ -800,7 +800,11 @@ class Controller extends Assessment\Controller
          */
         $plagscanMapper = PlagscanMapper::getInstance();
 
-        if ($isFinal && $response->getId()) {
+        /* Plagscans should only spawn upon saving a Submitted IResponse instance
+         * This screen is shared between self-reflection and non-self-reflection steps
+         * Self-reflection's plagscan stubs saving .......happens elsewhere
+         */
+        if ($isFinal && !$selfReflectable && $response->getId()) {
             foreach ($response->getAllFiles() as $currentFile) {
                 if (!$currentFile->getEditableInline()) {
                     $plagscanMapper->saveNewPlagscanStub($currentFile);
@@ -813,8 +817,8 @@ class Controller extends Assessment\Controller
          */
         $this->getResponse()->content->set([
             'postOutput' => [
-                function() use ($plagscanMapper, $isFinal, $response) {
-                    if ($isFinal && $response->getId()) {
+                function() use ($plagscanMapper, $isFinal, $selfReflectable, $response) {
+                    if ($isFinal && !$selfReflectable && $response->getId()) {
                         foreach ($response->getAllFiles() as $currentFile) {
                             $filename = $plagscanMapper->plagscanFilename($currentFile);
 
