@@ -59,19 +59,23 @@
                                 <!-- END admin_only_menu -->
                                 <li><a class="icon-logout" href="/logout.php">Logout</a></li>
                                 <!-- BEGIN can_switch -->
-                                <li class="separator">Switch User</li>
-                                <!-- END can_switch -->
-                                <!-- BEGIN switch_user -->
-                                <li class="switch-user">
-                                    <div class="card small-12">
-                                        <a class="no-pad" href="/user/switch/{MENU_SWITCH_USERID}" title="Switch to {MENU_SWITCH_USER_FULLNAME}">
-                                            <img src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square64" />
-                                            <p>{MENU_SWITCH_USER_FULLNAME}</p>
-                                            <p class="meta">{MENU_SWITCH_USER_ROLE}</p>
-                                        </a>
-                                    </div>
+                                <li>
+                                    <ul id="switch-user">
+                                        <li class="separator">Switch User</li>
+                                        <!-- END can_switch -->
+                                        <!-- BEGIN switch_user -->
+                                        <li class="switch-user">
+                                            <div class="card small-12">
+                                                <a class="no-pad" href="/user/switch/{MENU_SWITCH_USERID}" title="Switch to {MENU_SWITCH_USER_FULLNAME}">
+                                                    <img src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square64" />
+                                                    <p>{MENU_SWITCH_USER_FULLNAME}</p>
+                                                    <p class="meta">{MENU_SWITCH_USER_ROLE}</p>
+                                                </a>
+                                            </div>
+                                        </li>
+                                        <!-- END switch_user -->
+                                    </ul>
                                 </li>
-                                <!-- END switch_user -->
                                 <!-- BEGIN recover_user -->
                                 <li class="switch-user">
                                     <div class="card small-12">
