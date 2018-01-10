@@ -35,61 +35,77 @@ Usage:
  # These vars exist regardless of who is looking
  #}
 {% set readonly = interactionLocked and not USER.superUser %}
-{% set deleteRoute = routeLookupIfAuthorized('learningDueWorkResponse.deleteParticularResponse', { assessmentId: assessment.id, responseId: response.id, response: response }) %}
 
-{# Common elements
- # These ui elements exist regardless of who is looking
- #}
+{# Breadcrumbs are always present #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
+
+{# Participant Carousel #}
+{% block participantCarousel %}
+    {% include '@learningDueWorkResponse/inlineGrading/fragments/participantCarousel.twig' with {
+        carousel: carousel,
+        participant: participant
+    } only %}
+{% endblock %}
 
 {# These includes vary depending on who is viewing this page:
  # * Teachers doing their usual grading
  # * Students self-reflecting
  #}
-{% include '@learningDueWorkResponse/inlineGrading/fragments/participantCarousel.twig' with {
-    carousel: carousel,
-    participant: participant
-} only %}
+{% block meta %}
+    {% include '@learningDueWorkResponse/inlineGrading/fragments/meta.twig' with {
+        locale: locale,
+        assessment: assessment,
+        participant: participant,
+        responseList: responseList,
+        response: response,
+        readonly: readonly,
+        deleteRoute: routeLookupIfAuthorized('learningDueWorkResponse.deleteParticularResponse', { assessmentId: assessment.id, responseId: response.id, response: response })
+    } only %}
+{% endblock %}
 
-{% include '@learningDueWorkResponse/inlineGrading/fragments/meta.twig' with {
-    locale: locale,
-    assessment: assessment,
-    participant: participant,
-    responseList: responseList,
-    response: response,
-    readonly: readonly,
-    deleteRoute: deleteRoute
-} only %}
+{# Javascript that powers the feedback form #}
+{% block dynamicFeedback %}
+    {% include '@learningDueWorkResponse/inlineGrading/fragments/dynamicFeedback.twig' with {
+        publishText: 'Publish And Continue'
+    } only %}
+{% endblock %}
 
-{% include '@learningDueWorkResponse/inlineGrading/fragments/dynamicFeedback.twig' with {
-    publishText: 'Publish And Continue'
-} only %}
+{# List of Responses from which the user can choose #}
+{% block responseList %}
+    {% include '@learningDueWorkResponse/inlineGrading/fragments/responseList.twig' with {
+        assessment: assessment,
+        participant: participant,
+        responseList: responseList,
+        response: response
+    } only %}
+{% endblock %}
 
-{% include '@learningDueWorkResponse/inlineGrading/fragments/responseList.twig' with {
-    assessment: assessment,
-    participant: participant,
-    responseList: responseList,
-    response: response
-} only %}
+{# A preview of the file currently selected #}
+{% block responseFilePreview %}
+    {% if response and file %}
+        {% include '@learningDueWorkResponse/inlineGrading/strategy/' ~ subfragment.strategy with {data: subfragment.data} %}
+    {% endif %}
+{% endblock %}
 
-{% if response and file %}
-    {% include '@learningDueWorkResponse/inlineGrading/strategy/' ~ subfragment.strategy with {data: subfragment.data} %}
-{% endif %}
+{# A list of files in the current response #}
+{% block responseFileList %}
+    {% include '@learningDueWorkResponse/inlineGrading/fragments/responseFileList.twig' with {
+        assessment: assessment,
+        participant: participant,
+        response: response,
+        kamiEnabled: true
+    } only %}
+{% endblock %}
 
-{% include '@learningDueWorkResponse/inlineGrading/fragments/responseFileList.twig' with {
-    assessment: assessment,
-    participant: participant,
-    response: response,
-    kamiEnabled: true
-} only %}
-
-
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Feedback</h2>
+{# A subheading for the grading part #}
+{% block subheading %}
+    <div class="row">
+        <div class="small-12 island">
+            <h2 class="subheader">Feedback</h2>
+        </div>
     </div>
-</div>
+{% endblock %}
 
 {# Not the most recent response? Say so, and give a CTA to show the most recent. #}
 {% if not isMostRecentResponse %}
@@ -108,98 +124,100 @@ Usage:
     </div>
 {% endif %}
 
-<div class="row mark-scheme" id="assessment-status" data-participant>
-    <div class="small-12 island">
-        <section class="content">
+{# Grading logic and structure #}
+{% block grading %}
+    <div class="row mark-scheme" id="assessment-status" data-participant>
+        <div class="small-12 island">
+            <section class="content">
 
-            <form method="post" data-feedback-form action="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postResponseFeedback', {assessmentId: assessment.id, studentId: participant.user.id, responseId: response.id, participant: participant}) }}">
-                <input type="hidden" name="responseId" value="{{ response.id }}" />
+                <form method="post" data-feedback-form action="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postResponseFeedback', {assessmentId: assessment.id, studentId: participant.user.id, responseId: response.id, participant: participant}) }}">
+                    <input type="hidden" name="responseId" value="{{ response.id }}" />
 
-                <div class="row">
+                    <div class="row">
 
-                    {% if assessment.useRubric and rubricContext %}
-                        <div class="small-12 island">
-                            {% set rubricTemplate = readonly
+                        {% if assessment.useRubric and rubricContext %}
+                            <div class="small-12 island">
+                                {% set rubricTemplate = readonly
                                 ? 'grid.twig'
                                 : 'grid-markable.twig'
-                            %}
-                            {% include '@rubric/' ~ rubricTemplate with {
-                                rubric:         rubricContext.rubric,
-                                markType:       rubricContext.markType,
-                                markVisibility: participant.assessable.isFeedbackVisibleToUser(USER),
-                                showDescriptorValue: true,
-                                showGroupTotal: true,
-                                showRubricTotal: true
+                                %}
+                                {% include '@rubric/' ~ rubricTemplate with {
+                                    rubric:         rubricContext.rubric,
+                                    markType:       rubricContext.markType,
+                                    markVisibility: participant.assessable.isFeedbackVisibleToUser(USER),
+                                    showDescriptorValue: true,
+                                    showGroupTotal: true,
+                                    showRubricTotal: true
+                                } only %}
+                            </div>
+                        {% endif %}
+
+                        {% if 'none' != markSchemeName | lower %}
+                            <div class="small-12 medium-3 column">
+                                <label>{{ locale.grades.proper }}
+                                    {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
+                                        participant: participant,
+                                        feedback:    latestFeedback,
+                                        markScheme:  assessment.markScheme,
+                                        tabIndex:    1,
+                                        errors:      errors,
+                                        readonly:    readonly
+                                    } only %}
+                                </label>
+
+                                {% if assessment.useRubric and rubricContext and not readonly %}
+                                    {% include '@learningDueWorkResponse/inlineGrading/fragments/assignFromRubricButton.twig' with {
+                                        locale: locale,
+                                        rubricContext: rubricContext
+                                    } only %}
+                                {% endif %}
+                            </div>
+                        {% endif %}
+
+                        <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
+                            {% include '@learningAssessment/dueWork/comment.twig' with {
+                                participant: participant,
+                                feedback:    latestFeedback,
+                                tabIndex:    2,
+                                readonly:    readonly
                             } only %}
                         </div>
-                    {% endif %}
 
-                    {% if 'none' != markSchemeName | lower %}
-                        <div class="small-12 medium-3 column">
-                            <label>{{ locale.grades.proper }}
-                                {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
-                                    participant: participant,
-                                    feedback:    latestFeedback,
-                                    markScheme:  assessment.markScheme,
-                                    tabIndex:    1,
-                                    errors:      errors,
-                                    readonly:    readonly
-                                } only %}
-                            </label>
+                        {# Maybe files may be uploaded here? #}
+                        {% if attachzone and not readonly %}
+                            <div class="small-12 columns">
+                                {% include 'sub/attachzone.twig' with {attachzone: attachzone} only %}
+                            </div>
+                        {% endif %}
 
-                            {% if assessment.useRubric and rubricContext and not readonly %}
-                                {% include '@learningDueWorkResponse/inlineGrading/fragments/assignFromRubricButton.twig' with {
-                                    locale: locale,
-                                    rubricContext: rubricContext
-                                } only %}
-                            {% endif %}
-                        </div>
-                    {% endif %}
+                        {# Action Bar #}
+                        {% set isDraftFeedback     = latestFeedback and not latestFeedback.published %}
+                        {% set isPublishedFeedback = latestFeedback and latestFeedback.published %}
 
-                    <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
-                        {% include '@learningAssessment/dueWork/comment.twig' with {
-                            participant: participant,
-                            feedback:    latestFeedback,
-                            tabIndex:    2,
-                            readonly:    readonly
+                        {% spaceless %}
+                            {% set buttons %}
+                                <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen" {% if not isDraftFeedback %}style="display:none;"{% endif %}>Saved as Draft</span>
+                                {% if not readonly %}
+                                    <a class="button" id="continue-button">Continue</a>
+                                    <a class="button"
+                                       data-draft="publish"
+                                       {% if isPublishedFeedback %}style="display:none;"{% endif %}
+                                    >Publish and Continue</a>
+                                {% endif %}
+                            {% endset %}
+                        {% endspaceless %}
+
+                        {% include '@learningAssessment/fragments/actionBar.twig' with {
+                            actionStyle:  '',
+                            buttons:      buttons
                         } only %}
                     </div>
-
-                    {# Maybe files may be uploaded here? #}
-                    {% if attachzone and not readonly %}
-                        <div class="small-12 columns">
-                            {% include 'sub/attachzone.twig' with {attachzone: attachzone} only %}
-                        </div>
-                    {% endif %}
-
-                    {# Action Bar #}
-                    {% set isDraftFeedback     = latestFeedback and not latestFeedback.published %}
-                    {% set isPublishedFeedback = latestFeedback and latestFeedback.published %}
-
-                    {% spaceless %}
-                        {% set buttons %}
-                            <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen" {% if not isDraftFeedback %}style="display:none;"{% endif %}>Saved as Draft</span>
-                            {% if not readonly %}
-                                <a class="button" id="continue-button">Continue</a>
-                                <a class="button"
-                                   data-draft="publish"
-                                   {% if isPublishedFeedback %}style="display:none;"{% endif %}
-                                >Publish and Continue</a>
-                            {% endif %}
-                        {% endset %}
-                    {% endspaceless %}
-
-                    {% include '@learningAssessment/fragments/actionBar.twig' with {
-                        actionStyle:  '',
-                        buttons:      buttons
-                    } only %}
-                </div>
-            </form>
-        </section>
+                </form>
+            </section>
+        </div>
     </div>
-</div>
 
-<script src="/javascript/shared/submissions/jquery.combobox.js" type="text/javascript"></script>
+    <script src="/javascript/shared/submissions/jquery.combobox.js" type="text/javascript"></script>
+{% endblock %}
+
 <div id='toaster' class="toast" data-alert data-save-draft></div>
-
-
