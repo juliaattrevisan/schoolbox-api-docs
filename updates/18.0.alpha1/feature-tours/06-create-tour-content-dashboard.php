@@ -43,7 +43,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
         [
             'uuid'     => '204e36bb-f5b9-11e7-9503-08002751fd3c',
             'type'     => 'tooltip',
-            'selector' => '', // TODO
+            'selector' => '#profile-accordion',
             'content'  => "
                 <p>At the top of the side menu you will see your profile picture and name. Opening this will give you some further options.</p>
                 <p>
@@ -57,7 +57,6 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
         ],
 
         // Switch user
-        // TODO should this expand the switch user menu, or tell the user to click on it?
         [
             'uuid'     => '292d8471-f5b9-11e7-9503-08002751fd3c',
             'type'     => 'tooltip',
