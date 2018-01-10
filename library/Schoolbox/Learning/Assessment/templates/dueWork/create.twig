@@ -111,8 +111,9 @@
 {# ----------------------------------------------------------- #}
 {# Participation #}
 {# ----------------------------------------------------------- #}
-{% include '@learningAssessment/fragments/participation.twig' %}
-
+{% if context.baseContext is not unitSpecification %}
+    {% include '@learningAssessment/fragments/participation.twig' %}
+{% endif %}
 
 {# ----------------------------------------------------------- #}
 {# Curriculum #}
