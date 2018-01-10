@@ -64,13 +64,10 @@
                         {{ parent() }}
                     {% endblock %}
 
-                    <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
-                        {% include '@learningAssessment/dueWork/comment.twig' with {
-                            participant: participant,
-                            tabIndex:    2,
-                            readonly:    readonly
-                        } only %}
-                    </div>
+                    {# Provide comment input field in self-assessment #}
+                    {% block comment %}
+                        {{ parent() }}
+                    {% endblock %}
 
                     {# Maybe files may be uploaded here? #}
                     {% if attachzone and not readonly %}

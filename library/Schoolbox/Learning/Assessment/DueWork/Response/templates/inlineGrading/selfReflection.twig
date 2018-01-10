@@ -62,13 +62,16 @@
                     {# No grade value input in self-reflection #}
                     {% block gradeValue %}{% endblock %}
 
-                    <div class="small-12 column">
-                        {% include '@learningAssessment/dueWork/comment.twig' with {
-                            participant: participant,
-                            tabIndex:    2,
-                            readonly:    readonly
-                        } only %}
-                    </div>
+                    {# Provide comment input field in self-reflection, but in different size #}
+                    {% block comment %}
+                        <div class="small-12 column">
+                            {% include '@learningAssessment/dueWork/comment.twig' with {
+                                participant: participant,
+                                tabIndex: 2,
+                                readonly: readonly
+                            } only %}
+                        </div>
+                    {% endblock %}
 
                     {# Maybe files may be uploaded here? #}
                     {% if attachzone and not readonly %}
