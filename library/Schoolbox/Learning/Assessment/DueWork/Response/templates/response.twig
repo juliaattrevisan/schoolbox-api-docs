@@ -236,12 +236,18 @@ Usage:
     </div>
 </div>
 
-{# Not the most recent response? Say so, and that the feedback might not be the most recent. #}
+{# Not the most recent response? Say so, and give a CTA to show the most recent. #}
 {% if not isMostRecentResponse %}
     <div class="row">
         <div class="small-12 columns">
             <div class="alert-box warning">
-                This is not the most recent response for this due work. This feedback might be out of date.
+                This is not the most recent response for this due work.
+                {% set mostRecentResponseRoute = routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id}) %}
+                {% if not readonly %}
+                    You should consider giving feedback for <a href="{{ mostRecentResponseRoute }}">the most recent response</a> instead.
+                {% else %}
+                    <a href="{{ mostRecentResponseRoute }}">View the most recent response</a>.
+                {% endif %}
             </div>
         </div>
     </div>
