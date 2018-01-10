@@ -795,7 +795,10 @@ abstract class AbstractAssessment implements IAssessable
                 $participants[$participant->getUser()->getId()] = $participant;
             }
         }
-        return $participants;
+        return $participants->sortByCallback(function (Participant $p1, Participant $p2) {
+            $format = '{lastname},{firstname}';
+            return strcmp($p1->getUser()->formatName($format), $p2->getUser()->formatName($format));
+        }, true);
     }
 
 
