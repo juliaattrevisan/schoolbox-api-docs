@@ -132,12 +132,10 @@ class Controller extends Base
             $unitMapper = Implementation\Unit\Mapper::getInstance();
 
             try {
+                $ids = $unitMapper->getJoinMapper('course')->findByColumn('folder_id', $folder->getId())->getPropertyValues('id');
+
                 $units = $unitMapper->findByPredicates(
-                    $unitMapper->getPredicateBuilder()
-                        ->equals(
-                            'course_implementation_id',
-                            $unitMapper->getJoinMapper('course')->findByColumn('folder_id', $folder->getId())->getPropertyValues('id')
-                        )
+                    $unitMapper->getPredicateBuilder()->equals('course_implementation_id', $ids)
                 );
             } catch (\UnderflowException $e) {
                 // no units
