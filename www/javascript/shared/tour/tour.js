@@ -41,6 +41,7 @@ $(function () {
 
                     $(tour.steps).each(function (i, step) {
                         if (step.type === 'tooltip') {
+                            // TODO only push into steps to display if tooltips selector element is visible
                             stepsToDisplay.push({
                                 intro: step.body,
                                 element: step.selector,
