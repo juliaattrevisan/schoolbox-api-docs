@@ -337,12 +337,16 @@
 
 
     /**
-     * Resets the checkboxes & disables the button
+     * Resets the checkboxes & disables the actions button
      */
     function resetActions() {
         var $participants = $('#participants');
+        var $customiseDropdown = $('#customise-dropdown');
+
         $participants.find('input[type=checkbox]').prop('checked', false);
         $participants.find('li[data-participant]').removeClass('participant-selected');
+
+        $customiseDropdown.prop('disabled', true);
     }
 
 
