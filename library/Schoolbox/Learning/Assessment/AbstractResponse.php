@@ -71,8 +71,8 @@ abstract class AbstractResponse implements IResponse
     {
         /** @var IFeedback $mostRecentFeedback */
         $mostRecentFeedback = null;
-        foreach($this->getAllFeedback() as $feedback){
-            if(!$mostRecentFeedback || $feedback->getPublishedAt()->gt($mostRecentFeedback->getPublishedAt())){
+        foreach ($this->getAllFeedback() as $feedback) {
+            if (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt())) {
                 $mostRecentFeedback = $feedback;
             }
         }
