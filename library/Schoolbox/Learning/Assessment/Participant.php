@@ -412,10 +412,16 @@ class Participant
     /**
      * Returns the assessment description for this participant
      *
+     * If this participant's plan is dynamic, ignore the plan value and fetch
+     * from the assessment; otherwise, use the plan value if it's there.
+     *
      * @return string|null
      */
     public function getDescription(): ?string
     {
+        if ($this->plan->getIsDynamic()) {
+            return $this->plan->getAssessable()->getDescription();
+        }
         return $this->plan->getDescription() ?? $this->plan->getAssessable()->getDescription();
     }
 
@@ -423,10 +429,16 @@ class Participant
     /**
      * Returns when is the assessment published for this participant.
      *
+     * If this participant's plan is dynamic, ignore the plan value and fetch
+     * from the assessment; otherwise, use the plan value if it's there.
+     *
      * @return Alaress_Date_Format|null
      */
     public function getPublishDate(): ?Alaress_Date_Format
     {
+        if ($this->plan->getIsDynamic()) {
+            return $this->plan->getAssessable()->getPublishAt();
+        }
         return $this->coalesceDates($this->plan->getPublishDate(), $this->plan->getAssessable()->getPublishAt());
     }
 
@@ -434,10 +446,16 @@ class Participant
     /**
      * Returns when is the assessment open for this participant.
      *
+     * If this participant's plan is dynamic, ignore the plan value and fetch
+     * from the assessment; otherwise, use the plan value if it's there.
+     *
      * @return Alaress_Date_Format|null
      */
     public function getOpenDate(): ?Alaress_Date_Format
     {
+        if ($this->plan->getIsDynamic()) {
+            return $this->plan->getAssessable()->getOpenAt();
+        }
         return $this->coalesceDates($this->plan->getOpenDate(), $this->plan->getAssessable()->getOpenAt());
     }
 
@@ -445,10 +463,16 @@ class Participant
     /**
      * Returns when is the assessment due for this participant.
      *
+     * If this participant's plan is dynamic, ignore the plan value and fetch
+     * from the assessment; otherwise, use the plan value if it's there.
+     *
      * @return Alaress_Date_Format|null
      */
     public function getDueDate(): ?Alaress_Date_Format
     {
+        if ($this->plan->getIsDynamic()) {
+            return $this->plan->getAssessable()->getDueAt();
+        }
         return $this->coalesceDates($this->plan->getDueDate(), $this->plan->getAssessable()->getDueAt());
     }
 
@@ -456,10 +480,16 @@ class Participant
     /**
      * Returns when is the assessment closed for this participant.
      *
+     * If this participant's plan is dynamic, ignore the plan value and fetch
+     * from the assessment; otherwise, use the plan value if it's there.
+     *
      * @return Alaress_Date_Format|null
      */
     public function getCloseDate(): ?Alaress_Date_Format
     {
+        if ($this->plan->getIsDynamic()) {
+            return $this->plan->getAssessable()->getCloseAt();
+        }
         return $this->coalesceDates($this->plan->getCloseDate(), $this->plan->getAssessable()->getCloseAt());
     }
 
