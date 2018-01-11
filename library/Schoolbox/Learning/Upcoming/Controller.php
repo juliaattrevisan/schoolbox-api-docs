@@ -11,6 +11,7 @@ use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
 use External_ClassInterface;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\DueDateSortStrategy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -142,7 +143,7 @@ class Controller extends Base
         // Student's work
         $allWork = $this->assessmentDataSource
             ->findAllByStudent($student, $term)
-            ->sortBy('dueAt', 'asc');
+            ->sortByCallback(new DueDateSortStrategy($student));
 
         // A little different for JSON requests
         // TODO determine if it's appropriate to display in this way
