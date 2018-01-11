@@ -10,7 +10,6 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 use Alaress\Database\Predicate\Builder;
-use Alaress_Date_Format;
 use Database;
 use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -48,7 +47,6 @@ class RubricMapper
      */
     static protected $instance;
 
-
     /**
      * Retrieves the singleton instance of this class.
      *
@@ -60,17 +58,15 @@ class RubricMapper
         if (!isset(self::$instance[$class_name])) {
             self::$instance[$class_name] = new static();
         }
+
         return self::$instance[$class_name];
     }
-
-
 
     /** @var Database */
     protected $database;
 
     /** @var Factory */
     protected $factory;
-
 
     /** */
     public function __construct()
@@ -79,10 +75,10 @@ class RubricMapper
         $this->factory  = new Factory(new Rubric());
     }
 
-
     /**
      * @param AssessmentContext $context
      * @param string[]          $levelNames
+     *
      * @return Rubric
      */
     public function createForContext(AssessmentContext $context, array $levelNames = [])
@@ -92,7 +88,7 @@ class RubricMapper
             return $this->createForContext($context->getBaseContext(), $levelNames);
         }
 
-        $folderId = $context->getFolder()->getId();
+        $folderId       = $context->getFolder()->getId();
         $parentFolderId = null;
 
         if ($context instanceof UnitSpecification) {
@@ -104,23 +100,27 @@ class RubricMapper
 
     /**
      * Generate a base rubric with Indicators (aka Criteria) taken from the specified Folder[/s]
+     *
      * @deprecated use of ::createForContext() is preferable
      *
-     * @param int $folderId
+     * @param int      $folderId
      * @param int|null $parentFolderId
      * @param string[] $levelNames
+     *
      * @return Rubric
      */
     public function createForFolder($folderId, $parentFolderId = null, array $levelNames = [])
     {
         /**
          * Indexed by normalised Capability name
+         *
          * @var Criteria\Group[] $capabilityCache
          */
         $capabilityCache = [];
 
         /**
          * Indexed by normalised Capability name, then normalised Indicator name
+         *
          * @var Criteria\Criterion $indicatorCache
          */
         $indicatorCache = [];
@@ -129,7 +129,7 @@ class RubricMapper
 
         if (!count($levelNames)) {
             // default to 2 blank levels
-            $levelNames = [ '', '' ];
+            $levelNames = ['', ''];
         }
 
         // inject the levels
@@ -138,7 +138,7 @@ class RubricMapper
         }
 
         $args = ['folderId' => $folderId];
-        if($parentFolderId){
+        if ($parentFolderId) {
             $args['parentFolderId'] = $parentFolderId;
         }
         $in = implode(', :', array_keys($args));
@@ -176,8 +176,8 @@ class RubricMapper
 
             // First time we've seen this Capability + Indicator, or Indicator
             // is from the parentFolder (higher priority) ?
-            if(!isset($indicatorCache[$capabilityNormalisedName][$indicatorNormalisedName])
-            || ($parentFolderId && $parentFolderId == $r['parent_id'])
+            if (!isset($indicatorCache[$capabilityNormalisedName][$indicatorNormalisedName])
+                || ($parentFolderId && $parentFolderId == $r['parent_id'])
             ) {
                 $indicator = new Criteria\Criterion($r['id'], $this->normalizeSpace($r['name']));
                 $indicator->setReadOnly($r['usage_count'] > 0);
@@ -186,10 +186,10 @@ class RubricMapper
         }
 
         // For each group of Indicators
-        foreach($indicatorCache as $capabilityNormalisedName => $indicators){
+        foreach ($indicatorCache as $capabilityNormalisedName => $indicators) {
 
             // For each Indicator in the Capability
-            foreach($indicators as $indicatorNormalisedName => $indicator){
+            foreach ($indicators as $indicatorNormalisedName => $indicator) {
                 /** @var Criteria\Criterion $indicator */
                 // cascade the read-onlyness up to the Capability
                 if ($indicator->isReadOnly()) {
@@ -202,7 +202,6 @@ class RubricMapper
         return $rubric;
     }
 
-
     /**
      * Given a box ID, return the rubric assigned to it, if any
      *
@@ -211,6 +210,7 @@ class RubricMapper
      * @param SubmissionBox $box
      * @param bool          $getParentCriteria - whether to include box's folder's parent's criteria
      * @param bool          $editMode          - whether to include criteria not in use on box
+     *
      * @return Rubric
      */
     public function findBySubmissionBox(SubmissionBox $box, $getParentCriteria = false, $editMode = false)
@@ -220,16 +220,19 @@ class RubricMapper
         $levelList   = $this->generateLevelList($box);
 
         // setup the data structure to match what the factory expects
-        $postdata = [$box->getId() => [
-            'level'      => $levelList,
-            'group'      => $groups,
-            'criterion'  => $criteria,
-            'descriptor' => $descriptors,
-        ]];
+        $postdata = [
+            $box->getId() => [
+                'level'      => $levelList,
+                'group'      => $groups,
+                'criterion'  => $criteria,
+                'descriptor' => $descriptors,
+            ],
+        ];
 
         // use the factory to produce the rubric object
         /** @var Rubric $rubric */
         $rubric = $this->factory->buildFromPostData($postdata, $getParentCriteria || $editMode);
+
         return $rubric->setSubmissionBox($box);
     }
 
@@ -239,15 +242,16 @@ class RubricMapper
      * @param DueWork\Model $dueWork
      * @param bool          $getParentCriteria - whether to include box's folder's parent's criteria
      * @param bool          $editMode          - whether to include criteria not in use on box
+     *
      * @return Rubric
      */
     public function findByDueWork(DueWork\Model $dueWork, $getParentCriteria = false, $editMode = false)
     {
         /** @var SubmissionBox $box */
         $box = SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $dueWork->getId());
+
         return $this->findBySubmissionBox($box, $getParentCriteria, $editMode);
     }
-
 
     /**
      * Find all criteria that are available or in use by the $box.
@@ -257,30 +261,31 @@ class RubricMapper
      *
      * @param SubmissionBox $box
      * @param bool          $getParentCriteria - if specified, also get criteria the box's folder's parent
+     *
      * @return array $return
-     * @var array  $return[0]                 Groups
-     * @var array  $return[0][]               A single Criteria-Group
-     * @var string $return[0][]['name']       Name of the Criteria-Group
-     * @var array  $return[1]                 Criteria
-     * @var array  $return[1][]               A single Criterion
-     * @var int    $return[1][]['groupId']    Arbitrary GroupId (not stored in DB, just used to link to a Criteria-Group)
-     * @var bool   $return[1][]['on']         Whether this criteria is selected to be used in the $box
-     * @var string $return[1][]['name']       Name of Criterion
-     * @var bool   $return[1][]['readonly']   Whether user should be prevented from changing name
+     * @var array           $return            [0]                 Groups
+     * @var array           $return            [0][]               A single Criteria-Group
+     * @var string          $return            [0][]['name']       Name of the Criteria-Group
+     * @var array           $return            [1]                 Criteria
+     * @var array           $return            [1][]               A single Criterion
+     * @var int             $return            [1][]['groupId']    Arbitrary GroupId (not stored in DB, just used to link to a Criteria-Group)
+     * @var bool            $return            [1][]['on']         Whether this criteria is selected to be used in the $box
+     * @var string          $return            [1][]['name']       Name of Criterion
+     * @var bool            $return            [1][]['readonly']   Whether user should be prevented from changing name
      */
     protected function findCriteria(SubmissionBox $box, $getParentCriteria)
     {
         // why 20? because it's not 0. (arbitrary start of group indexes)
-        $groupId    = 20;
+        $groupId = 20;
 
         /** @var array $groupIdMap - indexed by criterion-group name */
         $groupIdMap = [];
 
         /** @var array $groups - indexed by groupId */
-        $groups     = [];
+        $groups = [];
 
         /** @var array $criteria - indexed by criterion.id */
-        $criteria   = [];
+        $criteria = [];
 
         $criteriaStatement = $this->generateCriteriaStatement($box, $getParentCriteria);
 
@@ -293,7 +298,7 @@ class RubricMapper
                 ++$groupId;
 
                 $groupIdMap[$groupName] = $groupId;
-                $groups[$groupId] = [ 'name' => $groupName ];
+                $groups[$groupId]       = ['name' => $groupName];
             }
 
             // check for usage
@@ -303,14 +308,14 @@ class RubricMapper
                 'groupId'  => $groupIdMap[$groupName],
                 'on'       => $r['selected'] > 0,
                 'name'     => $r['name'],
-                'readonly' => $usedElsewhere
+                'readonly' => $usedElsewhere,
             ];
         }
 
         // umm... I have *never* had to do this before... how does the while() loop break if not EOF??
         $criteriaStatement->closeCursor();
 
-        return [ $groups, $criteria ];
+        return [$groups, $criteria];
     }
 
     /**
@@ -322,6 +327,7 @@ class RubricMapper
      *
      * @param SubmissionBox $box
      * @param bool          $getParentCriteria - whether to also get criteria from box's folder's parent
+     *
      * @throws \Schoolbox\Mapper\Exception
      * @return \PDOStatement
      */
@@ -332,10 +338,10 @@ class RubricMapper
             'folderId' => $box->getCategory()->getId(),
         ];
 
-        $in = [ 'folderId' ];
+        $in = ['folderId'];
 
         // Retrieve criteria from the box's folder's parent ?
-        if($getParentCriteria){
+        if ($getParentCriteria) {
 
             // Is parent not yet hydrated?
             if (!$box->getCategory()->getParent()) {
@@ -380,9 +386,9 @@ class RubricMapper
         return $criteriaStatement;
     }
 
-
     /**
      * @param SubmissionBox $box
+     *
      * @return array
      */
     protected function findDescriptors(SubmissionBox $box)
@@ -405,36 +411,36 @@ class RubricMapper
         return $descriptors;
     }
 
-
     /**
      * @param SubmissionBox $box
+     *
      * @return array
      */
     protected function generateLevelList(SubmissionBox $box)
     {
         $levelList = [];
 
-        $levelCollection = LevelMapper::getInstance()->findByColumn('box_id', $box->getId(), [ 'order' => [ 'sequence' => 'ASC' ] ]);
+        $levelCollection = LevelMapper::getInstance()->findByColumn('box_id', $box->getId(), ['order' => ['sequence' => 'ASC']]);
 
         foreach ($levelCollection as $level) {
             $levelList[$level->getSequence()] = [
                 'id'   => $level->getId(),
-                'name' => $level->getName()
+                'name' => $level->getName(),
             ];
         }
 
         // ensure there are ALWAYS at least 2 levels
         while (count($levelList) < 2) {
-            $levelList[] = [ 'name' => '' ];
+            $levelList[] = ['name' => ''];
         }
 
         return $levelList;
     }
 
-
     /**
      * @param Rubric $grid
      * @param int[]  $selectedDescriptorIds
+     *
      * @return Rubric
      */
     public function applyMark(Rubric $grid, array $selectedDescriptorIds)
@@ -448,65 +454,68 @@ class RubricMapper
     }
 
     /**
-     * @param Rubric $grid
-     * @param User   $student
-     * @param bool   $publishedOnly       Whether to exclude draft marks
+     * @param Rubric   $grid
+     * @param User     $student
+     * @param bool     $publishedOnly Whether to exclude draft marks
+     * @param null|int $responseId
+     *
      * @return Rubric
      */
-    public function applyStudentMark(Rubric $grid, User $student, $publishedOnly)
+    public function applyStudentMark(Rubric $grid, User $student, $publishedOnly, $responseId = null)
     {
-        if (!$grid->getSubmissionBox() instanceof SubmissionBox) {
-            throw new \InvalidArgumentException("Cannot apply marks without a submission box");
+
+        $pb = new Builder($this->database, '');
+        $pb->equals('sr.owner', $student->getId());
+        $pb->equals('sr.box_id', $grid->getSubmissionBox()->getId());
+        $pb->isNull('sr.deleted_at');
+        if ($publishedOnly) {
+            $pb->notNull('sr.published_at');
+        }
+        if ($responseId) {
+            $pb->equals('sr.student_submission_id', $responseId);
         }
 
-        $publishedClause = $publishedOnly ? 'AND rm.published_at IS NOT NULL' : '';
+        $whereClause = implode(' AND ', $pb->getWhere());
+        $dateOrder   = $publishedOnly ? 'sr.published_at' : 'sr.created_at';
 
         // retrieve marks (descriptor selections for student)
-        $stmt = $this->database->query("
+        $query = "
             SELECT rm.descriptor_id
             FROM rubric_mark rm
-            JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
-            JOIN rubric_level rl ON rl.id = rd.level_id
-            WHERE rl.box_id = :boxId
-            AND rm.student_id = :userId
-            $publishedClause
-            AND rm.valid = TRUE
-            AND rm.created_at = (
-              SELECT MAX(created_at)
-              FROM rubric_mark rm
-              JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
-              JOIN rubric_level rl ON rl.id = rd.level_id AND rl.deleted_at IS NULL
-              WHERE rl.box_id = :boxId
-              AND rm.student_id = :userId
-              AND rm.valid = TRUE
-              $publishedClause
+            LEFT JOIN submission_return sr ON sr.id = rm.return_id
+            WHERE rm.valid = TRUE
+            AND rm.return_id = (
+              SELECT sr.id
+              FROM submission_return sr
+              WHERE $whereClause
+              ORDER BY $dateOrder DESC
+              LIMIT 1
             )
-            
-        ", [
-            'boxId'  => $grid->getSubmissionBox()->getId(),
-            'userId' => $student->getId()
-        ]);
+        ";
+
+        $statement = $this->database->query($query, $pb->getParams());
 
         $descriptorIds = [];
 
-        while ($id = $stmt->fetchColumn()) {
+        while ($id = $statement->fetchColumn()) {
             $descriptorIds[$id] = true;
         }
 
         return $this->applyMark($grid, array_keys($descriptorIds));
     }
 
-
     /**
      * Convenience (or safety) method wrapping grid fetch and mark application
      *
      * @param SubmissionBox $box
-     * @param User $student
+     * @param User          $student
+     *
      * @return Rubric
      */
     public function findBySubmissionBoxAndStudent(SubmissionBox $box, User $student)
     {
         $grid = $this->findBySubmissionBox($box);
+
         return $this->applyStudentMark($grid, $student, true);
     }
 
@@ -517,13 +526,13 @@ class RubricMapper
      * with a single space.
      *
      * @param  string $string
+     *
      * @return string
      */
     protected function normalizeSpace($string)
     {
         return trim(preg_replace('`\s+`', ' ', $string));
     }
-
 
     /**
      * Converts a Criterion name for comparison. Do NOT use for mutation before storage.
@@ -533,13 +542,13 @@ class RubricMapper
      * * trims whitespace
      *
      * @param $string
+     *
      * @return string
      */
     public function normaliseForComparison($string)
     {
         return strtolower($this->normalizeSpace($string));
     }
-
 
     protected function getcsv($fp, $limit = 13)
     {
@@ -564,6 +573,7 @@ class RubricMapper
      * @param IStorage $file
      * @param int      $folderId
      * @param int      $maxLevels
+     *
      * @throws \Schoolbox\Resource\Exception
      * @return Rubric
      */
@@ -571,12 +581,12 @@ class RubricMapper
     {
         $square = [];
 
-        $folderLookup = [ $folderId ];
+        $folderLookup = [$folderId];
 
         // Determine if the specified folder has a UnitSpec
         /** @var UnitSpecification $unitSpec */
         $unitSpec = UnitSpecificationMapper::getInstance()->findByColumn('folder_id', $folderId)->first();
-        if($unitSpec){
+        if ($unitSpec) {
             // Add the Unit's Course's Folder's ID
             $folderLookup[] = $unitSpec->getCourse()->getFolder()->getId();
         }
@@ -593,7 +603,7 @@ class RubricMapper
         // first 2 "cells" must be blank
         if ($headerRow[0] || $headerRow[1]) {
             //Excel was getting rid of levels that are not set so lets try and repair
-            $headerRow = array_fill(0, count($headerRow),'');
+            $headerRow = array_fill(0, count($headerRow), '');
             rewind($fp);
         }
 
@@ -620,10 +630,10 @@ class RubricMapper
                 $row[0] = $workingGroupName;
 
                 // extract the criterion uniquely
-                $workingCritName = $row[1];
+                $workingCritName                               = $row[1];
                 $criteria[$workingGroupName][$workingCritName] = [
                     'id'   => null,
-                    'name' => $workingCritName
+                    'name' => $workingCritName,
                 ];
             }
 
@@ -642,18 +652,18 @@ class RubricMapper
                         'grouping'    => $group,
                         'name'        => $name,
                         'parent_type' => 'category',
-                        'parent_id'   => $folderLookup
+                        'parent_id'   => $folderLookup,
                     ]);
 
                 } catch (\Schoolbox\Mapper\Exception $e) {
 
                     // if the crit doesn't exist, create and save
                     $model = CriterionMapper::getInstance()
-                                                      ->createModel()
-                                                      ->setName($name)
-                                                      ->setGrouping($group)
-                                                      ->setParentType('category')
-                                                      ->setParentId($folderId);
+                                            ->createModel()
+                                            ->setName($name)
+                                            ->setGrouping($group)
+                                            ->setParentType('category')
+                                            ->setParentId($folderId);
 
                     CriterionMapper::getInstance()->save($model);
                 }
@@ -698,57 +708,55 @@ class RubricMapper
                     $postdata['descriptor'][$critId][$levelSequence] = [
                         'id'     => null,
                         'text'   => $dText,
-                        'points' => $dVal
+                        'points' => $dVal,
                     ];
                 }
             }
         }
 
         /** @var Rubric $rubric */
-        $rubric = $this->factory->buildFromPostData([ 0 => $postdata ], true);
+        $rubric = $this->factory->buildFromPostData([0 => $postdata], true);
+
         return $rubric;
     }
 
     /**
      * Save rubrics selections for a particular Participant
      *
-     * @param Participant                $participant
-     * @param bool[]                     $descriptors key = descriptor.id, val = whether it is checked
-     * @param bool                       $isDraft     Whether these are draft marks
-     * @param int                        $returnId
+     * @param Participant $participant
+     * @param bool[]      $descriptors key = descriptor.id, val = whether it is checked
+     * @param int         $returnId    Feedback
      */
-    public function saveForParticipant(Participant $participant, array $descriptors = [], $isDraft, $returnId)
+    public function saveForParticipant(Participant $participant, array $descriptors = [], $returnId)
     {
-        $descriptorMapper   = DescriptorMapper::getInstance();
-        $markMapper         = MarkMapper::getInstance();
-        $publishedAt        = $isDraft ? new \Alaress_Date_NullDate() : Alaress_Date_Format::now();
+        $descriptorMapper = DescriptorMapper::getInstance();
+        $markMapper       = MarkMapper::getInstance();
 
         $returnedWorkMapper = SubmissionBox\ReturnedWorkMapper::getInstance();
 
-        // Blow away any previous draft marks for this student and assessment
-        $markMapper->deleteDraftMarks($participant->getUser(), $participant->getAssessable());
+        // Blow away any previous descriptor records with the feedback
+        $markMapper->deleteFeedbackMarks($returnId);
 
         $marksToSave = $markMapper->createCollection();
 
-        foreach($descriptors as $descriptorId => $isChecked){
-            if(!$isChecked){
+        foreach ($descriptors as $descriptorId => $isChecked) {
+            if (!$isChecked) {
                 continue;
             }
 
             $marksToSave->add(
                 $markMapper->createModel()
-                    ->setSubmissionReturn($returnedWorkMapper->createModel($returnId))
-                    ->setStudent($participant->getUser())
-                    ->setDescriptor($descriptorMapper->createModel($descriptorId))
-                    ->setPublishedAt($publishedAt)
-                    ->setValid(true)
+                           ->setSubmissionReturn($returnedWorkMapper->createModel($returnId))
+                           ->setDescriptor($descriptorMapper->createModel($descriptorId))
+                           ->setValid(true)
             );
         }
+
         $markMapper->save($marksToSave);
     }
 
     /**
-     * @param Rubric $rubric
+     * @param Rubric        $rubric
      * @param SubmissionBox $submissionBox
      */
     public function save(Rubric $rubric, SubmissionBox $submissionBox)
@@ -757,9 +765,11 @@ class RubricMapper
         $rubric->setSubmissionBox($submissionBox);
 
         // TODO some way to wrap all this in a transaction would be nice... -_-;
-        $existingLevelIds = LevelMapper::getInstance()->findIdsByColumn('box_id', $submissionBox->getId());
+        $existingLevelIds    = LevelMapper::getInstance()->findIdsByColumn('box_id', $submissionBox->getId());
         $existingDescriptors = DescriptorMapper::getInstance()->findByColumn('level_id', $existingLevelIds);
-        $existingDescriptors = $existingDescriptors->map(function(Descriptor $d){return clone $d;});
+        $existingDescriptors = $existingDescriptors->map(function (Descriptor $d) {
+            return clone $d;
+        });
 
         // first, persist the row and column headers (criteria and levels, respectively)
         CriterionMapper::getInstance()->save($criteria = $rubric->getORMCriteria());
@@ -770,7 +780,7 @@ class RubricMapper
         UsageMapper::getInstance()->save($usages = $rubric->getORMUsages());
 
         // finally, now that everything else is saved, save the descriptors
-        $descIds  = DescriptorMapper::getInstance()->save($descs = $rubric->getORMDescriptors());
+        $descIds = DescriptorMapper::getInstance()->save($descs = $rubric->getORMDescriptors());
 
         $this->checkDescriptorValueChanges($existingDescriptors, $descs);
 
@@ -781,7 +791,7 @@ class RubricMapper
         foreach ($descs as $desc) {
             $seenLevels[$desc->getLevel()->getId()] = true;
         }
-        $seenLevels   = array_keys($seenLevels);
+        $seenLevels = array_keys($seenLevels);
 
         $this->tidyUp(LevelMapper::getInstance(), ['box_id' => $submissionBox->getId()], $seenLevels);
 
@@ -790,7 +800,6 @@ class RubricMapper
         $this->tidyUp(DescriptorMapper::getInstance(), ['level_id' => $levelIds], $descIds);
     }
 
-
     /**
      * Soft-delete any rubric levels used by the specified submission boxes if they
      * no longer contain any non-deleted descriptors.
@@ -798,6 +807,7 @@ class RubricMapper
      * Returns the count of levels soft-deleted.
      *
      * @param int[] $submissionBoxIds
+     *
      * @return int
      */
     public function deleteEmptyLevels(array $submissionBoxIds)
@@ -824,7 +834,6 @@ class RubricMapper
         return $levelMapper->deleteByColumn($levelMapper->getIdentifierColumn(), $levelIds);
     }
 
-
     /**
      * Invalidates selected student marks if already given for this rubric and the rubric has changed.
      *
@@ -834,12 +843,13 @@ class RubricMapper
      *
      * @param Collection|Descriptor[] $existingDescriptors
      * @param Collection|Descriptor[] $newDescriptors The newly saved descriptors
+     *
      * @return bool Did we invalidate any descriptors?
      */
     protected function checkDescriptorValueChanges(Collection $existingDescriptors, Collection $newDescriptors)
     {
         // Group descriptors by criterionId, then LevelId, to enable O(1) lookup
-        $criteriaCallback = function(Descriptor $descriptor){
+        $criteriaCallback = function (Descriptor $descriptor) {
             return $descriptor->getCriterion()->getId();
         };
         /** @var Collection|Descriptor[][] $existingCriteriaDescriptors */
@@ -847,38 +857,37 @@ class RubricMapper
         /** @var Collection|Descriptor[][] $newCriteriaDescriptors */
         $newCriteriaDescriptors = $newDescriptors->groupByCallback($criteriaCallback);
 
-        $levelsCallback = function(Descriptor $descriptor){
+        $levelsCallback = function (Descriptor $descriptor) {
             return $descriptor->getLevel()->getId();
         };
-        foreach($existingCriteriaDescriptors as $existingCriterionDescriptors){
+        foreach ($existingCriteriaDescriptors as $existingCriterionDescriptors) {
             $existingCriterionDescriptors->indexByCallback($levelsCallback);
         }
-        foreach($newCriteriaDescriptors as $newCriterionDescriptors){
+        foreach ($newCriteriaDescriptors as $newCriterionDescriptors) {
             $newCriterionDescriptors->indexByCallback($levelsCallback);
         }
 
         // Have any descriptor values been updated ? (but not completely deleted)
         $hasDescriptorValuesChanged = false;
-        $deletedDescriptors = DescriptorMapper::getInstance()->createCollection();
-        foreach($existingCriteriaDescriptors as $criterionId => $existingCriterionDescriptors)
-        {
+        $deletedDescriptors         = DescriptorMapper::getInstance()->createCollection();
+        foreach ($existingCriteriaDescriptors as $criterionId => $existingCriterionDescriptors) {
             /** @var Collection $newCriterionDescriptors */
             $newCriterionDescriptors = $newCriteriaDescriptors->getOffset($criterionId);
 
             // Have we deleted this criterion?
-            if(!$newCriterionDescriptors){
+            if (!$newCriterionDescriptors) {
                 // Make a note of them, we may need you later...
                 $deletedDescriptors = $deletedDescriptors->merge($existingCriterionDescriptors);
                 continue;
             }
 
             // Examine each descriptor in this criterion
-            foreach($existingCriterionDescriptors as $levelId => $existingDescriptor){
+            foreach ($existingCriterionDescriptors as $levelId => $existingDescriptor) {
                 /** @var Descriptor $newDescriptor */
                 $newDescriptor = $newCriterionDescriptors->getOffset($levelId);
 
                 // Has the descriptor been deleted?
-                if(!$newDescriptor){
+                if (!$newDescriptor) {
                     $hasDescriptorValuesChanged = true;
                     break;
                 }
@@ -886,7 +895,7 @@ class RubricMapper
                 // Has the value changed ?
                 $existingValue = $existingDescriptor->getValue();
                 $newValue      = $newDescriptor->getValue();
-                if($existingValue != $newValue){
+                if ($existingValue != $newValue) {
                     $hasDescriptorValuesChanged = true;
                     break;
                 }
@@ -894,19 +903,21 @@ class RubricMapper
         }
 
         // Did we detect a value change?
-        if($hasDescriptorValuesChanged){
+        if ($hasDescriptorValuesChanged) {
             $this->invalidateDescriptorMarks($existingDescriptors);
+
             return true;
         }
 
         // Did we delete any criterion?
-        if($deletedDescriptors->count()){
+        if ($deletedDescriptors->count()) {
             $this->invalidateDescriptorMarks($deletedDescriptors);
+
             return true;
         }
+
         return false;
     }
-
 
     /**
      * Invalidates all marks given for the specified descriptors
@@ -915,24 +926,24 @@ class RubricMapper
      */
     protected function invalidateDescriptorMarks(Collection $descriptors)
     {
-        $markMapper = MarkMapper::getInstance();
+        $markMapper    = MarkMapper::getInstance();
         $descriptorIds = $descriptors->getColumnValues('id');
-        $columnList = [
+        $columnList    = [
             'descriptor_id' => $descriptorIds,
             'valid'         => true,
         ];
-        $marks = $markMapper->findByColumnList($columnList);
-        foreach($marks as $mark){
+        $marks         = $markMapper->findByColumnList($columnList);
+        foreach ($marks as $mark) {
             $mark->setValid(false);
         }
         $markMapper->save($marks);
     }
 
-
     /**
      * @param IMapper $mapper
-     * @param array $search
-     * @param array $exclude
+     * @param array   $search
+     * @param array   $exclude
+     *
      * @return bool
      */
     protected function tidyUp(IMapper $mapper, array $search, array $exclude)
@@ -947,7 +958,6 @@ class RubricMapper
         );
     }
 
-
     /**
      * Specialised query for returning the longitudinal cross-section of rubric data for a
      * student and set of DueWorks. Data is returned in a primitive hierarchy of:
@@ -958,20 +968,21 @@ class RubricMapper
      *
      * @param GenericCollection|DueWork\Model[] $dueWorks
      * @param User                              $student
+     *
      * @return array $longitude
-     * @var array  $longitude[$capability]
-     * @var string $longitude[$capability]['name']
-     * @var array  $longitude[$capability][$indicator]
-     * @var string $longitude[$capability][$indicator]['name']
-     * @var array  $longitude[$capability][$indicator]['activities']
-     * @var array  $longitude[$capability][$indicator]['activities'][$assessmentId]
-     * @var int    $longitude[$capability][$indicator]['activities'][$assessmentId]['id']
-     * @var string $longitude[$capability][$indicator]['activities'][$assessmentId]['name']
-     * @var string $longitude[$capability][$indicator]['activities'][$assessmentId]['descriptor']
+     * @var array                               $longitude [$capability]
+     * @var string                              $longitude [$capability]['name']
+     * @var array                               $longitude [$capability][$indicator]
+     * @var string                              $longitude [$capability][$indicator]['name']
+     * @var array                               $longitude [$capability][$indicator]['activities']
+     * @var array                               $longitude [$capability][$indicator]['activities'][$assessmentId]
+     * @var int                                 $longitude [$capability][$indicator]['activities'][$assessmentId]['id']
+     * @var string                              $longitude [$capability][$indicator]['activities'][$assessmentId]['name']
+     * @var string                              $longitude [$capability][$indicator]['activities'][$assessmentId]['descriptor']
      */
     public function getLongitudinal(GenericCollection $dueWorks, User $student)
     {
-        if(0 === $dueWorks->count()){
+        if (0 === $dueWorks->count()) {
             return [];
         }
 
@@ -979,9 +990,10 @@ class RubricMapper
 
         $pb
             ->equals('sb.assessment_id', $dueWorks->getColumnValues('id'))
-            ->equals('rm.student_id', $student->getId())
-            ->notNull('rm.published_at')
+            ->equals('sr.owner', $student->getId())
+            ->notNull('sr.published_at')
             ->isTrue('rm.valid')
+            ->isNull('sr.deleted_at')
             ->isNull('rd.deleted_at')
             ->isNull('rl.deleted_at')
             ->isNull('rc.deleted_at')
@@ -1009,17 +1021,19 @@ class RubricMapper
             JOIN rubric_descriptor rd ON rl.id = rd.level_id
             JOIN rubric_criterion  rc ON rc.id = rd.criterion_id
             JOIN rubric_mark       rm ON rd.id = rm.descriptor_id
+            JOIN submission_return sr ON sr.id = rm.return_id
             JOIN (
-                SELECT a.id AS 'a.id', rc.id AS 'rc.id', max(rm.published_at) AS 'rm.max_published_at'
+                SELECT a.id AS 'a.id', rc.id AS 'rc.id', max(sr.published_at) AS 'sr.max_published_at'
                 FROM rubric_mark       rm
                 JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
                 JOIN rubric_criterion  rc ON rc.id = rd.criterion_id
                 JOIN rubric_level      rl ON rl.id = rd.level_id
                 JOIN submission_box    sb ON sb.id = rl.box_id
                 JOIN assessment         a ON  a.id = sb.assessment_id
+                JOIN submission_return sr ON sr.id = rm.return_id
                 WHERE {$where}
                 GROUP BY sb.assessment_id, rd.criterion_id
-            ) t ON `a`.`id` = `t`.`a.id` AND `rc`.`id` = `t`.`rc.id` AND `rm`.`published_at` = `t`.`rm.max_published_at`
+            ) t ON `a`.`id` = `t`.`a.id` AND `rc`.`id` = `t`.`rc.id` AND `sr`.`published_at` = `t`.`sr.max_published_at`
             WHERE {$where}
             ORDER BY rc.grouping ASC, rc.name ASC, a.due_date DESC;
         ");
@@ -1032,8 +1046,8 @@ class RubricMapper
 
             list ($capability, $indicator, $assessmentId, $assessmentTitle, $descriptor) = $r;
 
-            $longitude[$capability]['name'] = $capability;
-            $longitude[$capability]['indicators'][$indicator]['name'] = $indicator;
+            $longitude[$capability]['name']                                                = $capability;
+            $longitude[$capability]['indicators'][$indicator]['name']                      = $indicator;
             $longitude[$capability]['indicators'][$indicator]['activities'][$assessmentId] = [
                 'id'         => $assessmentId,
                 'name'       => $assessmentTitle,
@@ -1060,6 +1074,7 @@ class RubricMapper
      *
      * @param int $sourceAssessmentId
      * @param int $destinationAssessmentId
+     *
      * @return bool Whether a new Rubric was created.
      */
     public function copyRubric($sourceAssessmentId, $destinationAssessmentId)
@@ -1077,7 +1092,7 @@ class RubricMapper
         $srcLevels = $levelMapper->findByColumn('box_id', $sourceBox->getId())->indexBy('id');
 
         // If no levels, the source box does not have a rubric. Bug out.
-        if(!count($srcLevels)){
+        if (!count($srcLevels)) {
             return false;
         }
 
@@ -1086,16 +1101,16 @@ class RubricMapper
         // Cannot mutate identity of objects returned from mappers.
         // Index all these collections by source version ID, even though the object will be destination version.
         /** @var Level[]|GenericCollection $dstLevels */
-        $dstLevels      = $levelMapper->createCollection();
+        $dstLevels = $levelMapper->createCollection();
         /** @var Descriptor[]|GenericCollection $dstDescriptors */
         $dstDescriptors = $descriptorMapper->createCollection();
         /** @var Criterion[]|GenericCollection $dstCriteria */
-        $dstCriteria    = $criterionMapper->createCollection();
+        $dstCriteria = $criterionMapper->createCollection();
         /** @var Usage[]|GenericCollection $dstUsages */
-        $dstUsages      = $usageMapper->createCollection();
+        $dstUsages = $usageMapper->createCollection();
 
         // Copy Levels
-        foreach($srcLevels as $srcLevel){
+        foreach ($srcLevels as $srcLevel) {
             $dstLevel = clone $srcLevel;
             $dstLevel->setId(null);
             $dstLevel->setSubmissionBox($dstBox);
@@ -1106,7 +1121,7 @@ class RubricMapper
         // Get Source Descriptors
         /** @var Descriptor[]|GenericCollection $srcDescriptors */
         $srcDescriptors = $descriptorMapper->findByColumn('level_id', $srcLevels->getColumnValues('id'))->indexBy('id');
-        $srcCriteria = $criterionMapper->createCollection();
+        $srcCriteria    = $criterionMapper->createCollection();
 
         /* Get existing destination criteria.
          *
@@ -1118,28 +1133,27 @@ class RubricMapper
          */
         /** @var Descriptor $firstSrcDescriptor */
         $firstSrcDescriptor = $srcDescriptors->first();
-        $existingCriteria = $criterionMapper->findByColumnList([
+        $existingCriteria   = $criterionMapper->findByColumnList([
             'parent_id'   => $dstBox->getCategory()->getId(),
             'parent_type' => $firstSrcDescriptor->getCriterion()->getParentType(),
         ], ['cache' => false]);
         // Convert to 2-D arrays, indexed by 'group' then 'name', so we can later find duplicates.
         /** @var Criterion[][] $existingGroupMap */
         $existingGroupMap = [];
-        foreach($existingCriteria as $existingCriterion){
-            $group = $this->normaliseForComparison($existingCriterion->getGrouping());
-            $name  = $this->normaliseForComparison($existingCriterion->getName());
+        foreach ($existingCriteria as $existingCriterion) {
+            $group                           = $this->normaliseForComparison($existingCriterion->getGrouping());
+            $name                            = $this->normaliseForComparison($existingCriterion->getName());
             $existingGroupMap[$group][$name] = $existingCriterion;
         }
 
-
         // Build new Rubric for destination box
-        foreach($srcDescriptors as $srcDescriptor){
+        foreach ($srcDescriptors as $srcDescriptor) {
 
             // Copy source Criterion or re-use existing Criterion
             $srcCriterionId = $srcDescriptor->getCriterion()->getId();
 
             // First time we've traversed this Criterion ?
-            if(!$srcCriteria->getOffset($srcCriterionId)){
+            if (!$srcCriteria->getOffset($srcCriterionId)) {
 
                 $srcCriterion = $srcDescriptor->getCriterion();
                 $srcCriteria->setOffset($srcCriterionId, $srcCriterion);
@@ -1147,17 +1161,17 @@ class RubricMapper
                 // Does this Criterion already exist on destination folder ?
 
                 $duplicate = false;
-                $group = $this->normaliseForComparison($srcCriterion->getGrouping());
-                $name  = null;
-                if(array_key_exists($group, $existingGroupMap)){
+                $group     = $this->normaliseForComparison($srcCriterion->getGrouping());
+                $name      = null;
+                if (array_key_exists($group, $existingGroupMap)) {
                     $name = $this->normaliseForComparison($srcCriterion->getName());
-                    if(array_key_exists($name, $existingGroupMap[$group])){
+                    if (array_key_exists($name, $existingGroupMap[$group])) {
                         $duplicate = true;
                     }
                 }
 
                 // Did we find an existing Criterion with the same name?
-                if($duplicate){
+                if ($duplicate) {
                     $dstCriterion = $existingGroupMap[$group][$name];
                 } else {
                     $dstCriterion = clone $srcDescriptor->getCriterion();
@@ -1190,7 +1204,7 @@ class RubricMapper
         ]);
 
         // Copy Usages
-        foreach($srcUsages as $srcUsage){
+        foreach ($srcUsages as $srcUsage) {
             $dstUsage = clone $srcUsage;
 
             /** @var Criterion $dstCriterion */
@@ -1206,6 +1220,7 @@ class RubricMapper
         $criterionMapper->save($dstCriteria);
         $descriptorMapper->save($dstDescriptors);
         $usageMapper->save($dstUsages);
+
         return true;
     }
 }

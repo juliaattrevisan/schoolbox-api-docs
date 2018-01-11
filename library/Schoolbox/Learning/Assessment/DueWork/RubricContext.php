@@ -36,26 +36,28 @@ class RubricContext
     /**
      * Get a markable grid for Rubrics marking
      *
-     * @param DueWork $dueWork
-     * @param User $student
+     * @param DueWork  $dueWork
+     * @param User     $student
+     * @param null|int $responseId
+     *
      * @return array
      */
-    public function generateMarkable(DueWork $dueWork, User $student)
+    public function generateMarkable(DueWork $dueWork, User $student, $responseId)
     {
-        if(!$dueWork->getUseRubric()){
+        if (!$dueWork->getUseRubric()) {
             return ['rubric' => null];
         }
 
         $markTypeSlug = $dueWork->getMarkType()->getSlug();
 
         $publishedOnly = false;
-        $this->rubricMapper->applyStudentMark($dueWork->getRubric(), $student, $publishedOnly);
+        $this->rubricMapper->applyStudentMark($dueWork->getRubric(), $student, $publishedOnly, $responseId);
 
         $context = [
-            'rubric' => $dueWork->getRubric()->toContext(),
+            'rubric'   => $dueWork->getRubric()->toContext(),
             'markType' => [
-                'mode' => $markTypeSlug
-            ]
+                'mode' => $markTypeSlug,
+            ],
         ];
 
         /* Inject available levels for this DueWork's GradeGroup
@@ -75,15 +77,16 @@ class RubricContext
      * Get a readonly grid and the student's current published rubric values
      *
      * @param DueWork $dueWork
-     * @param User $student
-     * @param User $currentUser
-     * @param Access $access
-     * @param bool $publishedOnly
+     * @param User    $student
+     * @param User    $currentUser
+     * @param Access  $access
+     * @param bool    $publishedOnly
+     *
      * @return array
      */
     public function generate(DueWork $dueWork, User $student, User $currentUser, Access $access, $publishedOnly = true)
     {
-        if(!$dueWork->getUseRubric()){
+        if (!$dueWork->getUseRubric()) {
             return ['rubric' => null];
         }
 
@@ -106,11 +109,12 @@ class RubricContext
      * Get a student agnostic readonly grid
      *
      * @param DueWork $dueWork
+     *
      * @return array
      */
     public function generateBasic(DueWork $dueWork, User $currentUser)
     {
-        if(!$dueWork->getUseRubric()){
+        if (!$dueWork->getUseRubric()) {
             return ['rubric' => null];
         }
 

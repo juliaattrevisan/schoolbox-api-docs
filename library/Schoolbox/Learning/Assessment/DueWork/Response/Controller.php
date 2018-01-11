@@ -298,7 +298,7 @@ class Controller extends Base
         // Should rubric be readonly or markable?
         $data['rubricContext'] = $isInteractionLocked && !$this->getUser()->isSuperuser()
             ? $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false)
-            : $rubricContext->generateMarkable($assessment, $participant->getUser());
+            : $rubricContext->generateMarkable($assessment, $participant->getUser(), ($response ? $response->getId() : null));
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/standard.twig', $data));
     }

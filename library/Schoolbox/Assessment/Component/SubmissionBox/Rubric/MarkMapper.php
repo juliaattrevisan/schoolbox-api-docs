@@ -16,7 +16,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 /**
  * Class MarkMapper
@@ -42,11 +41,7 @@ class MarkMapper extends Mapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
 
         $this->joins('return_id', ReturnedWorkMapper::class, 'id', self::TYPE_MODEL, null, 'submissionReturn', 'submission_return');
-        $this->joins('student_id', UserMapper::class, 'id', null, null, null, 'user');
         $this->joins('descriptor_id', DescriptorMapper::class, 'id', null, null, null, 'descriptor');
-
-        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
-        $this->uses('published_at', self::TYPE_DATETIME);
 
         // This is NOT a soft-delete column. It specifically relates to when a teacher alters a rubric's structure,
         // hence marks already given are invalid because they take their value from the rubric descriptor.
@@ -62,11 +57,9 @@ class MarkMapper extends Mapper
         return "
             SELECT  {$this->getColumnString()},
                     {$this->getJoinColumnString('submission_return', 'r')},
-                    {$this->getJoinColumnString('user', 'u')},
                     {$this->getJoinColumnString('descriptor', 'd')}
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('submission_return', '', 'r')}
-            LEFT JOIN {$this->getJoinSql('user', '', 'u')}
             LEFT JOIN {$this->getJoinSql('descriptor', '', 'd')}
         ";
     }
@@ -81,20 +74,11 @@ class MarkMapper extends Mapper
         /** @var ReturnedWorkMapper $submissionReturnMapper */
         $submissionReturnMapper = $this->getJoinMapper('submission_return');
         $marks = $this->createCollection();
-        $students = $this->getJoinMapper('user')->createCollection();
         $descriptors = $this->getJoinMapper('descriptor')->createCollection();
 
-        $studentKey = "u.{$this->getJoinMapper('user')->getIdentifierColumn()}";
         $descriptorKey = "d.{$this->getJoinMapper('descriptor')->getIdentifierColumn()}";
 
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
-
-            $userId = $r[$studentKey];
-            if(!$students->offsetExists($userId)){
-                $students->setOffset($userId, $this->hydrateJoin($r, 'user', 'u'));
-            }
-            /** @var User $student */
-            $student = $students->getOffset($userId);
 
             $descriptorId = $r[$descriptorKey];
             if(!$descriptors->offsetExists($descriptorId)){
@@ -105,7 +89,6 @@ class MarkMapper extends Mapper
 
             $mark = $this->hydrate($r);
             $mark->setSubmissionReturn($submissionReturnMapper->hydrate($r, 'r'));
-            $mark->setStudent($student);
             $mark->setDescriptor($descriptor);
             $marks->add($mark);
         }
@@ -114,66 +97,25 @@ class MarkMapper extends Mapper
     }
 
     /**
-     * This will HARD-DELETE all draft marks for the specified user and assessable.
+     * This will HARD-DELETE all previously given marks with the feedback.
      *
-     * @param User $user
-     * @param IAssessable $dueWork
+     * @param int  $returnId
      * @return int
      */
-    public function deleteDraftMarks(User $user, IAssessable $dueWork)
+    public function deleteFeedbackMarks($returnId)
     {
         $query = "
-            DELETE rm FROM rubric_mark rm 
-                JOIN rubric_descriptor rd ON rm.descriptor_id = rd.id
-                JOIN rubric_level   rl ON rl.id = rd.level_id
-                JOIN submission_box sb ON sb.id = rl.box_id
-                WHERE rm.student_id = :student_id
-                AND sb.assessment_id = :assessment_id
-                AND rm.published_at IS NULL
+            DELETE FROM rubric_mark 
+                WHERE return_id = :return_id;
         ";
 
         $statement = $this->database->prepare($query);
         $statement->execute([
-            'student_id'    => $user->getId(),
-            'assessment_id' => $dueWork->getId(),
+            'return_id' => $returnId,
         ]);
 
         return $statement->rowCount();
     }
-
-    /**
-     * Publishes any draft marks for the specified User and DueWork
-     *
-     * @param User $user
-     * @param IAssessable $dueWork
-     * @return int How many marks were published.
-     */
-    public function publishDraftMarks(User $user, IAssessable $dueWork)
-    {
-        $now = \Alaress_Date_Format::now();
-
-        $query = "
-                UPDATE rubric_mark rm
-                JOIN rubric_descriptor rd ON rm.descriptor_id = rd.id
-                JOIN rubric_level   rl ON rl.id = rd.level_id
-                JOIN submission_box sb ON sb.id = rl.box_id
-                SET
-                  rm.published_at = :now
-                WHERE rm.student_id = :student_id
-                AND sb.assessment_id = :assessment_id
-                AND rm.published_at IS NULL
-        ";
-
-        $statement = $this->database->prepare($query);
-        $statement->execute([
-            'now'           => $now->getDatabase(),
-            'student_id'    => $user->getId(),
-            'assessment_id' => $dueWork->getId(),
-        ]);
-
-        return $statement->rowCount();
-    }
-
 
     /**
      * Get a list of students who have some form of rubric marked for an assessment
@@ -184,20 +126,15 @@ class MarkMapper extends Mapper
     public function findMarkedByAssessment($assessment_id)
     {
         $query = "
-            SELECT            rubric_mark.student_id,
-                              COUNT(*)
-            FROM              rubric_mark
-            INNER JOIN        rubric_descriptor ON
-                              rubric_descriptor.id = rubric_mark.descriptor_id
-            INNER JOIN        rubric_level ON
-                              rubric_level.id = rubric_descriptor.level_id
-            INNER JOIN        submission_box ON 
-                              submission_box.id = rubric_level.box_id
-            INNER JOIN        assessment ON 
-                              assessment.id = submission_box.assessment_id
-            WHERE             valid = 1
-                              AND assessment.id = :assessmentId
-            GROUP BY          rubric_mark.student_id
+            SELECT            sr.owner AS student_id, COUNT(rm.id)
+            FROM              rubric_mark rm
+            INNER JOIN        rubric_descriptor rd ON rd.id = rm.descriptor_id
+            INNER JOIN        rubric_level rl ON rl.id = rd.level_id
+            INNER JOIN        submission_box sb ON sb.id = rl.box_id
+            INNER JOIN        assessment a ON a.id = sb.assessment_id
+            LEFT JOIN         submission_return sr ON sr.box_id = sb.id
+            WHERE             valid = 1 AND a.id = :assessmentId AND sr.deleted_at IS NULL
+            GROUP BY          sr.owner
         ";
         $stmt = $this->database->prepare($query);
         $stmt->execute([
