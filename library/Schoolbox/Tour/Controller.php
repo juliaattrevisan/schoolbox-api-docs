@@ -129,6 +129,10 @@ class Controller extends Base
                 $this->tourStatusMapper->delete($oldTourStatus);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 //Could not find old step in db...
+                $this->getResponse()->content->set($this->buildJsonOutput("Could not find previous status to delete. Will not save next status."));
+                $this->getResponse()->status->set(404);
+                return;
+
             }
         }
 
@@ -143,9 +147,16 @@ class Controller extends Base
                       ->setStatus($post['status']);
 
         try {
+            //Check if the corresponding step exists
+            $this->tourStepMapper->findOneByColumn("uuid", $post['newStep']);
             $this->tourStatusMapper->save($newTourStatus);
+
         } catch (\Schoolbox\Mapper\Exception $e) {
             //Attempted to save invalid data
+            $this->getResponse()->content->set($this->buildJsonOutput("Invalid status data. Did not save status."));
+            $this->getResponse()->status->set(400);
+            return;
+
         }
     }
 
