@@ -172,6 +172,9 @@ class Mapper extends BaseMapper implements IExceptionGenerator
     const ERROR_COMPLETE_BEFORE_SELF_REFLECT = 202;
 
     const ERROR_GROUP_NIAN_DENIED = 203;
+
+    const ERROR_ASSESSMENT_DELETED = 205;
+
     /**
      * Setup mapping
      */

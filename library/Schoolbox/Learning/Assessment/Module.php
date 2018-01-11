@@ -86,6 +86,16 @@ class Module extends BaseModule
         $preloadParticipant = function ($params) { return $this->preloadParticipant($params); };
 
         // rules in use
+        $notDeleted = new Rule\Callback(function(array $params){
+            /** @var IAssessable $assessment */
+            $assessment = $params['assessment'];
+
+            if($assessment->isDeleted()) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_ASSESSMENT_DELETED);
+            }
+
+        });
+
         $isSuper            = $this->getAuthRule('isSuperuser');
         $loggedIn           = $this->getAuthRule('isLoggedIn');
         $canWrite           = $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE);
@@ -93,6 +103,7 @@ class Module extends BaseModule
         $participantView    = $this->buildAuthRuleParticipantView();
         $canSubmit          = $this->buildAuthRuleCanSubmit();
         $canWriteAndNotSpec = $this->buildAuthRuleCanWriteAndNotSpec();
+        $canWriteAndNotSpec = new Rule\All($canWriteAndNotSpec, $notDeleted);
         $canAckSubmission   = $this->buildAuthRuleCanAcknowledgeSubmission();
 
         $canDelete = new Rule\Any(
@@ -102,6 +113,9 @@ class Module extends BaseModule
                 new IsDeletionUnLocked(new LockedChecker($this->getTermMapper()))
             )
         );
+
+
+
 
         $canModify = new Rule\Any(
             $isSuper,
