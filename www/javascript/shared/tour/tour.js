@@ -39,13 +39,20 @@ $(function () {
                     // so we can alternate between the different types appropriately.
                     var stepsToDisplay = [];
 
+                    function isOffscreen(element) {
+                        return $(element).position().left < 0
+                            || $(element).position().left > window.innerWidth
+                            || $(element).position().top < 0
+                            || $(element).position().top > window.innerHeight;
+                    }
+
                     function isVisible(element) {
                         // Note that :visible does not check if element has visibility == hidden,
                         // hence the need for a separate check
-                        // TODO this does not handle offscreen elements (i.e. left: -1000px)
                         return (
                             ($(element).css("visibility") !== "hidden")
                             && ($(element).is(":visible"))
+                            && (! isOffscreen(element))
                         );
                     }
 
