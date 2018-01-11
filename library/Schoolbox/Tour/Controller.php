@@ -120,11 +120,12 @@ class Controller extends Base
     {
         $this->getResponse()->content->set($this->buildJsonOutput(null));
 
+        /** @var User $user */
+        $user          = $this->getUser();
+
         //Delete previous step
         if ($oldStep != null) {
             try {
-                /** @var User $user */
-                $user          = $_SESSION["user"];
                 $oldTourStatus = $this->tourStatusMapper->findByColumnList(["current_step" => $oldStep, "url" => $url, "user_id" => $user->getId()]);
                 $this->tourStatusMapper->delete($oldTourStatus);
             } catch (\Schoolbox\Mapper\Exception $e) {
@@ -134,13 +135,13 @@ class Controller extends Base
 
         //Save new status
         $newStep = $this->tourStepMapper->createModel();
-        $newStep->setUuid($_POST['newStep']);
+        $newStep->setUuid($this->getRequest()->post['newStep']);
 
         $newTourStatus = $this->tourStatusMapper->createModel();
         $newTourStatus->setTourStep($newStep)
-                      ->setUser($_SESSION['user'])
+                      ->setUser($user)
                       ->setUrl($url)
-                      ->setStatus($_POST['status']);
+                      ->setStatus($this->getRequest()->post['status']);
 
         try {
             $this->tourStatusMapper->save($newTourStatus);
