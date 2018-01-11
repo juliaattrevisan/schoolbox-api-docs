@@ -46,9 +46,11 @@ $(function () {
                         steps: stepsToDisplay.filter(function(obj) { return $(obj.element).is(':visible'); })
                     });
 
+
                     var oldStep = null;
                     var completed  = false;
                     var tourUrl = window.location.pathname;
+                    //TO DO: Inject route when file is pluginerised
                     var saveRoute = '/tour/url/save';
 
                     tourCurrent.onchange(function(targetElement) {
