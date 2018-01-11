@@ -90,28 +90,26 @@ class DueWork_Rubric_Handler
             JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
             JOIN rubric_criterion rc  ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
             JOIN submission_return sr ON sr.id = rm.return_id
-			JOIN submission_box sb    ON sb.id = sr.box_id
-			JOIN assessment a         ON  a.id = sb.assessment_id
+            JOIN submission_box sb    ON sb.id = sr.box_id
+            JOIN assessment a         ON  a.id = sb.assessment_id
             JOIN (
                 -- ^Changed from LEFT JOIN to JOIN to allow filter out deleted feedbacks 
                 -- Get the latest published marks
                 SELECT
-                  sr.id AS r_id,
-                  sr.owner AS 'owner',
-                  sb.id AS 'sb_id',
-                  rc.id AS 'rc_id'
+                    MAX(sr.published_at) AS 'max_published_at',
+                    sr.id AS r_id,
+                    sr.owner AS 'student_id',
+                    sr.box_id AS 'sb_id'
                 FROM rubric_mark rm
                 JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
                 JOIN rubric_criterion rc  ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
-				JOIN submission_return sr ON sr.id = rm.return_id
+                JOIN submission_return sr ON sr.id = rm.return_id
                 JOIN submission_box sb    ON sb.id = sr.box_id
-                JOIN assessment a         ON a.id = sb.assessment_id
+                JOIN assessment a         ON  a.id = sb.assessment_id
                 WHERE {$whereClauseInner}
                 AND rm.valid
                 AND sr.published_at IS NOT NULL
-                AND sr.deleted_at IS NULL
-                ORDER BY sr.published_at DESC
-                LIMIT 1
+                GROUP BY sr.owner, sr.box_id, sr.id
             ) t ON t.r_id = rm.return_id
             WHERE {$whereClauseOuter}
             AND rm.valid
