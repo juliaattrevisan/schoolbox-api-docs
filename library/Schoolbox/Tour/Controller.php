@@ -132,14 +132,15 @@ class Controller extends Base
             }
         }
 
-        //Save new step
-        $newTourStatus = $this->tourStatusMapper->createModel();
+        //Save new status
         $newStep = $this->tourStepMapper->createModel();
         $newStep->setUuid($_POST['newStep']);
-        $newTourStatus->setTourStep($newStep);
-        $newTourStatus->setUser($_SESSION['user']);
-        $newTourStatus->setUrl($url);
-        $newTourStatus->setStatus($_POST['status']);
+
+        $newTourStatus = $this->tourStatusMapper->createModel();
+        $newTourStatus->setTourStep($newStep)
+                      ->setUser($_SESSION['user'])
+                      ->setUrl($url)
+                      ->setStatus($_POST['status']);
 
         try {
             $this->tourStatusMapper->save($newTourStatus);

@@ -77,6 +77,7 @@ class Model implements \JsonSerializable
     public function setUser($user)
     {
         $this->user = $user;
+        return $this;
     }
 
 
@@ -95,6 +96,7 @@ class Model implements \JsonSerializable
     public function setUrl($url)
     {
         $this->url = $url;
+        return $this;
     }
 
 
@@ -113,6 +115,7 @@ class Model implements \JsonSerializable
     public function setTourStep($tourStep)
     {
         $this->tourStep = $tourStep;
+        return $this;
     }
 
 
