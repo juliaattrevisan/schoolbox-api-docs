@@ -22,111 +22,113 @@
 {% endif %}
 
 
-{# ----------------------------------------------------------- #}
-{# Title #}
-{# ----------------------------------------------------------- #}
-<label>
-    Title
-    <input type="text" name="title" value="{{ assessment.title }}" required maxlength="255"/>
-</label>
+<fieldset>
+    {# ----------------------------------------------------------- #}
+    {# Title #}
+    {# ----------------------------------------------------------- #}
+    <label>
+        Title
+        <input type="text" name="title" value="{{ assessment.title }}" required maxlength="255"/>
+    </label>
 
 
-{# ----------------------------------------------------------- #}
-{# Work Type #}
-{# ----------------------------------------------------------- #}
-<label>
-    Work Type
-    <select name="workType">
-        <option value="" selected>None</option>
-        {% for workType in allWorkTypes %}
-            <option value="{{ workType.id }}" {% if assessment.workType.id == workType.id %}selected="selected"{% endif %}>{{ workType.name }}</option>
-        {% endfor %}
-    </select>
-</label>
+    {# ----------------------------------------------------------- #}
+    {# Work Type #}
+    {# ----------------------------------------------------------- #}
+    <label>
+        Work Type
+        <select name="workType">
+            <option value="" selected>None</option>
+            {% for workType in allWorkTypes %}
+                <option value="{{ workType.id }}" {% if assessment.workType.id == workType.id %}selected="selected"{% endif %}>{{ workType.name }}</option>
+            {% endfor %}
+        </select>
+    </label>
 
 
-{# ----------------------------------------------------------- #}
-{# Description #}
-{# ----------------------------------------------------------- #}
-<label>
-    Description<span class="hint has-tip tip-top" data-tooltip title="This content will be shown to users before they begin to attempt the quiz.">?</span>
-    <textarea name="description" id="assessment-description">{{ assessment.description }}</textarea>
-</label>
+    {# ----------------------------------------------------------- #}
+    {# Description #}
+    {# ----------------------------------------------------------- #}
+    <label>
+        Description<span class="hint has-tip tip-top" data-tooltip title="This content will be shown to users before they begin to attempt the quiz.">?</span>
+        <textarea name="description" id="assessment-description">{{ assessment.description }}</textarea>
+    </label>
 
 
-{# ----------------------------------------------------------- #}
-{# Completion Message #}
-{# ----------------------------------------------------------- #}
-<label>
-    Completion Message<span class="hint has-tip tip-top" data-tooltip title="This content will be shown to users when they complete the quiz.">?</span>
-    <textarea name="completion_message">{{ assessment.completionMessage }}</textarea>
-</label>
+    {# ----------------------------------------------------------- #}
+    {# Completion Message #}
+    {# ----------------------------------------------------------- #}
+    <label>
+        Completion Message<span class="hint has-tip tip-top" data-tooltip title="This content will be shown to users when they complete the quiz.">?</span>
+        <textarea name="completion_message">{{ assessment.completionMessage }}</textarea>
+    </label>
 
 
-{# ----------------------------------------------------------- #}
-{# Max Attempts #}
-{# ----------------------------------------------------------- #}
-<div class="row">
-    <div class="small-12 columns">
-        <label>
-            Max Attempts<span class="hint has-tip tip-top" data-tooltip title="This is how many times a user can begin the quiz again.">?</span>
-            {% set maxAttempts = 10 %}
+    {# ----------------------------------------------------------- #}
+    {# Max Attempts #}
+    {# ----------------------------------------------------------- #}
+    <div class="row">
+        <div class="small-12 columns">
+            <label>
+                Max Attempts<span class="hint has-tip tip-top" data-tooltip title="This is how many times a user can begin the quiz again.">?</span>
+                {% set maxAttempts = 10 %}
 
-            <select name="maxAttempts">
+                <select name="maxAttempts">
 
-                {% for i in 0..maxAttempts %}
-                    {% if i == assessment.maxAttempts %}
-                        {% set selected = 'selected' %}
-                    {% else %}
-                        {% set selected = '' %}
-                    {% endif %}
+                    {% for i in 0..maxAttempts %}
+                        {% if i == assessment.maxAttempts %}
+                            {% set selected = 'selected' %}
+                        {% else %}
+                            {% set selected = '' %}
+                        {% endif %}
 
-                    {% if i == 0 %}
-                        <option value="{{ i }}" {{ selected }}>Unlimited</option>
-                    {% else %}
-                        <option value="{{ i }}" {{ selected }}>{{ i }}</option>
-                    {% endif %}
-                {% endfor %}
+                        {% if i == 0 %}
+                            <option value="{{ i }}" {{ selected }}>Unlimited</option>
+                        {% else %}
+                            <option value="{{ i }}" {{ selected }}>{{ i }}</option>
+                        {% endif %}
+                    {% endfor %}
 
-            </select>
-        </label>
-    </div>
-</div>
-
-
-{# ----------------------------------------------------------- #}
-{# Default Activity Duration #}
-{# ----------------------------------------------------------- #}
-{% include '@learningAssessment/fragments/default_open_span.twig' with {assessment: assessment} only %}
-
-
-{# ----------------------------------------------------------- #}
-{# Allowed Time #}
-{# ----------------------------------------------------------- #}
-<div class="row">
-    <div class="small-5 medium-2 columns">
-        <label for="hasDuration">Allowed Time<span class="hint has-tip tip-top" data-tooltip title="After starting a quiz, students will have this much time to complete it. Switch off for no limit.">?</span></label>
-        <div class="switch round">
-            <input name="hasDuration" id="hasDuration" type="checkbox" {% if assessment.duration != -1 %}checked="checked"{% endif %} />
-            <label for="hasDuration">
-                <span class="icon-approve"></span>
-                <span class="icon-cancel"></span>
+                </select>
             </label>
         </div>
     </div>
-    <div class="small-7 medium-10 columns no-pad {% if assessment.duration == -1 %}hide{% endif %}" id="durationPanel">
-        <div class="small-6 columns">
-            <label>Hours
-                <input name='durationHours' type="text" value="{% if assessment.duration != -1 %}{{ assessment.durationComponents.hours }}{% endif %}" />
-            </label>
+
+
+    {# ----------------------------------------------------------- #}
+    {# Default Activity Duration #}
+    {# ----------------------------------------------------------- #}
+    {% include '@learningAssessment/fragments/default_open_span.twig' with {assessment: assessment} only %}
+
+
+    {# ----------------------------------------------------------- #}
+    {# Allowed Time #}
+    {# ----------------------------------------------------------- #}
+    <div class="row">
+        <div class="small-5 medium-2 columns">
+            <label for="hasDuration">Allowed Time<span class="hint has-tip tip-top" data-tooltip title="After starting a quiz, students will have this much time to complete it. Switch off for no limit.">?</span></label>
+            <div class="switch round">
+                <input name="hasDuration" id="hasDuration" type="checkbox" {% if assessment.duration != -1 %}checked="checked"{% endif %} />
+                <label for="hasDuration">
+                    <span class="icon-approve"></span>
+                    <span class="icon-cancel"></span>
+                </label>
+            </div>
         </div>
-        <div class="small-6 columns">
-            <label>Minutes
-                <input name='durationMinutes' type="text" value="{% if assessment.duration != -1 %}{{ assessment.durationComponents.minutes }}{% endif %}" />
-            </label>
+        <div class="small-7 medium-10 columns no-pad {% if assessment.duration == -1 %}hide{% endif %}" id="durationPanel">
+            <div class="small-6 columns">
+                <label>Hours
+                    <input name='durationHours' type="text" value="{% if assessment.duration != -1 %}{{ assessment.durationComponents.hours }}{% endif %}" />
+                </label>
+            </div>
+            <div class="small-6 columns">
+                <label>Minutes
+                    <input name='durationMinutes' type="text" value="{% if assessment.duration != -1 %}{{ assessment.durationComponents.minutes }}{% endif %}" />
+                </label>
+            </div>
         </div>
     </div>
-</div>
+</fieldset>
 
 
 {# ----------------------------------------------------------- #}

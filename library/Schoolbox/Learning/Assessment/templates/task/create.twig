@@ -5,36 +5,38 @@
 <input type="hidden" name="type" value="{% if assessment.url|length %}url{% else %}attach{% endif %}"/>
 
 
-{# ----------------------------------------------------------- #}
-{# Title #}
-{# ----------------------------------------------------------- #}
-<label>
-    Title
-    <input type="text" name="title" value="{{ assessment.title }}" required maxlength="255"/>
-</label>
+<fieldset>
+    {# ----------------------------------------------------------- #}
+    {# Title #}
+    {# ----------------------------------------------------------- #}
+    <label>
+        Title
+        <input type="text" name="title" value="{{ assessment.title }}" required maxlength="255"/>
+    </label>
 
 
-{# ----------------------------------------------------------- #}
-{# Work Type #}
-{# ----------------------------------------------------------- #}
-<label>
-    Work Type
-    <select name="workType">
-        <option value="" selected>None</option>
-        {% for workType in allWorkTypes %}
-            <option value="{{ workType.id }}" {% if assessment.workType.id == workType.id %}selected="selected"{% endif %}>{{ workType.name }}</option>
-        {% endfor %}
-    </select>
-</label>
+    {# ----------------------------------------------------------- #}
+    {# Work Type #}
+    {# ----------------------------------------------------------- #}
+    <label>
+        Work Type
+        <select name="workType">
+            <option value="" selected>None</option>
+            {% for workType in allWorkTypes %}
+                <option value="{{ workType.id }}" {% if assessment.workType.id == workType.id %}selected="selected"{% endif %}>{{ workType.name }}</option>
+            {% endfor %}
+        </select>
+    </label>
 
 
-{# ----------------------------------------------------------- #}
-{# Description #}
-{# ----------------------------------------------------------- #}
-<label>
-    Description
-    <textarea name="description" id="assessment-description">{{ assessment.description }}</textarea>
-</label>
+    {# ----------------------------------------------------------- #}
+    {# Description #}
+    {# ----------------------------------------------------------- #}
+    <label>
+        Description
+        <textarea name="description" id="assessment-description">{{ assessment.description }}</textarea>
+    </label>
+</fieldset>
 
 
 {# ----------------------------------------------------------- #}
