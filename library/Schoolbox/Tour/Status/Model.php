@@ -129,8 +129,6 @@ class Model implements \JsonSerializable
      */
     public function jsonSerialize()
     {
-        // TODO: Implement jsonSerialize() method.
-
         return [
             "user"      => $this->getUser(),
             "url"       => $this->getUrl(),
