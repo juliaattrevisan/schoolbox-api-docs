@@ -136,8 +136,9 @@ class Javascript extends \Calendar\Event\Type\Submission\Renderer\Javascript
         $status = $this->getStatus();
 
         // has this student completed this assessment?
-        $meta['status'] = $status;
-        $meta['complete'] = $status === 'reviewed';
+        $meta['status']       = $status;
+        $meta['completed']    = $status === 'reviewed';
+        $meta['assessmentId'] = $this->getEvent()->getAssessment()->getId();
 
         return $meta;
     }
