@@ -151,7 +151,7 @@ class Controller extends Base
                     return $assessment instanceof Project;
                 });
 
-                $resultSet[] = $this->makeResource($folder, $unit, 0, 'Content Areas');
+                $resultSet[] = $this->makeResource($folder, $unit, 0, 'Mastery Tasks');
 
                 foreach ($projects as $project) {
                     $resultSet[] = $this->makeResource($folder, $unit, $project->getId(), $project->getTitle());
