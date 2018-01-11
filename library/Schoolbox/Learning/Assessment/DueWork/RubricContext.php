@@ -42,7 +42,7 @@ class RubricContext
      *
      * @return array
      */
-    public function generateMarkable(DueWork $dueWork, User $student, $responseId)
+    public function generateMarkable(DueWork $dueWork, User $student, $responseId = null)
     {
         if (!$dueWork->getUseRubric()) {
             return ['rubric' => null];
