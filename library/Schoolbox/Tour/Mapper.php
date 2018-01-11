@@ -169,8 +169,6 @@ class Mapper extends BaseMapper
         ";
 
         if (!$repeat) {
-            /** @var User $user */
-            $user = $_SESSION['user'];
             $userQuery['bindings']['user_id'] = $user->getId();
 
             $sql = $sql. "AND

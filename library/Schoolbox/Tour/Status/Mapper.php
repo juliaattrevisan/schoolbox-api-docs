@@ -34,6 +34,7 @@ class Mapper extends BaseMapper
         $this->joins('current_step', StepMapper::class, 'uuid', null, null, 'tourStep', 'tourStep');
         $this->uses('url', self::TYPE_STRING);
         $this->uses('status', self::TYPE_STRING);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
     }
 
 
