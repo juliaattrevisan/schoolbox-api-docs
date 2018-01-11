@@ -25,12 +25,8 @@
         <textarea name="description" id="assessment-description">{{ assessment.description }}</textarea>
     </label>
 
-    <div class="row">
-        <div class="small-12 columns">
-            <label>Attach Files</label>
-            {% include 'sub/attachzone.twig' %}
-        </div>
-    </div>
+    {% include 'sub/attachzone.twig' %}
+
 </fieldset>
 
 
