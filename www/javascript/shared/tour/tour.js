@@ -39,9 +39,19 @@ $(function () {
                     // so we can alternate between the different types appropriately.
                     var stepsToDisplay = [];
 
+                    function isVisible(element) {
+                        // Note that :visible does not check if element has visibility == hidden,
+                        // hence the need for a separate check
+                        // TODO this does not handle offscreen elements (i.e. left: -1000px)
+                        return (
+                            ($(element).css("visibility") !== "hidden")
+                            && ($(element).is(":visible"))
+                        );
+                    }
+
                     $(tour.steps).each(function (i, step) {
-                        if (step.type === 'tooltip') {
-                            // TODO only push into steps to display if tooltips selector element is visible
+                        if (isVisible(step.selector)) {
+                            // Only use step if its element is visible
                             stepsToDisplay.push({
                                 intro: step.body,
                                 element: step.selector,
@@ -64,7 +74,7 @@ $(function () {
                         scrollTo: 'tooltip',
                         disableInteraction: false,
                         exitOnOverlayClick: false,
-                        steps: stepsToDisplay.filter(function(obj) { return $(obj.element).is(':visible'); })
+                        steps: stepsToDisplay
                     });
 
 
