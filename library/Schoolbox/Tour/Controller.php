@@ -127,7 +127,7 @@ class Controller extends Base
                 $user          = $_SESSION["user"];
                 $oldTourStatus = $this->tourStatusMapper->findByColumnList(["current_step" => $oldStep, "url" => $url, "user_id" => $user->getId()]);
                 $this->tourStatusMapper->delete($oldTourStatus);
-            } catch (Exception $e) {
+            } catch (\Schoolbox\Mapper\Exception $e) {
                 //Could not find old step in db...
             }
         }
@@ -143,7 +143,7 @@ class Controller extends Base
 
         try {
             $this->tourStatusMapper->save($newTourStatus);
-        } catch (Exception $e) {
+        } catch (\Schoolbox\Mapper\Exception $e) {
             //Attempted to save invalid data
         }
     }
