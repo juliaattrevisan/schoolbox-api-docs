@@ -469,18 +469,26 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	}
 
 	// Left nav arrow override
-	ul.off-canvas-list li {
-		&.has-submenu > a:after{
-			font-family: $font-family-icon;
-			content: "\e64b";
-			font-family: 'schoolbox';
-			float: right;
-		}
-		a {
-			color: $off-canvas-foreground;
-			&:hover {
+	ul.off-canvas-list {
+		li {
+			&.has-submenu > a:after {
+				font-family: $font-family-icon;
+				content: "\e64b";
+				font-family: 'schoolbox';
+				float: right;
+			}
+			a {
 				color: $off-canvas-foreground;
-				background-color: $off-canvas-hover;
+				&:hover {
+					color: $off-canvas-foreground;
+					background-color: $off-canvas-hover;
+				}
+			}
+			h3 {
+				a {
+					color: inherit;
+					padding: 0;
+				}
 			}
 		}
 	}
