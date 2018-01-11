@@ -48,18 +48,19 @@ $(function () {
 
                     var oldStep = null;
                     var completed  = false;
-                    var saveRoute = '/tour/url/{url}/{step}';
+                    var tourUrl = window.location.pathname;
+                    var saveRoute = '/tour/url/save';
 
                     tourCurrent.onchange(function(targetElement) {
-                        var tourUrl     = btoa(window.location.pathname);
                         var newStep     = tourCurrent._introItems[tourCurrent._currentStep].uuid;
-                        var postUrl     = saveRoute.replace("{url}", tourUrl).replace("{step}", oldStep || "");
 
                         //This matches the consts on the Status/Model - to be updated when this file is a plugin
                         var status      = "unactioned";
 
                         //Save the status
-                        $.post(postUrl, {
+                        $.post(saveRoute, {
+                            url: tourUrl,
+                            oldStep: oldStep,
                             newStep: newStep,
                             status: status
                         });
@@ -70,15 +71,15 @@ $(function () {
                     tourCurrent.oncomplete(function(targetElement) {
                         completed = true;
 
-                        var tourUrl     = btoa(window.location.pathname);
                         var newStep     = tourCurrent._introItems[tourCurrent._currentStep].uuid;
-                        var postUrl     = saveRoute.replace("{url}", tourUrl).replace("{step}", oldStep || "");
 
                         //This matches the consts on the Status/Model - to be updated when this file is a plugin
                         var status      = "completed";
 
                         //Save the status
-                        $.post(postUrl, {
+                        $.post(saveRoute, {
+                            url: tourUrl,
+                            oldStep: oldStep,
                             newStep: newStep,
                             status: status
                         });
@@ -87,15 +88,15 @@ $(function () {
                     tourCurrent.onexit(function(targetElement) {
                         //onexit triggers when oncomplete triggers, so need check
                         if(!completed) {
-                            var tourUrl = btoa(window.location.pathname);
                             var newStep = tourCurrent._introItems[tourCurrent._currentStep].uuid;
-                            var postUrl = saveRoute.replace("{url}", tourUrl).replace("{step}", oldStep || "");
 
                             //This matches the consts on the Status/Model - to be updated when this file is a plugin
                             var status = "dismissed";
 
                             //Save the status
-                            $.post(postUrl, {
+                            $.post(saveRoute, {
+                                url: tourUrl,
+                                oldStep: oldStep,
                                 newStep: newStep,
                                 status: status
                             });

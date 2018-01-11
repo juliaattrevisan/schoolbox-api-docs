@@ -112,21 +112,20 @@ class Controller extends Base
 
 
     /**
-     * @api POST /url/{url}/{oldStep}
-     * @param $oldStep
-     * @param $url
+     * @api POST /url/save
      */
-    public function saveStatus(?string $oldStep, string $url)
+    public function saveStatus()
     {
         $this->getResponse()->content->set($this->buildJsonOutput(null));
+        $post = $this->getRequest()->post;
 
         /** @var User $user */
         $user          = $this->getUser();
 
-        //Delete previous step
-        if ($oldStep != null) {
+        //Delete previous status
+        if ($post['oldStep'] != null) {
             try {
-                $oldTourStatus = $this->tourStatusMapper->findByColumnList(["current_step" => $oldStep, "url" => $url, "user_id" => $user->getId()]);
+                $oldTourStatus = $this->tourStatusMapper->findByColumnList(["current_step" => $post['oldStep'], "url" => $post['url'], "user_id" => $user->getId()]);
                 $this->tourStatusMapper->delete($oldTourStatus);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 //Could not find old step in db...
@@ -135,13 +134,13 @@ class Controller extends Base
 
         //Save new status
         $newStep = $this->tourStepMapper->createModel();
-        $newStep->setUuid($this->getRequest()->post['newStep']);
+        $newStep->setUuid($post['newStep']);
 
         $newTourStatus = $this->tourStatusMapper->createModel();
         $newTourStatus->setTourStep($newStep)
                       ->setUser($user)
-                      ->setUrl($url)
-                      ->setStatus($this->getRequest()->post['status']);
+                      ->setUrl($post['url'])
+                      ->setStatus($post['status']);
 
         try {
             $this->tourStatusMapper->save($newTourStatus);

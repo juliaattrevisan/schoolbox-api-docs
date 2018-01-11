@@ -30,7 +30,7 @@ class Module extends BaseModule
                 '/getStatus/{tour_uuid}' => 'tourStatus'
             ],
             'POST' => [
-                '/url/{url}{/oldStep}' => 'saveStatus',
+                '/url/save' => 'saveStatus',
             ],
         ]);
     }
