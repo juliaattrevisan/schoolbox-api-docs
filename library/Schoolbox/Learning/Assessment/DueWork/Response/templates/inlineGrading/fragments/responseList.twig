@@ -1,0 +1,33 @@
+{##
+ # This makes a dropdown list of IResponses that this student owns
+ #
+ # @param IAssessable assessment
+ # @param Participant participant
+ # @param IResponse response
+ # @param Collection|IResponse[] responseList
+ #}
+
+{% if responseList|length > 1 %}
+<script>
+    $(function() {
+        {# When a different response is selected from dropdown, navigate to its URL #}
+        $('#response-selector').change(function(event) {
+            event.preventDefault();
+            window.location.href = $(this).find('option:selected').attr('data-url');
+        });
+    });
+</script>
+<div class="row">
+    <div class="small-12 columns">
+        <select id="response-selector" title="Select a Submission">
+            {% for currentResponse in responseList %}
+                {% set viewRoute = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id, responseId: currentResponse.id, response: currentResponse, participant: participant}) %}
+
+                {% if viewRoute %}
+                    <option value="{{ currentResponse.id }}" {% if currentResponse.id == response.id %}selected="selected"{% endif %} data-url="{{ viewRoute }}">#{{ loop.revindex }}. Submission at {{ currentResponse.submittedAt.local }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+    </div>
+</div>
+{% endif %}

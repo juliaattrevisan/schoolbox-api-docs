@@ -85,6 +85,104 @@ class Controller extends Base
         $this->kamiConnector      = $kamiConnector;
     }
 
+    /**
+     * Get the contents of a particular $response for the purposes of Self Reflection
+     *
+     * @param DueWork     $assessment
+     * @param Participant $participant
+     * @param Model       $response
+     * @throws ApplicationException\Exception When trying to access a draft Response when you shouldn't
+     * @throws ServiceNotFound If unable to locate HTML web Output
+     * @throws \Aura\Router\Exception\RouteNotFound If cannot generate a requested route
+     * @throws \InvalidArgumentException If assessment due date is null.
+     * @throws \PDOException If something went wrong when saving the kami document's status
+     * @throws \LogicException If attempting to update the status of a kami doc that is not processing.
+     * @throws \UnexpectedValueException If unexpected status change is reported from Kami API
+     */
+    public function getParticularResponseForSelfReflection(
+        DueWork $assessment,
+        Participant $participant,
+        Model $response
+    ): void
+    {
+
+        /* Self-Assessment/Self Reflection: the response must be provided from the url param
+         * Assume this is the one to load. To continue with his part of self-assessment workflow check the
+         * participation setting. Learners are allowed in this section with a non-submitted Response under
+         * these circumstances
+         */
+        $selfAssessedWithResponse = (new ValidSelfAssessmentWithResponse())->isSatisfiedBy($this->getUser(), $participant);
+        $selfReflectedWithResponse = (new ValidSelfReflectionWithResponse())->isSatisfiedBy($this->getUser(), $participant);
+
+        if (!$selfAssessedWithResponse && !$selfReflectedWithResponse) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_COMPLETE_BEFORE_SELF_REFLECT);
+        }
+
+        /* For the last bread node
+         */
+        $breadcrumbNode = 'Self Assessment/Reflection';
+
+        if ($selfAssessedWithResponse) {
+            $breadcrumbNode = $this->getDi()->get('sitePage')->getLocalisedTerm('selfAssessment', false, true);
+        }
+        elseif ($selfReflectedWithResponse) {
+            $breadcrumbNode = $this->getDi()->get('sitePage')->getLocalisedTerm('selfReflection', false, true);
+        }
+
+        // The zone which contains the files
+        $latestFeedback    = $participant->findMostRecentFeedback();
+        $attachZoneFactory = new Attachzone\Factory();
+        $attachZone        = $attachZoneFactory->buildForDueWorkFeedback($latestFeedback);
+
+        // Is the page being displayed in readonly mode?
+        $isInteractionLocked = (new LockedChecker($this->termMapper))->isLockedForInteractions($assessment);
+
+        $data = [
+            'assessment' => $assessment,
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
+                ->add([$assessment->getTitle(), $this->getRouter()->generate('learningAssessment.getSummary',['assessmentId' => $assessment->getId(), 'studentId' => $participant->getUser()->getId()])])
+                ->add([$breadcrumbNode, '']),
+            'response' => $response,
+            'latestFeedback' => $latestFeedback,
+            'attachzone' => $attachZone->getTwigContext(),
+            'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
+
+            /* For saving feedbacks
+             */
+            'participant' => $participant,
+
+            /* I need this, otherwise Combobox dies catastrophically
+             */
+            'errors' => [],
+
+            /* Plagscan status
+             */
+            'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
+            'interactionLocked' => $isInteractionLocked,
+        ];
+
+        /* Rubrics data
+        */
+        $rubricMapper = RubricMapper::getInstance();
+        if($assessment->getUseRubric()){
+            $assessment->setRubric($rubricMapper->findByDueWork($assessment));
+        }
+        $rubricContext = new RubricContext($rubricMapper);
+
+        // Should rubric be readonly or markable?
+        $data['rubricContext'] = $isInteractionLocked && !$this->getUser()->isSuperuser()
+            ? $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false)
+            : $rubricContext->generateMarkable($assessment, $participant->getUser());
+
+        /* Figure out who's actually here and what screen to show
+         */
+        if ($selfAssessedWithResponse) {
+            $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/selfAssessment.twig', $data));
+        }
+        elseif ($selfReflectedWithResponse) {
+            $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/selfReflection.twig', $data));
+        }
+    }
 
     /**
      * Get the contents of a particular $response
@@ -110,6 +208,7 @@ class Controller extends Base
         Participant $participant,
         Model $response = null
     ): void {
+
         /* Module doesn't have access to $this->getUser()
          *
          * Superusers can see draft Responses in the inline grader
@@ -117,6 +216,7 @@ class Controller extends Base
          */
         $mostRecentResponse = $participant->findMostRecentSubmittedResponse();
         if (!$response) {
+
             $response             = $mostRecentResponse;
             $isMostRecentResponse = true;
         } else {
@@ -166,7 +266,6 @@ class Controller extends Base
             'selectedFileHash' => $this->getRequest()->query['hash'],
             'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
             'carousel' => (new StudentCarousel($this->getRouter(), $participant->getUser(), $assessment))->produce(),
-            'submissionStates' => \DueWork_ErrorMapper::getInstance()->findAll(),
 
             /* A list of all the Responses that the participant has spawned
              */
@@ -201,7 +300,7 @@ class Controller extends Base
             ? $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false)
             : $rubricContext->generateMarkable($assessment, $participant->getUser());
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/response.twig', $data));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/standard.twig', $data));
     }
 
 

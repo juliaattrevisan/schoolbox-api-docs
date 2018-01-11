@@ -1,0 +1,104 @@
+{% extends '@learningDueWorkResponse/inlineGrading/standard.twig' %}
+
+{# Go back to the assessment's summary screen, I guess? #}
+{% block nextUrl %}
+<script>
+    var nextUrl = '{{ routeLookup("learningAssessment.getSummary", {assessmentId: assessment.id, studentId: participant.user.id}) }}';
+</script>
+{% endblock %}
+
+{# No participant carousel in self-reflection #}
+{% block participantCarousel %}{% endblock %}
+
+{# No delete capability in self-reflection #}
+{% block meta %}
+    {% include '@learningDueWorkResponse/inlineGrading/fragments/meta.twig' with {
+        title: locale.selfReflection.proper ~ ' for',
+        assessment: assessment,
+        participant: participant,
+        responseList: responseList,
+        response: response,
+        readonly: readonly,
+        deleteRoute: false
+    } only %}
+{% endblock %}
+
+{# Different button text in self-reflection #}
+{% block dynamicFeedback %}
+    {% include '@learningDueWorkResponse/inlineGrading/fragments/dynamicFeedback.twig' with {
+        publishText: 'Submit self-reflection',
+        publishingText: 'Submitting self-reflection...',
+        publishedText: 'Submitted self-reflection'
+    } only %}
+{% endblock %}
+
+{# No response list in self-reflection #}
+{% block responseList %}{% endblock %}
+
+{# No response file preview in self-reflection #}
+{% block responseFilePreview %}{% endblock %}
+
+{# No response file list in self-reflection #}
+{% block responseFileList %}{% endblock %}
+
+{# No subheading in self-reflection #}
+{% block subheading %}{% endblock %}
+
+{# Instructions for the self-reflection #}
+{% block instructions %}
+    {% if rubricContext.rubric %}
+        {% set text = 'rubric and'  %}
+    {% endif %}
+
+<div class="row">
+    <div class="small-12 columns">
+        <div class="alert-box">{% spaceless %}
+            Use the {{ text }} comment box below to submit a {{ locale.selfReflection.singularForm }} before you submit this
+            work to your teacher for feedback.
+            {% endspaceless %}</div>
+    </div>
+</div>
+{% endblock %}
+
+{# Maybe out of date message doesn't exist here #}
+{% block mightBeOutofDate %}{% endblock %}
+
+{# No rubric descriptor/group/overall totals in self-reflection #}
+{% block rubricGrid %}
+    {% set showDescriptorValue = false %}
+    {% set showGroupTotal = false %}
+    {% set showRubricTotal = false %}
+
+    {{ parent() }}
+{% endblock %}
+
+{# No grade value input in self-reflection #}
+{% block gradeValue %}{% endblock %}
+
+{# Provide comment input field in self-reflection, but in different size #}
+{% block comment %}
+    <div class="small-12 column">
+        {% include '@learningAssessment/dueWork/comment.twig' with {
+            participant: participant,
+            tabIndex: 2,
+            readonly: readonly
+        } only %}
+    </div>
+{% endblock %}
+
+{# Action Bar #}
+{% block actionButtons %}
+    {% spaceless %}
+        {% set buttons %}
+            <span class="button disabled" data-draft="drafted" title="Saved as draft" {% if not isDraftFeedback %}style="display:none;"{% endif %}>Saved as Draft</span>
+            {% if not readonly %}
+                <a class="button" data-draft="publish"></a>
+            {% endif %}
+        {% endset %}
+    {% endspaceless %}
+
+    {% include '@learningAssessment/fragments/actionBar.twig' with {
+        actionStyle:  '',
+        buttons: buttons
+    } only %}
+{% endblock %}

@@ -229,6 +229,22 @@ class Participant
 
 
     /**
+     * Specifically find the most recent draft
+     * There should be no reason to have multiple drafts, unless bad/corrupted data
+     *
+     * @return IResponse|null
+     */
+    public function findMostRecentDraftResponse(): ?IResponse
+    {
+        if ($this->allResponses->count()) {
+            return $this->allResponses->filterBy('submittedAt', true)->sortBy('submittedAt', 'desc')->first();
+        }
+
+        return null;
+    }
+
+
+    /**
      * @return IResponse|null
      */
     public function findMostRecentSubmittedResponse()

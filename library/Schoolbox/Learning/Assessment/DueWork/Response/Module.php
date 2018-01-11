@@ -84,6 +84,7 @@ class Module extends BaseModule
         $this->register('DELETE', $responsePattern, 'deleteParticularResponse',  $hasWriteAccess, $preloadParticipant); // a || r
 
         $this->register('GET', $participantPattern . '/responses{/responseId:\d+}', 'getParticularResponse', $hasInlineAccess, $preloadParticipant); // a || r
+        $this->register('GET', $participantPattern . '/responses/self/{responseId:\d+}', 'getParticularResponseForSelfReflection', $hasInlineAccess, $preloadParticipant); // a || r
 
         $this->register('GET', $plagscanPattern,             'getPlagscanReport',         $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
         $this->register('GET', $plagscanPattern . '/iframe', 'getPlagscanReportContents', $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r

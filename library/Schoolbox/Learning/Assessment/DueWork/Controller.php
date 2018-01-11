@@ -17,6 +17,10 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessment;
+use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessmentWithResponse;
+use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfReflection;
+use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfReflectionWithResponse;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
@@ -761,11 +765,21 @@ class Controller extends Assessment\Controller
             }
         }
 
-        /* If we're saving the final version of the submission
-         * (ie. not a draft) ram the current datetime in
+        /* If we're saving the final version of the submission (ie. not a draft) ram the current datetime in
+         * Only need to check selfReflectable. selfReflectable is a prerequisite for selfAssessment, but the
+         * behaviour is the same in both selfReflectable and selfAssessment scenarios for setting up a new
+         * draft submission.
          */
+        $selfReflectable = (new ValidSelfReflection())->isSatisfiedBy($this->getUser(), $participant);
+
         if ($isFinal) {
-            $response->setSubmittedAt(Alaress_Date_Format::now());
+
+            /* submitted_at is determined after the next step when creating a self-assessed or self-reflected
+             * response. Otherwise, proceed normally
+             */
+            if (!$selfReflectable) {
+                $response->setSubmittedAt(Alaress_Date_Format::now());
+            }
         }
 
         /* Do the actual saving
@@ -786,7 +800,11 @@ class Controller extends Assessment\Controller
          */
         $plagscanMapper = PlagscanMapper::getInstance();
 
-        if ($isFinal && $response->getId()) {
+        /* Plagscans should only spawn upon saving a Submitted IResponse instance
+         * This screen is shared between self-reflection and non-self-reflection steps
+         * Self-reflection's plagscan stubs saving .......happens elsewhere
+         */
+        if ($isFinal && !$selfReflectable && $response->getId()) {
             foreach ($response->getAllFiles() as $currentFile) {
                 if (!$currentFile->getEditableInline()) {
                     $plagscanMapper->saveNewPlagscanStub($currentFile);
@@ -799,8 +817,8 @@ class Controller extends Assessment\Controller
          */
         $this->getResponse()->content->set([
             'postOutput' => [
-                function() use ($plagscanMapper, $isFinal, $response) {
-                    if ($isFinal && $response->getId()) {
+                function() use ($plagscanMapper, $isFinal, $selfReflectable, $response) {
+                    if ($isFinal && !$selfReflectable && $response->getId()) {
                         foreach ($response->getAllFiles() as $currentFile) {
                             $filename = $plagscanMapper->plagscanFilename($currentFile);
 
@@ -822,16 +840,33 @@ class Controller extends Assessment\Controller
             $rs->content->set($this->buildJsonOutput($result));
 
         } else {
-            // redirect after saving to Due Work Summary For Particular Student
-            $rs->redirect->to(
-                $this->getRouter()->generate(
-                    'learningAssessment.getSummary',
-                    [
-                        'assessmentId' => $assessment->getId(),
-                        'studentId'    => $participant->getUser()->getId(),
-                    ]
-                )
-            );
+
+            /* Go to the next step of Self-Assessment/Self-Reflection if appropriate
+             */
+            if ($selfReflectable) {
+                $rs->redirect->to(
+                    $this->getRouter()->generate(
+                        'learningDueWorkResponse.getParticularResponseForSelfReflection',
+                        [
+                            'assessmentId' => $assessment->getId(),
+                            'studentId'    => $participant->getUser()->getId(),
+                            'responseId'   => $response->getId()
+                        ]
+                    )
+                );
+            }
+            else {
+                // redirect after saving to Due Work Summary For Particular Student
+                $rs->redirect->to(
+                    $this->getRouter()->generate(
+                        'learningAssessment.getSummary',
+                        [
+                            'assessmentId' => $assessment->getId(),
+                            'studentId'    => $participant->getUser()->getId(),
+                        ]
+                    )
+                );
+            }
         }
     }
 

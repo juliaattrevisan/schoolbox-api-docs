@@ -1,0 +1,64 @@
+{##
+ # Allows user to delete a submission via the tot
+ #
+ # IAssessable assessment
+ # Participant participant
+ #}
+<script>
+    $(function() {
+        $('#header-options').find('[data-delete]').on('click', function (event) {
+            event.preventDefault();
+
+            var element = $(this);
+
+            $(this).confirmDialog({
+                header: 'Delete Submission',
+                format: 'html',
+                text: 'Are you sure you want to delete this submission? Anything attached to it will also be deleted.',
+                confirmLabel: 'Delete',
+                cancelLabel: 'Cancel',
+                confirmEvent: function () {
+
+                    // A toast
+                    var $toast = $('#toaster');
+                    $toast.toastActivate({text: 'Deleting submission...'});
+
+                    $.ajax(element.data('delete'), {
+                        headers: {
+                            'X-HTTP-Method-Override': 'DELETE'
+                        },
+                        dataType: 'json',
+                        type: 'POST'
+                    })
+                        .done(function () {
+
+                            {# If there are no submissions remaining, go to next person
+                             # Otherwise just refresh screen
+                             #}
+                            var destination;
+                            if ($('#response-selector').find('option').length < 2) {
+                                destination = nextUrl;
+                            }
+                            else {
+                                {# Reload summary screen to find what is now the most
+                                 # recent submission
+                                 #}
+                                destination = '{{ routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id}) }}'
+                            }
+
+                            {# Go to next available person in the carousel
+                             # If there is nobody, just visit Status screen
+                             #}
+                            window.location.href = destination;
+                        })
+                        .fail(function () {
+                            $toast.toastTimeout({
+                                text: 'Could not delete this submission',
+                                css: 'pop alert'
+                            });
+                        })
+                }
+            });
+        });
+    });
+</script>

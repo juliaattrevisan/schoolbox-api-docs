@@ -66,9 +66,13 @@
                 statusPending: 'pending',
                 statusReviewed: 'reviewed',
 
-                /* The text to display on the publish button
+                /* - The text to display on the publish button
+                 * - When publishing is taking place
+                 * - When publishing has successfully finished
                  */
                 publishText: 'Publish',
+                publishingText: 'Publishing...',
+                publishedText: 'Feedback published',
 
                 // Callbacks to execute upon initiation and successful completion of Draft and Publish actions
                 onPreDraftCallback: $.noop,
@@ -77,10 +81,7 @@
                 onPublishCallback: $.noop
             };
 
-            var derived = {
-            };
-
-            return $.extend(defaults, derived, options);
+            return $.extend(defaults, options);
         }
 
         /**
@@ -125,10 +126,10 @@
                     $btnDrafted  = $actionBar.find('[data-draft=drafted]'),
                     $btnPublish  = $actionBar.find('[data-draft=publish]');
 
-                $btnPublish.attr('disabled', 'disabled').text('Publishing...');
+                $btnPublish.attr('disabled', 'disabled').text(config.publishingText);
 
                 $(config.formSaveLabel).toastActivate({
-                    text: 'Publishing...'
+                    text: config.publishingText
                 });
 
                 // Publish submits everything
@@ -172,7 +173,7 @@
                     // can be deleted if needed on new feedback creation
                     $actionBar.attr('data-published', '');
 
-                    toast.call($participant, 'Feedback published', true, false);
+                    toast.call($participant, config.publishedText, true, false);
                     config.onPublishCallback(
                         $participant.data('participant'),
                         response.success,

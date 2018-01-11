@@ -1,0 +1,43 @@
+{##
+ # Metadata for the person doing the marking
+ #
+ # locale
+ # IAssessable assessment
+ # IResponse response
+ # Collection|IResponse[] responseList
+ # string deleteRoute
+ #}
+{% import '@learning/macro/dueDate.twig' as dueDate %}
+
+{% include '@learningDueWorkResponse/inlineGrading/fragments/deleteSubmission.twig' with {
+    assessment: assessment,
+    participant: participant
+} only %}
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>{{ title }} {{ assessment.title }}</h1>
+            <ul class="meta">
+                <li class="icon-calendar">{{ dueDate.participant(participant) }}</li>
+                <li class="icon-due-work"><a href="/homepage/{{ assessment.context.id }}">{{ assessment.context.title }}</a> {{ assessment.typeName }}</li>
+                {% if responseList|length == 1 %}
+                    <li class="icon-calendar">Submitted {{ response.submittedAt.short }}</li>
+                {% endif %}
+                {% if readonly %}
+                    <li class="icon-archive">Term has been archived</li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+    <nav>
+        <a class="icon-more" title="" data-dropdown="header-options"></a>
+    </nav>
+
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li><a class="icon-history" href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: participant.user.id}) }}">{{ locale.submissionHistory.proper }}</a></li>
+        {% if response and deleteRoute %}
+        <li><a class="icon-delete" data-delete="{{ deleteRoute }}">Delete Submission</a></li>
+        {% endif %}
+    </ul>
+</div>

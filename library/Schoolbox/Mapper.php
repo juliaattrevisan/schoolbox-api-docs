@@ -97,6 +97,7 @@ abstract class Mapper implements IMapper, Serializable
     const METHOD_DELETE = 'delete';
 
     // as per http://www.php.net/manual/en/pdostatement.rowcount.php#109891
+    const PDO_RESULT_NOCHANGE = 0;
     const PDO_RESULT_INSERT = 1;
     const PDO_RESULT_UPDATE = 2;
 
@@ -2697,6 +2698,7 @@ abstract class Mapper implements IMapper, Serializable
                         case self::PDO_RESULT_INSERT:
                             $pdoMethods[$i] = self::METHOD_CREATE;
                             break;
+                        case self::PDO_RESULT_NOCHANGE:
                         case self::PDO_RESULT_UPDATE:
                             $pdoMethods[$i] = self::METHOD_UPDATE;
                             break;
