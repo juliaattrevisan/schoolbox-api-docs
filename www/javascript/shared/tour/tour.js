@@ -107,11 +107,11 @@ $(function () {
 
 
                     //You can retrieve the tour status as follows
-                    var getRoute    = '/tour/getStatus/{tour_uuid}';
+                    var getRoute    = '/tour/status/{tour_uuid}';
                     var getUrl      = getRoute.replace("{tour_uuid}", tour["uuid"]);
 
                     $.get(getUrl, null, function (data, status) {
-                        //Do something with data
+                        //Do whatever you like with data
                     });
 
                     // Fire the tour
