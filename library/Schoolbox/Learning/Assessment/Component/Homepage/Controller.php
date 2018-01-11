@@ -121,23 +121,6 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
     }
 
     /**
-     * Retrieves date for sorting out of an assessment.
-     *
-     * @param IAssessable $assessment
-     * @return Alaress_Date_Format|null
-     */
-    private function retrieveDateForSort(IAssessable $assessment): ?Alaress_Date_Format
-    {
-        if ($assessment->isParticipant($this->getUser())) {
-            $participant = $assessment->getParticipantIfExtant($this->getUser());
-            if ($participant instanceof Participant) {
-                return $participant->getDueDate();
-            }
-        }
-        return $assessment->getDueAt();
-    }
-
-    /**
      * Renders view using Component_AbstractController::$templateObject.
      *
      * Responsible just for rendering objects already retrieved during execute()
