@@ -77,7 +77,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
         [
             'uuid'     => '3b62f95b-f5b9-11e7-9503-08002751fd3c',
             'type'     => 'tooltip',
-            'selector' => '', // TODO
+            'selector' => '#side-menu-mygroups',
             'content'  => "<p>In this section, you will find links to groups that you have been added to or have voluntarily joined.</p>",
         ],
 
@@ -85,7 +85,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
         [
             'uuid'     => '42517dab-f5b9-11e7-9503-08002751fd3c',
             'type'     => 'tooltip',
-            'selector' => '', // TODO
+            'selector' => '#side-menu-mysubjects',
             'content'  => "<p>This section will display links to the classes you teach. These are preloaded from enrolment data set up by your system administrators.</p>",
         ],
 
@@ -93,7 +93,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
         [
             'uuid'     => '4674f77e-f5b9-11e7-9503-08002751fd3c',
             'type'     => 'tooltip',
-            'selector' => '', // TODO
+            'selector' => '#side-menu-mylinks',
             'content'  => "This section can be customised by you. By clicking on the pencil icon, you can add your own individual links that are important for you.",
         ],
 
