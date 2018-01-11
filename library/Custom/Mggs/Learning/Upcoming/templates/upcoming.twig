@@ -187,7 +187,7 @@
                     if (status) {
                         $element.find('.fc-content').prepend(
                             $('<a class="progress-tick tiny" />')
-                                .addClass(status)
+                                .addClass(status).attr('title', status.capitalise())
                         );
 
                         $element.addClass('progress-' + status);
@@ -275,6 +275,44 @@
             },
             x: false
         }).init();
+
+        /**
+         * Update assessment method.
+         *
+         * * Gives event a "loading" style
+         * * Removes that style when update finishes (regardless of result)
+         *
+         * @param calEvent   The event to update
+         * @param delta      The amount of change
+         * @param revertFunc called if update failed for whatever reason.
+         *                   Sets event back to original state.
+         */
+        function updateAssessment(calEvent, delta, revertFunc) {
+            var format = 'Y-MM-DD HH:mm:ss';
+
+            // account for Fullcalendar exclusive vs inclusive end dates
+            var data = {
+                assessmentId: calEvent.data.meta.assessmentId,
+                openDate: calEvent.start.format(format),
+                dueDate: calEvent.start.clone().add({days: 1, seconds: -1}).format(format)
+            };
+
+            calEvent.className.push('loading');
+            var post = $.post(
+                '{{ routeLookup('learningPersonalised.postUpdateParticipation', {studentId: student.id}) }}',
+                data,
+                null,
+                'json'
+            );
+            post.fail(revertFunc)
+                .always(function() {
+                    // Remove the loading class
+                    calEvent.className = calEvent.className.filter(function (value) {
+                        return value != 'loading';
+                    });
+                    // $cal.fullCalendar('rerenderEvents');
+                });
+        };
 
         function isInsideBounds(event, target, resourceId)
         {
