@@ -214,7 +214,9 @@
                 },
                 'plan-participants': 'required'
             },
-            ignore: ':hidden',
+
+            // Ignore all hidden elements, except for the input hidden by selectize
+            ignore: ':hidden:not(#plan-participants)',
 
             // On valid - save the plan details in hidden inputs and apply to selected students
             submitHandler: function() {
