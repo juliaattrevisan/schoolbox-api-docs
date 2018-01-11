@@ -17,7 +17,7 @@
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 columns">
-            <h1>{{ locale.grading.proper }} {{ assessment.title }}</h1>
+            <h1>{{ title }} {{ assessment.title }}</h1>
             <ul class="meta">
                 <li class="icon-calendar">{{ dueDate.dueDate(assessment, participant.user) }}</li>
                 <li class="icon-due-work"><a href="/homepage/{{ assessment.context.id }}">{{ assessment.context.title }}</a> {{ assessment.typeName }}</li>

@@ -108,6 +108,9 @@ Usage:
     </div>
 </div>
 
+{# Instructions for the inline grader screen #}
+{% block instructions %}{% endblock %}
+
 {# Not the most recent response? Say so, and give a CTA to show the most recent. #}
 {% if not isMostRecentResponse %}
     <div class="row">
