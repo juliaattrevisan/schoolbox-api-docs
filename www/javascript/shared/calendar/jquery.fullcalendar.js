@@ -30,6 +30,9 @@ function Calendar(id, bubbleId, opts) {
             u: '.',
             d: '.'
         },
+        bubble: {
+            onOpen: $.noop()
+        },
         filter: {
             ajax: '.',
             enabled: true,
@@ -446,6 +449,7 @@ function Calendar(id, bubbleId, opts) {
     var filter = $.extend({}, this.options.filter, opts.filter)
     var fullCalendar = $.extend({}, this.options.fullCalendar, opts.fullCalendar)
     var datepicker   = $.extend({}, this.options.datepicker,   opts.datepicker)
+    var bubble = $.extend({}, this.options.bubble, opts.bubble)
 
     // perform the merge
     $.extend(this.options,opts)
@@ -454,6 +458,7 @@ function Calendar(id, bubbleId, opts) {
     this.options.filter = filter
     this.options.fullCalendar = fullCalendar
     this.options.datepicker   = datepicker
+    this.options.bubble = bubble
 
     if(this.options.filter.enabled) {
         this.filters.interaction(this)
@@ -807,6 +812,8 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
 
     this.fillForm(method+'Event', eventData);
     this.fillForm(method+'Task', eventData);
+
+    this.calendar.options.bubble.onOpen.call(this, method, eventData);
 }
 
 
