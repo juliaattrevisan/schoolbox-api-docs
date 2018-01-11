@@ -29,8 +29,9 @@ function attachAlaressDatePicker() {
             // find the submit button and use that to stall (and init if not already)
             staller = $dateinput.closest('[data-mage]').find('[data-mage-next]').stallSubmit({ event:'click' });
 
-        } else if ($dateinput.closest('#resource-booking-form').length) {
-            // Temporarily detach the staller form the resource booking form.
+        } else if ($dateinput.closest('#resource-booking-form').length || $dateinput.closest('#participant-customise-modal').length) {
+            // Detach the staller from forms that use jquery validate submitHandler to prevent double tapping issue.
+            // TODO: fix this properly :)
             staller = null;
 
         } else if ($dateinput.closest('form').length) {

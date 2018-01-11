@@ -73,6 +73,7 @@
 @import "components/curriculum/curriculum";
 @import "components/course/course";
 @import "components/marksheet";
+@import 'components/assessment/participation';
 
 // Feature Tour
 @import "../../javascript/components/intro.js/introjs.css";
@@ -109,6 +110,7 @@
 @import "../../javascript/components/foundation/scss/foundation/components/reveal";
 @import "../../javascript/components/foundation/scss/foundation/components/tooltips";
 @import "../../javascript/components/foundation/scss/foundation/components/flex-video";
+@import '../../javascript/components/foundation/scss/foundation/components/dropdown-buttons';
 @import "ui/selectize.customisation";
 
 //Magnific Popup

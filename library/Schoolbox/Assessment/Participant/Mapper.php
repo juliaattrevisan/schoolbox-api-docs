@@ -16,6 +16,7 @@ use Schoolbox\Assessment\Participant\Plan;
 
 /**
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model createModel($id = null)
  * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
  */
 class Mapper extends BaseMapper
@@ -43,10 +44,10 @@ class Mapper extends BaseMapper
     protected function getSelectString(): string
     {
         return "
-            SELECT {$this->getColumnString('p')},
+            SELECT {$this->getColumnString()},
                    {$this->getJoinColumnString('plan', 'pp')}
-            FROM   {$this->getTable()} p
-            JOIN   {$this->getJoinSql('plan', 'p', 'pp')}
+            FROM   {$this->getTable()}
+            JOIN   {$this->getJoinSql('plan', '', 'pp')}
         ";
     }
 
@@ -65,7 +66,7 @@ class Mapper extends BaseMapper
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $participant = $this->hydrate($row, 'p');
+            $participant = $this->hydrate($row);
             $participant->setPlan($planMapper->hydrate($row, 'pp'));
             $collection[$participant->getId()] = $participant;
         }

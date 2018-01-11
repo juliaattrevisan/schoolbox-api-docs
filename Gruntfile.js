@@ -138,6 +138,7 @@ var jsSrc = {
         // Feature tours
         'www/javascript/components/intro.js/intro.js',
         'www/javascript/shared/tour/tour.js'
+
     ],
     masonry: [
         // Colour handling

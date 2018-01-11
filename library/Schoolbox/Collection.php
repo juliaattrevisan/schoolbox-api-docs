@@ -109,7 +109,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      */
     public function offsetSet($offset, $value)
     {
-        if (empty($offset)) {
+        if (empty($offset) && $offset !== 0) {
             $this->stack[] = $value;
         } else {
             $this->stack[$offset] = $value;

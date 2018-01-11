@@ -31,6 +31,7 @@ class Mapper extends BaseMapper
         $this->joins('assessment_id', Assessment\Mapper::class, 'id', null, null, 'assessment', 'assessment');
         $this->joinsReverseMulti('participant_plan_id', Participant\Mapper::class, 'participants', 'participants');
         $this->uses('is_dynamic', self::TYPE_BOOLEAN);
+        $this->uses('name', self::TYPE_STRING);
         $this->uses('description', self::TYPE_STRING);
         $this->uses('publish_date', self::TYPE_DATETIME);
         $this->uses('open_date', self::TYPE_DATETIME);

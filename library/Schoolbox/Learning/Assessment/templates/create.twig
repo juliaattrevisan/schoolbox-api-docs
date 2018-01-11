@@ -3,9 +3,12 @@
 
 {{ bread.crumbsArray(breadcrumbs) }}
 
-<script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
-<script type="text/javascript" src="/javascript/shared/assessment/validationRules.js" data-locale-grading-proper="{{ locale.grading.proper }}"></script>
-<script type="text/javascript">
+<script src="/javascript/shared/jquery.mage.js"></script>
+<script src="/javascript/shared/assessment/validationRules.js" data-locale-grading-proper="{{ locale.grading.proper }}"></script>
+<script src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script src="/javascript/shared/assessment/participation.js"></script>
+<script>
     $(function () {
         // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
         $('input[data-mage-next]').mage();
@@ -32,6 +35,9 @@
              */
             setupAssessmentEnd('{{ assessmentType }}');
 
+            // Participation
+            $('#participation-container').participationSettings({});
+
         {% else %}
 
              /**
@@ -54,6 +60,12 @@
                      */
                     var assessmentType = $('input[name="type"]:checked').val();
                     setupAssessmentEnd(assessmentType);
+
+                    // Re-init foundation plugins
+                    $(document).foundation();
+
+                    // Participation
+                    $('#participation-container').participationSettings({});
                 }
             });
 
@@ -105,7 +117,7 @@
 
 <div class="row">
     <div class="small-12 columns island">
-        <form action="{{ formAction }}" id="assessmentForm" method="post">
+        <form action="{{ formAction }}" class="mage" id="assessmentForm" method="post">
             <section>
                 {% if not assessmentType|length %}
                 <fieldset class="content" data-mage="part-1">
@@ -167,3 +179,6 @@ in a form. The template hierachy should be refactored so that quiz EXTENDS the p
         </label>
     </form>
 </div>
+
+{# Participation modal w/ form. Must live outside of main form as per above #}
+{% include '@learningAssessment/fragments/participationModal.twig' %}

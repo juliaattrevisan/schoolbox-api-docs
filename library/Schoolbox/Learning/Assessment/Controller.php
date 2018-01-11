@@ -17,10 +17,9 @@ use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\User as User;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Term;
 
@@ -39,14 +38,15 @@ abstract class Controller extends ListController implements IAssessmentControlle
     /**
      * Controller constructor.
      *
-     * @param UserMapper            $userMapper
-     * @param ErrorMapper           $errorMapper
-     * @param DataModel\MapperProxy $assessmentMapper
-     * @param WorkTypeMapper        $workTypeMapper
-     * @param Access                $access
-     * @param Transactor            $transactor
-     * @param BreadcrumbFactory     $bakery
-     * @param Term\Mapper           $termMapper
+     * @param UserMapper             $userMapper
+     * @param ErrorMapper            $errorMapper
+     * @param DataModel\MapperProxy  $assessmentMapper
+     * @param WorkTypeMapper         $workTypeMapper
+     * @param Access                 $access
+     * @param Transactor             $transactor
+     * @param BreadcrumbFactory      $bakery
+     * @param Term\Mapper            $termMapper
+     * @param Participant\DataSource $participantDataSource
      */
     public function __construct(
         UserMapper $userMapper,
@@ -56,9 +56,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
         Access $access,
         Transactor $transactor,
         BreadcrumbFactory $bakery,
-        Term\Mapper $termMapper
+        Term\Mapper $termMapper,
+        Participant\DataSource $participantDataSource
     ) {
-        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor);
+        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $participantDataSource);
         $this->bakery          = $bakery;
         $this->workTypeMapper  = $workTypeMapper;
         $this->termMapper      = $termMapper;
@@ -78,6 +79,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         // build a stub
         $assessment = AssessmentType::stringToObject($type, $context);
+
+        // create a dynamic plan on the assessment to get started
+        $assessment->getPlans()->add((new Plan($assessment))->setIsDynamic(true));
+
+        $this->participantDataSource->loadParticipationIntoAssessment($assessment);
 
         $data = $this->getAssessmentAsTwigArray($context, $assessment);
 
@@ -329,6 +335,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         return $data;
     }
+
 
     /**
      * Return whether or not the given user is allowed to see the given participation

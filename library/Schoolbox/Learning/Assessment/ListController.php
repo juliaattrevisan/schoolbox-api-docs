@@ -12,6 +12,7 @@ use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
 use DomainException;
 use InvalidArgumentException;
+use PDOException;
 use RangeException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error;
@@ -20,6 +21,8 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Mapper;
+use Schoolbox\Assessment\Participant as ParticipantModels;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as Folder;
 use Schoolbox\Role;
@@ -52,27 +55,34 @@ class ListController extends Web\Controller\Base
      * @var Transactor
      */
     private $transactor;
+    /**
+     * @var Participant\DataSource
+     */
+    protected $participantDataSource;
 
 
     /**
-     * @param UserMapper   $userMapper
-     * @param Error\Mapper $errorMapper
-     * @param MapperProxy  $assessmentMapper
-     * @param Access       $access
-     * @param Transactor   $transactor
+     * @param UserMapper             $userMapper
+     * @param Error\Mapper           $errorMapper
+     * @param MapperProxy            $assessmentMapper
+     * @param Access                 $access
+     * @param Transactor             $transactor
+     * @param Participant\DataSource $participantDataSource
      */
     public function __construct(
         UserMapper $userMapper,
         Error\Mapper $errorMapper,
         MapperProxy $assessmentMapper,
         Access $access,
-        Transactor $transactor
+        Transactor $transactor,
+        Participant\DataSource $participantDataSource
     ) {
         $this->setUserMapper($userMapper);
         $this->setErrorMapper($errorMapper);
         $this->setAssessmentMapper($assessmentMapper);
         $this->setAccess($access);
         $this->setTransactor($transactor);
+        $this->participantDataSource = $participantDataSource;
     }
 
 
@@ -330,21 +340,165 @@ class ListController extends Web\Controller\Base
             $assessment = $assessmentFactory->produce($assessment);
 
             $transactionSummary = $this->getTransactor()->transact($assessment);
+            $assessmentId = $assessment->getId();
+
+            // assessment is saved; persist plans
+
+            // Note: in the returned collection
+            //    - any plans CREATED by this method will be NEGATIVELY INDEXED (the object has a real ID though)
+            //    - any plans UPDATED by this method will be ID INDEXED
+            $plans = $this->savePlanData($assessmentId, $postData['plans'] ?? []);
+
+            $this->saveParticipationData($plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
         }
-        catch (RangeException $e ) {
-            // cast
-            throw new DomainException($e->getMessage(), $e->getCode(), $e);
-        }
-        catch (InvalidArgumentException $e) {
-            // cast
-            throw new DomainException($e->getMessage(), $e->getCode(), $e);
-        }
-        catch (UnexpectedValueException $e) {
+        catch (RangeException|InvalidArgumentException|UnexpectedValueException|PDOException $e) {
             // cast
             throw new DomainException($e->getMessage(), $e->getCode(), $e);
         }
 
         return $transactionSummary;
+    }
+
+
+    /**
+     * @param GenericCollection|ParticipantModels\Plan\Model[] $plans
+     * @param array             $inclusionFlags
+     * @param array             $userPlanIndices
+     * @throws DomainException
+     * @throws UnexpectedValueException
+     * @throws Mapper\Exception
+     */
+    private function saveParticipationData(GenericCollection $plans, array $inclusionFlags, array $userPlanIndices)
+    {
+        $partMap = $this->participantDataSource->getParticipantMapper();
+
+        $planIds = $plans->getPropertyValues('id');
+
+        // plans are saved; persistipation
+        foreach ($inclusionFlags as $userId => $userIncluded) {
+
+            $existingParticipation = $partMap->findByColumnList([
+                'participant_plan_id' => $planIds,
+                'user_id'             => $userId
+            ]);
+
+            if ($userIncluded) {
+                // look up the plan
+                $userPlan = $plans[$userPlanIndices[$userId]];
+
+                if (!$userPlan) {
+                    throw new DomainException("User {$userId} was assigned index {$userPlanIndices[$userId]}, but there's no plan with that index (valid plan indices were " . json_encode($plans->keys()) . ')');
+                }
+
+                // generate a record if there is ALREADY existing participation, OR the plan is NOT dynamic
+                if ($existingParticipation->count() || !$userPlan->isDynamic()) {
+                    // this action needs to enforce the constraint of a user being in 0..1 plan
+                    // TODO atomicity!!! :'(
+                    $partMap->delete($existingParticipation);
+                    $partMap->save($this->makeAParticipation($userId, $userPlan));
+                }
+            } else {
+                if ($existingParticipation->count() === 0) {
+                    // we need to generate a record so we have *something* to exclude
+                    $existingParticipation = $partMap->createCollection([
+                        $this->makeAParticipation($userId, $plans->filterBy('isDynamic', true)->first())
+                    ]);
+                }
+
+                foreach ($existingParticipation as $record) {
+                    $record->setExcludedAt(\Alaress_Date_Format::now());
+                }
+
+                $partMap->save($existingParticipation);
+            }
+        }
+
+
+    }
+
+
+    /**
+     * @param int $userId
+     * @param ParticipantModels\Plan\Model $plan
+     * @return ParticipantModels\Model
+     */
+    private function makeAParticipation($userId, $plan)
+    {
+        $partMap = $this->participantDataSource->getParticipantMapper();
+        $userMap = $this->userMapper;
+
+        return $partMap->createModel()
+            ->setUser($userMap->createModel($userId))
+            ->setPlan($plan);
+    }
+
+    /**
+     * The return of this method will be a UNION of all plans that exist for the given assessment ID
+     * and the new plans specified by $postPlans. New plans will be persisted to the database (and thus have a real
+     * ID), but in the returned collection, they will be NEGATIVELY INDEXED, as given in $postPlans.
+     *
+     * @param int         $assessmentId
+     * @param array       $postPlans
+     * @return GenericCollection|ParticipantModels\Plan\Model[]
+     * @throws UnexpectedValueException
+     * @throws PDOException
+     * @throws Mapper\Exception
+     */
+    private function savePlanData(int $assessmentId, array $postPlans = [])
+    {
+        $dateFields = [ 'publish_date',  'open_date', 'due_date', 'close_date', 'created_at', 'updated_at' ];
+
+        $planMap = $this->participantDataSource->getPlanMapper();
+
+        $existingPlans = $planMap->findByColumn('assessment_id', $assessmentId)->indexBy('id');
+
+        // preload the plans list with the dyna-plan
+        $plans = $planMap->findByColumnList([ 'is_dynamic' => true, 'assessment_id' => $assessmentId ])->indexBy('id');
+
+        // obtain this reference for later
+        $dynaPlan = $plans->first();
+
+        // within $postPlans, any positive index is the ID of an existing plan; any negative index is a new plan
+        foreach ($postPlans as $planId => $planData) {
+            // if planId == 0, it's either the dyna-plan or invalid data, but ignorable either way
+
+            if ($planId > 0) {
+                // existing plan
+                // TODO SA-5670 (allow teachers to modify plans post-creation)
+                // for now: just add the plan to the list, ignoring any changes
+                $plans[$planId] = $existingPlans[$planId];
+
+            } elseif ($planId < 0) {
+                // new plan
+                unset($planData['id']);
+
+                $planData['assessment_id'] = $assessmentId;
+                $planData['is_dynamic']    = false;
+                $planData['created_at']    = null;
+
+                foreach ($dateFields as $dateField) {
+                    if (array_key_exists($dateField, $planData)) {
+                        // if the field is falsy, make it null
+                        if (!$planData[$dateField]) {
+                            $planData[$dateField] = null;
+                        }
+
+                        $planData[$dateField] = \Alaress_Date_Format::newLocal($planData[$dateField])->getDatabase();
+                    }
+                }
+
+                // note that we are using the negative index here
+                $plans[$planId] = $planMap->hydrate($planData);
+            }
+        }
+
+        // save all the plans
+        $planMap->save($plans);
+
+        // drop the dyna-plan into index 0 as well as its ID to get around a limitation in the POST payload
+        $plans[0] = $dynaPlan;
+
+        return $plans;
     }
 
 

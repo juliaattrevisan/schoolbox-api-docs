@@ -1,18 +1,19 @@
 {% set entityType = entityType ?: 'Folder' %}
 
-<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
-<script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
+<script src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
 
 {% if config.curriculum_tagging_enabled %}
-<div class="row">
-    <div class="small-12 columns">
-        <label>
-            Curriculum Codes
-            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Link this {{ entityType }} with a corresponding curriculum area, you can link multiple curriculum areas to this {{ entityType }}">?</span>
-            {% include 'sub/curriculumCodeSelector.twig' with {'codeList': curriculumNodes, 'renderButton': false} %}
-        </label>
-        {% include 'sub/curriculumBrowseButton.twig' %}
+<fieldset>
+    <legend>Curriculum</legend>
+    <div class="row">
+        <div class="small-12 columns">
+            <label>
+                Curriculum Codes
+                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Link this {{ entityType }} with a corresponding curriculum area, you can link multiple curriculum areas to this {{ entityType }}">?</span>
+                {% include 'sub/curriculumCodeSelector.twig' with {'codeList': curriculumNodes, 'renderButton': false} %}
+            </label>
+            {% include 'sub/curriculumBrowseButton.twig' %}
+        </div>
     </div>
-</div>
+</fieldset>
 {% endif %}

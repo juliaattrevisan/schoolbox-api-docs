@@ -86,6 +86,7 @@ class Controller extends Assessment\Controller
      * @param SingleFile\Mapper             $submissionFileMapper
      * @param Kami\Connector                $kamiConnector
      * @param Kami\Mapper                   $kamiMapper
+     * @param Participant\DataSource        $participantDataSource
      */
     public function __construct(
         UserMapper $userMapper,
@@ -102,9 +103,10 @@ class Controller extends Assessment\Controller
         Term\Mapper $termMapper,
         SingleFile\Mapper $submissionFileMapper,
         Kami\Connector $kamiConnector,
-        Kami\Mapper $kamiMapper
+        Kami\Mapper $kamiMapper,
+        Participant\DataSource $participantDataSource
     ) {
-        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $workTypeMapper, $access, $transactor, $bakery, $termMapper);
+        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $workTypeMapper, $access, $transactor, $bakery, $termMapper, $participantDataSource);
         $this->resultSetMapper       = $resultSetMapper;
         $this->rubricMapper          = $rubricMapper;
         $this->dueWorkResponseMapper = $dueWorkResponseMapper;

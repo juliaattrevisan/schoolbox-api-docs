@@ -34,7 +34,7 @@ $selectize-color-optgroup-text: $selectize-color-text !default;
 
 $selectize-shadow-input: none;
 $selectize-shadow-input-focus: none;
-$selectize-border: 2px solid $selectize-color-border;
+$selectize-border: $input-border-width solid $selectize-color-border;
 $selectize-border-radius: 0px;
 
 $selectize-width-item-border: 1px !default;
