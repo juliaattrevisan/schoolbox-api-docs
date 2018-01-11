@@ -58,7 +58,6 @@ class Controller extends Base
      * @param string $url
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    // TODO $url is wrong; '/' on timetable and news pages, though not on others
     public function getTours($url)
     {
         // Store the tours we are going to serve in an array
