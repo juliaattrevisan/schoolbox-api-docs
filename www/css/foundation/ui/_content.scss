@@ -1300,7 +1300,7 @@ tr:hover{
 		right: $reveal-close-right;
 	}
 
-    form {
+    form:not(.dzone) {
         margin-left: -1rem;
         margin-right: -1rem;
     }
