@@ -38,9 +38,10 @@ class RubricContext
      *
      * @param DueWork $dueWork
      * @param User $student
+     * @param null|int $responseId
      * @return array
      */
-    public function generateMarkable(DueWork $dueWork, User $student)
+    public function generateMarkable(DueWork $dueWork, User $student, $repsponseId)
     {
         if(!$dueWork->getUseRubric()){
             return ['rubric' => null];
@@ -49,7 +50,7 @@ class RubricContext
         $markTypeSlug = $dueWork->getMarkType()->getSlug();
 
         $publishedOnly = false;
-        $this->rubricMapper->applyStudentMark($dueWork->getRubric(), $student, $publishedOnly);
+        $this->rubricMapper->applyStudentMark($dueWork->getRubric(), $student, $publishedOnly, $repsponseId);
 
         $context = [
             'rubric' => $dueWork->getRubric()->toContext(),

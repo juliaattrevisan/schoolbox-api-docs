@@ -450,42 +450,46 @@ class RubricMapper
      * @param Rubric $grid
      * @param User   $student
      * @param bool   $publishedOnly       Whether to exclude draft marks
+     * @param null|int    $response
      * @return Rubric
      */
-    public function applyStudentMark(Rubric $grid, User $student, $publishedOnly)
+    public function applyStudentMark(Rubric $grid, User $student, $publishedOnly, $responseId = null)
     {
-        if (!$grid->getSubmissionBox() instanceof SubmissionBox) {
-            throw new \InvalidArgumentException("Cannot apply marks without a submission box");
+
+        $pb = new Builder($this->database, '');
+        $pb->equals('sr.owner', $student->getId());
+        $pb->equals('sr.box_id', $grid->getSubmissionBox()->getId());
+        $pb->isNull('sr.deleted_at');
+        if ($publishedOnly) {
+            $pb->notNull('sr.published_at');
+        }
+        if($responseId) {
+            $pb->equals('sr.student_submission_id', $responseId);
         }
 
-        $publishedClause = $publishedOnly ? 'AND sr.published_at IS NOT NULL' : '';
+        $whereClause = implode(' AND ', $pb->getWhere());
         $dateOrder = $publishedOnly ? 'sr.published_at' : 'sr.created_at';
 
         // retrieve marks (descriptor selections for student)
-        $stmt = $this->database->query("
+        $query = "
             SELECT rm.descriptor_id
             FROM rubric_mark rm
             LEFT JOIN submission_return sr ON sr.id = rm.return_id
             WHERE rm.valid = TRUE
-            $publishedClause
             AND rm.return_id = (
               SELECT sr.id
               FROM submission_return sr
-              WHERE sr.owner = :userId AND sr.box_id = :boxId
-              AND sr.deleted_at IS NULL
-              $publishedClause
+              WHERE $whereClause
               ORDER BY $dateOrder DESC
               LIMIT 1
             )
-            
-        ", [
-            'boxId'  => $grid->getSubmissionBox()->getId(),
-            'userId' => $student->getId()
-        ]);
+        ";
+
+        $statement = $this->database->query($query, $pb->getParams());
 
         $descriptorIds = [];
 
-        while ($id = $stmt->fetchColumn()) {
+        while ($id = $statement->fetchColumn()) {
             $descriptorIds[$id] = true;
         }
 
