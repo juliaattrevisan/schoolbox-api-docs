@@ -9,13 +9,15 @@
 
 namespace Schoolbox\Learning\Assessment\Component\Homepage;
 
+use Alaress_Date_Format;
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
+use Schoolbox\Learning\Assessment\DueDateSortStrategy;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Visibility;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -75,7 +77,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
             ];
 
             if(!$this->getConfig('showClosed')){
-                $options['closed_before'] = \Alaress_Date_Format::now();
+                $options['closed_before'] = Alaress_Date_Format::now();
             }
 
             $this->assessments = $this->getAssessmentMapper()
@@ -90,6 +92,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
                         return $visibility->isVisibleToUser($assessment, $this->getUser(), $this->getConfig('showClosed'));
                     }
                 )
+                ->sortByCallback(new DueDateSortStrategy($this->getUser()))
                 ->limit($this->getConfig('size') ?: null);
 
         } catch (\DomainException $e) {

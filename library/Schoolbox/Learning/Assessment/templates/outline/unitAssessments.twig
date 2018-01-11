@@ -69,7 +69,7 @@
                             </p>
                         {% else %}
                             <p class="meta spaced">
-                                <span class="unit-task-due-date">{{ dueDate.assessment(assessment) }}</span>
+                                <span class="unit-task-due-date">{{ dueDate.dueDate(assessment, USER) }}</span>
                             </p>
                         {% endif %}
                     </div>

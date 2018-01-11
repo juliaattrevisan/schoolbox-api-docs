@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Component\Dashboard;
 
 use Component_Dashboard_ControllerAbstract;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\DueDateSortStrategy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -71,22 +72,7 @@ class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
         $visibility = new Visibility($this->getAccess());
         $this->upcomingAssessments = $this->assessmentDataSource
             ->findAllByStudent($student, $term)
-            ->sortByCallback(function(IAssessable $a, IAssessable $b) {
-                // Due date
-                $comp = $a->getDueAt()->compare($b->getDueAt());
-                if ($comp) {
-                    return $comp;
-                }
-
-                // Sequence
-                $comp = $a->getSequence() - $b->getSequence();
-                if ($comp) {
-                    return $comp;
-                }
-
-                // Title
-                return strnatcasecmp($a->getTitle(), $b->getTitle());
-            })
+            ->sortByCallback(new DueDateSortStrategy($student))
             ->filter(function (IAssessable $assessable) use ($student, $visibility) {
                 // Only show work that the student has permission to view
                 return $visibility->isVisibleToUser($assessable, $student, false);
