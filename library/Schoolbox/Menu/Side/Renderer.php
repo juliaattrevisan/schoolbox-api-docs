@@ -49,7 +49,6 @@ class Renderer
      * @param string $pageCurrent
      * @return null|string
      */
-    // TODO get IDs into the side menu sections somehow
     public function menuSideRenderer(\Twig_Environment $twig, $user, $pageCurrent = null)
     {
         // Return null if no user logged in
