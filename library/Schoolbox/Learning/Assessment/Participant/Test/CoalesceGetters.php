@@ -66,38 +66,45 @@ class CoalesceGetters extends TestCase
 
         foreach ($this->getAssessables() as $assessable) {
             $assessable->setDescription(null);
-            $planObject = (new PlanObject($assessable))->setDescription(null);
+            $planObject = (new PlanObject($assessable))->setDescription(null)->setIsDynamic(false);
             $data[]     = [new Participant(new User(), $planObject), null];
         }
 
         foreach ($this->getAssessables() as $assessable) {
             $assessable->setDescription(null);
-            $planObject = (new PlanObject($assessable))->setDescription('');
+            $planObject = (new PlanObject($assessable))->setDescription('')->setIsDynamic(false);
             $data[]     = [new Participant(new User(), $planObject), ''];
         }
 
         foreach ($this->getAssessables() as $assessable) {
             $assessable->setDescription('');
-            $planObject = (new PlanObject($assessable))->setDescription(null);
+            $planObject = (new PlanObject($assessable))->setDescription(null)->setIsDynamic(false);
             $data[]     = [new Participant(new User(), $planObject), ''];
         }
 
         foreach ($this->getAssessables() as $assessable) {
             $assessable->setDescription('null');
-            $planObject = (new PlanObject($assessable))->setDescription(null);
+            $planObject = (new PlanObject($assessable))->setDescription(null)->setIsDynamic(false);
             $data[]     = [new Participant(new User(), $planObject), 'null'];
         }
 
         foreach ($this->getAssessables() as $assessable) {
             $assessable->setDescription(null);
-            $planObject = (new PlanObject($assessable))->setDescription('null');
+            $planObject = (new PlanObject($assessable))->setDescription('null')->setIsDynamic(false);
             $data[]     = [new Participant(new User(), $planObject), 'null'];
         }
 
         foreach ($this->getAssessables() as $assessable) {
             $assessable->setDescription('string2');
-            $planObject = (new PlanObject($assessable))->setDescription('string1');
+            $planObject = (new PlanObject($assessable))->setDescription('string1')->setIsDynamic(false);
             $data[]     = [new Participant(new User(), $planObject), 'string1'];
+        }
+
+        // Dynamic plan: always use assessment's description
+        foreach ($this->getAssessables() as $assessable) {
+            $assessable->setDescription('string2');
+            $planObject = (new PlanObject($assessable))->setDescription('string1')->setIsDynamic(true);
+            $data[]     = [new Participant(new User(), $planObject), 'string2'];
         }
 
         return $data;
@@ -125,7 +132,8 @@ class CoalesceGetters extends TestCase
                         ->setPublishDate($this->cloneDate($planDate))
                         ->setOpenDate($this->cloneDate($planDate))
                         ->setDueDate($this->cloneDate($planDate))
-                        ->setCloseDate($this->cloneDate($planDate));
+                        ->setCloseDate($this->cloneDate($planDate))
+                        ->setIsDynamic(false);
 
                     $data[] = [
                         new Participant(new User(), $planObject),
@@ -133,6 +141,21 @@ class CoalesceGetters extends TestCase
                         null === $planDate || $planDate->isNull() ? $assessmentDate : $planDate,
                         null === $planDate || $planDate->isNull() ? $assessmentDate : $planDate,
                         null === $planDate || $planDate->isNull() ? $assessmentDate : $planDate,
+                    ];
+
+                    // Dynamic plan: always use assessment's date
+                    $dynamicPlanObject = (new PlanObject($assessable))
+                        ->setPublishDate($this->cloneDate($planDate))
+                        ->setOpenDate($this->cloneDate($planDate))
+                        ->setDueDate($this->cloneDate($planDate))
+                        ->setCloseDate($this->cloneDate($planDate))
+                        ->setIsDynamic(true);
+                    $data[] = [
+                        new Participant(new User(), $dynamicPlanObject),
+                        $assessmentDate,
+                        $assessmentDate,
+                        $assessmentDate,
+                        $assessmentDate,
                     ];
                 }
             }
