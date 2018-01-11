@@ -54,14 +54,21 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'selector' => '#profile-accordion',
             'content'  => "
                 <p>At the top of the side menu you will see your profile picture and name. Opening this will give you some further options.</p>
-                <p>
+            ",
+        ],
+
+        // Profile accordion menu
+        [
+            'uuid'     => 'b3b2f865-f697-11e7-965e-08002751fd3c',
+            'type'     => 'tooltip',
+            'selector' => '#profile-options',
+            'content'  => "<p>
                     <b>Profile</b> will allow you to view your profile.
                     <br />
                     <b>Settings</b> will allow you to customise your notifications.
                     <br />
                     <b>Logout</b> will log you out of the system.
-                </p>
-            ",
+                </p>",
         ],
 
         // Switch user
