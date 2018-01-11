@@ -115,6 +115,7 @@ Usage:
 {% block instructions %}{% endblock %}
 
 {# Not the most recent response? Say so, and give a CTA to show the most recent. #}
+{% block mightBeOutofDate %}
 {% if not isMostRecentResponse %}
     <div class="row">
         <div class="small-12 columns">
@@ -130,6 +131,7 @@ Usage:
         </div>
     </div>
 {% endif %}
+{% endblock %}
 
 {# Grading logic and structure #}
 <div class="row mark-scheme" id="assessment-status" data-participant>
