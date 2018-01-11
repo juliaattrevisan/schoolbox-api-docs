@@ -9,10 +9,11 @@ namespace Schoolbox\Tour\Status;
 
 use Schoolbox\User;
 use Schoolbox\Tour\Step;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 
 class Model implements \JsonSerializable
 {
-
+    use CreatedAtDate;
 
     /** User has not interacted with this step/step in the joyride */
     const STATUS_UNACTIONED = 'unactioned';
