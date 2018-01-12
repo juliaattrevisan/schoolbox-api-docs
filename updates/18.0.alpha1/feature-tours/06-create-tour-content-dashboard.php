@@ -53,7 +53,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'type'     => 'tooltip',
             'selector' => '#profile-accordion',
             'content'  => "
-                <p>At the top of the side menu you will see your profile picture and name. Opening this will give you some further options.</p>
+                <p>At the top of the side menu you will see your profile picture and name. Clicking the arrow will give you some further options.</p>
             ",
         ],
 
