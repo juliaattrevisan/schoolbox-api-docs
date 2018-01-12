@@ -93,12 +93,11 @@
             fullCalendar: {
                 defaultDate: moment('2017-08-01'),
                 height: height,
-                defaultView: anchor || 'month',
+                defaultView: anchor || 'timelineTerm',
                 // Event limit: could be configured from session but leave global for now
                 eventLimit: 4,
                 firstDay: Number('{{ config.calendar_start_day|escape('js') }}'),
                 schedulerLicenseKey: '{{ config.fullcalendar_scheduler_license_key }}',
-                defaultView: 'timelineTerm',
                 views: {
                     timelineTerm: {
                         eventLimit: 1,
