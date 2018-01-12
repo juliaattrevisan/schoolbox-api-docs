@@ -249,6 +249,9 @@ function Calendar(id, bubbleId, opts) {
                     data.relatedBookings = calEvent.data.booking.related;
                 }
 
+                data.start = calEvent.start;
+                data.end   = calEvent.end;
+
                 self.bubble.display('edit', data, jsEvent, this);
 
                 // Hide event types in the bubble
