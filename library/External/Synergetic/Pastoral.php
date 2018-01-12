@@ -424,7 +424,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     ClassCode,
                     MethodCode,
                     EmailSentByID,
-                    ClassificationCode
+                    ClassificationCode,
+                    ConfidentialFlag
                 ) VALUES (
                     :studentExternalId, 
                     :itemDate,
@@ -439,7 +440,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     '',
                     '',
                     -1,
-                    :classificationCode
+                    :classificationCode,
+                    1
                 )
             ";
         } else {
@@ -455,7 +457,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                             CreatedById = :createdOwnerId,
                             ModifiedDate = :modifiedDate,
                             ModifiedById = :modifiedOwnerId,
-                            ClassificationCode = :classificationCode
+                            ClassificationCode = :classificationCode,
+                            ConfidentialFlag = 1
                 WHERE       PastoralCareSeq = :externalId
             ";
         }
