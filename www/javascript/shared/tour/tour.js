@@ -1,7 +1,7 @@
 $(function () {
 
     if (typeof(window.tourUrl) !== 'undefined') {
-        $.get(tourUrl).done(function (tours) {
+        $.get(window.tourUrl).done(function (tours) {
 
             // Function to initiate a joyride
 
@@ -27,7 +27,8 @@ $(function () {
                             stepsToDisplay.push({
                                 intro: step.body,
                                 element: step.selector,
-                                tooltipClass: step.css_class
+                                tooltipClass: step.css_class,
+                                uuid: step.uuid
                             });
                         }
                     });
@@ -43,6 +44,74 @@ $(function () {
                         disableInteraction: true,
                         exitOnOverlayClick: false,
                         steps: stepsToDisplay.filter(function(obj) { return $(obj.element).is(':visible'); })
+                    });
+
+
+                    var oldStep = null;
+                    var completed  = false;
+                    var tourUrl = window.location.pathname;
+                    //TO DO: Inject route when file is pluginerised
+                    var saveRoute = '/tour/url/save';
+
+                    tourCurrent.onchange(function(targetElement) {
+                        var newStep     = tourCurrent._introItems[tourCurrent._currentStep].uuid;
+
+                        //This matches the consts on the Status/Model - to be updated when this file is a plugin
+                        var status      = "unactioned";
+
+                        //Save the status
+                        $.post(saveRoute, {
+                            url: tourUrl,
+                            oldStep: oldStep,
+                            newStep: newStep,
+                            status: status
+                        });
+
+                        oldStep         = newStep;
+                    });
+
+                    tourCurrent.oncomplete(function(targetElement) {
+                        completed = true;
+
+                        var newStep     = tourCurrent._introItems[tourCurrent._currentStep].uuid;
+
+                        //This matches the consts on the Status/Model - to be updated when this file is a plugin
+                        var status      = "completed";
+
+                        //Save the status
+                        $.post(saveRoute, {
+                            url: tourUrl,
+                            oldStep: oldStep,
+                            newStep: newStep,
+                            status: status
+                        });
+                    });
+
+                    tourCurrent.onexit(function(targetElement) {
+                        //onexit triggers when oncomplete triggers, so need check
+                        if(!completed) {
+                            var newStep = tourCurrent._introItems[tourCurrent._currentStep].uuid;
+
+                            //This matches the consts on the Status/Model - to be updated when this file is a plugin
+                            var status = "dismissed";
+
+                            //Save the status
+                            $.post(saveRoute, {
+                                url: tourUrl,
+                                oldStep: oldStep,
+                                newStep: newStep,
+                                status: status
+                            });
+                        }
+                    });
+
+
+                    //You can retrieve the tour status as follows
+                    var getRoute    = '/tour/status/{tour_uuid}';
+                    var getUrl      = getRoute.replace("{tour_uuid}", tour["uuid"]);
+
+                    $.get(getUrl, null, function (data, status) {
+                        //Do whatever you like with data
                     });
 
                     // Fire the tour
