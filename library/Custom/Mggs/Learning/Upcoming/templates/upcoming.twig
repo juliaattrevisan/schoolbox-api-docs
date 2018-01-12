@@ -67,7 +67,8 @@
             height = 'auto';
         }
 
-        var $cal = $('#calendar')
+        var $cal = $('#calendar');
+        var $modalForm = $('#editEvent');
 
         c = new Calendar('calendar', 'calendar-bubble', {
             userId: '{{ student.id|escape('js') }}',
@@ -78,6 +79,16 @@
                 checkboxSelector: false,
                 applyFiltersSelector: false,
                 listViewButton: false
+            },
+            bubble: {
+                onOpen: function (method, eventData) {
+                    var format = convertFormat('{{ config.date_local }}');
+
+                    this.dom.find('[data-event-modal-field="bounds.open"]').text(moment(eventData.bounds.open).format(format));
+                    this.dom.find('[data-event-modal-field="bounds.due"]').text(moment(eventData.bounds.due).format(format));
+
+                    $modalForm.data('eventData', eventData);
+                }
             },
             fullCalendar: {
                 defaultDate: moment('2017-08-01'),
@@ -119,13 +130,13 @@
                     $cal.find('.fc-day').removeClass('no-drop');
                 },
 
+                eventDrop: updateAssessment,
                 eventAfterAllRender: function (view) {
                     if (view.type !== 'timelineTerm') {
                         // if not on timeline view, do nothing
                         return true;
                     }
 
-                    console.log('sdbfswd');
 
                 },
                 resources: {
@@ -162,7 +173,7 @@
                  * When an event is drawn on the calendar
                  * @param calEvent
                  */
-                eventRender: function(calEvent) {
+                eventRender: function (calEvent, $element, view) {
                     // Always render placeholders in the most basic manner
                     if (calEvent.id === 'placeholder') {
                         return true;
@@ -276,18 +287,61 @@
             x: false
         }).init();
 
+        $modalForm.on('change', 'input[data-datepicker]', function () {
+            var dateField = $modalForm.find('.date'),
+                prevDate  = dateField.text(),
+                eventData = $modalForm.data('eventData'),
+                newDate   = moment($(this).val(), convertFormat('{{ config.date_local }}')),
+                assessId  = eventData.assessmentId,
+                eventData = {
+                    className: [],
+                    start: newDate,
+                    data: {
+                        meta: {
+                            assessmentId: assessId
+                        }
+                    }
+                },
+                onDone = function () {
+                    // update the modal UI
+                    dateField.text(newDate.format('ddd Do MMM'));
+
+                    // update the view
+                    var calEvent = $cal.fullCalendar('clientEvents', function (calEvent) {
+                        return calEvent.data.meta.assessmentId == assessId;
+                    }).pop();
+
+                    calEvent.start = newDate;
+
+                    $cal.fullCalendar('updateEvent', calEvent);
+                },
+                onFail = function () {
+                    // revert the modal UI back to the previous value
+                    dateField.text(prevDate);
+                }
+            ;
+
+            // indicate new date is saving
+            dateField.html('<img class="saving-spinner" src="/images/foundation/preloader.gif" /> Saving new date&hellip;');
+
+            // attempt to persist this data
+            updateAssessment(eventData, null, onFail, onDone);
+        });
+
+
         /**
          * Update assessment method.
          *
          * * Gives event a "loading" style
          * * Removes that style when update finishes (regardless of result)
          *
-         * @param calEvent   The event to update
-         * @param delta      The amount of change
-         * @param revertFunc called if update failed for whatever reason.
-         *                   Sets event back to original state.
+         * @param calEvent    The event to update
+         * @param delta       The amount of change
+         * @param revertFunc  called if update failed for whatever reason.
+         *                    Sets event back to original state.
+         * @param successFunc called if update succeeds
          */
-        function updateAssessment(calEvent, delta, revertFunc) {
+        function updateAssessment(calEvent, delta, revertFunc, successFunc) {
             var format = 'Y-MM-DD HH:mm:ss';
 
             // account for Fullcalendar exclusive vs inclusive end dates
@@ -304,13 +358,12 @@
                 null,
                 'json'
             );
-            post.fail(revertFunc)
+            post.done(successFunc).fail(revertFunc)
                 .always(function() {
                     // Remove the loading class
                     calEvent.className = calEvent.className.filter(function (value) {
                         return value != 'loading';
                     });
-                    // $cal.fullCalendar('rerenderEvents');
                 });
         };
 
@@ -513,9 +566,14 @@
             <div class="small-12">
                 <h3 class="note"></h3>
                 <ul class="meta">
-                    <li class="icon-calendar">
-                        <span class="date"></span>
-                        <a href="#">change</a>
+                    <li class="icon-calendar">Your due date: <span class="date"></span></li>
+                    <li class="icon-time-value">{% spaceless %}
+                        You can change this date to be anywhere between
+                        <span data-event-modal-field="bounds.open"></span>
+                        and
+                        <span data-event-modal-field="bounds.due"></span>
+                    {% endspaceless %}</li>
+                    <li class="icon-info">
                         <em>(you can also change the date by dragging the assessment around the calendar)</em>
                     </li>
                     <li class="icon-staff-students" data-event-modal-field="post-by">Posted by <a class="author" href="#" data-is-user-link="1"></a></li>
@@ -527,6 +585,9 @@
                 <div>
                     <dl>
                         <dd>
+                            <span>
+                                <input data-datepicker data-datepicker-buttontext="Change Date" type="hidden" />
+                            </span>
                             <span class="homepageLink" data-is-html="1"></span>
                             <span class="moreDetailsLink" data-is-html="1"></span>
                             <span class="modifyLink" data-is-html="1"></span>
