@@ -17,7 +17,6 @@
             var defaults = {
                 element: element,
                 width: '100%',
-                deleteButton: $('[data-deleteButton="1"]')
             }
 
             var derived = {
