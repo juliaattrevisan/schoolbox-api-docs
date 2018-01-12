@@ -290,6 +290,9 @@ class Provisioner
                     }
                 }
 
+                // this inherently closes the DB cursor, which is necessary before attempting to open the next one
+                unset($externalUsers);
+
                 // end of a strat - save the result
                 $this->logger->warning("SUMMARY: $created users created, $updated users updated, $skipped users skipped");
                 $this->logMapper->flush($this->logger);
