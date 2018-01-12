@@ -83,11 +83,11 @@ class Cronterpreter
             // no diff: every day
             $fq = "every day";
 
-        } elseif (!array_diff(array_slice(array_keys($test), 1, 5), $days)) {
+        } elseif (!array_diff($days, array_slice(array_keys($test), 1, 5))) {
             // matches middle 5: weekdays
             $fq = "on weekdays";
 
-        } elseif (!array_diff([ 0, 6 ], $days)) {
+        } elseif (!array_diff($days, [0, 6])) {
             // matches first and last: weekend
             $fq = "on weekends";
 
