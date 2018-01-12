@@ -127,7 +127,7 @@
                                             {% endif %}
                                         {% else %}
                                             {% if not normalisedMark is null %}
-                                                {% set colorClass = normalisedMark >= 70 ? classMastered : classFailed %}
+                                                {% set colorClass = normalisedMark >= config.pbl_mastery_threshold ? classMastered : classFailed %}
                                             {% else %}
                                                 {% set colorClass = '' %}
                                             {% endif %}

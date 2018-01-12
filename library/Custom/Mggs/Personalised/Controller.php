@@ -182,7 +182,7 @@ class Controller extends Base
     public function getCalendarForStudent(User $student)
     {
         // Build the list
-        $eventFactory  = new Event\Factory($this->getRouter());
+        $eventFactory  = new Event\Factory($this->getRouter(), $this->getConfigLoader());
         $assessments   = $this->assessmentDataSource->findAllByStudentWithinWindow(
             $student,
             true,
