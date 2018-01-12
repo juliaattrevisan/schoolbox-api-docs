@@ -5,7 +5,6 @@
         var config = init(options, $(this));
 
         setupDimensions();
-        setupDelete();
 
         /**
          * Init
@@ -18,7 +17,6 @@
             var defaults = {
                 element: element,
                 width: '100%',
-                deleteButton: $('[data-deleteButton="1"]')
             }
 
             var derived = {
