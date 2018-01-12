@@ -122,7 +122,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     Flatpickr.localize(Flatpickr.l10ns.default);
     Flatpickr.l10ns.default.firstDayOfWeek = twigVars.weekStartDay;
 
-    window.pickerInstance[twigVars.id] = flatpickr("#pickerCalendar" + twigVars.id, {
+    var flatPickrConf = {
         defaultDate: twigVars.date,
         inline: true,
         altInput: false,
@@ -216,8 +216,9 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             }
         }
 
-    });
+    };
 
+    window.pickerInstance[twigVars.id] = flatpickr("#pickerCalendar" + twigVars.id, flatPickrConf);
 
     /**
      * Show the all day checkbox
