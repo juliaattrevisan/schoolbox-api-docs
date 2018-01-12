@@ -50,9 +50,10 @@ $(function () {
                         // Note that :visible does not check if element has visibility == hidden,
                         // hence the need for a separate check
                         return (
-                            ($(element).css("visibility") !== "hidden")
-                            && ($(element).is(":visible"))
-                            && (! isOffscreen(element))
+                            // TODO commented out temporarily for showcase
+                            // ($(element).css("visibility") !== "hidden") &&
+                            ($(element).is(":visible"))
+                            // && (! isOffscreen(element))
                         );
                     }
 
