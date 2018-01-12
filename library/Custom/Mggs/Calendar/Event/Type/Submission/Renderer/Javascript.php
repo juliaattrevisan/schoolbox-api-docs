@@ -11,6 +11,7 @@ namespace Custom\Mggs\Calendar\Event\Type\Submission\Renderer;
 use Calendar;
 use Calendar\Event\Type\EventBase;
 use Group;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\User;
 use SitePage;
@@ -47,6 +48,11 @@ class Javascript extends \Calendar\Event\Type\Submission\Renderer\Javascript
      */
     public function isEditable()
     {
+        if ($this->getEvent()->getAssessment() instanceof Project) {
+            // cannot move projects in this view
+            return false;
+        }
+
         // can edit if staff, or student is viewing own work
         return $this->getViewer()->getRole()->isStaff() || $this->getViewer()->getId() === $this->getUser()->getId();
     }
@@ -174,6 +180,22 @@ class Javascript extends \Calendar\Event\Type\Submission\Renderer\Javascript
             return 'pending';
         }
 
-        return 'reviewed';
+        // did the student master this task?
+        $fb = $part->getAuthoritativeFeedback(true);
+
+        if (!$fb) {
+            // erm, this shouldn't happen, but ok?
+            return 'pending';
+        }
+
+        $mark = $fb->getNormalisedMark();
+
+        if ($mark === null || $mark >= ConfigMapper::getInstance()->get('pbl_mastery_threshold')) {
+            // mark as success if null, or above mastery level
+            return 'reviewed';
+        }
+
+        // disappoint
+        return 'failed';
     }
 }
