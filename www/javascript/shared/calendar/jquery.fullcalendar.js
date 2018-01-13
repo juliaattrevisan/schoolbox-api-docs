@@ -200,19 +200,21 @@ function Calendar(id, bubbleId, opts) {
                 }
                 catch (e) {}
 
-                $.each(calEvent.data.attendance, function(k, v) {
-                    data['attendance' + k.capitalise()] = v
-                })
+                if ('attendance' in calEvent.data) {
+                    $.each(calEvent.data.attendance, function(k, v) {
+                        data['attendance' + k.capitalise()] = v
+                    })
 
-                // Attendance List butonye
-                if (data.attendanceListButton.toString() == 'true') {
-                    data.attendanceIcon = ''
-                    data.attendanceListButton = '<a class="button icon-group" href="/calendar/attendance/list/'
-                        + calEvent.data.meta.eventId + '">Attendees</a>'
-                }
-                // Attend/Unattend butonye
-                if (data.attendanceRequestButton.toString() != 'false') {
-                    data.attendanceRequestButton = '<a class="button icon-reply" href="#" data-attendance-request>' + data.attendanceRequestButton.toString() + '</a>'
+                    // Attendance List butonye
+                    if (data.attendanceListButton.toString() == 'true') {
+                        data.attendanceIcon = ''
+                        data.attendanceListButton = '<a class="button icon-group" href="/calendar/attendance/list/'
+                            + calEvent.data.meta.eventId + '">Attendees</a>'
+                    }
+                    // Attend/Unattend butonye
+                    if (data.attendanceRequestButton.toString() != 'false') {
+                        data.attendanceRequestButton = '<a class="button icon-reply" href="#" data-attendance-request>' + data.attendanceRequestButton.toString() + '</a>'
+                    }
                 }
 
                 data.bookingActions = [];
