@@ -14,6 +14,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     var pickerOptions = {
         // Flatpickr related
         enableTime: getValue($picker, 'data-datepicker-time'),
+        enable: getValue($picker, 'data-datepicker-range'), // enabled date range, in the form "YYYY-MM-DD,YYYY-MM-DD"
 
         // All the rest
         altFormat: getValue($picker, 'data-datepicker-format'), // false|date|datetime
@@ -217,6 +218,16 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         }
 
     };
+
+    // only apply this if actually specified
+    if (pickerOptions.enable) {
+        var range = pickerOptions.enable.split(',');
+
+        flatPickrConf.enable = [{
+            from: range[0],
+            to: range[1]
+        }];
+    }
 
     window.pickerInstance[twigVars.id] = flatpickr("#pickerCalendar" + twigVars.id, flatPickrConf);
 
