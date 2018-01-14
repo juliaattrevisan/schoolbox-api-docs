@@ -150,7 +150,7 @@ class DataSource
      * @throws DomainException If user has interaction but not participant record
      * @throws DefinitionException If unable to locate a specified mapper join
      */
-    public function loadParticipationIntoAssessmentCollection(Collection $assessments, User $user = null): void
+    public function loadParticipationIntoAssessmentCollection(Collection $assessments, User $user = null): Collection
     {
         /** @var Collection|IAssessable[] $assessableWithDescendants */
         $assessableWithDescendants = new GenericCollection(IAssessable::class);
@@ -165,6 +165,7 @@ class DataSource
                 $this->aggregator->aggregate($assessable);
             }
         }
+        return $assessableWithDescendants;
     }
 
 

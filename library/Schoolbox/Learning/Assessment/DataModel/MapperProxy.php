@@ -999,11 +999,10 @@ class MapperProxy
         Collection $collection,
         User $user = null
     ) {
-        $this->participantDataSource->loadParticipationIntoAssessmentCollection(
+        return $this->participantDataSource->loadParticipationIntoAssessmentCollection(
             $collection,
             $user
         );
-        return $collection;
     }
 
     /**

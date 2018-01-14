@@ -227,7 +227,7 @@ class Module extends BaseModule
         $unitImplsInTerm = $this->getUnitImplementationMapper()->createCollection();
 
         // Load Participants into relevant Assessments
-        $this->getParticipantDataSource()->loadParticipationIntoAssessmentCollection($dueAssessments);
+        $dueAssessments = $this->getParticipantDataSource()->loadParticipationIntoAssessmentCollection($dueAssessments);
         foreach ($dueAssessments as $assessment) {
             $unitImplsInTerm->setOffset($assessment->getContext()->getId(), $assessment->getContext());
         }
