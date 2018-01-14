@@ -412,7 +412,7 @@ class Controller extends Assessment\Controller
 
         if($assessment->getUseRubric()){
             $rubric = $this->rubricMapper->findByDueWork($assessment);
-            $this->participantMapper->loadParticipationIntoAssessment($assessment);
+            $assessment = $this->participantMapper->loadParticipationIntoAssessment($assessment);
 
             $data = array_merge($data, [
                 'headers'  => $this->getRubricHeaders($rubric),
@@ -441,7 +441,7 @@ class Controller extends Assessment\Controller
         }
 
         $rubric = $this->rubricMapper->findByDueWork($assessment);
-        $this->participantMapper->loadParticipationIntoAssessment($assessment);
+        $assessment = $this->participantMapper->loadParticipationIntoAssessment($assessment);
 
         $basename = (new \Url($assessment->getTitle()))->getSlug();
         $content = $this->array2csv($this->collateResultSquare($rubric, $assessment->getAllParticipants()));

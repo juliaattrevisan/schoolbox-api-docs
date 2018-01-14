@@ -823,7 +823,7 @@ class MapperProxy
             $originalModel = $this->baseMapper->findOneByColumnList([$column => $value]);
             $assessment    = $this->translateToDomainModel($originalModel);
             if ($loadParticipants) {
-                $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
+                $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
             }
             return $assessment;
 
@@ -831,7 +831,7 @@ class MapperProxy
             // Populate participants for the deleted assessment, and rethrow
             $assessment = $this->translateToDomainModel($e->getDeletedObject());
             if ($loadParticipants) {
-                $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
+                $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
             }
             $e->setDeletedObject($assessment);
             throw $e;
@@ -960,7 +960,7 @@ class MapperProxy
         $includeFeedbacks = true
     ) {
         foreach ($users as $user) {
-            $this->participantDataSource->loadParticipationIntoAssessment(
+            $assessment = $this->participantDataSource->loadParticipationIntoAssessment(
                 $assessment,
                 $user,
                 $includeResponses,
@@ -979,11 +979,10 @@ class MapperProxy
      */
     public function loadParticipantsIntoAssessment(IAssessable $assessable, User $user = null): IAssessable
     {
-        $this->participantDataSource->loadParticipationIntoAssessment(
+        return $this->participantDataSource->loadParticipationIntoAssessment(
             $assessable,
             $user
         );
-        return $assessable;
     }
 
     /**
