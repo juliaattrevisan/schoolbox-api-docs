@@ -147,7 +147,7 @@ class DataSource
      * This includes records for responses and feedbacks for every participant in each assessment.
      *
      * @param Collection|IAssessable[] $assessments
-     * @param User                     $user
+     * @param User|null                $user
      * @return Collection|IAssessable[] $assessments, with participation loaded.
      * @throws UnexpectedValueException If unable to merge student collections
      * @throws DomainException If user has interaction but not participant record
