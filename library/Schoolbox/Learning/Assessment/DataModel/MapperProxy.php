@@ -949,22 +949,16 @@ class MapperProxy
      *
      * @param IAssessable $assessment
      * @param Collection  $users
-     * @param bool        $includeResponses
-     * @param bool        $includeFeedbacks
      * @return IAssessable
      */
     public function loadParticularParticipantsIntoAssessment(
         IAssessable $assessment,
-        Collection $users,
-        $includeResponses = true,
-        $includeFeedbacks = true
+        Collection $users
     ) {
         foreach ($users as $user) {
             $assessment = $this->participantDataSource->loadParticipationIntoAssessment(
                 $assessment,
-                $user,
-                $includeResponses,
-                $includeFeedbacks
+                $user
             );
         }
         return $assessment;
