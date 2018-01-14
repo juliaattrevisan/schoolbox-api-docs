@@ -472,7 +472,7 @@ abstract class Synchronise_Base_Strategy
     */
     public function getHouseFromUser($currentUser)
     {
-        return 0;
+        return null;
     }
 
     /**
@@ -484,7 +484,7 @@ abstract class Synchronise_Base_Strategy
     */
     public function getResidentialHouseFromUser($currentUser)
     {
-        return 0;
+        return null;
     }
 
     /**
