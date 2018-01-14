@@ -12,6 +12,10 @@
 <script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
 <script type="text/javascript">
 
+    var realEventList = {};
+
+    var collapsed = false;
+
     // provide page-wide access to the calendar object so the callbacks can actually use it
     var c;
 
@@ -82,10 +86,36 @@
             },
             bubble: {
                 onOpen: function (method, eventData) {
-                    var format = convertFormat('{{ config.date_local }}');
 
-                    this.dom.find('[data-event-modal-field="bounds.open"]').text(moment(eventData.bounds.open).format(format));
-                    this.dom.find('[data-event-modal-field="bounds.due"]').text(moment(eventData.bounds.due).format(format));
+                    if (eventData.placeholder) {
+                        // do not bubble on placeholders; instead, we'll open the appropriate popover
+                        return false;
+                    }
+
+                    var format = convertFormat('{{ config.date_local }}'),
+                        open   = moment(eventData.bounds.open),
+                        due    = moment(eventData.bounds.due);
+
+                    this.dom.find('[data-event-modal-field="bounds.open"]').text(open.format(format));
+                    this.dom.find('[data-event-modal-field="bounds.due"]').text(due.format(format));
+                    this.dom.find('[data-datepicker]').attr('data-datepicker-range', open.format('YYYY-MM-DD') + ',' + due.format('YYYY-MM-DD'))
+
+                    // also re-init if we can
+                    for (var index in window.pickerInstance) {
+                        if (window.pickerInstance[index]) {
+                            // reset
+                            // window.pickerInstance[index].set('enable', null);
+
+                            // reconfigure
+                            window.pickerInstance[index].set('enable', [
+                                {
+                                    from: open.format('YYYY-MM-DD'),
+                                    to: due.format('YYYY-MM-DD')
+                                }
+                            ]);
+                            console.log(window.pickerInstance[index]);
+                        }
+                    }
 
                     $modalForm.data('eventData', eventData);
                 }
@@ -123,10 +153,17 @@
                                 $cell.addClass('no-drop');
                             }
                         }
+                    } else if (view.type == 'timelineTerm') {
+                        console.log(view);
                     }
                 },
                 eventDragStop: function () {
                     $cal.find('.fc-day').removeClass('no-drop');
+                    // allow a re-render of the view
+                    collapsed = false;
+
+                    // drain the list of real events for re-population
+                    realEventList = {};
                 },
 
                 eventDrop: updateAssessment,
@@ -136,12 +173,65 @@
                         return true;
                     }
 
+                    // just index the weeks
+                    $('.fc-scroller-canvas .fc-content tr').eq(2).find('th[data-date]').each(function (index) {
+                        $(this).find('.fc-cell-text').text(index + 1);
+                    });
 
+                    // already done this
+                    if (collapsed) {
+                        console.log('already collapsed, not re-rendering placeholders')
+                        return true;
+                    }
+
+                    console.log('rendering placeholders');
+
+                    // if there are already fakes, make them gone
+                    $cal.fullCalendar('removeEvents', function (calEvent) {
+                        return 'placeholder' in calEvent.data;
+                    });
+
+                    var listOfFakesToRender = [];
+                    // we're on timeline: take all the events that have been rendered
+                    // and smoosh them into placeholders
+                    for (var resourceId in realEventList) {
+                        for (var wk in realEventList[resourceId]) {
+                            var calEvents = realEventList[resourceId][wk];
+
+                            var placeholderEvent = {
+                                allDay: true,
+                                color: '#ffffff',
+                                editable: false,
+                                resourceId: resourceId,
+                                title: '', // blank title for placeholders
+                                start: moment(wk),
+                                end: null,
+                                data: {
+                                    placeholder: true,
+                                    meta: {
+                                        count: calEvents.length,
+                                        status: 'incomplete', // TODO figure out the composite of the events
+                                        wk: wk
+                                    }
+                                }
+                            };
+
+                            // fakeEventList[resourceId][wk] = placeholderEvent;
+                            listOfFakesToRender.push(placeholderEvent);
+                        }
+                    }
+
+                    console.log('collapsed is now true');
+                    // prevent recursion
+                    collapsed = true;
+
+                    // render the new set of events
+                    console.log('pushing render of fakes to queue');
+                    $cal.fullCalendar('renderEvents', listOfFakesToRender, true);
+
+                    // $cal.find('[data-resource-id]').each(renderPopovers);
                 },
-                resources: {
-                    dataType: 'json',
-                    url:      '{{ routeLookup('learningPersonalised.getResourcesForStudent', {studentId: student.id}) }}'
-                },
+                resources: debug_resources,
 
                 resourceAreaWidth: '40%',
                 resourceColumns: [
@@ -202,6 +292,38 @@
 
                         $element.addClass('progress-' + status);
                     }
+
+                    if (!view.type === 'timelineTerm') {
+                        // if not on timeline view, that's all
+                        return true;
+                    }
+
+                    if (calEvent.data.placeholder) {
+                        // dis fake
+                        console.log('fake');
+                        return true;
+                    }
+
+                    // not fake: in this case, we need to flag the postRender function to re-render all the fakes
+                    // console.log('collapsed is now false');
+                    // collapsed = false;
+
+                    // start by collating the count of real events per week
+
+                    // get the resource ID and derive the week in which this event occurs
+                    var rId = calEvent.resourceId,
+                        wk  = calEvent.start.year() + 'W' + calEvent.start.week();
+
+                    // make sure we don't cop NPEs
+                    ensureIndices(rId, wk);
+
+                    // push into the real event list
+                    realEventList[rId][wk].push([ calEvent, $element ]);
+
+                    // $element.addClass('hide').addClass('call-me-by-your-name');
+
+                    // for now, do the rest
+                    console.log('pushed event into ' + rId + ', ' + wk);
 
                     return true;
                 },
@@ -365,6 +487,16 @@
                     });
                 });
         };
+
+        function ensureIndices(rId, wk) {
+            if (typeof realEventList[rId] === 'undefined') {
+                realEventList[rId] = {};
+            }
+
+            if (typeof realEventList[rId][wk] === 'undefined') {
+                realEventList[rId][wk] = [];
+            }
+        }
 
         function isInsideBounds(event, target, resourceId)
         {
@@ -585,7 +717,7 @@
                     <dl>
                         <dd>
                             <span>
-                                <input data-datepicker data-datepicker-buttontext="Change Date" type="hidden" />
+                                <input id="pblDateChange" data-datepicker data-datepicker-buttontext="Change Date" type="hidden" />
                             </span>
                             <span class="homepageLink" data-is-html="1"></span>
                             <span class="moreDetailsLink" data-is-html="1"></span>
