@@ -104,7 +104,7 @@ class Sync extends Base implements ISync
         }
 
         // Single Tuple contains data for [P]arent and [S]pouse
-        $iterator = $this->databaseExternal->executeQueryIterator
+        $iterator = $this->databaseExternal->getQueryIterator
         (
             "
                 SELECT DISTINCT

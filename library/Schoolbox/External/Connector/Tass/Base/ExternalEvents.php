@@ -140,7 +140,7 @@ class ExternalEvents extends Base implements IExternalEvents
          */
         $query = implode(' UNION ', $allEvents);
 
-        return $this->databaseExternal->executeQueryIterator($query, [
+        return $this->databaseExternal->getQueryIterator($query, [
             'externalId' => $user->getExternalId(),
             'startTime' => $start->getDatabase(),
             'endTime' => $end->getDatabase()
