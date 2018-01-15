@@ -29,6 +29,11 @@
 
         {% set rowspan = group.criteria|length + (group.total ? 1 : 0) %}
 
+        {# Self-Assessment #}
+        {% if learnerRubric %}
+            {% set rowspan = rowspan + 1 %}
+        {% endif %}
+
         {% for critIndex, crit in group.criteria %}
     <tr data-group="{{ rubricId }}-{{ group.id }}">
         {# yay html tables... -_-; #}
@@ -99,6 +104,15 @@
                 {{ group.humanReadableMark }}
             </th>
         </tr>
+
+        {# Self-Assessment #}
+        {% if learnerRubric %}
+            <tr>
+                <th colspan="{{ rubric.levels|length + 1 }}">
+                    {{ learnerRubric.groups[groupIndex].humanReadableMark }} given in {{ locale.selfAssessment.singularForm }}
+                </th>
+            </tr>
+        {% endif %}
         {% endif %}
 
     {% endfor %}
