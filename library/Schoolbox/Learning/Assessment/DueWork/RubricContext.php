@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork;
 
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GridGenerator;
 use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -53,10 +54,10 @@ class RubricContext
         $publishedOnly = false;
 
         if ($responseId) {
-            $this->rubricMapper->applyStudentMarkForResponse($dueWork->getRubric(), $student, $publishedOnly, $responseId);
+            (new GridGenerator($this->rubricMapper))->applyStudentMarkForResponse($dueWork->getRubric(), $student, $publishedOnly, $responseId);
         }
         else {
-            $this->rubricMapper->applyStudentMark($dueWork->getRubric(), $student, $publishedOnly);
+            (new GridGenerator($this->rubricMapper))->applyStudentMark($dueWork->getRubric(), $student, $publishedOnly);
         }
 
         $context = [
@@ -96,7 +97,7 @@ class RubricContext
             return ['rubric' => null];
         }
 
-        $this->rubricMapper->applyStudentMark($dueWork->getRubric(), $student, $publishedOnly);
+        (new GridGenerator($this->rubricMapper))->applyStudentMark($dueWork->getRubric(), $student, $publishedOnly);
 
         $context = [
             'rubric' => $dueWork->getRubric()->toContext($currentUser),
