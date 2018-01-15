@@ -49,8 +49,7 @@ $(function () {
                                 uuid: step.uuid,
                                 jsEvents: step.events
                             });
-                        }
-                        if (step.type === 'modal') {
+                        } else if (step.type === 'modal') {
                             stepsToDisplay.push({
                                 intro: step.body,
                                 element: step.selector,

@@ -125,6 +125,7 @@ class Mapper extends BaseMapper
             FROM        {$this->getTable()}
             LEFT JOIN   {$this->getJoinSql('tour', '', 'tour', true)}
             LEFT JOIN   `tour_step_tooltip` ON `tour_step_tooltip`.`tour_step_uuid` = `tour_step`.`uuid`
+            LEFT JOIN   `tour_step_modal` ON `tour_step_modal`.`tour_step_uuid` = `tour_step`.`uuid`
             LEFT JOIN   `tour_step_event` ON `tour_step_event`.`tour_step_uuid` = `tour_step`.`uuid` AND `tour_step_event`.`deleted_at` IS NULL
             WHERE       `tour`.`uuid` = :tourUuid AND
                         `tour`.`active` = 1 AND

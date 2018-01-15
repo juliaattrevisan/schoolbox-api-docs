@@ -8,6 +8,7 @@ CREATE TABLE `tour_step_modal`
   `author_user_id`    INT(4) UNSIGNED   NULL,                     -- Not mandatory, Alaress created tooltips will not have an author ID
   `title`             VARCHAR(255)      NULL,                     -- Current has no purpose currently- for future use in an admin builder interface
   `body`              TEXT              NULL,                     -- Contents of the tooltip
+  `css_class`         VARCHAR(255)      NULL,                     -- Optional CSS class override for tooltip
   `created_at`        DATETIME          NOT NULL,
   `updated_at`        DATETIME          NOT NULL,
   `deleted_at`        DATETIME          NULL,
