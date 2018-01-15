@@ -13,7 +13,6 @@ namespace Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GridGenerator;
 use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
