@@ -1,3 +1,6 @@
+ALTER TABLE tour_step
+MODIFY COLUMN type enum('tooltip', 'modal');
+
 CREATE TABLE `tour_step_modal`
 (
   `uuid`              VARCHAR(36)       PRIMARY KEY NOT NULL,

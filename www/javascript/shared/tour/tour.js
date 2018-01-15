@@ -50,6 +50,13 @@ $(function () {
                                 jsEvents: step.events
                             });
                         }
+                        if (step.type === 'modal') {
+                            stepsToDisplay.push({
+                                intro: step.body,
+                                element: step.selector,
+                                uuid: step.uuid
+                            });
+                        }
                     });
 
                     tourCurrent.setOptions({
