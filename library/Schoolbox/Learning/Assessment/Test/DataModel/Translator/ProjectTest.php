@@ -217,11 +217,11 @@ class ProjectTest extends TestCase
      *
      * @dataProvider getTestTranslateMarkSchemeToDataModelData
      *
-     * @param Project $project
-     * @param int     $markTypeId
-     * @param int     $gradeGroupId
+     * @param Project  $project
+     * @param int      $markTypeId
+     * @param null|int $gradeGroupId
      */
-    public function testTranslateMarkSchemeToDataModel(Project $project, $markTypeId, $gradeGroupId)
+    public function testTranslateMarkSchemeToDataModel(Project $project, int $markTypeId, ?int $gradeGroupId)
     {
         /** @var ProjectModel $projectModel */
         $projectModel = $this->translator->translateToDataModel($project);
@@ -231,7 +231,9 @@ class ProjectTest extends TestCase
 
         // Test mark type
         $this->assertEquals($markTypeId, $projectModel->getMarkType()->getId());
-        $this->assertEquals($gradeGroupId, $projectModel->getGradeGroup()->getId());
+        if (null !== $gradeGroupId) {
+            $this->assertEquals($gradeGroupId, $projectModel->getGradeGroup()->getId());
+        }
     }
 
     /**

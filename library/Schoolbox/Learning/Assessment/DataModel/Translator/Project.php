@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
@@ -16,6 +17,7 @@ use Schoolbox\Learning\Assessment\DataModel\Translator as BaseTranslator;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project as ProjectObject;
 use Schoolbox\Learning\Assessment\Summator\Average;
+use Schoolbox\Learning\Assessment\Summator\ISummator;
 use Schoolbox\Learning\Assessment\Summator\Maximum;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
@@ -29,6 +31,7 @@ use UnexpectedValueException;
  */
 class Project implements IAssessmentTypeTranslator
 {
+
     /**
      * @var BaseTranslator
      */
@@ -36,6 +39,10 @@ class Project implements IAssessmentTypeTranslator
 
     /** @var ProjectMapper */
     private $projectMapper;
+
+    /** @var MarkTypeMapper */
+    private $markTypeMapper;
+
 
     /**
      * Constructor
@@ -45,7 +52,8 @@ class Project implements IAssessmentTypeTranslator
     public function __construct(BaseTranslator $baseTranslator)
     {
         $this->baseTranslator = $baseTranslator;
-        $this->projectMapper = ProjectMapper::getInstance(); // TODO inject
+        $this->projectMapper  = ProjectMapper::getInstance(); // TODO inject
+        $this->markTypeMapper = MarkTypeMapper::getInstance(); // TODO inject
     }
 
 
@@ -105,17 +113,14 @@ class Project implements IAssessmentTypeTranslator
         int $depth = 0,
         bool $translateProjectContext = true
     ): void {
-        $dataModel
-            ->setTitle($domainObject->getTitle())
-            ->setDescription($domainObject->getDescription())
-            ->setWeight($domainObject->getWeight())
-            ->setMarkType(new MarkType())
-            ->setGradeGroup(new GradeGroup())
-            ->setOwner($domainObject->getCreator());
+        if(null !== $domainObject->getCreator()){
+            $dataModel->setOwner($domainObject->getCreator());
+        }
 
         // Infinite-cycle check: Does the domainObject have children but the dataModel does not?
-        if($domainObject->getAssessables()->count() && !$dataModel->getAssessments()->count()){
-            foreach($domainObject->getAssessables() as $idx => $domainChild){
+        // TODO method args should include excluded child identifier
+        if ($domainObject->getAssessables()->count() && !$dataModel->getAssessments()->count()) {
+            foreach ($domainObject->getAssessables() as $idx => $domainChild) {
                 $subModel = $this->baseTranslator->translateToDataModel($domainChild, $depth + 1, false)->getAssessmentModel();
                 $subModel->setContextProject($dataModel);
                 $dataModel->getAssessments()[$idx] = $subModel;
@@ -137,21 +142,21 @@ class Project implements IAssessmentTypeTranslator
         // TODO move this to the mark scheme translator
         $markScheme = $domainObject->getMarkScheme();
         if ($markScheme instanceof Percentage) {
-            $dataModel->getMarkType()->setId(MarkType::TYPE_PERCENT);
+            $dataModel->setMarkType($this->markTypeMapper->createModel(MarkType::TYPE_PERCENT));
         } elseif ($markScheme instanceof LetterGrade) {
+            $dataModel->setMarkType($this->markTypeMapper->createModel(MarkType::TYPE_LETTER));
             $dataModel->setGradeGroup($markScheme->getGradeGroup());
-            $dataModel->getMarkType()->setId(MarkType::TYPE_LETTER);
         } elseif ($markScheme instanceof None) {
-            $dataModel->getMarkType()->setId(MarkType::TYPE_NONE);
+            $dataModel->setMarkType($this->markTypeMapper->createModel(MarkType::TYPE_NONE));
         }
     }
 
 
     /**
      * @param IAssessableDataModel|ProjectModel $dataModel
-     * @param IAssessable|ProjectObject          $domainObject
-     * @param int                  $depth
-     * @param bool                 $translateProjectContext
+     * @param IAssessable|ProjectObject         $domainObject
+     * @param int                               $depth
+     * @param bool                              $translateProjectContext
      * @throws UnexpectedValueException
      * @throws \DomainException
      * @throws \InvalidArgumentException
@@ -166,38 +171,52 @@ class Project implements IAssessmentTypeTranslator
         // Project-specific fields
 
         // Figure out which summator to make
-        if ($dataModel->getSummator() === ProjectModel::SUMMATOR_AVERAGE) {
-            $summator = new Average();
-        } elseif ($dataModel->getSummator() === ProjectModel::SUMMATOR_WEIGHTED_AVERAGE) {
-            $summator = new WeightedAverage();
-        } elseif ($dataModel->getSummator() === ProjectModel::SUMMATOR_MINIMUM) {
-            $summator = new Minimum();
-        } elseif ($dataModel->getSummator() === ProjectModel::SUMMATOR_MAXIMUM) {
-            $summator = new Maximum();
-        } else {
-            throw new UnexpectedValueException('$model->getSummator() is not a recognised summator type');
-        }
-        $domainObject->setSummator($summator);
-
-        $domainObject->setCreator($dataModel->getOwner());
+        $domainObject->setSummator($this->getSummator($dataModel));
+        null === $dataModel->getOwner() || $domainObject->setCreator($dataModel->getOwner());
 
         // Convert sub-assessments
-        if($dataModel instanceof ProjectModel){
-            // Does the data model have children but the domain does not?
-            if($dataModel->getAssessments()->count() && !$domainObject->getAssessables()->count()){
-                foreach($dataModel->getAssessments() as $idx => $dataChild){
-                    $domainChild = $this->baseTranslator->translateToDomainModel($dataChild->getSubObject(), $depth + 1, false);
-                    $domainChild->setContext($domainObject);
-                    $domainObject->getAssessables()[$idx] = $domainChild;
-                }
+
+        // Does the data model have children but the domain does not?
+        // TODO always translate all but the child specified in method args (if supplied)
+        if ($dataModel->getAssessments()->count() && !$domainObject->getAssessables()->count()) {
+            foreach ($dataModel->getAssessments() as $idx => $dataChild) {
+                $domainChild = $this->baseTranslator->translateToDomainModel($dataChild->getSubObject(), $depth + 1, false);
+                $domainChild->setContext($domainObject);
+                $domainObject->getAssessables()[$idx] = $domainChild;
             }
         }
 
-        // Convert mark type and grade group
-        $domainObject->setMarkType((new MarkType())->setId($dataModel->getMarkType()->getId()));
+        // Copy mark type and grade group
+        if (null !== $dataModel->getMarkType()) {
+            $domainObject->setMarkType($dataModel->getMarkType());
+        }
         if ($dataModel->getGradeGroup() instanceof GradeGroup) {
             $domainObject->setGradeGroup($dataModel->getGradeGroup());
         }
     }
 
+
+    /**
+     * @param ProjectModel $project
+     * @return null|ISummator
+     * @throws UnexpectedValueException
+     */
+    private function getSummator(ProjectModel $project): ?ISummator
+    {
+        $summatorString = $project->getSummator();
+        if (null === $summatorString) {
+            return null;
+        }
+        switch ($summatorString) {
+            case ProjectModel::SUMMATOR_AVERAGE:
+                return new Average();
+            case ProjectModel::SUMMATOR_WEIGHTED_AVERAGE:
+                return new WeightedAverage();
+            case ProjectModel::SUMMATOR_MINIMUM:
+                return new Minimum();
+            case ProjectModel::SUMMATOR_MAXIMUM:
+                return new Maximum();
+        }
+        throw new UnexpectedValueException('$model->getSummator() is not a recognised summator type');
+    }
 }

@@ -89,28 +89,31 @@ class DueWork implements IAssessmentTypeTranslator
         bool $translateProjectContext = true
     ): void {
 
-        $dataModel
-            ->setName($domainObject->getTitle())
-            ->setDescription($domainObject->getDescription())
-            ->setPublishDate($domainObject->getPublishAt())
-            ->setOpenDate($domainObject->getOpenAt())
-            ->setDueDate($domainObject->getDueAt())
-            ->setLateDate($domainObject->getCloseAt())
-            ->setWeight($domainObject->getWeight())
-            ->setMarkVisibility($domainObject->getMarkVisibility())
-            ->setSkipUnsubmitted($domainObject->getShowSubmittedOnly())
-            ->setAcceptOnline($domainObject->isAcceptSingle() || $domainObject->isAcceptMulti())
-            ->setAcceptMultiple($domainObject->isAcceptMulti())
-            ->setUseRubric($domainObject->getUseRubric())
-            ->setMarkedPerRubricGroup($domainObject->getMarkPerCapability())
-            ->setOwner($domainObject->getCreator())
-            ->setMarkType(new DueWorkModel\MarkType())
-            ->setGradeGroup(new DueWorkModel\GradeLevel\Group\Model())
-            ->setSelfAssessable($domainObject->getSelfAssessable())
-            ->setSelfReflectable($domainObject->getSelfReflectable());
+        // For brevity, these setters are only called if the corresponding getter() returns non-null
+        null === $domainObject->getTitle()             || $dataModel->setName($domainObject->getTitle());
+        null === $domainObject->getDescription()       || $dataModel->setDescription($domainObject->getDescription());
+        null === $domainObject->getPublishAt()         || $dataModel->setPublishDate($domainObject->getPublishAt());
+        null === $domainObject->getOpenAt()            || $dataModel->setOpenDate($domainObject->getOpenAt());
+        null === $domainObject->getDueAt()             || $dataModel->setDueDate($domainObject->getDueAt());
+        null === $domainObject->getCloseAt()           || $dataModel->setLateDate($domainObject->getCloseAt());
+        null === $domainObject->getWeight()            || $dataModel->setWeight($domainObject->getWeight());
+        null === $domainObject->getMarkVisibility()    || $dataModel->setMarkVisibility($domainObject->getMarkVisibility());
+        null === $domainObject->getShowSubmittedOnly() || $dataModel->setSkipUnsubmitted($domainObject->getShowSubmittedOnly());
+        null === $domainObject->isAcceptMulti()        || $dataModel->setAcceptMultiple($domainObject->isAcceptMulti());
+        null === $domainObject->getUseRubric()         || $dataModel->setUseRubric($domainObject->getUseRubric());
+        null === $domainObject->getMarkPerCapability() || $dataModel->setMarkedPerRubricGroup($domainObject->getMarkPerCapability());
+        null === $domainObject->getCreator()           || $dataModel->setOwner($domainObject->getCreator());
+        null === $domainObject->getSelfAssessable()    || $dataModel->setSelfAssessable($domainObject->getSelfAssessable());
+        null === $domainObject->getSelfReflectable()   || $dataModel->setSelfReflectable($domainObject->getSelfReflectable());
+
+        if(null !== $domainObject->isAcceptSingle() && null !== $domainObject->isAcceptMulti()){
+            $dataModel->setAcceptOnline($domainObject->isAcceptSingle() || $domainObject->isAcceptMulti());
+        }
 
         // Convert a mark type into fields
         // TODO move this to the mark scheme translator
+        $dataModel->setMarkType(new DueWorkModel\MarkType());
+        $dataModel->setGradeGroup(new DueWorkModel\GradeLevel\Group\Model());
         $markScheme = $domainObject->getMarkScheme();
         if ($markScheme instanceof TotalMarkWholeNumber) {
             $dataModel->setMaxMark($markScheme->getTotalMark());
@@ -159,14 +162,14 @@ class DueWork implements IAssessmentTypeTranslator
         bool $translateProjectContext = true
     ): void {
         // Due work-specific fields
-        $domainObject
-            ->setShowSubmittedOnly($dataModel->getSkipUnsubmitted())
-            ->setCreator($dataModel->getOwner())
-            ->setMaxMark($dataModel->getMaxMark())
-            ->setGradeGroup($dataModel->getGradeGroup())
-            ->setMarkVisibility($dataModel->getMarkVisibility())
-            ->setSelfAssessable($dataModel->getSelfAssessable())
-            ->setSelfReflectable($dataModel->getSelfReflectable());
+        null === $dataModel->getSkipUnsubmitted() || $domainObject->setShowSubmittedOnly($dataModel->getSkipUnsubmitted());
+        null === $dataModel->getOwner() || $domainObject->setCreator($dataModel->getOwner());
+        null === $dataModel->getMaxMark() || $domainObject->setMaxMark($dataModel->getMaxMark());
+        null === $dataModel->getGradeGroup() || $domainObject->setGradeGroup($dataModel->getGradeGroup());
+        null === $dataModel->getMarkVisibility() || $domainObject->setMarkVisibility($dataModel->getMarkVisibility());
+        null === $dataModel->getSelfAssessable() || $domainObject->setSelfAssessable($dataModel->getSelfAssessable());
+        null === $dataModel->getSelfReflectable() || $domainObject->setSelfReflectable($dataModel->getSelfReflectable());
+
 
         // Has Rubric?
         if ($dataModel->getUseRubric()) {
@@ -206,14 +209,9 @@ class DueWork implements IAssessmentTypeTranslator
         $domainObject->setWorkType($dataModel->getAssessmentModel()->getWorkType());
 
         // Convert mark type
-        $domainObject->setMarkType(
-            (new DueWorkModel\MarkType())
-                ->setId($dataModel->getMarkType()->getId())
-                ->setName($dataModel->getMarkType()->getName())
-                ->setSlug($dataModel->getMarkType()->getSlug())
-                ->setComment($dataModel->getMarkType()->getComment())
-                ->setEnabled($dataModel->getMarkType()->getEnabled())
-        );
+        if(null !== $dataModel->getMarkType()){
+            $domainObject->setMarkType($dataModel->getMarkType());
+        }
 
         // Attach a (possibly empty) Rubric
         $domainObject->setRubric($dataModel->getRubric());

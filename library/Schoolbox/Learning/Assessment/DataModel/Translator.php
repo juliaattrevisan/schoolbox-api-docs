@@ -172,8 +172,11 @@ class Translator
      * @throws UnexpectedValueException If assessment does not have a context
      * @throws LogicException If cyclic graph detected
      */
-    public function translateToDataModel(IAssessable $domainObject, int $depth = 0, bool $translateProjectContext = true): IAssessableDataModel
-    {
+    public function translateToDataModel(
+        IAssessable $domainObject,
+        int $depth = 0,
+        bool $translateProjectContext = true
+    ): IAssessableDataModel {
         $this->checkProjectNestingLevel($depth);
 
         // Attempt to translate assessments using the sub-translators
@@ -283,28 +286,32 @@ class Translator
         }
         $domainObject = $this->domainObjectCache[$dataHash];
 
+        // Copy attributes + relations
         $subTranslator->translateToDomainModel($dataModel, $domainObject);
 
         // Generic fields
         // Where there's both a version in assessment model and base model,
         // use the version in assessment model.
 
-        $domainObject
-            ->setMarkScheme($this->markSchemeFactory->spawnMarkSchemeFor($domainObject))
-            ->setSequence($assessmentModel->getSequence())
-            ->setWorkType($assessmentModel->getWorkType())
-            ->setTitle($assessmentModel->getTitle())
-            ->setDescription($assessmentModel->getDescription())
-            ->setDefaultOpenSpan($assessmentModel->getDefaultOpenSpan())
-            ->setWeight($assessmentModel->getWeight())
-            ->setPublishAt($assessmentModel->getPublishDate())
-            ->setOpenAt($assessmentModel->getOpenDate())
-            ->setDueAt($assessmentModel->getDueDate())
-            ->setCloseAt($assessmentModel->getCloseDate())
-            ->setCreatedAt($assessmentModel->getCreatedAt())
-            ->setUpdatedAt($assessmentModel->getUpdatedAt())
-            ->setDeletedAt($assessmentModel->getDeletedAt())
-            ->setCurriculumNodes($assessmentModel->getCurriculumNodes());
+        // Nullable properties
+        $domainObject->setSequence($assessmentModel->getSequence())
+                     ->setWorkType($assessmentModel->getWorkType())
+                     ->setTitle($assessmentModel->getTitle())
+                     ->setDescription($assessmentModel->getDescription())
+                     ->setDefaultOpenSpan($assessmentModel->getDefaultOpenSpan())
+                     ->setPublishAt($assessmentModel->getPublishDate())
+                     ->setOpenAt($assessmentModel->getOpenDate())
+                     ->setDueAt($assessmentModel->getDueDate())
+                     ->setCloseAt($assessmentModel->getCloseDate())
+                     ->setDeletedAt($assessmentModel->getDeletedAt())
+                     ->setCurriculumNodes($assessmentModel->getCurriculumNodes());
+
+        // Non-nullable properties
+        $markScheme = $this->markSchemeFactory->spawnMarkSchemeFor($domainObject);
+        null === $markScheme                     || $domainObject->setMarkScheme($markScheme);
+        null === $assessmentModel->getSequence() || $domainObject->setWeight($assessmentModel->getWeight());
+        null === $assessmentModel->getSequence() || $domainObject->setCreatedAt($assessmentModel->getCreatedAt());
+        null === $assessmentModel->getSequence() || $domainObject->setUpdatedAt($assessmentModel->getUpdatedAt());
 
         // Translate specification assessment if there is one
         $specification = $dataModel->getAssessmentModel()->getSpecificationAssessment();
