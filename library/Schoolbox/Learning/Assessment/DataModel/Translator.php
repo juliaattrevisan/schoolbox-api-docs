@@ -299,19 +299,19 @@ class Translator
                      ->setTitle($assessmentModel->getTitle())
                      ->setDescription($assessmentModel->getDescription())
                      ->setDefaultOpenSpan($assessmentModel->getDefaultOpenSpan())
-                     ->setPublishAt($assessmentModel->getPublishDate())
-                     ->setOpenAt($assessmentModel->getOpenDate())
-                     ->setDueAt($assessmentModel->getDueDate())
-                     ->setCloseAt($assessmentModel->getCloseDate())
                      ->setDeletedAt($assessmentModel->getDeletedAt())
                      ->setCurriculumNodes($assessmentModel->getCurriculumNodes());
 
         // Non-nullable properties
         $markScheme = $this->markSchemeFactory->spawnMarkSchemeFor($domainObject);
-        null === $markScheme                     || $domainObject->setMarkScheme($markScheme);
-        null === $assessmentModel->getSequence() || $domainObject->setWeight($assessmentModel->getWeight());
-        null === $assessmentModel->getSequence() || $domainObject->setCreatedAt($assessmentModel->getCreatedAt());
-        null === $assessmentModel->getSequence() || $domainObject->setUpdatedAt($assessmentModel->getUpdatedAt());
+        null === $markScheme                        || $domainObject->setMarkScheme($markScheme);
+        null === $assessmentModel->getWeight()      || $domainObject->setWeight($assessmentModel->getWeight());
+        null === $assessmentModel->getPublishDate() || $domainObject->setPublishAt($assessmentModel->getPublishDate());
+        null === $assessmentModel->getOpenDate()    || $domainObject->setOpenAt($assessmentModel->getOpenDate());
+        null === $assessmentModel->getDueDate()     || $domainObject->setDueAt($assessmentModel->getDueDate());
+        null === $assessmentModel->getCloseDate()   || $domainObject->setCloseAt($assessmentModel->getCloseDate());
+        null === $assessmentModel->getCreatedAt()   || $domainObject->setCreatedAt($assessmentModel->getCreatedAt());
+        null === $assessmentModel->getUpdatedAt()   || $domainObject->setUpdatedAt($assessmentModel->getUpdatedAt());
 
         // Translate specification assessment if there is one
         $specification = $dataModel->getAssessmentModel()->getSpecificationAssessment();

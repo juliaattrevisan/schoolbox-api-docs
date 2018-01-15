@@ -25,11 +25,16 @@ use Schoolbox\Resource\Storage\Model as StorageModel;
  */
 class DueWork implements IAssessmentTypeTranslator
 {
+    /** @var SubmissionBoxMapper */
     private $submissionBoxMapper;
+
+    /** @var DueWorkModel\MarkTypeMapper */
+    private $markTypeMapper;
 
     public function __construct()
     {
         $this->submissionBoxMapper = SubmissionBoxMapper::getInstance(); // TODO inject
+        $this->markTypeMapper = DueWorkModel\MarkTypeMapper::getInstance(); // TODO inject
     }
 
 
@@ -112,22 +117,17 @@ class DueWork implements IAssessmentTypeTranslator
 
         // Convert a mark type into fields
         // TODO move this to the mark scheme translator
-        $dataModel->setMarkType(new DueWorkModel\MarkType());
-        $dataModel->setGradeGroup(new DueWorkModel\GradeLevel\Group\Model());
         $markScheme = $domainObject->getMarkScheme();
         if ($markScheme instanceof TotalMarkWholeNumber) {
             $dataModel->setMaxMark($markScheme->getTotalMark());
-            $dataModel->getMarkType()->setId(DueWorkModel\MarkType::TYPE_TOTAL);
-
+            $dataModel->setMarkType($this->markTypeMapper->createModel(DueWorkModel\MarkType::TYPE_TOTAL));
         } elseif ($markScheme instanceof Percentage) {
-            $dataModel->getMarkType()->setId(DueWorkModel\MarkType::TYPE_PERCENT);
-
+            $dataModel->setMarkType($this->markTypeMapper->createModel(DueWorkModel\MarkType::TYPE_PERCENT));
         } elseif ($markScheme instanceof LetterGrade) {
             $dataModel->setGradeGroup($markScheme->getGradeGroup());
-            $dataModel->getMarkType()->setId(DueWorkModel\MarkType::TYPE_LETTER);
-
+            $dataModel->setMarkType($this->markTypeMapper->createModel(DueWorkModel\MarkType::TYPE_LETTER));
         } elseif ($markScheme instanceof None) {
-            $dataModel->getMarkType()->setId(DueWorkModel\MarkType::TYPE_NONE);
+            $dataModel->setMarkType($this->markTypeMapper->createModel(DueWorkModel\MarkType::TYPE_NONE));
         }
 
         // Translate files
