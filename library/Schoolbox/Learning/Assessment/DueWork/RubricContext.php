@@ -49,28 +49,12 @@ class RubricContext
             return ['rubric' => null];
         }
 
-        $markTypeSlug = $dueWork->getMarkType()->getSlug();
+        $context = $this->generateDefaultContext($dueWork);
 
-        $publishedOnly = false;
-
-        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMarkForResponse($publishedOnly, $responseId);
-
-        $context = [
-            'rubric'   => $dueWork->getRubric()->toContext(),
-            'markType' => [
-                'mode' => $markTypeSlug,
-            ],
-        ];
-
-        /* Inject available levels for this DueWork's GradeGroup
+        /* Spawn rubric grid
          */
-        $gradeLevels = [];
-
-        foreach ($dueWork->getGradeGroup()->getGradeLevels() as $gradeLevel) {
-            $gradeLevels[$gradeLevel->getLowerBound()] = $gradeLevel->getCaption();
-        }
-
-        $context['markType']['conf'] = $gradeLevels;
+        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMarkForResponse(false, $responseId);
+        $context['rubric'] = $dueWork->getRubric()->toContext();
 
         return $context;
     }
@@ -89,18 +73,26 @@ class RubricContext
             return ['rubric' => null];
         }
 
-        $markTypeSlug = $dueWork->getMarkType()->getSlug();
+        $context = $this->generateDefaultContext($dueWork);
 
-        $publishedOnly = false;
+        /* Spawn rubric grid
+         */
+        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMark(false);
+        $context['rubric'] = $dueWork->getRubric()->toContext();
 
-        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMark($publishedOnly);
+        return $context;
+    }
 
-        $context = [
-            'rubric'   => $dueWork->getRubric()->toContext(),
-            'markType' => [
-                'mode' => $markTypeSlug,
-            ],
-        ];
+
+    /**
+     * Generate default $context array structure
+     *
+     * @param Model $dueWork
+     *
+     * @return array
+     */
+    private function generateDefaultContext(DueWork $dueWork)
+    {
 
         /* Inject available levels for this DueWork's GradeGroup
          */
@@ -110,7 +102,12 @@ class RubricContext
             $gradeLevels[$gradeLevel->getLowerBound()] = $gradeLevel->getCaption();
         }
 
-        $context['markType']['conf'] = $gradeLevels;
+        $context = [
+            'markType' => [
+                'mode' => $dueWork->getMarkType()->getSlug(),
+                'conf' => $gradeLevels,
+            ],
+        ];
 
         return $context;
     }
