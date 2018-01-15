@@ -302,9 +302,15 @@ class Controller extends Base
         $rubricContext = new RubricContext($rubricMapper);
 
         // Should rubric be readonly or markable?
-        $data['rubricContext'] = $isInteractionLocked && !$this->getUser()->isSuperuser()
-            ? $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false)
-            : $rubricContext->generateMarkable($assessment, $participant->getUser(), ($response ? $response->getId() : null));
+        if ($isInteractionLocked && !$this->getUser()->isSuperuser()) {
+            $data['rubricContext'] = $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false);
+        }
+        elseif ($response) {
+            $data['rubricContext'] = $rubricContext->generateMarkableForResponse($assessment, $participant->getUser(), $response->getId());
+        }
+        else {
+            $data['rubricContext'] = $rubricContext->generateMarkable($assessment, $participant->getUser());
+        }
 
         /* If this contained a self-reflectable response, load that as well in addition to the usual rubricContext
          * The Instructor needs to see what the Learner chose simultaneously with what the Instructor will give
@@ -318,9 +324,15 @@ class Controller extends Base
         $selfReflected = (new ValidSelfReflection())->isSatisfiedBy($participant->getUser(), $participant);
 
         if ($selfReflected && $assessment->getUseRubric()) {
-            $data['learnerRubricContext'] = $isInteractionLocked && !$this->getUser()->isSuperuser()
-                ? $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false)
-                : $rubricContext->generateMarkable($assessment, $participant->getUser(), ($response ? $response->getId() : null));
+            if ($isInteractionLocked && !$this->getUser()->isSuperuser()) {
+                $data['learnerRubricContext'] = $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false);
+            }
+            elseif ($response) {
+                $data['learnerRubricContext'] = $rubricContext->generateMarkableForResponse($assessment, $participant->getUser(), $response->getId());
+            }
+            else {
+                $data['learnerRubricContext'] = $rubricContext->generateMarkable($assessment, $participant->getUser());
+            }
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/standard.twig', $data));

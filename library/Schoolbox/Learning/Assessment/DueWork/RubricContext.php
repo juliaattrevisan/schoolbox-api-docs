@@ -33,16 +33,17 @@ class RubricContext
         $this->rubricMapper = $rubricMapper;
     }
 
+
     /**
-     * Get a markable grid for Rubrics marking
+     * Get a markable grid for Rubrics marking, for a particular IResponse
      *
-     * @param DueWork  $dueWork
-     * @param User     $student
-     * @param null|int $responseId
+     * @param Model $dueWork
+     * @param User  $student
+     * @param int   $responseId
      *
      * @return array
      */
-    public function generateMarkable(DueWork $dueWork, User $student, $responseId = null)
+    public function generateMarkableForResponse(DueWork $dueWork, User $student, int $responseId)
     {
         if (!$dueWork->getUseRubric()) {
             return ['rubric' => null];
@@ -52,12 +53,47 @@ class RubricContext
 
         $publishedOnly = false;
 
-        if ($responseId) {
-            (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMarkForResponse($publishedOnly, $responseId);
+        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMarkForResponse($publishedOnly, $responseId);
+
+        $context = [
+            'rubric'   => $dueWork->getRubric()->toContext(),
+            'markType' => [
+                'mode' => $markTypeSlug,
+            ],
+        ];
+
+        /* Inject available levels for this DueWork's GradeGroup
+         */
+        $gradeLevels = [];
+
+        foreach ($dueWork->getGradeGroup()->getGradeLevels() as $gradeLevel) {
+            $gradeLevels[$gradeLevel->getLowerBound()] = $gradeLevel->getCaption();
         }
-        else {
-            (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMark($publishedOnly);
+
+        $context['markType']['conf'] = $gradeLevels;
+
+        return $context;
+    }
+
+    /**
+     * Get a markable grid for Rubrics marking
+     *
+     * @param DueWork  $dueWork
+     * @param User     $student
+     *
+     * @return array
+     */
+    public function generateMarkable(DueWork $dueWork, User $student)
+    {
+        if (!$dueWork->getUseRubric()) {
+            return ['rubric' => null];
         }
+
+        $markTypeSlug = $dueWork->getMarkType()->getSlug();
+
+        $publishedOnly = false;
+
+        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMark($publishedOnly);
 
         $context = [
             'rubric'   => $dueWork->getRubric()->toContext(),
