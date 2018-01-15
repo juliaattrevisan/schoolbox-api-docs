@@ -35,7 +35,7 @@ class RubricContext
 
 
     /**
-     * Get a markable grid for Rubrics marking, for a particular IResponse
+     * Get a markable grid for Rubrics marking, for an Instructor and particular IResponse
      *
      * @param Model $dueWork
      * @param User  $student
@@ -60,7 +60,7 @@ class RubricContext
     }
 
     /**
-     * Get a markable grid for Rubrics marking
+     * Get a markable grid for Rubrics marking, for an Instructor
      *
      * @param DueWork  $dueWork
      * @param User     $student
