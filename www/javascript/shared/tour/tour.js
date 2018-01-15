@@ -1,4 +1,4 @@
-$(function() {
+$(function () {
 
     if (typeof(window.tourUrl) !== 'undefined') {
         $.get(window.tourUrl).done(function (tours) {
@@ -38,8 +38,6 @@ $(function() {
                             });
                         }
                     });
-
-
 
                     tourCurrent.setOptions({
                         showStepNumbers: false,

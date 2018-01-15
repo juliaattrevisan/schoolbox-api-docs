@@ -272,3 +272,27 @@ END;
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
+
+
+
+-- Create an event for a step
+
+INSERT INTO     `tour_step_event`
+(
+                `uuid`,
+                `tour_step_uuid`,
+                `selector`,
+                `event`,
+                `author_user_id`,
+                `created_at`,
+                `updated_at`,
+                `deleted_at`
+)
+SELECT          UUID(),
+                @step2Uuid,
+                '.profile-drop',
+                'click',
+                (SELECT `id` FROM `user` WHERE `username` = 'alaress' LIMIT 1),
+                '1980-04-07 00:00:00',
+                '1980-04-07 00:00:00',
+                NULL;
