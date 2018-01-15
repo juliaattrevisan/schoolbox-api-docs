@@ -41,13 +41,15 @@ $(function () {
                     var stepsToDisplay = [];
 
                     $(tour.steps).each(function (i, step) {
-                        stepsToDisplay.push({
-                            intro: step.body,
-                            element: step.selector,
-                            tooltipClass: step.css_class,
-                            uuid: step.uuid,
-                            jsEvents: step.events
-                        });
+                        if (step.type === 'tooltip') {
+                            stepsToDisplay.push({
+                                intro: step.body,
+                                element: step.selector,
+                                tooltipClass: step.css_class,
+                                uuid: step.uuid,
+                                jsEvents: step.events
+                            });
+                        }
                     });
 
                     tourCurrent.setOptions({
