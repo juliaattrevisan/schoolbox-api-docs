@@ -38,11 +38,11 @@ class Task implements IAssessmentTypeTranslator
 
 
     /**
-     * @return IAssessable
+     * @inheritdoc
      */
-    public function createDomainObject(): IAssessable
+    public function createDomainObject(?int $id): IAssessable
     {
-        return new TaskObject(); // TODO consider using ID?
+        return (new TaskObject())->setId($id);
     }
 
 
@@ -73,17 +73,11 @@ class Task implements IAssessmentTypeTranslator
     /**
      * Copies all attributes from the domainObject to dataModel
      *
-     * @param IAssessable|TaskObject          $domainObject
+     * @param IAssessable|TaskObject         $domainObject
      * @param IAssessableDataModel|TaskModel $dataModel
-     * @param int                  $depth
-     * @param bool                 $translateProjectContext
      */
-    public function translateToDataModel(
-        IAssessable $domainObject,
-        IAssessableDataModel $dataModel,
-        int $depth = 0,
-        bool $translateProjectContext = true
-    ): void {
+    public function translateToDataModel(IAssessable $domainObject, IAssessableDataModel $dataModel): void
+    {
         // convert to task's model
         // task currently has its own ID, but that will be handled in the mapper proxy
         $dataModel

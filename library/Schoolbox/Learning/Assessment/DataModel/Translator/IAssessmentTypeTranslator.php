@@ -23,9 +23,10 @@ interface IAssessmentTypeTranslator
 
 
     /**
+     * @var null|int $id
      * @return IAssessable
      */
-    public function createDomainObject(): IAssessable;
+    public function createDomainObject(?int $id): IAssessable;
 
 
     /**
@@ -51,15 +52,8 @@ interface IAssessmentTypeTranslator
      *
      * @param IAssessable          $domainObject
      * @param IAssessableDataModel $dataModel
-     * @param int                  $depth
-     * @param bool                 $translateProjectContext
      */
-    public function translateToDataModel(
-        IAssessable $domainObject,
-        IAssessableDataModel $dataModel,
-        int $depth = 0,
-        bool $translateProjectContext = true
-    ): void;
+    public function translateToDataModel(IAssessable $domainObject, IAssessableDataModel $dataModel): void;
 
 
     /**

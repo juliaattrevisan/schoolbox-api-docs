@@ -49,11 +49,11 @@ class DueWork implements IAssessmentTypeTranslator
 
 
     /**
-     * @return IAssessable
+     * @inheritdoc
      */
-    public function createDomainObject(): IAssessable
+    public function createDomainObject(?int $id): IAssessable
     {
-        return new DueWorkObject(); // TODO consider using ID?
+        return (new DueWorkObject())->setId($id); // TODO consider using ID?
     }
 
 
@@ -84,16 +84,9 @@ class DueWork implements IAssessmentTypeTranslator
     /**
      * @param IAssessable|DueWorkObject          $domainObject
      * @param IAssessableDataModel|SubmissionBox $dataModel
-     * @param int                                $depth
-     * @param bool                               $translateProjectContext
      */
-    public function translateToDataModel(
-        IAssessable $domainObject,
-        IAssessableDataModel $dataModel,
-        int $depth = 0,
-        bool $translateProjectContext = true
-    ): void {
-
+    public function translateToDataModel(IAssessable $domainObject, IAssessableDataModel $dataModel): void
+    {
         // For brevity, these setters are only called if the corresponding getter() returns non-null
         null === $domainObject->getTitle()             || $dataModel->setName($domainObject->getTitle());
         null === $domainObject->getDescription()       || $dataModel->setDescription($domainObject->getDescription());

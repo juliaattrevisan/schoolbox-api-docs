@@ -39,11 +39,11 @@ class Quiz implements IAssessmentTypeTranslator
 
 
     /**
-     * @return IAssessable
+     * @inheritdoc
      */
-    public function createDomainObject(): IAssessable
+    public function createDomainObject(?int $id): IAssessable
     {
-        return new QuizObject(); // TODO consider using ID?
+        return (new QuizObject())->setId($id);
     }
 
 
@@ -76,15 +76,9 @@ class Quiz implements IAssessmentTypeTranslator
      *
      * @param IAssessable|QuizObject         $domainObject
      * @param IAssessableDataModel|QuizModel $dataModel
-     * @param int                            $depth
-     * @param bool                           $translateProjectContext
      */
-    public function translateToDataModel(
-        IAssessable $domainObject,
-        IAssessableDataModel $dataModel,
-        int $depth = 0,
-        bool $translateProjectContext = true
-    ): void {
+    public function translateToDataModel(IAssessable $domainObject, IAssessableDataModel $dataModel):void
+    {
         // convert to quiz's model
         $dataModel
             ->setAvailability(QuizModel::AVAILABILITY_ASSESS)

@@ -67,11 +67,11 @@ class Project implements IAssessmentTypeTranslator
 
 
     /**
-     * @return IAssessable
+     * @inheritdoc
      */
-    public function createDomainObject(): IAssessable
+    public function createDomainObject(?int $id): IAssessable
     {
-        return new ProjectObject();
+        return (new ProjectObject())->setId($id);
     }
 
 
@@ -102,29 +102,11 @@ class Project implements IAssessmentTypeTranslator
     /**
      * @param IAssessable|ProjectObject         $domainObject
      * @param IAssessableDataModel|ProjectModel $dataModel
-     * @param int                               $depth
-     * @param bool                              $translateProjectContext
-     * @throws UnexpectedValueException
-     * @throws \LogicException
      */
-    public function translateToDataModel(
-        IAssessable $domainObject,
-        IAssessableDataModel $dataModel,
-        int $depth = 0,
-        bool $translateProjectContext = true
-    ): void {
+    public function translateToDataModel(IAssessable $domainObject, IAssessableDataModel $dataModel): void
+    {
         if(null !== $domainObject->getCreator()){
             $dataModel->setOwner($domainObject->getCreator());
-        }
-
-        // Infinite-cycle check: Does the domainObject have children but the dataModel does not?
-        // TODO method args should include excluded child identifier
-        if ($domainObject->getAssessables()->count() && !$dataModel->getAssessments()->count()) {
-            foreach ($domainObject->getAssessables() as $idx => $domainChild) {
-                $subModel = $this->baseTranslator->translateToDataModel($domainChild, $depth + 1, false)->getAssessmentModel();
-                $subModel->setContextProject($dataModel);
-                $dataModel->getAssessments()[$idx] = $subModel;
-            }
         }
 
         // Translate summator
@@ -174,17 +156,6 @@ class Project implements IAssessmentTypeTranslator
         $domainObject->setSummator($this->getSummator($dataModel));
         null === $dataModel->getOwner() || $domainObject->setCreator($dataModel->getOwner());
 
-        // Convert sub-assessments
-
-        // Does the data model have children but the domain does not?
-        // TODO always translate all but the child specified in method args (if supplied)
-        if ($dataModel->getAssessments()->count() && !$domainObject->getAssessables()->count()) {
-            foreach ($dataModel->getAssessments() as $idx => $dataChild) {
-                $domainChild = $this->baseTranslator->translateToDomainModel($dataChild->getSubObject(), $depth + 1, false);
-                $domainChild->setContext($domainObject);
-                $domainObject->getAssessables()[$idx] = $domainChild;
-            }
-        }
 
         // Copy mark type and grade group
         if (null !== $dataModel->getMarkType()) {

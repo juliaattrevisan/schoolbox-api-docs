@@ -192,18 +192,22 @@ class DueWorkTest extends TestCase
         ];
     }
 
+
     /**
-    * /**
+     * /**
      * Test translation of mark scheme.
      *
      * @dataProvider getTestTranslateMarkSchemeToDataModelData
      *
-     * @param DueWork $dueWork
-     * @param int     $markTypeId
-     * @param int     $totalMark
-     * @param int     $gradeGroupId
+     * @param DueWork  $dueWork
+     * @param int      $markTypeId
+     * @param null|int $totalMark
+     * @param null|int $gradeGroupId
+     * @throws \LogicException
+     * @throws \PHPUnit\Framework\Exception
+     * @throws \UnexpectedValueException
      */
-    public function testTranslateMarkSchemeToDataModel(DueWork $dueWork, $markTypeId, $totalMark, $gradeGroupId)
+    public function testTranslateMarkSchemeToDataModel(DueWork $dueWork, int $markTypeId, ?int $totalMark, ?int $gradeGroupId)
     {
         /** @var DueWorkModel $dueWorkModel */
         $dueWorkModel = $this->translator->translateToDataModel($dueWork);
@@ -212,9 +216,17 @@ class DueWorkTest extends TestCase
         $this->assertInstanceOf(DueWorkModel::class, $dueWorkModel);
 
         // Test due work-specific fields
-        $this->assertEquals($markTypeId, $dueWorkModel->getMarkType()->getId());
+        if (null === $markTypeId) {
+            $this->assertNull($dueWorkModel->getMarkType());
+        } else {
+            $this->assertEquals($markTypeId, $dueWorkModel->getMarkType()->getId());
+        }
         $this->assertEquals($totalMark, $dueWorkModel->getMaxMark());
-        $this->assertEquals($gradeGroupId, $dueWorkModel->getGradeGroup()->getId());
+        if (null === $gradeGroupId) {
+            $this->assertNull($dueWorkModel->getGradeGroup());
+        } else {
+            $this->assertEquals($gradeGroupId, $dueWorkModel->getGradeGroup()->getId());
+        }
     }
 
     /**
