@@ -29,11 +29,6 @@
 
         {% set rowspan = group.criteria|length + (group.total ? 1 : 0) %}
 
-        {# Self-Assessment #}
-        {% if learnerRubric %}
-            {% set rowspan = rowspan + 1 %}
-        {% endif %}
-
         {% for critIndex, crit in group.criteria %}
     <tr data-group="{{ rubricId }}-{{ group.id }}">
         {# yay html tables... -_-; #}
@@ -95,48 +90,38 @@
 
         {% if group.total and showGroupTotal %}
         <tr>
-            <th data-group-summary="{{ rubricId }}-{{ group.id }}"
-                class="rb-group-summary"
-                colspan="{{ rubric.levels|length + 1 }}"
-                data-numerator="{{ group.sum }}"
-                data-denominator="{{ group.total }}"
-            >
+            <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">
+                <span data-group-summary="{{ rubricId }}-{{ group.id }}"
+                    data-numerator="{{ group.sum }}"
+                    data-denominator="{{ group.total }}">
                 {{ group.humanReadableMark }}
+                </span>
+
+                {# Self-Assessment #}
+                {% if learnerRubric %}
+                    ({{ learnerRubric.groups[groupIndex].humanReadableMark }} given in {{ locale.selfAssessment.singularForm }})
+                {% endif %}
             </th>
         </tr>
-
-        {# Self-Assessment #}
-        {% if learnerRubric %}
-            <tr>
-                <th colspan="{{ rubric.levels|length + 1 }}">
-                    {{ learnerRubric.groups[groupIndex].humanReadableMark }} given in {{ locale.selfAssessment.singularForm }}
-                </th>
-            </tr>
-        {% endif %}
         {% endif %}
 
     {% endfor %}
 
     {% if rubric.total and showRubricTotal %}
     <tr>
-        <th data-final-summary="{{ rubricId }}"
-            class="rb-final-summary"
-            colspan="{{ rubric.levels|length + 2 }}"
-            data-numerator="{{ rubric.sum }}"
-            data-denominator="{{ rubric.total }}"
-        >
-            {{ rubric.humanReadableMark }}
-        </th>
-    </tr>
+        <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}">
+            <span data-final-summary="{{ rubricId }}"
+                data-numerator="{{ rubric.sum }}"
+                data-denominator="{{ rubric.total }}">
+                {{ rubric.humanReadableMark }}
+            </span>
 
-    {# Self-Assessment #}
-    {% if learnerRubric %}
-    <tr>
-        <th colspan="{{ rubric.levels|length + 2 }}">
-            {{ learnerRubric.humanReadableMark }} given in {{ locale.selfAssessment.singularForm }}
+            {# Self-Assessment #}
+            {% if learnerRubric %}
+                ({{ learnerRubric.humanReadableMark }} given in {{ locale.selfAssessment.singularForm }})
+            {% endif %}
         </th>
     </tr>
-    {% endif %}
 
     {% endif %}
     </tbody>
