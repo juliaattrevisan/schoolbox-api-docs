@@ -14,6 +14,10 @@ use \Schoolbox\Permission\Access\UserAccess as UserAccessModel;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Alaress\Lumberjack\Logger;
 
+// Use a debug-supporting logger
+$log = new Logger(STDOUT, STDERR, \Monolog\Logger::DEBUG);
+$kernel->getDependencyInjector()->values['logger'] = $log;
+
 /**
  * Retrieve all parents of students in the specified subject
  * @param $subCode
@@ -48,8 +52,6 @@ $classHandler = new \External_Class();
 
 // suppress the route cache mutations
 $userAccessMapper->unregisterCallbacks();
-
-$log = new Logger(STDOUT, STDERR);
 
 $options = getopt("f:", ['students', 'dry-run']);
 
@@ -218,8 +220,6 @@ foreach ($classes as $folderId => $codes) {
         }
     }
 }
-
-$kernel->getDependencyInjector()->values['logger'] = $log;
 
 /** @var WritableCache $cache */
 $cache = $kernel->get('subscriptionCache');
