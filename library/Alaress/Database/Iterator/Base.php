@@ -26,6 +26,9 @@ class Base implements IIterator
     /** @var int $rowIndex Zero-indexed value used for row counting */
     protected $rowIndex = -1;
 
+    /** @var int $rowsetIndex Zero-indexed value for rowset counting */
+    protected $rowsetIndex = 0;
+
     /** @var array|bool $currentRow */
     protected $currentRow = false;
 
@@ -65,6 +68,7 @@ class Base implements IIterator
             }
 
             if ($result) {
+                $this->rowsetIndex = 0;
                 $this->next();
             }
         } catch (PDOException $e) {
@@ -147,10 +151,27 @@ class Base implements IIterator
         $result = $this->pdoStatement->nextRowset();
 
         if ($result) {
+            $this->rowsetIndex++;
             $this->rowIndex = -1;
             $this->next();
         }
 
         return $result;
+    }
+
+    /**
+     * Skip to the given rowset number.
+     *
+     * @param int $index
+     * @return bool Was the skip successful?
+     */
+    protected function skipToRowset($index): bool
+    {
+        while ($this->rowsetIndex < $index) {
+            if (!$this->nextRowset()) {
+                return false;
+            }
+        }
+        return true;
     }
 }
