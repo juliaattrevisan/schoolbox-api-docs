@@ -109,10 +109,7 @@ class GridGenerator
      */
     public function applyStudentMarkForResponse(bool $publishedOnly, int $responseId)
     {
-        $pb = new Builder($this->rubricMapper->getDatabase(), '');
-        $pb->equals('sr.owner', $this->student->getId());
-        $pb->equals('sr.box_id', $this->grid->getSubmissionBox()->getId());
-        $pb->isNull('sr.deleted_at');
+        $pb = $this->buildDefaultPb();
         $pb->equals('sr.student_submission_id', $responseId);
 
         if ($publishedOnly) {
@@ -130,10 +127,7 @@ class GridGenerator
      */
     public function applyStudentMark(bool $publishedOnly)
     {
-        $pb = new Builder($this->rubricMapper->getDatabase(), '');
-        $pb->equals('sr.owner', $this->student->getId());
-        $pb->equals('sr.box_id', $this->grid->getSubmissionBox()->getId());
-        $pb->isNull('sr.deleted_at');
+        $pb = $this->buildDefaultPb();
 
         if ($publishedOnly) {
             $pb->notNull('sr.published_at');
@@ -142,4 +136,19 @@ class GridGenerator
         return $this->applyStudentMarkQuery($publishedOnly, $pb);
     }
 
+
+    /**
+     * Build default PB instance
+     *
+     * @return Builder
+     */
+    private function buildDefaultPb(): Builder
+    {
+        $pb = new Builder($this->rubricMapper->getDatabase(), '');
+        $pb->equals('sr.owner', $this->student->getId());
+        $pb->equals('sr.box_id', $this->grid->getSubmissionBox()->getId());
+        $pb->isNull('sr.deleted_at');
+
+        return $pb;
+    }
 }
