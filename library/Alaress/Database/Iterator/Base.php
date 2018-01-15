@@ -160,6 +160,19 @@ class Base implements IIterator
     }
 
     /**
+     * Re-execute, and skip to whichever rowset the current iterator is on.
+     *
+     * @return bool Was the skip successful?
+     * @throws Exception if execute fails
+     */
+    protected function executeToCurrentRowset(): bool
+    {
+        $currentRowsetIndex = $this->rowsetIndex;
+        $this->execute();
+        return $this->skipToRowset($currentRowsetIndex);
+    }
+
+    /**
      * Skip to the given rowset number.
      *
      * @param int $index

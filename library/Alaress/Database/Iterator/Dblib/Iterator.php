@@ -26,7 +26,7 @@ class Iterator extends Base
             $this->pdoStatement->closeCursor();
         }
 
-        $this->execute();
+        $this->executeToCurrentRowset();
     }
 
     /**
