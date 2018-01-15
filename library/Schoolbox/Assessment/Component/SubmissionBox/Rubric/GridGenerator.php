@@ -21,41 +21,46 @@ class GridGenerator
     private $rubricMapper;
 
     /**
+     * @var Rubric
+     */
+    private $grid;
+
+    /**
      * GridGenerator constructor.
      *
      * @param RubricMapper $rubricMapper
+     * @param Rubric       $grid
      */
-    public function __construct(RubricMapper $rubricMapper)
+    public function __construct(RubricMapper $rubricMapper, Rubric $grid)
     {
         $this->rubricMapper = $rubricMapper;
+        $this->grid = $grid;
     }
 
     /**
-     * @param Rubric $grid
      * @param int[]  $selectedDescriptorIds
      *
      * @return Rubric
      */
-    public function applyMark(Rubric $grid, array $selectedDescriptorIds)
+    public function applyMark(array $selectedDescriptorIds)
     {
-        foreach ($grid->getAllDescriptors() as $descriptor) {
+        foreach ($this->grid->getAllDescriptors() as $descriptor) {
             $selected = \in_array($descriptor->getId(), $selectedDescriptorIds, false);
             $descriptor->setSelected($selected);
         }
 
-        return $grid;
+        return $this->grid;
     }
 
 
     /**
      * Using a Predicate Builder and a bool, find the pieces of the Rubric
      *
-     * @param Rubric  $grid
      * @param bool    $publishedOnly
      * @param Builder $pb
      * @return Rubric
      */
-    private function applyStudentMarkQuery(Rubric $grid, bool $publishedOnly, Builder $pb): Rubric
+    private function applyStudentMarkQuery(bool $publishedOnly, Builder $pb): Rubric
     {
         $whereClause = implode(' AND ', $pb->getWhere());
         $dateOrder   = $publishedOnly ? 'sr.published_at' : 'sr.created_at';
@@ -83,25 +88,24 @@ class GridGenerator
             $descriptorIds[$id] = true;
         }
 
-        return $this->applyMark($grid, array_keys($descriptorIds));
+        return $this->applyMark(array_keys($descriptorIds));
     }
 
 
     /**
      * Alias to applyStudentMark() for a particular IResponse instance
      *
-     * @param Rubric $grid
      * @param User   $student
      * @param bool   $publishedOnly Whether to exclude draft marks
      * @param int    $responseId
      *
      * @return Rubric
      */
-    public function applyStudentMarkForResponse(Rubric $grid, User $student, bool $publishedOnly, int $responseId)
+    public function applyStudentMarkForResponse(User $student, bool $publishedOnly, int $responseId)
     {
         $pb = new Builder($this->rubricMapper->getDatabase(), '');
         $pb->equals('sr.owner', $student->getId());
-        $pb->equals('sr.box_id', $grid->getSubmissionBox()->getId());
+        $pb->equals('sr.box_id', $this->grid->getSubmissionBox()->getId());
         $pb->isNull('sr.deleted_at');
         $pb->equals('sr.student_submission_id', $responseId);
 
@@ -109,29 +113,28 @@ class GridGenerator
             $pb->notNull('sr.published_at');
         }
 
-        return $this->applyStudentMarkQuery($grid, $publishedOnly, $pb);
+        return $this->applyStudentMarkQuery($publishedOnly, $pb);
     }
 
 
     /**
-     * @param Rubric   $grid
      * @param User     $student
      * @param bool     $publishedOnly Whether to exclude draft marks
      *
      * @return Rubric
      */
-    public function applyStudentMark(Rubric $grid, User $student, bool $publishedOnly)
+    public function applyStudentMark(User $student, bool $publishedOnly)
     {
         $pb = new Builder($this->rubricMapper->getDatabase(), '');
         $pb->equals('sr.owner', $student->getId());
-        $pb->equals('sr.box_id', $grid->getSubmissionBox()->getId());
+        $pb->equals('sr.box_id', $this->grid->getSubmissionBox()->getId());
         $pb->isNull('sr.deleted_at');
 
         if ($publishedOnly) {
             $pb->notNull('sr.published_at');
         }
 
-        return $this->applyStudentMarkQuery($grid, $publishedOnly, $pb);
+        return $this->applyStudentMarkQuery($publishedOnly, $pb);
     }
 
 }
