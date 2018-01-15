@@ -495,14 +495,39 @@ class RubricMapper
 
 
     /**
-     * @param Rubric   $grid
-     * @param User     $student
-     * @param bool     $publishedOnly Whether to exclude draft marks
-     * @param null|int $responseId
+     * Alias to applyStudentMark() for a particular IResponse instance
+     *
+     * @param Rubric $grid
+     * @param User   $student
+     * @param bool   $publishedOnly Whether to exclude draft marks
+     * @param int    $responseId
      *
      * @return Rubric
      */
-    public function applyStudentMark(Rubric $grid, User $student, bool $publishedOnly, $responseId = null)
+    public function applyStudentMarkForResponse(Rubric $grid, User $student, bool $publishedOnly, int $responseId)
+    {
+        $pb = new Builder($this->database, '');
+        $pb->equals('sr.owner', $student->getId());
+        $pb->equals('sr.box_id', $grid->getSubmissionBox()->getId());
+        $pb->isNull('sr.deleted_at');
+        $pb->equals('sr.student_submission_id', $responseId);
+
+        if ($publishedOnly) {
+            $pb->notNull('sr.published_at');
+        }
+
+        return $this->applyStudentMarkQuery($grid, $publishedOnly, $pb);
+    }
+
+
+    /**
+     * @param Rubric   $grid
+     * @param User     $student
+     * @param bool     $publishedOnly Whether to exclude draft marks
+     *
+     * @return Rubric
+     */
+    public function applyStudentMark(Rubric $grid, User $student, bool $publishedOnly)
     {
         $pb = new Builder($this->database, '');
         $pb->equals('sr.owner', $student->getId());
@@ -512,11 +537,8 @@ class RubricMapper
         if ($publishedOnly) {
             $pb->notNull('sr.published_at');
         }
-        if ($responseId) {
-            $pb->equals('sr.student_submission_id', $responseId);
-        }
 
-        $this->applyStudentMarkQuery($grid, $publishedOnly, $pb);
+        return $this->applyStudentMarkQuery($grid, $publishedOnly, $pb);
     }
 
     /**

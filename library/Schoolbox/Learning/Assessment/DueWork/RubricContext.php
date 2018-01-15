@@ -51,7 +51,13 @@ class RubricContext
         $markTypeSlug = $dueWork->getMarkType()->getSlug();
 
         $publishedOnly = false;
-        $this->rubricMapper->applyStudentMark($dueWork->getRubric(), $student, $publishedOnly, $responseId);
+
+        if ($responseId) {
+            $this->rubricMapper->applyStudentMarkForResponse($dueWork->getRubric(), $student, $publishedOnly, $responseId);
+        }
+        else {
+            $this->rubricMapper->applyStudentMark($dueWork->getRubric(), $student, $publishedOnly);
+        }
 
         $context = [
             'rubric'   => $dueWork->getRubric()->toContext(),
