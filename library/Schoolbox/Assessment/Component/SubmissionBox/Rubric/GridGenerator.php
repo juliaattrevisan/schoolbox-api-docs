@@ -49,7 +49,7 @@ class GridGenerator
      *
      * @return Rubric
      */
-    public function applyMark(array $selectedDescriptorIds)
+    public function applyMark(array $selectedDescriptorIds): Rubric
     {
         foreach ($this->grid->getAllDescriptors() as $descriptor) {
             $selected = \in_array($descriptor->getId(), $selectedDescriptorIds, false);
@@ -107,7 +107,7 @@ class GridGenerator
      *
      * @return Rubric
      */
-    public function applyStudentMarkForResponse(bool $publishedOnly, int $responseId)
+    public function applyStudentMarkForResponse(bool $publishedOnly, int $responseId): Rubric
     {
         $pb = $this->buildDefaultPb();
         $pb->equals('sr.student_submission_id', $responseId);
@@ -125,7 +125,7 @@ class GridGenerator
      *
      * @return Rubric
      */
-    public function applyStudentMark(bool $publishedOnly)
+    public function applyStudentMark(bool $publishedOnly): Rubric
     {
         $pb = $this->buildDefaultPb();
 
