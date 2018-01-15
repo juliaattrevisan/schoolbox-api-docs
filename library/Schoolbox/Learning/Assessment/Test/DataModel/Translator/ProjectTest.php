@@ -639,4 +639,170 @@ class ProjectTest extends TestCase
         $this->assertEquals(103, $projectModel->getAssessments()[2]->getId());
         $this->assertEquals(3, $projectModel->getAssessments()[2]->getSpecificationAssessment()->getId());
     }
+
+
+    /**
+     * @dataProvider provider_linear_data_project_tree
+     * @param ProjectModel $projectModel
+     * @param int          $id           Id of this project node
+     * @param int          $upExpected   How many nodes above this one?
+     * @param int          $downExpected How many nodes below this one?
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \UnexpectedValueException
+     */
+    public function test_linear_data_project_tree(ProjectModel $projectModel, int $id, int $upExpected, int $downExpected)
+    {
+        /** @var Project $domainObject */
+        $domainObject = $this->translator->translateToDomainModel($projectModel);
+        $this->assertEquals($id, $domainObject->getId());
+
+        $up            = $down = 0;
+        $domainContext = $domainObject->getContext();
+        while ($domainContext instanceof Project) {
+            $up++;
+            $domainContext = $domainContext->getContext();
+        }
+        $this->assertEquals($upExpected, $up);
+
+        $domainChild = $domainObject->getAssessables()->first();
+        while ($domainChild instanceof Project) {
+            $down++;
+            $domainChild = $domainChild->getAssessables()->first();
+        }
+        $this->assertEquals($downExpected, $down);
+    }
+
+
+    /**
+     * @dataProvider provider_branched_data_project_tree
+     * @param ProjectModel $projectModel
+     * @param int          $id
+     * @param int          $up
+     * @param int          $treeSize    Total expected tree size
+     * @param int          $descendants Expected descendant count
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \UnexpectedValueException
+     */
+    public function test_branched_data_project_tree(ProjectModel $projectModel, int $id, int $up, int $treeSize, int $descendants)
+    {
+        /** @var Project $domainObject */
+        $domainObject = $this->translator->translateToDomainModel($projectModel);
+        $this->assertEquals($id, $domainObject->getId());
+
+        // How far up to root are we?
+        $upActual = 0;
+        $root     = $domainObject;
+        while ($root->getContext() instanceof Project) {
+            $upActual++;
+            $root = $root->getContext();
+        }
+        $this->assertEquals($up, $upActual);
+
+        // Is the tree as big as expected?
+        $this->assertEquals($treeSize, 1 + $this->countSubAssessmentsRecursiveProject($root));
+
+        $this->assertEquals($descendants, $this->countSubAssessmentsRecursiveProject($domainObject));
+    }
+
+
+    /**
+     * Returns the number of project sub-assessments recursively
+     *
+     * @param Project $project
+     * @return int
+     */
+    private function countSubAssessmentsRecursiveProject(Project $project): int
+    {
+        $count = $project->getAssessables()->count();
+        foreach ($project->getAssessables() as $subAssessable) {
+            if ($subAssessable instanceof Project) {
+                $count += $this->countSubAssessmentsRecursiveProject($subAssessable);
+            }
+        }
+        return $count;
+    }
+
+
+    /**
+     * Returns a tree with a single branch of 5 nodes, from 1 (root) to 5 (leaf)
+     *
+     * @return array
+     */
+    public function provider_linear_data_project_tree(): array
+    {
+        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
+        $p1->getAssessmentModel()->setSubObject($p1);
+
+        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2));
+        $p2->getAssessmentModel()->setSubObject($p2);
+        $p2->getAssessmentModel()->setContextProject($p1);
+        $p1->getAssessments()[2] = $p2->getAssessmentModel();
+
+        $p3 = (new ProjectModel())->setId(3)->setAssessmentModel((new AssessmentModel())->setId(3));
+        $p3->getAssessmentModel()->setSubObject($p3);
+        $p3->getAssessmentModel()->setContextProject($p2);
+        $p2->getAssessments()[3] = $p3->getAssessmentModel();
+
+        $p4 = (new ProjectModel())->setId(4)->setAssessmentModel((new AssessmentModel())->setId(4));
+        $p4->getAssessmentModel()->setSubObject($p4);
+        $p4->getAssessmentModel()->setContextProject($p3);
+        $p3->getAssessments()[4] = $p4->getAssessmentModel();
+
+        $p5 = (new ProjectModel())->setId(5)->setAssessmentModel((new AssessmentModel())->setId(5));
+        $p5->getAssessmentModel()->setSubObject($p5);
+        $p5->getAssessmentModel()->setContextProject($p4);
+        $p4->getAssessments()[5] = $p5->getAssessmentModel();
+
+        return [
+            [$p1, 1, 0, 4],
+            [$p2, 2, 1, 3],
+            [$p3, 3, 2, 2],
+            [$p4, 4, 3, 1],
+            [$p5, 5, 4, 0],
+        ];
+    }
+
+
+    /**
+     * Returns a tree with 5 nodes, from 1 (root) to 5 (leaf), with two forks
+     *
+     * @return array
+     */
+    public function provider_branched_data_project_tree(): array
+    {
+        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
+        $p1->getAssessmentModel()->setSubObject($p1);
+        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2));
+        $p2->getAssessmentModel()->setSubObject($p2);
+        $p3 = (new ProjectModel())->setId(3)->setAssessmentModel((new AssessmentModel())->setId(3));
+        $p3->getAssessmentModel()->setSubObject($p3);
+        $p4 = (new ProjectModel())->setId(4)->setAssessmentModel((new AssessmentModel())->setId(4));
+        $p4->getAssessmentModel()->setSubObject($p4);
+        $p5 = (new ProjectModel())->setId(5)->setAssessmentModel((new AssessmentModel())->setId(5));
+        $p5->getAssessmentModel()->setSubObject($p5);
+
+        // #2 and #3 are children of #1
+        $p1->getAssessments()[2] = $p2->getAssessmentModel();
+        $p1->getAssessments()[3] = $p3->getAssessmentModel();
+        $p2->getAssessmentModel()->setContextProject($p1);
+        $p3->getAssessmentModel()->setContextProject($p2);
+
+        // #4 and #4 are children of #2
+        $p2->getAssessments()[4] = $p4->getAssessmentModel();
+        $p2->getAssessments()[5] = $p5->getAssessmentModel();
+        $p4->getAssessmentModel()->setContextProject($p2);
+        $p5->getAssessmentModel()->setContextProject($p2);
+
+        return [
+            [$p1, 1, 0, 5, 4],
+            [$p2, 2, 1, 5, 2],
+            [$p3, 3, 1, 5, 0],
+            [$p4, 4, 2, 5, 0],
+            [$p5, 5, 2, 5, 0],
+        ];
+    }
 }
