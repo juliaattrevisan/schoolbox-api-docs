@@ -7,21 +7,18 @@
 
 namespace Schoolbox\Learning\Assessment\DataModel;
 
-use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
-use Schoolbox\Assessment\Course\Task as TaskModel;
-use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
 use Schoolbox\Learning\Assessment\DataModel\Translator\IAssessmentTypeTranslator;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Translator as UnitImplementationTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitSpecificationTranslator;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Resource\Folder\Model as Folder;
 use UnexpectedValueException;
+use LogicException;
 
 /**
  * Translation class between an Assessment and its data model.
@@ -43,14 +40,45 @@ class Translator
     protected $subTranslators = [];
 
     /**
+     * @var Mapper
+     */
+    private $assessmentMapper;
+
+
+    /** @var IAssessableDataModel[]|GenericCollection */
+    private $dataModelCache;
+
+    /** @var IAssessable[]|GenericCollection */
+    private $domainObjectCache;
+
+    /**
+     * How many levels of projects-in-projects are supported?
+     * If we reach exceed this level we can conclude we have a cyclic graph.
+     *
+     * @var int
+     */
+    private $maxProjectLevels;
+
+
+    /**
      * Constructor
      *
-     * @param MarkSchemeFactory            $markSchemeFactory
+     * @param MarkSchemeFactory $markSchemeFactory
+     * @param Mapper            $assessmentMapper
+     * @param int               $maxProjectLevels
      */
-    public function __construct(MarkSchemeFactory $markSchemeFactory)
-    {
+    public function __construct(
+        MarkSchemeFactory $markSchemeFactory,
+        Mapper $assessmentMapper,
+        int $maxProjectLevels = 10
+    ) {
         $this->markSchemeFactory = $markSchemeFactory;
+        $this->assessmentMapper  = $assessmentMapper;
+        $this->maxProjectLevels  = $maxProjectLevels;
+        $this->dataModelCache    = new GenericCollection(IAssessableDataModel::class);
+        $this->domainObjectCache = new GenericCollection(IAssessable::class);
     }
+
 
     /**
      * Adds a sub-translator which is able to handle a particular variant of
@@ -65,37 +93,130 @@ class Translator
         return $this;
     }
 
+
+    /**
+     * @param IAssessable $domainObject
+     * @return IAssessmentTypeTranslator
+     * @throws UnexpectedValueException
+     */
+    private function getSubTranslatorDomain(IAssessable $domainObject)
+    {
+        foreach ($this->subTranslators as $subTranslator) {
+            if ($subTranslator->recognisesDomainObject($domainObject)) {
+                return $subTranslator;
+            }
+        }
+        throw new UnexpectedValueException('$assessment is not a recognised assessment type');
+    }
+
+
+    /**
+     * @param IAssessableDataModel $dataModel
+     * @return IAssessmentTypeTranslator
+     * @throws UnexpectedValueException
+     */
+    private function getSubTranslatorData(IAssessableDataModel $dataModel)
+    {
+        foreach ($this->subTranslators as $subTranslator) {
+            if ($subTranslator->recognisesDataModel($dataModel)) {
+                return $subTranslator;
+            }
+        }
+        throw new UnexpectedValueException('$dataModel is not a recognised assessment type');
+    }
+
+
+    /**
+     * @param IAssessmentTypeTranslator $subTranslator
+     * @param IAssessable               $domainObject
+     * @return IAssessableDataModel
+     */
+    private function createDataModel(IAssessmentTypeTranslator $subTranslator, IAssessable $domainObject): IAssessableDataModel
+    {
+        $dataModel       = $subTranslator->createDataModel();
+        $assessmentModel = $this->assessmentMapper->createModel($domainObject->getId());
+        $dataModel->setAssessmentModel($assessmentModel);
+        $assessmentModel->setSubObject($dataModel);
+        return $dataModel;
+    }
+
+
+    /**
+     * @param int $depth
+     * @throws UnexpectedValueException If we have recursed more than the configured level of project
+     */
+    private function checkProjectNestingLevel(int $depth): void
+    {
+        if ($depth >= $this->maxProjectLevels) {
+            throw new UnexpectedValueException("Invalid graph detected. Recursion depth: $depth");
+        }
+    }
+
+
     /**
      * Translates the Assessment business domain model to a data model.
      *
-     * @param IAssessable $assessment
+     * We need a mechanism to prevent projects transforming their children, who each transform their parent, Ad infinitum.
+     * We can either short-circuit at parent->child->parent or child->parent->child. If we choose the latter we would need
+     * to detect the position of items in the children collection to ensure consistent indexing between translation layers.
+     * This is an order(N) operation (and also fails if the same item instance is present multiple times),
+     * whereas settings a child's parent is order(1). Hence the former approach is used.
+     *
+     * We do need to re-transform relationships & properties even if entity is cached because those relationships may have changed
+     *
+     * @param IAssessable $domainObject
+     * @param int         $depth
+     * @param bool        $translateProjectContext
      * @return IAssessableDataModel
+     *
+     * @throws UnexpectedValueException If assessment does not have a context
+     * @throws LogicException If cyclic graph detected
      */
-    public function translateToDataModel(IAssessable $assessment)
+    public function translateToDataModel(IAssessable $domainObject, int $depth = 0, bool $translateProjectContext = true): IAssessableDataModel
     {
+        $this->checkProjectNestingLevel($depth);
+
+        // Attempt to translate assessments using the sub-translators
+        $subTranslator = $this->getSubTranslatorDomain($domainObject);
+        // TODO figure out which fields on assessable sub-objects are now redundant
+        // TODO figure out how to translate participants
+
+        // Have we not yet translated this domain object?
+        $domainHash = spl_object_hash($domainObject);
+        if (!$this->dataModelCache->keyExists($domainHash)) {
+            // Insert new dataModel in data cache
+            $this->dataModelCache[$domainHash] = $this->createDataModel($subTranslator, $domainObject);
+
+            // Insert domainObject in the domainObject cache so subsequent data-to-domain translation fetches this instance
+            $this->domainObjectCache[spl_object_hash($this->dataModelCache[$domainHash])] = $domainObject;
+        }
+        $dataModel       = $this->dataModelCache[$domainHash];
+        $assessmentModel = $dataModel->getAssessmentModel();
+
+        $subTranslator->translateToDataModel($domainObject, $dataModel, $depth);
+
         // Extract assessment base model
         // TODO figure out how to pass in the assessable's container (folder, course spec, course impl)
-        $assessmentModel = new Model();
         $assessmentModel
-            ->setId($assessment->getId())
-            ->setTitle($assessment->getTitle())
-            ->setDescription($assessment->getDescription())
-            ->setPublishDate($assessment->getPublishAt())
-            ->setOpenDate($assessment->getOpenAt())
-            ->setDueDate($assessment->getDueAt())
-            ->setCloseDate($assessment->getCloseAt())
-            ->setDefaultOpenSpan($assessment->getDefaultOpenSpan())
-            ->setWeight($assessment->getWeight())
-            ->setSequence($assessment->getSequence())
-            ->setWorkType($assessment->getWorkType())
-            ->setCreatedAt($assessment->getCreatedAt())
-            ->setUpdatedAt($assessment->getUpdatedAt())
-            ->setDeletedAt($assessment->getDeletedAt())
-            ->setCurriculumNodes($assessment->getCurriculumNodes())
-        ;
+            ->setTitle($domainObject->getTitle())
+            ->setDescription($domainObject->getDescription())
+            ->setPublishDate($domainObject->getPublishAt())
+            ->setOpenDate($domainObject->getOpenAt())
+            ->setDueDate($domainObject->getDueAt())
+            ->setCloseDate($domainObject->getCloseAt())
+            ->setDefaultOpenSpan($domainObject->getDefaultOpenSpan())
+            ->setWeight($domainObject->getWeight())
+            ->setSequence($domainObject->getSequence())
+            ->setWorkType($domainObject->getWorkType())
+            ->setCreatedAt($domainObject->getCreatedAt())
+            ->setUpdatedAt($domainObject->getUpdatedAt())
+            ->setDeletedAt($domainObject->getDeletedAt())
+            ->setCurriculumNodes($domainObject->getCurriculumNodes());
+
+        $dataModel->setAssessmentModel($assessmentModel);
 
         // Translate specification assessment if there is one
-        $specification = $assessment->getSpecificationAssessment();
+        $specification = $domainObject->getSpecificationAssessment();
         if ($specification instanceof IAssessable) {
             // Go to no great lengths here, as I need only an ID
             $specModel = $this->translateToDataModel($specification);
@@ -108,7 +229,7 @@ class Translator
         // Translate assessment context
         // TODO consider moving this to a translator
         // TODO add project context
-        $context = $assessment->getContext();
+        $context = $domainObject->getContext();
         if ($context instanceof Folder) {
             $assessmentModel->setAssessmentContext($context);
 
@@ -119,78 +240,71 @@ class Translator
             $assessmentModel->setAssessmentContext($context);
 
         } elseif ($context instanceof Project) {
-            // Can't use translator for projects - it will attempt to translate its sub-assessments,
-            // thus causing an infinite loop.
-            // Set a simplified version instead.
-            $assessmentModel->setAssessmentContext(
-                (new ProjectModel())
-                    ->setAssessmentModel((new AssessmentModel())->setId($context->getId()))
-            );
-
-        } else {
-            throw new UnexpectedValueException('$assessment has no context (folder, unit, unit spec or project)');
-        }
-
-        // Attempt to translate tasks using the sub-translators
-        // TODO figure out which fields on assessable sub-objects are now redundant
-        // TODO figure out how to translate participants
-        foreach ($this->subTranslators as $subTranslator) {
-            $model = $subTranslator->translateToDataModel($assessment);
-            if ($model instanceof IAssessableDataModel) {
-                $model->setAssessmentModel($assessmentModel);
-                return $model;
+            // Does the domainObject have a parent but the dataModel does not?
+            if ($translateProjectContext && !$dataModel->getAssessmentModel()->getContextProject()) {
+                $dataModel->getAssessmentModel()->setAssessmentContext($this->translateToDataModel($context, $depth + 1));
             }
         }
 
-        throw new UnexpectedValueException('$assessment is not a recognised assessment type');
+        return $dataModel;
     }
+
 
     /**
      * Translates the data model to a domain model.
      *
      * @param IAssessableDataModel $dataModel
+     * @param int                  $depth
+     * @param bool                 $translateParent
      * @return IAssessable
      * @throws UnexpectedValueException if $dataModel wasn't able to be translated
+     * @throws \DomainException If MarkType is invalid for the assessment
+     * @throws \InvalidArgumentException If assessment class not registered
+     * @throws LogicException If cyclic graph detected
      */
-    public function translateToDomainModel(IAssessableDataModel $dataModel)
+    public function translateToDomainModel(IAssessableDataModel $dataModel, int $depth = 0, bool $translateParent = true): IAssessable
     {
-        $assessable = null;
-        foreach ($this->subTranslators as $subTranslator) {
-            $assessable = $subTranslator->translateToDomainModel($dataModel);
+        $this->checkProjectNestingLevel($depth);
 
-            if ($assessable instanceof IAssessable) {
-                break;
-            }
+        $assessmentModel = $dataModel->getAssessmentModel();
+        if (!$assessmentModel instanceof AssessmentModel) {
+            throw new UnexpectedValueException('$dataModel has no assessment model');
         }
 
-        if (!$assessable instanceof IAssessable) {
-            throw new UnexpectedValueException('$dataModel is not a recognised assessment data model');
+        $subTranslator = $this->getSubTranslatorData($dataModel);
+
+        // Have we not yet translated this dataModel?
+        $dataHash = spl_object_hash($dataModel);
+        if (!$this->domainObjectCache->keyExists($dataHash)) {
+            $this->domainObjectCache[$dataHash] = $subTranslator->createDomainObject()->setId($assessmentModel->getId());
+
+            // Insert dataModel in the dataModel cache so subsequent domain-to-data translation fetches this instance
+            $this->dataModelCache[spl_object_hash($this->domainObjectCache[$dataHash])] = $dataModel;
         }
+        $domainObject = $this->domainObjectCache[$dataHash];
+
+        $subTranslator->translateToDomainModel($dataModel, $domainObject);
 
         // Generic fields
         // Where there's both a version in assessment model and base model,
         // use the version in assessment model.
-        if (!$dataModel->getAssessmentModel() instanceof AssessmentModel) {
-            throw new UnexpectedValueException('$dataModel has no assessment model');
-        }
-        $assessable
-            ->setMarkScheme($this->markSchemeFactory->spawnMarkSchemeFor($assessable))
-            ->setId($dataModel->getAssessmentModel()->getId())
-            ->setSequence($dataModel->getAssessmentModel()->getSequence())
-            ->setWorkType($dataModel->getAssessmentModel()->getWorkType())
-            ->setTitle($dataModel->getAssessmentModel()->getTitle())
-            ->setDescription($dataModel->getAssessmentModel()->getDescription())
-            ->setDefaultOpenSpan($dataModel->getAssessmentModel()->getDefaultOpenSpan())
-            ->setWeight($dataModel->getAssessmentModel()->getWeight())
-            ->setPublishAt($dataModel->getAssessmentModel()->getPublishDate())
-            ->setOpenAt($dataModel->getAssessmentModel()->getOpenDate())
-            ->setDueAt($dataModel->getAssessmentModel()->getDueDate())
-            ->setCloseAt($dataModel->getAssessmentModel()->getCloseDate())
-            ->setCreatedAt($dataModel->getAssessmentModel()->getCreatedAt())
-            ->setUpdatedAt($dataModel->getAssessmentModel()->getUpdatedAt())
-            ->setDeletedAt($dataModel->getAssessmentModel()->getDeletedAt())
-            ->setCurriculumNodes($dataModel->getAssessmentModel()->getCurriculumNodes())
-        ;
+
+        $domainObject
+            ->setMarkScheme($this->markSchemeFactory->spawnMarkSchemeFor($domainObject))
+            ->setSequence($assessmentModel->getSequence())
+            ->setWorkType($assessmentModel->getWorkType())
+            ->setTitle($assessmentModel->getTitle())
+            ->setDescription($assessmentModel->getDescription())
+            ->setDefaultOpenSpan($assessmentModel->getDefaultOpenSpan())
+            ->setWeight($assessmentModel->getWeight())
+            ->setPublishAt($assessmentModel->getPublishDate())
+            ->setOpenAt($assessmentModel->getOpenDate())
+            ->setDueAt($assessmentModel->getDueDate())
+            ->setCloseAt($assessmentModel->getCloseDate())
+            ->setCreatedAt($assessmentModel->getCreatedAt())
+            ->setUpdatedAt($assessmentModel->getUpdatedAt())
+            ->setDeletedAt($assessmentModel->getDeletedAt())
+            ->setCurriculumNodes($assessmentModel->getCurriculumNodes());
 
         // Translate specification assessment if there is one
         $specification = $dataModel->getAssessmentModel()->getSpecificationAssessment();
@@ -200,38 +314,43 @@ class Translator
             $model->setAssessmentModel($specification);
 
             // Holy recursion batman
-            $assessable->setSpecificationAssessment($this->translateToDomainModel($model));
+            $domainObject->setSpecificationAssessment($this->translateToDomainModel($model));
         }
 
         // Translate assessment context
         $context = $dataModel->getAssessmentModel()->getAssessmentContext();
         if ($context instanceof Folder) {
-            $assessable->setContext($context);
+            $domainObject->setContext($context);
 
         } elseif ($context instanceof UnitSpecification) {
-            $assessable->setContext($context);
+            $domainObject->setContext($context);
 
         } elseif ($context instanceof UnitImplementation) {
-            $assessable->setContext($context);
+            $domainObject->setContext($context);
 
         } elseif ($context instanceof ProjectModel) {
-            // Need to be careful when translating project:
-            // any constituent assessments need to be removed, otherwise they
-            // will attempt to hydrate their children, which will hydrate this
-            // again, and so on...
-            $context->setAssessments(new Collection());
-            $translatedContext = $this->translateToDomainModel($context);
-            if ($translatedContext instanceof Project) {
-                $assessable->setContext($translatedContext);
-            } else {
-                throw new UnexpectedValueException('$dataModel is a project, but its context is not for some reason!');
+            // Does the data model have a parent but the domain does not?
+            if ($translateParent && !$domainObject->getContext()) {
+                $translatedContext = $this->translateToDomainModel($context, $depth + 1);
+                if ($translatedContext instanceof Project) {
+                    $domainObject->setContext($translatedContext);
+                } else {
+                    throw new UnexpectedValueException('$dataModel is a project, but its context is not for some reason!');
+                }
             }
-
-        } else {
-            throw new UnexpectedValueException('$dataModel has no context (folder, unit, unit spec or project)');
         }
 
+        return $domainObject;
+    }
 
-        return $assessable;
+
+    /**
+     * @param int $maxProjectLevels
+     * @return Translator
+     */
+    public function setMaxProjectLevels(int $maxProjectLevels): self
+    {
+        $this->maxProjectLevels = $maxProjectLevels;
+        return $this;
     }
 }

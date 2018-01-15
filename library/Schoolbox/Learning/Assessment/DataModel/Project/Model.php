@@ -10,7 +10,9 @@ namespace Schoolbox\Learning\Assessment\DataModel\Project;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DataModel\IAssessmentContextDataModel;
@@ -107,9 +109,9 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel, ISoftD
     protected $gradeGroup;
 
     /**
-     * The collection of assessable models.
+     * The collection of this project's sub-assessment models.
      *
-     * @var Collection|IAssessableDataModel[]
+     * @var Collection|Assessment\Model[]
      */
     protected $assessments;
 
@@ -118,7 +120,7 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel, ISoftD
      */
     public function __construct()
     {
-        $this->assessments = new Collection();
+        $this->assessments = new GenericCollection(Assessment\Model::class);
         $this->markType    = new MarkType();
     }
 
@@ -159,7 +161,7 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel, ISoftD
     }
 
     /**
-     * @return Collection|IAssessableDataModel[]
+     * @return GenericCollection|Assessment\Model[]
      */
     public function getAssessments()
     {
@@ -167,12 +169,12 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel, ISoftD
     }
 
     /**
-     * @param Collection|IAssessableDataModel[] $assessments
+     * @param GenericCollection|Assessment\Model[] $assessments
      * @return static
      */
-    public function setAssessments(Collection $assessments)
+    public function setAssessments(GenericCollection $assessments)
     {
-        $this->assessments = $assessments;
+        $this->assessments->replaceWith($assessments);
         return $this;
     }
 

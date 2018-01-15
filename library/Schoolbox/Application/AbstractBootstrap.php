@@ -73,6 +73,7 @@ use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
 use Schoolbox\Learning\Assessment\DataModel\Translator as AssessmentDataModelTranslator;
 use Schoolbox\Learning\Assessment\DataModel\Translator\DueWork as DueWorkTranslator;
 use Schoolbox\Learning\Assessment\DataModel\Translator\Project as ProjectTranslator;
@@ -667,8 +668,11 @@ abstract class AbstractBootstrap implements BootstrapInterface
         // Register assessment data source
         $di->set(
             'assessmentTranslator',
-            $di->lazy(function () use ($di) {
-                $translator = new AssessmentDataModelTranslator(new MarkSchemeFactory());
+            $di->lazy(function () {
+                $translator = new AssessmentDataModelTranslator(
+                    new MarkSchemeFactory(),
+                    AssessmentMapper::getInstance()
+                );
                 $translator
                     ->addSubTranslator(new TaskTranslator())
                     ->addSubTranslator(new DueWorkTranslator())

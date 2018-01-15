@@ -377,18 +377,18 @@ class TranslatorTest extends TestCase
             [
                 // Basic assessment with a specification
                 (new Task())
-                    ->setId(3)
+                    ->setId(300)
                     ->setContext((new UnitImplementation())->setId(12345))
                     ->setCreator($this->teacher1)
                     ->setSpecificationAssessment(
                         (new Task())
-                            ->setId(2)
+                            ->setId(200)
                             ->setContext((new UnitSpecification())->setId(54321))
                             ->setCreator($this->teacher1)
                     ),
-                3,
+                300,
                 TaskModel::class,
-                2,
+                200,
                 UnitSpecification::class,
                 54321,
             ],
@@ -415,18 +415,18 @@ class TranslatorTest extends TestCase
                 // Usually only assessments within a unit implementation context will have a specification.
                 // However, that isn't a hard and fast rule.
                 (new Task())
-                    ->setId(3)
+                    ->setId(301)
                     ->setContext((new Folder())->setId(12345))
                     ->setCreator($this->teacher1)
                     ->setSpecificationAssessment(
                         (new Task())
-                            ->setId(2)
+                            ->setId(201)
                             ->setContext((new Folder())->setId(54321))
                             ->setCreator($this->teacher1)
                     ),
-                3,
+                301,
                 TaskModel::class,
-                2,
+                201,
                 Folder::class,
                 54321,
             ],

@@ -90,26 +90,28 @@ class ProjectTest extends TestCase
         // Test sub-assessables
         $this->assertCount(3, $projectModel->getAssessments());
 
-        $this->assertInstanceOf(TaskModel::class, $projectModel->getAssessments()[0]);
-        $this->assertEquals(1, $projectModel->getAssessments()[0]->getAssessmentModel()->getSequence());
-        $this->assertEquals(1, $projectModel->getAssessments()[0]->getAssessmentModel()->getId());
+        $this->assertInstanceOf(TaskModel::class, $projectModel->getAssessments()[0]->getSubObject());
+        $this->assertEquals(1, $projectModel->getAssessments()[0]->getSequence());
+        $this->assertEquals(1, $projectModel->getAssessments()[0]->getId());
 
-        $this->assertInstanceOf(QuizModel::class, $projectModel->getAssessments()[1]);
-        $this->assertEquals(2, $projectModel->getAssessments()[1]->getAssessmentModel()->getSequence());
-        $this->assertEquals(2, $projectModel->getAssessments()[1]->getAssessmentModel()->getId());
+        $this->assertInstanceOf(QuizModel::class, $projectModel->getAssessments()[1]->getSubObject());
+        $this->assertEquals(2, $projectModel->getAssessments()[1]->getSequence());
+        $this->assertEquals(2, $projectModel->getAssessments()[1]->getId());
 
-        $this->assertInstanceOf(DueWorkModel::class, $projectModel->getAssessments()[2]);
-        $this->assertEquals(3, $projectModel->getAssessments()[2]->getAssessmentModel()->getSequence());
-        $this->assertEquals(3, $projectModel->getAssessments()[2]->getAssessmentModel()->getId());
+        $this->assertInstanceOf(DueWorkModel::class, $projectModel->getAssessments()[2]->getSubObject());
+        $this->assertEquals(3, $projectModel->getAssessments()[2]->getSequence());
+        $this->assertEquals(3, $projectModel->getAssessments()[2]->getId());
     }
 
     /**
-     * Test translation of projects which contain projects.
+     * Test translation of projects which contain projects, greater than permitted level
      *
      * @expectedException \UnexpectedValueException
      */
     public function testTranslateWithinProjectToDataModel()
     {
+        $this->translator->setMaxProjectLevels(1);
+
         $project = (new Project(new Average()))
             ->setContext((new Folder())->setId(1))
             ->setId(12)
@@ -246,22 +248,24 @@ class ProjectTest extends TestCase
             )
             ->setMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_NONE));
 
+        $subTask = (new TaskModel())
+            ->setOwner($this->teacher1)
+            ->setAssessmentModel((new AssessmentModel())->setId(1));
+        $subQuiz = (new QuizModel())
+            ->setUser($this->teacher2)
+            ->setAssessmentModel((new AssessmentModel())->setId(2));
+        $subDueWork = (new DueWorkModel())
+            ->setOwner($this->teacher2)
+            ->setAssessmentModel((new AssessmentModel())->setId(3))
+            ->setMarkType($this->buildMarkType())
+            ->setSelfReflectable(true)
+            ->setSelfAssessable(true);
+
+
         $projectModel->getAssessments()
-            ->add((new TaskModel())
-                ->setOwner($this->teacher1)
-                ->setAssessmentModel((new AssessmentModel())->setId(1))
-            )
-            ->add((new QuizModel())
-                ->setUser($this->teacher2)
-                ->setAssessmentModel((new AssessmentModel())->setId(2))
-            )
-            ->add((new DueWorkModel())
-                ->setOwner($this->teacher2)
-                ->setAssessmentModel((new AssessmentModel())->setId(3))
-                ->setMarkType($this->buildMarkType())
-                ->setSelfReflectable(true)
-                ->setSelfAssessable(true)
-            );
+            ->add($subTask->getAssessmentModel()->setSubObject($subTask))
+            ->add($subQuiz->getAssessmentModel()->setSubObject($subQuiz))
+            ->add($subDueWork->getAssessmentModel()->setSubObject($subDueWork));
 
         /** @var Project $project */
         $project = $this->translator->translateToDomainModel($projectModel);
@@ -464,58 +468,56 @@ class ProjectTest extends TestCase
             ->setMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_NONE));
 
         // Project activities may have a specification, even though they're in the context of a project
+        $subTask = (new TaskModel())
+            ->setOwner($this->teacher1)
+            ->setAssessmentModel(
+                (new AssessmentModel())
+                    ->setId(101)
+                    ->setSpecificationAssessment(
+                        (new AssessmentModel())
+                            ->setId(1)
+                            ->setAssessmentContext($unitSpecModel)
+                            ->setSubObject((new TaskModel())->setId(1))
+                    )
+            );
+        $subQuiz = (new QuizModel())
+            ->setUser($this->teacher2)
+            ->setAssessmentModel(
+                (new AssessmentModel())
+                    ->setId(102)
+                    ->setSpecificationAssessment(
+                        (new AssessmentModel())
+                            ->setId(2)
+                            ->setAssessmentContext($unitSpecModel)
+                            ->setSubObject((new QuizModel())->setId(2))
+                    )
+            );
+        $subDueWork = (new DueWorkModel())
+            ->setOwner($this->teacher2)
+            ->setAssessmentModel(
+                (new AssessmentModel())
+                    ->setId(103)
+                    ->setSpecificationAssessment(
+                        (new AssessmentModel())
+                            ->setId(3)
+                            ->setAssessmentContext($unitSpecModel)
+                            ->setSubObject(
+                                (new DueWorkModel())
+                                    ->setId(3)
+                                    ->setMarkType($this->buildMarkType())
+                                    ->setSelfAssessable(true)
+                                    ->setSelfReflectable(true)
+                            )
+                    )
+            )
+            ->setMarkType($this->buildMarkType())
+            ->setSelfReflectable(true)
+            ->setSelfAssessable(true);
+
         $projectModel->getAssessments()
-                     ->add(
-                         (new TaskModel())
-                             ->setOwner($this->teacher1)
-                             ->setAssessmentModel(
-                                 (new AssessmentModel())
-                                     ->setId(101)
-                                     ->setSpecificationAssessment(
-                                         (new AssessmentModel())
-                                             ->setId(1)
-                                             ->setAssessmentContext($unitSpecModel)
-                                             ->setSubObject((new TaskModel())->setId(1))
-                                     )
-                             )
-                     )
-                     ->add(
-                         (new QuizModel())
-                             ->setUser($this->teacher2)
-                             ->setAssessmentModel(
-                                 (new AssessmentModel())
-                                     ->setId(102)
-                                     ->setSpecificationAssessment(
-                                         (new AssessmentModel())
-                                             ->setId(2)
-                                             ->setAssessmentContext($unitSpecModel)
-                                             ->setSubObject((new QuizModel())->setId(2))
-                                     )
-                             )
-                     )
-                     ->add(
-                         (new DueWorkModel())
-                             ->setOwner($this->teacher2)
-                             ->setAssessmentModel(
-                                 (new AssessmentModel())
-                                     ->setId(103)
-                                     ->setSpecificationAssessment(
-                                         (new AssessmentModel())
-                                             ->setId(3)
-                                             ->setAssessmentContext($unitSpecModel)
-                                             ->setSubObject(
-                                                 (new DueWorkModel())
-                                                     ->setId(3)
-                                                     ->setMarkType($this->buildMarkType())
-                                                     ->setSelfAssessable(true)
-                                                     ->setSelfReflectable(true)
-                                             )
-                                     )
-                             )
-                             ->setMarkType($this->buildMarkType())
-                             ->setSelfReflectable(true)
-                             ->setSelfAssessable(true)
-                     );
+                     ->add($subTask->getAssessmentModel()->setSubObject($subTask))
+                     ->add($subQuiz->getAssessmentModel()->setSubObject($subQuiz))
+                     ->add($subDueWork->getAssessmentModel()->setSubObject($subDueWork));
 
         /** @var Project $project */
         $project = $this->translator->translateToDomainModel($projectModel);
@@ -620,19 +622,19 @@ class ProjectTest extends TestCase
         // Test sub-assessables
         $this->assertCount(3, $projectModel->getAssessments());
 
-        $this->assertInstanceOf(TaskModel::class, $projectModel->getAssessments()[0]);
-        $this->assertEquals(1, $projectModel->getAssessments()[0]->getAssessmentModel()->getSequence());
-        $this->assertEquals(101, $projectModel->getAssessments()[0]->getAssessmentModel()->getId());
-        $this->assertEquals(1, $projectModel->getAssessments()[0]->getAssessmentModel()->getSpecificationAssessment()->getId());
+        $this->assertInstanceOf(TaskModel::class, $projectModel->getAssessments()[0]->getSubObject());
+        $this->assertEquals(1, $projectModel->getAssessments()[0]->getSequence());
+        $this->assertEquals(101, $projectModel->getAssessments()[0]->getId());
+        $this->assertEquals(1, $projectModel->getAssessments()[0]->getSpecificationAssessment()->getId());
 
-        $this->assertInstanceOf(QuizModel::class, $projectModel->getAssessments()[1]);
-        $this->assertEquals(2, $projectModel->getAssessments()[1]->getAssessmentModel()->getSequence());
-        $this->assertEquals(102, $projectModel->getAssessments()[1]->getAssessmentModel()->getId());
-        $this->assertEquals(2, $projectModel->getAssessments()[1]->getAssessmentModel()->getSpecificationAssessment()->getId());
+        $this->assertInstanceOf(QuizModel::class, $projectModel->getAssessments()[1]->getSubObject());
+        $this->assertEquals(2, $projectModel->getAssessments()[1]->getSequence());
+        $this->assertEquals(102, $projectModel->getAssessments()[1]->getId());
+        $this->assertEquals(2, $projectModel->getAssessments()[1]->getSpecificationAssessment()->getId());
 
-        $this->assertInstanceOf(DueWorkModel::class, $projectModel->getAssessments()[2]);
-        $this->assertEquals(3, $projectModel->getAssessments()[2]->getAssessmentModel()->getSequence());
-        $this->assertEquals(103, $projectModel->getAssessments()[2]->getAssessmentModel()->getId());
-        $this->assertEquals(3, $projectModel->getAssessments()[2]->getAssessmentModel()->getSpecificationAssessment()->getId());
+        $this->assertInstanceOf(DueWorkModel::class, $projectModel->getAssessments()[2]->getSubObject());
+        $this->assertEquals(3, $projectModel->getAssessments()[2]->getSequence());
+        $this->assertEquals(103, $projectModel->getAssessments()[2]->getId());
+        $this->assertEquals(3, $projectModel->getAssessments()[2]->getSpecificationAssessment()->getId());
     }
 }

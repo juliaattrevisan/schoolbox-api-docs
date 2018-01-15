@@ -27,6 +27,7 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use PDO;
 
 /**
  * Class Mapper
@@ -500,7 +501,7 @@ class Mapper extends BaseMapper
             $builder = $builder->in('id', array_merge($idList, $uniqueIds));
             return $this->findByPredicates($builder, $options);
         } catch (\UnderflowException $e) {
-            return new Collection();
+            return $this->createCollection();
         }
     }
 
@@ -520,7 +521,8 @@ class Mapper extends BaseMapper
         $quizIds           = [];
         $contextProjectIds = [];
 
-        foreach ($statement as $row) {
+        /** @noinspection PhpAssignmentInConditionInspection */
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             /** @var Model $model */
             $model = $this->hydrate($row);
             $model->setWorkType($this->hydrateJoin($row, 'work_type', 'wt'));
@@ -605,9 +607,7 @@ class Mapper extends BaseMapper
         $modelList = $this->augmentListWithSpecifications($modelList);
         // Grade groups
         $modelList = $this->augmentListWithGradeGroups($modelList);
-
-        /* Curriculum Nodes
-         */
+        // Curriculum Nodes
         $modelList = $this->augmentListWithCurriculumNodes($modelList);
 
         return $modelList;

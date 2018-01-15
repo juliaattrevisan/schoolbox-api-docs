@@ -8,9 +8,9 @@
 namespace Schoolbox\Learning\Assessment\Test\DataModel;
 
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
-use Schoolbox\Assessment\Course\Task as TaskModel;
 use Schoolbox\Learning\Assessment\DataModel\Translator;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\User;
 
 /**
@@ -38,7 +38,10 @@ trait TestTrait
      */
     protected function setUp()
     {
-        $this->translator = new Translator(new MarkSchemeFactory());
+        $this->translator = new Translator(
+            new MarkSchemeFactory(),
+            Assessment\Mapper::getInstance()
+        );
         $this->translator
             ->addSubTranslator(new Translator\Task())
             ->addSubTranslator(new Translator\DueWork())

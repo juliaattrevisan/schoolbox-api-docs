@@ -751,14 +751,18 @@ class MapperProxy
         // TODO try to remove this, and update translator to return Model objects directly
         $subModel = $model->getSubObject();
         $subModel->setAssessmentModel($model);
-        // Retrieve sub-projects
 
-
-        $assessable = $this->translator->translateToDomainModel($subModel);
-        if ($assessable instanceof ProjectObject) {
-            $assessable->setAssessables($this->findAllByProjectId($assessable->getId()));
+        // Load project sub-assessments:
+        // We could either do that here to one level, or in the assessment mapper recursively.
+        // This is non-trivial to achieve in the assessment mapper as its hydrateSelect() method
+        // fetches an assessment's context-project. That fetch would attempt to fetch the project's
+        // sub-assessments, and an infinite-cycle would result.
+        // For now, just do simply and fetch manually.
+        if ($subModel instanceof Project) {
+            $subModel->setAssessments($this->baseMapper->findByColumn('v_pa.project_id', $subModel->getId())->indexBy('id'));
         }
-        return $assessable;
+
+        return $this->translator->translateToDomainModel($subModel);
     }
 
     /**
@@ -766,17 +770,17 @@ class MapperProxy
      *
      * Any broken data models just get skipped.
      *
-     * @param Collection|Model[] $collection
+     * @param Collection|Model[] $dataModels
      * @return Collection|IAssessable[]
      * @throws \UnexpectedValueException If assessment's data is broken in database
      */
-    public function translateToDomainModelCollection(Collection $collection)
+    public function translateToDomainModelCollection(Collection $dataModels)
     {
-        $newCollection = $this->createCollection();
-        foreach ($collection as $model) {
-            if ($model instanceof Model) {
+        $domainObjects = $this->createCollection();
+        foreach ($dataModels as $idx => $dataModel) {
+            if ($dataModel instanceof Model) {
                 try {
-                    $newCollection->add($this->translateToDomainModel($model));
+                    $domainObjects[$idx] = $this->translateToDomainModel($dataModel);
                 } catch (\UnexpectedValueException $e) {
                     // Broken object from database - not much I can do but...
                     if(function_exists('newrelic_notice_error')){
@@ -786,7 +790,7 @@ class MapperProxy
                 }
             }
         }
-        return $newCollection;
+        return $domainObjects;
     }
 
     /**
@@ -821,7 +825,8 @@ class MapperProxy
         try {
             // Load model and its participants
             $originalModel = $this->baseMapper->findOneByColumnList([$column => $value]);
-            $assessment    = $this->translateToDomainModel($originalModel);
+
+            $assessment = $this->translateToDomainModel($originalModel);
             if ($loadParticipants) {
                 $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
             }

@@ -15,6 +15,7 @@ use Schoolbox;
  *
  * @package Schoolbox\Assessment\Component\SubmissionBox
  * @method MarkType findById($identifierValue)
+ * @method MarkType createModel($idValue = null)
  */
 class MarkTypeMapper extends Schoolbox\Mapper {
 
