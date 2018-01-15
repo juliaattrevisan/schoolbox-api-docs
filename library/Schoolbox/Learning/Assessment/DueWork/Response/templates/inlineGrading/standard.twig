@@ -168,6 +168,10 @@ Usage:
                         {% endif %}
                     {% endblock %}
 
+                    {# A hole for readonly self-reflection content #}
+                    {% block readonlyFeedback %}
+                    {% endblock %}
+
                     {# The little grades input combobox #}
                     {% block gradeValue %}
                         {% if 'none' != markSchemeName | lower %}
