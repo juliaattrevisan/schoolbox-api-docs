@@ -453,28 +453,17 @@ class RubricMapper
         return $grid;
     }
 
+
     /**
-     * @param Rubric   $grid
-     * @param User     $student
-     * @param bool     $publishedOnly Whether to exclude draft marks
-     * @param null|int $responseId
+     * Using a Predicate Builder and a bool, find the pieces of the Rubric
      *
+     * @param Rubric  $grid
+     * @param bool    $publishedOnly
+     * @param Builder $pb
      * @return Rubric
      */
-    public function applyStudentMark(Rubric $grid, User $student, $publishedOnly, $responseId = null)
+    private function applyStudentMarkQuery(Rubric $grid, bool $publishedOnly, Builder $pb)
     {
-
-        $pb = new Builder($this->database, '');
-        $pb->equals('sr.owner', $student->getId());
-        $pb->equals('sr.box_id', $grid->getSubmissionBox()->getId());
-        $pb->isNull('sr.deleted_at');
-        if ($publishedOnly) {
-            $pb->notNull('sr.published_at');
-        }
-        if ($responseId) {
-            $pb->equals('sr.student_submission_id', $responseId);
-        }
-
         $whereClause = implode(' AND ', $pb->getWhere());
         $dateOrder   = $publishedOnly ? 'sr.published_at' : 'sr.created_at';
 
@@ -502,6 +491,32 @@ class RubricMapper
         }
 
         return $this->applyMark($grid, array_keys($descriptorIds));
+    }
+
+
+    /**
+     * @param Rubric   $grid
+     * @param User     $student
+     * @param bool     $publishedOnly Whether to exclude draft marks
+     * @param null|int $responseId
+     *
+     * @return Rubric
+     */
+    public function applyStudentMark(Rubric $grid, User $student, bool $publishedOnly, $responseId = null)
+    {
+        $pb = new Builder($this->database, '');
+        $pb->equals('sr.owner', $student->getId());
+        $pb->equals('sr.box_id', $grid->getSubmissionBox()->getId());
+        $pb->isNull('sr.deleted_at');
+
+        if ($publishedOnly) {
+            $pb->notNull('sr.published_at');
+        }
+        if ($responseId) {
+            $pb->equals('sr.student_submission_id', $responseId);
+        }
+
+        $this->applyStudentMarkQuery($grid, $publishedOnly, $pb);
     }
 
     /**

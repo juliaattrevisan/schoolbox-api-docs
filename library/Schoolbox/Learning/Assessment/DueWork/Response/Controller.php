@@ -215,8 +215,8 @@ class Controller extends Base
          * Teachers cannot see draft Responses in the inline grader
          */
         $mostRecentResponse = $participant->findMostRecentSubmittedResponse();
-        if (!$response) {
 
+        if (!$response) {
             $response             = $mostRecentResponse;
             $isMostRecentResponse = true;
         } else {
@@ -285,20 +285,43 @@ class Controller extends Base
              */
             'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
             'interactionLocked' => $isInteractionLocked,
+
+            /* Self-Reflectable Rubrics
+             */
+            'learnerRubricContext' => null
         ];
 
         /* Rubrics data
         */
         $rubricMapper = RubricMapper::getInstance();
+
         if($assessment->getUseRubric()){
             $assessment->setRubric($rubricMapper->findByDueWork($assessment));
         }
+
         $rubricContext = new RubricContext($rubricMapper);
 
         // Should rubric be readonly or markable?
         $data['rubricContext'] = $isInteractionLocked && !$this->getUser()->isSuperuser()
             ? $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false)
             : $rubricContext->generateMarkable($assessment, $participant->getUser(), ($response ? $response->getId() : null));
+
+        /* If this contained a self-reflectable response, load that as well in addition to the usual rubricContext
+         * The Instructor needs to see what the Learner chose simultaneously with what the Instructor will give
+         *
+         * Currently have to trickt he validation class a little for this context; we only care if the assessment
+         * -was- validly set for the participant, not for the Instructor currently logged in
+         *
+         * If it was self-reflectable and used a rubric, find out what the latest Learner-owned Feedback is for the
+         * IResponse that we're looking at
+         */
+        $selfReflected = (new ValidSelfReflection())->isSatisfiedBy($participant->getUser(), $participant);
+
+        if ($selfReflected && $assessment->getUseRubric()) {
+            $data['learnerRubricContext'] = $isInteractionLocked && !$this->getUser()->isSuperuser()
+                ? $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false)
+                : $rubricContext->generateMarkable($assessment, $participant->getUser(), ($response ? $response->getId() : null));
+        }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/standard.twig', $data));
     }
