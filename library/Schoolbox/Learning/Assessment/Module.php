@@ -87,8 +87,14 @@ class Module extends BaseModule
 
         // rules in use
         $notDeleted = new Rule\Callback(function(array $params){
-            /** @var IAssessable $assessment */
-            $assessment = $params['assessment'];
+            if ($params['assessment'] instanceof IAssessable) {
+                $assessment = $params['assessment'];
+            } elseif ($params['participant'] instanceof Participant) {
+                $assessment = $params['participant']->getAssessable();
+            } else {
+                throw new NotFound();
+                //TO DO: Log to sentry
+            }
 
             if($assessment->isDeleted()) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_ASSESSMENT_DELETED);
@@ -101,6 +107,7 @@ class Module extends BaseModule
         $canWrite           = $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE);
         $canRead            = $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_READ);
         $participantView    = $this->buildAuthRuleParticipantView();
+        $participantView    = new Rule\All($participantView, $notDeleted);
         $canSubmit          = $this->buildAuthRuleCanSubmit();
         $canWriteAndNotSpec = $this->buildAuthRuleCanWriteAndNotSpec();
         $canWriteAndNotSpec = new Rule\All($canWriteAndNotSpec, $notDeleted);
