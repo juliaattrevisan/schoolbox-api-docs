@@ -515,10 +515,23 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
+        return $this->hydrateSelectRecursive($statement);
+    }
+
+    /**
+     * @param PDOStatement $statement
+     * @param bool         $hydrateProjectContext
+     * @return Collection|Model[]
+     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
+     */
+    private function hydrateSelectRecursive(PDOStatement $statement, bool $hydrateProjectContext = true)
+    {
         /** @var Collection|Model[] $modelList */
         $modelList         = $this->createCollection();
         $dueWorkIds        = [];
         $quizIds           = [];
+        $projectIds        = [];
         $contextProjectIds = [];
 
         /** @noinspection PhpAssignmentInConditionInspection */
@@ -552,6 +565,7 @@ class Mapper extends BaseMapper
             }
             // Project?
             if ($row['p.id']) {
+                $projectIds[$row['p.id']] = true;
                 $model->setProject($this->hydrateJoin($row, 'project', 'p'));
             } else {
                 $model->setProject(null);
@@ -600,7 +614,10 @@ class Mapper extends BaseMapper
         // Due work files
         $modelList = $this->augmentListWithDueWorkFiles($modelList, $dueWorkIds);
         // Project contexts
-        $modelList = $this->augmentListWithProjectContexts($modelList, $contextProjectIds);
+        if($hydrateProjectContext){
+            // Infinite-cycle breakout.
+            $modelList = $this->augmentListWithProjectContexts($modelList, $contextProjectIds);
+        }
         // Folder codes for all contexts
         $modelList = $this->augmentListWithFolderCodes($modelList);
         // Specification assessments
@@ -609,7 +626,50 @@ class Mapper extends BaseMapper
         $modelList = $this->augmentListWithGradeGroups($modelList);
         // Curriculum Nodes
         $modelList = $this->augmentListWithCurriculumNodes($modelList);
+        // Project sub-assessments
+        $modelList = $this->augmentListWithProjectSubAssessments($modelList, array_keys($projectIds));
+        return $modelList;
+    }
 
+
+    /**
+     * @param Collection|Model[] $modelList
+     * @param array      $projectIds
+     * @return Collection|Model[]
+     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
+     * @throws \UnderflowException
+     */
+    private function augmentListWithProjectSubAssessments(Collection $modelList, array $projectIds)
+    {
+        // Project sub-assessments
+        if (!\count($projectIds)) {
+            return $modelList;
+        }
+
+        $statement = $this->prepareSelect(
+            $this->getSelectString(),
+            $this->getFromString(),
+            new Builder($this->getDatabase(), $this->getTable()),
+            ['v_pa.project_id' => $projectIds]
+        );
+        $statement->execute();
+
+        /** @var Project\Mapper $projectMapper */
+        $projectMapper = $this->getJoinMapper('project');
+
+        $projects = $projectMapper->createCollection();
+        foreach ($modelList as $model) {
+            $project = $model->getProject();
+            if ($project) {
+                $projects[$project->getId()] = $project;
+            }
+        }
+
+        foreach ($this->hydrateSelectRecursive($statement, false) as $subAssessment) {
+            $projectId                                                       = $subAssessment->getContextProject()->getId();
+            $projects[$projectId]->getAssessments()[$subAssessment->getId()] = $subAssessment;
+        }
         return $modelList;
     }
 
@@ -744,7 +804,7 @@ class Mapper extends BaseMapper
                 if ($context instanceof Project\Model) {
                     $contextId = $context->getAssessmentModel()->getId();
                     if (isset($contextProjects[$contextId])) {
-                        $model->getAssessmentContext()->setAssessmentModel($contextProjects[$contextId]);
+                        $context->setAssessmentModel($contextProjects[$contextId]);
                     }
                 }
             }

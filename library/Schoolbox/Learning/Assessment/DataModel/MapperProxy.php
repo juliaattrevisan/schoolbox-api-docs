@@ -752,16 +752,6 @@ class MapperProxy
         $subModel = $model->getSubObject();
         $subModel->setAssessmentModel($model);
 
-        // Load project sub-assessments:
-        // We could either do that here to one level, or in the assessment mapper recursively.
-        // This is non-trivial to achieve in the assessment mapper as its hydrateSelect() method
-        // fetches an assessment's context-project. That fetch would attempt to fetch the project's
-        // sub-assessments, and an infinite-cycle would result.
-        // For now, just do simply and fetch manually.
-        if ($subModel instanceof Project) {
-            $subModel->setAssessments($this->baseMapper->findByColumn('v_pa.project_id', $subModel->getId())->indexBy('id'));
-        }
-
         return $this->translator->translateToDomainModel($subModel);
     }
 
