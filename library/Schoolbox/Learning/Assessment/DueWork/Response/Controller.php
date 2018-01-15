@@ -288,7 +288,8 @@ class Controller extends Base
 
             /* Self-Reflectable Rubrics
              */
-            'learnerRubricContext' => null
+            'learnerRubricContext' => null,
+            'latestSelfReflectedFeedback' => null,
         ];
 
         /* Rubrics data
@@ -324,6 +325,8 @@ class Controller extends Base
         $selfReflected = (new ValidSelfReflection())->isSatisfiedBy($participant->getUser(), $participant);
 
         if ($selfReflected && $assessment->getUseRubric()) {
+            $data['latestSelfReflectedFeedback'] = $participant->findMostRecentPublishedSelfReflectedFeedback();
+
             if ($isInteractionLocked && !$this->getUser()->isSuperuser()) {
                 $data['learnerRubricContext'] = $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false);
             }

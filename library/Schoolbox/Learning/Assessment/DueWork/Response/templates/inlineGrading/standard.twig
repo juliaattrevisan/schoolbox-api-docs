@@ -170,6 +170,13 @@ Usage:
 
                     {# A hole for readonly self-reflection content #}
                     {% block readonlyFeedback %}
+                        {% if learnerRubricContext %}
+                        <div class="small-12 columns">
+                            {{ latestSelfReflectedFeedback.humanReadableMark }}
+
+                            <p>{{ latestSelfReflectedFeedback.comment }}</p>
+                        </div>
+                        {% endif %}
                     {% endblock %}
 
                     {# The little grades input combobox #}

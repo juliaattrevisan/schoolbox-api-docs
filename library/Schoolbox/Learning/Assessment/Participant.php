@@ -309,6 +309,24 @@ class Participant
 
 
     /**
+     * Find the most recent feedback that a Learner made whilst self-reflecting/self-assessing
+     *
+     * @return null|IFeedback
+     */
+    public function findMostRecentPublishedSelfReflectedFeedback(): ?IFeedback
+    {
+        if ($this->allFeedbacks->count()) {
+            return $this->allFeedbacks
+                ->filterBy('publishedAt', true)
+                ->filterBy('reviewer', $this->getUser())
+                ->sortBy('publishedAt', 'desc')
+                ->first();
+        }
+
+        return null;
+    }
+
+    /**
      * Find the authoritative published AND visible Feedback for an Assessment for this Participant
      *
      * This assessment may have a mark visibility setting - if it does, and $viewingUser
