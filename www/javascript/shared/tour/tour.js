@@ -28,15 +28,13 @@ $(function () {
                                 intro: step.body,
                                 element: step.selector,
                                 tooltipClass: step.css_class,
-                                uuid: step.uuid
+                                uuid: step.uuid,
+                                jsEvent: step.event,
+                                jsEventSelector: step.event_selector
                             });
                         }
 
-                        if (step.event !== null && step.selector !== null) {
-                            tourCurrent.onbeforechange(function() {
-                                $(step.event_selector).trigger(step.event);
-                            });
-                        }
+
                     });
 
                     tourCurrent.setOptions({
@@ -60,20 +58,25 @@ $(function () {
                     var saveRoute = '/tour/url/save';
 
                     tourCurrent.onchange(function(targetElement) {
-                        var newStep     = tourCurrent._introItems[tourCurrent._currentStep].uuid;
+                        var stepCurrent = tourCurrent._introItems[tourCurrent._currentStep];
 
-                        //This matches the consts on the Status/Model - to be updated when this file is a plugin
-                        var status      = "unactioned";
+                        // If the step has a custom JS event attached - trigger that event now
+                        if (stepCurrent.jsEvent !== null && stepCurrent.jsEventSelector !== null) {
+                            $(stepCurrent.jsEventSelector).trigger(stepCurrent.jsEvent);
+                        }
 
-                        //Save the status
+                        // Update the status in the DB
+                        var newStep = stepCurrent.uuid;
+                        var status = "unactioned"; // TODO: use const from Status/Model when this is made into a plugin
+
                         $.post(saveRoute, {
                             url: tourUrl,
                             oldStep: oldStep,
-                            newStep: newStep,
+                            newStep: stepCurrent.uuid,
                             status: status
                         });
 
-                        oldStep         = newStep;
+                        oldStep = newStep;
                     });
 
                     tourCurrent.oncomplete(function(targetElement) {
