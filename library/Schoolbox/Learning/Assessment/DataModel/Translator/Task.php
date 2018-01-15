@@ -20,7 +20,9 @@ use Schoolbox\Learning\Assessment\Task\Model as TaskObject;
  */
 class Task implements IAssessmentTypeTranslator
 {
+
     private $taskMapper;
+
 
     public function __construct()
     {
@@ -86,13 +88,14 @@ class Task implements IAssessmentTypeTranslator
             ->setRequiresConfirmation(!$domainObject->isSelfAssessable());
     }
 
+
     /**
      * Copies all attributes from the dataModel to domainObject
      *
      * @param IAssessableDataModel|TaskModel $dataModel
-     * @param IAssessable|TaskObject          $domainObject ,
-     * @param int                  $depth
-     * @param bool                 $translateProjectContext
+     * @param IAssessable|TaskObject         $domainObject ,
+     * @param int                            $depth
+     * @param bool                           $translateProjectContext
      */
     public function translateToDomainModel(
         IAssessableDataModel $dataModel,

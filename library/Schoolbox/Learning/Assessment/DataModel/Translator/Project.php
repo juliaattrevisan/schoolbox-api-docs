@@ -105,7 +105,7 @@ class Project implements IAssessmentTypeTranslator
      */
     public function translateToDataModel(IAssessable $domainObject, IAssessableDataModel $dataModel): void
     {
-        if(null !== $domainObject->getCreator()){
+        if (null !== $domainObject->getCreator()) {
             $dataModel->setOwner($domainObject->getCreator());
         }
 

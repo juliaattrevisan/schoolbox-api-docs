@@ -104,7 +104,7 @@ class DueWork implements IAssessmentTypeTranslator
         null === $domainObject->getSelfAssessable()    || $dataModel->setSelfAssessable($domainObject->getSelfAssessable());
         null === $domainObject->getSelfReflectable()   || $dataModel->setSelfReflectable($domainObject->getSelfReflectable());
 
-        if(null !== $domainObject->isAcceptSingle() && null !== $domainObject->isAcceptMulti()){
+        if (null !== $domainObject->isAcceptSingle() && null !== $domainObject->isAcceptMulti()) {
             $dataModel->setAcceptOnline($domainObject->isAcceptSingle() || $domainObject->isAcceptMulti());
         }
 
@@ -202,7 +202,7 @@ class DueWork implements IAssessmentTypeTranslator
         $domainObject->setWorkType($dataModel->getAssessmentModel()->getWorkType());
 
         // Convert mark type
-        if(null !== $dataModel->getMarkType()){
+        if (null !== $dataModel->getMarkType()) {
             $domainObject->setMarkType($dataModel->getMarkType());
         }
 
