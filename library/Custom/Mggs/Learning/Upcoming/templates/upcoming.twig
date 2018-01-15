@@ -191,12 +191,23 @@
                         return 'placeholder' in calEvent.data;
                     });
 
+                    var completionSeq = [ 'incomplete', 'failed', 'pending', 'reviewed' ];
+
                     var listOfFakesToRender = [];
                     // we're on timeline: take all the events that have been rendered
                     // and smoosh them into placeholders
                     for (var resourceId in realEventList) {
                         for (var wk in realEventList[resourceId]) {
                             var calEvents = realEventList[resourceId][wk];
+
+                            var mergedStatus = '';
+
+                            for (var index in calEvents) {
+                                var eStatus = calEvents[index][0].data.meta.status;
+                                if (completionSeq.indexOf(eStatus) > completionSeq.indexOf(mergedStatus)) {
+                                    mergedStatus = eStatus;
+                                }
+                            }
 
                             var placeholderEvent = {
                                 allDay: true,
@@ -210,13 +221,12 @@
                                     placeholder: true,
                                     meta: {
                                         count: calEvents.length,
-                                        status: 'incomplete', // TODO figure out the composite of the events
+                                        status: eStatus,
                                         wk: wk
                                     }
                                 }
                             };
 
-                            // fakeEventList[resourceId][wk] = placeholderEvent;
                             listOfFakesToRender.push(placeholderEvent);
                         }
                     }
