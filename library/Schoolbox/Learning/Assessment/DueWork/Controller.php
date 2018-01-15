@@ -181,14 +181,16 @@ class Controller extends Assessment\Controller
         );
     }
 
+
     /**
      * Display appropriate landing page based on role
      *
-     * @api   GET /learning/assessments/:assessmentId/:userId
-     * @level 165
+     * @api      GET /learning/assessments/:assessmentId/:userId
+     * @level    165
      *
-     * @param Participant $participant
-     * @throws NotFound
+     * @param IAssessable $assessment
+     * @throws ServiceNotFound
+     * @internal param Participant $participant
      */
     public function getPreview(IAssessable $assessment)
     {
