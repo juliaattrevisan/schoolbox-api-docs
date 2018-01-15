@@ -118,10 +118,13 @@ class Mapper extends BaseMapper
                         `tour_step_tooltip`.`uuid` as `tooltip_uuid`,
                         `tour_step_tooltip`.`body` as `tooltip_body`,
                         `tour_step_tooltip`.`selector` as `tooltip_selector`,
-                        `tour_step_tooltip`.`css_class` as `tooltip_css_class`
+                        `tour_step_tooltip`.`css_class` as `tooltip_css_class`,
+                        `tour_step_event`.`selector` as `event_selector`,
+                        `tour_step_event`.`event` as `event`
             FROM        {$this->getTable()}
             LEFT JOIN   {$this->getJoinSql('tour', '', 'tour', true)}
             LEFT JOIN   `tour_step_tooltip` ON `tour_step_tooltip`.`tour_step_uuid` = `tour_step`.`uuid`
+            LEFT JOIN   `tour_step_event` ON `tour_step_event`.`tour_step_uuid` = `tour_step`.`uuid` AND `tour_step_event`.`deleted_at` IS NULL
             WHERE       `tour`.`uuid` = :tourUuid AND
                         `tour`.`active` = 1 AND
                         `tour`.`deleted_at` IS NULL AND
@@ -150,6 +153,8 @@ class Mapper extends BaseMapper
                         'body' => $row['tooltip_body'],
                         'css_class' => $row['tooltip_css_class'],
                         'selector' => $row['tooltip_selector'],
+                        'event_selector' => $row['event_selector'],
+                        'event' => $row['event'],
                     ];
                     break;
             }
