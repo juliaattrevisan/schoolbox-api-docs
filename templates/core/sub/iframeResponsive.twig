@@ -25,4 +25,4 @@
         }
     });
 </script>
-<iframe class="" id="{{ id }}" src="{{ src }}" frameborder="0"></iframe>
+<iframe class="" id="{{ id }}" src="{{ src }}" frameborder="0" {% if allow | length %}allow="{{ allow }}"{% endif %}></iframe>
