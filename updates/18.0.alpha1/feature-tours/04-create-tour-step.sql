@@ -41,3 +41,23 @@ CREATE TABLE `tour_step_tooltip`
 
 CREATE INDEX `tour_step_tooltip_user_id_idx` ON `tour_step_tooltip` (`author_user_id`);
 CREATE INDEX `tour_step_tooltip_tour_step_uuid_idx` ON `tour_step_tooltip` (`tour_step_uuid`);
+
+-- JS events on steps
+
+CREATE TABLE `tour_step_event`
+(
+  `uuid`              VARCHAR(36)       PRIMARY KEY NOT NULL,
+  `tour_step_uuid`    VARCHAR(36)       NOT NULL,               -- Mandatory, need to have an event linked to a step
+  `selector`          VARCHAR(255)      NOT NULL,               -- The selector to trigger the event on (eg. #search-input)
+  `event`             VARCHAR(255)      NOT NULL,               -- The event to trigger (eg. click)
+  `author_user_id`    INT(4) UNSIGNED   NULL,                   -- Not mandatory, Alaress created events will not have an author ID
+  `created_at`        DATETIME          NOT NULL,
+  `updated_at`        DATETIME          NOT NULL,
+  `deleted_at`        DATETIME          NULL,
+
+  CONSTRAINT `tour_step_event_user_id_fk` FOREIGN KEY (`author_user_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `tour_step_event_tour_step_uuid_fk` FOREIGN KEY (`tour_step_uuid`) REFERENCES `tour_step` (`uuid`)
+);
+
+CREATE INDEX `tour_step_event_user_id_idx` ON `tour_step_tooltip` (`author_user_id`);
+CREATE INDEX `tour_step_event_tour_step_uuid_idx` ON `tour_step_tooltip` (`tour_step_uuid`);
