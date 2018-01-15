@@ -449,7 +449,7 @@ class RubricMapper
     {
         $grid = $this->findBySubmissionBox($box);
 
-        return (new GridGenerator($this, $grid))->applyStudentMark($student, true);
+        return (new GridGenerator($this, $grid, $student))->applyStudentMark(true);
     }
 
     /**

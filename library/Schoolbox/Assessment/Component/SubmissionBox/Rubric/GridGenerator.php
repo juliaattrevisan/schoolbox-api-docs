@@ -26,15 +26,22 @@ class GridGenerator
     private $grid;
 
     /**
+     * @var User
+     */
+    private $student;
+
+    /**
      * GridGenerator constructor.
      *
      * @param RubricMapper $rubricMapper
      * @param Rubric       $grid
+     * @param User         $student
      */
-    public function __construct(RubricMapper $rubricMapper, Rubric $grid)
+    public function __construct(RubricMapper $rubricMapper, Rubric $grid, User $student)
     {
         $this->rubricMapper = $rubricMapper;
         $this->grid = $grid;
+        $this->student = $student;
     }
 
     /**
@@ -95,16 +102,15 @@ class GridGenerator
     /**
      * Alias to applyStudentMark() for a particular IResponse instance
      *
-     * @param User   $student
      * @param bool   $publishedOnly Whether to exclude draft marks
      * @param int    $responseId
      *
      * @return Rubric
      */
-    public function applyStudentMarkForResponse(User $student, bool $publishedOnly, int $responseId)
+    public function applyStudentMarkForResponse(bool $publishedOnly, int $responseId)
     {
         $pb = new Builder($this->rubricMapper->getDatabase(), '');
-        $pb->equals('sr.owner', $student->getId());
+        $pb->equals('sr.owner', $this->student->getId());
         $pb->equals('sr.box_id', $this->grid->getSubmissionBox()->getId());
         $pb->isNull('sr.deleted_at');
         $pb->equals('sr.student_submission_id', $responseId);
@@ -118,15 +124,14 @@ class GridGenerator
 
 
     /**
-     * @param User     $student
      * @param bool     $publishedOnly Whether to exclude draft marks
      *
      * @return Rubric
      */
-    public function applyStudentMark(User $student, bool $publishedOnly)
+    public function applyStudentMark(bool $publishedOnly)
     {
         $pb = new Builder($this->rubricMapper->getDatabase(), '');
-        $pb->equals('sr.owner', $student->getId());
+        $pb->equals('sr.owner', $this->student->getId());
         $pb->equals('sr.box_id', $this->grid->getSubmissionBox()->getId());
         $pb->isNull('sr.deleted_at');
 

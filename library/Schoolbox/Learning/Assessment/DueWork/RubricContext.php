@@ -53,10 +53,10 @@ class RubricContext
         $publishedOnly = false;
 
         if ($responseId) {
-            (new GridGenerator($this->rubricMapper, $dueWork->getRubric()))->applyStudentMarkForResponse($student, $publishedOnly, $responseId);
+            (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMarkForResponse($publishedOnly, $responseId);
         }
         else {
-            (new GridGenerator($this->rubricMapper, $dueWork->getRubric()))->applyStudentMark($student, $publishedOnly);
+            (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMark($publishedOnly);
         }
 
         $context = [
@@ -96,7 +96,7 @@ class RubricContext
             return ['rubric' => null];
         }
 
-        (new GridGenerator($this->rubricMapper, $dueWork->getRubric()))->applyStudentMark($student, $publishedOnly);
+        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMark($publishedOnly);
 
         $context = [
             'rubric' => $dueWork->getRubric()->toContext($currentUser),
