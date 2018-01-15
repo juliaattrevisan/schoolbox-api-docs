@@ -328,7 +328,7 @@ class Controller extends Base
                 $data['learnerRubricContext'] = $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false);
             }
             elseif ($response) {
-                $data['learnerRubricContext'] = $rubricContext->generateMarkableForResponse($assessment, $participant->getUser(), $response->getId());
+                $data['learnerRubricContext'] = $rubricContext->generateMarkableForResponseAndSelfReflection($assessment, $participant->getUser(), $response->getId());
             }
             else {
                 $data['learnerRubricContext'] = $rubricContext->generateMarkable($assessment, $participant->getUser());

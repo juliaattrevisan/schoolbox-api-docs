@@ -33,6 +33,30 @@ class RubricContext
         $this->rubricMapper = $rubricMapper;
     }
 
+    /**
+     * Get a markable grid for Rubrics marking, for an Instructor and particular IResponse
+     *
+     * @param Model $dueWork
+     * @param User  $student
+     * @param int   $responseId
+     *
+     * @return array
+     */
+    public function generateMarkableForResponseAndSelfReflection(DueWork $dueWork, User $student, int $responseId)
+    {
+        if (!$dueWork->getUseRubric()) {
+            return ['rubric' => null];
+        }
+
+        $context = $this->generateDefaultContext($dueWork);
+
+        /* Spawn rubric grid
+         */
+        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMarkForSelfReflectableResponse(false, $responseId, $student);
+        $context['rubric'] = $dueWork->getRubric()->toContext();
+
+        return $context;
+    }
 
     /**
      * Get a markable grid for Rubrics marking, for an Instructor and particular IResponse

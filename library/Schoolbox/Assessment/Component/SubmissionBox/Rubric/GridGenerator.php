@@ -102,6 +102,26 @@ class GridGenerator
     /**
      * Alias to applyStudentMark() for a particular IResponse instance
      *
+     * @param bool $publishedOnly Whether to exclude draft marks
+     * @param int  $responseId
+     * @param User $student
+     *
+     * @return Rubric
+     */
+    public function applyStudentMarkForSelfReflectableResponse(bool $publishedOnly, int $responseId, User $student): Rubric
+    {
+        $pb = $this->buildDefaultPb();
+        $pb->equals('sr.student_submission_id', $responseId);
+        $pb->equals('sr.marker', $student->getId());
+        $pb->notNull('sr.published_at');
+
+        return $this->applyStudentMarkQuery($publishedOnly, $pb);
+    }
+
+
+    /**
+     * Alias to applyStudentMark() for a particular IResponse instance
+     *
      * @param bool   $publishedOnly Whether to exclude draft marks
      * @param int    $responseId
      *
