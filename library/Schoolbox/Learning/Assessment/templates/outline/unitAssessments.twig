@@ -101,11 +101,16 @@
                 {% if canWrite  %}
                     <ul data-dropdown-content class="f-dropdown" id="options-task{{ assessment.id }}">
                         <li><a href="{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) }}" class="icon-progress">View Status</a></li>
-
                         {% if assessment is quiz %}
-                            <li><a href="{{ routeLookup('learningQuiz.getQuizSummary', {assessmentId: assessment.id}) }}" class="icon-modify" title="Modify this {{ locale.assessment }}">Modify</a></li>
+                            {% set url = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessment.id, assessment: assessment}) %}
+                            {% if url %}
+                                <li><a href="{{ url }}" class="icon-modify" title="Modify this {{ locale.assessment }}">Modify</a></li>
+                            {% endif %}
                         {% else %}
-                            <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-modify" data-interaction="open_edit_task_form" title="Modify this {{ locale.assessment }}">Modify</a></li>
+                            {% set url = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
+                            {% if url %}
+                                <li><a href="{{ url }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-modify" data-interaction="open_edit_task_form" title="Modify this {{ locale.assessment }}">Modify</a></li>
+                            {%  endif %}
                         {% endif %}
                         {% set url = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id, assessment: assessment}) %}
                         {% if url %}

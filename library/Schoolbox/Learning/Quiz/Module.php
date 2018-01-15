@@ -7,13 +7,17 @@
 namespace Schoolbox\Learning\Quiz;
 
 use Alaress\Authorizer\Authorizer;
+use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Module\RestfulModule;
 use Schoolbox\Module\StandardModuleTrait;
 use Alaress\Authorizer\Rule;
+use Schoolbox\Learning\Authorizer\Rule\IsModifyUnLocked;
+use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Role;
+use Schoolbox\Assessment\Term;
 
 /**
  * The Purpose of this class is to:
@@ -79,15 +83,45 @@ class Module extends RestfulModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $ruleRegexp = '(getQuizSummary|postAttemptDelete)';
-        $this->addRoutePermission($authorizer, $ruleRegexp,
-            new Rule\All(
-                new Rule\IsLoggedIn(),
-                new Rule\Any(
-                    new Rule\HasRole(Role::STAFF),
-                    new Rule\IsSuperuser()
-                )
+        $canWrite = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\HasRole(Role::STAFF),
+                new Rule\IsSuperuser()
             )
         );
+
+        $canModify = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\All(
+                $canWrite,
+                new IsModifyUnLocked(new LockedChecker($this->getTermMapper()))
+            )
+        );
+
+        $this->addRoutePermission($authorizer, 'postAttemptDelete', $canWrite);
+        $this->addRoutePermission($authorizer, 'getQuizSummary', $canModify);
+    }
+
+    /**
+     * @return Mapper|Term\Mapper
+     * @throws \InvalidArgumentException If unable to find mapper class
+     */
+    private function getTermMapper()
+    {
+        return $this->getMapperFactory()->get(Term\Mapper::class);
+    }
+
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+        $matcher->add('#getQuizSummary#', function($params){
+            /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $dataSource */
+            $dataSource = $this->getInjector()->get('assessmentDataSource');
+
+            return [
+                "assessmentId"   => $params["assessmentId"],
+                "assessment"     => $dataSource->findById($params["assessmentId"])
+            ];
+        });
     }
 }
