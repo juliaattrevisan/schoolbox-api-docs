@@ -15,7 +15,7 @@ use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Alaress\Lumberjack\Logger;
 
 // Use a debug-supporting logger
-$log = new Logger(STDOUT, STDERR, \Monolog\Logger::DEBUG);
+$log = new Logger(STDOUT, STDERR);
 $kernel->getDependencyInjector()->values['logger'] = $log;
 
 /**
@@ -221,12 +221,14 @@ foreach ($classes as $folderId => $codes) {
     }
 }
 
-/** @var WritableCache $cache */
-$cache = $kernel->get('subscriptionCache');
+// Reload cache (if not dry run)
+if (!$dryRun) {
+    /** @var WritableCache $cache */
+    $cache = $kernel->get('subscriptionCache');
 
-// do it.
-try {
-    $cache->cacheAllUsers(INSTANCE_ID);
-} catch (UnderflowException $e) {
-    $log->notice($e->getMessage(), [ $e ]);
+    try {
+        $cache->cacheAllUsers(INSTANCE_ID);
+    } catch (UnderflowException $e) {
+        $log->notice($e->getMessage(), [ $e ]);
+    }
 }
