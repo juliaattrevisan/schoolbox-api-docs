@@ -16,6 +16,7 @@
 use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use Schoolbox\Realtime\Routing\Cache\WritableCache;
 
 $fields = [ 'userId:' ];
 
@@ -36,10 +37,11 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $lo
         $opts['instance'] = INSTANCE_ID;
     }
 
+    /** @var WritableCache $cache */
     $cache = $di->get('subscriptionCache');
 
     if ($opts['userId']) {
-        $cache->cacheUser($opts['instance'], $opts['userId']);
+        $cache->cacheUsers($opts['instance'], [$opts['userId']]);
 
     } else {
         $cache->cacheAllUsers($opts['instance']);
