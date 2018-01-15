@@ -47,6 +47,7 @@
 
                     {% set inputId %}{{ formField }}[{{ crit.id }}][{{ level.id }}]{% endset %}
 
+                    {% set learnerSelected = learnerRubric.descriptors[crit.id][levelIndex]['selected'] %}
                     <td>
                         <input id="{{ inputId }}"
                                name="{{ formField }}[descriptors][{{ descriptor.id }}]"
@@ -59,6 +60,12 @@
                                {% if descriptor.selected %}checked="checked"{% endif %}
                         />
                         <label for="{{ inputId }}">
+
+                            {# TODO: Use stuart's styles #}
+                            {% if learnerSelected %}
+                                <span style='color:#f00'>SELF_REFLECTED_CHOICE</span>
+                            {% endif %}
+
                             <span class=rb-description>
                                 {{- descriptor.text|nl2br -}}
                             </span>
