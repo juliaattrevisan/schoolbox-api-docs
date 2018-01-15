@@ -46,7 +46,7 @@ class Resolver
      */
     public function getSubscribedUserIds($topic)
     {
-        return $this->resolve($topic, []);
+        return array_keys($this->resolve($topic, []));
     }
 
 
@@ -58,7 +58,7 @@ class Resolver
      * @return int[]
      * @throws OverflowException
      */
-    private function resolve($topic, array $seenPaths)
+    protected function resolve($topic, array $seenPaths)
     {
         if (isset($seenPaths[$topic])) {
             throw new OverflowException('Recursion detected: '. implode(' -> ', array_keys($seenPaths)) . " -> $topic");
@@ -71,25 +71,48 @@ class Resolver
 
             $userIds = [];
 
+            // define this value before we get into the loop, for efficiency
+            $payload = $this->getValue($seenPaths);
+
             foreach ($data as $key => $value) {
                 if (is_int($key)) {
                     // treat integers as user IDs
-                    $userIds[$key] = true;
+                    $userIds[$key] = $payload;
 
                 } else {
                     // treat strings as a redirect path
-                    foreach ($this->resolve($key, $seenPaths) as $userId) {
-                        $userIds[$userId] = true;
+                    foreach ($this->resolve($key, $seenPaths) as $userId => $payload) {
+                        $userIds[$userId] = $userIds[$userId] ?? $payload;
                     }
                 }
             }
 
-            return array_keys($userIds);
+            return $this->output($userIds);
 
         } catch (InvalidArgumentException $e) {
             // nobody subscribed, and that's totally ok
             return [];
         }
+    }
+
+
+    /**
+     * @param array $seenPaths
+     * @return bool
+     */
+    protected function getValue(array $seenPaths)
+    {
+        return true;
+    }
+
+
+    /**
+     * @param array $output
+     * @return array
+     */
+    protected function output(array $output)
+    {
+        return $output;
     }
 
 
