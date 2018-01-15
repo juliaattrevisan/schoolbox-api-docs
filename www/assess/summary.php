@@ -47,9 +47,12 @@ $dataSource = $this->getDi()->get('assessmentDataSource');
 
 /** @var Alaress\Authorizer\Authorizer $authorizer */
 $authorizer = $this->getDi()->get('authorizer');
-if (!$authorizer->isPathAuthorizedForUser('quiz.getQuizSummary', ['assessmentId' => $assess['assessment_id'],
-                                                                  'assessment' => $dataSource->findById($assess['assessment_id']), $_SESSION['user']])) {
-    throwException(Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
+$params     =  [
+    'assessmentId' => $assess['assessment_id'],
+    'assessment'   => $dataSource->findById($assess['assessment_id']),
+];
+if (!$authorizer->isPathAuthorizedForUser('learningQuiz.getQuizSummary', $params, $_SESSION['user'])) {
+    error(Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
 }
 
 if($assess['start']) {
