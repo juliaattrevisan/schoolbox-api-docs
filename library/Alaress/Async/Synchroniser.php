@@ -33,14 +33,15 @@ class Synchroniser
 
 
     /**
-     * @param string   $data
-     * @param callable $callback
+     * @param string|string[] $data
+     * @param callable        $callback
      */
     public function synchronise($data, callable $callback)
     {
         $busy = $this->redis->exists($this->key);
 
-        $this->redis->lpush($this->key, [ $data ]);
+        // if the data given is an array, conveniently it will queue all the values separately for us
+        $this->redis->lpush($this->key, (array)$data);
 
         if ($busy) {
             // someone else is dealing with this, but you've deposited your payload

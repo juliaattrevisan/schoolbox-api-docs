@@ -8,18 +8,21 @@
 
 namespace Schoolbox\Realtime\Routing\Cache;
 
+use UnderflowException;
+
 interface WritableCache
 {
 
     /**
      * @param string $instanceId
-     * @param int $userId
+     * @param int[] $userIds
      * @return void
      */
-    public function cacheUser($instanceId, $userId);
+    public function cacheUsers($instanceId, array $userIds);
 
     /**
      * @param string $instanceId
+     * @throws UnderflowException
      * @return void
      */
     public function cacheAllUsers($instanceId);

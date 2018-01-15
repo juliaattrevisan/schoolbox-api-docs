@@ -27,6 +27,12 @@ class UserMapper extends SchoolboxMapper
         $this->hasModel(User::class);
 
         $this->registerCallback('postSave', array($this, 'postSave'));
+
+        /** @var UserAccessMapper $accessMapper */
+        $accessMapper = $this->getJoinMapper('userAccess');
+
+        // unilaterally stop the access mapper from attempting to mutate the route cache
+        $accessMapper->unregisterCallbacks();
     }
 
     /**

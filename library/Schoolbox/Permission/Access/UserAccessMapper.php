@@ -9,16 +9,12 @@
 
 namespace Schoolbox\Permission\Access;
 
-use Alaress\Redis;
-use Monolog\Logger;
+use Aura\Di\Exception\ServiceNotFound;
 use PDO;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Queue\Bindings\Generator;
-use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
-use Schoolbox\Realtime\Routing\Subscription\Loader\Factory;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
@@ -49,17 +45,11 @@ class UserAccessMapper extends Mapper
      */
     protected function postSetup()
     {
-        /** @var UserMapper $map */
-        $map   = $this->getJoinMapper('user');
-        $redis = Redis::getClientInstance();
-        $gen   = new Generator();
-        $log   = new Logger('');
-
-        $factory = (new Factory($redis, $log))
-            ->setGenerator($gen)
-            ->setUserMapper($map);
-
-        $this->cache = new WriteCache($redis, $log, $factory);
+        try {
+            $this->cache = self::getDi()->get('subscriptionCache');
+        } catch (ServiceNotFound $e) {
+            // noop
+        }
     }
 
 
@@ -79,7 +69,7 @@ class UserAccessMapper extends Mapper
         $this->hasModel(UserAccess::class);
 
         $this->joins('uid', UserMapper::class, 'id', null, null, 'user', 'user');
-        $this->uses('service', self::TYPE_INTEGER, null);
+        $this->uses('service', self::TYPE_INTEGER);
         $this->uses('sid', self::TYPE_INTEGER, null, 'serviceIdentifier');
         $this->uses('type', self::TYPE_INTEGER, null, 'accessLevel');
 
@@ -87,6 +77,19 @@ class UserAccessMapper extends Mapper
         $this->registerCallback(self::CALLBACK_POSTDELETE, [ $this, 'calculateUserSubscription' ]);
     }
 
+
+    /**
+     * Removes any registered callbacks on this mapper
+     *
+     * @return $this
+     */
+    public function unregisterCallbacks(): self
+    {
+        $this->callback_queue[self::CALLBACK_POSTSAVE]   = [];
+        $this->callback_queue[self::CALLBACK_POSTDELETE] = [];
+
+        return $this;
+    }
 
     /**
      * We don't actually care about *how* the user's access has changed (added, removed, etc), only that it has.
@@ -102,7 +105,9 @@ class UserAccessMapper extends Mapper
             return;
         }
 
-        $this->cache->cacheUser(INSTANCE_ID, $model->getUser()->getId());
+        if ($this->cache) {
+            $this->cache->cacheUsers(INSTANCE_ID, [ $model->getUser()->getId() ]);
+        }
     }
 
 

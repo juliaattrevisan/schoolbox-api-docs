@@ -1,15 +1,22 @@
 #!/usr/bin/php
 <?php
 
-require_once __DIR__ . '/../library/Bootstrap.php';
+/** @var Kernel $kernel */
+$kernel = require_once __DIR__ . '/../library/Bootstrap.php';
 
+use Alaress\Application\Kernel;
 use \Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use \Schoolbox\Role;
-use \Schoolbox\UserMapper as UserMapper;
-use \Schoolbox\Permission\Access\UserAccessMapper as UserAccessMapper;
+use \Schoolbox\UserMapper;
+use \Schoolbox\Permission\Access\UserAccessMapper;
 use \Schoolbox\Permission\Access\UserAccess as UserAccessModel;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Alaress\Lumberjack\Logger;
+
+// Use a debug-supporting logger
+$log = new Logger(STDOUT, STDERR);
+$kernel->getDependencyInjector()->values['logger'] = $log;
 
 /**
  * Retrieve all parents of students in the specified subject
@@ -43,7 +50,8 @@ $folderMapper = FolderMapper::getInstance();
 $externalUser = new \External_User();
 $classHandler = new \External_Class();
 
-$log = new Logger(STDOUT, STDERR);
+// suppress the route cache mutations
+$userAccessMapper->unregisterCallbacks();
 
 $options = getopt("f:", ['students', 'dry-run']);
 
@@ -61,13 +69,14 @@ $loadStudents = isset($options['students']);
 $dryRun       = isset($options['dry-run']);
 
 /**
- * @param UserMapper $userMapper
+ * @param UserMapper       $userMapper
  * @param UserAccessMapper $userAccessMapper
- * @param Logger $log
- * @param int $externalId
- * @param string $role
- * @param int $folderId
- * @param bool $dryRun
+ * @param Logger           $log
+ * @param int              $externalId
+ * @param string           $role
+ * @param int              $folderId
+ * @param bool             $dryRun
+ * @throws PDOException
  */
 function loadUserAccess($userMapper, $userAccessMapper, $log, $externalId, $role, $folderId, $dryRun)
 {
@@ -101,13 +110,15 @@ function loadUserAccess($userMapper, $userAccessMapper, $log, $externalId, $role
         }
     } catch (MapperException $e) {
         $log->error("\tError:    External {$role} user ID not found {$externalId}");
+    } catch (UnexpectedValueException $e) {
+        $log->error("\tError:    {$e->getMessage()}");
     }
 }
 
 $folders = [];
 $classes = [];
 
-$handle = fopen($options['f'], "r");
+$handle = fopen($options['f'], 'rb');
 
 if ($handle) {
     while (($row = fgetcsv($handle)) !== false) {
@@ -127,7 +138,7 @@ if ($handle) {
     fclose($handle);
 } else {
     // Couldn't read file
-    $log->error("Could not locate file to import.");
+    $log->error('Could not locate file to import.');
     exit;
 }
 
@@ -207,5 +218,17 @@ foreach ($classes as $folderId => $codes) {
                 }
             }
         }
+    }
+}
+
+// Reload cache (if not dry run)
+if (!$dryRun) {
+    /** @var WritableCache $cache */
+    $cache = $kernel->get('subscriptionCache');
+
+    try {
+        $cache->cacheAllUsers(INSTANCE_ID);
+    } catch (UnderflowException $e) {
+        $log->notice($e->getMessage(), [ $e ]);
     }
 }

@@ -39,15 +39,17 @@ class WriteCache extends ReadCache implements WritableCache
 
 
     /**
-     * @inheritdoc
+     * @param string $instanceId
+     * @param int[]  $userIds
+     * @return void
      */
-    public function cacheUser($instanceId, $userId)
+    public function cacheUsers($instanceId, array $userIds)
     {
         try {
             $routeStorageKey = $this->getCacheKey($instanceId);
 
             // ensure this block of code is only ever executed by exactly one process at a time
-            (new Synchroniser($this, $this->redis))->synchronise($userId, function ($userId) use ($routeStorageKey) {
+            (new Synchroniser($this, $this->redis))->synchronise($userIds, function ($userId) use ($routeStorageKey) {
                 // this closure will be called multiple times consecutively if there are concurrent requests
                 $router = $this->bindIndividual($userId, $routeStorageKey);
                 $this->writeCache($router, $routeStorageKey);

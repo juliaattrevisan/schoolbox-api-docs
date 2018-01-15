@@ -51,6 +51,7 @@ use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Revision\DataSource as PastoralRevisionDataSource;
 use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use SitePage;
@@ -843,6 +844,34 @@ abstract class AbstractBootstrap implements BootstrapInterface
                 ['mapper' => $mapperFactory->getLazy(PastoralRevisionMapper::class)]
             )
         );
+
+        // notificaton routing cache
+
+        $di->params[\Schoolbox\Notif\Queue\Bindings\Generator::class] = [
+            'xUserHandler'      => $di->lazyGet('externalUser'),
+            'userMapper'        => $mapperFactory->getLazy(UserMapper::class),
+            'roleMapper'        => $mapperFactory->getLazy(\Schoolbox\RoleMapper::class),
+            'userAccessMapper'  => $mapperFactory->getLazy(UserAccessMapper::class),
+            'categoryMapper'    => $mapperFactory->getLazy(\Schoolbox\Resource\Folder\Mapper::class)
+        ];
+
+        $di->params[\Schoolbox\Realtime\Routing\Subscription\Loader\Factory::class] = [
+            'redis' => $di->lazyGet('redis'),
+            'log'   => $di->lazyValue('logger')
+        ];
+
+        $di->setters[\Schoolbox\Realtime\Routing\Subscription\Loader\Factory::class] = [
+            'setUserMapper' => $mapperFactory->getLazy(UserMapper::class),
+            'setGenerator'  => $di->lazyNew(\Schoolbox\Notif\Queue\Bindings\Generator::class)
+        ];
+
+        $di->set('subscriptionCache', $di->lazyNew(WriteCache::class, [
+            'redis' => $di->lazyGet('redis'),
+            'log'   => $di->lazyValue('logger'),
+            'loaderFactory' => $di->lazyNew(\Schoolbox\Realtime\Routing\Subscription\Loader\Factory::class)
+        ]));
+
+
 
         // install sentry
         $sentryToken   = \defined('SENTRY_TOKEN') ? SENTRY_TOKEN : '';

@@ -13,7 +13,9 @@ use Alaress\Lumberjack\CompositeLoggerInterface;
 use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use Schoolbox\Sync\Provisioner\Provisioner;
+
 
 $options = getopt("vr:", array('perform-update', 'instance::'));
 
@@ -68,5 +70,14 @@ $kernel->run(
         // will cause an exit as soon as stdout is written
         // (because stdout is closed when the old logger is destroyed)
         $ups->run($opts['perform'], $opts['roleType']);
+
+
+        if ($opts['perform']) {
+            // we need to manually refresh the routing cache now
+            /** @var WritableCache $cache */
+            $cache = $di->get('subscriptionCache');
+
+            $cache->cacheAllUsers($instanceId);
+        }
     }
 );

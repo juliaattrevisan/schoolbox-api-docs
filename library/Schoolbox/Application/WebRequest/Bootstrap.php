@@ -19,6 +19,7 @@ use Aura\Di;
 use Autoloader;
 use Config;
 use Database;
+use Psr\Log\NullLogger;
 use Schoolbox\Application\AbstractBootstrap;
 use Schoolbox\Config\ConfigMapper;
 
@@ -157,6 +158,9 @@ class Bootstrap extends AbstractBootstrap {
         parent::installDependencies();
 
         $di = $this->getKernel()->getDependencyInjector();
+
+        // register an empty logger to maintain interfaces as required
+        $di->values['logger'] = new NullLogger();
 
         // Mapper notifications:
         // They rely upon the session being injected into them, so do that.
