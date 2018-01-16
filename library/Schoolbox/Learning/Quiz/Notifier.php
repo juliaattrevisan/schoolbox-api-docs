@@ -34,6 +34,7 @@ use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 
 /**
  * @method Mapper getMapper()
@@ -170,9 +171,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     {
         // @mattday I've got a surprise for you - it's poop!
         $quiz = $this->getMapper()->findById($quiz->getId());
-        $quiz
-            ->setWorkType($this->workTypeMapper->findById($quiz->getWorkType()->getId()))
-            ->setCategory($this->categoryMapper->findById($quiz->getCategory()->getId()));
+        $quiz->setCategory($this->categoryMapper->findById($quiz->getCategory()->getId()));
+        if ($quiz->getWorkType() instanceof WorkType) {
+            $quiz->setWorkType($this->workTypeMapper->findById($quiz->getWorkType()->getId()));
+        }
         return $quiz;
     }
 
@@ -225,7 +227,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $quizId = $quiz->getId();
         $quiz = $this->fullyHydrateQuiz($quiz);
 
-        $quizType = $quiz->getWorkType()->getName();
+        $quizType = $quiz->getWorkType() ? $quiz->getWorkType()->getName() : "";
         $quizName = $quiz->getTitle();
 
         $icon = "/portrait?userId={$owner->getExternalId()}&size={$this->iconSize}";
@@ -696,7 +698,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         $quizName = $quiz->getTitle();
-        $quizType = $quiz->getWorkType()->getName();
+        $quizType = $quiz->getWorkType() ? $quiz->getWorkType()->getName() : "";
 
         $icon = "/images/icon.php?size={$this->iconSize}&icon=work";
 

@@ -18,153 +18,178 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 
-class Activity {
+class Activity
+{
 
-	/**
-	 * @var string
-	 */
-	protected $event;
+    /**
+     * @var string
+     */
+    protected $event;
 
-	/**
-	 * @var Folder
-	 */
-	protected $category;
+    /**
+     * @var Folder
+     */
+    protected $category;
 
-	/**
-	 * @var SubmissionBox
-	 */
-	protected $submission_box;
+    /**
+     * @var SubmissionBox
+     */
+    protected $submission_box;
 
-	/**
-	 * @var Quiz
-	 */
-	protected $assessment;
+    /**
+     * @var Quiz
+     */
+    protected $assessment;
 
-	/**
-	 * @var Submission
-	 */
-	protected $submission;
+    /**
+     * @var Submission
+     */
+    protected $submission;
 
-	/**
-	 * @var ReturnedWork
-	 */
-	protected $returned_work;
+    /**
+     * @var ReturnedWork
+     */
+    protected $returned_work;
 
-	/**
-	 * @var User
-	 */
-	protected $owner;
+    /**
+     * @var User
+     */
+    protected $owner;
 
-	/**
-	 * @var Alaress_Date_Format
-	 */
-	protected $date;
+    /**
+     * @var Alaress_Date_Format
+     */
+    protected $date;
 
-	/**
-	 * Auto-generated getters and setters
-	 */
+    /**
+     * Auto-generated getters and setters
+     */
 
-	/**
-	 * @param  \Alaress_Date_Format $date
-	 *
-	 * @return $this
-	 */
-	public function setDate($date) {
-		$this->date = $date;
-		return $this;
-	}
+    /**
+     * @param  \Alaress_Date_Format $date
+     *
+     * @return $this
+     */
+    public function setDate($date)
+    {
+        $this->date = $date;
+        return $this;
+    }
 
-	/**
-	 * @return \Alaress_Date_Format
-	 */
-	public function getDate() {
-		return $this->date;
-	}
 
-	/**
-	 * @param  \Schoolbox\User $owner
-	 *
-	 * @return $this
-	 */
-	public function setOwner($owner) {
-		$this->owner = $owner;
-		return $this;
-	}
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getDate()
+    {
+        return $this->date;
+    }
 
-	/**
-	 * @return \Schoolbox\User
-	 */
-	public function getOwner() {
-		return $this->owner;
-	}
 
-	/**
-	 * @param  \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork $returned_work
-	 *
-	 * @return $this
-	 */
-	public function setReturnedWork($returned_work) {
-		$this->returned_work = $returned_work;
-		return $this;
-	}
+    /**
+     * @param  \Schoolbox\User $owner
+     *
+     * @return $this
+     */
+    public function setOwner($owner)
+    {
+        $this->owner = $owner;
+        return $this;
+    }
 
-	/**
-	 * @return \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork
-	 */
-	public function getReturnedWork() {
-		return $this->returned_work;
-	}
 
-	/**
-	 * @param Submission $submission
-	 *
-	 * @return $this
-	 */
-	public function setSubmission($submission) {
-		$this->submission = $submission;
-		return $this;
-	}
+    /**
+     * @return \Schoolbox\User
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
 
-	/**
-	 * @return Submission
-	 */
-	public function getSubmission() {
-		return $this->submission;
-	}
 
-	/**
-	 * @param  \Schoolbox\Assessment\Component\SubmissionBox $submission_box
-	 *
-	 * @return $this
-	 */
-	public function setSubmissionBox($submission_box) {
-		$this->submission_box = $submission_box;
-		return $this;
-	}
+    /**
+     * @param  \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork $returned_work
+     *
+     * @return $this
+     */
+    public function setReturnedWork($returned_work)
+    {
+        $this->returned_work = $returned_work;
+        return $this;
+    }
 
-	/**
-	 * @return \Schoolbox\Assessment\Component\SubmissionBox
-	 */
-	public function getSubmissionBox() {
-		return $this->submission_box;
-	}
 
-	/**
-	 * @param  string $event
-	 *
-	 * @return $this
-	 */
-	public function setEvent($event) {
-		$this->event = $event;
-		return $this;
-	}
+    /**
+     * @return \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork
+     */
+    public function getReturnedWork()
+    {
+        return $this->returned_work;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getEvent() {
-		return $this->event;
-	}
+
+    /**
+     * @param Submission $submission
+     *
+     * @return $this
+     */
+    public function setSubmission($submission)
+    {
+        $this->submission = $submission;
+        return $this;
+    }
+
+
+    /**
+     * @return Submission
+     */
+    public function getSubmission()
+    {
+        return $this->submission;
+    }
+
+
+    /**
+     * @param  \Schoolbox\Assessment\Component\SubmissionBox $submission_box
+     *
+     * @return $this
+     */
+    public function setSubmissionBox($submission_box)
+    {
+        $this->submission_box = $submission_box;
+        return $this;
+    }
+
+
+    /**
+     * @return \Schoolbox\Assessment\Component\SubmissionBox
+     */
+    public function getSubmissionBox()
+    {
+        return $this->submission_box;
+    }
+
+
+    /**
+     * @param  string $event
+     *
+     * @return $this
+     */
+    public function setEvent($event)
+    {
+        $this->event = $event;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getEvent()
+    {
+        return $this->event;
+    }
+
 
     /**
      * Translate "event" strings into class representation
@@ -172,7 +197,8 @@ class Activity {
      *
      * @return string
      */
-    public function getEventIcon() {
+    public function getEventIcon()
+    {
         switch ($this->getEvent()) {
             case 'new' :
                 return 'icon-due-work';
@@ -194,98 +220,130 @@ class Activity {
         }
     }
 
-	/**
-	 * @param  Folder $category
-	 *
-	 * @return $this
-	 */
-	public function setCategory($category) {
-		$this->category = $category;
-		return $this;
-	}
 
-	/**
-	 * @return Folder
-	 */
-	public function getCategory() {
-		return $this->category;
-	}
-
-	/**
-	 * @param  Quiz $assessment
-	 *
-	 * @return $this
-	 */
-	public function setAssessment($assessment) {
-		$this->assessment = $assessment;
-		return $this;
-	}
-
-	/**
-	 * @return Quiz
-	 */
-	public function getAssessment() {
-		return $this->assessment;
-	}
+    /**
+     * @param  Folder $category
+     *
+     * @return $this
+     */
+    public function setCategory($category)
+    {
+        $this->category = $category;
+        return $this;
+    }
 
 
-	/**
-	 * Non-autogenerated methods
-	 */
+    /**
+     * @return Folder
+     */
+    public function getCategory()
+    {
+        return $this->category;
+    }
 
-	/**
-	 * Is this activity for an assessment object?
-	 *
-	 * @return bool
-	 */
-	public function isAssessment() {
-		return ($this->getAssessment()) ? true : false;
-	}
 
-	public function isSubmission() {
-		return ($this->getSubmission()) ? true : false;
-	}
+    /**
+     * @param  Quiz $assessment
+     *
+     * @return $this
+     */
+    public function setAssessment($assessment)
+    {
+        $this->assessment = $assessment;
+        return $this;
+    }
 
-	public function isReturn() {
-		return ($this->getReturnedWork()) ? true : false;
-	}
 
-	/**
-	 * Gets the object ID for this activity object.
-	 *
-	 * @return int
-	 */
-	public function getId() {
-		return $this->isAssessment() ? $this->getAssessment()->getId() : $this->getSubmissionBox()->getId();
-	}
+    /**
+     * @return Quiz
+     */
+    public function getAssessment()
+    {
+        return $this->assessment;
+    }
 
-	public function getName() {
-		return $this->isAssessment() ? $this->getAssessment()->getTitle() : $this->getSubmissionBox()->getName();
-	}
 
-	public function getType() {
-	    if($this->isAssessment()){
-            $assessmentModel =  $this->getAssessment()->getAssessmentModel();
+    /**
+     * Non-autogenerated methods
+     */
+
+    /**
+     * Is this activity for an assessment object?
+     *
+     * @return bool
+     */
+    public function isAssessment()
+    {
+        return ($this->getAssessment()) ? true : false;
+    }
+
+
+    public function isSubmission()
+    {
+        return ($this->getSubmission()) ? true : false;
+    }
+
+
+    public function isReturn()
+    {
+        return ($this->getReturnedWork()) ? true : false;
+    }
+
+
+    /**
+     * Gets the object ID for this activity object.
+     *
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->isAssessment() ? $this->getAssessment()->getId() : $this->getSubmissionBox()->getId();
+    }
+
+
+    public function getName()
+    {
+        return $this->isAssessment() ? $this->getAssessment()->getTitle() : $this->getSubmissionBox()->getName();
+    }
+
+
+    public function getType()
+    {
+        if ($this->isAssessment()) {
+            $assessmentModel = $this->getAssessment()->getAssessmentModel();
         } else {
             $assessmentModel = $this->getSubmissionBox()->getAssessmentModel();
         }
         $workType = $assessmentModel->getWorkType();
-	    return $workType ? $workType->getId() : null;
-	}
+        return $workType ? $workType->getId() : null;
+    }
 
-	public function getTypeName() {
-		return $this->isAssessment() ? $this->getAssessment()->getWorkType()->getName() : $this->getSubmissionBox()->getAssessmentModel()->getWorkType()->getName();
-	}
 
-	public function getReturnedFileId() {
-		return $this->isReturn() ? $this->getReturnedWork()->getId() : null;
-	}
+    public function getTypeName()
+    {
+        if ($this->isAssessment()) {
+            return $this->getAssessment()->getWorkType() ? $this->getAssessment()->getWorkType()->getName() : "";
+        } else {
+            $assessmentModel = $this->getSubmissionBox()->getAssessmentModel();
+            return $assessmentModel->getWorkType() ? $assessmentModel->getWorkType()->getName() : "";
+        }
+    }
 
-	public function getReturnedMark() {
-		return $this->isReturn() ? $this->getReturnedWork()->getHumanReadableMark() : null;
-	}
 
-	public function getReturnedNormalizedMark() {
-		return $this->isReturn() ? $this->getReturnedWork()->getNormalizedMark() : null;
-	}
+    public function getReturnedFileId()
+    {
+        return $this->isReturn() ? $this->getReturnedWork()->getId() : null;
+    }
+
+
+    public function getReturnedMark()
+    {
+        return $this->isReturn() ? $this->getReturnedWork()->getHumanReadableMark() : null;
+    }
+
+
+    public function getReturnedNormalizedMark()
+    {
+        return $this->isReturn() ? $this->getReturnedWork()->getNormalizedMark() : null;
+    }
 }
