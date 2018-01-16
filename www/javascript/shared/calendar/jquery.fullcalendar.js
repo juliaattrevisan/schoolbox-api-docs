@@ -253,8 +253,16 @@ function Calendar(id, bubbleId, opts) {
 
                 data.start = calEvent.start;
                 data.end   = calEvent.end;
+                if ('placeholder' in calEvent.data) {
+                    data.placeholder = true;
+                }
 
-                self.bubble.display('edit', data, jsEvent, this);
+                var doDisplay = self.bubble.display('edit', data, jsEvent, this);
+
+                if (doDisplay === false) {
+                    // if explicit false is given, proceed no further
+                    return;
+                }
 
                 // Hide event types in the bubble
                 var isTask = data.eventTypeId == c.options.taskTypeId;
@@ -818,7 +826,7 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
     this.fillForm(method+'Event', eventData);
     this.fillForm(method+'Task', eventData);
 
-    this.calendar.options.bubble.onOpen.call(this, method, eventData);
+    return this.calendar.options.bubble.onOpen.call(this, method, eventData);
 }
 
 
