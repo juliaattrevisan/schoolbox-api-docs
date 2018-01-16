@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Upcoming;
 use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
 use External_ClassInterface;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueDateSortStrategy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -139,6 +140,53 @@ class Controller extends Base
      */
     public function getUpcomingForStudent(User $student, Alaress_Date_Format $date)
     {
+        // A little different for JSON requests
+        // TODO determine if it's appropriate to display in this way
+        if (strpos($this->getRequest()->headers->get('accept'), 'application/json') !== false) {
+            $this->getResponse()->content->set($this->buildJsonOutput($this->buildPayloadForJson($student, $date)));
+            return;
+        }
+
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput('@learningUpcoming/upcoming.twig', $this->buildPayloadForHtml($student, $date))
+             ->setTitle('Upcoming Work for '.$student->formatName())
+             ->setTab('submission') // ¯\_(ツ)_/¯
+        );
+    }
+
+
+    /**
+     * @param User                $student
+     * @param Alaress_Date_Format $date
+     * @return Collection|IAssessable[]
+     */
+    protected function buildPayloadForJson(User $student, Alaress_Date_Format $date)
+    {
+        $term = $this->termMapper->findForDate($date);
+
+        // Student's work
+        $allWork = $this->assessmentDataSource
+            ->findAllByStudent($student, $term)
+            ->sortBy('dueAt', 'asc');
+
+        return $allWork->map(function(IAssessable $assessable) {
+            return [
+                'id'          => $assessable->getId(),
+                'title'       => $assessable->getTitle(),
+                'folderId'    => $assessable->getBaseContext()->getFolder()->getId(),
+                'folderTitle' => $assessable->getBaseContext()->getFolder()->getTitle(),
+            ];
+        });
+    }
+
+
+    /**
+     * @param User                $student
+     * @param Alaress_Date_Format $date
+     * @return array
+     */
+    protected function buildPayloadForHtml(User $student, Alaress_Date_Format $date)
+    {
         $term = $this->termMapper->findForDate($date);
 
         // Student's subjects and teachers
@@ -148,21 +196,6 @@ class Controller extends Base
         $allWork = $this->assessmentDataSource
             ->findAllByStudent($student, true, $term)
             ->sortByCallback(new DueDateSortStrategy($student));
-
-        // A little different for JSON requests
-        // TODO determine if it's appropriate to display in this way
-        if (strpos($this->getRequest()->headers->get('accept'), 'application/json') !== false) {
-            $response = $allWork->map(function(IAssessable $assessable) {
-                return [
-                    'id'          => $assessable->getId(),
-                    'title'       => $assessable->getTitle(),
-                    'folderId'    => $assessable->getBaseContext()->getFolder()->getId(),
-                    'folderTitle' => $assessable->getBaseContext()->getFolder()->getTitle(),
-                ];
-            });
-            $this->getResponse()->content->set($this->buildJsonOutput($response));
-            return;
-        }
 
         // Only get subjects from external if student's timetable isn't hidden.
         // I don't get this logic as class list != timetable, but apparently
@@ -209,21 +242,15 @@ class Controller extends Base
 
         $returnUrl = Redirect::queryString($this->getRouter()->generate('learningUpcoming.getUpcomingForStudent', ['id' => $student->getId()]));
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@learningUpcoming/upcoming.twig',
-                [
-                    'student'      => $student,
-                    'date'         => $date,
-                    'subjects'     => $subjects,
-                    'mailHandle'   => $this->getSession()->get('mailhandle'),
-                    'currentTerm'  => $term,
-                    'children'     => $children,
-                    'upcomingWork' => $upcomingWork->limit(self::UPCOMING_WORK_LIMIT),
-                    'returnUrl'    => $returnUrl
-                ]
-            )->setTitle('Upcoming Work for '.$student->formatName())
-             ->setTab('submission') // ¯\_(ツ)_/¯
-        );
+        return [
+            'student'      => $student,
+            'date'         => $date,
+            'subjects'     => $subjects,
+            'mailHandle'   => $this->getSession()->get('mailhandle'),
+            'currentTerm'  => $term,
+            'children'     => $children,
+            'upcomingWork' => $upcomingWork->limit(self::UPCOMING_WORK_LIMIT),
+            'returnUrl'    => $returnUrl
+        ];
     }
 }
