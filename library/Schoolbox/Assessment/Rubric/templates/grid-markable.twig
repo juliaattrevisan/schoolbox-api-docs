@@ -27,7 +27,12 @@
 
     {% for groupIndex, group in rubric.groups %}
 
-        {% set rowspan = group.criteria|length + (group.total ? 1 : 0) %}
+        {# Use rowspans  when group total is visible, otherwise don't need it #}
+        {% if showGroupTotal %}
+            {% set rowspan = group.criteria|length + (group.total ? 1 : 0) %}
+        {% else %}
+            {% set rowspan = group.criteria|length %}
+        {% endif %}
 
         {% for critIndex, crit in group.criteria %}
     <tr data-group="{{ rubricId }}-{{ group.id }}">
