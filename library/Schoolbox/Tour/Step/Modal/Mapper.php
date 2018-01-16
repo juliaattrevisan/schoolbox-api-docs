@@ -23,6 +23,7 @@ class Mapper extends AbstractMapper
      */
     protected function mapping()
     {
+        parent::mapping();
         $this->hasTable('tour_step_modal');
         $this->hasModel(Model::class);
     }

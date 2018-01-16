@@ -23,6 +23,7 @@ class Mapper extends AbstractMapper
      */
     protected function mapping()
     {
+        parent::mapping();
         $this->hasTable('tour_step_tooltip');
         $this->hasModel(Model::class);
         $this->uses('selector', self::TYPE_STRING, null, 'javascriptSelector');
