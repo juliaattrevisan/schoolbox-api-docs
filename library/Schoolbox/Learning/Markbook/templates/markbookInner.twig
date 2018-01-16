@@ -11,7 +11,18 @@
 
 {% import '@learning/macro/urgency.twig' as urgency %}
 
+{# If the markbook has more than this number of participants reduce functionality to improve browser performance#}
+{% set functionDegradeLimit = 80 %}
+{% set studentCount = markbook.students|length %}
+
 <div id="report_actions" class="actions-small-1 row">
+    {% if studentCount >= functionDegradeLimit %}
+    <div class="small-12 column list-item">
+        <ul class="meta">
+            <li class="icon-alert">This markbook is showing a large number of students; for performance reasons, student portraits and marking of tasks have been disabled.</li>
+        </ul>
+    </div>
+    {% endif %}
     <nav>
         <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
     </nav>
@@ -67,32 +78,25 @@
             </thead>
 
             <tbody>
-
                 {# Statistics: weight, visibility, mean, SD, min, max, submitted, returned #}
-
                 {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Weight', key: 'weight'} %}
-
                 {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Weight in ' ~ locale.project.proper, key: 'weightInProject'} %}
-
                 {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: '% Total Weight', key: 'weightPercent', round: 2} %}
-
                 {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: '% Total Weight in  ' ~ locale.project.proper, key: 'projectWeightPercent', round: 2} %}
-
                 {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Mean', key: 'mean'} %}
-
                 {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Standard Deviation', key: 'sd'} %}
-
                 {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Min', key: 'min'} %}
-
                 {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Max', key: 'max'} %}
-
                 {# Need all students that ever participated in any assessments #}
+                {% spaceless %}
                 {% for student in markbook.students %}
                 <tr data-student="{{ student.id }}">
                     <td class="no-pad">
                         <div class="compact card no-pad small-12">
                             <a href="/search/user/{{ student.id }}" title="View Profile">
+                                {% if studentCount < functionDegradeLimit %}
                                 <img src="/portrait.php?userId={{ student.externalId }}&size=square32" alt="View Profile" />
+                                {% endif %}
                                 <p>{{ student.lastname }}, {{ student.firstname }}</p>
                             </a>
                         </div>
@@ -114,11 +118,30 @@
                                 {% set participant = assessment.getParticipant(student) %}
                                 {% if assessment is task %}
                                    {# An icon that shows if the student has attempted the task or not #}
+                                    {% if studentCount < functionDegradeLimit %}
                                    {% include '@learningAssessment/fragments/progressTick.twig' with {
                                         assessment: assessment,
                                         participant: participant,
                                         writable: writable[assessment.id]
                                     } only %}
+                                    {% else %}
+                                        {% if participant.isResponseRequired %}
+                                            <div
+                                               class="no-text progress-tick"
+                                               title="Incomplete"
+                                               data-progress-tick-status="incomplete"></div>
+                                        {% elseif participant.isFeedbackRequired %}
+                                            <div
+                                               class="no-text progress-tick pending"
+                                               title="Self-assessed"
+                                               data-progress-tick-status="selfAssessed"></div>
+                                        {% elseif participant.isReviewComplete %}
+                                            <div
+                                               class="no-text progress-tick reviewed"
+                                               title="Completed"
+                                               data-progress-tick-status="teacherAssessed"></div>
+                                        {% endif %}
+                                    {% endif %}
                                 {% else %}
                                     {% set normalisedMark = participant.normalisedMark(false) %}
                                     {% set label = participant.hasSubmittedResponse and not participant.hasPublishedFeedback
@@ -135,6 +158,7 @@
                     {% endfor %}
                 </tr>
                 {% endfor %}
+                {% endspaceless %}
             </tbody>
             </table>
         {% else %}
