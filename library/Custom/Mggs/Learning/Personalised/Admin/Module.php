@@ -6,7 +6,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Custom\Mggs\Learning\Personalisad\Admin;
+namespace Custom\Mggs\Learning\Personalised\Admin;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
