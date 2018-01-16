@@ -172,12 +172,14 @@ class Mapper extends \Schoolbox\Mapper
                  * we don't want to detonate - just quietly not use plagscan
                  * Let's send the error to sentry though
                  */
+                /** @var \Raven_Client $sentry */
                 $sentry = self::getDi()->get('sentry');
                 $sentry->captureException($e);
             }
             catch (\RuntimeException $e) {
                 /* Could not spawn because plagscan api is down
                  */
+                /** @var \Raven_Client $sentry */
                 $sentry = self::getDi()->get('sentry');
                 $sentry->captureException(new \RuntimeException("Error: Plagscan unavailable. Could not generate access token.", $e->getCode(), $e));
             }
