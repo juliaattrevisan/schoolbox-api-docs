@@ -11,6 +11,7 @@ use Alaress\Application\Kernel;
 use Aura\Di\Exception\ServiceNotFound;
 use Config\Modules\ModuleConfigInterface;
 use Custom\Mggs\Learning\Personalised\Admin\Module as AdminModule;
+use Custom\Mggs\Learning\Upcoming\Module as UpcomingModule;
 use Schoolbox\Learning\Mastery\Module as MasteryModule;
 use Custom\Mggs\Personalised;
 
@@ -39,6 +40,10 @@ class PersonalisedLearning implements ModuleConfigInterface
 
             $adminModule = new AdminModule($di);
             $adminModule->init('/adminv2/pbl');
+
+            // override the default upcoming module
+            $upcomingModule = new UpcomingModule($di);
+            $upcomingModule->initOverride('/learning/due');
         }
     }
 }
