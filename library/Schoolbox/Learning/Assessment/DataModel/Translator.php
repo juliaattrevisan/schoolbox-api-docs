@@ -121,10 +121,15 @@ class Translator
         // Always translate from top-down.
         // This means we can always iterate a project's subAssessments in order(N) time.
         $rootAssessable = $domainObject;
+        $levelsClimbed  = 0;
         while ($rootAssessable->getContext() instanceof Project) {
-            $rootAssessable = $domainObject->getContext();
+            $levelsClimbed++;
+            if ($levelsClimbed > $this->maxProjectLevels) {
+                throw new LogicException("Unable to find root project after $levelsClimbed iterations. You have a cycle or too many project nesting levels");
+            }
+            $rootAssessable = $rootAssessable->getContext();
         }
-        $this->translateToDataModelRecursive($domainObject);
+        $this->translateToDataModelRecursive($rootAssessable);
         return $this->dataModelCache[spl_object_hash($domainObject)];
     }
 
@@ -144,7 +149,12 @@ class Translator
         // Always translate from top-down.
         // This means we can always iterate a project's subAssessments in order(N) time.
         $root = $dataModel;
-        while ($root->getAssessmentModel()->getContextProject() instanceof ProjectModel) {
+        $levelsClimbed  = 0;
+        while ($root->getAssessmentModel() instanceof AssessmentModel && $root->getAssessmentModel()->getContextProject() instanceof ProjectModel) {
+            $levelsClimbed++;
+            if ($levelsClimbed > $this->maxProjectLevels) {
+                throw new LogicException("Unable to find root project after $levelsClimbed iterations. You have a cycle or too many project nesting levels");
+            }
             $root = $root->getAssessmentModel()->getContextProject();
         }
         $this->translateToDomainModelRecursive($root);

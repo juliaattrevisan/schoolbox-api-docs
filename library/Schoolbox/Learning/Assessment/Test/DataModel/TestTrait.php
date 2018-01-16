@@ -33,6 +33,15 @@ trait TestTrait
      */
     protected $teacher2;
 
+
+    /**
+     * @return Assessment\Mapper
+     */
+    protected function getAssessmentMapper(): Assessment\Mapper
+    {
+        return Assessment\Mapper::getInstance();
+    }
+
     /**
      * Set up
      */
@@ -40,7 +49,7 @@ trait TestTrait
     {
         $this->translator = new Translator(
             new MarkSchemeFactory(),
-            Assessment\Mapper::getInstance()
+            $this->getAssessmentMapper()
         );
         $this->translator
             ->addSubTranslator(new Translator\Task())
