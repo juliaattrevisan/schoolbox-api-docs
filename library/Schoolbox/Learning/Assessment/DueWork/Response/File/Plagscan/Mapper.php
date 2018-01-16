@@ -11,6 +11,7 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
+use Raven_Client;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\Collection;
 use Schoolbox\File\Mimetype;
@@ -172,14 +173,14 @@ class Mapper extends \Schoolbox\Mapper
                  * we don't want to detonate - just quietly not use plagscan
                  * Let's send the error to sentry though
                  */
-                /** @var \Raven_Client $sentry */
+                /** @var Raven_Client $sentry */
                 $sentry = self::getDi()->get('sentry');
                 $sentry->captureException($e);
             }
             catch (\RuntimeException $e) {
                 /* Could not spawn because plagscan api is down
                  */
-                /** @var \Raven_Client $sentry */
+                /** @var Raven_Client $sentry */
                 $sentry = self::getDi()->get('sentry');
                 $sentry->captureException(new \RuntimeException("Error: Plagscan unavailable. Could not generate access token.", $e->getCode(), $e));
             }
@@ -320,11 +321,13 @@ class Mapper extends \Schoolbox\Mapper
         } catch (\DomainException $e) {
             // Something went unrecoverably wrong, so remove the document from the queue
             $plagscan->setStatus(Plagscan::STATUS_UNSCANNABLE);
+            /** @var Raven_Client $sentry */
             $sentry = self::getDi()->get('sentry');
             $sentry->captureException($e);
         } catch (\RuntimeException $e) {
             // Plagscan is unavailable or otherwise behaving unexpectedly - try again later
             // Status is already queued, no need to change that
+            /** @var Raven_Client $sentry */
             $sentry = self::getDi()->get('sentry');
             $sentry->captureException(new \RuntimeException("Error: Plagscan unavailable. Could not generate access token.", $e->getCode(), $e));
             // TODO is this check necessary - can't we assume plagscanID is empty if we're in the catch?
@@ -488,6 +491,7 @@ class Mapper extends \Schoolbox\Mapper
              * This allows you to re-encounter documents being checked against older versions of themselves
              * but can't do much to stop it if plagscan screws us
              */
+            /** @var Raven_Client $sentry */
             $sentry = self::getDi()->get('sentry');
             $sentry->captureException(new \RuntimeException("Could not privatise document in Plagscan.", $e->getCode(), $e));
         }
