@@ -19,6 +19,7 @@ use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Response\DataSource;
 use Schoolbox\Learning\Assessment\DueWork\RubricContext;
 use Schoolbox\Learning\Assessment\Timeline\ResponsesOnly;
+use Schoolbox\Learning\InlineGrader\SelfReflection\Rubric;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Permission\Access\Access;
@@ -318,47 +319,10 @@ class Controller extends Base
             $data['rubricContext'] = $rubricContext->generateMarkable($assessment, $participant->getUser());
         }
 
-        /* If this contained a self-reflectable response, load that as well in addition to the usual rubricContext
-         * The Instructor needs to see what the Learner chose simultaneously with what the Instructor will give
+        /* Augment with self-reflection data
          */
-        $latestSelfReflectedFeedback = $participant->findMostRecentPublishedSelfReflectedFeedback();
-
-        /* Load a historic self-reflection if one exists - occurs when the Self Reflection state is changed
-         * after self-reflections have been created. However, ignore it if the historic self-reflection isn't
-         * for the submission currently being viewed
-         */
-        if ($latestSelfReflectedFeedback && $latestSelfReflectedFeedback->getResponse()->getId() === $response->getId()) {
-
-            /* Rubric data for the self-reflection
-             * If it was self-reflectable and used a rubric, find out what the latest Learner-owned Feedback is for the
-             * IResponse that we're looking at
-             */
-            if ($assessment->getUseRubric()) {
-                $data['latestSelfReflectedFeedback'] = $latestSelfReflectedFeedback;
-
-                if ($isInteractionLocked && !$this->getUser()->isSuperuser()) {
-                    $data['learnerRubricContext'] = $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false);
-                }
-                elseif ($response) {
-                    $data['learnerRubricContext'] = $rubricContext->generateMarkableForResponseAndSelfReflection($assessment, $participant->getUser(), $response->getId());
-                }
-                else {
-                    $data['learnerRubricContext'] = $rubricContext->generateMarkable($assessment, $participant->getUser());
-                }
-            }
-
-            /* Need this to determine localisation string for headings
-             *
-             * This accommodates the scenario when the assessment's self-reflection ability has been turned off, but a
-             * self-reflection exists for the submission currently being viewed
-             */
-            if (null !== $latestSelfReflectedFeedback->getNormalisedMark()) {
-                $data['selfAssessed'] = true;
-            }
-            else {
-                $data['selfReflected'] = true;
-            }
-        }
+        $selfReflectionData = (new Rubric($assessment, $participant, $this->getUser(), $response, $isInteractionLocked, $rubricContext))->generate();
+        $data = array_merge($data, $selfReflectionData);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/standard.twig', $data));
     }
