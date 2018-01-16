@@ -168,14 +168,29 @@ Usage:
                         {% endif %}
                     {% endblock %}
 
-                    {# A hole for readonly self-reflection content #}
+                    {# A hole for readonly self-reflection content
+                     # Used when the Instructor wants to see the self-reflection while providing Feedback
+                     #}
                     {% block readonlyFeedback %}
                         {% if learnerRubricContext %}
-                        <div class="small-12 columns">
-                            {{ latestSelfReflectedFeedback.humanReadableMark }}
-
-                            <p>{{ latestSelfReflectedFeedback.comment }}</p>
-                        </div>
+                            {% import '@learning/macro/urgency.twig' as urgency %}
+                            <div class="small-12 columns">
+                                <ul class="information-list threaded">
+                                    <li>
+                                        <p>TODO: Localised Heading</p>
+                                        <ul class="information-list reply">
+                                            <li>
+                                                <div class="list-item flex-grade">
+                                                    <div class="grade">
+                                                        <span class="{{ urgency.marks(latestSelfReflectedFeedback.normalisedMark) }}">{{ latestSelfReflectedFeedback.humanReadableMark }}</span>
+                                                    </div>
+                                                </div>
+                                                <article>{{ latestSelfReflectedFeedback.comment|nl2br }}</article>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
                         {% endif %}
                     {% endblock %}
 
