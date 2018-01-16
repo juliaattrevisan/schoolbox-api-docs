@@ -320,21 +320,18 @@ class Controller extends Base
 
         /* If this contained a self-reflectable response, load that as well in addition to the usual rubricContext
          * The Instructor needs to see what the Learner chose simultaneously with what the Instructor will give
-         *
-         * Currently have to trick the validation class a little for this context; we only care if the assessment
-         * -was- validly set for the participant, not for the Instructor currently logged in
-         *
-         * If it was self-reflectable and used a rubric, find out what the latest Learner-owned Feedback is for the
-         * IResponse that we're looking at
          */
         $latestSelfReflectedFeedback = $participant->findMostRecentPublishedSelfReflectedFeedback();
 
         /* Load a historic self-reflection if one exists - occurs when the Self Reflection state is changed
-         * after self-reflections have been created
+         * after self-reflections have been created. However, ignore it if the historic self-reflection isn't
+         * for the submission currently being viewed
          */
-        if ($latestSelfReflectedFeedback) {
+        if ($latestSelfReflectedFeedback && $latestSelfReflectedFeedback->getResponse()->getId() === $response->getId()) {
 
             /* Rubric data for the self-reflection
+             * If it was self-reflectable and used a rubric, find out what the latest Learner-owned Feedback is for the
+             * IResponse that we're looking at
              */
             if ($assessment->getUseRubric()) {
                 $data['latestSelfReflectedFeedback'] = $latestSelfReflectedFeedback;
