@@ -86,13 +86,31 @@ class Module extends BaseModule
         $preloadParticipant = function ($params) { return $this->preloadParticipant($params); };
 
         // rules in use
+        $notDeleted = new Rule\Callback(function(array $params){
+            if ($params['assessment'] instanceof IAssessable) {
+                $assessment = $params['assessment'];
+            } elseif ($params['participant'] instanceof Participant) {
+                $assessment = $params['participant']->getAssessable();
+            } else {
+                throw new NotFound();
+                //TO DO: Log to sentry
+            }
+
+            if($assessment->isDeleted()) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_ASSESSMENT_DELETED);
+            }
+
+        });
+
         $isSuper            = $this->getAuthRule('isSuperuser');
         $loggedIn           = $this->getAuthRule('isLoggedIn');
         $canWrite           = $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE);
         $canRead            = $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_READ);
         $participantView    = $this->buildAuthRuleParticipantView();
+        $participantView    = new Rule\All($participantView, $notDeleted);
         $canSubmit          = $this->buildAuthRuleCanSubmit();
         $canWriteAndNotSpec = $this->buildAuthRuleCanWriteAndNotSpec();
+        $canWriteAndNotSpec = new Rule\All($canWriteAndNotSpec, $notDeleted);
         $canAckSubmission   = $this->buildAuthRuleCanAcknowledgeSubmission();
 
         $canDelete = new Rule\Any(
@@ -102,6 +120,9 @@ class Module extends BaseModule
                 new IsDeletionUnLocked(new LockedChecker($this->getTermMapper()))
             )
         );
+
+
+
 
         $canModify = new Rule\Any(
             $isSuper,
