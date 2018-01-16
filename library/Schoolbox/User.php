@@ -204,6 +204,7 @@ class User implements JsonSerializable, ISoftDeletable
     public function __construct()
     {
         $this->campusCollection = new GenericCollection(Campus::class);
+        $this->subject_collection = new GenericCollection(Subject::class);
         $this->setConfigLoader(new ConfigLoader());
         $this->setLinkedUser(new Collection(array()));
         $this->setRole(new Role());
