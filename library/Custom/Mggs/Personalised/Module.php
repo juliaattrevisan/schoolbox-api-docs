@@ -11,6 +11,9 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
+use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Term;
+use Schoolbox\Resource\Folder\ClassListFactory;
 use Custom\Mggs\Personalised\Participant;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -41,10 +44,27 @@ class Module extends BaseModule
             new Rule\HasRole(Role::STAFF)
         );
 
-        $studentPreload = function ($params) {
-            return [
-                'student' => $this->getUserMapper()->findById($params['studentId']),
-            ];
+        $preload = function ($params) {
+            $data = [];
+
+            if ($params['studentId']) {
+                $data['student'] = $this->getUserMapper()->findById($params['studentId']);
+            }
+
+            if ($params['date']) {
+                try {
+                    $data['term'] = $this->getMapperFactory()->get(Term\Mapper::class)->findForDate(
+                        \Alaress_Date_Format::newUrlDate($params['date'])
+                    );
+                } catch (\InvalidArgumentException $e) {
+                    // be friendly, but still stop here
+                    throw new NotFound();
+                }
+            } else {
+                $data['term'] = $this->getMapperFactory()->get(Term\Mapper::class)->findForToday();
+            }
+
+            return $data;
         };
 
         $this->register('GET', '', 'getPersonalised', new Rule\IsLoggedIn());
@@ -53,28 +73,28 @@ class Module extends BaseModule
             '/{studentId}',
             'getPersonalisedForStudent',
             $access,
-            $studentPreload
+            $preload
         );
         $this->register(
             'GET',
-            '/resources/{studentId}',
+            '/resources/{studentId}{/date}',
             'getResourcesForStudent',
             $access,
-            $studentPreload
+            $preload
         );
         $this->register(
             'GET',
             '/calendar/{studentId}',
             'getCalendarForStudent',
             $access,
-            $studentPreload
+            $preload
         );
         $this->register(
             'POST',
             '/update/{studentId}',
             'postUpdateParticipation',
             $access,
-            $studentPreload
+            $preload
         );
     }
 
@@ -100,6 +120,9 @@ class Module extends BaseModule
                     'assessmentDataSource' => $injector->lazyGet('assessmentDataSource'),
                     'participantMapper'    => $this->getParticipantMapper(),
                     'assessmentTranslator' => $injector->lazyGet('assessmentTranslator'),
+                    'classListFactory'     => $injector->lazyNew(ClassListFactory::class, [
+                        $injector->lazyGet('databaseInternal')
+                    ]),
                 ]
             )
         );

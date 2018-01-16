@@ -14,12 +14,16 @@ use Aura\Web\Exception\InvalidStatusCode;
 use Custom\Mggs\Personalised\Event;
 use Custom\Mggs\Personalised\Participant;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DataModel\Translator as AssessmentTranslator;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Classes\ClassList;
+use Schoolbox\Assessment\Term;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\ClassListFactory;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Implementation;
 
@@ -47,6 +51,11 @@ class Controller extends Base
      * @var AssessmentTranslator
      */
     protected $assessmentTranslator;
+    /**
+     * @var ClassListFactory
+     */
+    private $classListFactory;
+
 
     /**
      * Constructor
@@ -55,17 +64,20 @@ class Controller extends Base
      * @param AssessmentDataSource $assessmentDataSource
      * @param Participant\Mapper   $participantMapper
      * @param AssessmentTranslator $assessmentTranslator
+     * @param ClassListFactory     $classListFactory
      */
     public function __construct(
         Folder\Mapper $folderMapper,
         AssessmentDataSource $assessmentDataSource,
         Participant\Mapper $participantMapper,
-        AssessmentTranslator $assessmentTranslator
+        AssessmentTranslator $assessmentTranslator,
+        ClassListFactory $classListFactory
     ) {
         $this->folderMapper         = $folderMapper;
         $this->assessmentDataSource = $assessmentDataSource;
         $this->participantMapper    = $participantMapper;
         $this->assessmentTranslator = $assessmentTranslator;
+        $this->classListFactory = $classListFactory;
     }
 
 
@@ -114,14 +126,29 @@ class Controller extends Base
      *
      * TODO consider not AJAXing this
      *
-     * @api   GET /learning/personalised/resources/:studentId/
-     * @param User $student
+     * @api   GET /learning/personalised/resources/:studentId{/:date}
+     *
+     * @param Term\Model $term
+     * @param User       $student
      */
-    public function getResourcesForStudent(User $student)
+    public function getResourcesForStudent(User $student, Term\Model $term)
     {
         $resultSet = [];
 
-        foreach ($this->folderMapper->findForUser($student) as $folder) {
+        $now  = Alaress_Date_Format::newDatabaseDate('2017-08-01 00:00:00');
+
+        $classList = new ClassList(
+            $student,
+            $this->folderMapper,
+            \Timetable_ColourMapper::getInstance(), // not used in this context
+            $this->classListFactory
+        );
+        $gridData  = $classList->getClassList($term, $now);
+
+        /** @var GenericCollection|Folder\Model[] $folders */
+        $folders = $gridData['classList'];
+
+        foreach ($folders as $folder) {
 
             // Ignore non-classes
             if (strlen($folder->getCodeString()) === 0) {
