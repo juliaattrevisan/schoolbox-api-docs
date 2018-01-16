@@ -155,6 +155,7 @@
                         }
                     } else if (view.type == 'timelineTerm') {
                         console.log(view);
+                        hidePopover();
                     }
                 },
                 eventDragStop: function () {
@@ -180,7 +181,8 @@
 
                     // already done this
                     if (collapsed) {
-                        console.log('already collapsed, not re-rendering placeholders')
+                        console.log('already collapsed, stashing real events')
+                        $cal.find('.fc-event-container').each(renderPopovers);
                         return true;
                     }
 
@@ -239,7 +241,6 @@
                     console.log('pushing render of fakes to queue');
                     $cal.fullCalendar('renderEvents', listOfFakesToRender, true);
 
-                    // $cal.find('[data-resource-id]').each(renderPopovers);
                 },
                 resources: debug_resources,
 
@@ -303,14 +304,19 @@
                         $element.addClass('progress-' + status);
                     }
 
-                    if (!view.type === 'timelineTerm') {
+                    if (view.type !== 'timelineTerm') {
                         // if not on timeline view, that's all
                         return true;
                     }
 
+                    // regardless of whether or not this is a placeholder, set a known data attr for indexing
+                    var wk = calEvent.start.year() + 'W' + calEvent.start.week();
+                    $element.attr('data-wk', wk);
+
                     if (calEvent.data.placeholder) {
                         // dis fake
                         console.log('fake');
+                        $element.attr('data-placeholder', true).addClass('placeholder-event');
                         return true;
                     }
 
@@ -321,8 +327,7 @@
                     // start by collating the count of real events per week
 
                     // get the resource ID and derive the week in which this event occurs
-                    var rId = calEvent.resourceId,
-                        wk  = calEvent.start.year() + 'W' + calEvent.start.week();
+                    var rId = calEvent.resourceId;
 
                     // make sure we don't cop NPEs
                     ensureIndices(rId, wk);
@@ -330,7 +335,12 @@
                     // push into the real event list
                     realEventList[rId][wk].push([ calEvent, $element ]);
 
-                    // $element.addClass('hide').addClass('call-me-by-your-name');
+                    if (calEvent.className.indexOf('fc-helper') !== -1) {
+                        // this is a helper: render it, and don't do anything else
+                        return true;
+                    }
+
+                    $element.addClass('hide').addClass('real-event');
 
                     // for now, do the rest
                     console.log('pushed event into ' + rId + ', ' + wk);
@@ -498,6 +508,72 @@
                 });
         };
 
+        /**
+         * This gets called per $eventContainer of the scheduler view after all events are rendered
+         */
+        var renderPopovers = function () {
+            var $eventContainer = $(this);
+
+            console.log(this);
+
+            // start by cleaning up anything we did before
+
+            // salvage the real events
+            $eventContainer.find('[data-popover]').find('.real-event')
+                // .addClass('hide')
+                .appendTo($eventContainer);
+
+            // detach any previous popovers
+            $eventContainer.find('[data-popover]').detach();
+
+            // because of fullcalendar, we have to figure out the stacking of events based on their CSS LEFT attr -_-
+            var $events = $eventContainer.find('.real-event');
+
+            console.log($events.length + ' events in row');
+
+            var spots = {};
+
+            // index by css:left (unbelievable...)
+            $events.each(function () {
+                var $event = $(this);
+                var left = $event.css('left');
+
+                if (typeof spots[left] === 'undefined') {
+                    spots[left] = [];
+                }
+                spots[left].push(this);
+            });
+
+            for (var left in spots) {
+                console.log(left.length + ' events in column ' + left)
+                renderPopover($eventContainer, left, $(spots[left]));
+            }
+        };
+
+        var renderPopover = function ($eventContainer, left, $events) {
+
+            var wk = $events.eq(0).data('wk');
+
+            var $popover = $('<div class="fc-popover fc-more-popover fc-event-container hide" data-popover="' + wk + '" />');
+
+            $popover.html(
+                '<div class="fc-header fc-widget-header"><span class="fc-close fc-icon fc-icon-x"></span><span class="fc-title">'
+                + wk
+                +'</span><div class="fc-clear"></div></div>'
+            ).attr('data-row', $eventContainer.closest('[data-resource-id]').data('resourceId'));
+
+            $popover.css('left', left);
+
+            // push the events into the popover
+            $popover.append($events
+                .removeClass('hide')
+                .detach()
+            );
+
+            // create a floaty container for our real events to live in
+            $eventContainer.append($popover);
+        };
+
         function ensureIndices(rId, wk) {
             if (typeof realEventList[rId] === 'undefined') {
                 realEventList[rId] = {};
@@ -532,6 +608,34 @@
             return isInsideDates && event.resouceId == resourceId;
         }
 
+        $cal.on('click', '[data-placeholder]', function () {
+            $(this).closest('.fc-event-container').find('[data-popover="' + $(this).data('wk') + '"]').removeClass('hide');
+            console.log('popover shown');
+
+            $(document).on('mousedown', hidePopover);
+            console.log('popover hide listener attached');
+        });
+
+
+
+        function hidePopover(ev) {
+            console.log('trying to hide popover');
+
+            if (!ev) {
+                $('[data-popover]').addClass('hide');
+                console.log('popover hidden');
+                return;
+            }
+
+            // only hide the popover if the click happened outside the popover
+            if (!$(ev.target).closest('[data-popover]').length || $(ev.target).closest('.fc-close').length) {
+                $('[data-popover]').addClass('hide');
+                console.log('popover hidden');
+
+                $(document).off('mousedown', hidePopover);
+                console.log('popover hide listener detached');
+            }
+        }
     })
 </script>
 <!-- END custom_head -->
