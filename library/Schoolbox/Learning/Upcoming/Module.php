@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Upcoming;
 use Alaress\Authorizer\Rule;
 use Alaress_Date_Format;
 use Alaress\Module\Module as BaseModule;
+use Aura\Di\Container;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Aura\Di\ContainerInterface;
@@ -23,10 +24,11 @@ use Schoolbox\UserMapper;
  */
 class Module extends BaseModule
 {
+    const BASENAME = 'learningUpcoming';
     /**
      * @inheritdoc
      */
-    protected $basename = 'learningUpcoming';
+    protected $basename = self::BASENAME;
 
     /**
      * @inheritdoc
@@ -82,26 +84,36 @@ class Module extends BaseModule
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
+
+    /**
+     * Override with any steps required for a controller and its routes
+     *
+     * You should use this method to initialize any mappers or other objects
+     * which the controller needs, but are too heavy to initialize at module
+     * init time.
+     *
+     * @param Container|ContainerInterface $injector The dependency injection container.
+     */
+    protected function preInitControllerDependencies(ContainerInterface $injector)
+    {
+        $injector->params[Controller::class] = [
+            'userMapper'            => $this->getUserMapper(),
+            'folderMapper'          => $this->getMapperFactory()->getLazy(FolderMapper::class),
+            'termMapper'            => $this->getMapperFactory()->getLazy(TermMapper::class),
+            'externalClass'         => $this->getInjector()->lazyGet('externalClass'),
+            'assessmentDataSource'  => $injector->lazyGet('assessmentDataSource'),
+            'participantDataSource' => $injector->lazyGet('participantDataSource'),
+            'defaultGradeGroup'     => $this->getInjector()->lazyGet('defaultGradeGroup'),
+        ];
+    }
+
+
     /**
      * @inheritdoc
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'userMapper'            => $this->getUserMapper(),
-                    'folderMapper'          => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                    'termMapper'            => $this->getMapperFactory()->getLazy(TermMapper::class),
-                    'externalClass'         => $this->getInjector()->lazyGet('externalClass'),
-                    'assessmentDataSource'  => $injector->lazyGet('assessmentDataSource'),
-                    'participantDataSource' => $injector->lazyGet('participantDataSource'),
-                    'defaultGradeGroup'     => $this->getInjector()->lazyGet('defaultGradeGroup'),
-                ]
-            )
-        );
+        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
 
     /* Getters / Setters

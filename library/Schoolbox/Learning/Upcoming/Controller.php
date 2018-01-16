@@ -147,8 +147,10 @@ class Controller extends Base
             return;
         }
 
+        $namespace = $this->getTemplateNamespace($student);
+
         $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@learningUpcoming/upcoming.twig', $this->buildPayloadForHtml($student, $date))
+            $this->buildHtmlOutput("@$namespace/upcoming.twig", $this->buildPayloadForHtml($student, $date))
              ->setTitle('Upcoming Work for '.$student->formatName())
              ->setTab('submission') // ¯\_(ツ)_/¯
         );
@@ -179,6 +181,15 @@ class Controller extends Base
         });
     }
 
+
+    /**
+     * @param User $student
+     * @return string
+     */
+    protected function getTemplateNamespace(User $student)
+    {
+        return Module::BASENAME;
+    }
 
     /**
      * @param User                $student
