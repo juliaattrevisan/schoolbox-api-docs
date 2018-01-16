@@ -122,9 +122,6 @@ class Javascript extends \Calendar\Event\Type\Submission\Renderer\Javascript
             'color'     => $event->getColour(),
             'className' => $event->getEventClasses(),
             'resourceId' => $resourceId,
-            'constraint' => [
-                'resourceIds' => [ $resourceId ]
-            ]
         ];
     }
 
