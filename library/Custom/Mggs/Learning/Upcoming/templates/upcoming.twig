@@ -74,6 +74,9 @@
         var $cal = $('#calendar');
         var $modalForm = $('#editEvent');
 
+        var termDates = {{ termDates|escape('js') ?: '[]' }};
+        var redrawTimeout;
+
         c = new Calendar('calendar', 'calendar-bubble', {
             userId: '{{ student.id|escape('js') }}',
             filter: {
@@ -242,7 +245,10 @@
                     $cal.fullCalendar('renderEvents', listOfFakesToRender, true);
 
                 },
-                resources: debug_resources,
+                resources: {
+                    dataType: 'json',
+                    url:      '{{ routeLookup('learningPersonalised.getResourcesForStudent', {studentId: student.id}) }}'
+                },
 
                 resourceAreaWidth: '40%',
                 resourceColumns: [
