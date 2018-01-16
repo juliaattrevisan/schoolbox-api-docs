@@ -1,6 +1,7 @@
+#!/usr/bin/php
 <?php
 /**
- * Perform Schoolbox User/Synergetic synchronisations
+ * Perform external database permission checks
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
@@ -8,10 +9,29 @@
  * @version     SVN: $Id$
  */
 
-echo "[".date('Y-m-d H:i:s')."] Running health check script\n";
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Application\WebRequest\Kernel;
+use Schoolbox\Config;
 
-require_once(dirname(__FILE__) . '/../library/Bootstrap.php');
+/** @var Kernel $kernel */
+$kernel = require_once(dirname(__FILE__) . '/../library/Bootstrap.php');
 
-$sync = new Healthcheck();
+$di = $kernel->getDependencyInjector();
 
-echo $sync->run();
+/** @var IConnector $databaseExternal */
+$databaseExternal = $di->get('databaseExternal');
+
+/** @var Config\Loader $configLoader */
+$configLoader = $di->get('config');
+
+echo "[" . date('Y-m-d H:i:s') . "] Running health check script\n";
+
+$healthCheck = new Healthcheck($databaseExternal, $configLoader);
+$healthCheck->run();
+$results = $healthCheck->results();
+
+echo $results['log']."\n";
+
+if(isset($results['errors']) && count($results['errors']) > 0 ) {
+    echo "\n".implode("\n",$results['errors'])."\n";
+}
