@@ -22,4 +22,17 @@ class HouseMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_STRING,
 		));
 	}
+
+    /**
+     * This mapper does not raise notifications.
+     *
+     * @param object $object
+     * @param string $verb
+     * @param null   $previous
+     * @return bool
+     */
+    protected function raiseNotification($object, $verb, $previous = null)
+    {
+        return true;
+    }
 }
