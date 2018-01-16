@@ -287,11 +287,6 @@ class Controller extends Base
             'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
             'interactionLocked' => $isInteractionLocked,
 
-            /* Self-Reflectable Rubrics
-             */
-            'learnerRubricContext' => null,
-            'latestSelfReflectedFeedback' => null,
-
             /* For localising heading strings
              */
             'selfAssessed' => false,

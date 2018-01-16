@@ -79,7 +79,10 @@ class Rubric
      */
     public function generate()
     {
-        $data = [];
+        $data = [
+            'learnerRubricContext' => null,
+            'latestSelfReflectedFeedback' => null,
+        ];
 
         /* If this contained a self-reflectable response, load that as well in addition to the usual rubricContext
          * The Instructor needs to see what the Learner chose simultaneously with what the Instructor will give
