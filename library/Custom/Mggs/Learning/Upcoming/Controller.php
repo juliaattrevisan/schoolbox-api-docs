@@ -27,10 +27,12 @@ class Controller extends \Schoolbox\Learning\Upcoming\Controller
 
         $termDates = $this->findTermDates($date);
 
-        $payload['termDates']     = $termDates;
+        $payload['termDates'] = array_map(function (Alaress_Date_Format $d) {
+            return $d->getDatabaseDate();
+        }, $termDates);
 
         if ($termDates[0] && $termDates[3]) {
-            $payload['termWeekCount'] = $payload['termDates'][0]->diffInWeeks($payload['termDates'][3]);
+            $payload['termWeekCount'] = $termDates[0]->diffInWeeks($termDates[3]);
         }
 
         return $payload;
