@@ -223,7 +223,10 @@ class Bootstrap extends AbstractBootstrap {
         // ** In general: any request that authenticates via token instead of
         //    via session should be allowed
         // * Its headers don't match
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        // Accept request if it somehow doesn't have a REQUEST_METHOD at all;
+        // AFAIK this isn't fakeable, and this gets called by some CLI scripts
+        // despite it being the WebRequest bootstrap. (Go figure.)
+        if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] !== 'GET') {
 
             // Check against whitelist first
             $whitelist = ['/saml/consume.php'];
