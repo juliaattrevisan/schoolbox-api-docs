@@ -602,33 +602,34 @@
             // detach any previous popovers
             $eventContainer.find('[data-popover]').detach();
 
-            // because of fullcalendar, we have to figure out the stacking of events based on their CSS LEFT attr -_-
+            // get the event list
             var $events = $eventContainer.find('.real-event');
 
             console.log($events.length + ' events in row');
 
             var spots = {};
 
-            // index by css:left (unbelievable...)
+            // index by week
             $events.each(function () {
                 var $event = $(this);
-                var left = $event.css('left');
+                var wk = $event.data('wk');
 
-                if (typeof spots[left] === 'undefined') {
-                    spots[left] = [];
+                if (typeof spots[wk] === 'undefined') {
+                    spots[wk] = [];
                 }
-                spots[left].push(this);
+                spots[wk].push(this);
             });
 
-            for (var left in spots) {
-                console.log(left.length + ' events in column ' + left)
-                renderPopover($eventContainer, left, $(spots[left]));
+            for (var wk in spots) {
+                console.log(wk.length + ' events in column ' + wk)
+                renderPopover($eventContainer, $(spots[wk]));
             }
         };
 
-        var renderPopover = function ($eventContainer, left, $events) {
+        var renderPopover = function ($eventContainer, $events) {
 
-            var wk = $events.eq(0).data('wk');
+            var wk   = $events.eq(0).data('wk');
+            var left = $events.eq(0).css('left');
 
             var $popover = $('<div class="fc-popover fc-more-popover fc-event-container hide" data-popover="' + wk + '" />');
 
