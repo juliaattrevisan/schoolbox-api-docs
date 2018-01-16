@@ -16,7 +16,7 @@ use Schoolbox\RoleMapper;
 
 class Controller extends Base
 {
-    private const CONFIG = 'pbl_roles_enabled';
+    public const CONFIG = 'pbl_roles_enabled';
 
     /**
      * @var RoleMapper
