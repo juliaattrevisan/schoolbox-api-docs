@@ -11,7 +11,18 @@
 
 {% import '@learning/macro/urgency.twig' as urgency %}
 
+{# If the markbook has more than this number of participants reduce functionality to improve browser performance#}
+{% set functionDegradeLimit = 80 %}
+{% set studentCount = markbook.students|length %}
+
 <div id="report_actions" class="actions-small-1 row">
+    {% if studentCount >= functionDegradeLimit %}
+    <div class="small-12 column list-item">
+        <ul class="meta">
+            <li class="icon-alert">This markbook is showing a large number of students; for performance reasons, student portraits and marking of tasks have been disabled.</li>
+        </ul>
+    </div>
+    {% endif %}
     <nav>
         <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
     </nav>
@@ -77,14 +88,13 @@
                 {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Min', key: 'min'} %}
                 {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Max', key: 'max'} %}
                 {# Need all students that ever participated in any assessments #}
-                {% set studentCount = markbook.students|length %}
                 {% spaceless %}
                 {% for student in markbook.students %}
                 <tr data-student="{{ student.id }}">
                     <td class="no-pad">
                         <div class="compact card no-pad small-12">
                             <a href="/search/user/{{ student.id }}" title="View Profile">
-                                {% if studentCount < 80 %}
+                                {% if studentCount < functionDegradeLimit %}
                                 <img src="/portrait.php?userId={{ student.externalId }}&size=square32" alt="View Profile" />
                                 {% endif %}
                                 <p>{{ student.lastname }}, {{ student.firstname }}</p>
@@ -108,7 +118,7 @@
                                 {% set participant = assessment.getParticipant(student) %}
                                 {% if assessment is task %}
                                    {# An icon that shows if the student has attempted the task or not #}
-                                    {% if studentCount < 80 %}
+                                    {% if studentCount < functionDegradeLimit %}
                                    {% include '@learningAssessment/fragments/progressTick.twig' with {
                                         assessment: assessment,
                                         participant: participant,
