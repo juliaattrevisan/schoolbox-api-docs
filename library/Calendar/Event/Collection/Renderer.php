@@ -20,78 +20,84 @@ use Schoolbox\User;
 
 class Renderer
 {
-    /** @var string $interfaceClass */
-    protected $interfaceClass = 'Calendar_Api_EventType_Interface';
 
     /** @var Calendar_Api_EventType_Interface $api An instance of a Calendar API class */
-    protected $api = null;
+    private $api;
 
     /** @var int $startTimestamp A unix timestamp */
-    protected $startTimestamp = -1;
+    private $startTimestamp;
 
     /** @var int $endTimestamp A unix timestamp */
-    protected $endTimestamp = -1;
+    private $endTimestamp;
 
     /** @var SitePage $page An instance of sitepage */
-    protected $page;
+    private $page;
 
     /** @var User */
     private $user;
 
     /** @var User */
-    protected $viewer;
+    private $viewer;
 
     /** @var Group $groupHandler */
-    protected $groupHandler;
+    private $groupHandler;
 
     /** @var Calendar $calendarHandler */
-    protected $calendarHandler;
+    private $calendarHandler;
 
     /** @var Collection $allEvents Mega-stack Collection instance which stores all events */
-    protected $allEvents = null;
+    private $allEvents;
+
 
     /**
      * Constructor
      *
-     * @param $api
-     * @param $startTimestamp
-     * @param $endTimestamp
-     * @param User $user
-     * @param Sitepage $page
-     * @param User $viewer
+     * @param Calendar_Api_EventType_Interface $api
+     * @param int                              $startTimestamp
+     * @param int                              $endTimestamp
+     * @param User                             $user
+     * @param SitePage                         $page
+     * @param User                             $viewer
      */
-    public function __construct($api, $startTimestamp, $endTimestamp, User $user, Sitepage $page, User $viewer)
-    {
-        $this->setApi($api);
-        $this->setStartTimestamp($startTimestamp);
-        $this->setEndTimestamp($endTimestamp);
-        $this->user = $user;
-        $this->setPage($page);
-        $this->setViewer($viewer);
+    public function __construct(
+        Calendar_Api_EventType_Interface $api,
+        int $startTimestamp,
+        int $endTimestamp,
+        User $user,
+        Sitepage $page,
+        User $viewer
+    ) {
+        $this->api            = $api;
+        $this->startTimestamp = $startTimestamp;
+        $this->endTimestamp   = $endTimestamp;
+        $this->user           = $user;
+        $this->page           = $page;
+        $this->viewer         = $viewer;
 
         //TODO remove these deprecated dependencies
-        $this->setGroupHandler(new Group());
-        $this->setCalendarHandler(new Calendar());
+        $this->groupHandler    = new Group();
+        $this->calendarHandler = new Calendar();
 
-        $this->setAllEvents(new Collection());
+        $this->allEvents = new Collection();
         $this->collectAllEvents();
     }
+
 
     /**
      * Collects all events from everywhere, for the current day
      */
-    protected function collectAllEvents()
+    private function collectAllEvents(): void
     {
-        $eventList = $this->getApi()->getEvents($this->getStartTimestamp(), $this->getEndTimestamp());
+        $eventList = $this->api->getEvents($this->startTimestamp, $this->endTimestamp);
         /* Only attempt to merge collections
          */
         if ($eventList instanceof Collection) {
-            $this->getAllEvents()->merge($eventList);
+            $this->allEvents->merge($eventList);
         }
 
         /* Sort all the events in order of time
          */
-        $this->getAllEvents()->sort();
+        $this->allEvents->sort();
     }
 
 
@@ -105,7 +111,7 @@ class Renderer
     public function renderAll($type)
     {
         $output = '';
-        foreach ($this->getAllEvents() as $currentEvent) {
+        foreach ($this->allEvents as $currentEvent) {
             $output .= $this->renderEvent($currentEvent, $type);
         }
         return $output;
@@ -124,12 +130,12 @@ class Renderer
         $rendererClass = $event->getRendererClass($type);
         /** @var RendererInterface $renderObj */
         $renderObj = new $rendererClass(
-            $this->getPage(),
+            $this->page,
             $event,
             $this->user,
-            $this->getGroupHandler(),
-            $this->getCalendarHandler(),
-            $this->getViewer()
+            $this->groupHandler,
+            $this->calendarHandler,
+            $this->viewer
         );
         return $renderObj->render();
     }
@@ -137,147 +143,81 @@ class Renderer
     /* Getters/Setters
      */
 
-    /**
-     * Set api
-     *
-     * @param Calendar_Api_EventType_Interface $api
-     */
-    protected function setApi($api)
-    {
-        $this->api = $api;
-    }
-
-    /**
-     * Get api
-     *
-     * @return Calendar_Api_EventType_Interface
-     */
-    protected function getApi()
-    {
-        return $this->api;
-    }
-
-    /**
-     * Set end timestamp
-     *
-     * @param int $endTimestamp
-     */
-    protected function setEndTimestamp($endTimestamp)
-    {
-        $this->endTimestamp = $endTimestamp;
-    }
 
     /**
      * Get end timestamp
      *
      * @return int
      */
-    protected function getEndTimestamp()
+    protected function getEndTimestamp(): int
     {
         return $this->endTimestamp;
     }
 
-    /**
-     * Set start timestamp
-     *
-     * @param int $startTimestamp
-     */
-    protected function setStartTimestamp($startTimestamp)
-    {
-        $this->startTimestamp = $startTimestamp;
-    }
 
     /**
      * Get start timestamp
      *
      * @return int
      */
-    protected function getStartTimestamp()
+    protected function getStartTimestamp(): int
     {
         return $this->startTimestamp;
     }
 
-    /**
-     * Set page
-     *
-     * @param Sitepage $page
-     */
-    protected function setPage($page)
-    {
-        $this->page = $page;
-    }
 
     /**
      * Get page
      *
      * @return Sitepage
      */
-    protected function getPage()
+    protected function getPage(): SitePage
     {
         return $this->page;
     }
+
 
     /**
      * Set all events
      *
      * @param Collection $allEvents
+     * @return $this
      */
-    protected function setAllEvents($allEvents)
+    protected function setAllEvents(Collection $allEvents): self
     {
         $this->allEvents = $allEvents;
+        return $this;
     }
+
 
     /**
      * Get all events
      *
      * @return Collection
      */
-    public function getAllEvents()
+    public function getAllEvents(): Collection
     {
         return $this->allEvents;
     }
 
-    /**
-     * The interface which defines accessible methods
-     *
-     * @return string
-     */
-    public function getInterfaceClass()
-    {
-        return $this->interfaceClass;
-    }
-
-    /**
-     * @param Calendar $calendarHandler
-     */
-    public function setCalendarHandler($calendarHandler)
-    {
-        $this->calendarHandler = $calendarHandler;
-    }
 
     /**
      * @return Calendar
      */
-    public function getCalendarHandler()
+    protected function getCalendarHandler(): Calendar
     {
         return $this->calendarHandler;
     }
 
-    /**
-     * @param Group $groupHandler
-     */
-    public function setGroupHandler($groupHandler)
-    {
-        $this->groupHandler = $groupHandler;
-    }
 
     /**
      * @return Group
      */
-    public function getGroupHandler()
+    protected function getGroupHandler(): Group
     {
         return $this->groupHandler;
     }
+
 
     /**
      * @return User
@@ -287,18 +227,11 @@ class Renderer
         return $this->user;
     }
 
-    /**
-     * @param User $viewer
-     */
-    public function setViewer($viewer)
-    {
-        $this->viewer = $viewer;
-    }
 
     /**
      * @return User
      */
-    public function getViewer()
+    protected function getViewer(): User
     {
         return $this->viewer;
     }
