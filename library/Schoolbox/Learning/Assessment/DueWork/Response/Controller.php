@@ -321,7 +321,7 @@ class Controller extends Base
         /* If this contained a self-reflectable response, load that as well in addition to the usual rubricContext
          * The Instructor needs to see what the Learner chose simultaneously with what the Instructor will give
          *
-         * Currently have to trickt he validation class a little for this context; we only care if the assessment
+         * Currently have to trick the validation class a little for this context; we only care if the assessment
          * -was- validly set for the participant, not for the Instructor currently logged in
          *
          * If it was self-reflectable and used a rubric, find out what the latest Learner-owned Feedback is for the
