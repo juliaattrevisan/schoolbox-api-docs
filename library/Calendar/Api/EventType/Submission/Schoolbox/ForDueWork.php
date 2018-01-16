@@ -17,7 +17,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_ForDueWork extends Calendar_Ap
     /**
      * @var Timetable_ColourManager
      */
-    protected $colorManager;
+    private $colorManager;
 
     /**
      * {@inheritdoc}
@@ -37,7 +37,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_ForDueWork extends Calendar_Ap
      * @param  string $eventType
      * @return string
      */
-    protected function getEventColor(Folder $folder, $eventType)
+    protected function getEventColor(Folder $folder, $eventType): string
     {
         return $this->colorManager->getColour($folder->getId());
     }

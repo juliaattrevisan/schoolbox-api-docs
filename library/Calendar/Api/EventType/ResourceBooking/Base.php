@@ -39,14 +39,17 @@ abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_
      */
     protected $eventConverter;
 
+
     /**
      * Constructor
      *
      * @param $user
      * @param $config
+     * @throws DomainException If resource booking module is disabled in config
      */
     public function __construct($user, $config)
     {
+        parent::__construct($user);
         // Ensure ResourceBooking module is enabled
 
         $configMapper = ConfigMapper::getInstance();
@@ -55,7 +58,6 @@ abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_
             throw new DomainException('Resource Booking Module is disabled');
         }
 
-        $this->setUser($user);
         $this->setup();
     }
 

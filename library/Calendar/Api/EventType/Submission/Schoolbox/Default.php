@@ -18,12 +18,12 @@ use Schoolbox\Learning\Assessment\Visibility;
 class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_EventType_Abstract
 {
     /** @var Calendar */
-    private $calendarHandler = null;
+    private $calendarHandler;
 
     /**
      * @var AssessmentDataSource
      */
-    protected $assessmentDataSource;
+    private $assessmentDataSource;
 
     /**
      * Constructor
@@ -34,8 +34,8 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
      */
     public function __construct(\Schoolbox\User $user, $config, AssessmentDataSource $assessmentDataSource)
     {
-        $this->setCalendarHandler(new Calendar());
-        $this->setUser($user);
+        parent::__construct($user);
+        $this->calendarHandler = new Calendar();
         $this->assessmentDataSource = $assessmentDataSource;
     }
 
@@ -46,9 +46,9 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
      * @param  string $eventType
      * @return string
      */
-    protected function getEventColor(Folder $folder, $eventType)
+    protected function getEventColor(Folder $folder, $eventType): string
     {
-        return $this->getCalendarHandler()->displayColour($eventType);
+        return $this->calendarHandler->displayColour($eventType);
     }
 
     /**
@@ -164,24 +164,4 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 
     /* Getters/Setters
      */
-
-    /**
-     * Set calendar handler
-     *
-     * @param Calendar $calendarHandler
-     */
-    public function setCalendarHandler($calendarHandler)
-    {
-        $this->calendarHandler = $calendarHandler;
-    }
-
-    /**
-     * Get calendar handler
-     *
-     * @return Calendar
-     */
-    public function getCalendarHandler()
-    {
-        return $this->calendarHandler;
-    }
 }

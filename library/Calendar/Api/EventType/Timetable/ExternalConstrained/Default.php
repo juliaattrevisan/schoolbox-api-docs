@@ -19,7 +19,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
     /**
      * @var External_Timetable
      */
-    protected $externalTimetable = null;
+    private $externalTimetable;
 
     /**
      * Constructor
@@ -29,7 +29,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
      */
     public function __construct(\Schoolbox\User $user, $config)
     {
-        $this->setUser($user);
+        parent::__construct($user);
         $this->externalTimetable = new External_Timetable();
     }
 
@@ -341,16 +341,6 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
         return new Collection();
     }
 
-    /**
-     * @param  \External_Timetable $externalTimetable
-     *
-     * @return $this
-     */
-    public function setExternalTimetable($externalTimetable)
-    {
-        $this->externalTimetable = $externalTimetable;
-        return $this;
-    }
 
     /**
      * @return \External_Timetable

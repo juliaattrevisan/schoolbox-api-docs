@@ -40,7 +40,7 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
      */
     public function __construct(\Schoolbox\User $user, $config)
     {
-        $this->setUser($user);
+        parent::__construct($user);
         $this->setExternalTimetable(new External_Timetable());
         $this->setEventTypeMapper(EventTypeMapper::getInstance());
         $this->setConfigMapper(Calendar_Api_Config_Mapper::getInstance());

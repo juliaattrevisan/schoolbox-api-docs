@@ -31,10 +31,8 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
      */
     public function __construct(\Schoolbox\User $user, $config)
     {
-        $this->setUser($user);
-
+        parent::__construct($user);
         $eventHandler = new Calendar();
-
         $this->setAllLuEventTypes($eventHandler->getTypeList());
     }
 

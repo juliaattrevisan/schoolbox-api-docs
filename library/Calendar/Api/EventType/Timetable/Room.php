@@ -21,7 +21,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
     /**
      * @var External_TimetableInterface
      */
-    protected $externalTimetable = null;
+    protected $externalTimetable;
 
     /**
      * A map of codes to resource IDs for the room to show events for.
@@ -42,7 +42,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
      */
     public function __construct(\Schoolbox\User $user, $config, $roomCodes = [])
     {
-        $this->setUser($user);
+        parent::__construct($user);
         $this->externalTimetable = new External_Timetable();
         $this->roomCodes         = $roomCodes;
     }

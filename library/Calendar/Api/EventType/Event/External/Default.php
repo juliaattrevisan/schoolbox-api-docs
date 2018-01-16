@@ -22,14 +22,14 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      *
      * @var int
      */
-    const DEFAULT_EVENTTYPE_ID = 1;
+    private const DEFAULT_EVENTTYPE_ID = 1;
 
     /**
      * A string to indicate the source from which this event emerged
      *
      * @var string
      */
-    const EXTERNAL_EVENT_TYPE = 'external';
+    private const EXTERNAL_EVENT_TYPE = 'external';
 
     /**
      * An external event handler instance
@@ -46,7 +46,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
     /**
      * @var UserMapper
      */
-    protected $userMapper;
+    private $userMapper;
 
     /**
      * Constructor
@@ -55,8 +55,9 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      * @param $config
      * @param IExternalEvents $externalEvents
      */
-    public function __construct($user, $config, $externalEvents) {
-        $this->setUser($user);
+    public function __construct($user, $config, $externalEvents)
+    {
+        parent::__construct($user);
         $this->externalEvents = $externalEvents;
         $this->setEventTypeMapper(EventTypeMapper::getInstance());
         $this->setUserMapper(UserMapper::getInstance());

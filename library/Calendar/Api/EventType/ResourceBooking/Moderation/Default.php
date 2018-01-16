@@ -54,7 +54,7 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
         // We no longer show moderators bookings for all items [SB-6802]
         // Maybe they are a moderator for some items?
         $items = $this->getBookingMapper()->getJoinMapper('resource')->findForModerator(
-            $this->user->getId()
+            $this->getUser()->getId()
         );
         foreach ($items as $item) {
             $restrictedIds[] = $item->getId();

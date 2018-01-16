@@ -21,14 +21,23 @@ abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType
      *
      * @var int
      */
-    protected $connectorId;
+    private $connectorId;
 
     /**
      * An instance of User
      *
      * @var Schoolbox\User
      */
-    protected $user = null;
+    private $user;
+
+
+    /**
+     * @param User $user
+     */
+    public function __construct(User $user)
+    {
+        $this->user = $user;
+    }
 
     /* Getters/Setters
      */
@@ -53,31 +62,22 @@ abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType
         return $this->connectorId;
     }
 
-    /**
-     * Set user
-     *
-     * @param User $user
-     *
-     * @return $this
-     */
-    public function setUser($user)
-    {
-        $this->user = $user;
-        return $this;
-    }
 
     /**
      * @return User
      */
-    protected function getUser()
+    protected function getUser(): User
     {
         return $this->user;
     }
+
 
     /**
      * Helper method for loading this event type's calendar connector config.
      *
      * @return Calendar_Api_Config_Record|object
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     public function loadConnectorConfiguration()
     {
