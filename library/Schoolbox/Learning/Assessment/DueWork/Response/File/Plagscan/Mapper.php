@@ -11,6 +11,8 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
+use Aura\Di\Exception\ServiceNotFound;
+use Raven_Client;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\Collection;
 use Schoolbox\File\Mimetype;
@@ -168,15 +170,22 @@ class Mapper extends \Schoolbox\Mapper
                 $this->setConnector(new Connector($this->getConfigLoader(), $plagscanClientId, $plagscanApiKey));
             }
             catch (\DomainException $e) {
-
                 /* Could not spawn for some reason, but due to mapper usage
                  * we don't want to detonate - just quietly not use plagscan
+                 * Let's send the error to sentry though
                  */
+                $this->logConnectorException($e);
             }
             catch (\RuntimeException $e) {
-
                 /* Could not spawn because plagscan api is down
                  */
+                $this->logConnectorException(
+                    new \RuntimeException(
+                        "Error: Plagscan unavailable. Could not generate access token.",
+                        $e->getCode(),
+                        $e
+                    )
+                );
             }
         }
     }
@@ -307,16 +316,31 @@ class Mapper extends \Schoolbox\Mapper
 
         /* Send it to plag
          */
-        $plagscanId = $this->getConnector()->transmit($file, $filename);
 
-        /* Plagscan death
-         */
-        if (empty($plagscanId)) {
-            return [];
+        try {
+            $plagscanId = $this->getConnector()->transmit($file, $filename);
+            $plagscan->setPlagscanId($plagscanId);
+            $plagscan->setStatus(Plagscan::STATUS_PROCESSING);
+        } catch (\DomainException $e) {
+            // Something went unrecoverably wrong, so remove the document from the queue
+            $plagscan->setStatus(Plagscan::STATUS_UNSCANNABLE);
+            $this->logConnectorException($e);
+        } catch (\RuntimeException $e) {
+            // Plagscan is unavailable or otherwise behaving unexpectedly - try again later
+            // Status is already queued, no need to change that
+            $this->logConnectorException(
+                new \RuntimeException(
+                    "Error: Plagscan unavailable. Could not generate access token.",
+                    $e->getCode(),
+                    $e
+                )
+            );
+            // TODO is this check necessary - can't we assume plagscanID is empty if we're in the catch?
+            // TODO need to return [] in other catch as well
+            if (empty($plagscanId)) {
+                return [];
+            }
         }
-
-        $plagscan->setPlagscanId($plagscanId);
-        $plagscan->setStatus(Plagscan::STATUS_PROCESSING);
 
         return parent::save($plagscan);
     }
@@ -472,8 +496,29 @@ class Mapper extends \Schoolbox\Mapper
              * This allows you to re-encounter documents being checked against older versions of themselves
              * but can't do much to stop it if plagscan screws us
              */
+            $this->logConnectorException(
+                new \RuntimeException("Could not privatise document in Plagscan.", $e->getCode(), $e)
+            );
         }
     }
+
+    /**
+     * Logs exception raised by the Plagscan connector to Sentry (if possible).
+     *
+     * @param \Exception $ce
+     * @return void
+     */
+    private function logConnectorException(\Exception $ce) : void
+    {
+        try {
+            /** @var Raven_Client $sentry */
+            $sentry = self::getDi()->get('sentry');
+        } catch (ServiceNotFound $e) {
+            return;
+        }
+        $sentry->captureException($ce);
+    }
+
 
     /* Getters/Setters
      */
