@@ -16,7 +16,7 @@ use Schoolbox\Mapper\Traits\Model\Uuid;
 use Schoolbox\Tour\Step\Model as TourStep;
 use Schoolbox\User;
 
-abstract class AbstractModel implements ISoftDeletable
+abstract class AbstractModel implements ISoftDeletable, \JsonSerializable
 {
     use Uuid;
     use CreatedAtDate;
