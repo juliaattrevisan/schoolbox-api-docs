@@ -177,7 +177,14 @@ Usage:
                             <div class="small-12 columns">
                                 <ul class="information-list threaded">
                                     <li>
-                                        <p>TODO: Localised Heading</p>
+                                        <h2 class="subheader">{% spaceless %}
+                                            {% if selfAssessed %}
+                                                {{ locale.selfAssessment.proper }}
+                                            {% elseif selfReflected %}
+                                                {{ locale.selfReflection.proper }}
+                                            {% endif %}
+                                        {% endspaceless %}</h2>
+
                                         <ul class="information-list reply">
                                             <li>
                                                 <div class="list-item flex-grade">

@@ -290,6 +290,11 @@ class Controller extends Base
              */
             'learnerRubricContext' => null,
             'latestSelfReflectedFeedback' => null,
+
+            /* For localising heading strings
+             */
+            'selfAssessed' => false,
+            'selfReflected' => false,
         ];
 
         /* Rubrics data
@@ -323,6 +328,7 @@ class Controller extends Base
          * IResponse that we're looking at
          */
         $selfReflected = (new ValidSelfReflection())->isSatisfiedBy($participant->getUser(), $participant);
+        $selfAssessed = (new ValidSelfAssessment())->isSatisfiedBy($participant->getUser(), $participant);
 
         if ($selfReflected && $assessment->getUseRubric()) {
             $data['latestSelfReflectedFeedback'] = $participant->findMostRecentPublishedSelfReflectedFeedback();
@@ -335,6 +341,15 @@ class Controller extends Base
             }
             else {
                 $data['learnerRubricContext'] = $rubricContext->generateMarkable($assessment, $participant->getUser());
+            }
+
+            /* Need this to determine localisation string for headings
+             */
+            if ($selfAssessed) {
+                $data['selfAssessed'] = true;
+            }
+            elseif ($selfReflected) {
+                $data['selfReflected'] = true;
             }
         }
 
