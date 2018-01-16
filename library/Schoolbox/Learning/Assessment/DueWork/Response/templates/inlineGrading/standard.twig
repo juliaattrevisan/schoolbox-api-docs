@@ -170,17 +170,18 @@ Usage:
 
                     {# A hole for readonly self-reflection content
                      # Used when the Instructor wants to see the self-reflection while providing Feedback
+                     # Presence of a Learner-authored (marker, owner) tuple activates this
                      #}
                     {% block readonlyFeedback %}
-                        {% if learnerRubricContext %}
+                        {% if latestSelfReflectedFeedback %}
                             {% import '@learning/macro/urgency.twig' as urgency %}
                             <div class="small-12 columns">
                                 <ul class="information-list threaded">
                                     <li>
                                         <h2 class="subheader">{% spaceless %}
-                                            {% if selfAssessed %}
+                                            {% if latestSelfReflectedFeedback.normalisedMark != null %}
                                                 {{ locale.selfAssessment.proper }}
-                                            {% elseif selfReflected %}
+                                            {% else %}
                                                 {{ locale.selfReflection.proper }}
                                             {% endif %}
                                         {% endspaceless %}</h2>

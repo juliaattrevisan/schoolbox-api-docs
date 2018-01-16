@@ -82,8 +82,6 @@ class Rubric
         $data = [
             'learnerRubricContext' => null,
             'latestSelfReflectedFeedback' => null,
-            'selfAssessed' => false,
-            'selfReflected' => false,
         ];
 
         /* If this contained a self-reflectable response, load that as well in addition to the usual rubricContext
@@ -97,14 +95,13 @@ class Rubric
          * for the submission currently being viewed
          */
         if ($latestSelfReflectedFeedback && $latestSelfReflectedFeedback->getResponse()->getId() === $this->response->getId()) {
+            $data['latestSelfReflectedFeedback'] = $latestSelfReflectedFeedback;
 
             /* Rubric data for the self-reflection
              * If it was self-reflectable and used a rubric, find out what the latest Learner-owned Feedback is for the
              * IResponse that we're looking at
              */
             if ($this->assessment->getUseRubric()) {
-                $data['latestSelfReflectedFeedback'] = $latestSelfReflectedFeedback;
-
                 if ($this->isInteractionLocked && !$this->currentUser->isSuperuser()) {
                     $data['learnerRubricContext'] = $this->rubricContext->generate($this->assessment, $this->participant->getUser(), $this->currentUser, Access::getInstance(), false);
                 } elseif ($this->response) {
@@ -112,17 +109,6 @@ class Rubric
                 } else {
                     $data['learnerRubricContext'] = $this->rubricContext->generateMarkable($this->assessment, $this->participant->getUser());
                 }
-            }
-
-            /* Need this to determine localisation string for headings
-             *
-             * This accommodates the scenario when the assessment's self-reflection ability has been turned off, but a
-             * self-reflection exists for the submission currently being viewed
-             */
-            if (null !== $latestSelfReflectedFeedback->getNormalisedMark()) {
-                $data['selfAssessed'] = true;
-            } else {
-                $data['selfReflected'] = true;
             }
         }
 
