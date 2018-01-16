@@ -345,19 +345,20 @@ class Controller extends Base
                 else {
                     $data['learnerRubricContext'] = $rubricContext->generateMarkable($assessment, $participant->getUser());
                 }
-
             }
 
             /* Need this to determine localisation string for headings
+             *
+             * This accommodates the scenario when the assessment's self-reflection ability has been turned off, but a
+             * self-reflection exists for the submission currently being viewed
              */
-            if ((new ValidSelfAssessment())->isSatisfiedBy($participant->getUser(), $participant)) {
+            if (null !== $latestSelfReflectedFeedback->getNormalisedMark()) {
                 $data['selfAssessed'] = true;
             }
-            elseif ((new ValidSelfReflection())->isSatisfiedBy($participant->getUser(), $participant)) {
+            else {
                 $data['selfReflected'] = true;
             }
         }
-
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/standard.twig', $data));
     }
