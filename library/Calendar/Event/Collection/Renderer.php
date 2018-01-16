@@ -36,7 +36,7 @@ class Renderer
     protected $page;
 
     /** @var User */
-    protected $user;
+    private $user;
 
     /** @var User */
     protected $viewer;
@@ -65,7 +65,7 @@ class Renderer
         $this->setApi($api);
         $this->setStartTimestamp($startTimestamp);
         $this->setEndTimestamp($endTimestamp);
-        $this->setUser($user);
+        $this->user = $user;
         $this->setPage($page);
         $this->setViewer($viewer);
 
@@ -94,10 +94,13 @@ class Renderer
         $this->getAllEvents()->sort();
     }
 
+
     /**
      * Render all events
+     *
      * @param string $type
      * @return string
+     * @throws \Exception If unable to find a rendering class for the specified type
      */
     public function renderAll($type)
     {
@@ -108,11 +111,13 @@ class Renderer
         return $output;
     }
 
+
     /**
      * @param EventInterface $event
      * @param string         $type
      *
      * @return mixed
+     * @throws \Exception If unable to find a rendering class for the specified type
      */
     public function renderEvent($event, $type)
     {
@@ -121,7 +126,7 @@ class Renderer
         $renderObj = new $rendererClass(
             $this->getPage(),
             $event,
-            $this->getUser(),
+            $this->user,
             $this->getGroupHandler(),
             $this->getCalendarHandler(),
             $this->getViewer()
@@ -275,17 +280,9 @@ class Renderer
     }
 
     /**
-     * @param User $user
-     */
-    public function setUser($user)
-    {
-        $this->user = $user;
-    }
-
-    /**
      * @return User
      */
-    public function getUser()
+    protected function getUser(): User
     {
         return $this->user;
     }
