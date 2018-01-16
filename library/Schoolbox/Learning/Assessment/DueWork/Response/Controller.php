@@ -166,15 +166,14 @@ class Controller extends Base
         /* Rubrics data
         */
         $rubricMapper = RubricMapper::getInstance();
-        if($assessment->getUseRubric()){
-            $assessment->setRubric($rubricMapper->findByDueWork($assessment));
-        }
         $rubricContext = new RubricContext($rubricMapper);
 
-        // Should rubric be readonly or markable?
-        $data['rubricContext'] = $isInteractionLocked && !$this->getUser()->isSuperuser()
-            ? $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false)
-            : $rubricContext->generateMarkable($assessment, $participant->getUser());
+        if ($assessment->getUseRubric()) {
+            $assessment->setRubric($rubricMapper->findByDueWork($assessment));
+        }
+
+        $rubricData = (new InlineGrader\Rubric($assessment, $participant, $this->getUser(), $response, $isInteractionLocked, $rubricContext))->generate();
+        $data = array_merge($data, $rubricData);
 
         /* Figure out who's actually here and what screen to show
          */
