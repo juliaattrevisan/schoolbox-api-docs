@@ -20,8 +20,7 @@ CREATE TABLE `tour_step_modal`
 INSERT INTO `tour_step` (`uuid`, `tour_uuid`, `next_step_uuid`, `author_user_id`, `type`, `created_at`, `updated_at`)
 VALUES ('d7956911-f9ad-11e7-97db-08002751fd3c', '81bc678b-f9ab-11e7-97db-08002751fd3c', '81bce408-f9ab-11e7-97db-08002751fd3c', '19', 'modal', '1980-04-07 00:00:00', '1980-04-07 00:00:00');
 
-INSERT INTO `schoolbox`.`tour_step_modal` (`uuid`, `tour_step_uuid`, `author_user_id`, `title`, `body`, `created_at`, `updated_at`, `deleted_at`)
-VALUES ('a90666ad-f9ae-11e7-97db-08002751fd3c', 'd7956911-f9ad-11e7-97db-08002751fd3c', '19', 'Welcome to your tour!', 'Welcome to your tour!', '1980-04-07 00:00:00', '1980-04-07 00:00:00', '1980-04-07 00:00:00
-');
+INSERT INTO `schoolbox`.`tour_step_modal` (`uuid`, `tour_step_uuid`, `author_user_id`, `title`, `body`, `created_at`, `updated_at`)
+VALUES ('a90666ad-f9ae-11e7-97db-08002751fd3c', 'd7956911-f9ad-11e7-97db-08002751fd3c', '19', 'Welcome to your tour!', 'Welcome to your tour!', '1980-04-07 00:00:00', '1980-04-07 00:00:00');
 
 UPDATE `tour` set `tour_step_uuid` = 'd7956911-f9ad-11e7-97db-08002751fd3c';
