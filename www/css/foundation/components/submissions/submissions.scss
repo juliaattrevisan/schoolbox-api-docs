@@ -181,10 +181,10 @@ table.rubric {
         margin: -1rem 0;
 
         @media #{$small-only} {
-            margin: -0.5rem -1rem;
+            margin: -.5rem -1rem;
         }
         @media #{$medium-only} {
-            margin: -0.25rem 0;
+            margin: -.25rem 0;
         }
     }
 }
