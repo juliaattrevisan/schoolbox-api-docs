@@ -19,7 +19,8 @@ use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Response\DataSource;
 use Schoolbox\Learning\Assessment\DueWork\RubricContext;
 use Schoolbox\Learning\Assessment\Timeline\ResponsesOnly;
-use Schoolbox\Learning\InlineGrader\SelfReflection\Rubric;
+use Schoolbox\Learning\InlineGrader;
+use Schoolbox\Learning\InlineGrader\SelfReflection;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Permission\Access\Access;
@@ -296,27 +297,18 @@ class Controller extends Base
         /* Rubrics data
         */
         $rubricMapper = RubricMapper::getInstance();
+        $rubricContext = new RubricContext($rubricMapper);
 
-        if($assessment->getUseRubric()){
+        if ($assessment->getUseRubric()) {
             $assessment->setRubric($rubricMapper->findByDueWork($assessment));
         }
 
-        $rubricContext = new RubricContext($rubricMapper);
+        $rubricData = (new InlineGrader\Rubric($assessment, $participant, $this->getUser(), $response, $isInteractionLocked, $rubricContext))->generate();
+        $data = array_merge($data, $rubricData);
 
-        // Should rubric be readonly or markable?
-        if ($isInteractionLocked && !$this->getUser()->isSuperuser()) {
-            $data['rubricContext'] = $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false);
-        }
-        elseif ($response) {
-            $data['rubricContext'] = $rubricContext->generateMarkableForResponse($assessment, $participant->getUser(), $response->getId());
-        }
-        else {
-            $data['rubricContext'] = $rubricContext->generateMarkable($assessment, $participant->getUser());
-        }
-
-        /* Augment with self-reflection data
+        /* Augment with self-reflection rubric data
          */
-        $selfReflectionData = (new Rubric($assessment, $participant, $this->getUser(), $response, $isInteractionLocked, $rubricContext))->generate();
+        $selfReflectionData = (new SelfReflection\Rubric($assessment, $participant, $this->getUser(), $response, $isInteractionLocked, $rubricContext))->generate();
         $data = array_merge($data, $selfReflectionData);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/standard.twig', $data));
