@@ -142,4 +142,12 @@ class Bootstrap extends AbstractBootstrap {
         $di->values['logger'] = $this->getKernel()->logger();
     }
 
+
+    /**
+     * No middleware in daemonland.
+     */
+    public function runMiddleware()
+    {
+        // noop in daemonland
+    }
 }

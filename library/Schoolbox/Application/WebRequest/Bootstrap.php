@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Application\WebRequest;
 
+use Alaress\Csrf\HeaderCheck;
 use Alaress\DebugBar\DataCollector\RouteCollector;
 use Alaress\DebugBar\DataCollector\TidewaysCollector;
 use Alaress\DebugBar\DataCollector\XhprofCollector;
@@ -22,6 +23,8 @@ use Database;
 use Psr\Log\NullLogger;
 use Schoolbox\Application\AbstractBootstrap;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\IConfigLoader;
 
 
 class Bootstrap extends AbstractBootstrap {
@@ -206,6 +209,44 @@ class Bootstrap extends AbstractBootstrap {
         }
 
     }
+
+
+    /**
+     * Web requests require CSRF protection: that belongs in middleware.
+     */
+    public function runMiddleware()
+    {
+        // Ghetto CSRF middleware. Reject request if:
+        // * It's not a GET request
+        // ** Disregard X-Http-Method-Override, as that can be set by client
+        // * It's not a deliberately allowed request (only known example: /saml/consume.php)
+        // ** In general: any request that authenticates via token instead of
+        //    via session should be allowed
+        // * Its headers don't match
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+
+            // Check against whitelist first
+            $whitelist = ['/saml/consume.php'];
+            if (\in_array($_SERVER['SCRIPT_NAME'], $whitelist, true)) {
+                return;
+            }
+
+            // Then verify request origin
+            /** @var IConfigLoader $config */
+            $di        = $this->getKernel()->getDependencyInjector();
+            $config    = $di->get('config');
+            $fqdn      = trim($config->get('site_hostname').".".$config->get('site_domain'), ';.');
+            $csrfCheck = new HeaderCheck($_SERVER, $fqdn);
+            if (!$csrfCheck->verfiyRequestOrigin()) {
+                // Let's just say 403 Forbidden for now
+                // TODO replace the call to Sitepage::error() method
+                /** @var \SitePage $page */
+                $page = $di->get('layoutEngine');
+                $page->error(ErrorMapper::ERROR_FORM_SUBMIT, 'Invalid Request Origin', 403);
+            }
+        }
+    }
+
 
     /**
      * Shutdown handler for either exceptions or fatal errors

@@ -93,4 +93,12 @@ interface BootstrapInterface {
 	 */
 	public function installDependencies();
 
-} 
+
+    /**
+     * Run any middleware code which may manipulate or reject requests before
+     * they enter the kernel.
+     *
+     * @return void
+     */
+    public function runMiddleware();
+}
