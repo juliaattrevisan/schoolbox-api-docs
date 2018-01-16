@@ -284,11 +284,12 @@
                     $cal.fullCalendar('renderEvents', listOfFakesToRender, true);
 
                 },
-                resources: {
-                    dataType: 'json',
-                    url:      '{{ routeLookup('learningPersonalised.getResourcesForStudent', {studentId: student.id}) }}'
+                resources: function (callback) {
+                    var url = '{{ routeLookup('learningPersonalised.getResourcesForStudent', {studentId: student.id}) }}';
+                    $.get(url + '/' + $cal.fullCalendar('getDate').format('DD-MM-YYYY'), function (resourceObjects) {
+                        callback(resourceObjects);
+                    });
                 },
-
                 resourceAreaWidth: '40%',
                 resourceColumns: [
                     {
