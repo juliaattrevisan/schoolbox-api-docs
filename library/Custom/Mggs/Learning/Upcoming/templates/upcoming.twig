@@ -193,7 +193,7 @@
                         return 'placeholder' in calEvent.data;
                     });
 
-                    var completionSeq = [ 'incomplete', 'failed', 'pending', 'reviewed' ];
+                    var completionSeq = [ 'reviewed', 'pending', 'incomplete', 'failed' ];
 
                     var listOfFakesToRender = [];
                     // we're on timeline: take all the events that have been rendered
@@ -223,7 +223,7 @@
                                     placeholder: true,
                                     meta: {
                                         count: calEvents.length,
-                                        status: eStatus,
+                                        status: mergedStatus,
                                         wk: wk
                                     }
                                 }
