@@ -327,31 +327,40 @@ class Controller extends Base
          * If it was self-reflectable and used a rubric, find out what the latest Learner-owned Feedback is for the
          * IResponse that we're looking at
          */
-        $selfReflected = (new ValidSelfReflection())->isSatisfiedBy($participant->getUser(), $participant);
-        $selfAssessed = (new ValidSelfAssessment())->isSatisfiedBy($participant->getUser(), $participant);
+        $latestSelfReflectedFeedback = $participant->findMostRecentPublishedSelfReflectedFeedback();
 
-        if ($selfReflected && $assessment->getUseRubric()) {
-            $data['latestSelfReflectedFeedback'] = $participant->findMostRecentPublishedSelfReflectedFeedback();
+        /* Load a historic self-reflection if one exists - occurs when the Self Reflection state is changed
+         * after self-reflections have been created
+         */
+        if ($latestSelfReflectedFeedback) {
 
-            if ($isInteractionLocked && !$this->getUser()->isSuperuser()) {
-                $data['learnerRubricContext'] = $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false);
-            }
-            elseif ($response) {
-                $data['learnerRubricContext'] = $rubricContext->generateMarkableForResponseAndSelfReflection($assessment, $participant->getUser(), $response->getId());
-            }
-            else {
-                $data['learnerRubricContext'] = $rubricContext->generateMarkable($assessment, $participant->getUser());
+            /* Rubric data for the self-reflection
+             */
+            if ($assessment->getUseRubric()) {
+                $data['latestSelfReflectedFeedback'] = $latestSelfReflectedFeedback;
+
+                if ($isInteractionLocked && !$this->getUser()->isSuperuser()) {
+                    $data['learnerRubricContext'] = $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false);
+                }
+                elseif ($response) {
+                    $data['learnerRubricContext'] = $rubricContext->generateMarkableForResponseAndSelfReflection($assessment, $participant->getUser(), $response->getId());
+                }
+                else {
+                    $data['learnerRubricContext'] = $rubricContext->generateMarkable($assessment, $participant->getUser());
+                }
+
             }
 
             /* Need this to determine localisation string for headings
              */
-            if ($selfAssessed) {
+            if ((new ValidSelfAssessment())->isSatisfiedBy($participant->getUser(), $participant)) {
                 $data['selfAssessed'] = true;
             }
-            elseif ($selfReflected) {
+            elseif ((new ValidSelfReflection())->isSatisfiedBy($participant->getUser(), $participant)) {
                 $data['selfReflected'] = true;
             }
         }
+
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/standard.twig', $data));
     }
