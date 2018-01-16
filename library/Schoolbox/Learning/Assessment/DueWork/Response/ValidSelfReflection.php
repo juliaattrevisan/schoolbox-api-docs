@@ -2,9 +2,8 @@
 /**
  * ValidSelfReflection
  *
- * This (assessment, user) combination is valid for self-reflection
+ * This (assessment, user) combination is currently valid for self-reflection
  *
- * TODO: Add unit tests
  * TODO: Can you self-reflect on behalf of someone else, via SOBO?
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
