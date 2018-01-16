@@ -30,7 +30,7 @@ $healthCheck = new Healthcheck($databaseExternal, $configLoader);
 $healthCheck->run();
 $results = $healthCheck->results();
 
-echo $results['log'];
+echo $results['log']."\n";
 
 if(isset($results['errors']) && count($results['errors']) > 0 ) {
     echo "\n".implode("\n",$results['errors'])."\n";
