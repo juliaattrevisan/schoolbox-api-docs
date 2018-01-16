@@ -25,6 +25,7 @@ class Model implements ISoftDeletable
     // Step type constants
 
     const TYPE_TOOLTIP = 'tooltip';
+    const TYPE_MODAL = 'modal';
 
     /**
      * @var User|null
@@ -37,7 +38,7 @@ class Model implements ISoftDeletable
     protected $tour;
 
     /**
-     * @var string|null
+     * @var AbstractModel
      */
     protected $type;
 
@@ -85,19 +86,19 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return string|null
+     * @return AbstractModel
      */
-    public function getType(): ?string
+    public function getType(): AbstractModel
     {
         return $this->type;
     }
 
     /**
-     * @param string|null $type
+     * @param AbstractModel $type
      *
      * @return self
      */
-    public function setType(?string $type): self
+    public function setType(AbstractModel $type): self
     {
         $this->type = $type;
         return $this;
@@ -110,6 +111,7 @@ class Model implements ISoftDeletable
     {
         return $this->tourStep;
     }
+
     /**
      * @param Model|null $tourStep
      *
@@ -119,5 +121,22 @@ class Model implements ISoftDeletable
     {
         $this->tourStep = $tourStep;
         return $this;
+    }
+
+    /**
+     * Specify data which should be serialized to JSON
+     *
+     * @link  http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
+     */
+    public function jsonSerialize()
+    {
+        $json = $this->getType()->jsonSerialize();
+        $json['uuid'] = $this->getUuid();
+        $json['next_step_uuid'] = $this->getTourStep();
+
+        return $json;
     }
 }
