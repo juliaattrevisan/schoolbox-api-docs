@@ -8,6 +8,7 @@
 namespace Schoolbox\Tour\Step;
 
 use PDOStatement;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Tour\Mapper as TourMapper;
 use Schoolbox\UserMapper;
@@ -18,6 +19,8 @@ use Schoolbox\UserMapper;
  * @method Model createModel($id = null)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model findOneByColumnList($columnList, $order = [], $options = [])
+ * @method Model findByColumnList($columnList, $order = [], $options = [])
+ * @method GenericCollection | Model[] findByColumn($columnName, $columnValue, $options = array())
  * @package Schoolbox\Tour\Step
  */
 class Mapper extends BaseMapper
@@ -33,7 +36,8 @@ class Mapper extends BaseMapper
         $this->joins('next_step_uuid', Mapper::class, 'uuid', null, null, 'tourStep', 'tourStep');
         $this->joins('tour_uuid', TourMapper::class, 'uuid', null, null, 'tour', 'tour');
         $this->joins('author_user_id', UserMapper::class, 'id', null, null, 'author', 'author');
-        $this->uses('type', self::TYPE_STRING);
+        $this->joinsReverseSingle('tour_step_uuid', \Schoolbox\Tour\Step\Modal\Mapper::class, 'type', 'modalStep');
+        $this->joinsReverseSingle('tour_step_uuid', \Schoolbox\Tour\Step\Tooltip\Mapper::class, 'type', 'tooltipStep');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -69,10 +73,15 @@ class Mapper extends BaseMapper
     {
         return "
             SELECT      {$this->getColumnString()},
+                        `type`,
                         {$this->getJoinColumnString('author', 'a')},
-                        {$this->getJoinColumnString('tour', 't')}
+                        {$this->getJoinColumnString('tour', 't')},
+                        {$this->getJoinColumnString('modalStep', 'ms')},
+                        {$this->getJoinColumnString('tooltipStep', 'ts')}
             FROM        {$this->getTable()}
             INNER JOIN  {$this->getJoinSql('tour', '', 't')}
+            LEFT JOIN   {$this->getJoinSql('modalStep','','ms')}
+            LEFT JOIN   {$this->getJoinSql('tooltipStep','','ts')}            
             LEFT JOIN   {$this->getJoinSql('author', '', 'a', true)}
         ";
     }
@@ -97,6 +106,16 @@ class Mapper extends BaseMapper
                 $model->setAuthor($authorUserMapper->hydrate($row, 'a'));
                 $model->setTour($tourMapper->hydrate($row, 't'));
                 $collection->add($model);
+
+                try {
+                    if ($row['type'] == 'tooltip') {
+                        $model->setType(Tooltip\Mapper::getInstance()->hydrate($row, 'ts'));
+                    } else if ($row['type'] == 'modal') {
+                        $model->setType(Modal\Mapper::getInstance()->hydrate($row, 'ms'));
+                    }
+                } catch (\TypeError $e) {
+                    throw new NotFound();
+                }
             }
         }
 
