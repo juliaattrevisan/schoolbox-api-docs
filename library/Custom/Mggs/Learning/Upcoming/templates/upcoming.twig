@@ -878,6 +878,9 @@
     </div>
 {% endif %}
 
+{% set pronoun = USER.id == student.id ? 'Your' : student.firstName ~ "'s" %}
+{% set canModify = USER.id == student.id or USER.role.staff %}
+
 <div class="reveal-modal large" data-reveal aria-hidden="true" role="dialog" id="calendar-bubble">
     <form id="editEvent">
         <input type="hidden" name="eventId" />
@@ -886,7 +889,8 @@
             <div class="small-12">
                 <h3 class="note"></h3>
                 <ul class="meta">
-                    <li class="icon-calendar">Your due date: <span class="date"></span></li>
+                    <li class="icon-calendar">{{ pronoun }} due date: <span class="date"></span></li>
+                    {% if canModify %}
                     <li class="icon-time-value">{% spaceless %}
                         You can change this date to be anywhere between
                         <span data-event-modal-field="bounds.open"></span>
@@ -896,22 +900,20 @@
                     <li class="icon-info">
                         <em>(you can also change the date by dragging the assessment around the calendar)</em>
                     </li>
-                    <li class="icon-staff-students" data-event-modal-field="post-by">Posted by <a class="author" href="#" data-is-user-link="1"></a></li>
-                    <li class="icon-staff-students" data-event-modal-field="reviewedBy">Reviewed by <a class="reviewer" href="#" data-is-user-link="1"></a></li>
+                    {% endif %}
                 </ul>
 
                 <article class="detail" data-is-html="1"></article>
-
                 <div>
                     <dl>
                         <dd>
+                            {% if canModify %}
                             <span>
                                 <input id="pblDateChange" data-datepicker data-datepicker-buttontext="Change Date" type="hidden" />
                             </span>
+                            {% endif %}
                             <span class="homepageLink" data-is-html="1"></span>
                             <span class="moreDetailsLink" data-is-html="1"></span>
-                            <span class="modifyLink" data-is-html="1"></span>
-                            <span class="deleteLink" data-is-html="1"></span>
                         </dd>
                     </dl>
                 </div>
