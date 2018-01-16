@@ -74,7 +74,21 @@
         var $cal = $('#calendar');
         var $modalForm = $('#editEvent');
 
-        var termDates = {{ termDates|escape('js') ?: '[]' }};
+        var termDates = {{ termDates|json_encode|raw ?: '[]' }};
+
+        var defaultDate;
+
+        var now = moment('{{ date ? date.databaseDate : '' }}');
+        defaultDate = now;
+
+        if (termDates.length) {
+            if (moment(termDates[0]).isBefore(now)) {
+                defaultDate = termDates[0];
+            } else if (moment(termDates[2]).isBefore(now)) {
+                defaultDate = termDates[2];
+            }
+        }
+
         var redrawTimeout;
 
         c = new Calendar('calendar', 'calendar-bubble', {
@@ -124,7 +138,7 @@
                 }
             },
             fullCalendar: {
-                defaultDate: moment('2017-08-01'),
+                defaultDate: defaultDate,
                 height: height,
                 defaultView: anchor || 'timelineTerm',
                 // Event limit: could be configured from session but leave global for now
@@ -193,12 +207,37 @@
 
                     // if there are already fakes, make them gone
                     $cal.fullCalendar('removeEvents', function (calEvent) {
-                        return 'placeholder' in calEvent.data;
+                        return ('data' in calEvent && 'placeholder' in calEvent.data)
+                            || ('rendering' in calEvent && calEvent.rendering == 'background');
                     });
 
                     var completionSeq = [ 'reviewed', 'pending', 'incomplete', 'failed' ];
 
+                    var shade;
+
+                    // install background events
+                    if (termDates.length) {
+                        // find the weeks between terms
+                        shade = {
+                            start: moment(termDates[1]).add({ days: 5 }),
+                            end: moment(termDates[2]).add({days: -1})
+                        };
+                    }
+
                     var listOfFakesToRender = [];
+
+                    if (shade) {
+                        $cal.find('[data-resource-id]').each(function () {
+                            // paint out the holidays
+                            listOfFakesToRender.push({
+                                start: shade.start,
+                                end: shade.end,
+                                rendering: 'background',
+                                resourceId: $(this).data('resourceId')
+                            });
+                        });
+                    }
+
                     // we're on timeline: take all the events that have been rendered
                     // and smoosh them into placeholders
                     for (var resourceId in realEventList) {
@@ -219,7 +258,7 @@
                                 color: '#ffffff',
                                 editable: false,
                                 resourceId: resourceId,
-                                title: '', // blank title for placeholders
+                                title: calEvents.length,
                                 start: moment(wk),
                                 end: null,
                                 data: {
@@ -275,6 +314,11 @@
                     right: 'timelineTerm,month,basicWeek'
                 },
 
+                viewRender: function (view, $element) {
+                    // time to re-render
+                    collapsed = false;
+                },
+
                 /**
                  * When an event is drawn on the calendar
                  * @param calEvent
@@ -282,6 +326,10 @@
                 eventRender: function (calEvent, $element, view) {
                     // Always render placeholders in the most basic manner
                     if (calEvent.id === 'placeholder') {
+                        return true;
+                    }
+
+                    if (calEvent.rendering === 'background') {
                         return true;
                     }
 
@@ -301,17 +349,25 @@
                     // attach bling if given
                     var status = calEvent.data.meta.status;
 
+                    var isPlaceholder = calEvent.data.placeholder;
+
                     if (status) {
                         $element.find('.fc-content').prepend(
-                            $('<a class="progress-tick tiny" />')
-                                .addClass(status).attr('title', status.capitalise())
+                            $('<a class="progress-tick" />')
+                                .addClass(status)
+                                .addClass(isPlaceholder ? 'small' : 'tiny')
+                                .attr('title', status.capitalise())
                         );
 
                         $element.addClass('progress-' + status);
                     }
 
                     if (view.type !== 'timelineTerm') {
-                        // if not on timeline view, that's all
+                        // if not on timeline view, make sure we don't render placeholder
+                        if (isPlaceholder) {
+                            return false;
+                        }
+
                         return true;
                     }
 
@@ -319,10 +375,10 @@
                     var wk = calEvent.start.year() + 'W' + calEvent.start.week();
                     $element.attr('data-wk', wk);
 
-                    if (calEvent.data.placeholder) {
+                    if (isPlaceholder) {
                         // dis fake
                         console.log('fake');
-                        $element.attr('data-placeholder', true).addClass('placeholder-event');
+                        $element.attr('data-placeholder', true).addClass('placeholder-event').css('top');
                         return true;
                     }
 
@@ -370,7 +426,7 @@
                  * @param event
                  */
                 eventAllow: function (dropLocation, event) {
-                    return isInsideBounds(event, dropLocation.start, dropLocation.resouceId);
+                    return isInsideBounds(event, dropLocation.start, dropLocation.resourceId);
                 },
 
                 /**
@@ -378,9 +434,22 @@
                  * @param view
                  */
                 windowResize: function(view) {
-                    var wHeight = $(window).height();
-                    var calTop = c.dom.offset().top;
-                    c.dom.fullCalendar('option','contentHeight', wHeight - calTop - 120)
+                    if (view.type === 'timelineTerm') {
+                        // redraw, but not too frequently during drag
+                        if (redrawTimeout) {
+                            clearTimeout(redrawTimeout);
+                        }
+                        redrawTimeout = window.setTimeout(function () {
+                            $cal.find('.fc-event-container').each(renderPopovers);
+                        }, 200);
+
+                    } else {
+                        // recalc height
+                        var wHeight = $(window).height();
+                        var calTop = c.dom.offset().top;
+
+                        c.dom.fullCalendar('option','contentHeight', wHeight - calTop - 120)
+                    }
                 },
 
                 /**
@@ -611,7 +680,7 @@
             }
 
             // verify dates and resource IDs are valid
-            return isInsideDates && event.resouceId == resourceId;
+            return isInsideDates && event.resourceId == resourceId;
         }
 
         $cal.on('click', '[data-placeholder]', function () {
@@ -621,8 +690,6 @@
             $(document).on('mousedown', hidePopover);
             console.log('popover hide listener attached');
         });
-
-
 
         function hidePopover(ev) {
             console.log('trying to hide popover');
