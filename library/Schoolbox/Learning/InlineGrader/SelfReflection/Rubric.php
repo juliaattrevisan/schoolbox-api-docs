@@ -82,6 +82,8 @@ class Rubric
         $data = [
             'learnerRubricContext' => null,
             'latestSelfReflectedFeedback' => null,
+            'selfAssessed' => false,
+            'selfReflected' => false,
         ];
 
         /* If this contained a self-reflectable response, load that as well in addition to the usual rubricContext

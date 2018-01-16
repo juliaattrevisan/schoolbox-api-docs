@@ -286,11 +286,6 @@ class Controller extends Base
              */
             'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
             'interactionLocked' => $isInteractionLocked,
-
-            /* For localising heading strings
-             */
-            'selfAssessed' => false,
-            'selfReflected' => false,
         ];
 
         /* Rubrics data
