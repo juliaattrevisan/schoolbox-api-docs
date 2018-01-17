@@ -88,30 +88,36 @@ class Rubric
             'latestSelfReflectedFeedback' => null,
         ];
 
-        /* If this contained a self-reflectable response, load that as well in addition to the usual rubricContext
-         * The Instructor needs to see what the Learner chose simultaneously with what the Instructor will give
+        /* If there was an IResponse, there might be a self-reflection - try and find it
+         * Otherwise just return the defaults (nothing to show/find)
          */
-        /** @var IFeedback $latestSelfReflectedFeedback */
-        $latestSelfReflectedFeedback = $this->participant->findMostRecentPublishedSelfReflectedFeedback();
+        if ($this->response) {
 
-        /* Load a historic self-reflection if one exists - occurs when the Self Reflection state is changed
-         * after self-reflections have been created. However, ignore it if the historic self-reflection isn't
-         * for the submission currently being viewed
-         */
-        if ($latestSelfReflectedFeedback && $latestSelfReflectedFeedback->getResponse()->getId() === $this->response->getId()) {
-            $data['latestSelfReflectedFeedback'] = $latestSelfReflectedFeedback;
-
-            /* Rubric data for the self-reflection
-             * If it was self-reflectable and used a rubric, find out what the latest Learner-owned Feedback is for the
-             * IResponse that we're looking at
+            /* If this contained a self-reflectable response, load that as well in addition to the usual rubricContext
+             * The Instructor needs to see what the Learner chose simultaneously with what the Instructor will give
+             *
+             * Load a historic self-reflection if one exists - occurs when the Self Reflection state is changed
+             * after self-reflections have been created. However, ignore it if the historic self-reflection isn't
+             * for the submission currently being viewed
              */
-            if ($this->assessment->getUseRubric()) {
-                if ($this->isInteractionLocked && !$this->currentUser->isSuperuser()) {
-                    $data['learnerRubricContext'] = $this->rubricContext->generate($this->assessment, $this->participant->getUser(), $this->currentUser, Access::getInstance(), false);
-                } elseif ($this->response) {
-                    $data['learnerRubricContext'] = $this->rubricContext->generateMarkableForResponseAndSelfReflection($this->assessment, $this->participant->getUser(), $this->response->getId());
-                } else {
-                    $data['learnerRubricContext'] = $this->rubricContext->generateMarkable($this->assessment, $this->participant->getUser());
+            /** @var IFeedback $latestSelfReflectedFeedback */
+            $latestSelfReflectedFeedback = $this->participant->findMostRecentPublishedSelfReflectedFeedbackForResponse($this->response);
+
+            if ($latestSelfReflectedFeedback) {
+                $data['latestSelfReflectedFeedback'] = $latestSelfReflectedFeedback;
+
+                /* Rubric data for the self-reflection
+                 * If it was self-reflectable and used a rubric, find out what the latest Learner-owned Feedback is for the
+                 * IResponse that we're looking at
+                 */
+                if ($this->assessment->getUseRubric()) {
+                    if ($this->isInteractionLocked && !$this->currentUser->isSuperuser()) {
+                        $data['learnerRubricContext'] = $this->rubricContext->generate($this->assessment, $this->participant->getUser(), $this->currentUser, Access::getInstance(), false);
+                    } elseif ($this->response) {
+                        $data['learnerRubricContext'] = $this->rubricContext->generateMarkableForResponseAndSelfReflection($this->assessment, $this->participant->getUser(), $this->response->getId());
+                    } else {
+                        $data['learnerRubricContext'] = $this->rubricContext->generateMarkable($this->assessment, $this->participant->getUser());
+                    }
                 }
             }
         }

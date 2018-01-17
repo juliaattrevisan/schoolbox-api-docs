@@ -309,14 +309,17 @@ class Participant
 
 
     /**
-     * Find the most recent feedback that a Learner made whilst self-reflecting/self-assessing
+     * Find the most recent feedback that a Learner made for a particular $response,
+     * whilst self-reflecting/self-assessing
      *
+     * @param IResponse $response
      * @return null|IFeedback
      */
-    public function findMostRecentPublishedSelfReflectedFeedback(): ?IFeedback
+    public function findMostRecentPublishedSelfReflectedFeedbackForResponse(IResponse $response): ?IFeedback
     {
         if ($this->allFeedbacks->count()) {
             return $this->allFeedbacks
+                ->filterBy('response', $response->getId())
                 ->filterBy('publishedAt', true)
                 ->filterBy('reviewer', $this->getUser())
                 ->sortBy('publishedAt', 'desc')
