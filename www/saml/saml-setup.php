@@ -16,6 +16,8 @@ $settingsInfo = array (
             'url' => $spBaseUrl.'/saml/index.php?sls',
         ],
         'NameIDFormat' => OneLogin_Saml2_Constants::NAMEID_TRANSIENT,
+        'x509cert' => Cfg::get('data_stream'),
+        'privateKey' => Cfg::get('data_stream'),
     ],
     'idp' => [
         'entityId' => '',
@@ -25,7 +27,7 @@ $settingsInfo = array (
         ),
         // SLO endpoint info of the IdP.
         'singleLogoutService' => array (
-            'url' => Config::get('saml_logout_url'),
+            'url' => Config::get('saml_slo_url'),
             'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
         ),
         'x509cert' => preg_replace("/\r/m", "", Config::get('saml_idp_certificate')),
