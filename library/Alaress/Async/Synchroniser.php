@@ -34,9 +34,10 @@ class Synchroniser
 
     /**
      * @param string|string[] $data
-     * @param callable        $callback
+     * @param callable        $callback Call with every value of $data
+     * @param callable        $done     Call once $callback is finished
      */
-    public function synchronise($data, callable $callback)
+    public function synchronise($data, callable $callback, callable $done)
     {
         $busy = $this->redis->exists($this->key);
 
@@ -50,9 +51,15 @@ class Synchroniser
         }
 
         // lock obtained - you are the worker: sozlol, you do everyone's work
+        $this->flush($callback, $done);
+    }
+
+    public function flush(callable $callback, callable $done)
+    {
         while ($data = $this->redis->rpop($this->key)) {
             $callback($data);
         }
+        $done();
     }
 
 }
