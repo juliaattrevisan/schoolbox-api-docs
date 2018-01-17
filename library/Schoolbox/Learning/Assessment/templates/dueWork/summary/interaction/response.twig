@@ -28,7 +28,7 @@
 {% endif %}
 
 {% set deleteRoute = routeLookupIfAuthorized('learningDueWorkResponse.deleteParticularResponse', {assessment: currentInteraction.assessable, assessmentId: currentInteraction.assessable.id, participant: participant, studentId: participant.user.id, responseId: currentInteraction.id, response: currentInteraction}) %}
-<ul class="information-list threaded" {% if isOlderInteraction %}style="display:none"{% endif %} data-history-row>
+<ul class="information-list threaded">
     <li class="actions-small-1">
         <ul class="action-list">
             <li class="actions-small-1">

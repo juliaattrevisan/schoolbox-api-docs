@@ -5,18 +5,6 @@
 
         var $history = $('#history');
 
-        $('#view-history').on('click', function(event) {
-            event.preventDefault();
-
-            $(this).remove();
-
-            $history
-                .find('[data-history-row]:hidden')
-                .css({opacity:0})
-                .show()
-                .animate({opacity:1}, 2000);
-        });
-
         $history.on('click', '[data-delete]', function (e) {
             e.preventDefault();
             var $a = $(this);
@@ -68,27 +56,7 @@
         <h2 class="subheader">{{ locale.submissionHistory.proper }}</h2>
 
         <section id='history'>
-            {% set firstSubmissionIndex = 0 %}
-            {% set isOlderInteraction = false %}
-
-            {# Lookahead to see if there was at least one submission
-             #}
             {% for currentInteraction in timeline %}
-                {% if currentInteraction is response and not firstSubmissionIndex %}
-                    {% set firstSubmissionIndex = loop.index %}
-                {% endif %}
-            {% endfor %}
-
-            {% for currentInteraction in timeline %}
-                {# There is a submission somewhere in this history
-                 # Everything that comes after it should be Older Interactions
-                 #}
-                {% if firstSubmissionIndex and loop.index > firstSubmissionIndex %}
-                    {% set isOlderInteraction = true %}
-                {% elseif not firstSubmissionIndex and loop.index > 1 %}
-                    {% set isOlderInteraction = true %}
-                {% endif %}
-
                 {% if currentInteraction is response %}
                     {% include '@learningAssessment/dueWork/summary/interaction/response.twig' with {currentInteraction: currentInteraction, participant: participant} %}
                 {% elseif currentInteraction is feedback %}
@@ -98,18 +66,6 @@
 
             <div class="toast" data-alert></div>
         </section>
-
-        {% if timeline|length > 1 %}
-            {% if firstSubmissionIndex %}
-                {% set olderInteractions = timeline|length - firstSubmissionIndex %}
-            {% else %}
-                {% set olderInteractions = timeline|length - 1 %}
-            {% endif %}
-
-            {% if olderInteractions %}
-            <a id="view-history" class="button full-width icon-down-arrow">View {{ olderInteractions }} older interaction{% if olderInteractions > 1 %}s{% endif %}</a>
-            {% endif %}
-        {% endif %}
     </div>
 </div>
 {% else %}
