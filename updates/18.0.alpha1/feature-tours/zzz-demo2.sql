@@ -12,5 +12,7 @@ UPDATE `tour` set `tour_step_uuid` = @step1Uuid; --Up date the tour to use the n
 
 
 INSERT INTO `tour_step_modal` (`uuid`, `tour_step_uuid`, `author_user_id`, `title`, `body`, `created_at`, `updated_at`)
-VALUES (@step2Uuid, @step1Uuid, '19', 'Welcome to your tour!', 'Welcome to your tour!', '1980-04-07 00:00:00', '1980-04-07 00:00:00'); --Insert step type
+VALUES (@step2Uuid, @step1Uuid, '19', 'Welcome to your tour!',
+'Welcome to your dashboard! This tour will guide you through an overview of the main areas of the first screen you see when you log in.
+This includes; the dashboard, side menu and top menu.', '1980-04-07 00:00:00', '1980-04-07 00:00:00'); --Insert step type
 

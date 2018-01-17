@@ -45,7 +45,7 @@ $(function () {
                             stepsToDisplay.push({
                                 intro: step.body,
                                 element: step.selector,
-                                tooltipClass: step.css_class,
+                                tooltipClass: step.css_class+" notintro",
                                 uuid: step.uuid,
                                 jsEvents: step.events,
                                 type: 'tooltip'
@@ -93,6 +93,71 @@ $(function () {
                         var stepCurrent = tourCurrent._introItems[tourCurrent._currentStep];
                         var stepPrev = tourCurrent._introItems[tourCurrent._currentStep - 1];
                         var stepNext = tourCurrent._introItems[tourCurrent._currentStep + 1];
+
+                    tourCurrent.onafterchange(function(targetElement) {
+                        window.console.log(targetElement);
+                        if (tourCurrent._introItems[tourCurrent._currentStep].tooltipClass == 'introjs-intromodal') {
+                            window.console.log("intro");
+                            $('.introjs-nextbutton').html("Take me on the tour!");
+                            $('.introjs-skipbutton').html("No Thanks");
+                        } else {
+                            $('.introjs-nextbutton').html("Next");
+                            $('.introjs-skipbutton').html("×");
+                            $('.introjs-donebutton').html("Done");
+                        }
+                    });
+
+                    // tourCurrent.onchange(function(targetElement) {
+                    //     var newStep     = tourCurrent._introItems[tourCurrent._currentStep].uuid;
+                    //
+                    //     //This matches the consts on the Status/Model - to be updated when this file is a plugin
+                    //     var status      = "unactioned";
+                    //
+                    //     //Save the status
+                    //     $.post(saveRoute, {
+                    //         url: tourUrl,
+                    //         oldStep: oldStep,
+                    //         newStep: newStep,
+                    //         status: status
+                    //     });
+                    //
+                    //     oldStep         = newStep;
+                    // });
+                    //
+                    // tourCurrent.oncomplete(function(targetElement) {
+                    //     completed = true;
+                    //
+                    //     var newStep     = tourCurrent._introItems[tourCurrent._currentStep].uuid;
+                    //
+                    //     //This matches the consts on the Status/Model - to be updated when this file is a plugin
+                    //     var status      = "completed";
+                    //
+                    //     //Save the status
+                    //     $.post(saveRoute, {
+                    //         url: tourUrl,
+                    //         oldStep: oldStep,
+                    //         newStep: newStep,
+                    //         status: status
+                    //     });
+                    // });
+                    //
+                    // tourCurrent.onexit(function(targetElement) {
+                    //     //onexit triggers when oncomplete triggers, so need check
+                    //     if(!completed) {
+                    //         var newStep = tourCurrent._introItems[tourCurrent._currentStep].uuid;
+                    //
+                    //         //This matches the consts on the Status/Model - to be updated when this file is a plugin
+                    //         var status = "dismissed";
+                    //
+                    //         //Save the status
+                    //         $.post(saveRoute, {
+                    //             url: tourUrl,
+                    //             oldStep: oldStep,
+                    //             newStep: newStep,
+                    //             status: status
+                    //         });
+                    //     }
+                    // });
 
                         // If the current step has custom JS events attached to open of this step - trigger those events now
                         if (stepCurrent.jsEvents !== null) {

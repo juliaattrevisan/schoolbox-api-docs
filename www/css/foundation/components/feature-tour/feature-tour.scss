@@ -175,19 +175,21 @@
 // ----------------------------------------------------------------
 // Restyling the skip button to an X top right
 // ----------------------------------------------------------------
-.introjs-skipbutton:not(.introjs-donebutton) {
-  background: transparent;
-  color: $oil;
-  font-size: 2rem;
-  margin: 0;
-  padding: 0;
-  position: absolute;
-  right: 6px;
-  top: 3px;
-  text-shadow: none;
+.notintro{
+  .introjs-skipbutton:not(.introjs-donebutton) {
+    background: transparent;
+    color: $oil;
+    font-size: 2rem;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    right: 6px;
+    top: 3px;
+    text-shadow: none;
 
-  &:hover {
-    color: $accent-foreground;
+    &:hover {
+      color: $accent-foreground;
+    }
   }
 }
 
