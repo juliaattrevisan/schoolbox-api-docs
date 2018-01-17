@@ -231,7 +231,7 @@ class Module extends BaseModule
         $assessment = $this->getAssessmentDataSource()->findById($assessmentId);
         $student    = $this->getUserDataSource()->findById($studentId);
 
-        $this->getParticipantDataSource()->loadParticipationIntoAssessment($assessment, $student);
+        $assessment = $this->getParticipantDataSource()->loadParticipationIntoAssessment($assessment, $student);
 
         return $assessment->getParticipant($student);
     }

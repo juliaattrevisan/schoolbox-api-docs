@@ -126,16 +126,18 @@ class DataSource
      *
      * @param IAssessable $assessment
      * @param null|User   $user
+     * @return IAssessable $assessment, with participation loaded.
      * @throws UnexpectedValueException If unable to merge student collections
      * @throws DomainException If user has interaction but not participant record
      * @throws DefinitionException If unable to locate a specified mapper join
      */
-    public function loadParticipationIntoAssessment(IAssessable $assessment, User $user = null): void
+    public function loadParticipationIntoAssessment(IAssessable $assessment, User $user = null): IAssessable
     {
-        $this->loadParticipationIntoAssessmentCollection(
+        $collection = $this->loadParticipationIntoAssessmentCollection(
             new GenericCollection(IAssessable::class, [$assessment]),
             $user
         );
+        return $collection->first();
     }
 
 
@@ -145,12 +147,13 @@ class DataSource
      * This includes records for responses and feedbacks for every participant in each assessment.
      *
      * @param Collection|IAssessable[] $assessments
-     * @param User                     $user
+     * @param User|null                $user
+     * @return Collection|IAssessable[] $assessments, with participation loaded.
      * @throws UnexpectedValueException If unable to merge student collections
      * @throws DomainException If user has interaction but not participant record
      * @throws DefinitionException If unable to locate a specified mapper join
      */
-    public function loadParticipationIntoAssessmentCollection(Collection $assessments, User $user = null): void
+    public function loadParticipationIntoAssessmentCollection(Collection $assessments, User $user = null): Collection
     {
         /** @var Collection|IAssessable[] $assessableWithDescendants */
         $assessableWithDescendants = new GenericCollection(IAssessable::class);
@@ -165,6 +168,7 @@ class DataSource
                 $this->aggregator->aggregate($assessable);
             }
         }
+        return $assessableWithDescendants;
     }
 
 

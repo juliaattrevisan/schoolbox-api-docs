@@ -823,7 +823,7 @@ class MapperProxy
             $originalModel = $this->baseMapper->findOneByColumnList([$column => $value]);
             $assessment    = $this->translateToDomainModel($originalModel);
             if ($loadParticipants) {
-                $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
+                $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
             }
             return $assessment;
 
@@ -831,7 +831,7 @@ class MapperProxy
             // Populate participants for the deleted assessment, and rethrow
             $assessment = $this->translateToDomainModel($e->getDeletedObject());
             if ($loadParticipants) {
-                $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
+                $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
             }
             $e->setDeletedObject($assessment);
             throw $e;
@@ -949,22 +949,16 @@ class MapperProxy
      *
      * @param IAssessable $assessment
      * @param Collection  $users
-     * @param bool        $includeResponses
-     * @param bool        $includeFeedbacks
      * @return IAssessable
      */
     public function loadParticularParticipantsIntoAssessment(
         IAssessable $assessment,
-        Collection $users,
-        $includeResponses = true,
-        $includeFeedbacks = true
+        Collection $users
     ) {
         foreach ($users as $user) {
-            $this->participantDataSource->loadParticipationIntoAssessment(
+            $assessment = $this->participantDataSource->loadParticipationIntoAssessment(
                 $assessment,
-                $user,
-                $includeResponses,
-                $includeFeedbacks
+                $user
             );
         }
         return $assessment;
@@ -979,11 +973,10 @@ class MapperProxy
      */
     public function loadParticipantsIntoAssessment(IAssessable $assessable, User $user = null): IAssessable
     {
-        $this->participantDataSource->loadParticipationIntoAssessment(
+        return $this->participantDataSource->loadParticipationIntoAssessment(
             $assessable,
             $user
         );
-        return $assessable;
     }
 
     /**
@@ -999,11 +992,10 @@ class MapperProxy
         Collection $collection,
         User $user = null
     ) {
-        $this->participantDataSource->loadParticipationIntoAssessmentCollection(
+        return $this->participantDataSource->loadParticipationIntoAssessmentCollection(
             $collection,
             $user
         );
-        return $collection;
     }
 
     /**
