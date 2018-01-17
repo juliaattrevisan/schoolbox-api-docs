@@ -78,19 +78,18 @@
             {% endif %}
         </nav>
 
-        {# collapser goes here #}
-        <div class="{{ collapsed? 'hide' : '' }}"
-             data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
-             data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}">
-
         {% if currentFeedback.comment|length %}
-            <article>
+            <article class="{{ collapsed? 'hide' : '' }}"
+                     data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
+                     data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}">
                 {{ currentFeedback.comment|nl2br }}
             </article>
         {% endif %}
 
         {% if currentFeedback.allFiles | length %}
-            <ul class="information-list">
+            <ul class="information-list {{ collapsed? 'hide' : '' }}"
+                data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
+                data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}">
                 {% for currentFile in currentFeedback.allFiles %}
                 {# Only show published feedback and therefore also
                  # only list files that are involved with a Published Feedback
@@ -140,6 +139,5 @@
                 {% endfor %}
             </ul>
         {% endif %}
-        </div>
     </li>
 </ul>
