@@ -1,4 +1,17 @@
-{% include '@learningAssessment/dueWork/summary/interaction/feedback.twig' with {
-    currentFeedback: feedback,
-    participant: participant,
-} %}
+{##
+ # Participant's mark for submission history page.
+ #
+ # Currently displays the authoritative feedback.
+ #}
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Mark</h2>
+
+        <section>
+            {% include '@learningAssessment/dueWork/summary/interaction/feedback.twig' with {
+                currentFeedback: feedback,
+                participant: participant,
+            } %}
+        </section>
+    </div>
+</div>
