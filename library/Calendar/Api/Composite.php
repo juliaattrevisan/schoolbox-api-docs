@@ -18,7 +18,9 @@ use Calendar\Event\Type\EventInterface;
 class Calendar_Api_Composite implements Calendar_Api_EventType_Interface
 {
     /**
-     * @var array $api A list of all the api classes which produce Collections to combine
+     * A list of all the api classes which produce Collections to combine
+     *
+     * @var Calendar_Api_EventType_Interface[] $api
      */
     private $api = [];
 
@@ -34,8 +36,7 @@ class Calendar_Api_Composite implements Calendar_Api_EventType_Interface
     {
         $result = new Collection();
 
-        /** @var Calendar_Api_EventType_Interface $currentApi */
-        foreach ($this->getApi() as $currentApi) {
+        foreach ($this->api as $currentApi) {
             $result->merge($currentApi->getEvents($startTimestamp, $endTimestamp));
         }
 
@@ -54,7 +55,7 @@ class Calendar_Api_Composite implements Calendar_Api_EventType_Interface
     {
         $result = new Collection();
 
-        foreach ($this->getApi() as $currentApi) {
+        foreach ($this->api as $currentApi) {
             $result->merge($currentApi->getEvent($eventId));
         }
 
@@ -69,27 +70,5 @@ class Calendar_Api_Composite implements Calendar_Api_EventType_Interface
     public function add($api)
     {
         $this->api[] = $api;
-    }
-
-    /**
-     * Get the number of apis currently being used
-     *
-     * @return int
-     */
-    public function getCount()
-    {
-        return count($this->getApi());
-    }
-
-    // Getters & Setters
-
-    /**
-     * Get api
-     *
-     * @return array
-     */
-    public function getApi()
-    {
-        return $this->api;
     }
 }

@@ -1,4 +1,6 @@
 <?php
+use Schoolbox\User;
+
 /**
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
@@ -14,16 +16,15 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 	 */
 	private $calendarHandler;
 
-	/**
-	 * Constructor
-	 *
-	 * @param $user
-	 * @param $config
-	 */
-	public function __construct($user, $config) {
-        parent::__construct($user);
-		$this->setCalendarHandler(new Calendar());
-	}
+
+    /**
+     * @inheritdoc
+     */
+    public function __construct(int $connectorId, User $user)
+    {
+        parent::__construct($connectorId, $user);
+        $this->calendarHandler = new Calendar();
+    }
 
 	/**
 	 * Get day events from this data source
@@ -86,20 +87,11 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 	 */
 
 	/**
-	 * Set calendar handler
-	 *
-	 * @param Calendar $calendarHandler
-	 */
-	public function setCalendarHandler($calendarHandler) {
-		$this->calendarHandler = $calendarHandler;
-	}
-
-	/**
 	 * Get calendar handler
 	 *
 	 * @return Calendar
 	 */
-	public function getCalendarHandler() {
+	protected function getCalendarHandler() {
 		return $this->calendarHandler;
 	}
 }

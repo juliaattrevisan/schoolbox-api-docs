@@ -193,6 +193,7 @@ class Mapper extends BaseMapper
      * @param array $extra         Optional values to filter by.
      *                             resource_id: filters by given resource IDs
      *                             owner_id:    filters by this event owner
+     *                             category_id: filters by a resource booking category
      *
      * @return Collection|Model[]
      */
@@ -358,7 +359,7 @@ class Mapper extends BaseMapper
     /**
      * Retrieves all bookings for the given resource.
      *
-     * @param int   $resourceId
+     * @param int[] $resourceIds
      * @param int   $fromTimestamp
      * @param int   $toTimestamp
      * @param array $statusIds     Status IDs of events to fetch. By default,
@@ -367,13 +368,13 @@ class Mapper extends BaseMapper
      *
      * @return Collection|Model[]
      */
-    public function findForResource($resourceId, $fromTimestamp, $toTimestamp, $statusIds = array())
+    public function findForResource(array $resourceIds, $fromTimestamp, $toTimestamp, $statusIds = array())
     {
         return $this->findForTimespan(
             $fromTimestamp,
             $toTimestamp,
             $statusIds,
-            array('resource_id' => is_array($resourceId) ? $resourceId : [$resourceId])
+            array('resource_id' => $resourceIds)
         );
     }
 

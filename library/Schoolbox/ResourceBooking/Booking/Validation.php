@@ -26,6 +26,7 @@ use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Aura\Web\Request;
 use Calendar_Api_EventType_Timetable_Room as TimetableRoom;
+use Calendar_Api_Config_Mapper;
 
 class Validation
 {
@@ -518,7 +519,7 @@ class Validation
     private function getConflictingBookings(Item\Model $resource, DateTime $startDate, DateTime $endDate)
     {
         return $this->getBookingMapper()->findForResource(
-            $resource->getId(),
+            [$resource->getId()],
             $startDate->getTimestamp() + 1,
             $endDate->getTimestamp() - 1,
             [Status\Model::STATUS_APPROVED]
@@ -538,7 +539,8 @@ class Validation
     protected function getTimetableRoomEvents($roomCode, DateTime $startDate, DateTime $endDate)
     {
         // Using  [$roomCode => true] to make Calendar_Api_EventType_Timetable_Room::getEvents happy
-        $timetableRoom = new TimetableRoom($this->getUser(), [], [$roomCode => true]);
+        $config        = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(TimetableRoom::class);
+        $timetableRoom = new TimetableRoom($config->getId(), $this->getUser(), $this->externalTimetableHandler, [$roomCode => true]);
 
         return $timetableRoom->getEvents($startDate->getTimestamp() + 1, $endDate->getTimestamp() - 1);
     }

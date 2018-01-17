@@ -12,14 +12,11 @@ use Alaress\Application\Kernel;
 use Alaress\Authorizer\Rule;
 use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Database\Factory as AlaressDatabaseFactory;
-use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Module\Loader as ModuleLoader;
 use Alaress\Redis;
 use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
 use Calendar_Api_Factory;
-use DebugBar\Bridge\Twig\TraceableTwigEnvironment;
-use DebugBar\Bridge\Twig\TwigCollector;
 use Alaress\Session\Factory;
 use Alaress\Web\Output;
 use Alaress\Web\Router\RouterFactory;
@@ -125,10 +122,17 @@ abstract class AbstractBootstrap implements BootstrapInterface
         $this->kernel = $kernel;
     }
 
+
     /**
      * Install any internal dependencies into the kernel (routing, etc.)
      *
      * @return void
+     * @throws Di\Exception
+     * @throws Di\Exception\ContainerLocked
+     * @throws Di\Exception\ServiceNotFound
+     * @throws Di\Exception\ServiceNotObject
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     public function installDependencies()
     {
@@ -817,7 +821,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
         $di->set(
             'calendarApiFactory',
             $di->lazy(
-                function () use ($di, $mapperFactory) {
+                function () use ($di) {
                     try {
                         /** @var IConnector $databaseExternal */
                         $databaseExternal = $di->get('databaseExternal');
@@ -826,8 +830,10 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     }
 
                     /** @var AssessmentDataSource $assessmentDataSource */
-                    $assessmentDataSource = $di->get('assessmentDataSource');
-                    return new Calendar_Api_Factory($assessmentDataSource, $databaseExternal);
+                    $assessmentDataSource  = $di->get('assessmentDataSource');
+                    /** @var ParticipantDataSource $participantDataSource */
+                    $participantDataSource = $di->get('participantDataSource');
+                    return new Calendar_Api_Factory($assessmentDataSource, $participantDataSource, $databaseExternal);
                 }
             )
         );

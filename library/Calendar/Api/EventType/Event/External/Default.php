@@ -48,19 +48,20 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      */
     private $userMapper;
 
+
     /**
      * Constructor
      *
-     * @param User $user
-     * @param $config
+     * @param int             $connectorId
+     * @param User            $user
      * @param IExternalEvents $externalEvents
      */
-    public function __construct($user, $config, $externalEvents)
+    public function __construct(int $connectorId, User $user, $externalEvents)
     {
-        parent::__construct($user);
-        $this->externalEvents = $externalEvents;
-        $this->setEventTypeMapper(EventTypeMapper::getInstance());
-        $this->setUserMapper(UserMapper::getInstance());
+        parent::__construct($connectorId, $user);
+        $this->externalEvents  = $externalEvents;
+        $this->eventTypeMapper = EventTypeMapper::getInstance();
+        $this->userMapper      = UserMapper::getInstance();
     }
 
 
@@ -106,7 +107,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
              * If THAT option didn't exist (i.e. deleted after chosen) then just default to DEFAULT_EVENTTYPE_ID
              */
             try {
-                $eventType = $this->getEventTypeMapper()->findOneByColumn('eventType', $externalEvent['type'])->getId();
+                $eventType = $this->eventTypeMapper->findOneByColumn('eventType', $externalEvent['type'])->getId();
                 $event->setType($eventType);
             } catch (MapperException $e) {
                 $event->setType($defaultEventType);
@@ -157,9 +158,9 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
             /* If you can't find this user by external id, assume unknown
              */
             try {
-                $owner = $this->getUserMapper()->findByExternalId($externalEvent['owner']);
+                $owner = $this->userMapper->findByExternalId($externalEvent['owner']);
             } catch (MapperException $e) {
-                $owner = $this->getUserMapper()->getUnknownUser();
+                $owner = $this->userMapper->getUnknownUser();
             }
 
             $event->setAuthorId($externalEvent['owner']);
@@ -169,7 +170,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
              */
             try {
                 /** @var EventType $eventTypeObject */
-                $eventTypeObject = $this->getEventTypeMapper()->findById($event->getType());
+                $eventTypeObject = $this->eventTypeMapper->findById($event->getType());
                 $event->setColour($eventTypeObject->getColor());
             } catch (MapperException $e) {
                 $event->setColour(null);
@@ -191,54 +192,5 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      */
     public function getEvent($eventId) {
         return '';
-    }
-
-
-    /**
-     * Helper method for loading this event type's calendar connector config.
-     * @return Calendar_Api_Config_Record|object
-     * @throws MapperException
-     * @throws MapperException\Deleted
-     */
-    public function loadConnectorConfiguration() {
-        return Calendar_Api_Config_Mapper::getInstance()->findById(
-            $this->getConnectorId()
-        );
-    }
-
-    /**
-     * @param  EventTypeMapper $eventTypeMapper
-     * @return $this
-     */
-    public function setEventTypeMapper($eventTypeMapper) {
-        $this->eventTypeMapper = $eventTypeMapper;
-        return $this;
-    }
-
-    /**
-     * @return EventTypeMapper
-     */
-    public function getEventTypeMapper() {
-        return $this->eventTypeMapper;
-    }
-
-
-    /**
-     * @return UserMapper
-     */
-    private function getUserMapper(): UserMapper
-    {
-        return $this->userMapper;
-    }
-
-
-    /**
-     * @param UserMapper $userMapper
-     * @return $this
-     */
-    private function setUserMapper(UserMapper $userMapper)
-    {
-        $this->userMapper = $userMapper;
-        return $this;
     }
 }

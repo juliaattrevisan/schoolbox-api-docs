@@ -7,9 +7,6 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Alaress\Authorizer\Rule;
-use Alaress\Authorizer\Failure;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ResourceBooking\Booking;
 use Calendar\Event\Collection;
 

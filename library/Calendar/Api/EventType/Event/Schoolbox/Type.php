@@ -1,4 +1,7 @@
 <?php
+
+use Schoolbox\User;
+
 /**
  * Calendar_Api_EventType_Event_Schoolbox_Personal
  *
@@ -13,11 +16,24 @@
 class Calendar_Api_EventType_Event_Schoolbox_Type extends Calendar_Api_EventType_Event_Schoolbox_Default {
 
     /**
-     * Event Type
+     * Event Type to fetch.
      *
-     * @var int
+     * @var null|int
      */
-    protected $eventTypeId;
+    private $eventTypeId;
+
+
+    /**
+     * @param int      $connectorId
+     * @param User     $user
+     * @param int|null $eventTypeId
+     */
+    public function __construct(int $connectorId, User $user, int $eventTypeId = null)
+    {
+        parent::__construct($connectorId, $user);
+        $this->eventTypeId = $eventTypeId;
+    }
+
 
     /**
      * Overridden to get personal events only.
@@ -35,25 +51,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Type extends Calendar_Api_EventType
             $this->getUser(),
             $startTimestamp,
             $endTimestamp,
-            array('type' => $this->getEventTypeId())
+            array('type' => $this->eventTypeId)
         );
     }
-
-    /**
-     * @param  int $eventTypeId
-     *
-     * @return $this
-     */
-    public function setEventTypeId($eventTypeId) {
-        $this->eventTypeId = $eventTypeId;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getEventTypeId() {
-        return $this->eventTypeId;
-    }
-
 }

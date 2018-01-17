@@ -4,6 +4,7 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Day\Event;
+use Schoolbox\User;
 
 
 /**
@@ -21,7 +22,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
     /**
      * @var External_TimetableInterface
      */
-    protected $externalTimetable;
+    private $externalTimetable;
 
     /**
      * A map of codes to resource IDs for the room to show events for.
@@ -31,18 +32,25 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
      *
      * @var array
      */
-    protected $roomCodes;
+    private $roomCodes;
+
 
     /**
      * Constructor
      *
-     * @param \Schoolbox\User $user
-     * @param array           $config
-     * @param array           $roomCodes
+     * @param int                         $connectorId
+     * @param User                        $user
+     * @param External_TimetableInterface $externalTimetable
+     * @param array                       $roomCodes // TODO what type of array? Calls to this constructor are utilising various hacks.
+     *                                               // TODO This should document how to not filter by room code at all.
+     *                                               // TODO For consistency with other connectors I suggest is should be:
+     *                                                        null  => no filter (ie all),
+     *                                                        []    => return nothing,
+     *                                                        [x,y] => filter to x and y
      */
-    public function __construct(\Schoolbox\User $user, $config, $roomCodes = [])
+    public function __construct(int $connectorId, User $user, External_TimetableInterface $externalTimetable, $roomCodes = [])
     {
-        parent::__construct($user);
+        parent::__construct($connectorId, $user);
         $this->externalTimetable = new External_Timetable();
         $this->roomCodes         = $roomCodes;
     }
@@ -102,7 +110,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
 
                 // Cache lookups for external timetable
                 if (!isset($dayNumberList[$currentTimestamp][$campusId])) {
-                    $dayNumberList[$currentTimestamp][$campusId] = $this->getExternalTimetable()->getDayNumber(
+                    $dayNumberList[$currentTimestamp][$campusId] = $this->externalTimetable->getDayNumber(
                         $campus,
                         $currentTimestamp
                     );
@@ -207,29 +215,4 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
         return $this;
     }
 
-    /**
-     * @return \External_TimetableInterface
-     */
-    public function getExternalTimetable()
-    {
-        return $this->externalTimetable;
-    }
-
-    /**
-     * @param  string $roomCodes
-     * @return $this
-     */
-    public function setRoomCodes($roomCodes)
-    {
-        $this->roomCodes = $roomCodes;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRoomCodes()
-    {
-        return $this->roomCodes;
-    }
 }

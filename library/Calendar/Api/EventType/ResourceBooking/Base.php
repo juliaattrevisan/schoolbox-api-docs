@@ -15,6 +15,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
 use Schoolbox\ResourceBooking\Booking\Status\Model as BookingStatus;
 use Schoolbox\ResourceBooking\Booking\Util\EventConverter;
+use Schoolbox\User;
 
 abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_EventType_Abstract
 {
@@ -43,13 +44,13 @@ abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_
     /**
      * Constructor
      *
-     * @param $user
-     * @param $config
+     * @param int  $connectorId
+     * @param User $user
      * @throws DomainException If resource booking module is disabled in config
      */
-    public function __construct($user, $config)
+    public function __construct(int $connectorId, User $user)
     {
-        parent::__construct($user);
+        parent::__construct($connectorId, $user);
         // Ensure ResourceBooking module is enabled
 
         $configMapper = ConfigMapper::getInstance();

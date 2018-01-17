@@ -9,36 +9,43 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Resource\Folder;
+use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\User;
 
 class Calendar_Api_EventType_Submission_Schoolbox_ForDueWork extends Calendar_Api_EventType_Submission_Schoolbox_Default
 {
     /**
      * @var Timetable_ColourManager
      */
-    private $colorManager;
+    private $colourManager;
 
     /**
      * {@inheritdoc}
      */
-    public function __construct(\Schoolbox\User $user, $config, AssessmentDataSource $assessmentDataSource)
-    {
-        parent::__construct($user, $config, $assessmentDataSource);
-        $this->colorManager = new Timetable_ColourManager(
-            Timetable_ColourMapper::getInstance()->findAll()
-        );
+    public function __construct(
+        int $connectorId,
+        User $user,
+        Assessment\MapperProxy $assessmentDataSource,
+        Participant\DataSource $participantDataSource,
+        Visibility             $visibility,
+        Timetable_ColourManager $colourManager
+    ) {
+        parent::__construct($connectorId, $user, $assessmentDataSource, $participantDataSource, $visibility);
+        $this->colourManager = $colourManager;
     }
 
     /**
      * Gets the display color for an event.
      *
-     * @param  Folder $folder
+     * @param  Folder\Model $folder
      * @param  string $eventType
      * @return string
      */
-    protected function getEventColor(Folder $folder, $eventType): string
+    protected function getEventColor(Folder\Model $folder, $eventType): string
     {
-        return $this->colorManager->getColour($folder->getId());
+        return $this->colourManager->getColour($folder->getId());
     }
 }

@@ -16,7 +16,7 @@ use Schoolbox\User;
 abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType_Interface
 {
     /**
-     * The calendar_connector id from which this event was retrieved.
+     * The calendar_connector.id from which this event was retrieved.
      * This is used to create a functioning event detail screen in Mobile.
      *
      * @var int
@@ -32,32 +32,25 @@ abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType
 
 
     /**
+     * @param int  $connectorId
      * @param User $user
      */
-    public function __construct(User $user)
+    public function __construct(int $connectorId, User $user)
     {
-        $this->user = $user;
+        $this->connectorId = $connectorId;
+        $this->user        = $user;
     }
 
     /* Getters/Setters
      */
 
-    /**
-     * Set calendar_connector id
-     *
-     * @param int $connectorId
-     */
-    public function setConnectorId($connectorId)
-    {
-        $this->connectorId = $connectorId;
-    }
 
     /**
      * Get calendar_connector id
      *
      * @return int
      */
-    public function getConnectorId()
+    protected function getConnectorId(): int
     {
         return $this->connectorId;
     }
@@ -79,10 +72,10 @@ abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function loadConnectorConfiguration()
+    protected function loadConnectorConfiguration()
     {
         return Calendar_Api_Config_Mapper::getInstance()->findById(
-            $this->getConnectorId()
+            $this->connectorId
         );
     }
 }

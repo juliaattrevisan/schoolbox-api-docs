@@ -14,18 +14,21 @@ use Calendar_Api_EventType_Interface;
 use External_TimetableInterface;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\User;
+use Calendar_Api_EventType_ResourceBooking_Booking_ForItem;
+use Calendar_Api_EventType_Timetable_Room;
+use Calendar_Api_Config_Mapper;
 
 class CalendarApiFactory
 {
     /**
      * @var User
      */
-    protected $user;
+    private $user;
 
     /**
      * @var External_TimetableInterface
      */
-    protected $timetable;
+    private $timetable;
 
     /**
      * Constructor
@@ -35,10 +38,8 @@ class CalendarApiFactory
      */
     public function __construct(User $user, External_TimetableInterface $timetable)
     {
-        $this
-            ->setUser($user)
-            ->setTimetable($timetable)
-        ;
+        $this->user      = $user;
+        $this->timetable = $timetable;
     }
 
     /**
@@ -50,23 +51,26 @@ class CalendarApiFactory
     public function build(Item\Model $resource)
     {
         $api = new Calendar_Api_Composite();
+        $calendarConfigMapper = Calendar_Api_Config_Mapper::getInstance();
 
         // Add the resource API
-        $resourceApi = new \Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
-            $this->getUser(),
-            array()
+        $config = $calendarConfigMapper->findOneForClass(Calendar_Api_EventType_ResourceBooking_Booking_ForItem::class);
+        $resourceApi = new Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
+            $config->getId(),
+            $this->user,
+            $resource->getId()
         );
-        $resourceApi->setResourceId($resource->getId());
         $api->add($resourceApi);
 
         // Add the room code API if this resource has got a room code
         if ($roomCode = $resource->getRoomCode()) {
-            $timetableApi = new \Calendar_Api_EventType_Timetable_Room(
-                $this->getUser(),
-                array(),
+            $config = $calendarConfigMapper->findOneForClass(Calendar_Api_EventType_Timetable_Room::class);
+            $timetableApi = new Calendar_Api_EventType_Timetable_Room(
+                $config->getId(),
+                $this->user,
+                $this->timetable,
                 [$roomCode => $resource->getId()]
             );
-            $timetableApi->setExternalTimetable($this->getTimetable());
             $api->add($timetableApi);
         }
         return $api;
@@ -95,61 +99,29 @@ class CalendarApiFactory
             }
         }
 
+        $calendarConfigMapper = Calendar_Api_Config_Mapper::getInstance();
+
         // Get the list of resource IDs and room codes
         $api = new Calendar_Api_Composite();
         if (!empty($resourceIds)) {
+            $config = $calendarConfigMapper->findOneForClass(Calendar_Api_EventType_ResourceBooking_Booking_ForItem::class);
             $resourceApi = new \Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
-                $this->getUser(),
-                array()
+                $config->getId(),
+                $this->user,
+                $resourceIds
             );
-            $resourceApi->setResourceId($resourceIds);
             $api->add($resourceApi);
         }
         if ($getTimetabledRooms && !empty($roomCodes)) {
-            $timetableApi = new \Calendar_Api_EventType_Timetable_Room(
-                $this->getUser(),
-                array(),
+            $config = $calendarConfigMapper->findOneForClass(Calendar_Api_EventType_Timetable_Room::class);
+            $timetableApi = new Calendar_Api_EventType_Timetable_Room(
+                $config->getId(),
+                $this->user,
+                $this->timetable,
                 $roomCodes
             );
-            $timetableApi->setExternalTimetable($this->getTimetable());
             $api->add($timetableApi);
         }
         return $api;
-    }
-
-    /**
-     * @return User
-     */
-    protected function getUser()
-    {
-        return $this->user;
-    }
-
-    /**
-     * @param  User $user
-     * @return $this
-     */
-    protected function setUser($user)
-    {
-        $this->user = $user;
-        return $this;
-    }
-
-    /**
-     * @return External_TimetableInterface
-     */
-    protected function getTimetable()
-    {
-        return $this->timetable;
-    }
-
-    /**
-     * @param  External_TimetableInterface $timetable
-     * @return $this
-     */
-    protected function setTimetable($timetable)
-    {
-        $this->timetable = $timetable;
-        return $this;
     }
 }
