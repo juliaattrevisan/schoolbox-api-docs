@@ -97,7 +97,8 @@ class Controller extends Component_Dashboard_ControllerAbstract
     public function renderTemplate($templateHandle)
     {
         $newsByTopic = [];                     // Holds news items grouped by topic
-        $newsAll = new Collection();                  // Holds all news item grouped by date
+        $newsAll = new Collection();           // Holds all news item grouped by date
+        $added = [];
 
         /* Preprocess all the items we found in the db
          */
@@ -105,6 +106,12 @@ class Controller extends Component_Dashboard_ControllerAbstract
             foreach ($topicItems as $itemCurrent) {
                 $scrubbedHtml = Scrub::html($itemCurrent['item_body']);
                 $strippedContent = strip_tags($scrubbedHtml, '<img><video>');
+
+                if (in_array($itemCurrent['item_id'], $added)) {
+                    continue;
+                } else {
+                    $added[] = $itemCurrent['item_id'];
+                }
 
                 $item = [
                     'id' => $itemCurrent['item_id'],
