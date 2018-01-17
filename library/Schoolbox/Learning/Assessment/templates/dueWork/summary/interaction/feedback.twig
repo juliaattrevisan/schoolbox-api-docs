@@ -27,7 +27,7 @@
 {% endif %}
 
 <ul class="information-list reply">
-    <li class="actions-small-1">
+    <li class="actions-small-2">
         <div class="list-item flex-grade">
             <div class="card small-12">
                 {% if url %}
@@ -69,11 +69,15 @@
                 feedback: currentFeedback,
             }
         ) %}
-        {% if deleteRoute %}
         <nav>
-            <a class="icon-delete" data-delete="{{ deleteRoute }}"></a>
+            <a href="#" class="icon-down-arrow" data-collapser="feedback-{{ responseId }}-{{ currentFeedback.id }}"></a>
+            {% if deleteRoute %}
+                <a class="icon-delete" data-delete="{{ deleteRoute }}"></a>
+            {% endif %}
         </nav>
-        {% endif %}
+
+        {# collapser goes here #}
+        <div class="hide" data-collapse-state="collapsed" data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}">
 
         {% if currentFeedback.comment|length %}
             <article>
@@ -132,5 +136,6 @@
                 {% endfor %}
             </ul>
         {% endif %}
+        </div>
     </li>
 </ul>
