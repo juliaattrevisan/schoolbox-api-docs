@@ -5,6 +5,8 @@
 
         var $history = $('#history');
 
+        $history.find('[data-collapser]').collapsable();
+
         $history.on('click', '[data-delete]', function (e) {
             e.preventDefault();
             var $a = $(this);
