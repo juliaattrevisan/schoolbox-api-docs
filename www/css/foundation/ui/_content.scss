@@ -1445,7 +1445,7 @@ $progress-tick-size-tiny:    rem-calc($base-font-size * 0.75);
         visibility: hidden;
     }
 
-    &:hover {
+    &:not(.readonly):hover {
         &:before {
             visibility: visible;
         }
