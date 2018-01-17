@@ -1,6 +1,6 @@
 <?php
 /**
- * SelfReflection
+ * SelfReflection\Rubric
  *
  * Generates rubric data to display in getParticularResponse()
  *
@@ -80,6 +80,8 @@ class Rubric
 
     /**
      * Generate array pieces for the latest self-reflected feedback and response combination
+     *
+     * @return array
      */
     public function generate()
     {
