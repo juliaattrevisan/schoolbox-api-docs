@@ -47,13 +47,15 @@ $(function () {
                                 element: step.selector,
                                 tooltipClass: step.css_class,
                                 uuid: step.uuid,
-                                jsEvents: step.events
+                                jsEvents: step.events,
+                                type: 'tooltip'
                             });
                         } else if (step.type === 'modal') {
                             stepsToDisplay.push({
                                 intro: step.body,
-                                element: step.selector,
-                                uuid: step.uuid
+                                tooltipClass: step.css_class,
+                                uuid: step.uuid,
+                                type: 'modal'
                             });
                         }
                     });
@@ -69,7 +71,15 @@ $(function () {
                         scrollTo: 'tooltip',
                         disableInteraction: false,
                         exitOnOverlayClick: false,
-                        steps: stepsToDisplay.filter(function(obj) { return $(obj.element).length; }) // Filter out elements that don't exist in the DOM
+                        steps: stepsToDisplay.filter(function(obj) {
+                            if (obj.type == 'tooltip') {
+                                return $(obj.element).length; // Filter out elements that don't exist in the DOM
+                            } else if (obj.type == 'modal') {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        })
                     });
 
 
