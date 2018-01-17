@@ -60,7 +60,12 @@
                 {% if currentInteraction is response %}
                     {% include '@learningAssessment/dueWork/summary/interaction/response.twig' with {currentInteraction: currentInteraction, participant: participant} %}
                 {% elseif currentInteraction is feedback %}
-                    {% include '@learningAssessment/dueWork/summary/interaction/feedback.twig' with {currentFeedback: currentInteraction, participant: participant} %}
+                    {% include '@learningAssessment/dueWork/summary/interaction/feedback.twig' with {
+                        currentFeedback: currentInteraction,
+                        participant: participant,
+                        hasCollapser: true,
+                        collapsed: true,
+                    } %}
                 {% endif %}
             {% endfor %}
 

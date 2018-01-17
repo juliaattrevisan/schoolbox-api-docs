@@ -91,7 +91,9 @@
                         assessment: currentInteraction.assessable,
                         assessmentId: currentInteraction.assessable.id,
                         responseId: currentInteraction.id,
-                        participant: participant
+                        participant: participant,
+                        hasCollapser: true,
+                        collapsed: true,
                     } only %}
                 {% endfor %}
 
