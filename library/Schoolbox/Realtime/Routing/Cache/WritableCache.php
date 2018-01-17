@@ -22,6 +22,12 @@ interface WritableCache
 
     /**
      * @param string $instanceId
+     * @return void
+     */
+    public function flushCacheUsersQueue($instanceId);
+
+    /**
+     * @param string $instanceId
      * @throws UnderflowException
      * @return void
      */

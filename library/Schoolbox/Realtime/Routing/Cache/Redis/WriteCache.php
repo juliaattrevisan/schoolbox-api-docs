@@ -57,6 +57,19 @@ class WriteCache extends ReadCache implements WritableCache
 
 
     /**
+     * @param string $instanceId
+     * @return void
+     */
+    public function flushCacheUsersQueue($instanceId)
+    {
+        $this->buildSynchroniser()->flush(
+             $this->buildSynchroniserCallback($this->getCacheKey($instanceId)),
+             $this->buildSynchroniserDoneCallback($instanceId)
+         );
+    }
+
+
+    /**
      * @inheritdoc
      * @throws UnderflowException
      */
