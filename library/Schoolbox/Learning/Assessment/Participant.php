@@ -319,7 +319,9 @@ class Participant
     {
         if ($this->allFeedbacks->count()) {
             return $this->allFeedbacks
-                ->filterBy('response', $response->getId())
+                ->filter(function (IFeedback $feedback) use ($response) {
+                    return $feedback->getResponse()->getId() === $response->getId();
+                })
                 ->filterBy('publishedAt', true)
                 ->filterBy('reviewer', $this->getUser())
                 ->sortBy('publishedAt', 'desc')
