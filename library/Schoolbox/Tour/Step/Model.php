@@ -15,7 +15,7 @@ use Schoolbox\Mapper\Traits\Model\Uuid;
 use Schoolbox\Tour\Model as Tour;
 use Schoolbox\User;
 
-class Model implements ISoftDeletable
+class Model implements ISoftDeletable, \JsonSerializable
 {
     use Uuid;
     use CreatedAtDate;
@@ -135,7 +135,11 @@ class Model implements ISoftDeletable
     {
         $json = $this->getType()->jsonSerialize();
         $json['uuid'] = $this->getUuid();
-        $json['next_step_uuid'] = $this->getTourStep();
+        if ($this->getTourStep()) {
+            $json['next_step_uuid'] = $this->getTourStep()->getUuid();
+        } else {
+            $json['next_step_uuid'] = null;
+        }
 
         return $json;
     }

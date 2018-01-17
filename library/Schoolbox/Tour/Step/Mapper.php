@@ -8,6 +8,7 @@
 namespace Schoolbox\Tour\Step;
 
 use PDOStatement;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Tour\Mapper as TourMapper;
