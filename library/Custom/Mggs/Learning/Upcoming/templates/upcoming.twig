@@ -118,23 +118,6 @@
                     this.dom.find('[data-event-modal-field="bounds.due"]').text(due.format(format));
                     this.dom.find('[data-datepicker]').attr('data-datepicker-range', open.format('YYYY-MM-DD') + ',' + due.format('YYYY-MM-DD'))
 
-                    // also re-init if we can
-                    for (var index in window.pickerInstance) {
-                        if (window.pickerInstance[index]) {
-                            // reset
-                            // window.pickerInstance[index].set('enable', null);
-
-                            // reconfigure
-                            window.pickerInstance[index].set('enable', [
-                                {
-                                    from: open.format('YYYY-MM-DD'),
-                                    to: due.format('YYYY-MM-DD')
-                                }
-                            ]);
-                            console.log(window.pickerInstance[index]);
-                        }
-                    }
-
                     $modalForm.data('eventData', eventData);
                 }
             },
@@ -319,6 +302,7 @@
                 viewRender: function (view, $element) {
                     // time to re-render
                     collapsed = false;
+                    realEventList = {};
                 },
 
                 /**
@@ -712,6 +696,13 @@
                 console.log('popover hide listener detached');
             }
         }
+
+        $(document).on('open.fndtn.reveal', '#adtp-modal-1', function () {
+            var eData = $modalForm.data('eventData');
+            window.pickerInstance[1].set('minDate', eData.bounds.open);
+            window.pickerInstance[1].set('maxDate', eData.bounds.due);
+        });
+
     })
 </script>
 <!-- END custom_head -->
