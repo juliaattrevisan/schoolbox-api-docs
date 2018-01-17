@@ -70,14 +70,18 @@
             }
         ) %}
         <nav>
-            <a href="#" class="icon-down-arrow" data-collapser="feedback-{{ responseId }}-{{ currentFeedback.id }}"></a>
+            {% if hasCollapser %}
+                <a href="#" class="icon-down-arrow" data-collapser="feedback-{{ responseId }}-{{ currentFeedback.id }}"></a>
+            {% endif %}
             {% if deleteRoute %}
                 <a class="icon-delete" data-delete="{{ deleteRoute }}"></a>
             {% endif %}
         </nav>
 
         {# collapser goes here #}
-        <div class="hide" data-collapse-state="collapsed" data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}">
+        <div class="{{ collapsed? 'hide' : '' }}"
+             data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
+             data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}">
 
         {% if currentFeedback.comment|length %}
             <article>
