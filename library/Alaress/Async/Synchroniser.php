@@ -51,6 +51,11 @@ class Synchroniser
         }
 
         // lock obtained - you are the worker: sozlol, you do everyone's work
+        $this->flush($callback, $done);
+    }
+
+    public function flush(callable $callback, callable $done)
+    {
         while ($data = $this->redis->rpop($this->key)) {
             $callback($data);
         }
