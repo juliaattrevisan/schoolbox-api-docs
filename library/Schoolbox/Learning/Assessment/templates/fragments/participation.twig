@@ -76,7 +76,7 @@
 
                 <li data-participant="{{ user.id }}">
                     <input type="hidden" name="participant-include[{{ user.id }}]" id="participant-include-{{ user.id }}" value="{{ userInclude ? 1 : 0 }}">
-                    <input type="hidden" name="participant-plan[{{ user.id }}]" id="participant-plan-{{ user.id }}" value="{{ participant.plan.id ?: 0 }}">
+                    <input type="hidden" name="participant-plan[{{ user.id }}]" id="participant-plan-{{ user.id }}" value="{{ (participant.plan.id and not participant.plan.isDynamic) ? participant.plan.id : 0 }}">
                     <div data-participant-row>
                         <div class="selector" data-participant-selector>
                             <input
