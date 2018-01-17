@@ -68,8 +68,7 @@ class Rubric
         ?IResponse $response,
         bool $isInteractionLocked,
         RubricContext $rubricContext
-    )
-    {
+    ) {
         $this->assessment = $assessment;
         $this->participant = $participant;
         $this->currentUser = $currentUser;

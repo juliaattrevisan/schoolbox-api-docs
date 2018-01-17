@@ -12,7 +12,6 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\User;
 
-
 class GridGenerator
 {
     /**
