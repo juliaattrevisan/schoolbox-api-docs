@@ -107,57 +107,57 @@ $(function () {
                         }
                     });
 
-                    // tourCurrent.onchange(function(targetElement) {
-                    //     var newStep     = tourCurrent._introItems[tourCurrent._currentStep].uuid;
-                    //
-                    //     //This matches the consts on the Status/Model - to be updated when this file is a plugin
-                    //     var status      = "unactioned";
-                    //
-                    //     //Save the status
-                    //     $.post(saveRoute, {
-                    //         url: tourUrl,
-                    //         oldStep: oldStep,
-                    //         newStep: newStep,
-                    //         status: status
-                    //     });
-                    //
-                    //     oldStep         = newStep;
-                    // });
-                    //
-                    // tourCurrent.oncomplete(function(targetElement) {
-                    //     completed = true;
-                    //
-                    //     var newStep     = tourCurrent._introItems[tourCurrent._currentStep].uuid;
-                    //
-                    //     //This matches the consts on the Status/Model - to be updated when this file is a plugin
-                    //     var status      = "completed";
-                    //
-                    //     //Save the status
-                    //     $.post(saveRoute, {
-                    //         url: tourUrl,
-                    //         oldStep: oldStep,
-                    //         newStep: newStep,
-                    //         status: status
-                    //     });
-                    // });
-                    //
-                    // tourCurrent.onexit(function(targetElement) {
-                    //     //onexit triggers when oncomplete triggers, so need check
-                    //     if(!completed) {
-                    //         var newStep = tourCurrent._introItems[tourCurrent._currentStep].uuid;
-                    //
-                    //         //This matches the consts on the Status/Model - to be updated when this file is a plugin
-                    //         var status = "dismissed";
-                    //
-                    //         //Save the status
-                    //         $.post(saveRoute, {
-                    //             url: tourUrl,
-                    //             oldStep: oldStep,
-                    //             newStep: newStep,
-                    //             status: status
-                    //         });
-                    //     }
-                    // });
+                    tourCurrent.onchange(function(targetElement) {
+                        var newStep     = tourCurrent._introItems[tourCurrent._currentStep].uuid;
+
+                        //This matches the consts on the Status/Model - to be updated when this file is a plugin
+                        var status      = "unactioned";
+
+                        //Save the status
+                        $.post(saveRoute, {
+                            url: tourUrl,
+                            oldStep: oldStep,
+                            newStep: newStep,
+                            status: status
+                        });
+
+                        oldStep         = newStep;
+                    });
+
+                    tourCurrent.oncomplete(function(targetElement) {
+                        completed = true;
+
+                        var newStep     = tourCurrent._introItems[tourCurrent._currentStep].uuid;
+
+                        //This matches the consts on the Status/Model - to be updated when this file is a plugin
+                        var status      = "completed";
+
+                        //Save the status
+                        $.post(saveRoute, {
+                            url: tourUrl,
+                            oldStep: oldStep,
+                            newStep: newStep,
+                            status: status
+                        });
+                    });
+
+                    tourCurrent.onexit(function(targetElement) {
+                        //onexit triggers when oncomplete triggers, so need check
+                        if(!completed) {
+                            var newStep = tourCurrent._introItems[tourCurrent._currentStep].uuid;
+
+                            //This matches the consts on the Status/Model - to be updated when this file is a plugin
+                            var status = "dismissed";
+
+                            //Save the status
+                            $.post(saveRoute, {
+                                url: tourUrl,
+                                oldStep: oldStep,
+                                newStep: newStep,
+                                status: status
+                            });
+                        }
+                    });
 
                         // If the current step has custom JS events attached to open of this step - trigger those events now
                         if (stepCurrent.jsEvents !== null) {
