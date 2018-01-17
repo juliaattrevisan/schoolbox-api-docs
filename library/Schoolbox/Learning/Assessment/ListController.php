@@ -30,6 +30,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Traversable;
 use UnexpectedValueException;
+use Alaress_Date_Format;
 
 
 class ListController extends Web\Controller\Base
@@ -457,16 +458,20 @@ class ListController extends Web\Controller\Base
 
         // obtain this reference for later
         $dynaPlan = $plans->first();
-
         // within $postPlans, any positive index is the ID of an existing plan; any negative index is a new plan
         foreach ($postPlans as $planId => $planData) {
             // if planId == 0, it's either the dyna-plan or invalid data, but ignorable either way
 
             if ($planId > 0) {
-                // existing plan
-                // TODO SA-5670 (allow teachers to modify plans post-creation)
-                // for now: just add the plan to the list, ignoring any changes
-                $plans[$planId] = $existingPlans[$planId];
+                // existing plan updates
+                $plans[$planId] = $planMap
+                    ->createModel($planId)
+                    ->setName($planData['name'])
+                    ->setDescription($planData['description'])
+                    ->setPublishDate(Alaress_Date_Format::newLocal($planData['publish_date']))
+                    ->setOpenDate(Alaress_Date_Format::newLocal($planData['open_date']))
+                    ->setDueDate(Alaress_Date_Format::newLocal($planData['due_date']))
+                    ->setCloseDate(Alaress_Date_Format::newLocal($planData['close_date']));
 
             } elseif ($planId < 0) {
                 // new plan

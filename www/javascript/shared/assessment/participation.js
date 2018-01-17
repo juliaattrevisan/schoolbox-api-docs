@@ -471,10 +471,7 @@
      */
     function updatePlanData(planDetails) {
 
-        // Save the plan in hidden inputs
-        var $hiddenInputs;
         var planId = planDetails['id'];
-
         var $hiddenInputs = getPlanDataFields(planId);
 
         // Update hidden fields with new values
