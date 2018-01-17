@@ -290,8 +290,8 @@ INSERT INTO     `tour_step_event`
 )
 SELECT          UUID(),
                 @step2Uuid,
-                '.profile-drop',
-                'click',
+                '.account-menu',
+                'accordion.open',
                 (SELECT `id` FROM `user` WHERE `username` = 'alaress' LIMIT 1),
                 '1980-04-07 00:00:00',
                 '1980-04-07 00:00:00',

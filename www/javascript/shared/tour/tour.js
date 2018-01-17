@@ -1,4 +1,16 @@
+"use strict";
 $(function () {
+
+    /**
+     * Custom events that can be inserted into the `tour_step_event` and triggered on step start or finish
+     *
+     */
+    var tourActions = {
+        // Open an accordion
+        'accordion.open': function (element) {
+            $(element).foundation('accordion', 'open');
+        }
+    };
 
     if (typeof(window.tourUrl) !== 'undefined') {
         $.get(window.tourUrl).done(function (tours) {
@@ -62,7 +74,12 @@ $(function () {
 
                         // If the step has a custom JS event attached - trigger that event now
                         if (stepCurrent.jsEvent !== null && stepCurrent.jsEventSelector !== null) {
-                            $(stepCurrent.jsEventSelector).trigger(stepCurrent.jsEvent);
+                            // Check for a function listed above, if one found - run it
+                            if (tourActions[stepCurrent.jsEvent] !== undefined) {
+                                tourActions[stepCurrent.jsEvent].call(this, stepCurrent.jsEventSelector);
+                            } else { // Otherwise try for a generic trigger on the element
+                                $(stepCurrent.jsEventSelector).trigger(stepCurrent.jsEvent);
+                            }
                         }
 
                         // Update the status in the DB
