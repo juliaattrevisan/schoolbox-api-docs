@@ -91,6 +91,11 @@ if ($actualPermission > READ_ACCESS && $_GET['readonly']) {
 // setup the homepage handler
 $homepageHandler = new Homepage($folder->getId());
 
+// this category doesn't have a template, therefore doesn't have a homepage: redirect to resource browser.
+if (!$homepageHandler->getTemplate()) {
+    $this->localRedir('/resources/'.$folder->getId());
+}
+
 // Color mangling
 $colorFactory = new \Alaress\Color\ColorFactory();
 
@@ -112,10 +117,6 @@ foreach ($homepageHandler->getColorList() as $key => $color) {
     }
 }
 
-// this category doesn't have a template, therefore doesn't have a homepage: redirect to resource browser.
-if (!$homepageHandler->getTemplate()) {
-    $this->localRedir('/resources/'.$folder->getId());
-}
 
 // moving forward! log the pageview
 $mapper = new Schoolbox\Resource\Folder\Log\Mapper();
