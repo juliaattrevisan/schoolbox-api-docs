@@ -36,7 +36,17 @@
 
                 {% if descriptor %}
 
+                    {# Self-Assessment #}
+                    {% set learnerSelected = learnerRubric.descriptors[crit.id][levelIndex]['selected'] %}
+
                     <td {% if descriptor.selected  and markVisibility %}class="rb-selected"{% endif %}>
+
+                        {# Self-Assessment #}
+                        {# TODO: Use stuart's styles #}
+                        {% if learnerSelected %}
+                            <span style='color:#f00'>SELF_REFLECTED_CHOICE</span>
+                        {% endif %}
+
                         <p>
                             {{- descriptor.text|nl2br -}}
                         </p>
@@ -61,7 +71,14 @@
         {% if group.total %}
         <tr>
             {% if group.humanReadableMark %}
-            <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">{{ group.humanReadableMark }}</th>
+            <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">
+                {{ group.humanReadableMark }}
+
+                {# Self-Assessment #}
+                {% if learnerRubric %}
+                    ({{ learnerRubric.groups[groupIndex].humanReadableMark }} given in {{ locale.selfAssessment.singularForm }})
+                {% endif %}
+            </th>
             {% endif %}
         </tr>
         {% endif %}
@@ -72,7 +89,14 @@
     {% if rubric.total %}
     <tr>
         {% if rubric.humanReadableMark %}
-        <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}" >{{ rubric.humanReadableMark }}</th>
+        <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}" >
+            {{ rubric.humanReadableMark }}
+
+            {# Self-Assessment #}
+            {% if learnerRubric %}
+                ({{ learnerRubric.humanReadableMark }} given in {{ locale.selfAssessment.singularForm }})
+            {% endif %}
+        </th>
         {% endif %}
     </tr>
     {% endif %}
