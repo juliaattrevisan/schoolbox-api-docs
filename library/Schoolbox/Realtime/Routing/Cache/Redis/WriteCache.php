@@ -45,25 +45,24 @@ class WriteCache extends ReadCache implements WritableCache
      */
     public function cacheUsers($instanceId, array $userIds)
     {
-        try {
-            $routeStorageKey = $this->getCacheKey($instanceId);
+        $routeStorageKey = $this->getCacheKey($instanceId);
 
-            // ensure this block of code is only ever executed by exactly one process at a time
-            (new Synchroniser($this, $this->redis))->synchronise(
-                $userIds,
-                function ($userId) use ($routeStorageKey) {
-                    // this closure will be called multiple times consecutively if there are concurrent requests
+        // ensure this block of code is only ever executed by exactly one process at a time
+        (new Synchroniser($this, $this->redis))->synchronise(
+            $userIds,
+            function ($userId) use ($routeStorageKey) {
+                // this closure will be called multiple times consecutively if there are concurrent requests
+                try {
                     $router = $this->bindIndividual($userId, $routeStorageKey);
                     $this->writeCache($router, $routeStorageKey);
-                },
-                function() use ($instanceId) {
-                    $this->broadcastReload($instanceId);
-                });
-
-        } catch (UnderflowException $e) {
-            $this->log->notice($e->getMessage());
-        }
-
+                } catch (UnderflowException $e) {
+                    // this is fine; continue with rest
+                    $this->log->notice($e->getMessage());
+                }
+            },
+            function() use ($instanceId) {
+                $this->broadcastReload($instanceId);
+            });
     }
 
 
