@@ -33,6 +33,21 @@
             <div class="small-12 medium-3 medium-offset-9 column" id="mass-buttons">
                 <button
                     class="button expand dropdown"
+                    id="plan-dropdown"
+                    data-dropdown="plan-options"
+                    aria-controls="plan-options"
+                    aria-expanded="false"
+                >
+                    Modify Plans
+                </button>
+                <ul class="f-dropdown" id="plan-options" data-dropdown-content aria-hidden="true">
+                    {% for plan in assessment.plans if not plan.isDynamic %}
+                        <li><a href="#" data-plan-modify="{{ plan.id }}" data-plan-name="{{ plan.name }}">{{ plan.name }}</a></li>
+                    {% endfor %}
+                </ul>
+
+                <button
+                    class="button expand dropdown"
                     id="customise-dropdown"
                     data-dropdown="customise-options"
                     aria-controls="customise-options"

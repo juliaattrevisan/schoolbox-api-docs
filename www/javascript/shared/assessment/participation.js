@@ -141,6 +141,83 @@
             });
         });
 
+        /**
+         * Opening the learning plan modal
+         */
+        $participantSettings.on('click', '[data-plan-modify]', function(event) {
+            event.preventDefault();
+
+            var planId = $(this).attr('data-plan-modify');
+
+            var planData = getPlanData(planId);
+            var $planParticipants = $('#plan-participants');
+            var $planId = $customiseModal.find('#plan-id');
+            var $planName = $customiseModal.find('#plan-name');
+            var $planDesc = $customiseModal.find('#plan-desc');
+            var $planPublishDate = $customiseModal.find('#plan-publish-date');
+            var $planOpenDate = $customiseModal.find('#plan-open-date');
+            var $planDueDate = $customiseModal.find('#plan-due-date');
+            var $planCloseDate = $customiseModal.find('#plan-close-date');
+
+            // Init Selectize
+            $planParticipants.selectizeSelector({
+                multiple: true,
+                ajax: {
+                    url:      '/ajax/user.php',
+                    type:     'GET',
+                    data:     {groupID: 0},
+                    dataType: 'json'
+                }
+            });
+            var participantSelectize = $planParticipants[0].selectize;
+
+            // Destroy and reinit CKEditor
+            reinitCKE();
+
+            // Disable dates if assessment doesn't accept online submissions
+            if (!$('#acceptOnline').length || $('#acceptOnline').val() === '0') {
+                $('#plan-open-date').closest('[data-plan-date-container]').addClass('hide');
+                $('#plan-close-date').closest('[data-plan-date-container]').addClass('hide');
+            } else {
+                $('#plan-open-date').closest('[data-plan-date-container]').removeClass('hide');
+                $('#plan-close-date').closest('[data-plan-date-container]').removeClass('hide');
+            }
+
+            // Fill the selectize with the checked students
+            participantSelectize.clear();
+            $participants.find('input[value = ' + planId + ']').each(function() {
+                var participantId = $(this).parent().attr('data-participant');
+                var participantName = $('#participant-' + participantId).attr('data-user-name');
+                participantSelectize.addOption({
+                    'id': participantId,
+                    'name': participantName
+                });
+                participantSelectize.addItem(participantId);
+
+            });
+
+            // Clear any validation errors
+            $('#plan-name-error').hide();
+            $('#plan-publish-date-error').hide();
+            $('#plan-open-date-error').hide();
+            $('#plan-due-date-error').hide();
+            $('#plan-close-date-error').hide();
+
+            // Set dates & description to whatever is currently set on the main form
+            $planId.val(planData['id']);
+            $planName.val(planData['name']);
+            $planPublishDate.val(planData['publishDate']);
+            $planOpenDate.val(planData['openDate']);
+            $planDueDate.val(planData['dueDate']);
+            $planCloseDate.val(planData['closeDate']);
+            CKEDITOR.instances['plan-desc'].setData(planData['description']);
+
+            // Open modal
+            $customiseModal.foundation('reveal', 'open', {
+                clearData: true
+            });
+        });
+
 
         /**
          * On open of the custom plan modal - destroy and re-init CKEditor
@@ -220,63 +297,31 @@
 
             // On valid - save the plan details in hidden inputs and apply to selected students
             submitHandler: function() {
+
                 // increment the number of "new plans" in play
                 self.newPlanCount++;
-
                 var $customiseModal = $('#participant-customise-modal');
+                var oldPlanId = $customiseModal.find('#plan-id').val();
                 var newPlanId = -1 * self.newPlanCount;
-                var planName = $customiseModal.find('#plan-name').val();
-                var planDesc = CKEDITOR.instances['plan-desc'].getData();
-                var publishDate = $customiseModal.find('#plan-publish-date').val();
-                var openDate = $customiseModal.find('#plan-open-date').val();
-                var dueDate = $customiseModal.find('#plan-due-date').val();
-                var closeDate = $customiseModal.find('#plan-close-date').val();
 
-                // Save the plan in hidden inputs
-                var $hiddenInputs;
+                var planDetails = {
+                    'id' : oldPlanId > 0 ? oldPlanId : newPlanId,
+                    'name' : $customiseModal.find('#plan-name').val(),
+                    'description' : CKEDITOR.instances['plan-desc'].getData(),
+                    'publishDate' : $customiseModal.find('#plan-publish-date').val(),
+                    'openDate' : $customiseModal.find('#plan-open-date').val(),
+                    'dueDate' : $customiseModal.find('#plan-due-date').val(),
+                    'closeDate' : $customiseModal.find('#plan-close-date').val()
+                };
 
-                $hiddenInputs = $(document.createElement('input')).attr('type', 'hidden').attr('name', 'plans[' + newPlanId + '][id]').val('');
-
-                $hiddenInputs = $hiddenInputs.add($(document.createElement('input'))
-                    .attr('type', 'hidden')
-                    .attr('name', 'plans[' + newPlanId + '][name]')
-                    .attr('data-saved-plan', 1)
-                    .val(planName));
-
-                $hiddenInputs = $hiddenInputs.add($(document.createElement('input'))
-                    .attr('type', 'hidden')
-                    .attr('name', 'plans[' + newPlanId + '][description]')
-                    .val(planDesc));
-
-                $hiddenInputs = $hiddenInputs.add($(document.createElement('input'))
-                    .attr('type', 'hidden')
-                    .attr('name', 'plans[' + newPlanId + '][publish_date]')
-                    .val(publishDate));
-
-                $hiddenInputs = $hiddenInputs.add($(document.createElement('input'))
-                    .attr('type', 'hidden')
-                    .attr('name', 'plans[' + newPlanId + '][open_date]')
-                    .val(openDate));
-
-                $hiddenInputs = $hiddenInputs.add($(document.createElement('input'))
-                    .attr('type', 'hidden')
-                    .attr('name', 'plans[' + newPlanId + '][due_date]')
-                    .val(dueDate));
-
-                $hiddenInputs = $hiddenInputs.add($(document.createElement('input'))
-                    .attr('type', 'hidden')
-                    .attr('name', 'plans[' + newPlanId + '][close_date]')
-                    .val(closeDate));
-
-                // Append hidden inputs to the fieldset
-                $planDataContainer.append($hiddenInputs);
+                oldPlanId > 0 ? updatePlanData(planDetails) : addPlanData(planDetails);
 
                 // Add plan to drop down
                 var $planLink = $(document.createElement('a'))
                     .attr('href', '#')
-                    .attr('data-plan-use', newPlanId)
-                    .attr('data-plan-name', planName)
-                    .text(planName);
+                    .attr('data-plan-use', planDetails['id'])
+                    .attr('data-plan-name', planDetails['name'])
+                    .text(planDetails['name']);
 
                 var $planListItem = $(document.createElement('li')).append($planLink);
 
@@ -285,7 +330,7 @@
                     .before($planListItem);
 
                 // Update the selected students with the plan
-                updatePlan($('#plan-participants')[0].selectize.getValue().split(','), newPlanId, planName);
+                updatePlan($('#plan-participants')[0].selectize.getValue().split(','), planDetails['id'], planDetails['name']);
 
                 // Close the modal
                 $customiseModal.foundation('reveal', 'close');
@@ -374,6 +419,99 @@
         });
     }
 
+    /**
+     * Add new plan data to hidden inputs
+     */
+    function addPlanData(planDetails) {
+
+        // Save the plan in hidden inputs
+        var $hiddenInputs;
+        var planId = planDetails['id'];
+
+        $hiddenInputs = $(document.createElement('input')).attr('type', 'hidden').attr('name', 'plans[' + planId + '][id]').val('');
+
+        $hiddenInputs = $hiddenInputs.add($(document.createElement('input'))
+            .attr('type', 'hidden')
+            .attr('name', 'plans[' + planId + '][name]')
+            .attr('data-saved-plan', 1)
+            .val(planDetails['name']));
+
+        $hiddenInputs = $hiddenInputs.add($(document.createElement('input'))
+            .attr('type', 'hidden')
+            .attr('name', 'plans[' + planId + '][description]')
+            .val(planDetails['description']));
+
+        $hiddenInputs = $hiddenInputs.add($(document.createElement('input'))
+            .attr('type', 'hidden')
+            .attr('name', 'plans[' + planId + '][publish_date]')
+            .val(planDetails['publishDate']));
+
+        $hiddenInputs = $hiddenInputs.add($(document.createElement('input'))
+            .attr('type', 'hidden')
+            .attr('name', 'plans[' + planId + '][open_date]')
+            .val(planDetails['openDate']));
+
+        $hiddenInputs = $hiddenInputs.add($(document.createElement('input'))
+            .attr('type', 'hidden')
+            .attr('name', 'plans[' + planId + '][due_date]')
+            .val(planDetails['dueDate']));
+
+        $hiddenInputs = $hiddenInputs.add($(document.createElement('input'))
+            .attr('type', 'hidden')
+            .attr('name', 'plans[' + planId + '][close_date]')
+            .val(planDetails['closeDate']));
+
+        // Append hidden inputs to the fieldset
+        var $planDataContainer = $('#plan-data');
+        $planDataContainer.append($hiddenInputs);
+    }
+
+    /**
+     * Update plan data in the hidden inputs
+     */
+    function updatePlanData(planDetails) {
+
+        // Save the plan in hidden inputs
+        var $hiddenInputs;
+        var planId = planDetails['id'];
+
+        var $hiddenInputs = getPlanDataFields(planId);
+
+        // Update hidden fields with new values
+        for (var key in $hiddenInputs) {
+            $hiddenInputs[key].val(planDetails[key]);
+        }
+
+        // Append hidden inputs to the fieldset
+        // var $planDataContainer = $('#plan-data');
+        // $planDataContainer.append($hiddenInputs);
+
+    }
+
+    function getPlanData(planId) {
+
+        var planData = [];
+        var planDataFields = getPlanDataFields(planId);
+
+        for (var key in planDataFields) {
+            planData[key] = planDataFields[key].val();
+        }
+
+        return planData;
+    }
+
+    function getPlanDataFields(planId) {
+        var planDataFileds = {
+            'id'            : $('#plan-data').find($("input[name*='plans[" + planId + "][id]']")),
+            'name'          : $('#plan-data').find($("input[name*='plans[" + planId + "][name]']")),
+            'description'   : $('#plan-data').find($("input[name*='plans[" + planId + "][description]']")),
+            'publishDate'   : $('#plan-data').find($("input[name*='plans[" + planId + "][publish_date]']")),
+            'openDate'      : $('#plan-data').find($("input[name*='plans[" + planId + "][open_date]']")),
+            'dueDate'       : $('#plan-data').find($("input[name*='plans[" + planId + "][due_date]']")),
+            'closeDate'     : $('#plan-data').find($("input[name*='plans[" + planId + "][close_date]']"))
+        };
+        return planDataFileds;
+    }
 
     /**
      * The hook into jQuery's plugin infrastructure.
