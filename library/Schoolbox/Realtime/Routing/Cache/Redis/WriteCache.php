@@ -48,21 +48,11 @@ class WriteCache extends ReadCache implements WritableCache
         $routeStorageKey = $this->getCacheKey($instanceId);
 
         // ensure this block of code is only ever executed by exactly one process at a time
-        (new Synchroniser($this, $this->redis))->synchronise(
+        $this->buildSynchroniser()->synchronise(
             $userIds,
-            function ($userId) use ($routeStorageKey) {
-                // this closure will be called multiple times consecutively if there are concurrent requests
-                try {
-                    $router = $this->bindIndividual($userId, $routeStorageKey);
-                    $this->writeCache($router, $routeStorageKey);
-                } catch (UnderflowException $e) {
-                    // this is fine; continue with rest
-                    $this->log->notice($e->getMessage());
-                }
-            },
-            function() use ($instanceId) {
-                $this->broadcastReload($instanceId);
-            });
+            $this->buildSynchroniserCallback($routeStorageKey),
+            $this->buildSynchroniserDoneCallback($instanceId)
+        );
     }
 
 
@@ -121,6 +111,47 @@ class WriteCache extends ReadCache implements WritableCache
         $this->writeCache($router, $this->getCacheKey($instanceId));
 
         $this->broadcastReload($instanceId);
+    }
+
+    /**
+     * Build a synchroniser object for cacheUsers().
+     *
+     * @return Synchroniser
+     */
+    private function buildSynchroniser()
+    {
+        return new Synchroniser($this, $this->redis);
+    }
+
+    /**
+     * Build a callback for the synchroniser object for cacheUsers().
+     *
+     * @return callable
+     */
+    private function buildSynchroniserCallback($routeStorageKey)
+    {
+        return function ($userId) use ($routeStorageKey) {
+            // this closure will be called multiple times consecutively if there are concurrent requests
+            try {
+                $router = $this->bindIndividual($userId, $routeStorageKey);
+                $this->writeCache($router, $routeStorageKey);
+            } catch (UnderflowException $e) {
+                // this is fine; continue with rest
+                $this->log->notice($e->getMessage());
+            }
+        };
+    }
+
+    /**
+     * Build an on-complete callback for the synchroniser object for cacheUsers().
+     *
+     * @return callable
+     */
+    private function buildSynchroniserDoneCallback($instanceId)
+    {
+        return function() use ($instanceId) {
+            $this->broadcastReload($instanceId);
+        };
     }
 
 
