@@ -113,10 +113,8 @@ class Rubric
                 if ($this->assessment->getUseRubric()) {
                     if ($this->isInteractionLocked && !$this->currentUser->isSuperuser()) {
                         $data['learnerRubricContext'] = $this->rubricContext->generate($this->assessment, $this->participant->getUser(), $this->currentUser, Access::getInstance(), false);
-                    } elseif ($this->response) {
-                        $data['learnerRubricContext'] = $this->rubricContext->generateMarkableForResponseAndSelfReflection($this->assessment, $this->participant->getUser(), $this->response->getId());
                     } else {
-                        $data['learnerRubricContext'] = $this->rubricContext->generateMarkable($this->assessment, $this->participant->getUser());
+                        $data['learnerRubricContext'] = $this->rubricContext->generateMarkableForResponseAndSelfReflection($this->assessment, $this->participant->getUser(), $this->response->getId());
                     }
                 }
             }
