@@ -275,7 +275,7 @@ DEALLOCATE PREPARE stmt;
 
 
 
--- Create an event for a step
+-- Create open and close events for a step
 
 INSERT INTO     `tour_step_event`
 (
@@ -283,15 +283,40 @@ INSERT INTO     `tour_step_event`
                 `tour_step_uuid`,
                 `selector`,
                 `event`,
+                `insertion_point`,
                 `author_user_id`,
                 `created_at`,
                 `updated_at`,
                 `deleted_at`
 )
 SELECT          UUID(),
-                @step2Uuid,
+                @step1Uuid,
                 '.account-menu',
                 'accordion.open',
+                'open',
+                (SELECT `id` FROM `user` WHERE `username` = 'alaress' LIMIT 1),
+                '1980-04-07 00:00:00',
+                '1980-04-07 00:00:00',
+                NULL;
+
+
+INSERT INTO     `tour_step_event`
+(
+                `uuid`,
+                `tour_step_uuid`,
+                `selector`,
+                `event`,
+                `insertion_point`,
+                `author_user_id`,
+                `created_at`,
+                `updated_at`,
+                `deleted_at`
+)
+SELECT          UUID(),
+                @step1Uuid,
+                '.account-menu',
+                'accordion.close',
+                'end',
                 (SELECT `id` FROM `user` WHERE `username` = 'alaress' LIMIT 1),
                 '1980-04-07 00:00:00',
                 '1980-04-07 00:00:00',

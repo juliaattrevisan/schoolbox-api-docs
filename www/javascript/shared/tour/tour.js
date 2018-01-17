@@ -9,6 +9,11 @@ $(function () {
         // Open an accordion
         'accordion.open': function (element) {
             $(element).foundation('accordion', 'open');
+        },
+
+        // Close an accordion
+        'accordion.close': function (element) {
+            $(element).foundation('accordion', 'close');
         }
     };
 
@@ -41,8 +46,7 @@ $(function () {
                                 element: step.selector,
                                 tooltipClass: step.css_class,
                                 uuid: step.uuid,
-                                jsEvent: step.event,
-                                jsEventSelector: step.event_selector
+                                jsEvents: step.events
                             });
                         }
 
@@ -72,13 +76,20 @@ $(function () {
                     tourCurrent.onchange(function(targetElement) {
                         var stepCurrent = tourCurrent._introItems[tourCurrent._currentStep];
 
-                        // If the step has a custom JS event attached - trigger that event now
-                        if (stepCurrent.jsEvent !== null && stepCurrent.jsEventSelector !== null && $(stepCurrent.jsEventSelector).length) {
-                            // Check for a function listed above, if one found - run it
-                            if (tourActions[stepCurrent.jsEvent] !== undefined) {
-                                tourActions[stepCurrent.jsEvent].call(this, stepCurrent.jsEventSelector);
-                            } else { // Otherwise try for a generic trigger on the element
-                                $(stepCurrent.jsEventSelector).trigger(stepCurrent.jsEvent);
+                        // If the current step has custom JS events attached to open of this step - trigger those events now
+                        if (stepCurrent.jsEvents !== null) {
+                            for (var key in stepCurrent.jsEvents) {
+                                var jsEvent = stepCurrent.jsEvents[key];
+
+                                // Check this event is set to run on open, and the element exists
+                                if (jsEvent.insertion_point === 'open' && $(jsEvent.selector).length) {
+                                    // Check if the event is one of the predefined events
+                                    if (tourActions[jsEvent.event] !== undefined) {
+                                        tourActions[jsEvent.event].call(this, jsEvent.selector);
+                                    } else { // Otherwise try for a generic trigger on the element
+                                        $(jsEvent.selector).trigger(jsEvent.event);
+                                    }
+                                }
                             }
                         }
 
