@@ -318,23 +318,18 @@
                 update ? updatePlanData(planDetails) : addPlanData(planDetails);
 
                 if (update) {
-                    // Update plan in Modify drop downs
+                    // Update plan in drop downs
                     $('[data-plan-modify="' + planDetails['id'] + '"]').attr('data-plan-name', planDetails['name']).text(planDetails['name']);
                     $('[data-plan-use="' + planDetails['id'] + '"]').attr('data-plan-name', planDetails['name']).text(planDetails['name']);
                 }
                 else {
-                    // Add plan to Sctions drop down
-                    var $planLink = $(document.createElement('a'))
-                        .attr('href', '#')
-                        .attr('data-plan-use', planDetails['id'])
-                        .attr('data-plan-name', planDetails['name'])
-                        .text(planDetails['name']);
-
-                    var $planListItem = $(document.createElement('li')).append($planLink);
 
                     $('#participant-customise')
                         .closest('li')
-                        .before($planListItem);
+                        .prepend(createPlanListItem(planDetails));
+
+                    $('#plan-options')
+                        .append(createPlanListItem(planDetails));
                 }
 
                 // Update the selected students with the plan
@@ -536,6 +531,19 @@
             'closeDate': $('#plan-data').find($("input[name*='plans[" + planId + "][close_date]']"))
         };
         return planDataFileds;
+    }
+
+    /**
+     * Create a link element for a newly created plan
+     */
+    function createPlanListItem(planDetails) {
+        var $planLink = $(document.createElement('a'))
+            .attr('href', '#')
+            .attr('data-plan-use', planDetails['id'])
+            .attr('data-plan-name', planDetails['name'])
+            .text(planDetails['name']);
+
+        return $(document.createElement('li')).append($planLink);
     }
 
     /**
