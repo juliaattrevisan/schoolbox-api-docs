@@ -60,8 +60,13 @@ class Rubric
      * @param RubricContext  $rubricContext
      */
     public function __construct(
-        DueWork\Model $assessment, Participant $participant, User $currentUser,
-        ?IResponse $response, bool $isInteractionLocked, RubricContext $rubricContext)
+        DueWork\Model $assessment,
+        Participant $participant,
+        User $currentUser,
+        ?IResponse $response,
+        bool $isInteractionLocked,
+        RubricContext $rubricContext
+    )
     {
         $this->assessment = $assessment;
         $this->participant = $participant;
