@@ -213,30 +213,32 @@ class External_Tass_Timetable implements External_TimetableInterface
         $timetable = array();
 
         // Build the timetable
-        foreach ($timetabledef['desc'] as $x => $name) {
-            $timetable[$x]['periodName']     = $timetabledef['desc'][$x];
-            $timetable[$x]['periodStart']    = $timetabledef['start'][$x];
-            $timetable[$x]['periodEnd']      = $timetabledef['end'][$x];
-            $timetable[$x]['periodNumber']   = $timetabledef['number'][$x];
-            $timetable[$x]['periodSequence'] = 1;
-            $timetable[$x]['class']          = array();
-        }
+        if(is_array($timetabledef['desc'])) {
+            foreach ($timetabledef['desc'] as $x => $name) {
+                $timetable[$x]['periodName'] = $timetabledef['desc'][$x];
+                $timetable[$x]['periodStart'] = $timetabledef['start'][$x];
+                $timetable[$x]['periodEnd'] = $timetabledef['end'][$x];
+                $timetable[$x]['periodNumber'] = $timetabledef['number'][$x];
+                $timetable[$x]['periodSequence'] = 1;
+                $timetable[$x]['class'] = array();
+            }
 
-        // Add classes into it
-        while ($desc = $statement->fetch()) {
-            $code = trim($desc['year_grp']) . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']);
-            foreach ($timetable as $x => $timetablePeriod) {
-                if ($desc['prd_code'] == $timetablePeriod['periodNumber']
-                    && $timetablePeriod['periodSequence'] != 2
-                    && !isset($timetable[$x]['class'][$code])
-                ) {
-                    $timetable[$x]['class'][$code] = array(
-                        'description' => $desc['sub_desc'],
-                        'code'        => $code,
-                        'room'        => $desc['room_code'],
-                        'staffCode'   => $desc['tch_code'],
-                    );
-                    break;
+            // Add classes into it
+            while ($desc = $statement->fetch()) {
+                $code = trim($desc['year_grp']) . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']);
+                foreach ($timetable as $x => $timetablePeriod) {
+                    if ($desc['prd_code'] == $timetablePeriod['periodNumber']
+                        && $timetablePeriod['periodSequence'] != 2
+                        && !isset($timetable[$x]['class'][$code])
+                    ) {
+                        $timetable[$x]['class'][$code] = array(
+                            'description' => $desc['sub_desc'],
+                            'code'        => $code,
+                            'room'        => $desc['room_code'],
+                            'staffCode'   => $desc['tch_code'],
+                        );
+                        break;
+                    }
                 }
             }
         }
@@ -299,30 +301,32 @@ class External_Tass_Timetable implements External_TimetableInterface
 
         // Build the timetable
         // TODO do this somewhere generic as it's the same for all connectors
-        foreach ($timetabledef['desc'] as $x => $name) {
-            $timetable[$x]['periodName']     = $timetabledef['desc'][$x];
-            $timetable[$x]['periodStart']    = $timetabledef['start'][$x];
-            $timetable[$x]['periodEnd']      = $timetabledef['end'][$x];
-            $timetable[$x]['periodNumber']   = $timetabledef['number'][$x];
-            $timetable[$x]['periodSequence'] = 1;
-            $timetable[$x]['day']            = array_fill(1, $dayCount, array());
-        }
+        if(is_array($timetabledef['desc'])) {
+            foreach ($timetabledef['desc'] as $x => $name) {
+                $timetable[$x]['periodName'] = $timetabledef['desc'][$x];
+                $timetable[$x]['periodStart'] = $timetabledef['start'][$x];
+                $timetable[$x]['periodEnd'] = $timetabledef['end'][$x];
+                $timetable[$x]['periodNumber'] = $timetabledef['number'][$x];
+                $timetable[$x]['periodSequence'] = 1;
+                $timetable[$x]['day'] = array_fill(1, $dayCount, array());
+            }
 
-        // Build the class list
-        while ($desc = $statement->fetch()) {
-            $code = trim($desc['year_grp']) . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']);
-            foreach ($timetable as $x => $timetablePeriod) {
-                if ($desc['prd_code'] == $timetablePeriod['periodNumber']
-                    && $timetablePeriod['periodSequence'] != 2
-                    && !isset($timetable[$x]['day'][$desc['day_code']][$code])
-                ) {
-                    $timetable[$x]['day'][$desc['day_code']][$code] = array(
-                        'description'    => $desc['sub_desc'],
-                        'code'           => $code,
-                        'room'           => $desc['room_code'],
-                        'staffCode'      => $desc['tch_code'],
-                    );
-                    break;
+            // Build the class list
+            while ($desc = $statement->fetch()) {
+                $code = trim($desc['year_grp']) . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']);
+                foreach ($timetable as $x => $timetablePeriod) {
+                    if ($desc['prd_code'] == $timetablePeriod['periodNumber']
+                        && $timetablePeriod['periodSequence'] != 2
+                        && !isset($timetable[$x]['day'][$desc['day_code']][$code])
+                    ) {
+                        $timetable[$x]['day'][$desc['day_code']][$code] = array(
+                            'description' => $desc['sub_desc'],
+                            'code'        => $code,
+                            'room'        => $desc['room_code'],
+                            'staffCode'   => $desc['tch_code'],
+                        );
+                        break;
+                    }
                 }
             }
         }
