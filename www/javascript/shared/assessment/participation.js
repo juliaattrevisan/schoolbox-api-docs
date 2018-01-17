@@ -380,6 +380,25 @@
      * Update the students selected
      */
     function updatePlan(students, planId, planName) {
+
+        // Remove plan from students excluded during plan modification
+        var $existingStudents = $('li[data-participant]').find('input[value = ' + planId + ']');
+        $existingStudents.each(function (students) {
+           var existingStudentId = $(this).parent('li').attr('data-participant');
+           // If this student is not in the list of updated plan students, drop his plan to '(no customisations)'
+           if ($.inArray(existingStudentId, students) < 0) {
+               // Update the status showing for the student
+               $(this).siblings('div[data-participant-row]').find('div[data-participant-status]').text('(no customisations)');
+
+               // Make sure student is included now
+               $(this).find('#participant-include-' + existingStudentId).val(1);
+
+               // Update the hidden input for their plan
+               $(this).find('#participant-plan-' + existingStudentId).val(0);
+           }
+
+        });
+
         // Update the students with the plan
         $(students).each(function (index, studentID) {
             var $participantRow = $('li[data-participant=' + studentID + ']');
