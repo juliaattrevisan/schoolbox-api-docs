@@ -231,7 +231,7 @@ class Bootstrap extends AbstractBootstrap {
             // Check against whitelist first
             $whitelist = ['/saml/consume.php', '/api/register/*'];
             foreach ($whitelist as $path) {
-                if (fnmatch($path, $_SERVER['SCRIPT_NAME'])) {
+                if (fnmatch($path, $_SERVER['REQUEST_URI'])) {
                     return;
                 }
             }
