@@ -19,6 +19,8 @@ use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Response\DataSource;
 use Schoolbox\Learning\Assessment\DueWork\RubricContext;
 use Schoolbox\Learning\Assessment\Timeline\ResponsesOnly;
+use Schoolbox\Learning\InlineGrader;
+use Schoolbox\Learning\InlineGrader\SelfReflection;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Permission\Access\Access;
@@ -164,15 +166,14 @@ class Controller extends Base
         /* Rubrics data
         */
         $rubricMapper = RubricMapper::getInstance();
-        if($assessment->getUseRubric()){
-            $assessment->setRubric($rubricMapper->findByDueWork($assessment));
-        }
         $rubricContext = new RubricContext($rubricMapper);
 
-        // Should rubric be readonly or markable?
-        $data['rubricContext'] = $isInteractionLocked && !$this->getUser()->isSuperuser()
-            ? $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false)
-            : $rubricContext->generateMarkable($assessment, $participant->getUser());
+        if ($assessment->getUseRubric()) {
+            $assessment->setRubric($rubricMapper->findByDueWork($assessment));
+        }
+
+        $rubricData = (new InlineGrader\Rubric($assessment, $participant, $this->getUser(), $response, $isInteractionLocked, $rubricContext))->generate();
+        $data = array_merge($data, $rubricData);
 
         /* Figure out who's actually here and what screen to show
          */
@@ -215,8 +216,8 @@ class Controller extends Base
          * Teachers cannot see draft Responses in the inline grader
          */
         $mostRecentResponse = $participant->findMostRecentSubmittedResponse();
-        if (!$response) {
 
+        if (!$response) {
             $response             = $mostRecentResponse;
             $isMostRecentResponse = true;
         } else {
@@ -290,15 +291,19 @@ class Controller extends Base
         /* Rubrics data
         */
         $rubricMapper = RubricMapper::getInstance();
-        if($assessment->getUseRubric()){
-            $assessment->setRubric($rubricMapper->findByDueWork($assessment));
-        }
         $rubricContext = new RubricContext($rubricMapper);
 
-        // Should rubric be readonly or markable?
-        $data['rubricContext'] = $isInteractionLocked && !$this->getUser()->isSuperuser()
-            ? $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false)
-            : $rubricContext->generateMarkable($assessment, $participant->getUser(), ($response ? $response->getId() : null));
+        if ($assessment->getUseRubric()) {
+            $assessment->setRubric($rubricMapper->findByDueWork($assessment));
+        }
+
+        $rubricData = (new InlineGrader\Rubric($assessment, $participant, $this->getUser(), $response, $isInteractionLocked, $rubricContext))->generate();
+        $data = array_merge($data, $rubricData);
+
+        /* Augment with self-reflection rubric data
+         */
+        $selfReflectionData = (new SelfReflection\Rubric($assessment, $participant, $response, $rubricContext))->generate();
+        $data = array_merge($data, $selfReflectionData);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/standard.twig', $data));
     }

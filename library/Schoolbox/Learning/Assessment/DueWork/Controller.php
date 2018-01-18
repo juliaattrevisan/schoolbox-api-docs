@@ -17,10 +17,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessment;
-use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessmentWithResponse;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfReflection;
-use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfReflectionWithResponse;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
@@ -181,14 +178,16 @@ class Controller extends Assessment\Controller
         );
     }
 
+
     /**
      * Display appropriate landing page based on role
      *
-     * @api   GET /learning/assessments/:assessmentId/:userId
-     * @level 165
+     * @api      GET /learning/assessments/:assessmentId/:userId
+     * @level    165
      *
-     * @param Participant $participant
-     * @throws NotFound
+     * @param IAssessable $assessment
+     * @throws ServiceNotFound
+     * @internal param Participant $participant
      */
     public function getPreview(IAssessable $assessment)
     {
@@ -489,7 +488,7 @@ class Controller extends Assessment\Controller
             $studentId = $participant->getUser()->getId();
 
             // this will modify the "selection" of descriptors in the grid
-            $this->rubricMapper->applyStudentMark($rubric, $participant->getUser(), true);
+            (new Rubric\GridGenerator($this->rubricMapper, $rubric, $participant->getUser()))->applyStudentMark(true);
 
             foreach ($rubric->getSumPerGroup() as $group) {
                 foreach ($group->getAllCriteria() as $criterion) {

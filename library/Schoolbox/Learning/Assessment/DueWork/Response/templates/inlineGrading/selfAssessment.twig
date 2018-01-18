@@ -63,6 +63,9 @@
 {# Maybe out of date message doesn't exist here #}
 {% block mightBeOutofDate %}{% endblock %}
 
+{# A hole for readonly self-reflection content #}
+{% block readonlyFeedback %}{% endblock %}
+
 {# Show totals in self-assessment #}
 {% block rubricGrid %}
     {% set showDescriptorValue = true %}
@@ -88,3 +91,6 @@
         buttons: buttons
     } only %}
 {% endblock %}
+
+{# No Feedback files for self-assessment #}
+{% block attachzone %}{% endblock %}

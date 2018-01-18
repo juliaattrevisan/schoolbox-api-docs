@@ -10,9 +10,9 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork;
 
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GridGenerator;
 use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -34,31 +34,89 @@ class RubricContext
     }
 
     /**
-     * Get a markable grid for Rubrics marking
+     * Get a markable grid for Rubrics marking, for an Instructor and particular IResponse
      *
-     * @param DueWork  $dueWork
-     * @param User     $student
-     * @param null|int $responseId
+     * @param Model $dueWork
+     * @param User  $student
+     * @param int   $responseId
      *
      * @return array
      */
-    public function generateMarkable(DueWork $dueWork, User $student, $responseId = null)
+    public function generateMarkableForResponseAndSelfReflection(DueWork $dueWork, User $student, int $responseId)
     {
         if (!$dueWork->getUseRubric()) {
             return ['rubric' => null];
         }
 
-        $markTypeSlug = $dueWork->getMarkType()->getSlug();
+        $context = $this->generateDefaultContext($dueWork);
 
-        $publishedOnly = false;
-        $this->rubricMapper->applyStudentMark($dueWork->getRubric(), $student, $publishedOnly, $responseId);
+        /* Spawn rubric grid
+         */
+        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMarkForSelfReflectableResponse(false, $responseId, $student);
+        $context['rubric'] = $dueWork->getRubric()->toContext();
 
-        $context = [
-            'rubric'   => $dueWork->getRubric()->toContext(),
-            'markType' => [
-                'mode' => $markTypeSlug,
-            ],
-        ];
+        return $context;
+    }
+
+    /**
+     * Get a markable grid for Rubrics marking, for an Instructor and particular IResponse
+     *
+     * @param Model $dueWork
+     * @param User  $student
+     * @param int   $responseId
+     *
+     * @return array
+     */
+    public function generateMarkableForResponse(DueWork $dueWork, User $student, int $responseId)
+    {
+        if (!$dueWork->getUseRubric()) {
+            return ['rubric' => null];
+        }
+
+        $context = $this->generateDefaultContext($dueWork);
+
+        /* Spawn rubric grid
+         */
+        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMarkForResponse(false, $responseId);
+        $context['rubric'] = $dueWork->getRubric()->toContext();
+
+        return $context;
+    }
+
+    /**
+     * Get a markable grid for Rubrics marking, for an Instructor
+     *
+     * @param DueWork  $dueWork
+     * @param User     $student
+     *
+     * @return array
+     */
+    public function generateMarkable(DueWork $dueWork, User $student)
+    {
+        if (!$dueWork->getUseRubric()) {
+            return ['rubric' => null];
+        }
+
+        $context = $this->generateDefaultContext($dueWork);
+
+        /* Spawn rubric grid
+         */
+        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMark(false);
+        $context['rubric'] = $dueWork->getRubric()->toContext();
+
+        return $context;
+    }
+
+
+    /**
+     * Generate default $context array structure
+     *
+     * @param Model $dueWork
+     *
+     * @return array
+     */
+    private function generateDefaultContext(DueWork $dueWork)
+    {
 
         /* Inject available levels for this DueWork's GradeGroup
          */
@@ -68,7 +126,12 @@ class RubricContext
             $gradeLevels[$gradeLevel->getLowerBound()] = $gradeLevel->getCaption();
         }
 
-        $context['markType']['conf'] = $gradeLevels;
+        $context = [
+            'markType' => [
+                'mode' => $dueWork->getMarkType()->getSlug(),
+                'conf' => $gradeLevels,
+            ],
+        ];
 
         return $context;
     }
@@ -90,7 +153,7 @@ class RubricContext
             return ['rubric' => null];
         }
 
-        $this->rubricMapper->applyStudentMark($dueWork->getRubric(), $student, $publishedOnly);
+        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMark($publishedOnly);
 
         $context = [
             'rubric' => $dueWork->getRubric()->toContext($currentUser),

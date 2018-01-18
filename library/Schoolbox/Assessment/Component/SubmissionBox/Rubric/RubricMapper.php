@@ -438,73 +438,6 @@ class RubricMapper
     }
 
     /**
-     * @param Rubric $grid
-     * @param int[]  $selectedDescriptorIds
-     *
-     * @return Rubric
-     */
-    public function applyMark(Rubric $grid, array $selectedDescriptorIds)
-    {
-        foreach ($grid->getAllDescriptors() as $descriptor) {
-            $selected = in_array($descriptor->getId(), $selectedDescriptorIds);
-            $descriptor->setSelected($selected);
-        }
-
-        return $grid;
-    }
-
-    /**
-     * @param Rubric   $grid
-     * @param User     $student
-     * @param bool     $publishedOnly Whether to exclude draft marks
-     * @param null|int $responseId
-     *
-     * @return Rubric
-     */
-    public function applyStudentMark(Rubric $grid, User $student, $publishedOnly, $responseId = null)
-    {
-
-        $pb = new Builder($this->database, '');
-        $pb->equals('sr.owner', $student->getId());
-        $pb->equals('sr.box_id', $grid->getSubmissionBox()->getId());
-        $pb->isNull('sr.deleted_at');
-        if ($publishedOnly) {
-            $pb->notNull('sr.published_at');
-        }
-        if ($responseId) {
-            $pb->equals('sr.student_submission_id', $responseId);
-        }
-
-        $whereClause = implode(' AND ', $pb->getWhere());
-        $dateOrder   = $publishedOnly ? 'sr.published_at' : 'sr.created_at';
-
-        // retrieve marks (descriptor selections for student)
-        $query = "
-            SELECT rm.descriptor_id
-            FROM rubric_mark rm
-            LEFT JOIN submission_return sr ON sr.id = rm.return_id
-            WHERE rm.valid = TRUE
-            AND rm.return_id = (
-              SELECT sr.id
-              FROM submission_return sr
-              WHERE $whereClause
-              ORDER BY $dateOrder DESC
-              LIMIT 1
-            )
-        ";
-
-        $statement = $this->database->query($query, $pb->getParams());
-
-        $descriptorIds = [];
-
-        while ($id = $statement->fetchColumn()) {
-            $descriptorIds[$id] = true;
-        }
-
-        return $this->applyMark($grid, array_keys($descriptorIds));
-    }
-
-    /**
      * Convenience (or safety) method wrapping grid fetch and mark application
      *
      * @param SubmissionBox $box
@@ -516,7 +449,7 @@ class RubricMapper
     {
         $grid = $this->findBySubmissionBox($box);
 
-        return $this->applyStudentMark($grid, $student, true);
+        return (new GridGenerator($this, $grid, $student))->applyStudentMark(true);
     }
 
     /**
@@ -1222,5 +1155,16 @@ class RubricMapper
         $usageMapper->save($dstUsages);
 
         return true;
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * @return Database
+     */
+    public function getDatabase()
+    {
+        return $this->database;
     }
 }
