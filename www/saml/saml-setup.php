@@ -47,7 +47,7 @@ try {
     $idpMetadata_raw = $cache->init($idpMetadataUrl)->getStreamContents();
 
     try {
-        OneLogin_Saml2_IdPMetadataParser::injectIntoSettings($settingsInfo, OneLogin_Saml2_IdPMetadataParser::parseXML($idpMetadata_raw));
+        $settingsInfo = OneLogin_Saml2_IdPMetadataParser::injectIntoSettings($settingsInfo, OneLogin_Saml2_IdPMetadataParser::parseXML($idpMetadata_raw));
     } catch (Exception $e) {
         $cache->invalidateCache();
         SAMLDebugLog("Invalidating cache as we failed to get valid metadata from IDP");
