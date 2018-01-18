@@ -9,7 +9,11 @@
     <a href="/search/user/{{ user.id }}" title="View Profile">
         <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square64" />
     </a>
-    <h3><a href="/search/user/{{ user.id }}" title="View Profile">{{ user.fullName }}</a></h3>
+    {% if not user.deleted %}
+        <h3><a href="/search/user/{{ user.id }}" title="View Profile">{{ user.fullName }}</a></h3>
+    {% else %}
+        <h3>{{ user.fullName }}</h3>
+    {% endif %}
     <p class="meta">
         <span title="{{ statusTip }}" data-status class="progress-tick tiny {{ statusClass }}"></span>
         <span data-status-label>{{ statusText }}</span>
