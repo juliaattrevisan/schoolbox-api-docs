@@ -2,7 +2,7 @@
 $(function () {
 
     /**
-     * Custom events that can be inserted into the `tour_step_event` and triggered on step start or finish
+     * Custom events that can be inserted into the `tour_step_event` and triggered on step open or close
      *
      */
     var tourActions = {
@@ -143,7 +143,7 @@ $(function () {
                             });
                         }
 
-                        // Check for a close step on the step
+                        // Check for a close event on the step
                         // Purposefully left out of the completed check above - want to run it in both cases
                         if (currentStep !== undefined && currentStep.jsEvents !== null) {
                             runStepEvents(currentStep.jsEvents, 'close');

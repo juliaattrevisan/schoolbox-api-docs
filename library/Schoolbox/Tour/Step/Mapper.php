@@ -131,6 +131,7 @@ class Mapper extends BaseMapper
                         `tour`.`deleted_at` IS NULL AND
                         `tour_step`.`deleted_at` IS NULL AND
                         `tour_step_tooltip`.`deleted_at` IS NULL 
+            ORDER BY    `tour_step_event`.`order`
         ";
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute([
@@ -166,7 +167,6 @@ class Mapper extends BaseMapper
                     'insertion_point' => $row['event_insertion_point'],
                 ];
             }
-
         }
 
         // Starting with the initial step of the tour, follow the trail of UUIDs to create a correctly ordered

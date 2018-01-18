@@ -51,6 +51,7 @@ CREATE TABLE `tour_step_event`
   `selector`          VARCHAR(255)            NOT NULL,               -- The selector to trigger the event on (eg. #search-input)
   `event`             VARCHAR(255)            NOT NULL,               -- The event to trigger (eg. click)
   `insertion_point`   ENUM('open', 'close')   NOT NULL,               -- When to fire the event, opening of the step or on close of the step
+  `order`             TINYINT(1)              NOT NULL,               -- Order sequence of events (when there's multiple events for a single step)
   `author_user_id`    INT(4) UNSIGNED         NULL,                   -- Not mandatory, Alaress created events will not have an author ID
   `created_at`        DATETIME                NOT NULL,
   `updated_at`        DATETIME                NOT NULL,
