@@ -13,6 +13,8 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Tour\Mapper as TourMapper;
 use Schoolbox\UserMapper;
+use Schoolbox\Tour\Step\Type\Tooltip;
+use Schoolbox\Tour\Step\Type\Modal;
 
 /**
  * Class Mapper
@@ -37,8 +39,8 @@ class Mapper extends BaseMapper
         $this->joins('next_step_uuid', Mapper::class, 'uuid', null, null, 'tourStep', 'tourStep');
         $this->joins('tour_uuid', TourMapper::class, 'uuid', null, null, 'tour', 'tour');
         $this->joins('author_user_id', UserMapper::class, 'id', null, null, 'author', 'author');
-        $this->joinsReverseSingle('tour_step_uuid', \Schoolbox\Tour\Step\Modal\Mapper::class, 'type', 'modalStep');
-        $this->joinsReverseSingle('tour_step_uuid', \Schoolbox\Tour\Step\Tooltip\Mapper::class, 'type', 'tooltipStep');
+        $this->joinsReverseSingle('tour_step_uuid', Modal\Mapper::class, 'type', 'modalStep');
+        $this->joinsReverseSingle('tour_step_uuid', Tooltip\Mapper::class, 'type', 'tooltipStep');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);

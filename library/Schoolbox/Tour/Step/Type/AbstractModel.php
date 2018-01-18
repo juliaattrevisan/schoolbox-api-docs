@@ -6,7 +6,7 @@
  * Time: 8:32 AM
  */
 
-namespace Schoolbox\Tour\Step;
+namespace Schoolbox\Tour\Step\Type;
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;

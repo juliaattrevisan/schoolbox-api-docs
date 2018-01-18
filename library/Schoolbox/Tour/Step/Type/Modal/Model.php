@@ -5,9 +5,9 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Tour\Step\Modal;
+namespace Schoolbox\Tour\Step\Type\Modal;
 
-use Schoolbox\Tour\Step\AbstractModel;
+use Schoolbox\Tour\Step\Type\AbstractModel;
 
 class Model extends AbstractModel
 {

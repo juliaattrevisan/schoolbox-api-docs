@@ -14,6 +14,7 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\Uuid;
 use Schoolbox\Tour\Model as Tour;
 use Schoolbox\User;
+use Schoolbox\Tour\Step\Type\AbstractModel;
 
 class Model implements ISoftDeletable, \JsonSerializable
 {

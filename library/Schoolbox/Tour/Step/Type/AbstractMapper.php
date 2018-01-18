@@ -6,12 +6,13 @@
  * Time: 8:25 AM
  */
 
-namespace Schoolbox\Tour\Step;
+namespace Schoolbox\Tour\Step\Type;
 
 use PDOStatement;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Tour\Step\Mapper as TourStepMapper;
 use Schoolbox\UserMapper;
+use Schoolbox\Tour\Step\Model;
 
 abstract class AbstractMapper extends BaseMapper
 {
