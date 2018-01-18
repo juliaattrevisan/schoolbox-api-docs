@@ -229,9 +229,11 @@ class Bootstrap extends AbstractBootstrap {
         if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] !== 'GET') {
 
             // Check against whitelist first
-            $whitelist = ['/saml/consume.php'];
-            if (\in_array($_SERVER['SCRIPT_NAME'], $whitelist, true)) {
-                return;
+            $whitelist = ['/saml/consume.php', '/api/register/*'];
+            foreach ($whitelist as $path) {
+                if (fnmatch($path, $_SERVER['SCRIPT_NAME'])) {
+                    return;
+                }
             }
 
             // Then verify request origin
