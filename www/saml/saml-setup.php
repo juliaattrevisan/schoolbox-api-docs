@@ -20,7 +20,7 @@ $settingsInfo = array (
         'privateKey' => Cfg::get('saml_private_cert'),
     ],
     'idp' => [
-        'entityId' => '',
+        'entityId' => Config::get('saml_sso_url') ?: Cfg::get('saml_idp_metadata_url'),
         'singleSignOnService' => array (
             'url' => Config::get('saml_sso_url'),
             'binding' => OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT,
