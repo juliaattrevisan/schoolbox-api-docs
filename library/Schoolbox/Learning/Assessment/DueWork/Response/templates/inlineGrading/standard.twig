@@ -135,7 +135,7 @@ Usage:
 
 {# Grading logic and structure #}
 <div class="row mark-scheme" id="assessment-status" data-participant>
-    <div class="small-12 island">
+    <fieldset class="small-12 island">
         <form method="post" data-feedback-form action="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postResponseFeedback', {assessmentId: assessment.id, studentId: participant.user.id, responseId: response.id, participant: participant}) }}">
             <section>
                 <input type="hidden" name="responseId" value="{{ response.id }}" />
@@ -172,7 +172,7 @@ Usage:
                 {% block readonlyFeedback %}
                     {% if latestSelfReflectedFeedback %}
                         {% import '@learning/macro/urgency.twig' as urgency %}
-                        <div class="small-12 columns">
+                        <fieldset class="content">
                             <ul class="information-list threaded">
                                 <li>
                                     <h2 class="subheader">{% spaceless %}
@@ -195,7 +195,7 @@ Usage:
                                     </ul>
                                 </li>
                             </ul>
-                        </div>
+                        </fieldset>
                     {% endif %}
                 {% endblock %}
 
