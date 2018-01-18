@@ -198,10 +198,13 @@ class Mapper extends BaseMapper
         // Starting with the initial step of the tour, follow the trail of UUIDs to create a correctly ordered
         // array of steps for use in the javascript code
         $steps = [];
-        while ($stepCurrent !== null) {
+        $iterations = 0;
+        $maxIterations = 50;
+        while ($stepCurrent !== null && $iterations < $maxIterations) {
             $steps[] = $stepsStorage[$stepCurrent];
             // Move onto the next step in the sequence
-            $stepCurrent = $stepsStorage[$stepCurrent]['next_step_uuid'];
+            $stepCurrent = $stepsStorage[$stepCurrent]->getTourStep() ? $stepsStorage[$stepCurrent]->getTourStep()->getUuid() : null;
+            $iterations++;
         }
 
         return $steps;
