@@ -75,16 +75,22 @@ $(function () {
 
                     tourCurrent.onchange(function(targetElement) {
                         var stepCurrent = tourCurrent._introItems[tourCurrent._currentStep];
-                        var stepLast = tourCurrent._introItems[tourCurrent._currentStep - 1];
+                        var stepPrev = tourCurrent._introItems[tourCurrent._currentStep - 1];
+                        var stepNext = tourCurrent._introItems[tourCurrent._currentStep + 1];
 
                         // If the current step has custom JS events attached to open of this step - trigger those events now
                         if (stepCurrent.jsEvents !== null) {
                             runStepEvents(stepCurrent.jsEvents, 'open');
                         }
 
-                        // If the previous step had any custom JS events attached on close - trigger those now
-                        if (stepLast !== undefined && stepLast.jsEvents !== null) {
-                            runStepEvents(stepLast.jsEvents, 'close');
+                        // If the user has moved forward, and the previous step had any custom JS events attached on close - trigger those now
+                        if (stepPrev !== undefined && stepPrev.jsEvents !== null && tourCurrent._direction === 'forward') {
+                            runStepEvents(stepPrev.jsEvents, 'close');
+                        }
+
+                        // If the user has moved back, and the previous step had any custom JS events attached on close - trigger those now
+                        if (stepNext !== undefined && stepNext.jsEvents !== null && tourCurrent._direction === 'backward') {
+                            runStepEvents(stepNext.jsEvents, 'close');
                         }
 
                         // Update the status in the DB

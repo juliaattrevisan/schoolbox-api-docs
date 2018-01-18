@@ -365,7 +365,7 @@ INSERT INTO     `tour_step_event`
                 `deleted_at`
 )
 SELECT          UUID(),
-                @step1Uuid,
+                @step2Uuid,
                 '.account-menu',
                 'accordion.open',
                 'open',
@@ -388,7 +388,7 @@ INSERT INTO     `tour_step_event`
                 `deleted_at`
 )
 SELECT          UUID(),
-                @step1Uuid,
+                @step2Uuid,
                 '.account-menu',
                 'accordion.close',
                 'close',
