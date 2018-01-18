@@ -77,6 +77,7 @@
             event.preventDefault();
 
             var $planParticipants = $('#plan-participants');
+            var $planId = $customiseModal.find('#plan-id');
             var $planName = $customiseModal.find('#plan-name');
             var $planDesc = $customiseModal.find('#plan-desc');
             var $planPublishDate = $customiseModal.find('#plan-publish-date');
@@ -129,6 +130,7 @@
             $('#plan-close-date-error').hide();
 
             // Set dates & description to whatever is currently set on the main form
+            $planId.val(0);
             $planPublishDate.val($('#publishDate').val());
             $planOpenDate.val($('#openDate').val());
             $planDueDate.val($('#dueDate').val());
@@ -303,7 +305,7 @@
                 var $customiseModal = $('#participant-customise-modal');
                 var oldPlanId = $customiseModal.find('#plan-id').val();
                 var newPlanId = -1 * self.newPlanCount;
-                var update = oldPlanId > 0 ? true : false;
+                var update = oldPlanId == 0 ? false : true;
 
                 var planDetails = {
                     'id': update ? oldPlanId : newPlanId,
@@ -326,14 +328,14 @@
 
                     $('#participant-customise')
                         .closest('li')
-                        .prepend(createPlanListItem(planDetails));
+                        .before(createPlanListItem(planDetails, false));
 
                     $('#plan-options')
-                        .append(createPlanListItem(planDetails));
+                        .append(createPlanListItem(planDetails, true));
                 }
 
                 // Update the selected students with the plan
-                updatePlan($('#plan-participants')[0].selectize.getValue().split(','), planDetails['id'], planDetails['name']);
+                updatePlan($('#plan-participants')[0].selectize.getValue().split(','), planDetails['id'], planDetails['name'], update);
 
                 // Close the modal
                 $customiseModal.foundation('reveal', 'close');
@@ -358,7 +360,7 @@
             $participants.find(':checked').each(function () {
                 studentIDs.push($(this).attr('data-user-id'));
             });
-            updatePlan(studentIDs, planId, planName);
+            updatePlan(studentIDs, planId, planName, false);
 
             // Reset the checkboxes and buttons
             resetActions();
@@ -374,25 +376,20 @@
     /**
      * Update the students selected
      */
-    function updatePlan(students, planId, planName) {
+    function updatePlan(students, planId, planName, update) {
 
-        // Remove plan from students excluded during plan modification
-        var $existingStudents = $('li[data-participant]').find('input[value = ' + planId + ']');
-        $existingStudents.each(function (students) {
-           var existingStudentId = $(this).parent('li').attr('data-participant');
-           // If this student is not in the list of updated plan students, drop his plan to '(no customisations)'
-           if ($.inArray(existingStudentId, students) < 0) {
-               // Update the status showing for the student
-               $(this).siblings('div[data-participant-row]').find('div[data-participant-status]').text('(no customisations)');
+        if (update) {
+            // Clear this plan form all the students it was previously applied to
+            var $existingStudents = $('li[data-participant]').find('input[value = ' + planId + ']');
+            $existingStudents.each(function () {
 
-               // Make sure student is included now
-               $(this).find('#participant-include-' + existingStudentId).val(1);
+                // Update the status showing for the student
+                $(this).siblings('div[data-participant-row]').find('div[data-participant-status]').text('(no customisations)');
 
-               // Update the hidden input for their plan
-               $(this).find('#participant-plan-' + existingStudentId).val(0);
-           }
-
-        });
+                // Update the hidden input for their plan
+                $(this).val(0);
+            });
+        }
 
         // Update the students with the plan
         $(students).each(function (index, studentID) {
@@ -449,7 +446,7 @@
         var $hiddenInputs;
         var planId = planDetails['id'];
 
-        $hiddenInputs = $(document.createElement('input')).attr('type', 'hidden').attr('name', 'plans[' + planId + '][id]').val('');
+        $hiddenInputs = $(document.createElement('input')).attr('type', 'hidden').attr('name', 'plans[' + planId + '][id]').val(planId);
 
         $hiddenInputs = $hiddenInputs.add($(document.createElement('input'))
             .attr('type', 'hidden')
@@ -536,10 +533,11 @@
     /**
      * Create a link element for a newly created plan
      */
-    function createPlanListItem(planDetails) {
+    function createPlanListItem(planDetails, update) {
+        var attrName = update ? 'data-plan-modify' : 'data-plan-use';
         var $planLink = $(document.createElement('a'))
             .attr('href', '#')
-            .attr('data-plan-use', planDetails['id'])
+            .attr(attrName, planDetails['id'])
             .attr('data-plan-name', planDetails['name'])
             .text(planDetails['name']);
 
