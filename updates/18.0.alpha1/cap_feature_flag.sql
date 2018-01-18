@@ -1,0 +1,2 @@
+INSERT INTO `config`
+VALUES (null, 'custom_assessment_participation', 1, 'Custom Assesment Participation', 'Allows custom participation to be set for assessments', 3, null, 15, 'true', 'false', 'true')
