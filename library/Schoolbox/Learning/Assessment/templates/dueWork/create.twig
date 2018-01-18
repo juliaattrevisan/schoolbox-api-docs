@@ -107,7 +107,7 @@
 {# ----------------------------------------------------------- #}
 {# Participation #}
 {# ----------------------------------------------------------- #}
-{% if context.baseContext is not unitSpecification %}
+{% if context.baseContext is not unitSpecification and custom_assessment_participation %}
     {% include '@learningAssessment/fragments/participation.twig' %}
 {% endif %}
 

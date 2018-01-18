@@ -102,6 +102,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $data[Redirect::RETURN_URL] = $returnUrl;
         }
 
+        $data['custom_assessment_participation'] = $this->getConfigLoader()->get('custom_assessment_participation');
+
         // either output the fragment to the mage, or use the synchronous form
         if ($this->getRequest()->isXhr()) {
             $content = $this->buildUnthemedHtmlOutput("@learningAssessment/$type/create.twig", $data);
@@ -130,6 +132,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
         /* Curriculum Codes prefilled from those associated with the assessment itself
          */
         $data['curriculumNodes'] = $assessment->getCurriculumNodes();
+
+        $data['custom_assessment_participation'] = $this->getConfigLoader()->get('custom_assessment_participation');
 
         $template = "@learningAssessment/update.twig";
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
