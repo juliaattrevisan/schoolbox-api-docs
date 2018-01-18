@@ -75,6 +75,7 @@ $(function () {
 
                     tourCurrent.onchange(function(targetElement) {
                         var stepCurrent = tourCurrent._introItems[tourCurrent._currentStep];
+                        var stepLast = tourCurrent._introItems[tourCurrent._currentStep - 1];
 
                         // If the current step has custom JS events attached to open of this step - trigger those events now
                         if (stepCurrent.jsEvents !== null) {
@@ -83,6 +84,23 @@ $(function () {
 
                                 // Check this event is set to run on open, and the element exists
                                 if (jsEvent.insertion_point === 'open' && $(jsEvent.selector).length) {
+                                    // Check if the event is one of the predefined events
+                                    if (tourActions[jsEvent.event] !== undefined) {
+                                        tourActions[jsEvent.event].call(this, jsEvent.selector);
+                                    } else { // Otherwise try for a generic trigger on the element
+                                        $(jsEvent.selector).trigger(jsEvent.event);
+                                    }
+                                }
+                            }
+                        }
+
+                        // If the previous step had any custom JS events attached on close - trigger those now
+                        if (stepLast !== undefined && stepLast.jsEvents !== null) {
+                            for (var key in stepLast.jsEvents) {
+                                var jsEvent = stepLast.jsEvents[key];
+
+                                // Check this event is set to run on open, and the element exists
+                                if (jsEvent.insertion_point === 'close' && $(jsEvent.selector).length) {
                                     // Check if the event is one of the predefined events
                                     if (tourActions[jsEvent.event] !== undefined) {
                                         tourActions[jsEvent.event].call(this, jsEvent.selector);
