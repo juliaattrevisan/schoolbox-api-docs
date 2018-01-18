@@ -143,9 +143,11 @@ $(function () {
                     });
 
                     tourCurrent.onexit(function(targetElement) {
+                        var currentStep = tourCurrent._introItems[tourCurrent._currentStep];
+
                         //onexit triggers when oncomplete triggers, so need check
                         if(!completed) {
-                            var newStep = tourCurrent._introItems[tourCurrent._currentStep].uuid;
+                            var newStep = currentStep.uuid;
 
                             //This matches the consts on the Status/Model - to be updated when this file is a plugin
                             var status = "dismissed";
@@ -157,6 +159,24 @@ $(function () {
                                 newStep: newStep,
                                 status: status
                             });
+                        }
+
+                        // Check for a close step on the step
+                        // Purposefully left out of the completed check above - want to run it in both cases
+                        if (currentStep !== undefined && currentStep.jsEvents !== null) {
+                            for (var key in currentStep.jsEvents) {
+                                var jsEvent = currentStep.jsEvents[key];
+
+                                // Check this event is set to run on open, and the element exists
+                                if (jsEvent.insertion_point === 'close' && $(jsEvent.selector).length) {
+                                    // Check if the event is one of the predefined events
+                                    if (tourActions[jsEvent.event] !== undefined) {
+                                        tourActions[jsEvent.event].call(this, jsEvent.selector);
+                                    } else { // Otherwise try for a generic trigger on the element
+                                        $(jsEvent.selector).trigger(jsEvent.event);
+                                    }
+                                }
+                            }
                         }
                     });
 
