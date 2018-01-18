@@ -781,6 +781,9 @@ class Controller extends Base\Base
         $data = $this->getCourseData();
         $data['returnUrlKey'] = Redirect::RETURN_URL;
 
+        $folderModel = $this->getFolderMapper()->findById($query->get('folder'));
+        $data['suggestions'] = $this->getLinkSuggestions($folderModel);
+
         if ($this->getRequest()->isXhr()) {
             $options = [
                 'hasClose'         => true,
@@ -947,7 +950,7 @@ class Controller extends Base\Base
         $codes = $folder->getCurriculumNodes()->getColumnValues('code');
 
         // find all the folders that match this code, then filter for coarseness
-        return $this->getFolderMapper()->findByCurriculumCode($codes)->filter(function ($result) {
+        $courseFolders = $this->getFolderMapper()->findByCurriculumCode($codes)->filter(function ($result) {
             /** @var Folder $result */
             // TODO: test this with folders and courses which have curriculum codes
             try {
@@ -957,6 +960,12 @@ class Controller extends Base\Base
                 return false;
             }
         });
+
+        $courseFolderIds = $courseFolders->getPropertyValues('id');
+
+        $courseSpecs = $this->getCourseSpecificationMapper()->findByColumn('folder_id', $courseFolderIds);
+
+        return $courseSpecs;
     }
 
     /**
