@@ -108,6 +108,42 @@ DEALLOCATE PREPARE stmt;
 
 SET @step1Uuid = UUID();
 SET @step2Uuid = UUID();
+SET @step3Uuid = UUID();
+
+
+SET @sql :=
+
+CASE WHEN EXISTS (SELECT * FROM `config` WHERE `name` = 'site_location' AND `value` = 'demo') THEN
+
+  '
+      INSERT INTO   `tour_step`
+      (
+                    `uuid`,
+                    `tour_uuid`,
+                    `next_step_uuid`,
+                    `author_user_id`,
+                    `type`,
+                    `created_at`,
+                    `updated_at`,
+                    `deleted_at`
+      )
+      SELECT        @step3Uuid,
+                    @tourStaff,
+                    null,
+                    (SELECT `id` FROM `user` WHERE `username` = ''alaress'' LIMIT 1),
+                    ''tooltip'',
+                    ''1980-04-07 00:00:00'',
+                    ''1980-04-07 00:00:00'',
+                    NULL
+  '
+
+ELSE ''
+
+END;
+
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 SET @sql :=
 
@@ -127,7 +163,7 @@ CASE WHEN EXISTS (SELECT * FROM `config` WHERE `name` = 'site_location' AND `val
       )
       SELECT        @step2Uuid,
                     @tourStaff,
-                    null,
+                    @step3Uuid,
                     (SELECT `id` FROM `user` WHERE `username` = ''alaress'' LIMIT 1),
                     ''tooltip'',
                     ''1980-04-07 00:00:00'',
@@ -172,6 +208,7 @@ CASE WHEN EXISTS (SELECT * FROM `config` WHERE `name` = 'site_location' AND `val
 ELSE ''
 
 END;
+
 
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
@@ -239,8 +276,46 @@ CASE WHEN EXISTS (SELECT * FROM `config` WHERE `name` = 'site_location' AND `val
                     @step2Uuid,
                     (SELECT `id` FROM `user` WHERE `username` = ''alaress'' LIMIT 1),
                     ''Wrong Way! Turn Back!'',
-                    ''This is a dead-end...'',
+                    ''Keep going'',
                     ''#tile-10'',
+                    ''danger'',
+                    ''1980-04-07 00:00:00'',
+                    ''1980-04-07 00:00:00'',
+                    NULL
+  '
+
+ELSE ''
+
+END;
+
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @sql :=
+
+CASE WHEN EXISTS (SELECT * FROM `config` WHERE `name` = 'site_location' AND `value` = 'demo') THEN
+
+  '
+      INSERT INTO   `tour_step_tooltip`
+      (
+                    `uuid`,
+                    `tour_step_uuid`,
+                    `author_user_id`,
+                    `title`,
+                    `body`,
+                    `selector`,
+                    `css_class`,
+                    `created_at`,
+                    `updated_at`,
+                    `deleted_at`
+      )
+      SELECT        UUID(),
+                    @step3Uuid,
+                    (SELECT `id` FROM `user` WHERE `username` = ''alaress'' LIMIT 1),
+                    ''Wrong Way! Turn Back!'',
+                    ''Last step.'',
+                    ''.tab-bar-section ul li'',
                     ''danger'',
                     ''1980-04-07 00:00:00'',
                     ''1980-04-07 00:00:00'',
