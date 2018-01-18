@@ -152,7 +152,9 @@ button.submit{
  * the actual flex-list button dimensions aren't right.
  */
 .flex-list {
-    &.buttons a {
+    &.buttons a,
+    &.buttons button
+	{
 		@include flex;
 		@extend .button;
 		justify-content: center;
