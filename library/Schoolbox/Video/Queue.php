@@ -397,8 +397,8 @@ class Queue extends ResourceVideo
      */
     private function uploadTranscode($filename)
     {
-        $this->log("Overwriting storage with transcoded file");
-        $this->getStorage()->getFilesystem()->update($this->getStorage()->getPath(), file_get_contents($filename));
+        $this->log("Saving transcode to storage");
+        $this->getStorage()->getFilesystem()->put($this->getStorage()->getPath() . "-transcode", file_get_contents($filename));
         $this->getStorage()->setSize(filesize($filename));
         $this->storageMapper->save($this->storage);
 

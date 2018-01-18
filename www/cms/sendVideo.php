@@ -11,6 +11,7 @@
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\FileNotFoundException;
 use League\Flysystem\Filesystem;
+use League\Flysystem\FilesystemInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\File\Mapper as FileMapper;
@@ -221,9 +222,24 @@ function getStream(Storage $storage)
     if ($fileSystem->getAdapter() instanceof AwsS3Adapter) {
         // AWS S3
 
+        // Check for a transcode and use that if available, otherwise use the original video
+
+        /** @var FilesystemInterface $fileSystem */
+        $fileSystem = $storage->getFilesystem();
+
+        if ($fileSystem->has($storage->getPath() . "-transcode")) {
+            $storage->setFilename($storage->getFilename() . "-transcode");
+        }
+
         $videoStream = S3Stream::open($storage);
     } elseif (($localFilename = getLocalFilesystemPath($storage)) !== false) {
         // Local Disk
+
+        // Check for a transcode and use that if available, otherwise use the original video
+
+        if (file_exists($localFilename . "-transcode")) {
+            $localFilename .= "-transcode";
+        }
 
         $videoStream = fopen($localFilename, "r");
     }
