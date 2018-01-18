@@ -28,6 +28,10 @@ use Schoolbox\Tour\Step\Type\Modal;
  */
 class Mapper extends BaseMapper
 {
+    // Step type constants
+    const TYPE_TOOLTIP = 'tooltip';
+    const TYPE_MODAL = 'modal';
+
     /**
      * @inheritdoc
      */

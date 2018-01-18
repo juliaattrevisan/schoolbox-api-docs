@@ -8,10 +8,11 @@
 namespace Schoolbox\Tour\Step\Type\Tooltip;
 
 use Schoolbox\Tour\Step\Type\AbstractModel;
+use Schoolbox\Tour\Step;
 
 class Model extends AbstractModel
 {
-    const TYPE = \Schoolbox\Tour\Step\Model::TYPE_TOOLTIP;
+    const TYPE = Step\Mapper::TYPE_TOOLTIP;
 
     /**
      * @var string|null

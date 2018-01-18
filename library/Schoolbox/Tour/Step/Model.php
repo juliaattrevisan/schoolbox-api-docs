@@ -23,11 +23,6 @@ class Model implements ISoftDeletable, \JsonSerializable
     use UpdatedAtDate;
     use DeletedAtDate;
 
-    // Step type constants
-
-    const TYPE_TOOLTIP = 'tooltip';
-    const TYPE_MODAL = 'modal';
-
     /**
      * @var User|null
      */

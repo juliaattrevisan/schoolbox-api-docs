@@ -8,10 +8,11 @@
 namespace Schoolbox\Tour\Step\Type\Modal;
 
 use Schoolbox\Tour\Step\Type\AbstractModel;
+use Schoolbox\Tour\Step;
 
 class Model extends AbstractModel
 {
-    const TYPE = \Schoolbox\Tour\Step\Model::TYPE_MODAL;
+    const TYPE = Step\Mapper::TYPE_MODAL;
 
     /**
      * Specify data which should be serialized to JSON
