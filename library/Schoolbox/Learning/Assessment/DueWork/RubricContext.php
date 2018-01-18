@@ -14,6 +14,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GridGenerator;
 use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 
@@ -149,23 +150,7 @@ class RubricContext
      */
     public function generate(DueWork $dueWork, User $student, User $currentUser, Access $access, $publishedOnly = true)
     {
-        if (!$dueWork->getUseRubric()) {
-            return ['rubric' => null];
-        }
-
-        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMark($publishedOnly);
-
-        $context = [
-            'rubric' => $dueWork->getRubric()->toContext($currentUser),
-        ];
-
-        // Hide total mark from students and parents
-        $accessLevel = $access->getFolderAccess($currentUser, $dueWork->getBaseContext()->getFolder()->getId());
-        if ($accessLevel < UserAccess::ACCESS_WRITE) {
-            unset($context['rubric']['total']);
-        }
-
-        return $context;
+        return $this->generateReadonlyInternal($dueWork, $student, $currentUser, $access, $publishedOnly);
     }
 
     /**
@@ -187,6 +172,69 @@ class RubricContext
 
         // Don't show total mark here at all (it's zero anyway when there is no Participant)
         unset($context['rubric']['total']);
+
+        return $context;
+    }
+
+    /**
+     * Get a readonly grid for a particular feedback.
+     *
+     * @param DueWorkFeedback $feedback
+     * @param User            $currentUser
+     * @param Access          $access
+     * @param bool            $publishedOnly
+     * @return array
+     */
+    public function generateForFeedback(DueWorkFeedback $feedback, User $currentUser, Access $access, $publishedOnly = true)
+    {
+        $dueWork = $feedback->getAssessable();
+        if (!$dueWork instanceof DueWork) {
+            return ['rubric' => null];
+        }
+        return $this->generateReadonlyInternal(
+            $dueWork,
+            $feedback->getReviewee(),
+            $currentUser,
+            $access,
+            $publishedOnly,
+            $feedback->getId()
+        );
+    }
+
+    /**
+     * Internal method for generating a readonly rubric
+     *
+     * @param Model  $dueWork
+     * @param User   $student
+     * @param User   $currentUser
+     * @param Access $access
+     * @param bool   $publishedOnly
+     * @param null   $feedbackId
+     * @return array
+     */
+    private function generateReadonlyInternal(
+        DueWork $dueWork,
+        User $student,
+        User $currentUser,
+        Access $access,
+        $publishedOnly = true,
+        $feedbackId = null
+    ) {
+        if (!$dueWork->getUseRubric()) {
+            return ['rubric' => null];
+        }
+
+        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMark($publishedOnly, $feedbackId);
+
+        $context = [
+            'rubric' => $dueWork->getRubric()->toContext($currentUser),
+        ];
+
+        // Hide total mark from students and parents
+        $accessLevel = $access->getFolderAccess($currentUser, $dueWork->getBaseContext()->getFolder()->getId());
+        if ($accessLevel < UserAccess::ACCESS_WRITE) {
+            unset($context['rubric']['total']);
+        }
 
         return $context;
     }
