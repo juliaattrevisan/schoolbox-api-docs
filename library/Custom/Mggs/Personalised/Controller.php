@@ -308,12 +308,22 @@ class Controller extends Base
         // We have a valid assessment and date objects.
         // Check the dates are valid for the assessment.
         if ($openDate->lt($assessmentOpenDate)) {
-            $this->buildJsonResponse('Open date cannot be moved outside of assessment\'s open date', 400);
+            $text = sprintf(
+                'Open date cannot be before assessment open date: failed to assert %s < %s',
+                $assessmentOpenDate->getDatabase(),
+                $openDate->getDatabase()
+            );
+            $this->buildJsonResponse($text, 400);
             return;
         }
 
         if ($dueDate->gt($assessmentDueDate)) {
-            $this->buildJsonResponse('Due date cannot be moved outside of assessment\'s due date', 400);
+            $text = sprintf(
+                'Due date cannot be after assessment due date: failed to assert %s > %s',
+                $assessmentDueDate->getDatabase(),
+                $dueDate->getDatabase()
+            );
+            $this->buildJsonResponse($text, 400);
             return;
         }
 
