@@ -510,7 +510,7 @@
 
                     // update the view
                     var calEvent = $cal.fullCalendar('clientEvents', function (calEvent) {
-                        return calEvent.data.meta.assessmentId == assessId;
+                        return 'data' in calEvent && calEvent.data.meta.assessmentId == assessId;
                     }).pop();
 
                     calEvent.start = newDate;
@@ -550,7 +550,7 @@
             var data = {
                 assessmentId: calEvent.data.meta.assessmentId,
                 openDate: calEvent.start.format(format),
-                dueDate: calEvent.start.clone().add({days: 1, seconds: -1}).format(format)
+                dueDate: calEvent.start.clone().add({days: 1, minutes: -1}).format(format)
             };
 
             calEvent.className.push('loading');
