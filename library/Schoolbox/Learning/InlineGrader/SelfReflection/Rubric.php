@@ -16,8 +16,6 @@ use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\DueWork;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\User;
 
 class Rubric
 {
