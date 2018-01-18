@@ -302,7 +302,7 @@ class Controller extends Base
 
         /* Augment with self-reflection rubric data
          */
-        $selfReflectionData = (new SelfReflection\Rubric($assessment, $participant, $this->getUser(), $response, $isInteractionLocked, $rubricContext))->generate();
+        $selfReflectionData = (new SelfReflection\Rubric($assessment, $participant, $response, $rubricContext))->generate();
         $data = array_merge($data, $selfReflectionData);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/standard.twig', $data));

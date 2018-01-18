@@ -32,19 +32,9 @@ class Rubric
     private $assessment;
 
     /**
-     * @var User
-     */
-    private $currentUser;
-
-    /**
      * @var IResponse
      */
     private $response;
-
-    /**
-     * @var bool
-     */
-    private $isInteractionLocked = false;
 
     /**
      * @var DueWork\RubricContext
@@ -56,24 +46,18 @@ class Rubric
      *
      * @param DueWork\Model  $assessment
      * @param Participant    $participant
-     * @param User           $currentUser
      * @param null|IResponse $response
-     * @param bool           $isInteractionLocked
      * @param RubricContext  $rubricContext
      */
     public function __construct(
         DueWork\Model $assessment,
         Participant $participant,
-        User $currentUser,
         ?IResponse $response,
-        bool $isInteractionLocked,
         RubricContext $rubricContext
     ) {
         $this->assessment = $assessment;
         $this->participant = $participant;
-        $this->currentUser = $currentUser;
         $this->response = $response;
-        $this->isInteractionLocked = $isInteractionLocked;
         $this->rubricContext = $rubricContext;
     }
 
@@ -82,7 +66,7 @@ class Rubric
      *
      * @return array
      */
-    public function generate()
+    public function generate(): array
     {
         $data = [
             'learnerRubricContext' => null,
