@@ -86,12 +86,13 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 	/* Getters/Setters
 	 */
 
-	/**
-	 * Get calendar handler
-	 *
-	 * @return Calendar
-	 */
-	protected function getCalendarHandler() {
-		return $this->calendarHandler;
-	}
+    /**
+     * Get calendar handler
+     *
+     * @return Calendar
+     */
+    protected function getCalendarHandler()
+    {
+        return $this->calendarHandler;
+    }
 }

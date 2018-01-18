@@ -58,7 +58,7 @@ class CalendarApiFactory
         $resourceApi = new Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
             $config->getId(),
             $this->user,
-            $resource->getId()
+            [$resource->getId()]
         );
         $api->add($resourceApi);
 

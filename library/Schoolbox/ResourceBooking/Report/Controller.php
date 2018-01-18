@@ -125,7 +125,7 @@ class Controller extends Base
             'template' => '@resourceBookingReport/index.twig',
             'data'     => [
                 'categoryList' => $categoryList,
-                'eventList'    => $this->getApi()->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp()),
+                'eventList'    => $this->getApi()->getEvents((int)$start->getUnixTimeStamp(), (int)$end->getUnixTimeStamp()),
                 'search'       => [
                     'start'    => $start,
                     'end'      => $end,

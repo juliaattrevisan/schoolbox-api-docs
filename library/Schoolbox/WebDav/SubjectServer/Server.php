@@ -174,10 +174,10 @@ class Server extends DAV\Collection
                 $this->retrieveUserFromSource(),
                 true,
                 $this->currentTerm,
-                ['type'  => AssessmentType::TYPE_DUE_WORK,]
+                ['type' => AssessmentType::TYPE_DUE_WORK,]
             )
-            ->filter(function(IAssessable $assessment) use ($visibility) {
-                if(!$assessment instanceof DueWork || !($assessment->isAcceptMulti() || $assessment->isAcceptSingle())){
+            ->filter(function (IAssessable $assessment) use ($visibility) {
+                if (!$assessment instanceof DueWork || !($assessment->isAcceptMulti() || $assessment->isAcceptSingle())) {
                     // Not a due work? Or not accepting online submissions?
                     return false;
                 }

@@ -610,15 +610,15 @@ class Controller extends Base
         $source = new Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
             $calendarConfig->getId(),
             $this->getUser(),
-            $item->getId()
+            [$item->getId()]
         );
         $source
             ->setStatus($this->getRequest()->query['status']);
 
         $calendar = new Renderer(
             $source,
-            $this->getRequest()->query['start'],
-            $this->getRequest()->query['end'],
+            (int)$this->getRequest()->query['start'],
+            (int)$this->getRequest()->query['end'],
             $this->getUser(),
             $this->getDi()->get('sitePage'),
             $this->getUser()

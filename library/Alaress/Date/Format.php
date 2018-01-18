@@ -276,7 +276,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      *
      * @see Alaress_Date_Strategy_Abstract->setFromFormat() for param description
      *
-     * @param string|object                 $dateTime
+     * @param string|int|object             $dateTime
      * @param string|array                  $dateFormat If array, try each in turn until it works
      * @param DateTimeZone                  $timezone The timezone of the date, or null to use default
      * @param Alaress_Date_Locale_Interface $locale

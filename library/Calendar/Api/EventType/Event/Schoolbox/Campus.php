@@ -15,20 +15,20 @@ use Schoolbox\User;
 
 class Calendar_Api_EventType_Event_Schoolbox_Campus extends Calendar_Api_EventType_Event_Schoolbox_Default {
 
-	/**
-	 * The campus to get events for. If null, returns events for all campuses.
-	 *
-	 * @var null|int
-	 */
-	private $campus_id;
+    /**
+     * The campus to get events for. If null, returns events for all campuses.
+     *
+     * @var null|int
+     */
+    private $campus_id;
 
 
     /**
-     * @param int $connectorId
+     * @param int      $connectorId
      * @param User     $user
      * @param null|int $campusId
      */
-	public function __construct(int $connectorId, User $user, int $campusId = null)
+    public function __construct(int $connectorId, User $user, int $campusId = null)
     {
         parent::__construct($connectorId, $user);
         $this->campus_id = $campusId;
@@ -48,7 +48,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Campus extends Calendar_Api_EventTy
 			$this->getUser(),
 			$startTimestamp,
 			$endTimestamp,
-			array('campus' => $this->campus_id)
-		);
+            ['campus' => $this->campus_id]
+        );
 	}
 }

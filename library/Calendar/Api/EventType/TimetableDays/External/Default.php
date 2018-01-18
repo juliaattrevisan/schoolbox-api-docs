@@ -14,7 +14,6 @@ use Calendar\Event\Collection;
 use Calendar\Event\Type\Timetable\Event;
 use Schoolbox\User;
 
-
 class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api_EventType_Abstract
 {
 

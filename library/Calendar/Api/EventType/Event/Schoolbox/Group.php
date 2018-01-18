@@ -12,12 +12,12 @@ use Schoolbox\User;
  */
 class Calendar_Api_EventType_Event_Schoolbox_Group extends Calendar_Api_EventType_Event_Schoolbox_Default {
 
-	/**
-	 * The group to get events for. Does not filter by group if NULL
-	 *
-	 * @var null|int
-	 */
-	private $group_id;
+    /**
+     * The group to get events for. Does not filter by group if NULL
+     *
+     * @var null|int
+     */
+    private $group_id;
 
 
     /**
@@ -45,7 +45,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Group extends Calendar_Api_EventTyp
 			$this->getUser(),
 			$startTimestamp,
 			$endTimestamp,
-			array('group' => $this->group_id)
-		);
+            ['group' => $this->group_id]
+        );
 	}
 }

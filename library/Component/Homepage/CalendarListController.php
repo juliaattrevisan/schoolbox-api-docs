@@ -91,8 +91,8 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
         // Render all events for group using html renderer
         $eventRenderer = new Lister(
             $calendarApi,
-            $this->start->getUnixTimeStamp(),
-            $this->end->getUnixTimeStamp(),
+            (int)$this->start->getUnixTimeStamp(),
+            (int)$this->end->getUnixTimeStamp(),
             $this->getUser(),
             $this->getSitePage(),
             $this->getUser()

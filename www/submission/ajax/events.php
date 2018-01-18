@@ -43,7 +43,7 @@ $calendarApi           = new Calendar_Api_EventType_Submission_Schoolbox_ForDueW
     $visibility,
     $colourManager
 );
-$renderer              = new Calendar\Event\Collection\Renderer($calendarApi, $_GET['start'], $_GET['end'], $user, $this, $viewer);
+$renderer              = new Calendar\Event\Collection\Renderer($calendarApi, (int)$_GET['start'], (int)$_GET['end'], $user, $this, $viewer);
 
 // Render it
 echo "[";

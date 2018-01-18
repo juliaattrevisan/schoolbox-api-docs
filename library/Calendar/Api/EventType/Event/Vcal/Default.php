@@ -12,7 +12,6 @@ use Calendar\Event\Collection;
 use Calendar\Event\Type\Day\Event;
 use Schoolbox\User;
 
-
 class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_Abstract
 {
 

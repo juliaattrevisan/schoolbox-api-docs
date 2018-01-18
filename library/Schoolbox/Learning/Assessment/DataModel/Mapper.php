@@ -70,7 +70,7 @@ class Mapper extends BaseMapper
         $this->joinsReverseSingle('assessment_id', SubmissionBoxMapper::class, 'duework', 'duework');
         $this->joinsReverseSingle('assessment_id', Quiz\Mapper::class, 'quiz', 'quiz');
         $this->joinsReverseSingle('assessment_id', Project\Mapper::class, 'project', 'project');
-        $this->joinsReverseMulti('assessment_id',  Plan\Mapper::class, 'plans', 'plans');
+        $this->joinsReverseMulti('assessment_id', Plan\Mapper::class, 'plans', 'plans');
 
 
 
@@ -313,10 +313,10 @@ class Mapper extends BaseMapper
     /**
      * Somewhat efficient query for retrieving the assessments which this student has participated in.
      *
-     * @param User                $student
-     * @param bool                $usePlanDates Should we try to filter on plan dates instead of assessment dates?
-     * @param Alaress_Date_Format $from
-     * @param Alaress_Date_Format $to
+     * @param User                     $student
+     * @param bool                     $usePlanDates Should we try to filter on plan dates instead of assessment dates?
+     * @param null|Alaress_Date_Format $from
+     * @param null|Alaress_Date_Format $to
      * @return array|int[]
      * @throws BaseMapper\DefinitionException If join name is not on this mapper
      */
@@ -344,7 +344,7 @@ class Mapper extends BaseMapper
         }
 
         $planJoin = '';
-        if($usePlanDates){
+        if ($usePlanDates) {
             $planJoin = "
                 LEFT JOIN {$this->getJoinSql('plans', 'a', 'pp')}
                 LEFT JOIN {$this->getJoinSql('plans.participants', 'pp', 'p')} AND p.user_id = {$student->getId()}
@@ -500,7 +500,7 @@ class Mapper extends BaseMapper
 
         // Send IDs to findByColumnList
         $ids = array_merge($idList, $uniqueIds);
-        if(0 === \count($ids)){
+        if (0 === \count($ids)) {
             return $this->createCollection();
         }
         return $this->findByPredicates($builder->in('id', $ids), $options);
@@ -580,7 +580,7 @@ class Mapper extends BaseMapper
         $idStatement->execute($params);
         $idList = array_merge(array_column($idStatement->fetchAll(), 'id'), $uniqueIds);
 
-        if(0 === \count($idList)){
+        if (0 === \count($idList)) {
             return $this->createCollection();
         }
         return $this->findByPredicates($builder->in('id', $idList), $options);

@@ -74,8 +74,6 @@ class Visibility
             $participant = $assessment->getParticipantIfExtant($viewer);
             return $participant && Alaress_Date_Format::now()->gte($participant->getPublishDate());
         }
-
         return false;
     }
-
 }

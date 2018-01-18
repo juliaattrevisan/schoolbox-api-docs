@@ -27,8 +27,8 @@ abstract class Calendar_Layout_Full_Abstract
     protected $selectedDate = null;
     protected $startOfWeek = null;
 
-    /** Actual connector instance */
-    protected $api = null;
+    /** @var Calendar_Api_EventType_Interface Actual connector instance */
+    protected $api;
 
     /** @var  Schoolbox\User $user     Who this Calendar is about */
     protected $user;
@@ -474,7 +474,7 @@ abstract class Calendar_Layout_Full_Abstract
     /**
      * Get api
      *
-     * @return null
+     * @return Calendar_Api_EventType_Interface
      */
     protected function getApi()
     {

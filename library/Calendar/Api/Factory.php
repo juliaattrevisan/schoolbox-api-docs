@@ -23,7 +23,6 @@ use Schoolbox\Config;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
 
-
 class Calendar_Api_Factory
 {
     /**
@@ -52,7 +51,7 @@ class Calendar_Api_Factory
      *
      * @param Assessment\MapperProxy $assessmentDataSource
      * @param Participant\DataSource $participantDataSource
-     * @param  IConnector            $databaseExternal
+     * @param null|IConnector        $databaseExternal
      */
     public function __construct(
         Assessment\MapperProxy $assessmentDataSource,

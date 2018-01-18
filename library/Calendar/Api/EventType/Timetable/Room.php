@@ -6,7 +6,6 @@ use Calendar\Event\Collection;
 use Calendar\Event\Type\Day\Event;
 use Schoolbox\User;
 
-
 /**
  * Event type that represents events for a room.
  *
@@ -214,5 +213,4 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
         $this->externalTimetable = $externalTimetable;
         return $this;
     }
-
 }

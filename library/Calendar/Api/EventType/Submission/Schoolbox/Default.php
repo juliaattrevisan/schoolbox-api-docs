@@ -72,10 +72,8 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
      *
      * @param int $startTimestamp
      * @param int $endTimestamp
-     *
      * @return Collection|Submission[]
      * @throws DomainException
-     * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      * @throws \Schoolbox\Mapper\DefinitionException
      */
@@ -110,9 +108,8 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
         $this->participantDataSource->loadParticipationIntoAssessmentCollection($assessables, $this->getUser());
 
         foreach ($assessables as $assessment) {
-
             // Permission check to see the assessment
-            if(!$this->visibility->isVisibleToUser($assessment, $this->getUser(), true)){
+            if (!$this->visibility->isVisibleToUser($assessment, $this->getUser(), true)) {
                 continue;
             }
 

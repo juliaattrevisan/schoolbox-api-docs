@@ -46,14 +46,14 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
         $this->end->addDays($dayLimit);
 
         // Produce API for schoolbox group events
-        $calendarConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_Event_Schoolbox_Default::class);
+        $calendarConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_Event_Schoolbox_Group::class);
         $calendarApi    = new Calendar_Api_EventType_Event_Schoolbox_Group($calendarConfig->getId(), $this->getUser(), $this->getContext()->getId());
 
         // Render all events for group using html renderer
         $eventRenderer = new Lister(
             $calendarApi,
-            $this->start->getUnixTimeStamp(),
-            $this->end->getUnixTimeStamp(),
+            (int)$this->start->getUnixTimeStamp(),
+            (int)$this->end->getUnixTimeStamp(),
             $this->getUser(),
             $this->getSitePage(),
             $this->getUser()

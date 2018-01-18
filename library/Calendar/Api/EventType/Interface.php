@@ -1,8 +1,4 @@
 <?php
-
-use Calendar\Event\Type\EventInterface;
-use Schoolbox\Collection;
-
 /**
  * Calendar_Api_EventType_Interface
  *
@@ -22,14 +18,14 @@ interface Calendar_Api_EventType_Interface
     /**
      * @param int $startTimestamp
      * @param int $endTimestamp
-     * @return Collection
+     * @return Calendar\Event\Collection
      */
     public function getEvents($startTimestamp, $endTimestamp);
 
 
     /**
      * @param $eventId
-     * @return EventInterface
+     * @todo What does this return?
      */
     public function getEvent($eventId);
 }

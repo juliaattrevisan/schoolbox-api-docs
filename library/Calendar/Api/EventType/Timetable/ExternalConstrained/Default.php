@@ -6,7 +6,6 @@ use Calendar\Event\Collection;
 use Calendar\Event\Type\Timetable\Event;
 use Schoolbox\User;
 
-
 /**
  * Event type that represents events from the external timetable handler.
  *

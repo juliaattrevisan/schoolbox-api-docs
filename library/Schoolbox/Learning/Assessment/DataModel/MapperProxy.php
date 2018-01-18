@@ -355,7 +355,7 @@ class MapperProxy
      */
     public function findAllByFolderIdForReview($folderId, User $student = null, array $options = [])
     {
-        if($student instanceof User) {
+        if ($student instanceof User) {
             $assessments = $this->baseMapper->findForFolderAndParticipant(
                 [$folderId],
                 $student,
@@ -521,7 +521,7 @@ class MapperProxy
         // but has created a response or feedback for.
         $uniqueAssessmentIds = $this->baseMapper->findUniqueAssessmentIdsForStudentBetweenDates($student, $usePlanDates, $from, $to);
 
-        if($usePlanDates){
+        if ($usePlanDates) {
             $assessments = $this->baseMapper->findForFolderAndParticipant(
                 $classFolderIds,
                 $student,
@@ -577,7 +577,7 @@ class MapperProxy
         // but has created a response or feedback for.
         $uniqueAssessmentIds = $this->baseMapper->findUniqueAssessmentIdsForStudentBetweenDates($student, $usePlanDates, $from, $to);
 
-        if($usePlanDates){
+        if ($usePlanDates) {
             $assessments = $this->baseMapper->findForFolderAndParticipant(
                 $classFolderIds,
                 $student,
