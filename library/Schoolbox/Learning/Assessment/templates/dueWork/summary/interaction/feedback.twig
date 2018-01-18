@@ -92,7 +92,7 @@
                  data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
                  data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}">
                 {% include '@rubric/grid.twig' with {
-                    rubric: rubricContext.rubric,
+                    rubric: feedbackRubricContexts[currentFeedback.id].rubric,
                     markVisibility: participant.assessable.isFeedbackVisibleToUser(USER)
                 } only %}
             </div>

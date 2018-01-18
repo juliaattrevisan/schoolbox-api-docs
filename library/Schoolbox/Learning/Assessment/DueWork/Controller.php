@@ -239,6 +239,18 @@ class Controller extends Assessment\Controller
             $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
         }
 
+        // Generate rubric context for every feedback
+        $rubricContext          = new RubricContext($this->rubricMapper);
+        $feedbackRubricContexts = [];
+        foreach ($participant->getAllFeedbacks() as $feedback) {
+            if ($feedback->isPublished()) {
+                $feedbackRubricContexts[$feedback->getId()] = $rubricContext->generateForFeedback(
+                    $feedback,
+                    $this->getUser(),
+                    $this->getAccess()
+                );
+            }
+        }
 
         /* Find all the records spawned by $participant
          *
@@ -259,7 +271,8 @@ class Controller extends Assessment\Controller
 
             /* Rubrics data
              */
-            'rubricContext' => (new RubricContext($this->rubricMapper))->generate($assessment, $student, $this->getUser(), $this->getAccess()),
+            'rubricContext' => $rubricContext->generate($assessment, $student, $this->getUser(), $this->getAccess()),
+            'feedbackRubricContexts' => $feedbackRubricContexts,
 
             'authoritativeFeedback' => $participant->findAuthoritativeVisibleFeedback($this->getUser()),
         ];
