@@ -32,14 +32,14 @@ class Builder implements IBuilder
     /** @var string */
     protected $table;
 
-    /** @var array */
+    /** @var string[] */
     protected $where = [];
 
     /** @var array */
     protected $params = [];
 
     /** @var string */
-    protected $paramPrefix = null;
+    protected $paramPrefix;
 
     /**
      * PredicateBuilder constructor.
@@ -47,9 +47,9 @@ class Builder implements IBuilder
      * @param IQuoter $quoter
      * @param string  $table
      */
-    public function __construct(IQuoter $quoter, $table)
+    public function __construct(IQuoter $quoter, string $table)
     {
-        $this->setTable($table);
+        $this->table  = $table;
         $this->quoter = $quoter;
     }
 
@@ -105,7 +105,7 @@ class Builder implements IBuilder
      * @param bool     $negate
      * @return $this
      */
-    protected function addSubPredicate($glue, IBuilder $predicate, $negate)
+    protected function addSubPredicate(string $glue, IBuilder $predicate, bool $negate)
     {
         // Extract this object's where and params
         $this->params  = array_merge($this->getParams(), $predicate->getParams());
@@ -116,17 +116,19 @@ class Builder implements IBuilder
         return $this;
     }
 
+
     /**
      * Convenience method for adding directly from a Mapper column list
      *
      * @param array $columnList
      * @return self
+     * @throws UnderflowException If column array is empty
      */
-    public function addColumnList(array $columnList)
+    public function addColumnList(array $columnList): self
     {
         foreach ($columnList as $columnName => $columnValue) {
             $split = preg_split('/\\s+/', $columnName, 2);
-            if (count($split) > 1) {
+            if (\count($split) > 1) {
                 $this->addPredicate($split[0], $columnValue, $split[1]);
             } else {
                 $this->addPredicate($columnName, $columnValue);
@@ -136,20 +138,22 @@ class Builder implements IBuilder
         return $this;
     }
 
-    /**
-     * @param string $columnName
-     * @return Builder
-     */
-    public function isNull($columnName)
-    {
-        return $this->addPredicate($columnName, null);
-    }
 
     /**
      * @param string $columnName
      * @return Builder
      */
-    public function notNull($columnName)
+    public function isNull($columnName): self
+    {
+        return $this->addPredicate($columnName, null);
+    }
+
+
+    /**
+     * @param string $columnName
+     * @return Builder
+     */
+    public function notNull($columnName): self
     {
         return $this->addPredicate($columnName, null, self::OPERATOR_NOT_EQUALS);
     }
@@ -158,7 +162,7 @@ class Builder implements IBuilder
      * @param string $columnName
      * @return Builder
      */
-    public function isTrue($columnName)
+    public function isTrue($columnName): self
     {
         return $this->addPredicate($columnName, true);
     }
@@ -167,7 +171,7 @@ class Builder implements IBuilder
      * @param string $columnName
      * @return Builder
      */
-    public function isFalse($columnName)
+    public function isFalse($columnName): self
     {
         return $this->addPredicate($columnName, false);
     }
@@ -184,8 +188,9 @@ class Builder implements IBuilder
      * @param string                    $columnName
      * @param string|int|string[]|int[] $columnValue
      * @return Builder
+     * @throws UnderflowException If columnValue is an empty array
      */
-    public function notEquals($columnName, $columnValue)
+    public function notEquals($columnName, $columnValue): self
     {
         return $this->addPredicate($columnName, $columnValue, self::OPERATOR_NOT_EQUALS);
     }
@@ -201,7 +206,7 @@ class Builder implements IBuilder
      * @see \Database::escapeForLike for escaping user input.
      * @return Builder
      */
-    public function like($columnName, $columnValue)
+    public function like($columnName, $columnValue): self
     {
         return $this->addPredicate($columnName, $columnValue, self::OPERATOR_LIKE);
     }
@@ -220,7 +225,7 @@ class Builder implements IBuilder
      *                            @see \Database::escapeForLike for escaping user input.
      * @return Builder
      */
-    public function notLike($columnName, $columnValue)
+    public function notLike($columnName, $columnValue): self
     {
         return $this->addPredicate($columnName, $columnValue, self::OPERATOR_NOT_LIKE);
     }
@@ -230,7 +235,7 @@ class Builder implements IBuilder
      * @param int|string $columnValue  if string, must be datetime
      * @return Builder
      */
-    public function lessThan($columnName, $columnValue)
+    public function lessThan($columnName, $columnValue): self
     {
         return $this->addPredicate($columnName, $columnValue, self::OPERATOR_LT);
     }
@@ -240,7 +245,7 @@ class Builder implements IBuilder
      * @param int|string $columnValue  if string, must be datetime
      * @return Builder
      */
-    public function lessThanOrEqualTo($columnName, $columnValue)
+    public function lessThanOrEqualTo($columnName, $columnValue): self
     {
         $builder = null;
         try{
@@ -257,7 +262,7 @@ class Builder implements IBuilder
      * @param int|string $columnValue  if string, must be datetime
      * @return Builder
      */
-    public function greaterThan($columnName, $columnValue)
+    public function greaterThan($columnName, $columnValue): self
     {
         return $this->addPredicate($columnName, $columnValue, self::OPERATOR_GT);
     }
@@ -282,7 +287,7 @@ class Builder implements IBuilder
      * @param int|string $columnValue  if string, must be datetime
      * @return Builder
      */
-    public function notLessThan($columnName, $columnValue)
+    public function notLessThan($columnName, $columnValue): self
     {
         return $this->greaterThanOrEqualTo($columnName, $columnValue);
     }
@@ -292,7 +297,7 @@ class Builder implements IBuilder
      * @param int|string $columnValue  if string, must be datetime
      * @return Builder
      */
-    public function notGreaterThan($columnName, $columnValue)
+    public function notGreaterThan($columnName, $columnValue): self
     {
         return $this->lessThanOrEqualTo($columnName, $columnValue);
     }
@@ -305,7 +310,7 @@ class Builder implements IBuilder
      * @param mixed  $to   If null, this value is excluded.
      * @return Builder
      */
-    public function between($columnName, $from, $to)
+    public function between($columnName, $from, $to): self
     {
         // Either is null: ignore
         if (isset($from)) {
@@ -331,7 +336,7 @@ class Builder implements IBuilder
         \Alaress_Date_Format $from = null,
         \Alaress_Date_Format $to = null,
         $compareFormat = \Alaress_Date_Format::DATABASE_FORMAT
-    ) {
+    ): self {
         if (isset($from) && !$from->isNull()) {
             $this->addPredicate($columnName, $from->getUsingFormat($compareFormat), self::OPERATOR_GTE);
         }
@@ -348,7 +353,7 @@ class Builder implements IBuilder
      * @throws UnderflowException if an empty IN is attempted
      * @return self
      */
-    protected function addPredicate($columnName, $columnValue, $operator = self::OPERATOR_EQUALS)
+    protected function addPredicate($columnName, $columnValue, $operator = self::OPERATOR_EQUALS): self
     {
         // prepare operator modifiers
         $negate = self::OPERATOR_NOT_EQUALS == $operator || self::OPERATOR_NOT_LIKE == $operator;
@@ -439,7 +444,7 @@ class Builder implements IBuilder
      *
      * @return string Something like "(:id_0, :id_1, :id_2)".
      */
-    public static function getArrayPlaceholders($input, $prefix = null)
+    public static function getArrayPlaceholders($input, $prefix = null): string
     {
         return '(' . implode(',', self::getPlaceholders($input, $prefix)) . ')';
     }
@@ -452,7 +457,7 @@ class Builder implements IBuilder
      * @param string $prefix If not supplied, ? will be used as the placeholder
      *                       for all values.
      *
-     * @return array Something like:
+     * @return string[] Something like:
      *
      *      [
      *          'placeholders' => ":id_0, :id_1, :id_2",
@@ -463,7 +468,7 @@ class Builder implements IBuilder
      *          ]
      *      ]
      */
-    public static function getArrayBindings($input, $prefix = null)
+    public static function getArrayBindings($input, $prefix = null): array
     {
         $return = [];
         $return['placeholders'] = implode(",", self::getPlaceholders($input, $prefix));
@@ -484,9 +489,9 @@ class Builder implements IBuilder
      *
      * @param array $input
      * @param string $prefix
-     * @return array
+     * @return string[]
      */
-    protected static function getPlaceholders($input, $prefix = null)
+    protected static function getPlaceholders($input, $prefix = null): array
     {
         $placeholders = [];
         foreach ($input as $i => $param) {
@@ -509,7 +514,7 @@ class Builder implements IBuilder
      *
      * @return array
      */
-    public static function getArrayParameters($input, $prefix = null)
+    public static function getArrayParameters($input, $prefix = null): array
     {
         $params = array();
         foreach ($input as $i => $param) {
@@ -529,7 +534,7 @@ class Builder implements IBuilder
      * @param string $placeholder
      * @return string
      */
-    protected static function escapePlaceholder($placeholder)
+    protected static function escapePlaceholder($placeholder): string
     {
         return preg_replace('/[^a-zA-Z0-9_]/', '_', $placeholder);
     }
@@ -542,9 +547,9 @@ class Builder implements IBuilder
      * @param mixed $mixed
      * @return bool
      */
-    public static function canTraverse($mixed)
+    public static function canTraverse($mixed): bool
     {
-        return is_array($mixed) || ($mixed instanceof Traversable && $mixed instanceof Countable);
+        return \is_array($mixed) || ($mixed instanceof Traversable && $mixed instanceof Countable);
     }
 
 
@@ -553,22 +558,9 @@ class Builder implements IBuilder
      *
      * @return string
      */
-    public function getTable()
+    public function getTable(): string
     {
         return $this->table;
-    }
-
-
-    /**
-     * Set the target table
-     *
-     * @param string $table
-     * @return static
-     */
-    protected function setTable($table)
-    {
-        $this->table = $table;
-        return $this;
     }
 
 
@@ -578,7 +570,7 @@ class Builder implements IBuilder
      *
      * @return array
      */
-    public function getPredicates()
+    public function getPredicates(): array
     {
         return [
             'where'  => $this->where,
@@ -592,15 +584,15 @@ class Builder implements IBuilder
      *
      * @return int
      */
-    public function count()
+    public function count(): int
     {
-        return count($this->where);
+        return \count($this->where);
     }
 
     /**
      * @return string[]
      */
-    public function getWhere()
+    public function getWhere(): array
     {
         return $this->where;
     }
@@ -609,7 +601,7 @@ class Builder implements IBuilder
     /**
      * @return array
      */
-    public function getParams()
+    public function getParams(): array
     {
         return $this->params;
     }
@@ -622,7 +614,7 @@ class Builder implements IBuilder
      * @param mixed  $value
      * @return static
      */
-    public function putParam($param, $value)
+    public function putParam($param, $value): self
     {
         $this->params[$param] = $value;
         return $this;
@@ -634,7 +626,7 @@ class Builder implements IBuilder
      * @param $string
      * @return self|$this
      */
-    public function setParamPrefix($string)
+    public function setParamPrefix($string): self
     {
         $this->paramPrefix = $string;
         return $this;
@@ -646,7 +638,7 @@ class Builder implements IBuilder
      * @param string $param
      * @return string
      */
-    public function getNonCollidingParamAlias($param)
+    public function getNonCollidingParamAlias($param): string
     {
         $i = 0;
         while ($i < 10000) {
