@@ -15,16 +15,16 @@ use UnderflowException;
 
 class Builder implements IBuilder
 {
-    const OPERATOR_EQUALS     = '=';
-    const OPERATOR_NOT_EQUALS = '<>';
-    const OPERATOR_LIKE       = 'LIKE';
-    const OPERATOR_NOT_LIKE   = 'NOT LIKE';
-    const OPERATOR_LT         = '<';
-    const OPERATOR_LTE        = '<=';
-    const OPERATOR_GT         = '>';
-    const OPERATOR_GTE        = '>=';
-    const OPERATOR_INTERSECT  = 'AND';
-    const OPERATOR_UNION      = 'OR';
+    private const OPERATOR_EQUALS     = '=';
+    private const OPERATOR_NOT_EQUALS = '<>';
+    private const OPERATOR_LIKE       = 'LIKE';
+    private const OPERATOR_NOT_LIKE   = 'NOT LIKE';
+    private const OPERATOR_LT         = '<';
+    private const OPERATOR_LTE        = '<=';
+    private const OPERATOR_GT         = '>';
+    private const OPERATOR_GTE        = '>=';
+    private const OPERATOR_INTERSECT  = 'AND';
+    private const OPERATOR_UNION      = 'OR';
 
     /** @var IQuoter */
     protected $quoter;
