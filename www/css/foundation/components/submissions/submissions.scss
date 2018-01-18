@@ -177,11 +177,15 @@ table.rubric {
     form {
         margin-bottom: 0;
     }
-    table.rb {
-        margin-bottom: 1rem;
-    }
     .scrollable {
-        margin: -1rem -1rem 0;
+        margin: -1rem 0;
+
+        @media #{$small-only} {
+            margin: -0.5rem -1rem;
+        }
+        @media #{$medium-only} {
+            margin: -0.25rem 0;
+        }
     }
 }
 
