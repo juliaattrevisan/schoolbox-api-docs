@@ -18,10 +18,12 @@ use Alaress_Date_Format;
 
 class Visibility
 {
+
     /**
      * @var Access
      */
     private $access;
+
 
     /**
      * Visibility constructor.
@@ -67,7 +69,7 @@ class Visibility
             return true;
         }
         // Is viewer a learner?
-        if ($folderAccessLevel === UserAccess::ACCESS_READ){
+        if ($folderAccessLevel === UserAccess::ACCESS_READ) {
             // Is viewer a participant, and assessment is published for them?
             $participant = $assessment->getParticipantIfExtant($viewer);
             return $participant && Alaress_Date_Format::now()->gte($participant->getPublishDate());

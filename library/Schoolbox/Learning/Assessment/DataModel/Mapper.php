@@ -13,7 +13,6 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
-use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\GenericCollection;
@@ -27,6 +26,7 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use PDO;
+use Schoolbox\Assessment\Participant\Plan;
 use UnderflowException;
 
 /**
@@ -70,6 +70,7 @@ class Mapper extends BaseMapper
         $this->joinsReverseSingle('assessment_id', SubmissionBoxMapper::class, 'duework', 'duework');
         $this->joinsReverseSingle('assessment_id', Quiz\Mapper::class, 'quiz', 'quiz');
         $this->joinsReverseSingle('assessment_id', Project\Mapper::class, 'project', 'project');
+        $this->joinsReverseMulti('assessment_id',  Plan\Mapper::class, 'plans', 'plans');
 
 
 
@@ -312,27 +313,19 @@ class Mapper extends BaseMapper
     /**
      * Somewhat efficient query for retrieving the assessments which this student has participated in.
      *
-     * @param User       $student
-     * @param Term\Model $term
-     * @return array|int[]
-     * @throws BaseMapper\DefinitionException If join name is not on this mapper
-     */
-    public function findUniqueAssessmentIdsForStudent(User $student, Term\Model $term)
-    {
-        return $this->findUniqueAssessmentIdsForStudentBetweenDates($student, $term->getStart(), $term->getActualFinish());
-    }
-
-    /**
-     * Somewhat efficient query for retrieving the assessments which this student has participated in.
-     *
      * @param User                $student
+     * @param bool                $usePlanDates Should we try to filter on plan dates instead of assessment dates?
      * @param Alaress_Date_Format $from
      * @param Alaress_Date_Format $to
      * @return array|int[]
      * @throws BaseMapper\DefinitionException If join name is not on this mapper
      */
-    public function findUniqueAssessmentIdsForStudentBetweenDates(User $student, Alaress_Date_Format $from = null, Alaress_Date_Format $to = null)
-    {
+    public function findUniqueAssessmentIdsForStudentBetweenDates(
+        User $student,
+        bool $usePlanDates,
+        Alaress_Date_Format $from = null,
+        Alaress_Date_Format $to = null
+    ): array {
         // Filter task/duework/quiz by term dates
         $params   = [
             'userId' => $student->getId(),
@@ -343,11 +336,19 @@ class Mapper extends BaseMapper
         ];
         if ($from instanceof Alaress_Date_Format && !$from->isNull()) {
             $params['from'] = $from->getDatabase();
-            $whereParts[]   = 'DATE(a.due_date) >= :from';
+            $whereParts[]   = ($usePlanDates ? 'DATE(COALESCE(pp.due_date, a.due_date))' : 'DATE(a.due_date)') . ' >= :from';
         }
         if ($to instanceof Alaress_Date_Format && !$to->isNull()) {
             $params['to'] = $to->getDatabase();
-            $whereParts[]   = 'DATE(a.due_date) <= :to';
+            $whereParts[]   = ($usePlanDates ? 'DATE(COALESCE(pp.due_date, a.due_date))' : 'DATE(a.due_date)') . ' <= :to';
+        }
+
+        $planJoin = '';
+        if($usePlanDates){
+            $planJoin = "
+                LEFT JOIN {$this->getJoinSql('plans', 'a', 'pp')}
+                LEFT JOIN {$this->getJoinSql('plans.participants', 'pp', 'p')} AND p.user_id = {$student->getId()}
+            ";
         }
 
         $where = implode(' AND ', $whereParts);
@@ -362,6 +363,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('duework.return', 'd', 'dr')} AND dr.owner = :userId
             LEFT JOIN {$this->getJoinSql('quiz', 'a', 'q', true)}
             LEFT JOIN {$this->getJoinSql('quiz.attempt', 'q', 'qa')} AND qa.user_id = :userId
+            {$planJoin}
             WHERE {$where}
             ORDER BY a.id ASC
         ";
@@ -421,6 +423,7 @@ class Mapper extends BaseMapper
         ";
     }
 
+
     /**
      * Retrieves all assessable objects that are in this folder, whether they
      * are attached directly to this folder or through a course implementation
@@ -433,11 +436,11 @@ class Mapper extends BaseMapper
      *
      * @return Collection|Model[]
      */
-    public function findAllForFolderId($folderId, Builder $builder, $uniqueIds = [], $options = [])
+    public function findAllForFolderId($folderId, Builder $builder, array $uniqueIds = [], array $options = []): Collection
     {
         // Support stuff for query
         $folderList = Builder::canTraverse($folderId) ? $folderId : [$folderId];
-        if (count($folderList) === 0) {
+        if (\count($folderList) === 0) {
             // Exit early if empty
             return $this->createCollection();
         }
@@ -496,13 +499,91 @@ class Mapper extends BaseMapper
         $idList = array_column($idStatement->fetchAll(), 'id');
 
         // Send IDs to findByColumnList
-
-        try {
-            $builder = $builder->in('id', array_merge($idList, $uniqueIds));
-            return $this->findByPredicates($builder, $options);
-        } catch (UnderflowException $e) {
+        $ids = array_merge($idList, $uniqueIds);
+        if(0 === \count($ids)){
             return $this->createCollection();
         }
+        return $this->findByPredicates($builder->in('id', $ids), $options);
+    }
+
+
+    /**
+     * Returns assessments that:
+     * * are in the specified folders, or unitImpl/project belonging to the specified folders
+     * * if the student is in a plan with custom dates, date clauses are applied to the plan dates
+     *
+     * @param int[]   $folderIds
+     * @param User    $participantUser
+     * @param Builder $builder   A PredicateBuilder which contains columns to query on.
+     * @param array   $uniqueIds IDs of any assessables that should also be included
+     * @param array   $options   Any other options to pass to the final search to `findByColumnList`.
+     *
+     * @return GenericCollection|Model[]
+     */
+    public function findForFolderAndParticipant(
+        array $folderIds,
+        User $participantUser,
+        Builder $builder,
+        array $uniqueIds = [],
+        array $options = []
+    ): GenericCollection {
+        if (\count($folderIds) === 0) {
+            return $this->createCollection();
+        }
+        $params       = Builder::getArrayParameters($folderIds, 'folder');
+        $placeholders = Builder::getArrayPlaceholders($folderIds, 'folder');
+
+        $idQuery = "
+            SELECT a.id
+            FROM `folder` f
+            JOIN `assessment_folder` AS `v_f`  ON `f`.`id` = `v_f`.`folder_id`
+            JOIN `assessment` AS `a` ON `a`.`id` = `v_f`.`assessment_id`
+            LEFT JOIN participant_plan plan ON a.id = plan.assessment_id
+            LEFT JOIN participant pt ON plan.id = pt.participant_plan_id AND pt.user_id = {$participantUser->getId()}
+            WHERE f.id IN {$placeholders}
+
+            UNION
+
+            SELECT af.id
+            FROM `folder` uicf
+            JOIN `course_implementation` AS `uic` ON `uicf`.`id` = `uic`.`folder_id` AND `uic`.`deleted_at` IS NULL
+            JOIN `course_unit_implementation` AS `ui` ON `uic`.`id` = `ui`.`course_implementation_id` AND `ui`.`deleted_at` IS NULL
+            JOIN `assessment_course_unit_implementation` AS `v_ui` ON `ui`.`id` = `v_ui`.`course_unit_implementation_id`
+            JOIN `assessment` AS `af` ON `af`.`id` = `v_ui`.`assessment_id`
+            LEFT JOIN participant_plan plan ON af.id = plan.assessment_id
+            LEFT JOIN participant pt ON plan.id = pt.participant_plan_id AND pt.user_id = {$participantUser->getId()}
+            WHERE uicf.id IN {$placeholders}
+            
+            UNION
+            
+            SELECT `p_a`.`assessment_id`
+            FROM project_assessment `p_a` 
+            JOIN `project` AS `p` ON `p`.`id` = `p_a`.`project_id`
+            JOIN assessment_course_unit_implementation AS `v_ui` ON `v_ui`.`assessment_id` = `p`.assessment_id
+            JOIN `course_unit_implementation` AS `ui` ON `ui`.`id` = `v_ui`.`course_unit_implementation_id`
+            JOIN course_implementation AS `uic` ON `uic`.`id` = `ui`.course_implementation_id
+            LEFT JOIN participant_plan plan ON `p_a`.`assessment_id` = plan.assessment_id
+            LEFT JOIN participant pt ON plan.id = pt.participant_plan_id AND pt.user_id = {$participantUser->getId()}
+            WHERE `uic`.`folder_id` IN {$placeholders}
+            
+            UNION
+            
+            SELECT `p_a`.`assessment_id`
+            FROM project_assessment `p_a` 
+            JOIN `project` AS `p` ON `p`.`id` = `p_a`.`project_id`
+            JOIN assessment_folder AS `v_f`ON `v_f`.`assessment_id` = `p`.`assessment_id`
+            LEFT JOIN participant_plan plan ON `p_a`.`assessment_id` = plan.assessment_id
+            LEFT JOIN participant pt ON plan.id = pt.participant_plan_id AND pt.user_id = {$participantUser->getId()}
+            WHERE `v_f`.`folder_id` IN {$placeholders}
+        ";
+        $idStatement = $this->getDatabase()->prepare($idQuery);
+        $idStatement->execute($params);
+        $idList = array_merge(array_column($idStatement->fetchAll(), 'id'), $uniqueIds);
+
+        if(0 === \count($idList)){
+            return $this->createCollection();
+        }
+        return $this->findByPredicates($builder->in('id', $idList), $options);
     }
 
     /**

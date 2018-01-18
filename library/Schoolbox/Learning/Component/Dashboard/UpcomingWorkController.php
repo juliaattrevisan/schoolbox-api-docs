@@ -27,7 +27,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
 {
     // Should match the DB value
-    const LIMIT_DEFAULT = 10;
+    private const LIMIT_DEFAULT = 10;
 
     /**
      * The upcoming Quiz + DueWork that are visible to this Student
@@ -54,12 +54,17 @@ class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
      */
     private $assessmentDataSource;
 
+
     /**
      * Business logic to collate data ready for output
      *
      * @return bool Whether to continue on and attempt Component render
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function execute()
+    public function execute(): bool
     {
         $this->limit = is_numeric($this->getConfig('size')) ? $this->getConfig('size') : self::LIMIT_DEFAULT;
 
@@ -69,9 +74,9 @@ class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
         $term = $this->termMapper->findForToday();
         $student = $this->getUser();
 
-        $visibility = new Visibility($this->getAccess());
+        $visibility                = new Visibility($this->getAccess());
         $this->upcomingAssessments = $this->assessmentDataSource
-            ->findAllByStudent($student, $term)
+            ->findAllByStudent($student, true, $term)
             ->sortByCallback(new DueDateSortStrategy($student))
             ->filter(function (IAssessable $assessable) use ($student, $visibility) {
                 // Only show work that the student has permission to view
@@ -79,7 +84,7 @@ class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
             })
             ->limit($this->limit ?: null);
 
-        return count($this->upcomingAssessments) > 0;
+        return \count($this->upcomingAssessments) > 0;
     }
 
     /**

@@ -16,7 +16,6 @@ use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\DueDateSortStrategy;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -64,8 +63,6 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
             return false;
         }
 
-        // TODO - this effectively hydrates all Assessment types in this Folder, then filters out
-        // and discards 2/3 of results. Need to add a method, findAllForContextAndAssessmentType()
         try {
             $visibility = new Visibility($this->getAccess());
 

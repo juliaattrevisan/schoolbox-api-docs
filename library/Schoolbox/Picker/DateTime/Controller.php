@@ -195,10 +195,11 @@ class Controller extends Base
 
 
     /**
-     * @param int $year
-     * @param int $month
+     * @param int    $year
+     * @param int    $month
      * @param Folder $folder
      * @return void
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function getHeat($year, $month, Folder $folder)
     {
@@ -414,6 +415,7 @@ class Controller extends Base
      * @param Alaress_Date_Format $end
      * @param Folder              $folder
      * @return array
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     private function studentsDueWithinRange(Alaress_Date_Format $start, Alaress_Date_Format $end, $folder)
     {
@@ -442,9 +444,9 @@ class Controller extends Base
         foreach ($studentList as $studentCurrent) {
 
             // Create a mock user object and find all assessments for this student
-            $assessments = $this->getAssessmentMapperProxy()->findAllByStudentBetweenDates($studentCurrent, $start, $end);
+            $assessments = $this->getAssessmentMapperProxy()->findAllByStudentBetweenDates($studentCurrent, true, $start, $end);
             // Count how many assessments are due on the specified date
-            $assessmentsDue = count($assessments);
+            $assessmentsDue = \count($assessments);
             $assessmentList = [];
             foreach ($assessments as $assessment) {
                 $assessmentList[] = [

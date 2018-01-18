@@ -153,11 +153,13 @@ class GenericCollection extends Collection
         }
     }
 
+
     /**
      * Replace the internally held contents with the content of the given collection
      *
      * @param Collection $collection
      * @return static
+     * @throws DomainException If collection has wrong member-item type
      */
     public function replaceWith(Collection $collection)
     {

@@ -99,12 +99,15 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
         // Use the assessment data source to get everything for this user
 
         if ($this->getUser()->getRole()->isStudent()) {
-            /** @var Collection|IAssessable[] $assessables */
             $assessables = $this->assessmentDataSource->findAllByStudent($this->getUser(), true, $term);
-            $this->participantDataSource->loadParticipationIntoAssessmentCollection($assessables, $this->getUser());
         } else {
             $assessables = $this->assessmentDataSource->findAllByStaff($this->getUser(), $term);
         }
+
+        // Having a staff role does not guarantee WRITE+ perm to a assessment's folder.
+        // We need to load the current user's participation so users without WRITE+ perm can see the assessment
+        // by virtue of their participation.
+        $this->participantDataSource->loadParticipationIntoAssessmentCollection($assessables, $this->getUser());
 
         foreach ($assessables as $assessment) {
 
@@ -177,7 +180,4 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 
         return $collection;
     }
-
-    /* Getters/Setters
-     */
 }
