@@ -76,7 +76,7 @@ class Mapper extends BaseMapper
     {
         return "
             SELECT      {$this->getColumnString()},
-                        `type`,
+                        {$this->getTable()}.`type`,
                         {$this->getJoinColumnString('author', 'a')},
                         {$this->getJoinColumnString('tour', 't')},
                         {$this->getJoinColumnString('modalStep', 'ms')},
