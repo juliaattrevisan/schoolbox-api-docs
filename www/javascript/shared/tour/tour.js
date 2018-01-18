@@ -45,7 +45,7 @@ $(function () {
                             stepsToDisplay.push({
                                 intro: step.body,
                                 element: step.selector,
-                                tooltipClass: step.css_class+" notintro",
+                                tooltipClass: step.css_class+" closeable-tooltip",
                                 uuid: step.uuid,
                                 jsEvents: step.events,
                                 type: 'tooltip'
@@ -95,9 +95,7 @@ $(function () {
                         var stepNext = tourCurrent._introItems[tourCurrent._currentStep + 1];
 
                     tourCurrent.onafterchange(function(targetElement) {
-                        window.console.log(targetElement);
                         if (tourCurrent._introItems[tourCurrent._currentStep].tooltipClass == 'introjs-intromodal') {
-                            window.console.log("intro");
                             $('.introjs-nextbutton').html("Take me on the tour!");
                             $('.introjs-skipbutton').html("No Thanks");
                         } else {
