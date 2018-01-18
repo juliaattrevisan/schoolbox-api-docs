@@ -135,7 +135,7 @@ class Controller extends Base
     {
         $resultSet = [];
 
-        $now  = Alaress_Date_Format::newDatabaseDate('2017-08-01 00:00:00');
+        $now = Alaress_Date_Format::now();
 
         $classList = new ClassList(
             $student,
@@ -143,10 +143,9 @@ class Controller extends Base
             \Timetable_ColourMapper::getInstance(), // not used in this context
             $this->classListFactory
         );
-        $gridData  = $classList->getClassList($term, $now);
 
         /** @var GenericCollection|Folder\Model[] $folders */
-        $folders = $gridData['classList'];
+        $folders = $classList->getClassList($term, $now)['classList'];
 
         foreach ($folders as $folder) {
 
@@ -161,9 +160,17 @@ class Controller extends Base
             try {
                 $ids = $unitMapper->getJoinMapper('course')->findByColumn('folder_id', $folder->getId())->getPropertyValues('id');
 
-                $units = $unitMapper->findByPredicates(
-                    $unitMapper->getPredicateBuilder()->equals('course_implementation_id', $ids)
-                );
+                $where = $unitMapper->getPredicateBuilder()
+                    ->equals('course_implementation_id', $ids)
+                    ->notLessThan('due_date', $term->getStart()->getDatabase())
+                ;
+
+                if (!$term->getActualFinish()->isNull()) {
+                    $where->notGreaterThan('open_date', $term->getActualFinish()->getDatabase());
+                }
+
+                $units = $unitMapper->findByPredicates($where);
+
             } catch (\UnderflowException $e) {
                 // no units
                 continue;
