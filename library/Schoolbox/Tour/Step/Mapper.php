@@ -102,23 +102,26 @@ class Mapper extends BaseMapper
         /** @var TourMapper $tourMapper */
         $tourMapper = $this->getJoinMapper('tour');
 
+        $hydrators = [
+            'tooltip' => [Tooltip\Mapper::getInstance(), 'ts'],
+            'modal' => [Modal\Mapper::getInstance(), 'ms']
+        ];
+
         foreach ($statement as $row) {
             $model = $this->hydrate($row);
 
             if ($model instanceof Model) {
                 $model->setAuthor($authorUserMapper->hydrate($row, 'a'));
                 $model->setTour($tourMapper->hydrate($row, 't'));
-                $collection->add($model);
 
-                try {
-                    if ($row['type'] == 'tooltip') {
-                        $model->setType(Tooltip\Mapper::getInstance()->hydrate($row, 'ts'));
-                    } else if ($row['type'] == 'modal') {
-                        $model->setType(Modal\Mapper::getInstance()->hydrate($row, 'ms'));
-                    }
-                } catch (\TypeError $e) {
-                    throw new NotFound();
+                if (!array_key_exists($row['type'], $hydrators)) {
+                    continue;
                 }
+
+                [ $mapper, $alias ] = $hydrators[$row['type']];
+                $model->setType($mapper->hydrate($row, $alias));
+
+                $collection->add($model);
             }
         }
 
