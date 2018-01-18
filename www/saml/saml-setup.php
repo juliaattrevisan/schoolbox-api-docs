@@ -16,19 +16,19 @@ $settingsInfo = array (
             'url' => $spBaseUrl.'/saml/index.php?sls',
         ],
         'NameIDFormat' => OneLogin_Saml2_Constants::NAMEID_TRANSIENT,
-        'x509cert' => Cfg::get('data_stream'),
-        'privateKey' => Cfg::get('data_stream'),
+        'x509cert' => Cfg::get('saml_public_cert'),
+        'privateKey' => Cfg::get('saml_private_cert'),
     ],
     'idp' => [
         'entityId' => '',
         'singleSignOnService' => array (
             'url' => Config::get('saml_sso_url'),
-            'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+            'binding' => OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT,
         ),
         // SLO endpoint info of the IdP.
         'singleLogoutService' => array (
             'url' => Config::get('saml_slo_url'),
-            'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+            'binding' => OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT,
         ),
         'x509cert' => preg_replace("/\r/m", "", Config::get('saml_idp_certificate')),
     ],
