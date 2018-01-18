@@ -79,36 +79,12 @@ $(function () {
 
                         // If the current step has custom JS events attached to open of this step - trigger those events now
                         if (stepCurrent.jsEvents !== null) {
-                            for (var key in stepCurrent.jsEvents) {
-                                var jsEvent = stepCurrent.jsEvents[key];
-
-                                // Check this event is set to run on open, and the element exists
-                                if (jsEvent.insertion_point === 'open' && $(jsEvent.selector).length) {
-                                    // Check if the event is one of the predefined events
-                                    if (tourActions[jsEvent.event] !== undefined) {
-                                        tourActions[jsEvent.event].call(this, jsEvent.selector);
-                                    } else { // Otherwise try for a generic trigger on the element
-                                        $(jsEvent.selector).trigger(jsEvent.event);
-                                    }
-                                }
-                            }
+                            runStepEvents(stepCurrent.jsEvents, 'open');
                         }
 
                         // If the previous step had any custom JS events attached on close - trigger those now
                         if (stepLast !== undefined && stepLast.jsEvents !== null) {
-                            for (var key in stepLast.jsEvents) {
-                                var jsEvent = stepLast.jsEvents[key];
-
-                                // Check this event is set to run on open, and the element exists
-                                if (jsEvent.insertion_point === 'close' && $(jsEvent.selector).length) {
-                                    // Check if the event is one of the predefined events
-                                    if (tourActions[jsEvent.event] !== undefined) {
-                                        tourActions[jsEvent.event].call(this, jsEvent.selector);
-                                    } else { // Otherwise try for a generic trigger on the element
-                                        $(jsEvent.selector).trigger(jsEvent.event);
-                                    }
-                                }
-                            }
+                            runStepEvents(stepLast.jsEvents, 'close');
                         }
 
                         // Update the status in the DB
@@ -164,20 +140,9 @@ $(function () {
                         // Check for a close step on the step
                         // Purposefully left out of the completed check above - want to run it in both cases
                         if (currentStep !== undefined && currentStep.jsEvents !== null) {
-                            for (var key in currentStep.jsEvents) {
-                                var jsEvent = currentStep.jsEvents[key];
-
-                                // Check this event is set to run on open, and the element exists
-                                if (jsEvent.insertion_point === 'close' && $(jsEvent.selector).length) {
-                                    // Check if the event is one of the predefined events
-                                    if (tourActions[jsEvent.event] !== undefined) {
-                                        tourActions[jsEvent.event].call(this, jsEvent.selector);
-                                    } else { // Otherwise try for a generic trigger on the element
-                                        $(jsEvent.selector).trigger(jsEvent.event);
-                                    }
-                                }
-                            }
+                            runStepEvents(currentStep.jsEvents, 'close');
                         }
+
                     });
 
 
@@ -231,5 +196,28 @@ $(function () {
 
             $('body').trigger('tourReady');
         });
+    }
+
+
+    /**
+     * Run events for a step
+     *
+     * @param events
+     * @param insertionPoint
+     */
+    function runStepEvents(events, insertionPoint) {
+        for (var key in events) {
+            var jsEvent = events[key];
+
+            // Check this event is set to run on the specified insertion point, and the element exists
+            if (jsEvent.insertion_point === insertionPoint && $(jsEvent.selector).length) {
+                // Check if the event is one of the predefined events
+                if (tourActions[jsEvent.event] !== undefined) {
+                    tourActions[jsEvent.event].call(this, jsEvent.selector);
+                } else { // Otherwise try for a generic trigger on the element
+                    $(jsEvent.selector).trigger(jsEvent.event);
+                }
+            }
+        }
     }
 });
