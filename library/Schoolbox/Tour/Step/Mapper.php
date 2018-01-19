@@ -12,6 +12,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Tour\Mapper as TourMapper;
+use Schoolbox\Tour\Step\Mapper as StepMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Tour\Step\Type\Tooltip;
 use Schoolbox\Tour\Step\Type\Modal;
@@ -40,7 +41,7 @@ class Mapper extends BaseMapper
         $this->hasTable('tour_step');
         $this->hasModel(Model::class);
         $this->uses('uuid', self::TYPE_STRING, self::COLUMN_IDENTIFIER_UUID);
-        $this->joins('next_step_uuid', Mapper::class, 'uuid', null, null, 'tourStep', 'tourStep');
+        $this->joins('next_step_uuid', self::class, 'uuid', null, null, 'nextStep', 'nextStep');
         $this->joins('tour_uuid', TourMapper::class, 'uuid', null, null, 'tour', 'tour');
         $this->joins('author_user_id', UserMapper::class, 'id', null, null, 'author', 'author');
         $this->joinsReverseSingle('tour_step_uuid', Modal\Mapper::class, 'type', 'modalStep');
@@ -83,10 +84,12 @@ class Mapper extends BaseMapper
                         {$this->getTable()}.`type`,
                         {$this->getJoinColumnString('author', 'a')},
                         {$this->getJoinColumnString('tour', 't')},
+                        {$this->getJoinColumnString('nextStep', 'ns')},
                         {$this->getJoinColumnString('modalStep', 'ms')},
                         {$this->getJoinColumnString('tooltipStep', 'ts')}
             FROM        {$this->getTable()}
             INNER JOIN  {$this->getJoinSql('tour', '', 't')}
+            LEFT JOIN   {$this->getJoinSql('nextStep', '','ns')}
             LEFT JOIN   {$this->getJoinSql('modalStep','','ms')}
             LEFT JOIN   {$this->getJoinSql('tooltipStep','','ts')}            
             LEFT JOIN   {$this->getJoinSql('author', '', 'a', true)}
@@ -106,6 +109,9 @@ class Mapper extends BaseMapper
         /** @var TourMapper $tourMapper */
         $tourMapper = $this->getJoinMapper('tour');
 
+        /** @var StepMapper $stepMapper */
+        $stepMapper = $this->getJoinMapper('nextStep');
+
         $hydrators = [
             'tooltip' => [Tooltip\Mapper::getInstance(), 'ts'],
             'modal' => [Modal\Mapper::getInstance(), 'ms']
@@ -117,6 +123,7 @@ class Mapper extends BaseMapper
             if ($model instanceof Model) {
                 $model->setAuthor($authorUserMapper->hydrate($row, 'a'));
                 $model->setTour($tourMapper->hydrate($row, 't'));
+                $model->setNextStep($stepMapper->hydrate($row, 'ns'));
 
                 if (!array_key_exists($row['type'], $hydrators)) {
                     continue;
@@ -207,7 +214,7 @@ class Mapper extends BaseMapper
         while ($stepCurrent !== null && $iterations < $maxIterations) {
             $steps[] = $stepsStorage[$stepCurrent];
             // Move onto the next step in the sequence
-            $stepCurrent = $stepsStorage[$stepCurrent]->getTourStep() ? $stepsStorage[$stepCurrent]->getTourStep()->getUuid() : null;
+            $stepCurrent = $stepsStorage[$stepCurrent]->getNextStep() ? $stepsStorage[$stepCurrent]->getNextStep()->getUuid() : null;
             $iterations++;
         }
 

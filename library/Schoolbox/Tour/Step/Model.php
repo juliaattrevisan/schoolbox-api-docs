@@ -41,7 +41,7 @@ class Model implements ISoftDeletable, \JsonSerializable
     /**
      * @var Model|null
      */
-    protected $tourStep;
+    protected $nextStep;
 
     /**
      * @return User|null
@@ -103,9 +103,9 @@ class Model implements ISoftDeletable, \JsonSerializable
     /**
      * @return Model|null
      */
-    public function getTourStep(): ?Model
+    public function getNextStep(): ?Model
     {
-        return $this->tourStep;
+        return $this->nextStep;
     }
 
     /**
@@ -113,9 +113,9 @@ class Model implements ISoftDeletable, \JsonSerializable
      *
      * @return self|$this
      */
-    public function setTourStep(?Model $tourStep): self
+    public function setNextStep(?Model $nextStep): self
     {
-        $this->tourStep = $tourStep;
+        $this->nextStep = $nextStep;
         return $this;
     }
 
@@ -131,8 +131,8 @@ class Model implements ISoftDeletable, \JsonSerializable
     {
         $json = $this->getType()->jsonSerialize();
         $json['uuid'] = $this->getUuid();
-        if ($this->getTourStep()) {
-            $json['next_step_uuid'] = $this->getTourStep()->getUuid();
+        if ($this->getNextStep()) {
+            $json['next_step_uuid'] = $this->getNextStep()->getUuid();
         } else {
             $json['next_step_uuid'] = null;
         }
