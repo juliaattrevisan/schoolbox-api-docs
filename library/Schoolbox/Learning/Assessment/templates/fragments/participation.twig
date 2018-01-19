@@ -32,9 +32,10 @@
             <div class="row">
                 <div class="small-12 medium-6 medium-offset-6 column" id="mass-buttons">
                     <section class="content">
-                        <ul class="flex-list buttons">
+                        <nav>
+                        <ul class="flex-list small-12 medium-12 large-9 large-offset-3 medium-offset-0">
                             <li>
-                                <button
+                                <a
                                         class="button expand dropdown"
                                         id="customise-dropdown"
                                         data-dropdown="customise-options"
@@ -42,19 +43,18 @@
                                         aria-expanded="false"
                                         disabled
                                 >
-                                    Apply Participation
-                                </button>
+                                    Modify Participation
+                                </a>
                             </li>
                             <li>
-                                <button
-                                        class="button expand dropdown"
+                                <a
+                                        class="button icon-more"
                                         id="plan-dropdown"
                                         data-dropdown="plan-options"
-                                        aria-controls="plan-options"
-                                        aria-expanded="false"
+                                        title="Actions"
+                                        disabled
                                 >
-                                    Modify Plans
-                                </button>
+                                </a>
                             </li>
                         </ul>
                         <ul class="f-dropdown" id="customise-options" data-dropdown-content aria-hidden="true">
@@ -64,13 +64,15 @@
                             {% for plan in assessment.plans if not plan.isDynamic %}
                                 <li><a href="#" data-plan-use="{{ plan.id }}" data-plan-name="{{ plan.name }}">{{ plan.name }}</a></li>
                             {% endfor %}
-                            <li><a href="#" id="participant-customise">Create new plan</a></li>
+                            <li><a href="#" id="participant-customise">Create new plan...</a></li>
                         </ul>
                         <ul class="f-dropdown" id="plan-options" data-dropdown-content aria-hidden="true">
+                            <li class="separator">Modify Plans</li>
                             {% for plan in assessment.plans if not plan.isDynamic %}
                                 <li><a href="#" data-plan-modify="{{ plan.id }}" data-plan-name="{{ plan.name }}">{{ plan.name }}</a></li>
                             {% endfor %}
                         </ul>
+                        </nav>
                     </section>
                 </div>
             </div>

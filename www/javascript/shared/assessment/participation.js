@@ -45,6 +45,8 @@
             }
         });
 
+        enableActions();
+
         /**
          * Update action row on change of the participant checkboxes
          */
@@ -55,10 +57,10 @@
 
             if (checkCount) {
                 // Enable actions
-                $customiseDropdown.prop('disabled', false);
+                $customiseDropdown.attr('disabled', false);
             } else {
                 // Disable actions
-                $customiseDropdown.prop('disabled', true);
+                $customiseDropdown.attr('disabled', true);
             }
 
             // Highlight/unhighlight row
@@ -332,10 +334,12 @@
 
                     $('#plan-options')
                         .append(createPlanListItem(planDetails, true));
+
+                    enableActions();
                 }
 
                 // Update the selected students with the plan
-                updatePlan($('#plan-participants')[0].selectize.getValue().split(','), planDetails['id'], planDetails['name'], update);
+                updateStatus($('#plan-participants')[0].selectize.getValue().split(','), planDetails['id'], planDetails['name'], update);
 
                 // Close the modal
                 $customiseModal.foundation('reveal', 'close');
@@ -360,7 +364,7 @@
             $participants.find(':checked').each(function () {
                 studentIDs.push($(this).attr('data-user-id'));
             });
-            updatePlan(studentIDs, planId, planName, false);
+            updateStatus(studentIDs, planId, planName, false);
 
             // Reset the checkboxes and buttons
             resetActions();
@@ -376,7 +380,7 @@
     /**
      * Update the students selected
      */
-    function updatePlan(students, planId, planName, update) {
+    function updateStatus(students, planId, planName, update) {
 
         if (update) {
             // Clear this plan form all the students it was previously applied to
@@ -419,7 +423,7 @@
         $participants.find('input[type=checkbox]').prop('checked', false);
         $participants.find('li[data-participant]').removeClass('participant-selected');
 
-        $customiseDropdown.prop('disabled', true);
+        $customiseDropdown.attr('disabled', true);
     }
 
 
@@ -542,6 +546,16 @@
             .text(planDetails['name']);
 
         return $(document.createElement('li')).append($planLink);
+    }
+
+    /**
+     * Check if there are plans and enable actions
+     */
+    function enableActions() {
+        var checkPlans = $('#plan-data').find('input').length;
+        if (checkPlans ) {
+            $('#plan-dropdown').attr('disabled', false);
+        }
     }
 
     /**

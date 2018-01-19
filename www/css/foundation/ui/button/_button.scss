@@ -153,8 +153,7 @@ button.submit{
  */
 .flex-list {
     &.buttons a,
-    &.buttons button
-	{
+    &.buttons button {
 		@include flex;
 		@extend .button;
 		justify-content: center;
