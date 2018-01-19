@@ -123,6 +123,7 @@ class Builder implements IBuilder
      *
      * @param array $columnList
      * @return $this
+     * @throws InvalidColumnException If unable to parse column name
      */
     public function addColumnList(array $columnList): self
     {
@@ -141,6 +142,7 @@ class Builder implements IBuilder
     /**
      * @param string $columnName
      * @return Builder
+     * @throws InvalidColumnException If unable to parse column name
      */
     public function isNull(string $columnName): self
     {
@@ -151,6 +153,7 @@ class Builder implements IBuilder
     /**
      * @param string $columnName
      * @return Builder
+     * @throws InvalidColumnException If unable to parse column name
      */
     public function notNull(string $columnName): self
     {
@@ -160,6 +163,7 @@ class Builder implements IBuilder
     /**
      * @param string $columnName
      * @return Builder
+     * @throws InvalidColumnException If unable to parse column name
      */
     public function isTrue(string $columnName): self
     {
@@ -169,6 +173,7 @@ class Builder implements IBuilder
     /**
      * @param string $columnName
      * @return Builder
+     * @throws InvalidColumnException If unable to parse column name
      */
     public function isFalse(string $columnName): self
     {
@@ -180,7 +185,8 @@ class Builder implements IBuilder
      * @param string     $columnName
      * @param string|int $columnValue Ideally we would type-declare as 'scalar', but not possible.
      * @return $this
-     * @throws InvalidArgumentException If column value is not a scalar
+     * @throws InvalidArgumentException If column value is not a scalar (use isNull() if testing for NULLs)
+     * @throws InvalidColumnException If unable to parse column name
      */
     public function equals(string $columnName, $columnValue): self
     {
@@ -190,39 +196,12 @@ class Builder implements IBuilder
         return $this->addPredicate($columnName, $columnValue);
     }
 
-
-    /**
-     * @param string         $columnName
-     * @param string[]|int[] $columnValues
-     * @return $this
-     */
-    public function in(string $columnName, array $columnValues): self
-    {
-        if(0 === \count($columnValues)){
-            return $this->isFalse($columnName);
-        }
-        return $this->addPredicate($columnName, $columnValues);
-    }
-
-    /**
-     * @param string         $columnName
-     * @param string[]|int[] $columnValues
-     * @return $this
-     */
-    public function notIn(string $columnName, array $columnValues): self
-    {
-        if(0 === \count($columnValues)){
-            return $this->isTrue($columnName);
-        }
-        return $this->addPredicate($columnName, $columnValues, self::OPERATOR_NOT_EQUALS);
-    }
-
-
     /**
      * @param string     $columnName
      * @param string|int $columnValue
      * @return Builder
      * @throws InvalidArgumentException If $columnValue is not an string or int
+     * @throws InvalidColumnException If unable to parse column name
      */
     public function notEquals(string $columnName, $columnValue): self
     {
@@ -232,12 +211,42 @@ class Builder implements IBuilder
         return $this->addPredicate($columnName, $columnValue, self::OPERATOR_NOT_EQUALS);
     }
 
+    /**
+     * @param string         $columnName
+     * @param string[]|int[] $columnValues
+     * @return $this
+     * @throws InvalidColumnException If unable to parse column name
+     */
+    public function in(string $columnName, array $columnValues): self
+    {
+        if(0 === \count($columnValues)){
+            $this->where[] = 'FALSE';
+            return $this;
+        }
+        return $this->addPredicate($columnName, $columnValues);
+    }
+
+    /**
+     * @param string         $columnName
+     * @param string[]|int[] $columnValues
+     * @return $this
+     * @throws InvalidColumnException If unable to parse column name
+     */
+    public function notIn(string $columnName, array $columnValues): self
+    {
+        if(0 === \count($columnValues)){
+            $this->where[] = 'TRUE';
+            return $this;
+        }
+        return $this->addPredicate($columnName, $columnValues, self::OPERATOR_NOT_EQUALS);
+    }
 
     /**
      * @param string $columnName
      * @param string $columnValue Used directly in LIKE statement.
      * @see \Database::escapeForLike for escaping user input.
      * @return Builder
+     * @throws InvalidColumnException If unable to parse column name
      */
     public function like(string $columnName, string $columnValue): self
     {
@@ -254,6 +263,7 @@ class Builder implements IBuilder
      * @param string[] $columnValues Used directly in LIKE statement.
      * @see \Database::escapeForLike for escaping user input.
      * @return Builder
+     * @throws InvalidColumnException If unable to parse column name
      */
     public function likeAny(string $columnName, array $columnValues): self
     {
@@ -270,6 +280,7 @@ class Builder implements IBuilder
      * @param string $columnValue Used directly in NOT LIKE statement.
      * @see \Database::escapeForLike for escaping user input.
      * @return Builder
+     * @throws InvalidColumnException If unable to parse column name
      */
     public function notLike(string $columnName, string $columnValue): self
     {
@@ -284,6 +295,7 @@ class Builder implements IBuilder
      * @param int|string $columnValue if string, must be datetime
      * @return Builder
      * @throws InvalidArgumentException If column value is not a scalar
+     * @throws InvalidColumnException If unable to parse column name
      */
     public function lessThan(string $columnName, $columnValue): self
     {
@@ -300,6 +312,7 @@ class Builder implements IBuilder
      * @param int|string $columnValue if string, must be datetime
      * @return Builder
      * @throws InvalidArgumentException If column value is not a scalar
+     * @throws InvalidColumnException If unable to parse column name
      */
     public function lessThanOrEqualTo(string $columnName, $columnValue): self
     {
@@ -315,6 +328,7 @@ class Builder implements IBuilder
      * @param int|string $columnValue if string, must be datetime
      * @return Builder
      * @throws InvalidArgumentException If column value is not a scalar
+     * @throws InvalidColumnException If unable to parse column name
      */
     public function greaterThan(string $columnName, $columnValue): self
     {
@@ -331,6 +345,7 @@ class Builder implements IBuilder
      * @param int|string $columnValue
      * @return $this
      * @throws InvalidArgumentException If column value is not a scalar
+     * @throws InvalidColumnException If unable to parse column name
      */
     public function greaterThanOrEqualTo($columnName, $columnValue): self
     {
@@ -346,6 +361,7 @@ class Builder implements IBuilder
      * @param int|string $columnValue if string, must be datetime
      * @return $this
      * @throws InvalidArgumentException If column value is not a scalar
+     * @throws InvalidColumnException If unable to parse column name
      */
     public function notLessThan($columnName, $columnValue): self
     {
@@ -357,6 +373,7 @@ class Builder implements IBuilder
      * @param int|string $columnValue  if string, must be datetime
      * @return $this
      * @throws InvalidArgumentException If column value is not a scalar
+     * @throws InvalidColumnException If unable to parse column name
      */
     public function notGreaterThan($columnName, $columnValue): self
     {
@@ -372,14 +389,24 @@ class Builder implements IBuilder
      * @param string|int  $to   If null, this value is excluded.
      * @return Builder
      * @throws InvalidArgumentException If $from or $to are not null or scalars
+     * @throws InvalidColumnException If unable to parse column name
      */
     public function between(string $columnName, $from, $to): self
     {
-        // Either is null: ignore
-        if (null !== $from) {
+        // If both are set we need to use a sub-builder. Otherwise we may combine predicates
+        // with something other than AND and get unexpected results
+        if(null !== $from && null !== $to){
+            $subBuilder = (new self($this->quoter, $this->table))
+                ->greaterThanOrEqualTo($columnName, $from)
+                ->lessThanOrEqualTo($columnName, $to);
+            return $this->all($subBuilder);
+        }
+
+        // Else we only have a single clause and no such issue can occur
+        if (isset($from)) {
             $this->greaterThanOrEqualTo($columnName, $from);
         }
-        if (null !== $to) {
+        if (isset($to)) {
             $this->lessThanOrEqualTo($columnName, $to);
         }
         return $this;
@@ -393,6 +420,7 @@ class Builder implements IBuilder
      * @param Alaress_Date_Format $to   If null, this value is excluded.
      * @param string               $compareFormat
      * @return Builder
+     * @throws InvalidColumnException If unable to parse column name
      */
     public function betweenDates(
         string $columnName,
@@ -401,10 +429,10 @@ class Builder implements IBuilder
         $compareFormat = Alaress_Date_Format::DATABASE_FORMAT
     ): self {
         $fromString = $toString = null;
-        if (null !== $from && !$from->isNull()) {
+        if (isset($from) && !$from->isNull()) {
             $fromString = $from->getUsingFormat($compareFormat);
         }
-        if (null !== $to && !$to->isNull()) {
+        if (isset($to) && !$to->isNull()) {
             $toString = $to->getUsingFormat($compareFormat);
         }
         try {
@@ -415,83 +443,39 @@ class Builder implements IBuilder
         }
     }
 
+
     /**
      * @param string $columnName
      * @param mixed  $columnValue
      * @param string $operator
      * @return $this
+     * @throws InvalidColumnException If unable to parse column name
      */
     protected function addPredicate(string $columnName, $columnValue, $operator = self::OPERATOR_EQUALS): self
     {
         // prepare operator modifiers
         $negate = self::OPERATOR_NOT_EQUALS === $operator || self::OPERATOR_NOT_LIKE === $operator;
-        $fuzzy  = self::OPERATOR_LIKE === $operator || self::OPERATOR_NOT_LIKE === $operator;
 
-        // accommodate joins
-        $xpl = explode('.', $columnName) ?: [];
-
-        if (\count($xpl) === 1) {
-            $table = $this->getTable();
-            $field = $xpl[0];
-        } elseif (\count($xpl) === 2) {
-            [$table, $field] = $xpl;
-
-            // remove the period so SQL doesn't freak out
-            $columnName = str_replace('.', '_', $columnName);
-
-        } else {
-            // bad, but ignorable
-            return $this;
-        }
-
-        if ($negate) {
-            $whereNot = "NOT ";
-        } else {
-            $whereNot = "";
-        }
-
+        [$table, $field, $param] = $this->parseColumn($columnName);
+        $whereNot     = $negate ? 'NOT ' : '';
         $escaped_name = $this->quoter->quoteIdentifier($table) . '.' . $this->quoter->quoteIdentifier($field);
 
         if (!isset($columnValue)) {
             $this->where[] = "$escaped_name IS {$whereNot}NULL";
-
         } elseif ($columnValue === true) {
             $this->where[] = "$escaped_name IS {$whereNot}TRUE";
-
         } elseif ($columnValue === false) {
             $this->where[] = "$escaped_name IS {$whereNot}FALSE";
-
+        } elseif (self::canTraverse($columnValue)) {
+            $placeHolders  = self::getArrayPlaceholders($columnValue, $param);
+            $this->where[] = "$escaped_name {$whereNot}IN {$placeHolders}";
+            $this->params  = array_merge($this->params, self::getArrayParameters($columnValue, $param));
         } else {
-            // This method is smart enough to work with arrays and IN statements
-            if (self::canTraverse($columnValue)) {
-
-                if ($fuzzy) {
-                    // fuzzy match: use (LIKE :x OR LIKE :y), or (NOT LIKE :x AND NOT LIKE :y)
-                    $likeParts = [];
-
-                    foreach (self::getPlaceholders($columnValue, $columnName) as $option) {
-                        $likeParts[] = "$escaped_name {$whereNot}LIKE $option";
-                    }
-                    $subOperator = $negate ? ' AND ' : ' OR ';
-                    $this->where[] = '(' . implode($subOperator, $likeParts) . ')';
-
-                } else {
-                    // exact match: use IN
-                    $placeHolders = self::getArrayPlaceholders($columnValue, $columnName);
-                    $this->where[] = "$escaped_name {$whereNot}IN {$placeHolders}";
-                }
-
-                $this->params  = array_merge($this->params, self::getArrayParameters($columnValue, $columnName));
-
-            } else {
-                // alias the param
-                $a = $this->getNonCollidingParamAlias($columnName);
-
-                $this->where[] = "$escaped_name $operator :$a";
-                $this->putParam($a, $columnValue);
-            }
+            // alias the param
+            $a             = $this->getNonCollidingParamAlias($param);
+            $this->where[] = "$escaped_name $operator :$a";
+            $this->putParam($a, $columnValue);
         }
-
         return $this;
     }
 
@@ -500,7 +484,7 @@ class Builder implements IBuilder
      * Gets a string of placeholders for an array - usually used for creating a
      * list of placeholders for an IN condition.
      *
-     * @param array  $input
+     * @param array|Traversable $input
      * @param string $prefix If not supplied, ? will be used as the placeholder
      *                       for all values.
      *
@@ -549,7 +533,7 @@ class Builder implements IBuilder
     /**
      * The non-concatenated version of getArrayPlaceholders()
      *
-     * @param array $input
+     * @param array|Traversable $input
      * @param string $prefix
      * @return string[]
      */
@@ -718,6 +702,27 @@ class Builder implements IBuilder
         }
         // Couldn't generate? Crash and burn
         return false;
+    }
+
+
+    /**
+     * @param string $columnName
+     * @return array
+     * @throws InvalidColumnException If unable to parse column name
+     */
+    private function parseColumn(string $columnName): array
+    {
+        // accommodate joins
+        $xpl = explode('.', $columnName) ?: [];
+
+        if (1 === \count($xpl)) {
+            return [$this->getTable(), $xpl[0], $columnName];
+        }
+        if (2 === \count($xpl)) {
+            // remove the period so SQL doesn't freak out
+            return [$xpl[0], $xpl[0], str_replace('.', '_', $columnName)];
+        }
+        throw new InvalidColumnException("Unable to parse [table].column name: $columnName");
     }
 
 }
