@@ -83,6 +83,10 @@ try {
         $log->info("Scanning '{$globVideos}'...");
         $videos = glob($globVideos);
 
+        $globAudios = "{$configMapper->get("video_dir")}/*.mp3";
+        $log->info("Scanning '{$globAudios}'...");
+        $audios = glob($globAudios);
+
         $globPosters = "{$configMapper->get("video_dir")}/*-poster.jpg";
         $log->info("Scanning '{$globPosters}'...");
         $posters = glob($globPosters);
@@ -96,10 +100,11 @@ try {
         // Tally up the booty
 
         $countVideos     = count($videos);
+        $countAudios     = count($audios);
         $countPosters    = count($posters);
         $countThumbnails = count($thumbnails);
 
-        $countTotal = $countVideos + $countPosters + $countThumbnails;
+        $countTotal = $countVideos + $countAudios + $countPosters + $countThumbnails;
 
         // Shortcut if nothing left to migrate
 
@@ -114,7 +119,7 @@ try {
         $failed  = 0;
         $success = 0;
 
-        $log->info("Found {$countVideos} videos, {$countPosters} posters, {$countThumbnails} thumbnails");
+        $log->info("Found {$countVideos} videos, {$countAudios} audio, {$countPosters} posters, {$countThumbnails} thumbnails");
         $log->info("");
 
         // ------------------------------------------------------------------------------------------------------------
@@ -125,6 +130,18 @@ try {
 
         $log->info("Processing videos...");
         $results = uploadArrayToStorage($log, $videos, $storageMapper, Queue::TYPE_VIDEO);
+
+        $success += $results["success"];
+        $failed  += $results["failed"];
+
+        // ------------------------------------------------------------------------------------------------------------
+        // Migrate audio
+        // ------------------------------------------------------------------------------------------------------------
+
+        // Videos need to be migrated first so that the thumbnails/posters have something to be associated with
+
+        $log->info("Processing audio...");
+        $results = uploadArrayToStorage($log, $audios, $storageMapper, 'audio');
 
         $success += $results["success"];
         $failed  += $results["failed"];
@@ -199,7 +216,6 @@ function uploadArrayToStorage(LoggerInterface $log, array $filenames, StorageMap
         $log->info("    - Migrating:              {$countCurrent}/{$countQueue}");
         $log->info("    - Migration Type:         " . ucfirst($type));
         $log->info("    - Source File:            {$filename}");
-        $log->info(getDisplayFileSize($filename));
 
         if (uploadToStorage($log, $filename, $storageMapper, $type)) {
             $success++;
@@ -240,6 +256,8 @@ function uploadToStorage(LoggerInterface $log, $filename, StorageMapper $storage
     try {
         if ($type == Queue::TYPE_VIDEO) {
             $filenameArray = explode(".mp4", $filename);
+        } elseif ($type == 'audio') {
+            $filenameArray = explode(".mp3", $filename);
         } else {
             $filenameArray = explode("-", $filename);
         }
@@ -248,7 +266,7 @@ function uploadToStorage(LoggerInterface $log, $filename, StorageMapper $storage
 
         $videoStorage = $storageMapper->findByHash($hash);
 
-        $log->info("    - Storage Filename:       {$videoStorage->getFilename()}.{$videoStorage->getExtension()}");
+        $log->info("    - Storage Filename:       {$filename}");
     } catch (MapperException $e) {
         $log->error("    - Failed:                 Unable to locate corresponding storage object");
 
@@ -260,36 +278,13 @@ function uploadToStorage(LoggerInterface $log, $filename, StorageMapper $storage
     // ----------------------------------------------------------------------------------------------------------------
 
     try {
-        // Sadly the storage system requires that any file uploaded fakes a PHP file upload and thus is located in the
-        // system temp folder- so we have to move the file there for no good reason
 
-        if ($type == Queue::TYPE_VIDEO) {
-            $filenameTemp = getTempFilename(basename($filename), "mp4");
-        } else {
-            $filenameTemp = getTempFilename(basename($filename), "jpg");
-        }
+            $suffix = $type == Queue::TYPE_VIDEO || $type == 'audio' ? 'transcode' : $type;
+            $filenameImage = "/vagrant/data/storage/{$videoStorage->getPath()}-{$suffix}";
+            $log->info("    - Filename:      {$filename}");
+            $log->info("    - Uploaded Filename:      {$filenameImage}");
+            rename($filename, $filenameImage);
 
-        rename($filename, $filenameTemp);
-
-        if ($type == Queue::TYPE_VIDEO) {
-            // If the file doesn't exist in storage, create it- and update the size in the corresponding storage row
-
-            if (!$videoStorage->getFilesystem()->has($videoStorage->getPath())) {
-                $videoStorage->getFilesystem()->write($videoStorage->getPath(), file_get_contents($filenameTemp));
-                $videoStorage->setSize(filesize($filenameTemp));
-                $storageMapper->save($videoStorage);
-            }
-        } else {
-            $filenameImage = "{$videoStorage->getPath()}-{$type}";
-
-            $log->info("    - Uploaded Filename:      {$videoStorage->getPath()}-{$type}");
-
-            if ($videoStorage->getFilesystem()->has($filenameImage)) {
-                $videoStorage->getFilesystem()->update($filenameImage, file_get_contents($filenameTemp));
-            } else {
-                $videoStorage->getFilesystem()->write($filenameImage, file_get_contents($filenameTemp));
-            }
-        }
     } catch (MapperException $e) {
         $log->error("    - Failed:                 Unable to upload to storage");
 
@@ -297,36 +292,4 @@ function uploadToStorage(LoggerInterface $log, $filename, StorageMapper $storage
     }
 
     return true;
-}
-
-/**
- * Create a unique filename without creating the file like tempnam() does
- *
- * @param string $filename
- * @param string $extension
- *
- * @return string
- */
-function getTempFilename($filename, $extension)
-{
-    return sys_get_temp_dir() . "/migrator-{$filename}-" . date("YmdHis") . ".{$extension}";
-}
-
-/**
- * Get pretty file size for display
- *
- * @param string $filename
- *
- * @return string
- */
-function getDisplayFileSize($filename)
-{
-    clearstatcache();
-
-    $fileSize = filesize($filename);
-
-    $alaressByteFormat = new Alaress_Byte_Format();
-    $alaressByteFormat->bytesToString($fileSize);
-
-    return "    - Source File Size:       {$fileSize}";
 }

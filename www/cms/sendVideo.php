@@ -70,6 +70,31 @@ if (isset($type) && isset($id)) {
     $storage = $video->getStorage();
 
     // ----------------------------------------------------------------------------------------------------------------
+    // Retrieve mime type
+    // ----------------------------------------------------------------------------------------------------------------
+
+    /** @var string $mimeType */
+    if ($storage->getMimeType()->isAudio()) {
+        // If audio trancode, assume transcode format is audio/mpeg (mp3)
+        $mimeType = 'audio/mpeg';
+    } elseif ($storage->getMimeType()->isVideo()) {
+        // If video trancode, assume transcode format is video/mp4 (mp4)
+        $mimetype = 'video/mp4';
+    } else {
+        // If unknown, just flail about and choose the original file mimetype
+        $mimetype = $storage->getMimeType()->getMime();
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // Use explicitly the transcoded version of the audio/video, and transcode size
+    // ----------------------------------------------------------------------------------------------------------------
+    $storage->setPath($storage->getPath() . "-transcode");
+
+    /** @var Filesystem $fileSystem */
+    $fileSystem = $storage->getFilesystem();
+    $storage->setSize($fileSystem->getSize($storage->getPath()));
+
+    // ----------------------------------------------------------------------------------------------------------------
     // Retrieve stream
     // ----------------------------------------------------------------------------------------------------------------
 
@@ -95,13 +120,6 @@ if (isset($type) && isset($id)) {
     } catch (FileNotFoundException $e) {
         fail();
     }
-
-    // ----------------------------------------------------------------------------------------------------------------
-    // Retrieve mime type
-    // ----------------------------------------------------------------------------------------------------------------
-
-    /** @var string $mimeType */
-    $mimeType = $storage->getMimeType()->getMime();
 
     // ----------------------------------------------------------------------------------------------------------------
     // Prepare for streaming
@@ -221,27 +239,9 @@ function getStream(Storage $storage)
 
     if ($fileSystem->getAdapter() instanceof AwsS3Adapter) {
         // AWS S3
-
-        // Check for a transcode and use that if available, otherwise use the original video
-
-        /** @var FilesystemInterface $fileSystem */
-        $fileSystem = $storage->getFilesystem();
-
-        if ($fileSystem->has($storage->getPath() . "-transcode")) {
-            $storage->setPath($storage->getPath() . "-transcode");
-            $storage->setSize($fileSystem->getSize($storage->getPath() . "-transcode"));
-        }
-
         $videoStream = S3Stream::open($storage);
     } elseif (($localFilename = getLocalFilesystemPath($storage)) !== false) {
         // Local Disk
-
-        // Check for a transcode and use that if available, otherwise use the original video
-
-        if (file_exists($localFilename . "-transcode")) {
-            $localFilename .= "-transcode";
-        }
-
         $videoStream = fopen($localFilename, "r");
     }
 
