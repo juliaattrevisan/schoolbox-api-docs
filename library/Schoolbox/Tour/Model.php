@@ -45,7 +45,7 @@ class Model implements ISoftDeletable
     /**
      * @var TourStep|null
      */
-    protected $tourStep;
+    protected $firstStep;
 
     /**
      * @return User|null
@@ -138,9 +138,9 @@ class Model implements ISoftDeletable
     /**
      * @return TourStep|null
      */
-    public function getTourStep(): ?TourStep
+    public function getFirstStep(): ?TourStep
     {
-        return $this->tourStep;
+        return $this->firstStep;
     }
 
     /**
@@ -148,9 +148,9 @@ class Model implements ISoftDeletable
      *
      * @return self|$this
      */
-    public function setTourStep(?TourStep $tourStep): self
+    public function setFirstStep(?TourStep $firstStep): self
     {
-        $this->tourStep = $tourStep;
+        $this->firstStep = $firstStep;
         return $this;
     }
 

@@ -38,7 +38,7 @@ class Mapper extends BaseMapper
 
         $this->uses('uuid', self::TYPE_STRING, self::COLUMN_IDENTIFIER_UUID);
         $this->joins('author_user_id', UserMapper::class, 'id', null, null, 'author', 'author');
-        $this->joins('tour_step_uuid', TourStepMapper::class, 'uuid', null, null, 'tourStep', 'tourStep');
+        $this->joins('first_step_uuid', TourStepMapper::class, 'uuid', null, null, 'firstStep', 'firstStep');
         $this->uses('title', self::TYPE_STRING);
         $this->uses('description', self::TYPE_STRING);
         $this->uses('active', self::TYPE_BOOLEAN);
@@ -89,10 +89,10 @@ class Mapper extends BaseMapper
         return "
             SELECT      {$this->getColumnString()},
                         {$this->getJoinColumnString('author', 'a')},
-                        {$this->getJoinColumnString('tourStep', 's')}
+                        {$this->getJoinColumnString('firstStep', 's')}
             FROM        {$this->getTable()}
             LEFT JOIN   {$this->getJoinSql('author', '', 'a', true)}
-            LEFT JOIN   {$this->getJoinSql('tourStep', '', 's')}
+            LEFT JOIN   {$this->getJoinSql('firstStep', '', 's')}
         ";
     }
 
@@ -111,14 +111,14 @@ class Mapper extends BaseMapper
         $authorUserMapper = $this->getJoinMapper('author');
 
         /** @var TourStepMapper $tourStepMapper */
-        $tourStepMapper = $this->getJoinMapper('tourStep');
+        $tourStepMapper = $this->getJoinMapper('firstStep');
 
         foreach ($statement as $row) {
             $model = $this->hydrate($row);
 
             if ($model instanceof Model) {
                 $model->setAuthor($authorUserMapper->hydrate($row, 'a'));
-                $model->setTourStep($tourStepMapper->hydrate($row, 's'));
+                $model->setFirstStep($tourStepMapper->hydrate($row, 's'));
                 $collection->add($model);
             }
         }
