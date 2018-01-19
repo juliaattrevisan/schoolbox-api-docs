@@ -54,6 +54,18 @@ class Builder implements IBuilder
         $this->quoter = $quoter;
     }
 
+
+    /**
+     * Returns a predicate builder with the same quoter and table as this builder,
+     * suitable for building sub-predicates.
+     *
+     * @return static
+     */
+    public function buildSubBuilder(): self
+    {
+        return new static($this->quoter, $this->table);
+    }
+
     /**
      * Query the intersection (AND) of the conditions in the given predicate builder
      *
@@ -267,7 +279,7 @@ class Builder implements IBuilder
      */
     public function likeAny(string $columnName, array $columnValues): self
     {
-        $subBuilder = new self($this->quoter, $this->table);
+        $subBuilder = $this->buildSubBuilder();
         foreach($columnValues as $columnValue){
             $subBuilder->like($columnName, $columnValue);
         }
@@ -396,7 +408,7 @@ class Builder implements IBuilder
         // If both are set we need to use a sub-builder. Otherwise we may combine predicates
         // with something other than AND and get unexpected results
         if(null !== $from && null !== $to){
-            $subBuilder = (new self($this->quoter, $this->table))
+            $subBuilder = $this->buildSubBuilder()
                 ->greaterThanOrEqualTo($columnName, $from)
                 ->lessThanOrEqualTo($columnName, $to);
             return $this->all($subBuilder);
@@ -660,7 +672,7 @@ class Builder implements IBuilder
      * @param mixed  $value
      * @return static
      */
-    public function putParam($param, $value): self
+    public function putParam(string $param, $value): self
     {
         $this->params[$param] = $value;
         return $this;

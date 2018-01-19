@@ -36,6 +36,18 @@ class TestPredicateBuilding extends TestCase
     /**
      * @throws InvalidColumnException
      */
+    public function testAddColumnList()
+    {
+        $pb = new Builder($this->mySqlQuoter, 'table');
+        $pb->addColumnList(['column1' => 1, 'column2' => 2]);
+        $this->assertEquals('`table`.`column1` = :column1_0', $pb->getWhere()[0]);
+        $this->assertEquals('`table`.`column2` = :column2_0', $pb->getWhere()[1]);
+        $this->assertEquals($pb->getParams(), ['column1_0' => 1, 'column2_0' => 2]);
+    }
+
+    /**
+     * @throws InvalidColumnException
+     */
     public function testIsNull()
     {
         $pb = new Builder($this->mySqlQuoter, 'table');
