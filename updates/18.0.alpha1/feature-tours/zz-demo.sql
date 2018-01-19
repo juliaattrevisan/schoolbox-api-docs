@@ -360,7 +360,6 @@ INSERT INTO     `tour_step_event`
                 `event`,
                 `insertion_point`,
                 `order`,
-                `author_user_id`,
                 `created_at`,
                 `updated_at`,
                 `deleted_at`
@@ -371,7 +370,6 @@ SELECT          UUID(),
                 'accordion.open',
                 'open',
                 0,
-                (SELECT `id` FROM `user` WHERE `username` = 'alaress' LIMIT 1),
                 '1980-04-07 00:00:00',
                 '1980-04-07 00:00:00',
                 NULL;
@@ -384,7 +382,6 @@ INSERT INTO     `tour_step_event`
                 `event`,
                 `insertion_point`,
                 `order`,
-                `author_user_id`,
                 `created_at`,
                 `updated_at`,
                 `deleted_at`
@@ -395,7 +392,6 @@ SELECT          UUID(),
                 'click',
                 'open',
                 1,
-                (SELECT `id` FROM `user` WHERE `username` = 'alaress' LIMIT 1),
                 '1980-04-07 00:00:00',
                 '1980-04-07 00:00:00',
                 NULL;
@@ -409,7 +405,6 @@ INSERT INTO     `tour_step_event`
                 `event`,
                 `insertion_point`,
                 `order`,
-                `author_user_id`,
                 `created_at`,
                 `updated_at`,
                 `deleted_at`
@@ -420,7 +415,6 @@ SELECT          UUID(),
                 'accordion.close',
                 'close',
                 0,
-                (SELECT `id` FROM `user` WHERE `username` = 'alaress' LIMIT 1),
                 '1980-04-07 00:00:00',
                 '1980-04-07 00:00:00',
                 NULL;
