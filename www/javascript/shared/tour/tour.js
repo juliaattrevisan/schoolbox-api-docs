@@ -100,7 +100,7 @@ $(function () {
                         $.post(saveRoute, {
                             url: tourUrl,
                             oldStep: oldStep,
-                            newStep: stepCurrent.uuid,
+                            newStep: newStep,
                             status: status
                         });
 
