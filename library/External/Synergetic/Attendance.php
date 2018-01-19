@@ -54,6 +54,9 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
         //
         // This can be encapsulated further in a Factory
 
+        /** @var \Schoolbox\User $user */
+        $user = $_SESSION['user'];
+        
         $attendanceMaster = new AttendanceMaster(
             $class,
             $attendanceDate,
@@ -62,7 +65,7 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
             $fileYear,
             $fileSemester,
             $this->connector,
-            $_SESSION['sid']
+            $user->getExternalId()
         );
 
         $this->setAttendanceMaster($attendanceMaster);
