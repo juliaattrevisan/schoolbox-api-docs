@@ -46,12 +46,12 @@ try {
 $settingsInfo['sp'] = [
         'entityId' => $spBaseUrl,
         'assertionConsumerService' => [
-            'url' => $spBaseUrl.'/saml/index.php',
+            'url' => $spBaseUrl.'/saml/consume.php',
             'binding' => OneLogin_Saml2_Constants::BINDING_HTTP_POST,
 
         ],
         'singleLogoutService' => [
-            'url' => $spBaseUrl.'/saml/index.php?sls',
+            'url' => $spBaseUrl.'/saml/consume.php?sls',
             'binding' => OneLogin_Saml2_Constants::BINDING_HTTP_POST,
         ],
         'NameIDFormat' => OneLogin_Saml2_Constants::NAMEID_TRANSIENT,
