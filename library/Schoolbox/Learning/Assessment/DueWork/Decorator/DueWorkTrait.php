@@ -221,41 +221,6 @@ trait DueWorkTrait
     }
 
     /**
-     * @return boolean
-     */
-    protected function getSelfAssessable()
-    {
-        return $this->selfAssessable;
-    }
-
-    /**
-     * @param boolean $selfAssessable
-     * @return $this
-     */
-    protected function setSelfAssessable($selfAssessable)
-    {
-        $this->selfAssessable = $selfAssessable;
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getSelfReflectable()
-    {
-        return $this->selfReflectable;
-    }
-
-
-    /**
-     * @param bool $selfReflectable
-     */
-    public function setSelfReflectable(bool $selfReflectable)
-    {
-        $this->selfReflectable = $selfReflectable;
-    }
-
-    /**
      * @return int
      */
     public function getSelfReflectionType(): int
