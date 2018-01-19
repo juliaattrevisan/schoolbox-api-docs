@@ -968,10 +968,15 @@ class Controller extends Assessment\Controller
 
         // setup some data...
         $data = [
-            'acceptingResponses'=> true,
-            'attachzone'      => $zoneFactory->buildForAssessment($assessment)->getTwigContext(),
-            'allMarkTypes'    => $this->getAllMarkTypes($assessment),
-            'allGradeSchemes' => $this->getAllGradeSchemes(),
+            'acceptingResponses' => true,
+            'attachzone'         => $zoneFactory->buildForAssessment($assessment)->getTwigContext(),
+            'allMarkTypes'       => $this->getAllMarkTypes($assessment),
+            'allGradeSchemes'    => $this->getAllGradeSchemes(),
+            'selfReflectTypes'   => [
+                'none'    => Model::SELF_REFLECTION_NONE,
+                'reflect' => Model::SELF_REFLECTION_REFLECT_ONLY,
+                'assess'  => Model::SELF_REFLECTION_FULL,
+            ],
         ];
 
         // ...append rubric-related data...
