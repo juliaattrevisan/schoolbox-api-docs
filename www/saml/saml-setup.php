@@ -6,38 +6,24 @@ require_once __DIR__.'/../../library/Bootstrap.php';
 
 $spBaseUrl = 'https://'.Config::get('site_hostname').'.'.Config::get('site_domain');
 
+
 $settingsInfo = array (
-    'sp' => [
-        'entityId' => $spBaseUrl.'/saml/metadata.php',
-        'assertionConsumerService' => [
-            'url' => $spBaseUrl.'/saml/index.php',
-        ],
-        'singleLogoutService' => [
-            'url' => $spBaseUrl.'/saml/index.php?sls',
-        ],
-        'NameIDFormat' => OneLogin_Saml2_Constants::NAMEID_TRANSIENT,
-        'x509cert' => Cfg::get('saml_public_cert'),
-        'privateKey' => Cfg::get('saml_private_cert'),
-    ],
     'idp' => [
         'entityId' => Config::get('saml_sso_url') ?: Cfg::get('saml_idp_metadata_url'),
         'singleSignOnService' => array (
             'url' => Config::get('saml_sso_url'),
-            'binding' => OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT,
         ),
         // SLO endpoint info of the IdP.
         'singleLogoutService' => array (
             'url' => Config::get('saml_slo_url'),
-            'binding' => OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT,
         ),
         'x509cert' => preg_replace("/\r/m", "", Config::get('saml_idp_certificate')),
     ],
     'security' => [
-        'requestedAuthnContext'             => useSAMLKerberos() ? OneLogin_Saml2_Constants::AC_WINDOWS : OneLogin_Saml2_Constants::AC_PASSWORD_PROTECTED,
+        'requestedAuthnContext'             => [useSAMLKerberos() ? OneLogin_Saml2_Constants::AC_WINDOWS : OneLogin_Saml2_Constants::AC_PASSWORD_PROTECTED],
         'requestedAuthnContextComparison'   => Config::get('saml_auth_comparison'),
-    ]
+    ],
 );
-
 
 try {
     $url = new \Zend\Uri\Uri(Cfg::get('saml_idp_metadata_url'));
@@ -57,6 +43,21 @@ try {
     //noop, metadata url invalid
 }
 
+$settingsInfo['sp'] = [
+        'entityId' => $spBaseUrl,
+        'assertionConsumerService' => [
+            'url' => $spBaseUrl.'/saml/index.php',
+            'binding' => OneLogin_Saml2_Constants::BINDING_HTTP_POST,
+
+        ],
+        'singleLogoutService' => [
+            'url' => $spBaseUrl.'/saml/index.php?sls',
+            'binding' => OneLogin_Saml2_Constants::BINDING_HTTP_POST,
+        ],
+        'NameIDFormat' => OneLogin_Saml2_Constants::NAMEID_TRANSIENT,
+        'x509cert' => Cfg::get('saml_public_cert'),
+        'privateKey' => Cfg::get('saml_private_cert'),
+    ];
 
 /**
  * Checks if the user is in the correct IP range (by the whitelist)
