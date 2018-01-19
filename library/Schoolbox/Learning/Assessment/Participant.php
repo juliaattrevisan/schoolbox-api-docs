@@ -320,6 +320,9 @@ class Participant
         if ($this->allFeedbacks->count()) {
             return $this->allFeedbacks
                 ->filter(function (IFeedback $feedback) use ($response) {
+                    if (!$feedback->getResponse()) {
+                        return false;
+                    }
                     return $feedback->getResponse()->getId() === $response->getId();
                 })
                 ->filterBy('publishedAt', true)
