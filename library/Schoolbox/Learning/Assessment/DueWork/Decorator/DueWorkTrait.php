@@ -66,6 +66,11 @@ trait DueWorkTrait
     protected $selfReflectable;
 
     /**
+     * @var int
+     */
+    protected $selfReflectionType;
+
+    /**
      * Only relevant if this DueWork's MarkType is 'TotalMark'
      *
      * @var $int
@@ -250,4 +255,19 @@ trait DueWorkTrait
         $this->selfReflectable = $selfReflectable;
     }
 
+    /**
+     * @return int
+     */
+    public function getSelfReflectionType(): int
+    {
+        return $this->selfReflectionType;
+    }
+
+    /**
+     * @param int $selfReflectionType
+     */
+    public function setSelfReflectionType(int $selfReflectionType): void
+    {
+        $this->selfReflectionType = $selfReflectionType;
+    }
 }
