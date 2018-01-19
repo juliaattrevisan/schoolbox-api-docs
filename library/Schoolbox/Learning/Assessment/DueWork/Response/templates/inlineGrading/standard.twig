@@ -135,50 +135,47 @@ Usage:
 
 {# Grading logic and structure #}
 <div class="row mark-scheme" id="assessment-status" data-participant>
-    <div class="small-12 island">
-        <section class="content">
-
-            <form method="post" data-feedback-form action="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postResponseFeedback', {assessmentId: assessment.id, studentId: participant.user.id, responseId: response.id, participant: participant}) }}">
+    <fieldset class="small-12 island">
+        <form method="post" data-feedback-form action="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postResponseFeedback', {assessmentId: assessment.id, studentId: participant.user.id, responseId: response.id, participant: participant}) }}">
+            <section>
                 <input type="hidden" name="responseId" value="{{ response.id }}" />
 
-                <div class="row">
+                {# Settings for the rubric grid #}
+                {% set showDescriptorValue = true %}
+                {% set showGroupTotal = true %}
+                {% set showRubricTotal = true%}
 
-                    {# Settings for the rubric grid #}
-                    {% set showDescriptorValue = true %}
-                    {% set showGroupTotal = true %}
-                    {% set showRubricTotal = true%}
+                {% block rubricGrid %}
+                    {% if assessment.useRubric and rubricContext %}
+                        <fieldset class="content">
+                            {% set rubricTemplate = readonly
+                            ? 'grid.twig'
+                            : 'grid-markable.twig'
+                            %}
+                            {% include '@rubric/' ~ rubricTemplate with {
+                                rubric: rubricContext.rubric,
+                                learnerRubric: learnerRubricContext.rubric,
+                                markType: rubricContext.markType,
+                                markVisibility: participant.assessable.isFeedbackVisibleToUser(USER),
+                                showDescriptorValue: showDescriptorValue,
+                                showGroupTotal: showGroupTotal,
+                                showRubricTotal: showRubricTotal
+                            } only %}
+                        </fieldset>
+                    {% endif %}
+                {% endblock %}
 
-                    {% block rubricGrid %}
-                        {% if assessment.useRubric and rubricContext %}
-                            <div class="small-12 island">
-                                {% set rubricTemplate = readonly
-                                ? 'grid.twig'
-                                : 'grid-markable.twig'
-                                %}
-                                {% include '@rubric/' ~ rubricTemplate with {
-                                    rubric: rubricContext.rubric,
-                                    learnerRubric: learnerRubricContext.rubric,
-                                    markType: rubricContext.markType,
-                                    markVisibility: participant.assessable.isFeedbackVisibleToUser(USER),
-                                    showDescriptorValue: showDescriptorValue,
-                                    showGroupTotal: showGroupTotal,
-                                    showRubricTotal: showRubricTotal
-                                } only %}
-                            </div>
-                        {% endif %}
-                    {% endblock %}
-
-                    {# A hole for readonly self-reflection content
-                     # Used when the Instructor wants to see the self-reflection while providing Feedback
-                     # Presence of a Learner-authored (marker, owner) tuple activates this
-                     #}
-                    {% block readonlyFeedback %}
-                        {% if latestSelfReflectedFeedback %}
-                            {% import '@learning/macro/urgency.twig' as urgency %}
-                            <div class="small-12 columns">
-                                <ul class="information-list threaded">
-                                    <li>
-                                        <h2 class="subheader">{% spaceless %}
+                {# A hole for readonly self-reflection content
+                 # Used when the Instructor wants to see the self-reflection while providing Feedback
+                 # Presence of a Learner-authored (marker, owner) tuple activates this
+                 #}
+                {% block readonlyFeedback %}
+                    {% if latestSelfReflectedFeedback %}
+                        {% import '@learning/macro/urgency.twig' as urgency %}
+                        <fieldset class="content">
+                            <ul class="information-list threaded">
+                                <li>
+                                    <h2 class="subheader">{% spaceless %}
                                             {% if latestSelfReflectedFeedback.normalisedMark != null %}
                                                 {{ locale.selfAssessment.proper }}
                                             {% else %}
@@ -186,23 +183,24 @@ Usage:
                                             {% endif %}
                                         {% endspaceless %}</h2>
 
-                                        <ul class="information-list reply">
-                                            <li>
-                                                <div class="list-item flex-grade">
-                                                    <div class="grade">
-                                                        <span class="{{ urgency.marks(latestSelfReflectedFeedback.normalisedMark) }}">{{ latestSelfReflectedFeedback.humanReadableMark }}</span>
-                                                    </div>
+                                    <ul class="information-list reply">
+                                        <li>
+                                            <div class="list-item flex-grade">
+                                                <div class="grade">
+                                                    <span class="{{ urgency.marks(latestSelfReflectedFeedback.normalisedMark) }}">{{ latestSelfReflectedFeedback.humanReadableMark }}</span>
                                                 </div>
-                                                <article>{{ latestSelfReflectedFeedback.comment|nl2br }}</article>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </div>
-                        {% endif %}
-                    {% endblock %}
+                                            </div>
+                                            <article>{{ latestSelfReflectedFeedback.comment|nl2br }}</article>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </fieldset>
+                    {% endif %}
+                {% endblock %}
 
-                    {# The little grades input combobox #}
+                {# The little grades input combobox #}
+                <fieldset class="content">
                     {% block gradeValue %}
                         {% if 'none' != markSchemeName | lower %}
                             <div class="small-12 medium-3 column">
@@ -238,42 +236,44 @@ Usage:
                         } only %}
                     </div>
                     {% endblock %}
+                </fieldset>
 
-                    {# Maybe files may be uploaded here? #}
-                    {% block attachzone %}
-                        {% if attachzone and not readonly %}
+                {# Maybe files may be uploaded here? #}
+                {% block attachzone %}
+                    {% if attachzone and not readonly %}
+                        <fieldset class="content">
                             <div class="small-12 columns">
-                                {% include 'sub/attachzone.twig' with {attachzone: attachzone} only %}
+                            {% include 'sub/attachzone.twig' with {attachzone: attachzone} only %}
                             </div>
-                        {% endif %}
-                    {% endblock %}
+                        </fieldset>
+                    {% endif %}
+                {% endblock %}
 
-                    {# Action Bar #}
-                    {% set isDraftFeedback     = latestFeedback and not latestFeedback.published %}
-                    {% set isPublishedFeedback = latestFeedback and latestFeedback.published %}
+                {# Action Bar #}
+                {% set isDraftFeedback     = latestFeedback and not latestFeedback.published %}
+                {% set isPublishedFeedback = latestFeedback and latestFeedback.published %}
 
-                    {% block actionButtons %}
-                        {% spaceless %}
-                            {% set buttons %}
-                                <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen" {% if not isDraftFeedback %}style="display:none;"{% endif %}>Saved as Draft</span>
-                                {% if not readonly %}
-                                    <a class="button" id="continue-button">Continue</a>
-                                    <a class="button"
-                                       data-draft="publish"
-                                       {% if isPublishedFeedback %}style="display:none;"{% endif %}
-                                    >Publish and Continue</a>
-                                {% endif %}
-                            {% endset %}
-                        {% endspaceless %}
+                {% block actionButtons %}
+                    {% spaceless %}
+                        {% set buttons %}
+                            <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen" {% if not isDraftFeedback %}style="display:none;"{% endif %}>Saved as Draft</span>
+                            {% if not readonly %}
+                                <a class="button" id="continue-button">Continue</a>
+                                <a class="button"
+                                   data-draft="publish"
+                                   {% if isPublishedFeedback %}style="display:none;"{% endif %}
+                                >Publish and Continue</a>
+                            {% endif %}
+                        {% endset %}
+                    {% endspaceless %}
 
-                        {% include '@learningAssessment/fragments/actionBar.twig' with {
-                            actionStyle:  '',
-                            buttons: buttons
-                        } only %}
-                    {% endblock %}
-                </div>
-            </form>
-        </section>
+                    {% include '@learningAssessment/fragments/actionBar.twig' with {
+                        actionStyle:  '',
+                        buttons: buttons
+                    } only %}
+                {% endblock %}
+            </section>
+        </form>
     </div>
 </div>
 
