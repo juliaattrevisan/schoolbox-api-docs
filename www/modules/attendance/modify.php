@@ -225,11 +225,28 @@ if ($class) {
                 array('Code' => 'ABSENCE_OPTIONS_VALUE', 'Description' => 'ABSENCE_OPTIONS_DESCRIPTION')
             );
 
+            $filteredReasons = [];
+
+            foreach ($reasonDropdownOptions as $absenceReason) {
+                if ($absenceReason['AbsenceTypeCode'] === '' && trim($absenceReason['Code']) !== '') {
+                    foreach ($absenceDropdownOptions as $absenceType) {
+                        $filteredReasons[] = [
+                            'Code'            => $absenceReason['Code'],
+                            'AbsenceTypeCode' => $absenceType['Code'],
+                            'Description'     => $absenceReason['Description'],
+                        ];
+                    }
+                } else {
+                    $filteredReasons[] = $absenceReason;
+                }
+            }
+
+
             $reasonCode = $currentStudent['ActualAbsenceReasonCode'] ? $currentStudent['ActualAbsenceReasonCode'] : $currentStudent['PossibleReasonCode'];
 
             $this->dropDown(
-                'reason_options', $reasonDropdownOptions, $reasonCode, 'student',
-                array('Code' => 'REASON_OPTIONS_VALUE', 'Description' => 'REASON_OPTIONS_DESCRIPTION')
+                'reason_options', $filteredReasons, $reasonCode, 'student',
+                array('Code' => 'REASON_OPTIONS_VALUE', 'AbsenceTypeCode' => 'REASON_OPTIONS_TYPE', 'Description' => 'REASON_OPTIONS_DESCRIPTION')
             );
 
             $this->parse('student_block', 'student', true);
