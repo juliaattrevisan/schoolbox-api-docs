@@ -25,7 +25,6 @@ class Model extends AbstractModel
     public function jsonSerialize()
     {
         return [
-            'author'    => $this->getAuthor(),
             'title'     => $this->getTitle(),
             'css_class' => $this->getCssClass(),
             'body'      => $this->getBody(),

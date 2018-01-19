@@ -24,11 +24,6 @@ abstract class AbstractModel implements ISoftDeletable, \JsonSerializable
     use DeletedAtDate;
 
     /**
-     * @var User|null
-     */
-    protected $author;
-
-    /**
      * @var string|null
      */
     protected $title;

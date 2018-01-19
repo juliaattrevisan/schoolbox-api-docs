@@ -1,7 +1,7 @@
 <?php
 /**
- * @author      Damian Sloane <damian.sloane@alaress.com.au>
- * @copyright   Copyright 2017, Alaress Pty Ltd
+ * @author      Matthew Schembri <matt.schembri@alaress.com.au>
+ * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
 
