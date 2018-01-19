@@ -1,4 +1,21 @@
+"use strict";
 $(function () {
+
+    /**
+     * Custom events that can be inserted into the `tour_step_event` and triggered on step open or close
+     *
+     */
+    var tourActions = {
+        // Open an accordion
+        'accordion.open': function (element) {
+            $(element).foundation('accordion', 'open');
+        },
+
+        // Close an accordion
+        'accordion.close': function (element) {
+            $(element).foundation('accordion', 'close');
+        }
+    };
 
     if (typeof(window.tourUrl) !== 'undefined') {
         $.get(window.tourUrl).done(function (tours) {
@@ -28,9 +45,12 @@ $(function () {
                                 intro: step.body,
                                 element: step.selector,
                                 tooltipClass: step.css_class,
-                                uuid: step.uuid
+                                uuid: step.uuid,
+                                jsEvents: step.events
                             });
                         }
+
+
                     });
 
                     tourCurrent.setOptions({
@@ -54,12 +74,29 @@ $(function () {
                     var saveRoute = '/tour/url/save';
 
                     tourCurrent.onchange(function(targetElement) {
-                        var newStep     = tourCurrent._introItems[tourCurrent._currentStep].uuid;
+                        var stepCurrent = tourCurrent._introItems[tourCurrent._currentStep];
+                        var stepPrev = tourCurrent._introItems[tourCurrent._currentStep - 1];
+                        var stepNext = tourCurrent._introItems[tourCurrent._currentStep + 1];
 
-                        //This matches the consts on the Status/Model - to be updated when this file is a plugin
-                        var status      = "unactioned";
+                        // If the current step has custom JS events attached to open of this step - trigger those events now
+                        if (stepCurrent.jsEvents !== null) {
+                            runStepEvents(stepCurrent.jsEvents, 'open');
+                        }
 
-                        //Save the status
+                        // If the user has moved forward, and the previous step had any custom JS events attached on close - trigger those now
+                        if (stepPrev !== undefined && stepPrev.jsEvents !== null && tourCurrent._direction === 'forward') {
+                            runStepEvents(stepPrev.jsEvents, 'close');
+                        }
+
+                        // If the user has moved back, and the previous step had any custom JS events attached on close - trigger those now
+                        if (stepNext !== undefined && stepNext.jsEvents !== null && tourCurrent._direction === 'backward') {
+                            runStepEvents(stepNext.jsEvents, 'close');
+                        }
+
+                        // Update the status in the DB
+                        var newStep = stepCurrent.uuid;
+                        var status = "unactioned"; // TODO: use const from Status/Model when this is made into a plugin
+
                         $.post(saveRoute, {
                             url: tourUrl,
                             oldStep: oldStep,
@@ -67,7 +104,7 @@ $(function () {
                             status: status
                         });
 
-                        oldStep         = newStep;
+                        oldStep = newStep;
                     });
 
                     tourCurrent.oncomplete(function(targetElement) {
@@ -88,9 +125,11 @@ $(function () {
                     });
 
                     tourCurrent.onexit(function(targetElement) {
+                        var currentStep = tourCurrent._introItems[tourCurrent._currentStep];
+
                         //onexit triggers when oncomplete triggers, so need check
                         if(!completed) {
-                            var newStep = tourCurrent._introItems[tourCurrent._currentStep].uuid;
+                            var newStep = currentStep.uuid;
 
                             //This matches the consts on the Status/Model - to be updated when this file is a plugin
                             var status = "dismissed";
@@ -103,6 +142,13 @@ $(function () {
                                 status: status
                             });
                         }
+
+                        // Check for a close event on the step
+                        // Purposefully left out of the completed check above - want to run it in both cases
+                        if (currentStep !== undefined && currentStep.jsEvents !== null) {
+                            runStepEvents(currentStep.jsEvents, 'close');
+                        }
+
                     });
 
 
@@ -156,5 +202,28 @@ $(function () {
 
             $('body').trigger('tourReady');
         });
+    }
+
+
+    /**
+     * Run events for a step
+     *
+     * @param events
+     * @param insertionPoint
+     */
+    function runStepEvents(events, insertionPoint) {
+        for (var key in events) {
+            var jsEvent = events[key];
+
+            // Check this event is set to run on the specified insertion point, and the element exists
+            if (jsEvent.insertion_point === insertionPoint && $(jsEvent.selector).length) {
+                // Check if the event is one of the predefined events
+                if (tourActions[jsEvent.event] !== undefined) {
+                    tourActions[jsEvent.event].call(this, jsEvent.selector);
+                } else { // Otherwise try for a generic trigger on the element
+                    $(jsEvent.selector).trigger(jsEvent.event);
+                }
+            }
+        }
     }
 });

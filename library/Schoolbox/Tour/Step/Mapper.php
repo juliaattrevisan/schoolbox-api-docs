@@ -118,15 +118,20 @@ class Mapper extends BaseMapper
                         `tour_step_tooltip`.`uuid` as `tooltip_uuid`,
                         `tour_step_tooltip`.`body` as `tooltip_body`,
                         `tour_step_tooltip`.`selector` as `tooltip_selector`,
-                        `tour_step_tooltip`.`css_class` as `tooltip_css_class`
+                        `tour_step_tooltip`.`css_class` as `tooltip_css_class`,
+                        `tour_step_event`.`selector` as `event_selector`,
+                        `tour_step_event`.`event` as `event`,
+                        `tour_step_event`.`insertion_point` as `event_insertion_point`
             FROM        {$this->getTable()}
             LEFT JOIN   {$this->getJoinSql('tour', '', 'tour', true)}
             LEFT JOIN   `tour_step_tooltip` ON `tour_step_tooltip`.`tour_step_uuid` = `tour_step`.`uuid`
+            LEFT JOIN   `tour_step_event` ON `tour_step_event`.`tour_step_uuid` = `tour_step`.`uuid` AND `tour_step_event`.`deleted_at` IS NULL
             WHERE       `tour`.`uuid` = :tourUuid AND
                         `tour`.`active` = 1 AND
                         `tour`.`deleted_at` IS NULL AND
                         `tour_step`.`deleted_at` IS NULL AND
                         `tour_step_tooltip`.`deleted_at` IS NULL 
+            ORDER BY    `tour_step_event`.`order`
         ";
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute([
@@ -141,17 +146,26 @@ class Mapper extends BaseMapper
             if ($stepCurrent === null) {
                 $stepCurrent = $row['tour.tour_step_uuid'];
             }
-            switch ($row['type']) {
-                case Model::TYPE_TOOLTIP:
-                    $stepsStorage[$row['uuid']] = [
-                        'uuid' => $row['uuid'],
-                        'next_step_uuid' => $row['next_step_uuid'],
-                        'type' => Model::TYPE_TOOLTIP,
-                        'body' => $row['tooltip_body'],
-                        'css_class' => $row['tooltip_css_class'],
-                        'selector' => $row['tooltip_selector'],
-                    ];
-                    break;
+
+            if (!isset($stepsStorage[$row['uuid']])) {
+                $stepsStorage[$row['uuid']] = [
+                    'uuid'           => $row['uuid'],
+                    'next_step_uuid' => $row['next_step_uuid'],
+                    'type'           => Model::TYPE_TOOLTIP,
+                    'body'           => $row['tooltip_body'],
+                    'css_class'      => $row['tooltip_css_class'],
+                    'selector'       => $row['tooltip_selector'],
+                    'events'         => [] // Populated below
+                ];
+            }
+
+            // Add the event (can be multiple)
+            if ($row['event_selector'] && $row['event'] && $row['event_insertion_point']) {
+                $stepsStorage[$row['uuid']]['events'][] = [
+                    'selector'        => $row['event_selector'],
+                    'event'           => $row['event'],
+                    'insertion_point' => $row['event_insertion_point'],
+                ];
             }
         }
 
