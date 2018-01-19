@@ -1190,7 +1190,7 @@ class External_Synergetic_User implements External_UserInterface
         $predicateBuilder = $this->getConnector()
             ->buildPredicateBuilder('StudentYears')
             ->equals('StudentYears.FileYear', $fileYearSemester['year'])
-            ->equals('StudentYears.ID', $ids);
+            ->in('StudentYears.ID', $ids);
 
         $where = implode(' AND ', $predicateBuilder->getWhere());
 

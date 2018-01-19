@@ -63,7 +63,7 @@ class RoleAccessMapper extends Mapper
 
         $builder = $this->getPredicateBuilder();
         $builder->equals('ra.cid', $category->getId());
-        $builder->equals('r.deleted_at', null);
+        $builder->isNull('r.deleted_at');
         $whereClause = implode(' AND ', $builder->getWhere());
 
         // Get all permissions for the specified folder

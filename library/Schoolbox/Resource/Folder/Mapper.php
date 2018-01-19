@@ -681,7 +681,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * It should only get the children of $id and probably should be
      * established in Ancestry
      *
-     * @param int|int[] $id
+     * @param int $id
      * @return GenericCollection|Model[]
      */
     public function findByParent($id)
@@ -730,19 +730,18 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     /**
      * Search for folders with the given curriculum code(s)
      *
-     * @param string|string[] $code
+     * @param string[] $codes
      * @return Collection|Model[]
      * @throws MapperException
      */
-    public function findByCurriculumCode($code)
+    public function findByCurriculumCode(array $codes)
     {
-        if (!$code) {
+        if (0 === \count($codes)) {
             // no code? no matches
             return $this->createCollection();
         }
 
-        $builder = $this->getPredicateBuilder();
-        $builder->equals('cn.code', $code);
+        $builder = $this->getPredicateBuilder()->in('cn.code', $codes);
 
         return $this->findByPredicates($builder);
     }

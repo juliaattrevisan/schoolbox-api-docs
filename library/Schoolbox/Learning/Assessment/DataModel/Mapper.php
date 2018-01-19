@@ -497,7 +497,7 @@ class Mapper extends BaseMapper
         // Send IDs to findByColumnList
 
         try {
-            $builder = $builder->equals('id', array_merge($idList, $uniqueIds));
+            $builder = $builder->in('id', array_merge($idList, $uniqueIds));
             return $this->findByPredicates($builder, $options);
         } catch (\UnderflowException $e) {
             return new Collection();
@@ -627,7 +627,7 @@ class Mapper extends BaseMapper
         }
 
         // Fetch all curriculum nodes + supplementary fields
-        $predicate = $this->getPredicateBuilder()->equals('id', $modelList->getColumnValues('id'));
+        $predicate = $this->getPredicateBuilder()->in('id', $modelList->getColumnValues('id'));
         $where     = implode(' AND ', $predicate->getWhere());
         $query     = "
             SELECT

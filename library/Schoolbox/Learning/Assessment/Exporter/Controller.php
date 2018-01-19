@@ -333,7 +333,7 @@ class Controller extends BaseController
 
             // Load assessments into unit implementation
             $unitImplementation->setAssessables(
-                $this->assessmentDataSource->findAllByUnitImplementationId($unitImplementation->getId())
+                $this->assessmentDataSource->findAllByUnitImplementationId([$unitImplementation->getId()])
             );
 
             // Is $assessable imported into this unit yet?

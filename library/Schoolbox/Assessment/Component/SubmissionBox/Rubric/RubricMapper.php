@@ -750,7 +750,7 @@ class RubricMapper
         }
 
         $levelMapper       = LevelMapper::getInstance();
-        $pb                = $levelMapper->getPredicateBuilder()->equals('rl.box_id', $submissionBoxIds);
+        $pb                = $levelMapper->getPredicateBuilder()->in('rl.box_id', $submissionBoxIds);
         $boxIdPlaceholders = $pb->getWhere()[0];
 
         $query = "
@@ -922,7 +922,7 @@ class RubricMapper
         $pb = new Builder($this->database, '');
 
         $pb
-            ->equals('sb.assessment_id', $dueWorks->getColumnValues('id'))
+            ->in('sb.assessment_id', $dueWorks->getColumnValues('id'))
             ->equals('sr.owner', $student->getId())
             ->notNull('sr.published_at')
             ->isTrue('rm.valid')

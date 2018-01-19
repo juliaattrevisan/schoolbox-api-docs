@@ -32,39 +32,39 @@ interface IBuilder
      * @param string $columnName
      * @return IBuilder
      */
-    public function isNull($columnName);
+    public function isNull(string $columnName);
 
     /**
      * @param string $columnName
      * @return IBuilder
      */
-    public function notNull($columnName);
+    public function notNull(string $columnName);
 
     /**
      * @param string $columnName
      * @return IBuilder
      */
-    public function isTrue($columnName);
+    public function isTrue(string $columnName);
 
     /**
      * @param string $columnName
      * @return IBuilder
      */
-    public function isFalse($columnName);
+    public function isFalse(string $columnName);
 
     /**
      * @param string $columnName
      * @param string|int|string[]|int[] $columnValue
      * @return IBuilder
      */
-    public function equals($columnName, $columnValue);
+    public function equals(string $columnName, $columnValue);
 
     /**
      * @param string     $columnName
      * @param string|int $columnValue
      * @return IBuilder
      */
-    public function notEquals($columnName, $columnValue);
+    public function notEquals(string $columnName, $columnValue);
 
     /**
      * If $columnValue is an array, then the values are combined using 'OR'
@@ -77,7 +77,7 @@ interface IBuilder
      *                            @see \Database::escapeForLike for escaping user input.
      * @return IBuilder
      */
-    public function like($columnName, $columnValue);
+    public function like(string $columnName, string $columnValue);
 
     /**
      * If $columnValue is an array, then the values are combined using 'AND'
@@ -93,14 +93,14 @@ interface IBuilder
      *                            @see \Database::escapeForLike for escaping user input.
      * @return IBuilder
      */
-    public function notLike($columnName, $columnValue);
+    public function notLike(string $columnName, string $columnValue);
 
     /**
      * @param string     $columnName
      * @param int|string $columnValue  if string, must be datetime
      * @return IBuilder
      */
-    public function lessThan($columnName, $columnValue);
+    public function lessThan(string $columnName, $columnValue);
 
 
     /**
@@ -108,14 +108,14 @@ interface IBuilder
      * @param int|string $columnValue  if string, must be datetime
      * @return IBuilder
      */
-    public function greaterThan($columnName, $columnValue);
+    public function greaterThan(string $columnName, $columnValue);
 
     /**
      * @param string     $columnName
      * @param int|string $columnValue  if string, must be datetime
      * @return IBuilder
      */
-    public function lessThanOrEqualTo($columnName, $columnValue);
+    public function lessThanOrEqualTo(string $columnName, $columnValue);
 
     /**
      * @param string     $columnName
@@ -146,7 +146,7 @@ interface IBuilder
      * @param mixed  $to   If null, this value is excluded.
      * @return IBuilder
      */
-    public function between($columnName, $from, $to);
+    public function between(string $columnName, $from, $to);
 
     /**
      * Adds predicates for checking if this value is between two dates.
@@ -158,7 +158,7 @@ interface IBuilder
      * @return IBuilder
      */
     public function betweenDates(
-        $columnName,
+        string $columnName,
         \Alaress_Date_Format $from = null,
         \Alaress_Date_Format $to = null,
         $compareFormat = \Alaress_Date_Format::DATABASE_FORMAT

@@ -501,7 +501,7 @@ class IdFinder extends Filter\AbstractIdFinder
         }
 
         $builder = $this->getMapper()->getPredicateBuilder();
-        $builder->equals('f.id', $folderIds);
+        $builder->in('f.id', $folderIds);
 
         return [$builder->getWhere()[0], $builder->getParams()];
     }
@@ -524,7 +524,7 @@ class IdFinder extends Filter\AbstractIdFinder
                 unset($ids[NullableContext\Definition::KEY_NONE]);
             }
             $builder = $this->getMapper()->getPredicateBuilder();
-            $builder->equals('p.id', $ids);
+            $builder->in('p.id', $ids);
             $whereClause = $builder->getWhere()[0];
             $whereParams = $builder->getParams();
         }
@@ -562,7 +562,7 @@ class IdFinder extends Filter\AbstractIdFinder
         JOIN term $t ON (a.$dateColumn >= $t.start  AND ($t.actual_finish IS NULL OR a.$dateColumn < DATE_ADD($t.actual_finish, INTERVAL 1 DAY)))";
 
         $builder = $this->getMapper()->getPredicateBuilder();
-        $builder->equals("$t.id", $termIds->getAll());
+        $builder->in("$t.id", $termIds->getAll());
 
         return [$joinClause, implode(' AND ', $builder->getWhere()), $builder->getParams() ];
     }
@@ -609,7 +609,7 @@ class IdFinder extends Filter\AbstractIdFinder
                 unset($ids[NullableContext\Definition::KEY_NONE]);
             }
             $builder = $this->getMapper()->getPredicateBuilder();
-            $builder->equals('ui.id', $ids);
+            $builder->in('ui.id', $ids);
             $whereClause = $builder->getWhere()[0];
             $whereParams = $builder->getParams();
         }
@@ -635,7 +635,7 @@ class IdFinder extends Filter\AbstractIdFinder
                 unset($ids[NullableContext\Definition::KEY_NONE]);
             }
             $builder = $this->getMapper()->getPredicateBuilder();
-            $builder->equals('uis.id', $ids);
+            $builder->in('uis.id', $ids);
             $joinClause  = 'JOIN course_unit_specification uis ON ui.course_unit_specification_id = uis.id';
             $whereClause = $builder->getWhere()[0];
             $whereParams = $builder->getParams();
@@ -661,7 +661,7 @@ class IdFinder extends Filter\AbstractIdFinder
                 unset($ids[NullableContext\Definition::KEY_NONE]);
             }
             $builder = $this->getMapper()->getPredicateBuilder();
-            $builder->equals('us.id', $ids);
+            $builder->in('us.id', $ids);
             $whereClause = $builder->getWhere()[0];
             $whereParams = $builder->getParams();
         }

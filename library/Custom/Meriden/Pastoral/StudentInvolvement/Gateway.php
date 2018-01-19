@@ -92,10 +92,10 @@ class Gateway
                  ->between('absent_date', $year . '-01-01', $year . '-12-31');
 
         if (!empty($absenceTypes)) {
-            $pb = $pb->equals('absent_type', $absenceTypes);
+            $pb = $pb->in('absent_type', $absenceTypes);
         }
         if (!empty($reasonCodes)) {
-            $pb = $pb->equals('reas_code', $reasonCodes);
+            $pb = $pb->in('reas_code', $reasonCodes);
         }
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere());
@@ -361,7 +361,7 @@ class Gateway
         $pb = new PredicateBuilder($this->database, 'teacher');
         $pb = $pb->equals('studsub.stud_code', $externalId)
                  ->equals('studsub.cmpy_code', self::COMPANY_CODE)
-                 ->equals('studsub.sub_code', self::TUTOR_GROUPS)
+                 ->in('studsub.sub_code', self::TUTOR_GROUPS)
                  ->equals('tchsub.year_num', $year);
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere()) . " ORDER BY teacher.tch_name ASC";
@@ -400,7 +400,7 @@ class Gateway
 
         $pb = new PredicateBuilder($this->database, 'studsub');
         $pb = $pb->equals('studsub.stud_code', $externalId)
-                 ->equals('subtab.sub_code', self::TUTOR_GROUPS)
+                 ->in('subtab.sub_code', self::TUTOR_GROUPS)
                  ->equals('studsub.cmpy_code', self::COMPANY_CODE);
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere())
@@ -441,7 +441,7 @@ class Gateway
         $pb = new PredicateBuilder($this->database, 'studsub');
         $pb = $pb->equals('studsub.stud_code', $externalId)
                  ->equals('studsub.yr_study', $year)
-                 ->equals('subtab.sub_code', self::TUTOR_GROUPS)
+                 ->in('subtab.sub_code', self::TUTOR_GROUPS)
                  ->equals('studsub.cmpy_code', self::COMPANY_CODE);
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere())
@@ -490,7 +490,7 @@ class Gateway
         $pb = new PredicateBuilder($this->database, 'studsub');
         $pb = $pb->equals('studsub.stud_code', $externalId)
                  ->equals('studsub.yr_study', $year)
-                 ->notEquals('subtab.sub_code', self::EXCLUDED_SUBJECTS)
+                 ->notIn('subtab.sub_code', self::EXCLUDED_SUBJECTS)
                  ->equals('studsub.cmpy_code', self::COMPANY_CODE);
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere())

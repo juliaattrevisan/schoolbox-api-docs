@@ -119,7 +119,7 @@ class External_Isams_User implements External_UserInterface
     public function getParentEmails($synergyIds)
     {
         $emailList = [];
-        $pb = $this->getConnector()->buildPredicateBuilder("V_Parent")->equals("StudentID", $synergyIds);
+        $pb = $this->getConnector()->buildPredicateBuilder("V_Parent")->in("StudentID", $synergyIds);
         $pb->notEquals("CISEmail", "");
         $whereString = implode(" AND " , $pb->getWhere());
 

@@ -1677,7 +1677,7 @@ abstract class Mapper implements IMapper, Serializable
             foreach ($collection as $model) {
                 $idValues[] = $this->getModelProperty($model, $this->getIdentifierProperty());
             }
-            $pbs[] = $this->getPredicateBuilder()->equals($this->getIdentifierColumn(), $idValues);
+            $pbs[] = $this->getPredicateBuilder()->in($this->getIdentifierColumn(), $idValues);
 
         } else {
             // Building the query is hard - all I can do is compare against each property of each model.
@@ -2130,7 +2130,12 @@ abstract class Mapper implements IMapper, Serializable
 
         // filter on soft-deletions if this mapper supports them
         if (isset($this->soft_delete_column) && $options['deleted'] == false) {
-            $predicate->equals($this->soft_delete_column, $this->soft_delete_undeleted_value);
+            if(null === $this->soft_delete_undeleted_value){
+                $predicate->isNull($this->soft_delete_column);
+            } else {
+                $predicate->equals($this->soft_delete_column, $this->soft_delete_undeleted_value);
+            }
+
         }
 
         // If this underflows, someone passed an empty column value - return an empty set.

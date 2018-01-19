@@ -247,7 +247,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
 
         $pb = $this->getSelectionMapper()->getPredicateBuilder();
         $pb
-            ->equals('filter_id', $filterIds)
+            ->in('filter_id', $filterIds)
             ->equals('user_id', $user->getId())
             ->equals('page', $page);
 

@@ -178,7 +178,7 @@ class Controller extends BaseController
         $pageBuilder = $this->pageMapper->getPredicateBuilder();
         $pageBuilder
             ->equals('page', $page)
-            ->notEquals('filter_id', $pagesToSave->map(function (Page\Model $pageFilter) {
+            ->notIn('filter_id', $pagesToSave->map(function (Page\Model $pageFilter) {
                 return $pageFilter->getFilter()->getId();
             })->getAll());
         $this->pageMapper->deleteByPredicates($pageBuilder);
@@ -189,15 +189,15 @@ class Controller extends BaseController
             $optionsBuilder = $this->optionsMapper->getPredicateBuilder();
             $optionsBuilder
                 ->equals('filter_page_id', $pageFilter->getId())
-                ->notEquals('key', $pageFilter->getOptions()->getColumnValues('key'));
+                ->notIn('key', $pageFilter->getOptions()->getColumnValues('key'));
             $this->optionsMapper->deleteByPredicates($optionsBuilder);
         }
 
         // Delete any defaults for roleTypes that don't have access to the page
         $defaultsBuilder = $this->defaultsMapper->getPredicateBuilder();
         $defaultsBuilder
-            ->equals('filter_option_id', $optionsToSave->getColumnValues('id'))
-            ->notEquals('role_type', Page\Model::getPageRoleTypes()[$page]);
+            ->in('filter_option_id', $optionsToSave->getColumnValues('id'))
+            ->notIn('role_type', Page\Model::getPageRoleTypes()[$page]);
         $this->defaultsMapper->deleteByPredicates($defaultsBuilder);
 
         $this->response->content->set($this->buildJsonOutput(['status' => 200]));

@@ -273,7 +273,7 @@ class MapperProxy
             return $this->findAllByUnitSpecificationId($context->getId(), $options);
         }
         if ($context instanceof UnitImplementation) {
-            return $this->findAllByUnitImplementationId($context->getId(), $options);
+            return $this->findAllByUnitImplementationId([$context->getId()], $options);
         }
         if ($context instanceof ProjectObject) {
             return $this->findAllByProjectId($context->getId(), $options);
@@ -309,15 +309,15 @@ class MapperProxy
      *
      * This method does not currently load participants or the rubric grid.
      *
-     * @param int|int[] $unitImplId
+     * @param int[]     $unitImplIds
      * @param array     $options
      * @return Collection|IAssessable[]
      */
-    public function findAllByUnitImplementationId($unitImplId, array $options = [])
+    public function findAllByUnitImplementationId(array $unitImplIds, array $options = [])
     {
         try {
             $builder = $this->convertOptionsToPredicateBuilder($options)
-                            ->equals('ui.id', $unitImplId);
+                            ->in('ui.id', $unitImplIds);
             return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
         } catch (UnderflowException $e) {
             return $this->createCollection();
@@ -329,15 +329,15 @@ class MapperProxy
      *
      * This method loads participants, responses and feedback.
      *
-     * @param int|int[] $unitImplId
+     * @param int[]     $unitImplIds
      * @param User      $student If provided, load only this student's participation
      * @param array     $options
      * @return Collection|IAssessable[]
      */
-    public function findAllByUnitImplementationIdForCourseOutline($unitImplId, User $student = null, array $options = [])
+    public function findAllByUnitImplementationIdForCourseOutline(array $unitImplIds, User $student = null, array $options = [])
     {
         return $this->loadParticipantsIntoAssessmentCollection(
-            $this->findAllByUnitImplementationId($unitImplId, $options),
+            $this->findAllByUnitImplementationId($unitImplIds, $options),
             $student
         );
     }
@@ -398,11 +398,11 @@ class MapperProxy
      *
      * This method does not currently load participants or the rubric grid.
      *
-     * @param int|int[] $folderId
+     * @param int $folderId
      * @param array     $options
      * @return Collection|IAssessable[]
      */
-    public function findAllByFolderIdExclusively($folderId, array $options = [])
+    public function findAllByFolderIdExclusively(int $folderId, array $options = [])
     {
         try {
             $builder = $this->convertOptionsToPredicateBuilder($options)
