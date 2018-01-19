@@ -229,6 +229,7 @@ function getStream(Storage $storage)
 
         if ($fileSystem->has($storage->getPath() . "-transcode")) {
             $storage->setPath($storage->getPath() . "-transcode");
+            $storage->setSize($fileSystem->getSize($storage->getPath() . "-transcode"));
         }
 
         $videoStream = S3Stream::open($storage);
