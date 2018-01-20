@@ -121,10 +121,22 @@ class Builder implements IBuilder
     protected function addSubPredicate(string $glue, IBuilder $predicate, bool $negate)
     {
         // Extract this object's where and params
-        $this->params  = array_merge($this->getParams(), $predicate->getParams());
+        $where = ($negate ? 'NOT ' : '') . '(' . implode(" $glue ", $predicate->getWhere()) . ')';
+
+        // Test for collisions if inner and outer PB contain same placeholder keys
+        foreach($predicate->getParams() as $placeholder => $param) {
+            // Does this cause a collision?
+            if(array_key_exists($placeholder, $this->params)) {
+                $uniquePlaceholder                = $this->getNonCollidingParamAlias($placeholder);
+                $where                            = str_replace($placeholder, $uniquePlaceholder, $where);
+                $this->params[$uniquePlaceholder] = $param;
+            } else {
+                $this->params[$placeholder] = $param;
+            }
+        }
 
         // Set the new where into action
-        $this->where[] = ($negate ? 'NOT ' : '') . '('.implode(" $glue ", $predicate->getWhere()).')';
+        $this->where[] = $where;
 
         return $this;
     }
@@ -303,13 +315,13 @@ class Builder implements IBuilder
     /**
      * If $columnValue is array, then $columnName must be lessThan all values
      *
-     * @param string     $columnName
+     * @param string|ISqlFunc $columnName
      * @param int|string $columnValue if string, must be datetime
      * @return Builder
      * @throws InvalidArgumentException If column value is not a scalar
      * @throws InvalidColumnException If unable to parse column name
      */
-    public function lessThan(string $columnName, $columnValue): self
+    public function lessThan($columnName, $columnValue): self
     {
         if (!\is_scalar($columnValue)) {
             throw new InvalidArgumentException('Column value must be scalar. Found: ' . \gettype($columnValue));
@@ -457,37 +469,47 @@ class Builder implements IBuilder
 
 
     /**
-     * @param string $columnName
-     * @param mixed  $columnValue
-     * @param string $operator
+     * @param string|ISqlFunc $columnName
+     * @param mixed           $columnValue
+     * @todo $columnName + $columnValue can be generalised to $operandLeft + $operatorRight
+     * @todo $leftOperand, $operator, $rightOperand = null;
+     * @param string          $operator
      * @return $this
      * @throws InvalidColumnException If unable to parse column name
      */
-    protected function addPredicate(string $columnName, $columnValue, $operator = self::OPERATOR_EQUALS): self
+    protected function addPredicate($columnName, $columnValue, $operator = self::OPERATOR_EQUALS): self
     {
         // prepare operator modifiers
-        $negate = self::OPERATOR_NOT_EQUALS === $operator || self::OPERATOR_NOT_LIKE === $operator;
+        $negate   = self::OPERATOR_NOT_EQUALS === $operator || self::OPERATOR_NOT_LIKE === $operator;
+        $whereNot = $negate ? 'NOT ' : '';
 
-        [$table, $field, $param] = $this->parseColumn($columnName);
-        $whereNot     = $negate ? 'NOT ' : '';
-        $escaped_name = $this->quoter->quoteIdentifier($table) . '.' . $this->quoter->quoteIdentifier($field);
+        // prepare left operand
+        if($columnName instanceof ISqlFunc) {
+            $escapedOperand = $columnName->getEscapedOperand($this->quoter, $this->table);
+            $param          = $columnName->getParam();
+        } else {
+            [$table, $field, $param] = $this->parseColumnName($columnName);
+            $escapedOperand = $this->quoter->quoteIdentifier($table) . '.' . $this->quoter->quoteIdentifier($field);
+        }
 
-        if (!isset($columnValue)) {
-            $this->where[] = "$escaped_name IS {$whereNot}NULL";
-        } elseif ($columnValue === true) {
-            $this->where[] = "$escaped_name IS {$whereNot}TRUE";
-        } elseif ($columnValue === false) {
-            $this->where[] = "$escaped_name IS {$whereNot}FALSE";
-        } elseif (self::canTraverse($columnValue)) {
+
+        if(!isset($columnValue)) {
+            $this->where[] = "$escapedOperand IS {$whereNot}NULL";
+        } elseif($columnValue === true) {
+            $this->where[] = "$escapedOperand IS {$whereNot}TRUE";
+        } elseif($columnValue === false) {
+            $this->where[] = "$escapedOperand IS {$whereNot}FALSE";
+        } elseif(self::canTraverse($columnValue)) {
             $placeHolders  = self::getArrayPlaceholders($columnValue, $param);
-            $this->where[] = "$escaped_name {$whereNot}IN {$placeHolders}";
+            $this->where[] = "$escapedOperand {$whereNot}IN {$placeHolders}";
             $this->params  = array_merge($this->params, self::getArrayParameters($columnValue, $param));
         } else {
             // alias the param
             $a             = $this->getNonCollidingParamAlias($param);
-            $this->where[] = "$escaped_name $operator :$a";
+            $this->where[] = "$escapedOperand $operator :$a";
             $this->putParam($a, $columnValue);
         }
+
         return $this;
     }
 
@@ -716,25 +738,22 @@ class Builder implements IBuilder
         return false;
     }
 
-
     /**
      * @param string $columnName
-     * @return array
-     * @throws InvalidColumnException If unable to parse column name
+     * @return string[]
+     * @throws InvalidColumnException If unable to parse a table and field from the column name
      */
-    private function parseColumn(string $columnName): array
+    private function parseColumnName(string $columnName): array
     {
-        // accommodate joins
         $xpl = explode('.', $columnName) ?: [];
 
-        if (1 === \count($xpl)) {
-            return [$this->getTable(), $xpl[0], $columnName];
+        if(1 === \count($xpl)) {
+            return [$this->table, $xpl[0], $columnName];
         }
-        if (2 === \count($xpl)) {
+        if(2 === \count($xpl)) {
             // remove the period so SQL doesn't freak out
-            return [$xpl[0], $xpl[0], str_replace('.', '_', $columnName)];
+            return [$xpl[0], $xpl[1], str_replace('.', '_', $columnName)];
         }
         throw new InvalidColumnException("Unable to parse [table].column name: $columnName");
     }
-
 }

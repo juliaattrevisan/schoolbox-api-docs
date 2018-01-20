@@ -96,11 +96,11 @@ interface IBuilder
     public function notLike(string $columnName, string $columnValue);
 
     /**
-     * @param string     $columnName
+     * @param string|ISqlFunc $columnName
      * @param int|string $columnValue  if string, must be datetime
      * @return IBuilder
      */
-    public function lessThan(string $columnName, $columnValue);
+    public function lessThan($columnName, $columnValue);
 
 
     /**
