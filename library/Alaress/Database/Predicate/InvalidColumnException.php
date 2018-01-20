@@ -11,7 +11,7 @@ namespace Alaress\Database\Predicate;
 use LogicException;
 
 /**
- * Thrown if the predicate builder is unable to parse a column name
+ * Thrown if the predicate builder is unable to parse a column name into a table and field
  */
 class InvalidColumnException extends LogicException
 {

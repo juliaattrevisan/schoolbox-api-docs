@@ -164,11 +164,11 @@ class Builder implements IBuilder
 
 
     /**
-     * @param string $columnName
-     * @return Builder
+     * @param string|ISqlFunc $columnName
+     * @return $this
      * @throws InvalidColumnException If unable to parse column name
      */
-    public function isNull(string $columnName): self
+    public function isNull($columnName): self
     {
         return $this->addPredicate($columnName, null);
     }
@@ -176,43 +176,43 @@ class Builder implements IBuilder
 
     /**
      * @param string $columnName
-     * @return Builder
+     * @return $this
      * @throws InvalidColumnException If unable to parse column name
      */
-    public function notNull(string $columnName): self
+    public function notNull($columnName): self
     {
         return $this->addPredicate($columnName, null, self::OPERATOR_NOT_EQUALS);
     }
 
     /**
-     * @param string $columnName
-     * @return Builder
+     * @param string|ISqlFunc $columnName
+     * @return $this
      * @throws InvalidColumnException If unable to parse column name
      */
-    public function isTrue(string $columnName): self
+    public function isTrue($columnName): self
     {
         return $this->addPredicate($columnName, true);
     }
 
     /**
-     * @param string $columnName
-     * @return Builder
+     * @param string|ISqlFunc $columnName
+     * @return $this
      * @throws InvalidColumnException If unable to parse column name
      */
-    public function isFalse(string $columnName): self
+    public function isFalse($columnName): self
     {
         return $this->addPredicate($columnName, false);
     }
 
 
     /**
-     * @param string     $columnName
-     * @param string|int $columnValue Ideally we would type-declare as 'scalar', but not possible.
+     * @param string|ISqlFunc $columnName
+     * @param string|int      $columnValue Ideally we would type-declare as 'scalar', but not possible.
      * @return $this
      * @throws InvalidArgumentException If column value is not a scalar (use isNull() if testing for NULLs)
      * @throws InvalidColumnException If unable to parse column name
      */
-    public function equals(string $columnName, $columnValue): self
+    public function equals($columnName, $columnValue): self
     {
         if (!\is_scalar($columnValue)) {
             throw new InvalidArgumentException('Column value must be scalar. Found: ' . \gettype($columnValue));
@@ -221,13 +221,13 @@ class Builder implements IBuilder
     }
 
     /**
-     * @param string     $columnName
-     * @param string|int $columnValue
-     * @return Builder
+     * @param string|ISqlFunc $columnName
+     * @param string|int      $columnValue
+     * @return $this
      * @throws InvalidArgumentException If $columnValue is not an string or int
      * @throws InvalidColumnException If unable to parse column name
      */
-    public function notEquals(string $columnName, $columnValue): self
+    public function notEquals($columnName, $columnValue): self
     {
         if (!\is_scalar($columnValue)) {
             throw new InvalidArgumentException('Column value must be scalar. Found: ' . \gettype($columnValue));
@@ -236,12 +236,12 @@ class Builder implements IBuilder
     }
 
     /**
-     * @param string         $columnName
-     * @param string[]|int[] $columnValues
+     * @param string|ISqlFunc   $columnName
+     * @param array|Traversable $columnValues
      * @return $this
      * @throws InvalidColumnException If unable to parse column name
      */
-    public function in(string $columnName, array $columnValues): self
+    public function in($columnName, $columnValues): self
     {
         if(0 === \count($columnValues)){
             $this->where[] = 'FALSE';
@@ -251,12 +251,12 @@ class Builder implements IBuilder
     }
 
     /**
-     * @param string         $columnName
-     * @param string[]|int[] $columnValues
+     * @param string|ISqlFunc   $columnName
+     * @param array|Traversable $columnValues
      * @return $this
      * @throws InvalidColumnException If unable to parse column name
      */
-    public function notIn(string $columnName, array $columnValues): self
+    public function notIn($columnName, $columnValues): self
     {
         if(0 === \count($columnValues)){
             $this->where[] = 'TRUE';
@@ -265,14 +265,15 @@ class Builder implements IBuilder
         return $this->addPredicate($columnName, $columnValues, self::OPERATOR_NOT_EQUALS);
     }
 
+
     /**
-     * @param string $columnName
-     * @param string $columnValue Used directly in LIKE statement.
+     * @param string|ISqlFunc $columnName
+     * @param string          $columnValue Used directly in LIKE statement.
      * @see \Database::escapeForLike for escaping user input.
-     * @return Builder
+     * @return $this
      * @throws InvalidColumnException If unable to parse column name
      */
-    public function like(string $columnName, string $columnValue): self
+    public function like($columnName, string $columnValue): self
     {
         return $this->addPredicate($columnName, $columnValue, self::OPERATOR_LIKE);
     }
@@ -283,13 +284,13 @@ class Builder implements IBuilder
      *
      * To get student names that match ('A%' AND '%Y') you need to chain two calls to like()
      *
-     * @param string   $columnName
-     * @param string[] $columnValues Used directly in LIKE statement.
+     * @param string|ISqlFunc $columnName
+     * @param string[]        $columnValues Used directly in LIKE statement.
      * @see \Database::escapeForLike for escaping user input.
-     * @return Builder
+     * @return $this
      * @throws InvalidColumnException If unable to parse column name
      */
-    public function likeAny(string $columnName, array $columnValues): self
+    public function likeAny($columnName, array $columnValues): self
     {
         $subBuilder = $this->buildSubBuilder();
         foreach($columnValues as $columnValue){
@@ -300,13 +301,13 @@ class Builder implements IBuilder
 
 
     /**
-     * @param string          $columnName
-     * @param string $columnValue Used directly in NOT LIKE statement.
+     * @param string|ISqlFunc $columnName
+     * @param string          $columnValue Used directly in NOT LIKE statement.
      * @see \Database::escapeForLike for escaping user input.
-     * @return Builder
+     * @return $this
      * @throws InvalidColumnException If unable to parse column name
      */
-    public function notLike(string $columnName, string $columnValue): self
+    public function notLike($columnName, string $columnValue): self
     {
         return $this->addPredicate($columnName, $columnValue, self::OPERATOR_NOT_LIKE);
     }
@@ -316,8 +317,8 @@ class Builder implements IBuilder
      * If $columnValue is array, then $columnName must be lessThan all values
      *
      * @param string|ISqlFunc $columnName
-     * @param int|string $columnValue if string, must be datetime
-     * @return Builder
+     * @param int|string      $columnValue if string, must be datetime
+     * @return $this
      * @throws InvalidArgumentException If column value is not a scalar
      * @throws InvalidColumnException If unable to parse column name
      */
@@ -332,13 +333,13 @@ class Builder implements IBuilder
 
 
     /**
-     * @param string     $columnName
-     * @param int|string $columnValue if string, must be datetime
-     * @return Builder
+     * @param string|ISqlFunc $columnName
+     * @param int|string      $columnValue if string, must be datetime
+     * @return $this
      * @throws InvalidArgumentException If column value is not a scalar
      * @throws InvalidColumnException If unable to parse column name
      */
-    public function lessThanOrEqualTo(string $columnName, $columnValue): self
+    public function lessThanOrEqualTo($columnName, $columnValue): self
     {
         if (!\is_scalar($columnValue)) {
             throw new InvalidArgumentException('Column value must be scalar. Found: ' . \gettype($columnValue));
@@ -348,13 +349,13 @@ class Builder implements IBuilder
 
 
     /**
-     * @param string     $columnName
-     * @param int|string $columnValue if string, must be datetime
-     * @return Builder
+     * @param string|ISqlFunc $columnName
+     * @param int|string      $columnValue if string, must be datetime
+     * @return $this
      * @throws InvalidArgumentException If column value is not a scalar
      * @throws InvalidColumnException If unable to parse column name
      */
-    public function greaterThan(string $columnName, $columnValue): self
+    public function greaterThan($columnName, $columnValue): self
     {
         if (!\is_scalar($columnValue)) {
             throw new InvalidArgumentException('Column value must be scalar. Found: ' . \gettype($columnValue));
@@ -365,8 +366,8 @@ class Builder implements IBuilder
 
 
     /**
-     * @param string     $columnName
-     * @param int|string $columnValue
+     * @param string|ISqlFunc $columnName
+     * @param int|string      $columnValue
      * @return $this
      * @throws InvalidArgumentException If column value is not a scalar
      * @throws InvalidColumnException If unable to parse column name
@@ -381,8 +382,8 @@ class Builder implements IBuilder
 
 
     /**
-     * @param string     $columnName
-     * @param int|string $columnValue if string, must be datetime
+     * @param string|ISqlFunc $columnName
+     * @param int|string      $columnValue if string, must be datetime
      * @return $this
      * @throws InvalidArgumentException If column value is not a scalar
      * @throws InvalidColumnException If unable to parse column name
@@ -393,8 +394,8 @@ class Builder implements IBuilder
     }
 
     /**
-     * @param string     $columnName
-     * @param int|string $columnValue  if string, must be datetime
+     * @param string|ISqlFunc $columnName
+     * @param int|string      $columnValue if string, must be datetime
      * @return $this
      * @throws InvalidArgumentException If column value is not a scalar
      * @throws InvalidColumnException If unable to parse column name
@@ -408,14 +409,14 @@ class Builder implements IBuilder
     /**
      * Adds predicates for checking if this value is between two values.
      *
-     * @param string $columnName
-     * @param string|int  $from If null, this value is excluded.
+     * @param string|ISqlFunc $columnName
+     * @param string|int      $from If null, this value is excluded.
      * @param string|int  $to   If null, this value is excluded.
-     * @return Builder
+     * @return $this
      * @throws InvalidArgumentException If $from or $to are not null or scalars
      * @throws InvalidColumnException If unable to parse column name
      */
-    public function between(string $columnName, $from, $to): self
+    public function between($columnName, $from, $to): self
     {
         // If both are set we need to use a sub-builder. Otherwise we may combine predicates
         // with something other than AND and get unexpected results
@@ -439,15 +440,15 @@ class Builder implements IBuilder
     /**
      * Adds predicates for checking if this value is between two dates.
      *
-     * @param string               $columnName
-     * @param Alaress_Date_Format $from If null, this value is excluded.
-     * @param Alaress_Date_Format $to   If null, this value is excluded.
+     * @param string|ISqlFunc      $columnName
+     * @param Alaress_Date_Format  $from If null, this value is excluded.
+     * @param Alaress_Date_Format  $to   If null, this value is excluded.
      * @param string               $compareFormat
-     * @return Builder
+     * @return $this
      * @throws InvalidColumnException If unable to parse column name
      */
     public function betweenDates(
-        string $columnName,
+        $columnName,
         Alaress_Date_Format $from = null,
         Alaress_Date_Format $to = null,
         $compareFormat = Alaress_Date_Format::DATABASE_FORMAT

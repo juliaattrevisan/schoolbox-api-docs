@@ -14,6 +14,7 @@ use Alaress\Database\Quoter\IQuoter;
  */
 abstract class AbstractSqlFunc implements ISqlFunc
 {
+
     /**
      * Escapes a column name for insertion into query
      *
@@ -26,8 +27,10 @@ abstract class AbstractSqlFunc implements ISqlFunc
     protected function escapeColumn(IQuoter $quoter, string $defaultTable, string $column): string
     {
         [$table, $field] = $this->parseColumnName($defaultTable, $column);
+
         return $quoter->quoteIdentifier($table) . '.' . $quoter->quoteIdentifier($field);
     }
+
 
     /**
      * @param string $defaultTable
@@ -43,7 +46,6 @@ abstract class AbstractSqlFunc implements ISqlFunc
             return [$defaultTable, $xpl[0]];
         }
         if(2 === \count($xpl)) {
-            // remove the period so SQL doesn't freak out
             return [$xpl[0], $xpl[1]];
         }
         throw new InvalidColumnException("Unable to parse [table].column name: $columnName");
