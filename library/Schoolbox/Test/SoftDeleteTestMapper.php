@@ -19,6 +19,7 @@ class SoftDeleteTestMapper extends AbstractTestMapper
 {
     protected function mapping()
     {
+        $this->hasTable('table');
         $this->hasModel(SoftDeleteTestModel::class);
         $this->hasMap([
             'column'     => 'id',
