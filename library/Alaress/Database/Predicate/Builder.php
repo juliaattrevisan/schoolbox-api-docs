@@ -471,8 +471,6 @@ class Builder implements IBuilder
     /**
      * @param string|ISqlFunc $columnName
      * @param mixed           $columnValue
-     * @todo $columnName + $columnValue can be generalised to $operandLeft + $operatorRight
-     * @todo $leftOperand, $operator, $rightOperand = null;
      * @param string          $operator
      * @return $this
      * @throws InvalidColumnException If unable to parse column name
