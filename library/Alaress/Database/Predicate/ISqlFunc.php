@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Alaress\Database\Predicate;
 
-
 use Alaress\Database\Quoter\IQuoter;
 
 interface ISqlFunc

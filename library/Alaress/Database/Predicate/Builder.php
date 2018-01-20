@@ -126,7 +126,7 @@ class Builder implements IBuilder
         // Test for collisions if inner and outer PB contain same placeholder keys
         foreach($predicate->getParams() as $placeholder => $param) {
             // Does this cause a collision?
-            if(array_key_exists($placeholder, $this->params)) {
+            if (array_key_exists($placeholder, $this->params)) {
                 $uniquePlaceholder                = $this->getNonCollidingParamAlias($placeholder);
                 $where                            = str_replace($placeholder, $uniquePlaceholder, $where);
                 $this->params[$uniquePlaceholder] = $param;
@@ -134,10 +134,8 @@ class Builder implements IBuilder
                 $this->params[$placeholder] = $param;
             }
         }
-
         // Set the new where into action
         $this->where[] = $where;
-
         return $this;
     }
 
@@ -243,7 +241,7 @@ class Builder implements IBuilder
      */
     public function in($columnName, $columnValues): self
     {
-        if(0 === \count($columnValues)){
+        if (0 === \count($columnValues)) {
             $this->where[] = 'FALSE';
             return $this;
         }
@@ -258,7 +256,7 @@ class Builder implements IBuilder
      */
     public function notIn($columnName, $columnValues): self
     {
-        if(0 === \count($columnValues)){
+        if (0 === \count($columnValues)) {
             $this->where[] = 'TRUE';
             return $this;
         }
@@ -293,7 +291,7 @@ class Builder implements IBuilder
     public function likeAny($columnName, array $columnValues): self
     {
         $subBuilder = $this->buildSubBuilder();
-        foreach($columnValues as $columnValue){
+        foreach($columnValues as $columnValue) {
             $subBuilder->like($columnName, $columnValue);
         }
         return $this->any($subBuilder);
@@ -328,7 +326,6 @@ class Builder implements IBuilder
             throw new InvalidArgumentException('Column value must be scalar. Found: ' . \gettype($columnValue));
         }
         return $this->addPredicate($columnName, $columnValue, self::OPERATOR_LT);
-
     }
 
 
@@ -361,7 +358,6 @@ class Builder implements IBuilder
             throw new InvalidArgumentException('Column value must be scalar. Found: ' . \gettype($columnValue));
         }
         return $this->addPredicate($columnName, $columnValue, self::OPERATOR_GT);
-
     }
 
 
@@ -409,9 +405,9 @@ class Builder implements IBuilder
     /**
      * Adds predicates for checking if this value is between two values.
      *
-     * @param string|ISqlFunc $columnName
-     * @param string|int      $from If null, this value is excluded.
-     * @param string|int  $to   If null, this value is excluded.
+     * @param string|ISqlFunc  $columnName
+     * @param null|string|int  $from If null, this value is excluded.
+     * @param null|string|int  $to   If null, this value is excluded.
      * @return $this
      * @throws InvalidArgumentException If $from or $to are not null or scalars
      * @throws InvalidColumnException If unable to parse column name
@@ -420,10 +416,10 @@ class Builder implements IBuilder
     {
         // If both are set we need to use a sub-builder. Otherwise we may combine predicates
         // with something other than AND and get unexpected results
-        if(null !== $from && null !== $to){
+        if (null !== $from && null !== $to) {
             $subBuilder = $this->buildSubBuilder()
-                ->greaterThanOrEqualTo($columnName, $from)
-                ->lessThanOrEqualTo($columnName, $to);
+                               ->greaterThanOrEqualTo($columnName, $from)
+                               ->lessThanOrEqualTo($columnName, $to);
             return $this->all($subBuilder);
         }
 
@@ -462,7 +458,7 @@ class Builder implements IBuilder
         }
         try {
             return $this->between($columnName, $fromString, $toString);
-        } catch (InvalidArgumentException $e){
+        } catch(InvalidArgumentException $e) {
             // Impossible to throw as we are passing null or string
             return null;
         }
@@ -483,7 +479,7 @@ class Builder implements IBuilder
         $whereNot = $negate ? 'NOT ' : '';
 
         // prepare left operand
-        if($columnName instanceof ISqlFunc) {
+        if ($columnName instanceof ISqlFunc) {
             $escapedOperand = $columnName->getEscapedOperand($this->quoter, $this->table);
             $param          = $columnName->getParam();
         } else {
@@ -491,14 +487,13 @@ class Builder implements IBuilder
             $escapedOperand = $this->quoter->quoteIdentifier($table) . '.' . $this->quoter->quoteIdentifier($field);
         }
 
-
-        if(!isset($columnValue)) {
+        if (!isset($columnValue)) {
             $this->where[] = "$escapedOperand IS {$whereNot}NULL";
-        } elseif($columnValue === true) {
+        } elseif ($columnValue === true) {
             $this->where[] = "$escapedOperand IS {$whereNot}TRUE";
-        } elseif($columnValue === false) {
+        } elseif ($columnValue === false) {
             $this->where[] = "$escapedOperand IS {$whereNot}FALSE";
-        } elseif(self::canTraverse($columnValue)) {
+        } elseif (self::canTraverse($columnValue)) {
             $placeHolders  = self::getArrayPlaceholders($columnValue, $param);
             $this->where[] = "$escapedOperand {$whereNot}IN {$placeHolders}";
             $this->params  = array_merge($this->params, self::getArrayParameters($columnValue, $param));
@@ -746,10 +741,10 @@ class Builder implements IBuilder
     {
         $xpl = explode('.', $columnName) ?: [];
 
-        if(1 === \count($xpl)) {
+        if (1 === \count($xpl)) {
             return [$this->table, $xpl[0], $columnName];
         }
-        if(2 === \count($xpl)) {
+        if (2 === \count($xpl)) {
             // remove the period so SQL doesn't freak out
             return [$xpl[0], $xpl[1], str_replace('.', '_', $columnName)];
         }

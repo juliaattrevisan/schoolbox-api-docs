@@ -34,7 +34,7 @@ class Coalesce extends AbstractSqlFunc
      */
     public function __construct(array $columnNames)
     {
-        if(0 === \count($columnNames)){
+        if(0 === \count($columnNames)) {
             throw new InvalidArgumentException('Coalesce function requires at least 1 column name');
         }
         $this->columns = $columnNames;
@@ -59,6 +59,7 @@ class Coalesce extends AbstractSqlFunc
         foreach($this->columns as $column) {
             $escapedColumns[] = $this->escapeColumn($quoter, $defaultTable, $column);
         }
+
         return 'COALESCE(' . implode(',', $escapedColumns) . ')';
     }
 }

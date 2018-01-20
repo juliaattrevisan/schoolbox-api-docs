@@ -2130,7 +2130,7 @@ abstract class Mapper implements IMapper, Serializable
 
         // filter on soft-deletions if this mapper supports them
         if (isset($this->soft_delete_column) && $options['deleted'] == false) {
-            if(null === $this->soft_delete_undeleted_value){
+            if (null === $this->soft_delete_undeleted_value) {
                 $predicate->isNull($this->soft_delete_column);
             } else {
                 $predicate->equals($this->soft_delete_column, $this->soft_delete_undeleted_value);

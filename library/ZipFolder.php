@@ -48,7 +48,7 @@ class ZipFolder
         );
     }
 
-    function getFolders($folderId)
+    private function getFolders($folderId)
     {
         return $this->folderMapper->findByParent($folderId);
     }
