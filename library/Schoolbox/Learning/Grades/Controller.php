@@ -14,6 +14,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Error;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -149,17 +150,27 @@ class Controller extends Base
         // Add folders with response or feedback
         $folders = $this->findFoldersWithStudentInteractions($viewee, $term);
 
-        // Load Teachers
-        foreach($folders as $folder) {
-            $folder->loadTeachers();
-        }
+
 
         // Get all assessments for this user in the specified term, grouped by folder
         $assessmentsPerFolder = $this->assessmentMapperProxy
                                      ->findAllByStudent($viewee, false, $term)
+                                     ->filter(function(IAssessable $a) use ($viewee){
+                                         return !$a->getParticipant($viewee)->isExcluded();
+                                     })
                                      ->groupByCallback(function (IAssessable $assessment) {
                                          return $assessment->getBaseContext()->getFolder()->getId();
                                      });
+
+        /** @var GenericCollection|Folder\Model[] $folders */
+        $folders = $folders->filter(function(Folder\Model $folder) use ($assessmentsPerFolder){
+            return array_key_exists($folder->getId(), $assessmentsPerFolder);
+        });
+
+        // Load Teachers
+        foreach($folders as $folder) {
+            $folder->loadTeachers();
+        }
 
         $showOverallGrade = $this->getConfigLoader()
                                  ->get('show_overall_grade');
