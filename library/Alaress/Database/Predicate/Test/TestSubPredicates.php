@@ -14,6 +14,9 @@ use Alaress\Database\Quoter\Mysql;
 use Alaress\Database\Predicate\InvalidColumnException;
 use InvalidArgumentException;
 
+/**
+ * Tests that the Predicate Builder's sub-predicate public methods generate the expected SQL
+ */
 class TestSubPredicates extends TestCase
 {
 

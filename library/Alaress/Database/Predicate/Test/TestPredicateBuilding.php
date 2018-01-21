@@ -16,6 +16,9 @@ use Alaress_Date_NullDate;
 use Alaress\Database\Predicate\InvalidColumnException;
 use InvalidArgumentException;
 
+/**
+ * Tests that the Predicate Builder's public methods generate the expected SQL
+ */
 class TestPredicateBuilding extends TestCase
 {
 

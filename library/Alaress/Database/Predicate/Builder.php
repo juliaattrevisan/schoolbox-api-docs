@@ -146,12 +146,16 @@ class Builder implements IBuilder
      * @param array $columnList
      * @return $this
      * @throws InvalidColumnException If unable to parse column name
-     */
+          */
     public function addColumnList(array $columnList): self
     {
         foreach ($columnList as $columnName => $columnValue) {
             if (\is_array($columnValue)) {
-                $this->in($columnName, $columnValue);
+                try{
+                    $this->in($columnName, $columnValue);
+                } catch (InvalidArgumentException $e){
+                    // impossible to throw as we have passed an array
+                }
             } else {
                 // May be null, bool, or scalar
                 $this->addPredicate($columnName, $columnValue);
@@ -233,14 +237,19 @@ class Builder implements IBuilder
         return $this->addPredicate($columnName, $columnValue, self::OPERATOR_NOT_EQUALS);
     }
 
+
     /**
      * @param string|ISqlFunc   $columnName
      * @param array|Traversable $columnValues
      * @return $this
      * @throws InvalidColumnException If unable to parse column name
+     * @throws InvalidArgumentException If unable to traverse column values
      */
     public function in($columnName, $columnValues): self
     {
+        if(!self::canTraverse($columnValues)){
+            throw new InvalidArgumentException("Unable to traverse 'in()' arg. Found: " . gettype($columnValues));
+        }
         if (0 === \count($columnValues)) {
             $this->where[] = 'FALSE';
             return $this;
@@ -248,14 +257,19 @@ class Builder implements IBuilder
         return $this->addPredicate($columnName, $columnValues);
     }
 
+
     /**
      * @param string|ISqlFunc   $columnName
      * @param array|Traversable $columnValues
      * @return $this
      * @throws InvalidColumnException If unable to parse column name
+     * @throws InvalidArgumentException  If unable to traverse column values
      */
     public function notIn($columnName, $columnValues): self
     {
+        if(!self::canTraverse($columnValues)){
+            throw new InvalidArgumentException("Unable to traverse 'notIn()' arg. Found: " . gettype($columnValues));
+        }
         if (0 === \count($columnValues)) {
             $this->where[] = 'TRUE';
             return $this;
