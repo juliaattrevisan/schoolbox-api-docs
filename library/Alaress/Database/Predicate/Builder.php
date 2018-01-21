@@ -13,6 +13,7 @@ use Countable;
 use Traversable;
 use InvalidArgumentException;
 use Alaress_Date_Format;
+use UnderflowException;
 
 class Builder implements IBuilder
 {
@@ -146,15 +147,16 @@ class Builder implements IBuilder
      * @param array $columnList
      * @return $this
      * @throws InvalidColumnException If unable to parse column name
-          */
+     * @throws UnderflowException If an empty traversable is provided
+     */
     public function addColumnList(array $columnList): self
     {
         foreach ($columnList as $columnName => $columnValue) {
-            if (\is_array($columnValue)) {
+            if (self::canTraverse($columnValue)) {
                 try{
                     $this->in($columnName, $columnValue);
                 } catch (InvalidArgumentException $e){
-                    // impossible to throw as we have passed an array
+                    // impossible to throw as we have checked type is traversable
                 }
             } else {
                 // May be null, bool, or scalar
@@ -244,15 +246,17 @@ class Builder implements IBuilder
      * @return $this
      * @throws InvalidColumnException If unable to parse column name
      * @throws InvalidArgumentException If unable to traverse column values
+     * @throws UnderflowException If an empty traversable is provided
      */
     public function in($columnName, $columnValues): self
     {
         if(!self::canTraverse($columnValues)){
-            throw new InvalidArgumentException("Unable to traverse 'in()' arg. Found: " . gettype($columnValues));
+            throw new InvalidArgumentException("Unable to traverse 'in()' arg. Found: " . \gettype($columnValues));
         }
         if (0 === \count($columnValues)) {
-            $this->where[] = 'FALSE';
-            return $this;
+            // While this logically equates to $this->>where[] = 'FALSE', that would still trigger
+            // a potentially pointless round-trip to the DB. The caller should handle this case in code instead.
+            throw new UnderflowException('List of column values is empty');
         }
         return $this->addPredicate($columnName, $columnValues);
     }
@@ -264,6 +268,7 @@ class Builder implements IBuilder
      * @return $this
      * @throws InvalidColumnException If unable to parse column name
      * @throws InvalidArgumentException  If unable to traverse column values
+     * @throws UnderflowException If an empty traversable is provided
      */
     public function notIn($columnName, $columnValues): self
     {
@@ -271,8 +276,9 @@ class Builder implements IBuilder
             throw new InvalidArgumentException("Unable to traverse 'notIn()' arg. Found: " . gettype($columnValues));
         }
         if (0 === \count($columnValues)) {
-            $this->where[] = 'TRUE';
-            return $this;
+            // While this logically equates to $this->>where[] = 'TRUE', that would still trigger
+            // a potentially pointless round-trip to the DB. The caller should handle this case in code instead.
+            throw new UnderflowException('List of column values is empty');
         }
         return $this->addPredicate($columnName, $columnValues, self::OPERATOR_NOT_EQUALS);
     }
