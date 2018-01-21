@@ -40,6 +40,18 @@ class Controller extends \Schoolbox\Learning\Upcoming\Controller
 
 
     /**
+     * @api GET /learning/due/terms/:date
+     *
+     * @param Alaress_Date_Format $now
+     */
+    public function getTermDates(Alaress_Date_Format $now)
+    {
+        $this->getResponse()->content->set($this->buildJsonOutput(array_map(function (Alaress_Date_Format $d) {
+            return $d->getDatabaseDate();
+        }, $this->findTermDates($now))));
+    }
+
+    /**
      * @param Alaress_Date_Format $now
      * @return Alaress_Date_Format[]|array
      */

@@ -8,7 +8,9 @@
 
 namespace Custom\Mggs\Learning\Upcoming;
 
+use Alaress\Authorizer\Rule\IsLoggedIn;
 use Aura\Di\ContainerInterface;
+use Schoolbox\Application\Exception\NotFound;
 use Twig_Loader_Chain;
 
 
@@ -19,6 +21,26 @@ use Twig_Loader_Chain;
  */
 class Module extends \Schoolbox\Learning\Upcoming\Module
 {
+    /**
+     * @inheritdoc
+     */
+    public function registerRoutes()
+    {
+        parent::registerRoutes();
+
+        $this->register('GET', '/terms/{date}', 'getTermDates', new IsLoggedIn(), function (array $params) {
+
+            try {
+                return [
+                    'now' => \Alaress_Date_Format::newUrlDate($params['date'])
+                ];
+            } catch (\InvalidArgumentException $e) {
+                throw new NotFound();
+            }
+
+        });
+    }
+
 
     /**
      * @inheritdoc
