@@ -76,6 +76,7 @@
         var $modalForm = $('#editEvent');
 
         var defaultDate;
+        var totalEventCount = 0;
 
         var now = moment('{{ date ? date.databaseDate : '' }}');
         defaultDate = now;
@@ -90,9 +91,13 @@
                     userId: Number('{{ student.id|escape('js') }}')
                 },
                 success: function(data) {
-                    callback(data.filter(function(v) {
+                    var filtered = data.filter(function(v) {
                         return 'start' in v;
-                    }));
+                    });
+
+                    totalEventCount += filtered.length;
+
+                    callback(filtered);
                 },
                 cache: false
             });
@@ -207,6 +212,7 @@
                     collapsed = false;
 
                     // drain the list of real events for re-population
+                    console.log('resetting realEventList');
                     realEventList = {};
                 },
 
@@ -222,8 +228,18 @@
                         $(this).find('.fc-cell-text').text(index + 1);
                     });
 
+
+                    var realEventsExist = $.isEmptyObject(realEventList) == false;
+
+                    console.log('realEventsExist:', realEventsExist, ' collapsed:', collapsed);
+
+                    if (totalEventCount == 0) {
+                        console.log('no events yet');
+                        return true;
+                    }
+
                     // already done this
-                    if (collapsed) {
+                    if (realEventsExist && collapsed) {
                         console.log('already collapsed, stashing real events')
                         $cal.find('.fc-event-container').each(renderPopovers);
                         return true;
@@ -277,12 +293,12 @@
                         }
                     }
 
-                    console.log('collapsed is now true');
+                    console.log('collapsed is now', realEventsExist);
                     // prevent recursion
-                    collapsed = true;
+                    collapsed = realEventsExist;
 
                     // render the new set of events
-                    console.log('pushing render of fakes to queue');
+                    console.log('pushing render of fakes to queue, len: ', listOfFakesToRender.length);
                     $cal.fullCalendar('renderEvents', listOfFakesToRender, true);
 
                 },
@@ -290,7 +306,7 @@
                     var url = '{{ routeLookup('learningPersonalised.getResourcesForStudent', {studentId: student.id}) }}';
                     $.get(url + '/' + $cal.fullCalendar('getDate').format('DD-MM-YYYY'), function (resourceObjects) {
                         callback(resourceObjects);
-                        $cal.fullCalendar('refetchEventSources', fetchTerms);
+                        $cal.fullCalendar('addEventSource', fetchTerms);
                     });
                 },
                 resourceAreaWidth: '40%',
@@ -321,6 +337,7 @@
                 viewRender: function (view, $element) {
                     // time to re-render
                     collapsed = false;
+                    console.log('resetting realEventList');
                     realEventList = {};
                 },
 
@@ -335,6 +352,7 @@
                     }
 
                     if (calEvent.rendering === 'background') {
+                        console.log('rendering shade');
                         return true;
                     }
 
@@ -486,7 +504,7 @@
                     }
                 },
 
-                eventSources: [ fetchEvents, fetchTerms ]
+                eventSources: [ fetchEvents ]
             },
             x: false
         }).init();
