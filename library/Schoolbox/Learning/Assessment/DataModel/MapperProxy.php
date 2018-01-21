@@ -7,6 +7,7 @@
 namespace Schoolbox\Learning\Assessment\DataModel;
 
 use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Predicate\SqlFunc\Coalesce;
 use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -487,10 +488,12 @@ class MapperProxy
      *
      * @param User                $student
      * @param bool                $usePlanDates Should we filter by assessment dates or plan dates?
-     * @param Alaress_Date_Format $from    If provided, fetch only assessables due on or after this date
-     * @param Alaress_Date_Format $to      If provided, fetch only assessables due on or before this date
-     * @param array               $options Any other query options
+     * @param Alaress_Date_Format $from         If provided, fetch only assessables due on or after this date
+     * @param Alaress_Date_Format $to           If provided, fetch only assessables due on or before this date
+     * @param array               $options      Any other query options
      * @return Collection|IAssessable[]
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function findAllByStudentBetweenDates(
@@ -519,7 +522,7 @@ class MapperProxy
 
         // Find assessments which this student is no longer in the class for,
         // but has created a response or feedback for.
-        $uniqueAssessmentIds = $this->baseMapper->findUniqueAssessmentIdsForStudentBetweenDates($student, $usePlanDates, $from, $to);
+        $uniqueAssessmentIds = $this->baseMapper->findAssessmentsWithInteractions($student, $usePlanDates, $from, $to);
 
         if ($usePlanDates) {
             $assessments = $this->baseMapper->findForFolderAndParticipant(
@@ -575,7 +578,7 @@ class MapperProxy
 
         // Find assessments which this student is no longer in the class for,
         // but has created a response or feedback for.
-        $uniqueAssessmentIds = $this->baseMapper->findUniqueAssessmentIdsForStudentBetweenDates($student, $usePlanDates, $from, $to);
+        $uniqueAssessmentIds = $this->baseMapper->findAssessmentsWithInteractions($student, $usePlanDates, $from, $to);
 
         if ($usePlanDates) {
             $assessments = $this->baseMapper->findForFolderAndParticipant(
@@ -858,6 +861,8 @@ class MapperProxy
      * @param array $options
      * @param bool  $usePlanDates Filter by plan dates instead of assessment dates
      * @return Builder
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \InvalidArgumentException
      */
     protected function convertOptionsToPredicateBuilder(array $options, bool $usePlanDates): Builder
     {
@@ -872,9 +877,16 @@ class MapperProxy
         $aTable = $this->baseMapper->getTable();
 
         // Are we interested in the custom plan dates, or the assessment dates?
-        $publishDateColumn = $usePlanDates ? "DATE(COALESCE(pp.publish_date, $aTable.publish_date))" : "$aTable.publish_date";
-        $dueDateColumn     = $usePlanDates ? "DATE(COALESCE(pp.due_date, $aTable.due_date))" : "$aTable.due_date";
-        $closeDateColumn   = $usePlanDates ? "DATE(COALESCE(pp.close_date, $aTable.close_date))" : "$aTable.close_date";
+        if($usePlanDates){
+            $publishDateColumn = new Coalesce(['participant_plan.publish_date', "$aTable.publish_date"]);
+            $dueDateColumn     = new Coalesce(['participant_plan.due_date', "$aTable.due_date"]);
+            $closeDateColumn   = new Coalesce(['participant_plan.close_date', "$aTable.close_date"]);
+        } else {
+            $publishDateColumn = "$aTable.publish_date";
+            $dueDateColumn     = "$aTable.due_date";
+            $closeDateColumn   = "$aTable.close_date";
+        }
+
 
         // Due before / after filter (an ADF)
         if ($options['due_after'] instanceof \Alaress_Date_Format && !$options['due_after']->isNull()) {
