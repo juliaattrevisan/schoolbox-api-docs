@@ -43,8 +43,7 @@ class TestPredicateBuilding extends TestCase
     {
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->addColumnList(['column1' => 1, 'column2' => 2]);
-        $this->assertEquals('`table`.`column1` = :column1_0', $pb->getWhere()[0]);
-        $this->assertEquals('`table`.`column2` = :column2_0', $pb->getWhere()[1]);
+        $this->assertEquals(['`table`.`column1` = :column1_0','`table`.`column2` = :column2_0'], $pb->getWhere());
         $this->assertEquals($pb->getParams(), ['column1_0' => 1, 'column2_0' => 2]);
     }
 
@@ -55,7 +54,7 @@ class TestPredicateBuilding extends TestCase
     {
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->isNull('column');
-        $this->assertEquals('`table`.`column` IS NULL', $pb->getWhere()[0]);
+        $this->assertEquals(['`table`.`column` IS NULL'], $pb->getWhere());
         $this->assertEquals($pb->getParams(), []);
     }
 
@@ -67,7 +66,7 @@ class TestPredicateBuilding extends TestCase
     {
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->notNull('column');
-        $this->assertEquals('`table`.`column` IS NOT NULL', $pb->getWhere()[0]);
+        $this->assertEquals(['`table`.`column` IS NOT NULL'], $pb->getWhere());
         $this->assertEquals($pb->getParams(), []);
     }
 
@@ -79,7 +78,7 @@ class TestPredicateBuilding extends TestCase
     {
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->isTrue('column');
-        $this->assertEquals('`table`.`column` IS TRUE', $pb->getWhere()[0]);
+        $this->assertEquals(['`table`.`column` IS TRUE'], $pb->getWhere());
         $this->assertEquals($pb->getParams(), []);
     }
 
@@ -91,7 +90,7 @@ class TestPredicateBuilding extends TestCase
     {
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->isFalse('column');
-        $this->assertEquals('`table`.`column` IS FALSE', $pb->getWhere()[0]);
+        $this->assertEquals(['`table`.`column` IS FALSE'], $pb->getWhere());
         $this->assertEquals($pb->getParams(), []);
     }
 
@@ -104,8 +103,25 @@ class TestPredicateBuilding extends TestCase
     {
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->equals('column', 10);
-        $this->assertEquals('`table`.`column` = :column_0', $pb->getWhere()[0]);
+        $this->assertEquals(['`table`.`column` = :column_0'], $pb->getWhere());
         $this->assertEquals(10, $pb->getParams()['column_0']);
+    }
+
+
+    /**
+     * @throws InvalidArgumentException
+     * @throws InvalidColumnException
+     * @throws \PHPUnit\Framework\Exception
+     */
+    public function test_equals_adf()
+    {
+        $pb = new Builder($this->mySqlQuoter, 'table');
+        $pb->equals('column', new Alaress_Date_Format('2010-01-01 00:00:00', Alaress_Date_Format::DATABASE_FORMAT));
+        $this->assertEquals(['`table`.`column` = :column_0'], $pb->getWhere());
+        /** @var Alaress_Date_Format $adf */
+        $adf = $pb->getParams()['column_0'];
+        $this->assertInstanceOf(Alaress_Date_Format::class, $adf);
+        $this->assertEquals('2010-01-01T00:00:00+00:00', $adf->__toString());
     }
 
 
@@ -117,19 +133,20 @@ class TestPredicateBuilding extends TestCase
     {
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->notEquals('column', 10);
-        $this->assertEquals('`table`.`column` <> :column_0', $pb->getWhere()[0]);
+        $this->assertEquals(['`table`.`column` <> :column_0'], $pb->getWhere());
         $this->assertEquals(10, $pb->getParams()['column_0']);
     }
 
 
     /**
      * @throws InvalidColumnException
+     * @throws InvalidArgumentException
      */
     public function testIn()
     {
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->in('column', [10, 20]);
-        $this->assertEquals('`table`.`column` IN (:column_0,:column_1)', $pb->getWhere()[0]);
+        $this->assertEquals(['`table`.`column` IN (:column_0,:column_1)'], $pb->getWhere());
         $this->assertEquals(10, $pb->getParams()['column_0']);
         $this->assertEquals(20, $pb->getParams()['column_1']);
     }
@@ -137,6 +154,7 @@ class TestPredicateBuilding extends TestCase
 
     /**
      * @throws InvalidColumnException
+     * @throws InvalidArgumentException
      */
     public function testInEmpty()
     {
@@ -149,12 +167,13 @@ class TestPredicateBuilding extends TestCase
 
     /**
      * @throws InvalidColumnException
+     * @throws InvalidArgumentException
      */
     public function testNotIn()
     {
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->notIn('column', [10, 20]);
-        $this->assertEquals('`table`.`column` NOT IN (:column_0,:column_1)', $pb->getWhere()[0]);
+        $this->assertEquals(['`table`.`column` NOT IN (:column_0,:column_1)'], $pb->getWhere());
         $this->assertEquals(10, $pb->getParams()['column_0']);
         $this->assertEquals(20, $pb->getParams()['column_1']);
     }
@@ -162,12 +181,13 @@ class TestPredicateBuilding extends TestCase
 
     /**
      * @throws InvalidColumnException
+     * @throws InvalidArgumentException
      */
     public function testNotInEmpty()
     {
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->notIn('column', []);
-        $this->assertEquals('TRUE', $pb->getWhere()[0]);
+        $this->assertEquals(['TRUE'], $pb->getWhere());
         $this->assertEquals($pb->getParams(), []);
     }
 
@@ -179,7 +199,7 @@ class TestPredicateBuilding extends TestCase
     {
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->like('column', '%value%');
-        $this->assertEquals('`table`.`column` LIKE :column_0', $pb->getWhere()[0]);
+        $this->assertEquals(['`table`.`column` LIKE :column_0'], $pb->getWhere());
         $this->assertEquals('%value%', $pb->getParams()['column_0']);
     }
 
@@ -191,7 +211,7 @@ class TestPredicateBuilding extends TestCase
     {
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->likeAny('column', ['%value1%', '%value2%']);
-        $this->assertEquals('(`table`.`column` LIKE :column_0 OR `table`.`column` LIKE :column_1)', $pb->getWhere()[0]);
+        $this->assertEquals(['(`table`.`column` LIKE :column_0 OR `table`.`column` LIKE :column_1)'], $pb->getWhere());
         $this->assertEquals('%value1%', $pb->getParams()['column_0']);
         $this->assertEquals('%value2%', $pb->getParams()['column_1']);
     }
@@ -204,7 +224,7 @@ class TestPredicateBuilding extends TestCase
     {
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->notLike('column', '%value%');
-        $this->assertEquals('`table`.`column` NOT LIKE :column_0', $pb->getWhere()[0]);
+        $this->assertEquals(['`table`.`column` NOT LIKE :column_0'], $pb->getWhere());
         $this->assertEquals('%value%', $pb->getParams()['column_0']);
     }
 
@@ -217,7 +237,7 @@ class TestPredicateBuilding extends TestCase
     {
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->lessThan('column', 'value');
-        $this->assertEquals('`table`.`column` < :column_0', $pb->getWhere()[0]);
+        $this->assertEquals(['`table`.`column` < :column_0'], $pb->getWhere());
         $this->assertEquals('value', $pb->getParams()['column_0']);
     }
 
@@ -230,7 +250,7 @@ class TestPredicateBuilding extends TestCase
     {
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->lessThanOrEqualTo('column', 'value');
-        $this->assertEquals('`table`.`column` <= :column_0', $pb->getWhere()[0]);
+        $this->assertEquals(['`table`.`column` <= :column_0'], $pb->getWhere());
         $this->assertEquals('value', $pb->getParams()['column_0']);
     }
 
@@ -243,7 +263,7 @@ class TestPredicateBuilding extends TestCase
     {
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->greaterThan('column', 'value');
-        $this->assertEquals('`table`.`column` > :column_0', $pb->getWhere()[0]);
+        $this->assertEquals(['`table`.`column` > :column_0'], $pb->getWhere());
         $this->assertEquals('value', $pb->getParams()['column_0']);
     }
 
@@ -256,7 +276,7 @@ class TestPredicateBuilding extends TestCase
     {
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->greaterThanOrEqualTo('column', 'value');
-        $this->assertEquals('`table`.`column` >= :column_0', $pb->getWhere()[0]);
+        $this->assertEquals(['`table`.`column` >= :column_0'], $pb->getWhere());
         $this->assertEquals('value', $pb->getParams()['column_0']);
     }
 
@@ -269,7 +289,7 @@ class TestPredicateBuilding extends TestCase
     {
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->notLessThan('column', 'value');
-        $this->assertEquals('`table`.`column` >= :column_0', $pb->getWhere()[0]);
+        $this->assertEquals(['`table`.`column` >= :column_0'], $pb->getWhere());
         $this->assertEquals('value', $pb->getParams()['column_0']);
     }
 
@@ -282,7 +302,7 @@ class TestPredicateBuilding extends TestCase
     {
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->notGreaterThan('column', 'value');
-        $this->assertEquals('`table`.`column` <= :column_0', $pb->getWhere()[0]);
+        $this->assertEquals(['`table`.`column` <= :column_0'], $pb->getWhere());
         $this->assertEquals('value', $pb->getParams()['column_0']);
     }
 

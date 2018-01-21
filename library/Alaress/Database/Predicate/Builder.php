@@ -216,10 +216,10 @@ class Builder implements IBuilder
      */
     public function equals($columnName, $columnValue): self
     {
-        if (!\is_scalar($columnValue)) {
-            throw new InvalidArgumentException('Column value must be scalar. Found: ' . \gettype($columnValue));
+        if (\is_scalar($columnValue) || ($columnValue instanceof Alaress_Date_Format && !$columnValue->isNull())) {
+            return $this->addPredicate($columnName, $columnValue);
         }
-        return $this->addPredicate($columnName, $columnValue);
+        throw new InvalidArgumentException('Column value must be scalar or ADF. Found: ' . \gettype($columnValue));
     }
 
     /**
@@ -231,10 +231,10 @@ class Builder implements IBuilder
      */
     public function notEquals($columnName, $columnValue): self
     {
-        if (!\is_scalar($columnValue)) {
-            throw new InvalidArgumentException('Column value must be scalar. Found: ' . \gettype($columnValue));
+        if (\is_scalar($columnValue) || ($columnValue instanceof Alaress_Date_Format && !$columnValue->isNull())) {
+            return $this->addPredicate($columnName, $columnValue, self::OPERATOR_NOT_EQUALS);
         }
-        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_NOT_EQUALS);
+        throw new InvalidArgumentException('Column value must be scalar or ADF. Found: ' . \gettype($columnValue));
     }
 
 
@@ -336,10 +336,10 @@ class Builder implements IBuilder
      */
     public function lessThan($columnName, $columnValue): self
     {
-        if (!\is_scalar($columnValue)) {
-            throw new InvalidArgumentException('Column value must be scalar. Found: ' . \gettype($columnValue));
+        if (\is_scalar($columnValue) || ($columnValue instanceof Alaress_Date_Format && !$columnValue->isNull())) {
+            return $this->addPredicate($columnName, $columnValue, self::OPERATOR_LT);
         }
-        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_LT);
+        throw new InvalidArgumentException('Column value must be scalar or ADF. Found: ' . \gettype($columnValue));
     }
 
 
@@ -352,10 +352,10 @@ class Builder implements IBuilder
      */
     public function lessThanOrEqualTo($columnName, $columnValue): self
     {
-        if (!\is_scalar($columnValue)) {
-            throw new InvalidArgumentException('Column value must be scalar. Found: ' . \gettype($columnValue));
+        if (\is_scalar($columnValue) || ($columnValue instanceof Alaress_Date_Format && !$columnValue->isNull())) {
+            return $this->addPredicate($columnName, $columnValue, self::OPERATOR_LTE);
         }
-        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_LTE);
+        throw new InvalidArgumentException('Column value must be scalar or ADF. Found: ' . \gettype($columnValue));
     }
 
 
@@ -368,10 +368,10 @@ class Builder implements IBuilder
      */
     public function greaterThan($columnName, $columnValue): self
     {
-        if (!\is_scalar($columnValue)) {
-            throw new InvalidArgumentException('Column value must be scalar. Found: ' . \gettype($columnValue));
+        if (\is_scalar($columnValue) || ($columnValue instanceof Alaress_Date_Format && !$columnValue->isNull())) {
+            return $this->addPredicate($columnName, $columnValue, self::OPERATOR_GT);
         }
-        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_GT);
+        throw new InvalidArgumentException('Column value must be scalar or ADF. Found: ' . \gettype($columnValue));
     }
 
 
@@ -384,10 +384,10 @@ class Builder implements IBuilder
      */
     public function greaterThanOrEqualTo($columnName, $columnValue): self
     {
-        if (!\is_scalar($columnValue)) {
-            throw new InvalidArgumentException('Column value must be scalar. Found: ' . \gettype($columnValue));
+        if (\is_scalar($columnValue) || ($columnValue instanceof Alaress_Date_Format && !$columnValue->isNull())) {
+            return $this->addPredicate($columnName, $columnValue, self::OPERATOR_GTE);
         }
-        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_GTE);
+        throw new InvalidArgumentException('Column value must be scalar or ADF. Found: ' . \gettype($columnValue));
     }
 
 
