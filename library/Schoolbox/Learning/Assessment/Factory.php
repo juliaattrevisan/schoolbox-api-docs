@@ -154,8 +154,7 @@ class Factory
         $this->setUseRubric(trim($post['useRubric']));
         $this->setMarkPerCapability(trim($post['markPerCapability']));
         $this->setMaxMark(trim($post['maxMark']));
-        $this->setSelfAssessable((bool)$post['selfAssessable']);
-        $this->setSelfReflectable((bool)$post['selfReflectable']);
+        $this->setSelfReflectionType((int)$post['selfReflectionType']);
 
         $this->setRubricData($post[$post['formField']]);
 
@@ -253,8 +252,7 @@ class Factory
                 $this->getMaxMark(),
                 $this->getRubricData(),
                 $this->getAttachedFiles(),
-                $this->getSelfAssessable(),
-                $this->getSelfReflectable()
+                $this->getSelfReflectionType()
             );
 
         } elseif ($assessment instanceof Task) {

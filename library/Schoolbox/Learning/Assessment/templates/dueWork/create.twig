@@ -71,15 +71,12 @@
     </label>
 
     <label>Self-Reflection
-        <select id="selfReflectDropdown">
-            <option value="None">None</option>
-            <option value="selfReflectable" {% if assessment.selfReflectable and not assessment.selfAssessable %}selected{% endif %}>Self-Reflect</option>
-            <option value="selfAssessable" {% if assessment.selfAssessable and assessment.selfReflectable %}selected{% endif %} >Self-Reflect + Self-Assess</option>
+        <select id="selfReflectDropdown" name="selfReflectionType">
+            <option value="{{ selfReflectTypes.none }}" {% if assessment.selfReflectionType == selfReflectTypes.none %}selected{% endif %}>None</option>
+            <option value="{{ selfReflectTypes.reflect }}" {% if assessment.selfReflectionType == selfReflectTypes.reflect %}selected{% endif %}>Self-Reflect</option>
+            <option value="{{ selfReflectTypes.assess }}" {% if assessment.selfReflectionType == selfReflectTypes.assess %}selected{% endif %}>Self-Reflect + Self-Assess</option>
         </select>
     </label>
-
-    <input type="hidden" name="selfReflectable" {% if assessment.selfReflectable and not assessment.selfAssessable %}value="1"{% else %}value="0"{% endif %}>
-    <input type="hidden" name="selfAssessable" {% if assessment.selfReflectable and  assessment.selfAssessable %}value="1"{% else %}value="0"{% endif %}>
 
     {% import 'sub/visibility.twig' as visibility %}
     {{ visibility.dropdown(markVisibility, availableVisibilities) }}
@@ -163,19 +160,6 @@
          */
         $acceptOnlineToggle.change(function() {
             toggleDates($(this));
-        });
-
-        $("#selfReflectDropdown").change(function () {
-            if(this.value == "selfReflectable"){
-                $('input[name="selfReflectable"]').val("1");
-                $('input[name="selfAssessable"]').val("0");
-            } else if(this.value == "selfAssessable"){
-                $('input[name="selfReflectable"]').val("1");
-                $('input[name="selfAssessable"]').val("1");
-            } else {
-                $('input[name="selfReflectable"]').val("0");
-                $('input[name="selfAssessable"]').val("0");
-            }
         });
     });
 </script>

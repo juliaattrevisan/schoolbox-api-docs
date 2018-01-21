@@ -30,17 +30,32 @@ class Model extends AbstractAssessment
     /**
      * Accept zero submissions online
      */
-    const ACCEPT_ONLINE_NONE = 0;
+    public const ACCEPT_ONLINE_NONE = 0;
 
     /**
      * Accept one submission online
      */
-    const ACCEPT_ONLINE_SINGLE = 1;
+    public const ACCEPT_ONLINE_SINGLE = 1;
 
     /**
      * Accept multiple submissions online
      */
-    const ACCEPT_ONLINE_MULTI = 2;
+    public const ACCEPT_ONLINE_MULTI = 2;
+
+    /**
+     * Do not accept self-reflection at all
+     */
+    public const SELF_REFLECTION_NONE = 0;
+
+    /**
+     * Accept only student self-reflection (no marking or rubric grades available)
+     */
+    public const SELF_REFLECTION_REFLECT_ONLY = 1;
+
+    /**
+     * Accept full student self-assessment (marking and rubric grades available)
+     */
+    public const SELF_REFLECTION_FULL = 2;
 
     /**
      * All the Files that are part of the Due Work specification
@@ -666,5 +681,45 @@ class Model extends AbstractAssessment
     public function isSelfReflectable() : ?bool
     {
         return $this->selfReflectable;
+    }
+
+    /**
+     * Set self-assessment and reflection based on a `self::SELF_REFLECTION_*`
+     * constant.
+     *
+     * @param int $selfReflectionType a `self::SELF_REFLECTION_*` constant
+     * @return $this
+     */
+    public function setSelfReflectionType(int $selfReflectionType): self
+    {
+        switch ($selfReflectionType) {
+            case self::SELF_REFLECTION_REFLECT_ONLY:
+                $this->setSelfReflectable(true)->setSelfAssessable(false);
+                break;
+            case self::SELF_REFLECTION_FULL:
+                $this->setSelfReflectable(true)->setSelfAssessable(true);
+                break;
+            case self::SELF_REFLECTION_NONE:
+            default:
+                $this->setSelfReflectable(false)->setSelfAssessable(false);
+                break;
+        }
+        return $this;
+    }
+
+    /**
+     * Get self-reflection type.
+     *
+     * @return int a `self::SELF_REFLECTION_*` constant
+     */
+    public function getSelfReflectionType(): int
+    {
+        $selfReflectable = $this->isSelfReflectable();
+        $selfAssessable  = $this->isSelfAssessable();
+        if (!$selfReflectable) {
+            return self::SELF_REFLECTION_NONE;
+        } else {
+            return $selfAssessable ? self::SELF_REFLECTION_FULL : self::SELF_REFLECTION_REFLECT_ONLY;
+        }
     }
 }
