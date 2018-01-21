@@ -1,6 +1,15 @@
 # Custom Twig templates for Aura modules
 
+> This applies only to templates that exist within of Aura modules
+> (in other words, within `library/` sub-folders).
+>
+> See [Custom templates outside Aura modules](custom-templates-outside-aura-modules.md)
+> for a guide to customising templates that exist outside of Aura modules.
+
 ## A quick example
+
+> Aura supports only Twig templates; it does not, not will it ever, support
+> PHPLib templates.
 
 Switch school to MGGS, and rebuild CSS:
 
