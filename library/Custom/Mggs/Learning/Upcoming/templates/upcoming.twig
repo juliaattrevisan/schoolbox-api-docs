@@ -75,20 +75,62 @@
         var $cal = $('#calendar');
         var $modalForm = $('#editEvent');
 
-        var termDates = {{ termDates|json_encode|raw ?: '[]' }};
-
         var defaultDate;
 
         var now = moment('{{ date ? date.databaseDate : '' }}');
         defaultDate = now;
 
-        if (termDates.length) {
-            if (moment(termDates[0]).isBefore(now)) {
-                defaultDate = termDates[0];
-            } else if (moment(termDates[2]).isBefore(now)) {
-                defaultDate = termDates[2];
+        var fetchEvents = function (start, end, timezone, callback) {
+            $.ajax({
+                dataType: 'json',
+                url:      '/submission/ajax/events',
+                data: {
+                    start: Calendar.reOffsetTimestamp(start.unix()),
+                    end:   Calendar.reOffsetTimestamp(end.unix()),
+                    userId: Number('{{ student.id|escape('js') }}')
+                },
+                success: function(data) {
+                    callback(data.filter(function(v) {
+                        return 'start' in v;
+                    }));
+                },
+                cache: false
+            });
+        };
+
+        var fetchTerms = function (start, end, timezone, callback) {
+            if ($cal.find('[data-resource-id]').length === 0) {
+                // just complete with no events
+                callback([]);
             }
-        }
+
+            $.ajax({
+                dataType: 'json',
+                url: '{{ routeLookup('learningUpcoming.getTermDates') }}'.replace('{date}', start.format('DD-MM-YYYY')),
+                success: function (termDates) {
+                    var shades = [];
+
+                    // install background events
+                    // find the weeks between terms
+                    var shade = {
+                        start: moment(termDates[1]).add({ days: 5 }),
+                        end: moment(termDates[2]).add({days: -1})
+                    };
+
+                    $cal.find('[data-resource-id]').each(function () {
+                        // paint out the holidays
+                        shades.push({
+                            start: shade.start,
+                            end: shade.end,
+                            rendering: 'background',
+                            resourceId: $(this).data('resourceId')
+                        });
+                    });
+
+                    callback(shades);
+                }
+            });
+        };
 
         var redrawTimeout;
 
@@ -191,36 +233,12 @@
 
                     // if there are already fakes, make them gone
                     $cal.fullCalendar('removeEvents', function (calEvent) {
-                        return ('data' in calEvent && 'placeholder' in calEvent.data)
-                            || ('rendering' in calEvent && calEvent.rendering == 'background');
+                        return ('data' in calEvent && 'placeholder' in calEvent.data);
                     });
 
                     var completionSeq = [ 'reviewed', 'pending', 'incomplete', 'failed' ];
 
-                    var shade;
-
-                    // install background events
-                    if (termDates.length) {
-                        // find the weeks between terms
-                        shade = {
-                            start: moment(termDates[1]).add({ days: 5 }),
-                            end: moment(termDates[2]).add({days: -1})
-                        };
-                    }
-
                     var listOfFakesToRender = [];
-
-                    if (shade) {
-                        $cal.find('[data-resource-id]').each(function () {
-                            // paint out the holidays
-                            listOfFakesToRender.push({
-                                start: shade.start,
-                                end: shade.end,
-                                rendering: 'background',
-                                resourceId: $(this).data('resourceId')
-                            });
-                        });
-                    }
 
                     // we're on timeline: take all the events that have been rendered
                     // and smoosh them into placeholders
@@ -272,6 +290,7 @@
                     var url = '{{ routeLookup('learningPersonalised.getResourcesForStudent', {studentId: student.id}) }}';
                     $.get(url + '/' + $cal.fullCalendar('getDate').format('DD-MM-YYYY'), function (resourceObjects) {
                         callback(resourceObjects);
+                        $cal.fullCalendar('refetchEventSources', fetchTerms);
                     });
                 },
                 resourceAreaWidth: '40%',
@@ -467,24 +486,7 @@
                     }
                 },
 
-                // Stream location
-                events: function(start, end, timezone, callback) {
-                    $.ajax({
-                        dataType: 'json',
-                        url:      '/submission/ajax/events',
-                        data: {
-                            start: Calendar.reOffsetTimestamp(start.unix()),
-                            end:   Calendar.reOffsetTimestamp(end.unix()),
-                            userId: Number('{{ student.id|escape('js') }}')
-                        },
-                        success: function(data) {
-                            callback(data.filter(function(v) {
-                                return 'start' in v;
-                            }));
-                        },
-                        cache: false
-                    });
-                }
+                eventSources: [ fetchEvents, fetchTerms ]
             },
             x: false
         }).init();
