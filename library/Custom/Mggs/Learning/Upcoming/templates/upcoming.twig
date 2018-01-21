@@ -78,6 +78,8 @@
         var defaultDate;
         var totalEventCount = 0;
 
+        var visibleTermDates = [];
+
         var now = moment('{{ date ? date.databaseDate : '' }}');
         defaultDate = now;
 
@@ -100,6 +102,24 @@
                     callback(filtered);
                 },
                 cache: false
+            });
+        };
+
+        var redrawWeekNumbers = function () {
+            $('.fc-scroller-canvas .fc-content tr').eq(2).find('th[data-date]').each(function () {
+                console.log(this);
+
+                var disp = '';
+                var mom  = moment($(this).data('date'));
+
+                if (visibleTermDates.length) {
+                    if (mom.isBefore(visibleTermDates[3]) && mom.isAfter(visibleTermDates[0])) {
+                        disp = mom.diff(visibleTermDates[0], 'weeks') - 1;
+                    }
+                }
+
+                $(this).find('.fc-cell-text').text(disp);
+
             });
         };
 
@@ -134,6 +154,9 @@
 
                     callback(shades);
                 }
+            }).done(function (termDates) {
+                visibleTermDates = termDates;
+                redrawWeekNumbers();
             });
         };
 
@@ -223,11 +246,7 @@
                         return true;
                     }
 
-                    // just index the weeks
-                    $('.fc-scroller-canvas .fc-content tr').eq(2).find('th[data-date]').each(function (index) {
-                        $(this).find('.fc-cell-text').text(index + 1);
-                    });
-
+                    redrawWeekNumbers();
 
                     var realEventsExist = $.isEmptyObject(realEventList) == false;
 
