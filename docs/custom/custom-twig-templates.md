@@ -1,4 +1,4 @@
-# 9 Custom Twig templates for Aura modules
+# Custom Twig templates for Aura modules
 
 ## A quick example
 
