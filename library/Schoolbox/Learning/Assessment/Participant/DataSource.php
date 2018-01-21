@@ -232,25 +232,15 @@ class DataSource
      */
     private function loadDynamicPlanParticipants(GenericCollection $dynamicPlans): void
     {
-        // TODO SA-5354 - fetch excluded users, grouped by assessment
-        /** @var User[][]|Collection $excludedUsers Indexed by assessment.id, user.id */
-        $excludedUsers = new Collection();
-
-
         // Load dynamic participants into dynamic plans
         foreach ($dynamicPlans as $dynamicPlan) {
             $assessment           = $dynamicPlan->getAssessable();
             $explicitParticipants = $assessment->getAllParticipants();
-            $excludedUsers        = $excludedUsers[$assessment->getId()];
 
             // It's acceptable to findAllStudents in a loop for now, because the list is cached
             foreach ($this->findAllStudentsForAssessment($assessment) as $user) {
-                // Is this user already an explicit participant?
+                // Is this user already an explicit participant? (Either an inclusion or exclusion)
                 if ($explicitParticipants->keyExists($user->getId())) {
-                    continue;
-                }
-                // Is this user excluded?
-                if ($excludedUsers && $excludedUsers->keyExists($user->getId())) {
                     continue;
                 }
                 $dynamicPlan->getParticipants()[$user->getId()] = new ParticipantObject($user, $dynamicPlan);
@@ -424,7 +414,7 @@ class DataSource
 
 
     /**
-     * Loads all Plans and Participants into the Assessables
+     * Loads all Plans and Participants (including exclusions) into the Assessables
      *
      * @param IAssessable[]|GenericCollection $assessables Indexed by assessment.id
      * @throws DefinitionException If unable to locate a specified mapper join
