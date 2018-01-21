@@ -22,7 +22,7 @@ class Sync extends BaseSync
         $query = "
             SELECT
                 STKEY      AS student_id,
-                USER_NAME  AS network_login,
+                ST_NETWORK_LOGIN  AS network_login,
                 NULL       AS student_title,
                 FIRST_NAME AS student_given_name,
                 FIRST_NAME AS student_preferred,
@@ -52,7 +52,7 @@ class Sync extends BaseSync
         $query = "
             SELECT
                 SFKEY      AS staff_id,
-                USER_NAME  AS network_login,
+                NETWORK_LOGIN  AS network_login,
                 STAFF_TYPE AS active_flag,
                 NULL       AS staff_title,
                 FIRST_NAME AS staff_given_name,
