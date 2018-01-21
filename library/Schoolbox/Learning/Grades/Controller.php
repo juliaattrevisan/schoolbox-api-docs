@@ -247,7 +247,13 @@ class Controller extends Base
         ];
         $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
         $assessments   = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
-        $assessments   = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, $viewee);
+
+
+        $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, $viewee)
+                                                   ->filter(function (IAssessable $a) use ($viewee) {
+                                                       return !$a->getParticipant($viewee)->isExcluded();
+                                                   });
+
         $markbook      = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
 
         // Load conversation history (this also implicitly loads folder's teachers)
@@ -324,7 +330,10 @@ class Controller extends Base
 
         // Fetch assessments & participants
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
-        $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments);
+        $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, $viewee)
+                                                   ->filter(function (IAssessable $a) use ($viewee) {
+                                                       return !$a->getParticipant($viewee)->isExcluded();
+                                                   });
 
         // Show the graph for:
         // * instructors (always)
