@@ -52,10 +52,11 @@ class Visibility
      */
     public function isVisibleToUser(IAssessable $assessment, User $viewer, bool $showClosed): bool
     {
+        $participant = $assessment->getParticipantIfExtant($viewer);
+
         // Are we hiding assessments past their close date and we are past the close date ?
         if (!$showClosed) {
             // Use the participant's date if the viewing user is a participant
-            $participant = $assessment->getParticipantIfExtant($viewer);
             $closeDate   = $participant ? $participant->getCloseDate() : $assessment->getCloseAt();
             if (!$closeDate->isNull() && Alaress_Date_Format::now()->gte($closeDate)) {
                 return false;
@@ -70,9 +71,8 @@ class Visibility
         }
         // Is viewer a learner?
         if ($folderAccessLevel === UserAccess::ACCESS_READ) {
-            // Is viewer a participant, and assessment is published for them?
-            $participant = $assessment->getParticipantIfExtant($viewer);
-            return $participant && Alaress_Date_Format::now()->gte($participant->getPublishDate());
+            // Is viewer a participant, and not excluded, and assessment is published for them?
+            return $participant && !$participant->isExcluded() && Alaress_Date_Format::now()->gte($participant->getPublishDate());
         }
         return false;
     }
