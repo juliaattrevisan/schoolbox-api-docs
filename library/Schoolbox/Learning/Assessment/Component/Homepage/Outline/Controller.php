@@ -15,6 +15,7 @@ namespace Schoolbox\Learning\Assessment\Component\Homepage\Outline;
 
 use Alaress_Date_Format;
 use Component_Instance;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
@@ -109,21 +110,20 @@ class Controller extends Component_Homepage_ControllerAbstract
             $this->courseImplementation->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImplId));
 
             // Load all assessments in a single query
-            $uiIds = $this->courseImplementation->getUnits()->getColumnValues('id');
+            $uiIds = $this->courseImplementation->getUnits()->getPropertyValues('id');
 
             if ($this->readOnly) {
                 // I might be a student, but can't be anything more.
                 // In any case, load only my participation - if I'm not a participant, there will be nothing.
                 // also omit anything that is not yet published (there's no easy way to apply this filter to the query)
 
-                // this isn't cached in the factory method... for some reason...
-                $now = Alaress_Date_Format::now();
+                $visibility = new Visibility($this->getAccess());
 
                 $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdsForCourseOutline(
                     $uiIds,
                     $this->getUser()
-                )->filter(function (IAssessable $activity) use ($now) {
-                    return $activity->getPublishAt()->lte($now);
+                )->filter(function (IAssessable $activity) use ($visibility) {
+                    return $visibility->isVisibleToUser($activity, $this->getUser(), true);
                 });
             } else {
                 // I'm a teacher - load all participants.
@@ -154,7 +154,9 @@ class Controller extends Component_Homepage_ControllerAbstract
             );*/
 
         } catch (MapperException $e) {
-            // noop
+            if(ConfigMapper::getInstance()->get('debug_mode')){
+                throw $e;
+            }
         }
 
         return true;
