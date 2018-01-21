@@ -83,7 +83,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         // create a dynamic plan on the assessment to get started
         $assessment->getPlans()->add((new Plan($assessment))->setIsDynamic(true));
 
-        $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment);
+        $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, true);
 
         $data = $this->getAssessmentAsTwigArray($context, $assessment);
 

@@ -246,7 +246,8 @@ class MapperProxy
             return $this->loadParticipantsIntoAssessmentCollection(
                 $this->translateToDomainModelCollection(
                     $this->baseMapper->findByPredicates($builder, $options)
-                )
+                ),
+                false
             );
         } catch (UnderflowException $e) {
             return $this->createCollection();
@@ -339,6 +340,7 @@ class MapperProxy
     {
         return $this->loadParticipantsIntoAssessmentCollection(
             $this->findAllByUnitImplementationIds($unitImplIds, $options),
+            false,
             $student
         );
     }
@@ -373,7 +375,7 @@ class MapperProxy
             );
         }
 
-        return $this->loadParticipantsIntoAssessmentCollection($this->translateToDomainModelCollection($assessments), $student);
+        return $this->loadParticipantsIntoAssessmentCollection($this->translateToDomainModelCollection($assessments), false, $student);
     }
 
     /**
@@ -455,7 +457,7 @@ class MapperProxy
     public function findAllByProjectIdForReview($projectId, User $student = null, array $options = [])
     {
         $assessments = $this->findAllByProjectId($projectId, $options);
-        return $this->loadParticipantsIntoAssessmentCollection($assessments, $student);
+        return $this->loadParticipantsIntoAssessmentCollection($assessments, false, $student);
     }
 
 
@@ -541,7 +543,7 @@ class MapperProxy
             );
         }
 
-        return $this->loadParticipantsIntoAssessmentCollection($this->translateToDomainModelCollection($assessments), $student);
+        return $this->loadParticipantsIntoAssessmentCollection($this->translateToDomainModelCollection($assessments), false, $student);
     }
 
 
@@ -603,7 +605,7 @@ class MapperProxy
             );
         }
 
-        return $this->loadParticipantsIntoAssessmentCollection($this->translateToDomainModelCollection($assessments), $student);
+        return $this->loadParticipantsIntoAssessmentCollection($this->translateToDomainModelCollection($assessments), false, $student);
     }
 
     /**
@@ -821,6 +823,7 @@ class MapperProxy
         return $model;
     }
 
+
     /**
      * Helper function for finding a single assessment by a column and value.
      *
@@ -830,7 +833,9 @@ class MapperProxy
      * @param User   $student
      * @return IAssessable
      * @throws MapperException\Deleted if the assessment was deleted
-     * @throws MapperException         if the assessment doesn't exist at all
+     * @throws \DomainException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnexpectedValueException
      */
     protected function findSingle($column, $value, $loadParticipants = false, User $student = null)
     {
@@ -840,7 +845,7 @@ class MapperProxy
 
             $assessment = $this->translateToDomainModel($originalModel);
             if ($loadParticipants) {
-                $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
+                $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, true, $student);
             }
             return $assessment;
 
@@ -848,7 +853,7 @@ class MapperProxy
             // Populate participants for the deleted assessment, and rethrow
             $assessment = $this->translateToDomainModel($e->getDeletedObject());
             if ($loadParticipants) {
-                $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
+                $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, true, $student);
             }
             $e->setDeletedObject($assessment);
             throw $e;
@@ -971,44 +976,10 @@ class MapperProxy
 
 
     /**
-     * Load a particular set of participants into the given assessment
-     *
-     * @param IAssessable $assessment
-     * @param Collection  $users
-     * @return IAssessable
-     */
-    public function loadParticularParticipantsIntoAssessment(
-        IAssessable $assessment,
-        Collection $users
-    ) {
-        foreach ($users as $user) {
-            $assessment = $this->participantDataSource->loadParticipationIntoAssessment(
-                $assessment,
-                $user
-            );
-        }
-        return $assessment;
-    }
-
-    /**
-     * Loads participants into the given assessable.
-     *
-     * @param IAssessable $assessable
-     * @param User        $user
-     * @return IAssessable
-     */
-    public function loadParticipantsIntoAssessment(IAssessable $assessable, User $user = null): IAssessable
-    {
-        return $this->participantDataSource->loadParticipationIntoAssessment(
-            $assessable,
-            $user
-        );
-    }
-
-    /**
      * Loads participants into a collection of assessables.
      *
      * @param Collection $collection
+     * @param bool       $includeExcluded Should we include explicitly excluded participants in graph?
      * @param User       $user
      * @param bool       $includeResponses
      * @param bool       $includeFeedbacks
@@ -1016,10 +987,12 @@ class MapperProxy
      */
     public function loadParticipantsIntoAssessmentCollection(
         Collection $collection,
+        bool $includeExcluded,
         User $user = null
     ) {
         return $this->participantDataSource->loadParticipationIntoAssessmentCollection(
             $collection,
+            $includeExcluded,
             $user
         );
     }

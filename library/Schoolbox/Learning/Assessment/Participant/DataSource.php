@@ -125,16 +125,18 @@ class DataSource
      *       as it is more efficient when loading responses and feedbacks.
      *
      * @param IAssessable $assessment
+     * @param bool        $includeExcluded Should we include explicitly excluded participants in graph?
      * @param null|User   $user
      * @return IAssessable $assessment, with participation loaded.
      * @throws UnexpectedValueException If unable to merge student collections
      * @throws DomainException If user has interaction but not participant record
      * @throws DefinitionException If unable to locate a specified mapper join
      */
-    public function loadParticipationIntoAssessment(IAssessable $assessment, User $user = null): IAssessable
+    public function loadParticipationIntoAssessment(IAssessable $assessment, bool $includeExcluded, User $user = null): IAssessable
     {
         $collection = $this->loadParticipationIntoAssessmentCollection(
             new GenericCollection(IAssessable::class, [$assessment]),
+            $includeExcluded,
             $user
         );
         return $collection->first();
@@ -147,20 +149,21 @@ class DataSource
      * This includes records for responses and feedbacks for every participant in each assessment.
      *
      * @param Collection|IAssessable[] $assessments
+     * @param bool                     $includeExcluded Should we include explicitly excluded participants in graph?
      * @param User|null                $user
      * @return Collection|IAssessable[] $assessments, with participation loaded.
-     * @throws UnexpectedValueException If unable to merge student collections
-     * @throws DomainException If user has interaction but not participant record
      * @throws DefinitionException If unable to locate a specified mapper join
+     * @throws DomainException If user has interaction but not participant record
+     * @throws UnexpectedValueException If unable to merge student collections
      */
-    public function loadParticipationIntoAssessmentCollection(Collection $assessments, User $user = null): Collection
+    public function loadParticipationIntoAssessmentCollection(Collection $assessments, bool $includeExcluded, User $user = null): Collection
     {
         /** @var Collection|IAssessable[] $assessableWithDescendants */
         $assessableWithDescendants = new GenericCollection(IAssessable::class);
         $this->mergeSubAssessments($assessableWithDescendants, $assessments);
 
         // Load participants for all assessments, plus activities in projects
-        $this->findForAssessmentCollection($assessableWithDescendants, $user);
+        $this->findForAssessmentCollection($assessableWithDescendants, $includeExcluded, $user);
 
         // Insert project participant objects into any project
         foreach ($assessableWithDescendants as $assessable) {
@@ -184,12 +187,13 @@ class DataSource
      * This method sets the participants into each $assessment
      *
      * @param IAssessable[]|GenericCollection $assessments Indexed by assessment.id
+     * @param bool                     $includeExcluded Should we include explicitly excluded participants in graph?
      * @param null|User                       $user
      * @throws UnexpectedValueException If unable to merge student collections
      * @throws DomainException If user has interaction but not participant record
      * @throws DefinitionException If unable to locate a specified mapper join
      */
-    protected function findForAssessmentCollection(GenericCollection $assessments, User $user = null): void
+    protected function findForAssessmentCollection(GenericCollection $assessments, bool $includeExcluded, User $user = null): void
     {
         $this->loadPlansAndParticipants($assessments);
 
@@ -201,6 +205,8 @@ class DataSource
             }
         }
 
+        // We do need excluded participants to be present to determine whether to whether to
+        // insert students as dynamic participants.
         $this->loadDynamicPlanParticipants($dynamicPlans);
 
         // Add Responses
@@ -215,14 +221,29 @@ class DataSource
             $this->feedbackDataSource->findForAssessmentCollection($assessments, $user)
         );
 
-        // Sort by name after all that
-        // TODO this won't work now that we have IAssessable->Plan->Participants. Should we cache on IAssessable?
-        // TODO probably should make this a view-layer responsibility.
-        // TODO You could do $twigContext[participants] = $assessable->getParticipants()->sort(SortableFunctionObject)
-//        foreach ($assessments as $assessment) {
-//            $participants = $assessment->getAllParticipants()->sortByCallback([$this, 'sortCallback']);
-//            $assessment->setAllParticipants($participants);
-//        }
+        if(!$includeExcluded){
+            // But we may wish to then remove these participants so they are not present in the domain graph
+            $this->removeExcludedParticipants($assessments);
+        }
+    }
+
+
+    /**
+     * Strips any excluded participants from assessment plans so that they are not present in domain graph.
+     *
+     * @param GenericCollection|IAssessable[] $assessables
+     */
+    private function removeExcludedParticipants(GenericCollection $assessables): void
+    {
+        foreach($assessables as $assessable) {
+            foreach ($assessable->getPlans() as $plan) {
+                foreach ($plan->getParticipants() as $participant) {
+                    if ($participant->isExcluded()) {
+                        $plan->getParticipants()->offsetUnset($participant->getUser()->getId());
+                    }
+                }
+            }
+        }
     }
 
 

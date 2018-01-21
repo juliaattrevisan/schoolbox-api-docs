@@ -105,7 +105,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
         // Having a staff role does not guarantee WRITE+ perm to a assessment's folder.
         // We need to load the current user's participation so users without WRITE+ perm can see the assessment
         // by virtue of their participation.
-        $this->participantDataSource->loadParticipationIntoAssessmentCollection($assessables, $this->getUser());
+        $this->participantDataSource->loadParticipationIntoAssessmentCollection($assessables, false, $this->getUser());
 
         foreach ($assessables as $assessment) {
             // Permission check to see the assessment

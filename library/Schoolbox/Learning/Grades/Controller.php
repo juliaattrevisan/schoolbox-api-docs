@@ -248,7 +248,7 @@ class Controller extends Base
         $assessments   = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
 
 
-        $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, $viewee)
+        $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, false, $viewee)
                                                    ->filter(function (IAssessable $a) use ($viewee) {
                                                        return !$a->getParticipant($viewee)->isExcluded();
                                                    });
@@ -329,7 +329,7 @@ class Controller extends Base
 
         // Fetch assessments & participants
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
-        $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, $viewee)
+        $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, false, $viewee)
                                                    ->filter(function (IAssessable $a) use ($viewee) {
                                                        return !$a->getParticipant($viewee)->isExcluded();
                                                    });
