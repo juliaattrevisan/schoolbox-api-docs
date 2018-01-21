@@ -12,4 +12,4 @@ CREATE TABLE `tour`
 );
 
 CREATE INDEX `tour_author_user_id_idx`	on `tour` (`author_user_id`);
-CREATE INDEX `tour_author_tour_step_uuid_idx`	on `tour` (`tour_step_uuid`);
+CREATE INDEX `tour_step_uuid_idx`	on `tour` (`first_step_uuid`);

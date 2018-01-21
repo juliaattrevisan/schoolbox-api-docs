@@ -44,25 +44,6 @@ abstract class AbstractModel implements ISoftDeletable, \JsonSerializable
     protected $body;
 
     /**
-     * @return User|null
-     */
-    public function getAuthor(): ?User
-    {
-        return $this->author;
-    }
-
-    /**
-     * @param User|null $author
-     *
-     * @return self|$this
-     */
-    public function setAuthor(?User $author): self
-    {
-        $this->author = $author;
-        return $this;
-    }
-
-    /**
      * @return string|null
      */
     public function getTitle(): ?string

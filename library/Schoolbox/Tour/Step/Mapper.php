@@ -130,7 +130,8 @@ class Mapper extends BaseMapper
                 }
 
                 [ $mapper, $alias ] = $hydrators[$row['type']];
-                $model->setType($mapper->hydrate($row, $alias));
+                $type = $mapper->hydrate($row, $alias);
+                $model->setType($type);
 
                 $collection->add($model);
             }
@@ -181,14 +182,14 @@ class Mapper extends BaseMapper
         foreach ($statement as $row) {
             // Store the first step in the tour if we haven't yet
             if ($stepCurrent === null) {
-                $stepCurrent = $row['tour.tour_step_uuid'];
+                $stepCurrent = $row['tour.first_step_uuid'];
             }
 
             if (!isset($stepsStorage[$row['uuid']])) {
                 $stepsStorage[$row['uuid']] = [
                     'uuid'           => $row['uuid'],
                     'next_step_uuid' => $row['next_step_uuid'],
-                    'type'           => Model::TYPE_TOOLTIP,
+                    'type'           => self::TYPE_TOOLTIP,
                     'body'           => $row['tooltip_body'],
                     'css_class'      => $row['tooltip_css_class'],
                     'selector'       => $row['tooltip_selector'],
@@ -214,7 +215,7 @@ class Mapper extends BaseMapper
         while ($stepCurrent !== null && $iterations < $maxIterations) {
             $steps[] = $stepsStorage[$stepCurrent];
             // Move onto the next step in the sequence
-            $stepCurrent = $stepsStorage[$stepCurrent]->getNextStep() ? $stepsStorage[$stepCurrent]->getNextStep()->getUuid() : null;
+            $stepCurrent = $stepsStorage[$stepCurrent]['next_step_uuid'];
             $iterations++;
         }
 

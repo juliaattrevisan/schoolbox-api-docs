@@ -89,11 +89,6 @@ $(function () {
                     //TO DO: Inject route when file is pluginerised
                     var saveRoute = '/tour/url/save';
 
-                    tourCurrent.onchange(function(targetElement) {
-                        var stepCurrent = tourCurrent._introItems[tourCurrent._currentStep];
-                        var stepPrev = tourCurrent._introItems[tourCurrent._currentStep - 1];
-                        var stepNext = tourCurrent._introItems[tourCurrent._currentStep + 1];
-
                     tourCurrent.onafterchange(function(targetElement) {
                         if (tourCurrent._introItems[tourCurrent._currentStep].tooltipClass == 'introjs-intromodal') {
                             $('.introjs-nextbutton').html("Take me on the tour!");
@@ -106,10 +101,28 @@ $(function () {
                     });
 
                     tourCurrent.onchange(function(targetElement) {
-                        var newStep     = tourCurrent._introItems[tourCurrent._currentStep].uuid;
+                        var stepCurrent = tourCurrent._introItems[tourCurrent._currentStep];
+                        var stepPrev = tourCurrent._introItems[tourCurrent._currentStep - 1];
+                        var stepNext = tourCurrent._introItems[tourCurrent._currentStep + 1];
 
-                        //This matches the consts on the Status/Model - to be updated when this file is a plugin
-                        var status      = "unactioned";
+                        // If the current step has custom JS events attached to open of this step - trigger those events now
+                        if (stepCurrent.jsEvents !== null) {
+                            runStepEvents(stepCurrent.jsEvents, 'open');
+                        }
+
+                        // If the user has moved forward, and the previous step had any custom JS events attached on close - trigger those now
+                        if (stepPrev !== undefined && stepPrev.jsEvents !== null && tourCurrent._direction === 'forward') {
+                            runStepEvents(stepPrev.jsEvents, 'close');
+                        }
+
+                        // If the user has moved back, and the previous step had any custom JS events attached on close - trigger those now
+                        if (stepNext !== undefined && stepNext.jsEvents !== null && tourCurrent._direction === 'backward') {
+                            runStepEvents(stepNext.jsEvents, 'close');
+                        }
+
+                        // Update the status in the DB
+                        var newStep = stepCurrent.uuid;
+                        var status = "unactioned"; // TODO: use const from Status/Model when this is made into a plugin
 
                         //Save the status
                         $.post(saveRoute, {
@@ -155,35 +168,6 @@ $(function () {
                                 status: status
                             });
                         }
-                    });
-
-                        // If the current step has custom JS events attached to open of this step - trigger those events now
-                        if (stepCurrent.jsEvents !== null) {
-                            runStepEvents(stepCurrent.jsEvents, 'open');
-                        }
-
-                        // If the user has moved forward, and the previous step had any custom JS events attached on close - trigger those now
-                        if (stepPrev !== undefined && stepPrev.jsEvents !== null && tourCurrent._direction === 'forward') {
-                            runStepEvents(stepPrev.jsEvents, 'close');
-                        }
-
-                        // If the user has moved back, and the previous step had any custom JS events attached on close - trigger those now
-                        if (stepNext !== undefined && stepNext.jsEvents !== null && tourCurrent._direction === 'backward') {
-                            runStepEvents(stepNext.jsEvents, 'close');
-                        }
-
-                        // Update the status in the DB
-                        var newStep = stepCurrent.uuid;
-                        var status = "unactioned"; // TODO: use const from Status/Model when this is made into a plugin
-
-                        $.post(saveRoute, {
-                            url: tourUrl,
-                            oldStep: oldStep,
-                            newStep: newStep,
-                            status: status
-                        });
-
-                        oldStep = newStep;
                     });
 
                     tourCurrent.oncomplete(function(targetElement) {

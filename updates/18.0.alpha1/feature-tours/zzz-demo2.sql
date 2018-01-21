@@ -4,11 +4,11 @@ SET @step2Uuid = UUID(); --This is the uuid for the step type
 
 
 INSERT INTO `tour_step` (`uuid`, `tour_uuid`, `next_step_uuid`, `author_user_id`, `type`, `created_at`, `updated_at`)
-VALUES (@step1Uuid, (SELECT `uuid` FROM `tour` WHERE `title` = 'Staff Dashboard Tour') , (SELECT `tour_step_uuid` FROM `tour` WHERE `title` = 'Staff Dashboard Tour'),
+VALUES (@step1Uuid, (SELECT `uuid` FROM `tour` WHERE `title` = 'Staff Dashboard Tour') , (SELECT `first_step_uuid` FROM `tour` WHERE `title` = 'Staff Dashboard Tour'),
 '19', 'modal', '1980-04-07 00:00:00', '1980-04-07 00:00:00'); --Insert step, setting the current first step of the tour to the next step of the new step
 
 
-UPDATE `tour` set `tour_step_uuid` = @step1Uuid; --Up date the tour to use the new step first
+UPDATE `tour` set `first_step_uuid` = @step1Uuid; --Up date the tour to use the new step first
 
 
 INSERT INTO `tour_step_modal` (`uuid`, `tour_step_uuid`, `title`, `body`, `css_class`, `created_at`, `updated_at`)

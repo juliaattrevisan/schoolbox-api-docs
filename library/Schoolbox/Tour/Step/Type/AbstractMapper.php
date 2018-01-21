@@ -61,8 +61,7 @@ abstract class AbstractMapper extends BaseMapper
     {
         return "
             SELECT      {$this->getColumnString()},
-                        {$this->getJoinColumnString('author', 'a')},
-                        {$this->getJoinColumnString('tourStep', 's')}
+                        {$this->getJoinColumnString('tourStep', 's')},
             FROM        {$this->getTable()}
             INNER JOIN  {$this->getJoinSql('tourStep', '', 's')}
             LEFT JOIN   {$this->getJoinSql('author', '', 'a', true)}
@@ -76,9 +75,6 @@ abstract class AbstractMapper extends BaseMapper
     {
         $collection = $this->createCollection();
 
-        /** @var UserMapper $authorUserMapper */
-        $authorUserMapper = $this->getJoinMapper('author');
-
         /** @var TourStepMapper $tourStepMapper */
         $tourStepMapper = $this->getJoinMapper('tourStep');
 
@@ -86,7 +82,6 @@ abstract class AbstractMapper extends BaseMapper
             $model = $this->hydrate($row);
 
             if ($model instanceof Model) {
-                $model->setAuthor($authorUserMapper->hydrate($row, 'a'));
                 $model->setTourStep($tourStepMapper->hydrate($row, 's'));
                 $collection->add($model);
             }

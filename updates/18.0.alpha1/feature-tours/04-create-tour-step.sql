@@ -37,7 +37,6 @@ CREATE TABLE `tour_step_tooltip`
   CONSTRAINT `tour_step_tooltip_tour_step_uuid_fk` FOREIGN KEY (`tour_step_uuid`) REFERENCES `tour_step` (`uuid`)
 );
 
-CREATE INDEX `tour_step_tooltip_user_id_idx` ON `tour_step_tooltip` (`author_user_id`);
 CREATE INDEX `tour_step_tooltip_tour_step_uuid_idx` ON `tour_step_tooltip` (`tour_step_uuid`);
 
 -- JS events on steps
