@@ -77,72 +77,7 @@
          */
         $participantSettings.on('click', '#participant-customise', function (event) {
             event.preventDefault();
-
-            var $planParticipants = $('#plan-participants');
-            var $planId = $customiseModal.find('#plan-id');
-            var $planName = $customiseModal.find('#plan-name');
-            var $planDesc = $customiseModal.find('#plan-desc');
-            var $planPublishDate = $customiseModal.find('#plan-publish-date');
-            var $planOpenDate = $customiseModal.find('#plan-open-date');
-            var $planDueDate = $customiseModal.find('#plan-due-date');
-            var $planCloseDate = $customiseModal.find('#plan-close-date');
-
-            // Init Selectize
-            $planParticipants.selectizeSelector({
-                multiple: true,
-                ajax: {
-                    url: '/ajax/user.php',
-                    type: 'GET',
-                    data: {groupID: 0},
-                    dataType: 'json'
-                }
-            });
-            var participantSelectize = $planParticipants[0].selectize;
-
-            // Destroy and reinit CKEditor
-            reinitCKE();
-
-            // Disable dates if assessment doesn't accept online submissions
-            if (!$('#acceptOnline').length || $('#acceptOnline').val() === '0') {
-                $('#plan-open-date').closest('[data-plan-date-container]').addClass('hide');
-                $('#plan-close-date').closest('[data-plan-date-container]').addClass('hide');
-            } else {
-                $('#plan-open-date').closest('[data-plan-date-container]').removeClass('hide');
-                $('#plan-close-date').closest('[data-plan-date-container]').removeClass('hide');
-            }
-
-            // Fill the selectize with the checked students
-            participantSelectize.clear();
-            $participants.find(':checked').each(function () {
-                participantSelectize.addOption({
-                    'id': $(this).attr('data-user-id'),
-                    'name': $(this).attr('data-user-name')
-                });
-                participantSelectize.addItem($(this).attr('data-user-id'));
-            });
-
-            // Clear inputs
-            $planName.val('');
-
-            // Clear any validation errors
-            $('#plan-name-error').hide();
-            $('#plan-publish-date-error').hide();
-            $('#plan-open-date-error').hide();
-            $('#plan-due-date-error').hide();
-            $('#plan-close-date-error').hide();
-
-            // Set dates & description to whatever is currently set on the main form
-            $planId.val(0);
-            $planPublishDate.val($('#publishDate').val());
-            $planOpenDate.val($('#openDate').val());
-            $planDueDate.val($('#dueDate').val());
-            $planCloseDate.val($('#closeDate').val());
-            CKEDITOR.instances['plan-desc'].setData(CKEDITOR.instances['assessment-description'].getData());
-
-            // Open modal
-            $customiseModal.foundation('reveal', 'open', {
-                clearData: true
-            });
+            openPlanModal();
         });
 
         /**
@@ -152,74 +87,9 @@
             event.preventDefault();
 
             var planId = $(this).attr('data-plan-modify');
-
             var planData = getPlanData(planId);
-            var $planParticipants = $('#plan-participants');
-            var $planId = $customiseModal.find('#plan-id');
-            var $planName = $customiseModal.find('#plan-name');
-            var $planDesc = $customiseModal.find('#plan-desc');
-            var $planPublishDate = $customiseModal.find('#plan-publish-date');
-            var $planOpenDate = $customiseModal.find('#plan-open-date');
-            var $planDueDate = $customiseModal.find('#plan-due-date');
-            var $planCloseDate = $customiseModal.find('#plan-close-date');
 
-            // Init Selectize
-            $planParticipants.selectizeSelector({
-                multiple: true,
-                ajax: {
-                    url: '/ajax/user.php',
-                    type: 'GET',
-                    data: {groupID: 0},
-                    dataType: 'json'
-                }
-            });
-            var participantSelectize = $planParticipants[0].selectize;
-
-            // Destroy and reinit CKEditor
-            reinitCKE();
-
-            // Disable dates if assessment doesn't accept online submissions
-            if (!$('#acceptOnline').length || $('#acceptOnline').val() === '0') {
-                $('#plan-open-date').closest('[data-plan-date-container]').addClass('hide');
-                $('#plan-close-date').closest('[data-plan-date-container]').addClass('hide');
-            } else {
-                $('#plan-open-date').closest('[data-plan-date-container]').removeClass('hide');
-                $('#plan-close-date').closest('[data-plan-date-container]').removeClass('hide');
-            }
-
-            // Fill the selectize with the checked students
-            participantSelectize.clear();
-            $participants.find('input[value = ' + planId + ']').each(function () {
-                var participantId = $(this).parent().attr('data-participant');
-                var participantName = $('#participant-' + participantId).attr('data-user-name');
-                participantSelectize.addOption({
-                    'id': participantId,
-                    'name': participantName
-                });
-                participantSelectize.addItem(participantId);
-
-            });
-
-            // Clear any validation errors
-            $('#plan-name-error').hide();
-            $('#plan-publish-date-error').hide();
-            $('#plan-open-date-error').hide();
-            $('#plan-due-date-error').hide();
-            $('#plan-close-date-error').hide();
-
-            // Set dates & description to whatever is currently set on the main form
-            $planId.val(planData['id']);
-            $planName.val(planData['name']);
-            $planPublishDate.val(planData['publishDate']);
-            $planOpenDate.val(planData['openDate']);
-            $planDueDate.val(planData['dueDate']);
-            $planCloseDate.val(planData['closeDate']);
-            CKEDITOR.instances['plan-desc'].setData(planData['description']);
-
-            // Open modal
-            $customiseModal.foundation('reveal', 'open', {
-                clearData: true
-            });
+            openPlanModal(planData);
         });
 
 
@@ -553,9 +423,106 @@
      */
     function enableActions() {
         var checkPlans = $('#plan-data').find('input').length;
-        if (checkPlans ) {
+        if (checkPlans) {
             $('#plan-dropdown').attr('disabled', false);
         }
+    }
+
+    function openPlanModal(planData) {
+
+        var $customiseModal = $('#participant-customise-modal');
+        var $participants = $('#participants');
+
+        var $planParticipants = $('#plan-participants');
+        var $planId = $customiseModal.find('#plan-id');
+        var $planName = $customiseModal.find('#plan-name');
+        var $planDesc = $customiseModal.find('#plan-desc');
+        var $planPublishDate = $customiseModal.find('#plan-publish-date');
+        var $planOpenDate = $customiseModal.find('#plan-open-date');
+        var $planDueDate = $customiseModal.find('#plan-due-date');
+        var $planCloseDate = $customiseModal.find('#plan-close-date');
+
+        // Init Selectize
+        $planParticipants.selectizeSelector({
+            multiple: true,
+            ajax: {
+                url: '/ajax/user.php',
+                type: 'GET',
+                data: {groupID: 0},
+                dataType: 'json'
+            }
+        });
+        var participantSelectize = $planParticipants[0].selectize;
+
+        // Destroy and reinit CKEditor
+        reinitCKE();
+
+        // Disable dates if assessment doesn't accept online submissions
+        if (!$('#acceptOnline').length || $('#acceptOnline').val() === '0') {
+            $('#plan-open-date').closest('[data-plan-date-container]').addClass('hide');
+            $('#plan-close-date').closest('[data-plan-date-container]').addClass('hide');
+        } else {
+            $('#plan-open-date').closest('[data-plan-date-container]').removeClass('hide');
+            $('#plan-close-date').closest('[data-plan-date-container]').removeClass('hide');
+        }
+
+        // Fill the selectize with the checked students
+        participantSelectize.clear();
+        if (planData !== undefined) {
+            $participants.find('input[value = ' + planData['id'] + ']').each(function () {
+                var participantId = $(this).parent().attr('data-participant');
+                var participantName = $('#participant-' + participantId).attr('data-user-name');
+                participantSelectize.addOption({
+                    'id': participantId,
+                    'name': participantName
+                });
+                participantSelectize.addItem(participantId);
+
+            });
+        }
+        else {
+            $participants.find(':checked').each(function () {
+                participantSelectize.addOption({
+                    'id': $(this).attr('data-user-id'),
+                    'name': $(this).attr('data-user-name')
+                });
+                participantSelectize.addItem($(this).attr('data-user-id'));
+            });
+
+            // Clear inputs
+            $planName.val('');
+        }
+
+        // Clear any validation errors
+        $('#plan-name-error').hide();
+        $('#plan-publish-date-error').hide();
+        $('#plan-open-date-error').hide();
+        $('#plan-due-date-error').hide();
+        $('#plan-close-date-error').hide();
+
+        // Set dates & description to whatever is currently set on the main form
+        if (planData !== undefined) {
+            $planId.val(planData['id']);
+            $planName.val(planData['name']);
+            $planPublishDate.val(planData['publishDate']);
+            $planOpenDate.val(planData['openDate']);
+            $planDueDate.val(planData['dueDate']);
+            $planCloseDate.val(planData['closeDate']);
+            CKEDITOR.instances['plan-desc'].setData(planData['description']);
+        }
+        else {
+            $planId.val(0);
+            $planPublishDate.val($('#publishDate').val());
+            $planOpenDate.val($('#openDate').val());
+            $planDueDate.val($('#dueDate').val());
+            $planCloseDate.val($('#closeDate').val());
+            CKEDITOR.instances['plan-desc'].setData(CKEDITOR.instances['assessment-description'].getData());
+        }
+
+        // Open modal
+        $customiseModal.foundation('reveal', 'open', {
+            clearData: true
+        });
     }
 
     /**
