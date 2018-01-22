@@ -85,8 +85,8 @@ table.rb {
         .rb-self-reflection-choice {
             border-radius: 50%;
             position: absolute;
-            bottom: 0;
-            right: 0;
+            bottom: -$table-row-padding / 2;
+            right: -$table-row-padding / 2;
         }
     }
     textarea {
