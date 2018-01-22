@@ -89,7 +89,7 @@
         {% endif %}
 
         {# Rubric goes here #}
-        {% if rubricContext %}
+        {% if feedbackRubricContexts[currentFeedback.id] %}
             <div class="{{ collapsed? 'hide' : '' }}"
                  {% if hasCollapser %}
                  data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
