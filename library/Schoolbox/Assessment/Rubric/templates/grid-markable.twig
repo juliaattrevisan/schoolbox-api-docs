@@ -106,7 +106,7 @@
 
                 {# Self-Assessment #}
                 {% if learnerRubric %}
-                    {% if latestSelfReflectedFeedback.normalisedMark != null %}
+                    {% if latestSelfReflectedFeedback.isSelfAssessed %}
                         {% set selfReflectionName = locale.selfAssessment.proper %}
                     {% else %}
                         {% set selfReflectionName = locale.selfReflection.proper %}
@@ -131,7 +131,7 @@
 
             {# Self-Assessment #}
             {% if learnerRubric %}
-                {% if latestSelfReflectedFeedback.normalisedMark != null %}
+                {% if latestSelfReflectedFeedback.isSelfAssessed %}
                     {% set selfReflectionName = locale.selfAssessment.proper %}
                 {% else %}
                     {% set selfReflectionName = locale.selfReflection.proper %}
