@@ -152,15 +152,6 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'type'         => 'tooltip',
             'selector'     => '#content',
             'content'      => "The larger main area of the screen is your dashboard. It has components added to it that will be uniquely chosen for you by your school. These components could have links to external content, commonly used pages, features specific to your role, or important news.",
-            'events'       => [
-                [
-                    'uuid'            => '4e8732f4-ff49-11e7-bd23-08002751fd3c',
-                    'selector'        => '#account-menu',
-                    'event'           => 'accordion.close',
-                    'insertion_point' => 'close',
-                    'order'           => 0,
-                ],
-            ],
         ],
     ];
 
@@ -300,7 +291,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
                             `updated_at`,
                             `deleted_at`
               )
-              SELECT        '025bfb46-ff49-11e7-bd23-08002751fd3c',
+              SELECT        :uuid,
                             :tour_step_uuid,
                             (SELECT `id` FROM `user` WHERE `username` = 'alaress' LIMIT 1),
                             NULL,
@@ -312,6 +303,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
                             NULL
             ");
             $statement->execute([
+                'uuid'           => $step['tooltip_uuid'],
                 'tour_step_uuid' => $step['uuid'],
                 'content'        => trim($step['content']),
                 'selector'       => $step['selector'],
