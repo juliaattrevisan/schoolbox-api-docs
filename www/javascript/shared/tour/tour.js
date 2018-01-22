@@ -17,7 +17,8 @@ $(function () {
         }
     };
 
-    if (typeof(window.tourUrl) !== 'undefined') {
+    // Only show tours for medium viewport up
+    if (typeof(window.tourUrl) !== 'undefined' && $(window).width() > 935) {
         $.get(window.tourUrl).done(function (tours) {
 
             // Function to initiate a joyride

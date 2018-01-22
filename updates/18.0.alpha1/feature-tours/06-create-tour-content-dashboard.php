@@ -37,14 +37,6 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             ",
         ],
 
-        // Tell them to open the hamburger
-        [
-            'uuid'     => '3b2ea43e-f671-11e7-b480-08002751fd3c',
-            'type'     => 'tooltip',
-            'selector' => '#left-off-canvas-toggle',
-            'content'  => "<p>Clicking the three lines icon in the top left corner of the screen will reveal the side menu.</p>",
-        ],
-
         // Account details
         [
             'uuid'     => '204e36bb-f5b9-11e7-9503-08002751fd3c',
