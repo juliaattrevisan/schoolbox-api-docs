@@ -156,6 +156,9 @@ class Mapper extends BaseMapper
                         `tour_step_tooltip`.`body` as `tooltip_body`,
                         `tour_step_tooltip`.`selector` as `tooltip_selector`,
                         `tour_step_tooltip`.`css_class` as `tooltip_css_class`,
+                        `tour_step_modal`.`uuid` as `modal_uuid`,
+                        `tour_step_modal`.`body` as `modal_body`,
+                        `tour_step_modal`.`css_class` as `modal_css_class`,
                         `tour_step_event`.`selector` as `event_selector`,
                         `tour_step_event`.`event` as `event`,
                         `tour_step_event`.`insertion_point` as `event_insertion_point`
@@ -186,15 +189,27 @@ class Mapper extends BaseMapper
             }
 
             if (!isset($stepsStorage[$row['uuid']])) {
-                $stepsStorage[$row['uuid']] = [
-                    'uuid'           => $row['uuid'],
-                    'next_step_uuid' => $row['next_step_uuid'],
-                    'type'           => self::TYPE_TOOLTIP,
-                    'body'           => $row['tooltip_body'],
-                    'css_class'      => $row['tooltip_css_class'],
-                    'selector'       => $row['tooltip_selector'],
-                    'events'         => [] // Populated below
-                ];
+                if ($row['tooltip_uuid'] != null) {
+                    $stepsStorage[$row['uuid']] = [
+                        'uuid'           => $row['uuid'],
+                        'next_step_uuid' => $row['next_step_uuid'],
+                        'type'           => self::TYPE_TOOLTIP,
+                        'body'           => $row['tooltip_body'],
+                        'css_class'      => $row['tooltip_css_class'],
+                        'selector'       => $row['tooltip_selector'],
+                        'events'         => [] // Populated below
+                    ];
+                } else if ($row['modal_uuid'] != null) {
+                    $stepsStorage[$row['uuid']] = [
+                        'uuid'           => $row['uuid'],
+                        'next_step_uuid' => $row['next_step_uuid'],
+                        'type'           => self::TYPE_MODAL,
+                        'body'           => $row['modal_body'],
+                        'css_class'      => $row['modal_css_class'],
+                        'events'         => [] // Populated below
+                    ];
+                }
+
             }
 
             // Add the event (can be multiple)
