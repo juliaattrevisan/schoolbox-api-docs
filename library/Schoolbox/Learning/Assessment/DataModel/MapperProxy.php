@@ -334,7 +334,7 @@ class MapperProxy
      * @param array     $options
      * @return Collection|IAssessable[]
      */
-    public function findAllByUnitImplementationIdForCourseOutline(array $unitImplIds, User $student = null, array $options = [])
+    public function findAllByUnitImplementationIdsForCourseOutline(array $unitImplIds, User $student = null, array $options = [])
     {
         return $this->loadParticipantsIntoAssessmentCollection(
             $this->findAllByUnitImplementationIds($unitImplIds, $options),
