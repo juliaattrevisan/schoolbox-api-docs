@@ -42,7 +42,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'uuid'     => '3b2ea43e-f671-11e7-b480-08002751fd3c',
             'type'     => 'tooltip',
             'selector' => '#left-off-canvas-toggle',
-            'content'  => "<p>Click this button to open the side menu.</p>",
+            'content'  => "<p>Clicking the three lines icon in the top left corner of the screen will reveal the side menu.</p>",
         ],
 
         // Account details
@@ -102,7 +102,6 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'content'  => "<p>This section will display links to the classes you teach. These are preloaded from enrolment data set up by your system administrators.</p>",
         ],
 
-
         // My Groups
         [
             'uuid'     => '3b62f95b-f5b9-11e7-9503-08002751fd3c',
@@ -110,7 +109,6 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'selector' => '#side-menu-mygroups',
             'content'  => "<p>In this section, you will find links to groups that you have been added to or have voluntarily joined.</p>",
         ],
-
 
         // My Links
         [
@@ -133,7 +131,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'uuid'     => '4f99c8fb-f5b9-11e7-9503-08002751fd3c',
             'type'     => 'tooltip',
             'selector' => '#search',
-            'content'  => "In the top right hand corner you will see a search icon. Hovering over this reveals a search bar. You can search for users, text written in a textbox component, files, folders, links, news and events.",
+            'content'  => "In the top right hand corner you will see a search icon. Hovering over this reveals a search bar. You can search for users, page content, files, folders, links, news and events.",
         ],
 
         // Notifications
@@ -141,7 +139,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'uuid'     => '539d418c-f5b9-11e7-9503-08002751fd3c',
             'type'     => 'tooltip',
             'selector' => '#notifications',
-            'content'  => "The bell or notifications menu on the right of the screen is used to view your instant notifications. There are many notifications you can receive such as when a user posts in a social stream on a page you are involved in or if you have been added to a group page. Text in bold denotes a link that can be clicked. The notifications found here are customised by your school.",
+            'content'  => "The bell or notifications menu on the right of the screen is used to view your instant notifications. There are many notifications you can receive such as when a user posts in a social stream on a page you are involved in or if you have been added to a group page. Text in bold denotes a link that can be clicked. The notifications found here are customised by you and your school.",
         ],
 
         // Dashboard
