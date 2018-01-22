@@ -22,6 +22,13 @@ $settingsInfo = array (
     'security' => [
         'requestedAuthnContext'             => [useSAMLKerberos() ? OneLogin_Saml2_Constants::AC_WINDOWS : OneLogin_Saml2_Constants::AC_PASSWORD_PROTECTED],
         'requestedAuthnContextComparison'   => Config::get('saml_auth_comparison'),
+        'signatureAlgorithm'                => XMLSecurityKey::RSA_SHA256,
+        'digestAlgorithm'                   => XMLSecurityDSig::SHA256,
+        'lowercaseUrlencoding'              => true,
+        'wantNameId'                        => true,
+        'logoutRequestSigned'               => Cfg::get('saml_private_cert') ? true : false,
+        'logoutResponseSigned'              => Cfg::get('saml_private_cert') ? true : false,
+
     ],
 );
 
@@ -52,7 +59,7 @@ $settingsInfo['sp'] = [
         ],
         'singleLogoutService' => [
             'url' => $spBaseUrl.'/saml/consume.php?sls',
-            'binding' => OneLogin_Saml2_Constants::BINDING_HTTP_POST,
+            'binding' => OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT,
         ],
         'NameIDFormat' => OneLogin_Saml2_Constants::NAMEID_TRANSIENT,
         'x509cert' => Cfg::get('saml_public_cert'),

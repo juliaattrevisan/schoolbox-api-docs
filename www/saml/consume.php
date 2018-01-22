@@ -17,14 +17,29 @@ $auth = new OneLogin_Saml2_Auth($settingsInfo);
 /* Handle Single Logout commands */
 if (isset($_GET['sls'])) {
     try {
-        $auth->processSLO();
+        $auth->processSLO(false, null, true);
     } catch (OneLogin_Saml2_Error $e) {
         error(ErrorMapper::ERROR_PROCESSING, $e->getMessage());
     }
 
     $errors = $auth->getErrors();
+    $errorReason = $auth->getLastErrorReason();
     if (!empty($errors)) {
-        error(ErrorMapper::ERROR_PROCESSING, implode("\n", $errors));
+        error(ErrorMapper::ERROR_PROCESSING, $errorReason);
+    }
+
+    $samlLogoutUrl = trim(Cfg::get('saml_logout_url'));
+
+    // Replace some dynamic variables in the logout URL if set
+    $samlLogoutUrl = str_replace('{SCHOOLBOX_ADDRESS}',$_SERVER['SERVER_NAME'],$samlLogoutUrl);
+
+    if (strlen($samlLogoutUrl) > 0) {
+        // Redirect to logout location
+        header('Location: ' . $samlLogoutUrl);
+        exit;
+    }
+    else {
+        SitePage::localRedir("/login/");
     }
 }
 
@@ -55,6 +70,12 @@ else if(isset($_POST['SAMLResponse'])) {
             $page = $_POST['RelayState'];
         }
 
+        $_SESSION['samlUserdata'] = $auth->getAttributes();
+        $_SESSION['samlNameId'] = $auth->getNameId();
+        $_SESSION['samlNameIdFormat'] = $auth->getNameIdFormat();
+        $_SESSION['samlSessionIndex'] = $auth->getSessionIndex();
+        unset($_SESSION['AuthNRequestID']);
+
         SAMLDebugLog("SAML auth successful");
         SitePage::localRedir($page);
 
@@ -63,12 +84,6 @@ else if(isset($_POST['SAMLResponse'])) {
         $errorTracker[] = $msg;
         SAMLDebugLog($msg);
     }
-
-    $_SESSION['samlUserdata'] = $auth->getAttributes();
-    $_SESSION['samlNameId'] = $auth->getNameId();
-    $_SESSION['samlNameIdFormat'] = $auth->getNameIdFormat();
-    $_SESSION['samlSessionIndex'] = $auth->getSessionIndex();
-    unset($_SESSION['AuthNRequestID']);
 }
 else {
     error(ErrorMapper::ERROR_INFORMATION_MISSING);
