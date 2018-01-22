@@ -81,7 +81,7 @@
 
         var visibleTermDates = [];
 
-        var now = moment('{{ date ? date.databaseDate : '' }}');
+        var now = moment('{{ termDates ? termDates[0] : date }}');
         defaultDate = now;
 
         /**
