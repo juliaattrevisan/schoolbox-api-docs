@@ -43,7 +43,7 @@
     } %}
 {% else %}
     {% include '@learningAssessment/dueWork/summary/markingGuide.twig' with {
-        rubricContext: rubricContext,
+        rubricContext: emptyRubricContext,
         participant: participant,
     } %}
 {% endif %}

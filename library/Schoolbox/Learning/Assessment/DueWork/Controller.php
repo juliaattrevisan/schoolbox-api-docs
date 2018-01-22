@@ -271,7 +271,7 @@ class Controller extends Assessment\Controller
 
             /* Rubrics data
              */
-            'rubricContext' => $rubricContext->generate($assessment, $student, $this->getUser(), $this->getAccess()),
+            'emptyRubricContext' => $rubricContext->generateBasic($assessment, $student),
             'feedbackRubricContexts' => $feedbackRubricContexts,
 
             'authoritativeFeedback' => $participant->findAuthoritativeVisibleFeedback($this->getUser()),
