@@ -83,6 +83,14 @@
         var now = moment('{{ date ? date.databaseDate : '' }}');
         defaultDate = now;
 
+        /**
+         * How to fetch the assessments for the current view
+         *
+         * @param {Moment} start
+         * @param {Moment} end
+         * @param timezone
+         * @param {Function} callback
+         */
         var fetchEvents = function (start, end, timezone, callback) {
             $.ajax({
                 dataType: 'json',
@@ -105,6 +113,9 @@
             });
         };
 
+        /**
+         * Update the header
+         */
         var redrawWeekNumbers = function () {
             $('.fc-scroller-canvas .fc-content tr').eq(2).find('th[data-date]').each(function () {
                 console.log(this);
@@ -123,6 +134,14 @@
             });
         };
 
+        /**
+         * How to fetch the terms for the current view
+         *
+         * @param {Moment} start
+         * @param {Moment} end
+         * @param timezone
+         * @param {Function} callback
+         */
         var fetchTerms = function (start, end, timezone, callback) {
             if ($cal.find('[data-resource-id]').length === 0) {
                 // just complete with no events
@@ -160,6 +179,11 @@
             });
         };
 
+        /**
+         * How to retrieve a student's resources (subjects, units, projects)
+         *
+         * @param {Function} callback
+         */
         var fetchResources = function (callback) {
             var url = '{{ routeLookup('learningPersonalised.getResourcesForStudent', {studentId: student.id}) }}';
             $.get(url + '/' + $cal.fullCalendar('getDate').format('DD-MM-YYYY'), function (resourceObjects) {
@@ -168,6 +192,10 @@
             });
         };
 
+        /**
+         * @param {View}   view
+         * @param {jQuery} $element
+         */
         var onViewChange = function (view, $element) {
 
             redrawRequired = true;
@@ -181,6 +209,13 @@
             }
         };
 
+        /**
+         * When an event drag action starts
+         *
+         * @param {Object} calEvent
+         * @param {Event}  dragEvent
+         * @param {View}   view
+         */
         var onDragStart = function (calEvent, dragEvent, _empty, view) {
             if (view.type == 'month' || view.type == 'basicWeek') {
                 var len = view.dayGrid.dayDates.length;
@@ -200,6 +235,9 @@
             }
         };
 
+        /**
+         * When an event drag action ends
+         */
         var onDragStop = function () {
             $cal.find('.fc-day').removeClass('no-drop');
             // allow a re-render of the view
@@ -213,6 +251,7 @@
 
         /**
          * When external data is being fetched
+         *
          * @param {Boolean} isLoading
          * @param {View} view
          */
@@ -242,6 +281,7 @@
 
         /**
          * When the window is resized
+         *
          * @param {View} view
          */
         var onWindowResize = function(view) {
@@ -263,6 +303,11 @@
             }
         };
 
+        /**
+         * Once a batch of events have been rendered
+         *
+         * @param {View} view
+         */
         var afterRender = function (view) {
             if (view.type !== 'timelineTerm') {
                 // if not on timeline view, do nothing
