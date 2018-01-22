@@ -273,7 +273,7 @@ class MapperProxy
             return $this->findAllByUnitSpecificationId($context->getId(), $options);
         }
         if ($context instanceof UnitImplementation) {
-            return $this->findAllByUnitImplementationId([$context->getId()], $options);
+            return $this->findAllByUnitImplementationIds([$context->getId()], $options);
         }
         if ($context instanceof ProjectObject) {
             return $this->findAllByProjectId($context->getId(), $options);
@@ -313,7 +313,7 @@ class MapperProxy
      * @param array     $options
      * @return Collection|IAssessable[]
      */
-    public function findAllByUnitImplementationId(array $unitImplIds, array $options = [])
+    public function findAllByUnitImplementationIds(array $unitImplIds, array $options = [])
     {
         try {
             $builder = $this->convertOptionsToPredicateBuilder($options)
@@ -337,7 +337,7 @@ class MapperProxy
     public function findAllByUnitImplementationIdForCourseOutline(array $unitImplIds, User $student = null, array $options = [])
     {
         return $this->loadParticipantsIntoAssessmentCollection(
-            $this->findAllByUnitImplementationId($unitImplIds, $options),
+            $this->findAllByUnitImplementationIds($unitImplIds, $options),
             $student
         );
     }
