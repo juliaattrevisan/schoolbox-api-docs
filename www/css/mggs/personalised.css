@@ -70,3 +70,6 @@
 .placeholder-event .fc-content {
     overflow: visible;
 }
+.fc-time-area .fc-bgevent {
+    pointer-events: none;
+}
