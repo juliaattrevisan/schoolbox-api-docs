@@ -77,7 +77,9 @@
                                 </span>
                             {% endif %}
                             {% if learnerSelected %}
-                                <img class="rb-self-reflection-choice" src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32" title="Self-reflection choice" />
+                                <img class="rb-self-reflection-choice"
+                                     src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
+                                     title="{% if latestSelfReflectedFeedback.normalisedMark != null %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
                             {% endif %}
                         </label>
                     </td>
