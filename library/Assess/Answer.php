@@ -45,4 +45,13 @@ class Assess_Answer extends Evaluation_Answer {
     {
         throw new BadMethodCallException('You need to call this on a concrete Answer type');
     }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function prepareResponse(SitePage $page, $attemptId, $question_id)
+    {
+        throw new BadMethodCallException('You need to call this on a concrete Answer type');
+    }
 }
