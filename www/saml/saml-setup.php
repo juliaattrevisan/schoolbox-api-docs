@@ -61,7 +61,7 @@ $settingsInfo['sp'] = [
             'url' => $spBaseUrl.'/saml/consume.php?sls',
             'binding' => OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT,
         ],
-        'NameIDFormat' => OneLogin_Saml2_Constants::NAMEID_TRANSIENT,
+        'NameIDFormat' => OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED,
         'x509cert' => Cfg::get('saml_public_cert'),
         'privateKey' => Cfg::get('saml_private_cert'),
     ];
