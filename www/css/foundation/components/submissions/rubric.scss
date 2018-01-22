@@ -14,6 +14,14 @@ table.rb {
                     margin: $table-row-padding;
                 }
             }
+
+            /* So that in readonly view, absolute elements end up in the correct location
+             * such as the student's avatar in Self Reflection
+             */
+            .rb-self-reflection-choice {
+                bottom: $table-row-padding / 2;
+                right: $table-row-padding / 2;
+            }
         }
         input[type=checkbox], input[type=radio] {
             &:checked {
@@ -65,6 +73,20 @@ table.rb {
         overflow: hidden;
         input[type=text].rb-value {
             width: 5rem;
+        }
+
+        /* So that in readonly view, absolute elements end up in the correct location
+         * such as the student's avatar in Self Reflection
+         */
+        div {
+            position: relative;
+        }
+
+        .rb-self-reflection-choice {
+            border-radius: 50%;
+            position: absolute;
+            bottom: -$table-row-padding / 2;
+            right: -$table-row-padding / 2;
         }
     }
     textarea {
@@ -178,13 +200,6 @@ table.rb {
 .rb-final-summary {
     background-color: $input-border-color !important;
     color: calc-text-color($input-border-color);
-}
-
-.rb-self-reflection-choice {
-    border-radius: 50%;
-    position: absolute;
-    bottom: $table-row-padding / 2;
-    right: $table-row-padding / 2;
 }
 
 .rb-description, .rb-value {

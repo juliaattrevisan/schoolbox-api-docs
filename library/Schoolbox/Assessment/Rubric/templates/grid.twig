@@ -40,14 +40,15 @@
                     {% set learnerSelected = learnerRubric.descriptors[crit.id][levelIndex]['selected'] %}
 
                     <td {% if descriptor.selected  and markVisibility %}class="rb-selected"{% endif %}>
-                        <p>
-                            {{- descriptor.text|nl2br -}}
-                        </p>
-                        {% if descriptor.value is not null and config.rubric_show_points %}
-                        <aside>
-                            {{- descriptor.value -}}
-                        </aside>
-                        {% endif %}
+                        <div>
+                            <p>
+                                {{- descriptor.text|nl2br -}}
+                            </p>
+                            {% if descriptor.value is not null and config.rubric_show_points %}
+                            <aside>
+                                {{- descriptor.value -}}
+                            </aside>
+                            {% endif %}
 
                         {# Self-Assessment #}
                         {% if learnerSelected %}
@@ -55,6 +56,7 @@
                                  src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
                                  title="{% if latestSelfReflectedFeedback.normalisedMark != null %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
                         {% endif %}
+                        </div>
                     </td>
 
                 {% else %}
