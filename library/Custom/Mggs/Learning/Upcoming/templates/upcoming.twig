@@ -140,15 +140,11 @@
          * @param {Function} callback
          */
         var fetchTerms = function (start, end, timezone, callback) {
-            if ($cal.find('[data-resource-id]').length === 0) {
-                // just complete with no events
-                callback([]);
-            }
-
             $.ajax({
                 dataType: 'json',
                 url: '{{ routeLookup('learningUpcoming.getTermDates') }}'.replace('{date}', start.format('DD-MM-YYYY')),
                 success: function (termDates) {
+
                     var shades = [];
 
                     // install background events
@@ -164,7 +160,8 @@
                             start: shade.start,
                             end: shade.end,
                             rendering: 'background',
-                            resourceId: $(this).data('resourceId')
+                            resourceId: $(this).data('resourceId'),
+                            allDay: true
                         });
                     });
 
