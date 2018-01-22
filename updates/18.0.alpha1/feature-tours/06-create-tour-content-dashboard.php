@@ -28,13 +28,11 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 
     $steps = [
         // Introduction
-        // TODO this is not showing up.
         [
             'uuid'    => '158389f5-f5b9-11e7-9503-08002751fd3c',
             'type'    => 'modal',
             'content' => "
                 <h3>Welcome to your dashboard!</h3>
-                
                 <p>This tour will guide you through an overview of the main areas of the first screen you see when you log in. This includes; the dashboard, side menu and top menu.</p>
             ",
         ],
@@ -69,6 +67,15 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
                     <br />
                     <b>Logout</b> will log you out of the system.
                 </p>",
+            'events' => [
+                [
+                    'uuid' => '4225f5bf-ff01-11e7-9951-08002751fd3c',
+                    'selector' => '.account-menu',
+                    'event' => 'accordion.open',
+                    'insertion_point' => 'open',
+                    'order' => 0
+                ]
+            ]
         ],
 
         // Switch user
@@ -77,6 +84,14 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'type'     => 'tooltip',
             'selector' => '#switch-user',
             'content'  => "<p>The switch user section will list your other profiles within the system. It allows you to move easily between multiple accounts.</p>",
+            'events' => [
+                [
+                    'uuid' => '30b09d5e-ff05-11e7-9951-08002751fd3c',
+                    'selector' => '.account-menu',
+                    'event' => 'accordion.close',
+                    'insertion_point' => 'close'
+                ]
+            ]
         ],
 
         // Customisable Links
@@ -303,6 +318,43 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 
             // TODO with SA-5699, when infrastructure for modal step types exist - insert the content
 
+        }
+
+        // Insert any step events
+        if (isset($step['events'])) {
+            foreach ($step['events'] as $event) {
+                $statement = $database->prepare("
+                  INSERT INTO   `tour_step_event`
+                  (
+                                `uuid`,
+                                `tour_step_uuid`,
+                                `selector`,
+                                `event`,
+                                `insertion_point`,
+                                `order`,
+                                `created_at`,
+                                `updated_at`,
+                                `deleted_at`
+                  )
+                  SELECT        :uuid,
+                                :tour_step_uuid,
+                                :selector,
+                                :event,
+                                :insertion_point,
+                                :eventOrder,
+                                NOW(),
+                                NOW(),
+                                NULL
+                ");
+                $statement->execute([
+                    'uuid'              => $event['uuid'],
+                    'tour_step_uuid'    => $step['uuid'],
+                    'selector'          => $event['selector'],
+                    'event'             => $event['event'],
+                    'insertion_point'   => $event['insertion_point'],
+                    'eventOrder'        => $event['order'],
+                ]);
+            }
         }
 
         $i++;
