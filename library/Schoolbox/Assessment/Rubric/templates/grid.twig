@@ -51,11 +51,7 @@
 
                         {# Self-Assessment #}
                         {% if learnerSelected %}
-                            {% if learner %}
-                                <img src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32" title="Self-reflection choice" />
-                            {% else %}
-                                <span class="icon-staff-students" title="Self-reflection choice"></span>
-                            {% endif %}
+                            <img class="rb-self-reflection-choice" src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32" title="Self-reflection choice" />
                         {% endif %}
                     </td>
 
