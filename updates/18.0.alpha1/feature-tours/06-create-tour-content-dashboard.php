@@ -62,7 +62,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'events' => [
                 [
                     'uuid' => '4225f5bf-ff01-11e7-9951-08002751fd3c',
-                    'selector' => '.account-menu',
+                    'selector' => '#account-menu',
                     'event' => 'accordion.open',
                     'insertion_point' => 'open',
                     'order' => 0
