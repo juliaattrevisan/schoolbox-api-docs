@@ -330,7 +330,7 @@ class MapperProxy
      * This method loads participants, responses and feedback.
      *
      * @param int[]     $unitImplIds
-     * @param User      $student If provided, load only this student's participation
+     * @param null|User $student If provided, load only this student's participation
      * @param array     $options
      * @return Collection|IAssessable[]
      */

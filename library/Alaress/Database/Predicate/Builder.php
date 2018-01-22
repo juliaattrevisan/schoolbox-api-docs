@@ -125,7 +125,7 @@ class Builder implements IBuilder
         $where = ($negate ? 'NOT ' : '') . '(' . implode(" $glue ", $predicate->getWhere()) . ')';
 
         // Test for collisions if inner and outer PB contain same placeholder keys
-        foreach($predicate->getParams() as $placeholder => $param) {
+        foreach ($predicate->getParams() as $placeholder => $param) {
             // Does this cause a collision?
             if (array_key_exists($placeholder, $this->params)) {
                 $uniquePlaceholder                = $this->getNonCollidingParamAlias($placeholder);
@@ -153,9 +153,9 @@ class Builder implements IBuilder
     {
         foreach ($columnList as $columnName => $columnValue) {
             if (self::canTraverse($columnValue)) {
-                try{
+                try {
                     $this->in($columnName, $columnValue);
-                } catch (InvalidArgumentException $e){
+                } catch (InvalidArgumentException $e) {
                     // impossible to throw as we have checked type is traversable
                 }
             } else {
@@ -250,7 +250,7 @@ class Builder implements IBuilder
      */
     public function in($columnName, $columnValues): self
     {
-        if(!self::canTraverse($columnValues)){
+        if (!self::canTraverse($columnValues)) {
             throw new InvalidArgumentException("Unable to traverse 'in()' arg. Found: " . \gettype($columnValues));
         }
         if (0 === \count($columnValues)) {
@@ -272,7 +272,7 @@ class Builder implements IBuilder
      */
     public function notIn($columnName, $columnValues): self
     {
-        if(!self::canTraverse($columnValues)){
+        if (!self::canTraverse($columnValues)) {
             throw new InvalidArgumentException("Unable to traverse 'notIn()' arg. Found: " . gettype($columnValues));
         }
         if (0 === \count($columnValues)) {
@@ -311,7 +311,7 @@ class Builder implements IBuilder
     public function likeAny($columnName, array $columnValues): self
     {
         $subBuilder = $this->buildSubBuilder();
-        foreach($columnValues as $columnValue) {
+        foreach ($columnValues as $columnValue) {
             $subBuilder->like($columnName, $columnValue);
         }
         return $this->any($subBuilder);
@@ -478,7 +478,7 @@ class Builder implements IBuilder
         }
         try {
             return $this->between($columnName, $fromString, $toString);
-        } catch(InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             // Impossible to throw as we are passing null or string
             return null;
         }

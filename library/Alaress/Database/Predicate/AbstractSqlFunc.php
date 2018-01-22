@@ -42,10 +42,10 @@ abstract class AbstractSqlFunc implements ISqlFunc
     {
         $xpl = explode('.', $columnName) ?: [];
 
-        if(1 === \count($xpl)) {
+        if (1 === \count($xpl)) {
             return [$defaultTable, $xpl[0]];
         }
-        if(2 === \count($xpl)) {
+        if (2 === \count($xpl)) {
             return [$xpl[0], $xpl[1]];
         }
         throw new InvalidColumnException("Unable to parse [table].column name: $columnName");
