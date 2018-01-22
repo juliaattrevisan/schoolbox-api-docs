@@ -52,9 +52,9 @@ $(function () {
                         // hence the need for a separate check
                         return (
                             // TODO commented out temporarily for showcase
-                            // ($(element).css("visibility") !== "hidden") &&
-                            ($(element).is(":visible"))
-                            // && (! isOffscreen(element))
+                            ($(element).css('visibility') !== 'hidden')
+                            && ($(element).is(':visible'))
+                            && (!isOffscreen(element))
                         );
                     }
 
@@ -69,8 +69,6 @@ $(function () {
                                 jsEvents: step.events
                             });
                         }
-
-
                     });
 
                     tourCurrent.setOptions({
