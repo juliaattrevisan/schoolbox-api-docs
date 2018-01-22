@@ -1068,9 +1068,10 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function findById($id)
     {
-        // special case: 0 == root, but not in db
+        // special case: 0 === root, but not in db
         // TODO localise setName()
-        if ($id == 0) {
+        if (null !== $id && 0 == $id) {
+            // TODO this should only need to check (0 === $id) but we need to support strings, see SA-4539
             return $this->createModel()
                         ->setId(0)
                         ->setName('Top Level')
