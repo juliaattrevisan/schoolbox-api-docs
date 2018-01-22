@@ -84,14 +84,6 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'type'     => 'tooltip',
             'selector' => '#switch-user',
             'content'  => "<p>The switch user section will list your other profiles within the system. It allows you to move easily between multiple accounts.</p>",
-            'events' => [
-                [
-                    'uuid' => '30b09d5e-ff05-11e7-9951-08002751fd3c',
-                    'selector' => '.account-menu',
-                    'event' => 'accordion.close',
-                    'insertion_point' => 'close'
-                ]
-            ]
         ],
 
         // Customisable Links
