@@ -170,12 +170,9 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
      * TODO: If a response for the current user and attempt already exists,
      * prefill it.
      *
-     * @param  $page
-     * @param  $attemptId
-     * @param  $question_id
-     * @return void
+     * @inheritdoc
      */
-    public function prepareResponse($page, $attemptId, $question_id)
+    public function prepareResponse(SitePage $page, $attemptId, $question_id)
     {
         /* Optional configuration hook
          */

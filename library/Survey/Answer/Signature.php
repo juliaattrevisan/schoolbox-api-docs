@@ -116,12 +116,9 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
      *
      * Don't scrub this, because it breaks the json object
      *
-     * @param  $page
-     * @param  $attemptId
-     * @param  $question_id
-     * @return void
+     * @inheritdoc
      */
-    public function prepareResponse($page, $attemptId, $question_id)
+    public function prepareResponse(SitePage $page, $attemptId, $question_id)
     {
         /* Optional configuration hook
          */

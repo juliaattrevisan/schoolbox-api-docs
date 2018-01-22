@@ -112,12 +112,9 @@ abstract class Evaluation_Answer_Numeric extends Evaluation_Answer {
      * Resets answer tokens so a user can fill them in while actually taking
      * the test.
      *
-     * @param  $page
-     * @param  $attemptId
-     * @param  $question_id
-     * @return void
+     * @inheritdoc
      */
-    public function prepareResponse($page, $attemptId, $question_id)
+    public function prepareResponse(SitePage $page, $attemptId, $question_id)
     {
         /* Optional configuration hook
          */
