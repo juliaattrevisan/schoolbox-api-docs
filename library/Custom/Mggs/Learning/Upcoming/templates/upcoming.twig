@@ -304,12 +304,14 @@
         var afterRender = function (view) {
             if (view.type !== 'timelineTerm') {
                 // if not on timeline view, do nothing
+                console.log('not on timeline view');
                 return true;
             }
 
             redrawWeekNumbers();
 
             if (eventsRendered === 0) {
+                console.log('no events');
                 // no events were rendered; don't attempt anything else
                 return true;
             }
@@ -431,9 +433,10 @@
             if (view.type !== 'timelineTerm') {
                 // if not on timeline view, make sure we don't render placeholder
                 if (isPlaceholder) {
+                    console.log('is placeholder and not timetline view - hide');
                     return false;
                 }
-
+                console.log('not timeline view - render');
                 return true;
             }
 
@@ -442,8 +445,7 @@
             $element.attr('data-wk', wk);
 
             if (isPlaceholder) {
-                // dis fake
-                console.log('fake');
+                console.log('fake event');
                 $element.attr('data-placeholder', true).addClass('placeholder-event').css('top');
                 return true;
             }
@@ -465,6 +467,7 @@
 
             if (calEvent.className.indexOf('fc-helper') !== -1) {
                 // this is a helper: render it, and don't do anything else
+                console.log('is helper');
                 return true;
             }
 
