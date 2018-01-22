@@ -40,35 +40,14 @@ $(function () {
                     // so we can alternate between the different types appropriately.
                     var stepsToDisplay = [];
 
-                    function isOffscreen(element) {
-                        return $(element).position().left < 0
-                            || $(element).position().left > window.innerWidth
-                            || $(element).position().top < 0
-                            || $(element).position().top > window.innerHeight;
-                    }
-
-                    function isVisible(element) {
-                        // Note that :visible does not check if element has visibility == hidden,
-                        // hence the need for a separate check
-                        return (
-                            // TODO commented out temporarily for showcase
-                            ($(element).css('visibility') !== 'hidden')
-                            && ($(element).is(':visible'))
-                            && (!isOffscreen(element))
-                        );
-                    }
-
                     $(tour.steps).each(function (i, step) {
-                        if (isVisible(step.selector)) {
-                            // Only use step if its element is visible
-                            stepsToDisplay.push({
-                                intro: step.body,
-                                element: step.selector,
-                                tooltipClass: step.css_class,
-                                uuid: step.uuid,
-                                jsEvents: step.events
-                            });
-                        }
+                        stepsToDisplay.push({
+                            intro: step.body,
+                            element: step.selector,
+                            tooltipClass: step.css_class,
+                            uuid: step.uuid,
+                            jsEvents: step.events
+                        });
                     });
 
                     tourCurrent.setOptions({
@@ -81,7 +60,7 @@ $(function () {
                         scrollTo: 'tooltip',
                         disableInteraction: false,
                         exitOnOverlayClick: false,
-                        steps: stepsToDisplay
+                        steps: stepsToDisplay.filter(function(obj) { return $(obj.element).length; }) // Filter out elements that don't exist in the DOM
                     });
 
 
