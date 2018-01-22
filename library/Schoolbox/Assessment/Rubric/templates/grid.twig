@@ -40,12 +40,6 @@
                     {% set learnerSelected = learnerRubric.descriptors[crit.id][levelIndex]['selected'] %}
 
                     <td {% if descriptor.selected  and markVisibility %}class="rb-selected"{% endif %}>
-
-                        {# Self-Assessment #}
-                        {% if learnerSelected %}
-                            <img src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32" title="Self-reflection choice" />
-                        {% endif %}
-
                         <p>
                             {{- descriptor.text|nl2br -}}
                         </p>
@@ -53,6 +47,15 @@
                         <aside>
                             {{- descriptor.value -}}
                         </aside>
+                        {% endif %}
+
+                        {# Self-Assessment #}
+                        {% if learnerSelected %}
+                            {% if learner %}
+                                <img src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32" title="Self-reflection choice" />
+                            {% else %}
+                                <span class="icon-staff-students" title="Self-reflection choice"></span>
+                            {% endif %}
                         {% endif %}
                     </td>
 

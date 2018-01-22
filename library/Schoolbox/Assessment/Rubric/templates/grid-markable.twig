@@ -66,14 +66,8 @@
                                data-rubric-descriptor="{{ descriptor.id }}"
                                {% if descriptor.selected %}checked="checked"{% endif %}
                         />
-                        <label for="{{ inputId }}">
-
-                            {# Self-Assessment #}
-                            {% if learnerSelected %}
-                                <img src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32" title="Self-reflection choice" />
-                            {% endif %}
-
-                            <span class=rb-description>
+                        <label for="{{ inputId }}" class="rb-descriptor">
+                            <span class="rb-description">
                                 {{- descriptor.text|nl2br -}}
                             </span>
                             {% if descriptor.value is not null and showDescriptorValue %}
@@ -81,6 +75,15 @@
                                 {{- descriptor.value -}}
                             </span>
                             {% endif %}
+
+                            {% if learnerSelected %}
+                                {% if learner %}
+                                    <img class="rb-self-reflection-choice" src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32" title="Self-reflection choice" />
+                                {% else %}
+                                    <span class="rb-self-reflection-choice icon-staff-students" title="Self-reflection choice"></span>
+                                {% endif %}
+                            {% endif %}
+
                         </label>
                     </td>
 
