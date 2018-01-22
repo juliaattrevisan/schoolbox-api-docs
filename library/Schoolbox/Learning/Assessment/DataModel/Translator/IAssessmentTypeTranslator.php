@@ -60,14 +60,7 @@ interface IAssessmentTypeTranslator
      * Copies all attributes from the dataModel to domainObject
      *
      * @param IAssessableDataModel $dataModel
-     * @param IAssessable          $domainObject ,
-     * @param int                  $depth
-     * @param bool                 $translateProjectContext
+     * @param IAssessable          $domainObject
      */
-    public function translateToDomainModel(
-        IAssessableDataModel $dataModel,
-        IAssessable $domainObject,
-        int $depth = 0,
-        bool $translateProjectContext = true
-    ): void;
+    public function translateToDomainModel(IAssessableDataModel $dataModel, IAssessable $domainObject): void;
 }

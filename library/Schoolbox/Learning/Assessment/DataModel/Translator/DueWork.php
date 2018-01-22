@@ -145,15 +145,9 @@ class DueWork implements IAssessmentTypeTranslator
      *
      * @param IAssessableDataModel|SubmissionBox $dataModel
      * @param IAssessable|DueWorkObject          $domainObject
-     * @param int                                $depth
-     * @param bool                               $translateProjectContext
      */
-    public function translateToDomainModel(
-        IAssessableDataModel $dataModel,
-        IAssessable $domainObject,
-        int $depth = 0,
-        bool $translateProjectContext = true
-    ): void {
+    public function translateToDomainModel(IAssessableDataModel $dataModel, IAssessable $domainObject): void
+    {
         // Due work-specific fields
         null === $dataModel->getSkipUnsubmitted() || $domainObject->setShowSubmittedOnly($dataModel->getSkipUnsubmitted());
         null === $dataModel->getOwner() || $domainObject->setCreator($dataModel->getOwner());

@@ -101,16 +101,10 @@ class Quiz implements IAssessmentTypeTranslator
      * Copies all attributes from the dataModel to domainObject
      *
      * @param IAssessableDataModel|QuizModel $dataModel
-     * @param IAssessable|QuizObject         $domainObject ,
-     * @param int                            $depth
-     * @param bool                           $translateProjectContext
+     * @param IAssessable|QuizObject         $domainObject
      */
-    public function translateToDomainModel(
-        IAssessableDataModel $dataModel,
-        IAssessable $domainObject,
-        int $depth = 0,
-        bool $translateProjectContext = true
-    ): void {
+    public function translateToDomainModel(IAssessableDataModel $dataModel, IAssessable $domainObject): void
+    {
         // Quiz-specific fields
         $domainObject
             ->setMarkType((new MarkType())->setId(MarkType::TYPE_TOTAL))

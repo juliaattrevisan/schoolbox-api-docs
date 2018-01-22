@@ -93,16 +93,10 @@ class Task implements IAssessmentTypeTranslator
      * Copies all attributes from the dataModel to domainObject
      *
      * @param IAssessableDataModel|TaskModel $dataModel
-     * @param IAssessable|TaskObject         $domainObject ,
-     * @param int                            $depth
-     * @param bool                           $translateProjectContext
+     * @param IAssessable|TaskObject         $domainObject
      */
-    public function translateToDomainModel(
-        IAssessableDataModel $dataModel,
-        IAssessable $domainObject,
-        int $depth = 0,
-        bool $translateProjectContext = true
-    ): void {
+    public function translateToDomainModel(IAssessableDataModel $dataModel, IAssessable $domainObject): void
+    {
         // Task-specific fields
         $domainObject
             ->setMarkType((new MarkType())->setId(MarkType::TYPE_COMPLETION))

@@ -137,19 +137,10 @@ class Project implements IAssessmentTypeTranslator
     /**
      * @param IAssessableDataModel|ProjectModel $dataModel
      * @param IAssessable|ProjectObject         $domainObject
-     * @param int                               $depth
-     * @param bool                              $translateProjectContext
      * @throws UnexpectedValueException
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     * @throws \LogicException
      */
-    public function translateToDomainModel(
-        IAssessableDataModel $dataModel,
-        IAssessable $domainObject,
-        int $depth = 0,
-        bool $translateProjectContext = true
-    ): void {
+    public function translateToDomainModel(IAssessableDataModel $dataModel, IAssessable $domainObject): void
+    {
         // Project-specific fields
 
         // Figure out which summator to make
