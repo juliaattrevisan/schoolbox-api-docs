@@ -90,7 +90,7 @@
 
         {# Rubric goes here #}
         {% if rubricContext %}
-            <div class="small-12 island {{ collapsed? 'hide' : '' }}"
+            <div class="{{ collapsed? 'hide' : '' }}"
                  {% if hasCollapser %}
                  data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
                  data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}"
