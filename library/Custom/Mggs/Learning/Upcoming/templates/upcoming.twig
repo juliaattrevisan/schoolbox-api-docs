@@ -115,8 +115,6 @@
          */
         var redrawWeekNumbers = function () {
             $('.fc-scroller-canvas .fc-content tr').eq(2).find('th[data-date]').each(function () {
-                console.log(this);
-
                 var disp = '';
                 var mom  = moment($(this).data('date'));
 
@@ -194,8 +192,6 @@
         var onViewChange = function (view, $element) {
             if (view.type === 'timelineTerm') {
                 // time to re-render
-                console.log('preparing for re-render');
-
                 eventsRendered = 0;
                 collapsed = false;
                 realEventList = {};
@@ -223,7 +219,6 @@
                     }
                 }
             } else if (view.type == 'timelineTerm') {
-                console.log(view);
                 hidePopover();
             }
         };
@@ -237,7 +232,6 @@
             collapsed = false;
 
             // drain the list of real events for re-population
-            console.log('resetting realEventList');
             realEventList = {};
         };
 
@@ -304,30 +298,23 @@
         var afterRender = function (view) {
             if (view.type !== 'timelineTerm') {
                 // if not on timeline view, do nothing
-                console.log('not on timeline view');
                 return true;
             }
 
             redrawWeekNumbers();
 
             if (eventsRendered === 0) {
-                console.log('no events');
                 // no events were rendered; don't attempt anything else
                 return true;
             }
 
             var realEventsExist = $.isEmptyObject(realEventList) == false;
 
-            console.log('realEventsExist:', realEventsExist, ' collapsed:', collapsed);
-
             // already done this
             if (realEventsExist && collapsed) {
-                console.log('already collapsed, stashing real events')
                 $cal.find('.fc-event-container').each(renderPopovers);
                 return true;
             }
-
-            console.log('rendering placeholders');
 
             // if there are already fakes, make them gone
             $cal.fullCalendar('removeEvents', function (calEvent) {
@@ -375,12 +362,10 @@
                 }
             }
 
-            console.log('collapsed is now', realEventsExist);
             // prevent recursion
             collapsed = realEventsExist;
 
             // render the new set of events
-            console.log('pushing render of fakes to queue, len: ', listOfFakesToRender.length);
             $cal.fullCalendar('renderEvents', listOfFakesToRender, true);
         };
 
@@ -397,7 +382,6 @@
             }
 
             if (calEvent.rendering === 'background') {
-                console.log('rendering shade');
                 return true;
             }
 
@@ -433,10 +417,8 @@
             if (view.type !== 'timelineTerm') {
                 // if not on timeline view, make sure we don't render placeholder
                 if (isPlaceholder) {
-                    console.log('is placeholder and not timetline view - hide');
                     return false;
                 }
-                console.log('not timeline view - render');
                 return true;
             }
 
@@ -445,13 +427,11 @@
             $element.attr('data-wk', wk);
 
             if (isPlaceholder) {
-                console.log('fake event');
                 $element.attr('data-placeholder', true).addClass('placeholder-event').css('top');
                 return true;
             }
 
             // not fake: in this case, we need to flag the postRender function to re-render all the fakes
-            // console.log('collapsed is now false');
             // collapsed = false;
 
             // start by collating the count of real events per week
@@ -467,14 +447,10 @@
 
             if (calEvent.className.indexOf('fc-helper') !== -1) {
                 // this is a helper: render it, and don't do anything else
-                console.log('is helper');
                 return true;
             }
 
             $element.addClass('hide').addClass('real-event');
-
-            // for now, do the rest
-            console.log('pushed event into ' + rId + ', ' + wk);
 
             // increment the number of events
             ++eventsRendered;
@@ -675,8 +651,6 @@
         var renderPopovers = function () {
             var $eventContainer = $(this);
 
-            // console.log(this);
-
             // start by cleaning up anything we did before
 
             // salvage the real events
@@ -689,8 +663,6 @@
 
             // get the event list
             var $events = $eventContainer.find('.real-event');
-
-            // console.log($events.length + ' events in row');
 
             var spots = {};
 
@@ -706,7 +678,6 @@
             });
 
             for (var wk in spots) {
-                // console.log(wk.length + ' events in column ' + wk)
                 renderPopover($eventContainer, $(spots[wk]));
             }
         };
@@ -772,28 +743,20 @@
 
         $cal.on('click', '[data-placeholder]', function () {
             $(this).closest('.fc-event-container').find('[data-popover="' + $(this).data('wk') + '"]').removeClass('hide');
-            console.log('popover shown');
-
             $(document).on('mousedown', hidePopover);
-            console.log('popover hide listener attached');
         });
 
         function hidePopover(ev) {
-            console.log('trying to hide popover');
-
             if (!ev) {
                 $('[data-popover]').addClass('hide');
-                console.log('popover hidden');
                 return;
             }
 
             // only hide the popover if the click happened outside the popover
             if (!$(ev.target).closest('[data-popover]').length || $(ev.target).closest('.fc-close').length) {
                 $('[data-popover]').addClass('hide');
-                console.log('popover hidden');
 
                 $(document).off('mousedown', hidePopover);
-                console.log('popover hide listener detached');
             }
         }
 
