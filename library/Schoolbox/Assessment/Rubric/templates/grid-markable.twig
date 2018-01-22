@@ -67,20 +67,17 @@
                                {% if descriptor.selected %}checked="checked"{% endif %}
                         />
                         <label for="{{ inputId }}">
-
-                            {# Self-Assessment #}
-                            {# TODO: Use stuart's styles #}
-                            {% if learnerSelected %}
-                                <span style='color:#f00'>SELF_REFLECTED_CHOICE</span>
-                            {% endif %}
-
-                            <span class=rb-description>
+                            <span class="rb-description">
                                 {{- descriptor.text|nl2br -}}
                             </span>
+
                             {% if descriptor.value is not null and showDescriptorValue %}
-                            <span class="rb-value">
-                                {{- descriptor.value -}}
-                            </span>
+                                <span class="rb-value">
+                                    {{- descriptor.value -}}
+                                </span>
+                            {% endif %}
+                            {% if learnerSelected %}
+                                <img class="rb-self-reflection-choice" src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32" title="Self-reflection choice" />
                             {% endif %}
                         </label>
                     </td>

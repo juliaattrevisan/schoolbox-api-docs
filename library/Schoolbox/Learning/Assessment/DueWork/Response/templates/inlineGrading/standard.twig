@@ -155,6 +155,7 @@ Usage:
                             {% include '@rubric/' ~ rubricTemplate with {
                                 rubric: rubricContext.rubric,
                                 learnerRubric: learnerRubricContext.rubric,
+                                learner: participant.user,
                                 markType: rubricContext.markType,
                                 markVisibility: participant.assessable.isFeedbackVisibleToUser(USER),
                                 showDescriptorValue: showDescriptorValue,

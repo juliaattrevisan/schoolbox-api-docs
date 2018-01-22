@@ -179,6 +179,14 @@ table.rb {
     background-color: $input-border-color !important;
     color: calc-text-color($input-border-color);
 }
+
+.rb-self-reflection-choice {
+    border-radius: 50%;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
 .rb-description, .rb-value {
     display: block;
     &.error {
