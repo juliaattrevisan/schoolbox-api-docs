@@ -11,7 +11,12 @@
 
     var pluginName = 'participationSettings';
 
-    var defaults = {};
+    var defaults = {
+        planData: '#plan-data',
+        participants: '#participants',
+        participantSettings: '#participation-settings',
+        customiseModal: '#participant-customise-modal'
+    };
 
     /**
      * Constructor
@@ -25,15 +30,13 @@
         this.options = $.extend(true, {}, defaults, options);
         this.newPlanCount = 0;
 
-        var $planDataContainer = $('#plan-data');
-        var $participants = $('#participants');
-        var $participantSettings = $('#participation-settings');
-        var $customiseModal = $('#participant-customise-modal');
+        var $participants = $(defaults.participants);
+        var $participantSettings = $(defaults.participantSettings);
+        var $customiseModal = $(defaults.customiseModal);
 
         // ----------------------------------------------------------------
         // Events
         // ----------------------------------------------------------------
-
         /**
          * Hiding and showing settings on feature enable
          */
@@ -73,7 +76,7 @@
 
 
         /**
-         * Opening the learning plan modal
+         * Opening the learning plan modal to create a plan
          */
         $participantSettings.on('click', '#participant-customise', function (event) {
             event.preventDefault();
@@ -81,7 +84,7 @@
         });
 
         /**
-         * Opening the learning plan modal
+         * Opening the learning plan modal to modify a plan
          */
         $participantSettings.on('click', '[data-plan-modify]', function (event) {
             event.preventDefault();
@@ -174,7 +177,6 @@
 
                 // increment the number of "new plans" in play
                 self.newPlanCount++;
-                var $customiseModal = $('#participant-customise-modal');
                 var oldPlanId = $customiseModal.find('#plan-id').val();
                 var newPlanId = -1 * self.newPlanCount;
                 var update = oldPlanId == 0 ? false : true;
@@ -287,7 +289,7 @@
      * Resets the checkboxes & disables the actions button
      */
     function resetActions() {
-        var $participants = $('#participants');
+        var $participants = $(defaults.participants);
         var $customiseDropdown = $('#customise-dropdown');
 
         $participants.find('input[type=checkbox]').prop('checked', false);
@@ -301,8 +303,7 @@
      * Destroy and reinit CKEditor
      */
     function reinitCKE() {
-        var $customiseModal = $('#participant-customise-modal');
-        var $planDesc = $customiseModal.find('#plan-desc');
+        var $planDesc = $(defaults.customiseModal).find('#plan-desc');
         if (CKEDITOR.instances['plan-desc']) {
             CKEDITOR.instances['plan-desc'].destroy();
         }
@@ -354,8 +355,7 @@
             .val(planDetails['closeDate']));
 
         // Append hidden inputs to the fieldset
-        var $planDataContainer = $('#plan-data');
-        $planDataContainer.append($hiddenInputs);
+        $(defaults.planData).append($hiddenInputs);
     }
 
     /**
@@ -392,14 +392,15 @@
      * Get hidden input fields for plan
      */
     function getPlanDataFields(planId) {
+        var $planData = $(defaults.planData);
         var planDataFileds = {
-            'id': $('#plan-data').find($("input[name*='plans[" + planId + "][id]']")),
-            'name': $('#plan-data').find($("input[name*='plans[" + planId + "][name]']")),
-            'description': $('#plan-data').find($("input[name*='plans[" + planId + "][description]']")),
-            'publishDate': $('#plan-data').find($("input[name*='plans[" + planId + "][publish_date]']")),
-            'openDate': $('#plan-data').find($("input[name*='plans[" + planId + "][open_date]']")),
-            'dueDate': $('#plan-data').find($("input[name*='plans[" + planId + "][due_date]']")),
-            'closeDate': $('#plan-data').find($("input[name*='plans[" + planId + "][close_date]']"))
+            'id': $planData.find($("input[name*='plans[" + planId + "][id]']")),
+            'name': $planData.find($("input[name*='plans[" + planId + "][name]']")),
+            'description': $planData.find($("input[name*='plans[" + planId + "][description]']")),
+            'publishDate': $planData.find($("input[name*='plans[" + planId + "][publish_date]']")),
+            'openDate': $planData.find($("input[name*='plans[" + planId + "][open_date]']")),
+            'dueDate': $planData.find($("input[name*='plans[" + planId + "][due_date]']")),
+            'closeDate': $planData.find($("input[name*='plans[" + planId + "][close_date]']"))
         };
         return planDataFileds;
     }
@@ -422,7 +423,7 @@
      * Check if there are plans and enable actions
      */
     function enableActions() {
-        var checkPlans = $('#plan-data').find('input').length;
+        var checkPlans = $(defaults.planData).find('input').length;
         if (checkPlans) {
             $('#plan-dropdown').attr('disabled', false);
         }
@@ -430,10 +431,10 @@
 
     function openPlanModal(planData) {
 
-        var $customiseModal = $('#participant-customise-modal');
-        var $participants = $('#participants');
-
         var $planParticipants = $('#plan-participants');
+        var $customiseModal = $(defaults.customiseModal);
+        var $participants = $(defaults.participants);
+
         var $planId = $customiseModal.find('#plan-id');
         var $planName = $customiseModal.find('#plan-name');
         var $planDesc = $customiseModal.find('#plan-desc');
@@ -469,7 +470,7 @@
         // Fill the selectize with the checked students
         participantSelectize.clear();
         if (planData !== undefined) {
-            $participants.find('input[value = ' + planData['id'] + ']').each(function () {
+                $participants.find('input[value = ' + planData['id'] + ']').each(function () {
                 var participantId = $(this).parent().attr('data-participant');
                 var participantName = $('#participant-' + participantId).attr('data-user-name');
                 participantSelectize.addOption({
