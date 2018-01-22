@@ -130,7 +130,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
         [
             'uuid'     => '539d418c-f5b9-11e7-9503-08002751fd3c',
             'type'     => 'tooltip',
-            'selector' => '#notifications',
+            'selector' => '#notification-toggle',
             'content'  => "The bell or notifications menu on the right of the screen is used to view your instant notifications. There are many notifications you can receive such as when a user posts in a social stream on a page you are involved in or if you have been added to a group page. Text in bold denotes a link that can be clicked. The notifications found here are customised by you and your school.",
         ],
 
