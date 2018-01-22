@@ -17,6 +17,8 @@
 
     var collapsed = false;
 
+    var eventsRendered = 0;
+
     // provide page-wide access to the calendar object so the callbacks can actually use it
     var c;
 
@@ -76,7 +78,6 @@
         var $modalForm = $('#editEvent');
 
         var defaultDate;
-        var totalEventCount = 0;
 
         var visibleTermDates = [];
 
@@ -101,13 +102,9 @@
                     userId: Number('{{ student.id|escape('js') }}')
                 },
                 success: function(data) {
-                    var filtered = data.filter(function(v) {
+                    callback(data.filter(function(v) {
                         return 'start' in v;
-                    });
-
-                    totalEventCount += filtered.length;
-
-                    callback(filtered);
+                    }));
                 },
                 cache: false
             });
@@ -188,6 +185,7 @@
             var url = '{{ routeLookup('learningPersonalised.getResourcesForStudent', {studentId: student.id}) }}';
             $.get(url + '/' + $cal.fullCalendar('getDate').format('DD-MM-YYYY'), function (resourceObjects) {
                 callback(resourceObjects);
+                // once the resources are loaded, THEN we can load the holiday overlay
                 $cal.fullCalendar('addEventSource', fetchTerms);
             });
         };
@@ -197,14 +195,12 @@
          * @param {jQuery} $element
          */
         var onViewChange = function (view, $element) {
-
-            redrawRequired = true;
-
             if (view.type === 'timelineTerm') {
                 // time to re-render
+                console.log('preparing for re-render');
+
+                eventsRendered = 0;
                 collapsed = false;
-                totalEventCount = 0;
-                console.log('resetting realEventList');
                 realEventList = {};
             }
         };
@@ -316,26 +312,21 @@
 
             redrawWeekNumbers();
 
+            if (eventsRendered === 0) {
+                // no events were rendered; don't attempt anything else
+                return true;
+            }
+
             var realEventsExist = $.isEmptyObject(realEventList) == false;
 
             console.log('realEventsExist:', realEventsExist, ' collapsed:', collapsed);
 
-            if (!redrawRequired) {
-                // if not forcing a redraw
-                if (totalEventCount == 0) {
-                    console.log('no events yet');
-                    return true;
-                }
-
-                // already done this
-                if (realEventsExist && collapsed) {
-                    console.log('already collapsed, stashing real events')
-                    $cal.find('.fc-event-container').each(renderPopovers);
-                    return true;
-                }
+            // already done this
+            if (realEventsExist && collapsed) {
+                console.log('already collapsed, stashing real events')
+                $cal.find('.fc-event-container').each(renderPopovers);
+                return true;
             }
-
-            redrawRequired = false;
 
             console.log('rendering placeholders');
 
@@ -484,6 +475,9 @@
 
             // for now, do the rest
             console.log('pushed event into ' + rId + ', ' + wk);
+
+            // increment the number of events
+            ++eventsRendered;
 
             return true;
         };
@@ -681,7 +675,7 @@
         var renderPopovers = function () {
             var $eventContainer = $(this);
 
-            console.log(this);
+            // console.log(this);
 
             // start by cleaning up anything we did before
 
@@ -696,7 +690,7 @@
             // get the event list
             var $events = $eventContainer.find('.real-event');
 
-            console.log($events.length + ' events in row');
+            // console.log($events.length + ' events in row');
 
             var spots = {};
 
@@ -712,7 +706,7 @@
             });
 
             for (var wk in spots) {
-                console.log(wk.length + ' events in column ' + wk)
+                // console.log(wk.length + ' events in column ' + wk)
                 renderPopover($eventContainer, $(spots[wk]));
             }
         };
