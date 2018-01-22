@@ -34,18 +34,7 @@ these tests: modify `vagrant.yaml` and ensure this value for `data_filename`:
 ### Reprovision
 
 If you've not yet reprovisioned after checking out this branch: run
-`vagrant provision` to install Chrome and its dependencies.
-
-### Chromedriver
-
-To download, install and configure Chromedriver:
-
-    vagrant ssh
-    cd /vagrant
-    ./test/acceptance/bin/chromedriver.sh
-
-This will ensure chromedriver is available in vagrant's PATH, where it can be
-invoked by codeception.
+`vagrant provision` to install Chrome, Chromium WebDriver and its dependencies.
 
 ### Codeception test
 
