@@ -80,8 +80,10 @@
 
         {% if currentFeedback.comment|length %}
             <article class="{{ collapsed? 'hide' : '' }}"
+                     {% if hasCollapser %}
                      data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
-                     data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}">
+                     data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}"
+                     {% endif %}>
                 {{ currentFeedback.comment|nl2br }}
             </article>
         {% endif %}
@@ -89,8 +91,10 @@
         {# Rubric goes here #}
         {% if rubricContext %}
             <div class="small-12 island {{ collapsed? 'hide' : '' }}"
+                 {% if hasCollapser %}
                  data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
-                 data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}">
+                 data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}"
+                 {% endif %}>
                 {% include '@rubric/grid.twig' with {
                     rubric: feedbackRubricContexts[currentFeedback.id].rubric,
                     markVisibility: participant.assessable.isFeedbackVisibleToUser(USER)
