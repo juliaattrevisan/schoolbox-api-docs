@@ -228,6 +228,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $quiz = $this->fullyHydrateQuiz($quiz);
 
         $quizType = $quiz->getWorkType() ? $quiz->getWorkType()->getName() : "";
+        if ($quizType === '') {
+            $quizType = "quiz";
+        }
         $quizName = $quiz->getTitle();
 
         $icon = "/portrait?userId={$owner->getExternalId()}&size={$this->iconSize}";
