@@ -208,15 +208,16 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      * the test.
      *
      * @param SitePage $page
-     * @param  $attemptId
-     * @param  $question_id
-     * @return void
+     * @param int $attemptId
+     * @param int $question_id
      */
     public function prepareResponse(SitePage $page, $attemptId, $question_id)
     {
         /* Optional configuration hook
          */
         $this->configureResponse($page, $question_id);
+
+        $questionConfig = json_decode($this->questionHandler->getByID($question_id)['config']);
 
         $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
 
@@ -237,6 +238,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
                     'ANSWER_VALUE_FACADE' => $valueFacade,
                     'ANSWER_VALUE' => $currentAnswer->value,
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
+                    'ANSWER_AUTO_COMPLETE' => $questionConfig->randomiseOptionOrder ? 'off' : 'on',
                 ));
 
                 if ($existing['response']) {
