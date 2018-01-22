@@ -23,7 +23,7 @@ suites:
         extensions:
             enabled:
                 - Codeception\Extension\RunProcess:
-                  - 'chromedriver --url-base=/wd/hub'
+                  - '/usr/lib/chromium-browser/chromedriver --url-base=/wd/hub'
 
 extensions:
     enabled:
