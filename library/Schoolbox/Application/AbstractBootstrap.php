@@ -667,10 +667,10 @@ abstract class AbstractBootstrap implements BootstrapInterface
         // Register assessment data source
         $di->set(
             'assessmentTranslator',
-            $di->lazy(function () {
+            $di->lazy(function () use ($di) {
                 $translator = new AssessmentDataModelTranslator(
                     new MarkSchemeFactory(),
-                    AssessmentMapper::getInstance()
+                    $di->get('mapperFactory')->get(AssessmentMapper::class)
                 );
                 $translator
                     ->addSubTranslator(new TaskTranslator())
