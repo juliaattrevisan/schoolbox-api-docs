@@ -106,7 +106,13 @@
 
                 {# Self-Assessment #}
                 {% if learnerRubric %}
-                    ({{ learnerRubric.groups[groupIndex].humanReadableMark }} given in {{ locale.selfAssessment.singularForm }})
+                    {% if latestSelfReflectedFeedback.normalisedMark != null %}
+                        {% set selfReflectionName = locale.selfAssessment.proper %}
+                    {% else %}
+                        {% set selfReflectionName = locale.selfReflection.proper %}
+                    {% endif %}
+
+                    ({{ learnerRubric.groups[groupIndex].humanReadableMark }} given in {{ selfReflectionName }})
                 {% endif %}
             </th>
         </tr>
@@ -125,14 +131,18 @@
 
             {# Self-Assessment #}
             {% if learnerRubric %}
-                ({{ learnerRubric.humanReadableMark }} given in {{ locale.selfAssessment.singularForm }})
+                {% if latestSelfReflectedFeedback.normalisedMark != null %}
+                    {% set selfReflectionName = locale.selfAssessment.proper %}
+                {% else %}
+                    {% set selfReflectionName = locale.selfReflection.proper %}
+                {% endif %}
+
+                ({{ learnerRubric.humanReadableMark }} given in {{ selfReflectionName }})
             {% endif %}
         </th>
     </tr>
-
     {% endif %}
     </tbody>
-
 </table>
 </div>
 {# js specific to the rubric we just injected to...wherever we injected it #}
