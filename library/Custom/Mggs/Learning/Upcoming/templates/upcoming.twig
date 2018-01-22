@@ -160,6 +160,289 @@
             });
         };
 
+        var fetchResources = function (callback) {
+            var url = '{{ routeLookup('learningPersonalised.getResourcesForStudent', {studentId: student.id}) }}';
+            $.get(url + '/' + $cal.fullCalendar('getDate').format('DD-MM-YYYY'), function (resourceObjects) {
+                callback(resourceObjects);
+                $cal.fullCalendar('addEventSource', fetchTerms);
+            });
+        };
+
+        var onViewChange = function (view, $element) {
+
+            redrawRequired = true;
+
+            if (view.type === 'timelineTerm') {
+                // time to re-render
+                collapsed = false;
+                totalEventCount = 0;
+                console.log('resetting realEventList');
+                realEventList = {};
+            }
+        };
+
+        var onDragStart = function (calEvent, dragEvent, _empty, view) {
+            if (view.type == 'month' || view.type == 'basicWeek') {
+                var len = view.dayGrid.dayDates.length;
+
+                for (var i = 0; i < len; ++i) {
+                    var $cell       = $(view.dayGrid.cellEls[i]),
+                        target      = view.dayGrid.dayDates[i];
+
+                    if (!isInsideBounds(calEvent, target)) {
+                        // if OOB
+                        $cell.addClass('no-drop');
+                    }
+                }
+            } else if (view.type == 'timelineTerm') {
+                console.log(view);
+                hidePopover();
+            }
+        };
+
+        var onDragStop = function () {
+            $cal.find('.fc-day').removeClass('no-drop');
+            // allow a re-render of the view
+            collapsed = false;
+
+            // drain the list of real events for re-population
+            console.log('resetting realEventList');
+            realEventList = {};
+        };
+
+
+        /**
+         * When external data is being fetched
+         * @param {Boolean} isLoading
+         * @param {View} view
+         */
+        var onLoading = function(isLoading, view) {
+
+            /* Show loading div right in the middle
+             */
+            if (isLoading === true) {
+                $.magnificPopup.open({
+                    showCloseBtn: false,
+                    items: {
+                        src: "<div class='preview loader'></div>",
+                        type: 'inline'
+                    }
+                });
+            }
+            /* Has finished loading
+             */
+            else {
+                /* Hide loading div
+                 */
+                $.magnificPopup.close();
+                var d = c.dom.fullCalendar('getDate');
+                $('#datepicker').datepicker('setDate', d.format('DD-MM-YYYY'));
+            }
+        };
+
+        /**
+         * When the window is resized
+         * @param {View} view
+         */
+        var onWindowResize = function(view) {
+            if (view.type === 'timelineTerm') {
+                // redraw, but not too frequently during drag
+                if (redrawTimeout) {
+                    clearTimeout(redrawTimeout);
+                }
+                redrawTimeout = window.setTimeout(function () {
+                    $cal.find('.fc-event-container').each(renderPopovers);
+                }, 200);
+
+            } else {
+                // recalc height
+                var wHeight = $(window).height();
+                var calTop = c.dom.offset().top;
+
+                c.dom.fullCalendar('option','contentHeight', wHeight - calTop - 120)
+            }
+        };
+
+        var afterRender = function (view) {
+            if (view.type !== 'timelineTerm') {
+                // if not on timeline view, do nothing
+                return true;
+            }
+
+            redrawWeekNumbers();
+
+            var realEventsExist = $.isEmptyObject(realEventList) == false;
+
+            console.log('realEventsExist:', realEventsExist, ' collapsed:', collapsed);
+
+            if (!redrawRequired) {
+                // if not forcing a redraw
+                if (totalEventCount == 0) {
+                    console.log('no events yet');
+                    return true;
+                }
+
+                // already done this
+                if (realEventsExist && collapsed) {
+                    console.log('already collapsed, stashing real events')
+                    $cal.find('.fc-event-container').each(renderPopovers);
+                    return true;
+                }
+            }
+
+            redrawRequired = false;
+
+            console.log('rendering placeholders');
+
+            // if there are already fakes, make them gone
+            $cal.fullCalendar('removeEvents', function (calEvent) {
+                return ('data' in calEvent && 'placeholder' in calEvent.data);
+            });
+
+            var completionSeq = [ 'reviewed', 'pending', 'incomplete', 'failed' ];
+
+            var listOfFakesToRender = [];
+
+            // we're on timeline: take all the events that have been rendered
+            // and smoosh them into placeholders
+            for (var resourceId in realEventList) {
+                for (var wk in realEventList[resourceId]) {
+                    var calEvents = realEventList[resourceId][wk];
+
+                    var mergedStatus = '';
+
+                    for (var index in calEvents) {
+                        var eStatus = calEvents[index][0].data.meta.status;
+                        if (completionSeq.indexOf(eStatus) > completionSeq.indexOf(mergedStatus)) {
+                            mergedStatus = eStatus;
+                        }
+                    }
+
+                    var placeholderEvent = {
+                        allDay: true,
+                        color: '#ffffff',
+                        editable: false,
+                        resourceId: resourceId,
+                        title: calEvents.length,
+                        start: moment(wk),
+                        end: null,
+                        data: {
+                            placeholder: true,
+                            meta: {
+                                count: calEvents.length,
+                                status: mergedStatus,
+                                wk: wk
+                            }
+                        }
+                    };
+
+                    listOfFakesToRender.push(placeholderEvent);
+                }
+            }
+
+            console.log('collapsed is now', realEventsExist);
+            // prevent recursion
+            collapsed = realEventsExist;
+
+            // render the new set of events
+            console.log('pushing render of fakes to queue, len: ', listOfFakesToRender.length);
+            $cal.fullCalendar('renderEvents', listOfFakesToRender, true);
+        };
+
+        /**
+         * When an event is drawn on the calendar
+         * @param {Object} calEvent
+         * @param {jQuery} $element
+         * @param {View} view
+         */
+        var renderEvent = function (calEvent, $element, view) {
+            // Always render placeholders in the most basic manner
+            if (calEvent.id === 'placeholder') {
+                return true;
+            }
+
+            if (calEvent.rendering === 'background') {
+                console.log('rendering shade');
+                return true;
+            }
+
+            // Ignore the phantom event that the API puts there
+            if (!calEvent.data) {
+                return false;
+            }
+
+            // Don't render me if I'm marked as do not render
+            if ('is_rendered' in calEvent && !(calEvent.is_rendered)) {
+                return false;
+            }
+
+            // rip off the resizers
+            $element.removeClass('fc-resizable').find('.fc-resizer').remove();
+
+            // attach bling if given
+            var status = calEvent.data.meta.status;
+
+            var isPlaceholder = calEvent.data.placeholder;
+
+            if (status) {
+                $element.find('.fc-content').prepend(
+                    $('<a class="progress-tick" />')
+                        .addClass(status)
+                        .addClass(isPlaceholder ? 'small' : 'tiny')
+                        .attr('title', status.capitalise())
+                );
+
+                $element.addClass('progress-' + status);
+            }
+
+            if (view.type !== 'timelineTerm') {
+                // if not on timeline view, make sure we don't render placeholder
+                if (isPlaceholder) {
+                    return false;
+                }
+
+                return true;
+            }
+
+            // regardless of whether or not this is a placeholder, set a known data attr for indexing
+            var wk = calEvent.start.year() + 'W' + calEvent.start.week();
+            $element.attr('data-wk', wk);
+
+            if (isPlaceholder) {
+                // dis fake
+                console.log('fake');
+                $element.attr('data-placeholder', true).addClass('placeholder-event').css('top');
+                return true;
+            }
+
+            // not fake: in this case, we need to flag the postRender function to re-render all the fakes
+            // console.log('collapsed is now false');
+            // collapsed = false;
+
+            // start by collating the count of real events per week
+
+            // get the resource ID and derive the week in which this event occurs
+            var rId = calEvent.resourceId;
+
+            // make sure we don't cop NPEs
+            ensureIndices(rId, wk);
+
+            // push into the real event list
+            realEventList[rId][wk].push([ calEvent, $element ]);
+
+            if (calEvent.className.indexOf('fc-helper') !== -1) {
+                // this is a helper: render it, and don't do anything else
+                return true;
+            }
+
+            $element.addClass('hide').addClass('real-event');
+
+            // for now, do the rest
+            console.log('pushed event into ' + rId + ', ' + wk);
+
+            return true;
+        };
+
         var redrawTimeout;
 
         c = new Calendar('calendar', 'calendar-bubble', {
@@ -211,123 +494,6 @@
                         slotWidth: 24,
                     }
                 },
-                eventDragStart: function (calEvent, dragEvent, _empty, view) {
-                    if (view.type == 'month' || view.type == 'basicWeek') {
-                        var len = view.dayGrid.dayDates.length;
-
-                        for (var i = 0; i < len; ++i) {
-                            var $cell       = $(view.dayGrid.cellEls[i]),
-                                target      = view.dayGrid.dayDates[i];
-
-                            if (!isInsideBounds(calEvent, target)) {
-                                // if OOB
-                                $cell.addClass('no-drop');
-                            }
-                        }
-                    } else if (view.type == 'timelineTerm') {
-                        console.log(view);
-                        hidePopover();
-                    }
-                },
-                eventDragStop: function () {
-                    $cal.find('.fc-day').removeClass('no-drop');
-                    // allow a re-render of the view
-                    collapsed = false;
-
-                    // drain the list of real events for re-population
-                    console.log('resetting realEventList');
-                    realEventList = {};
-                },
-
-                eventDrop: updateAssessment,
-                eventAfterAllRender: function (view) {
-                    if (view.type !== 'timelineTerm') {
-                        // if not on timeline view, do nothing
-                        return true;
-                    }
-
-                    redrawWeekNumbers();
-
-                    var realEventsExist = $.isEmptyObject(realEventList) == false;
-
-                    console.log('realEventsExist:', realEventsExist, ' collapsed:', collapsed);
-
-                    if (totalEventCount == 0) {
-                        console.log('no events yet');
-                        return true;
-                    }
-
-                    // already done this
-                    if (realEventsExist && collapsed) {
-                        console.log('already collapsed, stashing real events')
-                        $cal.find('.fc-event-container').each(renderPopovers);
-                        return true;
-                    }
-
-                    console.log('rendering placeholders');
-
-                    // if there are already fakes, make them gone
-                    $cal.fullCalendar('removeEvents', function (calEvent) {
-                        return ('data' in calEvent && 'placeholder' in calEvent.data);
-                    });
-
-                    var completionSeq = [ 'reviewed', 'pending', 'incomplete', 'failed' ];
-
-                    var listOfFakesToRender = [];
-
-                    // we're on timeline: take all the events that have been rendered
-                    // and smoosh them into placeholders
-                    for (var resourceId in realEventList) {
-                        for (var wk in realEventList[resourceId]) {
-                            var calEvents = realEventList[resourceId][wk];
-
-                            var mergedStatus = '';
-
-                            for (var index in calEvents) {
-                                var eStatus = calEvents[index][0].data.meta.status;
-                                if (completionSeq.indexOf(eStatus) > completionSeq.indexOf(mergedStatus)) {
-                                    mergedStatus = eStatus;
-                                }
-                            }
-
-                            var placeholderEvent = {
-                                allDay: true,
-                                color: '#ffffff',
-                                editable: false,
-                                resourceId: resourceId,
-                                title: calEvents.length,
-                                start: moment(wk),
-                                end: null,
-                                data: {
-                                    placeholder: true,
-                                    meta: {
-                                        count: calEvents.length,
-                                        status: mergedStatus,
-                                        wk: wk
-                                    }
-                                }
-                            };
-
-                            listOfFakesToRender.push(placeholderEvent);
-                        }
-                    }
-
-                    console.log('collapsed is now', realEventsExist);
-                    // prevent recursion
-                    collapsed = realEventsExist;
-
-                    // render the new set of events
-                    console.log('pushing render of fakes to queue, len: ', listOfFakesToRender.length);
-                    $cal.fullCalendar('renderEvents', listOfFakesToRender, true);
-
-                },
-                resources: function (callback) {
-                    var url = '{{ routeLookup('learningPersonalised.getResourcesForStudent', {studentId: student.id}) }}';
-                    $.get(url + '/' + $cal.fullCalendar('getDate').format('DD-MM-YYYY'), function (resourceObjects) {
-                        callback(resourceObjects);
-                        $cal.fullCalendar('addEventSource', fetchTerms);
-                    });
-                },
                 resourceAreaWidth: '40%',
                 resourceColumns: [
                     {
@@ -345,112 +511,22 @@
                         field: 'mastery'
                     }
                 ],
-
-
                 header: {
-                    left: 'prevWindow,today,nextWindow',
+                    left: 'prev,today,next',
                     center: 'title',
                     right: 'timelineTerm,month,basicWeek'
                 },
+                eventSources: [ fetchEvents ],
 
-                viewRender: function (view, $element) {
-                    // time to re-render
-                    collapsed = false;
-                    console.log('resetting realEventList');
-                    realEventList = {};
-                },
-
-                /**
-                 * When an event is drawn on the calendar
-                 * @param calEvent
-                 */
-                eventRender: function (calEvent, $element, view) {
-                    // Always render placeholders in the most basic manner
-                    if (calEvent.id === 'placeholder') {
-                        return true;
-                    }
-
-                    if (calEvent.rendering === 'background') {
-                        console.log('rendering shade');
-                        return true;
-                    }
-
-                    // Ignore the phantom event that the API puts there
-                    if (!calEvent.data) {
-                        return false;
-                    }
-
-                    // Don't render me if I'm marked as do not render
-                    if ('is_rendered' in calEvent && !(calEvent.is_rendered)) {
-                        return false;
-                    }
-
-                    // rip off the resizers
-                    $element.removeClass('fc-resizable').find('.fc-resizer').remove();
-
-                    // attach bling if given
-                    var status = calEvent.data.meta.status;
-
-                    var isPlaceholder = calEvent.data.placeholder;
-
-                    if (status) {
-                        $element.find('.fc-content').prepend(
-                            $('<a class="progress-tick" />')
-                                .addClass(status)
-                                .addClass(isPlaceholder ? 'small' : 'tiny')
-                                .attr('title', status.capitalise())
-                        );
-
-                        $element.addClass('progress-' + status);
-                    }
-
-                    if (view.type !== 'timelineTerm') {
-                        // if not on timeline view, make sure we don't render placeholder
-                        if (isPlaceholder) {
-                            return false;
-                        }
-
-                        return true;
-                    }
-
-                    // regardless of whether or not this is a placeholder, set a known data attr for indexing
-                    var wk = calEvent.start.year() + 'W' + calEvent.start.week();
-                    $element.attr('data-wk', wk);
-
-                    if (isPlaceholder) {
-                        // dis fake
-                        console.log('fake');
-                        $element.attr('data-placeholder', true).addClass('placeholder-event').css('top');
-                        return true;
-                    }
-
-                    // not fake: in this case, we need to flag the postRender function to re-render all the fakes
-                    // console.log('collapsed is now false');
-                    // collapsed = false;
-
-                    // start by collating the count of real events per week
-
-                    // get the resource ID and derive the week in which this event occurs
-                    var rId = calEvent.resourceId;
-
-                    // make sure we don't cop NPEs
-                    ensureIndices(rId, wk);
-
-                    // push into the real event list
-                    realEventList[rId][wk].push([ calEvent, $element ]);
-
-                    if (calEvent.className.indexOf('fc-helper') !== -1) {
-                        // this is a helper: render it, and don't do anything else
-                        return true;
-                    }
-
-                    $element.addClass('hide').addClass('real-event');
-
-                    // for now, do the rest
-                    console.log('pushed event into ' + rId + ', ' + wk);
-
-                    return true;
-                },
+                eventDragStart: onDragStart,
+                eventDragStop: onDragStop,
+                eventDrop: updateAssessment,
+                eventAfterAllRender: afterRender,
+                resources: fetchResources,
+                viewRender: onViewChange,
+                eventRender: renderEvent,
+                loading: onLoading,
+                windowResize: onWindowResize,
 
                 /**
                  * Nothing's resizable here
@@ -469,61 +545,7 @@
                  */
                 eventAllow: function (dropLocation, event) {
                     return isInsideBounds(event, dropLocation.start, dropLocation.resourceId);
-                },
-
-                /**
-                 * When the window is resized
-                 * @param view
-                 */
-                windowResize: function(view) {
-                    if (view.type === 'timelineTerm') {
-                        // redraw, but not too frequently during drag
-                        if (redrawTimeout) {
-                            clearTimeout(redrawTimeout);
-                        }
-                        redrawTimeout = window.setTimeout(function () {
-                            $cal.find('.fc-event-container').each(renderPopovers);
-                        }, 200);
-
-                    } else {
-                        // recalc height
-                        var wHeight = $(window).height();
-                        var calTop = c.dom.offset().top;
-
-                        c.dom.fullCalendar('option','contentHeight', wHeight - calTop - 120)
-                    }
-                },
-
-                /**
-                 * When external data is being fetched
-                 * @param isLoading
-                 * @param view
-                 */
-                loading: function(isLoading, view) {
-
-                    /* Show loading div right in the middle
-                     */
-                    if (isLoading === true) {
-                        $.magnificPopup.open({
-                            showCloseBtn: false,
-                            items: {
-                                src: "<div class='preview loader'></div>",
-                                type: 'inline'
-                            }
-                        });
-                    }
-                    /* Has finished loading
-                     */
-                    else {
-                        /* Hide loading div
-                         */
-                        $.magnificPopup.close();
-                        var d = c.dom.fullCalendar('getDate');
-                        $('#datepicker').datepicker('setDate', d.format('DD-MM-YYYY'));
-                    }
-                },
-
-                eventSources: [ fetchEvents ]
+                }
             },
             x: false
         }).init();
