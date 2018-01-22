@@ -16,3 +16,17 @@ function isSmallDevice() {
 
     return false;
 }
+
+/**
+ * Check if current window width is medium or down.
+ * At the time of writing - this can be used to check if the sidebar is collapsed by default or not.
+ *
+ * @returns {boolean}
+ */
+function windowIsMediumDown() {
+    if (window.innerWidth <= 950) { // window.innerWidth is used to factor in scrollbars
+        return true;
+    }
+
+    return false;
+}
