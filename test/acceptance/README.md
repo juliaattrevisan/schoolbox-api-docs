@@ -21,16 +21,6 @@ Running tests
 These tests are currently configured to run within Schoolbox's Vagrant box.
 The acceptance tests are configured to automatically start chromedriver (the web driver for Chrome Headless).
 
-### Demo data set
-
-These tests are currently unreliable with the `legacy` demo data set; this is
-due to the dashboard containing `<img>` tags whose `src` is a dead link.
-
-You should switch to the `sales` dataset before reprovisioning and running
-these tests: modify `vagrant.yaml` and ensure this value for `data_filename`:
-
-    data_filename: "sales.tar.gz"
-
 ### Reprovision
 
 If you've not yet reprovisioned after checking out this branch: run
