@@ -632,6 +632,9 @@ class Mapper extends BaseMapper
 
 
     /**
+     * For any projects found in $modelList, identified by $projectIds, find thier sub-assessments
+     * and load them into the projects.
+     *
      * @param Collection|Model[] $modelList
      * @param array      $projectIds
      * @return Collection|Model[]
