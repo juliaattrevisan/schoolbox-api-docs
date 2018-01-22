@@ -94,6 +94,14 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'content'  => "<p>On the left hand side of the page you will find your side menu.</p><p>The links found here are customised by your school and will help you navigate to commonly used pages.</p>",
         ],
 
+        // My Subjects
+        [
+            'uuid'     => '42517dab-f5b9-11e7-9503-08002751fd3c',
+            'type'     => 'tooltip',
+            'selector' => '#side-menu-mysubjects',
+            'content'  => "<p>This section will display links to the classes you teach. These are preloaded from enrolment data set up by your system administrators.</p>",
+        ],
+
 
         // My Groups
         [
@@ -103,13 +111,6 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'content'  => "<p>In this section, you will find links to groups that you have been added to or have voluntarily joined.</p>",
         ],
 
-        // My Subjects
-        [
-            'uuid'     => '42517dab-f5b9-11e7-9503-08002751fd3c',
-            'type'     => 'tooltip',
-            'selector' => '#side-menu-mysubjects',
-            'content'  => "<p>This section will display links to the classes you teach. These are preloaded from enrolment data set up by your system administrators.</p>",
-        ],
 
         // My Links
         [
