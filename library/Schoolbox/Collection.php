@@ -255,7 +255,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     /**
      * Gets first item in collection (regardless of its key)
      *
-     * @return mixed
+     * @return mixed|null
      */
     public function first()
     {

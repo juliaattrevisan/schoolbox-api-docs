@@ -496,7 +496,9 @@ class ListController extends Web\Controller\Base
         $planMap->save($plans);
 
         // drop the dyna-plan into index 0 as well as its ID to get around a limitation in the POST payload
-        $plans[0] = $dynaPlan;
+        if ($dynaPlan) {
+            $plans[0] = $dynaPlan;
+        }
 
         return $plans;
     }
