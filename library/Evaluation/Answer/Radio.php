@@ -197,6 +197,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
          */
         $this->configureResponse($page, $question_id);
 
+        $questionConfig = json_decode($this->questionHandler->getByID($question_id)['config']);
         $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
 
         $answerGroup = $this->getByQuestionID($question_id);
@@ -217,6 +218,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
                         'ANSWER_VALUE_FACADE' => $valueFacade,
                         'ANSWER_VALUE' => $currentAnswer->value,
                         'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
+                        'ANSWER_AUTO_COMPLETE' => $questionConfig->randomiseOptionOrder ? 'off' : 'on',
                     )
                 );
 

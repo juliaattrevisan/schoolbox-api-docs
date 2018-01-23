@@ -87,6 +87,15 @@ abstract class Evaluation_Answer extends DeprecatedModel
 	public function configure(SitePage $page, $config) {
 	}
 
+
+    /**
+     * @param SitePage $page
+     * @param int      $attemptId
+     * @param int      $question_id
+     */
+    abstract public function prepareResponse(SitePage $page, $attemptId, $question_id);
+
+
     /**
      * Output configuration tags in xml
      *
