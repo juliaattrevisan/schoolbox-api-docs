@@ -207,9 +207,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      * Resets answer tokens so a user can fill them in while actually taking
      * the test.
      *
-     * @param SitePage $page
-     * @param int $attemptId
-     * @param int $question_id
+     * @inheritdoc
      */
     public function prepareResponse(SitePage $page, $attemptId, $question_id)
     {
