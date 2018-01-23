@@ -147,10 +147,10 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel, ISoftD
     }
 
     /**
-     * @param GenericCollection|Assessment\Model[] $assessments
-     * @return static
+     * @param Collection|Assessment\Model[] $assessments
+     * @return $this
      */
-    public function setAssessments(GenericCollection $assessments)
+    public function setAssessments(Collection $assessments): self
     {
         $this->assessments->replaceWith($assessments);
         return $this;
