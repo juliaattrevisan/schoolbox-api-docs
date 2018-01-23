@@ -137,7 +137,7 @@ class QuizTest extends TestCase
      */
     public function testTranslateNullDataModelToDomainModel()
     {
-        $nullQuizDataModel   = (new QuizModel())->setId(null);
+        $nullQuizDataModel   = (new QuizModel())->setId(null)->setAssessmentModel(new AssessmentModel());
         $nullQuizDomainModel = $this->translator->translateToDomainModel($nullQuizDataModel);
         $this->assertNull($nullQuizDomainModel->getId());
     }

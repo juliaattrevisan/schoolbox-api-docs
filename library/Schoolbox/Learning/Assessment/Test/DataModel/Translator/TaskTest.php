@@ -171,7 +171,7 @@ class TaskTest extends TestCase
      */
     public function testTranslateNullDataModelToDomainModel()
     {
-        $nullTaskDataModel   = (new TaskModel())->setId(null);
+        $nullTaskDataModel   = (new TaskModel())->setId(null)->setAssessmentModel(new AssessmentModel());
         $nullTaskDomainModel = $this->translator->translateToDomainModel($nullTaskDataModel);
         $this->assertNull($nullTaskDomainModel->getId());
     }

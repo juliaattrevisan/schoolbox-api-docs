@@ -362,7 +362,7 @@ class ProjectTest extends TestCase
      */
     public function testTranslateNullDataModelToDomainModel()
     {
-        $nullProjectDataModel   = (new ProjectModel())->setId(null);
+        $nullProjectDataModel   = (new ProjectModel())->setId(null)->setAssessmentModel(new AssessmentModel());
         $nullProjectDomainModel = $this->translator->translateToDomainModel($nullProjectDataModel);
         $this->assertNull($nullProjectDomainModel->getId());
     }

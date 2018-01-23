@@ -429,7 +429,7 @@ class DueWorkTest extends TestCase
      */
     public function testTranslateNullDataModelToDomainModel()
     {
-        $nullDueWorkDataModel   = (new DueWorkModel())->setId(null);
+        $nullDueWorkDataModel   = (new DueWorkModel())->setId(null)->setAssessmentModel(new AssessmentModel());
         $nullDueWorkDomainModel = $this->translator->translateToDomainModel($nullDueWorkDataModel);
         $this->assertNull($nullDueWorkDomainModel->getId());
     }
