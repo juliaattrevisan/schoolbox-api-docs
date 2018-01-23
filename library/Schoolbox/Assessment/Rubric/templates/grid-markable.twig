@@ -31,7 +31,9 @@
          # This is only off when self-reflecting with a grid that doesn't show descriptor points
          # and groups - here, it never shows the group subtotal, sow rowspan calcs are off
          #}
-        {% if showGroupTotal %}
+        {% if self == 'selfReflection' and not showGroupTotal %}
+            {% set rowspan = group.criteria|length %}
+        {% else %}
             {% set rowspan = group.criteria|length + (group.total ? 1 : 0) %}
         {% endif %}
 

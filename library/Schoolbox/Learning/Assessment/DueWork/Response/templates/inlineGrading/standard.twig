@@ -143,7 +143,8 @@ Usage:
                 {# Settings for the rubric grid #}
                 {% set showDescriptorValue = true %}
                 {% set showGroupTotal = true %}
-                {% set showRubricTotal = true%}
+                {% set showRubricTotal = true %}
+                {% set self = 'none' %}
 
                 {% block rubricGrid %}
                     {% if assessment.useRubric and rubricContext %}
@@ -161,7 +162,8 @@ Usage:
                                 showDescriptorValue: showDescriptorValue,
                                 showGroupTotal: showGroupTotal,
                                 showRubricTotal: showRubricTotal,
-                                latestSelfReflectedFeedback: latestSelfReflectedFeedback
+                                latestSelfReflectedFeedback: latestSelfReflectedFeedback,
+                                self: self
                             } only %}
                         </fieldset>
                     {% endif %}
