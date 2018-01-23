@@ -227,7 +227,9 @@
                 $customiseModal.foundation('reveal', 'close');
 
                 // Reset the checkboxes and buttons
-                resetActions();
+                if (newPlan) {
+                    resetActions();
+                }
 
             }
         });
