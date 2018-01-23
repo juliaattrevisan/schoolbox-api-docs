@@ -38,6 +38,7 @@ class TestSubPredicates extends TestCase
     {
         $pb    = new TestableBuilder($this->mySqlQuoter, 'table');
         $subPb = $pb->emptyClone();
+        $this->assertInstanceOf(TestableBuilder::class, $subPb);
         $this->assertSame($pb->getQuoter(), $subPb->getQuoter());
         $this->assertSame($pb->getTable(), $subPb->getTable());
     }
