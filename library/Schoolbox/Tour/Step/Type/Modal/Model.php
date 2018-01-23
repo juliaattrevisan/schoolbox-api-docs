@@ -12,8 +12,6 @@ use Schoolbox\Tour\Step;
 
 class Model extends AbstractModel
 {
-    const TYPE = Step\Mapper::TYPE_MODAL;
-
     /**
      * Specify data which should be serialized to JSON
      *
@@ -28,7 +26,7 @@ class Model extends AbstractModel
             'title'     => $this->getTitle(),
             'css_class' => $this->getCssClass(),
             'body'      => $this->getBody(),
-            'type'      => $this::TYPE
+            'type'      => Step\Mapper::TYPE_MODAL
         ];
     }
 }
