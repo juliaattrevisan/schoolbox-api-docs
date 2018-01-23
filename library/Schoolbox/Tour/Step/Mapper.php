@@ -118,17 +118,17 @@ class Mapper extends BaseMapper
         ];
 
         foreach ($statement as $row) {
+            if (!array_key_exists($row['type'], $hydrators)) {
+                continue;
+            }
+
             $model = $this->hydrate($row);
 
             if ($model instanceof Model) {
                 $model->setAuthor($authorUserMapper->hydrate($row, 'a'));
                 $model->setTour($tourMapper->hydrate($row, 't'));
                 $model->setNextStep($stepMapper->hydrate($row, 'ns'));
-
-                if (!array_key_exists($row['type'], $hydrators)) {
-                    continue;
-                }
-
+                
                 [ $mapper, $alias ] = $hydrators[$row['type']];
                 $type = $mapper->hydrate($row, $alias);
                 $model->setType($type);
