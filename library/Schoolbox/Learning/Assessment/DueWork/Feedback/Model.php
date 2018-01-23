@@ -52,4 +52,32 @@ class Model extends AbstractFeedback
         return $this;
     }
 
+
+    /**
+     * The author of the feedback is the same as the person who receives it
+     * The feedback has normalised marks
+     *
+     * @return bool
+     */
+    public function isSelfAssessed(): bool
+    {
+        $reviewerIsSubmissionAuthor = ($this->getReviewee()->getId() === $this->getReviewer()->getId());
+        $feedbackHasNormalisedMarks = $this->getNormalisedMark() !== null;
+
+        return $reviewerIsSubmissionAuthor && $feedbackHasNormalisedMarks;
+    }
+
+    /**
+     * The author of the feedback is the same as the person who receives it
+     * The feedback does not have normalised marks
+     *
+     * @return bool
+     */
+    public function isSelfReflected(): bool
+    {
+        $reviewerIsSubmissionAuthor = ($this->getReviewee()->getId() === $this->getReviewer()->getId());
+        $feedbackHasNormalisedMarks = $this->getNormalisedMark() === null;
+
+        return $reviewerIsSubmissionAuthor && $feedbackHasNormalisedMarks;
+    }
 }
