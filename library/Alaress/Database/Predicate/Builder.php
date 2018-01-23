@@ -9,7 +9,6 @@
 namespace Alaress\Database\Predicate;
 
 use Alaress\Database\Quoter\IQuoter;
-use Countable;
 use Traversable;
 use InvalidArgumentException;
 use Alaress_Date_Format;
@@ -152,7 +151,7 @@ class Builder implements IBuilder
     public function addColumnList(array $columnList): self
     {
         foreach ($columnList as $columnName => $columnValue) {
-            if (self::canTraverse($columnValue)) {
+            if (\is_iterable($columnValue)) {
                 try {
                     $this->in($columnName, $columnValue);
                 } catch (InvalidArgumentException $e) {
@@ -250,7 +249,7 @@ class Builder implements IBuilder
      */
     public function in($columnName, $columnValues): self
     {
-        if (!self::canTraverse($columnValues)) {
+        if (!\is_iterable($columnValues)) {
             throw new InvalidArgumentException("Unable to traverse 'in()' arg. Found: " . \gettype($columnValues));
         }
         if (0 === \count($columnValues)) {
@@ -272,7 +271,7 @@ class Builder implements IBuilder
      */
     public function notIn($columnName, $columnValues): self
     {
-        if (!self::canTraverse($columnValues)) {
+        if (!\is_iterable($columnValues)) {
             throw new InvalidArgumentException("Unable to traverse 'notIn()' arg. Found: " . gettype($columnValues));
         }
         if (0 === \count($columnValues)) {
@@ -513,7 +512,7 @@ class Builder implements IBuilder
             $this->where[] = "$escapedOperand IS {$whereNot}TRUE";
         } elseif ($columnValue === false) {
             $this->where[] = "$escapedOperand IS {$whereNot}FALSE";
-        } elseif (self::canTraverse($columnValue)) {
+        } elseif (\is_iterable($columnValue)) {
             $placeHolders  = self::getArrayPlaceholders($columnValue, $param);
             $this->where[] = "$escapedOperand {$whereNot}IN {$placeHolders}";
             $this->params  = array_merge($this->params, self::getArrayParameters($columnValue, $param));
@@ -643,7 +642,7 @@ class Builder implements IBuilder
      */
     public static function canTraverse($mixed): bool
     {
-        return \is_array($mixed) || ($mixed instanceof Traversable && $mixed instanceof Countable);
+        return \is_iterable($mixed);
     }
 
 
