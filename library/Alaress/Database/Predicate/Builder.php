@@ -10,9 +10,9 @@ namespace Alaress\Database\Predicate;
 
 use Alaress\Database\Quoter\IQuoter;
 use Traversable;
-use InvalidArgumentException;
 use Alaress_Date_Format;
 use UnderflowException;
+use TypeError;
 
 class Builder implements IBuilder
 {
@@ -154,7 +154,7 @@ class Builder implements IBuilder
             if (\is_iterable($columnValue)) {
                 try {
                     $this->in($columnName, $columnValue);
-                } catch (InvalidArgumentException $e) {
+                } catch (TypeError $e) {
                     // impossible to throw as we have checked type is traversable
                 }
             } else {
@@ -209,33 +209,63 @@ class Builder implements IBuilder
 
 
     /**
+     * @param string|ISqlFunc                      $columnName
+     * @param string|int|float|Alaress_Date_Format $columnValue
+     * @param string                               $operator
+     * @return Builder
+     * @throws InvalidColumnException
+     * @throws TypeError If $columnValue is of invalid type. Use isNull() for matching NULL
+     */
+    private function addScalarPredicate($columnName, $columnValue, string $operator): self
+    {
+        if (\is_scalar($columnValue) || ($columnValue instanceof Alaress_Date_Format && !$columnValue->isNull())) {
+            throw new TypeError('Invalid columnValue type. Expected: [string|int|float|ADF]. Actual: ' . gettype($columnValue));
+        }
+        return $this->addPredicate($columnName, $columnValue, $operator);
+    }
+
+
+    /**
+     * @param string|ISqlFunc $columnName
+     * @param iterable        $columnValues
+     * @param string          $operator
+     * @throws InvalidColumnException
+     * @throws UnderflowException         If iterable is empty
+     * @return $this
+     */
+    private function addIterablePredicate($columnName, iterable $columnValues, string $operator)
+    {
+        if (0 === \count($columnValues)) {
+            // While this logically equates to $this->>where[] = 'TRUE'|'FALSE', that would still trigger
+            // a potentially pointless round-trip to the DB. The caller should handle this case in code instead.
+            throw new UnderflowException('List of column values is empty');
+        }
+        return $this->addPredicate($columnName, $columnValues, $operator);
+    }
+
+
+    /**
      * @param string|ISqlFunc $columnName
      * @param string|int      $columnValue Ideally we would type-declare as 'scalar', but not possible.
      * @return $this
-     * @throws InvalidArgumentException If column value is not a scalar (use isNull() if testing for NULLs)
      * @throws InvalidColumnException If unable to parse column name
+     * @throws TypeError If column value is not a scalar (use isNull() if testing for NULLs)
      */
     public function equals($columnName, $columnValue): self
     {
-        if (\is_scalar($columnValue) || ($columnValue instanceof Alaress_Date_Format && !$columnValue->isNull())) {
-            return $this->addPredicate($columnName, $columnValue);
-        }
-        throw new InvalidArgumentException('Column value must be scalar or ADF. Found: ' . \gettype($columnValue));
+        return $this->addScalarPredicate($columnName, $columnValue, self::OPERATOR_EQUALS);
     }
 
     /**
      * @param string|ISqlFunc $columnName
      * @param string|int      $columnValue
      * @return $this
-     * @throws InvalidArgumentException If $columnValue is not an string or int
+     * @throws TypeError If $columnValue is of invalid type. Use isNull() for matching NULL
      * @throws InvalidColumnException If unable to parse column name
      */
     public function notEquals($columnName, $columnValue): self
     {
-        if (\is_scalar($columnValue) || ($columnValue instanceof Alaress_Date_Format && !$columnValue->isNull())) {
-            return $this->addPredicate($columnName, $columnValue, self::OPERATOR_NOT_EQUALS);
-        }
-        throw new InvalidArgumentException('Column value must be scalar or ADF. Found: ' . \gettype($columnValue));
+        return $this->addScalarPredicate($columnName, $columnValue, self::OPERATOR_NOT_EQUALS);
     }
 
 
@@ -244,20 +274,11 @@ class Builder implements IBuilder
      * @param array|Traversable $columnValues
      * @return $this
      * @throws InvalidColumnException If unable to parse column name
-     * @throws InvalidArgumentException If unable to traverse column values
      * @throws UnderflowException If an empty traversable is provided
      */
     public function in($columnName, $columnValues): self
     {
-        if (!\is_iterable($columnValues)) {
-            throw new InvalidArgumentException("Unable to traverse 'in()' arg. Found: " . \gettype($columnValues));
-        }
-        if (0 === \count($columnValues)) {
-            // While this logically equates to $this->>where[] = 'FALSE', that would still trigger
-            // a potentially pointless round-trip to the DB. The caller should handle this case in code instead.
-            throw new UnderflowException('List of column values is empty');
-        }
-        return $this->addPredicate($columnName, $columnValues);
+        return $this->addIterablePredicate($columnName, $columnValues, self::OPERATOR_EQUALS);
     }
 
 
@@ -266,20 +287,11 @@ class Builder implements IBuilder
      * @param array|Traversable $columnValues
      * @return $this
      * @throws InvalidColumnException If unable to parse column name
-     * @throws InvalidArgumentException  If unable to traverse column values
      * @throws UnderflowException If an empty traversable is provided
      */
     public function notIn($columnName, $columnValues): self
     {
-        if (!\is_iterable($columnValues)) {
-            throw new InvalidArgumentException("Unable to traverse 'notIn()' arg. Found: " . gettype($columnValues));
-        }
-        if (0 === \count($columnValues)) {
-            // While this logically equates to $this->>where[] = 'TRUE', that would still trigger
-            // a potentially pointless round-trip to the DB. The caller should handle this case in code instead.
-            throw new UnderflowException('List of column values is empty');
-        }
-        return $this->addPredicate($columnName, $columnValues, self::OPERATOR_NOT_EQUALS);
+        return $this->addIterablePredicate($columnName, $columnValues, self::OPERATOR_NOT_EQUALS);
     }
 
 
@@ -336,15 +348,12 @@ class Builder implements IBuilder
      * @param string|ISqlFunc $columnName
      * @param int|string      $columnValue if string, must be datetime
      * @return $this
-     * @throws InvalidArgumentException If column value is not a scalar
+     * @throws TypeError If $columnValue is of invalid type. Use isNull() for matching NULL
      * @throws InvalidColumnException If unable to parse column name
      */
     public function lessThan($columnName, $columnValue): self
     {
-        if (\is_scalar($columnValue) || ($columnValue instanceof Alaress_Date_Format && !$columnValue->isNull())) {
-            return $this->addPredicate($columnName, $columnValue, self::OPERATOR_LT);
-        }
-        throw new InvalidArgumentException('Column value must be scalar or ADF. Found: ' . \gettype($columnValue));
+        return $this->addScalarPredicate($columnName, $columnValue, self::OPERATOR_LT);
     }
 
 
@@ -352,15 +361,12 @@ class Builder implements IBuilder
      * @param string|ISqlFunc $columnName
      * @param int|string      $columnValue if string, must be datetime
      * @return $this
-     * @throws InvalidArgumentException If column value is not a scalar
+     * @throws TypeError If $columnValue is of invalid type. (Use isNull() for matching NULL)
      * @throws InvalidColumnException If unable to parse column name
      */
     public function lessThanOrEqualTo($columnName, $columnValue): self
     {
-        if (\is_scalar($columnValue) || ($columnValue instanceof Alaress_Date_Format && !$columnValue->isNull())) {
-            return $this->addPredicate($columnName, $columnValue, self::OPERATOR_LTE);
-        }
-        throw new InvalidArgumentException('Column value must be scalar or ADF. Found: ' . \gettype($columnValue));
+        return $this->addScalarPredicate($columnName, $columnValue, self::OPERATOR_LTE);
     }
 
 
@@ -368,15 +374,12 @@ class Builder implements IBuilder
      * @param string|ISqlFunc $columnName
      * @param int|string      $columnValue if string, must be datetime
      * @return $this
-     * @throws InvalidArgumentException If column value is not a scalar
+     * @throws TypeError If $columnValue is of invalid type. (Use isNull() for matching NULL)
      * @throws InvalidColumnException If unable to parse column name
      */
     public function greaterThan($columnName, $columnValue): self
     {
-        if (\is_scalar($columnValue) || ($columnValue instanceof Alaress_Date_Format && !$columnValue->isNull())) {
-            return $this->addPredicate($columnName, $columnValue, self::OPERATOR_GT);
-        }
-        throw new InvalidArgumentException('Column value must be scalar or ADF. Found: ' . \gettype($columnValue));
+        return $this->addScalarPredicate($columnName, $columnValue, self::OPERATOR_GT);
     }
 
 
@@ -384,15 +387,12 @@ class Builder implements IBuilder
      * @param string|ISqlFunc $columnName
      * @param int|string      $columnValue
      * @return $this
-     * @throws InvalidArgumentException If column value is not a scalar
+     * @throws TypeError If $columnValue is of invalid type. (Use isNull() for matching NULL)
      * @throws InvalidColumnException If unable to parse column name
      */
     public function greaterThanOrEqualTo($columnName, $columnValue): self
     {
-        if (\is_scalar($columnValue) || ($columnValue instanceof Alaress_Date_Format && !$columnValue->isNull())) {
-            return $this->addPredicate($columnName, $columnValue, self::OPERATOR_GTE);
-        }
-        throw new InvalidArgumentException('Column value must be scalar or ADF. Found: ' . \gettype($columnValue));
+        return $this->addScalarPredicate($columnName, $columnValue, self::OPERATOR_GTE);
     }
 
 
@@ -400,7 +400,7 @@ class Builder implements IBuilder
      * @param string|ISqlFunc $columnName
      * @param int|string      $columnValue if string, must be datetime
      * @return $this
-     * @throws InvalidArgumentException If column value is not a scalar
+     * @throws TypeError If $columnValue is of invalid type. (Use isNull() for matching NULL)
      * @throws InvalidColumnException If unable to parse column name
      */
     public function notLessThan($columnName, $columnValue): self
@@ -412,7 +412,7 @@ class Builder implements IBuilder
      * @param string|ISqlFunc $columnName
      * @param int|string      $columnValue if string, must be datetime
      * @return $this
-     * @throws InvalidArgumentException If column value is not a scalar
+     * @throws TypeError If $columnValue is of invalid type. (Use isNull() for matching NULL)
      * @throws InvalidColumnException If unable to parse column name
      */
     public function notGreaterThan($columnName, $columnValue): self
@@ -428,7 +428,7 @@ class Builder implements IBuilder
      * @param null|string|int  $from If null, this value is excluded.
      * @param null|string|int  $to   If null, this value is excluded.
      * @return $this
-     * @throws InvalidArgumentException If $from or $to are not null or scalars
+     * @throws TypeError If $columnValue is of invalid type. (Use isNull() for matching NULL)
      * @throws InvalidColumnException If unable to parse column name
      */
     public function between($columnName, $from, $to): self
@@ -477,7 +477,7 @@ class Builder implements IBuilder
         }
         try {
             return $this->between($columnName, $fromString, $toString);
-        } catch (InvalidArgumentException $e) {
+        } catch (TypeError $e) {
             // Impossible to throw as we are passing null or string
             return null;
         }
@@ -491,7 +491,7 @@ class Builder implements IBuilder
      * @return $this
      * @throws InvalidColumnException If unable to parse column name
      */
-    protected function addPredicate($columnName, $columnValue, $operator = self::OPERATOR_EQUALS): self
+    protected function addPredicate($columnName, $columnValue, string $operator = self::OPERATOR_EQUALS): self
     {
         // prepare operator modifiers
         $negate   = self::OPERATOR_NOT_EQUALS === $operator || self::OPERATOR_NOT_LIKE === $operator;
