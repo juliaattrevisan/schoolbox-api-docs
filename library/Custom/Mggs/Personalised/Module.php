@@ -79,7 +79,7 @@ class Module extends BaseModule
             'GET',
             '/resources/{studentId}{/date}',
             'getResourcesForStudent',
-            $access,
+            new Rule\Any($access, new Rule\IsParentOfStudent('studentId')),
             $preload
         );
         $this->register(
