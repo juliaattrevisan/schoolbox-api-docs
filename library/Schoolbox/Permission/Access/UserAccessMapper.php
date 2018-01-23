@@ -681,13 +681,15 @@ class UserAccessMapper extends Mapper
             if ($result) {
                 // Found matching student, give them read/write perms if student/staff respectively
 
+                $studentReadAccess = $this->getConfigLoader()->get('allow_student_class_access') ? UserAccess::ACCESS_READ : UserAccess::ACCESS_DENY;
+
                 $model = new UserAccess();
                 $model->setService($service);
                 $model->setServiceIdentifier($serviceIdentifier);
                 $model->setUser($user);
                 $model->setAccessLevel(
                     $user->getRole()->getType() == 'student'
-                        ? UserAccess::ACCESS_READ
+                        ? $studentReadAccess
                         : UserAccess::ACCESS_WRITE);
 
                 // Cache for future calls and return the permission object
