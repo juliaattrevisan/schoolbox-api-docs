@@ -34,6 +34,8 @@
         var $participantSettings = $(defaults.participantSettings);
         var $customiseModal = $(defaults.customiseModal);
 
+        var newPlan = true;
+
         // ----------------------------------------------------------------
         // Events
         // ----------------------------------------------------------------
@@ -81,6 +83,7 @@
         $participantSettings.on('click', '#participant-customise', function (event) {
             event.preventDefault();
             openPlanModal();
+            newPlan = true;
         });
 
         /**
@@ -91,7 +94,7 @@
 
             var planId = $(this).attr('data-plan-modify');
             var planData = getPlanData(planId);
-
+            newPlan = false;
             openPlanModal(planData);
         });
 
@@ -166,7 +169,11 @@
                     required: true,
                     datepickerDate: true
                 },
-                'plan-participants': 'required'
+                'plan-participants': {
+                    required: function () {
+                        return newPlan;
+                    }
+                }
             },
 
             // Ignore all hidden elements, except for the input hidden by selectize
@@ -179,10 +186,9 @@
                 self.newPlanCount++;
                 var oldPlanId = $customiseModal.find('#plan-id').val();
                 var newPlanId = -1 * self.newPlanCount;
-                var update = oldPlanId == 0 ? false : true;
 
                 var planDetails = {
-                    'id': update ? oldPlanId : newPlanId,
+                    'id': newPlan ? newPlanId : oldPlanId,
                     'name': $customiseModal.find('#plan-name').val(),
                     'description': CKEDITOR.instances['plan-desc'].getData(),
                     'publishDate': $customiseModal.find('#plan-publish-date').val(),
@@ -191,15 +197,9 @@
                     'closeDate': $customiseModal.find('#plan-close-date').val()
                 };
 
-                update ? updatePlanData(planDetails) : addPlanData(planDetails);
+                newPlan ? addPlanData(planDetails) : updatePlanData(planDetails);
 
-                if (update) {
-                    // Update plan in drop downs
-                    $('[data-plan-modify="' + planDetails['id'] + '"]').attr('data-plan-name', planDetails['name']).text(planDetails['name']);
-                    $('[data-plan-use="' + planDetails['id'] + '"]').attr('data-plan-name', planDetails['name']).text(planDetails['name']);
-                }
-                else {
-
+                if (newPlan) {
                     $('#participant-customise')
                         .closest('li')
                         .before(createPlanListItem(planDetails, false));
@@ -209,9 +209,19 @@
 
                     enableActions();
                 }
+                else {
+                    // Update plan in drop downs
+                    $('[data-plan-modify="' + planDetails['id'] + '"]').attr('data-plan-name', planDetails['name']).text(planDetails['name']);
+                    $('[data-plan-use="' + planDetails['id'] + '"]').attr('data-plan-name', planDetails['name']).text(planDetails['name']);
+                }
+                var studentIDs = [];
+
+                if ($('#plan-participants')[0].selectize.getValue().length > 0) {
+                    studentIDs = $('#plan-participants')[0].selectize.getValue().split(',');
+                }
 
                 // Update the selected students with the plan
-                updateStatus($('#plan-participants')[0].selectize.getValue().split(','), planDetails['id'], planDetails['name'], update);
+                updateStatus(studentIDs, planDetails['id'], planDetails['name'], newPlan);
 
                 // Close the modal
                 $customiseModal.foundation('reveal', 'close');
@@ -236,7 +246,7 @@
             $participants.find(':checked').each(function () {
                 studentIDs.push($(this).attr('data-user-id'));
             });
-            updateStatus(studentIDs, planId, planName, false);
+            updateStatus(studentIDs, planId, planName, true);
 
             // Reset the checkboxes and buttons
             resetActions();
@@ -252,9 +262,10 @@
     /**
      * Update the students selected
      */
-    function updateStatus(students, planId, planName, update) {
+    function updateStatus(students, planId, planName, newPlan) {
 
-        if (update) {
+        // If updating an existing plan
+        if (newPlan === false) {
             // Clear this plan form all the students it was previously applied to
             var $existingStudents = $('li[data-participant]').find('input[value = ' + planId + ']');
             $existingStudents.each(function () {
@@ -266,22 +277,23 @@
                 $(this).val(0);
             });
         }
+        if (students.length > 0 && students !== undefined) {
+            // Update the students with the plan
+            $(students).each(function (index, studentID) {
+                var $participantRow = $('li[data-participant=' + studentID + ']');
+                var $participantCard = $participantRow.find('div.card');
 
-        // Update the students with the plan
-        $(students).each(function (index, studentID) {
-            var $participantRow = $('li[data-participant=' + studentID + ']');
-            var $participantCard = $participantRow.find('div.card');
+                // Update the status showing for the student
+                $participantRow.find('div[data-participant-status]').text(planName);
 
-            // Update the status showing for the student
-            $participantRow.find('div[data-participant-status]').text(planName);
+                // Make sure student is included now
+                $participantRow.find('#participant-include-' + studentID).val(1);
+                $participantCard.removeClass('participant-excluded');
 
-            // Make sure student is included now
-            $participantRow.find('#participant-include-' + studentID).val(1);
-            $participantCard.removeClass('participant-excluded');
-
-            // Update the hidden input for their plan
-            $participantRow.find('#participant-plan-' + studentID).val(planId);
-        });
+                // Update the hidden input for their plan
+                $participantRow.find('#participant-plan-' + studentID).val(planId);
+            });
+        }
     }
 
 
@@ -470,7 +482,7 @@
         // Fill the selectize with the checked students
         participantSelectize.clear();
         if (planData !== undefined) {
-                $participants.find('input[value = ' + planData['id'] + ']').each(function () {
+            $participants.find('input[value = ' + planData['id'] + ']').each(function () {
                 var participantId = $(this).parent().attr('data-participant');
                 var participantName = $('#participant-' + participantId).attr('data-user-name');
                 participantSelectize.addOption({
@@ -500,6 +512,7 @@
         $('#plan-open-date-error').hide();
         $('#plan-due-date-error').hide();
         $('#plan-close-date-error').hide();
+        $('#plan-participants-error').hide();
 
         // Set dates & description to whatever is currently set on the main form
         if (planData !== undefined) {
