@@ -73,3 +73,7 @@
 .fc-time-area .fc-bgevent {
     pointer-events: none;
 }
+.no-bling {
+    border-radius: 10px;
+    background-color: #002344;
+}

@@ -403,8 +403,10 @@
 
             var isPlaceholder = calEvent.data.placeholder;
 
+            var $content = $element.find('.fc-content');
+
             if (status) {
-                $element.find('.fc-content').prepend(
+                $content.prepend(
                     $('<a class="progress-tick" />')
                         .addClass(status)
                         .addClass(isPlaceholder ? 'small' : 'tiny')
@@ -412,6 +414,8 @@
                 );
 
                 $element.addClass('progress-' + status);
+            } else if (isPlaceholder) {
+                $content.prepend($('<a class="progress-tick small no-bling" />'));
             }
 
             if (view.type !== 'timelineTerm') {
