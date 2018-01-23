@@ -370,6 +370,42 @@ class DueWorkTest extends TestCase
         $this->assertEquals('A dumb type', $dueWork->getWorkType()->getName());
     }
 
+
+    /**
+     * Assert that translating a data model to a domain model, then back to a
+     * data model returns the original data model.
+     */
+    public function testTranslateDataModelBackToDomainModel()
+    {
+        $dueWorkDataModel = (new DueWorkModel())
+            ->setId(6789)
+            ->setAssessmentModel(
+                (new AssessmentModel())
+                    ->setAssessmentContext((new Folder())->setId(1))
+                    ->setId(33)
+                    ->setWorkType((new WorkType())
+                        ->setId(12)
+                        ->setName('A dumb type')
+                    )
+            );
+
+        $dueWorkDomainModel           = $this->translator->translateToDomainModel($dueWorkDataModel);
+        $retranslatedDueWorkDataModel = $this->translator->translateToDataModel($dueWorkDomainModel);
+        $this->assertSame($dueWorkDataModel, $retranslatedDueWorkDataModel);
+    }
+
+
+    /**
+     * Assert that null data model can be translated to a domain model.
+     */
+    public function testTranslateNullDataModelToDomainModel()
+    {
+        $nullDueWorkDataModel   = (new DueWorkModel())->setId(null);
+        $nullDueWorkDomainModel = $this->translator->translateToDomainModel($nullDueWorkDataModel);
+        $this->assertNull($nullDueWorkDomainModel->getId());
+    }
+
+
     /**
      * Data provider for different due work response acceptance settings.
      */
