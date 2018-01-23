@@ -52,6 +52,7 @@ $(function () {
 
                     tourCurrent.setOptions({
                         showStepNumbers: false,
+                        showBullets: false,
                         hidePrev: true,
                         hideNext: true,
                         nextLabel: 'Next',
