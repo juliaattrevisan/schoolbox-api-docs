@@ -671,7 +671,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
                 $translator = new AssessmentDataModelTranslator(
                     new MarkSchemeFactory(),
                     $di->get('mapperFactory')->get(AssessmentMapper::class),
-                    2
+                    AssessmentDataModelTranslator::MAX_PROJECT_LEVELS_DEFAULT
                 );
                 $translator
                     ->addSubTranslator(new TaskTranslator())

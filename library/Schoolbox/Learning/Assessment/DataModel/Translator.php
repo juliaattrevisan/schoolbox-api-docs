@@ -27,6 +27,13 @@ class Translator
 {
 
     /**
+     * By default, only permit 2 levels (ie sub-assessments inside a project)
+     *
+     * @const int
+     */
+    public const MAX_PROJECT_LEVELS_DEFAULT = 2;
+
+    /**
      * Factory for mark schemes for assessables.
      *
      * @var MarkSchemeFactory
@@ -71,7 +78,7 @@ class Translator
     public function __construct(
         MarkSchemeFactory $markSchemeFactory,
         Mapper $assessmentMapper,
-        int $maxProjectLevels = 10
+        int $maxProjectLevels
     ) {
         $this->markSchemeFactory = $markSchemeFactory;
         $this->assessmentMapper  = $assessmentMapper;

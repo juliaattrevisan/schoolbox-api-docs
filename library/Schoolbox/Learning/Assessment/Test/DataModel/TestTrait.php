@@ -49,7 +49,8 @@ trait TestTrait
     {
         $this->translator = new Translator(
             new MarkSchemeFactory(),
-            $this->getAssessmentMapper()
+            $this->getAssessmentMapper(),
+            10
         );
         $this->translator
             ->addSubTranslator(new Translator\Task())
