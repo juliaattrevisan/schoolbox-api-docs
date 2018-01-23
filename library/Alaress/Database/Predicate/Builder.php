@@ -270,26 +270,26 @@ class Builder implements IBuilder
 
 
     /**
-     * @param string|ISqlFunc   $columnName
-     * @param array|Traversable $columnValues
+     * @param string|ISqlFunc $columnName
+     * @param iterable        $columnValues
      * @return $this
      * @throws InvalidColumnException If unable to parse column name
      * @throws UnderflowException If an empty traversable is provided
      */
-    public function in($columnName, $columnValues): self
+    public function in($columnName, iterable $columnValues): self
     {
         return $this->addIterablePredicate($columnName, $columnValues, self::OPERATOR_EQUALS);
     }
 
 
     /**
-     * @param string|ISqlFunc   $columnName
-     * @param array|Traversable $columnValues
+     * @param string|ISqlFunc $columnName
+     * @param iterable        $columnValues
      * @return $this
      * @throws InvalidColumnException If unable to parse column name
      * @throws UnderflowException If an empty traversable is provided
      */
-    public function notIn($columnName, $columnValues): self
+    public function notIn($columnName, iterable $columnValues): self
     {
         return $this->addIterablePredicate($columnName, $columnValues, self::OPERATOR_NOT_EQUALS);
     }
