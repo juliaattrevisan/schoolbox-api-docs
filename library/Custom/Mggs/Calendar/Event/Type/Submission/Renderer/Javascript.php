@@ -190,7 +190,14 @@ class Javascript extends \Calendar\Event\Type\Submission\Renderer\Javascript
 
         $mark = $fb->getNormalisedMark();
 
-        if ($mark === null || $mark >= ConfigMapper::getInstance()->get('pbl_mastery_threshold')) {
+        // determine which threshold we need to respect
+        if ($this->getEvent()->getAssessment()->getContext() instanceof Project) {
+            $threshold = 'pbl_project_threshold';
+        } else {
+            $threshold = 'pbl_mastery_threshold';
+        }
+
+        if ($mark === null || $mark >= ConfigMapper::getInstance()->get($threshold)) {
             // mark as success if null, or above mastery level
             return 'reviewed';
         }
