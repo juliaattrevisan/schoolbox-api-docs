@@ -12,7 +12,7 @@ use Alaress\Database\Predicate\Builder;
 use PHPUnit\Framework\TestCase;
 use Alaress\Database\Quoter\Mysql;
 use Alaress\Database\Predicate\InvalidColumnException;
-use InvalidArgumentException;
+use TypeError;
 
 /**
  * Tests that the Predicate Builder's sub-predicate public methods generate the expected SQL
@@ -45,7 +45,7 @@ class TestSubPredicates extends TestCase
 
     /**
      * @throws InvalidColumnException
-     * @throws InvalidArgumentException
+     * @throws TypeError
      */
     public function testAll()
     {
@@ -58,9 +58,10 @@ class TestSubPredicates extends TestCase
         $this->assertEquals($pb->getParams(), ['column_0' => 1, 'column_1' => 2]);
     }
 
+
     /**
      * @throws InvalidColumnException
-     * @throws InvalidArgumentException
+     * @throws TypeError
      */
     public function testAny()
     {
@@ -73,9 +74,10 @@ class TestSubPredicates extends TestCase
         $this->assertEquals($pb->getParams(), ['column_0' => 1, 'column_1' => 2]);
     }
 
+
     /**
      * @throws InvalidColumnException
-     * @throws InvalidArgumentException
+     * @throws TypeError
      */
     public function testNotAll()
     {
@@ -88,9 +90,10 @@ class TestSubPredicates extends TestCase
         $this->assertEquals($pb->getParams(), ['column_0' => 1, 'column_1' => 2]);
     }
 
+
     /**
      * @throws InvalidColumnException
-     * @throws InvalidArgumentException
+     * @throws TypeError
      */
     public function testNotAny()
     {
@@ -104,9 +107,14 @@ class TestSubPredicates extends TestCase
     }
 
 
+    /**
+     * @throws InvalidColumnException
+     * @throws TypeError
+     * @throws \PHPUnit\Framework\Exception
+     */
     public function testCollisions()
     {
-        $pb    = new Builder($this->mySqlQuoter, 'table');
+        $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->greaterThan('height', 5);
         $pb->lessThan('height', 50);
         $subPb = $pb->buildSubBuilder()
@@ -120,7 +128,7 @@ class TestSubPredicates extends TestCase
 
         // Each should be present in the WHERE clause
         $where = implode(' AND ', $pb->getWhere());
-        foreach(array_keys($pb->getParams()) as $placeholder){
+        foreach (array_keys($pb->getParams()) as $placeholder) {
             $this->assertContains($placeholder, $where);
         }
     }

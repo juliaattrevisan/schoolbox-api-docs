@@ -9,7 +9,8 @@ declare(strict_types=1);
 namespace Alaress\Database\Predicate\Test;
 
 use Alaress\Database\Predicate\Builder;
-use InvalidArgumentException;
+use TypeError;
+use UnderflowException;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Predicate\ISqlFunc;
 use Alaress\Database\Predicate\SqlFunc\Coalesce;
@@ -46,6 +47,7 @@ class TestExpectedExceptions extends TestCase
      * @param mixed  $value
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
+     * @throws UnderflowException
      */
     public function test_addColumnList(string $invalidColumnName, $value)
     {
@@ -113,17 +115,17 @@ class TestExpectedExceptions extends TestCase
 
     /**
      * @dataProvider provider_invalidColumn_validValue
-     * @param string|ISqlFunc  $invalidOperand
+     * @param string|ISqlFunc  $invalidColumn
      * @param string|float|int $value
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_equals_invalidColumn($invalidOperand, $value)
+    public function test_equals_invalidColumn($invalidColumn, $value)
     {
         $this->expectException(InvalidColumnException::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
-        $pb->equals($invalidOperand, $value);
+        $pb->equals($invalidColumn, $value);
     }
 
 
@@ -131,13 +133,13 @@ class TestExpectedExceptions extends TestCase
      * @dataProvider provider_validColumn_invalidValue
      * @param string|ISqlFunc  $validOperand
      * @param string|float|int $invalidValue
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
     public function test_equals_invalidArg($validOperand, $invalidValue)
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->equals($validOperand, $invalidValue);
     }
@@ -147,7 +149,7 @@ class TestExpectedExceptions extends TestCase
      * @dataProvider provider_invalidColumn_validValue
      * @param string|ISqlFunc  $invalidOperand
      * @param string|float|int $value
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
@@ -163,13 +165,13 @@ class TestExpectedExceptions extends TestCase
      * @dataProvider provider_validColumn_invalidValue
      * @param string|ISqlFunc  $validOperand
      * @param string|float|int $invalidValue
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
     public function test_notEquals_invalidArg($validOperand, $invalidValue)
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->notEquals($validOperand, $invalidValue);
     }
@@ -179,9 +181,10 @@ class TestExpectedExceptions extends TestCase
      * @dataProvider provider_invalidColumn_validValueTraversable
      * @param string|ISqlFunc   $invalidOperand
      * @param array|Traversable $validValue
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
+     * @throws UnderflowException
      */
     public function test_in_invalidColumn($invalidOperand, $validValue)
     {
@@ -195,15 +198,29 @@ class TestExpectedExceptions extends TestCase
      * @dataProvider provider_validColumn_invalidValueTraversable
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidValue
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
+     * @throws UnderflowException
      */
     public function test_in_invalidArg($validOperand, $invalidValue)
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->in($validOperand, $invalidValue);
+    }
+
+
+    /**
+     * @throws InvalidColumnException
+     * @throws PHPUnit\Framework\Exception
+     * @throws UnderflowException
+     */
+    public function test_in_eEmpty()
+    {
+        $this->expectException(UnderflowException::class);
+        $pb = new Builder($this->mySqlQuoter, 'table');
+        $pb->in('column', []);
     }
 
 
@@ -211,9 +228,10 @@ class TestExpectedExceptions extends TestCase
      * @dataProvider provider_invalidColumn_validValueTraversable
      * @param string|ISqlFunc   $invalidOperand
      * @param array|Traversable $validValue
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
+     * @throws UnderflowException
      */
     public function test_notIn_invalidColumn($invalidOperand, $validValue)
     {
@@ -227,15 +245,29 @@ class TestExpectedExceptions extends TestCase
      * @dataProvider provider_validColumn_invalidValueTraversable
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidValue
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
+     * @throws UnderflowException
      */
     public function test_notIn_invalidArg($validOperand, $invalidValue)
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->notIn($validOperand, $invalidValue);
+    }
+
+
+    /**
+     * @throws InvalidColumnException
+     * @throws PHPUnit\Framework\Exception
+     * @throws UnderflowException
+     */
+    public function testNotInEmpty()
+    {
+        $this->expectException(UnderflowException::class);
+        $pb = new Builder($this->mySqlQuoter, 'table');
+        $pb->notIn('column', []);
     }
 
 
@@ -285,7 +317,7 @@ class TestExpectedExceptions extends TestCase
      * @dataProvider provider_invalidColumn_validValue
      * @param string|ISqlFunc $invalidOperand
      * @param mixed           $validValue
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
@@ -301,13 +333,13 @@ class TestExpectedExceptions extends TestCase
      * @dataProvider provider_validColumn_invalidValue
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidValue
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
     public function test_lessThan_validColumn_invalidValue($validOperand, $invalidValue)
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->lessThan($validOperand, $invalidValue);
     }
@@ -317,7 +349,7 @@ class TestExpectedExceptions extends TestCase
      * @dataProvider provider_invalidColumn_validValue
      * @param string|ISqlFunc $invalidOperand
      * @param mixed           $validValue
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
@@ -333,13 +365,13 @@ class TestExpectedExceptions extends TestCase
      * @dataProvider provider_validColumn_invalidValue
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidValue
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
     public function test_lessThanOrEqualTo_validColumn_invalidValue($validOperand, $invalidValue)
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->lessThanOrEqualTo($validOperand, $invalidValue);
     }
@@ -349,7 +381,7 @@ class TestExpectedExceptions extends TestCase
      * @dataProvider provider_invalidColumn_validValue
      * @param string|ISqlFunc $invalidOperand
      * @param mixed           $validValue
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
@@ -365,13 +397,13 @@ class TestExpectedExceptions extends TestCase
      * @dataProvider provider_validColumn_invalidValue
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidValue
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
     public function test_greaterThan_validColumn_invalidValue($validOperand, $invalidValue)
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->greaterThan($validOperand, $invalidValue);
     }
@@ -381,7 +413,7 @@ class TestExpectedExceptions extends TestCase
      * @dataProvider provider_invalidColumn_validValue
      * @param string|ISqlFunc $invalidOperand
      * @param mixed           $validValue
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
@@ -397,13 +429,13 @@ class TestExpectedExceptions extends TestCase
      * @dataProvider provider_validColumn_invalidValue
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidValue
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
     public function test_greaterThanOrEqualTo_validColumn_invalidValue($validOperand, $invalidValue)
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->greaterThanOrEqualTo($validOperand, $invalidValue);
     }
@@ -413,7 +445,7 @@ class TestExpectedExceptions extends TestCase
      * @dataProvider provider_invalidColumn_validValue
      * @param string|ISqlFunc $invalidOperand
      * @param mixed           $validValue
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
@@ -429,13 +461,13 @@ class TestExpectedExceptions extends TestCase
      * @dataProvider provider_validColumn_invalidValue
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidValue
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
     public function test_notLessThan_validColumn_invalidValue($validOperand, $invalidValue)
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->notLessThan($validOperand, $invalidValue);
     }
@@ -445,7 +477,7 @@ class TestExpectedExceptions extends TestCase
      * @dataProvider provider_invalidColumn_validValue
      * @param string|ISqlFunc $invalidOperand
      * @param mixed           $validValue
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
@@ -461,13 +493,13 @@ class TestExpectedExceptions extends TestCase
      * @dataProvider provider_validColumn_invalidValue
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidValue
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
     public function test_notGreaterThan_validColumn_invalidValue($validOperand, $invalidValue)
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->notGreaterThan($validOperand, $invalidValue);
     }
@@ -478,7 +510,7 @@ class TestExpectedExceptions extends TestCase
      * @param string|ISqlFunc $invalidOperand
      * @param mixed           $validFrom
      * @param mixed           $validTo
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
@@ -495,13 +527,13 @@ class TestExpectedExceptions extends TestCase
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidFrom
      * @param mixed           $invalidTo
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
     public function test_between_validColumn_invalidValue($validOperand, $invalidFrom, $invalidTo)
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->between($validOperand, $invalidFrom, $invalidTo);
     }

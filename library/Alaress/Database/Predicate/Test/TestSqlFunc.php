@@ -12,7 +12,7 @@ use Alaress\Database\Predicate\SqlFunc\Coalesce;
 use Alaress\Database\Predicate\SqlFunc\Now;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use PHPUnit\Framework\TestCase;
-use InvalidArgumentException;
+use TypeError;
 use Alaress\Database\Predicate\InvalidColumnException;
 
 /**
@@ -22,7 +22,7 @@ class TestSqlFunc extends TestCase
 {
 
     /**
-     * @throws InvalidArgumentException If column value is not of correct type
+     * @throws TypeError If column value is not of correct type
      * @throws InvalidColumnException If unable to parse column name
      */
     public function testCoalesce(): void
@@ -33,8 +33,9 @@ class TestSqlFunc extends TestCase
         $this->assertEquals(['coalesce_0' => 10], $pb->getParams());
     }
 
+
     /**
-     * @throws InvalidArgumentException If column value is not of correct type
+     * @throws TypeError If column value is not of correct type
      * @throws InvalidColumnException If unable to parse column name
      */
     public function testCoalesceDefaultTable(): void
@@ -45,8 +46,9 @@ class TestSqlFunc extends TestCase
         $this->assertEquals(['coalesce_0' => 10], $pb->getParams());
     }
 
+
     /**
-     * @throws InvalidArgumentException If column value is not of correct type
+     * @throws TypeError If column value is not of correct type
      * @throws InvalidColumnException If unable to parse column name
      */
     public function testNow(): void

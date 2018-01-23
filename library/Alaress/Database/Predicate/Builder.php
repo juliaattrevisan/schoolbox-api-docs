@@ -219,9 +219,9 @@ class Builder implements IBuilder
     private function addScalarPredicate($columnName, $columnValue, string $operator): self
     {
         if (\is_scalar($columnValue) || ($columnValue instanceof Alaress_Date_Format && !$columnValue->isNull())) {
-            throw new TypeError('Invalid columnValue type. Expected: [string|int|float|ADF]. Actual: ' . gettype($columnValue));
+            return $this->addPredicate($columnName, $columnValue, $operator);
         }
-        return $this->addPredicate($columnName, $columnValue, $operator);
+        throw new TypeError('Invalid columnValue type. Expected: [string|int|float|ADF]. Actual: ' . gettype($columnValue));
     }
 
 

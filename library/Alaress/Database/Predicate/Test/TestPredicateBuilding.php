@@ -14,7 +14,8 @@ use Alaress\Database\Quoter\Mysql;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
 use Alaress\Database\Predicate\InvalidColumnException;
-use InvalidArgumentException;
+use TypeError;
+use UnderflowException;
 
 /**
  * Tests that the Predicate Builder's public methods generate the expected SQL
@@ -38,14 +39,16 @@ class TestPredicateBuilding extends TestCase
 
     /**
      * @throws InvalidColumnException
+     * @throws UnderflowException
      */
     public function testAddColumnList()
     {
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->addColumnList(['column1' => 1, 'column2' => 2]);
-        $this->assertEquals(['`table`.`column1` = :column1_0','`table`.`column2` = :column2_0'], $pb->getWhere());
+        $this->assertEquals(['`table`.`column1` = :column1_0', '`table`.`column2` = :column2_0'], $pb->getWhere());
         $this->assertEquals($pb->getParams(), ['column1_0' => 1, 'column2_0' => 2]);
     }
+
 
     /**
      * @throws InvalidColumnException
@@ -96,7 +99,7 @@ class TestPredicateBuilding extends TestCase
 
 
     /**
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      */
     public function testEquals()
@@ -109,7 +112,7 @@ class TestPredicateBuilding extends TestCase
 
 
     /**
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      * @throws \PHPUnit\Framework\Exception
      */
@@ -126,7 +129,7 @@ class TestPredicateBuilding extends TestCase
 
 
     /**
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      */
     public function testNotEquals()
@@ -140,7 +143,8 @@ class TestPredicateBuilding extends TestCase
 
     /**
      * @throws InvalidColumnException
-     * @throws InvalidArgumentException
+     * @throws TypeError
+     * @throws UnderflowException
      */
     public function testIn()
     {
@@ -154,20 +158,8 @@ class TestPredicateBuilding extends TestCase
 
     /**
      * @throws InvalidColumnException
-     * @throws InvalidArgumentException
-     */
-    public function testInEmpty()
-    {
-        $pb = new Builder($this->mySqlQuoter, 'table');
-        $pb->in('column', []);
-        $this->assertEquals('FALSE', $pb->getWhere()[0]);
-        $this->assertEquals($pb->getParams(), []);
-    }
-
-
-    /**
-     * @throws InvalidColumnException
-     * @throws InvalidArgumentException
+     * @throws TypeError
+     * @throws UnderflowException
      */
     public function testNotIn()
     {
@@ -176,19 +168,6 @@ class TestPredicateBuilding extends TestCase
         $this->assertEquals(['`table`.`column` NOT IN (:column_0,:column_1)'], $pb->getWhere());
         $this->assertEquals(10, $pb->getParams()['column_0']);
         $this->assertEquals(20, $pb->getParams()['column_1']);
-    }
-
-
-    /**
-     * @throws InvalidColumnException
-     * @throws InvalidArgumentException
-     */
-    public function testNotInEmpty()
-    {
-        $pb = new Builder($this->mySqlQuoter, 'table');
-        $pb->notIn('column', []);
-        $this->assertEquals(['TRUE'], $pb->getWhere());
-        $this->assertEquals($pb->getParams(), []);
     }
 
 
@@ -230,7 +209,7 @@ class TestPredicateBuilding extends TestCase
 
 
     /**
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      */
     public function testLessThan()
@@ -243,7 +222,7 @@ class TestPredicateBuilding extends TestCase
 
 
     /**
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      */
     public function testLessThanOrEqualTo()
@@ -256,7 +235,7 @@ class TestPredicateBuilding extends TestCase
 
 
     /**
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      */
     public function testGreaterThan()
@@ -269,7 +248,7 @@ class TestPredicateBuilding extends TestCase
 
 
     /**
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      */
     public function testGreaterThanOrEqualTo()
@@ -282,7 +261,7 @@ class TestPredicateBuilding extends TestCase
 
 
     /**
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      */
     public function testNotLessThan()
@@ -295,7 +274,7 @@ class TestPredicateBuilding extends TestCase
 
 
     /**
-     * @throws InvalidArgumentException
+     * @throws TypeError
      * @throws InvalidColumnException
      */
     public function testNotGreaterThan()
@@ -314,7 +293,7 @@ class TestPredicateBuilding extends TestCase
      * @param string[]        $where
      * @param mixed[]         $params
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \InvalidArgumentException
+     * @throws \TypeError
      */
     public function testBetween($from, $to, array $where, array $params)
     {
@@ -348,7 +327,7 @@ class TestPredicateBuilding extends TestCase
      * @param string $table
      * @param string $quotedColumnAndTable
      * @throws InvalidColumnException
-     * @throws InvalidArgumentException
+     * @throws TypeError
      */
     public function testTableNames(string $column, string $table, string $quotedColumnAndTable)
     {
@@ -382,8 +361,8 @@ class TestPredicateBuilding extends TestCase
      */
     public function providerBetweenDates(): array
     {
-        $date1 = new Alaress_Date_Format('2010-01-01', Alaress_Date_Format::DATABASE_DATE_FORMAT);
-        $date2 = new Alaress_Date_Format('2010-01-01', Alaress_Date_Format::DATABASE_DATE_FORMAT);
+        $date1    = new Alaress_Date_Format('2010-01-01', Alaress_Date_Format::DATABASE_DATE_FORMAT);
+        $date2    = new Alaress_Date_Format('2010-01-01', Alaress_Date_Format::DATABASE_DATE_FORMAT);
         $nullDate = new Alaress_Date_NullDate();
         return [
             [null, null, [], []],
