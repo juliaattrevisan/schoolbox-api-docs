@@ -30,8 +30,8 @@ use Schoolbox\Tour\Step\Type\Modal;
 class Mapper extends BaseMapper
 {
     // Step type constants
-    const TYPE_TOOLTIP = 'tooltip';
-    const TYPE_MODAL = 'modal';
+    public const TYPE_TOOLTIP = 'tooltip';
+    public const TYPE_MODAL = 'modal';
 
     /**
      * @inheritdoc
@@ -128,7 +128,7 @@ class Mapper extends BaseMapper
                 $model->setAuthor($authorUserMapper->hydrate($row, 'a'));
                 $model->setTour($tourMapper->hydrate($row, 't'));
                 $model->setNextStep($stepMapper->hydrate($row, 'ns'));
-                
+
                 [ $mapper, $alias ] = $hydrators[$row['type']];
                 $type = $mapper->hydrate($row, $alias);
                 $model->setType($type);
