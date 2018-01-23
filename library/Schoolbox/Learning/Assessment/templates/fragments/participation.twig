@@ -59,9 +59,10 @@
                             </li>
                         </ul>
                         <ul class="f-dropdown" id="customise-options" data-dropdown-content aria-hidden="true">
-                            <li><a href="#" data-participant-change="exclude">Exclude from assessment</a></li>
+                            <li><a href="#" data-participant-change="exclude" class="hide">Exclude from assessment</a></li>
+                            <li><a href="#" data-participant-change="include" class="hide">Include to assessment</a></li>
                             <li class="separator">Learning Plans</li>
-                            <li><a href="#" data-participant-change="include">Default plan</a></li>
+                            <li><a href="#" data-participant-change="default" class="hide">Remove customisation</a></li>
                             {% for plan in assessment.plans if not plan.isDynamic %}
                                 <li><a href="#" data-plan-use="{{ plan.id }}" data-plan-name="{{ plan.name }}">{{ plan.name }}</a></li>
                             {% endfor %}
@@ -83,6 +84,7 @@
                     {% set user = participant.user %}
                     {% set userInclude = (not participant.excludedAt) or participant.excludedAt.null %}
                     {% set userPlanName = userInclude ? (participant.plan.name ?: '(no customisations)') : '(excluded)' %}
+                    {% set userStatus = userInclude ? (participant.plan.name ? 'custom' : 'included') : 'excluded' %}
 
                     <li data-participant="{{ user.id }}">
                         <input type="hidden" name="participant-include[{{ user.id }}]" id="participant-include-{{ user.id }}" value="{{ userInclude ? 1 : 0 }}">
@@ -106,7 +108,7 @@
                                             <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square32">
                                             <p>{{ user.fullName }}</p>
                                         </div>
-                                        <div class="small-12 medium-6 columns meta" data-participant-status>{{ userPlanName }}</div>
+                                        <div class="small-12 medium-6 columns meta" data-participant-status="{{ userStatus }}">{{ userPlanName }}</div>
                                     </label>
                                 </div>
                             </div>

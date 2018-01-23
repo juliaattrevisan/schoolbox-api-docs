@@ -50,6 +50,9 @@
             }
         });
 
+        /**
+         * Display tot
+         */
         enableActions();
 
         /**
@@ -60,6 +63,15 @@
             var $customiseDropdown = $('#customise-dropdown');
             var $participantRow = $(this).closest('li[data-participant]');
 
+            // Highlight/unhighlight row
+            if ($(this).is(':checked')) {
+                $participantRow.addClass('participant-selected');
+            } else {
+                $participantRow.removeClass('participant-selected');
+            }
+
+            displayParticipationOptions();
+
             if (checkCount) {
                 // Enable actions
                 $customiseDropdown.prop('disabled', false);
@@ -68,12 +80,6 @@
                 $customiseDropdown.prop('disabled', true);
             }
 
-            // Highlight/unhighlight row
-            if ($(this).is(':checked')) {
-                $participantRow.addClass('participant-selected');
-            } else {
-                $participantRow.removeClass('participant-selected');
-            }
         });
 
 
@@ -114,7 +120,7 @@
         $participantSettings.on('click', 'a[data-participant-change]', function (event) {
             event.preventDefault();
 
-            var include = $(this).attr('data-participant-change') === 'include';
+            var action = $(this).attr('data-participant-change');
 
             // Reflect the change in the UI
             var $studentsSelected = $participants.find(':checked');
@@ -122,21 +128,31 @@
                 var $participantRow = $(this).closest('li');
                 var $participantCard = $participantRow.find('div.card');
                 var studentID = $participantRow.attr('data-participant');
+                var statusValue;
                 var status;
 
-                if (include) {
+                if (action === 'include') {
                     $participantCard.removeClass('participant-excluded');
                     status = '(no customisations)';
-                } else {
+                    statusValue = 'included';
+                } else if (action === 'exclude') {
                     $participantCard.addClass('participant-excluded');
                     status = '(excluded)';
+                    statusValue = 'excluded';
+                } else {
+                    $participantCard.removeClass('participant-excluded');
+                    status = '(no customisations)';
+                    statusValue = 'custom';
                 }
 
                 // Update the status showing for the student
-                $participantRow.find('div[data-participant-status]').text(status);
+                $participantRow
+                    .find('div[data-participant-status]')
+                    .attr('data-participant-status', statusValue)
+                    .text(status);
 
                 // Adjust the hidden value for include
-                $('#participant-include-' + studentID).val(+include);
+                $('#participant-include-' + studentID).val(+action);
 
                 // Reset plan back to 0
                 $participantRow.find('#participant-plan-' + studentID).val(0);
@@ -273,7 +289,11 @@
             $existingStudents.each(function () {
 
                 // Update the status showing for the student
-                $(this).siblings('div[data-participant-row]').find('div[data-participant-status]').text('(no customisations)');
+                $(this)
+                    .siblings('div[data-participant-row]')
+                    .find('div[data-participant-status]')
+                    .attr('data-participant-status', 'included')
+                    .text('(no customisations)');
 
                 // Update the hidden input for their plan
                 $(this).val(0);
@@ -285,8 +305,11 @@
                 var $participantRow = $('li[data-participant=' + studentID + ']');
                 var $participantCard = $participantRow.find('div.card');
 
-                // Update the status showing for the student
-                $participantRow.find('div[data-participant-status]').text(planName);
+            // Update the status display for the student
+            $participantRow
+                .find('div[data-participant-status]')
+                .attr('data-participant-status', 'custom')
+                .text(planName);
 
                 // Make sure student is included now
                 $participantRow.find('#participant-include-' + studentID).val(1);
@@ -540,6 +563,42 @@
             clearData: true
         });
     }
+
+    /**
+     * Control action display under the "Modify Participation" drop down
+     */
+    function displayParticipationOptions() {
+        var $participants = $(defaults.participants);
+        var excluded = $participants.find(':checked').closest('li').find('[data-participant-status = excluded]').length;
+        var included = $participants.find(':checked').closest('li').find('[data-participant-status = included]').length;
+        var custom = $participants.find(':checked').closest('li').find('[data-participant-status = custom]').length;
+
+        // Show exclude action if at least one selected student is included or has a custom plan
+        if (included || custom) {
+            $('[data-participant-change = exclude]').removeClass('hide');
+        }
+        else {
+            $('[data-participant-change = exclude]').addClass('hide');
+        }
+
+        // Show include action if at least one selected student is excluded
+        if (excluded) {
+            $('[data-participant-change = include]').removeClass('hide');
+        }
+        else {
+            $('[data-participant-change = include]').addClass('hide');
+        }
+
+        // Show remove participation action if at least one selected student is excluded or has a custom plan
+        if (excluded || custom) {
+            $('[data-participant-change = default]').removeClass('hide');
+        }
+        else {
+            $('[data-participant-change = default]').addClass('hide');
+        }
+
+    }
+
 
     /**
      * The hook into jQuery's plugin infrastructure.
