@@ -35,8 +35,17 @@
     </div>
 </div>
 
-{% if participant.assessable.useRubric %}
-    {% include '@learningAssessment/dueWork/summary/rubric.twig' %}
+{# show authoritative feedback if it's there #}
+{% if authoritativeFeedback %}
+    {% include '@learningAssessment/dueWork/summary/mark.twig' with {
+        feedback: authoritativeFeedback,
+        participant: participant,
+    } %}
+{% else %}
+    {% include '@learningAssessment/dueWork/summary/markingGuide.twig' with {
+        rubricContext: emptyRubricContext,
+        participant: participant,
+    } %}
 {% endif %}
 
 {% include '@learningAssessment/dueWork/history.twig' %}

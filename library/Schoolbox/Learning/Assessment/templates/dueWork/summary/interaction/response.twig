@@ -86,13 +86,18 @@
 
                     {# We pass the responseId as well, so that people can download annotated kami docs
                      #}
+                    {# TODO restore only to include, as rubricContext shouldn't be passed in #}
                     {% include '@learningAssessment/dueWork/summary/interaction/feedback.twig' with {
                         currentFeedback: currentFeedback,
                         assessment: currentInteraction.assessable,
                         assessmentId: currentInteraction.assessable.id,
                         responseId: currentInteraction.id,
-                        participant: participant
-                    } only %}
+                        participant: participant,
+                        hasCollapser: true,
+                        collapsed: true,
+                        feedbackRubricContexts: feedbackRubricContexts,
+                    }
+                    only %}
                 {% endfor %}
 
         {% endif %}

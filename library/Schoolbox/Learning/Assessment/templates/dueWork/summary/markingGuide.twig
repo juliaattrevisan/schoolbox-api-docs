@@ -1,0 +1,11 @@
+{##
+ # Marking guide for submission history page.
+ #
+ # Currently only displays a rubric grid.
+ #}
+{% if participant.assessable.useRubric %}
+    {% include '@learningAssessment/dueWork/summary/rubric.twig' with {
+        rubricContext: rubricContext,
+        participant: participant,
+    } %}
+{% endif %}

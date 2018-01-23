@@ -27,7 +27,7 @@
 {% endif %}
 
 <ul class="information-list reply">
-    <li class="actions-small-1">
+    <li class="actions-small-2">
         <div class="list-item flex-grade">
             <div class="card small-12">
                 {% if url %}
@@ -69,20 +69,43 @@
                 feedback: currentFeedback,
             }
         ) %}
-        {% if deleteRoute %}
         <nav>
-            <a class="icon-delete" data-delete="{{ deleteRoute }}"></a>
+            {% if hasCollapser %}
+                <a href="#" class="icon-down-arrow" data-collapser="feedback-{{ responseId }}-{{ currentFeedback.id }}"></a>
+            {% endif %}
+            {% if deleteRoute %}
+                <a class="icon-delete" data-delete="{{ deleteRoute }}"></a>
+            {% endif %}
         </nav>
-        {% endif %}
 
         {% if currentFeedback.comment|length %}
-            <article>
+            <article class="{{ collapsed? 'hide' : '' }}"
+                     {% if hasCollapser %}
+                     data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
+                     data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}"
+                     {% endif %}>
                 {{ currentFeedback.comment|nl2br }}
             </article>
         {% endif %}
 
+        {# Rubric goes here #}
+        {% if feedbackRubricContexts[currentFeedback.id] %}
+            <div class="{{ collapsed? 'hide' : '' }}"
+                 {% if hasCollapser %}
+                 data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
+                 data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}"
+                 {% endif %}>
+                {% include '@rubric/grid.twig' with {
+                    rubric: feedbackRubricContexts[currentFeedback.id].rubric,
+                    markVisibility: participant.assessable.isFeedbackVisibleToUser(USER)
+                } only %}
+            </div>
+        {% endif %}
+
         {% if currentFeedback.allFiles | length %}
-            <ul class="information-list">
+            <ul class="information-list {{ collapsed? 'hide' : '' }}"
+                data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
+                data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}">
                 {% for currentFile in currentFeedback.allFiles %}
                 {# Only show published feedback and therefore also
                  # only list files that are involved with a Published Feedback
