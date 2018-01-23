@@ -451,8 +451,6 @@ class ListController extends Web\Controller\Base
 
         $planMap = $this->participantDataSource->getPlanMapper();
 
-        $existingPlans = $planMap->findByColumn('assessment_id', $assessmentId)->indexBy('id');
-
         // preload the plans list with the dyna-plan
         $plans = $planMap->findByColumnList([ 'is_dynamic' => true, 'assessment_id' => $assessmentId ])->indexBy('id');
 

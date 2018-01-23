@@ -62,10 +62,10 @@
 
             if (checkCount) {
                 // Enable actions
-                $customiseDropdown.attr('disabled', false);
+                $customiseDropdown.prop('disabled', false);
             } else {
                 // Disable actions
-                $customiseDropdown.attr('disabled', true);
+                $customiseDropdown.prop('disabled', true);
             }
 
             // Highlight/unhighlight row
@@ -307,7 +307,7 @@
         $participants.find('input[type=checkbox]').prop('checked', false);
         $participants.find('li[data-participant]').removeClass('participant-selected');
 
-        $customiseDropdown.attr('disabled', true);
+        $customiseDropdown.prop('disabled', true);
     }
 
 
