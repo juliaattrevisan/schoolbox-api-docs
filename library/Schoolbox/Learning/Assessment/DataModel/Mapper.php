@@ -27,6 +27,7 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use PDO;
+use UnderflowException;
 
 /**
  * Class Mapper
@@ -499,7 +500,7 @@ class Mapper extends BaseMapper
         try {
             $builder = $builder->in('id', array_merge($idList, $uniqueIds));
             return $this->findByPredicates($builder, $options);
-        } catch (\UnderflowException $e) {
+        } catch (UnderflowException $e) {
             return $this->createCollection();
         }
     }
@@ -632,7 +633,7 @@ class Mapper extends BaseMapper
 
 
     /**
-     * For any projects found in $modelList, identified by $projectIds, find thier sub-assessments
+     * For any projects found in $modelList, identified by $projectIds, find their sub-assessments
      * and load them into the projects.
      *
      * @param Collection|Model[] $modelList
@@ -640,7 +641,7 @@ class Mapper extends BaseMapper
      * @return Collection|Model[]
      * @throws BaseMapper\DefinitionException
      * @throws BaseMapper\Exception
-     * @throws \UnderflowException
+     * @throws UnderflowException
      */
     private function augmentListWithProjectSubAssessments(Collection $modelList, array $projectIds)
     {
@@ -660,6 +661,9 @@ class Mapper extends BaseMapper
         /** @var Project\Mapper $projectMapper */
         $projectMapper = $this->getJoinMapper('project');
 
+        // $projects stores references to each $modelList item's project.
+        // When a value in $projects gets updated (happens in last foreach):
+        // the corresponding $modelList item's project gets updated.
         $projects = $projectMapper->createCollection();
         foreach ($modelList as $model) {
             $project = $model->getProject();
