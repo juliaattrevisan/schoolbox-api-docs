@@ -85,7 +85,7 @@ class Sync extends Base implements ISync
                         V_Student.Grade                 AS student_year_level_description            
             FROM        V_Parent
             JOIN        V_Student ON V_Student.StudentID = V_Parent.StudentID
-            WHERE       V_Parent.Relationship IN ('Caregiver', 'Father', 'Guardian', 'Legal Guardian', 'Mother', 'Primary Contact')
+            WHERE       V_Parent.Relationship IN ('Caregiver', 'Father', 'Guardian', 'Legal Guardian', 'Mother', 'Primary Contact', 'Stepfather', 'Stepmother')
             ORDER BY    ParentID
         ";
 
