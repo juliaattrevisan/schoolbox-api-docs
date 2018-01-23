@@ -269,21 +269,12 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             $next_step_uuid = $stepsReversed[$i - 1]['uuid'];
         }
 
-        if ($step['type'] === 'tooltip') {
-            $statement->execute([
-                'uuid'           => $step['uuid'],
-                'tour_uuid'      => $tour_uuid,
-                'next_step_uuid' => $next_step_uuid,
-                'step_type'      => 'tooltip',
-            ]);
-        } else if ($step['type'] === 'modal') {
-            $statement->execute([
-                'uuid'           => $step['uuid'],
-                'tour_uuid'      => $tour_uuid,
-                'next_step_uuid' => $next_step_uuid,
-                'step_type'      => 'modal',
-            ]);
-        }
+        $statement->execute([
+            'uuid'           => $step['uuid'],
+            'tour_uuid'      => $tour_uuid,
+            'next_step_uuid' => $next_step_uuid,
+            'step_type'      => $step['type'],
+        ]);
 
 
         if ($step['type'] === 'tooltip') {
