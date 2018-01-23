@@ -160,7 +160,7 @@ class External_Tass_PortalController extends Alaress\Web\Controller\Base
         else if ($this->getUser()->getRole()->isStudent() && \Cfg::get('external_tass_sso_student_code') == "TASS ID") {
             $ssoCode = $this->getUser()->getExternalId();
         } else {
-            $ssoCode = $this->getUser()->getUsername();
+            $ssoCode = urlencode($this->getUser()->getUsername());
         }
 
         $config['sso_code'] = $ssoCode;
