@@ -276,9 +276,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
                 'next_step_uuid' => $next_step_uuid,
                 'step_type'      => 'tooltip',
             ]);
-        }
-
-        if ($step['type'] === 'modal') {
+        } else if ($step['type'] === 'modal') {
             $statement->execute([
                 'uuid'           => $step['uuid'],
                 'tour_uuid'      => $tour_uuid,
