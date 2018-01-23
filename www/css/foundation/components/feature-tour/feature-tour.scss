@@ -156,6 +156,13 @@
   width: 100%;
   margin-right: 0;
 
+  color: $submit-button-color;
+  background-color: $submit-button-bg-color;
+  &:hover, &:focus {
+    color: $submit-button-color;
+    background-color: $submit-button-bg-hover;
+  }
+
   // Hide the previous and next buttons on the last step, leaving just the 'done' button
   &+ .introjs-nextbutton,
   &+ .introjs-prevbutton {
@@ -168,6 +175,17 @@
 
   &.introjs-fullbutton {
     border-radius: 0;
+  }
+}
+
+.introjs-startbutton,
+.introjs-donebutton {
+  font-weight: $font-weight-semibold;
+  color: $submit-button-color;
+  background-color: $submit-button-bg-color;
+  &:hover, &:focus {
+    color: $submit-button-color;
+    background-color: $submit-button-bg-hover;
   }
 }
 

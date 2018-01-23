@@ -99,10 +99,10 @@ $(function () {
 
                     tourCurrent.onafterchange(function(targetElement) {
                         if (tourCurrent._introItems[tourCurrent._currentStep].tooltipClass == 'introjs-intromodal') {
-                            $('.introjs-nextbutton').html('Take me on the tour!');
+                            $('.introjs-nextbutton').html('Take me on the tour!').addClass('introjs-startbutton');
                             $('.introjs-skipbutton').html('No Thanks');
                         } else {
-                            $('.introjs-nextbutton').html(buttonLabels.next);
+                            $('.introjs-nextbutton').html(buttonLabels.next).removeClass('introjs-startbutton');
                             $('.introjs-skipbutton').html(buttonLabels.skip);
                             $('.introjs-donebutton').html(buttonLabels.done);
                         }
