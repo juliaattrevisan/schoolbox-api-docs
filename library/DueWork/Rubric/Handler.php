@@ -71,7 +71,7 @@ class DueWork_Rubric_Handler
          * @see http://www.sqlservice.se/sql-server-performance-death-by-correlated-subqueries/
          */
         $pb = new Alaress\Database\Predicate\Builder($this->db, '');
-        $pb->equals('rc.parent_id', $folderIds)
+        $pb->in('rc.parent_id', $folderIds)
            ->equals('rc.parent_type', Criterion::PARENT_TYPE_CATEGORY)
            ->greaterThanOrEqualTo('a.due_date', $term->getStart()->getDatabase());
 
@@ -120,7 +120,7 @@ class DueWork_Rubric_Handler
 
         // 2. Get max mark per criterion and dueWork
         $pb = new Alaress\Database\Predicate\Builder($this->db, '');
-        $pb->equals('rc.parent_id', $folderIds)
+        $pb->in('rc.parent_id', $folderIds)
            ->equals('rc.parent_type', Criterion::PARENT_TYPE_CATEGORY);
         $whereClause = implode(' AND ', $pb->getWhere());
         $stmt        = Database::getInstance()->prepare("
@@ -197,7 +197,7 @@ class DueWork_Rubric_Handler
         }
 
         $pb = new Alaress\Database\Predicate\Builder($this->db, '');
-        $pb->equals('parent_id', $parentIds)
+        $pb->in('parent_id', $parentIds)
            ->equals('parent_type', $parentType);
 
         $whereClause = implode(' AND ', $pb->getWhere());

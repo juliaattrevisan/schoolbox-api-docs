@@ -501,7 +501,7 @@ class Controller extends Base\Base
 
             // Load IAssessables
             foreach ($courseImpl->getUnits() as $unitImpl) {
-                $unitImpl->setAssessables($this->assessmentMapperProxy->findAllByUnitImplementationId($unitImpl->getId()));
+                $unitImpl->setAssessables($this->assessmentMapperProxy->findAllByUnitImplementationIds([$unitImpl->getId()]));
             }
 
             //Save unit criteria to class page

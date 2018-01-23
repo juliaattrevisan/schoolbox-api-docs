@@ -329,4 +329,14 @@ abstract class Base implements IBroker
     {
         return $this->quoter->escapeForLike($string);
     }
+
+
+    /**
+     * @inheritdoc
+     * @todo This should not live here. This class should NOT implement IQuoter
+     */
+    public function getEscapedOperand(string $defaultTable, string $columnName): string
+    {
+        return $this->quoter->getEscapedOperand($defaultTable, $columnName);
+    }
 }

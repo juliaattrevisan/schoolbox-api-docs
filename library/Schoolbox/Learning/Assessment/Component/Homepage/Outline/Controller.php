@@ -119,7 +119,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 // this isn't cached in the factory method... for some reason...
                 $now = Alaress_Date_Format::now();
 
-                $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdForCourseOutline(
+                $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdsForCourseOutline(
                     $uiIds,
                     $this->getUser()
                 )->filter(function (IAssessable $activity) use ($now) {
@@ -127,7 +127,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 });
             } else {
                 // I'm a teacher - load all participants.
-                $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdForCourseOutline($uiIds);
+                $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdsForCourseOutline($uiIds);
             }
 
             // And then add them to the displayed course impl

@@ -122,24 +122,24 @@ class Acquisition
         /* Dynamically assemble WHERE clause
          */
         $pb = new Builder($this->userMapper->getDatabase(), 'upd');
-        $pb->equals('registration_state', $this->states);
+        $pb->in('registration_state', $this->states);
         $pb->equals('cs.id', $this->courseSpecId);
-        $pb->equals('cs.deleted_at', null);
-        $pb->equals('ci.deleted_at', null);
-        $pb->equals('cui.deleted_at', null);
-        $pb->equals('p.deleted_at', null);
-        $pb->equals('a.deleted_at', null);
+        $pb->isNull('cs.deleted_at');
+        $pb->isNull('ci.deleted_at');
+        $pb->isNull('cui.deleted_at');
+        $pb->isNull('p.deleted_at');
+        $pb->isNull('a.deleted_at');
         $pb->notEquals('a.created_at', '0000-00-00 00:00:00');
-        $pb->equals('u.deleted_at', null);
+        $pb->isNull('u.deleted_at');
         $pb->equals('sb.use_rubric', 1);
-        $pb->equals('rd.deleted_at', null);
-        $pb->equals('rc.deleted_at', null);
-        $pb->notEquals('rm.published_at', null);
+        $pb->isNull('rd.deleted_at');
+        $pb->isNull('rc.deleted_at');
+        $pb->isNull('rm.published_at');
 
         /* Show only unaccredited users
          */
         if ($this->unaccreditedOnly) {
-            $pb->equals('accredited_at', null);
+            $pb->isNull('accredited_at');
         }
 
         $where = implode("\nAND ", $pb->getWhere());
@@ -199,12 +199,12 @@ class Acquisition
     private function findRoster() :array
     {
         $pb = new Builder($this->userMapper->getDatabase(), 'upd');
-        $pb->equals('registration_state', $this->states);
+        $pb->in('registration_state', $this->states);
 
         /* Show only unaccredited users
          */
         if ($this->unaccreditedOnly) {
-            $pb->equals('accredited_at', null);
+            $pb->isNull('accredited_at');
         }
 
         $where = implode("\nAND ", $pb->getWhere());

@@ -52,7 +52,7 @@ class ClassListFactory
 
         $pb = $this->database
             ->buildPredicateBuilder('')
-            ->equals('f.id', $folderIds)
+            ->in('f.id', $folderIds)
             ->greaterThanOrEqualTo('a.due_date', $start->getDatabase());
         if ($end && !$end->isNull()) {
             $pb->lessThan('a.due_date', $end->getDatabase());

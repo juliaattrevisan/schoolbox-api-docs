@@ -292,6 +292,17 @@ class Database implements IDatabase, Serializable, IQuoter
         return $this->quoter->escapeForLike($string);
     }
 
+
+    /**
+     * @inheritdoc
+     * @todo this class should NOT extend IQuoter. Callers should call $db->getQuoter()->quoterMethod()
+     */
+    public function getEscapedOperand(string $defaultTable, string $columnName): string
+    {
+        return $this->quoter->getEscapedOperand($defaultTable, $columnName);
+    }
+
+
     /**
      * Tries to create a unique parameter name
      *

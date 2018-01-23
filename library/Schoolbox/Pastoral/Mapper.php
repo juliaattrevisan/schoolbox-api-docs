@@ -511,7 +511,7 @@ class Mapper extends BaseMapper
 
         $pbHeadingSearch     = $this->getPredicateBuilder()
                                     ->setParamPrefix('heading')
-                                    ->like('pastoral.heading', $words);
+                                    ->likeAny('pastoral.heading', $words);
         $recordHeadingClause = $pbHeadingSearch->getWhere()[0];
 
         // --------------------------------------------------------------------------------------------------------
@@ -520,7 +520,7 @@ class Mapper extends BaseMapper
 
         $pbPublicBodySearch     = $this->getPredicateBuilder()
                                        ->setParamPrefix('pub_body')
-                                       ->like('pastoral.body_public', $words);
+                                       ->likeAny('pastoral.body_public', $words);
         $recordPublicBodyClause = $pbPublicBodySearch->getWhere()[0];
 
         // --------------------------------------------------------------------------------------------------------
@@ -529,7 +529,7 @@ class Mapper extends BaseMapper
 
         $pbPrivateBodySearch     = $this->getPredicateBuilder()
                                         ->setParamPrefix('pri_body')
-                                        ->like('pastoral.body_private', $words);
+                                        ->likeAny('pastoral.body_private', $words);
         $recordPrivateBodyClause = $pbPrivateBodySearch->getWhere()[0];
 
         // --------------------------------------------------------------------------------------------------------
@@ -547,13 +547,13 @@ class Mapper extends BaseMapper
 
         $pbPublicCommentSearch = $this->getPredicateBuilder()
                                       ->setParamPrefix('pub_cs')
-                                      ->like('pastoral_comment.body', $words);
+                                      ->likeAny('pastoral_comment.body', $words);
 
         $commentPublicClause = implode(' OR ', $pbPublicCommentSearch->getWhere());
 
         $pbPublicCommentNotPrivateSearch = $this->getPredicateBuilder()
                                                 ->setParamPrefix('pub_ispub')
-                                                ->equals('pastoral_comment.private', false);
+                                                ->isFalse('pastoral_comment.private');
 
         $commentPublicClause = "
             (
@@ -569,13 +569,13 @@ class Mapper extends BaseMapper
 
         $pbPrivateCommentSearch = $this->getPredicateBuilder()
                                        ->setParamPrefix('pri_cs')
-                                       ->like('pastoral_comment.body', $words);
+                                       ->likeAny('pastoral_comment.body', $words);
 
         $commentPrivateClause = implode(' OR ', $pbPrivateCommentSearch->getWhere());
 
         $pbPrivateCommentIsPrivateSearch = $this->getPredicateBuilder()
                                                 ->setParamPrefix('pri_ispri')
-                                                ->equals('pastoral_comment.private', true);
+                                                ->isTrue('pastoral_comment.private');
 
         $commentPrivateClause = "
             (

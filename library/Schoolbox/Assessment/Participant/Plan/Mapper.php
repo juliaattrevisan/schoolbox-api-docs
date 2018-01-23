@@ -95,7 +95,7 @@ class Mapper extends BaseMapper
             return $this->createCollection();
         }
         $column = "{$this->getTable()}.assessment_id";
-        return $this->findPlansAndParticipants($this->getPredicateBuilder()->equals($column, $assessmentIds));
+        return $this->findPlansAndParticipants($this->getPredicateBuilder()->in($column, $assessmentIds));
     }
 
 

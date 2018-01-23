@@ -191,7 +191,7 @@ class Module extends BaseModule
 
         // Load Assessments in Unit Impls (regardless of due date - as we need them for navigation)
         /** @var GenericCollection|IAssessable[] $assessmentImpls */
-        $assessmentImpls = $this->getAssessmentDataSource()->findAllByUnitImplementationId($unitImplementations->getColumnValues('id'))->indexBy('id');
+        $assessmentImpls = $this->getAssessmentDataSource()->findAllByUnitImplementationIds($unitImplementations->getColumnValues('id'))->indexBy('id');
         foreach ($assessmentImpls as $assessmentImpl) {
             $unitImplementation = $unitImplementations[$assessmentImpl->getContext()->getId()];
             $unitImplementation->getAssessables()->setOffset($assessmentImpl->getId(), $assessmentImpl);

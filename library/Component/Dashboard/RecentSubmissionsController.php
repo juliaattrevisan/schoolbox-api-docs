@@ -114,7 +114,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
 
         // Get most recent N days of DueWork Submissions for the filtered assessments
         $pb = $this->submissionDataSource->getPredicateBuilder();
-        $pb->equals('b.assessment_id', $taughtAssessmentIds);
+        $pb->in('b.assessment_id', $taughtAssessmentIds);
         if (self::DAY_LIMIT_ALL === $dayLimit) {
             $pb->notNull('submitted_at');
         } else {
@@ -124,7 +124,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
 
         // Get most recent N days of Quiz Attempts for the filtered assessments
         $pb = $this->attemptDataSource->getPredicateBuilder();
-        $pb->equals('a.assessment_id', $taughtAssessmentIds);
+        $pb->in('a.assessment_id', $taughtAssessmentIds);
         $pb->equals('a.availability', Quiz::AVAILABILITY_ASSESS);
         if (self::DAY_LIMIT_ALL === $dayLimit) {
             $pb->notNull('finish');

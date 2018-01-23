@@ -110,7 +110,7 @@ class ImportFactory
         ";
 
         $pb = new Builder($this->database, '');
-        $pb->equals('us.id', array_keys($unitSpecCache));
+        $pb->in('us.id', array_keys($unitSpecCache));
         $pb->isNull('sa.deleted_at');
         $query .= 'WHERE' . implode(' AND ', $pb->getWhere());
         $statement = $this->database->prepare($query);
@@ -224,7 +224,7 @@ class ImportFactory
         ";
 
         $pbInner1 = new Builder($this->database, '');
-        $pbInner1->equals('ui_inner.id', $unitImplIds);
+        $pbInner1->in('ui_inner.id', $unitImplIds);
         $pbInner1->isNull('ia.deleted_at');
         $innerQuery1 .= 'WHERE ' . implode(' AND ', $pbInner1->getWhere());
 
@@ -273,7 +273,7 @@ class ImportFactory
             LEFT JOIN project ipr                         ON ipr.assessment_id = ia.id
         ";
         $pbOuter1 = new Builder($this->database, '');
-        $pbOuter1->equals('us.id', array_keys($unitSpecCache));
+        $pbOuter1->in('us.id', array_keys($unitSpecCache));
         $query1 .= ' WHERE ' . implode(' AND ', $pbOuter1->getWhere());
 
         // Get the following Assessments:
@@ -320,7 +320,7 @@ class ImportFactory
         $pbOuter2 = new Builder($this->database, '');
         $pbOuter2->isNull('ia.deleted_at');
         $pbOuter2->isNull('asi.implementation_assessment_id');
-        $pbOuter2->equals('ui.id', $unitImplIds);
+        $pbOuter2->in('ui.id', $unitImplIds);
         $query2 .= ' WHERE ' . implode(' AND ', $pbOuter2->getWhere());
 
         $query = "$query1 UNION $query2";
@@ -412,7 +412,7 @@ class ImportFactory
             LEFT JOIN assess sqz         ON sqz.assessment_id = sa.id
             LEFT JOIN task stk           ON stk.assessment_id = sa.id";
         $pb = new Builder($this->database, '');
-        $pb->equals('p.assessment_id', $projectSpecs->keys());
+        $pb->in('p.assessment_id', $projectSpecs->keys());
         $query .= ' WHERE' . implode(' AND ', $pb->getWhere());
 
         $statement = $this->database->prepare($query);
@@ -486,7 +486,7 @@ class ImportFactory
             LEFT JOIN assess iqz         ON iqz.assessment_id = ia.id
             LEFT JOIN task itk           ON itk.assessment_id = ia.id";
         $pb = new Builder($this->database, '');
-        $pb->equals('p.assessment_id', $projectImpls->keys());
+        $pb->in('p.assessment_id', $projectImpls->keys());
         $pb->isNull('ia.deleted_at');
         $query .= ' WHERE' . implode(' AND ', $pb->getWhere());
 
@@ -611,7 +611,7 @@ class ImportFactory
             LEFT JOIN assessment sa ON sa.id = asi.specification_assessment_id
         ";
         $pb1 = new Builder($this->database, '');
-        $pb1->equals('aui.course_unit_implementation_id', $unitImplIds);
+        $pb1->in('aui.course_unit_implementation_id', $unitImplIds);
         $query1 .= ' WHERE ' . implode(' AND ', $pb1->getWhere());
 
 
@@ -629,7 +629,7 @@ class ImportFactory
             LEFT JOIN assessment sa ON sa.id = asi.specification_assessment_id
         ";
         $pb2 = new Builder($this->database, '');
-        $pb2->equals('pui.course_unit_implementation_id', $unitImplIds);
+        $pb2->in('pui.course_unit_implementation_id', $unitImplIds);
         $query2 .= ' WHERE ' . implode(' AND ', $pb2->getWhere());
 
         $query = "$query1 UNION $query2";

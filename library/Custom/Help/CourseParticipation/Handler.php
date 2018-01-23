@@ -137,6 +137,7 @@ class Handler
 
         if ($fuzzy) {
             // if we're doing a fuzzy lookup, search by `year`
+            /** @var string[][] $map */
             $map = json_decode(file_get_contents(__DIR__ . '/code-map.json'), true);
 
             if (empty($map[$schoolCode])) {
@@ -144,7 +145,7 @@ class Handler
                 return [];
             }
 
-            $predicate->equals('year', $map[$schoolCode]);
+            $predicate->in('year', $map[$schoolCode]);
 
         } else {
             // "normal" behaviour is to look up by external IDs

@@ -180,6 +180,16 @@ class MockDatabase implements IDatabase, IQuoter
         return $string;
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function getEscapedOperand(string $defaultTable, string $columnName): string
+    {
+        return $columnName;
+    }
+
+
     /**
      * @return bool
      */
