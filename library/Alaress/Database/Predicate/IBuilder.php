@@ -14,6 +14,14 @@ interface IBuilder
 {
 
     /**
+     * Returns a predicate builder with the same quoter and table as this builder,
+     * suitable for building sub-predicates.
+     *
+     * @return $this
+     */
+    public function emptyClone(): self;
+
+    /**
      * Query the intersection (AND) of the conditions in the given predicate builder
      *
      * @param IBuilder $predicate

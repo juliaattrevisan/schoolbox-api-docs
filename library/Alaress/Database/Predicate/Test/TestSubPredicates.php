@@ -37,7 +37,7 @@ class TestSubPredicates extends TestCase
     public function testBuildSubBuilder()
     {
         $pb    = new TestableBuilder($this->mySqlQuoter, 'table');
-        $subPb = $pb->buildSubBuilder();
+        $subPb = $pb->emptyClone();
         $this->assertSame($pb->getQuoter(), $subPb->getQuoter());
         $this->assertSame($pb->getTable(), $subPb->getTable());
     }
@@ -50,7 +50,7 @@ class TestSubPredicates extends TestCase
     public function testAll()
     {
         $pb    = new Builder($this->mySqlQuoter, 'table');
-        $subPb = $pb->buildSubBuilder()
+        $subPb = $pb->emptyClone()
                     ->equals('column', 1)
                     ->equals('column', 2);
         $pb->all($subPb);
@@ -66,7 +66,7 @@ class TestSubPredicates extends TestCase
     public function testAny()
     {
         $pb    = new Builder($this->mySqlQuoter, 'table');
-        $subPb = $pb->buildSubBuilder()
+        $subPb = $pb->emptyClone()
                     ->equals('column', 1)
                     ->equals('column', 2);
         $pb->any($subPb);
@@ -82,7 +82,7 @@ class TestSubPredicates extends TestCase
     public function testNotAll()
     {
         $pb    = new Builder($this->mySqlQuoter, 'table');
-        $subPb = $pb->buildSubBuilder()
+        $subPb = $pb->emptyClone()
                     ->equals('column', 1)
                     ->equals('column', 2);
         $pb->notAll($subPb);
@@ -98,7 +98,7 @@ class TestSubPredicates extends TestCase
     public function testNotAny()
     {
         $pb    = new Builder($this->mySqlQuoter, 'table');
-        $subPb = $pb->buildSubBuilder()
+        $subPb = $pb->emptyClone()
                     ->equals('column', 1)
                     ->equals('column', 2);
         $pb->notAny($subPb);
@@ -117,7 +117,7 @@ class TestSubPredicates extends TestCase
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->greaterThan('height', 5);
         $pb->lessThan('height', 50);
-        $subPb = $pb->buildSubBuilder()
+        $subPb = $pb->emptyClone()
                     ->equals('height', 10)
                     ->equals('weight', 20);
         $pb->all($subPb);

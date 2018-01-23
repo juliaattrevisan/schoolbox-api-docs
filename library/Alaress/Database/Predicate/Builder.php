@@ -56,12 +56,9 @@ class Builder implements IBuilder
 
 
     /**
-     * Returns a predicate builder with the same quoter and table as this builder,
-     * suitable for building sub-predicates.
-     *
-     * @return static
+     * @inheritdoc
      */
-    public function buildSubBuilder(): self
+    public function emptyClone(): IBuilder
     {
         return new static($this->quoter, $this->table);
     }
@@ -321,7 +318,7 @@ class Builder implements IBuilder
      */
     public function likeAny($columnName, array $columnValues): self
     {
-        $subBuilder = $this->buildSubBuilder();
+        $subBuilder = $this->emptyClone();
         foreach ($columnValues as $columnValue) {
             $subBuilder->like($columnName, $columnValue);
         }
@@ -436,7 +433,7 @@ class Builder implements IBuilder
         // If both are set we need to use a sub-builder. Otherwise we may combine predicates
         // with something other than AND and get unexpected results
         if (null !== $from && null !== $to) {
-            $subBuilder = $this->buildSubBuilder()
+            $subBuilder = $this->emptyClone()
                                ->greaterThanOrEqualTo($columnName, $from)
                                ->lessThanOrEqualTo($columnName, $to);
             return $this->all($subBuilder);
