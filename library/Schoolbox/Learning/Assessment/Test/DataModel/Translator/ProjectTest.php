@@ -126,6 +126,32 @@ class ProjectTest extends TestCase
     }
 
     /**
+     * Assert that translating a domain model to a data model, then back to a
+     * domain model returns the original domain model.
+     */
+    public function testTranslateDomainModelBackToDataModel()
+    {
+        $projectDomainModel = (new Project())
+            ->setId(908)
+            ->setContext((new Folder())->setId(1))
+        ;
+
+        $projectDataModel               = $this->translator->translateToDataModel($projectDomainModel);
+        $retranslatedProjectDomainModel = $this->translator->translateToDomainModel($projectDataModel);
+        $this->assertSame($projectDomainModel, $retranslatedProjectDomainModel);
+    }
+
+    /**
+     * Assert that null domain model can be translated to a data model.
+     */
+    public function testTranslateNullDomainModelToDataModel()
+    {
+        $nullProjectDomainModel = (new Project())->setId(null);
+        $nullProjectDataModel   = $this->translator->translateToDataModel($nullProjectDomainModel);
+        $this->assertNull($nullProjectDataModel->getId());
+    }
+
+    /**
      * Test translation of projects which contain projects, greater than permitted level
      *
      * @expectedException \UnexpectedValueException
@@ -310,6 +336,35 @@ class ProjectTest extends TestCase
 
         $this->assertInstanceOf(DueWork::class, $project->getAssessables()[2]);
         $this->assertEquals(3, $project->getAssessables()[2]->getId());
+    }
+
+    /**
+     * Assert that translating a data model to a domain model, then back to a
+     * data model returns the original data model.
+     */
+    public function testTranslateDataModelBackToDomainModel()
+    {
+        $projectDataModel = (new ProjectModel())
+            ->setId(6789)
+            ->setAssessmentModel(
+                (new AssessmentModel())
+                    ->setAssessmentContext((new Folder())->setId(1))
+                    ->setId(33)
+            );
+
+        $projectDomainModel           = $this->translator->translateToDomainModel($projectDataModel);
+        $retranslatedProjectDataModel = $this->translator->translateToDataModel($projectDomainModel);
+        $this->assertSame($projectDataModel, $retranslatedProjectDataModel);
+    }
+
+    /**
+     * Assert that null data model can be translated to a domain model.
+     */
+    public function testTranslateNullDataModelToDomainModel()
+    {
+        $nullProjectDataModel   = (new ProjectModel())->setId(null);
+        $nullProjectDomainModel = $this->translator->translateToDomainModel($nullProjectDataModel);
+        $this->assertNull($nullProjectDomainModel->getId());
     }
 
     /**
