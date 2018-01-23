@@ -59,6 +59,35 @@ class TaskTest extends TestCase
         $this->assertEquals(false, $taskModel->getRequiresConfirmation());
     }
 
+
+    /**
+     * Assert that translating a domain model to a data model, then back to a
+     * domain model returns the original domain model.
+     */
+    public function testTranslateDomainModelBackToDataModel()
+    {
+        $taskDomainModel = (new Task())
+            ->setId(908)
+            ->setContext((new Folder())->setId(1))
+        ;
+
+        $taskDataModel               = $this->translator->translateToDataModel($taskDomainModel);
+        $retranslatedTaskDomainModel = $this->translator->translateToDomainModel($taskDataModel);
+        $this->assertSame($taskDomainModel, $retranslatedTaskDomainModel);
+    }
+
+
+    /**
+     * Assert that null domain model can be translated to a data model.
+     */
+    public function testTranslateNullDomainModelToDataModel()
+    {
+        $nullTaskDomainModel = (new Task())->setId(null);
+        $nullTaskDataModel   = $this->translator->translateToDataModel($nullTaskDomainModel);
+        $this->assertNull($nullTaskDataModel->getId());
+    }
+
+
     /**
      * Data provider for testTranslateToDomainModel
      *
@@ -114,5 +143,36 @@ class TaskTest extends TestCase
         $this->assertEquals($link, $task->getUrl());
         $this->assertEquals($selfAssessable, $task->isSelfAssessable());
         $this->assertEquals($creatorId, $task->getCreator()->getId());
+    }
+
+
+    /**
+     * Assert that translating a data model to a domain model, then back to a
+     * data model returns the original data model.
+     */
+    public function testTranslateDataModelBackToDomainModel()
+    {
+        $taskDataModel = (new TaskModel())
+            ->setId(6789)
+            ->setAssessmentModel(
+                (new AssessmentModel())
+                    ->setAssessmentContext((new Folder())->setId(1))
+                    ->setId(33)
+            );
+
+        $taskDomainModel           = $this->translator->translateToDomainModel($taskDataModel);
+        $retranslatedTaskDataModel = $this->translator->translateToDataModel($taskDomainModel);
+        $this->assertSame($taskDataModel, $retranslatedTaskDataModel);
+    }
+
+
+    /**
+     * Assert that null data model can be translated to a domain model.
+     */
+    public function testTranslateNullDataModelToDomainModel()
+    {
+        $nullTaskDataModel   = (new TaskModel())->setId(null);
+        $nullTaskDomainModel = $this->translator->translateToDomainModel($nullTaskDataModel);
+        $this->assertNull($nullTaskDomainModel->getId());
     }
 }
