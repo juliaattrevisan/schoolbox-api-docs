@@ -98,28 +98,7 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
      */
     public function findAbsenceDropdownOptions()
     {
-        return $this->getSynergeticLookupOptions("dbo.luAbsenceType");
-    }
-
-    /**
-     * A list of options for the attendance reason drop-down
-     *
-     * @return array
-     */
-    public function findReasonDropdownOptions()
-    {
-        return $this->getSynergeticLookupOptions("dbo.luAbsenceReason");
-    }
-
-    /**
-     * Get Synergetic lookup table options with code appended in front of description for use in drop downs
-     *
-     * @param string $tableName
-     * @return array
-     */
-    private function getSynergeticLookupOptions($tableName)
-    {
-        $statement = $this->connector->executeQuery("SELECT Code, Description FROM {$tableName} WHERE ActiveFlag = 1");
+        $statement = $this->connector->executeQuery("SELECT Code, Description FROM dbo.luAbsenceType WHERE ActiveFlag = 1");
         $result = $statement->fetchAll();
 
         $returnArray = [];
@@ -129,6 +108,37 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
         foreach ($result as $resultCurrent) {
             $return = [];
             $return['Code'] = trim($resultCurrent['Code']);
+
+            if (!empty($return['Code'])) {
+                $return['Description'] = "{$return['Code']} - {$resultCurrent['Description']}";
+            } else {
+                $return['Description'] = $resultCurrent['Description'];
+            }
+
+            $returnArray[] = $return;
+        }
+
+        return $returnArray;
+    }
+
+    /**
+     * A list of options for the attendance reason drop-down
+     *
+     * @return array
+     */
+    public function findReasonDropdownOptions()
+    {
+        $statement = $this->connector->executeQuery("SELECT Code, AbsenceTypeCode, Description FROM dbo.luAbsenceReason WHERE ActiveFlag = 1");
+        $result = $statement->fetchAll();
+
+        $returnArray = [];
+
+        // Append code in front of description
+
+        foreach ($result as $resultCurrent) {
+            $return = [];
+            $return['Code'] = trim($resultCurrent['Code']);
+            $return['AbsenceTypeCode'] = trim($resultCurrent['AbsenceTypeCode']);
 
             if (!empty($return['Code'])) {
                 $return['Description'] = "{$return['Code']} - {$resultCurrent['Description']}";

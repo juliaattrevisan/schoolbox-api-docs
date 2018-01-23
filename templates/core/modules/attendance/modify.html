@@ -1,5 +1,6 @@
 <!-- BEGIN custom_head -->
 <script type='text/javascript' src='/javascript/components/jquery-timepicker-jt/jquery.timepicker.js'></script>
+<script type="text/javascript" src="/javascript/jquery.chained.min.js"></script>
 <script type='text/javascript'>
 	$(function() {
         $('[data-timepicker]').timepicker({
@@ -85,16 +86,16 @@
                             </div>
                         </td>
                         <td class="hide-for-small">
-                            <select name='PossibleAbsenceCode[]'>
+                            <select id='absenceType{STUDENT_UID}' name='PossibleAbsenceCode[]'>
                                 <!-- BEGIN absence_options -->
                                 <option value='{ABSENCE_OPTIONS_VALUE}' {ABSENCE_OPTIONS_VALUE_SELECTED}>{ABSENCE_OPTIONS_DESCRIPTION}</option>
                                 <!-- END absence_options -->
                             </select>
                         </td>
                         <td class="hide-for-small">
-                            <select name='PossibleReasonCode[]'>
+                            <select id='absenceReason{STUDENT_UID}' name='PossibleReasonCode[]'>
                                 <!-- BEGIN reason_options -->
-                                <option value='{REASON_OPTIONS_VALUE}' {REASON_OPTIONS_VALUE_SELECTED}>{REASON_OPTIONS_DESCRIPTION}</option>
+                                <option value='{REASON_OPTIONS_VALUE}' data-chained="{REASON_OPTIONS_TYPE}" {REASON_OPTIONS_VALUE_SELECTED}>{REASON_OPTIONS_DESCRIPTION}</option>
                                 <!-- END reason_options -->
                             </select>
                             <input type='text' maxlength='100' name='PossibleReasonDescription[]' value="{STUDENT_REASON_DESCRIPTION}" />
@@ -108,6 +109,11 @@
                             <!-- END student_absent -->
                         </td>
                     </tr>
+                    <script>
+                        $(function() {
+                           $('#absenceReason{STUDENT_UID}').chained('#absenceType{STUDENT_UID}');
+                        })
+                    </script>
                     <!-- END student -->
                     </tbody>
                 </table>
