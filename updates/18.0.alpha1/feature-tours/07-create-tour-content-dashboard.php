@@ -36,6 +36,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
                 <h3>Welcome to your dashboard!</h3>
                 <p>This tour will guide you through an overview of the main areas of the first screen you see when you log in. This includes; the dashboard, side menu and top menu.</p>
             ",
+            'css_class'    => 'introjs-intromodal',
         ],
 
         // Account details
@@ -256,7 +257,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
                         :tour_uuid,
                         :next_step_uuid,
                         (SELECT `id` FROM `user` WHERE `username` = 'alaress' LIMIT 1),
-                        'tooltip',
+                        :step_type,
                         NOW(),
                         NOW(),
                         NULL
@@ -268,11 +269,23 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             $next_step_uuid = $stepsReversed[$i - 1]['uuid'];
         }
 
-        $statement->execute([
-            'uuid'           => $step['uuid'],
-            'tour_uuid'      => $tour_uuid,
-            'next_step_uuid' => $next_step_uuid,
-        ]);
+        if ($step['type'] === 'tooltip') {
+            $statement->execute([
+                'uuid'           => $step['uuid'],
+                'tour_uuid'      => $tour_uuid,
+                'next_step_uuid' => $next_step_uuid,
+                'step_type'      => 'tooltip',
+            ]);
+        }
+
+        if ($step['type'] === 'modal') {
+            $statement->execute([
+                'uuid'           => $step['uuid'],
+                'tour_uuid'      => $tour_uuid,
+                'next_step_uuid' => $next_step_uuid,
+                'step_type'      => 'modal',
+            ]);
+        }
 
 
         if ($step['type'] === 'tooltip') {
@@ -282,7 +295,6 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
               (
                             `uuid`,
                             `tour_step_uuid`,
-                            `author_user_id`,
                             `title`,
                             `body`,
                             `selector`,
@@ -293,7 +305,6 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
               )
               SELECT        :uuid,
                             :tour_step_uuid,
-                            (SELECT `id` FROM `user` WHERE `username` = 'alaress' LIMIT 1),
                             NULL,
                             :content,
                             :selector,
@@ -311,7 +322,33 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 
         } elseif ($step['type'] === 'modal') {
 
-            // TODO with SA-5699, when infrastructure for modal step types exist - insert the content
+            $statement = $database->prepare("
+              INSERT INTO   `tour_step_modal`
+              (
+                            `uuid`,
+                            `tour_step_uuid`,
+                            `title`,
+                            `body`,
+                            `css_class`,
+                            `created_at`,
+                            `updated_at`,
+                            `deleted_at`
+              )
+              SELECT        :uuid,
+                            :tour_step_uuid,
+                            NULL,
+                            :content,
+                            :css_class,
+                            NOW(),
+                            NOW(),
+                            NULL
+            ");
+            $statement->execute([
+                'uuid'           => $step['tooltip_uuid'],
+                'tour_step_uuid' => $step['uuid'],
+                'content'        => trim($step['content']),
+                'css_class'      => $step['css_class'],
+            ]);
 
         }
 
@@ -359,11 +396,11 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
     // Update the tour table with the first step uuid
     $statement = $database->prepare("
         UPDATE          `tour`
-        SET             `tour_step_uuid` = :tour_step_uuid
+        SET             `first_step_uuid` = :first_step_uuid
         WHERE           `uuid` = :uuid
     ");
     $statement->execute([
         'uuid'           => $tour_uuid,
-        'tour_step_uuid' => $steps[0]['uuid'],
+        'first_step_uuid' => $steps[0]['uuid'],
     ]);
 });
