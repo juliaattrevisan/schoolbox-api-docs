@@ -60,14 +60,22 @@ $(function () {
                         }
                     });
 
+                    var buttonLabels = {
+                        next: 'Next',
+                        prev: 'Back',
+                        done: 'Finish',
+                        skip: '&times;'
+                    };
+
                     tourCurrent.setOptions({
                         showStepNumbers: false,
                         showBullets: false,
                         hidePrev: true,
                         hideNext: true,
-                        nextLabel: 'Next',
-                        prevLabel: 'Back',
-                        skipLabel: '&times;',
+                        nextLabel: buttonLabels.next,
+                        prevLabel: buttonLabels.prev,
+                        doneLabel: buttonLabels.done,
+                        skipLabel: buttonLabels.skip,
                         scrollTo: 'tooltip',
                         disableInteraction: false,
                         exitOnOverlayClick: false,
@@ -91,12 +99,12 @@ $(function () {
 
                     tourCurrent.onafterchange(function(targetElement) {
                         if (tourCurrent._introItems[tourCurrent._currentStep].tooltipClass == 'introjs-intromodal') {
-                            $('.introjs-nextbutton').html("Take me on the tour!");
-                            $('.introjs-skipbutton').html("No Thanks");
+                            $('.introjs-nextbutton').html('Take me on the tour!');
+                            $('.introjs-skipbutton').html('No Thanks');
                         } else {
-                            $('.introjs-nextbutton').html("Next");
-                            $('.introjs-skipbutton').html("×");
-                            $('.introjs-donebutton').html("Done");
+                            $('.introjs-nextbutton').html(buttonLabels.next);
+                            $('.introjs-skipbutton').html(buttonLabels.skip);
+                            $('.introjs-donebutton').html(buttonLabels.done);
                         }
                     });
 
