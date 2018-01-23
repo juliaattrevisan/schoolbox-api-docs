@@ -59,6 +59,32 @@ class QuizTest extends TestCase
     }
 
     /**
+     * Assert that translating a domain model to a data model, then back to a
+     * domain model returns the original domain model.
+     */
+    public function testTranslateDomainModelBackToDataModel()
+    {
+        $quizDomainModel = (new Quiz())
+            ->setId(908)
+            ->setContext((new Folder())->setId(1))
+        ;
+
+        $quizDataModel               = $this->translator->translateToDataModel($quizDomainModel);
+        $retranslatedQuizDomainModel = $this->translator->translateToDomainModel($quizDataModel);
+        $this->assertSame($quizDomainModel, $retranslatedQuizDomainModel);
+    }
+
+    /**
+     * Assert that null domain model can be translated to a data model.
+     */
+    public function testTranslateNullDomainModelToDataModel()
+    {
+        $nullQuizDomainModel = (new Quiz())->setId(null);
+        $nullQuizDataModel   = $this->translator->translateToDataModel($nullQuizDomainModel);
+        $this->assertNull($nullQuizDataModel->getId());
+    }
+
+    /**
      * Test translating quiz-specific fields to domain model
      */
     public function testTranslateToDomainModel()
@@ -85,5 +111,34 @@ class QuizTest extends TestCase
         $this->assertEquals(Quiz::DURATION_UNLIMITED, $quiz->getDuration());
         $this->assertEquals(Quiz::ATTEMPTS_UNLIMITED, $quiz->getMaxAttempts());
         $this->assertEquals(3, $quiz->getCreator()->getId());
+    }
+
+    /**
+     * Assert that translating a data model to a domain model, then back to a
+     * data model returns the original data model.
+     */
+    public function testTranslateDataModelBackToDomainModel()
+    {
+        $quizDataModel = (new QuizModel())
+            ->setId(6789)
+            ->setAssessmentModel(
+                (new AssessmentModel())
+                    ->setAssessmentContext((new Folder())->setId(1))
+                    ->setId(33)
+            );
+
+        $quizDomainModel           = $this->translator->translateToDomainModel($quizDataModel);
+        $retranslatedQuizDataModel = $this->translator->translateToDataModel($quizDomainModel);
+        $this->assertSame($quizDataModel, $retranslatedQuizDataModel);
+    }
+
+    /**
+     * Assert that null data model can be translated to a domain model.
+     */
+    public function testTranslateNullDataModelToDomainModel()
+    {
+        $nullQuizDataModel   = (new QuizModel())->setId(null);
+        $nullQuizDomainModel = $this->translator->translateToDomainModel($nullQuizDataModel);
+        $this->assertNull($nullQuizDomainModel->getId());
     }
 }
