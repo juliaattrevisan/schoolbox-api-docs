@@ -20,6 +20,7 @@ use Swift_Attachment;
 use Swift_EmbeddedFile;
 use Swift_Mailer;
 use Swift_Message;
+use Swift_RfcComplianceException;
 use Swift_SmtpTransport;
 use Swift_SwiftException;
 use Swift_Transport;
