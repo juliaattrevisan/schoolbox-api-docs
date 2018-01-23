@@ -502,8 +502,8 @@ class Builder implements IBuilder
             $escapedOperand = $columnName->getEscapedOperand($this->quoter, $this->table);
             $param          = $columnName->getParam();
         } else {
-            [$table, $field, $param] = $this->parseColumnName($columnName);
-            $escapedOperand = $this->quoter->quoteIdentifier($table) . '.' . $this->quoter->quoteIdentifier($field);
+            $escapedOperand = $this->quoter->getEscapedOperand($this->table, $columnName);
+            $param = str_replace('.', '_', $columnName);
         }
 
         if (!isset($columnValue)) {
@@ -749,24 +749,5 @@ class Builder implements IBuilder
         }
         // Couldn't generate? Crash and burn
         return false;
-    }
-
-    /**
-     * @param string $columnName
-     * @return string[]
-     * @throws InvalidColumnException If unable to parse a table and field from the column name
-     */
-    private function parseColumnName(string $columnName): array
-    {
-        $xpl = explode('.', $columnName) ?: [];
-
-        if (1 === \count($xpl)) {
-            return [$this->table, $xpl[0], $columnName];
-        }
-        if (2 === \count($xpl)) {
-            // remove the period so SQL doesn't freak out
-            return [$xpl[0], $xpl[1], str_replace('.', '_', $columnName)];
-        }
-        throw new InvalidColumnException("Unable to parse [table].column name: $columnName");
     }
 }

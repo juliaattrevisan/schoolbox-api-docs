@@ -477,4 +477,13 @@ class Base implements Serializable, IConnector
     public function escapeForLike($string) {
         return $this->broker->escapeForLike($string);
     }
+
+    /**
+     * @inheritdoc
+     * @todo This should not live here. This class should NOT implement IQuoter
+     */
+    public function getEscapedOperand(string $defaultTable, string $columnName): string
+    {
+        return $this->broker->getEscapedOperand($defaultTable, $columnName);
+    }
 }

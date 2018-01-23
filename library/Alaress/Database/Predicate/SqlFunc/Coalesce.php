@@ -57,7 +57,7 @@ class Coalesce extends AbstractSqlFunc
     {
         $escapedColumns = [];
         foreach ($this->columns as $column) {
-            $escapedColumns[] = $this->escapeColumn($quoter, $defaultTable, $column);
+            $escapedColumns[] = $quoter->getEscapedOperand($defaultTable, $column);
         }
 
         return 'COALESCE(' . implode(',', $escapedColumns) . ')';
