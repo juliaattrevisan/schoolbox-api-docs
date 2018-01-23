@@ -48,14 +48,14 @@ $(function () {
                                 tooltipClass: step.css_class+" closeable-tooltip",
                                 uuid: step.uuid,
                                 jsEvents: step.events,
-                                type: 'tooltip'
+                                type: step.type
                             });
                         } else if (step.type === 'modal') {
                             stepsToDisplay.push({
                                 intro: step.body,
                                 tooltipClass: step.css_class,
                                 uuid: step.uuid,
-                                type: 'modal'
+                                type: step.type
                             });
                         }
                     });
