@@ -14,6 +14,9 @@
                 // Hide obnoxious red dot
                 showStepNumbers: false,
 
+                // Hide bullet navigation, they open up a few problems
+                showBullets: false,
+
                 // Hide the Next button at the end
                 // Hide the Prev button at the start
                 hidePrev: true,
@@ -28,17 +31,13 @@
                 scrollTo: 'tooltip',
 
                 // Can't interact with highlighted elements
-                disableInteraction: true,
+                disableInteraction: false,
 
                 // Prevent accidental closing
                 exitOnOverlayClick: false,
 
                 // The tooltips for the tour, filtering out any that aren't visible
                 steps: [
-                    {
-                        element: document.querySelector('#left-off-canvas-toggle'),
-                        intro: "This step will only show for mobile, as this skips any steps on elements that aren't visible."
-                    },
                     {
                         element: document.querySelector('#first-tour'),
                         intro: "Access your component settings, collapse the component or remove the component from the page."
@@ -59,7 +58,7 @@
                         element: document.querySelector('#sasquatch'),
                         intro: "This step will never display, because #sasquatch doesn't exist... on this page..."
                     }
-                ].filter(function(obj) { return $(obj.element).is(':visible'); })
+                ].filter(function(obj) { return $(obj.element).length; }) // Filter out elements that don't exist in the DOM
             });
 
             // Start the tour

@@ -17,7 +17,8 @@ $(function () {
         }
     };
 
-    if (typeof(window.tourUrl) !== 'undefined') {
+    // Only show tours windows larger than medium (has sidebar showing)
+    if (typeof(window.tourUrl) !== 'undefined' && !windowIsMediumDown()) {
         $.get(window.tourUrl).done(function (tours) {
 
             // Function to initiate a joyride
@@ -40,30 +41,27 @@ $(function () {
                     var stepsToDisplay = [];
 
                     $(tour.steps).each(function (i, step) {
-                        if (step.type === 'tooltip') {
-                            stepsToDisplay.push({
-                                intro: step.body,
-                                element: step.selector,
-                                tooltipClass: step.css_class,
-                                uuid: step.uuid,
-                                jsEvents: step.events
-                            });
-                        }
-
-
+                        stepsToDisplay.push({
+                            intro: step.body,
+                            element: step.selector,
+                            tooltipClass: step.css_class,
+                            uuid: step.uuid,
+                            jsEvents: step.events
+                        });
                     });
 
                     tourCurrent.setOptions({
                         showStepNumbers: false,
+                        showBullets: false,
                         hidePrev: true,
                         hideNext: true,
                         nextLabel: 'Next',
                         prevLabel: 'Back',
                         skipLabel: '&times;',
                         scrollTo: 'tooltip',
-                        disableInteraction: true,
+                        disableInteraction: false,
                         exitOnOverlayClick: false,
-                        steps: stepsToDisplay.filter(function(obj) { return $(obj.element).is(':visible'); })
+                        steps: stepsToDisplay.filter(function(obj) { return $(obj.element).length; }) // Filter out elements that don't exist in the DOM
                     });
 
 

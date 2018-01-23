@@ -433,7 +433,7 @@ class SitePage extends Page
 
         if ($toursEnabled) {
             $request    = parse_url($_SERVER['REQUEST_URI']);
-            $encodedUrl = Redirect::encode(str_replace(basename($_SERVER['SCRIPT_NAME']), '', $request['path']));
+            $encodedUrl = Redirect::encode($request['path']);
             $this->setVar('TOUR_ROUTE', $this->routeLookup('tour.getTours', ['url' => $encodedUrl]));
             $this->parse('tour_script_block', 'tour_script', true);
         } else {
