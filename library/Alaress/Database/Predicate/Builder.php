@@ -57,6 +57,7 @@ class Builder implements IBuilder
 
     /**
      * @inheritdoc
+     * @return static
      */
     public function emptyClone(): IBuilder
     {
