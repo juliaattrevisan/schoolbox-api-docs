@@ -104,6 +104,7 @@ abstract class AbstractMailer implements IMailer
                 }
             } else if ($to['name']) {
                 //Name only, can't send email
+                throw new Swift_RfcComplianceException("No email address supplied.");
             }
             else {
                 //Assume two dimensional array
