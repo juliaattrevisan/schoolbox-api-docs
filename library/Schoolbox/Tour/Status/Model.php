@@ -16,13 +16,13 @@ class Model implements \JsonSerializable
     use CreatedAtDate;
 
     /** User has not interacted with this step/step in the joyride */
-    const STATUS_UNACTIONED = 'unactioned';
+    public const STATUS_UNACTIONED = 'unactioned';
 
     /** User has completed the joyride */
-    const STATUS_COMPLETED = 'completed';
+    public const STATUS_COMPLETED = 'completed';
 
     /** User has dismissed the joyride- and presumably never wants to see the damn thing again */
-    const STATUS_DISMISSED = 'dismissed';
+    public const STATUS_DISMISSED = 'dismissed';
 
     /**
      * @var User|null
@@ -74,6 +74,7 @@ class Model implements \JsonSerializable
 
     /**
      * @param null|User $user
+     * @return $this
      */
     public function setUser($user)
     {
@@ -93,6 +94,7 @@ class Model implements \JsonSerializable
 
     /**
      * @param null|String $url
+     * @return $this
      */
     public function setUrl($url)
     {
@@ -112,6 +114,7 @@ class Model implements \JsonSerializable
 
     /**
      * @param null|Step\Model $tourStep
+     * @return $this
      */
     public function setTourStep($tourStep)
     {
@@ -131,10 +134,10 @@ class Model implements \JsonSerializable
     public function jsonSerialize()
     {
         return [
-            "user"      => $this->getUser(),
-            "url"       => $this->getUrl(),
-            "status"    => $this->getStatus(),
-            "tourStep"  => $this->getTourStep()
+            'user'      => $this->getUser(),
+            'url'       => $this->getUrl(),
+            'status'    => $this->getStatus(),
+            'tourStep'  => $this->getTourStep()
         ];
     }
 }

@@ -8,7 +8,7 @@
 namespace Schoolbox\Tour;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\File\Exception;
+use Schoolbox\Mapper;
 use Schoolbox\Tour\Mapper as TourMapper;
 use Schoolbox\Tour\Trigger\Mapper as TourTriggerMapper;
 use Schoolbox\Tour\Trigger\Model as TourTrigger;
@@ -94,7 +94,7 @@ class Controller extends Base
             }
 
             // Only add if one or more triggers was found
-            if (count($triggerArray) > 0) {
+            if (\count($triggerArray) > 0) {
                 $data[] = [
                     'uuid'        => $tour->getUuid(),
                     'title'       => $tour->getTitle(),
@@ -123,13 +123,18 @@ class Controller extends Base
         $user          = $this->getUser();
 
         //Delete previous status
-        if ($post['oldStep'] != null) {
+        if ($post['oldStep'] !== null) {
             try {
-                $oldTourStatus = $this->tourStatusMapper->findByColumnList(["current_step" => $post['oldStep'], "url" => $post['url'], "user_id" => $user->getId()]);
+                $oldTourStatus = $this->tourStatusMapper->findByColumnList([
+                    'current_step' => $post['oldStep'],
+                    'url' => $post['url'],
+                    'user_id' => $user->getId()
+                ]);
+
                 $this->tourStatusMapper->delete($oldTourStatus);
-            } catch (\Schoolbox\Mapper\Exception $e) {
+            } catch (Mapper\Exception $e) {
                 //Could not find old step in db...
-                $this->getResponse()->content->set($this->buildJsonOutput("Could not find previous status to delete. Will not save next status."));
+                $this->getResponse()->content->set($this->buildJsonOutput('Could not find previous status to delete. Will not save next status.'));
                 $this->getResponse()->status->set(404);
                 return;
             }
@@ -150,9 +155,9 @@ class Controller extends Base
             $this->tourStepMapper->findOneByColumn("uuid", $post['newStep']);
             $this->tourStatusMapper->save($newTourStatus);
             $this->getResponse()->status->set(204);
-        } catch (\Schoolbox\Mapper\Exception $e) {
+        } catch (Mapper\Exception $e) {
             //Attempted to save invalid data
-            $this->getResponse()->content->set($this->buildJsonOutput("Invalid status data. Did not save status."));
+            $this->getResponse()->content->set($this->buildJsonOutput('Invalid status data. Did not save status.'));
             $this->getResponse()->status->set(400);
         }
     }
@@ -160,7 +165,8 @@ class Controller extends Base
 
     /**
      * @api POST /tourStatus/{uuid}
-     * @param $tour_uuid
+     * @param string $tour_uuid
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function tourStatus(string $tour_uuid)
     {
@@ -174,7 +180,7 @@ class Controller extends Base
             $status     = $this->tourStatusMapper->findOneByColumnList(["current_step" => $steps->getPropertyValues("uuid")]);
             $serialized = $status->jsonSerialize();
             $this->getResponse()->content->set($this->buildJsonOutput($serialized));
-        } catch (\Schoolbox\Mapper\Exception $e) {
+        } catch (Mapper\Exception $e) {
             //No status for any of the steps - we are taking the tour for the first time;
             return;
         }
