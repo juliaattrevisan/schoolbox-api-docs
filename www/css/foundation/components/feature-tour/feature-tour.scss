@@ -1,3 +1,4 @@
+$modal-width: 30rem;
 $tooltip-padding: 1rem;
 
 // ----------------------------------------------------------------
@@ -71,8 +72,8 @@ $tooltip-padding: 1rem;
 // Modal
 // ----------------------------------------------------------------
 .introjs-intromodal {
-  padding-bottom: 2.75rem; // This is to allow space for the absolute positioned 'no thanks' button
-  min-width: 470px;
+  padding-bottom: 3rem; // This is to allow space for the absolute positioned 'no thanks' button
+  min-width: $modal-width;
 }
 
 
@@ -206,9 +207,11 @@ $tooltip-padding: 1rem;
   position: absolute;
   right: $tooltip-padding;
   bottom: $tooltip-padding;
-  padding: 0;
+  margin: 0;
+  padding-bottom: 0;
   color: $monsoon;
   min-height: auto;
+  width: $modal-width - ($tooltip-padding*2);
 
   &:hover {
     background: transparent;
