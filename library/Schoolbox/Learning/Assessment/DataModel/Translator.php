@@ -238,7 +238,7 @@ class Translator
      * @throws UnexpectedValueException If assessment does not have a context
      * @throws LogicException If cyclic graph detected
      */
-    private function translateToDataModelRecursive(IAssessable $domainObject, int $depth = 0): IAssessableDataModel
+    private function translateToDataModelRecursive(IAssessable $domainObject, int $depth = 1): IAssessableDataModel
     {
         // TODO SA-5744 when descending tree during logically atomic assessment collection translation, need to use
         // TODO         a translation id to skip re-translation of entities already translated during the current translation
@@ -367,7 +367,7 @@ class Translator
      * @throws \InvalidArgumentException If assessment class not registered
      * @throws LogicException If cyclic graph detected
      */
-    private function translateToDomainModelRecursive(IAssessableDataModel $dataModel, int $depth = 0): IAssessable
+    private function translateToDomainModelRecursive(IAssessableDataModel $dataModel, int $depth = 1): IAssessable
     {
         $this->checkProjectNestingLevel($depth);
 
