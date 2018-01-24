@@ -15,19 +15,52 @@ use Schoolbox\Learning\Assessment\IAssessable;
  */
 interface IAssessmentTypeTranslator
 {
-    /**
-     * Returns a translation of a domain object to a data model object if it can, or null if it cannot.
-     *
-     * @param IAssessable $assessment
-     * @return IAssessableDataModel|null
-     */
-    public function translateToDataModel(IAssessable $assessment);
 
     /**
-     * Returns a translation of a data model object to a domain object if it can, or null if it cannot.
-     *
-     * @param IAssessableDataModel $model
-     * @return IAssessable|null
+     * @return IAssessableDataModel
      */
-    public function translateToDomainModel(IAssessableDataModel $model);
+    public function createDataModel(): IAssessableDataModel;
+
+
+    /**
+     * @var null|int $id
+     * @return IAssessable
+     */
+    public function createDomainObject(?int $id): IAssessable;
+
+
+    /**
+     * Does this sub-translator recognise this assessable?
+     *
+     * @param IAssessable $domainObject
+     * @return bool
+     */
+    public function recognisesDomainObject(IAssessable $domainObject): bool;
+
+
+    /**
+     * Does this sub-translator recognise this assessment?
+     *
+     * @param IAssessableDataModel $dataModel
+     * @return bool
+     */
+    public function recognisesDataModel(IAssessableDataModel $dataModel): bool;
+
+
+    /**
+     * Copies all attributes from the domainObject to dataModel
+     *
+     * @param IAssessable          $domainObject
+     * @param IAssessableDataModel $dataModel
+     */
+    public function translateToDataModel(IAssessable $domainObject, IAssessableDataModel $dataModel): void;
+
+
+    /**
+     * Copies all attributes from the dataModel to domainObject
+     *
+     * @param IAssessableDataModel $dataModel
+     * @param IAssessable          $domainObject
+     */
+    public function translateToDomainModel(IAssessableDataModel $dataModel, IAssessable $domainObject): void;
 }

@@ -10,18 +10,26 @@ namespace Schoolbox\Learning\Assessment\Test\DataModel;
 use Alaress_Date_Format;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Course\Task as TaskModel;
+use Schoolbox\Config\TestLoader;
+use Schoolbox\Learning\Quiz\Model as QuizModel;
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\Project;
 
 
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use Schoolbox\Learning\Quiz\Model as QuizModel;
+
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\UserMapper;
 
 /**
  * Tests for the assessment data model translator.
@@ -377,18 +385,18 @@ class TranslatorTest extends TestCase
             [
                 // Basic assessment with a specification
                 (new Task())
-                    ->setId(3)
+                    ->setId(300)
                     ->setContext((new UnitImplementation())->setId(12345))
                     ->setCreator($this->teacher1)
                     ->setSpecificationAssessment(
                         (new Task())
-                            ->setId(2)
+                            ->setId(200)
                             ->setContext((new UnitSpecification())->setId(54321))
                             ->setCreator($this->teacher1)
                     ),
-                3,
+                300,
                 TaskModel::class,
-                2,
+                200,
                 UnitSpecification::class,
                 54321,
             ],
@@ -415,18 +423,18 @@ class TranslatorTest extends TestCase
                 // Usually only assessments within a unit implementation context will have a specification.
                 // However, that isn't a hard and fast rule.
                 (new Task())
-                    ->setId(3)
+                    ->setId(301)
                     ->setContext((new Folder())->setId(12345))
                     ->setCreator($this->teacher1)
                     ->setSpecificationAssessment(
                         (new Task())
-                            ->setId(2)
+                            ->setId(201)
                             ->setContext((new Folder())->setId(54321))
                             ->setCreator($this->teacher1)
                     ),
-                3,
+                301,
                 TaskModel::class,
-                2,
+                201,
                 Folder::class,
                 54321,
             ],
@@ -467,5 +475,204 @@ class TranslatorTest extends TestCase
         // Assert specification context
         $this->assertInstanceOf($specificationContextClass, $specificationAssessmentModel->getAssessmentContext());
         $this->assertEquals($specificationContextId, $specificationAssessmentModel->getAssessmentContext()->getId());
+    }
+
+
+    /**
+     * Ensure if we translate a domainObject-to-dataModel, that identity is preserved
+     *
+     * @dataProvider providerDomainObjects
+     * @param IAssessable $domainObject
+     * @throws \LogicException
+     * @throws \UnexpectedValueException
+     */
+    public function testInstanceUniquenessPreservationDomain(IAssessable $domainObject)
+    {
+        $dataModel1 = $this->translator->translateToDataModel($domainObject);
+        $dataModel2 = $this->translator->translateToDataModel($domainObject);
+        $this->assertSame($dataModel1, $dataModel2);
+    }
+
+    /**
+     * Ensure if we translate a dataModel-to-domainObject, that identity is preserved
+     *
+     * @dataProvider providerDataModels
+     * @param IAssessableDataModel $dataModel
+     * @throws \LogicException
+     * @throws \UnexpectedValueException
+     */
+    public function testInstanceUniquenessPreservationData(IAssessableDataModel $dataModel)
+    {
+        $domainObject1 = $this->translator->translateToDomainModel($dataModel);
+        $domainObject2 = $this->translator->translateToDomainModel($dataModel);
+        $this->assertSame($domainObject1, $domainObject2);
+    }
+
+    /**
+     * Ensure if we translate a domain-data-domain, that identity is preserved
+     *
+     * @dataProvider providerDomainObjects
+     * @param IAssessable $domainObject
+     * @throws \LogicException
+     * @throws \UnexpectedValueException
+     */
+    public function testInstanceIdentityDomainToDataToDomain(IAssessable $domainObject)
+    {
+        $dataModel       = $this->translator->translateToDataModel($domainObject);
+        $twiceTranslated = $this->translator->translateToDomainModel($dataModel);
+
+        $this->assertSame($domainObject, $twiceTranslated);
+    }
+
+    /**
+     * Ensure if we translate a data-domain-data, that identity is preserved
+     *
+     * @dataProvider providerDataModels
+     * @param IAssessableDataModel $dataModel
+     * @throws \LogicException
+     * @throws \UnexpectedValueException
+     */
+    public function testInstanceIdentityDomainToDataToData(IAssessableDataModel $dataModel)
+    {
+        $domainObject    = $this->translator->translateToDomainModel($dataModel);
+        $twiceTranslated = $this->translator->translateToDataModel($domainObject);
+
+        $this->assertSame($dataModel, $twiceTranslated);
+    }
+
+    /**
+     * Ensure if we re-translate domain-to-data, any intervening mutations are re-applied
+     *
+     * @dataProvider providerDomainObjects
+     * @param IAssessable $domainObject
+     * @throws \LogicException
+     * @throws \UnexpectedValueException
+     */
+    public function testInterveningMutationsDomainToData(IAssessable $domainObject)
+    {
+        $titleOriginal = 'OriginalTitle';
+        $titleUpdated = 'UpdatedTitle';
+
+        // Set title to original and test
+        $domainObject->setTitle($titleOriginal);
+        $dataModel       = $this->translator->translateToDataModel($domainObject);
+        $this->assertEquals($titleOriginal, $dataModel->getAssessmentModel()->getTitle());
+
+        // Update title, re-translate, and re-test
+        $domainObject->setTitle($titleUpdated);
+        $dataModel       = $this->translator->translateToDataModel($domainObject);
+        $this->assertEquals($titleUpdated, $dataModel->getAssessmentModel()->getTitle());
+    }
+
+    /**
+     * Ensure if we re-translate data-to-domain, any intervening mutations are re-applied
+     *
+     * @dataProvider providerDataModels
+     * @param IAssessableDataModel $dataModel
+     * @throws \LogicException
+     * @throws \UnexpectedValueException
+     */
+    public function testInterveningMutationsDataToDomain(IAssessableDataModel $dataModel)
+    {
+        $titleOriginal = 'OriginalTitle';
+        $titleUpdated = 'UpdatedTitle';
+
+        // Set title to original and test
+        $dataModel->getAssessmentModel()->setTitle($titleOriginal);
+        $domainObject       = $this->translator->translateToDomainModel($dataModel);
+        $this->assertEquals($titleOriginal, $domainObject->getTitle());
+
+        // Update title, re-translate, and re-test
+        $dataModel->getAssessmentModel()->setTitle($titleUpdated);
+        $domainObject       = $this->translator->translateToDomainModel($dataModel);
+        $this->assertEquals($titleUpdated, $domainObject->getTitle());
+    }
+
+    /**
+     * Ensure if we re-translate domain-to-data, any intervening mutations are re-applied
+     *
+     * @throws \LogicException
+     * @throws \UnexpectedValueException
+     */
+    public function testInterveningMutationsDomainToDataModels()
+    {
+        $ownerOriginal = 100;
+        $ownerUpdated  = 200;
+        $userMapper = UserMapper::getInstance();
+        $userMapper->setConfigLoader(new TestLoader());
+
+        // Set owner to original and test
+        $projectObject = (new Project())->setCreator($userMapper->createModel($ownerOriginal));
+        /** @var ProjectModel $projectModel */
+        $projectModel       = $this->translator->translateToDataModel($projectObject);
+        $this->assertEquals($ownerOriginal, $projectModel->getOwner()->getId());
+
+        // Update owner, re-translate, and re-test
+        $projectObject->getCreator()->setId($ownerUpdated);
+        $projectModel       = $this->translator->translateToDataModel($projectObject);
+        $this->assertEquals($ownerUpdated, $projectModel->getOwner()->getId());
+    }
+
+
+    /**
+     * @return array
+     */
+    public function providerDomainObjects(): array
+    {
+        $data = [];
+        foreach($this->getDomainModels() as $domainModel){
+            $data[] = [$domainModel];
+        }
+        return $data;
+    }
+
+
+    /**
+     * @return array
+     * @throws \UnexpectedValueException
+     */
+    public function providerDataModels(): array
+    {
+        $data = [];
+        foreach($this->getDataModels() as $dataModel){
+            $data[] = [$dataModel];
+        }
+        return $data;
+    }
+
+
+    /**
+     * @return IAssessable[]
+     */
+    private function getDomainModels(): array
+    {
+        return [
+            new Task(),
+            new Quiz(),
+            new DueWork(),
+            new Project(),
+        ];
+    }
+
+
+    /**
+     * @return array
+     * @throws \UnexpectedValueException
+     */
+    private function getDataModels(): array
+    {
+        $assessmentMapper = AssessmentMapper::getInstance();
+
+        $task = (new TaskModel())->setAssessmentModel($assessmentMapper->createModel());
+        $quiz = (new QuizModel())->setAssessmentModel($assessmentMapper->createModel());
+        $dueWork = (new SubmissionBox())->setAssessmentModel($assessmentMapper->createModel());
+        $project = (new ProjectModel())->setAssessmentModel($assessmentMapper->createModel());
+
+        return[
+            $task->getAssessmentModel()->setSubObject($task)->getSubObject(),
+            $quiz->getAssessmentModel()->setSubObject($quiz)->getSubObject(),
+            $dueWork->getAssessmentModel()->setSubObject($dueWork)->getSubObject(),
+            $project->getAssessmentModel()->setSubObject($project)->getSubObject(),
+        ];
     }
 }

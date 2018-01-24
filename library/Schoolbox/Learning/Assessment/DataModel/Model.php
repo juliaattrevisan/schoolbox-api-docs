@@ -115,7 +115,7 @@ class Model implements ISoftDeletable
      * Only one of task, due work, quiz or project may be associated with a
      * single assessment.
      *
-     * @var Task
+     * @var null|Task
      */
     protected $task;
 
@@ -125,7 +125,7 @@ class Model implements ISoftDeletable
      * Only one of task, due work, quiz or project may be associated with a
      * single assessment.
      *
-     * @var DueWork
+     * @var null|DueWork
      */
     protected $dueWork;
 
@@ -135,7 +135,7 @@ class Model implements ISoftDeletable
      * Only one of task, due work, quiz or project may be associated with a
      * single assessment.
      *
-     * @var Quiz
+     * @var null|Quiz
      */
     protected $quiz;
 
@@ -145,7 +145,7 @@ class Model implements ISoftDeletable
      * Only one of task, due work, quiz or project may be associated with a
      * single assessment.
      *
-     * @var Project
+     * @var null|Project
      */
     protected $project;
 
@@ -154,7 +154,7 @@ class Model implements ISoftDeletable
      *
      * An assessment may only be within a single context.
      *
-     * @var Folder
+     * @var null|Folder
      */
     protected $contextFolder;
 
@@ -163,7 +163,7 @@ class Model implements ISoftDeletable
      *
      * An assessment may only be within a single context.
      *
-     * @var UnitSpecification
+     * @var null|UnitSpecification
      */
     protected $contextUnitSpecification;
 
@@ -172,7 +172,7 @@ class Model implements ISoftDeletable
      *
      * An assessment may only be within a single context.
      *
-     * @var UnitImplementation
+     * @var null|UnitImplementation
      */
     protected $contextUnitImplementation;
 
@@ -181,7 +181,7 @@ class Model implements ISoftDeletable
      *
      * An assessment may only be within a single context.
      *
-     * @var Project
+     * @var null|Project
      */
     protected $contextProject;
 
@@ -191,7 +191,7 @@ class Model implements ISoftDeletable
      *
      * It will not have a Spec if it was created directly in the unit implementation.
      *
-     * @var Model
+     * @var null|Model
      */
     protected $specificationAssessment;
 
@@ -577,7 +577,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Task
+     * @return null|Task
      */
     public function getTask()
     {
@@ -595,7 +595,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return DueWork
+     * @return null|DueWork
      */
     public function getDueWork()
     {
@@ -613,7 +613,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Quiz
+     * @return null|Quiz
      */
     public function getQuiz()
     {
@@ -631,7 +631,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Project
+     * @return null|Project
      */
     public function getProject()
     {
@@ -649,7 +649,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Folder
+     * @return null|Folder
      */
     public function getContextFolder()
     {
@@ -667,7 +667,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return UnitSpecification
+     * @return null|UnitSpecification
      */
     public function getContextUnitSpecification()
     {
@@ -685,7 +685,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return UnitImplementation
+     * @return null|UnitImplementation
      */
     public function getContextUnitImplementation()
     {
@@ -703,7 +703,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Project
+     * @return null|Project
      */
     public function getContextProject()
     {
@@ -721,7 +721,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Model
+     * @return null|Model
      */
     public function getSpecificationAssessment()
     {

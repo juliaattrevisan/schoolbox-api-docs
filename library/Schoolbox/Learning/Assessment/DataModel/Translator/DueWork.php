@@ -8,6 +8,8 @@
 namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkObject;
@@ -17,151 +19,188 @@ use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
 use Schoolbox\Resource\Storage\Model as StorageModel;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 
 /**
  * Sub-translator for due work specific fields.
  */
 class DueWork implements IAssessmentTypeTranslator
 {
-    /**
-     * @inheritdoc
-     */
-    public function translateToDataModel(IAssessable $assessment)
+    /** @var SubmissionBoxMapper */
+    private $submissionBoxMapper;
+
+    /** @var DueWorkModel\MarkTypeMapper */
+    private $markTypeMapper;
+
+    public function __construct()
     {
-        if ($assessment instanceof DueWorkObject) {
-            // convert to due work's model
-            $model = new DueWorkModel();
-            $model
-                ->setName($assessment->getTitle())
-                ->setDescription($assessment->getDescription())
-                ->setPublishDate($assessment->getPublishAt())
-                ->setOpenDate($assessment->getOpenAt())
-                ->setDueDate($assessment->getDueAt())
-                ->setLateDate($assessment->getCloseAt())
-                ->setWeight($assessment->getWeight())
-                ->setMarkVisibility($assessment->getMarkVisibility())
-                ->setSkipUnsubmitted($assessment->getShowSubmittedOnly())
-                ->setAcceptOnline($assessment->isAcceptSingle() || $assessment->isAcceptMulti())
-                ->setAcceptMultiple($assessment->isAcceptMulti())
-                ->setUseRubric($assessment->getUseRubric())
-                ->setMarkedPerRubricGroup($assessment->getMarkPerCapability())
-                ->setOwner($assessment->getCreator())
-                ->setMarkType(new DueWorkModel\MarkType())
-                ->setGradeGroup(new DueWorkModel\GradeLevel\Group\Model())
-                ->setSelfAssessable($assessment->getSelfAssessable())
-                ->setSelfReflectable($assessment->getSelfReflectable())
-            ;
-
-            // Convert a mark type into fields
-            // TODO move this to the mark scheme translator
-            $markScheme = $assessment->getMarkScheme();
-            if ($markScheme instanceof TotalMarkWholeNumber) {
-                $model->setMaxMark($markScheme->getTotalMark());
-                $model->getMarkType()->setId(DueWorkModel\MarkType::TYPE_TOTAL);
-
-            } elseif ($markScheme instanceof Percentage) {
-                $model->getMarkType()->setId(DueWorkModel\MarkType::TYPE_PERCENT);
-
-            } elseif ($markScheme instanceof LetterGrade) {
-                $model->setGradeGroup($markScheme->getGradeGroup());
-                $model->getMarkType()->setId(DueWorkModel\MarkType::TYPE_LETTER);
-
-            } elseif ($markScheme instanceof None) {
-                $model->getMarkType()->setId(DueWorkModel\MarkType::TYPE_NONE);
-
-            }
-
-            // Translate files
-            // TODO consider whether the DueWorkFile model is required - should Storage be used directly?
-            foreach ($assessment->getAttachedFiles() as $file) {
-                $model->addAttachment(
-                    (new StorageModel())
-                        ->setHash($file->getHash())
-                        ->setFilename($file->getFilename())
-                        ->setExtension($file->getExtension())
-                );
-            }
-
-            // TODO figure out mark visibility - it's likely obsolete as feedback is manually published
-            // TODO figure out rubric result set
-            // TODO figure out mark per rubric group
-            // TODO set model's grade group, mark type, max mark based on mark scheme
-            return $model;
-        }
-        return null;
+        $this->submissionBoxMapper = SubmissionBoxMapper::getInstance(); // TODO inject
+        $this->markTypeMapper = DueWorkModel\MarkTypeMapper::getInstance(); // TODO inject
     }
 
+
+    /**
+     * @return IAssessableDataModel
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function createDataModel(): IAssessableDataModel
+    {
+        return $this->submissionBoxMapper->createModel(); // TODO consider using ID
+    }
+
+
     /**
      * @inheritdoc
      */
-    public function translateToDomainModel(IAssessableDataModel $model)
+    public function createDomainObject(?int $id): IAssessable
     {
-        if ($model instanceof DueWorkModel) {
-            // Due work-specific fields
-            $assessable = (new DueWorkObject())
-                ->setShowSubmittedOnly($model->getSkipUnsubmitted())
-                ->setCreator($model->getOwner())
-                ->setMaxMark($model->getMaxMark())
-                ->setGradeGroup($model->getGradeGroup())
-                ->setMarkVisibility($model->getMarkVisibility())
-                ->setSelfAssessable($model->getSelfAssessable())
-                ->setSelfReflectable($model->getSelfReflectable())
-            ;
+        return (new DueWorkObject())->setId($id); // TODO consider using ID?
+    }
 
-            // Has Rubric?
-            if ($model->getUseRubric()) {
-                $assessable->setUseRubric(true);
 
-                if ($model->isMarkedPerRubricGroup()) {
-                    $assessable->setMarkPerCapability(true);
-                }
+    /**
+     * Does this sub-translator recognise this assessable?
+     *
+     * @param IAssessable $domainObject
+     * @return bool
+     */
+    public function recognisesDomainObject(IAssessable $domainObject): bool
+    {
+        return $domainObject instanceof DueWorkObject;
+    }
 
-                $assessable->setRubric($model->getRubric());
-            } else {
-                $assessable->setUseRubric(false);
-                $assessable->setMarkPerCapability(false);
-            }
 
-            // Figure out submission visibility
-            if ($model->getAcceptOnline()) {
-                if ($model->getAcceptMultiple()) {
-                    $assessable->setAcceptsMultiple();
-                } else {
-                    $assessable->setAcceptsSingle();
-                }
-            } else {
-                $assessable->setAcceptsNone();
-            }
+    /**
+     * Does this sub-translator recognise this assessment?
+     *
+     * @param IAssessableDataModel $dataModel
+     * @return bool
+     */
+    public function recognisesDataModel(IAssessableDataModel $dataModel): bool
+    {
+        return $dataModel instanceof SubmissionBox;
+    }
 
-            // Convert attachments
-            foreach ($model->getAttachments() as $attachment) {
-                $assessable->getAttachedFiles()->add(
-                    (new DueWorkFile())
-                        ->setFilename($attachment->getFilename())
-                        ->setStorage($attachment)
-                );
-            }
 
-            // Convert work type
-            $assessable->setWorkType($model->getAssessmentModel()->getWorkType());
+    /**
+     * @param IAssessable|DueWorkObject          $domainObject
+     * @param IAssessableDataModel|SubmissionBox $dataModel
+     */
+    public function translateToDataModel(IAssessable $domainObject, IAssessableDataModel $dataModel): void
+    {
+        // For brevity, these setters are only called if the corresponding getter() returns non-null
+        null === $domainObject->getTitle()             || $dataModel->setName($domainObject->getTitle());
+        null === $domainObject->getDescription()       || $dataModel->setDescription($domainObject->getDescription());
+        null === $domainObject->getPublishAt()         || $dataModel->setPublishDate($domainObject->getPublishAt());
+        null === $domainObject->getOpenAt()            || $dataModel->setOpenDate($domainObject->getOpenAt());
+        null === $domainObject->getDueAt()             || $dataModel->setDueDate($domainObject->getDueAt());
+        null === $domainObject->getCloseAt()           || $dataModel->setLateDate($domainObject->getCloseAt());
+        null === $domainObject->getWeight()            || $dataModel->setWeight($domainObject->getWeight());
+        null === $domainObject->getMarkVisibility()    || $dataModel->setMarkVisibility($domainObject->getMarkVisibility());
+        null === $domainObject->getShowSubmittedOnly() || $dataModel->setSkipUnsubmitted($domainObject->getShowSubmittedOnly());
+        null === $domainObject->isAcceptMulti()        || $dataModel->setAcceptMultiple($domainObject->isAcceptMulti());
+        null === $domainObject->getUseRubric()         || $dataModel->setUseRubric($domainObject->getUseRubric());
+        null === $domainObject->getMarkPerCapability() || $dataModel->setMarkedPerRubricGroup($domainObject->getMarkPerCapability());
+        null === $domainObject->getCreator()           || $dataModel->setOwner($domainObject->getCreator());
+        null === $domainObject->getSelfAssessable()    || $dataModel->setSelfAssessable($domainObject->getSelfAssessable());
+        null === $domainObject->getSelfReflectable()   || $dataModel->setSelfReflectable($domainObject->getSelfReflectable());
 
-            // Convert mark type
-            $assessable->setMarkType(
-                (new DueWorkModel\MarkType())
-                    ->setId($model->getMarkType()->getId())
-                    ->setName($model->getMarkType()->getName())
-                    ->setSlug($model->getMarkType()->getSlug())
-                    ->setComment($model->getMarkType()->getComment())
-                    ->setEnabled($model->getMarkType()->getEnabled())
-            );
-
-            // Attach a (possibly empty) Rubric
-            $assessable->setRubric($model->getRubric());
-
-            return $assessable;
+        if (null !== $domainObject->isAcceptSingle() && null !== $domainObject->isAcceptMulti()) {
+            $dataModel->setAcceptOnline($domainObject->isAcceptSingle() || $domainObject->isAcceptMulti());
         }
-        return null;
+
+        // Convert a mark type into fields
+        // TODO move this to the mark scheme translator
+        $markScheme = $domainObject->getMarkScheme();
+        if ($markScheme instanceof TotalMarkWholeNumber) {
+            $dataModel->setMaxMark($markScheme->getTotalMark());
+            $dataModel->setMarkType($this->markTypeMapper->createModel(DueWorkModel\MarkType::TYPE_TOTAL));
+        } elseif ($markScheme instanceof Percentage) {
+            $dataModel->setMarkType($this->markTypeMapper->createModel(DueWorkModel\MarkType::TYPE_PERCENT));
+        } elseif ($markScheme instanceof LetterGrade) {
+            $dataModel->setGradeGroup($markScheme->getGradeGroup());
+            $dataModel->setMarkType($this->markTypeMapper->createModel(DueWorkModel\MarkType::TYPE_LETTER));
+        } elseif ($markScheme instanceof None) {
+            $dataModel->setMarkType($this->markTypeMapper->createModel(DueWorkModel\MarkType::TYPE_NONE));
+        }
+
+        // Translate files
+        // TODO consider whether the DueWorkFile model is required - should Storage be used directly?
+        foreach ($domainObject->getAttachedFiles() as $file) {
+            $dataModel->addAttachment(
+                (new StorageModel())
+                    ->setHash($file->getHash())
+                    ->setFilename($file->getFilename())
+                    ->setExtension($file->getExtension())
+            );
+        }
+        // TODO figure out mark visibility - it's likely obsolete as feedback is manually published
+        // TODO figure out rubric result set
+        // TODO figure out mark per rubric group
+        // TODO set model's grade group, mark type, max mark based on mark scheme
+    }
+
+
+    /**
+     * Copies all attributes from the dataModel to domainObject
+     *
+     * @param IAssessableDataModel|SubmissionBox $dataModel
+     * @param IAssessable|DueWorkObject          $domainObject
+     */
+    public function translateToDomainModel(IAssessableDataModel $dataModel, IAssessable $domainObject): void
+    {
+        // Due work-specific fields
+        null === $dataModel->getSkipUnsubmitted() || $domainObject->setShowSubmittedOnly($dataModel->getSkipUnsubmitted());
+        null === $dataModel->getOwner() || $domainObject->setCreator($dataModel->getOwner());
+        null === $dataModel->getMaxMark() || $domainObject->setMaxMark($dataModel->getMaxMark());
+        null === $dataModel->getGradeGroup() || $domainObject->setGradeGroup($dataModel->getGradeGroup());
+        null === $dataModel->getMarkVisibility() || $domainObject->setMarkVisibility($dataModel->getMarkVisibility());
+        null === $dataModel->getSelfAssessable() || $domainObject->setSelfAssessable($dataModel->getSelfAssessable());
+        null === $dataModel->getSelfReflectable() || $domainObject->setSelfReflectable($dataModel->getSelfReflectable());
+
+
+        // Has Rubric?
+        if ($dataModel->getUseRubric()) {
+            $domainObject->setUseRubric(true);
+
+            if ($dataModel->isMarkedPerRubricGroup()) {
+                $domainObject->setMarkPerCapability(true);
+            }
+
+            $domainObject->setRubric($dataModel->getRubric());
+        } else {
+            $domainObject->setUseRubric(false);
+            $domainObject->setMarkPerCapability(false);
+        }
+
+        // Figure out submission visibility
+        if ($dataModel->getAcceptOnline()) {
+            if ($dataModel->getAcceptMultiple()) {
+                $domainObject->setAcceptsMultiple();
+            } else {
+                $domainObject->setAcceptsSingle();
+            }
+        } else {
+            $domainObject->setAcceptsNone();
+        }
+
+        // Convert attachments
+        foreach ($dataModel->getAttachments() as $attachment) {
+            $domainObject->getAttachedFiles()->add(
+                (new DueWorkFile())
+                    ->setFilename($attachment->getFilename())
+                    ->setStorage($attachment)
+            );
+        }
+
+        // Convert work type
+        $domainObject->setWorkType($dataModel->getAssessmentModel()->getWorkType());
+
+        // Convert mark type
+        if (null !== $dataModel->getMarkType()) {
+            $domainObject->setMarkType($dataModel->getMarkType());
+        }
+
+        // Attach a (possibly empty) Rubric
+        $domainObject->setRubric($dataModel->getRubric());
     }
 }

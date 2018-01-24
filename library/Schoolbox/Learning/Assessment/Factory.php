@@ -213,13 +213,14 @@ class Factory
     private function produceNew()
     {
         // Instantiate empty Assessment model
-        $assessment = AssessmentType::stringToObject($this->getAssessmentType(), $this->getContext());
+        $assessment = AssessmentType::stringToObject($this->getAssessmentType(), $this->context);
         if($assessment instanceof Project){
             $assessment->setSummator((new SummatorFactory($this->getSummator()))->produce());
         }
 
         // Attach context
-        $assessment->setContext($this->getContext());
+        $assessment->setContext($this->context);
+        $this->context->getAssessables()->add($assessment);
 
         return $this->produceFromExistingAssessment($assessment);
     }
@@ -545,14 +546,6 @@ class Factory
     {
         $this->closeAt = $closeAt;
         return $this;
-    }
-
-    /**
-     * @return AssessmentContext
-     */
-    protected function getContext()
-    {
-        return $this->context;
     }
 
     /**

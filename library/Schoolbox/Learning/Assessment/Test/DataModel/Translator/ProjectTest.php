@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Assessment\Test\DataModel\Translator;
 
 use Alaress_Date_Format;
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Quiz\Model as QuizModel;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
@@ -40,6 +41,27 @@ use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 class ProjectTest extends TestCase
 {
     use TestTrait;
+
+
+    /**
+     * Returns an assessment mapper that by-passes the model cache.
+     *
+     * This enables multiple unit test to execute in series with models of the same ID not polluting other tests.
+     *
+     * @return Assessment\Mapper
+     */
+    protected function getAssessmentMapper(): Assessment\Mapper
+    {
+        return new class extends Assessment\Mapper
+        {
+
+            public function createModel($id = null)
+            {
+                return parent::createModel()->setId($id);
+            }
+        };
+    }
+
 
     /**
      * Test translating a project
@@ -90,26 +112,54 @@ class ProjectTest extends TestCase
         // Test sub-assessables
         $this->assertCount(3, $projectModel->getAssessments());
 
-        $this->assertInstanceOf(TaskModel::class, $projectModel->getAssessments()[0]);
-        $this->assertEquals(1, $projectModel->getAssessments()[0]->getAssessmentModel()->getSequence());
-        $this->assertEquals(1, $projectModel->getAssessments()[0]->getAssessmentModel()->getId());
+        $this->assertInstanceOf(TaskModel::class, $projectModel->getAssessments()[0]->getSubObject());
+        $this->assertEquals(1, $projectModel->getAssessments()[0]->getSequence());
+        $this->assertEquals(1, $projectModel->getAssessments()[0]->getId());
 
-        $this->assertInstanceOf(QuizModel::class, $projectModel->getAssessments()[1]);
-        $this->assertEquals(2, $projectModel->getAssessments()[1]->getAssessmentModel()->getSequence());
-        $this->assertEquals(2, $projectModel->getAssessments()[1]->getAssessmentModel()->getId());
+        $this->assertInstanceOf(QuizModel::class, $projectModel->getAssessments()[1]->getSubObject());
+        $this->assertEquals(2, $projectModel->getAssessments()[1]->getSequence());
+        $this->assertEquals(2, $projectModel->getAssessments()[1]->getId());
 
-        $this->assertInstanceOf(DueWorkModel::class, $projectModel->getAssessments()[2]);
-        $this->assertEquals(3, $projectModel->getAssessments()[2]->getAssessmentModel()->getSequence());
-        $this->assertEquals(3, $projectModel->getAssessments()[2]->getAssessmentModel()->getId());
+        $this->assertInstanceOf(DueWorkModel::class, $projectModel->getAssessments()[2]->getSubObject());
+        $this->assertEquals(3, $projectModel->getAssessments()[2]->getSequence());
+        $this->assertEquals(3, $projectModel->getAssessments()[2]->getId());
     }
 
     /**
-     * Test translation of projects which contain projects.
+     * Assert that translating a domain model to a data model, then back to a
+     * domain model returns the original domain model.
+     */
+    public function testTranslateDomainModelBackToDataModel()
+    {
+        $projectDomainModel = (new Project())
+            ->setId(908)
+            ->setContext((new Folder())->setId(1))
+        ;
+
+        $projectDataModel               = $this->translator->translateToDataModel($projectDomainModel);
+        $retranslatedProjectDomainModel = $this->translator->translateToDomainModel($projectDataModel);
+        $this->assertSame($projectDomainModel, $retranslatedProjectDomainModel);
+    }
+
+    /**
+     * Assert that null domain model can be translated to a data model.
+     */
+    public function testTranslateNullDomainModelToDataModel()
+    {
+        $nullProjectDomainModel = (new Project())->setId(null);
+        $nullProjectDataModel   = $this->translator->translateToDataModel($nullProjectDomainModel);
+        $this->assertNull($nullProjectDataModel->getId());
+    }
+
+    /**
+     * Test translation of projects which contain projects, greater than permitted level
      *
      * @expectedException \UnexpectedValueException
      */
     public function testTranslateWithinProjectToDataModel()
     {
+        $this->translator->setMaxProjectLevels(1);
+
         $project = (new Project(new Average()))
             ->setContext((new Folder())->setId(1))
             ->setId(12)
@@ -215,11 +265,11 @@ class ProjectTest extends TestCase
      *
      * @dataProvider getTestTranslateMarkSchemeToDataModelData
      *
-     * @param Project $project
-     * @param int     $markTypeId
-     * @param int     $gradeGroupId
+     * @param Project  $project
+     * @param int      $markTypeId
+     * @param null|int $gradeGroupId
      */
-    public function testTranslateMarkSchemeToDataModel(Project $project, $markTypeId, $gradeGroupId)
+    public function testTranslateMarkSchemeToDataModel(Project $project, int $markTypeId, ?int $gradeGroupId)
     {
         /** @var ProjectModel $projectModel */
         $projectModel = $this->translator->translateToDataModel($project);
@@ -229,7 +279,9 @@ class ProjectTest extends TestCase
 
         // Test mark type
         $this->assertEquals($markTypeId, $projectModel->getMarkType()->getId());
-        $this->assertEquals($gradeGroupId, $projectModel->getGradeGroup()->getId());
+        if (null !== $gradeGroupId) {
+            $this->assertEquals($gradeGroupId, $projectModel->getGradeGroup()->getId());
+        }
     }
 
     /**
@@ -246,22 +298,24 @@ class ProjectTest extends TestCase
             )
             ->setMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_NONE));
 
+        $subTask = (new TaskModel())
+            ->setOwner($this->teacher1)
+            ->setAssessmentModel((new AssessmentModel())->setId(1));
+        $subQuiz = (new QuizModel())
+            ->setUser($this->teacher2)
+            ->setAssessmentModel((new AssessmentModel())->setId(2));
+        $subDueWork = (new DueWorkModel())
+            ->setOwner($this->teacher2)
+            ->setAssessmentModel((new AssessmentModel())->setId(3))
+            ->setMarkType($this->buildMarkType())
+            ->setSelfReflectable(true)
+            ->setSelfAssessable(true);
+
+
         $projectModel->getAssessments()
-            ->add((new TaskModel())
-                ->setOwner($this->teacher1)
-                ->setAssessmentModel((new AssessmentModel())->setId(1))
-            )
-            ->add((new QuizModel())
-                ->setUser($this->teacher2)
-                ->setAssessmentModel((new AssessmentModel())->setId(2))
-            )
-            ->add((new DueWorkModel())
-                ->setOwner($this->teacher2)
-                ->setAssessmentModel((new AssessmentModel())->setId(3))
-                ->setMarkType($this->buildMarkType())
-                ->setSelfReflectable(true)
-                ->setSelfAssessable(true)
-            );
+            ->add($subTask->getAssessmentModel()->setSubObject($subTask))
+            ->add($subQuiz->getAssessmentModel()->setSubObject($subQuiz))
+            ->add($subDueWork->getAssessmentModel()->setSubObject($subDueWork));
 
         /** @var Project $project */
         $project = $this->translator->translateToDomainModel($projectModel);
@@ -282,6 +336,35 @@ class ProjectTest extends TestCase
 
         $this->assertInstanceOf(DueWork::class, $project->getAssessables()[2]);
         $this->assertEquals(3, $project->getAssessables()[2]->getId());
+    }
+
+    /**
+     * Assert that translating a data model to a domain model, then back to a
+     * data model returns the original data model.
+     */
+    public function testTranslateDataModelBackToDomainModel()
+    {
+        $projectDataModel = (new ProjectModel())
+            ->setId(6789)
+            ->setAssessmentModel(
+                (new AssessmentModel())
+                    ->setAssessmentContext((new Folder())->setId(1))
+                    ->setId(33)
+            );
+
+        $projectDomainModel           = $this->translator->translateToDomainModel($projectDataModel);
+        $retranslatedProjectDataModel = $this->translator->translateToDataModel($projectDomainModel);
+        $this->assertSame($projectDataModel, $retranslatedProjectDataModel);
+    }
+
+    /**
+     * Assert that null data model can be translated to a domain model.
+     */
+    public function testTranslateNullDataModelToDomainModel()
+    {
+        $nullProjectDataModel   = (new ProjectModel())->setId(null)->setAssessmentModel(new AssessmentModel());
+        $nullProjectDomainModel = $this->translator->translateToDomainModel($nullProjectDataModel);
+        $this->assertNull($nullProjectDomainModel->getId());
     }
 
     /**
@@ -464,58 +547,56 @@ class ProjectTest extends TestCase
             ->setMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_NONE));
 
         // Project activities may have a specification, even though they're in the context of a project
+        $subTask = (new TaskModel())
+            ->setOwner($this->teacher1)
+            ->setAssessmentModel(
+                (new AssessmentModel())
+                    ->setId(101)
+                    ->setSpecificationAssessment(
+                        (new AssessmentModel())
+                            ->setId(1)
+                            ->setAssessmentContext($unitSpecModel)
+                            ->setSubObject((new TaskModel())->setId(1))
+                    )
+            );
+        $subQuiz = (new QuizModel())
+            ->setUser($this->teacher2)
+            ->setAssessmentModel(
+                (new AssessmentModel())
+                    ->setId(102)
+                    ->setSpecificationAssessment(
+                        (new AssessmentModel())
+                            ->setId(2)
+                            ->setAssessmentContext($unitSpecModel)
+                            ->setSubObject((new QuizModel())->setId(2))
+                    )
+            );
+        $subDueWork = (new DueWorkModel())
+            ->setOwner($this->teacher2)
+            ->setAssessmentModel(
+                (new AssessmentModel())
+                    ->setId(103)
+                    ->setSpecificationAssessment(
+                        (new AssessmentModel())
+                            ->setId(3)
+                            ->setAssessmentContext($unitSpecModel)
+                            ->setSubObject(
+                                (new DueWorkModel())
+                                    ->setId(3)
+                                    ->setMarkType($this->buildMarkType())
+                                    ->setSelfAssessable(true)
+                                    ->setSelfReflectable(true)
+                            )
+                    )
+            )
+            ->setMarkType($this->buildMarkType())
+            ->setSelfReflectable(true)
+            ->setSelfAssessable(true);
+
         $projectModel->getAssessments()
-                     ->add(
-                         (new TaskModel())
-                             ->setOwner($this->teacher1)
-                             ->setAssessmentModel(
-                                 (new AssessmentModel())
-                                     ->setId(101)
-                                     ->setSpecificationAssessment(
-                                         (new AssessmentModel())
-                                             ->setId(1)
-                                             ->setAssessmentContext($unitSpecModel)
-                                             ->setSubObject((new TaskModel())->setId(1))
-                                     )
-                             )
-                     )
-                     ->add(
-                         (new QuizModel())
-                             ->setUser($this->teacher2)
-                             ->setAssessmentModel(
-                                 (new AssessmentModel())
-                                     ->setId(102)
-                                     ->setSpecificationAssessment(
-                                         (new AssessmentModel())
-                                             ->setId(2)
-                                             ->setAssessmentContext($unitSpecModel)
-                                             ->setSubObject((new QuizModel())->setId(2))
-                                     )
-                             )
-                     )
-                     ->add(
-                         (new DueWorkModel())
-                             ->setOwner($this->teacher2)
-                             ->setAssessmentModel(
-                                 (new AssessmentModel())
-                                     ->setId(103)
-                                     ->setSpecificationAssessment(
-                                         (new AssessmentModel())
-                                             ->setId(3)
-                                             ->setAssessmentContext($unitSpecModel)
-                                             ->setSubObject(
-                                                 (new DueWorkModel())
-                                                     ->setId(3)
-                                                     ->setMarkType($this->buildMarkType())
-                                                     ->setSelfAssessable(true)
-                                                     ->setSelfReflectable(true)
-                                             )
-                                     )
-                             )
-                             ->setMarkType($this->buildMarkType())
-                             ->setSelfReflectable(true)
-                             ->setSelfAssessable(true)
-                     );
+                     ->add($subTask->getAssessmentModel()->setSubObject($subTask))
+                     ->add($subQuiz->getAssessmentModel()->setSubObject($subQuiz))
+                     ->add($subDueWork->getAssessmentModel()->setSubObject($subDueWork));
 
         /** @var Project $project */
         $project = $this->translator->translateToDomainModel($projectModel);
@@ -620,19 +701,593 @@ class ProjectTest extends TestCase
         // Test sub-assessables
         $this->assertCount(3, $projectModel->getAssessments());
 
-        $this->assertInstanceOf(TaskModel::class, $projectModel->getAssessments()[0]);
-        $this->assertEquals(1, $projectModel->getAssessments()[0]->getAssessmentModel()->getSequence());
-        $this->assertEquals(101, $projectModel->getAssessments()[0]->getAssessmentModel()->getId());
-        $this->assertEquals(1, $projectModel->getAssessments()[0]->getAssessmentModel()->getSpecificationAssessment()->getId());
+        $this->assertInstanceOf(TaskModel::class, $projectModel->getAssessments()[0]->getSubObject());
+        $this->assertEquals(1, $projectModel->getAssessments()[0]->getSequence());
+        $this->assertEquals(101, $projectModel->getAssessments()[0]->getId());
+        $this->assertEquals(1, $projectModel->getAssessments()[0]->getSpecificationAssessment()->getId());
 
-        $this->assertInstanceOf(QuizModel::class, $projectModel->getAssessments()[1]);
-        $this->assertEquals(2, $projectModel->getAssessments()[1]->getAssessmentModel()->getSequence());
-        $this->assertEquals(102, $projectModel->getAssessments()[1]->getAssessmentModel()->getId());
-        $this->assertEquals(2, $projectModel->getAssessments()[1]->getAssessmentModel()->getSpecificationAssessment()->getId());
+        $this->assertInstanceOf(QuizModel::class, $projectModel->getAssessments()[1]->getSubObject());
+        $this->assertEquals(2, $projectModel->getAssessments()[1]->getSequence());
+        $this->assertEquals(102, $projectModel->getAssessments()[1]->getId());
+        $this->assertEquals(2, $projectModel->getAssessments()[1]->getSpecificationAssessment()->getId());
 
-        $this->assertInstanceOf(DueWorkModel::class, $projectModel->getAssessments()[2]);
-        $this->assertEquals(3, $projectModel->getAssessments()[2]->getAssessmentModel()->getSequence());
-        $this->assertEquals(103, $projectModel->getAssessments()[2]->getAssessmentModel()->getId());
-        $this->assertEquals(3, $projectModel->getAssessments()[2]->getAssessmentModel()->getSpecificationAssessment()->getId());
+        $this->assertInstanceOf(DueWorkModel::class, $projectModel->getAssessments()[2]->getSubObject());
+        $this->assertEquals(3, $projectModel->getAssessments()[2]->getSequence());
+        $this->assertEquals(103, $projectModel->getAssessments()[2]->getId());
+        $this->assertEquals(3, $projectModel->getAssessments()[2]->getSpecificationAssessment()->getId());
+    }
+
+
+    /**
+     * @dataProvider provider_linear_data_project_tree
+     * @param ProjectModel $projectModel
+     * @param int          $id           Id of this project node
+     * @param int          $upExpected   How many nodes above this one?
+     * @param int          $downExpected How many nodes below this one?
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \UnexpectedValueException
+     */
+    public function test_linear_data_project_tree(ProjectModel $projectModel, int $id, int $upExpected, int $downExpected)
+    {
+        /** @var Project $domainObject */
+        $domainObject = $this->translator->translateToDomainModel($projectModel);
+        $this->assertEquals($id, $domainObject->getId());
+
+        $up            = $down = 0;
+        $domainContext = $domainObject->getContext();
+        while ($domainContext instanceof Project) {
+            $up++;
+            $domainContext = $domainContext->getContext();
+        }
+        $this->assertEquals($upExpected, $up);
+
+        $domainChild = $domainObject->getAssessables()->first();
+        while ($domainChild instanceof Project) {
+            $down++;
+            $domainChild = $domainChild->getAssessables()->first();
+        }
+        $this->assertEquals($downExpected, $down);
+    }
+
+
+    /**
+     * Verify that a project tree that touches max depth can be translated.
+     */
+    public function testDataProjectTreeTouchingMaxDepth()
+    {
+        $this->translator->setMaxProjectLevels(2);
+
+        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
+        $p1->getAssessmentModel()->setSubObject($p1);
+
+        $q1 = (new QuizModel())->setId(3)->setAssessmentModel((new AssessmentModel())->setId(2));
+        $q1->getAssessmentModel()->setSubObject($q1);
+        $q1->getAssessmentModel()->setContextProject($p1);
+        $p1->getAssessments()[2] = $q1->getAssessmentModel();
+
+        $this->assertInstanceOf(Project::class, $this->translator->translateToDomainModel($p1));
+    }
+
+
+    /**
+     * Ensure that a project assessment, if somehow in multiple projects,
+     * is the same object in both projects.
+     */
+    public function testDataProjectTreeAssessmentInMultipleProjects()
+    {
+        // Create three projects: p1, p2, p3
+        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
+        $p1->getAssessmentModel()->setSubObject($p1);
+        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2));
+        $p2->getAssessmentModel()->setSubObject($p2);
+        $p3 = (new ProjectModel())->setId(3)->setAssessmentModel((new AssessmentModel())->setId(3));
+        $p3->getAssessmentModel()->setSubObject($p3);
+
+        // Put p2 and p3 in p1
+        $p2->getAssessmentModel()->setContextProject($p1);
+        $p1->getAssessments()[2] = $p2->getAssessmentModel();
+        $p3->getAssessmentModel()->setContextProject($p1);
+        $p1->getAssessments()[3] = $p3->getAssessmentModel();
+
+        // Create quiz q4, in both p2 and p3
+        $q4 = (new QuizModel())->setId(4)->setAssessmentModel((new AssessmentModel())->setId(4));
+        $q4->getAssessmentModel()->setSubObject($q4);
+        $p2->getAssessments()[4] = $q4->getAssessmentModel();
+        $p3->getAssessments()[4] = $q4->getAssessmentModel();
+        // An assessment may be in several projects, but may only have one context
+        $q4->getAssessmentModel()->setContextProject($p3);
+
+        /** @var Project $p1DomainModel */
+        /** @var Project $p2DomainModel */
+        /** @var Project $p3DomainModel */
+        $p1DomainModel = $this->translator->translateToDomainModel($p1);
+        $p2DomainModel = $p1DomainModel->getAssessables()[2];
+        $p3DomainModel = $p1DomainModel->getAssessables()[3];
+        $this->assertInstanceOf(Project::class, $p1DomainModel);
+        $this->assertInstanceOf(Project::class, $p2DomainModel);
+        $this->assertInstanceOf(Project::class, $p3DomainModel);
+
+        $p2q4DomainModel = $p2DomainModel->getAssessables()[4];
+        $p3q4DomainModel = $p3DomainModel->getAssessables()[4];
+        $this->assertInstanceOf(Quiz::class, $p2q4DomainModel);
+        $this->assertInstanceOf(Quiz::class, $p3q4DomainModel);
+        $this->assertSame($p2q4DomainModel, $p3q4DomainModel);
+    }
+
+
+    /**
+     * Verify that a project tree with a cyclic reference cannot be translated.
+     *
+     * @expectedException \LogicException
+     */
+    public function testDataProjectTreeCyclicReference()
+    {
+        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
+        $p1->getAssessmentModel()->setSubObject($p1);
+
+        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2));
+        $p2->getAssessmentModel()->setSubObject($p2);
+        $p2->getAssessmentModel()->setContextProject($p1);
+        $p1->getAssessments()[2] = $p2->getAssessmentModel();
+
+        // Add a cyclic reference (p2 is within p1, put p1 within p2)
+        $p1->getAssessmentModel()->setContextProject($p2);
+
+        $this->translator->translateToDomainModel($p1);
+    }
+
+
+    /**
+     * Verify that a project tree that is too deep cannot be translated.
+     *
+     * @expectedException \UnexpectedValueException
+     */
+    public function testDataProjectTreeExceedingMaxDepth()
+    {
+        $this->translator->setMaxProjectLevels(1);
+
+        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
+        $p1->getAssessmentModel()->setSubObject($p1);
+
+        $q1 = (new QuizModel())->setId(3)->setAssessmentModel((new AssessmentModel())->setId(2));
+        $q1->getAssessmentModel()->setSubObject($q1);
+        $q1->getAssessmentModel()->setContextProject($p1);
+        $p1->getAssessments()[2] = $q1->getAssessmentModel();
+
+        $this->translator->translateToDomainModel($p1);
+    }
+
+
+    /**
+     * Verify that a project tree cannot contain a project at its bottom level.
+     *
+     * @expectedException \UnexpectedValueException
+     */
+    public function testDataProjectTreeDisallowsBottomLevelProject()
+    {
+        $this->translator->setMaxProjectLevels(2);
+
+        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
+        $p1->getAssessmentModel()->setSubObject($p1);
+
+        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2));
+        $p2->getAssessmentModel()->setSubObject($p2);
+        $p2->getAssessmentModel()->setContextProject($p1);
+        $p1->getAssessments()[2] = $p2->getAssessmentModel();
+
+        $this->translator->translateToDomainModel($p1);
+    }
+
+
+    /**
+     * @dataProvider provider_branched_data_project_tree
+     * @param ProjectModel $projectModel
+     * @param int          $id
+     * @param int          $up
+     * @param int          $treeSize    Total expected tree size
+     * @param int          $descendants Expected descendant count
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \UnexpectedValueException
+     */
+    public function test_branched_data_project_tree(ProjectModel $projectModel, int $id, int $up, int $treeSize, int $descendants)
+    {
+        /** @var Project $domainObject */
+        $domainObject = $this->translator->translateToDomainModel($projectModel);
+        $this->assertEquals($id, $domainObject->getId());
+
+        // How far up to root are we?
+        $upActual = 0;
+        $root     = $domainObject;
+        while ($root->getContext() instanceof Project) {
+            $upActual++;
+            $root = $root->getContext();
+        }
+        $this->assertEquals($up, $upActual);
+
+        // Is the tree as big as expected?
+        $this->assertEquals($treeSize, 1 + $this->countSubAssessmentsRecursiveProjectObject($root));
+
+        $this->assertEquals($descendants, $this->countSubAssessmentsRecursiveProjectObject($domainObject));
+    }
+
+
+    /**
+     * @dataProvider provider_linear_domain_project_tree
+     * @param Project $projectObject
+     * @param int     $id           Id of this project node
+     * @param int     $upExpected   How many nodes above this one?
+     * @param int     $downExpected How many nodes below this one?
+     * @throws \LogicException
+     * @throws \UnexpectedValueException
+     */
+    public function test_linear_domain_project_tree(Project $projectObject, int $id, int $upExpected, int $downExpected)
+    {
+        /** @var ProjectModel $projectModel */
+        $projectModel = $this->translator->translateToDataModel($projectObject);
+        $this->assertEquals($id, $projectModel->getAssessmentModel()->getId());
+
+        $upActual       = $downActual = 0;
+        $contextProject = $projectModel->getAssessmentModel()->getContextProject();
+        while ($contextProject instanceof ProjectModel) {
+            $upActual++;
+            $contextProject = $contextProject->getAssessmentModel()->getContextProject();
+        }
+        $this->assertEquals($upExpected, $upActual);
+
+        /** @var AssessmentModel $dataChild */
+        $dataChild = $projectModel->getAssessments()->first();
+        while ($dataChild instanceof AssessmentModel && $dataChild->getSubObject() instanceof ProjectModel) {
+            $downActual++;
+            /** @var ProjectModel $subObject */
+            $subObject = $dataChild->getSubObject();
+            $dataChild = $subObject->getAssessments()->first();
+        }
+        $this->assertEquals($downExpected, $downActual);
+    }
+
+
+    /**
+     * Verify that a project tree that touches max depth can be translated.
+     */
+    public function testDomainProjectTreeTouchingMaxDepth()
+    {
+        $this->translator->setMaxProjectLevels(2);
+
+        $p1 = (new Project())->setId(1);
+        $q2 = (new Quiz())->setId(2);
+
+        $p1->getAssessables()[2] = $q2;
+        $q2->setContext($p1);
+
+        $this->assertInstanceOf(ProjectModel::class, $this->translator->translateToDataModel($p1));
+    }
+
+
+    /**
+     * Verify that a project tree with a cyclic reference cannot be translated.
+     *
+     * @expectedException \LogicException
+     */
+    public function testDomainProjectTreeCyclicReference()
+    {
+        $p1 = (new Project())->setId(1);
+        $p2 = (new Project())->setId(2);
+
+        $p1->getAssessables()[2] = $p2;
+        $p2->setContext($p1);
+
+        // Add a cyclic reference (p2 is within p1, put p1 within p2)
+        $p2->getAssessables()[1] = $p1;
+        $p1->setContext($p2);
+
+        $this->translator->translateToDataModel($p1);
+    }
+
+
+    /**
+     * Verify that a project tree that is too deep cannot be translated.
+     *
+     * @expectedException \UnexpectedValueException
+     */
+    public function testDomainProjectTreeExceedingMaxDepth()
+    {
+        $this->translator->setMaxProjectLevels(1);
+
+        $p1 = (new Project())->setId(1);
+        $q2 = (new Quiz())->setId(2);
+
+        $p1->getAssessables()[2] = $q2;
+        $q2->setContext($p1);
+
+        $this->translator->translateToDataModel($p1);
+    }
+
+
+    /**
+     * Verify that a project tree cannot contain a project at its bottom level.
+     *
+     * @expectedException \UnexpectedValueException
+     */
+    public function testDomainProjectTreeDisallowsBottomLevelProject()
+    {
+        $this->translator->setMaxProjectLevels(2);
+
+        $p1 = (new Project())->setId(1);
+        $p2 = (new Project())->setId(2);
+
+        $p1->getAssessables()[2] = $p2;
+        $p2->setContext($p1);
+
+        $this->translator->translateToDataModel($p1);
+    }
+
+
+    /**
+     * Ensure that a project assessment, if somehow in multiple projects,
+     * is the same object in both projects.
+     */
+    public function testDomainProjectTreeAssessmentInMultipleProjects()
+    {
+        // Create three projects: p1, p2, p3
+        $p1 = (new Project())->setId(1);
+        $p2 = (new Project())->setId(2);
+        $p3 = (new Project())->setId(3);
+
+        // Put p2 and p3 in p1
+        $p1->getAssessables()[2] = $p2;
+        $p1->getAssessables()[3] = $p3;
+        $p2->setContext($p1);
+        $p3->setContext($p1);
+
+        // Create quiz q4, in both p2 and p3
+        $q4 = (new Quiz())->setId(4);
+        $p2->getAssessables()[4] = $q4;
+        $p3->getAssessables()[4] = $q4;
+        // An assessment may be in several projects, but may only have one context
+        $q4->setContext($p3);
+
+        /** @var ProjectModel $p1DataModel */
+        /** @var ProjectModel $p2DataModel */
+        /** @var ProjectModel $p3DataModel */
+        /** @var QuizModel    $q4DataModel */
+        $p1DataModel = $this->translator->translateToDataModel($p1);
+        $p2DataModel = $p1DataModel->getAssessments()[2]->getProject();
+        $p3DataModel = $p1DataModel->getAssessments()[3]->getProject();
+        $this->assertInstanceOf(ProjectModel::class, $p1DataModel);
+        $this->assertInstanceOf(ProjectModel::class, $p2DataModel);
+        $this->assertInstanceOf(ProjectModel::class, $p3DataModel);
+
+        $p2q4DataModel = $p2DataModel->getAssessments()[4]->getQuiz();
+        $p3q4DataModel = $p3DataModel->getAssessments()[4]->getQuiz();
+        $this->assertInstanceOf(QuizModel::class, $p2q4DataModel);
+        $this->assertInstanceOf(QuizModel::class, $p3q4DataModel);
+        $this->assertSame($p2q4DataModel, $p3q4DataModel);
+    }
+
+
+    /**
+     * @dataProvider provider_branched_domain_project_tree
+     * @param Project $projectObject
+     * @param int     $id
+     * @param int     $up
+     * @param int     $treeSize    Total expected tree size
+     * @param int     $descendants Expected descendant count
+     * @throws \LogicException
+     * @throws \UnexpectedValueException
+     */
+    public function test_branched_domain_project_tree(Project $projectObject, int $id, int $up, int $treeSize, int $descendants)
+    {
+        /** @var ProjectModel $projectModel */
+        $projectModel = $this->translator->translateToDataModel($projectObject);
+        $this->assertEquals($id, $projectModel->getAssessmentModel()->getId());
+
+        // How far up to root are we?
+        $upActual    = 0;
+        $rootProject = $projectModel;
+        while ($rootProject->getAssessmentModel()->getContextProject() instanceof ProjectModel) {
+            $upActual++;
+            $rootProject = $rootProject->getAssessmentModel()->getContextProject();
+        }
+        $this->assertEquals($up, $upActual);
+
+        // Is the tree as big as expected?
+        $this->assertEquals($treeSize, 1 + $this->countSubAssessmentsRecursiveProjectModel($rootProject));
+
+        $this->assertEquals($descendants, $this->countSubAssessmentsRecursiveProjectModel($projectModel));
+    }
+
+
+    /**
+     * Returns the number of project sub-assessments recursively
+     *
+     * @param ProjectModel $projectModel
+     * @return int
+     * @throws \UnexpectedValueException
+     */
+    private function countSubAssessmentsRecursiveProjectModel(ProjectModel $projectModel): int
+    {
+        $count = $projectModel->getAssessments()->count();
+        foreach ($projectModel->getAssessments() as $subAssessment) {
+            $subObject = $subAssessment->getSubObject();
+            if ($subObject instanceof ProjectModel) {
+                $count += $this->countSubAssessmentsRecursiveProjectModel($subObject);
+            }
+        }
+        return $count;
+    }
+
+
+    /**
+     * Returns the number of project sub-assessments recursively
+     *
+     * @param Project $projectObject
+     * @return int
+     */
+    private function countSubAssessmentsRecursiveProjectObject(Project $projectObject): int
+    {
+        $count = $projectObject->getAssessables()->count();
+        foreach ($projectObject->getAssessables() as $subAssessable) {
+            if ($subAssessable instanceof Project) {
+                $count += $this->countSubAssessmentsRecursiveProjectObject($subAssessable);
+            }
+        }
+        return $count;
+    }
+
+
+    /**
+     * Returns a tree with a single branch of 5 nodes, from 1 (root) to 5 (leaf)
+     *
+     * @return array
+     */
+    public function provider_linear_data_project_tree(): array
+    {
+        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
+        $p1->getAssessmentModel()->setSubObject($p1);
+
+        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2));
+        $p2->getAssessmentModel()->setSubObject($p2);
+        $p2->getAssessmentModel()->setContextProject($p1);
+        $p1->getAssessments()[2] = $p2->getAssessmentModel();
+
+        $p3 = (new ProjectModel())->setId(3)->setAssessmentModel((new AssessmentModel())->setId(3));
+        $p3->getAssessmentModel()->setSubObject($p3);
+        $p3->getAssessmentModel()->setContextProject($p2);
+        $p2->getAssessments()[3] = $p3->getAssessmentModel();
+
+        $p4 = (new ProjectModel())->setId(4)->setAssessmentModel((new AssessmentModel())->setId(4));
+        $p4->getAssessmentModel()->setSubObject($p4);
+        $p4->getAssessmentModel()->setContextProject($p3);
+        $p3->getAssessments()[4] = $p4->getAssessmentModel();
+
+        $p5 = (new ProjectModel())->setId(5)->setAssessmentModel((new AssessmentModel())->setId(5));
+        $p5->getAssessmentModel()->setSubObject($p5);
+        $p5->getAssessmentModel()->setContextProject($p4);
+        $p4->getAssessments()[5] = $p5->getAssessmentModel();
+
+        return [
+            [$p1, 1, 0, 4],
+            [$p2, 2, 1, 3],
+            [$p3, 3, 2, 2],
+            [$p4, 4, 3, 1],
+            [$p5, 5, 4, 0],
+        ];
+    }
+
+
+    /**
+     * Returns a tree with 5 nodes, from 1 (root) to 5 (leaf), with two forks
+     *
+     * @return array
+     */
+    public function provider_branched_data_project_tree(): array
+    {
+        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
+        $p1->getAssessmentModel()->setSubObject($p1);
+        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2));
+        $p2->getAssessmentModel()->setSubObject($p2);
+        $p3 = (new ProjectModel())->setId(3)->setAssessmentModel((new AssessmentModel())->setId(3));
+        $p3->getAssessmentModel()->setSubObject($p3);
+        $p4 = (new ProjectModel())->setId(4)->setAssessmentModel((new AssessmentModel())->setId(4));
+        $p4->getAssessmentModel()->setSubObject($p4);
+        $p5 = (new ProjectModel())->setId(5)->setAssessmentModel((new AssessmentModel())->setId(5));
+        $p5->getAssessmentModel()->setSubObject($p5);
+
+        // #2 and #3 are children of #1
+        $p1->getAssessments()[2] = $p2->getAssessmentModel();
+        $p1->getAssessments()[3] = $p3->getAssessmentModel();
+        $p2->getAssessmentModel()->setContextProject($p1);
+        $p3->getAssessmentModel()->setContextProject($p2);
+
+        // #4 and #4 are children of #2
+        $p2->getAssessments()[4] = $p4->getAssessmentModel();
+        $p2->getAssessments()[5] = $p5->getAssessmentModel();
+        $p4->getAssessmentModel()->setContextProject($p2);
+        $p5->getAssessmentModel()->setContextProject($p2);
+
+        // [node, nodeId, countUp, countTreeSize, countDescendants]
+        return [
+            [$p1, 1, 0, 5, 4],
+            [$p2, 2, 1, 5, 2],
+            [$p3, 3, 1, 5, 0],
+            [$p4, 4, 2, 5, 0],
+            [$p5, 5, 2, 5, 0],
+        ];
+    }
+
+
+    /**
+     * Returns a tree with a single branch of 5 nodes, from 1 (root) to 5 (leaf)
+     *
+     * @return array
+     */
+    public function provider_linear_domain_project_tree(): array
+    {
+        $p1 = (new Project())->setId(1);
+        $p2 = (new Project())->setId(2);
+        $p3 = (new Project())->setId(3);
+        $p4 = (new Project())->setId(4);
+        $p5 = (new Project())->setId(5);
+
+        $p1->getAssessables()[2] = $p2;
+        $p2->setContext($p1);
+
+        $p2->getAssessables()[3] = $p3;
+        $p3->setContext($p2);
+
+        $p3->getAssessables()[4] = $p4;
+        $p4->setContext($p3);
+
+        $p4->getAssessables()[5] = $p5;
+        $p5->setContext($p4);
+
+        // [Initial translation node, node id, ancestor count, descendant count]
+        return [
+            [$p1, 1, 0, 4],
+            [$p2, 2, 1, 3],
+            [$p3, 3, 2, 2],
+            [$p4, 4, 3, 1],
+            [$p5, 5, 4, 0],
+        ];
+    }
+
+
+    /**
+     * Returns a tree with 5 nodes, from 1 (root) to 5 (leaf), with two forks
+     *
+     * @return array
+     */
+    public function provider_branched_domain_project_tree(): array
+    {
+        $p1 = (new Project())->setId(1);
+        $p2 = (new Project())->setId(2);
+        $p3 = (new Project())->setId(3);
+        $p4 = (new Project())->setId(4);
+        $p5 = (new Project())->setId(5);
+
+        // #2 and #3 are children of #1
+        $p1->getAssessables()[2] = $p2;
+        $p1->getAssessables()[3] = $p3;
+        $p2->setContext($p1);
+        $p3->setContext($p1);
+
+        // #4 and #4 are children of #2
+        $p2->getAssessables()[4] = $p4;
+        $p2->getAssessables()[5] = $p5;
+        $p4->setContext($p2);
+        $p5->setContext($p2);
+
+        // [node, nodeId, countUp, countTreeSize, countDescendants]
+        return [
+            [$p1, 1, 0, 5, 4],
+            [$p2, 2, 1, 5, 2],
+            [$p3, 3, 1, 5, 0],
+            [$p4, 4, 2, 5, 0],
+            [$p5, 5, 2, 5, 0],
+        ];
     }
 }

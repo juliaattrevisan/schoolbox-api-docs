@@ -10,7 +10,9 @@ namespace Schoolbox\Learning\Assessment\DataModel\Project;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DataModel\IAssessmentContextDataModel;
@@ -65,27 +67,6 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel, ISoftD
     protected $owner;
 
     /**
-     * The title of the project.
-     *
-     * @var string
-     */
-    protected $title;
-
-    /**
-     * The long form description of the project.
-     *
-     * @var string
-     */
-    protected $description;
-
-    /**
-     * The weight of this project in determining class grades.
-     *
-     * @var int
-     */
-    protected $weight;
-
-    /**
      * The name of the summator that this uses.
      *
      * @var string
@@ -107,9 +88,9 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel, ISoftD
     protected $gradeGroup;
 
     /**
-     * The collection of assessable models.
+     * The collection of this project's sub-assessment models.
      *
-     * @var Collection|IAssessableDataModel[]
+     * @var Collection|Assessment\Model[]
      */
     protected $assessments;
 
@@ -118,8 +99,7 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel, ISoftD
      */
     public function __construct()
     {
-        $this->assessments = new Collection();
-        $this->markType    = new MarkType();
+        $this->assessments = new GenericCollection(Assessment\Model::class);
     }
 
     /**
@@ -159,7 +139,7 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel, ISoftD
     }
 
     /**
-     * @return Collection|IAssessableDataModel[]
+     * @return GenericCollection|Assessment\Model[]
      */
     public function getAssessments()
     {
@@ -167,12 +147,12 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel, ISoftD
     }
 
     /**
-     * @param Collection|IAssessableDataModel[] $assessments
-     * @return static
+     * @param Collection|Assessment\Model[] $assessments
+     * @return $this
      */
-    public function setAssessments(Collection $assessments)
+    public function setAssessments(Collection $assessments): self
     {
-        $this->assessments = $assessments;
+        $this->assessments->replaceWith($assessments);
         return $this;
     }
 
@@ -194,59 +174,6 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel, ISoftD
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getTitle()
-    {
-        return $this->title;
-    }
-
-    /**
-     * @param string $title
-     * @return static
-     */
-    public function setTitle($title)
-    {
-        $this->title = $title;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDescription()
-    {
-        return $this->description;
-    }
-
-    /**
-     * @param string $description
-     * @return static
-     */
-    public function setDescription($description)
-    {
-        $this->description = $description;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getWeight()
-    {
-        return $this->weight;
-    }
-
-    /**
-     * @param int $weight
-     * @return static
-     */
-    public function setWeight($weight)
-    {
-        $this->weight = $weight;
-        return $this;
-    }
 
     /**
      * @return GradeGroup

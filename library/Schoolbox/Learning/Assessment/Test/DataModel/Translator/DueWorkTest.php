@@ -132,6 +132,35 @@ class DueWorkTest extends TestCase
         $this->assertEquals(DueWorkModel\MarkType::TYPE_NONE, $dueWorkModel->getMarkType()->getId());
     }
 
+
+    /**
+     * Assert that translating a domain model to a data model, then back to a
+     * domain model returns the original domain model.
+     */
+    public function testTranslateDomainModelBackToDataModel()
+    {
+        $dueWorkDomainModel = (new DueWork())
+            ->setId(908)
+            ->setContext((new Folder())->setId(1))
+        ;
+
+        $dueWorkDataModel               = $this->translator->translateToDataModel($dueWorkDomainModel);
+        $retranslatedDueWorkDomainModel = $this->translator->translateToDomainModel($dueWorkDataModel);
+        $this->assertSame($dueWorkDomainModel, $retranslatedDueWorkDomainModel);
+    }
+
+
+    /**
+     * Assert that null domain model can be translated to a data model.
+     */
+    public function testTranslateNullDomainModelToDataModel()
+    {
+        $nullDueWorkDomainModel = (new DueWork())->setId(null);
+        $nullDueWorkDataModel   = $this->translator->translateToDataModel($nullDueWorkDomainModel);
+        $this->assertNull($nullDueWorkDataModel->getId());
+    }
+
+
     /**
      * Data provider for different due work response acceptance settings.
      */
@@ -192,18 +221,22 @@ class DueWorkTest extends TestCase
         ];
     }
 
+
     /**
-    * /**
+     * /**
      * Test translation of mark scheme.
      *
      * @dataProvider getTestTranslateMarkSchemeToDataModelData
      *
-     * @param DueWork $dueWork
-     * @param int     $markTypeId
-     * @param int     $totalMark
-     * @param int     $gradeGroupId
+     * @param DueWork  $dueWork
+     * @param int      $markTypeId
+     * @param null|int $totalMark
+     * @param null|int $gradeGroupId
+     * @throws \LogicException
+     * @throws \PHPUnit\Framework\Exception
+     * @throws \UnexpectedValueException
      */
-    public function testTranslateMarkSchemeToDataModel(DueWork $dueWork, $markTypeId, $totalMark, $gradeGroupId)
+    public function testTranslateMarkSchemeToDataModel(DueWork $dueWork, int $markTypeId, ?int $totalMark, ?int $gradeGroupId)
     {
         /** @var DueWorkModel $dueWorkModel */
         $dueWorkModel = $this->translator->translateToDataModel($dueWork);
@@ -212,9 +245,17 @@ class DueWorkTest extends TestCase
         $this->assertInstanceOf(DueWorkModel::class, $dueWorkModel);
 
         // Test due work-specific fields
-        $this->assertEquals($markTypeId, $dueWorkModel->getMarkType()->getId());
+        if (null === $markTypeId) {
+            $this->assertNull($dueWorkModel->getMarkType());
+        } else {
+            $this->assertEquals($markTypeId, $dueWorkModel->getMarkType()->getId());
+        }
         $this->assertEquals($totalMark, $dueWorkModel->getMaxMark());
-        $this->assertEquals($gradeGroupId, $dueWorkModel->getGradeGroup()->getId());
+        if (null === $gradeGroupId) {
+            $this->assertNull($dueWorkModel->getGradeGroup());
+        } else {
+            $this->assertEquals($gradeGroupId, $dueWorkModel->getGradeGroup()->getId());
+        }
     }
 
     /**
@@ -357,6 +398,42 @@ class DueWorkTest extends TestCase
         $this->assertEquals(12, $dueWork->getWorkType()->getId());
         $this->assertEquals('A dumb type', $dueWork->getWorkType()->getName());
     }
+
+
+    /**
+     * Assert that translating a data model to a domain model, then back to a
+     * data model returns the original data model.
+     */
+    public function testTranslateDataModelBackToDomainModel()
+    {
+        $dueWorkDataModel = (new DueWorkModel())
+            ->setId(6789)
+            ->setAssessmentModel(
+                (new AssessmentModel())
+                    ->setAssessmentContext((new Folder())->setId(1))
+                    ->setId(33)
+                    ->setWorkType((new WorkType())
+                        ->setId(12)
+                        ->setName('A dumb type')
+                    )
+            );
+
+        $dueWorkDomainModel           = $this->translator->translateToDomainModel($dueWorkDataModel);
+        $retranslatedDueWorkDataModel = $this->translator->translateToDataModel($dueWorkDomainModel);
+        $this->assertSame($dueWorkDataModel, $retranslatedDueWorkDataModel);
+    }
+
+
+    /**
+     * Assert that null data model can be translated to a domain model.
+     */
+    public function testTranslateNullDataModelToDomainModel()
+    {
+        $nullDueWorkDataModel   = (new DueWorkModel())->setId(null)->setAssessmentModel(new AssessmentModel());
+        $nullDueWorkDomainModel = $this->translator->translateToDomainModel($nullDueWorkDataModel);
+        $this->assertNull($nullDueWorkDomainModel->getId());
+    }
+
 
     /**
      * Data provider for different due work response acceptance settings.

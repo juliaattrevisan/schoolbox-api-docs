@@ -620,19 +620,6 @@ class Project extends AbstractAssessment implements AssessmentContext
         return $this->precision;
     }
 
-    /**
-     * @param AssessmentContext $context
-     * @throws InvalidArgumentException
-     * @return static
-     */
-    public function setContext(AssessmentContext $context = null)
-    {
-        if($context instanceof Project){
-            throw new InvalidArgumentException('For now, a Project cannot reside inside another Project');
-        }
-        parent::setContext($context);
-        return $this;
-    }
 
     /**
      * Retrieves the folder this Project ultimately belongs to.

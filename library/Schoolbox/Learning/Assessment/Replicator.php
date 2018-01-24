@@ -76,6 +76,7 @@ class Replicator
     ): IAssessable {
         $newAssessment = $assessmentSpec->cloneForCopy();
         $newAssessment->setContext($destination);
+        $destination->getAssessables()->add($newAssessment);
         $newAssessment->setCreator($newOwner);
         if (null !== $sequence) {
             $newAssessment->setSequence($sequence);

@@ -181,8 +181,6 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
     {
         $this->setAttachments(new Collection());
         $this->setCategory(new FolderModel());
-        $this->setMarkType(new MarkType());
-        $this->setGradeGroup(new GradeLevel\Group\Model());
         $this->setCurriculumNodes(new Collection());
         $this->setPublishDate(new \Alaress_Date_NullDate());
         $this->setOpenDate(new \Alaress_Date_NullDate());
@@ -307,7 +305,7 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
      * @param  string $description
      * @return $this
      */
-    public function setDescription($description)
+    public function setDescription(string $description)
     {
         $this->description = $description;
         return $this;
@@ -930,9 +928,9 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-     * @return bool
+     * @return null|bool
      */
-    public function isSelfReflectable(): bool
+    public function isSelfReflectable(): ?bool
     {
         return $this->selfReflectable;
     }

@@ -668,7 +668,11 @@ abstract class AbstractBootstrap implements BootstrapInterface
         $di->set(
             'assessmentTranslator',
             $di->lazy(function () use ($di) {
-                $translator = new AssessmentDataModelTranslator(new MarkSchemeFactory());
+                $translator = new AssessmentDataModelTranslator(
+                    new MarkSchemeFactory(),
+                    $di->get('mapperFactory')->get(AssessmentMapper::class),
+                    AssessmentDataModelTranslator::MAX_PROJECT_LEVELS_DEFAULT
+                );
                 $translator
                     ->addSubTranslator(new TaskTranslator())
                     ->addSubTranslator(new DueWorkTranslator())

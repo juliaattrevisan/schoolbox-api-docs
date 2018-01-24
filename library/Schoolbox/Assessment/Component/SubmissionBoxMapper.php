@@ -116,7 +116,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
      *
      * @param int $idValue
      * @throws \Schoolbox\Mapper\Exception
-     * @return object
+     * @return object|SubmissionBox
      */
     public function createModel($idValue = null)
     {

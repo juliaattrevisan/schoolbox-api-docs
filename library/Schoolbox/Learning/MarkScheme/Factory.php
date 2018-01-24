@@ -47,12 +47,16 @@ class Factory
 
     /**
      * @param IAssessable $assessable
-     * @return IMarkScheme
+     * @return null|IMarkScheme
      * @throws \DomainException If MarkType is invalid for the assessment
      * @throws \InvalidArgumentException If assessment class not registered
      */
-    public function spawnMarkSchemeFor(IAssessable $assessable)
+    public function spawnMarkSchemeFor(IAssessable $assessable): ?IMarkScheme
     {
+        $markType = $assessable->getMarkType();
+        if (null === $markType) {
+            return null;
+        }
         if ($assessable instanceof Task) {
             return $this->spawnForTask($assessable);
         }
