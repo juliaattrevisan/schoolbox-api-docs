@@ -157,6 +157,7 @@ class Mapper extends BaseMapper
                         `tour_step_tooltip`.`selector` as `tooltip_selector`,
                         `tour_step_tooltip`.`css_class` as `tooltip_css_class`,
                         `tour_step_modal`.`uuid` as `modal_uuid`,
+                        `tour_step_modal`.`title` as `modal_title`,
                         `tour_step_modal`.`body` as `modal_body`,
                         `tour_step_modal`.`css_class` as `modal_css_class`,
                         `tour_step_event`.`selector` as `event_selector`,
@@ -204,6 +205,7 @@ class Mapper extends BaseMapper
                         'uuid'           => $row['uuid'],
                         'next_step_uuid' => $row['next_step_uuid'],
                         'type'           => self::TYPE_MODAL,
+                        'title'          => $row['modal_title'],
                         'body'           => $row['modal_body'],
                         'css_class'      => $row['modal_css_class'],
                         'events'         => [] // Populated below

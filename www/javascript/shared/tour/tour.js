@@ -51,8 +51,17 @@ $(function () {
                                 type: step.type
                             });
                         } else if (step.type === 'modal') {
+
+                            var modalContent = '';
+
+                            if (step.title) {
+                                modalContent += '<h2>' + step.title + '</h2>';
+                            }
+
+                            modalContent += step.body;
+
                             stepsToDisplay.push({
-                                intro: step.body,
+                                intro: modalContent,
                                 tooltipClass: step.css_class,
                                 uuid: step.uuid,
                                 type: step.type

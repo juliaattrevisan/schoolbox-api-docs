@@ -32,8 +32,8 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'uuid'         => '158389f5-f5b9-11e7-9503-08002751fd3c',
             'tooltip_uuid' => '2530b35a-ff4a-11e7-bd23-08002751fd3c',
             'type'         => 'modal',
+            'title'        => 'Welcome to your dashboard!',
             'content'      => "
-                <h3>Welcome to your dashboard!</h3>
                 <p>This tour will guide you through an overview of the main areas of the first screen you see when you log in. This includes; the dashboard, side menu and top menu.</p>
             ",
             'css_class'    => 'introjs-intromodal',
@@ -284,7 +284,6 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
               (
                             `uuid`,
                             `tour_step_uuid`,
-                            `title`,
                             `body`,
                             `selector`,
                             `css_class`,
@@ -294,7 +293,6 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
               )
               SELECT        :uuid,
                             :tour_step_uuid,
-                            NULL,
                             :content,
                             :selector,
                             NULL,
@@ -325,7 +323,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
               )
               SELECT        :uuid,
                             :tour_step_uuid,
-                            NULL,
+                            :title,
                             :content,
                             :css_class,
                             NOW(),
@@ -335,6 +333,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             $statement->execute([
                 'uuid'           => $step['tooltip_uuid'],
                 'tour_step_uuid' => $step['uuid'],
+                'title'          => trim($step['title']),
                 'content'        => trim($step['content']),
                 'css_class'      => $step['css_class'],
             ]);
