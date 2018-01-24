@@ -13,6 +13,7 @@ use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
 use Schoolbox\Learning\Assessment\DataModel\Translator\IAssessmentTypeTranslator;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
@@ -300,7 +301,11 @@ class Translator
         } elseif ($context instanceof UnitImplementation) {
             $assessmentModel->setAssessmentContext($context);
         } elseif ($context instanceof Project) {
-            $dataModel->getAssessmentModel()->setContextProject($this->dataModelCache[spl_object_hash($context)]);
+            // Fetch project from cache, building it if required
+            $projectDataModel = $this->getCachedDataModel($context, $this->getSubTranslatorDomain($context));
+            if ($projectDataModel instanceof IAssessableDataModel) {
+                $assessmentModel->setAssessmentContext($projectDataModel);
+            }
         }
 
         // This would ideally be in the Project translator. But that would require making this method public.
@@ -436,7 +441,11 @@ class Translator
         } elseif ($context instanceof UnitImplementation) {
             $domainObject->setContext($context);
         } elseif ($context instanceof ProjectModel) {
-            $domainObject->setContext($this->domainObjectCache[spl_object_hash($context)]);
+            // Fetch project from cache, building it if required
+            $projectDomainModel = $this->getCachedDomainObject($context, $this->getSubTranslatorData($context));
+            if ($projectDomainModel instanceof AssessmentContext) {
+                $domainObject->setContext($projectDomainModel);
+            }
         }
 
         // Ideally this would exist in the Project translator, but that would require making this method public.
