@@ -26,7 +26,6 @@ CREATE TABLE `tour_step_tooltip`
 (
   `uuid`              VARCHAR(36)       PRIMARY KEY NOT NULL,
   `tour_step_uuid`    VARCHAR(36)       NOT NULL,                 -- Mandatory, can't have a tooltip floating without a corresponding step
-  `title`             VARCHAR(255)      NULL,                     -- Current has no purpose currently- for future use in an admin builder interface
   `body`              TEXT              NULL,                     -- Contents of the tooltip
   `selector`          VARCHAR(255)      NOT NULL,                 -- Tooltips must have a selector (no floating centered tooltips)
   `css_class`         VARCHAR(255)      NULL,                     -- Optional CSS class override for tooltip
