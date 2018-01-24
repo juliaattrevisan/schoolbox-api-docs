@@ -30,34 +30,30 @@
     {% if assessment.allParticipants | length %}
         <div id="participation-settings"> {# class="hide" #}
             <div class="row">
-                <div class="small-12 medium-6 large-4 medium-offset-6 large-offset-8 column" id="mass-buttons">
-                    <section class="content">
-                        <nav>
-                        <ul class="flex-list small-12 medium-12 large-10 medium-offset-0 large-offset-2">
-                            <li>
-                                <button
-                                        class="button expand dropdown"
-                                        id="customise-dropdown"
-                                        data-dropdown="customise-options"
-                                        aria-controls="customise-options"
-                                        aria-expanded="false"
-                                        disabled
-                                >
-                                    Modify Participation
-                                </button>
-                            </li>
-                            <li class="hide">
-                                <button
-                                        class="button icon-more"
-                                        id="plan-dropdown"
-                                        data-dropdown="plan-options"
-                                        aria-controls="customise-options"
-                                        aria-expanded="false"
-                                        title="Modify Plans"
-                                >
-                                </button>
-                            </li>
-                        </ul>
+                <div class="small-12 medium-6 large-4 medium-offset-6 large-offset-8 columns" id="mass-buttons">
+                    <nav>
+                        <div class="flex-list buttons">
+                            <button
+                                class="button dropdown"
+                                id="customise-dropdown"
+                                data-dropdown="customise-options"
+                                aria-controls="customise-options"
+                                aria-expanded="false"
+                                disabled
+                            >
+                                Modify Participation
+                            </button>
+
+                            <button
+                                class="button icon-more icon hide"
+                                id="plan-dropdown"
+                                data-dropdown="plan-options"
+                                aria-controls="customise-options"
+                                aria-expanded="false"
+                                title="Modify Plans"
+                            >
+                            </button>
+                        </div>
                         <ul class="f-dropdown" id="customise-options" data-dropdown-content aria-hidden="true">
                             <li><a href="#" data-participant-change="exclude" class="hide">Exclude from assessment</a></li>
                             <li><a href="#" data-participant-change="include" class="hide">Include in assessment</a></li>
@@ -74,8 +70,7 @@
                                 <li><a href="#" data-plan-modify="{{ plan.id }}" data-plan-name="{{ plan.name }}">{{ plan.name }}</a></li>
                             {% endfor %}
                         </ul>
-                        </nav>
-                    </section>
+                    </nav>
                 </div>
             </div>
 

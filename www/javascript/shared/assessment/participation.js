@@ -461,7 +461,7 @@
     function enableActions() {
         var checkPlans = $(defaults.planData).find('input').length;
         if (checkPlans) {
-            $('#plan-dropdown').closest('li').removeClass('hide');
+            $('#plan-dropdown').closest('button').removeClass('hide');
         }
     }
 
