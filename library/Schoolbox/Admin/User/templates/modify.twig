@@ -560,10 +560,21 @@
 
             var resourceBooking = '{{ constant('RESOURCE_BOOKING_SERVICE') }}';
             var fixtures = '{{ constant('SPORTS_ADMINISTRATOR_SERVICE') }}';
+            var cms = '{{ constant('CMS_SERVICE') }}';
+            var curriculum = '{{ constant('CURRICULUM_SERVICE') }}';
+            var pastoralCare = '{{ constant('PASTORAL_SERVICE') }}';
+
             var moderateOnlyServices = [resourceBooking, fixtures];
+            var noMiddleDropdownServices = [cms, resourceBooking, curriculum, pastoralCare, fixtures]
 
             var moderateAccess = 3;
             var readAccess = 1;
+
+            if (noMiddleDropdownServices.indexOf(selectedServiceId) !== -1) {
+                $("#defaultSelect").hide();
+            } else {
+                $("#defaultSelect").show();
+            }
 
             if (moderateOnlyServices.indexOf(selectedServiceId) !== -1) {
                 $("#read").hide();
