@@ -132,21 +132,16 @@
                 var status;
                 var include;
 
-                if (action === 'include') {
+                if (action === 'include' || action === 'default') {
                     $participantCard.removeClass('participant-excluded');
                     status = '(no customisations)';
                     statusValue = 'included';
                     include = 1;
-                } else if (action === 'exclude') {
+                } else {
                     $participantCard.addClass('participant-excluded');
                     status = '(excluded)';
                     statusValue = 'excluded';
                     include = 0;
-                } else {
-                    $participantCard.removeClass('participant-excluded');
-                    status = '(no customisations)';
-                    statusValue = 'custom';
-                    include = 1;
                 }
 
                 // Update the status showing for the student
