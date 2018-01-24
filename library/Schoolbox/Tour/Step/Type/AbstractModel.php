@@ -1,11 +1,12 @@
 <?php
 /**
- * @author      Damian Sloane <damian.sloane@alaress.com.au>
- * @copyright   Copyright 2017, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * Created by PhpStorm.
+ * User: matt.schembri
+ * Date: 16/01/18
+ * Time: 8:32 AM
  */
 
-namespace Schoolbox\Tour\Step\Tooltip;
+namespace Schoolbox\Tour\Step\Type;
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -15,27 +16,12 @@ use Schoolbox\Mapper\Traits\Model\Uuid;
 use Schoolbox\Tour\Step\Model as TourStep;
 use Schoolbox\User;
 
-class Model implements ISoftDeletable
+abstract class AbstractModel implements ISoftDeletable, \JsonSerializable
 {
     use Uuid;
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
-
-    /**
-     * @var User|null
-     */
-    protected $author;
-
-    /**
-     * @var string|null
-     */
-    protected $title;
-
-    /**
-     * @var string|null
-     */
-    protected $javascriptSelector;
 
     /**
      * @var string|null
@@ -51,63 +37,6 @@ class Model implements ISoftDeletable
      * @var string|null
      */
     protected $body;
-
-    /**
-     * @return User|null
-     */
-    public function getAuthor(): ?User
-    {
-        return $this->author;
-    }
-
-    /**
-     * @param User|null $author
-     *
-     * @return self|$this
-     */
-    public function setAuthor(?User $author): self
-    {
-        $this->author = $author;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getTitle(): ?string
-    {
-        return $this->title;
-    }
-
-    /**
-     * @param string|null $title
-     *
-     * @return self
-     */
-    public function setTitle(?string $title): self
-    {
-        $this->title = $title;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getJavascriptSelector(): ?string
-    {
-        return $this->javascriptSelector;
-    }
-
-    /**
-     * @param string|null $javascriptSelector
-     *
-     * @return self
-     */
-    public function setJavascriptSelector(?string $javascriptSelector): self
-    {
-        $this->javascriptSelector = $javascriptSelector;
-        return $this;
-    }
 
     /**
      * @return string|null

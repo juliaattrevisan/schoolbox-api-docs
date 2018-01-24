@@ -14,17 +14,14 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\Uuid;
 use Schoolbox\Tour\Model as Tour;
 use Schoolbox\User;
+use Schoolbox\Tour\Step\Type\AbstractModel;
 
-class Model implements ISoftDeletable
+class Model implements ISoftDeletable, \JsonSerializable
 {
     use Uuid;
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
-
-    // Step type constants
-
-    const TYPE_TOOLTIP = 'tooltip';
 
     /**
      * @var User|null
@@ -37,14 +34,14 @@ class Model implements ISoftDeletable
     protected $tour;
 
     /**
-     * @var string|null
+     * @var AbstractModel
      */
     protected $type;
 
     /**
      * @var Model|null
      */
-    protected $tourStep;
+    protected $nextStep;
 
     /**
      * @return User|null
@@ -85,19 +82,19 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return string|null
+     * @return AbstractModel
      */
-    public function getType(): ?string
+    public function getType(): AbstractModel
     {
         return $this->type;
     }
 
     /**
-     * @param string|null $type
+     * @param AbstractModel $type
      *
      * @return self
      */
-    public function setType(?string $type): self
+    public function setType(AbstractModel $type): self
     {
         $this->type = $type;
         return $this;
@@ -106,18 +103,40 @@ class Model implements ISoftDeletable
     /**
      * @return Model|null
      */
-    public function getTourStep(): ?Model
+    public function getNextStep(): ?Model
     {
-        return $this->tourStep;
+        return $this->nextStep;
     }
+
     /**
-     * @param Model|null $tourStep
+     * @param Model|null $nextStep
      *
      * @return self|$this
      */
-    public function setTourStep(?Model $tourStep): self
+    public function setNextStep(?Model $nextStep): self
     {
-        $this->tourStep = $tourStep;
+        $this->nextStep = $nextStep;
         return $this;
+    }
+
+    /**
+     * Specify data which should be serialized to JSON
+     *
+     * @link  http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
+     */
+    public function jsonSerialize()
+    {
+        $json = $this->getType()->jsonSerialize();
+        $json['uuid'] = $this->getUuid();
+        if ($this->getNextStep()) {
+            $json['next_step_uuid'] = $this->getNextStep()->getUuid();
+        } else {
+            $json['next_step_uuid'] = null;
+        }
+
+        return $json;
     }
 }

@@ -32,10 +32,11 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'uuid'         => '158389f5-f5b9-11e7-9503-08002751fd3c',
             'tooltip_uuid' => '2530b35a-ff4a-11e7-bd23-08002751fd3c',
             'type'         => 'modal',
+            'title'        => 'Welcome to your dashboard!',
             'content'      => "
-                <h3>Welcome to your dashboard!</h3>
                 <p>This tour will guide you through an overview of the main areas of the first screen you see when you log in. This includes; the dashboard, side menu and top menu.</p>
             ",
+            'css_class'    => 'introjs-intromodal',
         ],
 
         // Account details
@@ -256,7 +257,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
                         :tour_uuid,
                         :next_step_uuid,
                         (SELECT `id` FROM `user` WHERE `username` = 'alaress' LIMIT 1),
-                        'tooltip',
+                        :step_type,
                         NOW(),
                         NOW(),
                         NULL
@@ -272,6 +273,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'uuid'           => $step['uuid'],
             'tour_uuid'      => $tour_uuid,
             'next_step_uuid' => $next_step_uuid,
+            'step_type'      => $step['type'],
         ]);
 
 
@@ -282,8 +284,6 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
               (
                             `uuid`,
                             `tour_step_uuid`,
-                            `author_user_id`,
-                            `title`,
                             `body`,
                             `selector`,
                             `css_class`,
@@ -293,8 +293,6 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
               )
               SELECT        :uuid,
                             :tour_step_uuid,
-                            (SELECT `id` FROM `user` WHERE `username` = 'alaress' LIMIT 1),
-                            NULL,
                             :content,
                             :selector,
                             NULL,
@@ -311,7 +309,34 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 
         } elseif ($step['type'] === 'modal') {
 
-            // TODO with SA-5699, when infrastructure for modal step types exist - insert the content
+            $statement = $database->prepare("
+              INSERT INTO   `tour_step_modal`
+              (
+                            `uuid`,
+                            `tour_step_uuid`,
+                            `title`,
+                            `body`,
+                            `css_class`,
+                            `created_at`,
+                            `updated_at`,
+                            `deleted_at`
+              )
+              SELECT        :uuid,
+                            :tour_step_uuid,
+                            :title,
+                            :content,
+                            :css_class,
+                            NOW(),
+                            NOW(),
+                            NULL
+            ");
+            $statement->execute([
+                'uuid'           => $step['tooltip_uuid'],
+                'tour_step_uuid' => $step['uuid'],
+                'title'          => trim($step['title']),
+                'content'        => trim($step['content']),
+                'css_class'      => $step['css_class'],
+            ]);
 
         }
 
@@ -359,11 +384,11 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
     // Update the tour table with the first step uuid
     $statement = $database->prepare("
         UPDATE          `tour`
-        SET             `tour_step_uuid` = :tour_step_uuid
+        SET             `first_step_uuid` = :first_step_uuid
         WHERE           `uuid` = :uuid
     ");
     $statement->execute([
         'uuid'           => $tour_uuid,
-        'tour_step_uuid' => $steps[0]['uuid'],
+        'first_step_uuid' => $steps[0]['uuid'],
     ]);
 });

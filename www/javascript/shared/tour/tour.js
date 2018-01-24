@@ -41,27 +41,62 @@ $(function () {
                     var stepsToDisplay = [];
 
                     $(tour.steps).each(function (i, step) {
-                        stepsToDisplay.push({
-                            intro: step.body,
-                            element: step.selector,
-                            tooltipClass: step.css_class,
-                            uuid: step.uuid,
-                            jsEvents: step.events
-                        });
+                        if (step.type === 'tooltip') {
+                            stepsToDisplay.push({
+                                intro: step.body,
+                                element: step.selector,
+                                tooltipClass: step.css_class+" closeable-tooltip",
+                                uuid: step.uuid,
+                                jsEvents: step.events,
+                                type: step.type
+                            });
+                        } else if (step.type === 'modal') {
+
+                            var modalContent = '';
+
+                            if (step.title) {
+                                modalContent += '<h2>' + step.title + '</h2>';
+                            }
+
+                            modalContent += step.body;
+
+                            stepsToDisplay.push({
+                                intro: modalContent,
+                                tooltipClass: step.css_class,
+                                uuid: step.uuid,
+                                type: step.type
+                            });
+                        }
                     });
+
+                    var buttonLabels = {
+                        next: 'Next',
+                        prev: 'Back',
+                        done: 'Finish',
+                        skip: '&times;'
+                    };
 
                     tourCurrent.setOptions({
                         showStepNumbers: false,
                         showBullets: false,
                         hidePrev: true,
                         hideNext: true,
-                        nextLabel: 'Next',
-                        prevLabel: 'Back',
-                        skipLabel: '&times;',
+                        nextLabel: buttonLabels.next,
+                        prevLabel: buttonLabels.prev,
+                        doneLabel: buttonLabels.done,
+                        skipLabel: buttonLabels.skip,
                         scrollTo: 'tooltip',
                         disableInteraction: false,
                         exitOnOverlayClick: false,
-                        steps: stepsToDisplay.filter(function(obj) { return $(obj.element).length; }) // Filter out elements that don't exist in the DOM
+                        steps: stepsToDisplay.filter(function(obj) {
+                            if (obj.type == 'tooltip') {
+                                return $(obj.element).length; // Filter out elements that don't exist in the DOM
+                            } else if (obj.type == 'modal') {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        })
                     });
 
 
@@ -70,6 +105,17 @@ $(function () {
                     var tourUrl = window.location.pathname;
                     //TO DO: Inject route when file is pluginerised
                     var saveRoute = '/tour/url/save';
+
+                    tourCurrent.onafterchange(function(targetElement) {
+                        if (tourCurrent._introItems[tourCurrent._currentStep].tooltipClass == 'introjs-intromodal') {
+                            $('.introjs-nextbutton').html('Take me on the tour!').addClass('introjs-startbutton');
+                            $('.introjs-skipbutton').html('No Thanks').addClass('introjs-nothanksbutton');
+                        } else {
+                            $('.introjs-nextbutton').html(buttonLabels.next).removeClass('introjs-startbutton');
+                            $('.introjs-skipbutton').html(buttonLabels.skip).removeClass('introjs-nothanksbutton');
+                            $('.introjs-donebutton').html(buttonLabels.done);
+                        }
+                    });
 
                     tourCurrent.onchange(function(targetElement) {
                         var stepCurrent = tourCurrent._introItems[tourCurrent._currentStep];
@@ -95,6 +141,7 @@ $(function () {
                         var newStep = stepCurrent.uuid;
                         var status = "unactioned"; // TODO: use const from Status/Model when this is made into a plugin
 
+                        //Save the status
                         $.post(saveRoute, {
                             url: tourUrl,
                             oldStep: oldStep,
@@ -102,7 +149,42 @@ $(function () {
                             status: status
                         });
 
-                        oldStep = newStep;
+                        oldStep         = newStep;
+                    });
+
+                    tourCurrent.oncomplete(function(targetElement) {
+                        completed = true;
+
+                        var newStep     = tourCurrent._introItems[tourCurrent._currentStep].uuid;
+
+                        //This matches the consts on the Status/Model - to be updated when this file is a plugin
+                        var status      = "completed";
+
+                        //Save the status
+                        $.post(saveRoute, {
+                            url: tourUrl,
+                            oldStep: oldStep,
+                            newStep: newStep,
+                            status: status
+                        });
+                    });
+
+                    tourCurrent.onexit(function(targetElement) {
+                        //onexit triggers when oncomplete triggers, so need check
+                        if(!completed) {
+                            var newStep = tourCurrent._introItems[tourCurrent._currentStep].uuid;
+
+                            //This matches the consts on the Status/Model - to be updated when this file is a plugin
+                            var status = "dismissed";
+
+                            //Save the status
+                            $.post(saveRoute, {
+                                url: tourUrl,
+                                oldStep: oldStep,
+                                newStep: newStep,
+                                status: status
+                            });
+                        }
                     });
 
                     tourCurrent.oncomplete(function(targetElement) {

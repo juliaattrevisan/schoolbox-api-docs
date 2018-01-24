@@ -26,8 +26,6 @@ CREATE TABLE `tour_step_tooltip`
 (
   `uuid`              VARCHAR(36)       PRIMARY KEY NOT NULL,
   `tour_step_uuid`    VARCHAR(36)       NOT NULL,                 -- Mandatory, can't have a tooltip floating without a corresponding step
-  `author_user_id`    INT(4) UNSIGNED   NULL,                     -- Not mandatory, Alaress created tooltips will not have an author ID
-  `title`             VARCHAR(255)      NULL,                     -- Current has no purpose currently- for future use in an admin builder interface
   `body`              TEXT              NULL,                     -- Contents of the tooltip
   `selector`          VARCHAR(255)      NOT NULL,                 -- Tooltips must have a selector (no floating centered tooltips)
   `css_class`         VARCHAR(255)      NULL,                     -- Optional CSS class override for tooltip
@@ -35,11 +33,9 @@ CREATE TABLE `tour_step_tooltip`
   `updated_at`        DATETIME          NOT NULL,
   `deleted_at`        DATETIME          NULL,
 
-  CONSTRAINT `tour_step_tooltip_user_id_fk` FOREIGN KEY (`author_user_id`) REFERENCES `user` (`id`),
   CONSTRAINT `tour_step_tooltip_tour_step_uuid_fk` FOREIGN KEY (`tour_step_uuid`) REFERENCES `tour_step` (`uuid`)
 );
 
-CREATE INDEX `tour_step_tooltip_user_id_idx` ON `tour_step_tooltip` (`author_user_id`);
 CREATE INDEX `tour_step_tooltip_tour_step_uuid_idx` ON `tour_step_tooltip` (`tour_step_uuid`);
 
 -- JS events on steps

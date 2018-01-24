@@ -1,39 +1,29 @@
 <?php
 /**
- * @author      Damian Sloane <damian.sloane@alaress.com.au>
- * @copyright   Copyright 2017, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * Created by PhpStorm.
+ * User: matt.schembri
+ * Date: 16/01/18
+ * Time: 8:25 AM
  */
 
-namespace Schoolbox\Tour\Step\Tooltip;
+namespace Schoolbox\Tour\Step\Type;
 
 use PDOStatement;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Tour\Step\Mapper as TourStepMapper;
 use Schoolbox\UserMapper;
+use Schoolbox\Tour\Step\Model;
 
-/**
- * Class Mapper
- *
- * @method Model createModel($id = null)
- * @method Model hydrate(array $row, $alias = '', $callback = null)
- * @package Schoolbox\Tour\Step\Tooltip
- */
-class Mapper extends BaseMapper
+abstract class AbstractMapper extends BaseMapper
 {
     /**
      * @inheritdoc
      */
     protected function mapping()
     {
-        $this->hasTable('tour_step_tooltip');
-        $this->hasModel(Model::class);
         $this->uses('uuid', self::TYPE_STRING, self::COLUMN_IDENTIFIER_UUID);
         $this->joins('tour_step_uuid', TourStepMapper::class, 'uuid', null, null, 'tourStep', 'tourStep');
-        $this->joins('author_user_id', UserMapper::class, 'id', null, null, 'author', 'author');
-        $this->uses('title', self::TYPE_STRING);
         $this->uses('body', self::TYPE_STRING);
-        $this->uses('selector', self::TYPE_STRING, null, 'javascriptSelector');
         $this->uses('css_class', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
@@ -70,8 +60,7 @@ class Mapper extends BaseMapper
     {
         return "
             SELECT      {$this->getColumnString()},
-                        {$this->getJoinColumnString('author', 'a')},
-                        {$this->getJoinColumnString('tourStep', 's')}
+                        {$this->getJoinColumnString('tourStep', 's')},
             FROM        {$this->getTable()}
             INNER JOIN  {$this->getJoinSql('tourStep', '', 's')}
             LEFT JOIN   {$this->getJoinSql('author', '', 'a', true)}
@@ -85,9 +74,6 @@ class Mapper extends BaseMapper
     {
         $collection = $this->createCollection();
 
-        /** @var UserMapper $authorUserMapper */
-        $authorUserMapper = $this->getJoinMapper('author');
-
         /** @var TourStepMapper $tourStepMapper */
         $tourStepMapper = $this->getJoinMapper('tourStep');
 
@@ -95,7 +81,6 @@ class Mapper extends BaseMapper
             $model = $this->hydrate($row);
 
             if ($model instanceof Model) {
-                $model->setAuthor($authorUserMapper->hydrate($row, 'a'));
                 $model->setTourStep($tourStepMapper->hydrate($row, 's'));
                 $collection->add($model);
             }

@@ -8,9 +8,14 @@
 namespace Schoolbox\Tour\Step;
 
 use PDOStatement;
+use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Tour\Mapper as TourMapper;
+use Schoolbox\Tour\Step\Mapper as StepMapper;
 use Schoolbox\UserMapper;
+use Schoolbox\Tour\Step\Type\Tooltip;
+use Schoolbox\Tour\Step\Type\Modal;
 
 /**
  * Class Mapper
@@ -18,10 +23,16 @@ use Schoolbox\UserMapper;
  * @method Model createModel($id = null)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model findOneByColumnList($columnList, $order = [], $options = [])
+ * @method GenericCollection|Model[] findByColumnList($columnList, $options = array())
+ * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = array())
  * @package Schoolbox\Tour\Step
  */
 class Mapper extends BaseMapper
 {
+    // Step type constants
+    public const TYPE_TOOLTIP = 'tooltip';
+    public const TYPE_MODAL = 'modal';
+
     /**
      * @inheritdoc
      */
@@ -30,10 +41,11 @@ class Mapper extends BaseMapper
         $this->hasTable('tour_step');
         $this->hasModel(Model::class);
         $this->uses('uuid', self::TYPE_STRING, self::COLUMN_IDENTIFIER_UUID);
-        $this->joins('next_step_uuid', Mapper::class, 'uuid', null, null, 'tourStep', 'tourStep');
+        $this->joins('next_step_uuid', self::class, 'uuid', null, null, 'nextStep', 'nextStep');
         $this->joins('tour_uuid', TourMapper::class, 'uuid', null, null, 'tour', 'tour');
         $this->joins('author_user_id', UserMapper::class, 'id', null, null, 'author', 'author');
-        $this->uses('type', self::TYPE_STRING);
+        $this->joinsReverseSingle('tour_step_uuid', Modal\Mapper::class, 'type', 'modalStep');
+        $this->joinsReverseSingle('tour_step_uuid', Tooltip\Mapper::class, 'type', 'tooltipStep');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -69,10 +81,17 @@ class Mapper extends BaseMapper
     {
         return "
             SELECT      {$this->getColumnString()},
+                        {$this->getTable()}.`type`,
                         {$this->getJoinColumnString('author', 'a')},
-                        {$this->getJoinColumnString('tour', 't')}
+                        {$this->getJoinColumnString('tour', 't')},
+                        {$this->getJoinColumnString('nextStep', 'ns')},
+                        {$this->getJoinColumnString('modalStep', 'ms')},
+                        {$this->getJoinColumnString('tooltipStep', 'ts')}
             FROM        {$this->getTable()}
             INNER JOIN  {$this->getJoinSql('tour', '', 't')}
+            LEFT JOIN   {$this->getJoinSql('nextStep', '','ns')}
+            LEFT JOIN   {$this->getJoinSql('modalStep','','ms')}
+            LEFT JOIN   {$this->getJoinSql('tooltipStep','','ts')}            
             LEFT JOIN   {$this->getJoinSql('author', '', 'a', true)}
         ";
     }
@@ -90,12 +109,30 @@ class Mapper extends BaseMapper
         /** @var TourMapper $tourMapper */
         $tourMapper = $this->getJoinMapper('tour');
 
+        /** @var StepMapper $stepMapper */
+        $stepMapper = $this->getJoinMapper('nextStep');
+
+        $hydrators = [
+            'tooltip' => [Tooltip\Mapper::getInstance(), 'ts'],
+            'modal' => [Modal\Mapper::getInstance(), 'ms']
+        ];
+
         foreach ($statement as $row) {
+            if (!array_key_exists($row['type'], $hydrators)) {
+                continue;
+            }
+
             $model = $this->hydrate($row);
 
             if ($model instanceof Model) {
                 $model->setAuthor($authorUserMapper->hydrate($row, 'a'));
                 $model->setTour($tourMapper->hydrate($row, 't'));
+                $model->setNextStep($stepMapper->hydrate($row, 'ns'));
+
+                [ $mapper, $alias ] = $hydrators[$row['type']];
+                $type = $mapper->hydrate($row, $alias);
+                $model->setType($type);
+
                 $collection->add($model);
             }
         }
@@ -119,12 +156,17 @@ class Mapper extends BaseMapper
                         `tour_step_tooltip`.`body` as `tooltip_body`,
                         `tour_step_tooltip`.`selector` as `tooltip_selector`,
                         `tour_step_tooltip`.`css_class` as `tooltip_css_class`,
+                        `tour_step_modal`.`uuid` as `modal_uuid`,
+                        `tour_step_modal`.`title` as `modal_title`,
+                        `tour_step_modal`.`body` as `modal_body`,
+                        `tour_step_modal`.`css_class` as `modal_css_class`,
                         `tour_step_event`.`selector` as `event_selector`,
                         `tour_step_event`.`event` as `event`,
                         `tour_step_event`.`insertion_point` as `event_insertion_point`
             FROM        {$this->getTable()}
             LEFT JOIN   {$this->getJoinSql('tour', '', 'tour', true)}
             LEFT JOIN   `tour_step_tooltip` ON `tour_step_tooltip`.`tour_step_uuid` = `tour_step`.`uuid`
+            LEFT JOIN   `tour_step_modal` ON `tour_step_modal`.`tour_step_uuid` = `tour_step`.`uuid`
             LEFT JOIN   `tour_step_event` ON `tour_step_event`.`tour_step_uuid` = `tour_step`.`uuid` AND `tour_step_event`.`deleted_at` IS NULL
             WHERE       `tour`.`uuid` = :tourUuid AND
                         `tour`.`active` = 1 AND
@@ -144,19 +186,31 @@ class Mapper extends BaseMapper
         foreach ($statement as $row) {
             // Store the first step in the tour if we haven't yet
             if ($stepCurrent === null) {
-                $stepCurrent = $row['tour.tour_step_uuid'];
+                $stepCurrent = $row['tour.first_step_uuid'];
             }
 
             if (!isset($stepsStorage[$row['uuid']])) {
-                $stepsStorage[$row['uuid']] = [
-                    'uuid'           => $row['uuid'],
-                    'next_step_uuid' => $row['next_step_uuid'],
-                    'type'           => Model::TYPE_TOOLTIP,
-                    'body'           => $row['tooltip_body'],
-                    'css_class'      => $row['tooltip_css_class'],
-                    'selector'       => $row['tooltip_selector'],
-                    'events'         => [] // Populated below
-                ];
+                if ($row['tooltip_uuid'] != null) {
+                    $stepsStorage[$row['uuid']] = [
+                        'uuid'           => $row['uuid'],
+                        'next_step_uuid' => $row['next_step_uuid'],
+                        'type'           => self::TYPE_TOOLTIP,
+                        'body'           => $row['tooltip_body'],
+                        'css_class'      => $row['tooltip_css_class'],
+                        'selector'       => $row['tooltip_selector'],
+                        'events'         => [] // Populated below
+                    ];
+                } elseif ($row['modal_uuid'] != null) {
+                    $stepsStorage[$row['uuid']] = [
+                        'uuid'           => $row['uuid'],
+                        'next_step_uuid' => $row['next_step_uuid'],
+                        'type'           => self::TYPE_MODAL,
+                        'title'          => $row['modal_title'],
+                        'body'           => $row['modal_body'],
+                        'css_class'      => $row['modal_css_class'],
+                        'events'         => [] // Populated below
+                    ];
+                }
             }
 
             // Add the event (can be multiple)
@@ -172,10 +226,13 @@ class Mapper extends BaseMapper
         // Starting with the initial step of the tour, follow the trail of UUIDs to create a correctly ordered
         // array of steps for use in the javascript code
         $steps = [];
-        while ($stepCurrent !== null) {
+        $iterations = 0;
+        $maxIterations = 50;
+        while ($stepCurrent !== null && $iterations < $maxIterations) {
             $steps[] = $stepsStorage[$stepCurrent];
             // Move onto the next step in the sequence
             $stepCurrent = $stepsStorage[$stepCurrent]['next_step_uuid'];
+            $iterations++;
         }
 
         return $steps;

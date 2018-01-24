@@ -1,3 +1,6 @@
+$modal-width: 30rem;
+$tooltip-padding: 1rem;
+
 // ----------------------------------------------------------------
 // Tooltip
 // ----------------------------------------------------------------
@@ -5,7 +8,7 @@
   border-radius: 0;
   box-sizing: border-box;
   min-width: 350px;
-  padding: 1rem;
+  padding: $tooltip-padding;
 }
 
 .introjs-arrow {
@@ -62,6 +65,15 @@
 .introjs-tooltiptext {
   font-size: $paragraph-font-size;
   padding-right: 2rem;
+}
+
+
+// ----------------------------------------------------------------
+// Modal
+// ----------------------------------------------------------------
+.introjs-intromodal {
+  padding-bottom: 3rem; // This is to allow space for the absolute positioned 'no thanks' button
+  min-width: $modal-width;
 }
 
 
@@ -133,6 +145,7 @@
   text-align: center;
   text-shadow: none;
   @include button-dimensions();
+  margin: 1rem 0 0;
 
   &:hover {
     background-color: $content-ui-hover;
@@ -156,6 +169,14 @@
   width: 100%;
   margin-right: 0;
 
+  color: $submit-button-color;
+  background-color: $submit-button-bg-color;
+  &:hover,
+  &:focus {
+    color: $submit-button-color;
+    background-color: $submit-button-bg-hover;
+  }
+
   // Hide the previous and next buttons on the last step, leaving just the 'done' button
   &+ .introjs-nextbutton,
   &+ .introjs-prevbutton {
@@ -171,23 +192,53 @@
   }
 }
 
+.introjs-startbutton,
+.introjs-donebutton {
+  font-weight: $font-weight-semibold;
+  color: $submit-button-color;
+  background-color: $submit-button-bg-color;
+  &:hover,
+  &:focus {
+    color: $submit-button-color;
+    background-color: $submit-button-bg-hover;
+  }
+}
+
+.introjs-nothanksbutton {
+  background: transparent;
+  position: absolute;
+  right: $tooltip-padding;
+  bottom: $tooltip-padding;
+  margin: 0;
+  padding-bottom: 0;
+  color: $monsoon;
+  min-height: auto;
+  width: $modal-width - ($tooltip-padding*2);
+
+  &:hover {
+    background: transparent;
+  }
+}
+
 
 // ----------------------------------------------------------------
 // Restyling the skip button to an X top right
 // ----------------------------------------------------------------
-.introjs-skipbutton:not(.introjs-donebutton) {
-  background: transparent;
-  color: $oil;
-  font-size: 2rem;
-  margin: 0;
-  padding: 0;
-  position: absolute;
-  right: 6px;
-  top: 3px;
-  text-shadow: none;
+.closeable-tooltip {
+  .introjs-skipbutton:not(.introjs-donebutton) {
+    background: transparent;
+    color: $oil;
+    font-size: 2rem;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    right: 6px;
+    top: 3px;
+    text-shadow: none;
 
-  &:hover {
-    color: $accent-foreground;
+    &:hover {
+      color: $accent-foreground;
+    }
   }
 }
 
