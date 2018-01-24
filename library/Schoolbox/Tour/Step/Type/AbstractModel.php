@@ -26,11 +26,6 @@ abstract class AbstractModel implements ISoftDeletable, \JsonSerializable
     /**
      * @var string|null
      */
-    protected $title;
-
-    /**
-     * @var string|null
-     */
     protected $cssClass;
 
     /**
@@ -42,25 +37,6 @@ abstract class AbstractModel implements ISoftDeletable, \JsonSerializable
      * @var string|null
      */
     protected $body;
-
-    /**
-     * @return string|null
-     */
-    public function getTitle(): ?string
-    {
-        return $this->title;
-    }
-
-    /**
-     * @param string|null $title
-     *
-     * @return self
-     */
-    public function setTitle(?string $title): self
-    {
-        $this->title = $title;
-        return $this;
-    }
 
     /**
      * @return string|null

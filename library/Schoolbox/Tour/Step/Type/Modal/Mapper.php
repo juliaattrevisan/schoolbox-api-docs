@@ -26,5 +26,6 @@ class Mapper extends AbstractMapper
         parent::mapping();
         $this->hasTable('tour_step_modal');
         $this->hasModel(Model::class);
+        $this->uses('title', self::TYPE_STRING);
     }
 }

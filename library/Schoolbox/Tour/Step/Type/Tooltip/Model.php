@@ -47,7 +47,6 @@ class Model extends AbstractModel
     public function jsonSerialize()
     {
         return [
-            'title'     => $this->getTitle(),
             'css_class' => $this->getCssClass(),
             'body'      => $this->getBody(),
             'type'      => Step\Mapper::TYPE_TOOLTIP,

@@ -13,6 +13,11 @@ use Schoolbox\Tour\Step;
 class Model extends AbstractModel
 {
     /**
+     * @var string|null
+     */
+    protected $title;
+
+    /**
      * Specify data which should be serialized to JSON
      *
      * @link  http://php.net/manual/en/jsonserializable.jsonserialize.php
@@ -28,5 +33,24 @@ class Model extends AbstractModel
             'body'      => $this->getBody(),
             'type'      => Step\Mapper::TYPE_MODAL
         ];
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param string|null $title
+     *
+     * @return self
+     */
+    public function setTitle(?string $title): self
+    {
+        $this->title = $title;
+        return $this;
     }
 }

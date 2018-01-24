@@ -23,7 +23,6 @@ abstract class AbstractMapper extends BaseMapper
     {
         $this->uses('uuid', self::TYPE_STRING, self::COLUMN_IDENTIFIER_UUID);
         $this->joins('tour_step_uuid', TourStepMapper::class, 'uuid', null, null, 'tourStep', 'tourStep');
-        $this->uses('title', self::TYPE_STRING);
         $this->uses('body', self::TYPE_STRING);
         $this->uses('css_class', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
