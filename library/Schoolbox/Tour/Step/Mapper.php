@@ -23,8 +23,8 @@ use Schoolbox\Tour\Step\Type\Modal;
  * @method Model createModel($id = null)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model findOneByColumnList($columnList, $order = [], $options = [])
- * @method Model findByColumnList($columnList, $order = [], $options = [])
- * @method GenericCollection | Model[] findByColumn($columnName, $columnValue, $options = array())
+ * @method GenericCollection|Model[] findByColumnList($columnList, $options = array())
+ * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = array())
  * @package Schoolbox\Tour\Step
  */
 class Mapper extends BaseMapper
@@ -200,7 +200,7 @@ class Mapper extends BaseMapper
                         'selector'       => $row['tooltip_selector'],
                         'events'         => [] // Populated below
                     ];
-                } else if ($row['modal_uuid'] != null) {
+                } elseif ($row['modal_uuid'] != null) {
                     $stepsStorage[$row['uuid']] = [
                         'uuid'           => $row['uuid'],
                         'next_step_uuid' => $row['next_step_uuid'],
@@ -211,7 +211,6 @@ class Mapper extends BaseMapper
                         'events'         => [] // Populated below
                     ];
                 }
-
             }
 
             // Add the event (can be multiple)

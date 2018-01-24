@@ -144,7 +144,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param TourStep|null $tourStep
+     * @param TourStep|null $firstStep
      *
      * @return self|$this
      */

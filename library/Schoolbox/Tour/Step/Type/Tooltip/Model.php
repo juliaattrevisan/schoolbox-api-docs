@@ -53,5 +53,4 @@ class Model extends AbstractModel
             'selector'  => $this->getJavascriptSelector()
         ];
     }
-
 }

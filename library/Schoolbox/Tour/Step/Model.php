@@ -109,7 +109,7 @@ class Model implements ISoftDeletable, \JsonSerializable
     }
 
     /**
-     * @param Model|null $tourStep
+     * @param Model|null $nextStep
      *
      * @return self|$this
      */

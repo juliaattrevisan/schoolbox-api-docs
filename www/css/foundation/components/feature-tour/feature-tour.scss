@@ -145,7 +145,7 @@ $tooltip-padding: 1rem;
   text-align: center;
   text-shadow: none;
   @include button-dimensions();
-  margin: 1rem 0 0 0;
+  margin: 1rem 0 0;
 
   &:hover {
     background-color: $content-ui-hover;
@@ -171,7 +171,8 @@ $tooltip-padding: 1rem;
 
   color: $submit-button-color;
   background-color: $submit-button-bg-color;
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     color: $submit-button-color;
     background-color: $submit-button-bg-hover;
   }
@@ -196,7 +197,8 @@ $tooltip-padding: 1rem;
   font-weight: $font-weight-semibold;
   color: $submit-button-color;
   background-color: $submit-button-bg-color;
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     color: $submit-button-color;
     background-color: $submit-button-bg-hover;
   }
@@ -222,7 +224,7 @@ $tooltip-padding: 1rem;
 // ----------------------------------------------------------------
 // Restyling the skip button to an X top right
 // ----------------------------------------------------------------
-.closeable-tooltip{
+.closeable-tooltip {
   .introjs-skipbutton:not(.introjs-donebutton) {
     background: transparent;
     color: $oil;
