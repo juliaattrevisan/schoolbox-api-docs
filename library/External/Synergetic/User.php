@@ -540,6 +540,15 @@ class External_Synergetic_User implements External_UserInterface
             $filters .= " AND StudentForm = :form";
         }
 
+        if ($this->config->get('external_synergetic_student_contact_types') === '') {
+            // No relationships were found, use the default values we had before introducing this feature
+            $studentContactTypes = ['SC1','SC2','SC3'];
+        } else {
+            $studentContactTypes = explode(',', $this->config->get('external_synergetic_student_contact_types'));
+        }
+
+        $contactTypes = Builder::getArrayBindings($studentContactTypes, 'types');
+
         // Now can build the query string
 
         $query = "
