@@ -905,6 +905,82 @@ class ProjectTest extends TestCase
 
 
     /**
+     * Verify that a project tree that touches max depth can be translated.
+     */
+    public function testDomainProjectTreeTouchingMaxDepth()
+    {
+        $this->translator->setMaxProjectLevels(2);
+
+        $p1 = (new Project())->setId(1);
+        $q2 = (new Quiz())->setId(2);
+
+        $p1->getAssessables()[2] = $q2;
+        $q2->setContext($p1);
+
+        $this->assertInstanceOf(ProjectModel::class, $this->translator->translateToDataModel($p1));
+    }
+
+
+    /**
+     * Verify that a project tree with a cyclic reference cannot be translated.
+     *
+     * @expectedException \LogicException
+     */
+    public function testDomainProjectTreeCyclicReference()
+    {
+        $p1 = (new Project())->setId(1);
+        $p2 = (new Project())->setId(2);
+
+        $p1->getAssessables()[2] = $p2;
+        $p2->setContext($p1);
+
+        // Add a cyclic reference (p2 is within p1, put p1 within p2)
+        $p2->getAssessables()[1] = $p1;
+        $p1->setContext($p2);
+
+        $this->translator->translateToDataModel($p1);
+    }
+
+
+    /**
+     * Verify that a project tree that is too deep cannot be translated.
+     *
+     * @expectedException \UnexpectedValueException
+     */
+    public function testDomainProjectTreeExceedingMaxDepth()
+    {
+        $this->translator->setMaxProjectLevels(1);
+
+        $p1 = (new Project())->setId(1);
+        $q2 = (new Quiz())->setId(2);
+
+        $p1->getAssessables()[2] = $q2;
+        $q2->setContext($p1);
+
+        $this->translator->translateToDataModel($p1);
+    }
+
+
+    /**
+     * Verify that a project tree cannot contain a project at its bottom level.
+     *
+     * @expectedException \UnexpectedValueException
+     */
+    public function testDomainProjectTreeDisallowsBottomLevelProject()
+    {
+        $this->translator->setMaxProjectLevels(2);
+
+        $p1 = (new Project())->setId(1);
+        $p2 = (new Project())->setId(2);
+
+        $p1->getAssessables()[2] = $p2;
+        $p2->setContext($p1);
+
+        $this->translator->translateToDataModel($p1);
+    }
+
+
+    /**
      * @dataProvider provider_branched_domain_project_tree
      * @param Project $projectObject
      * @param int     $id
