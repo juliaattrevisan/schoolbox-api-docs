@@ -558,11 +558,9 @@
         $("#serviceSelect").change(function(e) {
             var selectedServiceId = $(e.target).val();
 
-            // This doesn't fix the magic number problem exactly, but makes it easier to understand and extend.
             var resourceBooking = '{{ constant('RESOURCE_BOOKING_SERVICE') }}';
-            var pastoralCare = '{{ constant('PASTORAL_SERVICE') }}';
             var fixtures = '{{ constant('SPORTS_ADMINISTRATOR_SERVICE') }}';
-            var moderateOnlyServices = [resourceBooking, pastoralCare, fixtures];
+            var moderateOnlyServices = [resourceBooking, fixtures];
 
             var moderateAccess = 3;
             var readAccess = 1;
