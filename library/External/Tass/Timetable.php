@@ -99,9 +99,9 @@ class External_Tass_Timetable implements External_TimetableInterface
             $date = time();
         }
 
-        $cmpyCode = $this->getCampusCode($campus);
+        $cmpyCode = $this->getDatabase()->quote($this->getCampusCode($campus));
         $ttDate   = date("Y-m-d 00:00:00", $date);
-        $ttId     = $this->getTimetableCode($campus);
+        $ttId     = $this->getDatabase()->quote($this->getTimetableCode($campus));
 
         $query = "
             SELECT  day_code 
