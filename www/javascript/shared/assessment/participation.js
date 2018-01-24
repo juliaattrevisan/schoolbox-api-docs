@@ -575,24 +575,21 @@
         // Show exclude action if at least one selected student is included or has a custom plan
         if (included || custom) {
             $('[data-participant-change = exclude]').removeClass('hide');
-        }
-        else {
+        } else {
             $('[data-participant-change = exclude]').addClass('hide');
         }
 
         // Show include action if at least one selected student is excluded
         if (excluded) {
             $('[data-participant-change = include]').removeClass('hide');
-        }
-        else {
+        } else {
             $('[data-participant-change = include]').addClass('hide');
         }
 
-        // Show remove participation action if at least one selected student is excluded or has a custom plan
+        // Show 'remove customisations' action if at least one selected student is excluded or has a custom plan
         if (excluded || custom) {
             $('[data-participant-change = default]').removeClass('hide');
-        }
-        else {
+        } else {
             $('[data-participant-change = default]').addClass('hide');
         }
 
