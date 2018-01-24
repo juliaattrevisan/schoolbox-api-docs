@@ -152,14 +152,16 @@ button.submit{
  * the actual flex-list button dimensions aren't right.
  */
 .flex-list {
-    &.buttons a {
-		@include flex;
-		@extend .button;
-		justify-content: center;
-		margin: 1px 1px 0 0;
-        &.submit {
-            @extend input[type="submit"];
-        }
+    &.buttons {
+		a, button {
+			@include flex;
+			@extend .button;
+			justify-content: center;
+			margin: 1px 1px 0 0;
+			&.submit {
+				@extend input[type="submit"];
+			}
+		}
     }
 	li:last-child a{
 		margin-right: 0;

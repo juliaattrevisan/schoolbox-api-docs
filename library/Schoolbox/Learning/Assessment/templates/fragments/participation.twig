@@ -28,81 +28,107 @@
     </div>
     #}
     {% if assessment.allParticipants | length %}
-    <div id="participation-settings"> {# class="hide" #}
-        <div class="row">
-            <div class="small-12 medium-3 medium-offset-9 column" id="mass-buttons">
-                <button
-                    class="button expand dropdown"
-                    id="customise-dropdown"
-                    data-dropdown="customise-options"
-                    aria-controls="customise-options"
-                    aria-expanded="false"
-                    disabled
-                >
-                    Actions
-                </button>
-                <ul class="f-dropdown" id="customise-options" data-dropdown-content aria-hidden="true">
-                    <li><a href="#" data-participant-change="exclude">Exclude from assessment</a></li>
-                    <li class="separator">Learning Plans</li>
-                    <li><a href="#" data-participant-change="include">Default plan</a></li>
-                    {% for plan in assessment.plans if not plan.isDynamic %}
-                        <li><a href="#" data-plan-use="{{ plan.id }}" data-plan-name="{{ plan.name }}">{{ plan.name }}</a></li>
-                    {% endfor %}
-                    <li><a href="#" id="participant-customise">Create new plan</a></li>
-                </ul>
+        <div id="participation-settings"> {# class="hide" #}
+            <div class="row">
+                <div class="small-12 medium-6 large-4 medium-offset-6 large-offset-8 column" id="mass-buttons">
+                    <section class="content">
+                        <nav>
+                        <ul class="flex-list small-12 medium-12 large-10 medium-offset-0 large-offset-2">
+                            <li>
+                                <button
+                                        class="button expand dropdown"
+                                        id="customise-dropdown"
+                                        data-dropdown="customise-options"
+                                        aria-controls="customise-options"
+                                        aria-expanded="false"
+                                        disabled
+                                >
+                                    Modify Participation
+                                </button>
+                            </li>
+                            <li class="hide">
+                                <button
+                                        class="button icon-more"
+                                        id="plan-dropdown"
+                                        data-dropdown="plan-options"
+                                        aria-controls="customise-options"
+                                        aria-expanded="false"
+                                        title="Modify Plans"
+                                >
+                                </button>
+                            </li>
+                        </ul>
+                        <ul class="f-dropdown" id="customise-options" data-dropdown-content aria-hidden="true">
+                            <li><a href="#" data-participant-change="exclude">Exclude from assessment</a></li>
+                            <li class="separator">Learning Plans</li>
+                            <li><a href="#" data-participant-change="include">Default plan</a></li>
+                            {% for plan in assessment.plans if not plan.isDynamic %}
+                                <li><a href="#" data-plan-use="{{ plan.id }}" data-plan-name="{{ plan.name }}">{{ plan.name }}</a></li>
+                            {% endfor %}
+                            <li><a href="#" id="participant-customise">Create new plan...</a></li>
+                        </ul>
+                        <ul class="f-dropdown" id="plan-options" data-dropdown-content aria-hidden="true">
+                            <li class="separator">Modify Plans</li>
+                            {% for plan in assessment.plans if not plan.isDynamic %}
+                                <li><a href="#" data-plan-modify="{{ plan.id }}" data-plan-name="{{ plan.name }}">{{ plan.name }}</a></li>
+                            {% endfor %}
+                        </ul>
+                        </nav>
+                    </section>
+                </div>
             </div>
-        </div>
 
-        <ul class="information-list card-selectable" id="participants">
-            {% for participant in assessment.allParticipants %}
-                {% set user = participant.user %}
-                {% set userInclude = (not participant.excludedAt) or participant.excludedAt.null %}
-                {% set userPlanName = userInclude ? (participant.plan.name ?: '(no customisations)') : '(excluded)' %}
+            <ul class="information-list card-selectable" id="participants">
+                {% for participant in assessment.allParticipants %}
+                    {% set user = participant.user %}
+                    {% set userInclude = (not participant.excludedAt) or participant.excludedAt.null %}
+                    {% set userPlanName = userInclude ? (participant.plan.name ?: '(no customisations)') : '(excluded)' %}
 
-                <li data-participant="{{ user.id }}">
-                    <input type="hidden" name="participant-include[{{ user.id }}]" id="participant-include-{{ user.id }}" value="{{ userInclude ? 1 : 0 }}">
-                    <input type="hidden" name="participant-plan[{{ user.id }}]" id="participant-plan-{{ user.id }}" value="{{ participant.plan.id ?: 0 }}">
-                    <div data-participant-row>
-                        <div class="selector" data-participant-selector>
-                            <input
-                                    id="participant-{{ user.id }}"
-                                    type="checkbox" value="1"
-                                    name="participant[{{ user.id }}]"
-                                    data-participant-select data-user-id="{{ user.id }}"
-                                    data-user-name="{{ user.fullName }}"
-                            >
-                            <label for="participant-{{ user.id }}" class="checkbox-label"></label>
-                        </div>
-                        <div class="small-12 column">
-                            <div class="row">
-                                <label for="participant-{{ user.id }}" class="checkbox-label">
-                                    <div class="small-12 medium-6 columns compact card{{ userInclude ? '' : ' participant-excluded' }}">
-                                        <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square32">
-                                        <p>{{ user.fullName }}</p>
-                                    </div>
-                                    <div class="small-12 medium-6 columns meta" data-participant-status>{{ userPlanName }}</div>
-                                </label>
+                    <li data-participant="{{ user.id }}">
+                        <input type="hidden" name="participant-include[{{ user.id }}]" id="participant-include-{{ user.id }}" value="{{ userInclude ? 1 : 0 }}">
+                        <input type="hidden" name="participant-plan[{{ user.id }}]" id="participant-plan-{{ user.id }}"
+                               value="{{ (participant.plan.id and not participant.plan.isDynamic) ? participant.plan.id : 0 }}">
+                        <div data-participant-row>
+                            <div class="selector" data-participant-selector>
+                                <input
+                                        id="participant-{{ user.id }}"
+                                        type="checkbox" value="1"
+                                        name="participant[{{ user.id }}]"
+                                        data-participant-select data-user-id="{{ user.id }}"
+                                        data-user-name="{{ user.fullName }}"
+                                >
+                                <label for="participant-{{ user.id }}" class="checkbox-label"></label>
+                            </div>
+                            <div class="small-12 column">
+                                <div class="row">
+                                    <label for="participant-{{ user.id }}" class="checkbox-label">
+                                        <div class="small-12 medium-6 columns compact card{{ userInclude ? '' : ' participant-excluded' }}">
+                                            <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square32">
+                                            <p>{{ user.fullName }}</p>
+                                        </div>
+                                        <div class="small-12 medium-6 columns meta" data-participant-status>{{ userPlanName }}</div>
+                                    </label>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
 
-    </div>
-    <div id="plan-data">
-    {# load in the existing plans #}
-    {% for plan in assessment.plans if not plan.isDynamic %}
-        {# we don't need the dyna-plan rendered here #}
-        <input type="hidden" name="plans[{{ plan.id }}][id]" value="{{ plan.id }}" />
-        <input type="hidden" name="plans[{{ plan.id }}][name]" value="{{ plan.name }}" data-saved-plan />
-        <input type="hidden" name="plans[{{ plan.id }}][description]" value="{{ plan.description }}" />
-        <input type="hidden" name="plans[{{ plan.id }}][publish_date]" value="{{ plan.publishDate.local }}" />
-        <input type="hidden" name="plans[{{ plan.id }}][open_date]" value="{{ plan.openDate.local }}" />
-        <input type="hidden" name="plans[{{ plan.id }}][due_date]" value="{{ plan.dueDate.local }}" />
-        <input type="hidden" name="plans[{{ plan.id }}][close_date]" value="{{ plan.closeDate.local }}" />
-    {% endfor %}
-    </div>
+        </div>
+        <div id="plan-data">
+            {# load in the existing plans #}
+            {% for plan in assessment.plans if not plan.isDynamic %}
+                {# we don't need the dyna-plan rendered here #}
+                <input type="hidden" name="plans[{{ plan.id }}][id]" value="{{ plan.id }}"/>
+                <input type="hidden" name="plans[{{ plan.id }}][name]" value="{{ plan.name }}" data-saved-plan/>
+                <input type="hidden" name="plans[{{ plan.id }}][description]" value="{{ plan.description }}"/>
+                <input type="hidden" name="plans[{{ plan.id }}][publish_date]" value="{{ plan.publishDate.local }}"/>
+                <input type="hidden" name="plans[{{ plan.id }}][open_date]" value="{{ plan.openDate.local }}"/>
+                <input type="hidden" name="plans[{{ plan.id }}][due_date]" value="{{ plan.dueDate.local }}"/>
+                <input type="hidden" name="plans[{{ plan.id }}][close_date]" value="{{ plan.closeDate.local }}"/>
+            {% endfor %}
+        </div>
     {% else %}
         <div class="empty-state">
             <i class="icon-users"></i>
