@@ -5,6 +5,7 @@
  * @link        http://www.alaress.com.au/
  */
 
+use Html2Text\Html2Text;
 use Schoolbox\External\Exception as ExternalException;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -130,6 +131,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                           dbo.FileSemesters.SystemCurrentFlag = 1
     ";
 
+    /** @var Html2Text $htmlConverter */
+    protected $htmlConverter;
+
     /**
      * Constructor
      */
@@ -138,6 +142,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         // This connects to the Synergetic database and stores an IConnection in `$this->connector` variable
 
         $this->setupDatabase();
+
+        $this->htmlConverter = new Html2Text();
 
         $externalPing = new External_Ping();
 
@@ -241,13 +247,19 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                 // Remove the Synergetic magic blank value
 
-                $record["Details"] = trim(strip_tags($record["Details"]));
+                $record["Details"] = trim(($record["Details"]));
 
                 if ($record["Details"] == self::BLANK_PRIVATE_RECORD) {
                     $record["Details"] = '';
                 }
 
-                $record["PrivateDetails"] = trim(strip_tags($record["PrivateDetails"]));
+                $this->htmlConverter->setHtml($record["Details"]);
+                $record["Details"] = trim($this->htmlConverter->getText());
+                $record["Details"] = html_entity_decode($record["Details"], ENT_QUOTES);
+
+                $this->htmlConverter->setHtml($record["PrivateDetails"]);
+                $record["PrivateDetails"] = trim($this->htmlConverter->getText());
+                $record["PrivateDetails"] = html_entity_decode($record["PrivateDetails"], ENT_QUOTES);
 
                 if ($record["PrivateDetails"] == self::BLANK_PRIVATE_RECORD) {
                     $record["PrivateDetails"] = '';
@@ -921,13 +933,22 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             }
         }
 
+        $this->htmlConverter->setHtml($pastoral->getBodyPublic());
+        $bodyPublicText = $this->htmlConverter->getText();
+        $bodyPublicText = html_entity_decode($bodyPublicText, ENT_QUOTES);
+
+        $this->htmlConverter->setHtml($pastoral->getBodyPrivate());
+        $bodyPrivateText = $this->htmlConverter->getText();
+        $bodyPrivateText = html_entity_decode($bodyPrivateText, ENT_QUOTES);
+
+
         // Return an array containing the parameters for the insert/update query
 
         $params = [
             'studentExternalId' => $studentExternalId,
             'itemDate' => $pastoral->getCreatedAt()->getDatabase(),
-            'publicBody' => substr($pastoral->getBodyPublic(), 0, 2000),
-            'privateBody' => substr($pastoral->getBodyPrivate(), 0, 2000),
+            'publicBody' => substr($bodyPublicText, 0, 2000),
+            'privateBody' => substr($bodyPrivateText, 0, 2000),
             'pastoralTypeCode' => substr($pastoralTypeCode, 0, 15),
             'pastoralSubTypeCode' => substr($pastoralSubTypeCode, 0, 15),
             'classificationCode' => substr($documentClassificationCode, 0, 15),
