@@ -12,8 +12,6 @@
 namespace Schoolbox\Learning\InlineGrader\SelfReflection;
 
 use Schoolbox\Learning\Assessment\DueWork\RubricContext;
-use Schoolbox\Learning\Assessment\IFeedback;
-use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\DueWork;
 
@@ -30,7 +28,7 @@ class Rubric
     private $assessment;
 
     /**
-     * @var IResponse
+     * @var DueWork\Response\Model
      */
     private $response;
 
@@ -44,13 +42,13 @@ class Rubric
      *
      * @param DueWork\Model  $assessment
      * @param Participant    $participant
-     * @param null|IResponse $response
+     * @param null|DueWork\Response\Model $response
      * @param RubricContext  $rubricContext
      */
     public function __construct(
         DueWork\Model $assessment,
         Participant $participant,
-        ?IResponse $response,
+        ?DueWork\Response\Model $response,
         RubricContext $rubricContext
     ) {
         $this->assessment = $assessment;
@@ -83,8 +81,7 @@ class Rubric
              * after self-reflections have been created. However, ignore it if the historic self-reflection isn't
              * for the submission currently being viewed
              */
-            /** @var IFeedback $latestSelfReflectedFeedback */
-            $latestSelfReflectedFeedback = $this->participant->findMostRecentPublishedSelfReflectedFeedbackForResponse($this->response);
+            $latestSelfReflectedFeedback = $this->response->findMostRecentPublishedSelfReflectedFeedback();
 
             if ($latestSelfReflectedFeedback) {
                 $data['latestSelfReflectedFeedback'] = $latestSelfReflectedFeedback;
