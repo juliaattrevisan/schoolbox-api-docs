@@ -772,6 +772,52 @@ class ProjectTest extends TestCase
 
 
     /**
+     * Ensure that a project assessment, if somehow in multiple projects,
+     * is the same object in both projects.
+     */
+    public function testDataProjectTreeAssessmentInMultipleProjects()
+    {
+        // Create three projects: p1, p2, p3
+        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
+        $p1->getAssessmentModel()->setSubObject($p1);
+        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2));
+        $p2->getAssessmentModel()->setSubObject($p2);
+        $p3 = (new ProjectModel())->setId(3)->setAssessmentModel((new AssessmentModel())->setId(3));
+        $p3->getAssessmentModel()->setSubObject($p3);
+
+        // Put p2 and p3 in p1
+        $p2->getAssessmentModel()->setContextProject($p1);
+        $p1->getAssessments()[2] = $p2->getAssessmentModel();
+        $p3->getAssessmentModel()->setContextProject($p1);
+        $p1->getAssessments()[3] = $p3->getAssessmentModel();
+
+        // Create quiz q4, in both p2 and p3
+        $q4 = (new QuizModel())->setId(4)->setAssessmentModel((new AssessmentModel())->setId(4));
+        $q4->getAssessmentModel()->setSubObject($q4);
+        $p2->getAssessments()[4] = $q4->getAssessmentModel();
+        $p3->getAssessments()[4] = $q4->getAssessmentModel();
+        // An assessment may be in several projects, but may only have one context
+        $q4->getAssessmentModel()->setContextProject($p3);
+
+        /** @var Project $p1DomainModel */
+        /** @var Project $p2DomainModel */
+        /** @var Project $p3DomainModel */
+        $p1DomainModel = $this->translator->translateToDomainModel($p1);
+        $p2DomainModel = $p1DomainModel->getAssessables()[2];
+        $p3DomainModel = $p1DomainModel->getAssessables()[3];
+        $this->assertInstanceOf(Project::class, $p1DomainModel);
+        $this->assertInstanceOf(Project::class, $p2DomainModel);
+        $this->assertInstanceOf(Project::class, $p3DomainModel);
+
+        $p2q4DomainModel = $p2DomainModel->getAssessables()[4];
+        $p3q4DomainModel = $p3DomainModel->getAssessables()[4];
+        $this->assertInstanceOf(Quiz::class, $p2q4DomainModel);
+        $this->assertInstanceOf(Quiz::class, $p3q4DomainModel);
+        $this->assertSame($p2q4DomainModel, $p3q4DomainModel);
+    }
+
+
+    /**
      * Verify that a project tree with a cyclic reference cannot be translated.
      *
      * @expectedException \LogicException
@@ -977,6 +1023,49 @@ class ProjectTest extends TestCase
         $p2->setContext($p1);
 
         $this->translator->translateToDataModel($p1);
+    }
+
+
+    /**
+     * Ensure that a project assessment, if somehow in multiple projects,
+     * is the same object in both projects.
+     */
+    public function testDomainProjectTreeAssessmentInMultipleProjects()
+    {
+        // Create three projects: p1, p2, p3
+        $p1 = (new Project())->setId(1);
+        $p2 = (new Project())->setId(2);
+        $p3 = (new Project())->setId(3);
+
+        // Put p2 and p3 in p1
+        $p1->getAssessables()[2] = $p2;
+        $p1->getAssessables()[3] = $p3;
+        $p2->setContext($p1);
+        $p3->setContext($p1);
+
+        // Create quiz q4, in both p2 and p3
+        $q4 = (new Quiz())->setId(4);
+        $p2->getAssessables()[4] = $q4;
+        $p3->getAssessables()[4] = $q4;
+        // An assessment may be in several projects, but may only have one context
+        $q4->setContext($p3);
+
+        /** @var ProjectModel $p1DataModel */
+        /** @var ProjectModel $p2DataModel */
+        /** @var ProjectModel $p3DataModel */
+        /** @var QuizModel    $q4DataModel */
+        $p1DataModel = $this->translator->translateToDataModel($p1);
+        $p2DataModel = $p1DataModel->getAssessments()[2]->getProject();
+        $p3DataModel = $p1DataModel->getAssessments()[3]->getProject();
+        $this->assertInstanceOf(ProjectModel::class, $p1DataModel);
+        $this->assertInstanceOf(ProjectModel::class, $p2DataModel);
+        $this->assertInstanceOf(ProjectModel::class, $p3DataModel);
+
+        $p2q4DataModel = $p2DataModel->getAssessments()[4]->getQuiz();
+        $p3q4DataModel = $p3DataModel->getAssessments()[4]->getQuiz();
+        $this->assertInstanceOf(QuizModel::class, $p2q4DataModel);
+        $this->assertInstanceOf(QuizModel::class, $p3q4DataModel);
+        $this->assertSame($p2q4DataModel, $p3q4DataModel);
     }
 
 
