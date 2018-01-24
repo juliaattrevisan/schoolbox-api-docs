@@ -553,9 +553,23 @@
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript">
     $(function () {
+        var servicesDropdown = $("#serviceSelect");
+
+        if (servicesDropdown.val() === "") {
+            $("#permissionSelect").hide();
+            $("#defaultSelect").hide();
+        }
 
         {# Hide Read and Write permission options in dropdown for certain services #}
-        $("#serviceSelect").change(function(e) {
+        servicesDropdown.change(function(e) {
+            if (servicesDropdown.val() === "") {
+                $("#permissionSelect").hide();
+                $("#defaultSelect").hide();
+            } else {
+                $("#permissionSelect").show();
+                $("#defaultSelect").show();
+            }
+
             var selectedServiceId = $(e.target).val();
 
             var resourceBooking = '{{ constant('RESOURCE_BOOKING_SERVICE') }}';
@@ -572,7 +586,7 @@
 
             if (noMiddleDropdownServices.indexOf(selectedServiceId) !== -1) {
                 $("#defaultSelect").hide();
-            } else {
+            } else if ($("#serviceSelect").val() !== "")  {
                 $("#defaultSelect").show();
             }
 
