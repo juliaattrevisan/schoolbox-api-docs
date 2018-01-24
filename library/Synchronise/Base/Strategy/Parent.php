@@ -480,7 +480,7 @@ class Synchronise_Base_Strategy_Parent extends Synchronise_Base_Strategy
     */
     public function getSpouseHouseFromUser($currentUser)
     {
-        return 0;
+        return null;
     }
 
     /**
@@ -492,7 +492,7 @@ class Synchronise_Base_Strategy_Parent extends Synchronise_Base_Strategy
     */
     public function getSpouseResidentialHouseFromUser($currentUser)
     {
-        return 0;
+        return null;
     }
 
     /**
