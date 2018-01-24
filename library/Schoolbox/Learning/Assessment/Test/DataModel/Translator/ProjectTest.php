@@ -753,6 +753,89 @@ class ProjectTest extends TestCase
 
 
     /**
+     * Verify that a project tree that touches max depth can be translated.
+     */
+    public function testDataProjectTreeTouchingMaxDepth()
+    {
+        $this->translator->setMaxProjectLevels(2);
+
+        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
+        $p1->getAssessmentModel()->setSubObject($p1);
+
+        $q1 = (new QuizModel())->setId(3)->setAssessmentModel((new AssessmentModel())->setId(2));
+        $q1->getAssessmentModel()->setSubObject($q1);
+        $q1->getAssessmentModel()->setContextProject($p1);
+        $p1->getAssessments()[2] = $q1->getAssessmentModel();
+
+        $this->assertInstanceOf(Project::class, $this->translator->translateToDomainModel($p1));
+    }
+
+
+    /**
+     * Verify that a project tree with a cyclic reference cannot be translated.
+     *
+     * @expectedException \LogicException
+     */
+    public function testDataProjectTreeCyclicReference()
+    {
+        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
+        $p1->getAssessmentModel()->setSubObject($p1);
+
+        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2));
+        $p2->getAssessmentModel()->setSubObject($p2);
+        $p2->getAssessmentModel()->setContextProject($p1);
+        $p1->getAssessments()[2] = $p2->getAssessmentModel();
+
+        // Add a cyclic reference (p2 is within p1, put p1 within p2)
+        $p1->getAssessmentModel()->setContextProject($p2);
+
+        $this->translator->translateToDomainModel($p1);
+    }
+
+
+    /**
+     * Verify that a project tree that is too deep cannot be translated.
+     *
+     * @expectedException \UnexpectedValueException
+     */
+    public function testDataProjectTreeExceedingMaxDepth()
+    {
+        $this->translator->setMaxProjectLevels(1);
+
+        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
+        $p1->getAssessmentModel()->setSubObject($p1);
+
+        $q1 = (new QuizModel())->setId(3)->setAssessmentModel((new AssessmentModel())->setId(2));
+        $q1->getAssessmentModel()->setSubObject($q1);
+        $q1->getAssessmentModel()->setContextProject($p1);
+        $p1->getAssessments()[2] = $q1->getAssessmentModel();
+
+        $this->translator->translateToDomainModel($p1);
+    }
+
+
+    /**
+     * Verify that a project tree cannot contain a project at its bottom level.
+     *
+     * @expectedException \UnexpectedValueException
+     */
+    public function testDataProjectTreeDisallowsBottomLevelProject()
+    {
+        $this->translator->setMaxProjectLevels(2);
+
+        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
+        $p1->getAssessmentModel()->setSubObject($p1);
+
+        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2));
+        $p2->getAssessmentModel()->setSubObject($p2);
+        $p2->getAssessmentModel()->setContextProject($p1);
+        $p1->getAssessments()[2] = $p2->getAssessmentModel();
+
+        $this->translator->translateToDomainModel($p1);
+    }
+
+
+    /**
      * @dataProvider provider_branched_data_project_tree
      * @param ProjectModel $projectModel
      * @param int          $id
@@ -818,89 +901,6 @@ class ProjectTest extends TestCase
             $dataChild = $subObject->getAssessments()->first();
         }
         $this->assertEquals($downExpected, $downActual);
-    }
-
-
-    /**
-     * Verify that a project tree that touches max depth can be translated.
-     */
-    public function testDomainProjectTreeTouchingMaxDepth()
-    {
-        $this->translator->setMaxProjectLevels(2);
-
-        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
-        $p1->getAssessmentModel()->setSubObject($p1);
-
-        $q1 = (new QuizModel())->setId(3)->setAssessmentModel((new AssessmentModel())->setId(2));
-        $q1->getAssessmentModel()->setSubObject($q1);
-        $q1->getAssessmentModel()->setContextProject($p1);
-        $p1->getAssessments()[2] = $q1->getAssessmentModel();
-
-        $this->assertInstanceOf(Project::class, $this->translator->translateToDomainModel($p1));
-    }
-
-
-    /**
-     * Verify that a project tree with a cyclic reference cannot be translated.
-     *
-     * @expectedException \LogicException
-     */
-    public function testDomainProjectTreeCyclicReference()
-    {
-        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
-        $p1->getAssessmentModel()->setSubObject($p1);
-
-        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2));
-        $p2->getAssessmentModel()->setSubObject($p2);
-        $p2->getAssessmentModel()->setContextProject($p1);
-        $p1->getAssessments()[2] = $p2->getAssessmentModel();
-
-        // Add a cyclic reference (p2 is within p1, put p1 within p2)
-        $p1->getAssessmentModel()->setContextProject($p2);
-
-        $this->translator->translateToDomainModel($p1);
-    }
-
-
-    /**
-     * Verify that a project tree that is too deep cannot be translated.
-     *
-     * @expectedException \UnexpectedValueException
-     */
-    public function testDomainProjectTreeExceedingMaxDepth()
-    {
-        $this->translator->setMaxProjectLevels(1);
-
-        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
-        $p1->getAssessmentModel()->setSubObject($p1);
-
-        $q1 = (new QuizModel())->setId(3)->setAssessmentModel((new AssessmentModel())->setId(2));
-        $q1->getAssessmentModel()->setSubObject($q1);
-        $q1->getAssessmentModel()->setContextProject($p1);
-        $p1->getAssessments()[2] = $q1->getAssessmentModel();
-
-        $this->translator->translateToDomainModel($p1);
-    }
-
-
-    /**
-     * Verify that a project tree cannot contain a project at its bottom level.
-     *
-     * @expectedException \UnexpectedValueException
-     */
-    public function testDomainProjectTreeDisallowsBottomLevelProject()
-    {
-        $this->translator->setMaxProjectLevels(2);
-
-        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
-        $p1->getAssessmentModel()->setSubObject($p1);
-
-        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2));
-        $p2->getAssessmentModel()->setSubObject($p2);
-        $p2->getAssessmentModel()->setContextProject($p1);
-        $p1->getAssessments()[2] = $p2->getAssessmentModel();
-
-        $this->translator->translateToDomainModel($p1);
     }
 
 
