@@ -57,12 +57,12 @@ function traverse($categoryId, $catsWithCodes = array())
 {
     $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
     $allFolders = $folderMapper->findByParent($categoryId);
-    $homepage = $currentFolder->getHomepage();
-
+    
     /* For JSON ajax
      */
     foreach ($allFolders as $currentFolder) {
         if (strlen($currentFolder->getCodeString())) {
+            $homepage = $currentFolder->getHomepage();
             $catsWithCodes[$currentFolder->getId()] = array(
                 'id' => $currentFolder->getId(),
                 'name' => $currentFolder->getName(),
