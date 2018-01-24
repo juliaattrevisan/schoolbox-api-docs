@@ -138,6 +138,7 @@ class Translator
             $rootAssessable = $rootAssessable->getContext();
         }
         $this->translateToDataModelRecursive($rootAssessable);
+        // If this line throws a NPE, most likely your model graph is missing the relationship from root to this node.
         return $this->dataModelCache[spl_object_hash($domainObject)];
     }
 
@@ -166,6 +167,7 @@ class Translator
             $root = $root->getAssessmentModel()->getContextProject();
         }
         $this->translateToDomainModelRecursive($root);
+        // If this line throws a NPE, most likely your model graph is missing the relationship from root to this node.
         return $this->domainObjectCache[spl_object_hash($dataModel)];
     }
 
