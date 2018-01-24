@@ -132,16 +132,28 @@
                 var status;
                 var include;
 
-                if (action === 'include' || action === 'default') {
-                    $participantCard.removeClass('participant-excluded');
-                    status = '(no customisations)';
-                    statusValue = 'included';
-                    include = 1;
-                } else {
+                // Include action
+                if (action === 'include') {
+                    // Only include those who are excluded, no change for others
+                    var isExcluded = $participantRow.find('div[data-participant-status = excluded]').length;
+                    if (isExcluded) {
+                        $participantCard.removeClass('participant-excluded');
+                        status = '(no customisations)';
+                        statusValue = 'included';
+                        include = 1;
+                    }
+                // Exclude action
+                } else if (action === 'exclude') {
                     $participantCard.addClass('participant-excluded');
                     status = '(excluded)';
                     statusValue = 'excluded';
                     include = 0;
+                // Remove customisation action (drops plan to default)
+                } else {
+                    $participantCard.removeClass('participant-excluded');
+                    status = '(no customisations)';
+                    statusValue = 'included';
+                    include = 1;
                 }
 
                 // Update the status showing for the student
