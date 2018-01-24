@@ -130,19 +130,23 @@
                 var studentID = $participantRow.attr('data-participant');
                 var statusValue;
                 var status;
+                var include;
 
                 if (action === 'include') {
                     $participantCard.removeClass('participant-excluded');
                     status = '(no customisations)';
                     statusValue = 'included';
+                    include = 1;
                 } else if (action === 'exclude') {
                     $participantCard.addClass('participant-excluded');
                     status = '(excluded)';
                     statusValue = 'excluded';
+                    include = 0;
                 } else {
                     $participantCard.removeClass('participant-excluded');
                     status = '(no customisations)';
                     statusValue = 'custom';
+                    include = 1;
                 }
 
                 // Update the status showing for the student
@@ -152,7 +156,7 @@
                     .text(status);
 
                 // Adjust the hidden value for include
-                $('#participant-include-' + studentID).val(+action);
+                $('#participant-include-' + studentID).val(include);
 
                 // Reset plan back to 0
                 $participantRow.find('#participant-plan-' + studentID).val(0);
