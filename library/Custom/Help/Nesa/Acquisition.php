@@ -134,7 +134,7 @@ class Acquisition
         $pb->equals('sb.use_rubric', 1);
         $pb->isNull('rd.deleted_at');
         $pb->isNull('rc.deleted_at');
-        $pb->isNull('rm.published_at');
+        $pb->notNull('rm.published_at');
 
         /* Show only unaccredited users
          */
