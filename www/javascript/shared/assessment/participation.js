@@ -482,7 +482,7 @@
         var $planParticipants = $('#plan-participants');
         var $customiseModal = $(defaults.customiseModal);
         var $participants = $(defaults.participants);
-
+        var $modalHeader = $customiseModal.find('[data-plan-header]');
         var $planId = $customiseModal.find('#plan-id');
         var $planName = $customiseModal.find('#plan-name');
         var $planDesc = $customiseModal.find('#plan-desc');
@@ -552,6 +552,7 @@
 
         // Set dates & description to whatever is currently set on the main form
         if (planData !== undefined) {
+            $modalHeader.text('Modify Learning Plan');
             $planId.val(planData['id']);
             $planName.val(planData['name']);
             $planPublishDate.val(planData['publishDate']);
@@ -561,6 +562,7 @@
             CKEDITOR.instances['plan-desc'].setData(planData['description']);
         }
         else {
+            $modalHeader.text('Create New Learning Plan');
             $planId.val(0);
             $planPublishDate.val($('#publishDate').val());
             $planOpenDate.val($('#openDate').val());
