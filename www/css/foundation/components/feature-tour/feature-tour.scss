@@ -1,3 +1,5 @@
+$tooltip-padding: 1rem;
+
 // ----------------------------------------------------------------
 // Tooltip
 // ----------------------------------------------------------------
@@ -5,7 +7,7 @@
   border-radius: 0;
   box-sizing: border-box;
   min-width: 350px;
-  padding: 1rem;
+  padding: $tooltip-padding;
 }
 
 .introjs-arrow {
@@ -62,6 +64,14 @@
 .introjs-tooltiptext {
   font-size: $paragraph-font-size;
   padding-right: 2rem;
+}
+
+
+// ----------------------------------------------------------------
+// Modal
+// ----------------------------------------------------------------
+.introjs-intromodal {
+  padding-bottom: 2.75rem; // This is to allow space for the absolute positioned 'no thanks' button
 }
 
 
@@ -187,6 +197,21 @@
   &:hover, &:focus {
     color: $submit-button-color;
     background-color: $submit-button-bg-hover;
+  }
+}
+
+.introjs-nothanksbutton {
+  background: transparent;
+  position: absolute;
+  right: $tooltip-padding;
+  bottom: $tooltip-padding;
+  font-size: 13px;
+  padding: 0;
+  color: $monsoon;
+  min-height: auto;
+
+  &:hover {
+    background: transparent;
   }
 }
 
