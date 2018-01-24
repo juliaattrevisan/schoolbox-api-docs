@@ -14,6 +14,7 @@ use Aura\Web\Exception\InvalidStatusCode;
 use Custom\Mggs\Personalised\Event;
 use Custom\Mggs\Personalised\Participant;
 use Schoolbox\Collection;
+use Schoolbox\External\SubjectMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DataModel\Translator as AssessmentTranslator;
@@ -136,6 +137,8 @@ class Controller extends Base
         $resultSet = [];
 
         $now = Alaress_Date_Format::now();
+
+        $student->setSubjectCollection((new SubjectMapper())->findAllForStudent($student));
 
         $classList = new ClassList(
             $student,
