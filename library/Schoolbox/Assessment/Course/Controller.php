@@ -780,9 +780,11 @@ class Controller extends Base\Base
         $query = $this->getRequest()->query;
         $data = $this->getCourseData();
         $data['returnUrlKey'] = Redirect::RETURN_URL;
-
-        $folderModel = $this->getFolderMapper()->findById($query->get('folder'));
-        $data['suggestions'] = $this->getLinkSuggestions($folderModel);
+        
+        if($query->get('folder')) {
+            $folderModel = $this->getFolderMapper()->findById($query->get('folder'));
+            $data['suggestions'] = $this->getLinkSuggestions($folderModel);
+        }
 
         if ($this->getRequest()->isXhr()) {
             $options = [
