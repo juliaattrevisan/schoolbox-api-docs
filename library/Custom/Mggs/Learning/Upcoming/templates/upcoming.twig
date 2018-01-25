@@ -746,7 +746,14 @@
         }
 
         $cal.on('click', '[data-placeholder]', function () {
-            $(this).closest('.fc-event-container').find('[data-popover="' + $(this).data('wk') + '"]').removeClass('hide');
+            var $popover = $(this).closest('.fc-event-container').find('[data-popover="' + $(this).data('wk') + '"]');
+            var $row = $(this).closest('[data-resource-id]');
+
+            $popover.removeClass('hide');
+
+            // quick bounds-check
+            $popover.css('left', Math.min($popover.css('left').replace('px',''), $row.width() - $popover.width() - 2));
+
             $(document).on('mousedown', hidePopover);
         });
 
