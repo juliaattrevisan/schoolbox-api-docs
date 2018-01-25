@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Markbook;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IAssessableComparator;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Summator\Average;
 use Schoolbox\Learning\Assessment\Summator\Count;
@@ -338,5 +339,21 @@ class Markbook
                 }
             }
         }
+    }
+
+
+    /**
+     * Sorts the markbook's assessments. If no comparator is passed, applies default markbook sorting.
+     *
+     * @param IAssessableComparator|null $comparator
+     * @return $this
+     */
+    public function sortAssessables(IAssessableComparator $comparator = null): self
+    {
+        if (!$comparator) {
+            $comparator = new SortForMarkbook();
+        }
+        $this->assessments->sortByCallback($comparator->getCallable());
+        return $this;
     }
 }
