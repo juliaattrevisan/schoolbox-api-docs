@@ -126,48 +126,15 @@
             var $studentsSelected = $participants.find(':checked');
             $studentsSelected.each(function () {
                 var $participantRow = $(this).closest('li');
-                var $participantCard = $participantRow.find('div.card');
                 var studentID = $participantRow.attr('data-participant');
-                var statusValue;
-                var status;
-                var include;
+                var isExcluded = $participantRow.find('div[data-participant-status = excluded]').length;
 
-                // Include action
-                if (action === 'include') {
-                    // Only include those who are excluded, no change for others
-                    var isExcluded = $participantRow.find('div[data-participant-status = excluded]').length;
-                    if (isExcluded) {
-                        $participantCard.removeClass('participant-excluded');
-                        status = '(no customisations)';
-                        statusValue = 'included';
-                        include = 1;
-                    }
-                // Exclude action
+                // Set student back to default if user pressed 'include' they were excluded, or if user pressed 'remove customisations'
+                if ((action === 'include' && isExcluded) || action === 'default') {
+                    updateStudentStatus(studentID, true);
                 } else if (action === 'exclude') {
-                    $participantCard.addClass('participant-excluded');
-                    status = '(excluded)';
-                    statusValue = 'excluded';
-                    include = 0;
-                // Remove customisation action (drops plan to default)
-                } else {
-                    $participantCard.removeClass('participant-excluded');
-                    status = '(no customisations)';
-                    statusValue = 'included';
-                    include = 1;
+                    updateStudentStatus(studentID, false);
                 }
-
-                // Update the status showing for the student
-                $participantRow
-                    .find('div[data-participant-status]')
-                    .attr('data-participant-status', statusValue)
-                    .text(status);
-
-                // Adjust the hidden value for include
-                $('#participant-include-' + studentID).val(include);
-
-                // Reset plan back to 0
-                $participantRow.find('#participant-plan-' + studentID).val(0);
-
             });
 
             // Reset the checkboxes and buttons
@@ -248,7 +215,7 @@
                 }
 
                 // Update the selected students with the plan
-                updateStatus(studentIDs, planDetails['id'], planDetails['name'], newPlan);
+                updateStudentPlans(studentIDs, planDetails['id'], planDetails['name'], newPlan);
 
                 // Close the modal
                 $customiseModal.foundation('reveal', 'close');
@@ -275,7 +242,7 @@
             $participants.find(':checked').each(function () {
                 studentIDs.push($(this).attr('data-user-id'));
             });
-            updateStatus(studentIDs, planId, planName, true);
+            updateStudentPlans(studentIDs, planId, planName, true);
 
             // Reset the checkboxes and buttons
             resetActions();
@@ -289,13 +256,18 @@
     // ----------------------------------------------------------------
 
     /**
-     * Update the students selected
+     * Update an array of students to a specified plan
+     *
+     * @param {Array}       students        The students to update
+     * @param {int}         planId          The ID of the plan to use
+     * @param {string}      planName        The name of the plan
+     * @param {boolean}     newPlan         Whether the plan is new or not
      */
-    function updateStatus(students, planId, planName, newPlan) {
+    function updateStudentPlans(students, planId, planName, newPlan) {
 
         // If updating an existing plan
         if (newPlan === false) {
-            // Clear this plan form all the students it was previously applied to
+            // Clear this plan from all the students it was previously applied to
             var $existingStudents = $('li[data-participant]').find('input[value = ' + planId + ']');
             $existingStudents.each(function () {
 
@@ -310,6 +282,7 @@
                 $(this).val(0);
             });
         }
+
         if (students.length > 0 && students !== undefined) {
             // Update the students with the plan
             $(students).each(function (index, studentID) {
@@ -330,6 +303,42 @@
                 $participantRow.find('#participant-plan-' + studentID).val(planId);
             });
         }
+    }
+
+
+    /**
+     * Update a single student row to included with no customisations, or to excluded
+     *
+     * @param {int}         studentID             ID of student to update
+     * @param {boolean}     include               Whether to set to default, or set to excluded
+     */
+    function updateStudentStatus(studentID, include) {
+        var statusValue;
+        var status;
+        var $participantRow = $(defaults.participants).find('li[data-participant=' + studentID + ']');
+        var $participantCard = $participantRow.find('div.card');
+
+        if (include) {
+            $participantCard.removeClass('participant-excluded');
+            status = '(no customisations)';
+            statusValue = 'included';
+        } else {
+            $participantCard.addClass('participant-excluded');
+            status = '(excluded)';
+            statusValue = 'excluded';
+        }
+
+        // Update the status showing for the student
+        $participantRow
+            .find('div[data-participant-status]')
+            .attr('data-participant-status', statusValue)
+            .text(status);
+
+        // Adjust the hidden value for include
+        $('#participant-include-' + studentID).val(include ? 1 : 0);
+
+        // Reset plan back to 0
+        $participantRow.find('#participant-plan-' + studentID).val(0);
     }
 
 
