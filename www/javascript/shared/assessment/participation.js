@@ -335,7 +335,7 @@
             .text(status);
 
         // Adjust the hidden value for include
-        $('#participant-include-' + studentID).val(include);
+        $('#participant-include-' + studentID).val(include ? 1 : 0);
 
         // Reset plan back to 0
         $participantRow.find('#participant-plan-' + studentID).val(0);
