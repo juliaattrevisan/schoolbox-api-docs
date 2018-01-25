@@ -58,6 +58,9 @@ then
     /usr/bin/update-alternatives --set php /usr/bin/php7.1;
 fi
 
+echo "[SB][`date +%Y-%m-%d\ %X`] Installing Chromedriver";
+apt-get install -y chromium-chromedriver
+
 echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
 echo "[SB][`date +%Y-%m-%d\ %X`] Cleaning up zero byte files";
 find $cachedir -type f -empty -delete;
