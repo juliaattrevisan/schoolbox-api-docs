@@ -474,7 +474,7 @@ class ArticleMapper extends Mapper implements Searchable
             function ($item) use ($archive, $year, $month) {
                 /** @var Article $item */
                 $publishDate = $item->getPublishDate();
-                $expireStamp = $item->getExpiryDate()->getUnixTimestamp();
+                $expireStamp = $item->getExpiryDate()->getUnixTimeStamp();
 
                 $yearMatch  = $year ? $publishDate->getYear() == $year : true;
                 $monthMatch = $month ? $publishDate->getMonth() == $month : true;

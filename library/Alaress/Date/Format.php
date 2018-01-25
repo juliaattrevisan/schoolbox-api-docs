@@ -1139,11 +1139,11 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * Transform the datetime into a unix timestamp
      *
-     * @return string
+     * @return int
      */
-    public function getUnixTimeStamp()
+    public function getUnixTimeStamp(): int
     {
-        return $this->getUsingFormat(self::TIMESTAMP);
+        return (int)$this->getUsingFormat(self::TIMESTAMP);
     }
 
     /**

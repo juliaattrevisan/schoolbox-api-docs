@@ -224,7 +224,7 @@ class Factory
             /* Use the existing returned work record - it was created a short time ago or the marks are not yet visible
              */
             if ($this->getSubmissionBox()->getMarkVisibility() == IAssessable::MARK_VISIBILITY_PRIVATE
-                || $return_time->getUnixTimestamp() >= $window_ago->getUnixTimestamp()
+                || $return_time->getUnixTimeStamp() >= $window_ago->getUnixTimeStamp()
             ) {
                 $returnedWork->setCreatedAt(new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
             } /* Spawn a new returned work record, so pump in a returned date

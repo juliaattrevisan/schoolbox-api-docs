@@ -54,7 +54,7 @@ class EventNotifier extends AbstractModuleNotifier
     {
         /** @var Event $event */
         $event = $bundle->getEvent()->getObject();
-        $start = $event->getStartDateTime()->getUnixTimestamp();
+        $start = $event->getStartDateTime()->getUnixTimeStamp();
 
         // if this event is in the past, we don't want to know about it
         if ($start < time()) {
@@ -67,7 +67,7 @@ class EventNotifier extends AbstractModuleNotifier
         } elseif ($bundle->getMethod() == Mapper::METHOD_UPDATE) {
             // advise 10 minutes before start, and only advise updated once published
             $pubstamp = $event->getPublishDateTime() instanceof Alaress_Date_Format
-                ? $event->getPublishDateTime()->getUnixTimestamp()
+                ? $event->getPublishDateTime()->getUnixTimeStamp()
                 : self::IMMEDIATELY;
 
             if ($event->inSeries()) {
@@ -106,8 +106,8 @@ class EventNotifier extends AbstractModuleNotifier
             return -1;
         }
 
-        $nextTime = $next->getStartDateTime()->getUnixTimestamp();
-        $now      = Alaress_Date_Format::now()->getUnixTimestamp();
+        $nextTime = $next->getStartDateTime()->getUnixTimeStamp();
+        $now      = Alaress_Date_Format::now()->getUnixTimeStamp();
 
         // returns an with the next timestamp, or negative to cancel (ie. none left)
 
@@ -167,7 +167,7 @@ class EventNotifier extends AbstractModuleNotifier
 
         $bob = $this->newBuilder(self::TRIGGER_UPCOMING, $roleType, $event)
             ->setTitle(':name is about to start')
-            ->setTimestamp($event->getStartDateTime()->getUnixTimestamp() - (60 * self::UPCOMING_WINDOW))
+            ->setTimestamp($event->getStartDateTime()->getUnixTimeStamp() - (60 * self::UPCOMING_WINDOW))
             ->setParam('name', new Param($event->getTitle()));
 
         return $this->notify($event, array($bob->build()));

@@ -67,8 +67,8 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
         $api = $eventFactory->produceForUser($this->getUser());
         $this->eventRenderer = new Lister(
             $api,
-            (int)$this->start->getUnixTimeStamp(),
-            (int)$this->end->getUnixTimeStamp(),
+            $this->start->getUnixTimeStamp(),
+            $this->end->getUnixTimeStamp(),
             $this->getUser(),
             $this->getSitePage(),
             $this->getUser()

@@ -111,7 +111,7 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
 		if($bundle->getMethod() == Mapper::METHOD_CREATE) {
 			/** @var Wiki $wiki */
 			$wiki = $bundle->getEvent()->getObject();
-			$bundle->attach(self::TRIGGER_CREATED, $wiki->getCreated()->getUnixTimestamp());
+			$bundle->attach(self::TRIGGER_CREATED, $wiki->getCreated()->getUnixTimeStamp());
 		}
 	}
 
@@ -141,7 +141,7 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
                 $first = $this->revisionMapper->findOneByColumn('wikiID', $wiki->getId(), [ 'created' => 'asc' ]);
                 $user = $first->getUser();
                 $c = $c->merge(
-                    new Collection($this->notifyCreated($roletype, $wiki, $user)->getAll($wiki->getCreated()->getUnixTimestamp()))
+                    new Collection($this->notifyCreated($roletype, $wiki, $user)->getAll($wiki->getCreated()->getUnixTimeStamp()))
                 );
             } catch (\Schoolbox\Mapper\Exception $e) {
                 //noop 

@@ -84,7 +84,7 @@ class InstanceBundle {
 	/**
 	 * Returns all instances contained, indexed by destination
 	 *
-	 * @param bool $timestampOverride
+	 * @param int $timestampOverride
 	 * @return Instance[]
 	 */
 	public function getAll($timestampOverride = null) {

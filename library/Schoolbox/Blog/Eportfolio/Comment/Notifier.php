@@ -431,7 +431,7 @@ class Notifier extends AbstractModuleNotifier
             ->setSeverity(Logger::INFO)
             ->setNamespace($this->getSlug())
             ->addTopic("{$this->getSlug()}.comment.{$comment->getId()}.$trigger")
-            ->setTimestamp((int)$comment->getCreatedAt()->getUnixTimeStamp())
+            ->setTimestamp($comment->getCreatedAt()->getUnixTimeStamp())
             ->setBody($comment->getBody());
         return $bob;
     }

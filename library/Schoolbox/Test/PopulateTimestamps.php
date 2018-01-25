@@ -46,7 +46,7 @@ class PopulateTimestamps extends \PHPUnit\Framework\TestCase
         $model = $this->blogMapper->createModel();
         $this->blogMapper->save($model);
 
-        $this->assertEquals((int)$model->getCreatedAt()->getUnixTimeStamp(), $now->getUnixTimeStamp(), '', 0.001);
+        $this->assertEquals($model->getCreatedAt()->getUnixTimeStamp(), $now->getUnixTimeStamp(), '', 0.001);
     }
 
 
@@ -99,7 +99,7 @@ class PopulateTimestamps extends \PHPUnit\Framework\TestCase
         $model = $this->blogMapper->createModel();
         $this->blogMapper->save($model);
 
-        $this->assertEquals((int)$model->getUpdatedAt()->getUnixTimeStamp(), $now->getUnixTimeStamp(), '', 0.001);
+        $this->assertEquals($model->getUpdatedAt()->getUnixTimeStamp(), $now->getUnixTimeStamp(), '', 0.001);
     }
 
 

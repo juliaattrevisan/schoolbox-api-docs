@@ -68,7 +68,7 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 		if($bundle->getMethod() == Mapper::METHOD_CREATE) {
 			/** @var Revision $revision */
 			$revision = $bundle->getEvent()->getObject();
-			$bundle->attach(self::TRIGGER_REVISED, $revision->getCreated()->getUnixTimestamp());
+			$bundle->attach(self::TRIGGER_REVISED, $revision->getCreated()->getUnixTimeStamp());
 		}
 	}
 
@@ -95,7 +95,7 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 		$c = new Collection();
 		foreach($revisions as $revision) {
 			$c = $c->merge(
-				new Collection($this->notifyRevised($roletype, $revision, $revision->getUser())->getAll($revision->getCreated()->getUnixTimestamp()))
+				new Collection($this->notifyRevised($roletype, $revision, $revision->getUser())->getAll($revision->getCreated()->getUnixTimeStamp()))
 			);
 		}
 		return $c;

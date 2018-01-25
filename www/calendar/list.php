@@ -90,8 +90,8 @@ $api = $factory->produceForUser($user);
 
 $calendar = new Lister(
     $api,
-    (int)$start->getUnixTimeStamp(),
-    (int)$finish->addDays(1)->getUnixTimeStamp(),
+    $start->getUnixTimeStamp(),
+    $finish->addDays(1)->getUnixTimeStamp(),
     $user,
     $this,
     $user

@@ -212,7 +212,7 @@ class Csv extends Base
 
             /* Start datetime occurs after finish datetime
              */
-            if ($startDatetime->getUnixTimestamp() > $finishDatetime->getUnixTimestamp()) {
+            if ($startDatetime->getUnixTimeStamp() > $finishDatetime->getUnixTimeStamp()) {
                 $output[] = array(
                     'name'   => \Scrub::text($name),
                     'status' => 'Not Added',

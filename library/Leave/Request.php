@@ -58,7 +58,7 @@ class Leave_Request
     public function getDuration()
     {
         $duration = floor(
-            ($this->getFinish()->getUnixTimestamp() - $this->getStart()->getUnixTimestamp()) / (60 * 60 * 24)
+            ($this->getFinish()->getUnixTimeStamp() - $this->getStart()->getUnixTimeStamp()) / (60 * 60 * 24)
         );
 
         return $duration;
@@ -80,8 +80,8 @@ class Leave_Request
         if (null === $this->getFinish() || $this->getFinish()->isNull()) {
             return false;
         }
-        if ($this->getStart()->getUnixTimestamp() < $datetimeFinish->getUnixTimestamp()
-            && $this->getFinish()->getUnixTimestamp() > $datetimeStart->getUnixTimestamp()
+        if ($this->getStart()->getUnixTimeStamp() < $datetimeFinish->getUnixTimeStamp()
+            && $this->getFinish()->getUnixTimeStamp() > $datetimeStart->getUnixTimeStamp()
         ) {
             return true;
         }

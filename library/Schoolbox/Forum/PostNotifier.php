@@ -126,7 +126,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
                         $roletype,
                         $post,
                         $post->getOwner()
-                    )->getAll($post->getDate()->getUnixTimestamp())
+                    )->getAll($post->getDate()->getUnixTimeStamp())
                 )
             );
         }

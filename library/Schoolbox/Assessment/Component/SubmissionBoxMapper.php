@@ -945,7 +945,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 
         // Is the submission late (after overdue time)?
         $now = new \DateTime('now');
-        if ($box->getLateDate()->getUnixTimestamp() < $now->getTimestamp()) {
+        if ($box->getLateDate()->getUnixTimeStamp() < $now->getTimestamp()) {
             throw new Schoolbox\Resource\Exception(
                 'This submission box no longer accepts submissions.',
                 Schoolbox\Resource\Exception::CODE_SUBMISSION_CLOSED
@@ -968,7 +968,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         }
 
         // Is the submission early (before open time)?
-        if ($box->getOpenDate()->getUnixTimestamp() > $now->getTimestamp()) {
+        if ($box->getOpenDate()->getUnixTimeStamp() > $now->getTimestamp()) {
             throw new Schoolbox\Resource\Exception(
                 'This submission box does not accept submissions yet.',
                 Schoolbox\Resource\Exception::CODE_SUBMISSION_NOT_YET_OPEN

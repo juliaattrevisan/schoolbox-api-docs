@@ -92,7 +92,7 @@ class External_Maze_Loreto_User extends External_Maze_User {
 		/* Assign birthday
 		 */
 		$birthday = new \Alaress_Date_Format($student['StudentBirthDate'], 'Y-m-d');
-		$student['StudentBirthDate'] = $birthday->getUnixTimestamp();
+		$student['StudentBirthDate'] = $birthday->getUnixTimeStamp();
 
 		/* Find one or more homeroom teachers and condense them
 		 */

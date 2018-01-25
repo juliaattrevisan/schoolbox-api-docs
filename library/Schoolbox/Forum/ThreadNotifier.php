@@ -102,7 +102,7 @@ class ThreadNotifier extends AbstractModuleNotifier implements SourceInterface {
         $threads = $this->mapper->findForFeed($context, $limit, $offset);
 
         foreach ($threads as $thread) {
-            $c = $c->merge(new Collection($this->notifyFollowed($roletype, $thread, $thread->getUser())->getAll($thread->getDate()->getUnixTimestamp())));
+            $c = $c->merge(new Collection($this->notifyFollowed($roletype, $thread, $thread->getUser())->getAll($thread->getDate()->getUnixTimeStamp())));
         }
 
         return $c;

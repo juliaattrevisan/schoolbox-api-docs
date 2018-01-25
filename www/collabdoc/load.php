@@ -56,7 +56,7 @@ if ($authenticator->isParticipator($pad->getHomepageId())) {
 
 		list($groupId, $padName) = explode('$', $pad->getPadId());
 
-		$sessionResult = $client->createSession($groupId, $response['data']['authorID'], $etherpadSession->generateValidUntil()->getUnixTimestamp());
+		$sessionResult = $client->createSession($groupId, $response['data']['authorID'], $etherpadSession->generateValidUntil()->getUnixTimeStamp());
 		$data = $sessionResult->getData();
 
 		/* When the groupId is nonexistent in Etherpad
@@ -71,7 +71,7 @@ if ($authenticator->isParticipator($pad->getHomepageId())) {
 
 			list($groupId, $padName) = explode('$', $pad->getPadId());
 
-			$sessionResult = $client->createSession($groupId, $response['data']['authorID'], $etherpadSession->generateValidUntil()->getUnixTimestamp());
+			$sessionResult = $client->createSession($groupId, $response['data']['authorID'], $etherpadSession->generateValidUntil()->getUnixTimeStamp());
 			$data = $sessionResult->getData();
 		}
 

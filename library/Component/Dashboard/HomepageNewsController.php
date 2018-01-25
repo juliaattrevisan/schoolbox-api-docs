@@ -61,7 +61,7 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
                         'user_id' => $f['user_id'],
                         'name' => $f['name'],
                         'action' => $f['action'],
-                        'timestamp' => $feedTime->getUnixTimestamp(),
+                        'timestamp' => $feedTime->getUnixTimeStamp(),
                     );
                 }
 

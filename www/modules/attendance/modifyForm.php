@@ -42,7 +42,7 @@ if ($attendanceDate->getUsingFormat('W') < ($now->getUsingFormat('W') - 1)) {
     error(ErrorMapper::ERROR_ATTENDANCE_FUTURE);
 }
 
-if ($attendanceDate->getUnixTimestamp() > $now->getUnixTimestamp()) {
+if ($attendanceDate->getUnixTimeStamp() > $now->getUnixTimeStamp()) {
     error(ErrorMapper::ERROR_NOT_ENROLLED);
 }
 
