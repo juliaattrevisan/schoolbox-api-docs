@@ -142,6 +142,10 @@
                         statusValue = 'included';
                         include = 1;
                     }
+                    //else skip
+                    else {
+                        return true;
+                    }
                 // Exclude action
                 } else if (action === 'exclude') {
                     $participantCard.addClass('participant-excluded');
