@@ -349,7 +349,7 @@ class Mapper extends BaseMapper
     ): array {
         $pb = $this->getPredicateBuilder();
         $pb->isNull('a.deleted_at');
-        $pb->any($pb->buildSubBuilder()
+        $pb->any($pb->emptyClone()
                     ->notNull('tc.student_id')
                     ->notNull('ds.owner')
                     ->notNull('dr.owner')
