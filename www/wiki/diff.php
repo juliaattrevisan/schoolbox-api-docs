@@ -37,7 +37,11 @@ if (is_numeric($this->arg[0])) {
 	$this->setTab('resources');
 
 	// perfom diff
+    $htmldiffConfig = new Caxy\HtmlDiff\HtmlDiffConfig();
+    $htmldiffConfig->setPurifierCacheLocation(Cfg::get('xml_dir') . '/../purifier/');
+    $htmldiffConfig->setEncoding('UTF-8');
     $diff = new Caxy\HtmlDiff\HtmlDiff($from['body'], $to['body']);
+    $diff->setConfig($htmldiffConfig);
     $diff->build();
 
 	$modifiedDate = new Alaress_Date_Format($from['modified'], 'U');
