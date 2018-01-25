@@ -775,6 +775,7 @@
             var eData = $modalForm.data('eventData');
             window.pickerInstance[1].set('minDate', eData.bounds.open);
             window.pickerInstance[1].set('maxDate', eData.bounds.due);
+            window.pickerInstance[1].setDate(eData.start.format('YYYY-MM-DD'));
         });
 
     })
