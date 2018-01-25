@@ -180,7 +180,7 @@ Data:
                     <div id='assessment-list-empty-state' class="empty-state {% if assessment.assessables|length %}hide{% endif %}">
                         {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id, context: assessment }) %}
                         <i class="icon-project"></i>
-                        <p>You {{ locale.project }} currently has no activities.<br />To start assessing students you should <a href="{{ createRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">create an {{ locale.assessment }}</a> next.</p>
+                        <p>This {{ locale.project }} currently has no activities.<br />To start assessing students you should <a href="{{ createRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">create an {{ locale.assessment }}</a> next.</p>
                     </div>
                 </div>
 
