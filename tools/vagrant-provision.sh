@@ -59,7 +59,7 @@ then
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing Chromedriver";
-apt-get install chromium-chromedriver
+apt-get install -y chromium-chromedriver
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
 echo "[SB][`date +%Y-%m-%d\ %X`] Cleaning up zero byte files";
