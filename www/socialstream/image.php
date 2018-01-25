@@ -46,9 +46,8 @@ if ($urlDetect->isStorageUrl()) {
     $storage = $cache->getCachedFile();
 }
 
-$cache = new Image\Cache\Storage($storage, $size);
-
 try {
+    $cache = new Image\Cache\Storage($storage, $size);
     $processor = new Image\Processor\Standard(
         $cache,
         new Image\Transformation\Storage(),
@@ -56,6 +55,6 @@ try {
         new Imagine\Processor\Strategy\Factory()
     );
     $processor->load()->stream();
-} catch (\Exception $e) {
+} catch (\Throwable $e) {
     \SitePage::redirectToBrokenImageWithTransform('storage', $size);
 }
