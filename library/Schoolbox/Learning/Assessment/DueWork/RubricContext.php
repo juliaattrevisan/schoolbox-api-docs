@@ -123,8 +123,10 @@ class RubricContext
          */
         $gradeLevels = [];
 
-        foreach ($dueWork->getGradeGroup()->getGradeLevels() as $gradeLevel) {
-            $gradeLevels[$gradeLevel->getLowerBound()] = $gradeLevel->getCaption();
+        if ($dueWork->getGradeGroup()) {
+            foreach ($dueWork->getGradeGroup()->getGradeLevels() as $gradeLevel) {
+                $gradeLevels[$gradeLevel->getLowerBound()] = $gradeLevel->getCaption();
+            }
         }
 
         $context = [
