@@ -132,16 +132,28 @@
                 var status;
                 var include;
 
-                if (action === 'include' || action === 'default') {
-                    $participantCard.removeClass('participant-excluded');
-                    status = '(no customisations)';
-                    statusValue = 'included';
-                    include = 1;
-                } else {
+                // Include action
+                if (action === 'include') {
+                    // Only include those who are excluded, no change for others
+                    var isExcluded = $participantRow.find('div[data-participant-status = excluded]').length;
+                    if (isExcluded) {
+                        $participantCard.removeClass('participant-excluded');
+                        status = '(no customisations)';
+                        statusValue = 'included';
+                        include = 1;
+                    }
+                // Exclude action
+                } else if (action === 'exclude') {
                     $participantCard.addClass('participant-excluded');
                     status = '(excluded)';
                     statusValue = 'excluded';
                     include = 0;
+                // Remove customisation action (drops plan to default)
+                } else {
+                    $participantCard.removeClass('participant-excluded');
+                    status = '(no customisations)';
+                    statusValue = 'included';
+                    include = 1;
                 }
 
                 // Update the status showing for the student
@@ -470,7 +482,7 @@
         var $planParticipants = $('#plan-participants');
         var $customiseModal = $(defaults.customiseModal);
         var $participants = $(defaults.participants);
-
+        var $modalHeader = $customiseModal.find('[data-plan-header]');
         var $planId = $customiseModal.find('#plan-id');
         var $planName = $customiseModal.find('#plan-name');
         var $planDesc = $customiseModal.find('#plan-desc');
@@ -540,6 +552,7 @@
 
         // Set dates & description to whatever is currently set on the main form
         if (planData !== undefined) {
+            $modalHeader.text('Modify Learning Plan');
             $planId.val(planData['id']);
             $planName.val(planData['name']);
             $planPublishDate.val(planData['publishDate']);
@@ -549,6 +562,7 @@
             CKEDITOR.instances['plan-desc'].setData(planData['description']);
         }
         else {
+            $modalHeader.text('Create New Learning Plan');
             $planId.val(0);
             $planPublishDate.val($('#publishDate').val());
             $planOpenDate.val($('#openDate').val());
