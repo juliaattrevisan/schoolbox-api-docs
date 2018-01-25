@@ -319,7 +319,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
 
         foreach ($permissionCollection as $permission) {
             if ($permission->getSubscribed() || $permission->getAllowed()) {
-                $envelope->targetToUser($permission->getUserId(), $instance);
+                $envelope->targetToUser($permission->getUser()->getId(), $instance);
             }
         }
 
