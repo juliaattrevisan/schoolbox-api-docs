@@ -14,9 +14,13 @@ use Alaress_Date_Format;
 use Alaress_Date_NullDate;
 use \Schoolbox\Collection;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
+use Schoolbox\Learning\Assessment\DueWork\Feedback;
 
 use \Schoolbox\Learning\Assessment\AbstractResponse;
 
+/**
+ * @method Collection|Feedback\Model[] getAllFeedback()
+ */
 class Model extends AbstractResponse
 {
     /**
@@ -149,5 +153,26 @@ class Model extends AbstractResponse
     {
         $this->submittedAt = $submittedAt ?: new Alaress_Date_NullDate();
         return $this;
+    }
+
+
+    /**
+     * Returns the most recent published self-reflected feedback for this submission
+     *
+     * @return null|Feedback\Model
+     */
+    public function findMostRecentPublishedSelfReflectedFeedback(): ?Feedback\Model
+    {
+        /** @var Feedback\Model $mostRecentFeedback */
+        $mostRecentFeedback = null;
+        foreach ($this->getAllFeedback() as $feedback) {
+            if (!$feedback->isPublished() || !$feedback->isSelfAssessed()) {
+                continue;
+            }
+            if (!$mostRecentFeedback || $feedback->getPublishedAt()->gt($mostRecentFeedback->getPublishedAt())) {
+                $mostRecentFeedback = $feedback;
+            }
+        }
+        return $mostRecentFeedback;
     }
 }
