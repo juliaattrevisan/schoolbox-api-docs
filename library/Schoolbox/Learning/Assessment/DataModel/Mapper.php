@@ -225,8 +225,8 @@ class Mapper extends BaseMapper
      */
     protected function createDynamicPlanIfNew(Model $assessment, Model $previous = null)
     {
-        if ($previous) {
-            // this is a modify; do nothing
+        if ($previous || $assessment->hasProject() || $assessment->getPlans()->count()) {
+            // this is a modify, or a project, or already has plan[s]; do nothing
             return true;
         }
 
