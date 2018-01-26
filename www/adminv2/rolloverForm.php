@@ -1,5 +1,6 @@
 <?php
 use Schoolbox\Collection;
+use Schoolbox\Resource\HomepageConfig;
 
 /**
  *
@@ -56,16 +57,17 @@ function traverse($categoryId, $catsWithCodes = array())
 {
     $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
     $allFolders = $folderMapper->findByParent($categoryId);
-
+    
     /* For JSON ajax
      */
     foreach ($allFolders as $currentFolder) {
         if (strlen($currentFolder->getCodeString())) {
+            $homepage = $currentFolder->getHomepage();
             $catsWithCodes[$currentFolder->getId()] = array(
                 'id' => $currentFolder->getId(),
                 'name' => $currentFolder->getName(),
                 'parent' => $currentFolder->getParent()->getId(),
-                'template' => $currentFolder->getHomepage()->getTemplate()->getId(),
+                'template' => $homepage instanceof HomepageConfig ? $homepage->getTemplate()->getId() : null,
                 'code' => $currentFolder->getCodeString()
             );
         }
