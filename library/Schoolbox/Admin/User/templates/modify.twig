@@ -553,28 +553,56 @@
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript">
     $(function () {
+        var servicesDropdown = $("#serviceSelect");
+        var middleDropdown = $("#defaultSelect");
+        var permissionsDropdown = $("#permissionSelect");
 
-        {# Hide Read and Write permission options in dropdown for certain services #}
-        $("#serviceSelect").change(function(e) {
+        // Hide the last middle and last dropdowns initially, when no service is selected yet
+        if (servicesDropdown.val() === "") {
+            permissionsDropdown.hide();
+            middleDropdown.hide();
+        }
+
+        servicesDropdown.change(function(e) {
+            // Hide the last middle and last dropdowns when no service is selected
+            if (servicesDropdown.val() === "") {
+                permissionsDropdown.hide();
+                middleDropdown.hide();
+            } else {
+                permissionsDropdown.show();
+                middleDropdown.show();
+            }
+
             var selectedServiceId = $(e.target).val();
 
-            // This doesn't fix the magic number problem exactly, but makes it easier to understand and extend.
             var resourceBooking = '{{ constant('RESOURCE_BOOKING_SERVICE') }}';
-            var pastoralCare = '{{ constant('PASTORAL_SERVICE') }}';
             var fixtures = '{{ constant('SPORTS_ADMINISTRATOR_SERVICE') }}';
-            var moderateOnlyServices = [resourceBooking, pastoralCare, fixtures];
+            var cms = '{{ constant('CMS_SERVICE') }}';
+            var curriculum = '{{ constant('CURRICULUM_SERVICE') }}';
+            var pastoralCare = '{{ constant('PASTORAL_SERVICE') }}';
+
+            var moderateOnlyServices = [resourceBooking, fixtures];
+            var noMiddleDropdownServices = [cms, resourceBooking, curriculum, pastoralCare, fixtures]
 
             var moderateAccess = 3;
             var readAccess = 1;
 
+            // Hide the middle dropdown for services where it's empty
+            if (noMiddleDropdownServices.indexOf(selectedServiceId) !== -1) {
+                middleDropdown.hide();
+            } else if (servicesDropdown.val() !== "")  {
+                middleDropdown.show();
+            }
+
+            {# Hide Read and Write permission options in dropdown for certain services #}
             if (moderateOnlyServices.indexOf(selectedServiceId) !== -1) {
                 $("#read").hide();
                 $("#write").hide()
-                $("#permissionSelect").val(moderateAccess);
+                permissionsDropdown.val(moderateAccess);
             } else {
                 $("#read").show();
                 $("#write").show()
-                $("#permissionSelect").val(readAccess);
+                permissionsDropdown.val(readAccess);
             }
         });
 
