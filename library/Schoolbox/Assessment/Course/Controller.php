@@ -781,7 +781,7 @@ class Controller extends Base\Base
         $data = $this->getCourseData();
         $data['returnUrlKey'] = Redirect::RETURN_URL;
         
-        if($query->get('folder')) {
+        if ($query->get('folder')) {
             $folderModel = $this->getFolderMapper()->findById($query->get('folder'));
             $data['suggestions'] = $this->getLinkSuggestions($folderModel);
         }
