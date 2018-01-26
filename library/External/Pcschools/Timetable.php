@@ -1,4 +1,7 @@
 <?php
+
+use Schoolbox\CampusMapper;
+
 /**
  * PCSchools timetable connector
  *
@@ -19,6 +22,11 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     private $userMapper;
 
     /**
+     * @var \Schoolbox\CampusMapper
+     */
+    private $campusMapper;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -28,6 +36,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 //        $this->getDatabase()->query('SET ANSI_PADDING ON');
 //        $this->getDatabase()->query('SET ANSI_WARNINGS ON');
         $this->userMapper = new \Schoolbox\UserMapper();
+        $this->campusMapper = new \Schoolbox\CampusMapper();
     }
 
     /**
@@ -482,8 +491,131 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      */
     public function getRoomTimetable($roomCodes)
     {
-        // Not yet implemented
-        return [];
+        // Split the requested room codes into a CSV string for use in the query
+
+        if (!is_array($roomCodes)) {
+            $roomCodes = [$roomCodes];
+        }
+
+        array_walk($roomCodes, function (&$value, &$key) {
+            $value = "'" . $this->getDatabase()->quote($value) . "'";
+        });
+
+        $roomCodes = implode(",", $roomCodes);
+
+        // We don't have any information at this point in time as to which user, date, or other context we are in- so
+        // we sadly just end up blindly picking any campus to get a value to use for TIME_PERIOD in our queries
+
+        $timePeriod = '';
+
+        $campuses = CampusMapper::getInstance()->findAll();
+
+        foreach ($campuses as $campus) {
+            $timePeriod = trim($campus->getExtTimetableCode());
+            if ($timePeriod !== '') {
+                break;
+            }
+        }
+
+        if ($timePeriod === '') {
+            return [];
+        }
+
+        $timePeriod = $this->getDatabase()->quote($timePeriod);
+
+        // Run this mess
+
+        $sql = "
+            SELECT
+              TIMEFILE.DAY            AS TIMETABLE_DAY,
+              TIMEFILE.TIME_PERIOD    AS TIMETABLE_GROUP,
+              TIMEFILE.PERIOD         AS TIMETABLE_PERIOD,
+              TIMEPDHD.TIME_START     AS PERIOD_START,
+              TIMEPDHD.TIME_END       AS PERIOD_END,
+              TIMEPDHD.HEADING        AS PERIOD_NAME,
+              TIMEFILE.ROOM           AS ROOM_CODE,
+              TIMEROOM.[DESC]         AS ROOM_NAME,
+              TIMEFILE.YEAR           AS CLASS_YEAR_LEVEL,
+              TEACHER.TEACHER_CODE    AS TEACHER_CODE,
+              TEACHER.NAME_FOR_REPORT AS TEACHER_NAME,
+              TTABLE.SUB_CODE         AS SUBJECT_CODE,
+              SUBJECT.[DESC]          AS SUBJECT_NAME
+            FROM TIMEFILE
+              LEFT JOIN TTABLE ON TTABLE.PCS_SUB_NO = TIMEFILE.SUBJECT AND TTABLE.CLASS_PCS = TIMEFILE.CLASS AND TTABLE.YEAR_PCS = TIMEFILE.YEAR
+              LEFT JOIN SUBJECT ON SUBJECT.NO = TTABLE.PCS_SUB_NO
+              LEFT JOIN TEACHER ON TEACHER.TEACHER_CODE = TIMEFILE.TEACHER
+              LEFT JOIN TIMEROOM ON TIMEROOM.ABBREV = TIMEFILE.ROOM
+              LEFT JOIN TIMEPDHD ON TIMEPDHD.DAY = TIMEFILE.DAY AND TIMEPDHD.TIMEOFDAY = CAST(TIMEFILE.PERIOD AS VARCHAR(5)) AND
+              CASE
+                WHEN TIMEPDHD.RESTRICT_YR = '*C' THEN 1                                                                            
+                WHEN LEFT(TIMEPDHD.RESTRICT_YR, 1) <> '*' AND TIMEFILE.YEAR = TIMEPDHD.RESTRICT_YR THEN 1                          
+                WHEN LEFT(TIMEPDHD.RESTRICT_YR, 1) = '*' AND TIMEPDHD.INCLUDES LIKE '%|' + TIMEFILE.YEAR + '|%' THEN 1             
+                ELSE 0
+              END = 1
+            WHERE TIME_PERIOD = '{$timePeriod}' AND TIMEFILE.ROOM IN ({$roomCodes})
+        ";
+
+        $classes = $this->getDatabase()->getAll($sql);
+
+        $result = [];
+
+        foreach ($classes as $class) {
+
+            // If we don't have a start/end time- skip it.
+
+            if (trim($class['PERIOD_START']) === '' || trim($class['PERIOD_END']) === '') {
+                continue;
+            }
+
+            $periodStartArray = explode('.', $class['PERIOD_START']);
+            $periodStartAMPM = $periodStartArray[0] >= 12 ? 'PM' : 'AM';
+
+            if ($periodStartArray[0] > 12) {
+                $periodStartArray[0] -= 12;
+            }
+
+            if ($periodStartArray[0] < 10) {
+                $periodStartArray[0] = "0{$periodStartArray[0]}";
+            }
+
+            if ($periodStartArray[1] === null) {
+                $periodStartArray[1] = '00';
+            } else if ($periodStartArray[1] < 10 && strlen($periodStartArray[1]) < 2) {
+                $periodStartArray[1] = "{$periodStartArray[1]}0";
+            }
+
+            $periodStart = "{$periodStartArray[0]}:{$periodStartArray[1]}{$periodStartAMPM}";
+
+            $periodEndArray = explode('.', $class['PERIOD_END']);
+            $periodEndAMPM = $periodEndArray[0] >= 12 ? 'PM' : 'AM';
+
+            if ($periodEndArray[0] > 12) {
+                $periodEndArray[0] -= 12;
+            }
+
+            if ($periodEndArray[0] < 10) {
+                $periodEndArray[0] = "0{$periodEndArray[0]}";
+            }
+
+            if ($periodEndArray[1] === null) {
+                $periodEndArray[1] = '00';
+            } else if ($periodEndArray[1] < 10 && strlen($periodEndArray[1]) < 2) {
+                $periodEndArray[1] = "{$periodEndArray[1]}0";
+            }
+
+            $periodEnd = "{$periodEndArray[0]}:{$periodEndArray[1]}{$periodEndAMPM}";
+
+            $result[] = [
+                'DayNumber' => $class['TIMETABLE_DAY'],
+                'TimetableGroup' => $timePeriod,
+                'PeriodStart' => $periodStart,
+                'PeriodEnd' => $periodEnd,
+                'PeriodName' => $class['PERIOD_NAME'],
+                'Description' => "{$class['SUBJECT_NAME']}\n{$class["TEACHER_NAME"]}",
+            ];
+        }
+
+        return $result;
     }
 
     /**
