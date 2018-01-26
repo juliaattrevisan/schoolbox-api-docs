@@ -85,60 +85,39 @@ class External_Tass_Timetable implements External_TimetableInterface
 
     }
 
-    //gets current day number
+    /**
+     * Retrieve day number from TASS database
+     *
+     * @param \Schoolbox\Campus $campus
+     * @param int               $date
+     *
+     * @return int|string
+     */
     function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
     {
-
         if (!$date) {
             $date = time();
         }
 
-        if (date('w', $date) == 0 || date('w', $date) == 6) {
-            return false;
-        }
-        //get day count
-        if ($this->getDays($campus) == 5) {
-            return date("w", $date);
-        } elseif ($this->getDays($campus) == 7) {
-            return 0; //Not implemented
-        } elseif ($this->getDays($campus) == 10) {
-            $startDate = $this->getLastDay($date, $campus);
+        $cmpyCode = $this->getDatabase()->quote($this->getCampusCode($campus));
+        $ttDate   = date("Y-m-d 00:00:00", $date);
+        $ttId     = $this->getDatabase()->quote($this->getTimetableCode($campus));
 
-            if ($this->tassDay[$startDate] > 5) {
-                $this->tassDay[$startDate] = $this->tassDay[$startDate] + 1;  //extra days for weekend
-            }
-            $startDate = $startDate - ($this->tassDay[$startDate] * 86400);
+        $query = "
+            SELECT  day_code 
+            FROM    ttcalendar 
+            WHERE   cmpy_code = '{$cmpyCode}' AND 
+                    ttdate = '{$ttDate}' AND
+                    tt_id = '{$ttId}'
+        ";
 
-            if (!$startDate) {
-                //Just assume the start of the year if we cannot find anything
-                $startDate = mktime(0, 0, 0, 1, 1, date('Y'));
-            }
+        $result = $this->getDatabase()->query($query)->fetchColumn();
 
-            //find number of days between both dates
-            $difference = floor(($date - $startDate) / 86400);
-            //find number of weeks between 2 dates
-            $weeks = intval(($difference) / 7);
-
-            if (($weeks % 2) == 0) {
-                $day = date('w', $date);
-                if ($day < 1) {
-                    //on sundays move it forward
-                    $day = 1;
-                }
-            } else {
-                $day = date('w', $date) + 5;
-                if ($day < 6) {
-                    //on sundays move it forward
-                    $day = 6;
-                }
-
-            }
-            return $day;
-
-        } else {
-            //unknown day number
+        if (strlen(trim($result)) === 0) {
             return 0;
         }
+
+        return $result;
     }
 
     /**
