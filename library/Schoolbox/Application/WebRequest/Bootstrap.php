@@ -242,7 +242,7 @@ class Bootstrap extends AbstractBootstrap {
             $config    = $di->get('config');
             $fqdn      = trim($config->get('site_hostname').".".$config->get('site_domain'), ';.');
             $csrfCheck = new HeaderCheck($_SERVER, $fqdn);
-            if (!$csrfCheck->verfiyRequestOrigin()) {
+            if (!$csrfCheck->verifyRequestOrigin()) {
                 // Let's just say 403 Forbidden for now
                 // TODO replace the call to Sitepage::error() method
                 /** @var \SitePage $page */

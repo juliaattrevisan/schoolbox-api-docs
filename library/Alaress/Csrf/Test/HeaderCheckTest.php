@@ -110,7 +110,7 @@ class HeaderCheckTest extends TestCase
     public function testHeadersOnly(array $serverVars, bool $expectedResult)
     {
         $check = new HeaderCheck($serverVars);
-        $this->assertEquals($expectedResult, $check->verfiyRequestOrigin());
+        $this->assertEquals($expectedResult, $check->verifyRequestOrigin());
     }
 
     /**
@@ -175,6 +175,6 @@ class HeaderCheckTest extends TestCase
     public function testHeadersAndValidHost(array $serverVars, ?string $validHost, bool $expectedResult)
     {
         $check = new HeaderCheck($serverVars, $validHost);
-        $this->assertEquals($expectedResult, $check->verfiyRequestOrigin());
+        $this->assertEquals($expectedResult, $check->verifyRequestOrigin());
     }
 }
