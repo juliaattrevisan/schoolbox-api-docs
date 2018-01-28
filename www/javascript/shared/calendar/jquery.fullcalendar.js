@@ -826,7 +826,11 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
     this.fillForm(method+'Event', eventData);
     this.fillForm(method+'Task', eventData);
 
-    return this.calendar.options.bubble.onOpen.call(this, method, eventData);
+    if (this.calendar.options.bubble.onOpen) {
+        return this.calendar.options.bubble.onOpen.call(this, method, eventData);
+    }
+
+    return true;
 }
 
 
