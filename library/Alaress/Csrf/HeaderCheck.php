@@ -58,7 +58,7 @@ class HeaderCheck
      *
      * @return bool
      */
-    public function verfiyRequestOrigin() : bool
+    public function verifyRequestOrigin() : bool
     {
         $sources = array_filter(
             array_map(
