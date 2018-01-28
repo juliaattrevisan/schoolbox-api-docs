@@ -36,9 +36,9 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
         foreach ($subCodeArray as $code) {
             if (strpos($code, '/') !== false) {
                 $codeArray = explode('/', $code, 2);
-                $classQuery .= "(ts.Code = '{$this->database->quote($codeArray[1])}' AND t.Name = '{$this->database->quote($codeArray[0])}' ) OR ";
+                $classQuery .= "(tc.Name = '{$this->database->quote($codeArray[1])}' AND t.Name = '{$this->database->quote($codeArray[0])}' ) OR ";
             } else {
-                $classQuery .= "ts.Code = '{$this->database->quote($code)}' OR ";
+                $classQuery .= "tc.Name = '{$this->database->quote($code)}' OR ";
             }
         }
         return substr($classQuery, 0, -3) . ')';
@@ -65,10 +65,12 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
                 s.Code         AS synergy_id,
                 ''             AS ClassCampus
             FROM fc.TimetableSubject ts
-
-            INNER JOIN fc.TimetableSubjectChoice tsc ON ts.ID          = tsc.TimetableSubjectID
+            
             INNER JOIN fc.Timetable              t   ON ts.TimetableID = t.ID
-            INNER JOIN dbo.Student               s   ON tsc.PersonID   = s.PersonID
+            INNER JOIN fc.TimetableClass         tc   ON ts.ID             = tc.TimetableSubjectID
+            INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID
+            INNER JOIN fc.TimetableSubjectChoice tsc  ON tc.ID             = tsc.TimetableClassID
+            INNER JOIN dbo.Student               s    ON tsc.PersonID      = s.PersonID
 
             WHERE $classQuery
             AND   t.Enabled = 1

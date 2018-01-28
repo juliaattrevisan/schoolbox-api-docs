@@ -40,24 +40,26 @@ class External_Schooledge_User extends External_Humanedge_User implements Extern
             // 2nd part: non-blocked classes
             $query = "
                 SELECT DISTINCT
-                    ts.Code     AS code,
+                    tc.Name     AS code,
                     ts.Name     AS name,
                     t.ShortName AS campusCode,
                     ''          AS classType
                 FROM fc.TimetableSubject ts
 
-                INNER JOIN fc.TimetableSubjectChoice tsc ON ts.ID          = tsc.TimetableSubjectID
                 INNER JOIN fc.Timetable              t   ON ts.TimetableID = t.ID
-                INNER JOIN dbo.Student               s   ON tsc.PersonID   = s.PersonID
-
-                WHERE s.Code = $quotedId
+                INNER JOIN fc.TimetableClass         tc   ON ts.ID             = tc.TimetableSubjectID
+                INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID
+                INNER JOIN fc.TimetableSubjectChoice tsc  ON tc.ID             = tsc.TimetableClassID
+                INNER JOIN dbo.Student               s    ON tsc.PersonID      = s.PersonID
+                
+                WHERE s.Code = $quotedId         
                 AND   t.Enabled = 1
                 AND   t.Name IN ($campusCodeString)
 
                 UNION
 
                 SELECT DISTINCT
-                    ts.Code     AS code,
+                    tc.Name     AS code,
                     ts.Name     AS name,
                     t.ShortName AS campusCode,
                     ''          AS classType
@@ -75,6 +77,7 @@ class External_Schooledge_User extends External_Humanedge_User implements Extern
                 AND   t.Name IN ($campusCodeString)
 
                 ORDER BY code ASC
+
             ";
         } elseif ($user->getRole()->isStaff()) {
             // As far as I can interpret:
@@ -82,7 +85,7 @@ class External_Schooledge_User extends External_Humanedge_User implements Extern
             // Use use replacement staff if it's found
             $query = "
                 SELECT DISTINCT
-                    ts.Code     AS code,
+                    tc.Name     AS code,
                     ts.Name     AS name,
                     t.ShortName AS campusCode,
                     ''          AS classType

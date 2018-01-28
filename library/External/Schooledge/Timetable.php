@@ -16,7 +16,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
 
     private $classSelect = "
         t.Name                      AS ClassCampus,
-        ts.Code                     AS ClassCode,
+        tc.Name                     AS ClassCode,
         ts.Name                     AS ClassName,
         td.SortOrder                AS DayNumber,
         tpe.Code                    AS PeriodNumber,
@@ -367,7 +367,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 tp.Name                     AS PeriodName,
                 t.Name                      AS TimetableGroup,
                 t.Name                      AS ClassCampus,
-                ts.Code                     AS ClassCode,
+                tc.Name                     AS ClassCode,
                 ts.Name                     AS ClassName,
                 $this->baseStaffSelect,
                 $this->replacementStaffSelect
