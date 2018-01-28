@@ -77,3 +77,7 @@
     border-radius: 10px;
     background-color: #002344;
 }
+.fc-scroller-canvas .fc-cell-text {
+    display: block;
+    white-space: normal;
+}
