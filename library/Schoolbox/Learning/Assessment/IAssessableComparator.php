@@ -34,17 +34,4 @@ interface IAssessableComparator
      * @return callable
      */
     public function getCallable(): callable;
-
-
-    /**
-     * Implementing classes can be used as a function.
-     *
-     * This is for convenience, the preferred mechanism is getCallable()
-     *
-     * @param IAssessable $left
-     * @param IAssessable $right
-     * @return int
-     * @todo consider whether to provide this at all, or force use of getCallable()
-     */
-    public function __invoke(IAssessable $left, IAssessable $right): int;
 }

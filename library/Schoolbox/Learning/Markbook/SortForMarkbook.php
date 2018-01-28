@@ -69,15 +69,6 @@ class SortForMarkbook implements IAssessableComparator
 
 
     /**
-     * @inheritdoc
-     */
-    public function __invoke(IAssessable $left, IAssessable $right): int
-    {
-        return $this->compare($left, $right);
-    }
-
-
-    /**
      * Sorts assessments by sequence if both in unit-impl, or due-date directly.
      * Assessables must be in same unit-impl, or both directly on same folder.
      *
