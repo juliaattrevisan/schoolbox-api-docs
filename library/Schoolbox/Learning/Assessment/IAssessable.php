@@ -703,6 +703,16 @@ interface IAssessable extends ISoftDeletable
 
 
     /**
+     * Can learners give themselves feedback to this assessable?
+     *
+     * Note: DueWork self-assessment includes both self-reflectable and self-gradable
+     *
+     * @return bool
+     */
+    public function isSelfAssessable(): bool;
+
+
+    /**
      * Return the IResponse implementation class for this IAssessable
      *
      * @return string

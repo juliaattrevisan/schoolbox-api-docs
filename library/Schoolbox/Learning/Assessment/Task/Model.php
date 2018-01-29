@@ -26,6 +26,7 @@ use \Schoolbox\Resource\Storage\Model as StorageFile;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
+use UnexpectedValueException;
 
 /**
  * When a student self-assesses a task, it will generate an IResponse only, with a mark of 'incomplete' or 'self-assessed'.
@@ -279,9 +280,13 @@ class Model extends AbstractAssessment
      * Convenience intuitive method (but not a mapper standard get/set)
      *
      * @return bool
+     * @throws UnexpectedValueException If property is not set
      */
-    public function isSelfAssessable()
+    public function isSelfAssessable(): bool
     {
+        if(null === $this->isSelfAssessable){
+            throw new UnexpectedValueException('Property not set');
+        }
         return $this->isSelfAssessable;
     }
 

@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DueWork\Response\Test;
 
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfReflectionWithResponse;
 use Schoolbox\Learning\Assessment\Participant;
@@ -42,8 +43,7 @@ class SelfReflectionWithResponseTest extends TestCase
         $student = (new User())->setId(230);
 
         $correctAssessment = (new DueWork\Model())
-            ->setSelfAssessable(false)
-            ->setSelfReflectable(true);
+            ->setSelfReviewable(SubmissionBox::SELF_REVIEWABLE_REFLECT_ONLY);
 
         /* This participation is correctly set up to conclude Self Assessment
          */

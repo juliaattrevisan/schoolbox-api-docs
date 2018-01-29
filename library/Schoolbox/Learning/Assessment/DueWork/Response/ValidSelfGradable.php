@@ -15,8 +15,9 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
+use UnexpectedValueException;
 
-class ValidSelfAssessment extends ValidSelfReflection
+class ValidSelfGradable extends ValidSelfReflection
 {
 
     /**
@@ -24,10 +25,11 @@ class ValidSelfAssessment extends ValidSelfReflection
      *
      * @param Participant $participant
      * @return bool
+     * @throws UnexpectedValueException If due work model not hydrated
      */
-    protected function isSelfAssessable(Participant $participant): bool
+    protected function isSelfGradable(Participant $participant): bool
     {
-        return $participant->getAssessable()->isSelfAssessable();
+        return $this->getDueWork($participant)->isSelfGradable();
     }
 
 
@@ -37,6 +39,7 @@ class ValidSelfAssessment extends ValidSelfReflection
      * @param User        $user
      * @param Participant $participant
      * @return bool
+     * @throws UnexpectedValueException If due work model not hydrated
      */
     public function isSatisfiedBy(User $user, Participant $participant): bool
     {
@@ -47,8 +50,7 @@ class ValidSelfAssessment extends ValidSelfReflection
          */
         if ($this->isDueWork($participant)) {
             return $this->isViewingOwnParticipation($user, $participant)
-                && $this->isSelfAssessable($participant)
-                && $this->isSelfReflectable($participant);
+                && $this->isSelfGradable($participant);
         }
 
         return false;

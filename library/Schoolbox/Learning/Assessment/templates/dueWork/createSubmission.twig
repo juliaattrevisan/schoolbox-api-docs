@@ -215,7 +215,7 @@ Data:
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 
 {% set isSubmitOnBehalfOf = USER.id != student.id %}
-{% set requiresReflection = not isSubmitOnBehalfOf and (assessment.selfReflectable or assessment.selfAssessable) %}
+{% set requiresReflection = not isSubmitOnBehalfOf and assessment.selfAssessable %}
 
 <div class="row">
     <div class="small-12 island">

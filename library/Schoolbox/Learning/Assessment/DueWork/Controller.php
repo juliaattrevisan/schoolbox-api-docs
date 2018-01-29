@@ -987,10 +987,10 @@ class Controller extends Assessment\Controller
             'attachzone'         => $zoneFactory->buildForAssessment($assessment)->getTwigContext(),
             'allMarkTypes'       => $this->getAllMarkTypes($assessment),
             'allGradeSchemes'    => $this->getAllGradeSchemes(),
-            'selfReflectTypes'   => [
-                'none'    => Model::SELF_REFLECTION_NONE,
-                'reflect' => Model::SELF_REFLECTION_REFLECT_ONLY,
-                'assess'  => Model::SELF_REFLECTION_FULL,
+            'selfReviewTypes'   => [
+                'none'    => SubmissionBox::SELF_REVIEWABLE_NONE,
+                'reflect' => SubmissionBox::SELF_REVIEWABLE_REFLECT_ONLY,
+                'grade'   => SubmissionBox::SELF_REVIEWABLE_FULL,
             ],
         ];
 

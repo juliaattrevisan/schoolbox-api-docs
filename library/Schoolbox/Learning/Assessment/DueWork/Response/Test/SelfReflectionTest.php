@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Reflection\DueWork\Response\Test;
 
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfReflection;
 use Schoolbox\Learning\Assessment\Participant;
@@ -47,18 +48,15 @@ class SelfReflectionTest extends TestCase
         /* This assessment is correctly set up to start Self Reflection
          */
         $correctAssessment = (new DueWork\Model())
-            ->setSelfAssessable(false)
-            ->setSelfReflectable(true);
+            ->setSelfReviewable(SubmissionBox::SELF_REVIEWABLE_REFLECT_ONLY);
 
         /* This assessment is incorrectly set up to start Self Reflection
          */
         $incorrectAssessment1 = (new DueWork\Model())
-            ->setSelfAssessable(true)
-            ->setSelfReflectable(false);
+            ->setSelfReviewable(SubmissionBox::SELF_REVIEWABLE_FULL);
 
         $incorrectAssessment2 = (new DueWork\Model())
-            ->setSelfAssessable(false)
-            ->setSelfReflectable(false);
+            ->setSelfReviewable(SubmissionBox::SELF_REVIEWABLE_NONE);
 
         /* Test everything
          */

@@ -11,8 +11,10 @@
 namespace Schoolbox\Learning\Assessment\DueWork;
 
 use DomainException;
+use UnexpectedValueException;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use \Schoolbox\Collection;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
@@ -42,20 +44,6 @@ class Model extends AbstractAssessment
      */
     public const ACCEPT_ONLINE_MULTI = 2;
 
-    /**
-     * Do not accept self-reflection at all
-     */
-    public const SELF_REFLECTION_NONE = 0;
-
-    /**
-     * Accept only student self-reflection (no marking or rubric grades available)
-     */
-    public const SELF_REFLECTION_REFLECT_ONLY = 1;
-
-    /**
-     * Accept full student self-assessment (marking and rubric grades available)
-     */
-    public const SELF_REFLECTION_FULL = 2;
 
     /**
      * All the Files that are part of the Due Work specification
@@ -110,18 +98,13 @@ class Model extends AbstractAssessment
     private $maxMark;
 
     /**
-     * Students may self-assess their submission to the Due Work, if selfAssessable is true
-     *
-     * @var bool
+     * @var string
+     * @see SubmissionBox::SELF_REVIEWABLE_NONE
+     * @see SubmissionBox::SELF_REVIEWABLE_REFLECT_ONLY
+     * @see SubmissionBox::SELF_REVIEWABLE_FULL
      */
-    protected $selfAssessable;
+    private $selfReviewable;
 
-    /**
-     * Students may self-reflect their submission to the Due Work, if selfReflectable is true
-     *
-     * @var bool
-     */
-    protected $selfReflectable;
 
     /**
      * Model constructor.
@@ -627,99 +610,71 @@ class Model extends AbstractAssessment
         return Feedback\Model::class;
     }
 
+
     /**
-     * @return boolean
+     * @return null|string
      */
-    public function getSelfAssessable()
+    public function getSelfReviewable(): ?string
     {
-        return $this->selfAssessable;
+        return $this->selfReviewable;
     }
 
-    /**
-     * @param boolean $selfAssessable
-     * @return static
-     */
-    public function setSelfAssessable(bool $selfAssessable)
-    {
-        $this->selfAssessable = $selfAssessable;
-        return $this;
-    }
 
     /**
-    * Determine whether this due work is self-assessable
-    *
-    * @return bool
-    */
-    public function isSelfAssessable()
-    {
-        return $this->selfAssessable;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getSelfReflectable() : ?bool
-    {
-        return $this->selfReflectable;
-    }
-
-    /**
-     * @param bool $selfReflectable
-     * @return static
-     */
-    public function setSelfReflectable(bool $selfReflectable)
-    {
-        $this->selfReflectable = $selfReflectable;
-        return $this;
-    }
-
-    /**
-     * Alias for `getSelfReflectable()`
-     *
-     * @return bool
-     */
-    public function isSelfReflectable() : ?bool
-    {
-        return $this->selfReflectable;
-    }
-
-    /**
-     * Set self-assessment and reflection based on a `self::SELF_REFLECTION_*`
-     * constant.
-     *
-     * @param int $selfReflectionType a `self::SELF_REFLECTION_*` constant
+     * @param string $selfReviewable
      * @return $this
      */
-    public function setSelfReflectionType(int $selfReflectionType): self
+    public function setSelfReviewable(string $selfReviewable)
     {
-        switch ($selfReflectionType) {
-            case self::SELF_REFLECTION_REFLECT_ONLY:
-                $this->setSelfReflectable(true)->setSelfAssessable(false);
-                break;
-            case self::SELF_REFLECTION_FULL:
-                $this->setSelfReflectable(true)->setSelfAssessable(true);
-                break;
-            case self::SELF_REFLECTION_NONE:
-            default:
-                $this->setSelfReflectable(false)->setSelfAssessable(false);
-                break;
-        }
+        $this->selfReviewable = $selfReviewable;
         return $this;
     }
 
+
     /**
-     * Get self-reflection type.
+     * Determine whether this due work is self-assessable
      *
-     * @return int a `self::SELF_REFLECTION_*` constant
+     * @return bool
+     * @throws UnexpectedValueException If property is not set
      */
-    public function getSelfReflectionType(): int
+    public function isSelfAssessable(): bool
     {
-        $selfReflectable = $this->isSelfReflectable();
-        $selfAssessable  = $this->isSelfAssessable();
-        if (!$selfReflectable) {
-            return self::SELF_REFLECTION_NONE;
-        } else {
-            return $selfAssessable ? self::SELF_REFLECTION_FULL : self::SELF_REFLECTION_REFLECT_ONLY;
+        if (null === $this->selfReviewable) {
+            throw new UnexpectedValueException('Property not set');
         }
+        $selfAssessableStates = [SubmissionBox::SELF_REVIEWABLE_FULL, SubmissionBox::SELF_REVIEWABLE_FULL];
+        return \in_array($this->selfReviewable, $selfAssessableStates, true);
+    }
+
+
+    /**
+     * Can learners *only* reflect on their own work?
+     *
+     * Returns FALSE if the assessment is self-gradable
+     *
+     * @return bool
+     * @throws UnexpectedValueException If property is not set
+     */
+    public function isSelfReflectableOnly(): bool
+    {
+        if (null === $this->selfReviewable) {
+            throw new UnexpectedValueException('Property not set');
+        }
+        return $this->selfReviewable === SubmissionBox::SELF_REVIEWABLE_REFLECT_ONLY;
+    }
+
+
+    /**
+     * Can learners grade their own work?
+     *
+     * @return bool
+     * @throws UnexpectedValueException If property is not set
+     */
+    public function isSelfGradable(): bool
+    {
+        if (null === $this->selfReviewable) {
+            throw new UnexpectedValueException('Property not set');
+        }
+        return $this->selfReviewable === SubmissionBox::SELF_REVIEWABLE_FULL;
     }
 }

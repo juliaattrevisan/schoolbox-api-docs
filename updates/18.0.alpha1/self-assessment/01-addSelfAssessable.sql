@@ -1,2 +1,2 @@
 ALTER TABLE `submission_box`
-ADD `self_assessable` int(1) NOT NULL DEFAULT 0;
+ADD `self_reviewable` ENUM('none', 'reflect-only', 'full') NOT NULL;

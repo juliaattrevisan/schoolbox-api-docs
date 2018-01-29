@@ -10,22 +10,21 @@ namespace Schoolbox\Learning\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
+use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\Assessment\Task\Model as TaskModel;
 use Schoolbox\User;
 use InvalidArgumentException;
+use Schoolbox\Learning\Assessment\DueWork;
 
 /**
  * Class CanSelfAssess
  *
  * In $params we need:
  *  - 'participant' Participant:
- *      - assessable fully hydrated, must be a task or due work
+ *      - assessable fully hydrated
  *
  * The rule is:
- *  - if the due work or task is self assessable and you are the participant, you are good
+ *  - if the assessment is self-assessable and you are the participant, you are good
  *
  *
  * @package Schoolbox\Learning\Authorizer\Rule
@@ -39,7 +38,7 @@ class CanSelfAssess implements IAuthorizationRule
      * @param  User  $user   The user to authorize, if any. Null value assumes
      *                       that no user is logged in.
      *
-     * @throws InvalidArgumentException If unable to locate a Participant instance in $params, or assessment is not a due work or task
+     * @throws InvalidArgumentException If unable to locate a Participant instance in $params
      * @throws Unauthorized If assessment is not self-assessable, there's no response, or user is not the participant
      * @return bool
      */
@@ -58,17 +57,9 @@ class CanSelfAssess implements IAuthorizationRule
         /** @var Participant $participant */
         $participant = $params['participant'];
         $assessment = $participant->getAssessable();
-        
-        // Error out if assessment is not a due work or task
-        if (!$assessment instanceof DueWorkModel && !$assessment instanceof TaskModel) {
-            throw new InvalidArgumentException("Cannot check auth, assessment must be due work or task");
-        }
 
-        // Error out if assessment is not self-assessable
-        if (!($assessment->isSelfAssessable())) {
-            if ($assessment instanceof DueWorkModel && !$assessment->isSelfReflectable()) {
-                throw new Unauthorized('', ErrorMapper::ERROR_NO_SELF_ASSESS);
-            }
+        if(!$assessment->isSelfAssessable()){
+            throw new Unauthorized('', Error\Mapper::ERROR_NO_SELF_ASSESS);
         }
 
         // Check logged in user is the participant
@@ -76,18 +67,22 @@ class CanSelfAssess implements IAuthorizationRule
             throw new Unauthorized();
         }
 
-        $mostRecentResponse = $participant->findMostRecentResponse();
+        // DueWork must have a submitted response to self-assess
+        if($assessment instanceof DueWork\Model){
+            // TODO - this is ambiguous. The response being self-assessed should be specified in the route args
+            $mostRecentResponse = $participant->findMostRecentResponse();
 
-        /* Error when there are no responses at all
-         */
-        if (!$mostRecentResponse) {
-            throw new Unauthorized('', ErrorMapper::ERROR_COMPLETE_BEFORE_SELF_REFLECT);
-        }
+            /* Error when there are no responses at all
+             */
+            if (!$mostRecentResponse) {
+                throw new Unauthorized('', Error\Mapper::ERROR_COMPLETE_BEFORE_SELF_REFLECT);
+            }
 
-        // Error out if participant has no Draft responses to complete
-        // Nothing to do in that case
-        if ($mostRecentResponse->isSubmitted()) {
-            throw new Unauthorized('', ErrorMapper::ERROR_COMPLETE_BEFORE_SELF_REFLECT);
+            // Error out if participant has no Draft responses to complete
+            // Nothing to do in that case
+            if ($mostRecentResponse->isSubmitted()) {
+                throw new Unauthorized('', Error\Mapper::ERROR_COMPLETE_BEFORE_SELF_REFLECT);
+            }
         }
 
         // Assessment is self-assessable and logged in user is the participant, good to go

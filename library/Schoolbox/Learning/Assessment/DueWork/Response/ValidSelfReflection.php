@@ -17,6 +17,7 @@ use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
+use UnexpectedValueException;
 
 class ValidSelfReflection
 {
@@ -37,6 +38,19 @@ class ValidSelfReflection
      * @var Participant
      */
     protected $participant;
+
+
+    /**
+     * Helper method to avoid repeated type-hints and instanceof checks
+     * Will throw a type error if participant is not for a dueWork
+     *
+     * @param Participant $participant
+     * @return DueWork\Model|IAssessable
+     */
+    protected function getDueWork(Participant $participant): DueWork\Model
+    {
+        return $participant->getAssessable();
+    }
 
 
     /**
@@ -73,10 +87,11 @@ class ValidSelfReflection
      *
      * @param Participant $participant
      * @return bool
+     * @throws UnexpectedValueException If due-work model is not hydrated
      */
-    protected function isSelfReflectable(Participant $participant): bool
+    protected function isSelfReflectableOnly(Participant $participant): bool
     {
-        return $participant->getAssessable()->isSelfReflectable();
+        return $this->getDueWork($participant)->isSelfReflectableOnly();
     }
 
 
@@ -104,6 +119,7 @@ class ValidSelfReflection
      * @param User        $user
      * @param Participant $participant
      * @return bool
+     * @throws UnexpectedValueException If due-work model is not hydrated
      */
     public function isSatisfiedBy(User $user, Participant $participant): bool
     {
@@ -114,7 +130,7 @@ class ValidSelfReflection
          */
         if ($this->isDueWork($participant)) {
             return $this->isViewingOwnParticipation($user, $participant)
-                && $this->isSelfReflectable($participant);
+                && $this->isSelfReflectableOnly($participant);
         }
 
         return false;

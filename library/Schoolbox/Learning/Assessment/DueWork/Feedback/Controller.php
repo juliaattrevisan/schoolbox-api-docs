@@ -12,7 +12,7 @@ use PDOException;
 use RangeException;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessment;
+use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfGradable;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfReflection;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IFeedback;
