@@ -2,7 +2,7 @@ CREATE TABLE tour_status(
     user_id         int(4)UNSIGNED NOT NULL,
     current_step    varchar(36) NOT NULL,
     url             varchar(255) NOT NULL,
-    status          enum('unactioned', 'completed', 'dismissed'),
+    status          enum('unactioned', 'completed', 'dismissed', 'hard_set'),
     created_at      DATETIME NULL
 );
 
