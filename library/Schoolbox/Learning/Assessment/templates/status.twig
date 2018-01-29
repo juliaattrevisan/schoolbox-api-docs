@@ -51,7 +51,16 @@
                 <li class="icon-calendar">{{ dueDate.assessment(assessment) }}</li>
             {% endif %}
 
-            <li class="{{ icon.renderClass(assessment) }}">{{ assessment.typeName }}</li>
+            {# Self Assessment/Reflection state #}
+            {% if assessment.isSelfAssessable %}
+                {% set selfReflectSuffix = 'includes ' ~ locale.selfAssessment.proper %}
+            {% elseif assessment.isSelfReflectable %}
+                {% set selfReflectSuffix = 'includes ' ~ locale.selfReflection.proper %}
+            {% else %}
+                {% set selfReflectSuffix = '' %}
+            {% endif %}
+
+            <li class="{{ icon.renderClass(assessment) }}">{{ assessment.typeName }} {{ selfReflectSuffix }}</li>
 
             {{ markVisibilityMeta.markVisibilityMeta(assessment, true) }}
 
