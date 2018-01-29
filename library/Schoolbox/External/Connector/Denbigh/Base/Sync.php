@@ -52,7 +52,7 @@ class Sync extends Base implements ISync
     public function findAllParents()
     {
         $query = "
-            SELECT
+            SELECT DISTINCT
                 par.loginID      AS student_contact_network_login,
                 peo.denbighID    AS student_contact_id,
                 peo.title        AS student_contact_title,
@@ -74,7 +74,6 @@ class Sync extends Base implements ISync
             LEFT JOIN People peo ON peo.denbighID = par.peopleDenbighID
             LEFT JOIN Schoolbox_Students s ON s.familyDenbighID = par.familyDenbighID
             WHERE peo.id IS NOT NULL
-            GROUP BY peo.denbighID
             ORDER BY adr.familyDenbighID ASC, peo.denbighID ASC
         ";
 
@@ -107,8 +106,8 @@ class Sync extends Base implements ISync
                 ''               AS staff_house,
                 ''               AS staff_department,
                 ''               AS staff_year_level,
-                ''               AS staff_year_level_description                
-                
+                ''               AS staff_year_level_description
+
             FROM Staff s
             LEFT JOIN People p ON s.peopleDenbighID = p.denbighID
         ";
