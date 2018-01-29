@@ -1,0 +1,91 @@
+<div class="row">
+	<div class="small-12 island">
+		<h2 class="subheader">People <!-- BEGIN count -->({USER_DISP_COUNT} / {USER_COUNT})<!-- END count --></h2>
+		<section>
+			<ul class="action-list">
+			    <!-- BEGIN user -->
+				<li class="actions-small-1">
+					<div class="list-item">
+						<div class="card small-12">
+							<a href='/search/user/{USER_SEARCH_ID}'>
+								<img src="/portrait.php?userId={USER_SEARCH_SYNERGY_ID}&size=square64" />
+								<h3>{USER_SEARCH_NAME}</h3>
+							</a>
+							<!-- BEGIN position_title -->
+							<p class="meta">{USER_POSITION_TITLE}</p>
+							<!-- END position_title -->
+							<!-- BEGIN normal_title -->
+							<p class="meta">{USER_SEARCH_YEAR} {USER_SEARCH_CAMPUS} {USER_SEARCH_GROUP}</p>
+							<!-- END normal_title -->
+						</div>
+					</div>
+					<nav>
+						<a href="#" data-dropdown="overflowUser-{CURRENT_TAB}-{USER_SEARCH_ID}" class="no-text icon-more" title="Actions"></a>
+					</nav>
+					<!-- Dropdown -->
+					<ul class="f-dropdown" data-dropdown-content="" id="overflowUser-{CURRENT_TAB}-{USER_SEARCH_ID}">
+
+						<!-- BEGIN modify -->
+							<li><a href="/adminv2/user/{USER_SEARCH_ID}/modify" class="icon-modify" title="Modify User">Modify</a></li>
+
+							<!-- BEGIN modify_enabled -->
+								<li><a href="/user/switch/{USER_SEARCH_ID}" class="icon-staff-students" title="Log in as user">Impersonate</a></li>
+							<!-- END modify_enabled -->
+
+							<!-- BEGIN modify_disabled -->
+							<li><a class="icon-staff-students menu_disabled" title="Account disabled">Impersonate</a></li>
+							<!-- END modify_disabled -->
+
+						<!-- END modify -->
+
+						<!-- BEGIN boarder_leave -->
+						<li><a href="/modules/leave/student/{USER_SEARCH_ID}" class="icon-boarder-leave">Boarding Leave</a></li>
+						<!-- END boarder_leave -->
+
+						<!-- BEGIN timetable -->
+						<li><a href="/timetable/{USER_SEARCH_ID}" class="icon-timetable">Timetable</a></li>
+						<!-- END timetable -->
+
+						<!-- BEGIN pastoral -->
+						<li><a href="/pastoral/student/{USER_SEARCH_ID}" class="icon-pastoral">{TPL_LOCAL_PASTORALCARE_PC}</a></li>
+						<!-- END pastoral -->
+
+						<!-- BEGIN user_calendar -->
+						<li><a href='/calendar/full/{USER_CALENDAR_CURRENTDATE}/{USER_SEARCH_ID}' class="icon-calendar">{TPL_LOCAL_CALENDAR_PC}</a></li>
+						<!-- END user_calendar -->
+
+						<!-- BEGIN eportfolio -->
+						<li><a href="/eportfolio/{USER_SEARCH_ID}/profile" class="icon-eportfolio">ePortfolio</a></li>
+						<!-- END eportfolio -->
+
+						<!-- BEGIN grades_button -->
+						<!-- END grades_button -->
+
+						<!-- BEGIN due_work -->
+						<!-- END due_work -->
+
+						<!-- BEGIN academic_reports -->
+						<li><a href="/user/profile/documents/reports/{USER_SEARCH_ID}" class="icon-document">Academic Reports</a></li>
+						<!-- END academic_reports -->
+					</ul>
+
+				</li>
+			    <!-- END user -->
+			</ul>
+
+            <!-- BEGIN see_more -->
+			<div class="component-action">
+				<section>
+                	<a id="user-more" data-more="user" class="button" href="#">See all {MORE_COUNT} results for people</a>
+				</section>
+            </div>
+            <!-- END see_more -->
+		</section>
+	</div>
+	<ul class="pagination" data-search-pagination>
+		<!-- BEGIN pagination -->
+		<li class="{PAGE_CLASS}"><a href="#" data-page="{PAGE_NUMBER}">{PAGE_NAME}</a></li>
+		<!-- END pagination -->
+	</ul>
+</div>
+
