@@ -447,7 +447,8 @@ class Healthcheck
             'studcommrules',
             'eventcalendar',
             'eventcatdefs',
-            'eventtype'
+            'eventtype',
+            'tchcampus'
         ];
 
         $tables = array_merge($tables, $this->customUPSTest());
