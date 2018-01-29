@@ -219,13 +219,21 @@ class Bootstrap extends AbstractBootstrap {
         // Ghetto CSRF middleware. Reject request if:
         // * It's not a GET or HEAD request
         // ** Disregard X-Http-Method-Override, as that can be set by client
-        // * It's not a deliberately allowed request (only known example: /saml/consume.php)
+        // * It's not a deliberately allowed request, API endpoint or vhost
         // ** In general: any request that authenticates via token instead of
         //    via session should be allowed
         // * Its headers don't match
         // Accept request if it somehow doesn't have a REQUEST_METHOD at all;
         // AFAIK this isn't fakeable, and this gets called by some CLI scripts
         // despite it being the WebRequest bootstrap. (Go figure.)
+
+        $scriptWhitelist = [ '*/dav/index.php' ];
+        foreach ($scriptWhitelist as $path) {
+            if (fnmatch($path, $_SERVER['SCRIPT_FILENAME'])) {
+                return;
+            }
+        }
+
         if (isset($_SERVER['REQUEST_METHOD']) && !\in_array($_SERVER['REQUEST_METHOD'], ['GET', 'HEAD'], true)) {
 
             // Check against whitelist first
