@@ -12,7 +12,7 @@ use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Timetable\Event;
-
+use Schoolbox\User;
 
 class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api_EventType_Abstract
 {
@@ -20,30 +20,22 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
     /**
      * @var External_Timetable
      */
-    protected $externalTimetable;
+    private $externalTimetable;
 
     /**
      * @var EventTypeMapper
      */
-    protected $eventTypeMapper;
+    private $eventTypeMapper;
+
 
     /**
-     * @var Calendar_Api_Config_Mapper
+     * @inheritdoc
      */
-    protected $configMapper;
-
-    /**
-     * Constructor
-     *
-     * @param \Schoolbox\User $user
-     * @param                 $config
-     */
-    public function __construct(\Schoolbox\User $user, $config)
+    public function __construct(int $connectorId, User $user)
     {
-        $this->setUser($user);
-        $this->setExternalTimetable(new External_Timetable());
-        $this->setEventTypeMapper(EventTypeMapper::getInstance());
-        $this->setConfigMapper(Calendar_Api_Config_Mapper::getInstance());
+        parent::__construct($connectorId, $user);
+        $this->externalTimetable = new External_Timetable();
+        $this->eventTypeMapper   = EventTypeMapper::getInstance();
     }
 
     /**
@@ -72,7 +64,7 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
         $eventColor = null;
         try {
             /** @var EventType $eventTypeObject */
-            $eventTypeObject = $this->getEventTypeMapper()->findById($eventType);
+            $eventTypeObject = $this->eventTypeMapper->findById($eventType);
             $eventColor      = $eventTypeObject->getColor();
         } catch (\Schoolbox\Mapper\Exception $e) {
             // noop
@@ -104,11 +96,11 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
 
                     $campusId  = $campus->getId();
                     $campusName = $campus->getName();
-                    $dayNumber = $this->getExternalTimetable()->getDayNumber($campus, $currentTimestamp);
+                    $dayNumber = $this->externalTimetable->getDayNumber($campus, $currentTimestamp);
                     if ($dayNumber <= 0) {
                         continue;
                     }
-                    $dayName = $this->getExternalTimetable()->getDayName($dayNumber);
+                    $dayName = $this->externalTimetable->getDayName($dayNumber);
 
                     $event = new Event();
                     $event->setAllday(true);
@@ -150,59 +142,5 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
         // Blah
         $stack = new Collection();
         return $stack;
-    }
-
-    /**
-     * @param  External_Timetable $externalTimetable
-     * @return $this
-     */
-    public function setExternalTimetable($externalTimetable)
-    {
-        $this->externalTimetable = $externalTimetable;
-        return $this;
-    }
-
-    /**
-     * @return External_Timetable
-     */
-    public function getExternalTimetable()
-    {
-        return $this->externalTimetable;
-    }
-
-    /**
-     * @param  EventTypeMapper $eventTypeMapper
-     * @return $this
-     */
-    public function setEventTypeMapper($eventTypeMapper)
-    {
-        $this->eventTypeMapper = $eventTypeMapper;
-        return $this;
-    }
-
-    /**
-     * @return EventTypeMapper
-     */
-    public function getEventTypeMapper()
-    {
-        return $this->eventTypeMapper;
-    }
-
-    /**
-     * @param  Calendar_Api_Config_Mapper $configMapper
-     * @return $this
-     */
-    public function setConfigMapper($configMapper)
-    {
-        $this->configMapper = $configMapper;
-        return $this;
-    }
-
-    /**
-     * @return Calendar_Api_Config_Mapper
-     */
-    public function getConfigMapper()
-    {
-        return $this->configMapper;
     }
 }

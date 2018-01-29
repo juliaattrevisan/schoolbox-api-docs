@@ -22,7 +22,7 @@ class Urgent extends Base {
 	 * @return $this|mixed
 	 */
 	public function determine() {
-		$difference = $this->getEvent()->getStartDateTime()->getUnixTimestamp() - $_SERVER['REQUEST_TIME'];
+		$difference = $this->getEvent()->getStartDateTime()->getUnixTimeStamp() - $_SERVER['REQUEST_TIME'];
 
 		/* Find out what the event's next status should be
 		 */

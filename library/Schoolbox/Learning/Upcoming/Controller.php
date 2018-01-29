@@ -126,12 +126,16 @@ class Controller extends Base
         );
     }
 
+
     /**
      * Displays upcoming work for the given user.
      *
      * @api   GET /learning/due/:studentId{/:date}
      * @param User                $student
-     * @param Alaress_Date_Format $date    The date to show on the work calendar.
+     * @param Alaress_Date_Format $date The date to show on the work calendar.
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function getUpcomingForStudent(User $student, Alaress_Date_Format $date)
     {
@@ -142,7 +146,7 @@ class Controller extends Base
 
         // Student's work
         $allWork = $this->assessmentDataSource
-            ->findAllByStudent($student, $term)
+            ->findAllByStudent($student, true, $term)
             ->sortByCallback(new DueDateSortStrategy($student));
 
         // A little different for JSON requests

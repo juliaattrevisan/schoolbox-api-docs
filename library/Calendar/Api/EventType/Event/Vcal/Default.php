@@ -10,7 +10,7 @@
  */
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Day\Event;
-
+use Schoolbox\User;
 
 class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_Abstract
 {
@@ -21,21 +21,16 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
      *
      * @var array
      */
-    private $allLuEventTypes = array();
+    private $allLuEventTypes;
+
 
     /**
-     * Constructor
-     *
-     * @param \Schoolbox\User $user
-     * @param                 $config
+     * @inheritdoc
      */
-    public function __construct(\Schoolbox\User $user, $config)
+    public function __construct(int $connectorId, User $user)
     {
-        $this->setUser($user);
-
-        $eventHandler = new Calendar();
-
-        $this->setAllLuEventTypes($eventHandler->getTypeList());
+        parent::__construct($connectorId, $user);
+        $this->allLuEventTypes = (new Calendar())->getTypeList();
     }
 
     /**
@@ -47,7 +42,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
      */
     private function findLuEventType($id)
     {
-        foreach ($this->getAllLuEventTypes() as $currentLuEventType) {
+        foreach ($this->allLuEventTypes as $currentLuEventType) {
             if ($currentLuEventType['eventTypeID'] == $id) {
                 return $currentLuEventType;
             }
@@ -291,7 +286,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
         $categoryList = array_filter($categoryList, 'strlen');
         $metaDetails  = null;
         foreach ($categoryList as $categoryName) {
-            foreach ($this->getAllLuEventTypes() as $eventType) {
+            foreach ($this->allLuEventTypes as $eventType) {
                 if (strtoupper($eventType['eventType']) === $categoryName) {
                     $metaDetails = $eventType;
                     break;
@@ -337,28 +332,5 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
         $event->setConnectorId($this->getConnectorId());
 
         return $event;
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set allLuEventTypes
-     *
-     * @param array $allLuEventTypes
-     */
-    private function setAllLuEventTypes($allLuEventTypes)
-    {
-        $this->allLuEventTypes = $allLuEventTypes;
-    }
-
-    /**
-     * Get allLuEventTypes
-     *
-     * @return array
-     */
-    private function getAllLuEventTypes()
-    {
-        return $this->allLuEventTypes;
     }
 }

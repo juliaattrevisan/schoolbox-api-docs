@@ -263,8 +263,8 @@ $kernel->run(function ($di, $loop, $log, $opts) {
 
         $submissionBoxList = $submissionMapper->getDueActivities(
             [$folder->getId()],
-            $startTime->getUnixTimestamp(),
-            $endTime->getUnixTimestamp()
+            $startTime->getUnixTimeStamp(),
+            $endTime->getUnixTimeStamp()
         );
 
         // Check if we found anything
@@ -373,8 +373,8 @@ $kernel->run(function ($di, $loop, $log, $opts) {
 
         $quizList = $onlineAssessmentMapper->getDueActivities(
             [$folder->getId()],
-            $startTime->getUnixTimestamp(),
-            $endTime->getUnixTimestamp()
+            $startTime->getUnixTimeStamp(),
+            $endTime->getUnixTimeStamp()
         );
 
         if ($quizList->count() == 0) {

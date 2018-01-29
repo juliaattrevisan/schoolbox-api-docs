@@ -7,6 +7,7 @@
 namespace Schoolbox\Learning\Assessment\DataModel;
 
 use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Predicate\SqlFunc\Coalesce;
 use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -241,7 +242,7 @@ class MapperProxy
         try {
             // Get all assessables which have this assessment as a spec
             $options['spec_assessment_id'] = $assessmentId;
-            $builder = $this->convertOptionsToPredicateBuilder($options);
+            $builder = $this->convertOptionsToPredicateBuilder($options, false);
             return $this->loadParticipantsIntoAssessmentCollection(
                 $this->translateToDomainModelCollection(
                     $this->baseMapper->findByPredicates($builder, $options)
@@ -296,7 +297,7 @@ class MapperProxy
     public function findAllByUnitSpecificationId($unitSpecId, array $options = [])
     {
         try {
-            $builder = $this->convertOptionsToPredicateBuilder($options)
+            $builder = $this->convertOptionsToPredicateBuilder($options, false)
                             ->equals('us.id', $unitSpecId);
             return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
         } catch (UnderflowException $e) {
@@ -316,7 +317,7 @@ class MapperProxy
     public function findAllByUnitImplementationIds(array $unitImplIds, array $options = [])
     {
         try {
-            $builder = $this->convertOptionsToPredicateBuilder($options)
+            $builder = $this->convertOptionsToPredicateBuilder($options, false)
                             ->in('ui.id', $unitImplIds);
             return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
         } catch (UnderflowException $e) {
@@ -342,30 +343,6 @@ class MapperProxy
         );
     }
 
-    /**
-     * Finds all assessables for a folder.
-     *
-     * This now defaults to finding assessables that are within a course
-     * implementation of the given folder.
-     * This is more likely to be the expected behavior of this method.
-     *
-     * This method does not currently load participants or the rubric grid.
-     *
-     * @param int|int[] $folderId A folder or list of folders
-     * @param array     $options
-     * @return Collection|IAssessable[]
-     */
-    public function findAllByFolderId($folderId, array $options = [])
-    {
-        return $this->translateToDomainModelCollection(
-            $this->baseMapper->findAllForFolderId(
-                $folderId,
-                $this->convertOptionsToPredicateBuilder($options),
-                [],
-                $options
-            )
-        );
-    }
 
     /**
      * Finds all assessables for a folder for review.
@@ -379,17 +356,24 @@ class MapperProxy
      */
     public function findAllByFolderIdForReview($folderId, User $student = null, array $options = [])
     {
-        return $this->loadParticipantsIntoAssessmentCollection(
-            $this->translateToDomainModelCollection(
-                $this->baseMapper->findAllForFolderId(
-                    $folderId,
-                    $this->convertOptionsToPredicateBuilder($options),
-                    [],
-                    $options
-                )
-            ),
-            $student
-        );
+        if ($student instanceof User) {
+            $assessments = $this->baseMapper->findForFolderAndParticipant(
+                [$folderId],
+                $student,
+                $this->convertOptionsToPredicateBuilder($options, true),
+                [],
+                $options
+            );
+        } else {
+            $assessments = $this->baseMapper->findAllForFolderId(
+                $folderId,
+                $this->convertOptionsToPredicateBuilder($options, false),
+                [],
+                $options
+            );
+        }
+
+        return $this->loadParticipantsIntoAssessmentCollection($this->translateToDomainModelCollection($assessments), $student);
     }
 
     /**
@@ -405,7 +389,7 @@ class MapperProxy
     public function findAllByFolderIdExclusively(int $folderId, array $options = [])
     {
         try {
-            $builder = $this->convertOptionsToPredicateBuilder($options)
+            $builder = $this->convertOptionsToPredicateBuilder($options, false)
                             ->equals('f.id', $folderId);
             return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
         } catch (UnderflowException $e) {
@@ -430,7 +414,7 @@ class MapperProxy
     {
         try {
             // uicf.id = Unit Implementation Course Folder ID
-            $builder = $this->convertOptionsToPredicateBuilder($options)
+            $builder = $this->convertOptionsToPredicateBuilder($options, false)
                             ->equals('uicf.id', $folderId);
             return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
         } catch (UnderflowException $e) {
@@ -451,7 +435,7 @@ class MapperProxy
     public function findAllByProjectId($projectId, array $options = [])
     {
         try {
-            $builder = $this->convertOptionsToPredicateBuilder($options)
+            $builder = $this->convertOptionsToPredicateBuilder($options, false)
                             ->equals('pa.assessment_id', $projectId);
             return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
         } catch (UnderflowException $e) {
@@ -474,36 +458,50 @@ class MapperProxy
         return $this->loadParticipantsIntoAssessmentCollection($assessments, $student);
     }
 
+
     /**
      * Finds all assessables that this student is participating in.
      *
      * This method loads participation for $student only, and does not load the
      * rubric grid.
      *
+     * Even when interested in a specific student, we may or may not be interested in filtering by the
+     * assessment dates or the student's custom plan dates. It depends on the purpose:
+     * - Aggregation across a time period (eg grades for a term): use assessment dates, regardless of custom plan dates
+     * - Display of assessments (eg a list or calendar table): use custom plan dates if possible
+     *
      * @param User  $student
-     * @param Term  $term    Restrict results to this term
+     * @param bool  $usePlanDates Filter by custom plan dates instead of assessment dates?
+     * @param Term  $term Restrict results to this term
      * @param array $options
      * @return Collection|IAssessable[]
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function findAllByStudent(User $student, Term $term, $options = [])
+    public function findAllByStudent(User $student, bool $usePlanDates, Term $term, array $options = [])
     {
-        return $this->findAllByStudentBetweenDates($student, $term->getStart(), $term->getActualFinish(), $options);
+        return $this->findAllByStudentBetweenDates($student, $usePlanDates, $term->getStart(), $term->getActualFinish(), $options);
     }
+
 
     /**
      * Finds all assessables that this student is participating in, between the given dates.
      *
      * @param User                $student
-     * @param Alaress_Date_Format $from    If provided, fetch only assessables due on or after this date
-     * @param Alaress_Date_Format $to      If provided, fetch only assessables due on or before this date
-     * @param array               $options Any other query options
+     * @param bool                $usePlanDates Should we filter by assessment dates or plan dates?
+     * @param Alaress_Date_Format $from         If provided, fetch only assessables due on or after this date
+     * @param Alaress_Date_Format $to           If provided, fetch only assessables due on or before this date
+     * @param array               $options      Any other query options
      * @return Collection|IAssessable[]
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function findAllByStudentBetweenDates(
         User $student,
+        bool $usePlanDates,
         Alaress_Date_Format $from = null,
         Alaress_Date_Format $to = null,
-        $options = []
+        array $options = []
     ) {
         /** @var FolderMapper $folderMapper */
         $folderMapper = $this->baseMapper->getJoinMapper('assessment_folder');
@@ -515,28 +513,37 @@ class MapperProxy
             $student->getRole()->isStudent(),
             UserAccess::ACCESS_READ,
             true
-        )->getColumnValues('id');
+        )->getPropertyValues('id');
 
         // Build a list of parameters to pass to findAllForFolderId
         $options['due_after']  = $from;
         $options['due_before'] = $to;
-        $builder = $this->convertOptionsToPredicateBuilder($options);
+        $builder = $this->convertOptionsToPredicateBuilder($options, $usePlanDates);
 
         // Find assessments which this student is no longer in the class for,
         // but has created a response or feedback for.
-        $uniqueAssessmentIds = $this->baseMapper->findUniqueAssessmentIdsForStudentBetweenDates($student, $from, $to);
+        $uniqueAssessmentIds = $this->baseMapper->findAssessmentsWithInteractions($student, $usePlanDates, $from, $to);
 
-        return $this->loadParticipantsIntoAssessmentCollection(
-            $this->translateToDomainModelCollection(
-                $this->baseMapper->findAllForFolderId(
-                    $classFolderIds,
-                    $builder,
-                    $uniqueAssessmentIds
-                )
-            ),
-            $student
-        );
+        if ($usePlanDates) {
+            $assessments = $this->baseMapper->findForFolderAndParticipant(
+                $classFolderIds,
+                $student,
+                $builder,
+                $uniqueAssessmentIds,
+                $options
+            );
+        } else {
+            $assessments = $this->baseMapper->findAllForFolderId(
+                $classFolderIds,
+                $builder,
+                $uniqueAssessmentIds,
+                $options
+            );
+        }
+
+        return $this->loadParticipantsIntoAssessmentCollection($this->translateToDomainModelCollection($assessments), $student);
     }
+
 
     /**
      * Finds all assessables for this student that overlap a window.
@@ -546,11 +553,13 @@ class MapperProxy
      * fetches all assessments whose publish to end date span overlaps the window.
      *
      * @param User                $student
+     * @param bool                $usePlanDates Filter by plan dates instead of assessment dates
      * @param Alaress_Date_Format $from
      * @param Alaress_Date_Format $to
      * @return Collection|IAssessable[]
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function findAllByStudentWithinWindow(User $student, Alaress_Date_Format $from, Alaress_Date_Format $to)
+    public function findAllByStudentWithinWindow(User $student, bool $usePlanDates, Alaress_Date_Format $from, Alaress_Date_Format $to)
     {
         /** @var FolderMapper $folderMapper */
         $folderMapper = $this->baseMapper->getJoinMapper('assessment_folder');
@@ -562,25 +571,31 @@ class MapperProxy
             $student->getRole()->isStudent(),
             UserAccess::ACCESS_READ,
             true
-        )->getColumnValues('id');
+        )->getPropertyValues('id');
 
         // Build a list of parameters to pass to findAllForFolderId
-        $builder = $this->convertOptionsToPredicateBuilder(['window_open' => $from, 'window_close' => $to]);
+        $builder = $this->convertOptionsToPredicateBuilder(['window_open' => $from, 'window_close' => $to], $usePlanDates);
 
         // Find assessments which this student is no longer in the class for,
         // but has created a response or feedback for.
-        $uniqueAssessmentIds = $this->baseMapper->findUniqueAssessmentIdsForStudentBetweenDates($student, $from, $to);
+        $uniqueAssessmentIds = $this->baseMapper->findAssessmentsWithInteractions($student, $usePlanDates, $from, $to);
 
-        return $this->loadParticipantsIntoAssessmentCollection(
-            $this->translateToDomainModelCollection(
-                $this->baseMapper->findAllForFolderId(
-                    $classFolderIds,
-                    $builder,
-                    $uniqueAssessmentIds
-                )
-            ),
-            $student
-        );
+        if ($usePlanDates) {
+            $assessments = $this->baseMapper->findForFolderAndParticipant(
+                $classFolderIds,
+                $student,
+                $builder,
+                $uniqueAssessmentIds
+            );
+        } else {
+            $assessments = $this->baseMapper->findAllForFolderId(
+                $classFolderIds,
+                $builder,
+                $uniqueAssessmentIds
+            );
+        }
+
+        return $this->loadParticipantsIntoAssessmentCollection($this->translateToDomainModelCollection($assessments), $student);
     }
 
     /**
@@ -606,7 +621,7 @@ class MapperProxy
         )->getColumnValues('id');
 
         // Build a list of parameters to pass to findAllForFolderId
-        $predicate = $this->convertOptionsToPredicateBuilder(['term' => $term,]);
+        $predicate = $this->convertOptionsToPredicateBuilder(['term' => $term,], false);
 
         return $this->translateToDomainModelCollection(
             $this->baseMapper->findAllForFolderId($classFolderIds, $predicate)
@@ -762,7 +777,6 @@ class MapperProxy
      *
      * @param Collection|Model[] $dataModels
      * @return Collection|IAssessable[]
-     * @throws \UnexpectedValueException If assessment's data is broken in database
      */
     public function translateToDomainModelCollection(Collection $dataModels)
     {
@@ -833,6 +847,7 @@ class MapperProxy
         }
     }
 
+
     /**
      * Helper function for converting a list of options into a predicate builder.
      *
@@ -844,10 +859,12 @@ class MapperProxy
      *   (see AssessmentType::TYPE_* constants)
      *
      * @param array $options
+     * @param bool  $usePlanDates Filter by plan dates instead of assessment dates
      * @return Builder
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \InvalidArgumentException
      */
-    protected function convertOptionsToPredicateBuilder($options)
+    protected function convertOptionsToPredicateBuilder(array $options, bool $usePlanDates): Builder
     {
         $builder = $this->baseMapper->getPredicateBuilder();
         // Term filter (overrides due before/after)
@@ -857,31 +874,35 @@ class MapperProxy
             $options['due_before'] = $term->getActualFinish();
         }
 
-        /* It is not a valid query to filter from/to both a due and close date.
-         * Typically when considering spans of time we are interested in the due date (learning analytics, markbook etc)
-         * Typically when considering points in time (usually now) we are interested in close date (eg current visible DueWork)
-         */
-        if(array_key_exists('due_before', $options) && array_key_exists('close_before', $options) ){
-            throw new \InvalidArgumentException('Cannot filter to before both due and close dates.');
+        $aTable = $this->baseMapper->getTable();
+
+        // Are we interested in the custom plan dates, or the assessment dates?
+        if($usePlanDates){
+            $publishDateColumn = new Coalesce(['participant_plan.publish_date', "$aTable.publish_date"]);
+            $dueDateColumn     = new Coalesce(['participant_plan.due_date', "$aTable.due_date"]);
+            $closeDateColumn   = new Coalesce(['participant_plan.close_date', "$aTable.close_date"]);
+        } else {
+            $publishDateColumn = "$aTable.publish_date";
+            $dueDateColumn     = "$aTable.due_date";
+            $closeDateColumn   = "$aTable.close_date";
         }
-        if(array_key_exists('due_after', $options) && array_key_exists('closed_after', $options) ){
-            throw new \InvalidArgumentException('Cannot filter to after both due and close dates.');
-        }
+
+
         // Due before / after filter (an ADF)
         if ($options['due_after'] instanceof \Alaress_Date_Format && !$options['due_after']->isNull()) {
-            $builder->notLessThan('due_date', $options['due_after']->getDatabase());
+            $builder->notLessThan($dueDateColumn, $options['due_after']->getDatabase());
         }
         if ($options['due_before'] instanceof \Alaress_Date_Format && !$options['due_before']->isNull()) {
-            $builder->notGreaterThan('due_date', $options['due_before']->getDatabase());
+            $builder->notGreaterThan($dueDateColumn, $options['due_before']->getDatabase());
         }
 
         // Close before / after filter (an ADF)
         if ($options['closed_after'] instanceof \Alaress_Date_Format && !$options['closed_after']->isNull()) {
-            $builder->notLessThan('close_date', $options['closed_after']->getDatabase());
+            $builder->notLessThan($closeDateColumn, $options['closed_after']->getDatabase());
         }
 
         if ($options['close_before'] instanceof \Alaress_Date_Format && !$options['close_before']->isNull()) {
-            $builder->notGreaterThan('close_date', $options['close_before']->getDatabase());
+            $builder->notGreaterThan($closeDateColumn, $options['close_before']->getDatabase());
         }
 
         // Window before / after filter (an ADF)
@@ -893,8 +914,8 @@ class MapperProxy
             // NOT (assess.end < window.open OR assess.start >= window.close)
             $builder->notAny(
                 $this->baseMapper->getPredicateBuilder()
-                    ->lessThan('due_date', $options['window_open'])
-                    ->notLessThan('publish_date', $options['window_close'])
+                    ->lessThan($dueDateColumn, $options['window_open'])
+                    ->notLessThan($publishDateColumn, $options['window_close'])
             );
         }
 

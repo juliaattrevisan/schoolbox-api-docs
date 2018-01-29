@@ -186,8 +186,8 @@ class Controller extends Base {
         // put the results into a renderer
         $calendar = new Renderer(
             $source,
-            $this->getRequest()->query->get('start'),
-            $this->getRequest()->query->get('end'),
+            (int)$this->getRequest()->query->get('start'),
+            (int)$this->getRequest()->query->get('end'),
             $this->getUser(),
             $this->getDi()->get('sitePage'),
             $this->getUser()

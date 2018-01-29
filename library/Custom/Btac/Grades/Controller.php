@@ -22,13 +22,14 @@ class Controller extends \Schoolbox\Learning\Grades\Controller
      * @param User       $viewee
      * @param Term\Model $term
      * @throws ServiceNotFound If unable to find mail handler service
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function getGrades(User $viewee, Term\Model $term)
     {
         if (!$term) {
             $term = $this->getTermMapper()->findForToday();
         }
-        $assessments = $this->getAssessmentMapperProxy()->findAllByStudent($viewee, $term);
+        $assessments  = $this->getAssessmentMapperProxy()->findAllByStudent($viewee, false, $term);
 
         $year = null;
         $this->getCustomGrades($viewee, $assessments, $year, $term);
@@ -41,12 +42,13 @@ class Controller extends \Schoolbox\Learning\Grades\Controller
      * @param User $viewee
      * @param int  $year
      * @throws ServiceNotFound If unable to find mail handler service
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function getCustomGradesYear(User $viewee, $year)
     {
         $from        = new \Alaress_Date_Format("{$year}-01-01 00:00:00", \Alaress_Date_Format::DATABASE_FORMAT);
         $to          = new \Alaress_Date_Format("{$year}-12-31 23:59:59", \Alaress_Date_Format::DATABASE_FORMAT);
-        $assessments = $this->getAssessmentMapperProxy()->findAllByStudentBetweenDates($viewee, $from, $to);
+        $assessments = $this->getAssessmentMapperProxy()->findAllByStudentBetweenDates($viewee, false, $from, $to);
 
         //If we are looking at the year, no term is specified.
         //Specify term 1 of that year in this case

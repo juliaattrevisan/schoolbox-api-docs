@@ -248,7 +248,7 @@ class Notifier extends AbstractModuleNotifier
             ->setSeverity(Logger::INFO)
             ->setNamespace($this->getSlug())
             ->addTopic("{$this->getSlug()}.{$post->getId()}.$trigger")
-            ->setTimestamp((int)$post->getCreatedAt()->getUnixTimeStamp())
+            ->setTimestamp($post->getCreatedAt()->getUnixTimeStamp())
             ->setBody($post->getBody());
         return $bob;
     }

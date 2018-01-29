@@ -184,7 +184,7 @@ interface EventInterface
      * Get renderer class
      *
      * @param string $type
-     * @throws \Exception
+     * @throws \Exception If unable to find a rendering class for the specified type
      * @return string
      */
     public function getRendererClass($type);

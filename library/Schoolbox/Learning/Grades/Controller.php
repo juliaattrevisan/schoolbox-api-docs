@@ -155,8 +155,8 @@ class Controller extends Base
         }
 
         // Get all assessments for this user in the specified term, grouped by folder
-        $assessmentsPerFolder = $this->getAssessmentMapperProxy()
-                                     ->findAllByStudent($viewee, $term)
+        $assessmentsPerFolder = $this->assessmentMapperProxy
+                                     ->findAllByStudent($viewee, false, $term)
                                      ->groupByCallback(function (IAssessable $assessment) {
                                          return $assessment->getBaseContext()->getFolder()->getId();
                                      });

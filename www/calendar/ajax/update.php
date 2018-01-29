@@ -91,7 +91,8 @@ if (isset($_POST['title']) && isset($_POST['detail'])) {
 // Get event back out of the connector, so I know the rendering is consistent
 $owner = UserMapper::getInstance()->createModel()->setId($event['owner']);
 if ($eventId = $calendarHandler->update($updatedEvent)) {
-    $connector = new Calendar_Api_EventType_Event_Schoolbox_Default($owner, null);
+    $calendarConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_Event_Schoolbox_Default::class);
+    $connector      = new Calendar_Api_EventType_Event_Schoolbox_Default($calendarConfig->getId(), $owner);
 
     foreach ($connector->getEvent($eventId) as $calendarEvent) {
         // Only one event should ever be gotten here, so render that one only

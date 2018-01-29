@@ -1,9 +1,4 @@
 <?php
-
-use Schoolbox\Collection;
-use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Mapper\Exception as MapperException;
-
 /**
  * Calendar_Api_Config_Mapper
  *
@@ -13,6 +8,14 @@ use Schoolbox\Mapper\Exception as MapperException;
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
+ */
+
+use Schoolbox\Collection;
+use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+
+/**
+ * @method Calendar_Api_Config_Record findOneByColumnList($columnList, $order = [], $options = [])
  */
 class Calendar_Api_Config_Mapper extends BaseMapper
 {
@@ -37,11 +40,28 @@ class Calendar_Api_Config_Mapper extends BaseMapper
      * Un-uniqueified because this was ramming all vCal sources into the same
      * connector, and they should be unique (for filtering by source).
      *
-     * @return Collection
+     * @return Collection|Calendar_Api_Config_Record[]
      */
     public function getAllConfigRecords()
     {
         return $this->findByColumn('status', 1);
+    }
+
+
+    /**
+     * Finds the one config model for the specified fully-qualified class name, or throws exception.
+     *
+     * WARNING: This *will* likely throw an exception if you attempt to find the ID of a VCal connector.
+     *          The system may have more than one VCal connector configured.
+     *
+     * @param string $className The fully-qualified class name, eg 'Calendar_Api_EventType_Custom_EOTC_Default'
+     * @return Calendar_Api_Config_Record
+     */
+    public function findOneForClass(string $className): Calendar_Api_Config_Record
+    {
+        // Strip common prefix and explode on '_' char
+        [$eventType, $connectorClass] = explode('_', str_replace('Calendar_Api_EventType_', '', $className));
+        return $this->findOneByColumnList(['event_type' => $eventType, 'connector_class' => $connectorClass]);
     }
 
     /**
@@ -55,7 +75,7 @@ class Calendar_Api_Config_Mapper extends BaseMapper
      */
     public function isSourceEnabled($eventType, $connectorClass)
     {
-        return Calendar_Api_Config_Mapper::getInstance()->countByColumnList([
+        return $this->countByColumnList([
             'event_type'      => $eventType,
             'connector_class' => $connectorClass,
             'status'          => 1

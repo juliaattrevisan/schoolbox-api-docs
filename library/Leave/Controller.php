@@ -547,7 +547,7 @@ class Leave_Controller extends Controller
 
         /* If you're outside the threshold, you can create it
 		 */
-        if ($_SERVER['REQUEST_TIME'] < $thresholdDateTime->getUnixTimestamp()) {
+        if ($_SERVER['REQUEST_TIME'] < $thresholdDateTime->getUnixTimeStamp()) {
             return true;
         }
 

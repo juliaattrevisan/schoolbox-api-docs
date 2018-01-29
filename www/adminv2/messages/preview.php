@@ -164,7 +164,7 @@ switch ($this->arg[0]) {
                 ))
                 ->setBody($article->getBody())
                 ->setByline("{$article->getPostDate()->getDateOnly()} by {$article->getOwner()->formatName()} in {$article->getTopic()->getName()}")
-                ->setTimestamp($article->getPostDate()->getUnixTimestamp())
+                ->setTimestamp($article->getPostDate()->getUnixTimeStamp())
                 ->setNamespace(NSMapper::NS_NEWS)
                 ->build()
             );

@@ -176,10 +176,10 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         // ok, we're clear to attach some triggers now
 
-        $open     = (int)$box->getOpenDate()->getUnixTimeStamp();
-        $closed   = (int)$box->getDueDate()->getUnixTimeStamp();
-        $upcoming = (int)$closed - (self::UPCOMING_WINDOW * 3600);
-        $late     = (int)$box->getLateDate()->getUnixTimeStamp();
+        $open     = $box->getOpenDate()->getUnixTimeStamp();
+        $closed   = $box->getDueDate()->getUnixTimeStamp();
+        $upcoming = $closed - (self::UPCOMING_WINDOW * 3600);
+        $late     = $box->getLateDate()->getUnixTimeStamp();
 
         if ($upcoming < $open) {
             // if the upcoming date is before the open date, push upcoming to 1 minute after open, rounded to the nearest 5 minutes

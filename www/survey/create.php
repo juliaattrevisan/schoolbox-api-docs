@@ -32,7 +32,7 @@ if (!empty($_POST)) {
 
     /* Check that finish time cannot be before start time
      */
-    if ($start->getUnixTimestamp() >= $finish->getUnixTimestamp()) {
+    if ($start->getUnixTimeStamp() >= $finish->getUnixTimeStamp()) {
         error(145);
     }
 

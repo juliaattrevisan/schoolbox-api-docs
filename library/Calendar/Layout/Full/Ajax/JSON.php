@@ -70,8 +70,8 @@ class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Full_Abstract {
 		$endSequence = new Alaress_Date_Format($_GET['end'], 'U');
         $renderer = new Renderer(
 			$this->getApi(),
-			$startSequence->getUnixTimestamp(),
-			$endSequence->getUnixTimestamp(),
+            $startSequence->getUnixTimeStamp(),
+            $endSequence->getUnixTimeStamp(),
 			$this->getUser(),
 			$this->getPage(),
 			$this->getViewer()

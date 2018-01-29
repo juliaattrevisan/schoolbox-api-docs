@@ -11,32 +11,47 @@ use Calendar\Event\Collection;
 use Calendar\Event\Type\Submission\Event;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\User;
 
 class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_EventType_Abstract
 {
     /** @var Calendar */
-    private $calendarHandler = null;
+    private $calendarHandler;
 
-    /**
-     * @var AssessmentDataSource
-     */
-    protected $assessmentDataSource;
+    /** @var AssessmentDataSource */
+    private $assessmentDataSource;
+
+    /** @var Participant\DataSource */
+    private $participantDataSource;
+
+    /** @var Visibility */
+    private $visibility;
+
 
     /**
      * Constructor
      *
-     * @param \Schoolbox\User      $user
-     * @param                      $config
-     * @param AssessmentDataSource $assessmentDataSource
+     * @param int                    $connectorId
+     * @param User                   $user
+     * @param AssessmentDataSource   $assessmentDataSource
+     * @param Participant\DataSource $participantDataSource
+     * @param Visibility             $visibility
      */
-    public function __construct(\Schoolbox\User $user, $config, AssessmentDataSource $assessmentDataSource)
-    {
-        $this->setCalendarHandler(new Calendar());
-        $this->setUser($user);
-        $this->assessmentDataSource = $assessmentDataSource;
+    public function __construct(
+        int $connectorId,
+        User $user,
+        AssessmentDataSource $assessmentDataSource,
+        Participant\DataSource $participantDataSource,
+        Visibility $visibility
+    ) {
+        parent::__construct($connectorId, $user);
+        $this->calendarHandler       = new Calendar();
+        $this->assessmentDataSource  = $assessmentDataSource;
+        $this->participantDataSource = $participantDataSource;
+        $this->visibility            = $visibility;
     }
 
     /**
@@ -46,19 +61,21 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
      * @param  string $eventType
      * @return string
      */
-    protected function getEventColor(Folder $folder, $eventType)
+    protected function getEventColor(Folder $folder, $eventType): string
     {
-        return $this->getCalendarHandler()->displayColour($eventType);
+        return $this->calendarHandler->displayColour($eventType);
     }
+
 
     /**
      * Get day events from this data source
      *
-     * @param $startTimestamp
-     * @param $endTimestamp
-     *
-     * @internal param $currentDay
+     * @param int $startTimestamp
+     * @param int $endTimestamp
      * @return Collection|Submission[]
+     * @throws DomainException
+     * @throws UnexpectedValueException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function getEvents($startTimestamp, $endTimestamp)
     {
@@ -79,21 +96,20 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
         // Get a timeline of events
         // Use the assessment data source to get everything for this user
 
-
         if ($this->getUser()->getRole()->isStudent()) {
-            /** @var Collection|IAssessable[] $assessables */
-            $assessables = $this->assessmentDataSource->findAllByStudent($this->getUser(), $term);
+            $assessables = $this->assessmentDataSource->findAllByStudent($this->getUser(), true, $term);
         } else {
             $assessables = $this->assessmentDataSource->findAllByStaff($this->getUser(), $term);
         }
 
-        $access = Access::getInstance();
-        $visibility = new Visibility($access);
+        // Having a staff role does not guarantee WRITE+ perm to a assessment's folder.
+        // We need to load the current user's participation so users without WRITE+ perm can see the assessment
+        // by virtue of their participation.
+        $this->participantDataSource->loadParticipationIntoAssessmentCollection($assessables, $this->getUser());
 
         foreach ($assessables as $assessment) {
-
             // Permission check to see the assessment
-            if(!$visibility->isVisibleToUser($assessment, $this->getUser(), true)){
+            if (!$this->visibility->isVisibleToUser($assessment, $this->getUser(), true)) {
                 continue;
             }
 
@@ -160,28 +176,5 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
          */
 
         return $collection;
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set calendar handler
-     *
-     * @param Calendar $calendarHandler
-     */
-    public function setCalendarHandler($calendarHandler)
-    {
-        $this->calendarHandler = $calendarHandler;
-    }
-
-    /**
-     * Get calendar handler
-     *
-     * @return Calendar
-     */
-    public function getCalendarHandler()
-    {
-        return $this->calendarHandler;
     }
 }

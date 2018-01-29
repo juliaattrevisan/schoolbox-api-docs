@@ -15,10 +15,13 @@
  * @version     SVN: $Id$
  */
 
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Assessment\Participant;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
-
+use Schoolbox\Config;
+use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Permission\Access\Access;
 
 class Calendar_Api_Factory
 {
@@ -27,25 +30,37 @@ class Calendar_Api_Factory
      *
      * @var array
      */
-    protected $allTypes = array();
+    private $allTypes = [];
 
     /**
      * A data source for assessments.
      *
-     * @var AssessmentDataSource
+     * @var Assessment\MapperProxy
      */
-    protected $assessmentDataSource;
+    private $assessmentDataSource;
+
+    /** @var Participant\DataSource */
+    private $participantDataSource;
+
+    /** @var null|IConnector */
+    private $databaseExternal;
+
 
     /**
      * Constructor
      *
-     * @param AssessmentDataSource $assessmentDataSource
-     * @param  IConnector $databaseExternal
+     * @param Assessment\MapperProxy $assessmentDataSource
+     * @param Participant\DataSource $participantDataSource
+     * @param null|IConnector        $databaseExternal
      */
-    public function __construct(AssessmentDataSource $assessmentDataSource, IConnector $databaseExternal = null)
-    {
-        $this->assessmentDataSource = $assessmentDataSource;
-        $this->databaseExternal = $databaseExternal;
+    public function __construct(
+        Assessment\MapperProxy $assessmentDataSource,
+        Participant\DataSource $participantDataSource,
+        IConnector $databaseExternal = null
+    ) {
+        $this->assessmentDataSource  = $assessmentDataSource;
+        $this->participantDataSource = $participantDataSource;
+        $this->databaseExternal      = $databaseExternal;
 
         $allConfigRecords = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
 
@@ -53,8 +68,6 @@ class Calendar_Api_Factory
          * http://stackoverflow.com/questions/4264270/unserialize-sometimes-returns-false
          */
         foreach ($allConfigRecords as $currentConfig) {
-
-            /** @var Calendar_Api_Config_Record $currentConfig */
             try {
                 $config = $currentConfig->decodeConfig();
 
@@ -63,7 +76,7 @@ class Calendar_Api_Factory
                  */
                 $config->setId($currentConfig->getId());
 
-                $this->addConfig($config);
+                $this->allTypes[] = $config;
 
             } catch (DomainException $e) {
 
@@ -72,17 +85,20 @@ class Calendar_Api_Factory
         }
     }
 
+
     /**
      * Produce an API Composite
      *
      * @param \Schoolbox\User $user
      * @return Calendar_Api_Composite
+     * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      */
     public function produceForUser(\Schoolbox\User $user)
     {
         $compositeApi = new Calendar_Api_Composite();
 
-        foreach ($this->getAllTypes() as $config) {
+        foreach ($this->allTypes as $config) {
             try {
                 $compositeApi->add($this->produceFromConfig($config, $user));
             } catch (DomainException $e) {
@@ -92,14 +108,9 @@ class Calendar_Api_Factory
             // InvalidArgumentException or ReflectionException: NOT caught
         }
 
-        /* Throw error if no APIs were determined and found
-        if (!$compositeApi->getCount()) {
-            throw new Exception('No Calendar APIs found for your implementation.');
-        }
-         */
-
         return $compositeApi;
     }
+
 
     /**
      * Handle unique construction logic for each variant of the calendar connector.
@@ -107,83 +118,69 @@ class Calendar_Api_Factory
      * @param Calendar_Api_Config_Record $config
      * @param \Schoolbox\User            $user
      * @return Calendar_Api_EventType_Abstract
-     * @throws InvalidArgumentException if the item can't be built
-     * @throws ReflectionException could be thrown by the Reflection API
+     * @throws InvalidArgumentException If the item can't be built
+     * @throws UnexpectedValueException If unable to build the external event factory
      */
-    public function produceFromConfig($config, \Schoolbox\User $user)
+    private function produceFromConfig($config, \Schoolbox\User $user): Calendar_Api_EventType_Interface
     {
-        $base    = 'Calendar_Api_EventType_' . $config->getEventType() . '_' . $config->getConnectorClass();
-        $default = $base . '_Default';
-        $unique  = $base . '_' . ucwords(Cfg::get('site_location'));
+        $className   = "Calendar_Api_EventType_{$config->getEventType()}_{$config->getConnectorClass()}_Default";
+        $connectorId = $config->getId();
 
-        switch ($default) {
-            case 'Calendar_Api_EventType_Submission_Schoolbox_Default':
+        switch ($className) {
+            case Calendar_Api_EventType_Custom_EOTC_Default::class:
+                return new Calendar_Api_EventType_Custom_EOTC_Default($connectorId, $user);
+            case Calendar_Api_EventType_Event_External_Default::class:
                 // Same as default constructor, but add the assessment data source
-                $params = [$user, $config, $this->assessmentDataSource,];
-                break;
-
-            case 'Calendar_Api_EventType_Event_External_Default':
-                // Same as default constructor, but add the assessment data source
-                $factory = new ExternalConnectorFactory();
-                $externalEvents = $factory->build(new \Schoolbox\Config\Loader(), $this->databaseExternal, ExternalConnectorFactory::EXTERNAL_EVENTS);
-                $params = [$user, $config, $externalEvents,];
-                break;
-
+                $factory        = new ExternalConnectorFactory();
+                $externalEvents = $factory->build(new Config\Loader(), $this->databaseExternal, ExternalConnectorFactory::EXTERNAL_EVENTS);
+                return new Calendar_Api_EventType_Event_External_Default($connectorId, $user, $externalEvents);
+            case Calendar_Api_EventType_Event_Schoolbox_Campus::class:
+                return new Calendar_Api_EventType_Event_Schoolbox_Campus($connectorId, $user);
+            case Calendar_Api_EventType_Event_Schoolbox_Default::class:
+                return new Calendar_Api_EventType_Event_Schoolbox_Default($connectorId, $user);
+            case Calendar_Api_EventType_Event_Schoolbox_Group::class:
+                return new Calendar_Api_EventType_Event_Schoolbox_Group($connectorId, $user);
+            case Calendar_Api_EventType_Event_Schoolbox_Personal::class:
+                return new Calendar_Api_EventType_Event_Schoolbox_Personal($connectorId, $user);
+            case Calendar_Api_EventType_Event_Schoolbox_Type::class:
+                return new Calendar_Api_EventType_Event_Schoolbox_Type($connectorId, $user);
+            case Calendar_Api_EventType_Event_Vcal_Default::class:
+                return new Calendar_Api_EventType_Event_Vcal_Default($connectorId, $user);
+            case Calendar_Api_EventType_ResourceBooking_Booking_Default::class:
+                return new Calendar_Api_EventType_ResourceBooking_Booking_Default($connectorId, $user);
+            case Calendar_Api_EventType_ResourceBooking_Booking_ForCategory::class:
+                return new Calendar_Api_EventType_ResourceBooking_Booking_ForCategory($connectorId, $user);
+            case Calendar_Api_EventType_ResourceBooking_Booking_ForItem::class:
+                return new Calendar_Api_EventType_ResourceBooking_Booking_ForItem($connectorId, $user);
+            case Calendar_Api_EventType_ResourceBooking_Booking_ForUser::class:
+                return new Calendar_Api_EventType_ResourceBooking_Booking_ForUser($connectorId, $user);
+            case Calendar_Api_EventType_ResourceBooking_Moderation_Default::class:
+                return new Calendar_Api_EventType_ResourceBooking_Moderation_Default($connectorId, $user);
+            case Calendar_Api_EventType_Submission_Schoolbox_Default::class:
+                return new Calendar_Api_EventType_Submission_Schoolbox_Default(
+                    $connectorId,
+                    $user,
+                    $this->assessmentDataSource,
+                    $this->participantDataSource,
+                    new Visibility(Access::getInstance())
+                );
+            case Calendar_Api_EventType_Submission_Schoolbox_ForDueWork::class:
+                return new Calendar_Api_EventType_Submission_Schoolbox_ForDueWork(
+                    $connectorId,
+                    $user,
+                    $this->assessmentDataSource,
+                    $this->participantDataSource,
+                    new Visibility(Access::getInstance()),
+                    new Timetable_ColourManager(Timetable_ColourMapper::getInstance()->findAll())
+                );
+            case Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class:
+                return new Calendar_Api_EventType_Timetable_ExternalConstrained_Default($connectorId, $user);
+            case Calendar_Api_EventType_Timetable_Room::class:
+                return new Calendar_Api_EventType_Timetable_Room($connectorId, $user, new External_Timetable());
+            case Calendar_Api_EventType_TimetableDays_External_Default::class:
+                return new Calendar_Api_EventType_TimetableDays_External_Default($connectorId, $user);
             default:
-                $params = [$user, $config,];
-                break;
+                throw new InvalidArgumentException("Calendar connector not recognised: $className");
         }
-
-        foreach ([$unique, $default] as $className) {
-            if (class_exists($className)) {
-                $class          = new ReflectionClass($className);
-                $implementation = $class->newInstanceArgs($params);
-                break;
-            }
-        }
-
-        if (!(isset($implementation) && $implementation instanceof Calendar_Api_EventType_Abstract)) {
-            throw new InvalidArgumentException('No default or unique implementation found for '.$base);
-        }
-
-        $implementation->setConnectorId($config->getId());
-        return $implementation;
-    }
-
-    /**
-     * Empty list of configs
-     */
-    public function resetConfigs()
-    {
-        $this->allTypes = array();
-
-        return $this;
-    }
-
-    /**
-     * Use only preselected configs
-     *
-     * @param $config
-     *
-     * @return \Calendar_Api_Factory
-     */
-    public function addConfig($config)
-    {
-        $this->allTypes[] = $config;
-
-        return $this;
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Get all types
-     *
-     * @return array
-     */
-    protected function getAllTypes()
-    {
-        return $this->allTypes;
     }
 }

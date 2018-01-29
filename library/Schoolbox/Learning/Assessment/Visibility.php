@@ -14,13 +14,16 @@ namespace Schoolbox\Learning\Assessment;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Alaress_Date_Format;
 
 class Visibility
 {
+
     /**
      * @var Access
      */
     private $access;
+
 
     /**
      * Visibility constructor.
@@ -29,7 +32,7 @@ class Visibility
      */
     public function __construct(Access $access)
     {
-        $this->setAccess($access);
+        $this->access = $access;
     }
 
 
@@ -42,51 +45,35 @@ class Visibility
      * Instructor - is considered any user with WRITE+ perm to folder
      * Learner    - is considered any user with READ perm to folder
      *
-     * @param IAssessable $assessment
-     * @param User        $user
+     * @param IAssessable $assessment Must have plans and participants loaded if viewer is a learner
+     * @param User        $viewer
      * @param bool        $showClosed Should we exclude assessments if their close date has passed?
      * @return bool
      */
-    public function isVisibleToUser(IAssessable $assessment, User $user, $showClosed)
+    public function isVisibleToUser(IAssessable $assessment, User $viewer, bool $showClosed): bool
     {
-        $folderAccessLevel = $this->getAccess()->getFolderAccess($user, $assessment->getBaseContext()->getFolder()->getId());
-
         // Are we hiding assessments past their close date and we are past the close date ?
-        if (!$showClosed && !$assessment->getCloseAt()->isNull() && $assessment->isPastClose()){
-            return false;
+        if (!$showClosed) {
+            // Use the participant's date if the viewing user is a participant
+            $participant = $assessment->getParticipantIfExtant($viewer);
+            $closeDate   = $participant ? $participant->getCloseDate() : $assessment->getCloseAt();
+            if (!$closeDate->isNull() && Alaress_Date_Format::now()->gte($closeDate)) {
+                return false;
+            }
         }
 
-        // Is user an instructor?
+        $folderAccessLevel = $this->access->getFolderAccess($viewer, $assessment->getBaseContext()->getFolder()->getId());
+
+        // Is viewer an instructor?
         if ($folderAccessLevel >= UserAccess::ACCESS_WRITE) {
             return true;
         }
-        // Else is user a learner and assessment is published ?
-        elseif ($folderAccessLevel == UserAccess::ACCESS_READ && $assessment->isPublished()){
-            return true;
+        // Is viewer a learner?
+        if ($folderAccessLevel === UserAccess::ACCESS_READ) {
+            // Is viewer a participant, and assessment is published for them?
+            $participant = $assessment->getParticipantIfExtant($viewer);
+            return $participant && Alaress_Date_Format::now()->gte($participant->getPublishDate());
         }
-
         return false;
-    }
-
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @return Access
-     */
-    private function getAccess()
-    {
-        return $this->access;
-    }
-
-    /**
-     * @param Access $access
-     * @return $this
-     */
-    private function setAccess($access)
-    {
-        $this->access = $access;
-        return $this;
     }
 }

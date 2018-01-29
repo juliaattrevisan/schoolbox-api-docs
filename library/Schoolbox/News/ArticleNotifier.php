@@ -166,7 +166,7 @@ class ArticleNotifier extends AbstractModuleNotifier
             ->setBody($notifBody)
             ->setByline("$shortDate by $authorName in $topicName")
             // timestamp and filters are optional
-            ->setTimestamp($activeDate->getUnixTimestamp())
+            ->setTimestamp($activeDate->getUnixTimeStamp())
             // and then you build
             ->build();
 

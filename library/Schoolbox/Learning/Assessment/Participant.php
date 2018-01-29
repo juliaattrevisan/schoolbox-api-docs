@@ -432,9 +432,9 @@ class Participant
      * If this participant's plan is dynamic, ignore the plan value and fetch
      * from the assessment; otherwise, use the plan value if it's there.
      *
-     * @return Alaress_Date_Format|null
+     * @return Alaress_Date_Format
      */
-    public function getPublishDate(): ?Alaress_Date_Format
+    public function getPublishDate(): Alaress_Date_Format
     {
         if ($this->plan->getIsDynamic()) {
             return $this->plan->getAssessable()->getPublishAt();
@@ -449,9 +449,9 @@ class Participant
      * If this participant's plan is dynamic, ignore the plan value and fetch
      * from the assessment; otherwise, use the plan value if it's there.
      *
-     * @return Alaress_Date_Format|null
+     * @return Alaress_Date_Format
      */
-    public function getOpenDate(): ?Alaress_Date_Format
+    public function getOpenDate(): Alaress_Date_Format
     {
         if ($this->plan->getIsDynamic()) {
             return $this->plan->getAssessable()->getOpenAt();
@@ -466,9 +466,9 @@ class Participant
      * If this participant's plan is dynamic, ignore the plan value and fetch
      * from the assessment; otherwise, use the plan value if it's there.
      *
-     * @return Alaress_Date_Format|null
+     * @return Alaress_Date_Format
      */
-    public function getDueDate(): ?Alaress_Date_Format
+    public function getDueDate(): Alaress_Date_Format
     {
         if ($this->plan->getIsDynamic()) {
             return $this->plan->getAssessable()->getDueAt();
@@ -483,9 +483,9 @@ class Participant
      * If this participant's plan is dynamic, ignore the plan value and fetch
      * from the assessment; otherwise, use the plan value if it's there.
      *
-     * @return Alaress_Date_Format|null
+     * @return Alaress_Date_Format
      */
-    public function getCloseDate(): ?Alaress_Date_Format
+    public function getCloseDate(): Alaress_Date_Format
     {
         if ($this->plan->getIsDynamic()) {
             return $this->plan->getAssessable()->getCloseAt();
@@ -495,15 +495,18 @@ class Participant
 
 
     /**
-     * Returns the first non-null date, or null if both are null.
+     * Returns the first non-null date.
      *
-     * @param Alaress_Date_Format|null $date1
-     * @param Alaress_Date_Format|null $date2
-     * @return Alaress_Date_Format|null
+     * You cannot have participants of assessment specs, so we are guaranteed that the assessment is an implementation,
+     * in which case we are guaranteed the assessment has dates and NPEs should not occur.
+     *
+     * @param Alaress_Date_Format|null $planDate
+     * @param Alaress_Date_Format      $assessmentDate
+     * @return Alaress_Date_Format
      */
-    private function coalesceDates(?Alaress_Date_Format $date1, ?Alaress_Date_Format $date2): ?Alaress_Date_Format
+    private function coalesceDates(?Alaress_Date_Format $planDate, Alaress_Date_Format $assessmentDate): Alaress_Date_Format
     {
-        return null === $date1 || $date1->isNull() ? $date2 : $date1;
+        return null === $planDate || $planDate->isNull() ? $assessmentDate : $planDate;
     }
 
 

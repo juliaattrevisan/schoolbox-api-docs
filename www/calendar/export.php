@@ -13,14 +13,36 @@
 $kernel = require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
 use Alaress\Database\Connector\IConnector;
+use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Calendar\Event\Collection\Exporter;
 use Calendar\Event\Collection\CSVExporter;
 use EOTC\ConfigMapper as EOTCConfigMapper;
+use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\UserMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Mapper\Exception;
+
+
+/**
+ * Returns the config id for the specified calendar connector.
+ *
+ * @param string $className
+ * @return int
+ * @throws UnexpectedValueException If connector is not configured or not configured as active
+ */
+function getConnectorId(string $className)
+{
+    $connectorConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass($className);
+    if (Calendar_Api_Config_Record::ACTIVE !== $connectorConfig->getStatus()) {
+        throw new UnexpectedValueException("Calendar connector is not configured as active: $className");
+    }
+    return $connectorConfig->getId();
+}
 
 try {
     $token = $_GET['token'];
@@ -67,29 +89,36 @@ try {
 
     switch ($export_type) {
         case 'personal':
-            $api = new Calendar_Api_EventType_Event_Schoolbox_Personal($user, []);
+            $api = new Calendar_Api_EventType_Event_Schoolbox_Personal(
+                getConnectorId(Calendar_Api_EventType_Event_Schoolbox_Personal::class),
+                $user
+            );
             $filename = 'personal';
             break;
 
         case 'group':
-            $api = new Calendar_Api_EventType_Event_Schoolbox_Group($user, []);
             $export_id = intval($_GET['group']);
-            if ($export_id > 0) {
-                $api->setGroupId($export_id);
-            } else {
+            if ($export_id <= 0) {
                 throw new SchoolboxException('A group ID must be provided', 400);
             }
+            $api = new Calendar_Api_EventType_Event_Schoolbox_Group(
+                getConnectorId(Calendar_Api_EventType_Event_Schoolbox_Group::class),
+                $user,
+                $export_id
+            );
             $filename = sprintf('group%d', $export_id);
             break;
 
         case 'campus':
-            $api = new Calendar_Api_EventType_Event_Schoolbox_Campus($user, []);
             $export_id = intval($_GET['campus']);
-            if ($export_id > 0) {
-                $api->setCampusId($export_id);
-            } else {
+            if ($export_id <= 0) {
                 throw new SchoolboxException('A campus ID must be provided', 400);
             }
+            $api = new Calendar_Api_EventType_Event_Schoolbox_Campus(
+                getConnectorId(Calendar_Api_EventType_Event_Schoolbox_Campus::class),
+                $user,
+                $export_id
+            );
             $filename = sprintf('campus%d', $export_id);
             break;
 
@@ -98,46 +127,75 @@ try {
             $page = new SitePage(false);
             $page->setDi($kernel->getDependencyInjector());
 
-            /** @var MapperProxy $assessmentDataSource */
-            $assessmentDataSource = $page->getDi()->get('assessmentDataSource');
-            $api = new Calendar_Api_EventType_Submission_Schoolbox_Default($user, [], $assessmentDataSource);
+            /**
+             * @var MapperProxy $assessmentDataSource
+             * @var Participant\DataSource $participantDataSource
+             */
+            $assessmentDataSource  = $page->getDi()->get('assessmentDataSource');
+            $participantDataSource = $page->getDi()->get('participantDataSource');
+            $visibility            = new Visibility(Access::getInstance());
+            $api                   = new Calendar_Api_EventType_Submission_Schoolbox_Default(
+                getConnectorId(Calendar_Api_EventType_Submission_Schoolbox_Default::class),
+                $user,
+                $assessmentDataSource,
+                $participantDataSource,
+                $visibility
+            );
             $filename = 'duework';
             break;
 
         case 'timetable':
-            $api = new Calendar_Api_EventType_Timetable_ExternalConstrained_Default($user, []);
+            $api = new Calendar_Api_EventType_Timetable_ExternalConstrained_Default(
+                getConnectorId(Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class),
+                $user
+            );
             $filename = 'timetable';
             $start = $_SERVER['REQUEST_TIME'];
             $end = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
             break;
 
         case 'timetabledays':
-            $api = new Calendar_Api_EventType_TimetableDays_External_Default($user, []);
+            $api = new Calendar_Api_EventType_TimetableDays_External_Default(
+                getConnectorId(Calendar_Api_EventType_TimetableDays_External_Default::class),
+                $user
+            );
             $filename = 'timetabledays';
             $start = $_SERVER['REQUEST_TIME'];
             $end = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
             break;
 
         case 'resources':
-            $api = new Calendar_Api_EventType_ResourceBooking_Booking_Default($user, []);
+            $api = new Calendar_Api_EventType_ResourceBooking_Booking_Default(
+                getConnectorId(Calendar_Api_EventType_ResourceBooking_Booking_Default::class),
+                $user
+            );
             $filename = 'resources';
             break;
 
         case 'resource':
-            $api = new Calendar_Api_EventType_ResourceBooking_Booking_ForItem($user, []);
-            $api->setResourceId($resourceId);
+            $api = new Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
+                getConnectorId(Calendar_Api_EventType_ResourceBooking_Booking_ForItem::class),
+                $user,
+                $resourceId
+            );
             $filename = sprintf('resource%d', $resourceId);
             break;
 
         case 'resource_category':
-            $api = new Calendar_Api_EventType_ResourceBooking_Booking_ForCategory($user, []);
-            $api->setCategoryId($resourceCategoryId);
+            $api = new Calendar_Api_EventType_ResourceBooking_Booking_ForCategory(
+                getConnectorId(Calendar_Api_EventType_ResourceBooking_Booking_ForCategory::class),
+                $user,
+                $resourceCategoryId
+            );
             $filename = sprintf('resourceCategory%d', $resourceCategoryId);
             break;
 
         case 'event_type':
-            $api = new Calendar_Api_EventType_Event_Schoolbox_Type($user, []);
-            $api->setEventTypeId($eventTypeId);
+            $api = new Calendar_Api_EventType_Event_Schoolbox_Type(
+                getConnectorId(Calendar_Api_EventType_Event_Schoolbox_Type::class),
+                $user,
+                $eventTypeId
+            );
             $filename = sprintf('eventType%d', $eventTypeId);
             break;
 
@@ -146,7 +204,11 @@ try {
             $databaseExternal = $kernel->getDependencyInjector()->get('databaseExternal');
             $factory = new ExternalConnectorFactory();
             $externalEvents = $factory->build(new \Schoolbox\Config\Loader(), $databaseExternal, ExternalConnectorFactory::EXTERNAL_EVENTS);
-            $api = new Calendar_Api_EventType_Event_External_Default($user, [], $externalEvents);
+            $api = new Calendar_Api_EventType_Event_External_Default(
+                getConnectorId(Calendar_Api_EventType_Event_External_Default::class),
+                $user,
+                $externalEvents
+            );
             $filename = 'external';
             break;
 
@@ -155,7 +217,10 @@ try {
         case 'eotc_all':
 
             if (EOTCConfigMapper::getInstance()->isSubscriptionEnabled()) {
-                $api = new Calendar_Api_EventType_Custom_EOTC_Default($user, []);
+                $api = new Calendar_Api_EventType_Custom_EOTC_Default(
+                    getConnectorId(Calendar_Api_EventType_Custom_EOTC_Default::class),
+                    $user
+                );
                 $filename = 'eotc_all';
             } else {
 
@@ -171,14 +236,28 @@ try {
 
             // All day events, but exclude other sources
             $api = new Calendar_Api_Composite();
-            $api->add(new Calendar_Api_EventType_Event_Schoolbox_Default($user, []));
+            $api->add(new Calendar_Api_EventType_Event_Schoolbox_Default(
+                getConnectorId(Calendar_Api_EventType_Event_Schoolbox_Default::class),
+                $user
+            ));
             try {
                 // Resource bookings too for now, as there's no other place for them
-                $api->add(new Calendar_Api_EventType_ResourceBooking_Booking_Default($user, []));
-                $api->add(new Calendar_Api_EventType_ResourceBooking_Moderation_Default($user, []));
+                $api->add(new Calendar_Api_EventType_ResourceBooking_Booking_Default(
+                    getConnectorId(Calendar_Api_EventType_ResourceBooking_Booking_Default::class),
+                    $user
+                ));
+                $api->add(new Calendar_Api_EventType_ResourceBooking_Moderation_Default(
+                    getConnectorId(Calendar_Api_EventType_ResourceBooking_Moderation_Default::class),
+                    $user
+                ));
 
                 if (EOTCConfigMapper::getInstance()->isSubscriptionEnabled()) {
-                    $api->add(new Calendar_Api_EventType_Custom_EOTC_Default($user, []));
+                    $api->add(
+                        new Calendar_Api_EventType_Custom_EOTC_Default(
+                            getConnectorId(Calendar_Api_EventType_Custom_EOTC_Default::class),
+                            $user
+                        )
+                    );
                 }
             } catch (DomainException $e) {
                 // Do nothing. This is expected if Resource Booking is disabled
@@ -223,7 +302,7 @@ try {
     }
 
     $exporter->renderAll();
-} catch (SchoolboxException $e) {
+} catch (SchoolboxException|UnexpectedValueException|ServiceNotFound|RuntimeException $e) {
     $code = $e->getCode();
     switch ($code) {
         case 400:

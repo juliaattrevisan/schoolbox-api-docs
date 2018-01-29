@@ -1,4 +1,7 @@
 <?php
+
+use Schoolbox\User;
+
 /**
  * Calendar_Api_EventType_Event_Schoolbox_Campus
  *
@@ -12,14 +15,27 @@
 
 class Calendar_Api_EventType_Event_Schoolbox_Campus extends Calendar_Api_EventType_Event_Schoolbox_Default {
 
-	/**
-	 * The campus to get events for
-	 *
-	 * @var int
-	 */
-	protected $campus_id;
+    /**
+     * The campus to get events for. If null, returns events for all campuses.
+     *
+     * @var null|int
+     */
+    private $campus_id;
 
-	/**
+
+    /**
+     * @param int      $connectorId
+     * @param User     $user
+     * @param null|int $campusId
+     */
+    public function __construct(int $connectorId, User $user, int $campusId = null)
+    {
+        parent::__construct($connectorId, $user);
+        $this->campus_id = $campusId;
+    }
+
+
+    /**
 	 * Overridden to get events only for this campus.
 	 *
 	 * @param int $startTimestamp
@@ -32,24 +48,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Campus extends Calendar_Api_EventTy
 			$this->getUser(),
 			$startTimestamp,
 			$endTimestamp,
-			array('campus' => $this->getCampusId())
-		);
-	}
-
-	/**
-	 * @param  int $campus_id
-	 *
-	 * @return $this
-	 */
-	public function setCampusId($campus_id) {
-		$this->campus_id = $campus_id;
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getCampusId() {
-		return $this->campus_id;
+            ['campus' => $this->campus_id]
+        );
 	}
 }

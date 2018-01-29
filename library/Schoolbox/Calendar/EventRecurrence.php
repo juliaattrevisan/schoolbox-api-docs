@@ -127,16 +127,16 @@ class EventRecurrence {
 			$this->setEfficacy($efficacy);
 		}
 
-		if ($this->isValidInterval() && $this->getUntil()->getUnixTimestamp()) {
+		if ($this->isValidInterval() && $this->getUntil()->getUnixTimeStamp()) {
 			// repeat specified, and and enddate also, populate the dates to be set
 			$this->setSeriesId($this->getCalendarHandler()->getUpperSeriesIndex());
 
 			$start_timestamp = $this->getStartDate()->getUnixTimeStamp();
-			$end_timestamp = $this->getEndDate()->getUnixTimestamp();
+			$end_timestamp = $this->getEndDate()->getUnixTimeStamp();
 
 			// Repeat of events: repeat until the start date is after the until
 			// date (or x100, whatever is less)
-			for ($i = 0; ($start_timestamp <= $this->getUntil()->getUnixTimestamp()) && ($i < $this->getMaxNumRecurring()); $i++) {
+			for ($i = 0; ($start_timestamp <= $this->getUntil()->getUnixTimeStamp()) && ($i < $this->getMaxNumRecurring()); $i++) {
 				$this_start_date = new Alaress_Date_Format($start_timestamp, 'U');
 				$this_end_date = new Alaress_Date_Format($end_timestamp, 'U');
 
@@ -151,7 +151,7 @@ class EventRecurrence {
 				$end_timestamp = strtotime($this->intervalValue(), $end_timestamp);
 			}
 
-		} elseif ($this->isValidInterval() && (!$this->getUntil()->getUnixTimestamp())) {
+		} elseif ($this->isValidInterval() && (!$this->getUntil()->getUnixTimeStamp())) {
 			// if repeat is set, but no enddate was specified, bail out
 			// "not enough data submitted to the form"
 			throw new InvalidArgumentException("Repeat was set but no end-date specified", \Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);

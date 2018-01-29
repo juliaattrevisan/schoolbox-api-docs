@@ -1,4 +1,7 @@
 <?php
+
+use Schoolbox\User;
+
 /**
  * Like Calendar_Api_EventType_Event_Schoolbox_Default, but only returns events
  * for a given group.
@@ -9,14 +12,27 @@
  */
 class Calendar_Api_EventType_Event_Schoolbox_Group extends Calendar_Api_EventType_Event_Schoolbox_Default {
 
-	/**
-	 * The group to get evetns for
-	 *
-	 * @var int
-	 */
-	protected $group_id;
+    /**
+     * The group to get events for. Does not filter by group if NULL
+     *
+     * @var null|int
+     */
+    private $group_id;
 
-	/**
+
+    /**
+     * @param int      $connectorId
+     * @param User     $user
+     * @param int|null $groupId
+     */
+    public function __construct(int $connectorId, User $user, int $groupId = null)
+    {
+        parent::__construct($connectorId, $user);
+        $this->group_id = $groupId;
+    }
+
+
+    /**
 	 * Overridden to get events only for this group.
 	 *
 	 * @param int $startTimestamp
@@ -29,24 +45,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Group extends Calendar_Api_EventTyp
 			$this->getUser(),
 			$startTimestamp,
 			$endTimestamp,
-			array('group' => $this->getGroupId())
-		);
-	}
-
-	/**
-	 * @param  int $group_id
-	 *
-	 * @return $this
-	 */
-	public function setGroupId($group_id) {
-		$this->group_id = $group_id;
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getGroupId() {
-		return $this->group_id;
+            ['group' => $this->group_id]
+        );
 	}
 }

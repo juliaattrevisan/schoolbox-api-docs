@@ -7,17 +7,31 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Schoolbox\ResourceBooking\Booking;
 use Calendar\Event\Collection;
+use Schoolbox\User;
 
 class Calendar_Api_EventType_ResourceBooking_Booking_ForItem extends Calendar_Api_EventType_ResourceBooking_Base {
 
     /**
-     * The ID of the resource to fetch.
+     * The IDs of the resource to fetch. Does not filter by resourceId if NULL.
      *
-     * @var int
+     * @var null|array
      */
-    protected $resourceId;
+    private $resourceIds;
+
+
+    /**
+     * @param int        $connectorId
+     * @param User       $user
+     * @param null|int[] $resourceIds
+     * @throws DomainException If resource booking module is disabled in config
+     */
+    public function __construct(int $connectorId, User $user, array $resourceIds = null)
+    {
+        parent::__construct($connectorId, $user);
+        $this->resourceIds = $resourceIds;
+    }
+
 
     /**
      * Get day events from this data source
@@ -30,7 +44,7 @@ class Calendar_Api_EventType_ResourceBooking_Booking_ForItem extends Calendar_Ap
     public function getEvents($startTimestamp, $endTimestamp) {
         // Get all items out of booking mapper for this resource.
         $bookings = $this->getBookingMapper()->findForResource(
-            $this->getResourceId(),
+            $this->resourceIds,
             $startTimestamp,
             $endTimestamp,
             $this->getStatus()
@@ -45,21 +59,4 @@ class Calendar_Api_EventType_ResourceBooking_Booking_ForItem extends Calendar_Ap
         }
         return $collection;
     }
-
-    /**
-     * @param  int|array $resourceId
-     * @return $this
-     */
-    public function setResourceId($resourceId) {
-        $this->resourceId = $resourceId;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getResourceId() {
-        return $this->resourceId;
-    }
-
 }

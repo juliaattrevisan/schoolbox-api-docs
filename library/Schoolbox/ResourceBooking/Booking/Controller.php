@@ -13,6 +13,8 @@ use Alaress\Date\Interval;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Alaress\Date\Recurrence;
+use Calendar_Api_Config_Mapper;
+use Calendar_Api_EventType_Timetable_Room;
 use DateTime;
 use External_Timetable;
 use Schoolbox\Calendar;
@@ -26,6 +28,7 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 use Schoolbox\ResourceBooking\Booking\Status;
 use Schoolbox\Calendar\EventRecurrenceMapper;
+use Calendar_Api_EventType_ResourceBooking_Booking_ForItem;
 
 class Controller extends Base
 {
@@ -602,18 +605,20 @@ class Controller extends Base
         // the find method should receive:
         // Datetime objects?
         /** @var Model[] $bookings */
-        $source = new \Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
+        $calendarConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_ResourceBooking_Booking_ForItem::class);
+
+        $source = new Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
+            $calendarConfig->getId(),
             $this->getUser(),
-            []
+            [$item->getId()]
         );
         $source
-            ->setResourceId($item->getId())
             ->setStatus($this->getRequest()->query['status']);
 
         $calendar = new Renderer(
             $source,
-            $this->getRequest()->query['start'],
-            $this->getRequest()->query['end'],
+            (int)$this->getRequest()->query['start'],
+            (int)$this->getRequest()->query['end'],
             $this->getUser(),
             $this->getDi()->get('sitePage'),
             $this->getUser()
@@ -624,9 +629,11 @@ class Controller extends Base
         // Get timetabled classes for this room, if there are any.
         $roomCode = $item->getRoomCode();
         if (strlen($roomCode)) {
+            $config = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_Timetable_Room::class);
             $roomSource = new \Calendar_Api_EventType_Timetable_Room(
+                $config->getId(),
                 $this->getUser(),
-                [],
+                $this->externalTimetableHandler,
                 [$item->getRoomCode() => $item->getId()]
             );
 //            $roomSource->setRoomCodes($item->getRoomCode());

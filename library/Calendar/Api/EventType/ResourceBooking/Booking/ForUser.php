@@ -7,7 +7,6 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Schoolbox\ResourceBooking\Booking;
 use Calendar\Event\Collection;
 
 class Calendar_Api_EventType_ResourceBooking_Booking_ForUser extends Calendar_Api_EventType_ResourceBooking_Base {

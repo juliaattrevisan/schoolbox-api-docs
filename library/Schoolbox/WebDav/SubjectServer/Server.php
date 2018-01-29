@@ -18,6 +18,8 @@ use Schoolbox\Learning\Assessment\DueWork\Response\MapperProxy as DueWorkRespons
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Storage\Mapper as StorageDataSource;
 use Schoolbox\WebDav\HasUserSource;
 use Schoolbox\WebDav\NameGenerator;
@@ -146,10 +148,13 @@ class Server extends DAV\Collection
         return preg_split('/[\\\\\/]+/', $path, -1, PREG_SPLIT_NO_EMPTY);
     }
 
+
     /**
      * Gets list of child nodes from the given user's subjects.
      *
      * @return DAV\INode[]
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \InvalidArgumentException
      */
     public function getChildren()
     {
@@ -160,17 +165,23 @@ class Server extends DAV\Collection
         // Build an entire list of children
         $rootNode = new DAV\SimpleCollection('');
 
+        $visibility = new Visibility(Access::getInstance());
+
         // Only due works due this term, and that accept submissions
         /** @var IAssessable[][]|Collection[] $groupedAssessments */
         $groupedAssessments = $this->assessmentDataSource
             ->findAllByStudent(
                 $this->retrieveUserFromSource(),
+                true,
                 $this->currentTerm,
-                ['type'  => AssessmentType::TYPE_DUE_WORK,]
+                ['type' => AssessmentType::TYPE_DUE_WORK,]
             )
-            ->filter(function(IAssessable $assessment) {
-                return $assessment instanceof DueWork
-                    && ($assessment->isAcceptMulti() || $assessment->isAcceptSingle());
+            ->filter(function (IAssessable $assessment) use ($visibility) {
+                if (!$assessment instanceof DueWork || !($assessment->isAcceptMulti() || $assessment->isAcceptSingle())) {
+                    // Not a due work? Or not accepting online submissions?
+                    return false;
+                }
+                return $visibility->isVisibleToUser($assessment, $this->retrieveUserFromSource(), false);
             })
             ->groupByCallback(function(IAssessable $assessment) {
                 return $assessment->getBaseContext()->getFolder()->getId();

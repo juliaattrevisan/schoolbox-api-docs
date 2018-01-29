@@ -161,12 +161,14 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildJsonOutput($resultSet));
     }
 
+
     /**
      * Gets the resource calendar for this student (at this time).
      *
      * @param User $student
      *
      * @throws MapperException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function getCalendarForStudent(User $student)
     {
@@ -174,6 +176,7 @@ class Controller extends Base
         $eventFactory  = new Event\Factory($this->getRouter());
         $assessments   = $this->assessmentDataSource->findAllByStudentWithinWindow(
             $student,
+            true,
             new Alaress_Date_Format($this->getRequest()->query->get('start'), Alaress_Date_Format::TIMESTAMP),
             new Alaress_Date_Format($this->getRequest()->query->get('end'), Alaress_Date_Format::TIMESTAMP)
         );

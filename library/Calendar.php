@@ -465,7 +465,7 @@ class Calendar extends DeprecatedModel
      *                                current user are set.
      *                                * id: if set, only this event ID will be retrieved.
      *                                If empty, all events for user are retrieved.
-     *
+     *                                * type: if set, only events of this type will be retrieved.
      * @return Collection
      */
     public function getDayEvents(\Schoolbox\User $user, $startTimestamp, $endTimestamp, $filter = array())

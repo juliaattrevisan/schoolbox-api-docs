@@ -15,10 +15,8 @@ use Component_Dashboard_ControllerAbstract;
 use Calendar_Api_EventType_ResourceBooking_Moderation_Default;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\ResourceBooking\Booking;
-use Aura\Di;
 use Twig_Environment;
-use Alaress\Authorizer\Rule;
-use Alaress\Authorizer\Failure;
+use Calendar_Api_Config_Mapper;
 
 class ResourceManagement extends Component_Dashboard_ControllerAbstract
 {
@@ -63,8 +61,10 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
         $startTime = strtotime("00:00", $_SERVER['REQUEST_TIME']);
         $endTime   = strtotime("00:00 +$days day", $_SERVER['REQUEST_TIME']);
 
+        $config = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_ResourceBooking_Moderation_Default::class);
         $bookingApi = new Calendar_Api_EventType_ResourceBooking_Moderation_Default(
-            $this->getUser(), array()
+            $config->getId(),
+            $this->getUser()
         );
         $bookingApi->setStatus(
             array(

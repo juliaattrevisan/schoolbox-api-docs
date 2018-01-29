@@ -118,7 +118,7 @@ try {
 
 // Get timetable definition
 
-$timetableDay = $externalTimetable->getDayNumber($selectedCampus, $attendanceDate->getUnixTimestamp());
+$timetableDay = $externalTimetable->getDayNumber($selectedCampus, $attendanceDate->getUnixTimeStamp());
 
 $definition = $externalTimetable->getTimetableDefinition(
     null,

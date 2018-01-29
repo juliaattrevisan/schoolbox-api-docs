@@ -16,73 +16,66 @@ use Schoolbox\User;
 abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType_Interface
 {
     /**
-     * The calendar_connector id from which this event was retrieved.
+     * The calendar_connector.id from which this event was retrieved.
      * This is used to create a functioning event detail screen in Mobile.
      *
      * @var int
      */
-    protected $connectorId;
+    private $connectorId;
 
     /**
      * An instance of User
      *
      * @var Schoolbox\User
      */
-    protected $user = null;
+    private $user;
+
+
+    /**
+     * @param int  $connectorId
+     * @param User $user
+     */
+    public function __construct(int $connectorId, User $user)
+    {
+        $this->connectorId = $connectorId;
+        $this->user        = $user;
+    }
 
     /* Getters/Setters
      */
 
-    /**
-     * Set calendar_connector id
-     *
-     * @param int $connectorId
-     */
-    public function setConnectorId($connectorId)
-    {
-        $this->connectorId = $connectorId;
-    }
 
     /**
      * Get calendar_connector id
      *
      * @return int
      */
-    public function getConnectorId()
+    protected function getConnectorId(): int
     {
         return $this->connectorId;
     }
 
-    /**
-     * Set user
-     *
-     * @param User $user
-     *
-     * @return $this
-     */
-    public function setUser($user)
-    {
-        $this->user = $user;
-        return $this;
-    }
 
     /**
      * @return User
      */
-    protected function getUser()
+    protected function getUser(): User
     {
         return $this->user;
     }
+
 
     /**
      * Helper method for loading this event type's calendar connector config.
      *
      * @return Calendar_Api_Config_Record|object
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function loadConnectorConfiguration()
+    protected function loadConnectorConfiguration()
     {
         return Calendar_Api_Config_Mapper::getInstance()->findById(
-            $this->getConnectorId()
+            $this->connectorId
         );
     }
 }

@@ -4,7 +4,7 @@ use Schoolbox\Campus;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Timetable\Event;
-
+use Schoolbox\User;
 
 /**
  * Event type that represents events from the external timetable handler.
@@ -19,17 +19,15 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
     /**
      * @var External_Timetable
      */
-    protected $externalTimetable = null;
+    private $externalTimetable;
+
 
     /**
-     * Constructor
-     *
-     * @param \Schoolbox\User $user
-     * @param                 $config
+     * @inheritdoc
      */
-    public function __construct(\Schoolbox\User $user, $config)
+    public function __construct(int $connectorId, User $user)
     {
-        $this->setUser($user);
+        parent::__construct($connectorId, $user);
         $this->externalTimetable = new External_Timetable();
     }
 
@@ -94,7 +92,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                     $dayTimetable = $this->buildTimetableExpensively($this->getUser(), $campus, $date);
 
                 } else {
-                    $dayNumber = $this->getExternalTimetable()->getDayNumber($campus, $currentTimestamp);
+                    $dayNumber = $this->externalTimetable->getDayNumber($campus, $currentTimestamp);
 
                     if ($dayNumber <= 0) {
                         continue;
@@ -204,7 +202,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
     private function buildTimetableExpensively(Schoolbox\User $user, Campus $campus, Alaress_Date_Format $date)
     {
         try {
-            $timetable = $this->getExternalTimetable()->getTimetableForDate(
+            $timetable = $this->externalTimetable->getTimetableForDate(
                 $user->getExternalId(),
                 $user->getId(),
                 $campus,
@@ -233,7 +231,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
         try {
             // we are aware of the deprecation of this method, but must use it regardless
             /** @noinspection PhpDeprecationInspection */
-            $timetable = $this->getExternalTimetable()->getDayTimetable(
+            $timetable = $this->externalTimetable->getDayTimetable(
                 $user->getExternalId(),
                 $user->getId(),
                 $campus,
@@ -339,24 +337,5 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
     {
         // No events in this strat, just return empty.
         return new Collection();
-    }
-
-    /**
-     * @param  \External_Timetable $externalTimetable
-     *
-     * @return $this
-     */
-    public function setExternalTimetable($externalTimetable)
-    {
-        $this->externalTimetable = $externalTimetable;
-        return $this;
-    }
-
-    /**
-     * @return \External_Timetable
-     */
-    public function getExternalTimetable()
-    {
-        return $this->externalTimetable;
     }
 }

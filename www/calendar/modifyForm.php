@@ -114,7 +114,7 @@ switch ($_REQUEST['action']) {
             exit;
         }
         // Don't allow start to be after end
-        if ($startDate->getUnixTimestamp() > $endDate->getUnixTimestamp()) {
+        if ($startDate->getUnixTimeStamp() > $endDate->getUnixTimeStamp()) {
             error(145);
             exit;
         }
