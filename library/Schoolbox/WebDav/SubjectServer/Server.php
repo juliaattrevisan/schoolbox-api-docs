@@ -170,10 +170,11 @@ class Server extends DAV\Collection
         // Only due works due this term, and that accept submissions
         /** @var IAssessable[][]|Collection[] $groupedAssessments */
         $groupedAssessments = $this->assessmentDataSource
-            ->findAllByStudent(
+            ->findAllByStudentWithinWindow(
                 $this->retrieveUserFromSource(),
                 true,
-                $this->currentTerm,
+                \Alaress_Date_Format::now()->startOfDay(),
+                \Alaress_Date_Format::now()->endOfDay(),
                 ['type' => AssessmentType::TYPE_DUE_WORK,]
             )
             ->filter(function (IAssessable $assessment) use ($visibility) {
