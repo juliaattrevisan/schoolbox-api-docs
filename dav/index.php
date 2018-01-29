@@ -7,7 +7,6 @@
  */
 
 use Alaress\Application\Kernel;
-use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\MapperFactory;
 use Schoolbox\WebDav\FileServer\Folder as WebDavFolder;
@@ -36,7 +35,6 @@ $publicdir = (new WebDavFolder(
         $mapperFactory->get(\Schoolbox\Resource\Storage\Mapper::class),
         $kernel->get('submissionDataSource'),
         $mapperFactory->get(ErrorMapper::class),
-        $mapperFactory->get(TermMapper::class)->findForToday(),
         new WebDavNameGenerator()
     )
 );
