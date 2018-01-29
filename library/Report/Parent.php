@@ -313,6 +313,20 @@ class Report_Parent extends Report_Abstract
     public function render()
     {
         $allContacts = $this->getAllRecords();
+
+        if ($this->isYearsRestricted()) {
+            $contactsFiltered = [];
+            $allYears = $this->getChildrensYears();
+            foreach ($allContacts as $contact) {
+                foreach ($allYears as $currentYear) {
+                    if ($currentYear == Scrub::text($contact['StudentYearLevel'])) {
+                        $contactsFiltered[] = $contact;
+                    }
+                }
+            }
+            $allContacts = $contactsFiltered;
+        }
+
         $allEmails = array();
 
         $showContact = false;
