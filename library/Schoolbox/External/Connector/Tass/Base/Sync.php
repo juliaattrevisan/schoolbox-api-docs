@@ -242,7 +242,6 @@ class Sync extends Base implements ISync
                     ''                  AS home_email,
                     t.e_mail            AS default_email,
                     t.school_email      AS work_email,
-                    ''                  AS staff_campus,
                     ''                  AS staff_house,
                     ''                  AS staff_year_level,
                     ''                  AS staff_year_level_description,
@@ -254,10 +253,12 @@ class Sync extends Base implements ISync
                         ELSE 'TEACHER'
                     END                 AS staff_category_type,
                     ''                  AS staff_category,
-                    td.tch_dept         AS staff_department
+                    td.tch_dept         AS staff_department,
+                    tc.campus_code      AS staff_campus
                 FROM tel_vw_telemf AS t
                 LEFT JOIN teacher AS te ON t.emp_code = te.emp_code AND t.cust_code = te.cmpy_code
                 LEFT JOIN tchdept AS td ON te.tch_code = td.tch_code
+                LEFT JOIN tchcampus AS tc ON te.tch_code = tc.tch_code AND t.cust_code = tc.cmpy_code
                 LEFT JOIN portalusers AS p ON prodcode='TIA' AND t.cust_code = p.cmpy_code AND (t.emp_code = p.portal_code OR te.tch_code = p.portal_code) 
                 WHERE t.cust_code = :companyCode
             ",
