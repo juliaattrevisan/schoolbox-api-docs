@@ -1,0 +1,40 @@
+{# Usage:
+    {% include 'sub/classTile.twig' with {
+        'term':       Term
+        'class':      Folder
+        'classType':  string
+        'courses':    string[] CourseSpec titles indexed by courseSpec.id
+    } only %}
+#}
+
+
+<div class="card-new small-12">
+    <a href="/homepage/{{ class.id }}">
+        <div class="card-feature-image" style="background-color:{{ class.colour }}; border-bottom: 10px solid {{ class.colour }};{%  if class.coverImage.hash %} background-image: url('/storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>
+    </a>
+    <div class="card-content actions-small-1">
+        <div class="list-item">
+            <h3><a href="/homepage/{{ class.id }}" title="{{ class.title }}">{{ class.title }}</a></h3>
+            <p class="meta">{{ classType }}</p>
+        </div>
+        {% if USER.getRole.isStaff == true %}
+            <nav>
+                <a href="#" class="icon-more" data-dropdown="class-options{{ class.id }}" aria-expanded="false" title="Actions"></a>
+            </nav>
+            <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
+                <li><a href="/subject/classList/{{ class.getCodeString() }}" class="icon-class-list">Class List</a></li>
+                <li><a href="{{ routeLookup('learningMarkbook.getMarkbookForClassAndTerm', {folderId: class.id, termCode: term.code}) }}" class="icon-curriculum">Markbook</a></li>
+                <li><a href="/resource/folder/modify/{{ class.id }} " class="icon-modify">Modify</a></li>
+                {% if courses | length %}
+                    <li class="separator">Analytics</li>
+                    {% for courseSpecId, courseSpecTitle in courses %}
+                        {% set url = routeLookup('learningAnalytics.folderWithTerm', {courseSpecId: courseSpecId, folderId: class.id, termCode: term.code}) %}
+                        <li><a href="{{ url }}" class="icon-poll">{{ courseSpecTitle }}</a></li>
+                    {% endfor %}
+                {% endif %}
+
+            </ul>
+        {% endif %}
+    </div>
+</div>
+
