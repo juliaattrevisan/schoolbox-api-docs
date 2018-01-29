@@ -120,7 +120,7 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
 
 /* Continue once you get past checks
  */
-$author = UserMapper::getInstance()->findById($assess['user_id']);
+$author = UserMapper::getInstance()->findByIdWithFallback($assess['user_id']);
 $folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assess['category_id']);
 
 $allSummary = $assessHandler->getIntroSummary($assess['assess_id']);
