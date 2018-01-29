@@ -16,6 +16,13 @@
         });
     </script>
     {{ parent() }}
+
+    {% block buttons_dueWork %}
+    {% endblock buttons_dueWork %}
+
+    {% block buttons_grades %}
+    {% endblock buttons_grades %}
+
     {% if isStaff %}
         <ul class="flex-list flex-wrap buttons">
             <li>
