@@ -32,10 +32,6 @@
                         <li>
                             <a class="progress" href="/synergetic/stures?id={STUDENT_EXTERNAL_ID}">Progress</a>
                         </li>
-                        <!-- BEGIN reports -->
-                        <li><a class="icon-document" href="/user/profile/documents/reports/{STUDENT_ID}">Reports</a></li>
-                        <!-- END reports -->
-
                         <!-- BEGIN timetable -->
                         <li>
                             <a class="timetable" href="/timetable/{STUDENT_ID}">Timetable</a>
@@ -60,9 +56,11 @@
                         <li>
                             <a class="contacts" href="/synergetic/contacts?id={STUDENT_EXTERNAL_ID}">Contacts</a>
                         </li>
+                        <!-- BEGIN reports -->
                         <li>
-                            <a class="documents" href="/synergetic/docs?id={STUDENT_EXTERNAL_ID}">Documents</a>
+                            <a class="documents" href="/user/profile/documents/reports/{STUDENT_ID}">Documents</a>
                         </li>
+                        <!-- END reports -->
                         <!-- BEGIN pastoral -->
                         <li>
                             <a class="pastoral" href="/pastoral/student/{STUDENT_ID}">{TPL_LOCAL_PASTORALCARE_PC}</a>
