@@ -48,11 +48,11 @@ class Synchronise_Synergetic_Kings_Strategy_Student extends Synchronise_Base_Str
             			Disables account and clears House attributes.
             			(We don't want to accidentally delete a student's work)
             		*/
-            		$existingStudent['house'] = '';
-	  				$existingStudent['residential_house_id'] = '';
-	  				$existingStudent['enabled'] = 0;
+#            		$existingStudent['house'] = null;
+#	  		$existingStudent['residential_house_id'] = null;
+	  		$existingStudent['enabled'] = 0;
             		$this->verbose_filter->outputMessage('- Disabling '.$existingStudent['synergy_id']."|".$existingStudent['lastname'].", ".$existingStudent['firstname']);
-	                $this->executeCreateUpdate($existingStudent);
+	                #$this->executeCreateUpdate($existingStudent);
 	            } else {
 	            	$this->verbose_filter->outputMessage('- Planning disable of '.$existingStudent['synergy_id']."|".$existingStudent['lastname'].", ".$existingStudent['firstname']);
 	            }

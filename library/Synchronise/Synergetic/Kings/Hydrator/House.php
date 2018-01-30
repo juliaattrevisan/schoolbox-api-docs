@@ -75,7 +75,7 @@ class Synchronise_Synergetic_Kings_Hydrator_House implements Synchronise_Base_IH
 	case 'HHA':
 		return 19;
          default:
-                return 0;
+                return null;
         }
 
         #return $this->getHouse($student['StudentHouseDescription']);
@@ -87,7 +87,7 @@ class Synchronise_Synergetic_Kings_Hydrator_House implements Synchronise_Base_IH
 	$student = $this->external_user_handler->getStudent($externalUser['StudentID']);
 	#echo "in: ".$student['StudentBoardingHouse']."\n";
     	if (empty($student['StudentBoardingHouse'])) {
-    		return 0;
+    		return null;
     	} else {
         switch (strtoupper(trim($student['StudentBoardingHouse']))) {
         case 'FOR':
@@ -111,7 +111,7 @@ class Synchronise_Synergetic_Kings_Hydrator_House implements Synchronise_Base_IH
 	case 'WAD':
 		return 11; 
 	default:
-                return 0;
+                return null;
         }
 
 #    		return $this->getResidentialHouse($student['StudentBoardingHouseDescription']);
