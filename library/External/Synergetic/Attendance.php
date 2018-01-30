@@ -29,17 +29,19 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
     /** @var Attendance_Synergetic_AttendanceMaster $attendanceMaster An instance of Attendance_Synergetic_AttendanceMaster_Abstract */
     private $attendanceMaster = null;
 
+
     /**
      * Constructor
      *
-     * @param array $class Result row from SynergyOne.dbo.SubjectClasses
+     * @param array               $class Result row from SynergyOne.dbo.SubjectClasses
      * @param Alaress_Date_Format $attendanceDate
-     * @param string $attendanceDay
-     * @param int $attendancePeriod
-     * @param int $fileYear
-     * @param int $fileSemester
+     * @param string              $attendanceDay
+     * @param int                 $attendancePeriod
+     * @param int                 $fileYear
+     * @param int                 $fileSemester
+     * @param int                 $staffId
      */
-    public function __construct($class, Alaress_Date_Format $attendanceDate, $attendanceDay, $attendancePeriod, $fileYear, $fileSemester)
+    public function __construct($class, Alaress_Date_Format $attendanceDate, $attendanceDay, $attendancePeriod, $fileYear, $fileSemester, $staffId)
     {
         // This connects to the Synergetic database and stores an IConnection in `$this->connector` variable
 
@@ -54,9 +56,6 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
         //
         // This can be encapsulated further in a Factory
 
-        /** @var \Schoolbox\User $user */
-        $user = $_SESSION['user'];
-        
         $attendanceMaster = new AttendanceMaster(
             $class,
             $attendanceDate,
@@ -65,7 +64,7 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
             $fileYear,
             $fileSemester,
             $this->connector,
-            $user->getExternalId()
+            $staffId
         );
 
         $this->setAttendanceMaster($attendanceMaster);

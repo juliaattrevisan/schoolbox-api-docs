@@ -71,7 +71,8 @@ try {
         $attendanceDay,
         $attendancePeriod,
         $externalUserHandler->getCurrentYear($_SESSION['user']->getExternalId()),
-        $externalUserHandler->getCurrentSemester($_SESSION['user']->getExternalId())
+        $externalUserHandler->getCurrentSemester($_SESSION['user']->getExternalId()),
+        $_SESSION['user']->getExternalId()
     );
 
 } catch (ExternalException $e) {
