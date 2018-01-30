@@ -237,9 +237,9 @@ class DataSource
     {
         foreach($assessables as $assessable) {
             foreach ($assessable->getPlans() as $plan) {
-                foreach ($plan->getParticipants() as $participant) {
+                foreach ($plan->getParticipants() as $idx => $participant) {
                     if ($participant->isExcluded()) {
-                        $plan->getParticipants()->offsetUnset($participant->getUser()->getId());
+                        $plan->getParticipants()->offsetUnset($idx);
                     }
                 }
             }
