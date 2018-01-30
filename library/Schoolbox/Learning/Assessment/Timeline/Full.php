@@ -185,25 +185,36 @@ class Full
              */
             if ($includeDraftResponses || $currentResponse->isSubmitted()) {
 
+                /* If $isFeedbackVisible is false,
+                 * Filter out non-self-assessed feedback
+                 *
+                 * Otherwise just use all feedback
+                 */
+                if ($isFeedbackVisible) {
+                    $includedFeedback = $currentResponse->getAllFeedback();
+                } else {
+                    // Only self-assessment feedback is allowed
+                    // TODO use isSelfAssessment or whatever method once implemented
+                    $includedFeedback = $currentResponse->getAllFeedback()->filter(
+                        function (IFeedback $feedback) {
+                            return $feedback->getReviewee()->getId() === $feedback->getReviewer()->getId();
+                        }
+                    );
+                }
+
                 /* If $includeUnpublishedFeedback is false,
                  * Filter out unpublished Feedback from each $response
                  *
                  * Otherwise just use the stack that was given to us
                  * which has the unpublished feedbacks in there already
                  */
-                $includedFeedback = new Collection();
-                if ($isFeedbackVisible) {
-                    if ($includeUnpublishedFeedback) {
-                        $includedFeedback = $currentResponse->getAllFeedback();
-
-                    } else {
-                        /** @var DueWork\Feedback\Model $currentFeedback */
-                        foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
-                            if ($currentFeedback->isPublished()) {
-                                $includedFeedback->add($currentFeedback);
-                            }
+                if (!$includeUnpublishedFeedback) {
+                    /** @var DueWork\Feedback\Model $currentFeedback */
+                    $includedFeedback = $includedFeedback->filter(
+                        function (IFeedback $feedback) {
+                            return $feedback->isPublished();
                         }
-                    }
+                    );
                 }
 
                 /* Maintain a list of all the Feedbacks that were discovered
@@ -236,6 +247,9 @@ class Full
                 /* Sort files alphabetically
                  */
                 $currentResponse->getAllFiles()->sortBy('filename', 'asc');
+
+                // Exclude all feedback except ones explicitly allowed
+                $currentResponse->setAllFeedback($includedFeedback);
 
                 $this->getRecombined()->add($currentResponse);
             }
