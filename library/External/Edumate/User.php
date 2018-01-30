@@ -192,8 +192,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     {
         $caseSensitiveFields = array(
             'StudentContactID', 'StudentContactTitle', 'StudentContactPreferred',
-            'StudentContactSurname', 'StudentContactDefaultEmail', 'StudentContactAddress1', 'StudentContactSuburb',
-            'StudentContactPostCode', 'StudentContactState', 'StudentContactPhoneActual', 'StudentContactMobilePhone',
+            'StudentContactSurname', 'StudentContactDefaultEmail', 'StudentContactPhoneActual', 'StudentContactMobilePhone',
             'StudentContactOccupPhone', 'StudentContactSpouseID', 'StudentContactSpouseTitle',
             'StudentContactSpousePreferred', 'StudentContactSpouseSurname', 'StudentContactSpouseMobilePhone',
             'StudentContactSpouseOccupPhone', 'StudentContactSpouseDefaultEmail', 'StudentContactType'
