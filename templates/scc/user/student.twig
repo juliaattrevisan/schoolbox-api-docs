@@ -6,3 +6,13 @@
         <li><a class="icon-staff" href="/synergetic/pti?id={{ user.externalId }}">PTI</a></li>
     {% endif %}
 {% endblock buttons %}
+{% extends "@core/user/student.twig" %}
+
+{% block synergeticComments %}
+    {% if externalUser.Comment is not empty and showComments %}
+        <div class="expander icon-down-arrow content" data-collapser="comment">View Comments</div>
+        <div class="alert-box hide highlight icon-info" data-collapse-state="collapsed" data-collapsable="comment">
+            {{ externalUser.Comment | nl2br }}
+        </div>
+    {% endif %}
+{% endblock synergeticComments %}
