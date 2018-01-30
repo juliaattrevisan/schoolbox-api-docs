@@ -351,7 +351,7 @@ class User extends AbstractImporter
      * Retrieves users of whom this user is a guardian.
      *
      * @param  UserModel $user
-     * @return UserModel[]
+     * @return Collection|UserModel[]
      */
     protected function retrieveUserChildren(UserModel $user)
     {
@@ -488,10 +488,12 @@ class User extends AbstractImporter
     {
         $user = $userResult->getUser();
         if ($this->performUpdate) {
-            $this->log->info(sprintf('Creating user "%s"', $user->formatName()));
             try {
                 if (!$this->userMapper->save($user)) {
                     $this->log->error('Could not create user!');
+                }
+                else {
+                    $this->log->info(sprintf('Created user "%s" (%d)', $user->formatName(), $user->getId()));
                 }
             } catch (\Exception $e) {
                 $this->log->error('User not created: '.$e->getMessage() );
@@ -511,16 +513,18 @@ class User extends AbstractImporter
         $user = $userResult->getUser();
         $diff = $this->userMapper->diff($userResult->getOriginalUser(), $user);
         if ($this->performUpdate) {
-            $this->log->info(sprintf('Updating user "%s"', $user->formatName()), ['diff' => $diff]);
             try {
                 if (!$this->userMapper->save($user)) {
                     $this->log->error('Could not update user!');
+                }
+                else {
+                    $this->log->info(sprintf('Updated user "%s" (%d)', $user->formatName(), $user->getId()), ['diff' => $diff]);
                 }
             } catch (\Exception $e) {
                 $this->log->error('User not created: '.$e->getMessage() );
             }
         } else {
-            $this->log->info(sprintf('Pretending to update user "%s"', $user->formatName()), ['diff' => $diff]);
+            $this->log->info(sprintf('Pretending to update user "%s" (%d)', $user->formatName(), $user->getId()), ['diff' => $diff]);
         }
     }
 
@@ -542,16 +546,19 @@ class User extends AbstractImporter
             );
         }
         if ($this->performUpdate) {
-            $this->log->info(sprintf('Deleting user "%s"', $user->formatName()));
             try {
                 if (!$this->userMapper->delete($user)) {
                     $this->log->error('Could not delete user!');
+                }
+                else {
+                    $this->log->info(sprintf('Deleted user "%s" (%d)', $user->formatName(), $user->getId()));
+
                 }
             } catch (\Exception $e) {
                 $this->log->error('Could not delete user: '.$e->getMessage() );
             }
         } else {
-            $this->log->info(sprintf('Pretending to delete user "%s"', $user->formatName()));
+            $this->log->info(sprintf('Pretending to delete user "%s" (%d)', $user->formatName(), $user->getId()));
         }
     }
 
@@ -566,17 +573,20 @@ class User extends AbstractImporter
         $userProfile = $userResult->getUserProfile();
         $diff        = $this->userProfileMapper->diff($userResult->getOriginalUserProfile(), $userProfile);
         if ($this->performUpdate) {
-            $this->log->info(sprintf('Updating user profile for "%s"', $user->formatName()), ['diff' => $diff]);
             try {
                 $userProfile->setUserId($user->getId());
                 if (!$this->userProfileMapper->save($userProfile)) {
                     $this->log->error('Could not update user profile!');
                 }
+                else {
+                    $this->log->info(sprintf('Updated user profile for "%s" (%d)', $user->formatName(), $user->getId()), ['diff' => $diff]);
+
+                }
             } catch (\Exception $e) {
                 $this->log->error('Could not update user profile: '. $e->getMessage() );
             }
         } else {
-            $this->log->info(sprintf('Pretending to update user profile for "%s"', $user->formatName()), ['diff' => $diff]);
+            $this->log->info(sprintf('Pretending to update user profile for "%s" (%d)', $user->formatName(), $user->getId()), ['diff' => $diff]);
         }
     }
 
@@ -606,7 +616,7 @@ class User extends AbstractImporter
 
         // Diff the list
         if ($this->performUpdate) {
-            $this->log->info(sprintf('Updating children for "%s"', $user->formatName()), $context);
+            $this->log->info(sprintf('Updating children for "%s" (%d)', $user->formatName(), $user->getId()), $context);
             try {
                 // Wipe and save the new users
                 $this->userRelationMapper->deleteByColumn('user_id', $user->getId());
