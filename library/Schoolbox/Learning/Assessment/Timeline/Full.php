@@ -194,10 +194,9 @@ class Full
                     $includedFeedback = $currentResponse->getAllFeedback();
                 } else {
                     // Only self-assessment feedback is allowed
-                    // TODO use isSelfAssessment or whatever method once implemented
                     $includedFeedback = $currentResponse->getAllFeedback()->filter(
                         function (IFeedback $feedback) {
-                            return $feedback->getReviewee()->getId() === $feedback->getReviewer()->getId();
+                            return $feedback->isSelfAssessed();
                         }
                     );
                 }
