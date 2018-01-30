@@ -45,16 +45,18 @@ class Attendance_Synergetic_AttendanceMaster
     /** @var int $attendanceMasterSeq The primary key associated with the selected class, date and period used in dbo.AttendanceMaster */
     protected $attendanceMasterSeq = -1;
 
+
     /**
      * Constructor
      *
-     * @param array $class Result row from SynergyOne.dbo.SubjectClasses
+     * @param array               $class Result row from SynergyOne.dbo.SubjectClasses
      * @param Alaress_Date_Format $attendanceDate
-     * @param string $attendanceDay
-     * @param int $attendancePeriod
-     * @param int $fileYear
-     * @param int $fileSemester
-     * @param IConnector $connector
+     * @param string              $attendanceDay
+     * @param int                 $attendancePeriod
+     * @param int                 $fileYear
+     * @param int                 $fileSemester
+     * @param IConnector          $connector
+     * @param int                 $staffId
      */
     public function __construct($class, $attendanceDate, $attendanceDay, $attendancePeriod, $fileYear, $fileSemester, $connector, $staffId)
     {
