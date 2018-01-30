@@ -704,13 +704,6 @@ class External_Doublefirst_User implements External_UserInterface
                       cm.Greeting AS StudentContactPreferred,
                       c.Surname StudentContactSurname,
                       ceh.EmailID AS StudentContactDefaultEmail,
-                      1 AS ValidAddressFlag,
-                      a.SubDwelling AS StudentContactAddress1,
-                      a.Street AS StudentContactAddress2,
-                      a.Locality AS StudentContactAddress3,
-                      a.Dwelling AS StudentContactSuburb,
-                      a.Postcode AS StudentContactPostCode,
-                      a.County AS StudentContactState,
                       cp.HomeTelephoneNumber AS StudentContactPhoneActual,
                       
                       LTRIM(
