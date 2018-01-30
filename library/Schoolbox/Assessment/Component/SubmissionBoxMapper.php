@@ -62,11 +62,9 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $this->uses('rubric_group_marks', self::TYPE_BOOLEAN, null, 'markedPerRubricGroup');
         $this->uses('mark_visibility', self::TYPE_INTEGER);
         $this->uses('skip_unsubmitted', self::TYPE_BOOLEAN);
-        $this->uses('created', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP); // TODO deprecated, lives on `assessment` table now
-        $this->uses('deleted', self::TYPE_BOOLEAN, self::COLUMN_SOFTDELETE); // TODO deprecated, lives on `assessment` table now
         $this->uses('self_assessable', self::TYPE_BOOLEAN, null, 'selfAssessable');
         $this->uses('self_reflectable', self::TYPE_BOOLEAN, null, 'selfReflectable');
-        
+
         $this->joins('category', Folder\Mapper::class); // TODO deprecated, retained for legacy compatibility only
         $this->joins('owner', Schoolbox\UserMapper::class);
         $this->joins('mark_type', SubmissionBox\MarkTypeMapper::class, 'mark_type_id');
@@ -95,8 +93,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
             'other_key' => 'box_id',
         ));
 
-
-        $this->hasSoftDeleteBooleanField('deleted');
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'postSave'));
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'deleteFromMarkbook'));
