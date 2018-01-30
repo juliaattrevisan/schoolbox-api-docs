@@ -494,26 +494,6 @@
                                             {% endif %}
 
                                             {% endif %}
-
-                                        <li class="actions-small-1">
-                                            <div class="list-item">
-                                                <div class="card small-12">
-                                                    <span class="icon-home size-32"></span>
-                                                    {% if contact.StudentContactAddress1 or contact.StudentContactAddress2 or contact.StudentContactAddress3 %}
-                                                        <p>{{ contact.StudentContactAddress1 }}</p>
-                                                        <p>{{ contact.StudentContactAddress2 }}</p>
-                                                        <p>{{ contact.StudentContactAddress3 }}</p>
-                                                        <p>{{ contact.StudentContactSuburb }},</p>
-                                                        <p>{{ contact.StudentContactState }} {{ contact.StudentContactPostCode }}</p>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                            <nav>
-                                                {% if contact.StudentContactPhoneActual %}
-                                                <a class="icon-mobile" href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}"></a>
-                                                {% endif %}
-                                            </nav>
-                                        </li>
                                     {% endfor %}
                                 </ul>
                             </section>
