@@ -220,12 +220,8 @@ class External_Schoolpro_User implements External_UserInterface
                  */
                 'StudentContactPreferred'          => $currentStudentContact['FullName'],
                 'StudentContactSpousePreferred'    => $currentStudentContact['SpouseName'],
-                'StudentContactAddress1'           => $currentStudentContact['LocationLine'],
                 'StudentContactID'                 => $currentStudentContact['ID'],
                 'StudentContactDefaultEmail'       => $currentStudentContact['email'],
-                'StudentContactSuburb'             => $currentStudentContact['Suburb'],
-                'StudentContactPostCode'           => $currentStudentContact['Postcode'],
-                'StudentContactState'              => $currentStudentContact['State'],
                 'StudentContactPhoneActual'        => $currentStudentContact['HomePhone'],
                 'StudentContactMobilePhone'        => $currentStudentContact['Mobile'],
                 'StudentContactOccupPhone'         => $currentStudentContact['BusinessPhone'],
