@@ -297,23 +297,22 @@ class Controller extends Base
                     'name'          => [
                         'caption'   => 'Name',                                  // Friendly caption that is displayed
                         'width'     => 7,                                       // Width of the column on anything bigger than 'small'
+                        'maxLength' => 50,
                     ],
                     'type' => [
-                        //'radio'     => '1'                                    // If defined the column will be a radio button shared by every item
-                        //'nullable'  => '1'                                    // If defined the column will have a checkbox that can be ticked to select NULL as a value
-                        //'getter'    => 'getTimetableColourId',                // Can be used to override getter if it has some weird name
                         'caption'   => 'Role Type',
                         'lookup'    => $luRoleType,                             // If defined the column will appear as a select box
                         'width'     => 3,
+                        'mandatory' => true,
                     ],
                     'canChangePassword' => [
                         'caption'   => 'Allow Password Change',
-                        //'tooltip'   => 'Test',                                // If defined a tooltip will appear next to the header
                         'lookup'    => [
                             ['key' => 1, 'value' => 'Yes'],
                             ['key' => 0, 'value' => 'No'],
                         ],
                         'width'     => 2,
+                        'mandatory' => true,
                     ]
                 ]
             ],
@@ -324,6 +323,7 @@ class Controller extends Base
                     'house'         => [
                         'caption'   => 'Name',
                         'width'     => 12,
+                        'maxLength' => 50,
                     ]
                 ]
             ],
@@ -334,6 +334,7 @@ class Controller extends Base
                     'house'         => [
                         'caption'   => 'Name',
                         'width'     => 12,
+                        'maxLength' => 255,
                     ]
                 ]
             ],
@@ -407,6 +408,7 @@ class Controller extends Base
                     'name'          => [
                         'caption'   => 'Name',
                         'width'     => 6,
+                        'maxLength' => 255,
                     ],
                     'extTimetableCode' => [
                         'caption'   => 'External Timetable Code',
@@ -425,6 +427,7 @@ class Controller extends Base
                     'type'          => [
                         'caption'   => 'Event Type',
                         'width'     => 10,
+                        'maxLength' => 100,
                     ],
                     'color'         => [
                         'caption'   => 'Event Colour',
@@ -441,6 +444,7 @@ class Controller extends Base
                     'name'          => [
                         'caption'   => 'Name',
                         'width'     => 12,
+                        'maxLength' => 150,
                     ],
                 ]
             ],
@@ -451,6 +455,7 @@ class Controller extends Base
                     'name'          => [
                         'caption'   => 'Name',
                         'width'     => 8,
+                        'maxLength' => 40,
                     ],
                     'externalResultType' => [
                         'caption'   => 'External SIS Type',
@@ -465,6 +470,7 @@ class Controller extends Base
                     'code'          => [
                         'caption'   => 'Code',
                         'width'     => 2,
+                        'maxLength' => 4,
                     ],
                     'displayAs'     => [
                         'caption'   => 'Display Name',
@@ -506,6 +512,7 @@ class Controller extends Base
                             ['key' => 'false', 'value' => 'No'],
                         ],
                         'width'     => 2,
+                        'mandatory' => true,
                     ]
                 ]
             ],
@@ -532,6 +539,7 @@ class Controller extends Base
                     'name'          => [
                         'caption'   => 'Name',
                         'width'     => 6,
+                        'maxLength' => 100,
                     ],
                     'documentClassification' => [
                         'getter'    => 'getDocumentClassification',
@@ -566,6 +574,7 @@ class Controller extends Base
                     'name'          => [
                         'caption'   => 'Name',
                         'width'     => 8,
+                        'maxLength' => 100,
                     ],
                     'externalCode' => [
                         'caption'   => 'SIS Code',
@@ -582,6 +591,7 @@ class Controller extends Base
                     'name'          => [
                         'caption'   => 'Name',
                         'width'     => 10,
+                        'maxLength' => 100,
                     ],
                     'externalCode' => [
                         'caption'   => 'SIS Code',
@@ -603,6 +613,7 @@ class Controller extends Base
                     'name' => [
                         'caption' => 'Name',
                         'width' => 8,
+                        'maxLength' => 100,
                     ],
                     'dashboard' => [
                         'caption' => 'Show On Pastoral Dashboard',
