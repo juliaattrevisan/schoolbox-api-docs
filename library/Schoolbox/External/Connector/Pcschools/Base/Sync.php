@@ -35,7 +35,12 @@ class Sync extends Base implements ISync
                 ID.LOGIN        AS network_login,
                 ''              AS student_title,
                 S.GIVEN_NAME    AS student_given_name,
-                S.GIVEN_NAME    AS student_preferred,
+                CASE
+                WHEN
+                    S.KNOWN_AS_NAME != ''
+                THEN S.KNOWN_AS_NAME
+                ELSE S.GIVEN_NAME
+                END             AS student_preferred,
                 S.LEGAL_SURNAME AS student_surname,
                 S.SEX           AS student_gender,
                 ''              AS student_home_email,
