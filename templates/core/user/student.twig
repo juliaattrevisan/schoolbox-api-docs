@@ -494,6 +494,17 @@
                                             {% endif %}
 
                                             {% endif %}
+
+                                            {% if contact.StudentContactPhoneActual and not contact.StudentContactSilentPhoneFlag %}
+                                                <li>
+                                                    <div class="list-item">
+                                                        <div class="card small-12">
+                                                            <span class="icon-phone size-32" title="Home Phone"></span>
+                                                            <p><a href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}">{{ contact.StudentContactPhoneActual }}</a></p>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            {% endif %}
                                     {% endfor %}
                                 </ul>
                             </section>
