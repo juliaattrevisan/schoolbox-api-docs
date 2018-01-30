@@ -187,12 +187,6 @@ class External_Pcschools_User implements External_UserInterface
         $rowset = $this->getDatabase()->getAll("
             SELECT
                 F.IDENTITY_ID#,
-                -- Address
-                F.COR_ADDRESS,
-                F.COR_ADDRESS1,
-                F.COR_TOWN,
-                F.COR_POST_CODE,
-                F.STATE_COR,
                 -- Father
                 F.DAD_LMS,
                 F.FATHER_TITLE,
@@ -244,13 +238,6 @@ class External_Pcschools_User implements External_UserInterface
             'StudentContactPreferred'          => '',
             'StudentContactSurname'            => '',
             'StudentContactDefaultEmail'       => '',
-            'ValidAddressFlag'                 => '',
-            'StudentContactAddress1'           => '',
-            'StudentContactAddress2'           => '',
-            'StudentContactAddress3'           => '',
-            'StudentContactSuburb'             => '',
-            'StudentContactPostCode'           => '',
-            'StudentContactState'              => '',
             'StudentContactPhoneActual'        => '',
             'StudentContactMobilePhone'        => '',
             'StudentContactOccupPhone'         => '',
