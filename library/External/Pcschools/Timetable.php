@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PCSchools timetable connector
  *
@@ -26,18 +27,12 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     private $userMapper;
 
     /**
-     * @var CampusMapper
-     */
-    private $campusMapper;
-
-    /**
      * Constructor
      */
     public function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
         $this->userMapper = new UserMapper();
-        $this->campusMapper = new CampusMapper();
     }
 
     /**
@@ -258,6 +253,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             // N contains random stuff (Dismissal)
             //
             // TODO: Possibly make a config variable of types to include
+
             if ($period["TYPE"] != "Y") {
                 // TODO: Remove hardcoded day one once Schoolbox supports different day/times
                 $periodNumber = "01." . str_pad($period['CODE'], 2, '0');
@@ -277,7 +273,8 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         // Add classes for each day into it
         foreach ($dayClasses as $dayClass) {
             // TODO: Remove hardcoded day one once Schoolbox supports different day/times
-            $period    = "01." . str_pad($dayClass['PERIOD'], 2, '0');
+            $period = "01." . str_pad($dayClass['PERIOD'], 2, '0');
+
             $classCode = $timePeriod . '/' . $dayClass['YEAR'] . $dayClass['ABBREV'] . $dayClass['CLASS'];
 
             if ($dayNumber == $dayClass['DAY']) {
@@ -567,9 +564,35 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      */
     public function getRoomTimetable($roomCodes)
     {
-        // Not yet implemented
-        return [];
-    }
+        // Split the requested room codes into a CSV string for use in the query
+
+        if (!is_array($roomCodes)) {
+            $roomCodes = [$roomCodes];
+        }
+
+        array_walk($roomCodes, function (&$value, &$key) {
+            $value = "'" . $this->getDatabase()->quote($value) . "'";
+        });
+
+        $roomCodes = implode(",", $roomCodes);
+
+        // We don't have any information at this point in time as to which user, date, or other context we are in- so
+        // we sadly just end up blindly picking any campus to get a value to use for TIME_PERIOD in our queries
+
+        $timePeriod = '';
+
+        $campuses = CampusMapper::getInstance()->findAll();
+
+        foreach ($campuses as $campus) {
+            $timePeriod = trim($campus->getExtTimetableCode());
+            if ($timePeriod !== '') {
+                break;
+            }
+        }
+
+        if ($timePeriod === '') {
+            return [];
+        }
 
         $timePeriod = $this->getDatabase()->quote($timePeriod);
 
