@@ -103,11 +103,21 @@
                  {% endif %}>
                 {# Context must display regardless of all else for self-assesses #}
                 {# TODO move into GridGenerator or something #}
-                {% set markVisibility = currentFeedback.isSelfAssessed or currentFeedback.isSelfReflected or participant.assessable.isFeedbackVisibleToUser(USER) %}
-                {% include '@rubric/grid.twig' with {
-                    rubric: feedbackRubricContexts[currentFeedback.id].rubric,
-                    markVisibility: markVisibility
-                } only %}
+                {% if currentFeedback.isSelfAssessed or currentFeedback.isSelfReflected %}
+                    {# set learnerRubric to same as rubric, so both rubric and self-selection can show #}
+                    {# set visibilty false, so rubric shows only as self-selection #}
+                    {% include '@rubric/grid.twig' with {
+                        rubric: feedbackRubricContexts[currentFeedback.id].rubric,
+                        learnerRubric: feedbackRubricContexts[currentFeedback.id].rubric,
+                        learner: participant.user,
+                        markVisibility: false
+                    } only %}
+                {% else %}
+                    {% include '@rubric/grid.twig' with {
+                        rubric: feedbackRubricContexts[currentFeedback.id].rubric,
+                        markVisibility: participant.assessable.isFeedbackVisibleToUser(USER)
+                    } only %}
+                {% endif %}
             </div>
         {% endif %}
 
