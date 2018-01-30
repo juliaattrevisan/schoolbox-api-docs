@@ -101,9 +101,12 @@
                  data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
                  data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}"
                  {% endif %}>
+                {# Context must display regardless of all else for self-assesses #}
+                {# TODO move into GridGenerator or something #}
+                {% set markVisibility = currentFeedback.isSelfAssessed or currentFeedback.isSelfReflected or participant.assessable.isFeedbackVisibleToUser(USER) %}
                 {% include '@rubric/grid.twig' with {
                     rubric: feedbackRubricContexts[currentFeedback.id].rubric,
-                    markVisibility: participant.assessable.isFeedbackVisibleToUser(USER)
+                    markVisibility: markVisibility
                 } only %}
             </div>
         {% endif %}
