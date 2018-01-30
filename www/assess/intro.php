@@ -131,8 +131,19 @@ $this->setBlock(TEMPLATE_content, 'section', 'section_block');
 $this->setBlock(TEMPLATE_content, 'startTest', 'startTest_block');
 $this->setBlock(TEMPLATE_content, 'has_assess_description', 'has_assess_description_block');
 $this->setBlock(TEMPLATE_content, 'has_assess_due', 'has_assess_due_block');
+$this->setBlock(TEMPLATE_content, 'author_link_open', 'author_link_open_block');
+$this->setBlock(TEMPLATE_content, 'author_link_close', 'author_link_close_block');
 
 $this->setTitle('Assessment: ' . Scrub::text($assess['title']));
+
+
+if ($author->isDeleted()) {
+    $this->setVar('author_link_open_block', '');
+    $this->setVar('author_link_close_block', '');
+} else {
+    $this->parse('author_link_open_block', 'author_link_open');
+    $this->parse('author_link_close_block', 'author_link_close');
+}
 
 $this->setVar(array(
     'RETURN_URL_SUFFIX' => isset($_GET["returnUrl"]) ? "?returnUrl=" . $_GET["returnUrl"] : "",
