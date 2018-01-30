@@ -36,10 +36,10 @@ class Sync extends Base implements ISync
                 ''              AS student_title,
                 S.GIVEN_NAME    AS student_given_name,
                 CASE
-                WHEN
-                    S.KNOWN_AS_NAME != ''
-                THEN S.KNOWN_AS_NAME
-                ELSE S.GIVEN_NAME
+                    WHEN
+                        S.KNOWN_AS_NAME != ''
+                    THEN S.KNOWN_AS_NAME
+                    ELSE S.GIVEN_NAME
                 END             AS student_preferred,
                 S.LEGAL_SURNAME AS student_surname,
                 S.SEX           AS student_gender,
@@ -182,10 +182,10 @@ class Sync extends Base implements ISync
                 T.SALUTATION     AS staff_title,
                 T.GIVEN_NAMES    AS staff_given_name,
                 CASE
-                WHEN
-                    T.KNOWNAS != ''
-                THEN T.KNOWNAS
-                ELSE T.GIVEN_NAMES
+                    WHEN
+                        T.KNOWNAS != ''
+                    THEN T.KNOWNAS
+                    ELSE T.GIVEN_NAMES
                 END              AS staff_preferred_name,
                 T.SURNAME        AS staff_surname,
                 ''               AS default_email_code,
