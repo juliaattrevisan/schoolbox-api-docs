@@ -193,7 +193,7 @@ class RubricContext
         if (!$dueWork instanceof DueWork) {
             return ['rubric' => null];
         }
-        return $this->generateReadonlyInternal(
+        $rubric = $this->generateReadonlyInternal(
             $dueWork,
             $feedback->getReviewee(),
             $currentUser,
@@ -201,6 +201,15 @@ class RubricContext
             $publishedOnly,
             $feedback->getId()
         );
+        // Post-process: if self-reflect, remove descriptor values
+        if ($feedback->isSelfReflected()) {
+            foreach ($rubric['rubric']['descriptors'] as $indicatorId => $descriptors) {
+                foreach ($descriptors as $level => $descriptor) {
+                    $rubric['rubric']['descriptors'][$indicatorId][$level]['value'] = null;
+                }
+            }
+        }
+        return $rubric;
     }
 
     /**
