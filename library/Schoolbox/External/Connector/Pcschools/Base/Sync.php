@@ -176,7 +176,12 @@ class Sync extends Base implements ISync
                 ''               AS active_flag,
                 T.SALUTATION     AS staff_title,
                 T.GIVEN_NAMES    AS staff_given_name,
-                T.GIVEN_NAMES    AS staff_preferred_name,
+                CASE
+                WHEN
+                    T.KNOWNAS != ''
+                THEN T.KNOWNAS
+                ELSE T.GIVEN_NAMES
+                END              AS staff_preferred_name,
                 T.SURNAME        AS staff_surname,
                 ''               AS default_email_code,
                 ''               AS home_email,
