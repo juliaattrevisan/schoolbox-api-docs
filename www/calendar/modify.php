@@ -1,5 +1,6 @@
 <?php
 
+use Schoolbox\Calendar\Event;
 use Schoolbox\Permission\Access\Access as FolderAccess;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
@@ -430,5 +431,11 @@ $page->checkList(
         'name' => 'EVENT_ROLE_NAME'
     )
 );
+
+/* Pass Personal const for ui elements
+ */
+$page->setVar([
+    'PERSONAL_LEVEL' => Event::ACCESS_PERSONAL
+]);
 
 $page->outputPage();
