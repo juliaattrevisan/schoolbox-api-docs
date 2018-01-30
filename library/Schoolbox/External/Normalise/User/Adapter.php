@@ -537,26 +537,6 @@ class Adapter  implements \External_UserInterface {
                 ;
 
                 $guardian1
-                    ->getPostalAddress()
-                    ->setAddress1($currentResult['StudentContactAddress1'])
-                    ->setAddress2($currentResult['StudentContactAddress2'])
-                    ->setAddress3($currentResult['StudentContactAddress3'])
-                    ->setSuburb($currentResult['StudentContactSuburb'])
-                    ->setState($currentResult['StudentContactState'])
-                    ->setPostcode($currentResult['StudentContactPostCode'])
-                ;
-
-                $guardian1
-                    ->getHomeAddress()
-                    ->setAddress1($currentResult['StudentContactAddress1'])
-                    ->setAddress2($currentResult['StudentContactAddress2'])
-                    ->setAddress3($currentResult['StudentContactAddress3'])
-                    ->setSuburb($currentResult['StudentContactSuburb'])
-                    ->setState($currentResult['StudentContactState'])
-                    ->setPostcode($currentResult['StudentContactPostCode'])
-                ;
-
-                $guardian1
                     ->getPhoneHome()
                     ->setNumber($currentResult['StudentContactPhoneActual'])
                     ->setSilent($currentResult['StudentContactSilentPhoneFlag'])
