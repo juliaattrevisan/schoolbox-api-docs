@@ -35,12 +35,18 @@
                 {% endif %}
                     <img src="/portrait.php?userId={{ currentFeedback.reviewer.externalId }}&amp;size=square64" alt="">
                     <p>
-                        {% if currentFeedback.published %}
-                            Feedback
+                        {% if currentFeedback.isSelfAssessed %}
+                            {{ locale.selfAssessment.proper }}
+                        {% elseif currentFeedback.isSelfReflected %}
+                            {{ locale.selfReflection.proper }}
                         {% else %}
-                            Draft Feedback
+                            {% if currentFeedback.published %}
+                                Feedback
+                            {% else %}
+                                Draft Feedback
+                            {% endif %}
+                            by {{ currentFeedback.reviewer.fullname }}
                         {% endif %}
-                        by {{ currentFeedback.reviewer.fullname }}
                         {% if currentFeedback.response.id %}
                         <span class="pipe meta">
                             {{ currentFeedback.published ? currentFeedback.publishedAt.short : currentFeedback.updatedAt.short }}

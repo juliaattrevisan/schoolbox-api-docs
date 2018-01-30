@@ -196,7 +196,9 @@ class Full
                     // Only self-assessment feedback is allowed
                     $includedFeedback = $currentResponse->getAllFeedback()->filter(
                         function (IFeedback $feedback) {
-                            return $feedback->isSelfAssessed();
+                            return $feedback instanceof Duework\Feedback\Model
+                                && ($feedback->isSelfAssessed() || $feedback->isSelfReflected())
+                            ;
                         }
                     );
                 }
