@@ -20,7 +20,7 @@ class Sync extends Base implements ISync
     public function findAllStudents()
     {
         return new StudentIterator(
-            $this->databaseExternal->executeStoredProcedureIterator(
+            $this->databaseExternal->getStoredProcedureIterator(
                 'sbGetStudentAccounts',
                 ['pUserName' => 'alaress', 'pUserPass' => 'alaress']
             )
@@ -33,7 +33,7 @@ class Sync extends Base implements ISync
     public function findAllParents()
     {
         return new GuardianIterator(
-            $this->databaseExternal->executeStoredProcedureIterator(
+            $this->databaseExternal->getStoredProcedureIterator(
                 'sbGetGuardianAccounts',
                 ['pUserName' => 'alaress', 'pUserPass' => 'alaress']
             )
@@ -46,7 +46,7 @@ class Sync extends Base implements ISync
     public function findAllStaff()
     {
         return new StaffIterator(
-            $this->databaseExternal->executeStoredProcedureIterator(
+            $this->databaseExternal->getStoredProcedureIterator(
                 'sbGetStaffAccounts',
                 ['pUserName' => 'alaress', 'pUserPass' => 'alaress']
             )

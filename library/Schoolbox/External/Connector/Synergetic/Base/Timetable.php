@@ -92,7 +92,7 @@ class Timetable extends Base implements ITimetable
         $externalIdBindings1 = $this->databaseExternal->prepareInBindings($externalIds);
         $externalIdBindings2 = $this->databaseExternal->prepareInBindings($externalIds);
 
-        $subjectIterator = $this->databaseExternal->executeQueryIterator(
+        $subjectIterator = $this->databaseExternal->getQueryIterator(
             "
                 SELECT          SubjectClasses.SubjectClassesSeq AS id,
                                 StudentClasses.ClassCode AS code,

@@ -20,7 +20,7 @@ class Sync extends Base implements ISync
      */
     public function findAllStudents()
     {
-        $studentIterator = $this->databaseExternal->executeQueryIterator("
+        $studentIterator = $this->databaseExternal->getQueryIterator("
             
             SELECT          vStudents.StudentID                           AS student_id,
                             NetworkLogin                                  AS network_login,
@@ -68,7 +68,7 @@ class Sync extends Base implements ISync
         $contactTypeBindings1 = $this->databaseExternal->prepareInBindings($contactTypes);
         $contactTypeBindings2 = $this->databaseExternal->prepareInBindings($contactTypes);
 
-        $guardianIterator = $this->databaseExternal->executeQueryIterator("
+        $guardianIterator = $this->databaseExternal->getQueryIterator("
             
             SELECT DISTINCT cp.NetworkLogin                               AS student_contact_network_login,
                             s.StudentContactID                            AS student_contact_id,
@@ -132,7 +132,7 @@ class Sync extends Base implements ISync
      */
     public function findAllStaff()
     {
-        $staffIterator = $this->databaseExternal->executeQueryIterator("
+        $staffIterator = $this->databaseExternal->getQueryIterator("
             
             SELECT          vStaff.StaffID                                AS staff_id,
                             Community.NetworkLogin                        AS network_login,

@@ -106,7 +106,7 @@ class External_Schoolbox_Class implements External_ClassInterface
                 $predicate["bindings"],
                 ['type' => $type]
             )
-        )->executeIterator();
+        )->getIterator();
     }
 
     /**
@@ -172,6 +172,6 @@ class External_Schoolbox_Class implements External_ClassInterface
                             u.firstname
             ",
             $predicate["bindings"]
-        )->executeIterator();
+        )->getIterator();
     }
 }

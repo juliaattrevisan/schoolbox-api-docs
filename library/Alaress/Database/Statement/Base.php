@@ -222,22 +222,13 @@ abstract Class Base implements IStatement
     /**
      * @inheritdoc
      */
-    public function executeIterator($values = null)
+    public function getIterator($values = null)
     {
         try {
             $this->prepareExecution($values);
-
-            // Grab iterator
-            $iterator = $this->broker->getIterator($this, $this->statement);
-
-            // Execute the statement
-            $iterator->execute();
-
-            // If we got to this point we got a valid iterator which had rows
-            return $iterator;
-
+            return $this->broker->getIterator($this, $this->statement);
         } catch (PDOException $e) {
-            throw new Exception("Exception error executing iterator: " . $e->getMessage(), 0, $e);
+            throw new Exception("Exception error retrieving iterator: " . $e->getMessage(), 0, $e);
         }
     }
 

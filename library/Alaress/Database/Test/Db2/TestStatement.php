@@ -101,13 +101,13 @@ class TestStatement extends TestCase
     }
 
     /**
-     * Test executeIterator() method
+     * Test getIterator() method
      *
      * @requires extension ibm_db2
      */
-    public function testExecuteIterator()
+    public function testGetIterator()
     {
-        $iterator = $this->db2Test->executeQueryIterator(
+        $iterator = $this->db2Test->getQueryIterator(
             'SELECT * FROM USERS WHERE NAME_LAST LIKE :nameLast',
             ['nameLast' => '%a%']
         );

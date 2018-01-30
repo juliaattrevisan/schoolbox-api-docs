@@ -293,7 +293,7 @@ class External_Synergetic_User implements External_UserInterface
                         r.ID IN ({$externalIdBindings['placeholders']})
         ";
 
-        $iteratorParents = $this->getConnector()->executeQueryIterator($query, $externalIdBindings['bindings']);
+        $iteratorParents = $this->getConnector()->getQueryIterator($query, $externalIdBindings['bindings']);
 
         $emailList = [];
 
@@ -400,7 +400,7 @@ class External_Synergetic_User implements External_UserInterface
 
         $student = [];
 
-        $iteratorStudents = $this->getConnector()->executeQueryIterator($query, ['externalId' => $synID]);
+        $iteratorStudents = $this->getConnector()->getQueryIterator($query, ['externalId' => $synID]);
 
         foreach ($iteratorStudents as $row) {
 
@@ -614,7 +614,7 @@ class External_Synergetic_User implements External_UserInterface
         // Now that we have created the query, time to shove it across to the database with
         // the appropriate parameters
 
-        $iteratorContacts = $this->getConnector()->executeQueryIterator($query, $bindings);
+        $iteratorContacts = $this->getConnector()->getQueryIterator($query, $bindings);
 
         $contactList = [];
 
@@ -754,7 +754,7 @@ class External_Synergetic_User implements External_UserInterface
                             StudentContactType IN ('SC1', 'SC2', 'SC3')
         ";
 
-        $iteratorContacts = $this->getConnector()->executeQueryIterator($query, ['externalId' => $externalUserId]);
+        $iteratorContacts = $this->getConnector()->getQueryIterator($query, ['externalId' => $externalUserId]);
 
         $contactList = [];
 
@@ -1213,7 +1213,7 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getStudentForms()
     {
-        $iteratorForms = $this->getConnector()->executeQueryIterator(
+        $iteratorForms = $this->getConnector()->getQueryIterator(
             "SELECT Code, Description FROM dbo.luForm WHERE ActiveFlag = 1"
         );
 

@@ -167,7 +167,7 @@ class External_Humanedge_Ngsl_Timetable extends External_Humanedge_Timetable
             $timetable[$x]['periodEnd']      = $timetabledef['end'][$x];
             $timetable[$x]['class']          = [];
         }
-        foreach ($db->executeQueryIterator($query, $params) as $timetabledClass) {
+        foreach ($db->getQueryIterator($query, $params) as $timetabledClass) {
             // Account for classes which extend multiple periods
             $periodSpan = range(
                 $timetabledClass['PeriodNumber'],
@@ -339,7 +339,7 @@ class External_Humanedge_Ngsl_Timetable extends External_Humanedge_Timetable
             // Fill in each day with blanks
             $timetable[$x]['day']            = array_fill(1, $timetabledef['dayCount'], []);
         }
-        foreach ($db->executeQueryIterator($query, $params) as $timetabledClass) {
+        foreach ($db->getQueryIterator($query, $params) as $timetabledClass) {
             // Account for classes which extend multiple periods
             $periodSpan = range(
                 $timetabledClass['PeriodNumber'],

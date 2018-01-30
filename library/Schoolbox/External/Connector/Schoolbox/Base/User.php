@@ -73,7 +73,7 @@ class User extends Base implements IUser
 
         $externalIdBindings = $this->databaseExternal->prepareInBindings($externalIds);
 
-        $guardianIterator = $this->databaseExternal->executeQueryIterator("
+        $guardianIterator = $this->databaseExternal->getQueryIterator("
 
             SELECT      `user`.`synergy_id` AS `externalId`,
                         `user`.`title` AS `title`,
@@ -239,7 +239,7 @@ class User extends Base implements IUser
 
         // Create the SQL query
 
-        $studentIterator = $this->databaseExternal->executeQueryIterator("
+        $studentIterator = $this->databaseExternal->getQueryIterator("
 
             SELECT      `user`.`synergy_id` as `externalId`,
                         `user`.`title` as `title`,
@@ -322,7 +322,7 @@ class User extends Base implements IUser
     {
         $externalIdBindings = $this->databaseExternal->prepareInBindings($externalIds);
 
-        $studentIterator = $this->databaseExternal->executeQueryIterator("
+        $studentIterator = $this->databaseExternal->getQueryIterator("
 
             SELECT      `user`.`synergy_id` as `externalId`,
                         `user`.`title` AS `title`,
@@ -414,7 +414,7 @@ class User extends Base implements IUser
      */
     public function getStudentsAccessible($externalId)
     {
-        $studentIterator = $this->databaseExternal->executeQueryIterator('
+        $studentIterator = $this->databaseExternal->getQueryIterator('
 
             SELECT      `user`.`synergy_id` as `externalId`,
                         `user`.`title` AS `title`,
@@ -506,7 +506,7 @@ class User extends Base implements IUser
 
         $externalIdBindings = $this->databaseExternal->prepareInBindings($externalIds);
 
-        $staffIterator = $this->databaseExternal->executeQueryIterator("
+        $staffIterator = $this->databaseExternal->getQueryIterator("
 
             SELECT      `user`.`synergy_id` AS `externalId`,
                         `user`.`title` AS `title`,
@@ -577,7 +577,7 @@ class User extends Base implements IUser
      */
     public function getStaffDirectory($filter = [])
     {
-        $staffIterator = $this->databaseExternal->executeQueryIterator('
+        $staffIterator = $this->databaseExternal->getQueryIterator('
 
             SELECT      `user`.`synergy_id` AS `externalId`,
                         `user`.`title` AS `title`,
@@ -682,7 +682,7 @@ class User extends Base implements IUser
     {
         $externalIdBindings = $this->databaseExternal->prepareInBindings($externalIds);
 
-        $campusIterator = $this->databaseExternal->executeQueryIterator(
+        $campusIterator = $this->databaseExternal->getQueryIterator(
             "
                 SELECT DISTINCT
                           `luCampus`.`id` as `id`, 

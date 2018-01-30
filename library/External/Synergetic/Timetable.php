@@ -523,7 +523,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             ]
         );
 
-        $iterator = $statement->executeIterator();
+        $iterator = $statement->getIterator();
 
         $count = 0;
 

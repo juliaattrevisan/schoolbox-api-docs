@@ -130,7 +130,7 @@ class External_Isams_User implements External_UserInterface
             WHERE $whereString
         ";
 
-        $iterator = $this->getConnector()->executeQueryIterator($query, $pb->getParams());
+        $iterator = $this->getConnector()->getQueryIterator($query, $pb->getParams());
 
         foreach ($iterator as $currentRow) {
             if (!isset($emailList[$currentRow['ParentID']])) {
@@ -363,7 +363,7 @@ class External_Isams_User implements External_UserInterface
                             V_Class.Tutor2ID = :external_user_id
         ';
 
-        $iterator = $this->getConnector()->executeQueryIterator($sql, ['external_user_id' => $externalUserId]);
+        $iterator = $this->getConnector()->getQueryIterator($sql, ['external_user_id' => $externalUserId]);
         $subjectList = [];
 
         foreach ($iterator as $currentRow) {

@@ -11,6 +11,7 @@
 namespace Alaress\Database\Iterator\Db2;
 
 use Alaress\Database\Iterator\Base;
+use Alaress\Database\Wrapper\Db2\PDOStatement;
 
 class Iterator extends Base
 {
@@ -22,6 +23,11 @@ class Iterator extends Base
         // DB2 does not implement rewinding or scrollable cursors, just cheating and re-executing the statement.
 
         $this->rowIndex = -1;
-        $this->execute();
+
+        if ($this->pdoStatement instanceof PDOStatement) {
+            $this->pdoStatement->closeCursor();
+        }
+
+        $this->executeToCurrentRowset();
     }
 }

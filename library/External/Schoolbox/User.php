@@ -50,7 +50,7 @@ class External_Schoolbox_User implements External_UserInterface
 
         $predicate = PredicateBuilder::getArrayBindings($id_list, 'contactId');
 
-        $parentIterator = $this->internalDatabase->executeQueryIterator(
+        $parentIterator = $this->internalDatabase->getQueryIterator(
             "
                 SELECT      parent.synergy_id AS StudentContactID,
                             parent.alt_email AS StudentContactEmail
@@ -178,7 +178,7 @@ class External_Schoolbox_User implements External_UserInterface
     {
         $contactAdaptionList = [];
 
-        $iterateContacts = $this->internalDatabase->executeQueryIterator(
+        $iterateContacts = $this->internalDatabase->getQueryIterator(
             "
                 SELECT      u.*
                 FROM        user_relation ur

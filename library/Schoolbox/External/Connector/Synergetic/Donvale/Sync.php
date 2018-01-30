@@ -40,7 +40,7 @@ class Sync extends BaseSync
         ";
 
         return new Iterator\Guardian(
-            $this->databaseExternal->executeQueryIterator($query)
+            $this->databaseExternal->getQueryIterator($query)
         );
     }
 }

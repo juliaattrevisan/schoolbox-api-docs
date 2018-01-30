@@ -55,7 +55,7 @@ class Sync extends Base implements ISync
             ORDER BY StudentID
         ";
 
-        return new Iterator\Student($this->databaseExternal->executeQueryIterator($query));
+        return new Iterator\Student($this->databaseExternal->getQueryIterator($query));
     }
 
     /**
@@ -89,7 +89,7 @@ class Sync extends Base implements ISync
             ORDER BY    ParentID
         ";
 
-        return new Iterator\Guardian($this->databaseExternal->executeQueryIterator($query));
+        return new Iterator\Guardian($this->databaseExternal->getQueryIterator($query));
     }
 
     /**
@@ -121,7 +121,7 @@ class Sync extends Base implements ISync
             ORDER BY    V_Staff.StaffID
         ";
 
-        return new Iterator\Staff($this->databaseExternal->executeQueryIterator($query));
+        return new Iterator\Staff($this->databaseExternal->getQueryIterator($query));
     }
 }
 

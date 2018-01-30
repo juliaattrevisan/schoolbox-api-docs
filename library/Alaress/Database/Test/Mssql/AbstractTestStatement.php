@@ -173,11 +173,11 @@ abstract class AbstractTestStatement extends TestCase
     }
 
     /**
-     * Test executeIterator() method
+     * Test getIterator() method
      */
-    public function testExecuteIterator()
+    public function testGetIterator()
     {
-        $iterator = $this->mssqlTest->executeQueryIterator(
+        $iterator = $this->mssqlTest->getQueryIterator(
             'SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname',
             ['Surname' => 'rhodes']
         );
@@ -341,7 +341,7 @@ abstract class AbstractTestStatement extends TestCase
         $result   = null;
         $returns  = ['value' => &$result, 'type' => PDO::PARAM_INT, 'length' => 4];
         $outputs  = [];
-        $iterator = $this->mssqlTest->executeStoredProcedureIterator(
+        $iterator = $this->mssqlTest->getStoredProcedureIterator(
             'uReturnValueTest',
             [],
             $outputs,
@@ -367,7 +367,7 @@ abstract class AbstractTestStatement extends TestCase
      */
     public function testStoredProcedureWithMultipleRecordSets()
     {
-        $iterator = $this->mssqlTest->executeStoredProcedureIterator('uTestMultipleRecordsets');
+        $iterator = $this->mssqlTest->getStoredProcedureIterator('uTestMultipleRecordsets');
 
         $count = 0;
         $expectedResults = ['1', '2', '3', '4'];

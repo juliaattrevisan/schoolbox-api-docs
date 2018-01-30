@@ -49,7 +49,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
             'pUserPass' => 'alaress',
             'pCampusID' => $campus->getExtTimetableCode(),
         ]);
-        $iterator = $statement->executeIterator();
+        $iterator = $statement->getIterator();
 
         $allDefinitions = [];
 
@@ -170,7 +170,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
             'pDayNumber' => $dayNumber,
         ]);
 
-        return $statement->executeIterator();
+        return $statement->getIterator();
     }
 
     /**
@@ -193,7 +193,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
             'pDayNumber' => $dayNumber,
         ]);
 
-        return $statement->executeIterator();
+        return $statement->getIterator();
     }
 
     /**
