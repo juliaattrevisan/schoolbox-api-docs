@@ -556,11 +556,17 @@ class MapperProxy
      * @param bool                $usePlanDates Filter by plan dates instead of assessment dates
      * @param Alaress_Date_Format $from
      * @param Alaress_Date_Format $to
+     * @param array               $options Any other query options
      * @return Collection|IAssessable[]
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function findAllByStudentWithinWindow(User $student, bool $usePlanDates, Alaress_Date_Format $from, Alaress_Date_Format $to)
-    {
+    public function findAllByStudentWithinWindow(
+        User $student,
+        bool $usePlanDates,
+        Alaress_Date_Format $from,
+        Alaress_Date_Format $to,
+        array $options = []
+    ) {
         /** @var FolderMapper $folderMapper */
         $folderMapper = $this->baseMapper->getJoinMapper('assessment_folder');
 
@@ -574,7 +580,9 @@ class MapperProxy
         )->getPropertyValues('id');
 
         // Build a list of parameters to pass to findAllForFolderId
-        $builder = $this->convertOptionsToPredicateBuilder(['window_open' => $from, 'window_close' => $to], $usePlanDates);
+        $options['window_open']  = $from;
+        $options['window_close'] = $to;
+        $builder = $this->convertOptionsToPredicateBuilder($options, $usePlanDates);
 
         // Find assessments which this student is no longer in the class for,
         // but has created a response or feedback for.
@@ -857,6 +865,8 @@ class MapperProxy
      * * converts "close_before" and "closed_after" to close date filters
      * * converts "type" to a filter which matches only that assessment type
      *   (see AssessmentType::TYPE_* constants)
+     * * converts "window_open" and "window_close" to a window inside which
+     *   to find due assessments
      *
      * @param array $options
      * @param bool  $usePlanDates Filter by plan dates instead of assessment dates

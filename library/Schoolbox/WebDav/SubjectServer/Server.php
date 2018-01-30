@@ -42,11 +42,6 @@ class Server extends DAV\Collection
     private $assessmentDataSource;
 
     /**
-     * @var Term
-     */
-    private $currentTerm;
-
-    /**
      * @var StorageDataSource
      */
     private $storageDataSource;
@@ -84,7 +79,6 @@ class Server extends DAV\Collection
      * @param StorageDataSource         $storageDataSource
      * @param DueWorkResponseDataSource $dueWorkResponseDataSource
      * @param ErrorMapper               $errorMapper
-     * @param Term                      $currentTerm
      * @param NameGenerator             $nameGenerator
      */
     public function __construct(
@@ -94,13 +88,11 @@ class Server extends DAV\Collection
         StorageDataSource $storageDataSource,
         DueWorkResponseDataSource $dueWorkResponseDataSource,
         ErrorMapper $errorMapper,
-        Term $currentTerm,
         NameGenerator $nameGenerator
     ) {
         $this->name                      = $name;
         $this->setUserSource($userSource);
         $this->assessmentDataSource      = $assessmentDataSource;
-        $this->currentTerm               = $currentTerm;
         $this->storageDataSource         = $storageDataSource;
         $this->dueWorkResponseDataSource = $dueWorkResponseDataSource;
         $this->errorMapper               = $errorMapper;
@@ -170,10 +162,11 @@ class Server extends DAV\Collection
         // Only due works due this term, and that accept submissions
         /** @var IAssessable[][]|Collection[] $groupedAssessments */
         $groupedAssessments = $this->assessmentDataSource
-            ->findAllByStudent(
+            ->findAllByStudentWithinWindow(
                 $this->retrieveUserFromSource(),
                 true,
-                $this->currentTerm,
+                \Alaress_Date_Format::now()->startOfDay(),
+                \Alaress_Date_Format::now()->endOfDay(),
                 ['type' => AssessmentType::TYPE_DUE_WORK,]
             )
             ->filter(function (IAssessable $assessment) use ($visibility) {
