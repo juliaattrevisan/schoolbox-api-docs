@@ -972,4 +972,15 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         }
         return true;
     }
+
+    /**
+     * Override delete as we now only delete the assessment not the submission_box
+     * @param object|Collection $object
+     * @return bool
+     */
+    function delete($object)
+    {
+        //noop
+        return true;
+    }
 }
