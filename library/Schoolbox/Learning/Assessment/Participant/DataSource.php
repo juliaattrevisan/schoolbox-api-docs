@@ -154,7 +154,7 @@ class DataSource
      * @return Collection|IAssessable[] $assessments, with participation loaded.
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws DomainException If user has interaction but not participant record
-     * @throws UnexpectedValueException If unable to merge student collections
+     * @throws UnexpectedValueException If unable to derive project participant collection
      */
     public function loadParticipationIntoAssessmentCollection(Collection $assessments, bool $includeExcluded, User $user = null): Collection
     {

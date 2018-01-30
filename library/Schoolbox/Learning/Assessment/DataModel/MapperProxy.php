@@ -34,6 +34,14 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 use UnderflowException;
+use Schoolbox\Mapper\DefinitionException;
+use DomainException;
+use UnexpectedValueException;
+use Alaress\Database\Predicate\InvalidColumnException;
+use TypeError;
+use PDOException;
+use LogicException;
+use InvalidArgumentException;
 
 /**
  * Proxy mapper for IAssessable objects.
@@ -88,6 +96,7 @@ class MapperProxy
         $this->model                 = IAssessable::class;
     }
 
+
     /**
      * Finds an assessable by ID.
      *
@@ -95,8 +104,12 @@ class MapperProxy
      *
      * @param int $id
      * @return IAssessable
+     * @throws DefinitionException If unable to locate a specified mapper join
+     * @throws DomainException If user has interaction but not participant record
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws LogicException If cyclic graph detected
      * @throws MapperException\Deleted if the assessment was deleted
-     * @throws MapperException         if the assessment doesn't exist at all
+     * @throws UnexpectedValueException If unable to derive project participant collections
      */
     public function findById($id)
     {
@@ -110,6 +123,13 @@ class MapperProxy
      *
      * @param int $id
      * @return IAssessable
+     * @throws MapperException\Deleted if the assessment was deleted
+     * @throws MapperException         if the assessment doesn't exist at all
+     * @throws DomainException If user has interaction but not participant record
+     * @throws DefinitionException If unable to locate a specified mapper join
+     * @throws UnexpectedValueException If unable to derive project participant collections
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws LogicException If cyclic graph detected
      */
     public function findByIdForModify($id)
     {
@@ -124,11 +144,18 @@ class MapperProxy
      * @param int  $id
      * @param User $student If provided, load only this student's participation
      * @return IAssessable
+     * @throws MapperException\Deleted if the assessment was deleted
+     * @throws DomainException If user has interaction but not participant record
+     * @throws DefinitionException If unable to locate a specified mapper join
+     * @throws UnexpectedValueException If unable to derive project participant collections
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws LogicException If cyclic graph detected
      */
     public function findByIdForReview($id, User $student = null)
     {
         return $this->findSingle('id', $id, true, $student);
     }
+
 
     /**
      * Finds all assessments that match the list of IDs.
@@ -138,6 +165,9 @@ class MapperProxy
      * @param int[] $ids
      * @param array $options
      * @return GenericCollection|IAssessable[]
+     * @throws DomainException If MarkType is invalid for the assessment
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws LogicException If cyclic graph detected
      */
     public function findAllByIds($ids, array $options = [])
     {
@@ -161,6 +191,11 @@ class MapperProxy
      * @param User $student If provided, load only this student's participation
      * @return IAssessable
      * @throws MapperException\Deleted if the quiz is deleted
+     * @throws DomainException If user has interaction but not participant record
+     * @throws DefinitionException If unable to locate a specified mapper join
+     * @throws UnexpectedValueException If unable to derive project participant collections
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws LogicException If cyclic graph detected
      */
     public function findByQuizId($quizId, User $student = null)
     {
@@ -181,12 +216,18 @@ class MapperProxy
      * @param int  $dueWorkId
      * @param User $student If provided, load only this student's participation
      * @return IAssessable
-     * @throws MapperException\Deleted if the quiz is deleted
+     * @throws MapperException\Deleted if the due-work is deleted
+     * @throws DomainException If user has interaction but not participant record
+     * @throws DefinitionException If unable to locate a specified mapper join
+     * @throws UnexpectedValueException If unable to derive project participant collections
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws LogicException If cyclic graph detected
      */
     public function findByDueWorkId($dueWorkId, User $student = null)
     {
         return $this->findSingle('d.id', $dueWorkId, true, $student);
     }
+
 
     /**
      * Find an assessment for the given task ID.
@@ -201,12 +242,18 @@ class MapperProxy
      * @param int  $taskId
      * @param User $student If provided, load only this student's participation
      * @return IAssessable
-     * @throws MapperException\Deleted if the quiz is deleted
+     * @throws DefinitionException If unable to locate a specified mapper join
+     * @throws DomainException If user has interaction but not participant record
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws LogicException If cyclic graph detected
+     * @throws MapperException\Deleted if the task is deleted
+     * @throws UnexpectedValueException If unable to derive project participant collections
      */
     public function findByTaskId($taskId, User $student = null)
     {
         return $this->findSingle('t.id', $taskId, true, $student);
     }
+
 
     /**
      * Finds the specification assessment for a implementation assessment.
@@ -217,8 +264,12 @@ class MapperProxy
      *
      * @param int $assessmentId
      * @return IAssessable
+     * @throws DefinitionException If unable to locate a specified mapper join
+     * @throws DomainException If user has interaction but not participant record
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws LogicException If cyclic graph detected
      * @throws MapperException\Deleted if the assessment was deleted
-     * @throws MapperException         if the assessment doesn't exist at all
+     * @throws UnexpectedValueException If unable to derive project participant collections
      */
     public function findSpecificationByImplementationId($assessmentId)
     {
@@ -228,14 +279,22 @@ class MapperProxy
         return $this->findById($model->getSpecificationAssessment()->getId());
     }
 
+
     /**
      * Finds the specification assessment for a implementation assessment.
      *
      * This method loads participants, responses and feedback.
      *
-     * @param int $assessmentId
+     * @param int   $assessmentId
      * @param array $options
      * @return IAssessable[]
+     * @throws DefinitionException If unable to locate a specified mapper join
+     * @throws DomainException If user has interaction but not participant record
+     * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws LogicException If cyclic graph detected
+     * @throws TypeError If a PredicateBuilder method is called with wrong data type
+     * @throws UnexpectedValueException If unable to merge student collections
      */
     public function findAllImplementationsBySpecificationId($assessmentId, array $options = [])
     {
@@ -254,6 +313,7 @@ class MapperProxy
         }
     }
 
+
     /**
      * Find all assessables for this context.
      *
@@ -265,6 +325,9 @@ class MapperProxy
      * @param AssessmentContext $context
      * @param array             $options
      * @return Collection|IAssessable[]
+     * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
+     * @throws TypeError If a PredicateBuilder method is called with wrong data type
+     * @throws LogicException If cyclic graph detected during translation
      */
     public function findAllByContext(AssessmentContext $context, array $options = [])
     {
@@ -283,6 +346,7 @@ class MapperProxy
         return $this->createCollection();
     }
 
+
     /**
      * Finds all assessables for a unit specification.
      *
@@ -294,6 +358,9 @@ class MapperProxy
      * @param int   $unitSpecId
      * @param array $options
      * @return Collection|IAssessable[]
+     * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
+     * @throws LogicException If cyclic graph detected during translation
+     * @throws TypeError If a PredicateBuilder method is called with wrong data type
      */
     public function findAllByUnitSpecificationId($unitSpecId, array $options = [])
     {
@@ -306,14 +373,18 @@ class MapperProxy
         }
     }
 
+
     /**
      * Finds all assessables for a unit implementation.
      *
      * This method does not currently load participants or the rubric grid.
      *
-     * @param int[]     $unitImplIds
-     * @param array     $options
+     * @param int[] $unitImplIds
+     * @param array $options
      * @return Collection|IAssessable[]
+     * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
+     * @throws LogicException If cyclic graph detected during translation
+     * @throws TypeError If a PredicateBuilder method is called with wrong data type
      */
     public function findAllByUnitImplementationIds(array $unitImplIds, array $options = [])
     {
@@ -326,6 +397,7 @@ class MapperProxy
         }
     }
 
+
     /**
      * Finds all assessables for a unit implementation.
      *
@@ -335,6 +407,12 @@ class MapperProxy
      * @param null|User $student If provided, load only this student's participation
      * @param array     $options
      * @return Collection|IAssessable[]
+     * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
+     * @throws TypeError If a PredicateBuilder method is called with wrong data type
+     * @throws DefinitionException If unable to locate a specified mapper join
+     * @throws DomainException If user has interaction but not participant record
+     * @throws UnexpectedValueException If unable to merge student collections
+     * @throws LogicException If cyclic graph detected during translation
      */
     public function findAllByUnitImplementationIdsForCourseOutline(array $unitImplIds, User $student = null, array $options = [])
     {
@@ -355,6 +433,12 @@ class MapperProxy
      * @param User      $student  If provided, load only this student's participation
      * @param array     $options
      * @return Collection|IAssessable[]
+     * @throws TypeError If a PredicateBuilder method is called with wrong data type
+     * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
+     * @throws DefinitionException If unable to locate a specified mapper join
+     * @throws DomainException If user has interaction but not participant record
+     * @throws UnexpectedValueException If unable to merge student collections
+     * @throws LogicException If cyclic graph detected during translation
      */
     public function findAllByFolderIdForReview($folderId, User $student = null, array $options = [])
     {
@@ -387,6 +471,9 @@ class MapperProxy
      * @param int $folderId
      * @param array     $options
      * @return Collection|IAssessable[]
+     * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
+     * @throws TypeError If a PredicateBuilder method is called with wrong data type
+     * @throws LogicException If cyclic graph detected during translation
      */
     public function findAllByFolderIdExclusively(int $folderId, array $options = [])
     {
@@ -411,6 +498,9 @@ class MapperProxy
      * @param int   $folderId
      * @param array $options
      * @return Collection|IAssessable[]
+     * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
+     * @throws TypeError If a PredicateBuilder method is called with wrong data type
+     * @throws LogicException If cyclic graph detected during translation
      */
     public function findAllByCourseImplementationFolderId($folderId, array $options = [])
     {
@@ -433,6 +523,9 @@ class MapperProxy
      * @param int   $projectId The assessment ID of the project (as opposed to the project's internal ID)
      * @param array $options
      * @return Collection|IAssessable[]
+     * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
+     * @throws TypeError If a PredicateBuilder method is called with wrong data type
+     * @throws LogicException If cyclic graph detected during translation
      */
     public function findAllByProjectId($projectId, array $options = [])
     {
@@ -445,14 +538,21 @@ class MapperProxy
         }
     }
 
+
     /**
      * Finds all assessables that are part of the given project, along with
      * all participation and rubric grids.
      *
      * @param int   $projectId The assessment ID of the project (as opposed to the project's internal ID)
-     * @param User  $student If provided, load only this student's participation
+     * @param User  $student   If provided, load only this student's participation
      * @param array $options
      * @return Collection|IAssessable[]
+     * @throws TypeError If a PredicateBuilder method is called with wrong data type
+     * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
+     * @throws DefinitionException If unable to locate a specified mapper join
+     * @throws DomainException If user has interaction but not participant record
+     * @throws UnexpectedValueException If unable to merge student collections
+     * @throws LogicException If cyclic graph detected during translation
      */
     public function findAllByProjectIdForReview($projectId, User $student = null, array $options = [])
     {
@@ -474,10 +574,14 @@ class MapperProxy
      *
      * @param User  $student
      * @param bool  $usePlanDates Filter by custom plan dates instead of assessment dates?
-     * @param Term  $term Restrict results to this term
+     * @param Term  $term         Restrict results to this term
      * @param array $options
      * @return Collection|IAssessable[]
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws TypeError If a PredicateBuilder method is called with wrong data type
+     * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
+     * @throws DefinitionException If unable to locate a specified mapper join
+     * @throws LogicException If cyclic graph detected during translation
+     * @throws UnexpectedValueException If unable to merge project participant collections
      */
     public function findAllByStudent(User $student, bool $usePlanDates, Term $term, array $options = [])
     {
@@ -494,9 +598,12 @@ class MapperProxy
      * @param Alaress_Date_Format $to           If provided, fetch only assessables due on or before this date
      * @param array               $options      Any other query options
      * @return Collection|IAssessable[]
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \InvalidArgumentException
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws DefinitionException If specified join mapper unable to not registered
+     * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
+     * @throws TypeError If a PredicateBuilder method is called with wrong data type
+     * @throws DomainException If user has interaction but not participant record
+     * @throws UnexpectedValueException If unable to merge project participant collections
+     * @throws LogicException If cyclic graph detected during translation
      */
     public function findAllByStudentBetweenDates(
         User $student,
@@ -560,7 +667,12 @@ class MapperProxy
      * @param Alaress_Date_Format $to
      * @param array               $options Any other query options
      * @return Collection|IAssessable[]
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws DefinitionException If specified join mapper not registered
+     * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
+     * @throws TypeError If a PredicateBuilder method is called with wrong data type
+     * @throws DomainException If user has interaction but not participant record
+     * @throws UnexpectedValueException If unable to merge student collections
+     * @throws LogicException If cyclic graph detected during translation
      */
     public function findAllByStudentWithinWindow(
         User $student,
@@ -608,14 +720,19 @@ class MapperProxy
         return $this->loadParticipantsIntoAssessmentCollection($this->translateToDomainModelCollection($assessments), false, $student);
     }
 
+
     /**
      * Finds all assessables for a staff member.
      *
      * This method does not loads participation.
      *
      * @param User $staff
-     * @param Term $term    Restrict results to this term
+     * @param Term $term Restrict results to this term
      * @return Collection|IAssessable[]
+     * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
+     * @throws TypeError If a PredicateBuilder method is called with wrong data type
+     * @throws DefinitionException If specified join mapper cannot be found
+     * @throws LogicException If cyclic graph detected during translation
      */
     public function findAllByStaff(User $staff, Term $term)
     {
@@ -638,10 +755,16 @@ class MapperProxy
         );
     }
 
+
     /**
      * Saves an assessable
      *
      * @param IAssessable $assessable
+     * @throws MapperException If no instance of model is found
+     * @throws MapperException\Deleted If the model was found but has been deleted
+     * @throws UnexpectedValueException If a triggered callback failed, and caller should know about it
+     * @throws PDOException If unable to execute SQL
+     * @throws LogicException If cyclic graph detected during translation
      */
     public function save(IAssessable $assessable)
     {
@@ -753,6 +876,8 @@ class MapperProxy
      * Deletes an assessable
      *
      * @param IAssessable $assessable
+     * @throws UnexpectedValueException If assessment does not have a context
+     * @throws LogicException If cyclic graph detected during translation
      */
     public function delete(IAssessable $assessable)
     {
@@ -769,6 +894,10 @@ class MapperProxy
      *
      * @param Model $model
      * @return IAssessable
+     * @throws UnexpectedValueException if $dataModel wasn't able to be translated
+     * @throws DomainException If MarkType is invalid for the assessment
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws LogicException If cyclic graph detected
      */
     public function translateToDomainModel(Model $model)
     {
@@ -787,6 +916,9 @@ class MapperProxy
      *
      * @param Collection|Model[] $dataModels
      * @return Collection|IAssessable[]
+     * @throws DomainException If MarkType is invalid for the assessment
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws LogicException If cyclic graph detected during translation
      */
     public function translateToDomainModelCollection(Collection $dataModels)
     {
@@ -812,6 +944,8 @@ class MapperProxy
      *
      * @param IAssessable $assessable
      * @return Model
+     * @throws UnexpectedValueException If assessment does not have a context
+     * @throws LogicException If cyclic graph detected
      */
     public function translateToDataModel(IAssessable $assessable)
     {
@@ -833,9 +967,11 @@ class MapperProxy
      * @param User   $student
      * @return IAssessable
      * @throws MapperException\Deleted if the assessment was deleted
-     * @throws \DomainException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \UnexpectedValueException
+     * @throws DomainException If user has interaction but not participant record
+     * @throws DefinitionException If unable to locate a specified mapper join
+     * @throws UnexpectedValueException If unable to derive project participant collections
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws LogicException If cyclic graph detected
      */
     protected function findSingle($column, $value, $loadParticipants = false, User $student = null)
     {
@@ -849,7 +985,10 @@ class MapperProxy
             }
             return $assessment;
 
-        } catch (MapperException\Deleted $e) {
+        }
+        // This can be thrown. The @method annotation masks exceptions thrown from base implementation.
+        /** @noinspection PhpRedundantCatchClauseInspection */
+        catch (MapperException\Deleted $e) {
             // Populate participants for the deleted assessment, and rethrow
             $assessment = $this->translateToDomainModel($e->getDeletedObject());
             if ($loadParticipants) {
@@ -876,8 +1015,8 @@ class MapperProxy
      * @param array $options
      * @param bool  $usePlanDates Filter by plan dates instead of assessment dates
      * @return Builder
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \InvalidArgumentException
+     * @throws InvalidColumnException If a PredicateBuilder method is called
+     * @throws TypeError If a PredicateBuilder method is called with wrong data type
      */
     protected function convertOptionsToPredicateBuilder(array $options, bool $usePlanDates): Builder
     {
@@ -981,9 +1120,10 @@ class MapperProxy
      * @param Collection $collection
      * @param bool       $includeExcluded Should we include explicitly excluded participants in graph?
      * @param User       $user
-     * @param bool       $includeResponses
-     * @param bool       $includeFeedbacks
      * @return Collection|IAssessable[]
+     * @throws DefinitionException If unable to locate a specified mapper join
+     * @throws DomainException If user has interaction but not participant record
+     * @throws UnexpectedValueException If unable to merge student collections
      */
     public function loadParticipantsIntoAssessmentCollection(
         Collection $collection,

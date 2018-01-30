@@ -43,6 +43,7 @@ use Traversable;
 use UnderflowException;
 use TypeError;
 use Alaress\Database\Predicate\InvalidColumnException;
+use UnexpectedValueException;
 
 
 abstract class Mapper implements IMapper, Serializable
@@ -2655,8 +2656,8 @@ abstract class Mapper implements IMapper, Serializable
      * @param $object
      * @return bool|\int[]
      * @throws Exception
-     * @throws PDOException
-     * @throws \UnexpectedValueException
+     * @throws PDOException If unable to execute SQL
+     * @throws UnexpectedValueException If a triggered callback failed, and caller should know about it
      */
     public function save($object)
     {
@@ -2771,12 +2772,14 @@ abstract class Mapper implements IMapper, Serializable
         return $affectedIDs;
     }
 
-
+    // Despite PHPStorm's warning, the PDOException is thrown during calls to PDO::execute() for SQL errors because
+    // we have configured the PDO connection with $PDO->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    /** @noinspection PhpDocRedundantThrowsInspection */
     /**
      * Update any n:n relations that exist
      *
      * @param object $model
-     * @throws PDOException
+     * @throws PDOException If unable to execute SQL. (as PDO is configured with PDO::ERRMODE_EXCEPTION)
      * @return bool
      */
     private function savePolyJoins($model)
