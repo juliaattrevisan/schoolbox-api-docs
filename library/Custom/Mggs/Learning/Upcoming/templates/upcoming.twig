@@ -482,7 +482,7 @@
                         return false;
                     }
 
-                    var format = convertFormat('{{ config.date_local }}'),
+                    var format = adtp.convertFormat('{{ config.date_local }}'),
                         open   = moment(eventData.bounds.open),
                         due    = moment(eventData.bounds.due);
 
@@ -576,7 +576,7 @@
             var dateField = $modalForm.find('.date'),
                 prevDate  = dateField.text(),
                 eventData = $modalForm.data('eventData'),
-                newDate   = moment($(this).val(), convertFormat('{{ config.date_local }}')),
+                newDate   = moment($(this).val(), adtp.convertFormat('{{ config.date_local }}')),
                 assessId  = eventData.assessmentId,
                 eventData = {
                     className: [],
