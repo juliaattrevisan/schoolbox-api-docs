@@ -191,11 +191,23 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     public function getStudentContactList($externalUserId)
     {
         $caseSensitiveFields = array(
-            'StudentContactID', 'StudentContactTitle', 'StudentContactPreferred',
-            'StudentContactSurname', 'StudentContactDefaultEmail', 'StudentContactPhoneActual', 'StudentContactMobilePhone',
-            'StudentContactOccupPhone', 'StudentContactSpouseID', 'StudentContactSpouseTitle',
-            'StudentContactSpousePreferred', 'StudentContactSpouseSurname', 'StudentContactSpouseMobilePhone',
-            'StudentContactSpouseOccupPhone', 'StudentContactSpouseDefaultEmail', 'StudentContactType'
+            'StudentContactID',
+            'StudentContactTitle',
+            'StudentContactPreferred',
+            'StudentContactSurname',
+            'StudentContactDefaultEmail',
+            'StudentContactPhoneActual',
+            'StudentContactSilentPhoneFlag',
+            'StudentContactMobilePhone',
+            'StudentContactOccupPhone',
+            'StudentContactSpouseID',
+            'StudentContactSpouseTitle',
+            'StudentContactSpousePreferred',
+            'StudentContactSpouseSurname',
+            'StudentContactSpouseMobilePhone',
+            'StudentContactSpouseOccupPhone',
+            'StudentContactSpouseDefaultEmail',
+            'StudentContactType'
         );
 
         $stmt = $this->getConnection()->prepareQuery("

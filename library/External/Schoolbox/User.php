@@ -137,6 +137,7 @@ class External_Schoolbox_User implements External_UserInterface
                             parent.lastname AS StudentContactSurname,
                             pp.guardian1Email AS StudentContactDefaultEmail,
                             pp.guardian1HomePhone AS StudentContactPhoneActual,
+                            0 AS StudentContactSilentPhoneFlag,
                             pp.guardian1MobilePhone AS StudentContactMobilePhone,
                             pp.guardian1WorkPhone AS StudentContactOccupPhone,
                             '' AS StudentContactSpouseID,

@@ -223,6 +223,7 @@ class External_Schoolpro_User implements External_UserInterface
                 'StudentContactID'                 => $currentStudentContact['ID'],
                 'StudentContactDefaultEmail'       => $currentStudentContact['email'],
                 'StudentContactPhoneActual'        => $currentStudentContact['HomePhone'],
+                'StudentContactSilentPhoneFlag'    => 0,
                 'StudentContactMobilePhone'        => $currentStudentContact['Mobile'],
                 'StudentContactOccupPhone'         => $currentStudentContact['BusinessPhone'],
                 'StudentContactRelation'           => '',

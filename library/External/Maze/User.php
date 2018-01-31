@@ -434,6 +434,7 @@ class External_Maze_User implements External_UserInterface
 				MSURNAME AS StudentContactSurname,
 				M_EMAIL AS StudentContactDefaultEmail,
 				TELEPHONE AS StudentContactPhoneActual,
+				UM.SILENT_NUMBER AS StudentContactSilentPhoneFlag,
 				MMOBILE AS StudentContactMobilePhone,
 				MBUS_PHONE AS StudentContactOccupPhone,
 				'' AS StudentContactRelation,

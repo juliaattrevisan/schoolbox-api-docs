@@ -299,6 +299,7 @@ class External_Isams_User implements External_UserInterface
                         V_Parent.Mobile               AS StudentContactMobilePhone,
                         ''                            AS StudentContactOccupPhone,
                         ''                            AS StudentContactPhoneActual,
+                        0                             AS StudentContactSilentPhoneFlag,
                         V_Parent.Relationship         AS StudentContactRelation,
                         ''                            AS StudentContactSpouseID,
                         ''                            AS StudentContactSpouseTitle,

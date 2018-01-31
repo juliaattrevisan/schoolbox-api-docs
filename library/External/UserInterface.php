@@ -68,6 +68,7 @@ interface External_UserInterface {
      * StudentContactSurname,
      * StudentContactDefaultEmail,
      * StudentContactPhoneActual,
+     * StudentContactSilentPhoneFlag,
      * StudentContactMobilePhone,
      * StudentContactOccupPhone,
      * StudentContactRelation,

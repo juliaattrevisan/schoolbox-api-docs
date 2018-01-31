@@ -358,6 +358,7 @@ class External_Denbigh_User implements External_UserInterface
                 'StudentContactSurname'          => $contact['surname'],
                 'StudentContactDefaultEmail'     => $contact['email'],
                 'StudentContactPhoneActual'      => $contact['telephoneHome'],
+                'StudentContactSilentPhoneFlag'  => 0,
                 'StudentContactMobilePhone'      => '',
                 'StudentContactOccupPhone'       => '',
                 'StudentContactSpouseID'         => '',

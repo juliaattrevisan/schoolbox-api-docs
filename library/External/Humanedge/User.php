@@ -140,6 +140,7 @@ class External_Humanedge_User implements External_UserInterface
                 c.LastName AS StudentContactSurname,
                 c.Email AS StudentContactDefaultEmail,
                 c.PhoneHome AS StudentContactPhoneActual,
+                0 AS StudentContactSilentPhoneFlag,
                 c.PhoneMobile AS StudentContactMobilePhone,
                 c.PhoneWork AS StudentContactOccupPhone,
                 '' AS StudentContactRelation,

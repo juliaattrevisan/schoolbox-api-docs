@@ -705,6 +705,7 @@ class External_Doublefirst_User implements External_UserInterface
                       c.Surname StudentContactSurname,
                       ceh.EmailID AS StudentContactDefaultEmail,
                       cp.HomeTelephoneNumber AS StudentContactPhoneActual,
+                      0 AS StudentContactSilentPhoneFlag,
                       
                       LTRIM(
                         RTRIM(
