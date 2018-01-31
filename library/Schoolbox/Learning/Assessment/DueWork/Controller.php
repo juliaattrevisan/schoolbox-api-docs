@@ -277,11 +277,17 @@ class Controller extends Assessment\Controller
             'authoritativeFeedback' => $participant->findAuthoritativeVisibleFeedback($this->getUser()),
         ];
 
+        $twigData['submissionsBlocked']    = false;
+        $twigData['acknowlegementBlocked'] = false;
         try {
             $assessment->assertAcceptSubmission($allResponses);
-            $twigData['submissionsBlocked'] = false;
         } catch (DomainException $e) {
             $twigData['submissionsBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
+            try {
+                $assessment->assertAcceptAcknowledgement();
+            } catch (DomainException $e) {
+                $twigData['acknowlegementBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
+            }
         }
 
         $this->getResponse()->content->set(
