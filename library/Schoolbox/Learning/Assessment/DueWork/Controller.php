@@ -939,7 +939,9 @@ class Controller extends Assessment\Controller
         // Otherwise, publish acknowledgement immediately.
         $assessment = $participant->getAssessable();
         try {
-            $response = $this->persistEmptySobo($participant, null);
+            // Try to find a non-draft to return first; attach ack to that draft instead.
+            $response = $participant->findMostRecentDraftResponse()
+                        ?? $this->persistEmptySobo($participant, null);
             $route    = 'learningAssessment.getSummary';
             $params   = [
                 'participant'  => $participant,
