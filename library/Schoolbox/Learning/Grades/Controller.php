@@ -29,6 +29,10 @@ use Schoolbox\Filter\Page as FilterPage;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
 use Schoolbox\Learning\Assessment\DueWork;
+use Alaress\Database\Predicate\InvalidColumnException;
+use LogicException;
+use TypeError;
+use UnexpectedValueException;;
 
 class Controller extends Base
 {
@@ -143,27 +147,29 @@ class Controller extends Base
      * @param Term\Model $term
      * @throws DefinitionException If a required mapper join is not defined
      * @throws ServiceNotFound If unable to locate HTML web Output
+     * @throws TypeError If a PredicateBuilder method is called with wrong data type
+     * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
+     * @throws LogicException If cyclic graph detected during translation
+     * @throws UnexpectedValueException If unable to merge project participant collections
      */
     public function getGrades(User $viewee, Term\Model $term)
     {
         // Add folders with response or feedback
         $folders = $this->findFoldersWithStudentInteractions($viewee, $term);
 
-
-
         // Get all assessments for this user in the specified term, grouped by folder
         $assessmentsPerFolder = $this->assessmentMapperProxy
-                                     ->findAllByStudent($viewee, false, $term)
-                                     ->filter(function(IAssessable $a) use ($viewee){
-                                         return !$a->getParticipant($viewee)->isExcluded();
-                                     })
-                                     ->groupByCallback(function (IAssessable $assessment) {
-                                         return $assessment->getBaseContext()->getFolder()->getId();
-                                     });
+            ->findAllByStudent($viewee, false, $term)
+            ->filter(function (IAssessable $a) use ($viewee) {
+                return $a->isParticipant($viewee);
+            })
+            ->groupByCallback(function (IAssessable $assessment) {
+                return $assessment->getBaseContext()->getFolder()->getId();
+            });
 
         /** @var GenericCollection|Folder\Model[] $folders */
         $folders = $folders->filter(function(Folder\Model $folder) use ($assessmentsPerFolder){
-            return array_key_exists($folder->getId(), $assessmentsPerFolder);
+            return $assessmentsPerFolder->keyExists($folder->getId());
         });
 
         // Load Teachers
@@ -185,7 +191,6 @@ class Controller extends Base
                 $markbooks->setOffset($folderId, new Markbook($assessments, $this->defaultGradeGroup, $this->getUser()));
             }
         }
-
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/summary.twig', [
             'student'          => $viewee,
@@ -250,7 +255,7 @@ class Controller extends Base
 
         $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, false, $viewee)
                                                    ->filter(function (IAssessable $a) use ($viewee) {
-                                                       return !$a->getParticipant($viewee)->isExcluded();
+                                                       return $a->isParticipant($viewee);
                                                    });
 
         $markbook      = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
@@ -331,7 +336,7 @@ class Controller extends Base
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
         $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, false, $viewee)
                                                    ->filter(function (IAssessable $a) use ($viewee) {
-                                                       return !$a->getParticipant($viewee)->isExcluded();
+                                                       return $a->isParticipant($viewee);
                                                    });
 
         // Show the graph for:
