@@ -11,6 +11,7 @@ use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
 use Custom\Mggs\Personalised\Participant;
 use Schoolbox\Collection;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Project;
@@ -32,13 +33,21 @@ class Factory
     protected $router;
 
     /**
+     * @var IConfigLoader
+     */
+    private $conf;
+
+
+    /**
      * Constructor
      *
-     * @param Router $router
+     * @param Router        $router
+     * @param IConfigLoader $conf
      */
-    public function __construct(Router $router)
+    public function __construct(Router $router, IConfigLoader $conf)
     {
         $this->router = $router;
+        $this->conf = $conf;
     }
 
     /**
@@ -218,9 +227,8 @@ class Factory
                 } else {
                     $mark = $feedback->getNormalisedMark();
                     if (isset($mark)) {
-                        // > mastery threshold (hardcode to 70 for now)
-                        // TODO un-hardcode this
-                        $className[] = ($mark >= 70 ? 'mastered' : 'fail');
+                        // > mastery threshold (default value is 70, but configurable)
+                        $className[] = ($mark >= $this->conf->get('pbl_mastery_threshold') ? 'mastered' : 'fail');
                     }
                 }
 

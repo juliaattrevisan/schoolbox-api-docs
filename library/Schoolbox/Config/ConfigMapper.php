@@ -13,6 +13,12 @@ namespace Schoolbox\Config;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
 
+
+/**
+ * Class ConfigMapper
+ * @package Schoolbox\Config
+ * @method Config findOneByColumn($columnName, $columnValue, $order = array(), $options = array())
+ */
 class ConfigMapper extends Mapper implements IConfigLoader
 {
 

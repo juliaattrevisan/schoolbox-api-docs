@@ -33,14 +33,127 @@ class Javascript extends Base
             return '';
         }
 
+        $event = $this->deriveCore();
+        $event['data'] = [
+            'meta'       => $this->deriveMeta(),
+            'links'      => $this->deriveLinks(),
+            'styles'     => $this->deriveStyles(),
+            'attendance' => $this->deriveAttendance(),
+            'custom'     => $this->deriveCustom()
+        ];
+
+
+        return json_encode($event, JSON_PARTIAL_OUTPUT_ON_ERROR) . ',';
+    }
+
+
+    /**
+     * @return array
+     */
+    protected function deriveCore()
+    {
+        $event = $this->getEvent();
+
         /* Congeal all that stuff
          */
-        $start = $this->getEvent()->getStartTime()->getDatabaseDate();
-        $all_day = $this->getEvent()->getAllday();
-        if (!$all_day) {
-            $start .= ' ' . $this->getEvent()->getStartTime()->getDatabaseTime();
+        $start = $event->getStartTime()->getDatabaseDate();
+        $allDay = $event->getAllday();
+        if (!$allDay) {
+            $start .= ' ' . $event->getStartTime()->getDatabaseTime();
         }
 
+        $data = [
+            'title' => $event->getTitle(),
+            'start' => $start,
+            'end' => '',
+
+            /* Whether you can edit this event or not
+             */
+            'editable' => $this->isEditable(),
+
+            /* Whether it's an all-day event or not
+             * If allDay is true, then you can't resize it
+             *
+             * Schoolbox usage would be that all events are not
+             * allDay events
+             */
+            'allDay' => $allDay,
+
+            /* Colour of the event
+             */
+            'color' => $event->getColour(),
+            'className' => $event->getEventClasses(),
+        ];
+
+        if ($this->getEvent()->getResourceId()) {
+            $data['resourceId'] = $this->getEvent()->getResourceId();
+        }
+
+        return $data;
+    }
+
+
+    /**
+     * @return array
+     */
+    protected function deriveMeta()
+    {
+        $event = $this->getEvent();
+
+        return [
+            'eventId'   => $event->getEventId(),
+            'time'      => $event->getTime(),
+            'detail'    => Scrub::html($event->getDetail()),
+            'location'  => '',
+            'eventType' => 'type' . $event->getType(),
+            'type'      => $event->getEventType(),
+            'author'    => $event->getAuthorName(),
+            'authorId'  => $event->getAuthorId(),
+            'level'     => $event->getEventClasses(),
+            'completed' => '',
+        ];
+    }
+
+
+    /**
+     * @return array
+     */
+    protected function deriveLinks()
+    {
+        return [];
+    }
+
+
+    /**
+     * @return array
+     */
+    protected function deriveStyles()
+    {
+        return [
+            'visible' => true,
+        ];
+    }
+
+
+    /**
+     * @return array
+     */
+    protected function deriveAttendance()
+    {
+        return [
+            'icon'          => false,
+            'status'        => false,
+            'requestButton' => false,
+            'listButton'    => false,
+        ];
+    }
+
+
+    /**
+     * @return array
+     */
+    protected function deriveCustom()
+    {
         $modifyLink = $this->getRouteIfAuthorized(
             'learningAssessment.getUpdateAssessmentForm',
             [
@@ -68,60 +181,11 @@ class Javascript extends Base
                 ]
             );
         }
-        $event = array(
-            'title'     => $this->getEvent()->getTitle(),
-            'start'     => $start,
-            'end'       => "",
-            /* Whether you can edit this event or not
-             */
-            'editable'  => $this->isEditable(),
-            /* Whether it's an all-day event or not
-             * If allDay is true, then you can't resize it
-             *
-             * Schoolbox usage would be that all events are not
-             * allDay events
-             */
-            'allDay'    => $all_day,
-            /* Colour of the event
-             */
-            'color'     => $this->getEvent()->getColour(),
-            'className' => $this->getEvent()->getEventClasses(),
-            /* Extra data that the Event Object doesn't directly support
-             */
-            'data'      => array(
-                'meta'       => array(
-                    'eventId'   => $this->getEvent()->getEventId(),
-                    'time'      => $this->getEvent()->getTime(),
-                    'detail'    => Scrub::html($this->getEvent()->getDetail()),
-                    'location'  => '',
-                    'eventType' => 'type' . $this->getEvent()->getType(),
-                    'type'      => $this->getEvent()->getEventType(),
-                    'author'    => $this->getEvent()->getAuthorName(),
-                    'authorId'  => $this->getEvent()->getAuthorId(),
-                    'level'     => $this->getEvent()->getEventClasses(),
-                    'completed' => '',
-                ),
-                'links'      => array(),
-                'styles'     => array(
-                    'visible' => true,
-                ),
-                'attendance' => array(
-                    'icon'          => false,
-                    'status'        => false,
-                    'requestButton' => false,
-                    'listButton'    => false,
-                ),
-                'custom'     => array(
-                    'modifyLink'      => $modifyLink,
-                    'moreDetailsLink' => $moreDetailsLink,
-                ),
-            ),
-        );
 
-        if ($this->getEvent()->getResourceId()) {
-            $event['resourceId'] = $this->getEvent()->getResourceId();
-        }
-
-        return json_encode($event, JSON_PARTIAL_OUTPUT_ON_ERROR) . ',';
+        return [
+            'modifyLink'      => $modifyLink,
+            'moreDetailsLink' => $moreDetailsLink,
+        ];
     }
+
 }

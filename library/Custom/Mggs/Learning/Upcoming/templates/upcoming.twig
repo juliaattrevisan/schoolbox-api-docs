@@ -1,0 +1,995 @@
+
+{% import '@learning/macro/urgency.twig' as urgency %}
+{% import '@learning/macro/dueDate.twig' as dueDate %}
+
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.print.css" media="print" />
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar-scheduler/dist/scheduler.min.css" />
+<link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
+<link rel="stylesheet" type="text/css" href="/css/mggs/personalised.css" />
+<script type="text/javascript" src="/javascript/components/schoolbox-fullcalendar.min.js?v={SITE_VERSION}"></script>
+<script type="text/javascript" src="/javascript/components/fullcalendar-scheduler/dist/scheduler.min.js"></script>
+<script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+<script type="text/javascript">
+
+    var realEventList = {};
+
+    var collapsed = false;
+
+    var eventsRendered = 0;
+
+    // provide page-wide access to the calendar object so the callbacks can actually use it
+    var c;
+
+    /**
+     * Update event method:
+     *
+     * * Gives event a "loading" style
+     * * Removes that style when update finishes
+     *
+     * @param event      The event to update
+     * @param data       The data to send to the update script
+     * @param revertFunc called if update failed for whatever reason.
+     *                   Sets event back to original state.
+     */
+    var updateWrapper = function(event, data, revertFunc) {
+        event.className.push('loading');
+        c.cupdate(data, function (returnData) {
+            event.className = event.className.filter(function (value) {
+                return value != 'loading';
+            });
+            if (!returnData) {
+                revertFunc();
+            }
+            c.dom.fullCalendar('rerenderEvents');
+        });
+    };
+
+    // once the DOM has loaded, punch a fancy calendar into it
+    $(function() {
+        // Allow checking of anchor for view to display
+        var anchor = '';
+        var parts  = location.href.split('#');
+
+        if (parts.length > 1) {
+            anchor = parts[1];
+            switch (anchor) {
+                case 'month':
+                    anchor = 'month';
+                    break;
+                case 'week':
+                case 'agendaWeek':
+                    anchor = 'agendaWeek';
+                    break;
+                default:
+                    anchor = '';
+                    break;
+            }
+        }
+
+        var height = null;
+
+        if (isSmallDevice()) {
+            height = 'auto';
+        }
+
+        var $cal = $('#calendar');
+        var $modalForm = $('#editEvent');
+
+        var defaultDate;
+
+        var visibleTermDates = [];
+
+        var now = moment('{{ termDates ? termDates[0] : date }}');
+        defaultDate = now;
+
+        /**
+         * How to fetch the assessments for the current view
+         *
+         * @param {Moment} start
+         * @param {Moment} end
+         * @param timezone
+         * @param {Function} callback
+         */
+        var fetchEvents = function (start, end, timezone, callback) {
+            $.ajax({
+                dataType: 'json',
+                url:      '/submission/ajax/events',
+                data: {
+                    start: Calendar.reOffsetTimestamp(start.unix()),
+                    end:   Calendar.reOffsetTimestamp(end.unix()),
+                    userId: Number('{{ student.id|escape('js') }}')
+                },
+                success: function(data) {
+                    callback(data.filter(function(v) {
+                        return 'start' in v;
+                    }));
+                },
+                cache: false
+            });
+        };
+
+        /**
+         * Update the header
+         */
+        var redrawWeekNumbers = function () {
+            $('.fc-scroller-canvas .fc-content tr').eq(2).find('th[data-date]').each(function () {
+                var disp = '';
+                var mom  = moment($(this).data('date'));
+
+                if (visibleTermDates.length) {
+                    if (mom.isBefore(visibleTermDates[3]) && mom.isAfter(visibleTermDates[0])) {
+                        disp = mom.diff(visibleTermDates[0], 'weeks');
+                    }
+                }
+
+                $(this).find('.fc-cell-text').text(disp);
+
+            });
+        };
+
+        /**
+         * How to fetch the terms for the current view
+         *
+         * @param {Moment} start
+         * @param {Moment} end
+         * @param timezone
+         * @param {Function} callback
+         */
+        var fetchTerms = function (start, end, timezone, callback) {
+            $.ajax({
+                dataType: 'json',
+                url: '{{ routeLookup('learningUpcoming.getTermDates') }}'.replace('{date}', start.format('DD-MM-YYYY')),
+                success: function (termDates) {
+
+                    var shades = [];
+
+                    // install background events
+                    // find the weeks between terms
+                    var shade = {
+                        start: moment(termDates[1]).add({ days: 5 }),
+                        end: moment(termDates[2]).add({days: -1})
+                    };
+
+                    $cal.find('[data-resource-id]').each(function () {
+                        // paint out the holidays
+                        shades.push({
+                            start: shade.start,
+                            end: shade.end,
+                            rendering: 'background',
+                            resourceId: $(this).data('resourceId'),
+                            allDay: true
+                        });
+                    });
+
+                    callback(shades);
+                }
+            }).done(function (termDates) {
+                visibleTermDates = termDates;
+                redrawWeekNumbers();
+            });
+        };
+
+        /**
+         * How to retrieve a student's resources (subjects, units, projects)
+         *
+         * @param {Function} callback
+         */
+        var fetchResources = function (callback) {
+            var url = '{{ routeLookup('learningPersonalised.getResourcesForStudent', {studentId: student.id}) }}';
+            $.get(url + '/' + $cal.fullCalendar('getDate').format('DD-MM-YYYY'), function (resourceObjects) {
+                callback(resourceObjects);
+                // once the resources are loaded, THEN we can load the holiday overlay
+                $cal.fullCalendar('addEventSource', fetchTerms);
+            });
+        };
+
+        /**
+         * @param {View}   view
+         * @param {jQuery} $element
+         */
+        var onViewChange = function (view, $element) {
+            if (view.type === 'timelineTerm') {
+                // time to re-render
+                eventsRendered = 0;
+                collapsed = false;
+                realEventList = {};
+            }
+        };
+
+        /**
+         * When an event drag action starts
+         *
+         * @param {Object} calEvent
+         * @param {Event}  dragEvent
+         * @param {View}   view
+         */
+        var onDragStart = function (calEvent, dragEvent, _empty, view) {
+            if (view.type == 'month' || view.type == 'basicWeek') {
+                var len = view.dayGrid.dayDates.length;
+
+                for (var i = 0; i < len; ++i) {
+                    var $cell       = $(view.dayGrid.cellEls[i]),
+                        target      = view.dayGrid.dayDates[i];
+
+                    if (!isInsideBounds(calEvent, target)) {
+                        // if OOB
+                        $cell.addClass('no-drop');
+                    }
+                }
+            } else if (view.type == 'timelineTerm') {
+                hidePopover();
+            }
+        };
+
+        /**
+         * When an event drag action ends
+         */
+        var onDragStop = function () {
+            $cal.find('.fc-day').removeClass('no-drop');
+            // allow a re-render of the view
+            collapsed = false;
+
+            // drain the list of real events for re-population
+            realEventList = {};
+        };
+
+
+        /**
+         * When external data is being fetched
+         *
+         * @param {Boolean} isLoading
+         * @param {View} view
+         */
+        var onLoading = function(isLoading, view) {
+
+            /* Show loading div right in the middle
+             */
+            if (isLoading === true) {
+                $.magnificPopup.open({
+                    showCloseBtn: false,
+                    items: {
+                        src: "<div class='preview loader'></div>",
+                        type: 'inline'
+                    }
+                });
+            }
+            /* Has finished loading
+             */
+            else {
+                /* Hide loading div
+                 */
+                $.magnificPopup.close();
+                var d = c.dom.fullCalendar('getDate');
+                $('#datepicker').datepicker('setDate', d.format('DD-MM-YYYY'));
+            }
+        };
+
+        /**
+         * When the window is resized
+         *
+         * @param {View} view
+         */
+        var onWindowResize = function(view) {
+            if (view.type === 'timelineTerm') {
+                // redraw, but not too frequently during drag
+                if (redrawTimeout) {
+                    clearTimeout(redrawTimeout);
+                }
+                redrawTimeout = window.setTimeout(function () {
+                    $cal.find('.fc-event-container').each(renderPopovers);
+                }, 200);
+
+            } else {
+                // recalc height
+                var wHeight = $(window).height();
+                var calTop = c.dom.offset().top;
+
+                c.dom.fullCalendar('option','contentHeight', wHeight - calTop - 120)
+            }
+        };
+
+        /**
+         * Once a batch of events have been rendered
+         *
+         * @param {View} view
+         */
+        var afterRender = function (view) {
+            if (view.type !== 'timelineTerm') {
+                // if not on timeline view, do nothing
+                return true;
+            }
+
+            redrawWeekNumbers();
+
+            if (eventsRendered === 0) {
+                // no events were rendered; don't attempt anything else
+                return true;
+            }
+
+            var realEventsExist = $.isEmptyObject(realEventList) == false;
+
+            // already done this
+            if (realEventsExist && collapsed) {
+                $cal.find('.fc-event-container').each(renderPopovers);
+                return true;
+            }
+
+            // if there are already fakes, make them gone
+            $cal.fullCalendar('removeEvents', function (calEvent) {
+                return ('data' in calEvent && 'placeholder' in calEvent.data);
+            });
+
+            var completionSeq = [ 'reviewed', 'pending', 'incomplete', 'failed' ];
+
+            var listOfFakesToRender = [];
+
+            // we're on timeline: take all the events that have been rendered
+            // and smoosh them into placeholders
+            for (var resourceId in realEventList) {
+                for (var wk in realEventList[resourceId]) {
+                    var calEvents = realEventList[resourceId][wk];
+
+                    var mergedStatus = '';
+
+                    for (var index in calEvents) {
+                        var eStatus = calEvents[index][0].data.meta.status;
+                        if (completionSeq.indexOf(eStatus) > completionSeq.indexOf(mergedStatus)) {
+                            mergedStatus = eStatus;
+                        }
+                    }
+
+                    var placeholderEvent = {
+                        allDay: true,
+                        color: '#ffffff',
+                        editable: false,
+                        resourceId: resourceId,
+                        title: calEvents.length,
+                        start: moment(wk),
+                        end: null,
+                        data: {
+                            placeholder: true,
+                            meta: {
+                                count: calEvents.length,
+                                status: mergedStatus,
+                                wk: wk
+                            }
+                        }
+                    };
+
+                    listOfFakesToRender.push(placeholderEvent);
+                }
+            }
+
+            // prevent recursion
+            collapsed = realEventsExist;
+
+            // render the new set of events
+            $cal.fullCalendar('renderEvents', listOfFakesToRender, true);
+        };
+
+        /**
+         * When an event is drawn on the calendar
+         * @param {Object} calEvent
+         * @param {jQuery} $element
+         * @param {View} view
+         */
+        var renderEvent = function (calEvent, $element, view) {
+            // Always render placeholders in the most basic manner
+            if (calEvent.id === 'placeholder') {
+                return true;
+            }
+
+            if (calEvent.rendering === 'background') {
+                return true;
+            }
+
+            // Ignore the phantom event that the API puts there
+            if (!calEvent.data) {
+                return false;
+            }
+
+            // Don't render me if I'm marked as do not render
+            if ('is_rendered' in calEvent && !(calEvent.is_rendered)) {
+                return false;
+            }
+
+            // rip off the resizers
+            $element.removeClass('fc-resizable').find('.fc-resizer').remove();
+
+            // attach bling if given
+            var status = calEvent.data.meta.status;
+
+            var isPlaceholder = calEvent.data.placeholder;
+
+            var $content = $element.find('.fc-content');
+
+            if (status) {
+                $content.prepend(
+                    $('<a class="progress-tick" />')
+                        .addClass(status)
+                        .addClass(isPlaceholder ? 'small' : 'tiny')
+                        .attr('title', status.capitalise())
+                );
+
+                $element.addClass('progress-' + status);
+            } else if (isPlaceholder) {
+                $content.prepend($('<a class="progress-tick small no-bling" />'));
+            }
+
+            if (view.type !== 'timelineTerm') {
+                // if not on timeline view, make sure we don't render placeholder
+                if (isPlaceholder) {
+                    return false;
+                }
+                return true;
+            }
+
+            // regardless of whether or not this is a placeholder, set a known data attr for indexing
+            var wk = calEvent.start.year() + 'W' + calEvent.start.week();
+            $element.attr('data-wk', wk);
+
+            if (isPlaceholder) {
+                $element.attr('data-placeholder', true).addClass('placeholder-event').css('top');
+                return true;
+            }
+
+            // not fake: in this case, we need to flag the postRender function to re-render all the fakes
+            // collapsed = false;
+
+            // start by collating the count of real events per week
+
+            // get the resource ID and derive the week in which this event occurs
+            var rId = calEvent.resourceId;
+
+            // make sure we don't cop NPEs
+            ensureIndices(rId, wk);
+
+            // push into the real event list
+            realEventList[rId][wk].push([ calEvent, $element ]);
+
+            if (calEvent.className.indexOf('fc-helper') !== -1) {
+                // this is a helper: render it, and don't do anything else
+                return true;
+            }
+
+            $element.addClass('hide').addClass('real-event');
+
+            // increment the number of events
+            ++eventsRendered;
+
+            return true;
+        };
+
+        var redrawTimeout;
+
+        c = new Calendar('calendar', 'calendar-bubble', {
+            userId: '{{ student.id|escape('js') }}',
+            filter: {
+                ajax: '/calendar/ajax/filter',
+                btnSelector: false,
+                exportButtonSelector: false,
+                checkboxSelector: false,
+                applyFiltersSelector: false,
+                listViewButton: false
+            },
+            bubble: {
+                onOpen: function (method, eventData) {
+
+                    if (eventData.placeholder) {
+                        // do not bubble on placeholders; instead, we'll open the appropriate popover
+                        return false;
+                    }
+
+                    var format = convertFormat('{{ config.date_local }}'),
+                        open   = moment(eventData.bounds.open),
+                        due    = moment(eventData.bounds.due);
+
+                    this.dom.find('[data-event-modal-field="bounds.open"]').text(open.format(format));
+                    this.dom.find('[data-event-modal-field="bounds.due"]').text(due.format(format));
+                    this.dom.find('[data-datepicker]').attr('data-datepicker-range', open.format('YYYY-MM-DD') + ',' + due.format('YYYY-MM-DD'))
+
+                    $modalForm.data('eventData', eventData);
+                }
+            },
+            fullCalendar: {
+                defaultDate: defaultDate,
+                height: height,
+                defaultView: anchor || 'timelineTerm',
+                // Event limit: could be configured from session but leave global for now
+                eventLimit: 4,
+                firstDay: Number('{{ config.calendar_start_day|escape('js') }}'),
+                schedulerLicenseKey: '{{ config.fullcalendar_scheduler_license_key }}',
+                views: {
+                    timelineTerm: {
+                        eventLimit: 1,
+                        type: 'timeline',
+                        duration: { weeks: 22 },
+                        slotDuration: { weeks: 1 },
+                        slotLabelFormat: { weeks: 1 },
+                        slotLabelInterval: { weeks: 1 },
+                        buttonText: 'Semester',
+                        slotWidth: 24,
+                    },
+                    basicWeek: {
+                        eventLimit: 0
+                    }
+                },
+                resourceAreaWidth: '40%',
+                resourceColumns: [
+                    {
+                        group: true,
+                        labelText: 'Subject',
+                        field: 'subject'
+                    },
+                    {
+                        group: true,
+                        labelText: 'Unit',
+                        field: 'unit'
+                    },
+                    {
+                        labelText: '',
+                        field: 'mastery'
+                    }
+                ],
+                header: {
+                    left: 'prev,today,next',
+                    center: 'title',
+                    right: 'timelineTerm,month,basicWeek'
+                },
+                eventSources: [ fetchEvents ],
+
+                eventDragStart: onDragStart,
+                eventDragStop: onDragStop,
+                eventDrop: updateAssessment,
+                eventAfterAllRender: afterRender,
+                resources: fetchResources,
+                viewRender: onViewChange,
+                eventRender: renderEvent,
+                loading: onLoading,
+                windowResize: onWindowResize,
+
+                /**
+                 * Nothing's resizable here
+                 *
+                 * @param event
+                 * @param delta
+                 * @param revertFunc
+                 */
+                eventResize: function(event, delta, revertFunc) {
+                    revertFunc();
+                },
+
+                /**
+                 * @param dropLocation
+                 * @param event
+                 */
+                eventAllow: function (dropLocation, event) {
+                    return isInsideBounds(event, dropLocation.start, dropLocation.resourceId);
+                }
+            },
+            x: false
+        }).init();
+
+        $modalForm.on('change', 'input[data-datepicker]', function () {
+            var dateField = $modalForm.find('.date'),
+                prevDate  = dateField.text(),
+                eventData = $modalForm.data('eventData'),
+                newDate   = moment($(this).val(), convertFormat('{{ config.date_local }}')),
+                assessId  = eventData.assessmentId,
+                eventData = {
+                    className: [],
+                    start: newDate,
+                    data: {
+                        meta: {
+                            assessmentId: assessId
+                        }
+                    }
+                },
+                onDone = function () {
+                    // update the modal UI
+                    dateField.text(newDate.format('ddd Do MMM'));
+
+                    // update the view
+                    var calEvent = $cal.fullCalendar('clientEvents', function (calEvent) {
+                        return 'data' in calEvent && calEvent.data.meta.assessmentId == assessId;
+                    }).pop();
+
+                    calEvent.start = newDate;
+
+                    $cal.fullCalendar('updateEvent', calEvent);
+                },
+                onFail = function () {
+                    // revert the modal UI back to the previous value
+                    dateField.text(prevDate);
+                }
+            ;
+
+            // indicate new date is saving
+            dateField.html('<img class="saving-spinner" src="/images/foundation/preloader.gif" /> Saving new date&hellip;');
+
+            // attempt to persist this data
+            updateAssessment(eventData, null, onFail, onDone);
+        });
+
+
+        /**
+         * Update assessment method.
+         *
+         * * Gives event a "loading" style
+         * * Removes that style when update finishes (regardless of result)
+         *
+         * @param calEvent    The event to update
+         * @param delta       The amount of change
+         * @param revertFunc  called if update failed for whatever reason.
+         *                    Sets event back to original state.
+         * @param successFunc called if update succeeds
+         */
+        function updateAssessment(calEvent, delta, revertFunc, successFunc) {
+            var format = 'Y-MM-DD HH:mm:ss';
+
+            // account for Fullcalendar exclusive vs inclusive end dates
+            var data = {
+                assessmentId: calEvent.data.meta.assessmentId,
+                openDate: calEvent.start.format(format),
+                dueDate: calEvent.start.clone().add({days: 1, minutes: -1}).format(format)
+            };
+
+            calEvent.className.push('loading');
+            var post = $.post(
+                '{{ routeLookup('learningPersonalised.postUpdateParticipation', {studentId: student.id}) }}',
+                data,
+                null,
+                'json'
+            );
+            post.done(successFunc).fail(revertFunc)
+                .always(function() {
+                    // Remove the loading class
+                    calEvent.className = calEvent.className.filter(function (value) {
+                        return value != 'loading';
+                    });
+                });
+        };
+
+        /**
+         * This gets called per $eventContainer of the scheduler view after all events are rendered
+         */
+        var renderPopovers = function () {
+            var $eventContainer = $(this);
+
+            // start by cleaning up anything we did before
+
+            // salvage the real events
+            $eventContainer.find('[data-popover]').find('.real-event')
+                // .addClass('hide')
+                .appendTo($eventContainer);
+
+            // detach any previous popovers
+            $eventContainer.find('[data-popover]').detach();
+
+            // get the event list
+            var $events = $eventContainer.find('.real-event');
+
+            var spots = {};
+
+            // index by week
+            $events.each(function () {
+                var $event = $(this);
+                var wk = $event.data('wk');
+
+                if (typeof spots[wk] === 'undefined') {
+                    spots[wk] = [];
+                }
+                spots[wk].push(this);
+            });
+
+            for (var wk in spots) {
+                renderPopover($eventContainer, $(spots[wk]));
+            }
+        };
+
+        var renderPopover = function ($eventContainer, $events) {
+
+            var wk   = $events.eq(0).data('wk');
+            var left = $events.eq(0).css('left');
+
+            var $popover = $('<div class="fc-popover fc-more-popover fc-event-container hide" data-popover="' + wk + '" />');
+
+            $popover.html(
+                '<div class="fc-header fc-widget-header"><span class="fc-close fc-icon fc-icon-x"></span><span class="fc-title">'
+                + wk
+                +'</span><div class="fc-clear"></div></div>'
+            ).attr('data-row', $eventContainer.closest('[data-resource-id]').data('resourceId'));
+
+            $popover.css('left', left);
+
+            // push the events into the popover
+            $popover.append($events
+                .removeClass('hide')
+                .detach()
+            );
+
+            // create a floaty container for our real events to live in
+            $eventContainer.append($popover);
+        };
+
+        function ensureIndices(rId, wk) {
+            if (typeof realEventList[rId] === 'undefined') {
+                realEventList[rId] = {};
+            }
+
+            if (typeof realEventList[rId][wk] === 'undefined') {
+                realEventList[rId][wk] = [];
+            }
+        }
+
+        function isInsideBounds(event, target, resourceId)
+        {
+            var isInsideDates;
+
+            if (!'bounds' in event.data.meta) {
+                // no bound specified, let anything happen
+                isInsideDates = true;
+            } else {
+                var bounds        = event.data.meta.bounds,
+                    insideOpen    = target.isSameOrAfter(bounds.open),
+                    insideClose   = target.isSameOrBefore(moment(bounds.due + ' 23:59:59'));
+
+                isInsideDates = insideOpen && insideClose;
+            }
+
+            if (!event.resourceId || !resourceId) {
+                // if no resource ID given on either side, just do the date check
+                return isInsideDates;
+            }
+
+            // verify dates and resource IDs are valid
+            return isInsideDates && event.resourceId == resourceId;
+        }
+
+        $cal.on('click', '[data-placeholder]', function () {
+            var $popover = $(this).closest('.fc-event-container').find('[data-popover="' + $(this).data('wk') + '"]');
+            var $row = $(this).closest('[data-resource-id]');
+
+            $popover.removeClass('hide');
+
+            // quick bounds-check
+            $popover.css('left', Math.min($popover.css('left').replace('px',''), $row.width() - $popover.width() - 2));
+
+            $(document).on('mousedown', hidePopover);
+        });
+
+        function hidePopover(ev) {
+            if (!ev) {
+                $('[data-popover]').addClass('hide');
+                return;
+            }
+
+            // only hide the popover if the click happened outside the popover
+            if (!$(ev.target).closest('[data-popover]').length || $(ev.target).closest('.fc-close').length) {
+                $('[data-popover]').addClass('hide');
+
+                $(document).off('mousedown', hidePopover);
+            }
+        }
+
+        $(document).on('open.fndtn.reveal', '#adtp-modal-1', function () {
+            var eData = $modalForm.data('eventData');
+            window.pickerInstance[1].set('minDate', eData.bounds.open);
+            window.pickerInstance[1].set('maxDate', eData.bounds.due);
+            window.pickerInstance[1].setDate(eData.start.format('YYYY-MM-DD'));
+        });
+
+    })
+</script>
+<!-- END custom_head -->
+
+{# Header #}
+<div class="row">
+    <div class="small-12 columns">
+        <div class="actions-small-1 row">
+            <div class="list-item">
+                <div class="small-12 column">
+                    <h1>{{ locale.dueWork.proper }} for {{ student.formatName }}</h1>
+                </div>
+            </div>
+
+            {% if children|length > 0 %}
+                <nav>
+                    <a class='icon-group' data-dropdown='header-options'></a>
+                </nav>
+
+                <ul id="header-options" class="f-dropdown" data-dropdown-content>
+                    {% for child in children %}
+                        <li>
+                            <div class="card small-12">
+                                <a href="{{ routeLookup('learningUpcoming.getUpcomingForStudent', {studentId: child.id, student: child}) }}" title="View upcoming work">
+                                    <img src="/portrait.php?userId={{ child.externalId }}&size=square64" alt="View upcoming work" />
+                                    <p>{{ child.formatName }}</p>
+                                    <p class="meta">{{ child.role.name }}</p>
+                                </a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <div id="calendar"></div>
+        </section>
+    </div>
+</div>
+
+{% if subjects|length %}
+    <div class="row">
+        <div class="small-12 medium-6 columns island">
+            <h2 class="subheader">Upcoming {{ locale.dueWork.proper }}</h2>
+            {% if upcomingWork|length %}
+                <section>
+                    <ul class="action-list">
+                        {% for upcoming in upcomingWork %}
+                            <li>
+                                <div class="card small-12">
+                                    <h3>
+                                        {% set route = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: upcoming.id, student: student, studentId: student.id, assessment: upcoming}) %}
+                                        {% if route %}
+                                            <a class="title" href="{{ route }}{{ returnUrl }}">{{ upcoming.title }}</a>
+                                        {% else %}
+                                            {{ upcoming.title }}
+                                        {% endif %}
+                                    </h3>
+
+                                    <p class="meta">
+                                        <a href="/homepage/{{ upcoming.context.folder.id }}">{{ upcoming.context.folder.title }}</a>
+                                        {{ upcoming.typeName }}
+                                    </p>
+
+                                    <p class="meta">{{ dueDate.dueDate(upcoming, student) }}</p>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            {% else %}
+                <div class="empty-state">
+                    <i class="icon-due-work"></i>
+                    <p>Currently no work has been set, nice one.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="small-12 medium-6 columns">
+            <h2 class="subheader">{{ locale.subject.properPlural }}</h2>
+            {% if subjects|length %}
+                <div class="row">
+                    <div class="small-12 island">
+                        {% for subject in subjects %}
+                            <section>
+                                <ul class="information-list">
+                                    <li>
+                                        <div class="list-item">
+                                            {% set gradePath = routeLookupIfAuthorized('learningGrades.getGradesForSubject', {viewee: student, userId: student.id, term: currentTerm, termCode: currentTerm.code, subject: subject, subjectId: subject.folder.id}) %}
+                                            <div class="small-{{ subject.grade ? 8 : 12 }} card">
+                                                {% if gradePath %}
+                                                    <a href="{{ gradePath }}" title="View {{ locale.grades.properPlural }}">
+                                                        <span class="icon-home size-32" title="{{ subject.folder.title }}"></span>
+                                                        <p>{{ subject.folder.title }}</p>
+                                                    </a>
+                                                {% else %}
+                                                    <span class="icon-home size-32" title="{{ subject.folder.title }}"></span>
+                                                    <p>{{ subject.folder.title }}</p>
+                                                {% endif %}
+                                                <p class="meta">{{ subject.folder.codeString }}</p>
+                                            </div>
+
+                                            {% if subject.grade %}
+                                                <div class="small-4 columns no-pad">
+                                                    <div class="grade content">
+                                                        {% if gradePath  %}
+                                                            <a href="{{ gradePath }}">
+                                                        <span class="{{ urgency.marks(subject.grade.meanNormalised) }}">
+                                                            {{ subject.grade.weightedMean }}
+                                                        </span>
+                                                            </a>
+                                                        {% else %}
+                                                            <span class="{{ urgency.marks(subject.grade.meanNormalised) }}">
+                                                        {{ subject.grade.weightedMean }}
+                                                    </span>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </li>
+
+                                    {% for teacher in subject.teachers %}
+                                        <li class="actions-small-1">
+                                            <div class="list-item">
+                                                <div class="small-12 card">
+                                                    <a href="/search/user/{{ teacher.id }}" title="">
+                                                        <img src="/portrait.php?userId={{ teacher.externalId }}&amp;size=square64" alt="{{ teacher.formatName }}" />
+                                                        <p>{{ teacher.formatName }}</p>
+                                                    </a>
+                                                    <p class="meta">{{ teacher.role.name }}</p>
+                                                </div>
+
+                                            </div>
+                                            <nav>
+                                                <a href="{{ mailHandle }}{{ teacher.email }}" class="icon-email" title="Email {{ teacher.formatName }}"></a>
+                                            </nav>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </section>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <section>
+                    <div class="empty-state">
+                        <i class="icon-due-work"></i>
+                        <p>
+                            {% if USER.id == student.id %}
+                                You are not currently enrolled in any classes.
+                            {% else %}
+                                {{ student.formatName }} is not currently enrolled in any classes.
+                            {% endif %}
+                        </p>
+                    </div>
+                </section>
+            {% endif %}
+        </div>
+    </div>
+{% endif %}
+
+{% set pronoun = USER.id == student.id ? 'Your' : student.firstName ~ "'s" %}
+{% set canModify = USER.id == student.id or USER.role.staff %}
+
+<div class="reveal-modal large" data-reveal aria-hidden="true" role="dialog" id="calendar-bubble">
+    <form id="editEvent">
+        <input type="hidden" name="eventId" />
+
+        <div class="row">
+            <div class="small-12">
+                <h3 class="note"></h3>
+                <ul class="meta">
+                    <li class="icon-calendar">{{ pronoun }} due date: <span class="date"></span></li>
+                    {% if canModify %}
+                    <li class="icon-time-value">{% spaceless %}
+                        You can change this date to be anywhere between
+                        <span data-event-modal-field="bounds.open"></span>
+                        and
+                        <span data-event-modal-field="bounds.due"></span>
+                    {% endspaceless %}</li>
+                    <li class="icon-info">
+                        <em>(you can also change the date by dragging the assessment around the calendar)</em>
+                    </li>
+                    {% endif %}
+                </ul>
+
+                <article class="detail" data-is-html="1"></article>
+                <div>
+                    <dl>
+                        <dd>
+                            {% if canModify %}
+                            <span>
+                                <input id="pblDateChange" data-datepicker data-datepicker-buttontext="Change Date" type="hidden" />
+                            </span>
+                            {% endif %}
+                            <span class="homepageLink" data-is-html="1"></span>
+                            <span class="moreDetailsLink" data-is-html="1"></span>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>

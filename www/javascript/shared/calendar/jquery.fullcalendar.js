@@ -30,6 +30,9 @@ function Calendar(id, bubbleId, opts) {
             u: '.',
             d: '.'
         },
+        bubble: {
+            onOpen: $.noop()
+        },
         filter: {
             ajax: '.',
             enabled: true,
@@ -197,19 +200,21 @@ function Calendar(id, bubbleId, opts) {
                 }
                 catch (e) {}
 
-                $.each(calEvent.data.attendance, function(k, v) {
-                    data['attendance' + k.capitalise()] = v
-                })
+                if ('attendance' in calEvent.data) {
+                    $.each(calEvent.data.attendance, function(k, v) {
+                        data['attendance' + k.capitalise()] = v
+                    })
 
-                // Attendance List butonye
-                if (data.attendanceListButton.toString() == 'true') {
-                    data.attendanceIcon = ''
-                    data.attendanceListButton = '<a class="button icon-group" href="/calendar/attendance/list/'
-                        + calEvent.data.meta.eventId + '">Attendees</a>'
-                }
-                // Attend/Unattend butonye
-                if (data.attendanceRequestButton.toString() != 'false') {
-                    data.attendanceRequestButton = '<a class="button icon-reply" href="#" data-attendance-request>' + data.attendanceRequestButton.toString() + '</a>'
+                    // Attendance List butonye
+                    if (data.attendanceListButton.toString() == 'true') {
+                        data.attendanceIcon = ''
+                        data.attendanceListButton = '<a class="button icon-group" href="/calendar/attendance/list/'
+                            + calEvent.data.meta.eventId + '">Attendees</a>'
+                    }
+                    // Attend/Unattend butonye
+                    if (data.attendanceRequestButton.toString() != 'false') {
+                        data.attendanceRequestButton = '<a class="button icon-reply" href="#" data-attendance-request>' + data.attendanceRequestButton.toString() + '</a>'
+                    }
                 }
 
                 data.bookingActions = [];
@@ -246,7 +251,18 @@ function Calendar(id, bubbleId, opts) {
                     data.relatedBookings = calEvent.data.booking.related;
                 }
 
-                self.bubble.display('edit', data, jsEvent, this);
+                data.start = calEvent.start;
+                data.end   = calEvent.end;
+                if ('placeholder' in calEvent.data) {
+                    data.placeholder = true;
+                }
+
+                var doDisplay = self.bubble.display('edit', data, jsEvent, this);
+
+                if (doDisplay === false) {
+                    // if explicit false is given, proceed no further
+                    return;
+                }
 
                 // Hide event types in the bubble
                 var isTask = data.eventTypeId == c.options.taskTypeId;
@@ -446,6 +462,7 @@ function Calendar(id, bubbleId, opts) {
     var filter = $.extend({}, this.options.filter, opts.filter)
     var fullCalendar = $.extend({}, this.options.fullCalendar, opts.fullCalendar)
     var datepicker   = $.extend({}, this.options.datepicker,   opts.datepicker)
+    var bubble = $.extend({}, this.options.bubble, opts.bubble)
 
     // perform the merge
     $.extend(this.options,opts)
@@ -454,6 +471,7 @@ function Calendar(id, bubbleId, opts) {
     this.options.filter = filter
     this.options.fullCalendar = fullCalendar
     this.options.datepicker   = datepicker
+    this.options.bubble = bubble
 
     if(this.options.filter.enabled) {
         this.filters.interaction(this)
@@ -807,6 +825,12 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
 
     this.fillForm(method+'Event', eventData);
     this.fillForm(method+'Task', eventData);
+
+    if (this.calendar.options.bubble.onOpen) {
+        return this.calendar.options.bubble.onOpen.call(this, method, eventData);
+    }
+
+    return true;
 }
 
 

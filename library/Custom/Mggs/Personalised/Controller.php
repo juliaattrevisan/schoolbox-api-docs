@@ -14,12 +14,19 @@ use Aura\Web\Exception\InvalidStatusCode;
 use Custom\Mggs\Personalised\Event;
 use Custom\Mggs\Personalised\Participant;
 use Schoolbox\Collection;
+use Schoolbox\External\SubjectMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DataModel\Translator as AssessmentTranslator;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Classes\ClassList;
+use Schoolbox\Assessment\Term;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\ClassListFactory;
 use Schoolbox\User;
+use Schoolbox\Learning\Course\DataModel\Implementation;
 
 /**
  * Controller for the personalised learning screen.
@@ -27,7 +34,7 @@ use Schoolbox\User;
 class Controller extends Base
 {
     /**
-     * @var FolderMapper
+     * @var Folder\Mapper
      */
     protected $folderMapper;
 
@@ -45,25 +52,33 @@ class Controller extends Base
      * @var AssessmentTranslator
      */
     protected $assessmentTranslator;
+    /**
+     * @var ClassListFactory
+     */
+    private $classListFactory;
+
 
     /**
      * Constructor
      *
-     * @param FolderMapper         $folderMapper
+     * @param Folder\Mapper        $folderMapper
      * @param AssessmentDataSource $assessmentDataSource
      * @param Participant\Mapper   $participantMapper
      * @param AssessmentTranslator $assessmentTranslator
+     * @param ClassListFactory     $classListFactory
      */
     public function __construct(
-        FolderMapper $folderMapper,
+        Folder\Mapper $folderMapper,
         AssessmentDataSource $assessmentDataSource,
         Participant\Mapper $participantMapper,
-        AssessmentTranslator $assessmentTranslator
+        AssessmentTranslator $assessmentTranslator,
+        ClassListFactory $classListFactory
     ) {
         $this->folderMapper         = $folderMapper;
         $this->assessmentDataSource = $assessmentDataSource;
         $this->participantMapper    = $participantMapper;
         $this->assessmentTranslator = $assessmentTranslator;
+        $this->classListFactory = $classListFactory;
     }
 
 
@@ -112,55 +127,86 @@ class Controller extends Base
      *
      * TODO consider not AJAXing this
      *
-     * @api   GET /learning/personalised/resources/:studentId/
-     * @param User $student
+     * @api   GET /learning/personalised/resources/:studentId{/:date}
+     *
+     * @param Term\Model $term
+     * @param User       $student
      */
-    public function getResourcesForStudent(User $student)
+    public function getResourcesForStudent(User $student, Term\Model $term)
     {
         $resultSet = [];
 
-        foreach ($this->folderMapper->findForUser($student) as $folder) {
+        $now = Alaress_Date_Format::now();
+
+        $student->setSubjectCollection((new SubjectMapper())->findAllForStudent($student));
+
+        $classList = new ClassList(
+            $student,
+            $this->folderMapper,
+            \Timetable_ColourMapper::getInstance(), // not used in this context
+            $this->classListFactory
+        );
+
+        /** @var GenericCollection|Folder\Model[] $folders */
+        $folders = $classList->getClassList($term, $now)['classList'];
+
+        foreach ($folders as $folder) {
 
             // Ignore non-classes
             if (strlen($folder->getCodeString()) === 0) {
                 continue;
             }
 
-            // Resource for folder
-            $resultSet[] = [
-                'id'          => $folder->getId(),
-                'title'       => $folder->getTitle(),
-                'folderTitle' => $folder->getTitle(),
-            ];
+            // TODO singleton
+            $unitMapper = Implementation\Unit\Mapper::getInstance();
 
-            $baseResult = [
-                'parentId'    => $folder->getId(),
-                'folderId'    => $folder->getId(),
-                'folderTitle' => $folder->getTitle(),
-            ];
+            try {
+                $ids = $unitMapper->getJoinMapper('course')->findByColumn('folder_id', $folder->getId())->getPropertyValues('id');
 
-            // Resources for: units, content areas, projects, activities
-            $resultSet[] = [
-                'id'    => $folder->getId().'-unit',
-                'title' => 'Units',
-            ] + $baseResult;
-            $resultSet[] = [
-                'id'    => $folder->getId().'-contentArea',
-                'title' => 'Content Areas',
-            ] + $baseResult;
-            $resultSet[] = [
-                'id'    => $folder->getId().'-project',
-                'title' => 'Projects',
-            ] + $baseResult;
-            $resultSet[] = [
-                'id'    => $folder->getId().'-activity',
-                'title' => 'Activities',
-            ] + $baseResult;
+                $where = $unitMapper->getPredicateBuilder()
+                    ->equals('course_implementation_id', $ids)
+                    ->notLessThan('due_date', $term->getStart()->getDatabase())
+                ;
+
+                if (!$term->getActualFinish()->isNull()) {
+                    $where->notGreaterThan('open_date', $term->getActualFinish()->getDatabase());
+                }
+
+                $units = $unitMapper->findByPredicates($where);
+
+            } catch (\UnderflowException $e) {
+                // no units
+                continue;
+            }
+
+            foreach ($units as $unit) {
+
+                /** @var Project[] $projects */
+                $projects = $this->assessmentDataSource->findAllByContext($unit)->filter(function (IAssessable $assessment) {
+                    return $assessment instanceof Project;
+                });
+
+                $resultSet[] = $this->makeResource($folder, $unit, 0, 'Mastery Tasks');
+
+                foreach ($projects as $project) {
+                    $resultSet[] = $this->makeResource($folder, $unit, $project->getId(), $project->getTitle());
+                }
+            }
+
         }
 
         $this->getResponse()->content->set($this->buildJsonOutput($resultSet));
     }
 
+    private function makeResource(Folder\Model $folder, Implementation\Unit\Model $unit, $projectId, $projectName)
+    {
+        return [
+            'id'      => sprintf('%d-%d-%d', $folder->getId(), $unit->getId(), $projectId),
+            'subject' => $folder->getNameWithCodes(),
+            'unit'    => $unit->getTitle(),
+            'mastery' => $projectName
+        ];
+    }
 
     /**
      * Gets the resource calendar for this student (at this time).
@@ -173,7 +219,7 @@ class Controller extends Base
     public function getCalendarForStudent(User $student)
     {
         // Build the list
-        $eventFactory  = new Event\Factory($this->getRouter());
+        $eventFactory  = new Event\Factory($this->getRouter(), $this->getConfigLoader());
         $assessments   = $this->assessmentDataSource->findAllByStudentWithinWindow(
             $student,
             true,
@@ -272,12 +318,22 @@ class Controller extends Base
         // We have a valid assessment and date objects.
         // Check the dates are valid for the assessment.
         if ($openDate->lt($assessmentOpenDate)) {
-            $this->buildJsonResponse('Open date cannot be moved outside of assessment\'s open date', 400);
+            $text = sprintf(
+                'Open date cannot be before assessment open date: failed to assert %s < %s',
+                $assessmentOpenDate->getDatabase(),
+                $openDate->getDatabase()
+            );
+            $this->buildJsonResponse($text, 400);
             return;
         }
 
         if ($dueDate->gt($assessmentDueDate)) {
-            $this->buildJsonResponse('Due date cannot be moved outside of assessment\'s due date', 400);
+            $text = sprintf(
+                'Due date cannot be after assessment due date: failed to assert %s > %s',
+                $assessmentDueDate->getDatabase(),
+                $dueDate->getDatabase()
+            );
+            $this->buildJsonResponse($text, 400);
             return;
         }
 

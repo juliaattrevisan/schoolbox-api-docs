@@ -16,14 +16,27 @@ use Alaress\Authorizer\Failure\Unauthorized;
 
 class IsParentOfStudent implements IAuthorizationRule
 {
+    /** @var string */
+    private $key;
+
+
+    /**
+     * @param string $paramKeyToCheck
+     */
+    public function __construct($paramKeyToCheck = 'student')
+    {
+        $this->key = $paramKeyToCheck;
+    }
+
+
     /**
      * {@inheritdoc}
      */
     public function authorize(array $params = array(), User $user = null)
     {
-        $params['student']->loadParents();
+        $params[$this->key]->loadParents();
 
-        if ($user->isParentOf($params['student'])) {
+        if ($user->isParentOf($params[$this->key])) {
             return true;
         }
 

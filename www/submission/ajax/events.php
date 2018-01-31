@@ -7,6 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
 
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
@@ -45,10 +46,11 @@ $calendarApi           = new Calendar_Api_EventType_Submission_Schoolbox_ForDueW
 );
 $renderer              = new Calendar\Event\Collection\Renderer($calendarApi, (int)$_GET['start'], (int)$_GET['end'], $user, $this, $viewer);
 
-// Render it
-echo "[";
-echo $renderer->renderAll('javascript');
-/* Final null element to help keep IE happy
- */
-echo "{}]";
+// until this script becomes an Aura route, this is really the best we can do...
+$strategy = ConfigMapper::getInstance()->get('site_location') === 'mggs'
+    ? 'pbl-javascript'
+    : 'javascript';
+
+// final null element to help keep IE happy
+printf('[%s{}]', $renderer->renderAll($strategy));
 exit;

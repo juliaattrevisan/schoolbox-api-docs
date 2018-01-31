@@ -1,0 +1,83 @@
+.fc-placeholder {
+    position: absolute;
+    display: block;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    color: white;
+}
+.fc-popover .fc-timeline-event {
+    position: static;
+}
+.fc-time-area .fc-event-container {
+    z-index: auto;
+}
+.progress-pending {
+    opacity: 0.6;
+}
+.progress-reviewed {
+    opacity: 0.35;
+}
+.fc-event:hover {
+    opacity: 1;
+}
+.no-drop {
+    background: #d7d7d7;
+}
+.fc-highlight-skeleton {
+    display: none !important;
+}
+.input-group {
+    display: inline;
+}
+.saving-spinner {
+    width: 10px;
+    display: inline;
+    margin: 0 2px 0 4px;
+    position: relative;
+    top: -2px;
+}
+.fc-popover .fc-event .fc-bg {
+    display: none;
+}
+.fc-popover.fc-event-container {
+    min-width: 150px;
+    width: auto !important;
+    top: -23px;
+    z-index: 200;
+}
+.fc-event.placeholder-event {
+    /*opacity: 1;*/
+}
+.placeholder-event {
+    display: none;
+}
+.fc-timelineTerm-view .placeholder-event {
+    display: block;
+}
+.placeholder-event .progress-tick:before {
+    content: none;
+}
+.placeholder-event .fc-title {
+    position: absolute !important;
+    font-weight: bold;
+    width: 26px;
+    text-align: center;
+    color: white;
+    top: 3px !important;
+}
+.placeholder-event .fc-content {
+    overflow: visible;
+}
+.fc-time-area .fc-bgevent {
+    pointer-events: none;
+}
+.no-bling {
+    border-radius: 10px;
+    background-color: #002344;
+}
+.fc-scroller-canvas .fc-cell-text {
+    display: block;
+    white-space: normal;
+}
