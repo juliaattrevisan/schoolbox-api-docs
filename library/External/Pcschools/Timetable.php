@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\CampusMapper;
+
 /**
  * PCSchools timetable connector
  *
@@ -7,13 +9,6 @@
  * @copyright Copyright 2015, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-
-use Alaress\Database\Exception as AlaressDatabaseException;
-use Schoolbox\Campus;
-use Schoolbox\CampusMapper;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\UserMapper;
-
 class External_Pcschools_Timetable implements External_TimetableInterface
 {
     /**
@@ -22,9 +17,14 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     private $database;
 
     /**
-     * @var UserMapper
+     * @var \Schoolbox\UserMapper
      */
     private $userMapper;
+
+    /**
+     * @var \Schoolbox\CampusMapper
+     */
+    private $campusMapper;
 
     /**
      * Constructor
@@ -32,48 +32,44 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     public function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
-        $this->userMapper = new UserMapper();
+//        // Required, as using @LOGIC_NO
+//        $this->getDatabase()->query('SET ANSI_PADDING ON');
+//        $this->getDatabase()->query('SET ANSI_WARNINGS ON');
+        $this->userMapper = new \Schoolbox\UserMapper();
+        $this->campusMapper = new \Schoolbox\CampusMapper();
     }
 
     /**
-     * The headings of the timetable, going horizontally from left to right containing all the times and day numbers
-     *
+     * The headings of the timetable, going horizontally
+     * from left to right containing all the times and day numbers
      * Has the structure for each period
-     *
      * $timetableDef['desc'][]
      * $timetableDef['start'][]
      * $timetableDef['end'][]
      * $timetableDef['number'][]
      * $timetableDef['sequence'][]
      *
-     * Padua College uses a different timetable for most days of the week- to avoid dealing with this we are taking
-     * the Day 1 timetable only and clobbering the rest of the week with the same timetable. I am however selecting the
-     * period number in the format DD.PP (day number.period number- e.g "01.05")
-     *
-     * @param string $externalUserId If set, the external user ID to get definition for.
-     * @param Campus $campus
-     * @param int    $day
+     * @param string            $externalUserId If set, the external user ID to get definition for.
+     * @param \Schoolbox\Campus $campus
+     * @param int               $day
      *
      * @return array
      */
-    public function getTimetableDefinition($externalUserId, Campus $campus, $day = 0)
+    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)
     {
-        // TODO: Hardcoded until we handle differing times each day of the timetable
-
-        $day = 1;
-
-        $sql = "
-            SELECT DISTINCT   REPLACE(STR(DAY, 2),SPACE(1),'0') + '.' + REPLACE(STR(TIMEOFDAY, 2),SPACE(1),'0') AS NUMBER,
-                              HEADING,
-                              TIME_START,
-                              TIME_END
-            FROM              TIMEPDHD
-            WHERE             SORT_ORDER > 0 AND DAY > 0 AND [TYPE] <> 'Y' AND [DAY] = {$day}
-            ORDER BY          REPLACE(STR(DAY, 2),SPACE(1),'0') + '.' + REPLACE(STR(TIMEOFDAY, 2),SPACE(1),'0')
-        ";
-
-        $timetableDays = $this->getDatabase()->getAll($sql);
-
+        // TIMEPDHD looks like the timetable start/end time
+        // It can be restricted on student's year, though.
+        // MVP: don't bother with any of this, Cornerstone doesn't.
+        $timetableDays = $this->getDatabase()->getAll("
+            SELECT
+                CODE,
+                HEADING,
+                TIME_START,
+                TIME_END,
+                SORT_ORDER
+            FROM TIMEPDHD
+            ORDER BY SORT_ORDER ASC
+        ");
         $result = [
             'desc'        => [],
             'start'       => [],
@@ -81,17 +77,17 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             'number'      => [],
             'sequence'    => [],
             'dayCount'    => $this->getDayCount(),
-            'periodCount' => $this->getPeriodCount(),
+            'periodCount' => count($timetableDays),
         ];
-
         foreach ($timetableDays as $timetableDay) {
+            // CODE isn't part of default definition, but I need it for matching
+            $result['code'][]     = $timetableDay['CODE'];
             $result['desc'][]     = $timetableDay['HEADING'];
             $result['start'][]    = $timetableDay['TIME_START'];
             $result['end'][]      = $timetableDay['TIME_END'];
-            $result['number'][]   = $timetableDay['NUMBER'];
+            $result['number'][]   = $timetableDay['SORT_ORDER'];
             $result['sequence'][] = 1;
         }
-
         return $result;
     }
 
@@ -102,43 +98,32 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      */
     protected function getDayCount()
     {
-        return $this->getDatabase()
-                    ->getOne("SELECT MAX(DAY) FROM TIMEFILE WHERE TIME_PERIOD = (SELECT TIME_PERIOD FROM sysfile)");
-    }
-
-    /**
-     * Gets the maximum number of periods for a day from the database. This is again a kluge and it is not a one-size
-     * fits all database, and allows for different number of periods each day. As such this just grabs the maximum
-     * possible.
-     *
-     * @return array|bool
-     */
-    protected function getPeriodCount()
-    {
-        return $this->getDatabase()
-                    ->getOne("SELECT MAX(SUBQUERY.PERIODS) FROM (SELECT COUNT(*) AS PERIODS FROM TIMEPDHD GROUP BY TIMEPDHD.DAY) AS SUBQUERY");
+        return $this->getDatabase()->getOne(
+            "SELECT MAX(DAY) FROM TIMEFILE WHERE TIME_PERIOD = (SELECT TIME_PERIOD from sysfile)"
+        );
     }
 
     /**
      * Get the current day number for a given campus
      *
-     * @param Campus $campus
-     * @param int    $date
+     * @param Schoolbox\Campus $campus
+     * @param int              $date
      *
      * @internal param $campusId
      * @return int
      */
-    public function getDayNumber(Campus $campus, $date = 0)
+    public function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
     {
         if ($date) {
             $day = date('Y-m-d', $date);
         } else {
             $day = date('Y-m-d');
         }
-
-        $result = $this->getDatabase()
-                       ->getOne("SELECT TIMETABLE_DAY FROM CALENDAR WHERE [DATE] = {$this->getDatabase()->smartQuote($day)}");
-
+        $result = $this->getDatabase()->getOne("
+            SELECT TIMETABLE_DAY
+            FROM CALENDAR
+            WHERE [DATE] = {$this->getDatabase()->smartQuote($day)}
+        ");
         return intval($result) ?: 0;
     }
 
@@ -151,7 +136,8 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      */
     function getDayName($dayNumber)
     {
-        return 'Day ' . $dayNumber;
+        // I don't think that PCSchools stores a day name.
+        return 'Day '.$dayNumber;
     }
 
     /**
@@ -160,22 +146,19 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      * PeriodNumber
      * PeriodNumberSeq
      *
-     * @param Campus $campus
-     * @param int    $now
+     * @param Schoolbox\Campus $campus
+     * @param int              $now
      *
      * @internal param $campusId
      * @return array
      */
-    public function getPeriodNumber(Campus $campus, $now = 0, $user = null)
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
     {
         // Assume that definition doesn't vary per student
         // Should this use getFullTimetable then?
-
         $definition = $this->getTimetableDefinition(null, $campus, $now);
-
         foreach ($definition['number'] as $i => $number) {
             $sequence = $definition[$i]['sequence'];
-
             if ($now) {
                 $start = strtotime($definition[$i]['start'], $now);
                 $end   = strtotime($definition[$i]['end'], $now);
@@ -183,7 +166,6 @@ class External_Pcschools_Timetable implements External_TimetableInterface
                 $start = strtotime($definition[$i]['start']);
                 $end   = strtotime($definition[$i]['end']);
             }
-
             if ($start < $now && $now <= $end) {
                 return [
                     'PeriodNumber'    => $number,
@@ -191,34 +173,32 @@ class External_Pcschools_Timetable implements External_TimetableInterface
                 ];
             }
         }
-
         return [];
     }
+
 
     /**
      * {@inheritdoc}
      *
-     * @param string $externalUserId
-     * @param string $userId
-     * @param Campus $campus
-     * @param int    $dayNumber
-     *
-     * @throws AlaressDatabaseException
+     * @param                  $externalUserId
+     * @param                  $userId
+     * @param Schoolbox\Campus $campus
+     * @param                  $dayNumber
+     * @throws \Alaress\Database\Exception
      * @return array
      */
-    public function getDayTimetable($externalUserId, $userId, Campus $campus, $dayNumber)
+    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
     {
+        // I need to know if $userId is a teacher or student
         try {
             $user = $this->userMapper->findById($userId);
-        } catch (MapperException $e) {
+        } catch (\Schoolbox\Mapper\Exception $e) {
             return [];
         }
 
         $studentExternalId = '';
         $teacherExternalId = '';
-
-        $timePeriod = $campus->getExtTimetableCode();
-
+        $timePeriod        = $campus->getExtTimetableCode();
         if ($user->getRole()->isStudent()) {
             $studentExternalId = $user->getExternalId();
         } elseif ($user->getRole()->isStaff()) {
@@ -227,9 +207,9 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
         $statement = $this->getDatabase()->prepareProcedure('spSelTimetable');
         $statement->bindInputs([
-            'DATE'        => date('Ymd'),
-            'TIMEPERIOD'  => $timePeriod,
-            'STUDKEY'     => $studentExternalId,
+            'DATE' => date('Ymd'),
+            'TIMEPERIOD' => $timePeriod,
+            'STUDKEY' => $studentExternalId,
             'TEACHERCODE' => $teacherExternalId,
         ]);
 
@@ -243,57 +223,36 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         $statement->close();
 
         // The $homeClasses definition is mostly included within dayPeriods
-
         $timetable = [];
-
         foreach ($dayPeriods as $period) {
-            // Y periods seem to contain day name definition, skipping these
-            // D contains duties (eg. Yard duty)
-            // T contains timetabled classes
-            // N contains random stuff (Dismissal)
-            //
-            // TODO: Possibly make a config variable of types to include
-
-            if ($period["TYPE"] != "Y") {
-                // TODO: Remove hardcoded day one once Schoolbox supports different day/times
-                $periodNumber = "01." . str_pad($period['CODE'], 2, '0');
-
-                $timetable[$periodNumber]['periodName']     = $period['HEADING'];
-                $timetable[$periodNumber]['periodStart']    = $period['TIME_START'];
-                $timetable[$periodNumber]['periodEnd']      = $period['TIME_END'];
-                $timetable[$periodNumber]['periodSort']     = str_pad(sprintf('%.2f', $period['TIME_START']), 5, '0', STR_PAD_LEFT);
-                $timetable[$periodNumber]['periodNumber']   = $periodNumber;
-                $timetable[$periodNumber]['periodSequence'] = 1;
-                $timetable[$periodNumber]['class']          = [];
-            }
+            // Order the list by sortOrder
+            $order = $period['SORT_ORDER'];
+            $timetable[$order]['periodName']     = $period['HEADING'];
+            $timetable[$order]['periodStart']    = $period['TIME_START'];
+            $timetable[$order]['periodEnd']      = $period['TIME_END'];
+            $timetable[$order]['periodNumber']   = $order;
+            $timetable[$order]['periodSequence'] = 1;
+            $timetable[$order]['class']          = [];
         }
-
         ksort($timetable);
 
         // Add classes for each day into it
         foreach ($dayClasses as $dayClass) {
-            // TODO: Remove hardcoded day one once Schoolbox supports different day/times
-            $period = "01." . str_pad($dayClass['PERIOD'], 2, '0');
-
-            $classCode = $timePeriod . '/' . $dayClass['YEAR'] . $dayClass['ABBREV'] . $dayClass['CLASS'];
-
+            $period = $dayClass['PERIOD'];
+            $code   = $timePeriod.'/'.$dayClass['YEAR'].$dayClass['ABBREV'].$dayClass['CLASS'];
             if ($dayNumber == $dayClass['DAY']) {
-                $timetable[$period]['class'][$classCode] = [
+                $timetable[$period]['class'][$code] = array(
                     'description'        => $dayClass['DESC'],
-                    'code'               => $classCode,
+                    'code'               => $code,
                     'campus'             => $timePeriod,
                     'room'               => $dayClass['ROOM'],
                     'StaffPreferredName' => $dayClass['NAME_FOR_REPORT'],
-                ];
+                );
             }
         }
-
-        usort($timetable, function ($a, $b) {
-            return strcmp($a['periodSort'], $b['periodSort']);
-        });
-
         return $timetable;
     }
+
 
     /**
      * Return a user's timetable for a specific date
@@ -317,23 +276,23 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      *
      * @param                     $externalUserId
      * @param                     $userId
-     * @param Campus              $campus
+     * @param Schoolbox\Campus    $campus
      * @param Alaress_Date_Format $date
      *
      * @return mixed
      */
-    public function getTimetableForDate($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date)
+    public function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date)
     {
+        // I need to know if $userId is a teacher or student
         try {
             $user = $this->userMapper->findById($userId);
-        } catch (MapperException $e) {
+        } catch (\Schoolbox\Mapper\Exception $e) {
             return [];
         }
 
         $studentExternalId = '';
         $teacherExternalId = '';
         $timePeriod        = $campus->getExtTimetableCode();
-
         if ($user->getRole()->isStudent()) {
             $studentExternalId = $user->getExternalId();
         } elseif ($user->getRole()->isStaff()) {
@@ -342,9 +301,9 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
         $statement = $this->getDatabase()->prepareProcedure('spSelTimetable');
         $statement->bindInputs([
-            'DATE'        => $date->getUsingFormat('Ymd'),
-            'TIMEPERIOD'  => $timePeriod,
-            'STUDKEY'     => $studentExternalId,
+            'DATE' => $date->getUsingFormat('Ymd'),
+            'TIMEPERIOD' => $timePeriod,
+            'STUDKEY' => $studentExternalId,
             'TEACHERCODE' => $teacherExternalId,
         ]);
 
@@ -354,39 +313,29 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         $statement->nextRowset();
         $dayClasses = $statement->fetchAll();
         $statement->nextRowset();
-        // $homeClasses = $statement->fetchAll();
+//        $homeClasses = $statement->fetchAll();
         $statement->nextRowset();
         $weekDays = $statement->fetchAll();
         $statement->nextRowset();
-        // $terms = $statement->fetchAll();
+//        $terms = $statement->fetchAll();
         $statement->close();
 
         // The $homeClasses definition is mostly included within dayPeriods
-
         $timetable = [];
-
         foreach ($dayPeriods as $period) {
-            // TODO: Possibly make a config variable of types to include
-            if ($period["TYPE"] != "Y") {
-                // TODO: Remove hardcoded day one once Schoolbox supports different day/times
-                $periodNumber = "01." . str_pad($period['CODE'], 2, '0');
-
-                $timetable[$periodNumber]['periodName']     = $period['HEADING'];
-                $timetable[$periodNumber]['periodStart']    = sprintf('%.2f', $period['TIME_START']);
-                $timetable[$periodNumber]['periodEnd']      = sprintf('%.2f', $period['TIME_END']);
-                $timetable[$periodNumber]['periodSort']     = str_pad(sprintf('%.2f', $period['TIME_START']), 5, '0', STR_PAD_LEFT);
-                $timetable[$periodNumber]['periodNumber']   = $periodNumber;
-                $timetable[$periodNumber]['periodSequence'] = 1;
-                $timetable[$periodNumber]['class']          = [];
-            }
+            // Order the list by sortOrder
+            $order = $period['SORT_ORDER'];
+            $timetable[$order]['periodName']     = $period['HEADING'];
+            $timetable[$order]['periodStart']    = sprintf('%.2f', $period['TIME_START']);
+            $timetable[$order]['periodEnd']      = sprintf('%.2f', $period['TIME_END']);
+            $timetable[$order]['periodNumber']   = $order;
+            $timetable[$order]['periodSequence'] = 1;
+            $timetable[$order]['class']          = [];
         }
-
         ksort($timetable);
 
         // What's the current day number?
-
         $dayNumber = 0;
-
         foreach ($weekDays as $weekDay) {
             try {
                 $adf = new Alaress_Date_Format($weekDay['DATE'], Alaress_Date_Format::DATABASE_FORMAT);
@@ -401,26 +350,18 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
         // Add classes for each day into it
         foreach ($dayClasses as $dayClass) {
-            // TODO: Remove hardcoded day one once Schoolbox supports different day/times
-            $period = "01." . str_pad($dayClass['PERIOD'], 2, '0');
-
-            $classCode = $timePeriod . '/' . $dayClass['YEAR'] . $dayClass['ABBREV'] . $dayClass['CLASS'];
-
+            $period = $dayClass['PERIOD'];
+            $code   = $timePeriod.'/'.$dayClass['YEAR'].$dayClass['ABBREV'].$dayClass['CLASS'];
             if ($dayNumber == $dayClass['DAY']) {
-                $timetable[$period]['class'][$classCode] = [
-                    'description'        => "{$period} {$dayClass['DESC']}",
-                    'code'               => $classCode,
+                $timetable[$period]['class'][$code] = array(
+                    'description'        => $dayClass['DESC'],
+                    'code'               => $code,
                     'campus'             => $timePeriod,
                     'room'               => $dayClass['ROOM'],
                     'StaffPreferredName' => $dayClass['NAME_FOR_REPORT'],
-                ];
+                );
             }
         }
-
-        usort($timetable, function ($a, $b) {
-            return strcmp($a['periodSort'], $b['periodSort']);
-        });
-
         return $timetable;
     }
 
@@ -464,17 +405,17 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      *
      * @param                  $externalUserId
      * @param                  $userId
-     * @param Campus           $campus
+     * @param Schoolbox\Campus $campus
      *
      * @internal param $campusId
      * @return mixed
      */
-    public function getFullTimetable($externalUserId, $userId, Campus $campus)
+    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
     {
         // I need to know if $userId is a teacher or student
         try {
             $user = $this->userMapper->findById($userId);
-        } catch (MapperException $e) {
+        } catch (\Schoolbox\Mapper\Exception $e) {
             return [];
         }
 
@@ -489,9 +430,9 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
         $statement = $this->getDatabase()->prepareProcedure('spSelTimetable');
         $statement->bindInputs([
-            'DATE'        => date('Ymd'),
-            'TIMEPERIOD'  => $timePeriod,
-            'STUDKEY'     => $studentExternalId,
+            'DATE' => date('Ymd'),
+            'TIMEPERIOD' => $timePeriod,
+            'STUDKEY' => $studentExternalId,
             'TEACHERCODE' => $teacherExternalId,
         ]);
 
@@ -501,9 +442,9 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         $statement->nextRowset();
         $dayClasses = $statement->fetchAll();
         $statement->nextRowset();
-        // $homeClasses = $statement->fetchAll();
+//        $homeClasses = $statement->fetchAll();
         $statement->nextRowset();
-        // $weekDays = $statement->fetchAll();
+//        $weekDays = $statement->fetchAll();
         $statement->nextRowset();
         $terms = $statement->fetchAll();
         $statement->close();
@@ -511,47 +452,33 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         $term = array_shift($terms);
 
         // The $homeClasses definition is mostly included within dayPeriods
-
         $timetable = [];
         $dayCount  = $term['TIMEDAYS'];
-
         foreach ($dayPeriods as $period) {
-            // TODO: Possibly make a config variable of types to include
-            if ($period["TYPE"] != "Y") {
-                // TODO: Remove hardcoded day one once Schoolbox supports different day/times
-                $periodNumber = "01." . str_pad($period['CODE'], 2, '0');
-
-                $timetable[$periodNumber]['periodName']     = $period['HEADING'];
-                $timetable[$periodNumber]['periodStart']    = sprintf('%.2f', $period['TIME_START']);
-                $timetable[$periodNumber]['periodEnd']      = sprintf('%.2f', $period['TIME_END']);
-                $timetable[$periodNumber]['periodSort']     = str_pad(sprintf('%.2f', $period['TIME_START']), 5, '0', STR_PAD_LEFT);
-                $timetable[$periodNumber]['periodNumber']   = $periodNumber;
-                $timetable[$periodNumber]['periodSequence'] = 1;
-                $timetable[$periodNumber]['day']            = array_fill(1, $dayCount, []);
-            }
+            // Order the list by sortOrder
+            $order = $period['SORT_ORDER'];
+            $timetable[$order]['periodName']     = $period['HEADING'];
+            $timetable[$order]['periodStart']    = sprintf('%.2f', $period['TIME_START']);
+            $timetable[$order]['periodEnd']      = sprintf('%.2f', $period['TIME_END']);
+            $timetable[$order]['periodNumber']   = $order;
+            $timetable[$order]['periodSequence'] = 1;
+            $timetable[$order]['day']            = array_fill(1, $dayCount, array());
         }
+        ksort($timetable);
 
         // Add classes for each day into it
         foreach ($dayClasses as $dayClass) {
-            $day = $dayClass['DAY'];
-            // TODO: Remove hardcoded day one once Schoolbox supports different day/times
-            $period = "01." . str_pad($dayClass['PERIOD'], 2, '0');
-
-            $classCode = $timePeriod . '/' . $dayClass['YEAR'] . $dayClass['ABBREV'] . $dayClass['CLASS'];
-
-            $timetable[$period]['day'][$day][$classCode] = [
+            $period = $dayClass['PERIOD'];
+            $day    = $dayClass['DAY'];
+            $code   = $timePeriod.'/'.$dayClass['YEAR'].$dayClass['ABBREV'].$dayClass['CLASS'];
+            $timetable[$period]['day'][$day][$code] = array(
                 'description'        => $dayClass['DESC'],
-                'code'               => $classCode,
+                'code'               => $code,
                 'campus'             => $timePeriod,
                 'room'               => $dayClass['ROOM'],
                 'StaffPreferredName' => $dayClass['NAME_FOR_REPORT'],
-            ];
+            );
         }
-
-        usort($timetable, function ($a, $b) {
-            return strcmp($a['periodSort'], $b['periodSort']);
-        });
-
         return $timetable;
     }
 
@@ -633,6 +560,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         $result = [];
 
         foreach ($classes as $class) {
+
             // If we don't have a start/end time- skip it.
 
             if (trim($class['PERIOD_START']) === '' || trim($class['PERIOD_END']) === '') {
@@ -640,7 +568,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             }
 
             $periodStartArray = explode('.', $class['PERIOD_START']);
-            $periodStartAMPM  = $periodStartArray[0] >= 12 ? 'PM' : 'AM';
+            $periodStartAMPM = $periodStartArray[0] >= 12 ? 'PM' : 'AM';
 
             if ($periodStartArray[0] > 12) {
                 $periodStartArray[0] -= 12;
@@ -652,14 +580,14 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
             if ($periodStartArray[1] === null) {
                 $periodStartArray[1] = '00';
-            } elseif ($periodStartArray[1] < 10 && strlen($periodStartArray[1]) < 2) {
+            } else if ($periodStartArray[1] < 10 && strlen($periodStartArray[1]) < 2) {
                 $periodStartArray[1] = "{$periodStartArray[1]}0";
             }
 
             $periodStart = "{$periodStartArray[0]}:{$periodStartArray[1]}{$periodStartAMPM}";
 
             $periodEndArray = explode('.', $class['PERIOD_END']);
-            $periodEndAMPM  = $periodEndArray[0] >= 12 ? 'PM' : 'AM';
+            $periodEndAMPM = $periodEndArray[0] >= 12 ? 'PM' : 'AM';
 
             if ($periodEndArray[0] > 12) {
                 $periodEndArray[0] -= 12;
@@ -671,19 +599,19 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
             if ($periodEndArray[1] === null) {
                 $periodEndArray[1] = '00';
-            } elseif ($periodEndArray[1] < 10 && strlen($periodEndArray[1]) < 2) {
+            } else if ($periodEndArray[1] < 10 && strlen($periodEndArray[1]) < 2) {
                 $periodEndArray[1] = "{$periodEndArray[1]}0";
             }
 
             $periodEnd = "{$periodEndArray[0]}:{$periodEndArray[1]}{$periodEndAMPM}";
 
             $result[] = [
-                'DayNumber'      => $class['TIMETABLE_DAY'],
+                'DayNumber' => $class['TIMETABLE_DAY'],
                 'TimetableGroup' => $timePeriod,
-                'PeriodStart'    => $periodStart,
-                'PeriodEnd'      => $periodEnd,
-                'PeriodName'     => $class['PERIOD_NAME'],
-                'Description'    => "{$class['SUBJECT_NAME']}\n{$class["TEACHER_NAME"]}",
+                'PeriodStart' => $periodStart,
+                'PeriodEnd' => $periodEnd,
+                'PeriodName' => $class['PERIOD_NAME'],
+                'Description' => "{$class['SUBJECT_NAME']}\n{$class["TEACHER_NAME"]}",
             ];
         }
 
@@ -706,7 +634,6 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     private function setDatabase($database)
     {
         $this->database = $database;
-
         return $this;
     }
 }
