@@ -18,7 +18,6 @@
                 e.preventDefault();
                 var $this = $(this);
                 $this.confirmDialog({
-                    text: $this.data('confirmDialogText'),
                     confirmEvent: function() {
                         toast.toastActivate({ text: 'Acknowledging...' });
                         $.post(route, {}, null, 'json')
