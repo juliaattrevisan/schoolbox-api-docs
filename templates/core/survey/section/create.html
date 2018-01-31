@@ -22,17 +22,6 @@
             prompt.toggleClass('hide');
         });
 
-        jQuery.validator.addMethod("combo", function(value, element)
-                {
-                    if (($('[data-shuffle]').is(':checked')) && ($('[data-max-questions]').val() == ""))
-                    {
-                        return false;
-                    }
-                    else return true;
-                },
-                "You've selected random selection of questions. Please enter the number of questions to put in the pool."
-        );
-
         $('#createSection').alaressValidate({
             rules: {
                 title: {
@@ -40,8 +29,7 @@
                     minlength: 2
                 },
                 pool: {
-                    number:true,
-                    combo: true
+                    number: true
                 }
             },
             messages: {
