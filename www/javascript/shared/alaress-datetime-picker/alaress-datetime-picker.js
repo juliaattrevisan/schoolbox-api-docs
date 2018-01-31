@@ -1,401 +1,210 @@
-// To keep the date format string the same between the flatpickr format string, and MomentJS need to create a mapping function
+(function(adtp, $, undefined) {
 
-convertFormat = function (format) {
-    var formatMap = {
-            d: 'DD',
-            D: 'ddd',
-            j: 'D',
-            J: 'Do',
-            l: 'dddd',
-            N: 'E',
-            K: 'A',
-            S: 'SS',
-            w: 'd',
-            W: 'W',
-            F: 'MMMM',
-            m: 'MM',
-            M: 'MMM',
-            n: 'M',
-            o: 'GGGG',
-            Y: 'YYYY',
-            y: 'YY',
-            a: 'a',
-            A: 'A',
-            g: 'h',
-            G: 'H',
-            h: 'hh',
-            H: 'HH',
-            i: 'mm',
-            s: 'ss',
-            O: 'ZZ',
-            P: 'Z'
-        },
-
-        formatEx = /[dDjJlNKSwWFmMnoYyaAgGhHisOP]/g;
-
-    // Just return the converted format
-    return format.replace(formatEx, function (format) {
-        return formatMap[format];
-    });
-};
-
-var momentFormats = {
-    database: 'YYYY-MM-DD HH:mm:ss',
-    databaseShort: 'YYYY-MM-DD',
-    nice: 'dddd, MMM D, Y'
-};
-
-//Use global counter in case multiple alaressDateTimePicker() have been called from one page
-
-var pickerCounter = 0;
-countPickers = function () {
-    pickerCounter++;
-    return pickerCounter;
-};
-
-function getValue(input, attribute) {
-    var value = input.attr(attribute);
-    // There is no such attribute, return false
-    if (value === undefined) {
-        return false;
-    }
-    // The attribute is there and has a value, return it
-    else if (value.length > 0) {
-        return value;
-    }
-    // The attribute is there, but no value is set, return true
-    else {
-        return true;
-    }
-}
-
-function getOptions(element) {
-
-    var buttonText = getValue(element, 'data-datepicker-buttontext');
-
-    // Build datepicker options form the element data attributes
-    var elementOptions = {
-        id : getValue(element, 'data-datepicker-id'),
-        noButton: getValue(element, 'data-datepicker-nobutton'),
-        buttonText: buttonText === true ? '' : (buttonText || 'Select Date'),
-        displayFormat: dateDisplayFormats.localDateTime, //Default display datetime format
-        displayFormatDate: dateDisplayFormats.localDate, //Default display date format
-        databaseFormat: 'Y-m-d H:i:s',
-        enableTime: getValue(element, 'data-datepicker-time'),
-        allDaySwitch: getValue(element, 'data-datepicker-alldayswitch'), //Show All Day switch
-        allDayInput: getValue(element, 'data-datepicker-alldayinput'), //Sync with external AllDay input hidden field
-        altFormat: getValue(element, 'data-datepicker-format'), // false|date|datetime
-        type: getValue(element, 'data-datepicker-call'), //Ajax call type: events, duework or nothing
-        endDay: getValue(element, 'data-datepicker-endofday'), // Should allday change time to 23:59:59
-        endPeriod: getValue(element, 'data-datepicker-endofperiod'), // It will use end of the period to set time through timetable picker
-        staller: null
+    // -----------------------------------------------------------------------
+    // Public vars & methods
+    // -----------------------------------------------------------------------
+    adtp.momentFormats = {
+        database: 'YYYY-MM-DD HH:mm:ss',
+        databaseShort: 'YYYY-MM-DD',
+        nice: 'dddd, MMM D, Y'
     };
-    return elementOptions;
-}
 
-function getPickerFormats(allDayState, options) {
-    // Getting element date/datetime format settings
-    var from, to;
-    // Format is always date or datetime
-    if (options.altFormat !== false) {
-        if (options.altFormat === 'date') {
-            from = options.displayFormatDate;
-            to = options.displayFormatDate;
-        }
-        else if (options.altFormat === 'datetime') {
-            from = options.displayFormat;
-            to = options.displayFormat;
-        }
-    }
-    else {
-        // If no time, format is date
-        if (options.enableTime === false) {
-            from = options.displayFormatDate;
-            to = options.displayFormatDate;
-        }
-        else {
-            // Or... looking at the allDaySwitch option
-            if (options.allDaySwitch === true) {
-                // Ok, the allDaySwitch changed, changing the format accordingly
-                if (allDayState) {
-                    from = options.displayFormat;
-                    to = options.displayFormatDate;
-                }
-                else {
-                    from = options.displayFormat;
-                    to = options.displayFormat;
-                }
-            }
-            else {
-                from = options.displayFormat;
-                to = options.displayFormat;
-            }
-        }
-    }
-    var formats = {
-        convertFrom: from,
-        convertTo: to
+    // Use global counter in case multiple alaressDateTimePicker() have been called from one page
+    var pickerCounter = 0;
+    adtp.countPickers = function () {
+        pickerCounter++;
+        return pickerCounter;
     };
-    return formats;
-}
 
-function getLinkedElements(element, options) {
-    // Get all linked inputs, e.g. startDate, endDate
-    var elements = $('[data-datepicker-alldayinput = ' + options.allDayInput + ']');
-    var linkedElements = [];
-    elements.each(function () {
-        if ($(this)[0] !== element[0]) {
-            linkedElements.push($(this));
-        }
-    });
-    return linkedElements;
-}
+    /**
+     * To keep the date format string the same between the flatpickr format string, and MomentJS need to create a mapping function
+     *
+     * @param format
+     */
+    adtp.convertFormat = function (format) {
+        var formatMap = {
+                d: 'DD',
+                D: 'ddd',
+                j: 'D',
+                J: 'Do',
+                l: 'dddd',
+                N: 'E',
+                K: 'A',
+                S: 'SS',
+                w: 'd',
+                W: 'W',
+                F: 'MMMM',
+                m: 'MM',
+                M: 'MMM',
+                n: 'M',
+                o: 'GGGG',
+                Y: 'YYYY',
+                y: 'YY',
+                a: 'a',
+                A: 'A',
+                g: 'h',
+                G: 'H',
+                h: 'hh',
+                H: 'HH',
+                i: 'mm',
+                s: 'ss',
+                O: 'ZZ',
+                P: 'Z'
+            },
 
-function setValue(element, options, state, trigger, date) {
-    // Get their pickerIds
-    var pId = element.attr('data-datepicker-id');
+            formatEx = /[dDjJlNKSwWFmMnoYyaAgGhHisOP]/g;
 
-    // Get the format
-    var pickerFormats = getPickerFormats(state, options);
-    var value;
-
-    if (date !== undefined) {
-        value = moment(date);
-    }
-    else if (window.pickerInstance[pId] !== undefined && window.pickerInstance[pId].input.value) {
-        value = moment(window.pickerInstance[pId].input.value);
-    }
-    else if (element.val() !== undefined && element.val()) {
-        value = moment(element.val(), convertFormat(pickerFormats.convertFrom));
-    }
-    else {
-        value = moment();
-    }
-
-    // All Day is on
-    var v;
-    if (state === true) {
-        if (options.endDay) {
-            v = value.endOf('day').format(convertFormat(pickerFormats.convertTo));
-        }
-        else {
-            v = value.startOf('day').format(convertFormat(pickerFormats.convertTo));
-        }
-        if (window.pickerInstance[pId] !== undefined) {
-            window.pickerInstance[pId].setDate(v.toISOString);
-        }
-        element.val(v);
-    }
-    else {
-        v = moment(value).format(convertFormat(pickerFormats.convertTo));
-        if (window.pickerInstance[pId] !== undefined) {
-            window.pickerInstance[pId].setDate(v.toISOString);
-        }
-        element.val(v);
-    }
-
-    if (trigger === true) {
-        element.trigger('change');
-    }
-
-    if (options.allDayInput !== false) {
-        $('#' + options.allDayInput).val(state ? 1 : 0);
-    }
-
-    // Hide any possible validation error from the field
-    $('#' + element.attr('id') + '-error').hide();
-    $(element).removeClass('error');
-
-}
-
-function setCalendarAllDay(state, pickerId) {
-
-    var $timeDiv = $('#pickerCalendar' + pickerId).closest('#adtp-modal-' + pickerId).find('.flatpickr-time');
-
-    // All Day is on
-    if (state === true) {
-        $timeDiv.hide();
-        $('#hideTime' + pickerId).prop('checked', true);
-
-    }
-    else {
-        $timeDiv.show();
-        $('#hideTime' + pickerId).prop('checked', false);
-    }
-
-}
-
-/**
- * Massages the datetime picker's value into a valid format, or errors out if it cannot.
- *
- * This uses an AJAX call to /ajax/strtotime.php, which uses method strtotime()
- * to convert the input's value to a recognisable date value.
- *
- * @param {jQuery.Event} e       a jQuery event
- * @param {jQuery}       staller if given, the element to attach the AJAX promise to
- */
-function massageDateValue(e, staller) {
-    var t = e.target;
-
-    if ($.trim($(t).val()) != '') {
-
-        // set up params to guide server-side parsing
-        var opts = getOptions($(t));
-        var params = {
-            string: t.value
-        };
-        var xhr = $.get('/ajax/strtotime.php', params);
-        var $fieldError = $('#' + $(t).attr('id') + '-error'); // A possible validation error for this field
-
-        // Hide any validation error while this is processing
-        $fieldError.hide();
-
-        // Disable the field
-        $(t).prop('readonly', true);
-        $(t).prop('disabled', true);
-
-        xhr.done(function (data) {
-
-            $(t).prop('disabled', false);
-
-            // If it couldn't parse a date - show a validation error on the form
-            if (data.error) {
-
-                $(t).addClass('error');
-
-                if (!$fieldError.length) { // don't create multiple errors
-
-                    var error = '<label id="' + $(t).attr('id') + '-error" class="error" for="' + $(t).attr('id') + '">Please enter a valid date</label>';
-
-                    if ($(t).closest('.input-group').length) {
-                        $(t).closest('.input-group').after(error);
-                    } else {
-                        $(t).after(error);
-                    }
-
-                } else {
-
-                    // It might be hidden - show
-                    $fieldError.show();
-                }
-
-            } else {
-
-                var newDate = moment(data.time);
-
-                // If field has all day switch data param and is end or start of day - make all day
-                var state = ((newDate.format('HHmm') == '0000' || newDate.format('HHmm') == '2359') && (opts.allDaySwitch));
-
-                // Does the linked element (if any) have time?
-                if (opts.allDayInput) {
-                    var linkedElements = getLinkedElements($(t), opts);
-
-                    linkedElements.forEach(function (item) {
-                        var itemOptions = getOptions($(item));
-                        var itemDate = moment(item.val(), convertFormat(itemOptions.displayFormat));
-                        var itemState = ((itemDate.format('HHmm') == '0000' || itemDate.format('HHmm') == '2359') && state);
-
-                        // Update the state of the linked field
-                        setValue($(item), itemOptions, itemState, true);
-
-                        // Update the original field's state to make consistent
-                        // Note: all fields in the group must be 0000 or 2359 in order for all day to be switched on
-                        state = itemState;
-
-                    });
-                }
-
-                // Add the parsed date into the field
-                // assumption: if time is 00:00:00 and the endDay flag is set, push to 23:59:59 instead
-                // this causes a limitation that it is *not possible* to set a field of this nature to midnight
-                setValue($(t), opts, state, true, newDate);
-
-                // Sync dates if applicable
-                syncDatesOnElement($(t), opts, '');
-
-                // Remove any error class on the field
-                $(t).removeClass('error');
-
-                // Hide any validation error
-                $fieldError.hide();
-            }
-
-        }).always(function () {
-            $(t).prop('readonly', false);
-            $(t).prop('disabled', false);
+        // Just return the converted format
+        return format.replace(formatEx, function (format) {
+            return formatMap[format];
         });
-
-        // this listener needs to be installed last in this case
-        if (staller) {
-            // install this XHR as stalling form submit
-            staller.stallSubmit(xhr);
-        }
-    }
-}
-
-
-/**
- * Takes an element and syncs it with it's start and end date as per its data attribs
- * Will run itself in one direction until it stops finding a start or end date set
- *
- * @param {jQuery} $element
- * @param {object} options
- * @param {string} from - used to set a direction this will go in, start or end
- */
-function syncDatesOnElement($element, options, from) {
-
-    var dateFormat = fieldHasTime(options) ? dateDisplayFormats.momentJsDatetime : dateDisplayFormats.momentJs;
-
-    var syncOptions = {
-        dateFormat: dateFormat
     };
 
-    if ($element.attr('data-datesync-startdate') !== undefined && from !== 'end') {
 
-        syncOptions.startDate = $element.attr('data-datesync-startdate');
-        syncOptions.endDate = $element;
+    /**
+     *
+     * @param input
+     * @param attribute
+     * @returns {boolean}
+     */
+    adtp.getValue = function(input, attribute) {
+        var value = input.attr(attribute);
+        // There is no such attribute, return false
+        if (value === undefined) {
+            return false;
+        }
+        // The attribute is there and has a value, return it
+        else if (value.length > 0) {
+            return value;
+        }
+        // The attribute is there, but no value is set, return true
+        else {
+            return true;
+        }
+    };
 
-        $element.syncDatesNow(syncOptions);
 
-        // Run this again for the start element
-        syncDatesOnElement($($element.attr('data-datesync-startdate')), options, 'start');
+    /**
+     *
+     * @param element
+     * @returns {object}
+     */
+    adtp.getOptions = function(element) {
+
+        var buttonText = adtp.getValue(element, 'data-datepicker-buttontext');
+
+        // Build datepicker options form the element data attributes
+        var elementOptions = {
+            id : adtp.getValue(element, 'data-datepicker-id'),
+            noButton: adtp.getValue(element, 'data-datepicker-nobutton'),
+            buttonText: buttonText === true ? '' : (buttonText || 'Select Date'),
+            displayFormat: dateDisplayFormats.localDateTime, //Default display datetime format
+            displayFormatDate: dateDisplayFormats.localDate, //Default display date format
+            databaseFormat: 'Y-m-d H:i:s',
+            enableTime: adtp.getValue(element, 'data-datepicker-time'),
+            allDaySwitch: adtp.getValue(element, 'data-datepicker-alldayswitch'), //Show All Day switch
+            allDayInput: adtp.getValue(element, 'data-datepicker-alldayinput'), //Sync with external AllDay input hidden field
+            altFormat: adtp.getValue(element, 'data-datepicker-format'), // false|date|datetime
+            type: adtp.getValue(element, 'data-datepicker-call'), //Ajax call type: events, duework or nothing
+            endDay: adtp.getValue(element, 'data-datepicker-endofday'), // Should allday change time to 23:59:59
+            endPeriod: adtp.getValue(element, 'data-datepicker-endofperiod'), // It will use end of the period to set time through timetable picker
+            staller: null
+        };
+        return elementOptions;
+    };
+
+
+    /**
+     * Takes an element and syncs it with it's start and end date as per its data attribs
+     * Will run itself in one direction until it stops finding a start or end date set
+     *
+     * @param {jQuery} $element
+     * @param {object} options
+     * @param {string} from - used to set a direction this will go in, start or end
+     */
+    adtp.syncDatesOnElement = function($element, options, from) {
+
+        var dateFormat = fieldHasTime(options) ? dateDisplayFormats.momentJsDatetime : dateDisplayFormats.momentJs;
+
+        var syncOptions = {
+            dateFormat: dateFormat
+        };
+
+        if ($element.attr('data-datesync-startdate') !== undefined && from !== 'end') {
+
+            syncOptions.startDate = $element.attr('data-datesync-startdate');
+            syncOptions.endDate = $element;
+
+            $element.syncDatesNow(syncOptions);
+
+            // Run this again for the start element
+            adtp.syncDatesOnElement($($element.attr('data-datesync-startdate')), options, 'start');
+        }
+
+        if ($element.attr('data-datesync-endDate') !== undefined && from !== 'start') {
+
+            syncOptions.startDate = $element;
+            syncOptions.endDate = $element.attr('data-datesync-endDate');
+
+            $element.syncDatesNow(syncOptions);
+
+            // Run this again for the end element
+            adtp.syncDatesOnElement($($element.attr('data-datesync-endDate')), options, 'end');
+        }
+    };
+
+
+    /**
+     *
+     * @param state
+     * @param pickerId
+     */
+    adtp.setCalendarAllDay = function(state, pickerId) {
+
+        var $timeDiv = $('#pickerCalendar' + pickerId).closest('#adtp-modal-' + pickerId).find('.flatpickr-time');
+
+        // All Day is on
+        if (state === true) {
+            $timeDiv.hide();
+            $('#hideTime' + pickerId).prop('checked', true);
+
+        }
+        else {
+            $timeDiv.show();
+            $('#hideTime' + pickerId).prop('checked', false);
+        }
+
+    };
+
+
+    // -----------------------------------------------------------------------
+    // Private methods
+    // -----------------------------------------------------------------------
+
+    /**
+     * Check if this field should have time given its options and whether all day is on
+     *
+     * @param {object} options
+     * @returns {boolean}
+     */
+    function fieldHasTime(options) {
+        // Only retuning true if time is enabled, just a matter of whether all day is enabled and if so -
+        // is it currently activated?
+        return ((options.enableTime && options.allDayInput === false) || (options.enableTime && $('#' + options.allDayInput).val() == 0));
     }
 
-    if ($element.attr('data-datesync-endDate') !== undefined && from !== 'start') {
 
-        syncOptions.startDate = $element;
-        syncOptions.endDate = $element.attr('data-datesync-endDate');
+}( window.adtp = window.adtp || {}, jQuery ));
 
-        $element.syncDatesNow(syncOptions);
-
-        // Run this again for the end element
-        syncDatesOnElement($($element.attr('data-datesync-endDate')), options, 'end');
-    }
-
-}
-
-
-/**
- * Check if this field should have time given its options and whether all day is on
- *
- * @param {object} options
- * @returns {boolean}
- */
-function fieldHasTime(options) {
-    // Only retuning true if time is enabled, just a matter of whether all day is enabled and if so -
-    // is it currently activated?
-    return ((options.enableTime && options.allDayInput === false) || (options.enableTime && $('#' + options.allDayInput).val() == 0));
-}
 
 
 // Extend jQuery with our datepicker function
-
 $.fn.alaressDateTimePicker = function (optionsOverride) {
 
     var element = this;
 
     // Build datepicker options form the element data attributes
-    var options = getOptions(element);
+    var options = adtp.getOptions(element);
 
     // Override with user any options --- should this stay? Todo
     for (var attribute in optionsOverride) {
@@ -435,7 +244,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
     window.pickerInstance = [];
 
     // Count this picker in
-    var pickerId = countPickers();
+    var pickerId = adtp.countPickers();
 
     // Set pickerID to the element attr
     element.attr('data-datepicker-id', pickerId);
@@ -462,14 +271,14 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         var originalValue;
 
         if (element.val().length > 0) {
-            originalValue = moment(element.val(), convertFormat(options.displayFormat));
+            originalValue = moment(element.val(), adtp.convertFormat(options.displayFormat));
         }
         // if no value has been passed, use today
         else {
             originalValue = moment();
         }
         if (options.allDayInput !== false && $('#' + options.allDayInput).val() == 1) {
-            originalValue = moment(originalValue, convertFormat(options.displayFormatDate));
+            originalValue = moment(originalValue, adtp.convertFormat(options.displayFormatDate));
         }
 
         var $modal = $('#adtp-modal-' + pickerId);
@@ -489,7 +298,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
             // if datetime, pass date only
             // AJAX in the modal contents if they haven't already been loaded
-            $modal.load('/picker/datetime/type/' + options.type + '/element/' + element.attr('id') + '/id/' + pickerId + '/value/' + encodeURIComponent(originalValue.format(momentFormats.database)), function () {
+            $modal.load('/picker/datetime/type/' + options.type + '/element/' + element.attr('id') + '/id/' + pickerId + '/value/' + encodeURIComponent(originalValue.format(adtp.momentFormats.database)), function () {
 
                 // Capture closure of modal
                 $(document).on('closed.fndtn.reveal', '#adtp-modal-' + pickerId, function () {
@@ -520,12 +329,12 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                     if (options.allDayInput !== false) {
                         var linkedElements = getLinkedElements(element, options);
                         linkedElements.forEach(function (item) {
-                            setValue(item, getOptions(item), $('#hideTime' + pickerId).is(':checked'), true);
+                            setValue(item, adtp.getOptions(item), $('#hideTime' + pickerId).is(':checked'), true);
                         });
                     }
 
                     // Sync dates if applicable
-                    syncDatesOnElement(element, options, '');
+                    adtp.syncDatesOnElement(element, options, '');
 
                     // Close modal
                     $modal.foundation('reveal', 'close');
@@ -561,18 +370,18 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
                     setValue(element, options, timetableAllDay, true, newDate);
                     // Set allday state on the calendar picker
-                    setCalendarAllDay(timetableAllDay, pickerId);
+                    adtp.setCalendarAllDay(timetableAllDay, pickerId);
 
                     if (options.allDayInput !== false) {
                         var linkedElements = getLinkedElements(element, options);
                         linkedElements.forEach(function (item) {
-                            setValue(item, getOptions(item), timetableAllDay, true);
-                            setCalendarAllDay(timetableAllDay, getOptions(item).id);
+                            setValue(item, adtp.getOptions(item), timetableAllDay, true);
+                            adtp.setCalendarAllDay(timetableAllDay, adtp.getOptions(item).id);
                         });
                     }
 
                     // Sync dates if applicable
-                    syncDatesOnElement(element, options, '');
+                    adtp.syncDatesOnElement(element, options, '');
 
                     // Close the modal
                     $modal.foundation('reveal', 'close');
@@ -587,4 +396,248 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         }
     });
 
+
+
+    // -----------------------------------------------------------------------
+    // Private methods
+    // -----------------------------------------------------------------------
+
+    /**
+     *
+     * @param allDayState
+     * @param options
+     * @returns {{convertFrom: *, convertTo: *}}
+     */
+    function getPickerFormats(allDayState, options) {
+        // Getting element date/datetime format settings
+        var from;
+        var to;
+
+        // Format is always date or datetime
+        if (options.altFormat !== false) {
+            if (options.altFormat === 'date') {
+                from = options.displayFormatDate;
+                to = options.displayFormatDate;
+            } else if (options.altFormat === 'datetime') {
+                from = options.displayFormat;
+                to = options.displayFormat;
+            }
+        } else {
+            // If no time, format is date
+            if (options.enableTime === false) {
+                from = options.displayFormatDate;
+                to = options.displayFormatDate;
+            } else {
+                // Or... looking at the allDaySwitch option
+                if (options.allDaySwitch === true) {
+                    // Ok, the allDaySwitch changed, changing the format accordingly
+                    if (allDayState) {
+                        from = options.displayFormat;
+                        to = options.displayFormatDate;
+                    } else {
+                        from = options.displayFormat;
+                        to = options.displayFormat;
+                    }
+                } else {
+                    from = options.displayFormat;
+                    to = options.displayFormat;
+                }
+            }
+        }
+
+        return {
+            convertFrom: from,
+            convertTo: to
+        };
+    }
+
+
+    /**
+     *
+     * @param element
+     * @param options
+     * @returns {Array}
+     */
+    function getLinkedElements(element, options) {
+        // Get all linked inputs, e.g. startDate, endDate
+        var elements = $('[data-datepicker-alldayinput = ' + options.allDayInput + ']');
+        var linkedElements = [];
+        elements.each(function () {
+            if ($(this)[0] !== element[0]) {
+                linkedElements.push($(this));
+            }
+        });
+        return linkedElements;
+    }
+
+
+    /**
+     *
+     * @param element
+     * @param options
+     * @param state
+     * @param trigger
+     * @param date
+     */
+    function setValue(element, options, state, trigger, date) {
+        // Get their pickerIds
+        var pId = element.attr('data-datepicker-id');
+
+        // Get the format
+        var pickerFormats = getPickerFormats(state, options);
+        var value;
+
+        if (date !== undefined) {
+            value = moment(date);
+        } else if (window.pickerInstance[pId] !== undefined && window.pickerInstance[pId].input.value) {
+            value = moment(window.pickerInstance[pId].input.value);
+        } else if (element.val() !== undefined && element.val()) {
+            value = moment(element.val(), adtp.convertFormat(pickerFormats.convertFrom));
+        } else {
+            value = moment();
+        }
+
+        // All Day is on
+        var v;
+        if (state === true) {
+            if (options.endDay) {
+                v = value.endOf('day').format(adtp.convertFormat(pickerFormats.convertTo));
+            } else {
+                v = value.startOf('day').format(adtp.convertFormat(pickerFormats.convertTo));
+            }
+
+            if (window.pickerInstance[pId] !== undefined) {
+                window.pickerInstance[pId].setDate(v.toISOString);
+            }
+            element.val(v);
+        }
+        else {
+            v = moment(value).format(adtp.convertFormat(pickerFormats.convertTo));
+            if (window.pickerInstance[pId] !== undefined) {
+                window.pickerInstance[pId].setDate(v.toISOString);
+            }
+            element.val(v);
+        }
+
+        if (trigger === true) {
+            element.trigger('change');
+        }
+
+        if (options.allDayInput !== false) {
+            $('#' + options.allDayInput).val(state ? 1 : 0);
+        }
+
+        // Hide any possible validation error from the field
+        $('#' + element.attr('id') + '-error').hide();
+        $(element).removeClass('error');
+    }
+
+
+    /**
+     * Massages the datetime picker's value into a valid format, or errors out if it cannot.
+     *
+     * This uses an AJAX call to /ajax/strtotime.php, which uses method strtotime()
+     * to convert the input's value to a recognisable date value.
+     *
+     * @param {jQuery.Event} e       a jQuery event
+     * @param {jQuery}       staller if given, the element to attach the AJAX promise to
+     */
+    function massageDateValue(e, staller) {
+        var t = e.target;
+
+        if ($.trim($(t).val()) != '') {
+
+            // set up params to guide server-side parsing
+            var opts = adtp.getOptions($(t));
+            var params = {
+                string: t.value
+            };
+            var xhr = $.get('/ajax/strtotime.php', params);
+            var $fieldError = $('#' + $(t).attr('id') + '-error'); // A possible validation error for this field
+
+            // Hide any validation error while this is processing
+            $fieldError.hide();
+
+            // Disable the field
+            $(t).prop('readonly', true);
+            $(t).prop('disabled', true);
+
+            xhr.done(function (data) {
+
+                $(t).prop('disabled', false);
+
+                // If it couldn't parse a date - show a validation error on the form
+                if (data.error) {
+
+                    $(t).addClass('error');
+
+                    if (!$fieldError.length) { // don't create multiple errors
+
+                        var error = '<label id="' + $(t).attr('id') + '-error" class="error" for="' + $(t).attr('id') + '">Please enter a valid date</label>';
+
+                        if ($(t).closest('.input-group').length) {
+                            $(t).closest('.input-group').after(error);
+                        } else {
+                            $(t).after(error);
+                        }
+
+                    } else {
+
+                        // It might be hidden - show
+                        $fieldError.show();
+                    }
+
+                } else {
+
+                    var newDate = moment(data.time);
+
+                    // If field has all day switch data param and is end or start of day - make all day
+                    var state = ((newDate.format('HHmm') == '0000' || newDate.format('HHmm') == '2359') && (opts.allDaySwitch));
+
+                    // Does the linked element (if any) have time?
+                    if (opts.allDayInput) {
+                        var linkedElements = getLinkedElements($(t), opts);
+
+                        linkedElements.forEach(function (item) {
+                            var itemOptions = adtp.getOptions($(item));
+                            var itemDate = moment(item.val(), adtp.convertFormat(itemOptions.displayFormat));
+                            var itemState = ((itemDate.format('HHmm') == '0000' || itemDate.format('HHmm') == '2359') && state);
+
+                            // Update the state of the linked field
+                            setValue($(item), itemOptions, itemState, true);
+
+                            // Update the original field's state to make consistent
+                            // Note: all fields in the group must be 0000 or 2359 in order for all day to be switched on
+                            state = itemState;
+
+                        });
+                    }
+
+                    // Add the parsed date into the field
+                    // assumption: if time is 00:00:00 and the endDay flag is set, push to 23:59:59 instead
+                    // this causes a limitation that it is *not possible* to set a field of this nature to midnight
+                    setValue($(t), opts, state, true, newDate);
+
+                    // Sync dates if applicable
+                    adtp.syncDatesOnElement($(t), opts, '');
+
+                    // Remove any error class on the field
+                    $(t).removeClass('error');
+
+                    // Hide any validation error
+                    $fieldError.hide();
+                }
+
+            }).always(function () {
+                $(t).prop('readonly', false);
+                $(t).prop('disabled', false);
+            });
+
+            // this listener needs to be installed last in this case
+            if (staller) {
+                // install this XHR as stalling form submit
+                staller.stallSubmit(xhr);
+            }
+        }
+    }
 };
