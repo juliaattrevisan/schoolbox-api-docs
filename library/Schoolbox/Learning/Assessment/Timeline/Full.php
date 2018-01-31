@@ -207,8 +207,10 @@ class Full
 
         // Filter for feedback display:
         // If somehow not due work feedback: exclude
-        // If a self-assess:                 respect $includeUnpublishedSelfReflectionFeedback
-        // If instructor:                    respect $includeUnpublishedInstructorFeedback and $isFeedbackVisible
+        // If a self-assess:                 if published show,
+        //                                   if not respect $includeUnpublishedSelfReflectionFeedback
+        // If instructor:                    if published respect $isFeedbackVisible,
+        //                                   if not respect $includeUnpublishedInstructorFeedback
         $feedbackFilter = function (IFeedback $feedback) use (
             $includeUnpublishedSelfReflectionFeedback,
             $includeUnpublishedInstructorFeedback,
@@ -216,9 +218,15 @@ class Full
         ) {
             if ($feedback instanceof Duework\Feedback\Model) {
                 if ($feedback->isSelfReflected() || $feedback->isSelfAssessed()) {
+                    if ($feedback->isPublished()) {
+                        return true;
+                    }
                     return $includeUnpublishedSelfReflectionFeedback;
                 }
-                return $includeUnpublishedInstructorFeedback && $isFeedbackVisible;
+                if ($feedback->isPublished()) {
+                    return $isFeedbackVisible;
+                }
+                return $includeUnpublishedInstructorFeedback;
             }
             return false;
         };
