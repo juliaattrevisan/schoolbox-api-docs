@@ -935,13 +935,13 @@ class Controller extends Assessment\Controller
      */
     public function postAcknowledgeDraft(Participant $participant)
     {
-        // This should only be a draft if the assessment requires self-reflection.
-        // Otherwise, publish acknowledgement immediately.
+        // Despite this method's name, it doesn't always create a draft.
+        // * If there's already a draft, it merely returns the existing draft
+        // * If the assess doesn't require self-reflection, it publishes immediately
         $assessment = $participant->getAssessable();
+        $selfReview = $assessment instanceof Model
+                      && ($assessment->isSelfAssessable() || $assessment->isSelfReflectable());
         try {
-            // Try to find a non-draft to return first; attach ack to that draft instead.
-            $response = $participant->findMostRecentDraftResponse()
-                        ?? $this->persistEmptySobo($participant, null);
             $route    = 'learningAssessment.getSummary';
             $params   = [
                 'participant'  => $participant,
@@ -950,13 +950,26 @@ class Controller extends Assessment\Controller
                 'student'      => $participant->getUser(),
                 'studentId'    => $participant->getUser()->getId(),
             ];
-            if ($assessment instanceof Model) {
-                if ($assessment->isSelfAssessable() || $assessment->isSelfReflectable()) {
-                    $route                = 'learningDueWorkResponse.getParticularResponseForSelfReflection';
-                    $params['response']   = $response;
-                    $params['responseId'] = $response->getId();
+
+            if ($selfReview) {
+                // Try to find a non-draft to return first; attach ack to that draft instead.
+                $response = $participant->findMostRecentDraftResponse();
+                if (!$response) {
+                    $response = $this->persistEmptySobo(
+                        $participant,
+                        $selfReview ? null : Alaress_Date_Format::now()
+                    );
                 }
+
+                $route                = 'learningDueWorkResponse.getParticularResponseForSelfReflection';
+                $params['response']   = $response;
+                $params['responseId'] = $response->getId();
+
+            } else {
+                // Just create a new ack
+                $response = $this->persistEmptySobo($participant, Alaress_Date_Format::now());
             }
+
             $data = [
                 'success'       => true,
                 'id'            => $response->getId(),
