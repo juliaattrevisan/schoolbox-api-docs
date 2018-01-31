@@ -143,7 +143,7 @@ class Session
             }
 
             if (Cfg::get('external_enable')) {
-                $this->setSynergyInfo($userMapper);
+                $this->setSynergyInfo($userMapper, $user);
             }
 
             if ($this->getUseLoginLog()) {
@@ -460,13 +460,14 @@ class Session
         }
     }
 
+
     /**
      * @param UserMapper $userMapper
+     * @param User       $user
      */
-    function setSynergyInfo(UserMapper $userMapper)
+    private function setSynergyInfo(UserMapper $userMapper, User $user)
     {
         $synUser = new External_User;
-        $groupHandler = new Group();
         $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
 
         $synergy_id = $_SESSION['sid'];
@@ -479,7 +480,7 @@ class Session
 
         if ($synergy_id) {
 //if user is parent get information regarding enrolled students
-            if ($groupHandler->isParent()) {
+            if ($user->getRole()->isParent()) {
                 $children = $synUser->getEnrolledStudents($synergy_id);
 
                 /* Get subject list for each student */
@@ -488,6 +489,8 @@ class Session
 
                         try {
                             $childObject = $userMapper->findByExternalId($child['RelatedID']);
+                            $user->getChildren()[$childObject->getId()] = $childObject;
+                            $childObject->getParents()[$user->getId()] = $user;
                             if(!$childObject->getHideTimetable()) {
                                 $subjectList = $synUser->getSubjectList($childObject);
                             }
