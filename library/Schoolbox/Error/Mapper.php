@@ -173,6 +173,9 @@ class Mapper extends BaseMapper implements IExceptionGenerator
 
     const ERROR_GROUP_NIAN_DENIED = 203;
 
+    const ERROR_ATTENDANCE_SEQUENCE = 204;
+
+
     const ERROR_ASSESSMENT_DELETED = 205;
 
     /**
