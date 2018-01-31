@@ -40,7 +40,7 @@ class Visibility
      * Determines if the specified user can see an IAssessable.
      *
      * * Instructor  - can see anytime (so long as not past close and we are hiding closed)
-     * * Learner     - can only see after publish date
+     * * Learner     - can only see if a participant (or parent of participant), and after publish date
      *
      * Instructor - is considered any user with WRITE+ perm to folder
      * Learner    - is considered any user with READ perm to folder
@@ -52,28 +52,71 @@ class Visibility
      */
     public function isVisibleToUser(IAssessable $assessment, User $viewer, bool $showClosed): bool
     {
-        $participant = $assessment->getParticipantIfExtant($viewer);
-
-        // Are we hiding assessments past their close date and we are past the close date ?
-        if (!$showClosed) {
-            // Use the participant's date if the viewing user is a participant
-            $closeDate   = $participant ? $participant->getCloseDate() : $assessment->getCloseAt();
-            if (!$closeDate->isNull() && Alaress_Date_Format::now()->gte($closeDate)) {
-                return false;
-            }
-        }
-
         $folderAccessLevel = $this->access->getFolderAccess($viewer, $assessment->getBaseContext()->getFolder()->getId());
+        $now               = Alaress_Date_Format::now();
 
         // Is viewer an instructor?
         if ($folderAccessLevel >= UserAccess::ACCESS_WRITE) {
-            return true;
+            if ($showClosed) {
+                return true;
+            }
+            if ($this->isNotClosedForInstructor($assessment, $viewer, $now)) {
+                return true;
+            }
+        } // Is viewer a learner (may be a student, or parent of student)?
+        elseif ($folderAccessLevel === UserAccess::ACCESS_READ) {
+            // Is the viewer a participant themselves?
+            if ($this->isVisibleToLearner($assessment, $viewer, $showClosed, $now)) {
+                return true;
+            }
+
+            // Are they are parent? Is assessment visible to their children?
+            foreach ($viewer->getChildren() as $child) {
+                // Is the child a participant, an assessment is visible to them?
+                if ($this->isVisibleToLearner($assessment, $child, $showClosed, $now)) {
+                    return true;
+                }
+            }
         }
-        // Is viewer a learner?
-        if ($folderAccessLevel === UserAccess::ACCESS_READ) {
-            // Is viewer a participant, and not excluded, and assessment is published for them?
-            return $participant && !$participant->isExcluded() && Alaress_Date_Format::now()->gte($participant->getPublishDate());
-        }
+
         return false;
+    }
+
+
+    /**
+     * Is the assessable not closed for the Instructor?
+     *
+     * @param IAssessable         $assessable
+     * @param User                $instructor
+     * @param Alaress_Date_Format $now
+     * @return bool
+     */
+    private function isNotClosedForInstructor(IAssessable $assessable, User $instructor, Alaress_Date_Format $now): bool
+    {
+        // If instructor is also a participant, respect their custom close date.
+        $participant = $assessable->getParticipantIfExtant($instructor);
+        $closeDate   = $participant ? $participant->getCloseDate() : $assessable->getCloseAt();
+        return $closeDate->isNull() || $now->lt($closeDate);
+    }
+
+
+    /**
+     * Is the assessable visible to the Learner?
+     *
+     * @param IAssessable         $assessable
+     * @param User                $learner
+     * @param bool                $showClosed Should we show assessments after their closed date?
+     * @param Alaress_Date_Format $now
+     * @return bool
+     */
+    private function isVisibleToLearner(IAssessable $assessable, User $learner, bool $showClosed, Alaress_Date_Format $now): bool
+    {
+        $participant = $assessable->getParticipantIfExtant($learner);
+        if (!$participant || $participant->isExcluded()) {
+            return false;
+        }
+        $closeDate   = $participant->getCloseDate();
+        $isPublished = $now->gte($participant->getPublishDate());
+        return $isPublished && ($showClosed || $now->lte($closeDate));
     }
 }

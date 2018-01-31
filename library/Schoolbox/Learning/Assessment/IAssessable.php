@@ -235,6 +235,7 @@ interface IAssessable extends ISoftDeletable
      *
      * @param User $user
      * @return bool
+     * @todo rename to isNonExcludedParticipant() for clarity
      */
     public function isParticipant(User $user);
 
