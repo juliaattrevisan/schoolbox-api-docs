@@ -927,7 +927,7 @@ class Controller extends Assessment\Controller
      * @api   POST /learning/assessments/:assessmentId/:studentId/ackDraft
      * @level 17.0
      */
-    public function postPendingAcknowledgeDraft(Participant $participant)
+    public function postAcknowledgeDraft(Participant $participant)
     {
         $assessment = $participant->getAssessable();
         try {
