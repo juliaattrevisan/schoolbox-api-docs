@@ -194,11 +194,30 @@ class UserAccessNotifier extends AbstractModuleNotifier
     protected function notifyLeft($userAccess, $user)
     {
         if ($userAccess->getUser()->getId() == $user->getId()) {
-            return $this->notifyAdmin(':user left :groupname', self::TRIGGER_LEFT, $userAccess);
+            $envelope = $this->notifyAdmin(':user left :groupname', self::TRIGGER_LEFT, $userAccess);
         } else {
-            return $this->notifyAdmin(':effector removed :user from :groupname', self::TRIGGER_LEFT, $userAccess,
-                $user);
+            $envelope = $this->notifyAdmin(':effector removed :user from :groupname', self::TRIGGER_LEFT, $userAccess, $user);
         }
+
+        $bob = new Builder();
+        $cat = FolderMapper::getInstance()->findById($userAccess->getServiceIdentifier());
+
+        $bob->setTitle(':moderator has removed you from :groupname')
+            ->setSeverity(Logger::NOTICE)
+            ->setHref('/')
+            ->setIcon("/portrait.php?size={$this->iconSize}&userId={$user->getExternalId()}")
+            ->setNamespace($this->getSlug())
+            ->setParams([
+                'moderator' => new UserParam($user),
+                'groupname' => new CategoryParam($cat, Param::STACKING_REPLACE)
+            ])
+            ->addTopic("group.{$cat->getId()}.".self::TRIGGER_APPROVED)
+        ;
+
+        $envelope->targetToUser($userAccess->getUser(), $bob->build());
+
+        return $envelope;
+
     }
 
 
