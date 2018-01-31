@@ -276,15 +276,12 @@ class Full
          */
         if ($isFeedbackVisible) {
             foreach ($this->getParticipant()->getAllFeedbacks() as $currentFeedback) {
-                if (!in_array($currentFeedback->getId(), $processedFeedback)) {
+                if (!\in_array($currentFeedback->getId(), $processedFeedback, true)
+                    && $feedbackFilter($currentFeedback)
+                ) {
+                    $this->getRecombined()->add($currentFeedback);
 
-                    /* Only show Published feedbacks
-                     */
-                    if ($feedbackFilter($currentFeedback)) {
-                        $this->getRecombined()->add($currentFeedback);
-
-                        $processedFeedback[] = $currentFeedback->getId();
-                    }
+                    $processedFeedback[] = $currentFeedback->getId();
                 }
             }
         }
