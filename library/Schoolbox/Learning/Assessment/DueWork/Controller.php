@@ -898,7 +898,40 @@ class Controller extends Assessment\Controller
     {
         $assessment = $participant->getAssessable();
         try {
-            $response = $this->persistEmptySobo($participant);
+            $response = $this->persistEmptySobo($participant, Alaress_Date_Format::now());
+            $data = [
+                'success'       => true,
+                'id'            => $response->getId(),
+                'submittedLate' => $assessment->isOverdue() || $assessment->isPastClose(),
+            ];
+            $code = 200;
+        } catch (\PDOException $e) {
+            $data = [
+                'success' => false,
+                'message' => $e->getMessage(),
+            ];
+            $code = 403;
+        }
+        $this->getResponse()->status->set($code);
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
+    }
+
+
+    /**
+     * Action for a participant in a due work to create an empty draft
+     * acknowledgement that they have submitted a due work.
+     *
+     * TODO merge common code w/ postPendingAcknowledge, postStatusAcknowledge
+     *
+     * @param Participant $participant
+     * @api   POST /learning/assessments/:assessmentId/:studentId/ackDraft
+     * @level 17.0
+     */
+    public function postPendingAcknowledgeDraft(Participant $participant)
+    {
+        $assessment = $participant->getAssessable();
+        try {
+            $response = $this->persistEmptySobo($participant, null);
             $data = [
                 'success'       => true,
                 'id'            => $response->getId(),
@@ -930,7 +963,7 @@ class Controller extends Assessment\Controller
     public function postPendingAcknowledge(Participant $participant)
     {
         try {
-            $this->persistEmptySobo($participant);
+            $this->persistEmptySobo($participant, Alaress_Date_Format::now());
             $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learning/fragments/toMarkParticipant.twig', [
                 'participant' => $participant,
                 'assessment'  => $participant->getAssessable(),
@@ -950,18 +983,19 @@ class Controller extends Assessment\Controller
     /**
      * Common logic for 'dueWork status' and 'pending assessments' pages 'acknowledgement of submission receipt'.
      *
-     * @param Participant $participant
+     * @param Participant              $participant
+     * @param Alaress_Date_Format|null $submittedDate Date this was submitted at, null if draft
      * @return Submission
      * @throws \PDOException If something went wrong in the save process
      */
-    private function persistEmptySobo(Participant $participant)
+    private function persistEmptySobo(Participant $participant, ?Alaress_Date_Format $submittedDate)
     {
         $assessment = $participant->getAssessable();
         $response   = $this->dueWorkResponseMapper->createModel()
             ->setAssessable($assessment)
             ->setSubmittedBy($this->getUser())
             ->setSubmittedOnBehalfOf($participant->getUser())
-            ->setSubmittedAt(Alaress_Date_Format::now())
+            ->setSubmittedAt($submittedDate)
             ->setCreatedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now());
 
