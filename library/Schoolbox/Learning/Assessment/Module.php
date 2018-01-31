@@ -554,9 +554,8 @@ class Module extends BaseModule
                     new Rule\IsUser('studentId'),
                     new IsParticipant(),
                     new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
-                    new IsAssessmentOpen()
-                    // Until I figure out more about how it should work: they may ack multiple times
-//                    new ParticipantHasNoInteractions()
+                    new IsAssessmentOpen(),
+                    new ParticipantHasNoInteractions()
                 )
             )
         );
