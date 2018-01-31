@@ -1,5 +1,24 @@
 {% extends '@core/user/student.twig' %}
 
+{% block details_formTeacher %}
+    {% if showClasses %}
+        {% if formTeacher %}
+            {% if externalUser.StudentYearLevel >= 6 and externalUser.StudentYearLevel <= 12 %}
+                <dt class="small-12 medium-3">Tutor Group Teacher:</dt>
+            {% else %}
+                <dt class="small-12 medium-3">Class Teacher:</dt>
+            {% endif %}
+            <dd class="small-12 medium-9">
+                {% if formTeacher.id %}
+                    <a href="{{ session.mailhandle }}{{ formTeacher.email }}">{{ formTeacher.formatName }}</a>
+                {% else %}
+                    {{ formTeacher.formatName }}
+                {% endif %}
+            </dd>
+        {% endif %}
+    {% endif %}
+{% endblock details_formTeacher %}
+
 {% block details_studentForm %}
     {% if showClasses %}
         {% if externalUser.StudentForm %}
