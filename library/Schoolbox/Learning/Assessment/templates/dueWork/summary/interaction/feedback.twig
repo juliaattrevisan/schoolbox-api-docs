@@ -1,23 +1,47 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
-{# Associated Feedback
+{#
+ # Self-reflection/assessment:
+ # Go to self-assess screen to resume
+ #
+ # Associated Feedback
  # Go to Inline Grader to resume
  #
  # Floating Feedback
  # Go to Quickmark to resume
  #}
-{% if currentFeedback.response.id %}
-    {% if not currentFeedback.isPublished %}
-        {% set url = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {
-            assessmentId: currentFeedback.assessable.id,
-            studentId: currentFeedback.response.submittedOnBehalfOf.id,
-            responseId: responseId,
-            response: currentFeedback.response,
-            participant: participant
-        }) %}
-        {% set tooltip = 'Resume Inline ' ~ locale.grading.proper %}
-    {% endif %}
-{% else %}
-    {% if not currentFeedback.isPublished %}
+{% set url     = null %}
+{% set tooltip = null %}
+{% if not currentFeedback.isPublished %}
+    {% if currentFeedback.response.id %}
+        {% if currentFeedback.isSelfAssessed %}
+            {% set url = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponseForSelfReflection', {
+                assessmentId: currentFeedback.assessable.id,
+                studentId: currentFeedback.response.submittedOnBehalfOf.id,
+                responseId: responseId,
+                response: currentFeedback.response,
+                participant: participant
+            }) %}
+            {% set tooltip = 'Resume ' ~ locale.selfAssessment.proper %}
+        {% elseif currentFeedback.isSelfReflected %}
+            {% set url = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponseForSelfReflection', {
+                assessmentId: currentFeedback.assessable.id,
+                studentId: currentFeedback.response.submittedOnBehalfOf.id,
+                responseId: responseId,
+                response: currentFeedback.response,
+                participant: participant
+            }) %}
+            {% set tooltip = 'Resume ' ~ locale.selfReflection.proper %}
+        {% else %}
+            {% set url = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {
+                assessmentId: currentFeedback.assessable.id,
+                studentId: currentFeedback.response.submittedOnBehalfOf.id,
+                responseId: responseId,
+                response: currentFeedback.response,
+                participant: participant
+            }) %}
+            {% set tooltip = 'Resume Inline ' ~ locale.grading.proper %}
+        {% endif %}
+    {% else %}
         {% set url = routeLookupIfAuthorized('learningAssessment.getStatus', {
             assessmentId: currentFeedback.assessable.id,
             assessment: currentFeedback.assessable
