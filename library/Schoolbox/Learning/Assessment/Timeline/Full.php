@@ -65,7 +65,7 @@ class Full
      */
     public function getForParent()
     {
-        return $this->getTimeline(false, false, AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT);
+        return $this->getTimeline(false, false, false, AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT);
     }
 
     /**
@@ -76,7 +76,7 @@ class Full
      */
     public function getForTeacher()
     {
-        return $this->getTimeline(true, false, AbstractAssessment::MARK_VISIBILITY_PRIVATE);
+        return $this->getTimeline(false, true, false, AbstractAssessment::MARK_VISIBILITY_PRIVATE);
     }
 
 
@@ -89,7 +89,7 @@ class Full
      */
     public function getForStudent()
     {
-        return $this->getTimeline(false, true, AbstractAssessment::MARK_VISIBILITY_STUDENT);
+        return $this->getTimeline(true, false, true, AbstractAssessment::MARK_VISIBILITY_STUDENT);
     }
 
 
@@ -101,7 +101,7 @@ class Full
      */
     public function getForAdmin()
     {
-        return $this->getTimeline(true, true, AbstractAssessment::MARK_VISIBILITY_PRIVATE);
+        return $this->getTimeline(true, true, true, AbstractAssessment::MARK_VISIBILITY_PRIVATE);
     }
 
 
@@ -146,16 +146,26 @@ class Full
      * Recombine if required, otherwise return a cached
      * version of the recombination because reasons
      *
-     * @param bool $includeUnpublishedFeedback
+     * @param bool $includeUnpublishedSelfReflectionFeedback
+     * @param bool $includeUnpublishedInstructorFeedback
      * @param bool $includeDraftResponses
      * @param int  $minimumVisibility          Assessment mark's visibility must be at least this
      * @return Collection
      */
-    protected function getTimeline($includeUnpublishedFeedback, $includeDraftResponses, $minimumVisibility)
-    {
+    protected function getTimeline(
+        $includeUnpublishedSelfReflectionFeedback,
+        $includeUnpublishedInstructorFeedback,
+        $includeDraftResponses,
+        $minimumVisibility
+    ) {
         // TODO evaluate the appropriateness of caching here
 //        if (!$this->getHasRecombined()) {
-        $this->recombine($includeUnpublishedFeedback, $includeDraftResponses, $minimumVisibility);
+        $this->recombine(
+            $includeUnpublishedSelfReflectionFeedback,
+            $includeUnpublishedInstructorFeedback,
+            $includeDraftResponses,
+            $minimumVisibility
+        );
 //            $this->setHasRecombined(true);
 //        }
 
@@ -168,15 +178,38 @@ class Full
      *
      * 1 + 1 = 1
      *
-     * @param bool $includeUnpublishedFeedback
+     * @param bool $includeUnpublishedSelfReflectionFeedback
+     * @param bool $includeUnpublishedInstructorFeedback
      * @param bool $includeDraftResponses
      * @param int  $minimumVisibility
      */
-    protected function recombine($includeUnpublishedFeedback, $includeDraftResponses, $minimumVisibility)
-    {
+    protected function recombine(
+        $includeUnpublishedSelfReflectionFeedback,
+        $includeUnpublishedInstructorFeedback,
+        $includeDraftResponses,
+        $minimumVisibility
+    ) {
         $processedFeedback = [];
 
         $isFeedbackVisible = $this->getParticipant()->getAssessable()->getMarkVisibility() >= $minimumVisibility;
+
+        // Filter for feedback display:
+        // If somehow not due work feedback: exclude
+        // If a self-assess:                 respect $includeUnpublishedSelfReflectionFeedback
+        // If instructor:                    respect $includeUnpublishedInstructorFeedback and $isFeedbackVisible
+        $feedbackFilter = function (IFeedback $feedback) use (
+            $includeUnpublishedSelfReflectionFeedback,
+            $includeUnpublishedInstructorFeedback,
+            $isFeedbackVisible
+        ) {
+            if ($feedback instanceof Duework\Feedback\Model) {
+                if ($feedback->isSelfReflected() || $feedback->isSelfAssessed()) {
+                    return $includeUnpublishedSelfReflectionFeedback;
+                }
+                return $includeUnpublishedInstructorFeedback && $isFeedbackVisible;
+            }
+            return false;
+        };
 
         /** @var DueWork\Response\Model $currentResponse */
         foreach ($this->getParticipant()->getAllResponses() as $currentResponse) {
@@ -185,38 +218,9 @@ class Full
              */
             if ($includeDraftResponses || $currentResponse->isSubmitted()) {
 
-                /* If $isFeedbackVisible is false,
-                 * Filter out non-self-assessed feedback
-                 *
-                 * Otherwise just use all feedback
-                 */
-                if ($isFeedbackVisible) {
-                    $includedFeedback = $currentResponse->getAllFeedback();
-                } else {
-                    // Only self-assessment feedback is allowed
-                    $includedFeedback = $currentResponse->getAllFeedback()->filter(
-                        function (IFeedback $feedback) {
-                            return $feedback instanceof Duework\Feedback\Model
-                                && ($feedback->isSelfAssessed() || $feedback->isSelfReflected())
-                            ;
-                        }
-                    );
-                }
-
-                /* If $includeUnpublishedFeedback is false,
-                 * Filter out unpublished Feedback from each $response
-                 *
-                 * Otherwise just use the stack that was given to us
-                 * which has the unpublished feedbacks in there already
-                 */
-                if (!$includeUnpublishedFeedback) {
-                    /** @var DueWork\Feedback\Model $currentFeedback */
-                    $includedFeedback = $includedFeedback->filter(
-                        function (IFeedback $feedback) {
-                            return $feedback->isPublished();
-                        }
-                    );
-                }
+                // Exclude feedback which doesn't match the filter
+                /** @var Duework\Feedback\Model[] $includedFeedback */
+                $includedFeedback = $currentResponse->getAllFeedback()->filter($feedbackFilter);
 
                 /* Maintain a list of all the Feedbacks that were discovered
                  * as being part of Responses to ensure they don't get duped
@@ -256,7 +260,7 @@ class Full
             }
         }
 
-        /* Only grab unique Floating Feedbacks
+        /* Only grab unique Floating Feedbacks that match the filter
          */
         if ($isFeedbackVisible) {
             foreach ($this->getParticipant()->getAllFeedbacks() as $currentFeedback) {
@@ -264,7 +268,7 @@ class Full
 
                     /* Only show Published feedbacks
                      */
-                    if ($includeUnpublishedFeedback || $currentFeedback->isPublished()) {
+                    if ($feedbackFilter($currentFeedback)) {
                         $this->getRecombined()->add($currentFeedback);
 
                         $processedFeedback[] = $currentFeedback->getId();
