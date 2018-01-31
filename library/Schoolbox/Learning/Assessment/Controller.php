@@ -539,14 +539,30 @@ abstract class Controller extends ListController implements IAssessmentControlle
         }
 
         if ($assessment->isParticipant($this->getUser())) {
-            // If you're a participant, get redirected to the summary
-            return $this->getRouter()->generate('learningAssessment.getSummary', [
+            $summaryRoute = $this->getRouter()->generate('learningAssessment.getSummary', [
                 'assessmentId' => $assessment->getId(),
                 'studentId'    => $this->getUser()->getId(),
             ]);
+            if ($summaryRoute) {
+                return $summaryRoute;
+            }
         }
 
-        // Is the user not a participant, but has perm to view the preview route?
+        // If a parent of a participant, go to the summary page of the first non-excluded participant, if parents can READ+ folder context
+        // TODO - this is not ideal. Consider a teacher has N children participating in the assessment
+        /** @var mixed[][] $children */
+        $children = $this->getSession()->get('children');
+        foreach($children as $child){
+            $childSummaryRoute = $this->getRouter()->generate('learningAssessment.getSummary', [
+                'assessmentId' => $assessment->getId(),
+                'studentId'    => $child['id'],
+            ]);
+            if ($childSummaryRoute) {
+                return $childSummaryRoute;
+            }
+        }
+
+        // Does user have permission to view the preview route?
         if ($previewRoute) {
             return $previewRoute;
         }

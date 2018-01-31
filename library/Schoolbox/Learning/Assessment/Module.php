@@ -15,7 +15,7 @@ use Aura\Di\ContainerInterface;
 use OutOfBoundsException;
 use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
 use Schoolbox\Learning\Authorizer\Rule\CanRespondToAssessment;
-use Schoolbox\Learning\Authorizer\Rule\CanSeeAssessment;
+use Schoolbox\Learning\Authorizer\Rule\CanSeeParticipation;
 use Schoolbox\Learning\Authorizer\Rule\IsAssessmentOpen;
 use Schoolbox\Learning\Authorizer\Rule\ValidAssessmentType;
 use Schoolbox\Learning\Authorizer\Rule\IsDeletionUnLocked;
@@ -98,8 +98,7 @@ class Module extends BaseModule
         $isSuper            = $this->getAuthRule('isSuperuser');
         $loggedIn           = $this->getAuthRule('isLoggedIn');
         $canWrite           = $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE);
-        $participantView    = $this->buildAuthRuleParticipantView();
-        $participantView    = new Rule\All($participantView, $notDeleted);
+        $canViewSummary     = $this->buildAuthRuleCanViewSummary();
         $canSubmit          = $this->buildAuthRuleCanSubmit();
         $canWriteAndNotSpec = $this->buildAuthRuleCanWriteAndNotSpec();
         $canWriteAndNotSpec = new Rule\All($canWriteAndNotSpec, $notDeleted);
@@ -146,7 +145,7 @@ class Module extends BaseModule
         $this->register('GET',   "$assRoute/overview/export",        'downloadOverview',         $canWrite,           $preloadAssessment); // a || c
         $this->register('GET',   "$assRoute/submissions/download",   'downloadSubmissions',      $canWrite,           $preloadAssessment); // a || c
 
-        $this->register('GET',   "$assRoute/$studentParam",          'getSummary',               $participantView,    $preloadParticipant); // s || p
+        $this->register('GET',   "$assRoute/$studentParam",          'getSummary',               $canViewSummary,     $preloadParticipant); // s || p
         $this->register('GET',   "$assRoute/preview",                'getPreview',               $canWrite,           $preloadAssessment);  // s || p
         $this->register('GET',   "$assRoute/$studentParam/submit",   'getCreateResponseForm',    $canSubmit,          $preloadParticipant); // p
         $this->register('POST',  "$assRoute/$studentParam/submit",   'postCreateResponse',       $canSubmit,          $preloadParticipant); // p
@@ -625,18 +624,23 @@ class Module extends BaseModule
 
 
     /**
+     * To view a summary page requires:
+     * - assessment not soft-deleted
+     * - current user is superuser or can see assessment, and
+     * - assessment is not an assessment specification
      *
      * @return Rule\IAuthorizationRule
      * @throws \InvalidArgumentException
      * @throws NotFound
      * @throws InvalidPath
      */
-    private function buildAuthRuleParticipantView()
+    private function buildAuthRuleCanViewSummary()
     {
         return new Rule\All(
+            new AssessmentNotDeleted(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                new CanSeeAssessment($this->getAccess(), $this->getConfig())
+                new CanSeeParticipation($this->getAccess(), $this->getConfig())
             ),
             new Rule\Callback(function(array $params){
                 if (!isset($params['assessment']) && !isset($params['participant'])) {
