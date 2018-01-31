@@ -107,7 +107,7 @@ class NavigationSelector
                 if (($this->getUser()->getYear() >= 7) && ($this->getUser()->getYear() <= 10)) {
                     $this->setDefaultReport('schoolGrades');
                 }
-            } elseif ($this->getUser()->getCampusCollection()->first()->getExtTimetableCode() == 'SNR') {
+            } elseif ($this->getUser()->getCampusCollection()->first()->getExtTimetableCode() == 'SEC') {
                 /* NCEA for year 11 specifically
                  */
                 if ($this->getUser()->getYear() == 11) {
