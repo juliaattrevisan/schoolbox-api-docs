@@ -13,6 +13,7 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use OutOfBoundsException;
+use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
 use Schoolbox\Learning\Authorizer\Rule\CanRespondToAssessment;
 use Schoolbox\Learning\Authorizer\Rule\CanSeeAssessment;
 use Schoolbox\Learning\Authorizer\Rule\IsAssessmentOpen;
@@ -93,22 +94,7 @@ class Module extends BaseModule
         $preloadParticipant            = function ($params) { return $this->preloadParticipant($params); };
 
         // rules in use
-        $notDeleted = new Rule\Callback(function(array $params){
-            if ($params['assessment'] instanceof IAssessable) {
-                $assessment = $params['assessment'];
-            } elseif ($params['participant'] instanceof Participant) {
-                $assessment = $params['participant']->getAssessable();
-            } else {
-                throw new NotFound();
-                //TO DO: Log to sentry
-            }
-
-            if($assessment->isDeleted()) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_ASSESSMENT_DELETED);
-            }
-
-        });
-
+        $notDeleted         = new AssessmentNotDeleted();
         $isSuper            = $this->getAuthRule('isSuperuser');
         $loggedIn           = $this->getAuthRule('isLoggedIn');
         $canWrite           = $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE);
@@ -639,6 +625,7 @@ class Module extends BaseModule
 
 
     /**
+     *
      * @return Rule\IAuthorizationRule
      * @throws \InvalidArgumentException
      * @throws NotFound
