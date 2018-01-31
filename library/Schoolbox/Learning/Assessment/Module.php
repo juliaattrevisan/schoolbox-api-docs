@@ -547,6 +547,14 @@ class Module extends BaseModule
                     new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
                     new CanRespondToAssessment($this->getAccess()),
                     new ParticipantHasNoInteractions()
+                ),
+                // Participants may now acknowledge their own submissions
+                new Rule\All(
+                    new Rule\IsUser('studentId'),
+                    new IsParticipant(),
+                    new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
+                    new IsAssessmentOpen(),
+                    new ParticipantHasNoInteractions()
                 )
             )
         );
