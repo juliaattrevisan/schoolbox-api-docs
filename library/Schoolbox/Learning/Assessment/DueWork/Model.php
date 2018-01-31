@@ -211,21 +211,17 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * Can a participant create a receipt response?
+     * Can a participant create an acknowledgement response?
      *
-     * This action is only available to open due works which the participant
-     * has no existent responses to.
+     * This action is only available to open due works, but is open as long as
+     * the due work is open regardless of how many responses the participant
+     * has created.
      *
-     * @param Collection $responses
      * @throws DomainException
      */
-    public function assertAcceptReceiptResponse(\Schoolbox\Collection $responses)
+    public function assertAcceptAcknowledgement()
     {
         $this->assertOpen();
-
-        if ($responses->count() > 0) {
-            throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_ONLINE_RESPONSE);
-        }
     }
 
     /**
