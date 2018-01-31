@@ -925,7 +925,7 @@ class Controller extends Assessment\Controller
      *
      * @param Participant $participant
      * @api   POST /learning/assessments/:assessmentId/:studentId/ackDraft
-     * @level 17.0
+     * @level 18.0
      */
     public function postAcknowledgeDraft(Participant $participant)
     {
