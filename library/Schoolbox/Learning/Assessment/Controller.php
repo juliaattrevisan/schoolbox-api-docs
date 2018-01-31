@@ -22,6 +22,10 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Mapper\DefinitionException;
+use UnexpectedValueException;
+use Aura\Di\Exception\ServiceNotFound;
+
 
 abstract class Controller extends ListController implements IAssessmentController
 {
@@ -65,6 +69,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $this->termMapper      = $termMapper;
     }
 
+
     /**
      * Get the form for creating a new assessment in a particular context
      *
@@ -72,6 +77,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @level 165
      *
      * @param AssessmentContext $context
+     * @throws DomainException If user has interaction but not participant record
+     * @throws ServiceNotFound If unable to locate HTML web Output renderer in DI
+     * @throws DefinitionException If unable to locate a specified mapper join
+     * @throws UnexpectedValueException If unable to derive a project's participant collection
      */
     public function getCreateAssessmentForm(AssessmentContext $context)
     {

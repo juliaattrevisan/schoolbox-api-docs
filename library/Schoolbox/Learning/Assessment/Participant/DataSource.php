@@ -128,7 +128,7 @@ class DataSource
      * @param bool        $includeExcluded Should we include explicitly excluded participants in graph?
      * @param null|User   $user
      * @return IAssessable $assessment, with participation loaded.
-     * @throws UnexpectedValueException If unable to merge student collections
+     * @throws UnexpectedValueException If unable to derive project participant collection
      * @throws DomainException If user has interaction but not participant record
      * @throws DefinitionException If unable to locate a specified mapper join
      */

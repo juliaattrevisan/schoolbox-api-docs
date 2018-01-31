@@ -54,6 +54,11 @@ use UnexpectedValueException;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Learning\InlineGrader\Kami;
+use Schoolbox\Application\Exception as ApplicationException;
+use DomainException;
+use InvalidArgumentException;
+use LogicException;
+
 
 class Module extends BaseModule
 {
@@ -82,9 +87,10 @@ class Module extends BaseModule
     protected function registerRoutes()
     {
         // preloaders to use
-        $preloadContext     = function ($params) { return $this->preloadContext($params); };
-        $preloadAssessment  = function ($params) { return $this->preloadAssessment($params); };
-        $preloadParticipant = function ($params) { return $this->preloadParticipant($params); };
+        $preloadContext                = function ($params) { return $this->preloadContext($params); };
+        $preloadAssessment             = function ($params) { return $this->preloadAssessment($params, false); };
+        $preloadAssessmentWithExcluded = function ($params) { return $this->preloadAssessment($params, true); };
+        $preloadParticipant            = function ($params) { return $this->preloadParticipant($params); };
 
         // rules in use
         $notDeleted = new Rule\Callback(function(array $params){
@@ -122,9 +128,6 @@ class Module extends BaseModule
             )
         );
 
-
-
-
         $canModify = new Rule\Any(
             $isSuper,
             new Rule\All(
@@ -143,35 +146,37 @@ class Module extends BaseModule
 
 
         // register the routes
-        $this->register('GET',      "$assListRoute",                    'getAssessmentsByContext', $isSuper,            $preloadContext);
-        $this->register('POST',     "$assListRoute",                    'postCreateAssessment',    $canWrite,           $preloadContext); // a || c
-        $this->register('POST',     "$assListRoute/reorder",            'postReorderAssessments',  $canWrite,           $preloadContext); // a || c
-        $this->register('GET',      "$assListRoute/new",                'getCreateAssessmentForm', $canWrite,           $preloadContext); // a || c
+        $this->register('GET',   "$assListRoute",                    'getAssessmentsByContext',  $isSuper,            $preloadContext);
+        $this->register('POST',  "$assListRoute",                    'postCreateAssessment',     $canWrite,           $preloadContext); // a || c
+        $this->register('POST',  "$assListRoute/reorder",            'postReorderAssessments',   $canWrite,           $preloadContext); // a || c
+        $this->register('GET',   "$assListRoute/new",                'getCreateAssessmentForm',  $canWrite,           $preloadContext); // a || c
 
-        $this->register('GET',      "$assRoute",                        'getAssessment',           $loggedIn,           $preloadAssessment);
-        $this->register('POST',     "$assRoute",                        'postUpdateAssessment',    $canWrite,           $preloadAssessment); // a || c
-        $this->register('PATCH',    "$assRoute",                        'patchUpdateAssessment',   $canWrite,           $preloadAssessment); // a || c
-        $this->register('GET',      "$assRoute/modify",                 'getUpdateAssessmentForm', $canModify,          $preloadAssessment); // a || c
-        $this->register('POST',     "$assRoute/delete",                 'postDeleteAssessment',    $canDelete,          $preloadAssessment); // a || c
-        $this->register('GET',      "$assRoute/status",                 'getStatus',               $canWriteAndNotSpec, $preloadAssessment); // a || c
-        $this->register('GET',      "$assRoute/overview",               'getOverview',             $canWrite,           $preloadAssessment); // a || c
-        $this->register('GET',      "$assRoute/overview/export",        'downloadOverview',        $canWrite,           $preloadAssessment); // a || c
-        $this->register('GET',      "$assRoute/submissions/download",   'downloadSubmissions',     $canWrite,           $preloadAssessment); // a || c
+        $this->register('GET',   "$assRoute",                        'getAssessment',            $loggedIn,           $preloadAssessment);
+        $this->register('POST',  "$assRoute",                        'postUpdateAssessment',     $canWrite,           $preloadAssessment); // a || c
+        $this->register('PATCH', "$assRoute",                        'patchUpdateAssessment',    $canWrite,           $preloadAssessment); // a || c
+        $this->register('GET',   "$assRoute/modify",                 'getUpdateAssessmentForm',  $canModify,          $preloadAssessmentWithExcluded); // a || c
+        $this->register('POST',  "$assRoute/delete",                 'postDeleteAssessment',     $canDelete,          $preloadAssessment); // a || c
+        $this->register('GET',   "$assRoute/status",                 'getStatus',                $canWriteAndNotSpec, $preloadAssessment); // a || c
+        $this->register('GET',   "$assRoute/overview",               'getOverview',              $canWrite,           $preloadAssessment); // a || c
+        $this->register('GET',   "$assRoute/overview/export",        'downloadOverview',         $canWrite,           $preloadAssessment); // a || c
+        $this->register('GET',   "$assRoute/submissions/download",   'downloadSubmissions',      $canWrite,           $preloadAssessment); // a || c
 
-        $this->register('GET',      "$assRoute/$studentParam",          'getSummary',              $participantView,    $preloadParticipant); // s || p
-        $this->register('GET',      "$assRoute/preview",                'getPreview',              $canRead,            $preloadAssessment); // s || p
-        $this->register('GET',      "$assRoute/$studentParam/submit",   'getCreateResponseForm',   $canSubmit,          $preloadParticipant); // p
-        $this->register('POST',     "$assRoute/$studentParam/submit",   'postCreateResponse',      $canSubmit,          $preloadParticipant); // p
-        $this->register('POST',     "$assRoute/$studentParam/received", 'postStatusAcknowledge',   $canAckSubmission,   $preloadParticipant); // p
-        $this->register('POST',     "$assRoute/$studentParam/ack",      'postPendingAcknowledge',  $canAckSubmission,   $preloadParticipant); // p
-        $this->register('POST',     "$assRoute/$studentParam/ackSelf",  'postSelfAcknowledge',     $canAckSubmission,   $preloadParticipant); // p
+        $this->register('GET',   "$assRoute/$studentParam",          'getSummary',               $participantView,    $preloadParticipant); // s || p
+        $this->register('GET',   "$assRoute/preview",                'getPreview',               $canRead,            $preloadAssessment);  // s || p
+        $this->register('GET',   "$assRoute/$studentParam/submit",   'getCreateResponseForm',    $canSubmit,          $preloadParticipant); // p
+        $this->register('POST',  "$assRoute/$studentParam/submit",   'postCreateResponse',       $canSubmit,          $preloadParticipant); // p
+        $this->register('POST',  "$assRoute/$studentParam/received", 'postStatusAcknowledge',    $canAckSubmission,   $preloadParticipant); // p
+        $this->register('POST',  "$assRoute/$studentParam/ack",      'postPendingAcknowledge',   $canAckSubmission,   $preloadParticipant); // p
+        $this->register('POST',  "$assRoute/$studentParam/ackSelf",  'postSelfAcknowledge',      $canAckSubmission,   $preloadParticipant); // p
     }
+
 
     /**
      * Set the name of the controller to execute, based on the given assessment
      *
      * @param IAssessable $a
      * @return void
+     * @throws UnexpectedValueException If unable to recognise IAssessable object
      */
     public function setControllerFromAssessment(IAssessable $a)
     {
@@ -187,19 +192,26 @@ class Module extends BaseModule
         $this->controllerClass = $map[AssessmentType::objectToString($a)];
     }
 
+
     /**
      * Convert route params into a participant object
      *
      * @param array $params
      * @return array
+     * @throws Mapper\DefinitionException If a specified join mapper is not found
+     * @throws DomainException If user has interaction but not participant record
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws LogicException If cyclic graph detected
+     * @throws ApplicationException\Exception If assessment is not found
      * @throws NotFound
+     * @throws Forbidden
      */
     protected function preloadParticipant(array $params)
     {
         try {
             // obtain the assessment from our other preload
             $student     = $this->getUserMapper()->findById($params['studentId']);
-            $assessment  = $this->preloadAssessment($params, $student)['assessment'];
+            $assessment  = $this->preloadAssessment($params, false, $student)['assessment'];
 
             $access = $this->getAccess()->getFolderAccess($student, $assessment->getContext()->getFolder()->getId());
 
@@ -278,20 +290,31 @@ class Module extends BaseModule
         ];
     }
 
+
     /**
      * Convert route params into an assessment object
      *
-     * @param array $params
-     * @param User  $student If provided, only load this student's participation
+     * @param array     $params
+     * @param bool      $includeExcluded Should we load excluded participations?
+     * @param null|User $student If provided, only load this student's participation
      * @return array
+     * @throws Mapper\DefinitionException If a specified join mapper is not found
+     * @throws UnexpectedValueException If unable to derive project participant collections
+     * @throws DomainException If user has interaction but not participant record
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws LogicException If cyclic graph detected
+     * @throws ApplicationException\Exception If assessment is not found
      */
-    protected function preloadAssessment(array $params, User $student = null)
+    protected function preloadAssessment(array $params, bool $includeExcluded, User $student = null)
     {
         try {
-            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], $student);
+            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], $includeExcluded, $student);
         } catch (MapperException\Deleted $e){
             $assessment = $e->getDeletedObject();
-        } catch (MapperException $e) {
+        }
+        /** @noinspection PhpRedundantCatchClauseInspection */
+        catch (MapperException $e) {
+            // Possibly thrown by base findByOne() mapper call, but masked by overriding @method annotation
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 

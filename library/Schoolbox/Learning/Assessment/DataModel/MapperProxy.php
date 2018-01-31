@@ -113,7 +113,7 @@ class MapperProxy
      */
     public function findById($id)
     {
-        return $this->findSingle('id', $id);
+        return $this->findSingle('id', $id, false, false);
     }
 
     /**
@@ -136,24 +136,26 @@ class MapperProxy
         return $this->findById($id);
     }
 
+
     /**
      * Find by ID for review, either of a single student or all in the class.
      *
      * This method loads participants, responses, feedback and rubric grid.
      *
      * @param int  $id
+     * @param bool $includeExcluded Should we include participant exclusion records?
      * @param User $student If provided, load only this student's participation
      * @return IAssessable
-     * @throws MapperException\Deleted if the assessment was deleted
-     * @throws DomainException If user has interaction but not participant record
      * @throws DefinitionException If unable to locate a specified mapper join
-     * @throws UnexpectedValueException If unable to derive project participant collections
+     * @throws DomainException If user has interaction but not participant record
      * @throws InvalidArgumentException If assessment class not registered
      * @throws LogicException If cyclic graph detected
+     * @throws MapperException\Deleted if the assessment was deleted
+     * @throws UnexpectedValueException If unable to derive project participant collections
      */
-    public function findByIdForReview($id, User $student = null)
+    public function findByIdForReview($id, bool $includeExcluded, User $student = null)
     {
-        return $this->findSingle('id', $id, true, $student);
+        return $this->findSingle('id', $id, true, $includeExcluded, $student);
     }
 
 
@@ -199,7 +201,7 @@ class MapperProxy
      */
     public function findByQuizId($quizId, User $student = null)
     {
-        return $this->findSingle('q.assess_id', $quizId, true, $student);
+        return $this->findSingle('q.assess_id', $quizId, true, false, $student);
     }
 
     /**
@@ -225,7 +227,7 @@ class MapperProxy
      */
     public function findByDueWorkId($dueWorkId, User $student = null)
     {
-        return $this->findSingle('d.id', $dueWorkId, true, $student);
+        return $this->findSingle('d.id', $dueWorkId, true, false, $student);
     }
 
 
@@ -251,7 +253,7 @@ class MapperProxy
      */
     public function findByTaskId($taskId, User $student = null)
     {
-        return $this->findSingle('t.id', $taskId, true, $student);
+        return $this->findSingle('t.id', $taskId, true, false, $student);
     }
 
 
@@ -961,19 +963,20 @@ class MapperProxy
     /**
      * Helper function for finding a single assessment by a column and value.
      *
-     * @param string $column
-     * @param int    $value
-     * @param bool   $loadParticipants
-     * @param User   $student
+     * @param string    $column
+     * @param int       $value
+     * @param bool      $loadParticipants  Should we load participations?
+     * @param bool      $includeExcluded   If loading participants, should we include excluded participations?
+     * @param null|User $student
      * @return IAssessable
-     * @throws MapperException\Deleted if the assessment was deleted
-     * @throws DomainException If user has interaction but not participant record
      * @throws DefinitionException If unable to locate a specified mapper join
-     * @throws UnexpectedValueException If unable to derive project participant collections
+     * @throws DomainException If user has interaction but not participant record
      * @throws InvalidArgumentException If assessment class not registered
      * @throws LogicException If cyclic graph detected
+     * @throws MapperException\Deleted if the assessment was deleted
+     * @throws UnexpectedValueException If unable to derive project participant collections
      */
-    protected function findSingle($column, $value, $loadParticipants = false, User $student = null)
+    protected function findSingle($column, $value, bool $loadParticipants, bool $includeExcluded, User $student = null)
     {
         try {
             // Load model and its participants
@@ -981,7 +984,7 @@ class MapperProxy
 
             $assessment = $this->translateToDomainModel($originalModel);
             if ($loadParticipants) {
-                $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, true, $student);
+                $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $includeExcluded, $student);
             }
             return $assessment;
 
@@ -992,7 +995,7 @@ class MapperProxy
             // Populate participants for the deleted assessment, and rethrow
             $assessment = $this->translateToDomainModel($e->getDeletedObject());
             if ($loadParticipants) {
-                $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, true, $student);
+                $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $includeExcluded, $student);
             }
             $e->setDeletedObject($assessment);
             throw $e;
