@@ -6,7 +6,6 @@
         <li><a class="icon-staff" href="/synergetic/pti?id={{ user.externalId }}">PTI</a></li>
     {% endif %}
 {% endblock buttons %}
-{% extends "@core/user/student.twig" %}
 
 {% block synergeticComments %}
     {% if externalUser.Comment is not empty and showComments %}
