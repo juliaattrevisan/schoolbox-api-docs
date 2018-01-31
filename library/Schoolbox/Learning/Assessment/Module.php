@@ -112,7 +112,6 @@ class Module extends BaseModule
         $isSuper            = $this->getAuthRule('isSuperuser');
         $loggedIn           = $this->getAuthRule('isLoggedIn');
         $canWrite           = $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE);
-        $canRead            = $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_READ);
         $participantView    = $this->buildAuthRuleParticipantView();
         $participantView    = new Rule\All($participantView, $notDeleted);
         $canSubmit          = $this->buildAuthRuleCanSubmit();
@@ -162,7 +161,7 @@ class Module extends BaseModule
         $this->register('GET',   "$assRoute/submissions/download",   'downloadSubmissions',      $canWrite,           $preloadAssessment); // a || c
 
         $this->register('GET',   "$assRoute/$studentParam",          'getSummary',               $participantView,    $preloadParticipant); // s || p
-        $this->register('GET',   "$assRoute/preview",                'getPreview',               $canRead,            $preloadAssessment);  // s || p
+        $this->register('GET',   "$assRoute/preview",                'getPreview',               $canWrite,           $preloadAssessment);  // s || p
         $this->register('GET',   "$assRoute/$studentParam/submit",   'getCreateResponseForm',    $canSubmit,          $preloadParticipant); // p
         $this->register('POST',  "$assRoute/$studentParam/submit",   'postCreateResponse',       $canSubmit,          $preloadParticipant); // p
         $this->register('POST',  "$assRoute/$studentParam/received", 'postStatusAcknowledge',    $canAckSubmission,   $preloadParticipant); // p

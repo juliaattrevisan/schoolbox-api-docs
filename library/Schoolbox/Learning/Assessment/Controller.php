@@ -27,6 +27,7 @@ use UnexpectedValueException;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Application\Exception as ApplicationException;
+use Aura\Web\Exception\InvalidStatusCode;
 
 
 abstract class Controller extends ListController implements IAssessmentController
@@ -265,18 +266,21 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @api GET /learning/assessment/:assessmentId
      * @param IAssessable $assessment
      * @throws RouteNotFound If unable to generate a requested route
-     * @throws ApplicationException\Exception If current user should not have permission to view this page
+     * @throws InvalidStatusCode If we attempt to set an invalid HTTP response code
      */
     public function getAssessment(IAssessable $assessment)
     {
-        $redirect      = $this->determineGetAssessmentRedirect($assessment);
-        $redirOverride = $this->getRequest()->query->get(Redirect::RETURN_URL);
-
-        if ($redirOverride) {
-            $redirect .= '?' . Redirect::RETURN_URL . "={$redirOverride}";
+        try{
+            $redirect      = $this->determineGetAssessmentRedirect($assessment);
+            $redirOverride = $this->getRequest()->query->get(Redirect::RETURN_URL);
+            if ($redirOverride) {
+                $redirect .= '?' . Redirect::RETURN_URL . "={$redirOverride}";
+            }
+            $this->getResponse()->redirect->to($redirect);
+        } catch (ApplicationException\Exception $e){
+            // As far as this user is concerned, this resource does not exist.
+            $this->getResponse()->status->setCode(404);
         }
-
-        $this->getResponse()->redirect->to($redirect);
     }
 
 
@@ -506,7 +510,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
 
     /**
-     * Returns a redirect route, or throws a 404
+     * Returns a redirect route, or throw an exception.
      *
      * @param IAssessable $assessment
      * @return string
@@ -547,7 +551,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
             return $previewRoute;
         }
 
-        // Everyone else sees a 404
         throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
     }
 }
