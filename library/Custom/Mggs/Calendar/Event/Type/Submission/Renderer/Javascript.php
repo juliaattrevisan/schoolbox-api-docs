@@ -170,7 +170,12 @@ class Javascript extends \Calendar\Event\Type\Submission\Renderer\Javascript
             return null;
         }
 
-        $part = $this->getEvent()->getAssessment()->getParticipant($this->getUser());
+        $part = $this->getEvent()->getAssessment()->getParticipantIfExtant($this->getUser());
+
+        if (!$part) {
+            // if there's no participation, there's no bling
+            return null;
+        }
 
         if ($part->isResponseRequired()) {
             return 'incomplete';
