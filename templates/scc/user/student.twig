@@ -1,5 +1,8 @@
 {% extends '@core/user/student.twig' %}
 
-{% block buttons_miscellaneous %}
-    <a class="icon-staff" href="/synergetic/pti?id={{ user.externalid }}">PTI</a>
-{% endblock buttons_miscellaneous %}
+{% block buttons %}
+    {{ parent() }}
+    {% if isParentOfStudent %}
+        <li><a class="icon-staff" href="/synergetic/pti?id={{ user.externalId }}">PTI</a></li>
+    {% endif %}
+{% endblock buttons %}
