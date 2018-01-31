@@ -549,13 +549,14 @@ class Module extends BaseModule
                     new CanRespondToAssessment($this->getAccess()),
                     new ParticipantHasNoInteractions()
                 ),
-                // Participants may now acknowledge their own submissions
+                // Participants may now acknowledge their own submissions.
                 new Rule\All(
                     new Rule\IsUser('studentId'),
                     new IsParticipant(),
                     new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
-                    new IsAssessmentOpen(),
-                    new ParticipantHasNoInteractions()
+                    new IsAssessmentOpen()
+                    // Until I figure out more about how it should work: they may ack multiple times
+//                    new ParticipantHasNoInteractions()
                 )
             )
         );
