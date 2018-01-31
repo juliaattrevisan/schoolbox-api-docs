@@ -197,13 +197,7 @@ class Model extends AbstractAssessment
      */
     public function assertAcceptSubmission(\Schoolbox\Collection $responses)
     {
-        if ($this->getOpenAt()->gt(\Alaress_Date_Format::now())) {
-            throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NOT_YET_OPEN);
-        }
-
-        if (\Alaress_Date_Format::now()->gt($this->getCloseAt())) {
-            throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_CLOSED);
-        }
+        $this->assertOpen();
 
         if ($this->isAcceptNone()) {
             throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_ONLINE_RESPONSE);
@@ -213,6 +207,40 @@ class Model extends AbstractAssessment
          */
         if ($this->isAcceptSingle() && $responses->count() && $responses->first()->isSubmitted()) {
             throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_MULTIPLE_RESPONSE);
+        }
+    }
+
+    /**
+     * Can a participant create a receipt response?
+     *
+     * This action is only available to open due works which the participant
+     * has no existent responses to.
+     *
+     * @param Collection $responses
+     * @throws DomainException
+     */
+    public function assertAcceptReceiptResponse(\Schoolbox\Collection $responses)
+    {
+        $this->assertOpen();
+
+        if ($responses->count() > 0) {
+            throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_ONLINE_RESPONSE);
+        }
+    }
+
+    /**
+     * Assert whether this due work is open.
+     *
+     * @throws DomainException
+     */
+    private function assertOpen()
+    {
+        if ($this->getOpenAt()->gt(\Alaress_Date_Format::now())) {
+            throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NOT_YET_OPEN);
+        }
+
+        if (\Alaress_Date_Format::now()->gt($this->getCloseAt())) {
+            throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_CLOSED);
         }
     }
 
