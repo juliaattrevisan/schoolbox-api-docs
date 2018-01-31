@@ -935,13 +935,31 @@ class Controller extends Assessment\Controller
      */
     public function postAcknowledgeDraft(Participant $participant)
     {
+        // This should only be a draft if the assessment requires self-reflection.
+        // Otherwise, publish acknowledgement immediately.
         $assessment = $participant->getAssessable();
         try {
             $response = $this->persistEmptySobo($participant, null);
+            $route    = 'learningAssessment.getSummary';
+            $params   = [
+                'participant'  => $participant,
+                'assessment'   => $assessment,
+                'assessmentId' => $assessment->getId(),
+                'student'      => $participant->getUser(),
+                'studentId'    => $participant->getUser()->getId(),
+            ];
+            if ($assessment instanceof Model) {
+                if ($assessment->isSelfAssessable() || $assessment->isSelfReflectable()) {
+                    $route                = 'learningDueWorkResponse.getParticularResponseForSelfReflection';
+                    $params['response']   = $response;
+                    $params['responseId'] = $response->getId();
+                }
+            }
             $data = [
                 'success'       => true,
                 'id'            => $response->getId(),
                 'submittedLate' => $assessment->isOverdue() || $assessment->isPastClose(),
+                'location'      => $this->getRouteIfAuthorized($route, $params, $this->getUser()),
             ];
             $code = 200;
         } catch (\PDOException $e) {
