@@ -8,33 +8,11 @@
             file_browser_category_id: '{ASSESS_CATEGORY_ID}'
         });
 
-        if ($('[data-shuffle]').prop("checked")) {
-            var prompt = $('[data-max-questions-prompt]');
-            var input = prompt.find('[data-max-questions]');
-
-            prompt.removeClass('hide');
-            input.prop('disabled', false);
-        }
-
-        $('[data-shuffle]').change(function() {
-            if (prompt.hasClass("hide")) {
-                input.prop('disabled', false);
-            }
-            else {
-                input.prop('disabled', true);
-            }
-
-            prompt.toggleClass('hide');
-        });
-
         $('#modifySection').alaressValidate({
             rules: {
                 title: {
                     required: true,
                     minlength: 2
-                },
-                pool: {
-                    number: true
                 }
             },
 

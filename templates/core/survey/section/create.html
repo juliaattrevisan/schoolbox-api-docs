@@ -8,28 +8,11 @@
             file_browser_category_id: '{ASSESS_CATEGORY_ID}'
         });
 
-        $('[data-shuffle]').change(function() {
-            var prompt = $('[data-max-questions-prompt]');
-            var input = prompt.find('[data-max-questions]');
-
-            if (prompt.hasClass("hide")) {
-                input.prop('disabled', false);
-            }
-            else {
-                input.prop('disabled', true);
-            }
-
-            prompt.toggleClass('hide');
-        });
-
         $('#createSection').alaressValidate({
             rules: {
                 title: {
                     required: true,
                     minlength: 2
-                },
-                pool: {
-                    number: true
                 }
             },
             messages: {
@@ -61,23 +44,6 @@
                 <label>
                     Section Title
                     <input name="title" type="text" size="35" class="required"/>
-                </label>
-
-                <label>
-                    Shuffle Questions
-                    <span class="hint has-tip tip-top" data-tooltip title="Questions should be selected randomly">?</span>
-                </label>
-                <div class="switch">
-                    <input name="random" id="random" type="checkbox" value="1" data-shuffle />
-                    <label for="random">
-                        <span>On</span>
-                        <span>Off</span>
-                    </label>
-                </div>
-
-                <label class="hide" data-max-questions-prompt>
-                    Maximum number of questions to show
-                    <input name="pool" disabled="disabled" type="text" data-max-questions />
                 </label>
 
                 <label>
