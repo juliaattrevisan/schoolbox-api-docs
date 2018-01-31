@@ -141,8 +141,8 @@ class External_Maze_Timetable implements External_TimetableInterface
                 }
 
                 $timetableDef['desc'][] = $desc;
-                $timetableDef['start'][] = $this->getHelper()->mazeTime($current['TIME_START']);
-                $timetableDef['end'][] = $this->getHelper()->mazeTime($current['TIME_END']);
+                $timetableDef['start'][] = date("g:ia", strtotime($current['TIME_START']));
+                $timetableDef['end'][] = date("g:ia", strtotime($current['TIME_END']));
                 $timetableDef['number'][] = $current['TIME_INDEX'];
                 $timetableDef['sequence'][] = 1;
             }
@@ -209,7 +209,7 @@ class External_Maze_Timetable implements External_TimetableInterface
      *
      * @param int|\Schoolbox\Campus $campus
      * @param int $now
-     * @return int
+     * @return array
      */
     public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
     {
@@ -232,13 +232,11 @@ class External_Maze_Timetable implements External_TimetableInterface
                 $startTime = $currentTime['startTime'];
                 $endTime = $currentTime['endTime'];
 
-                if ($startTime->getDatabaseTime() <= $now->getDatabaseTime()) {
-                    if ($endTime->getDatabaseTime() > $now->getDatabaseTime()) {
+                if ($now->between($startTime, $endTime)) {
                         return array(
                             'PeriodNumber'    => $i,
                             'PeriodNumberSeq' => 1,
                         );
-                    }
                 }
 
                 $i++;
