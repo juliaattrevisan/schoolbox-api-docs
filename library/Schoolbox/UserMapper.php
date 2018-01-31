@@ -260,6 +260,7 @@ class UserMapper extends Mapper
             SELECT {$this->getColumnString()}, IF(su.id, 1, 0) as `superuser`,
                     {$this->getJoinColumnString('role', 'g')},
                     {$this->getJoinColumnString('userCampus', 'c')},
+                    `v_c`.`defaultCampus`, -- we need this attribute from the join table
                     {$this->getJoinColumnString('schoolHouse', 'h')},
                     {$this->getColumnString('lu')}
             FROM `user`
@@ -895,5 +896,18 @@ class UserMapper extends Mapper
         // Update events
         $query = "UPDATE event SET owner = :toId WHERE owner = :fromId";
         $this->database->query($query, $params);
+    }
+
+
+    /**
+     * Finds a user by username
+     *
+     * @param string $username
+     * @param array  $options
+     * @return null|User
+     */
+    public function findByUsername(string $username, array $options = []): ?User
+    {
+        return $this->findByColumn('username', $username, $options)->first();
     }
 }

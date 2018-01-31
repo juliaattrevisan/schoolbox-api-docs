@@ -9,6 +9,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\UserMapper;
+use Schoolbox\User;
 
 class Session
 {
@@ -70,19 +71,19 @@ class Session
      */
     public function create($username, $remember = false)
     {
-        $userHandler = new User;
-        $userMapper = new UserMapper;
+        $userHandler  = new \User;
+        $userMapper   = UserMapper::getInstance();
         $groupHandler = new Group;
 
         //Clear all remnants of past sessions
         $this->destroy();
 
-        $user = $userHandler->getByUsername($username);
+        $user = $userMapper->findByUsername($username, ['order' => ['v_c.defaultCampus' => 'DESC']]);
 
-        $ip = Session::getIP();
+        $ip = self::getIP();
 
         /* if user is found and enabled and session is started create our user record */
-        if (is_array($user) && $user['enabled'] && session_start()) {
+        if ($user instanceof User && $user->getEnabled() && session_start()) {
             /* Store remember me cookie so user can return in the future */
 
             if ($remember == true) {
@@ -102,41 +103,42 @@ class Session
                 $redis->executeCommand($redis->createCommand('set', array($key, $username) ));
                 $redis->executeCommand($redis->createCommand('expire', array($key,  ($expire - $_SERVER['REQUEST_TIME']))));
             }
+
             //register users id
-            $_SESSION['title'] = $user['title'];
-            $_SESSION['firstname'] = $user['firstname'];
-            $_SESSION['lastname'] = $user['lastname'];
-            $_SESSION['id'] = $user['uid'];
-            $_SESSION['sid'] = $user['synergy_id'];
-            $_SESSION['gid'] = $user['group_id'];
-            $_SESSION['houseId'] = $user['house'];
-            $_SESSION['year'] = $user['year'];
-            $_SESSION['local_email'] = $user['local_email'];
-            $_SESSION['alt_email'] = $user['alt_email'];
-            $_SESSION['webmail'] = $user['webmail'];
-            $_SESSION['key'] = $user['key'];
-            $_SESSION['lasttime'] = time();
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['password'] = $_POST['password'];
-            $_SESSION['eportfolio_enabled'] = $user['eportfolio_enabled'];
-            $_SESSION['ip'] = $ip;
-            $_SESSION['campus'] = $userHandler->getUserCampus($user['uid']);
-            $_SESSION['calendar_view'] = $user['calendar_view'];
+            $_SESSION['title']              = $user->getTitle();
+            $_SESSION['firstname']          = $user->getFirstname();
+            $_SESSION['lastname']           = $user->getLastname();
+            $_SESSION['id']                 = $user->getId();
+            $_SESSION['sid']                = $user->getExternalId();
+            $_SESSION['gid']                = $user->getRole() ? $user->getRole()->getId() : null;
+            $_SESSION['houseId']            = $user->getSchoolHouse() ? $user->getSchoolHouse()->getId() : null;
+            $_SESSION['year']               = $user->getYear();
+            $_SESSION['local_email']        = $user->getLocalEmail();
+            $_SESSION['alt_email']          = $user->getAltEmail();
+            $_SESSION['webmail']            = $user->getWebmail();
+            $_SESSION['key']                = $user->getKey();
+            $_SESSION['lasttime']           = time();
+            $_SESSION['username']           = $user->getUsername();
+            $_SESSION['password']           = $_POST['password'];
+            $_SESSION['eportfolio_enabled'] = $user->getEportfolioEnable();
+            $_SESSION['ip']                 = $ip;
+            $_SESSION['campus']             = $userHandler->getUserCampus($user->getId());
+            $_SESSION['calendar_view']      = $user->getCalendarView();
 
             // add mobile session data
             $sbmAuth = new Authenticator();
-            $result = $sbmAuth->appendSession($user['uid']);
+            $result = $sbmAuth->appendSession($user->getId());
 
             //if no mail enabled or user has elected to use external client set mailhandle to mailto:
             //TODO: remove this parent special config, but schools currently rely on it, need to update all parents to mail_handler = 1
-            if (Cfg::get('mail_enable') == 0 || $user['mail_handler'] || ($groupHandler->isParent() && !$user['local_email'])) {
+            if (Cfg::get('mail_enable') == 0 || $user->getUseInternalMail() || ($groupHandler->isParent() && !$user->getLocalEmail())) {
                 $_SESSION['mailhandle'] = "mailto:";
             } else {
                 $_SESSION['mailhandle'] = "/mail/createMail.php?replyto=";
             }
 
             //superuser value, used to bypass most security checks
-            if ($user['su'] == 1) {
+            if ($user->isSuperuser()) {
                 $_SESSION['su'] = 1;
             }
 
@@ -147,7 +149,7 @@ class Session
             if ($this->getUseLoginLog()) {
                 $notif = Notifactory::create(Notif::TOPIC_AUTH);
                 $notif->notice("Login success for $username", array(
-                    'username' => $user['username'],
+                    'username' => $user->getUsername(),
                     'ip'       => $ip,
                     'login'    => 1,
                 ));
