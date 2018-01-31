@@ -57,9 +57,12 @@ class Full
 
 
     /**
-     * Get the timeline, as seen by a teacher on their child's summary page
-     * As a parent, you cannot see draft submissions or unpublished feedback,
-     * and can only see feedback if the assessment allows parents to see it.
+     * Get the timeline, as seen by a teacher on their child's summary page.
+     * As a parent, you:
+     * * cannot see unpublished self-reflection feedback
+     * * cannot see unpublished instructor feedback
+     * * cannot see draft responses
+     * * can see published feedback if assessment allows parents to see it
      *
      * @return Collection
      */
@@ -70,7 +73,11 @@ class Full
 
     /**
      * Get the timeline, as seen by a teacher grading a student.
-     * As a teacher, you cannot see submissions the student has drafted but not yet submitted.
+     * As a teacher, you:
+     * * cannot see unpublished self-reflection feedback
+     * * can see unpublished instructor feedback
+     * * cannot see draft responses
+     * * can see published feedback
      *
      * @return Collection
      */
@@ -81,9 +88,12 @@ class Full
 
 
     /**
-     * Get the timeline, as seen by a student on their summary page
-     * As a student, you cannot see feedback the teacher has drafted but not yet published,
-     * and can only see feedback if the assessment allows students to see it.
+     * Get the timeline, as seen by a student on their summary page.
+     * As a student, you:
+     * * can see unpublished self-reflection feedback
+     * * cannot see unpublished instructor feedback
+     * * can see draft responses
+     * * can see published feedback if assessment allows students to see it
      *
      * @return Collection
      */
@@ -94,8 +104,10 @@ class Full
 
 
     /**
-     * Get the admin-only form of a timeline, including EVERYTHING for when you need to perform admin functions
-     * As an admin, you can see damn well everything.
+     * Get the admin-only form of a timeline, including EVERYTHING for when you
+     * need to perform admin functions.
+     * As an admin, you:
+     * * can see damn well everything
      *
      * @return Collection
      */
