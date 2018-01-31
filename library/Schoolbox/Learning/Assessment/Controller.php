@@ -25,6 +25,8 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Mapper\DefinitionException;
 use UnexpectedValueException;
 use Aura\Di\Exception\ServiceNotFound;
+use Aura\Router\Exception\RouteNotFound;
+use Schoolbox\Application\Exception as ApplicationException;
 
 
 abstract class Controller extends ListController implements IAssessmentController
@@ -253,54 +255,30 @@ abstract class Controller extends ListController implements IAssessmentControlle
         }
     }
 
+
     /**
      * Redirect method
      *
-     * Sends you to a status or summary screen depending on who is
+     * Sends you to a status, summary, or preview screen depending on who is
      * currently logged in and what they are viewing
      *
      * @api GET /learning/assessment/:assessmentId
      * @param IAssessable $assessment
+     * @throws RouteNotFound If unable to generate a requested route
+     * @throws ApplicationException\Exception If current user should not have permission to view this page
      */
     public function getAssessment(IAssessable $assessment)
     {
-        /* Check permission and default to page based on access level of user */
+        $redirect      = $this->determineGetAssessmentRedirect($assessment);
+        $redirOverride = $this->getRequest()->query->get(Redirect::RETURN_URL);
 
-        $folder = $assessment->getBaseContext()->getFolder();
-
-        $perms = $this->getAccess()->getFolderAccess($this->getUser(), $folder->getId());
-        /* If you're a staff, get redirected to a Status overview
-         */
-        if ($assessment->isSpecification() && $perms >= UserAccess::ACCESS_READ) {
-            // Preview assessment in specification context
-            $redirect = $this->getRouter()->generate('learningAssessment.getPreview', ['assessmentId' => $assessment->getId()]);
-        }
-        elseif ($perms >= UserAccess::ACCESS_WRITE) {
-            $redirect = $this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]);
-        }
-        elseif ($assessment->isParticipant($this->getUser())) {
-            // If you're a student, get redirected to the summary
-            $redirect = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId(), 'studentId' => $this->getUser()->getId()]);
-        }
-        elseif ($perms >= UserAccess::ACCESS_READ) {
-            $redirect = $this->getRouter()->generate('learningAssessment.getPreview', ['assessmentId' => $assessment->getId()]);
+        if ($redirOverride) {
+            $redirect .= '?' . Redirect::RETURN_URL . "={$redirOverride}";
         }
 
-        if($redirect) {
-            $redirOverride = $this->getRequest()->query->get(Redirect::RETURN_URL);
-
-            if ($redirOverride) {
-                $redirect .= "?" . Redirect::RETURN_URL . "=" . $redirOverride;
-            }
-
-            $this->getResponse()->redirect->to($redirect);
-            return;
-        }
-
-        /* Everyone else sees The Nothing
-         */
-        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        $this->getResponse()->redirect->to($redirect);
     }
+
 
     /**
      * @param AssessmentContext $context
@@ -524,5 +502,52 @@ abstract class Controller extends ListController implements IAssessmentControlle
     protected function getTermMapper()
     {
         return $this->termMapper;
+    }
+
+
+    /**
+     * Returns a redirect route, or throws a 404
+     *
+     * @param IAssessable $assessment
+     * @return string
+     * @throws RouteNotFound If unable to generate a requested route
+     * @throws ApplicationException\Exception If current user should not have permission to view this page
+     */
+    private function determineGetAssessmentRedirect(IAssessable $assessment): string
+    {
+        // Specs should only be previewed
+        $previewRoute = $this->getRouteIfAuthorized('learningAssessment.getPreview', [
+            'assessment'   => $assessment,
+            'assessmentId' => $assessment->getId(),
+        ], $this->getUser());
+        if ($previewRoute && $assessment->isSpecification()) {
+            // Preview assessment in specification context
+            return $previewRoute;
+        }
+
+        // Is status page viewable?
+        $statusRoute = $this->getRouteIfAuthorized('learningAssessment.getStatus', [
+            'assessment'   => $assessment,
+            'assessmentId' => $assessment->getId(),
+        ], $this->getUser());
+        if ($statusRoute) {
+            return $statusRoute;
+        }
+
+        if ($assessment->isParticipant($this->getUser())) {
+            // If you're a participant, get redirected to the summary
+            return $this->getRouter()->generate('learningAssessment.getSummary', [
+                'assessmentId' => $assessment->getId(),
+                'studentId'    => $this->getUser()->getId(),
+            ]);
+        }
+
+        // Is the user not a participant, but has perm to view the preview route?
+        if ($previewRoute) {
+            return $previewRoute;
+        }
+
+        // Everyone else sees a 404
+        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
     }
 }
