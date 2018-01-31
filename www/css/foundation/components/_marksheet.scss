@@ -11,4 +11,8 @@
         // Hack to avoid an unnecessary scrollbar caused by rotated elements
         margin-bottom: 0.8125rem;
     }
+
+    .excluded {
+        background-color: #f9f9f9;
+    }
 }
