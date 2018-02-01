@@ -203,7 +203,7 @@ class Controller extends Base
 
         // Did we just give some rubric marks?
         if (is_array($post['rubric'])) {
-            $this->rubricMapper->saveForParticipant($post['rubric']['descriptors'], $feedback->getId());
+            $this->rubricMapper->saveForFeedback($post['rubric']['descriptors'], $feedback->getId());
         }
     }
 
