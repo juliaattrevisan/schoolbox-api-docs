@@ -552,7 +552,7 @@ class Factory
         }
 
         // And get the original too (plus all participants)
-        $assessments->add($this->assessmentDataSource->findByIdForReview($baseAssessment->getId()));
+        $assessments->add($this->assessmentDataSource->findByIdForReview($baseAssessment->getId(), false));
 
         $distribution = [
             'grouped'    => [],

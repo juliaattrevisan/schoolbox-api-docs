@@ -76,7 +76,7 @@ class Module extends BaseModule
     protected function preloadAssessment(array $params): array
     {
         try {
-            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
+            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], false);
         } catch (MapperException\Deleted $e){
             $assessment = $e->getDeletedObject();
         } catch (MapperException $e) {
