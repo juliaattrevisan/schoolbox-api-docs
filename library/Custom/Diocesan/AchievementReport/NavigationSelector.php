@@ -98,38 +98,30 @@ class NavigationSelector
     {
         $this->setDefaultReport(array('error' => 'Unknown default report.'));
 
-        if ($this->getUser()->getCampusCollection()->first() instanceof Campus) {
-            if (in_array($this->getUser()->getCampusCollection()->first()->getExtTimetableCode(), array('JNR', 'JS'))) {
-                if (($this->getUser()->getYear() >= 1) && ($this->getUser()->getYear() <= 6)) {
-                    $this->setDefaultReport('comingSoon');
-                }
-            } elseif ($this->getUser()->getCampusCollection()->first()->getExtTimetableCode() == 'JH') {
-                if (($this->getUser()->getYear() >= 7) && ($this->getUser()->getYear() <= 10)) {
-                    $this->setDefaultReport('schoolGrades');
-                }
-            } elseif ($this->getUser()->getCampusCollection()->first()->getExtTimetableCode() == 'SEC') {
-                /* NCEA for year 11 specifically
-                 */
-                if ($this->getUser()->getYear() == 11) {
-                    if ($this->getHasNcea()) {
-                        $this->setDefaultReport('ncea');
-                    } else {
-                        $this->setDefaultReport(array('error' => 'Year 11 student not in NCEA.'));
-                    }
-                } /* Need to decide whether this is an IB or an NCEA student
-                 */
-                elseif (($this->getUser()->getYear() >= 12) && ($this->getUser()->getYear() <= 13)) {
-                    if ($this->getHasIb()) {
-                        $this->setDefaultReport('ib');
-                    } elseif ($this->getHasNcea()) {
-                        $this->setDefaultReport('ncea');
-                    } else {
-                        $this->setDefaultReport(array('error' => 'Year 12/13 student not in NCEA or IB.'));
-                    }
-                }
+        if (($this->getUser()->getYear() >= 1) && ($this->getUser()->getYear() <= 6)) {
+            $this->setDefaultReport('comingSoon');
+        }
+        elseif (($this->getUser()->getYear() >= 7) && ($this->getUser()->getYear() <= 10)) {
+            $this->setDefaultReport('schoolGrades');
+        }
+        /* NCEA for year 11 specifically
+         */
+        elseif ($this->getUser()->getYear() == 11) {
+            if ($this->getHasNcea()) {
+                $this->setDefaultReport('ncea');
+            } else {
+                $this->setDefaultReport(array('error' => 'Year 11 student not in NCEA.'));
             }
-        } else {
-            $this->setDefaultReport(array('error' => "Unknown default campus for {$this->getUser()->getFullname()}."));
+        } /* Need to decide whether this is an IB or an NCEA student
+         */
+        elseif (($this->getUser()->getYear() >= 12) && ($this->getUser()->getYear() <= 13)) {
+            if ($this->getHasIb()) {
+                $this->setDefaultReport('ib');
+            } elseif ($this->getHasNcea()) {
+                $this->setDefaultReport('ncea');
+            } else {
+                $this->setDefaultReport(array('error' => 'Year 12/13 student not in NCEA or IB.'));
+            }
         }
     }
 
