@@ -1,0 +1,37 @@
+{#
+    Text-input for 'total-mark' markScheme.
+
+    Usage: [
+        markScheme:  MarkScheme\TotalMarkFractional
+        tabIndex:    int
+        errors:      string[]       Admin-configured submission states
+        readonly:    bool           Should this form input be rendered as readonly?
+    ]
+#}
+
+{% if markScheme.totalMark % 1 != 0 %}
+    {% include '@learningMarkScheme/fragments/text-input.twig' with {
+    participant: participant,
+    feedback:    feedback,
+    tabIndex:    tabIndex,
+    placeholder: readonly ? '(no mark given)' : 'Mark out of ' ~ markScheme.totalMark | number_format(2),
+    limit:       markScheme.totalMark,
+    maxLength:   16,
+    inputTitle:  'Maximum Mark: ' ~ markScheme.totalMark,
+    errors:      errors,
+    readonly:    readonly
+    } only %}
+{% else %}
+    {% include '@learningMarkScheme/fragments/text-input.twig' with {
+    participant: participant,
+    feedback:    feedback,
+    tabIndex:    tabIndex,
+    placeholder: readonly ? '(no mark given)' : 'Mark out of ' ~ markScheme.totalMark | number_format(0),
+    limit:       markScheme.totalMark,
+    maxLength:   16,
+    inputTitle:  'Maximum Mark: ' ~ markScheme.totalMark,
+    errors:      errors,
+    readonly:    readonly
+    } only %}
+{% endif %}
+
