@@ -904,7 +904,7 @@ class Controller extends Assessment\Controller
     {
         $assessment = $participant->getAssessable();
         try {
-            $response = $this->persistEmptySobo($participant, Alaress_Date_Format::now());
+            $response = $this->persistAcknowledgementResponse($participant, Alaress_Date_Format::now());
             $data = [
                 'success'       => true,
                 'id'            => $response->getId(),
@@ -963,7 +963,7 @@ class Controller extends Assessment\Controller
             if ($selfReview) {
                 $response = $participant->findMostRecentDraftResponse();
                 if (!$response) {
-                    $response = $this->persistEmptySobo($participant, null);
+                    $response = $this->persistAcknowledgementResponse($participant, null);
                 }
 
                 $route                = 'learningDueWorkResponse.getParticularResponseForSelfReflection';
@@ -971,7 +971,7 @@ class Controller extends Assessment\Controller
                 $params['responseId'] = $response->getId();
 
             } else {
-                $response = $this->persistEmptySobo($participant, Alaress_Date_Format::now());
+                $response = $this->persistAcknowledgementResponse($participant, Alaress_Date_Format::now());
             }
 
             $data = [
@@ -1006,7 +1006,7 @@ class Controller extends Assessment\Controller
     public function postPendingAcknowledge(Participant $participant)
     {
         try {
-            $this->persistEmptySobo($participant, Alaress_Date_Format::now());
+            $this->persistAcknowledgementResponse($participant, Alaress_Date_Format::now());
             $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learning/fragments/toMarkParticipant.twig', [
                 'participant' => $participant,
                 'assessment'  => $participant->getAssessable(),
@@ -1031,7 +1031,7 @@ class Controller extends Assessment\Controller
      * @return Submission
      * @throws \PDOException If something went wrong in the save process
      */
-    private function persistEmptySobo(Participant $participant, ?Alaress_Date_Format $submittedDate)
+    private function persistAcknowledgementResponse(Participant $participant, ?Alaress_Date_Format $submittedDate)
     {
         $assessment = $participant->getAssessable();
         $response   = $this->dueWorkResponseMapper->createModel()
