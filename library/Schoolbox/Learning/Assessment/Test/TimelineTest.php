@@ -54,6 +54,7 @@ class TimelineTest extends TestCase
         $response1 = new Submission();
         $response1
             ->setId(1)
+            ->setSubmittedBy($student)
             ->setSubmittedOnBehalfOf($student)
             ->setAssessable($assessment)
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
@@ -81,16 +82,22 @@ class TimelineTest extends TestCase
     public function testOneResponseOneFeedback()
     {
         $assessment = new DueWork();
+        $student = new User();
+        $teacher = new User();
 
         $response1 = new Submission();
         $response1
             ->setId(1)
+            ->setSubmittedBy($student)
+            ->setSubmittedOnBehalfOf($student)
             ->setAssessable($assessment)
             ->setSubmittedAt(new \Alaress_Date_Format('2016-11-01 10:45:00', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $feedback1 = new Feedback();
         $feedback1
             ->setId(11)
+            ->setReviewee($student)
+            ->setReviewer($teacher)
             ->setAssessable($assessment)
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
@@ -119,22 +126,30 @@ class TimelineTest extends TestCase
     public function testOneResponseMultipleFeedback()
     {
         $assessment = new DueWork();
+        $student = new User();
+        $teacher = new User();
 
         $response1 = new Submission();
         $response1
             ->setId(1)
+            ->setSubmittedBy($student)
+            ->setSubmittedOnBehalfOf($student)
             ->setAssessable($assessment)
             ->setSubmittedAt(new \Alaress_Date_Format('2016-11-01 10:45:00', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $feedback1 = new Feedback();
         $feedback1
             ->setId(11)
+            ->setReviewee($student)
+            ->setReviewer($teacher)
             ->setAssessable($assessment)
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-01 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $feedback2 = new Feedback();
         $feedback2
             ->setId(22)
+            ->setReviewee($student)
+            ->setReviewer($teacher)
             ->setAssessable($assessment)
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
@@ -166,16 +181,22 @@ class TimelineTest extends TestCase
     public function testMultipleResponsesMultipleFeedback()
     {
         $assessment = new DueWork();
+        $student = new User();
+        $teacher = new User();
 
         $response1 = new Submission();
         $response1
             ->setId(1)
+            ->setSubmittedBy($student)
+            ->setSubmittedOnBehalfOf($student)
             ->setAssessable($assessment)
             ->setSubmittedAt(new \Alaress_Date_Format('2016-11-01 10:45:00', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $feedback1 = new Feedback();
         $feedback1
             ->setId(11)
+            ->setReviewee($student)
+            ->setReviewer($teacher)
             ->setAssessable($assessment)
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-01 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
@@ -184,12 +205,16 @@ class TimelineTest extends TestCase
         $response2 = new Submission();
         $response2
             ->setId(2)
+            ->setSubmittedBy($student)
+            ->setSubmittedOnBehalfOf($student)
             ->setAssessable($assessment)
             ->setSubmittedAt(new \Alaress_Date_Format('2016-11-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $feedback2 = new Feedback();
         $feedback2
             ->setId(22)
+            ->setReviewee($student)
+            ->setReviewer($teacher)
             ->setAssessable($assessment)
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
@@ -198,12 +223,16 @@ class TimelineTest extends TestCase
         $response3 = new Submission();
         $response3
             ->setId(3)
+            ->setSubmittedBy($student)
+            ->setSubmittedOnBehalfOf($student)
             ->setAssessable($assessment)
             ->setSubmittedAt(new \Alaress_Date_Format('2016-10-31 04:34:34', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $feedback3 = new Feedback();
         $feedback3
             ->setId(33)
+            ->setReviewee($student)
+            ->setReviewer($teacher)
             ->setAssessable($assessment)
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-23 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
@@ -234,6 +263,8 @@ class TimelineTest extends TestCase
     public function testMultipleResponsesMultipleFeedbackWithFloaters()
     {
         $assessment = new DueWork();
+        $student = new User();
+        $teacher = new User();
 
         // Allow feedbacks to show for parents
         $assessment->setMarkVisibility(DueWork::MARK_VISIBILITY_PARENT_STUDENT);
@@ -241,12 +272,16 @@ class TimelineTest extends TestCase
         $response1 = new Submission();
         $response1
             ->setId(1)
+            ->setSubmittedBy($student)
+            ->setSubmittedOnBehalfOf($student)
             ->setAssessable($assessment)
             ->setSubmittedAt(new \Alaress_Date_Format('2016-11-01 10:45:00', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $feedback1 = new Feedback();
         $feedback1
             ->setId(11)
+            ->setReviewee($student)
+            ->setReviewer($teacher)
             ->setAssessable($assessment)
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-01 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
@@ -255,12 +290,16 @@ class TimelineTest extends TestCase
         $response2 = new Submission();
         $response2
             ->setId(2)
+            ->setSubmittedBy($student)
+            ->setSubmittedOnBehalfOf($student)
             ->setAssessable($assessment)
             ->setSubmittedAt(new \Alaress_Date_Format('2016-11-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $feedback2 = new Feedback();
         $feedback2
             ->setId(22)
+            ->setReviewee($student)
+            ->setReviewer($teacher)
             ->setAssessable($assessment)
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
@@ -269,12 +308,16 @@ class TimelineTest extends TestCase
         $response3 = new Submission();
         $response3
             ->setId(3)
+            ->setSubmittedBy($student)
+            ->setSubmittedOnBehalfOf($student)
             ->setAssessable($assessment)
             ->setSubmittedAt(new \Alaress_Date_Format('2016-10-31 04:34:34', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $feedback3 = new Feedback();
         $feedback3
             ->setId(33)
+            ->setReviewee($student)
+            ->setReviewer($teacher)
             ->setAssessable($assessment)
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-23 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
@@ -285,18 +328,24 @@ class TimelineTest extends TestCase
         $floating1 = new Feedback();
         $floating1
             ->setId(111)
+            ->setReviewee($student)
+            ->setReviewer($teacher)
             ->setAssessable($assessment)
             ->setPublishedAt(new \Alaress_Date_Format('2016-11-01 00:00:01', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $floating2 = new Feedback();
         $floating2
             ->setId(222)
+            ->setReviewee($student)
+            ->setReviewer($teacher)
             ->setAssessable($assessment)
             ->setPublishedAt(new \Alaress_Date_Format('2016-11-01 01:01:01', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $floating3 = new Feedback();
         $floating3
             ->setId(333)
+            ->setReviewee($student)
+            ->setReviewer($teacher)
             ->setAssessable($assessment)
             ->setPublishedAt(new \Alaress_Date_Format('2016-11-01 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
 
