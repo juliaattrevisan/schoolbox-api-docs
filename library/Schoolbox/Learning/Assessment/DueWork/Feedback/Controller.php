@@ -24,6 +24,7 @@ use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\UserMapper;
 use Alaress_Date_Format;
 
@@ -98,10 +99,32 @@ class Controller extends Base
     public function postParticipantFeedback(Participant $participant)
     {
         $mostRecentFeedback = $participant->findMostRecentFeedback();
-        $post = $this->getRequest()->post->getArrayCopy();
+        $post               = $this->getRequest()->post->getArrayCopy();
+
+        // Load rubric; I'm going to need that so I can save it
+        $assessment = $participant->getAssessable();
+        if ($assessment instanceof DueWork\Model && $assessment->getUseRubric()) {
+            $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
+        }
 
         try {
             $feedback = $this->processFeedback($participant, $mostRecentFeedback, $post);
+
+            // Finagle a rubric grid out of the most recent draft
+            $rubricContext = new DueWork\RubricContext($this->rubricMapper);
+            $grid          = $rubricContext->generateForFeedback(
+                $mostRecentFeedback,
+                $this->getUser(),
+                Access::getInstance()
+            );
+            if (!empty($grid['rubric']['descriptors'])) {
+                foreach ($grid['rubric']['descriptors'] as $descriptorId => $marks) {
+                    foreach ($marks as $mark) {
+                        $post['rubric']['descriptors'][$mark['id']] = $mark['selected'];
+                    }
+                }
+            }
+
             $this->processRubric($participant, $post, $feedback);
         }
         catch (RangeException $e) {
