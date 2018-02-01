@@ -924,8 +924,18 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * Action for a participant in a due work to create an empty draft
-     * acknowledgement that they have submitted a due work.
+     * Action for a due work participant to create an empty acknowledgement
+     * response.
+     *
+     * If the assessment doesn't allow self-reflect or self-assessment, this
+     * will simply create the acknowledgement response.
+     *
+     * If it does, it will:
+     * * Redirect to the self-reflect screen for the most recent draft response
+     *   so the participant may reflect on their work, and publish from there
+     * * If there is no draft; a new draft acknowledgement response will be
+     *   created, and then will redirect to the self-reflect screen for that
+     *   response
      *
      * TODO merge common code w/ postPendingAcknowledge, postStatusAcknowledge
      *
@@ -933,32 +943,27 @@ class Controller extends Assessment\Controller
      * @api   POST /learning/assessments/:assessmentId/:studentId/ackDraft
      * @level 18.0
      */
-    public function postAcknowledgeDraft(Participant $participant)
+    public function postSelfAcknowledge(Participant $participant)
     {
-        // Despite this method's name, it doesn't always create a draft.
-        // * If there's already a draft, it merely returns the existing draft
-        // * If the assess doesn't require self-reflection, it publishes immediately
         $assessment = $participant->getAssessable();
         $selfReview = $assessment instanceof Model
                       && ($assessment->isSelfAssessable() || $assessment->isSelfReflectable());
-        try {
-            $route    = 'learningAssessment.getSummary';
-            $params   = [
-                'participant'  => $participant,
-                'assessment'   => $assessment,
-                'assessmentId' => $assessment->getId(),
-                'student'      => $participant->getUser(),
-                'studentId'    => $participant->getUser()->getId(),
-            ];
 
+        // Route and arguments for location to redirect to once acknowledged.
+        $route      = 'learningAssessment.getSummary';
+        $params     = [
+            'participant'  => $participant,
+            'assessment'   => $assessment,
+            'assessmentId' => $assessment->getId(),
+            'student'      => $participant->getUser(),
+            'studentId'    => $participant->getUser()->getId(),
+        ];
+
+        try {
             if ($selfReview) {
-                // Try to find a non-draft to return first; attach ack to that draft instead.
                 $response = $participant->findMostRecentDraftResponse();
                 if (!$response) {
-                    $response = $this->persistEmptySobo(
-                        $participant,
-                        $selfReview ? null : Alaress_Date_Format::now()
-                    );
+                    $response = $this->persistEmptySobo($participant, null);
                 }
 
                 $route                = 'learningDueWorkResponse.getParticularResponseForSelfReflection';
@@ -966,7 +971,6 @@ class Controller extends Assessment\Controller
                 $params['responseId'] = $response->getId();
 
             } else {
-                // Just create a new ack
                 $response = $this->persistEmptySobo($participant, Alaress_Date_Format::now());
             }
 

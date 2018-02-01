@@ -2,7 +2,7 @@
 {{ bread.crumbsArray(breadcrumbs) }}
 
 {% set selfAcknowledgeRoute = routeLookupIfAuthorized(
-    'learningAssessment.postAcknowledgeDraft',
+    'learningAssessment.postSelfAcknowledge',
     { assessmentId: participant.assessable.id, studentId: participant.user.id, assessment: participant.assessable, participant: participant }
 ) %}
 
