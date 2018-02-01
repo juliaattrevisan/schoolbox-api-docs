@@ -260,13 +260,17 @@ abstract class Controller extends ListController implements IAssessmentControlle
     /**
      * Redirect method
      *
-     * Sends you to a summary, or preview screen depending on who is
+     * Sends you to a status, summary, or preview screen depending on who is
      * currently logged in and what they are viewing
      *
      * @api GET /learning/assessment/:assessmentId
      * @param IAssessable $assessment
      * @throws RouteNotFound If unable to generate a requested route
      * @throws InvalidStatusCode If we attempt to set an invalid HTTP response code
+     * @deprecated
+     * @todo This route is very fragile. Its auth check (loggedIn) is potentially misleading.
+     *       Callers are the best informed on whether they wish to view a single user's intersection with
+     *       the assessment (summary), or a group of users (create/modify/markbook/status etc)
      */
     public function getAssessment(IAssessable $assessment)
     {
@@ -513,9 +517,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * Returns a redirect route, or throw an exception.
      *
      * Order of preference:
-     * * A spec?        => Preview (must be able to simulate participation, but not create interactions)
-     * * A participant? => Summary
-     * * Write access?  => Preview (so they may become a participant if desired)
+     * * A spec?          => Preview (must be able to simulate participation, but not create interactions)
+     * * Status viewable? => Status
+     * * A participant?   => Summary
+     * * Write access?    => Preview (so they may become a participant if desired)
      *
      * @param IAssessable $assessment
      * @return string
@@ -533,6 +538,17 @@ abstract class Controller extends ListController implements IAssessmentControlle
             // Preview assessment in specification context
             return $previewRoute;
         }
+
+
+        // Is status page viewable?
+        $statusRoute = $this->getRouteIfAuthorized('learningAssessment.getStatus', [
+            'assessment'   => $assessment,
+            'assessmentId' => $assessment->getId(),
+        ], $this->getUser());
+        if ($statusRoute) {
+            return $statusRoute;
+        }
+
 
         // Participants should go to their summary page
         if ($assessment->isParticipant($this->getUser())) {
