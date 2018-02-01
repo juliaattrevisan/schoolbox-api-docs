@@ -187,7 +187,7 @@ class Module extends BaseModule
      * @throws LogicException If cyclic graph detected
      * @throws ApplicationException\Exception If assessment is not found
      * @throws NotFound
-     * @throws Forbidden
+     * @throws InvalidPath
      */
     protected function preloadParticipant(array $params)
     {
@@ -229,8 +229,7 @@ class Module extends BaseModule
             }
         } catch (UnexpectedValueException $e) {
             // Student isn't a participant
-            throw new Forbidden();
-
+            throw new InvalidPath();
         } catch (OutOfBoundsException $e) {
             // given user/assessment combination is invalid: not a participant
             throw new NotFound();

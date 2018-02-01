@@ -13,7 +13,6 @@ use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
 use InvalidArgumentException;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Permission\Access\Access;
@@ -28,13 +27,15 @@ use Schoolbox\User;
  * - a 'student' or 'participant'
  *
  * The rules are:
- *  - if you have WRITE access to the folder, you can see the participation
+ *  - In all cases, if the specified participant user is not a participant, FALSE
+ *  - if you have WRITE access to the folder TRUE
  *  - else
  *      - if not yet published, FALSE
  *      - if participant, TRUE
- *      - if parent access permitted AND a child is a participant, TRUE
+ *      - if parent access permitted, and system configured to let parents see dueWork details AND a child is a participant and child could see the assessment, TRUE
  *      - else FALSE
- * - In all cases, if the specified participant user is not a participant, throw InvalidPath
+ *
+ * Note this does not permit non-participants with WRITE+ perm to see this page. That is outside this rule's responsibility.
  */
 class CanSeeParticipation implements IAuthorizationRule
 {
