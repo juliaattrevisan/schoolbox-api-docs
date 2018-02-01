@@ -302,58 +302,6 @@ class Mapper extends BaseMapper implements FeedableMapperInterface
         return $collection;
     }
 
-    /**
-     * Gets the list of upcoming activities for submission boxes.
-     *
-     * The following activities are retrieved:
-     *
-     * * Upcoming assessments, which the user hasn't submitted work for
-     *
-     * @param int $user_id The user for who activities are fetched for.
-     * @param int $limit The max number of activities to be fetched.
-     * @param array $categories The categories to fetch activities for.
-     *
-     * @return ActivityCollection
-     */
-    public function getUpcomingActivities($user_id, $limit, $categories)
-    {
-        //
-        // All submission boxes that are due in the future.
-        $attempt_mapper = $this->getJoinMapper('attempt');
-        $query = "
-			SELECT
-				{$this->getColumnString('a')},
-				{$this->getJoinMapper('category')->getColumnString('c')},
-				(SELECT COUNT(*) FROM {$attempt_mapper->getTable()} am
-				 WHERE a.assess_id=am.assess_id AND am.user_id = :user_id
-				) AS attempt_count
-			FROM {$this->getTable()} a
-			LEFT JOIN {$this->getJoinSql('category', 'a', 'c')}
-			WHERE a.category_id IN {$this->getArrayPlaceholders($categories, 'category')}
-			AND a.start < NOW()
-			HAVING (attempt_count = 0 OR attempt_count <= a.max_attempts)
-			ORDER BY a.start ASC
-			LIMIT :limit
-		";
-        $statement = $this->database->prepare($query);
-        $statement->bindValue('user_id', $user_id, PDO::PARAM_INT);
-        $statement->bindValue('limit', $limit, PDO::PARAM_INT);
-        foreach ($this->getArrayParameters($categories, 'category') as $param => $value) {
-            $statement->bindValue($param, $value, PDO::PARAM_INT);
-        }
-        $statement->execute();
-        $assessments = $this->hydrateList($statement, 'sb', function ($mapper, $model, $row) {
-            $model->setCategory($mapper->getJoinMapper('category')->hydrate($row, 'c'));
-            return $model;
-        });
-
-        $factory = new ActivityFactory();
-        $collection = new ActivityCollection();
-        foreach ($assessments as $assessment) {
-            $collection->add($factory->buildFromOnlineAssessment($assessment, 'upcoming'));
-        }
-        return $collection;
-    }
 
     /**
      * Calculates and returns the statistics for the given online assessment
