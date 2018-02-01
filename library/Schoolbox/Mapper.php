@@ -41,6 +41,9 @@ use Schoolbox\Realtime\Schedule\Trigger\TriggerFactoryFactory;
 use Serializable;
 use Traversable;
 use UnderflowException;
+use TypeError;
+use Alaress\Database\Predicate\InvalidColumnException;
+
 
 abstract class Mapper implements IMapper, Serializable
 {
@@ -1657,6 +1660,7 @@ abstract class Mapper implements IMapper, Serializable
         return true;
     }
 
+
     /**
      * Creates a set of predicate builders - between them, they will match all
      * objects in $collection.
@@ -1665,6 +1669,9 @@ abstract class Mapper implements IMapper, Serializable
      *
      * @param Collection $collection A collection of models
      * @return Builder[]
+     * @throws UnderflowException
+     * @throws InvalidColumnException
+     * @throws TypeError
      */
     protected function buildPredicateBuildersForCollection(Collection $collection)
     {
@@ -1686,7 +1693,14 @@ abstract class Mapper implements IMapper, Serializable
                 // This is because joining them together doesn't know how to re-alias params.
                 $pb = $this->getPredicateBuilder();
                 foreach ($this->map as $column) {
-                    $pb->equals($column['column'], $this->getModelProperty($model, $column['property']));
+                    $property = $this->getModelProperty($model, $column['property']);
+                    if (\is_iterable($property)) {
+                        $pb->in($column['column'], $property);
+                    } elseif (null === $property) {
+                        $pb->isNull($column['column']);
+                    } else {
+                        $pb->equals($column['column'], $property);
+                    }
                 }
                 $pbs[] = $pb;
             }
