@@ -499,7 +499,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
         if ($assessment->isParticipant($this->getUser())) {
             $summaryRoute = $this->getRouteIfAuthorized('learningAssessment.getSummary', [
                 'assessmentId' => $assessment->getId(),
+                'assessment'   => $assessment,
                 'studentId'    => $this->getUser()->getId(),
+                'student'      => $this->getUser(),
             ]);
             if ($summaryRoute) {
                 return $summaryRoute;
@@ -512,7 +514,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
         foreach($this->getUser()->getChildren() as $child){
             $childSummaryRoute = $this->getRouteIfAuthorized('learningAssessment.getSummary', [
                 'assessmentId' => $assessment->getId(),
+                'assessment'   => $assessment,
                 'studentId'    => $child->getId(),
+                'student'      => $child,
             ]);
             if ($childSummaryRoute) {
                 return $childSummaryRoute;
