@@ -186,7 +186,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         $filters = array(
             'sb.category = :category',
             'sr.owner = :student',
-            'sb.deleted IS FALSE',
+            'a.deleted_at IS NULL',
         );
         if (!empty($extra_params['owner'])) {
             $params['owner'] = $extra_params['owner'];
@@ -209,20 +209,21 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
 
         // Get submission grade group, but only for letter grade submissions
         $query = "
-			SELECT
-				sb.id AS box_id,
-				sr.mark,
-				sr.norm_mark,
-				sr.published_at,
-				sr.comment,
-				sb.weight,
-				sb.mark_type,
-				sb.submission_grade_group_id
-			FROM {$this->getTable()} sr
-			LEFT JOIN {$this->getJoinSql('submission_box', 'sr', 'sb')}
-			WHERE $filters
-			ORDER BY sr.published_at DESC
-		";
+            SELECT
+                sb.id AS box_id,
+                sr.mark,
+                sr.norm_mark,
+                sr.published_at,
+                sr.comment,
+                sb.weight,
+                sb.mark_type,
+                sb.submission_grade_group_id
+            FROM {$this->getTable()} sr
+            INNER JOIN {$this->getJoinSql('assessmentModel', 'sb', 'a')}
+            LEFT JOIN {$this->getJoinSql('submission_box', 'sr', 'sb')}
+            WHERE $filters
+            ORDER BY sr.published_at DESC
+        ";
         $statement = $this->database->prepare($query);
         $statement->execute($params);
 
