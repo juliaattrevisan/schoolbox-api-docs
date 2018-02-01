@@ -1,0 +1,485 @@
+<!-- BEGIN custom_head -->
+
+<!-- Styles for text  -->
+<style type="text/css">
+    /** Make these styles more specific than topbar styles  **/
+    #component-layout .column-top .component-titlebar {
+        background-color: {top_head_bg};
+    }
+
+    #component-layout .column-top .component-titlebar h2, #component-layout .column-top .component-titlebar a {
+        color: {top_head_font};
+    }
+
+    #component-layout .column-top .island section {
+        color: {top_font};
+        background-color: {top_bg_primary};
+    }
+
+    #component-layout .column-left .component-titlebar {
+        background-color: {left_head_bg};
+    }
+
+    #component-layout .column-left .component-titlebar h2, #component-layout .column-left .component-titlebar a {
+        color: {left_head_font};
+    }
+
+    #component-layout .column-left .island section {
+        color: {left_font};
+        background-color: {left_bg_primary};
+    }
+
+    #component-layout .column-right .component-titlebar {
+        background-color: {right_head_bg};
+    }
+
+    #component-layout .column-right .component-titlebar h2, #component-layout .column-right .component-titlebar a {
+        color: {right_head_font};
+    }
+
+    #component-layout .column-right .island section {
+        color: {right_font};
+        background-color: {right_bg_primary};
+    }
+
+    <!-- Special Effects for Action Buttons -->
+    #component-layout .column-top .component-titlebar nav a,
+    #component-layout .column-left .component-titlebar nav a,
+    #component-layout .column-right .component-titlebar nav a
+    {
+        opacity: 0.5;
+    }
+
+    #component-layout .column-top .component-titlebar nav a:hover,
+    #component-layout .column-left .component-titlebar nav a:hover,
+    #component-layout .column-right .component-titlebar nav a:hover
+    {
+        opacity: 1;
+        background-color: transparent;
+    }
+</style>
+<script type="text/javascript">
+    var colours = {};
+    // <!-- BEGIN colour_list -->
+    // Colourset for {COLOUR_ARRAY} colours
+    colours['{COLOUR_ARRAY}'] = {
+        'top_head_font'      : '{top_head_font}',
+        'top_head_bg'        : '{top_head_bg}',
+        'top_font'           : '{top_font}',
+        'top_bg_primary'     : '{top_bg_primary}',
+
+        'left_head_font'     : '{left_head_font}',
+        'left_head_bg'       : '{left_head_bg}',
+        'left_font'          : '{left_font}',
+        'left_bg_primary'    : '{left_bg_primary}',
+
+        'right_head_font'    : '{right_head_font}',
+        'right_head_bg'      : '{right_head_bg}',
+        'right_font'         : '{right_font}',
+        'right_bg_primary'   : '{right_bg_primary}'
+    };
+    // <!-- END colour_list -->
+</script>
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/homepage/rss/{ID}/{USER_TOKEN}" />
+
+<script type="text/javascript" src="/javascript/shared/jquery.ajax-form.js"></script>
+<script type="text/javascript">
+    $(function() {
+        /* Collapse content on components
+         */
+        $('[data-component]').find('[data-collapser=true]').collapsable();
+
+        // Adds page to my links
+        $('#postToMyLinks').click( function (event) {
+            event.preventDefault();
+            $(this).ajaxForm({
+                url: "/cms/myLinksForm.php",
+                data: { url: {HOMEPAGE_URL_JS}, description: {HEADING_JS}},
+                type: 'post'
+            }).on('done.ajaxForm', function() {
+                location.reload();
+            });
+        });
+    });
+</script>
+
+<!-- BEGIN modify_layout -->
+<link rel="stylesheet" type="text/css" href="/javascript/components/spectrum/spectrum.css" />
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/javascript/components/schoolbox-masonry.min.js?v={SITE_VERSION}"></script>
+
+<script type="text/javascript">
+    $(function() {
+        var url = '/homepage/configForm.php';
+
+        var homepage = $('#component-layout');
+        homepage.masonry({
+            context: {
+                cid: '{ID}'
+            },
+            component: {
+                url: url,
+                calcSequenceData: function (columns) {
+                    var masonry = this,
+                        data  = { type: 'components' },
+                        order = ['left','right','top','bottom'];
+
+                    $.each(columns, function (position, column) {
+                        var key = 'column' + (order.indexOf(position) + 1);
+
+                        data[key] = column.children(masonry.options.component.selector).map(function () {
+                            /*
+                             * Two components in ePorfolio have no id's (My Profile, Teacher Notes)
+                             * and always appear in the same positions. So we do a check to see if
+                             * an id is set. If it isn't, and we don't do the check, the script breaks
+                             * and components cannot be relocated successfully
+                             */
+                            if (this.id) {
+                                return this.id.substr(9);
+                            }
+                        }).toArray().join(',');
+                    });
+
+                    return data;
+                }
+            },
+            column: {
+                leftColumnWidth: '{TEMPLATE_LEFT_COLUMN_WIDTH}',
+                placeholderTpl: '<div class="masonry-placeholder" />'
+            },
+            palette: {
+                url: url,
+                selector: '#tabs-1',
+                containerSelector: '.tabs-content',
+                handleSelector: '[data-component-palette]',
+                refreshItem: function () {
+                    this.find('[data-relation="count"]').text(this.data('count'));
+                }
+            },
+            spectrum: {
+                selector: '#tabs-2',
+                colours: colours,
+                restoreBtnSelector: '[data-role="reset-to-default"]',
+                cancelBtnSelector: '[data-role="undo"]',
+                saveBtnSelector: '[data-role="save"]',
+                saveLabelSelector: '[data-relation="saveLayout"]',
+                url: url
+            },
+            slider: {
+                selector: '[data-interaction="column-width"]',
+                url: url
+            }
+        });
+
+        // Fix slider on tab
+        $('[data-tab]').on('toggled', function (event, tab) {
+            tab.foundation('reflow');
+
+            // What tab is this?
+            var tabData = tab.data();
+            if ('hideEmpty' in tabData) {
+                homepage.removeClass('show-empty');
+            } else if ('showEmpty' in tabData) {
+                homepage.addClass('show-empty');
+            }
+        });
+
+        /* Tab toggler
+         * Deal with special components placeholder
+         */
+        $.fn.tabActivator({
+            onTabClose: function(tabActivator) {
+                homepage.removeClass('show-empty');
+            }
+        });
+
+        /* Attach Course Selector Modal listeners
+         */
+        $.fn.courseSelectorModal({
+            courseSelector: {
+                query: {
+                    hasClose:      true,
+                    hasAdd:        false,
+                    hasTot:        false,
+                    linkToUnits:   false,
+                    folder:        {ID},
+                    encodedReturnUrl: "{ENCODED_RETURN_URL}"
+                }
+            }
+        });
+
+    });
+</script>
+<!-- END modify_layout -->
+<script type="text/javascript" src="/javascript/jquery.fileDrop.js"></script>
+<!-- END custom_head -->
+
+<div id="course-selector-modal" class="reveal-modal" data-reveal></div>
+
+<div class="row actions-small-4">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{HEADING}</h1>
+        </div>
+    </div>
+    <nav>
+        <!-- BEGIN edit_page -->
+        <span data-tab>
+            <span class="tab-title" data-show-empty>
+                <a class="icon-add" href="#tabs-1" title="Add components" data-tab-activator></a>
+            </span>
+            <span class="tab-title" data-hide-empty>
+                <a class="icon-components" href="#tabs-2" title="Edit columns" data-tab-activator></a>
+            </span>
+        </span>
+        <!-- END edit_page -->
+        <a href="#" class="icon-more" data-dropdown="tab-control" title="Actions"></a>
+    </nav>
+    <ul id="tab-control" class="f-dropdown" data-dropdown-content>
+
+        <!-- BEGIN readonly_switch_on -->
+        <li class="separator">You are in Teacher View</li>
+        <li><a href="?readonly=1" class="icon-staff-students">Switch to Student View</a></li>
+        <!-- END readonly_switch_on -->
+
+        <!-- BEGIN readonly_switch_off -->
+        <li class="separator">You are in Student View</li>
+        <li><a href="?readonly=0" class="icon-teacher">Switch to Teacher View</a></li>
+        <!-- END readonly_switch_off -->
+
+        <!-- BEGIN page_controls -->
+        <li class="separator">Folder Actions</li>
+        <!-- BEGIN stats_data -->
+        <li>
+            <a href="/resource/folder/create/{ID}" class="icon-add">Add Sub Folder</a>
+        </li>
+        <li>
+            <a href="/resource/folder/modify/{ID}" class="icon-modify">Modify Folder</a>
+        </li>
+        <!-- END stats_data -->
+        <!-- BEGIN manage_page -->
+        <li>
+            <a href="/group/modify/{ID}" class="icon-group">Manage Group</a>
+        </li>
+        <!-- END manage_page -->
+        <!-- BEGIN addmylinks -->
+        <li>
+            <a href="#" class="icon-favourite" id="postToMyLinks" >Add to My Links</a>
+        </li>
+        <!-- END addmylinks -->
+        <!-- BEGIN view_stats -->
+        <li>
+            <a href="/statistics/homepage/{ID}" class="icon-progress">View Statistics</a>
+        </li>
+        <!-- END view_stats -->
+        <li>
+            <a href="/resources/{ID}" class="icon-folder">Browse {TPL_LOCAL_RESOURCE_PLURAL_PC}</a>
+        </li>
+        <li>
+            <a href="/homepage/rss/{ID}/{USER_TOKEN}" class="icon-homepagefeed">RSS</a>
+        </li>
+
+        <!-- BEGIN subscribedModerated -->
+        <li class="separator">Awaiting Membership</li>
+        <li>
+            <a href="/group/joinForm.php?leave={ID}&return=true" class="icon-cancel">Cancel Application</a>
+        </li>
+        <!-- END subscribedModerated -->
+        <!-- BEGIN subscribed -->
+        <li class="separator">Group Membership</li>
+        <li>
+            <a href="/group/joinForm.php?leave={ID}&return=true" class="icon-logout">Leave Group</a>
+        </li>
+        <!-- END subscribed -->
+        <!-- BEGIN unsubscribed -->
+        <li class="separator">Group Membership</li>
+        <li>
+            <a href="/group/joinForm.php?join={ID}&return=true" class="icon-add">Join Group</a>
+        </li>
+        <!-- END unsubscribed -->
+
+        <!-- BEGIN course_actions -->
+        <li class="separator">Course Actions</li>
+        <li><a href="/course/import/{ID}" class="icon-course" data-course-selector>Link to Course</a></li>
+        <li><a href="/course/import/management/{ID}" class="icon-course">Manage Courses</a></li>
+        <!-- END course_actions -->
+
+        <!-- BEGIN manage_class -->
+        <li class="separator">{CLASS_ACTIONS_HEADING}</li>
+
+        <!-- BEGIN student_grades -->
+        <!-- END student_grades -->
+        <!-- BEGIN class_list -->
+        <li>
+            <a href="/subject/classList/{CODE}" class="icon-class-list">Class List</a>
+        </li>
+        <!-- END class_list -->
+
+        <!-- BEGIN markbook_link -->
+        <li>
+            <a href="{MARKBOOK_LINK}" class="icon-curriculum">Markbook</a>
+        </li>
+        <!-- END markbook_link -->
+
+        <!-- BEGIN manage_criteria -->
+        <li>
+            <a href="/submission/rubricCriteria/{ID}" class="icon-criteria">Manage Criteria</a>
+        </li>
+        <!-- END manage_criteria -->
+        <!-- END manage_class -->
+        <!-- END page_controls -->
+    </ul>
+</div>
+
+<!-- BEGIN customise_page -->
+<div id="tabs-homepage" class="tabs-content no-margin">
+    <!--------------------->
+    <!-- Component Tab 1 -->
+    <!--------------------->
+    <div id="tabs-1" class="component-tabs">
+        <div class="small-12 island">
+            <dl class="tabs" data-tab>
+                <!-- BEGIN homepage_component_tab -->
+                <dd class="{COMPONENT_CATEGORY_CLASS}">
+                    <a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">
+                        {COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})
+                    </a>
+                </dd>
+                <!-- END homepage_component_tab -->
+            </dl>
+            <div class="tabs-content">
+                <!-- BEGIN homepage_component_page -->
+                <ul class="component-palette content no-pad grid small-block-grid-1 medium-block-grid-2 large-block-grid-3 {HOMEPAGE_COMPONENT_CATEGORY_CLASS}" id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}">
+                    <!-- BEGIN homepage_component -->
+                    <li>
+                        <div class="card small-12 {HOMEPAGE_COMPONENT_MULTIPLE_STATE}"
+                             data-count="{HOMEPAGE_COMPONENT_COUNT}"
+                             data-multi="{HOMEPAGE_COMPONENT_MULTIPLE_STATE}"
+                             data-component-palette>
+                            <a href="#" rel="{HOMEPAGE_COMPONENT_ID}" title="{HOMEPAGE_COMPONENT_DESCRIPTION}">
+                                <span class="size-32 icon-masonry icon-masonry-{HOMEPAGE_COMPONENT_CLASS}"></span>
+                                <p>{HOMEPAGE_COMPONENT_NAME}</p>
+                                <p class="meta">(<span data-relation="count">{HOMEPAGE_COMPONENT_COUNT}</span>)</p>
+                            </a>
+                        </div>
+                    </li>
+                    <!-- END homepage_component -->
+                </ul>
+                <!-- END homepage_component_page -->
+            </div>
+        </div>
+    </div>
+
+    <!--------------------->
+    <!-- Component Tab 2 -->
+    <!--------------------->
+    <div id="tabs-2" class="component-tabs">
+        <div class="small-12 island">
+            <form method="POST" action="" name="saveColours">
+                <section>
+                    <!-- don't show a slider for screens which don't have multiple columns -->
+                    <fieldset class="content hide-for-medium-down">
+                        <legend>
+                            Column Width
+                            <span data-tooltip class="has-tip tip-top hint" title="Drag the slider to change the width of the left and right columns. (On small screens, the right column will drop below the left.)">?</span>
+                        </legend>
+                        <div class="small-12 columns">
+                            <div class="small-6 small-offset-3 end columns">
+                                <div class="range-slider"
+                                     data-original-value="{TEMPLATE_LEFT_COLUMN_WIDTH}"
+                                     data-slider="{TEMPLATE_LEFT_COLUMN_WIDTH}"
+                                     data-interaction="column-width"
+                                     data-options="start: 3; end: 9"
+                                >
+                                    <span class="range-slider-handle" role="slider" tabindex="0"></span>
+                                    <span class="range-slider-active-segment"></span>
+                                    <input type="hidden" name="width" value="{TEMPLATE_LEFT_COLUMN_WIDTH}">
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- BEGIN homepage_color_selector -->
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <fieldset class="hide-for-medium-down">
+                                <legend>
+                                    Select Columns To Colour
+                                    <span data-tooltip class="has-tip tip-top hint" title="Select a column to modify colours for.">?</span>
+                                </legend>
+                                <div class="small-12 columns">
+                                    <input id="top" type="checkbox" data-column-selector checked />
+                                    <label for="top" class="checkbox-label">Top</label>
+                                </div>
+                                <div class="small-12 large-6 columns">
+                                    <input id="left" type="checkbox" data-column-selector checked />
+                                    <label for="left" class="checkbox-label">
+                                        <span class="hide-for-medium-down">Left</span>
+                                        <span class="show-for-medium-down">Middle</span>
+                                    </label>
+                                </div>
+                                <div class="small-12 large-6 columns">
+                                    <input id="right" type="checkbox" data-column-selector checked />
+                                    <label for="right" class="checkbox-label">
+                                        <span class="hide-for-medium-down">Right</span>
+                                        <span class="show-for-medium-down">Bottom</span>
+                                    </label>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="content">
+                        <div class="small-12 medium-6 columns">
+                            <fieldset>
+                                <legend>Heading Colours</legend>
+                                <label for="head_font">Text</label>
+                                <input id="head_font" class="colorBox" name="colors[head_font]" type="text" data-colorpicker />
+                                <label for="head_bg">Background</label>
+                                <input id="head_bg" class="colorBox" name="colors[head_bg]" type="text" data-colorpicker />
+                            </fieldset>
+                        </div>
+                        <div class="small-12 medium-6 columns">
+                            <fieldset>
+                                <legend>Content Colours</legend>
+                                <label for="font">Text</label>
+                                <input id="font" class="colorBox" name="colors[font]" type="text" data-colorpicker />
+                                <label for="bg_primary">Background</label>
+                                <input id="bg_primary" class="colorBox" name="colors[bg_primary]" type="text" data-colorpicker />
+                            </fieldset>
+                        </div>
+                    </fieldset>
+                    <!-- END homepage_color_selector -->
+
+                    <ul class="flex-list buttons">
+                        <li><a href="#" class="button icon-approve submit no-margin" data-role="save">Save</a></li>
+                        <li><a href="#" class="button icon-refresh no-margin" data-role="reset-to-default">Reset</a></li>
+                        <li><a href="#" class="button icon-undo no-margin" data-role="undo">Undo Changes</a></li>
+                    </ul>
+
+                    <div class="toast" data-alert data-relation="saveLayout"></div>
+                </section>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- END customise_page -->
+
+<div id="component-layout" class="row homepage-{ID}">
+    <div class="small-12 column column-top" data-position="top">{component_position_top}</div>
+    <div class="small-12 large-{TEMPLATE_LEFT_COLUMN_WIDTH} column column-left" data-position="left">{component_position_left}</div>
+    <div class="small-12 large-{TEMPLATE_RIGHT_COLUMN_WIDTH} column column-right" data-position="right">{component_position_right}</div>
+    <!--
+    <div class="bottom clearfix">{component_position_bottom}</div>
+    -->
+</div>
+<input type="hidden" id="categoryID" value="{ID}" />
+
+<div id="resource-browser" class="hide"></div>
+
+<script type="text/javascript">
+    // all forms should submit without prevention
+    $(".homepage form").submit(function() {
+        window.check = false;
+    });
+</script>
