@@ -333,68 +333,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
     }
 
     /**
-    * Conversion of SubmissionBoxHandler->getAllDueWork().
-    *
-    * @todo Implement this as an activity list instead of an array return
-    *
-    * @param int                  $user_id    The user ID to retrieve for.
-    * @param array                $categories The categories to search for.
-    * @param \Alaress_Date_Format $from
-    * @param \Alaress_Date_Format $to
-    *
-    * @return array
-    */
-    public function getAllDueWork($user_id, $categories, \Alaress_Date_Format $from, \Alaress_Date_Format $to)
-    {
-        // Submission box: hydrate with category, student submissions and returns.
-        $parts = [
-            'b.deleted = 0',
-            "b.category IN {$this->getArrayPlaceholders($categories, 'category')}",
-        ];
-        $params = $this->getArrayParameters($categories, 'category');
-        $params['user_id'] = $user_id;
-        if (!$from->isNull()) {
-            $params['from'] = $from->getDatabaseDate();
-            $parts[]        = 'DATE(b.date) >= :from';
-        }
-        if (!$to->isNull()) {
-            $params['to'] = $to->getDatabaseDate();
-            $parts[]      = 'DATE(b.date) <= :to';
-        }
-
-        $wherePart = implode(' AND ', $parts);
-        $query     = "
-			SELECT
-			b.id AS bid,
-			s.id AS sid,
-			r.id AS rid,
-			UNIX_TIMESTAMP(b.late_date) AS lateDate,
-			UNIX_TIMESTAMP(b.date) AS dueDate,
-			c.name AS categoryName,
-			b.name,
-			b.description,
-			r.mark,
-			r.norm_mark,
-			r.comment,
-			b.mark_visibility,
-			b.self_assessable,
-			b.self_reflectable,
-			b.created, s.submitted_at, r.published_at
-			FROM submission_box b
-			LEFT JOIN folder c ON c.id = b.category
-			LEFT JOIN student_submission s ON s.box_id = b.id AND (s.owner = :user_id OR s.owner IS NULL)
-			LEFT JOIN submission_return  r ON r.box_id = b.id AND (r.owner = :user_id OR r.owner IS NULL)
-			WHERE $wherePart
-			GROUP BY b.id
-			ORDER BY categoryName, b.created DESC, s.submitted_at DESC, r.published_at DESC
-		";
-
-        $statement = $this->database->prepare($query);
-        $statement->execute($params);
-        return $statement->fetchAll();
-    }
-
-    /**
     * Gets the list of activities related to submission boxes.
     *
     * The following activities are retrieved:
