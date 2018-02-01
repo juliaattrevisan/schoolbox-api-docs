@@ -18,6 +18,8 @@
     {% endif %}
 {% endblock details_tutorTeacher %}
 
+
+
 {% block details_coordTeacher %}
     {% if coordTeacher %}
         <dt class="small-12 medium-3">Year Coordinator:</dt>
@@ -33,6 +35,15 @@
 
 {% block details_hohTeacher %}
 {% endblock details_hohTeacher %}
+
+{% block details_tutorGroup %}
+    {% if showClasses %}
+        {% if externalUser.StudentTutorDescription %}
+            <dt class="small-12 medium-3">Pastoral Care Group:</dt>
+            <dd class="small-12 medium-9">{{ externalUser.StudentTutorDescription }}</dd>
+        {% endif %}
+    {% endif %}
+{% endblock details_tutorGroup %}
 
 {# Buttons - add intranet at start of list #}
 {% block buttons %}
