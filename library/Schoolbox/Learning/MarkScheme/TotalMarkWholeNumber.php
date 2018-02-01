@@ -59,26 +59,11 @@ class TotalMarkWholeNumber extends TotalMarkAbstract
      */
     private function validate($totalMark)
     {
-        // null or int ?
-        if(null === $totalMark || is_int($totalMark)){
+        // null or numeric ?
+        if(null === $totalMark || is_numeric($totalMark)){
             return $totalMark;
         }
 
-        // string (eg '4' or '4.0')?
-        if(is_string($totalMark)){
-            $totalMark = (float)$totalMark;
-        }
-
-        // float ?
-        if(is_float($totalMark)){
-            // No fractional component ?
-            if(0.0 === fmod($totalMark, 1.0)){
-                return (int)$totalMark;
-            }
-            throw new \InvalidArgumentException("Total mark whole number must not contain fractional component: $totalMark");
-        }
-
-        $type = gettype($totalMark);
         throw new \InvalidArgumentException("Total mark whole number must be null or numeric scalar: ($type)$totalMark");
     }
 
