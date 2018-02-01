@@ -978,7 +978,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
      * @param object|Collection $object
      * @return bool
      */
-    function delete($object)
+    public function delete($object)
     {
         //noop
         return true;

@@ -30,7 +30,7 @@ use Schoolbox\User;
 use Schoolbox\Collection;
 use Schoolbox\Permission\Access\Access;
 
-class SubmissionBox implements ISoftDeletable, IAssessableDataModel
+class SubmissionBox implements IAssessableDataModel
 {
     use HasCurriculumNodes;
     use AssessmentModelTrait;
