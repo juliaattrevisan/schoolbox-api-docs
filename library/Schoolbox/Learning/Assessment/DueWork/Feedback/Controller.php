@@ -18,7 +18,6 @@ use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\DueWork;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
@@ -204,8 +203,7 @@ class Controller extends Base
 
         // Did we just give some rubric marks?
         if (is_array($post['rubric'])) {
-            $rubMap = RubricMapper::getInstance();
-            $rubMap->saveForParticipant($participant, $post['rubric']['descriptors'], $feedback->getId());
+            $this->rubricMapper->saveForParticipant($post['rubric']['descriptors'], $feedback->getId());
         }
     }
 

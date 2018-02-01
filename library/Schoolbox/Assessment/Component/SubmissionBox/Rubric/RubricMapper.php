@@ -658,11 +658,10 @@ class RubricMapper
     /**
      * Save rubrics selections for a particular Participant
      *
-     * @param Participant $participant
-     * @param bool[]      $descriptors key = descriptor.id, val = whether it is checked
-     * @param int         $returnId    Feedback
+     * @param bool[] $descriptors key = descriptor.id, val = whether it is checked
+     * @param int    $returnId    Feedback
      */
-    public function saveForParticipant(Participant $participant, array $descriptors = [], $returnId)
+    public function saveForParticipant(array $descriptors = [], $returnId)
     {
         $descriptorMapper = DescriptorMapper::getInstance();
         $markMapper       = MarkMapper::getInstance();
