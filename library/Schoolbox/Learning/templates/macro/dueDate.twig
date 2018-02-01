@@ -16,7 +16,7 @@
 {% macro dueDate(assessable, user) %}
 {% spaceless %}
     {% import _self as dueDate %}
-    {# Is the current user a participant ? #}
+    {# Is the nominated user a participant ? #}
     {% set participant = assessable.participantIfExtant(user) %}
     {% if participant %}
         {{ dueDate.participant(participant) }}
