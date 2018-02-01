@@ -970,15 +970,22 @@ class User implements JsonSerializable, ISoftDeletable
     /**
      * Is this user a parent of $child?
      *
-     * Requires that `loadParents()` has been called on $child.
+     * Requires that either:
+     * - `loadParents()` has been called on $child, or
+     * - this user is the current session user (and hence their children were loaded during session creation)
      *
      * @param  User $child
      * @return bool
      */
-    public function isParentOf(User $child)
+    public function isParentOf(User $child): bool
     {
         foreach ($child->getParents() as $parent) {
             if ($parent->getId() == $this->getId()) {
+                return true;
+            }
+        }
+        foreach ($this->children as $currentChild) {
+            if ($currentChild->getId() == $child->getId()) {
                 return true;
             }
         }
