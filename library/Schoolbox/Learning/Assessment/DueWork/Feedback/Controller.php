@@ -115,22 +115,10 @@ class Controller extends Base
         try {
             $feedback = $this->processFeedback($participant, $mostRecentFeedback, $post);
 
-            // Finagle a rubric grid out of the most recent draft
-            $rubricContext = new DueWork\RubricContext($this->rubricMapper);
-            $grid          = $rubricContext->generateForFeedback(
-                $mostRecentFeedback,
-                $this->getUser(),
-                $this->access
-            );
-            if (!empty($grid['rubric']['descriptors'])) {
-                foreach ($grid['rubric']['descriptors'] as $descriptorId => $marks) {
-                    foreach ($marks as $mark) {
-                        $post['rubric']['descriptors'][$mark['id']] = $mark['selected'];
-                    }
-                }
+            // Don't process rubric; just copy from the last one
+            if ($mostRecentFeedback instanceof IFeedback) {
+                $this->rubricMapper->copySelections($mostRecentFeedback->getId(), $feedback->getId());
             }
-
-            $this->processRubric($participant, $post, $feedback);
         }
         catch (RangeException $e) {
             $this->sendError('Invalid mark provided');
