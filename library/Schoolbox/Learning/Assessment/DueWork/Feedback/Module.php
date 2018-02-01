@@ -204,7 +204,6 @@ class Module extends BaseModule
             'responseDataSource'    => $injector->lazyGet('responseDataSource'),
             'rubricMapper'          => $this->getMapperFactory()->get(Rubric\RubricMapper::class),
             'returnedWorkMapper'    => $this->getMapperFactory()->get(ReturnedWorkMapper::class),
-            'access'                => $this->getAccess(),
         ];
     }
 
