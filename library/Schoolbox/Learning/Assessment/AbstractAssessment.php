@@ -212,6 +212,19 @@ abstract class AbstractAssessment implements IAssessable
         return $clone;
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function getBaseAssessable(): IAssessable
+    {
+        if ($this->context instanceof Project) {
+            // Recursively climb until we reach a base assessment
+            return $this->context->getBaseAssessable();
+        }
+        return $this;
+    }
+
     /* Delegation Methods
      */
 

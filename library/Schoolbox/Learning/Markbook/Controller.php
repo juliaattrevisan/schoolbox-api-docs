@@ -326,7 +326,7 @@ class Controller extends Base
 
         // Build a markbook
         $markbook = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
-        $markbook->getAssessments()->sortBy(['dueAt', 'sequence'], ['asc', 'asc']);
+        $markbook->sortAssessables();
         return $markbook;
     }
 
