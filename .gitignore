@@ -40,4 +40,5 @@ post-provision.sh
 .idea/
 browscap.ini
 .*.lock
+*.lock
 version.json
