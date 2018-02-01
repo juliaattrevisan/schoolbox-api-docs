@@ -171,18 +171,6 @@ class Activity {
         return $result['duework'];
     }
 
-    function countDueWork($id) {
-        //returns total active submission boxes for category
-
-        $query = "SELECT COUNT(sub.id) as submitted, COUNT(box.id) as total FROM submission_box AS box
-			LEFT JOIN student_submission AS sub ON sub.box_id = box.id AND sub.owner = '" . $_SESSION['id'] . "'
-			WHERE box.category = '$id' AND box.deleted = '0' AND box.owner != '" . $_SESSION['id'] . "' AND task_id IS NULL";
-
-        $result = $this->db->getRow($query);
-
-        return $result['total'] - $result['submitted'];
-    }
-
     function newReturnedWork($id) {
         $lastvisit = $this->lastReturnedWorkVisit();
 
