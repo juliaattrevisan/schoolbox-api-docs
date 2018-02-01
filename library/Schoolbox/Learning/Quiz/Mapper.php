@@ -31,7 +31,7 @@ use Schoolbox\UserMapper;
  * @method Model createModel($id = null)
  * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
  */
-class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterface
+class Mapper extends BaseMapper implements FeedableMapperInterface
 {
 
     /**
@@ -239,87 +239,6 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
             $activityFactory->buildFromOnlineAssessment($object, 'upcoming')
         );
         return true;
-    }
-
-    /**
-     * Gets the list of activities related to online assessments.
-     *
-     * The following activities are retrieved:
-     *
-     * * New assessments within the categories
-     * * Closed assessments within the categories
-     *
-     * @param int $user_id The user for who activities are fetched for.
-     *                          Currently isn't used for this query, but may
-     *                          later be used to filter out assessments which a
-     *                          user has already submitted.
-     * @param int $limit The max number of activities to be fetched.
-     * @param array $categories The categories to fetch activities for.
-     *
-     * @return ActivityCollection
-     */
-    public function getActivities($user_id, $limit, array $categories)
-    {
-        $factory = new ActivityFactory();
-        $collection = new ActivityCollection();
-        $queries = array(
-            array(
-                'event'      => 'new',
-                'query'      => "
-					SELECT
-						{$this->getColumnString('a')},
-						{$this->getJoinMapper('category')->getColumnString('c')}
-					FROM {$this->getTable()} a
-					LEFT JOIN {$this->getJoinSql('category', 'a', 'c')}
-					WHERE a.category_id IN {$this->getArrayPlaceholders($categories, 'category')}
-					AND a.start < NOW()
-					AND a.deleted_at IS NULL
-					ORDER BY a.start DESC
-					LIMIT :limit
-				",
-                'date_field' => 'start',
-                'limit'      => $limit,
-            ),
-            array(
-                'event'      => 'closed',
-                'query'      => "
-					SELECT
-						{$this->getColumnString('a')},
-						{$this->getJoinMapper('category')->getColumnString('c')}
-					FROM {$this->getTable()} a
-					LEFT JOIN {$this->getJoinSql('category', 'a', 'c')}
-					WHERE a.category_id IN {$this->getArrayPlaceholders($categories, 'category')}
-					AND a.finish < NOW()
-					AND a.deleted_at IS NULL
-					ORDER BY a.finish DESC
-					LIMIT :limit
-				",
-                'date_field' => 'finish',
-                'limit'      => $limit,
-            ),
-        );
-
-        foreach ($queries as $query) {
-            $statement = $this->database->prepare($query['query']);
-            $params = $this->getArrayParameters($categories, 'category');
-            if (!empty($query['limit'])) {
-                $params['limit'] = $query['limit'];
-            }
-            foreach ($params as $key => $value) {
-                $statement->bindParam($key, intval($value), PDO::PARAM_INT);
-            }
-            $statement->execute();
-
-            //
-            // Pass to activity collection instead? createFromOnlineAssessment?
-            foreach ($statement as $row) {
-                $assess = $this->hydrate($row, 'a');
-                $assess->setCategory($this->getJoinMapper('category')->hydrate($row, 'c'));
-                $collection->add($factory->buildFromOnlineAssessment($assess, $query['event']));
-            }
-        }
-
-        return $collection;
     }
 
     /**

@@ -198,47 +198,6 @@ class SubmissionMapper extends BaseMapper
 
 
     /**
-     * Gets the list of activities related to student submissions.
-     *
-     * An activity is returned for each submission that this user has made into
-     * a submission box in the given categories.
-     *
-     * @param int   $userId
-     * @param int   $limit
-     * @param array $categories
-     * @return Activity[]|ActivityCollection
-     * @throws BaseMapper\DefinitionException
-     */
-    public function getActivities($userId, $limit, array $categories)
-    {
-        $boxJoin      = $this->getJoinMapper('box_id');
-        $categoryJoin = $boxJoin->getJoinMapper('category');
-
-        $query = "
-            SELECT
-                {$this->getColumnString('ss')},
-                {$boxJoin->getColumnString('sb')},
-                {$categoryJoin->getColumnString('c')}
-            FROM {$this->getTable()} `ss`
-            LEFT JOIN {$this->getJoinSql('box_id', 'ss', 'sb')}
-            LEFT JOIN {$boxJoin->getJoinSql('category', 'sb', 'c')}
-            WHERE sb.category IN {$boxJoin->getArrayPlaceholders($categories, 'category')}
-            AND sb.deleted IS FALSE
-            AND ss.owner = :user_id
-            AND ss.submitted_at IS NOT NULL
-            ORDER BY ss.submitted_at DESC
-            LIMIT :limit
-        ";
-
-        $params = $this->getArrayParameters($categories, 'category');
-        $params['limit']   = $limit;
-        $params['user_id'] = $userId;
-
-        return $this->hydrateActivities($query, $params);
-    }
-
-
-    /**
      * @param int $userId
      * @param int $boxId
      * @return ActivityCollection

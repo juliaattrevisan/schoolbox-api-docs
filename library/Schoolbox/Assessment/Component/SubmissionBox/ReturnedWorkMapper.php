@@ -33,7 +33,7 @@ use Schoolbox\GenericCollection;
  * @method ReturnedWork createModel($idValue = null)
  * @method GenericCollection|ReturnedWork[] createCollection($contents = [])
  */
-class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessment\IActivityMapper
+class ReturnedWorkMapper extends Schoolbox\Mapper
 {
     protected function mapping()
     {
@@ -160,75 +160,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         return $collection;
     }
 
-    /**
-     * Gets the list of activities related to submission returns.
-     *
-     * An activity is returned for each submission return for this user in the
-     * given categories.
-     *
-     * @param int $user_id The user for who activities are fetched for.
-     * @param int $limit The max number of activities to be fetched.
-     * @param array $categories The categories to fetch activities for.
-     * @param array $visibilities Which MARK_VISIBILITY* constants are viewable?
-     *
-     * @return ActivityCollection
-     */
-    public function getActivities($user_id, $limit, array $categories, array $visibilities = [IAssessable::MARK_VISIBILITY_PARENT_STUDENT])
-    {
-        // TODO - SA-1308 This method has been commented out so the page can work without a fatal error.
-        // Need to update the query below, and build the new object graph, then use it accordingly in
-        // all callers to this method.
-        return new Schoolbox\Collection();
-
-        //
-        // User mapper: I want to know if the user (requesting user, not user
-        // whose activities are fetched) is a parent, or a student.
-        // Parent:  sb.visibility = ALL
-        // Student: sb.visibility IN (ALL, STUDENTS)
-
-        $collection = new ActivityCollection();
-        $factory = new ActivityFactory();
-        $box_join = $this->getJoinMapper('submission_box');
-        $category_join = $box_join->getJoinMapper('category');
-        $storage_join = $this->getJoinMapper('storage');
-        $mime_join = $storage_join->getJoinMapper('allowedFileExtension');
-
-        $query = "
-			SELECT
-				{$this->getColumnString('sr')},
-				{$box_join->getColumnString('sb')},
-				{$category_join->getColumnString('c')},
-				{$storage_join->getColumnString('files')},
-				{$mime_join->getColumnString('mime')}
-			FROM {$this->getTable()} sr
-			LEFT JOIN {$this->getJoinSql('submission_box', 'sr', 'sb')}
-			LEFT JOIN {$box_join->getJoinSql('category', 'sb', 'c')}
-			LEFT JOIN {$this->getJoinSql('storage', 'sr', 'files')}
-			LEFT JOIN {$storage_join->getJoinSql('allowedFileExtension', 'files', 'mime', true)}
-			WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
-			AND sb.deleted IS FALSE
-			AND sb.mark_visibility IN {$this->getArrayPlaceholders($visibilities, 'vis')}
-			AND sr.owner = :user_id
-			ORDER BY sr.returned DESC
-			LIMIT :limit
-		";
-        $statement = $this->database->prepare($query);
-        $params = $this->getArrayParameters($categories, 'category') + $this->getArrayParameters($visibilities, 'vis');
-        $params['limit'] = $limit;
-        $params['user_id'] = $user_id;
-        foreach ($params as $key => $value) {
-            $statement->bindParam($key, intval($value), \PDO::PARAM_INT);
-        }
-        $statement->execute();
-        foreach ($statement as $row) {
-            $collection->add(
-                $factory->buildFromReturnedWork(
-                    $this->hydrateForActivityList($row)
-                )
-            );
-        }
-        return $collection;
-    }
 
     /**
      * Builds list of student's marks for all returns in the given category.
