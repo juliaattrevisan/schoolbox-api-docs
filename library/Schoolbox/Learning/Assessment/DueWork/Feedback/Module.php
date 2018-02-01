@@ -202,7 +202,7 @@ class Module extends BaseModule
             'assessmentDataSource'  => $injector->lazyGet('assessmentDataSource'),
             'userMapper'            => $this->getMapperFactory()->get(UserMapper::class),
             'responseDataSource'    => $injector->lazyGet('responseDataSource'),
-            'rubricMarkMapper'      => $this->getMapperFactory()->get(Rubric\MarkMapper::class),
+            'rubricMapper'          => $this->getMapperFactory()->get(Rubric\RubricMapper::class),
             'returnedWorkMapper'    => $this->getMapperFactory()->get(ReturnedWorkMapper::class),
         ];
     }

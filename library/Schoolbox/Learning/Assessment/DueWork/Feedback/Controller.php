@@ -45,8 +45,8 @@ class Controller extends Base
     /** @var UserMapper */
     protected $userMapper;
 
-    /** @var Rubric\MarkMapper */
-    private $rubricMarkMapper;
+    /** @var Rubric\RubricMapper */
+    private $rubricMapper;
 
     /** @var ReturnedWorkMapper */
     private $returnedWorkMapper;
@@ -62,7 +62,7 @@ class Controller extends Base
      * @param AssessmentDataSource  $assessmentDataSource
      * @param ResponseDataSource    $responseDataSource
      * @param UserMapper            $userMapper
-     * @param Rubric\MarkMapper     $rubricMarkMapper
+     * @param Rubric\RubricMapper   $rubricMapper
      * @param ReturnedWorkMapper    $returnedWorkMapper
      * @param Plagscan\Mapper       $plagscanMapper
      */
@@ -72,7 +72,7 @@ class Controller extends Base
         AssessmentDataSource $assessmentDataSource,
         ResponseDataSource $responseDataSource,
         UserMapper $userMapper,
-        Rubric\MarkMapper $rubricMarkMapper,
+        Rubric\RubricMapper $rubricMapper,
         ReturnedWorkMapper $returnedWorkMapper,
         Plagscan\Mapper $plagscanMapper
     ) {
@@ -81,7 +81,7 @@ class Controller extends Base
         $this->assessmentDataSource  = $assessmentDataSource;
         $this->responseDataSource    = $responseDataSource;
         $this->userMapper            = $userMapper;
-        $this->rubricMarkMapper      = $rubricMarkMapper;
+        $this->rubricMapper          = $rubricMapper;
         $this->returnedWorkMapper    = $returnedWorkMapper;
         $this->plagscanMapper        = $plagscanMapper;
     }
