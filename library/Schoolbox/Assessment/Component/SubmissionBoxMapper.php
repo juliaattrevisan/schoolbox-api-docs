@@ -493,21 +493,22 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 
         $stmt = $this->database->prepare(
             "
-			SELECT
-				{$this->getColumnString('sb')},
-				{$this->getJoinColumnString('category', 'c')},
-				{$this->getJoinColumnString('owner', 'u')}
-			FROM
-				`{$this->getTable()}` `sb`
-				LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
-				INNER JOIN {$this->getJoinSql('owner', 'sb', 'u', true)}
-			WHERE
-				`sb`.`category` = :cat_id
-				AND ( `sb`.`open_date` < :time OR `sb`.`date` < :time )
-				AND `sb`.`deleted` = 0
-			ORDER BY `sb`.`open_date` DESC, `sb`.`date` DESC
-			LIMIT $offset, $limit
-		"
+            SELECT
+                {$this->getColumnString('sb')},
+                {$this->getJoinColumnString('category', 'c')},
+                {$this->getJoinColumnString('owner', 'u')}
+            FROM
+                `{$this->getTable()}` `sb`
+                LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
+                INNER JOIN {$this->getJoinSql('owner', 'sb', 'u', true)}
+                INNER JOIN {$this->getJoinSql('assessmentModel', 'sb', 'a')}
+            WHERE
+                `sb`.`category` = :cat_id
+                AND ( `sb`.`open_date` < :time OR `sb`.`date` < :time )
+                AND `a`.`deleted_at` IS NOT NULL
+            ORDER BY `sb`.`open_date` DESC, `sb`.`date` DESC
+            LIMIT $offset, $limit
+        "
         );
 
         $stmt->execute(array(
