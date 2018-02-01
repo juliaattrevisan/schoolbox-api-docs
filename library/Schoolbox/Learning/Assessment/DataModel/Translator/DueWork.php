@@ -17,7 +17,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Percentage;
-use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
+use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Resource\Storage\Model as StorageModel;
 
 /**
@@ -110,7 +110,7 @@ class DueWork implements IAssessmentTypeTranslator
         // Convert a mark type into fields
         // TODO move this to the mark scheme translator
         $markScheme = $domainObject->getMarkScheme();
-        if ($markScheme instanceof TotalMarkWholeNumber) {
+        if ($markScheme instanceof TotalMarkFractional) {
             $dataModel->setMaxMark($markScheme->getTotalMark());
             $dataModel->setMarkType($this->markTypeMapper->createModel(DueWorkModel\MarkType::TYPE_TOTAL));
         } elseif ($markScheme instanceof Percentage) {

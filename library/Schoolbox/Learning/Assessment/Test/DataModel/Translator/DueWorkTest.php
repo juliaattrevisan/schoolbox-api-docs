@@ -20,6 +20,7 @@ use Schoolbox\Learning\Assessment\Test\DataModel\TestTrait;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Percentage;
+use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Storage\Model as StorageModel;
@@ -573,7 +574,7 @@ class DueWorkTest extends TestCase
         // Test mark scheme and ancillary information
         $scheme = $dueWork->getMarkScheme();
         $this->assertInstanceOf($markSchemeClass, $scheme);
-        if ($scheme instanceof TotalMarkWholeNumber) {
+        if ($scheme instanceof TotalMarkFractional) {
             $this->assertEquals($totalMark, $scheme->getTotalMark());
         }
         if ($scheme instanceof LetterGrade) {
