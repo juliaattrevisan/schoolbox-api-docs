@@ -6,17 +6,19 @@ INSERT INTO participant(participant_plan_id, user_id, created_at, updated_at)
     SELECT * FROM (
       SELECT pp.id, ss.owner, ss.created_at
       FROM submission_box sb
+      JOIN assessment a ON sb.assessment_id = a.id
       JOIN student_submission ss ON sb.id = ss.box_id
       JOIN participant_plan pp ON pp.assessment_id = sb.assessment_id
-      WHERE sb.deleted IS FALSE
+      WHERE a.deleted_at IS NULL
       AND ss.deleted_at IS NULL) t1
     UNION
     SELECT * FROM (
       SELECT pp.id, sr.owner, sr.created_at
       FROM submission_box sb
+      JOIN assessment a ON sb.assessment_id = a.id
       JOIN submission_return sr ON sb.id = sr.box_id
       JOIN participant_plan pp ON pp.assessment_id = sb.assessment_id
-      WHERE sb.deleted IS FALSE
+      WHERE a.deleted_at IS NULL
       AND sr.deleted_at IS NULL) t2
   ) t3
   GROUP BY id, owner;

@@ -9,8 +9,7 @@ INSERT INTO participant_plan(assessment_id, is_dynamic, created_at, updated_at)
     FROM submission_box sb
     JOIN assessment a ON sb.assessment_id = a.id
     LEFT JOIN participant_plan pp ON a.id = pp.assessment_id
-    WHERE sb.deleted = 0
-    AND a.deleted_at IS NULL
+    WHERE a.deleted_at IS NULL
     AND pp.id IS NULL
       UNION
     SELECT a.id, 1, a.created_at, a.created_at
