@@ -32,7 +32,7 @@ use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
-use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
+use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeLevel;
 use Schoolbox\User;
@@ -1290,7 +1290,7 @@ class AssessableTest extends TestCase
     {
         $dueWork = $this->getDummyDueWork();
         $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
-        $dueWork->setMarkScheme(new TotalMarkWholeNumber($dueWork->getMaxMark()));
+        $dueWork->setMarkScheme(new TotalMarkFractional($dueWork->getMaxMark()));
         return [
             [$dueWork, $this->getDummyStudent(1), null],
             [$dueWork, $this->getDummyStudent(2), null],
@@ -1313,7 +1313,7 @@ class AssessableTest extends TestCase
     {
         $dueWork = $this->getDummyDueWork();
         $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
-        $dueWork->setMarkScheme(new TotalMarkWholeNumber($dueWork->getMaxMark()));
+        $dueWork->setMarkScheme(new TotalMarkFractional($dueWork->getMaxMark()));
         return [
             [$dueWork, $this->getDummyStudent(1), null],
             [$dueWork, $this->getDummyStudent(2), null],
@@ -1382,7 +1382,7 @@ class AssessableTest extends TestCase
     {
         $dueWork = $this->getDummyDueWork();
         $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_TOTAL));
-        $dueWork->setMarkScheme(new TotalMarkWholeNumber($dueWork->getMaxMark()));
+        $dueWork->setMarkScheme(new TotalMarkFractional($dueWork->getMaxMark()));
         return [
             [$dueWork, $this->getDummyStudent(1), null],
             [$dueWork, $this->getDummyStudent(2), null],
@@ -1405,7 +1405,7 @@ class AssessableTest extends TestCase
     {
         $dueWork = $this->getDummyDueWork();
         $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_TOTAL));
-        $dueWork->setMarkScheme(new TotalMarkWholeNumber($dueWork->getMaxMark()));
+        $dueWork->setMarkScheme(new TotalMarkFractional($dueWork->getMaxMark()));
         return [
             [$dueWork, $this->getDummyStudent(1), null],
             [$dueWork, $this->getDummyStudent(2), null],
@@ -1564,7 +1564,7 @@ class AssessableTest extends TestCase
     {
         $dueWork = $this->getDummyDueWork();
         $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_TOTAL));
-        $dueWork->setMarkScheme(new TotalMarkWholeNumber($dueWork->getMaxMark()));
+        $dueWork->setMarkScheme(new TotalMarkFractional($dueWork->getMaxMark()));
         return [
             [$dueWork, $this->getDummyStudent(1), null],
             [$dueWork, $this->getDummyStudent(2), null],
@@ -1586,7 +1586,7 @@ class AssessableTest extends TestCase
     {
         $dueWork = $this->getDummyDueWork();
         $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_TOTAL));
-        $dueWork->setMarkScheme(new TotalMarkWholeNumber($dueWork->getMaxMark()));
+        $dueWork->setMarkScheme(new TotalMarkFractional($dueWork->getMaxMark()));
         return [
             [$dueWork, $this->getDummyStudent(1), null],
             [$dueWork, $this->getDummyStudent(2), null],

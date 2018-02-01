@@ -8,11 +8,11 @@
 namespace Schoolbox\Learning\Assessment\Test;
 
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
+use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use \InvalidArgumentException;
 use \RangeException;
 
-class TotalMarkWholeNumberTest extends TestCase
+class TotalMarkFractionalTest extends TestCase
 {
 
     /**
@@ -21,7 +21,7 @@ class TotalMarkWholeNumberTest extends TestCase
      */
     public function test_valid_string_Denominator($validStringTotalMark)
     {
-        new TotalMarkWholeNumber($validStringTotalMark);
+        new TotalMarkFractional($validStringTotalMark);
     }
 
 
@@ -32,7 +32,7 @@ class TotalMarkWholeNumberTest extends TestCase
      */
     public function test_invalid_string_Denominator($invalidStringTotalMark)
     {
-        new TotalMarkWholeNumber($invalidStringTotalMark);
+        new TotalMarkFractional($invalidStringTotalMark);
     }
 
     /**
@@ -42,7 +42,7 @@ class TotalMarkWholeNumberTest extends TestCase
      */
     public function test_invalid_range_string_Denominator($totalMark)
     {
-        new TotalMarkWholeNumber($totalMark);
+        new TotalMarkFractional($totalMark);
     }
 
     /**
@@ -51,7 +51,7 @@ class TotalMarkWholeNumberTest extends TestCase
     public function test_Fractional_Denominator()
     {
         $input = 10.5;
-        new TotalMarkWholeNumber($input);
+        new TotalMarkFractional($input);
     }
 
     /**
@@ -60,7 +60,7 @@ class TotalMarkWholeNumberTest extends TestCase
     public function test_Negative_Denominator()
     {
         $input = -10;
-        new TotalMarkWholeNumber($input);
+        new TotalMarkFractional($input);
     }
 
 
@@ -72,7 +72,7 @@ class TotalMarkWholeNumberTest extends TestCase
      */
     public function test_getHumanReadable($normalised, $totalMark, $expected)
     {
-        $markScheme = new TotalMarkWholeNumber($totalMark);
+        $markScheme = new TotalMarkFractional($totalMark);
         $actual = $markScheme->getHumanReadableMark($normalised);
         $message = "Failed asserting equality. Input: $normalised, Expected: $expected, Actual: $actual";
         $this->assertEquals($expected, $actual, $message);
@@ -89,7 +89,7 @@ class TotalMarkWholeNumberTest extends TestCase
      */
     public function test_getNormalised($humanReadable, $totalMark, $expected)
     {
-        $markScheme = new TotalMarkWholeNumber($totalMark);
+        $markScheme = new TotalMarkFractional($totalMark);
         $actual = $markScheme->getNormalisedMark($humanReadable);
         $message = "Failed asserting equality. Input: $humanReadable, Expected: $expected, Actual: $actual";
         $this->assertEquals($expected, $actual, $message);
@@ -106,7 +106,7 @@ class TotalMarkWholeNumberTest extends TestCase
     public function test_getNormalised_Recurring($humanReadable, $totalMark, $expected)
     {
         $delta = 0.00001;
-        $markScheme = new TotalMarkWholeNumber($totalMark);
+        $markScheme = new TotalMarkFractional($totalMark);
         $actual = $markScheme->getNormalisedMark($humanReadable);
         $message = "Failed asserting equality. Input: $humanReadable, Expected: $expected, Actual: $actual";
         $this->assertLessThan($delta, abs($expected - $actual), $message);

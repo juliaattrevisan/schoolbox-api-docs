@@ -259,7 +259,7 @@ $dueWork = (new DueWork())
         ->setId(12)
         ->setName('A dumb type')
     )
-    ->setMarkScheme(new \Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber(40))
+    ->setMarkScheme(new \Schoolbox\Learning\MarkScheme\TotalMarkFractional(40))
     ->useRubric()
 ;
 // Due work files have no sequence stored, so order by name
