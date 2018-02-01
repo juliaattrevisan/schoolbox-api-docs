@@ -143,7 +143,7 @@
                                         {% endif %}
                                     {% endif %}
                                 {% else %}
-                                    {% set normalisedMark = participant.normalisedMark(false) %}
+                                    {% set normalisedMark = participant.normalisedMark(true) %}
                                     {% set label = participant.hasSubmittedResponse and not participant.hasPublishedFeedback
                                         ? "Pending" : participant.humanReadableMark(true) | default('–')
                                     %}
