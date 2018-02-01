@@ -373,7 +373,7 @@ class RubricMapper
                     c.`name`
                 FROM rubric_usage u
                 RIGHT JOIN rubric_criterion c ON u.criterion_id = c.id
-                LEFT JOIN submission_box b ON u.submission_box_id = b.id AND b.deleted IS NOT TRUE
+                LEFT JOIN submission_box b ON u.submission_box_id = b.id
                 WHERE parent_type = 'category'
                 AND parent_id IN (:$in)
                 AND deleted_at IS NULL
