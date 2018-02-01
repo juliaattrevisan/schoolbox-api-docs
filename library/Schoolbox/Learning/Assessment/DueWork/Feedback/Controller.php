@@ -100,17 +100,17 @@ class Controller extends Base
         $mostRecentFeedback = $participant->findMostRecentFeedback();
         $post               = $this->getRequest()->post->getArrayCopy();
 
-        // Load rubric; I'm going to need that so I can save it
-        $assessment = $participant->getAssessable();
-        if ($assessment instanceof DueWork\Model && $assessment->getUseRubric()) {
-            $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
-        }
-
         try {
             $feedback = $this->processFeedback($participant, $mostRecentFeedback, $post);
 
             // Don't process rubric; just copy from the last one
-            if ($mostRecentFeedback instanceof IFeedback) {
+            $assessment = $participant->getAssessable();
+            if (
+                $feedback instanceof DueWork\Feedback\Model
+                && $mostRecentFeedback instanceof DueWork\Feedback\Model
+                && $assessment instanceof DueWork\Model
+                && $assessment->getUseRubric()
+            ) {
                 $this->rubricMapper->copySelections($mostRecentFeedback->getId(), $feedback->getId());
             }
         }
