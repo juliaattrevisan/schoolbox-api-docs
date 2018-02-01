@@ -106,69 +106,6 @@ class Submission extends DeprecatedModel implements \Schoolbox\IHomepageCleanabl
 
     }
 
-    /**
-     * Simplified this query so we can use it just to find out what categories a user has submission boxes in
-     * @deprecated
-     *
-     * @param int                 $userID
-     * @param Alaress_Date_Format $from
-     * @param Alaress_Date_Format $to
-     * @return array|bool
-     */
-    public function getAllForUser($userID, Alaress_Date_Format $from = null, Alaress_Date_Format $to = null)
-    {
-        $dateConditionA = '';
-        $dateConditionB = '';
-
-        if (isset($from) && !$from->isNull()) {
-            $date            = $this->db->smartQuote($from->getDatabaseDate());
-            $dateConditionA .= ' AND DATE(submission_box.date) >= '.$date;
-            $dateConditionB .= ' AND DATE(assess.start)        >= '.$date;
-        }
-        if (isset($to) && !$to->isNull()) {
-            $date            = $this->db->smartQuote($to->getDatabaseDate());
-            $dateConditionA .= ' AND DATE(submission_box.date) <= '.$date;
-            $dateConditionB .= ' AND DATE(assess.start)        <= '.$date;
-        }
-
-        $query = "
-            (
-                SELECT
-                    submission_box.id,
-                    submission_box.name,
-                    submission_box.description,
-                    submission_box.accept_submission,
-                    submission_box.category catid,
-                    submission_box.mark_visibility
-                FROM submission_box
-                JOIN folder ON submission_box.category = folder.id AND folder.deleted_at IS NULL
-                WHERE submission_box.owner = '$userID'
-                AND submission_box.deleted = '0'
-                AND submission_box.task_id IS NULL
-                $dateConditionA
-            )
-            UNION
-            (
-                SELECT
-                    assess.assess_id,
-                    assess.title,
-                    assess.description,
-                    true AS accept_submission,
-                    assess.category_id AS catid,
-                    assess.mark_visibility
-                FROM assess
-                JOIN folder ON assess.category_id = folder.id AND  folder.deleted_at IS NULL
-                WHERE assess.deleted_at IS NULL
-                AND assess.task_id IS NULL
-                AND assess.availability = 'assess'
-                AND assess.user_id = '$userID'
-                $dateConditionB
-            )
-            ORDER BY catid DESC";
-
-        return $this->db->getAll($query);
-    }
-
 
     /**
      * @deprecated
