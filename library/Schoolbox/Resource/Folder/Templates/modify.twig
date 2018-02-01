@@ -74,6 +74,9 @@
 
                         // Redirect to dashboard after request completes
                         $.post('/resource/folder/delete', postParams).done(function () {
+                            window.setTimeout( function () {
+                                $toast.toastTimeout({text: 'Folder deleted', duration: 3000, css: 'success'});
+                            }, 1000);
                             window.location = '/dashboard';
                         });
                     }
