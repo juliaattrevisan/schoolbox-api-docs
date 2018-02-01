@@ -142,9 +142,9 @@ class MapperProxy
      *
      * This method loads participants, responses, feedback and rubric grid.
      *
-     * @param int  $id
-     * @param bool $includeExcluded Should we include participant exclusion records?
-     * @param User $student If provided, load only this student's participation
+     * @param int       $id
+     * @param bool      $includeExcluded Should we include participant exclusion records?
+     * @param null|User $student         If provided, load only this student's participation
      * @return IAssessable
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws DomainException If user has interaction but not participant record
@@ -987,9 +987,7 @@ class MapperProxy
                 $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $includeExcluded, $student);
             }
             return $assessment;
-
-        }
-        // This can be thrown. The @method annotation masks exceptions thrown from base implementation.
+        } // This can be thrown. The @method annotation masks exceptions thrown from base implementation.
         /** @noinspection PhpRedundantCatchClauseInspection */
         catch (MapperException\Deleted $e) {
             // Populate participants for the deleted assessment, and rethrow

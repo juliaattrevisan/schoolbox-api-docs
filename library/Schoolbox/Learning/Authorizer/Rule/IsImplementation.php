@@ -19,12 +19,9 @@ class IsImplementation implements IAuthorizationRule
 {
 
     /**
-     * Performs an authorization check.
+     * Check assessment is not a specification
      *
-     * @param  array $params Any parameters passed as part of the route.
-     * @param  User  $user   The user to authorize, if any. Null value assumes
-     *                       that no user is logged in.
-     * @throws \Alaress\Authorizer\Failure\Base if the request isn't authorized.
+     * @inheritdoc
      * @throws InvalidArgumentException If unable to locate required params in route args
      */
     public function authorize(array $params = [], User $user = null)

@@ -38,7 +38,6 @@ use TypeError;
 use UnexpectedValueException;
 use Alaress_Date_Format;
 
-
 class Controller extends Component_Homepage_ControllerAbstract
 {
     /**
@@ -170,9 +169,8 @@ class Controller extends Component_Homepage_ControllerAbstract
                     $unitImpl->setAssessables($assessments[$unitImpl->getId()]);
                 }
             }
-
         } catch (MapperException $e) {
-            if(ConfigMapper::getInstance()->get('debug_mode')){
+            if (ConfigMapper::getInstance()->get('debug_mode')) {
                 throw $e;
             }
         }

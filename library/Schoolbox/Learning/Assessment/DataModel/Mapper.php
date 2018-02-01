@@ -622,9 +622,9 @@ class Mapper extends BaseMapper
         if (0 === \count($idList)) {
             return $this->createCollection();
         }
-        try{
+        try {
             $builder->in('id', $idList);
-        } catch (UnderflowException $e){
+        } catch (UnderflowException $e) {
             // Should be impossible to trigger as we have checked for empty array. But handle here to simplify calling code.
             return $this->createCollection();
         }

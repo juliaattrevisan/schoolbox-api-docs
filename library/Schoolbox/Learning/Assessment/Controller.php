@@ -18,8 +18,6 @@ use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Mapper\DefinitionException;
@@ -28,7 +26,6 @@ use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Application\Exception as ApplicationException;
 use Aura\Web\Exception\InvalidStatusCode;
-
 
 abstract class Controller extends ListController implements IAssessmentController
 {
@@ -274,14 +271,14 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     public function getAssessment(IAssessable $assessment)
     {
-        try{
+        try {
             $redirect      = $this->determineGetAssessmentRedirect($assessment);
             $redirOverride = $this->getRequest()->query->get(Redirect::RETURN_URL);
             if ($redirOverride) {
                 $redirect .= '?' . Redirect::RETURN_URL . "={$redirOverride}";
             }
             $this->getResponse()->redirect->to($redirect);
-        } catch (ApplicationException\Exception $e){
+        } catch (ApplicationException\Exception $e) {
             // As far as this user is concerned, this resource does not exist.
             $this->getResponse()->status->setCode(404);
         }
@@ -511,7 +508,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         // If a parent of a participant, go to the summary page of the first non-excluded participant, if parents can READ+ folder context
         // TODO - this is not ideal. Consider a teacher has N children participating in the assessment
         /** @var mixed[][] $children */
-        foreach($this->getUser()->getChildren() as $child){
+        foreach ($this->getUser()->getChildren() as $child) {
             $childSummaryRoute = $this->getRouteIfAuthorized('learningAssessment.getSummary', [
                 'assessmentId' => $assessment->getId(),
                 'assessment'   => $assessment,

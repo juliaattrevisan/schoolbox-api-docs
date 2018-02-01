@@ -221,7 +221,7 @@ class DataSource
             $this->feedbackDataSource->findForAssessmentCollection($assessments, $user)
         );
 
-        if(!$includeExcluded){
+        if (!$includeExcluded) {
             // But we may wish to then remove these participants so they are not present in the domain graph
             $this->removeExcludedParticipants($assessments);
         }
@@ -235,7 +235,7 @@ class DataSource
      */
     private function removeExcludedParticipants(GenericCollection $assessables): void
     {
-        foreach($assessables as $assessable) {
+        foreach ($assessables as $assessable) {
             foreach ($assessable->getPlans() as $plan) {
                 foreach ($plan->getParticipants() as $idx => $participant) {
                     if ($participant->isExcluded()) {

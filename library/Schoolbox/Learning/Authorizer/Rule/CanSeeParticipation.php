@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Learning\Authorizer\Rule;
 
-
 use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
@@ -61,11 +60,7 @@ class CanSeeParticipation implements IAuthorizationRule
     /**
      * Performs an authorization check.
      *
-     * @param  array $params Any parameters passed as part of the route.
-     * @param  User  $user   The user to authorize, if any. Null value assumes
-     *                       that no user is logged in.
-     * @return bool
-     * @throws \Alaress\Authorizer\Failure\Base if the request isn't authorized.
+     * @inheritdoc
      * @throws InvalidArgumentException If unable to find a student and assessable in route params
      */
     public function authorize(array $params = [], User $user = null)

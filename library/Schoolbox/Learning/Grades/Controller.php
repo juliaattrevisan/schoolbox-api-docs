@@ -32,7 +32,7 @@ use Schoolbox\Learning\Assessment\DueWork;
 use Alaress\Database\Predicate\InvalidColumnException;
 use LogicException;
 use TypeError;
-use UnexpectedValueException;;
+use UnexpectedValueException;
 
 class Controller extends Base
 {
@@ -168,7 +168,7 @@ class Controller extends Base
             });
 
         /** @var GenericCollection|Folder\Model[] $folders */
-        $folders = $folders->filter(function(Folder\Model $folder) use ($assessmentsPerFolder){
+        $folders = $folders->filter(function (Folder\Model $folder) use ($assessmentsPerFolder) {
             return $assessmentsPerFolder->keyExists($folder->getId());
         });
 

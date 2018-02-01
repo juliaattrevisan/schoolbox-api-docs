@@ -37,7 +37,7 @@ class Visibility
 
 
     /**
-     * Determines if the specified user can see an IAssessable.
+     * Determines if the specified user can see an IAssessable (but not necessarily its details or participant interactions)
      *
      * * Instructor  - can see anytime (so long as not past close and we are hiding closed)
      * * Learner     - can only see if a participant (or parent of participant), and after publish date
@@ -81,7 +81,7 @@ class Visibility
      * @param Alaress_Date_Format $now
      * @return bool
      */
-    public function isVisibleToInstructor(IAssessable $assessable, User $instructor, bool $showClosed,  Alaress_Date_Format $now): bool
+    public function isVisibleToInstructor(IAssessable $assessable, User $instructor, bool $showClosed, Alaress_Date_Format $now): bool
     {
         if ($showClosed) {
             return true;

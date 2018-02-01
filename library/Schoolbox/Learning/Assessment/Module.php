@@ -6,7 +6,6 @@
  */
 namespace Schoolbox\Learning\Assessment;
 
-use Alaress\Authorizer\Failure\Forbidden;
 use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
@@ -34,7 +33,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as Submissio
 use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskResponseMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DueWork\Response\MapperProxy as DueWorkResponseMapper;
@@ -60,7 +58,6 @@ use Schoolbox\Application\Exception as ApplicationException;
 use DomainException;
 use InvalidArgumentException;
 use LogicException;
-
 
 class Module extends BaseModule
 {
@@ -581,8 +578,8 @@ class Module extends BaseModule
             new AssessmentNotDeleted(),
             new Rule\Any(
                 $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
-                new Rule\HasRole(Role::STAFF))
-            ,
+                new Rule\HasRole(Role::STAFF)
+            ),
             new IsImplementation()
         );
     }

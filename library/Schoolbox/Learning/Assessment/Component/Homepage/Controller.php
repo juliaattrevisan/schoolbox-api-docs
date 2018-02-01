@@ -76,7 +76,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
                 'order' => ['due_date' => 'asc'],
             ];
 
-            if(!$showClosed){
+            if (!$showClosed) {
                 $options['closed_before'] = Alaress_Date_Format::now();
             }
 

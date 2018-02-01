@@ -21,11 +21,8 @@ class AssessmentNotDeleted implements IAuthorizationRule
     /**
      * Ensures the assessment is not soft-deleted
      *
-     * @param  array $params Any parameters passed as part of the route.
-     * @param  User  $user   The user to authorize, if any. Null value assumes
-     *                       that no user is logged in.
-     * @throws InvalidPath If the assessment is soft-deleted
-     * @throws InvalidArgumentException  If an IAssessable was unable to be found in route params
+     * @inheritdoc
+     * @throws InvalidArgumentException If an IAssessable was unable to be found in route params
      */
     public function authorize(array $params = [], User $user = null)
     {

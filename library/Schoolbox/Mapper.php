@@ -45,7 +45,6 @@ use TypeError;
 use Alaress\Database\Predicate\InvalidColumnException;
 use UnexpectedValueException;
 
-
 abstract class Mapper implements IMapper, Serializable
 {
     /**
