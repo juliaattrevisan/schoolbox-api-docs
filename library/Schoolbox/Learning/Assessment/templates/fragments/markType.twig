@@ -99,7 +99,12 @@
     <div class="small-12 medium-6 columns" style="display:none;" data-max-mark>
         <label for="maxMark">
             Maximum Available Marks
-            <input id="maxMark" type="text" name="maxMark" value="{{ assessment.maxMark % 1 != 0 ? assessment.maxMark| number_format(2) : assessment.maxMark | number_format(0) }}"/>
+            {% if assessment.maxMark // 1 != assessment.maxMark %}
+                {% set markDisplay = assessment.maxMark | number_format(2) %}
+            {% else %}
+                {% set markDisplay = assessment.maxMark | number_format(0) %}
+            {% endif %}
+            <input id="maxMark" type="text" name="maxMark" value="{{ markDisplay }}"/>
         </label>
     </div>
 

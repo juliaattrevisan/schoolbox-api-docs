@@ -9,7 +9,7 @@
     ]
 #}
 
-{% if markScheme.totalMark % 1 != 0 %}
+{% if markScheme.totalMark // 1 != markScheme.totalMark %}
     {% include '@learningMarkScheme/fragments/text-input.twig' with {
     participant: participant,
     feedback:    feedback,
