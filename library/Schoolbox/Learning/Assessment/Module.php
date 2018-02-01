@@ -206,7 +206,7 @@ class Module extends BaseModule
              * This pretends the teacher is a participant
              */
             if ($access >= UserAccess::ACCESS_WRITE) {
-                $plan = new Plan($assessment);
+                $plan = (new Plan($assessment))->setIsDynamic(true); // TODO this is just a temp hack. Fix properly in SA-5769
                 $assessment->getPlans()->add($plan);
                 $participant = new Participant($student, $plan);
                 $plan->getParticipants()[$student->getId()] = $participant;
