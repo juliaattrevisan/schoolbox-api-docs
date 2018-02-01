@@ -11,12 +11,27 @@
 <li id="component-assessment-{{ assessable.id }}" class="actions-small-1" data-assessment="{{ assessable.id }}" data-assessment-title="{{  assessable.title }}">
     <div class="list-item">
         <div class="card small-12">
-            {% if assessable.isParticipant(USER) or canWrite %}
-                {% set href = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessable.id, assessment: assessable, studentId: USER.id}) %}
-            {%  else %}
-                {% set href = routeLookupIfAuthorized('learningAssessment.getPreview', {assessmentId: assessable.id, assessment: assessable}) %}
+
+            {# You can see an assessment, but not visit its summary page if you are a parent, with a child participating, but system is configured to hide due work details #}
+            {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
+                assessmentId: assessable.id,
+                assessment: assessable,
+                studentId: USER.id,
+                student: USER
+            }) %}
+            {# No route for own participation, what about children ?#}
+            {% if not viewRoute and USER.role.parent %}
+                {% for child in USER.children if not viewRoute %}
+                    {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
+                        assessmentId: assessable.id,
+                        assessment: assessable,
+                        studentId: child.id,
+                        student: child
+                    }) %}
+                {% endfor %}
             {% endif %}
-            {% if viewRoute %}<a href="{{ href }}">{% endif %}
+
+            {% if viewRoute %}<a href="{{ viewRoute }}">{% endif %}
                 <h3 data-assessment-title>{{ assessable.title }}</h3>
             {% if viewRoute %}</a>{% endif %}
             <p class="meta">{{ dueDate.dueDate(assessable, USER) }}</p>

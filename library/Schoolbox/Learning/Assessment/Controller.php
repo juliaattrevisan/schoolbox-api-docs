@@ -512,6 +512,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
     /**
      * Returns a redirect route, or throw an exception.
      *
+     * Order of preference:
+     * * A spec?        => Preview (must be able to simulate participation, but not create interactions)
+     * * A participant? => Summary
+     * * Write access?  => Preview (so they may become a participant if desired)
+     *
      * @param IAssessable $assessment
      * @return string
      * @throws RouteNotFound If unable to generate a requested route
@@ -529,17 +534,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
             return $previewRoute;
         }
 
-        // Is status page viewable?
-        $statusRoute = $this->getRouteIfAuthorized('learningAssessment.getStatus', [
-            'assessment'   => $assessment,
-            'assessmentId' => $assessment->getId(),
-        ], $this->getUser());
-        if ($statusRoute) {
-            return $statusRoute;
-        }
-
+        // Participants should go to their summary page
         if ($assessment->isParticipant($this->getUser())) {
-            $summaryRoute = $this->getRouter()->generate('learningAssessment.getSummary', [
+            $summaryRoute = $this->getRouteIfAuthorized('learningAssessment.getSummary', [
                 'assessmentId' => $assessment->getId(),
                 'studentId'    => $this->getUser()->getId(),
             ]);
@@ -551,11 +548,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
         // If a parent of a participant, go to the summary page of the first non-excluded participant, if parents can READ+ folder context
         // TODO - this is not ideal. Consider a teacher has N children participating in the assessment
         /** @var mixed[][] $children */
-        $children = $this->getSession()->get('children');
-        foreach($children as $child){
-            $childSummaryRoute = $this->getRouter()->generate('learningAssessment.getSummary', [
+        foreach($this->getUser()->getChildren() as $child){
+            $childSummaryRoute = $this->getRouteIfAuthorized('learningAssessment.getSummary', [
                 'assessmentId' => $assessment->getId(),
-                'studentId'    => $child['id'],
+                'studentId'    => $child->getId(),
             ]);
             if ($childSummaryRoute) {
                 return $childSummaryRoute;

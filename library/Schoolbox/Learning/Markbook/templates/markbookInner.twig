@@ -47,12 +47,12 @@
                     {% for assessment in markbook.assessments %}
                     <th data-assessment="{{ assessment.id }}">
                         <div>
-                                <span>
-                                    <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}" title="{{ assessment.title }}">
-                                        {{ assessment.title }}
-                                    </a><br/>
-                                    <span class="meta">{{ assessment.typeName }}</span>
-                                </span>
+                            {# A teacher clicking an assessment from the markbook is most likely interested in seeing more granular results #}
+                            {% set href = routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) %}
+                            <span>
+                                <a href="{{ href }}" title="{{ assessment.title }}">{{ assessment.title }}</a><br/>
+                                <span class="meta">{{ assessment.typeName }}</span>
+                            </span>
                         </div>
                     </th>
                     {% endfor %}

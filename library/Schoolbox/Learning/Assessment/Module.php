@@ -19,6 +19,7 @@ use Schoolbox\Learning\Authorizer\Rule\CanSeeParticipation;
 use Schoolbox\Learning\Authorizer\Rule\IsAssessmentOpen;
 use Schoolbox\Learning\Authorizer\Rule\ValidAssessmentType;
 use Schoolbox\Learning\Authorizer\Rule\IsDeletionUnLocked;
+use Schoolbox\Learning\Authorizer\Rule\IsImplementation;
 use Schoolbox\Learning\Authorizer\Rule\IsModifyUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsParticipant;
@@ -94,15 +95,13 @@ class Module extends BaseModule
         $preloadParticipant            = function ($params) { return $this->preloadParticipant($params); };
 
         // rules in use
-        $notDeleted         = new AssessmentNotDeleted();
-        $isSuper            = $this->getAuthRule('isSuperuser');
-        $loggedIn           = $this->getAuthRule('isLoggedIn');
-        $canWrite           = $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE);
-        $canViewSummary     = $this->buildAuthRuleCanViewSummary();
-        $canSubmit          = $this->buildAuthRuleCanSubmit();
-        $canWriteAndNotSpec = $this->buildAuthRuleCanWriteAndNotSpec();
-        $canWriteAndNotSpec = new Rule\All($canWriteAndNotSpec, $notDeleted);
-        $canAckSubmission   = $this->buildAuthRuleCanAcknowledgeSubmission();
+        $isSuper                  = $this->getAuthRule('isSuperuser');
+        $loggedIn                 = $this->getAuthRule('isLoggedIn');
+        $canWrite                 = $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE);
+        $canViewSummary           = $this->buildAuthRuleCanViewSummary();
+        $canSubmit                = $this->buildAuthRuleCanSubmit();
+        $canViewStatus            = $this->buildAuthRuleCanViewStatus();
+        $canAckSubmission         = $this->buildAuthRuleCanAcknowledgeSubmission();
 
         $canDelete = new Rule\Any(
             $isSuper,
@@ -130,28 +129,28 @@ class Module extends BaseModule
 
 
         // register the routes
-        $this->register('GET',   "$assListRoute",                    'getAssessmentsByContext',  $isSuper,            $preloadContext);
-        $this->register('POST',  "$assListRoute",                    'postCreateAssessment',     $canWrite,           $preloadContext); // a || c
-        $this->register('POST',  "$assListRoute/reorder",            'postReorderAssessments',   $canWrite,           $preloadContext); // a || c
-        $this->register('GET',   "$assListRoute/new",                'getCreateAssessmentForm',  $canWrite,           $preloadContext); // a || c
+        $this->register('GET',   "$assListRoute",                    'getAssessmentsByContext',  $isSuper,          $preloadContext);
+        $this->register('POST',  "$assListRoute",                    'postCreateAssessment',     $canWrite,         $preloadContext); // a || c
+        $this->register('POST',  "$assListRoute/reorder",            'postReorderAssessments',   $canWrite,         $preloadContext); // a || c
+        $this->register('GET',   "$assListRoute/new",                'getCreateAssessmentForm',  $canWrite,         $preloadContext); // a || c
 
-        $this->register('GET',   "$assRoute",                        'getAssessment',            $loggedIn,           $preloadAssessment);
-        $this->register('POST',  "$assRoute",                        'postUpdateAssessment',     $canWrite,           $preloadAssessment); // a || c
-        $this->register('PATCH', "$assRoute",                        'patchUpdateAssessment',    $canWrite,           $preloadAssessment); // a || c
-        $this->register('GET',   "$assRoute/modify",                 'getUpdateAssessmentForm',  $canModify,          $preloadAssessmentWithExcluded); // a || c
-        $this->register('POST',  "$assRoute/delete",                 'postDeleteAssessment',     $canDelete,          $preloadAssessment); // a || c
-        $this->register('GET',   "$assRoute/status",                 'getStatus',                $canWriteAndNotSpec, $preloadAssessment); // a || c
-        $this->register('GET',   "$assRoute/overview",               'getOverview',              $canWrite,           $preloadAssessment); // a || c
-        $this->register('GET',   "$assRoute/overview/export",        'downloadOverview',         $canWrite,           $preloadAssessment); // a || c
-        $this->register('GET',   "$assRoute/submissions/download",   'downloadSubmissions',      $canWrite,           $preloadAssessment); // a || c
+        $this->register('GET',   "$assRoute",                        'getAssessment',            $loggedIn,         $preloadAssessment);
+        $this->register('POST',  "$assRoute",                        'postUpdateAssessment',     $canWrite,         $preloadAssessment); // a || c
+        $this->register('PATCH', "$assRoute",                        'patchUpdateAssessment',    $canWrite,         $preloadAssessment); // a || c
+        $this->register('GET',   "$assRoute/modify",                 'getUpdateAssessmentForm',  $canModify,        $preloadAssessmentWithExcluded); // a || c
+        $this->register('POST',  "$assRoute/delete",                 'postDeleteAssessment',     $canDelete,        $preloadAssessment); // a || c
+        $this->register('GET',   "$assRoute/status",                 'getStatus',                $canViewStatus,    $preloadAssessment); // a || c
+        $this->register('GET',   "$assRoute/overview",               'getOverview',              $canWrite,         $preloadAssessment); // a || c
+        $this->register('GET',   "$assRoute/overview/export",        'downloadOverview',         $canWrite,         $preloadAssessment); // a || c
+        $this->register('GET',   "$assRoute/submissions/download",   'downloadSubmissions',      $canWrite,         $preloadAssessment); // a || c
 
-        $this->register('GET',   "$assRoute/$studentParam",          'getSummary',               $canViewSummary,     $preloadParticipant); // s || p
-        $this->register('GET',   "$assRoute/preview",                'getPreview',               $canWrite,           $preloadAssessment);  // s || p
-        $this->register('GET',   "$assRoute/$studentParam/submit",   'getCreateResponseForm',    $canSubmit,          $preloadParticipant); // p
-        $this->register('POST',  "$assRoute/$studentParam/submit",   'postCreateResponse',       $canSubmit,          $preloadParticipant); // p
-        $this->register('POST',  "$assRoute/$studentParam/received", 'postStatusAcknowledge',    $canAckSubmission,   $preloadParticipant); // p
-        $this->register('POST',  "$assRoute/$studentParam/ack",      'postPendingAcknowledge',   $canAckSubmission,   $preloadParticipant); // p
-        $this->register('POST',  "$assRoute/$studentParam/ackSelf",  'postSelfAcknowledge',      $canAckSubmission,   $preloadParticipant); // p
+        $this->register('GET',   "$assRoute/$studentParam",          'getSummary',               $canViewSummary,   $preloadParticipant); // s || p
+        $this->register('GET',   "$assRoute/preview",                'getPreview',               $canWrite,         $preloadAssessment);  // s || p
+        $this->register('GET',   "$assRoute/$studentParam/submit",   'getCreateResponseForm',    $canSubmit,        $preloadParticipant); // p
+        $this->register('POST',  "$assRoute/$studentParam/submit",   'postCreateResponse',       $canSubmit,        $preloadParticipant); // p
+        $this->register('POST',  "$assRoute/$studentParam/received", 'postStatusAcknowledge',    $canAckSubmission, $preloadParticipant); // p
+        $this->register('POST',  "$assRoute/$studentParam/ack",      'postPendingAcknowledge',   $canAckSubmission, $preloadParticipant); // p
+        $this->register('POST',  "$assRoute/$studentParam/ackSelf",  'postSelfAcknowledge',      $canAckSubmission, $preloadParticipant); // p
     }
 
 
@@ -577,20 +576,15 @@ class Module extends BaseModule
      * @throws NotFound
      * @throws InvalidPath
      */
-    private function buildAuthRuleCanWriteAndNotSpec()
+    private function buildAuthRuleCanViewStatus()
     {
         return new Rule\All(
-            $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
-            new Rule\Callback(function(array $params){
-                if (!isset($params['assessment'])) {
-                    throw new NotFound('No assessment preloaded');
-                }
-                /** @var IAssessable $assessment */
-                $assessment = $params['assessment'];
-                if(!$assessment instanceof Project && $assessment->getBaseContext() instanceof UnitSpecification){
-                    throw new InvalidPath('Cannot view a status page for an Assessment Specification');
-                }
-            })
+            new AssessmentNotDeleted(),
+            new Rule\Any(
+                $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
+                new Rule\HasRole(Role::STAFF))
+            ,
+            new IsImplementation()
         );
     }
 
@@ -630,28 +624,18 @@ class Module extends BaseModule
      * - assessment is not an assessment specification
      *
      * @return Rule\IAuthorizationRule
-     * @throws \InvalidArgumentException
-     * @throws NotFound
-     * @throws InvalidPath
+     * @throws InvalidArgumentException
+     * @throws InvalidPath If URL does not exist for this user
      */
     private function buildAuthRuleCanViewSummary()
     {
         return new Rule\All(
             new AssessmentNotDeleted(),
+            new IsImplementation(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                new CanSeeParticipation($this->getAccess(), $this->getConfig())
-            ),
-            new Rule\Callback(function(array $params){
-                if (!isset($params['assessment']) && !isset($params['participant'])) {
-                    throw new NotFound('No assessment or participant preloaded');
-                }
-                /** @var IAssessable $assessment */
-                $assessment = $params['assessment'] ?: $params['participant']->getAssessable() ;
-                if($assessment->getBaseContext() instanceof UnitSpecification){
-                    throw new InvalidPath('Cannot view a summary page for an Assessment Specification');
-                }
-            })
+                new CanSeeParticipation($this->getAccess(), $this->getConfig()->get('restrict_student_submissions'))
+            )
         );
     }
 

@@ -205,6 +205,7 @@ abstract class Base {
         return $this->getSession()->getSegment(static::class);
     }
 
+
     /**
      * Attempts to authorize a route for a user. Returns the URL for that route
      * if authorized, and false if not.
@@ -214,6 +215,7 @@ abstract class Base {
      * @param  User   $user   The user to authorize the route for. Defaults to
      *                        currently authenticated user.
      * @return string|bool    The URL for the route if authorized, false if not.
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function getRouteIfAuthorized($name, array $params = array(), User $user = null) {
         if (!($user instanceof User)) {

@@ -9,6 +9,7 @@
 namespace Schoolbox\Learning\Authorizer\Rule;
 
 
+use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
 use InvalidArgumentException;
@@ -33,6 +34,7 @@ use Schoolbox\User;
  *      - if participant, TRUE
  *      - if parent access permitted AND a child is a participant, TRUE
  *      - else FALSE
+ * - In all cases, if the specified participant user is not a participant, throw InvalidPath
  */
 class CanSeeParticipation implements IAuthorizationRule
 {
@@ -40,18 +42,18 @@ class CanSeeParticipation implements IAuthorizationRule
     /** @var Access */
     private $access;
 
-    /** @var IConfigLoader */
-    private $conf;
+    /** @var bool */
+    private $restrictStudentSubmissions;
 
 
     /**
-     * @param Access        $access
-     * @param IConfigLoader $conf
+     * @param Access $access
+     * @param bool   $restrictStudentSubmissions
      */
-    public function __construct(Access $access, IConfigLoader $conf)
+    public function __construct(Access $access, bool $restrictStudentSubmissions)
     {
-        $this->access = $access;
-        $this->conf   = $conf;
+        $this->access                     = $access;
+        $this->restrictStudentSubmissions = $restrictStudentSubmissions;
     }
 
 
@@ -74,10 +76,10 @@ class CanSeeParticipation implements IAuthorizationRule
         // Is student not a participant?
         if (!$participant) {
             // Then this route does not exist.
-            return false;
+            throw new InvalidPath();
         }
 
-        $folderId = $assessable->getBaseContext()->getFolder()->getId();
+        $folderId   = $assessable->getBaseContext()->getFolder()->getId();
         if (!$folderId) {
             throw new InvalidArgumentException("Cannot check auth, activity does not have folder hydrated");
         }
@@ -109,7 +111,7 @@ class CanSeeParticipation implements IAuthorizationRule
         }
 
         // Hide just the detail of work from parents
-        if ($this->conf->get('restrict_student_submissions')) {
+        if ($this->restrictStudentSubmissions) {
             throw new Unauthorized();
         }
 
