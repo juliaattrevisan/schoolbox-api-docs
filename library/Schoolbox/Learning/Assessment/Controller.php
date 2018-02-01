@@ -260,7 +260,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
     /**
      * Redirect method
      *
-     * Sends you to a status, summary, or preview screen depending on who is
+     * Sends you to a summary, or preview screen depending on who is
      * currently logged in and what they are viewing
      *
      * @api GET /learning/assessment/:assessmentId
