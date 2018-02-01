@@ -273,6 +273,25 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
+     * @param User $user
+     * @return bool
+     */
+    public function unsetUserParticipation(User $user): bool
+    {
+        $userRemoved = false;
+        foreach ($this->plans as $plan) {
+            foreach ($plan->getParticipants() as $idx => $participant) {
+                if ((int)$participant->getUser()->getId() === (int)$user->getId()) {
+                    $plan->getParticipants()->offsetUnset($idx);
+                    $userRemoved = true;
+                }
+            }
+        }
+        return $userRemoved;
+    }
+
+
+    /**
      * Find a reference to a particular Participant in this Assessable, if they exist.
      *
      * This was added for optimization reasons - it's far more performant to check if

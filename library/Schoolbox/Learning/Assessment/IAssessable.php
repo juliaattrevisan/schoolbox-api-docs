@@ -262,6 +262,15 @@ interface IAssessable extends ISoftDeletable
 
 
     /**
+     * Removes the specified user's participation from this IAssessment.
+     *
+     * @param User $user
+     * @return bool TRUE if user was removed, FALSE if user was not found
+     */
+    public function unsetUserParticipation(User $user): bool;
+
+
+    /**
      * Gets the normalised mark, regardless of MarkScheme
      *
      * @param Participant $participant

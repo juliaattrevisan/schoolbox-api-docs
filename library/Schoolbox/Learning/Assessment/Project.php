@@ -573,6 +573,24 @@ class Project extends AbstractAssessment implements AssessmentContext
         return $clone;
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function unsetUserParticipation(User $user): bool
+    {
+        // Remove from this project.
+        $userRemoved = parent::unsetUserParticipation($user);
+
+        // And remove from sub-assessables.
+        foreach ($this->assessables as $subAssessable) {
+            if ($subAssessable->unsetUserParticipation($user)) {
+                $userRemoved = true;
+            }
+        }
+        return $userRemoved;
+    }
+
     /* Getters/Setters
      */
 
