@@ -721,14 +721,8 @@ class External_Synergetic_User implements External_UserInterface
                             a.StudentContactPreferred,
                             a.StudentContactSurname,
                             a.StudentContactDefaultEmail,
-                            a.ValidAddressFlag,
-                            a.StudentContactAddress1,
-                            a.StudentContactAddress2,
-                            a.StudentContactAddress3,
-                            a.StudentContactSuburb,
-                            a.StudentContactPostCode,
-                            a.StudentContactState,
                             a.StudentContactPhoneActual,
+                            a.StudentContactSilentPhoneFlag,
                             a.StudentContactMobilePhone,
                             a.StudentContactOccupPhone,
                             a.StudentContactRelation,
@@ -759,15 +753,6 @@ class External_Synergetic_User implements External_UserInterface
         $contactList = [];
 
         foreach ($iteratorContacts as $contact) {
-            if ($contact['ValidAddressFlag'] == 0) {
-                $contact['StudentContactAddress1'] = '';
-                $contact['StudentContactAddress2'] = '';
-                $contact['StudentContactAddress3'] = '';
-                $contact['StudentContactSuburb'] = '';
-                $contact['StudentContactPostCode'] = '';
-                $contact['StudentContactState'] = '';
-            }
-
             $contactList[] = $contact;
         }
 

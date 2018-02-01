@@ -335,10 +335,6 @@ class External_Denbigh_User implements External_UserInterface
                               pe_p.title, 
                               pe_p.email,
                               pa_p.familyDenbighID,
-                              a.street, 
-                              a.suburb, 
-                              a.state, 
-                              a.postcode, 
                               a.telephoneHome
                 FROM          People pe_s
                 LEFT JOIN     Students s ON s.peopleDenbighID = pe_s.denbighID
@@ -361,11 +357,8 @@ class External_Denbigh_User implements External_UserInterface
                 'StudentContactPreferred'        => $contact['preferred_name'],
                 'StudentContactSurname'          => $contact['surname'],
                 'StudentContactDefaultEmail'     => $contact['email'],
-                'StudentContactAddress1'         => $contact['street'],
-                'StudentContactSuburb'           => $contact['suburb'],
-                'StudentContactPostCode'         => $contact['postcode'],
-                'StudentContactState'            => $contact['state'],
                 'StudentContactPhoneActual'      => $contact['telephoneHome'],
+                'StudentContactSilentPhoneFlag'  => 0,
                 'StudentContactMobilePhone'      => '',
                 'StudentContactOccupPhone'       => '',
                 'StudentContactSpouseID'         => '',
