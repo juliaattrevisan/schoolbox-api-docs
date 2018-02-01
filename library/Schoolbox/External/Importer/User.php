@@ -275,68 +275,6 @@ class User extends AbstractImporter
     }
 
     /**
-     * Reads all rows from the CSV reader, and loads them into an associative
-     * array structure.
-     *
-     * @return array|User\Result[]
-     */
-    protected function parse()
-    {
-        $result = [];
-        foreach ($this->reader as $i => $row) {
-            $this->log->info("Parsing row $i...", ['row' => $row]);
-
-            // Step 1: identify user
-            $user = $this->retrieveUser($row);
-            if (!$user instanceof UserModel) {
-                $this->log->warning('User could not be identified - skipping');
-                continue;
-            }
-
-            $userResult = new User\Result();
-            $userResult->setOriginalUser(clone $user);
-            if ($user->getId()) {
-                $this->log->info(sprintf('User found (ID: #%d)', $user->getId()));
-            } else {
-                $this->log->info('User not found - creating new user');
-            }
-
-            // Step 2: are they deleted?
-            // Users aren't currently soft-deletable, so they stay deleted.
-            if ($this->parseStringBoolean($row['Delete?'])) {
-                $userResult->setIsUserDeleted(true);
-            }
-
-            // Step 3: update user based on fields
-            $userResult->setUser($this->hydrateUser($row, $user));
-
-            // Step 4: update extended fields if using SB connector
-            if (!$this->hasExternalDb()) {
-                // User profile
-                $userProfile = $this->retrieveUserProfile($user);
-                $userResult->setOriginalUserProfile(clone $userProfile);
-                $userResult->setUserProfile($this->hydrateUserProfile($row, $userProfile));
-
-                // User's children (identified by external ID)
-                $userChildren = $this->retrieveUserChildren($user);
-                $userResult->setOriginalChildren(clone $userChildren);
-                $userResult->setChildren($this->hydrateChildren($row, $userChildren));
-            }
-
-            // Step 5: sanity check - is data logically valid?
-            try{
-                $this->sanityCheck($userResult);
-                $result[] = $userResult;
-            } catch (\UnexpectedValueException $e){
-                $this->log->warning(sprintf("%s - skipping",$e->getMessage()),['row' => $row]);
-                continue;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
      * Performs a sanity check on this user
      *
      * Throws validation exceptions if it isn't.
@@ -413,7 +351,7 @@ class User extends AbstractImporter
      * Retrieves users of whom this user is a guardian.
      *
      * @param  UserModel $user
-     * @return UserModel[]
+     * @return Collection|UserModel[]
      */
     protected function retrieveUserChildren(UserModel $user)
     {
@@ -472,10 +410,50 @@ class User extends AbstractImporter
      */
     public function save()
     {
-        $result = $this->parse();
+        foreach ($this->reader as $i => $row) {
 
-        // Pass 1: save users
-        foreach ($result as $userResult) {
+            // Step 1: identify user
+            $user = $this->retrieveUser($row);
+            if (!$user instanceof UserModel) {
+                $this->log->warning('User could not be identified - skipping');
+                continue;
+            }
+
+            $userResult = new User\Result();
+            $userResult->setOriginalUser(clone $user);
+
+            // Step 2: are they deleted?
+            // Users aren't currently soft-deletable, so they stay deleted.
+            if ($this->parseStringBoolean($row['Delete?'])) {
+                $userResult->setIsUserDeleted(true);
+            }
+
+            // Step 3: update user based on fields
+            $userResult->setUser($this->hydrateUser($row, $user));
+
+            // Step 4: update extended fields if using SB connector
+            if (!$this->hasExternalDb()) {
+                // User profile
+                $userProfile = $this->retrieveUserProfile($user);
+                $userResult->setOriginalUserProfile(clone $userProfile);
+                $userResult->setUserProfile($this->hydrateUserProfile($row, $userProfile));
+
+                // User's children (identified by external ID)
+                $userChildren = $this->retrieveUserChildren($user);
+                $userResult->setOriginalChildren(clone $userChildren);
+                $userResult->setChildren($this->hydrateChildren($row, $userChildren));
+            }
+
+            // Step 5: sanity check - is data logically valid?
+            try{
+                $this->sanityCheck($userResult);
+            } catch (\UnexpectedValueException $e){
+                $this->log->warning(sprintf("%s - skipping",$e->getMessage()),['row' => $row]);
+                continue;
+            }
+
+
+            // Step 6: save user
             if ($userResult->isUserDeleted()) {
                 $this->deleteUser($userResult);
             } else {
@@ -489,13 +467,15 @@ class User extends AbstractImporter
                     $this->updateUserProfile($userResult);
                 }
             }
-        }
 
-        // Pass 2: save user relations (if using SB connector)
-        if (!$this->hasExternalDb()) {
-            foreach ($result as $userResult) {
+
+            // Step 6: save user relations (if using SB connector)
+            if (!$this->hasExternalDb()) {
                 $this->updateChildren($userResult);
             }
+
+            unset($userResult);
+            unset($user);
         }
     }
 
@@ -508,18 +488,18 @@ class User extends AbstractImporter
     {
         $user = $userResult->getUser();
         if ($this->performUpdate) {
-            $this->log->info(sprintf('Creating user "%s"', $user->formatName()), ['user' => $user]);
             try {
-                if ($this->userMapper->save($user)) {
-                    $this->log->info(sprintf('User created (ID: #%d)', $user->getId()));
-                } else {
+                if (!$this->userMapper->save($user)) {
                     $this->log->error('Could not create user!');
                 }
+                else {
+                    $this->log->info(sprintf('Created user "%s" (%d)', $user->formatName(), $user->getId()));
+                }
             } catch (\Exception $e) {
-                $this->log->error('Could not create user!', ['error' => $e->getMessage()]);
+                $this->log->error('User not created: '.$e->getMessage() );
             }
         } else {
-            $this->log->info(sprintf('Pretending to create user "%s"', $user->formatName()), ['user' => $user]);
+            $this->log->info(sprintf('Pretending to create user "%s"', $user->formatName()));
         }
     }
 
@@ -533,18 +513,18 @@ class User extends AbstractImporter
         $user = $userResult->getUser();
         $diff = $this->userMapper->diff($userResult->getOriginalUser(), $user);
         if ($this->performUpdate) {
-            $this->log->info(sprintf('Updating user "%s"', $user->formatName()), ['diff' => $diff]);
             try {
-                if ($this->userMapper->save($user)) {
-                    $this->log->info(sprintf('User updated (ID: #%d)', $user->getId()));
-                } else {
+                if (!$this->userMapper->save($user)) {
                     $this->log->error('Could not update user!');
                 }
+                else {
+                    $this->log->info(sprintf('Updated user "%s" (%d)', $user->formatName(), $user->getId()), ['diff' => $diff]);
+                }
             } catch (\Exception $e) {
-                $this->log->error('Could not update user!', ['error' => $e->getMessage()]);
+                $this->log->error('User not created: '.$e->getMessage() );
             }
         } else {
-            $this->log->info(sprintf('Pretending to update user "%s"', $user->formatName()), ['diff' => $diff]);
+            $this->log->info(sprintf('Pretending to update user "%s" (%d)', $user->formatName(), $user->getId()), ['diff' => $diff]);
         }
     }
 
@@ -566,18 +546,19 @@ class User extends AbstractImporter
             );
         }
         if ($this->performUpdate) {
-            $this->log->info(sprintf('Deleting user "%s"', $user->formatName()), ['user' => $user]);
             try {
-                if ($this->userMapper->delete($user)) {
-                    $this->log->info('User deleted');
-                } else {
+                if (!$this->userMapper->delete($user)) {
                     $this->log->error('Could not delete user!');
                 }
+                else {
+                    $this->log->info(sprintf('Deleted user "%s" (%d)', $user->formatName(), $user->getId()));
+
+                }
             } catch (\Exception $e) {
-                $this->log->error('Could not delete user!', ['error' => $e->getMessage()]);
+                $this->log->error('Could not delete user: '.$e->getMessage() );
             }
         } else {
-            $this->log->info(sprintf('Pretending to delete user "%s"', $user->formatName()), ['user' => $user]);
+            $this->log->info(sprintf('Pretending to delete user "%s" (%d)', $user->formatName(), $user->getId()));
         }
     }
 
@@ -592,19 +573,20 @@ class User extends AbstractImporter
         $userProfile = $userResult->getUserProfile();
         $diff        = $this->userProfileMapper->diff($userResult->getOriginalUserProfile(), $userProfile);
         if ($this->performUpdate) {
-            $this->log->info(sprintf('Updating user profile for "%s"', $user->formatName()), ['diff' => $diff]);
             try {
                 $userProfile->setUserId($user->getId());
-                if ($this->userProfileMapper->save($userProfile)) {
-                    $this->log->info('User profile updated');
-                } else {
+                if (!$this->userProfileMapper->save($userProfile)) {
                     $this->log->error('Could not update user profile!');
                 }
+                else {
+                    $this->log->info(sprintf('Updated user profile for "%s" (%d)', $user->formatName(), $user->getId()), ['diff' => $diff]);
+
+                }
             } catch (\Exception $e) {
-                $this->log->error('Could not update user profile!', ['error' => $e->getMessage()]);
+                $this->log->error('Could not update user profile: '. $e->getMessage() );
             }
         } else {
-            $this->log->info(sprintf('Pretending to update user profile for "%s"', $user->formatName()), ['diff' => $diff]);
+            $this->log->info(sprintf('Pretending to update user profile for "%s" (%d)', $user->formatName(), $user->getId()), ['diff' => $diff]);
         }
     }
 
@@ -634,7 +616,7 @@ class User extends AbstractImporter
 
         // Diff the list
         if ($this->performUpdate) {
-            $this->log->info(sprintf('Updating children for "%s"', $user->formatName()), $context);
+            $this->log->info(sprintf('Updating children for "%s" (%d)', $user->formatName(), $user->getId()), $context);
             try {
                 // Wipe and save the new users
                 $this->userRelationMapper->deleteByColumn('user_id', $user->getId());
@@ -649,9 +631,8 @@ class User extends AbstractImporter
                     $newRelations[] = $newRelation;
                 }
                 $this->userRelationMapper->save($newRelations);
-                $this->log->info('Children updated');
             } catch (\Exception $e) {
-                $this->log->error('Could not update children!', ['error' => $e->getMessage()]);
+                $this->log->error('Could not update children: '.$e->getMessage());
             }
         } else {
             $this->log->info(sprintf('Pretending to update children for "%s"', $user->formatName()), $context);
