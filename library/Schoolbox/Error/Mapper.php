@@ -177,6 +177,7 @@ class Mapper extends BaseMapper implements IExceptionGenerator
 
 
     const ERROR_ASSESSMENT_DELETED = 205;
+    const ERROR_FOLDER_DELETED = 206;
 
     /**
      * Setup mapping
