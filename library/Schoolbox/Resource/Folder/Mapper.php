@@ -1080,11 +1080,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         }
 
         /** @var Model $folder */
-        try {
-            $folder = parent::findById($id);
-        } catch (DeletedException $e) {
-            error(ErrorMapper::ERROR_FOLDER_DELETED);
-        }
+        $folder = parent::findById($id);
+
         return $folder;
     }
 

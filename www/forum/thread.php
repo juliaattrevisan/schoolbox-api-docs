@@ -2,6 +2,8 @@
 require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
 use \Schoolbox\Breadcrumbs;
+use \Schoolbox\Mapper\Exception\Deleted as DeletedException;
+use \Schoolbox\Error\Mapper as ErrorMapper;
 
 $forumHandler = new Forum();
 $groupHandler = new Group();
@@ -30,7 +32,11 @@ if (!isset($thread['threadID'])) {
 }
 
 $categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
-$category = $categoryMapper->findById($thread['categoryID']);
+try {
+    $category = $categoryMapper->findById($thread['categoryID']);
+} catch (DeletedException $e) {
+    error(ErrorMapper::ERROR_FOLDER_DELETED);
+}
 
 /* forum exists
  */
