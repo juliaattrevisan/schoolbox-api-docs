@@ -333,56 +333,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
     }
 
     /**
-    * Conversion of SubmissionBoxHandler->getAllYearsByUser().
-    *
-    * @todo move to a more appropriate class?
-    *
-    * This could get a list of categories which have submissions, and pass to
-    * CategoryMapper->getByIds()?
-    *
-    * @param int                  $user_id  The user ID to retrieve for.
-    * @param \Alaress_Date_Format $from
-    * @param \Alaress_Date_Format $to
-    *
-    * @return array
-    */
-    public function submittedToCategoryList($user_id, \Alaress_Date_Format $from, \Alaress_Date_Format $to)
-    {
-        $parts = [
-            '(ss.owner = :user_id OR sr.owner = :user_id)',
-            'sb.deleted IS FALSE',
-        ];
-        $params['user_id'] = $user_id;
-        if (!$from->isNull()) {
-            $params['from'] = $from->getDatabaseDate();
-            $parts[]        = 'DATE(sb.date) >= :from';
-        }
-        if (!$to->isNull()) {
-            $params['to'] = $to->getDatabaseDate();
-            $parts[]      = 'DATE(sb.date) <= :to';
-        }
-        $wherePart = implode(' AND ', $parts);
-        $query     = "
-			SELECT folder.id, folder.name, GROUP_CONCAT(cc.code) AS code
-			FROM folder
-			LEFT JOIN folder_code cc ON folder.id = cc.folder_id AND cc.deleted_at IS NULL
-			WHERE folder.id IN (
-				SELECT DISTINCT sb.category
-				FROM submission_box sb
-				LEFT JOIN student_submission ss ON ss.box_id = sb.id
-				LEFT JOIN submission_return  sr ON sr.box_id = sb.id
-				WHERE $wherePart
-			)
-			GROUP BY folder.id
-			ORDER BY folder.name";
-
-        $statement = $this->database->prepare($query);
-        $statement->execute($params);
-        return $statement->fetchAll();
-    }
-
-
-    /**
     * Conversion of SubmissionBoxHandler->getAllDueWork().
     *
     * @todo Implement this as an activity list instead of an array return
