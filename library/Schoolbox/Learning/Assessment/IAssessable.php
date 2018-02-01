@@ -30,6 +30,16 @@ interface IAssessable extends ISoftDeletable
     public const MARK_VISIBILITY_STUDENT = 1;
     public const MARK_VISIBILITY_PARENT_STUDENT = 2;
 
+
+    /**
+     * Returns this IAssessable if this IAssessable is not inside a project,
+     * otherwise returns this IAssessable's root project.
+     *
+     * @return IAssessable
+     */
+    public function getBaseAssessable(): IAssessable;
+
+
     /**
      * Creates a clone of this assessment.
      *
