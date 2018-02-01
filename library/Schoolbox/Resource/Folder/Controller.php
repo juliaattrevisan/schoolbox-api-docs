@@ -311,8 +311,6 @@ class Controller extends BaseController
             'format' => 'json',
             'data' => json_encode(['result' => 'success'])
         ]);
-
-        // TODO redirect once finished
     }
 
     /**
