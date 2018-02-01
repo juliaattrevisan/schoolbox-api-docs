@@ -63,7 +63,7 @@ trait DueWorkTrait
     /**
      * Only relevant if this DueWork's MarkType is 'TotalMark'
      *
-     * @var $int
+     * @var float
      */
     private $maxMark;
 
@@ -159,7 +159,7 @@ trait DueWorkTrait
     }
 
     /**
-     * @return int
+     * @return float
      */
     protected function getMaxMark()
     {
@@ -167,7 +167,7 @@ trait DueWorkTrait
     }
 
     /**
-     * @param int $maxMark
+     * @param float $maxMark
      */
     protected function setMaxMark($maxMark)
     {

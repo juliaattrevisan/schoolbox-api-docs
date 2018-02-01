@@ -95,7 +95,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
     /**
      * Only relevant if this DueWork's MarkType is 'TotalMark'
      *
-     * @var $int
+     * @var float
      */
     private $maxMark;
 
@@ -589,7 +589,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
     }
 
     /**
-     * @return int
+     * @return float
      */
     public function getMaxMark()
     {
@@ -597,7 +597,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
     }
 
     /**
-     * @param int $maxMark
+     * @param float $maxMark
      * @return static
      */
     public function setMaxMark($maxMark)
