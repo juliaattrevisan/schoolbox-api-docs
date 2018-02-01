@@ -337,61 +337,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
 
     /**
-     * Return whether or not the given user is allowed to see the given participation
-     *
-     * @param User        $user
-     * @param Participant $participant
-     * @return bool
-     */
-    protected function userCanViewParticipation(User $user, Participant $participant)
-    {
-        $student = $participant->getUser();
-
-        // staff can always see
-        if ($user->getRole()->isStaff()) {
-            return true;
-        }
-
-        // student can see own
-        if ($student->getId() == $user->getId()) {
-            return true;
-        }
-
-        // filter guests, and other students
-        if (!$user->getRole()->isParent()) {
-            return false;
-        }
-
-        // parent can see ... IF config allows
-        if ($this->getConfigLoader()->get('restrict_student_submission')) {
-            return false;
-        }
-
-        // parents are limited to their own children (this is expensive so definitely do this last!)
-        $student->loadParents();
-        if ($student->isChildOf($user)) {
-            return true;
-        }
-
-        // failed all checks: bounce 'em!
-        return false;
-    }
-
-    /**
-     * Assert that the current session user is allowed to see the given participation
-     * TODO consider pushing this up into the module
-     *
-     * @param Participant $participant
-     */
-    protected function assertParticipantAccess(Participant $participant)
-    {
-        if (!$this->userCanViewParticipation($this->getUser(), $participant)) {
-            // could probably throw a 403, but that would give away the fact that, yes, the student is a participant of that assessment
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-        }
-    }
-
-    /**
      * All the possible Mark Types to choose from for this particular $assessmentType
      *
      * @param IAssessable $assessable

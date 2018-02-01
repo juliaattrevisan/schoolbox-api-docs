@@ -280,9 +280,6 @@ class Controller extends Assessment\Controller
      */
     public function postCreateResponse(Participant $participant)
     {
-        // Ensure the current session user is allowed to see the given participation
-        $this->assertParticipantAccess($participant);
-
         // Did user mark (regardless of who they are) the task as incomplete ?
         $isMarkedComplete = $this->getRequest()->post->getInt('status') != TaskCompletion::STATUS_INCOMPLETE;
 

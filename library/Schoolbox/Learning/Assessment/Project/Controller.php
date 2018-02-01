@@ -227,8 +227,6 @@ class Controller extends Assessment\Controller
      */
     public function getSummary(Participant $participant)
     {
-        $this->assertParticipantAccess($participant);
-
         /** @var Assessment\Project $project */
         $project = $participant->getAssessable();
         $student = $participant->getUser();
