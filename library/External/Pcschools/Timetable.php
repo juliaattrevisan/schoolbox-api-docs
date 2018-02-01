@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PCSchools timetable connector
  *
@@ -21,14 +22,9 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     private $database;
 
     /**
-     * @var \Schoolbox\UserMapper
+     * @var UserMapper
      */
     private $userMapper;
-
-    /**
-     * @var CampusMapper
-     */
-    private $campusMapper;
 
     /**
      * Constructor
@@ -37,7 +33,6 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     {
         $this->setDatabase(MSSQL::getInstance());
         $this->userMapper = new UserMapper();
-        $this->campusMapper = new CampusMapper();
     }
 
     /**
@@ -51,9 +46,13 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      * $timetableDef['number'][]
      * $timetableDef['sequence'][]
      *
-     * @param string            $externalUserId If set, the external user ID to get definition for.
+     * Padua College uses a different timetable for most days of the week- to avoid dealing with this we are taking
+     * the Day 1 timetable only and clobbering the rest of the week with the same timetable. I am however selecting the
+     * period number in the format DD.PP (day number.period number- e.g "01.05")
+     *
+     * @param string $externalUserId If set, the external user ID to get definition for.
      * @param Campus $campus
-     * @param int               $day
+     * @param int    $day
      *
      * @return array
      */
@@ -103,9 +102,21 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      */
     protected function getDayCount()
     {
-        return $this->getDatabase()->getOne(
-            "SELECT MAX(DAY) FROM TIMEFILE WHERE TIME_PERIOD = (SELECT TIME_PERIOD from sysfile)"
-        );
+        return $this->getDatabase()
+                    ->getOne("SELECT MAX(DAY) FROM TIMEFILE WHERE TIME_PERIOD = (SELECT TIME_PERIOD FROM sysfile)");
+    }
+
+    /**
+     * Gets the maximum number of periods for a day from the database. This is again a kluge and it is not a one-size
+     * fits all database, and allows for different number of periods each day. As such this just grabs the maximum
+     * possible.
+     *
+     * @return array|bool
+     */
+    protected function getPeriodCount()
+    {
+        return $this->getDatabase()
+                    ->getOne("SELECT MAX(SUBQUERY.PERIODS) FROM (SELECT COUNT(*) AS PERIODS FROM TIMEPDHD GROUP BY TIMEPDHD.DAY) AS SUBQUERY");
     }
 
     /**
@@ -124,11 +135,10 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         } else {
             $day = date('Y-m-d');
         }
-        $result = $this->getDatabase()->getOne("
-            SELECT TIMETABLE_DAY
-            FROM CALENDAR
-            WHERE [DATE] = {$this->getDatabase()->smartQuote($day)}
-        ");
+
+        $result = $this->getDatabase()
+                       ->getOne("SELECT TIMETABLE_DAY FROM CALENDAR WHERE [DATE] = {$this->getDatabase()->smartQuote($day)}");
+
         return intval($result) ?: 0;
     }
 
