@@ -35,7 +35,7 @@ class IsImplementation implements IAuthorizationRule
         /** @var IAssessable $assessment */
         $assessment = $params['assessment'] ?: $params['participant']->getAssessable();
         if ($assessment->getBaseContext() instanceof UnitSpecification\Model) {
-            throw new InvalidPath('Cannot view a summary page for an Assessment Specification');
+            throw new InvalidPath('Assessment is a Specification');
         }
     }
 }

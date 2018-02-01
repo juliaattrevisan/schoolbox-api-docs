@@ -89,7 +89,7 @@ class Visibility
         // If instructor is also a participant, respect their custom close date.
         $participant = $assessable->getParticipantIfExtant($instructor);
         $closeDate   = $participant ? $participant->getCloseDate() : $assessable->getCloseAt();
-        return $closeDate->isNull() || $now->lt($closeDate);
+        return $now->lt($closeDate);
     }
 
 
