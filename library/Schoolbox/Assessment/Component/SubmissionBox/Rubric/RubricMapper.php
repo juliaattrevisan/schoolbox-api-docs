@@ -690,6 +690,35 @@ class RubricMapper
     }
 
     /**
+     * Copies the selected descriptors from one submission return to another.
+     *
+     * @param int $sourceReturnId
+     * @param int $destinationReturnId
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function copySelections($sourceReturnId, $destinationReturnId)
+    {
+        // Don't do anything if the source and dest are the same
+        if ($sourceReturnId === $destinationReturnId) {
+            return;
+        }
+        $markMapper        = MarkMapper::getInstance();
+        $sourceMarks       = $markMapper->findByColumnList(['return_id' => $sourceReturnId]);
+        $destinationMarks  = $markMapper->createCollection();
+        $destinationReturn = SubmissionBox\ReturnedWorkMapper::getInstance()->createModel($destinationReturnId);
+
+        foreach ($sourceMarks as $sourceDescriptor) {
+            $destinationMarks->add(
+                $markMapper->createModel()
+                    ->setDescriptor($sourceDescriptor->getDescriptor())
+                    ->setSubmissionReturn($destinationReturn)
+                    ->setValid($sourceDescriptor->isValid())
+            );
+        }
+        $markMapper->save($destinationMarks);
+    }
+
+    /**
      * @param Rubric        $rubric
      * @param SubmissionBox $submissionBox
      */
