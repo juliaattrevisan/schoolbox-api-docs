@@ -544,18 +544,19 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $cat_mapper  = $this->getJoinMapper('category');
         $user_mapper = $this->getJoinMapper('owner');
         $query = "
-			SELECT
-				{$this->getColumnString('sb')},
-				{$cat_mapper->getColumnString('c')},
-				{$user_mapper->getColumnString('u')}
-			FROM {$this->getTable()} sb
-			LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
-			LEFT JOIN {$this->getJoinSql('owner',    'sb', 'u')}
-			WHERE sb.category IN {$this->getArrayPlaceholders($category_list, 'category')}
-			AND sb.date BETWEEN :from_date AND :to_date
-			AND sb.deleted IS FALSE
-			ORDER BY sb.date ASC
-		";
+            SELECT
+                {$this->getColumnString('sb')},
+                {$cat_mapper->getColumnString('c')},
+                {$user_mapper->getColumnString('u')}
+            FROM {$this->getTable()} sb
+            INNER JOIN {$this->getJoinSql('assessmentModel', 'sb', 'a')}
+            LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
+            LEFT JOIN {$this->getJoinSql('owner',    'sb', 'u')}
+            WHERE sb.category IN {$this->getArrayPlaceholders($category_list, 'category')}
+            AND sb.date BETWEEN :from_date AND :to_date
+            AND a.deleted_at IS NULL
+            ORDER BY sb.date ASC
+        ";
 
         //
         // Build parameters
