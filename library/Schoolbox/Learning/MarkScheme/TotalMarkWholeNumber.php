@@ -49,13 +49,13 @@ class TotalMarkWholeNumber extends TotalMarkAbstract
 
 
     /**
-     * Validates and returns the $totalMark as null or int
+     * Validates and returns the $totalMark as null or numeric
      *
      * Does not perform negative check.
      *
      * @param float|int|string|null $totalMark
      * @return null|int
-     * @throws \InvalidArgumentException If $totalMark is invalid type or contains fractional component
+     * @throws \InvalidArgumentException If $totalMark is invalid type
      */
     private function validate($totalMark)
     {
