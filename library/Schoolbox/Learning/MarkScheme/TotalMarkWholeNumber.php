@@ -25,7 +25,7 @@ class TotalMarkWholeNumber extends TotalMarkAbstract
 
     /**
      * @param float|int|string|null $totalMark
-     * @throws \InvalidArgumentException If $totalMark is of wrong data type or contains fractional component
+     * @throws \InvalidArgumentException If $totalMark is of wrong data type
      * @throws \RangeException If $totalMark is negative
      */
     public function __construct($totalMark)
