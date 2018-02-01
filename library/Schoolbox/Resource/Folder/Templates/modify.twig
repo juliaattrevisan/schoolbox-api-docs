@@ -68,16 +68,8 @@
                 $(this).confirmDialog({
                     text: 'Are you sure you wish to delete this folder?',
                     confirmEvent: function() {
-                        // Toast
-                        var $toast = $('[data-toast]');
-                        $toast.toastActivate({text: 'Deleting folder...'});
-
-                        // Redirect to dashboard after request completes
                         $.post('/resource/folder/delete', postParams).done(function () {
-                            window.setTimeout( function () {
-                                $toast.toastTimeout({text: 'Folder deleted', duration: 3000, css: 'success'});
-                            }, 1000);
-                            window.location = '/dashboard';
+                            history.go(-1);
                         });
                     }
                 });
@@ -372,9 +364,3 @@
         </form>
     </div>
 </div>
-
-<section class="content">
-    <div id='toaster' class="toast" data-toast></div>
-</section>
-
-
