@@ -33,7 +33,7 @@ class SortForMarkbook implements IAssessableComparator
      * Sorts by:
      * 1. Ultimate folder context id
      * 2. UnitImpl open date, then directly in folder
-     * 3. Root-assessment sequence in in unit-impl, or root-assessment due-date in directly on folder
+     * 3. Base-assessment sequence in in unit-impl, or base-assessment due-date in directly on folder
      * 4. Project, then project sub-assessments by sequence
      *
      * @inheritdoc
@@ -43,87 +43,28 @@ class SortForMarkbook implements IAssessableComparator
         return function (IAssessable $left, IAssessable $right) {
             // Sort first by folder
             $folderCompare = $this->compareFolders($left, $right);
-            if ($folderCompare) {
+            if (0 !== $folderCompare) {
                 return $folderCompare;
             }
 
             // Both in same folder, sort by unit-impl open date, before directly in folder
             $folderUnitImplCompare = $this->compareUnitImplOrFolder($left, $right);
-            if ($folderUnitImplCompare) {
+            if (0 !== $folderUnitImplCompare) {
                 return $folderUnitImplCompare;
             }
 
             // Either both in same unit-impl, or both directly in same folder.
-            // (Root-assessment is a assessment not in a project, or the parent of project sub-assessables)
-            // Sort by root-sequence if in unit-impl, or due-date if directly on folder
-            $rootSequenceCompare = $this->compareRootSequenceOrDueDate($left, $right);
-            if ($rootSequenceCompare) {
-                return $rootSequenceCompare;
+            // (Base-assessment is a assessment not in a project, or the parent of project sub-assessables)
+            // Sort by base-sequence if in unit-impl, or base-due-date if directly on folder
+            $baseCompare = $this->compareBaseSequenceOrDueDate($left, $right);
+            if (0 !== $baseCompare) {
+                return $baseCompare;
             }
 
-            // Same root-assessment sequence, in same unit-impl or direct on folder.
+            // Same base-assessment sequence, in same unit-impl or direct on folder.
             // Place sub-assessments to right of their parent project. Sort sub-assessments by sequence
             return $this->compareIsProjectOrSubAssessable($left, $right);
         };
-    }
-
-
-    /**
-     * Sorts assessments by sequence if both in unit-impl, or due-date directly.
-     * Assessables must be in same unit-impl, or both directly on same folder.
-     *
-     * @param IAssessable $left
-     * @param IAssessable $right
-     * @return int
-     */
-    private function compareRootSequenceOrDueDate(IAssessable $left, IAssessable $right): int
-    {
-        $rootLeft  = $this->getRootAssessment($left);
-        $rootRight = $this->getRootAssessment($right);
-
-        // Are they both in the same unit impl
-        if ($rootLeft->getBaseContext() instanceof UnitImplementation\Model) {
-            // Compare by root-assessment sequence
-            return $rootLeft->getSequence() <=> $rootRight->getSequence();
-        }
-        // Both directly on same folder, compare by due-date
-        return $rootLeft->getDueAt()->compare($rootRight->getDueAt());
-    }
-
-
-    /**
-     * Sorts a project and their sub-assessables by project first, then sub-assessments by sequence
-     *
-     * @param IAssessable $left
-     * @param IAssessable $right
-     * @return int
-     */
-    private function compareIsProjectOrSubAssessable(IAssessable $left, IAssessable $right): int
-    {
-        if ($left instanceof Project) {
-            return -1;
-        }
-        if ($right instanceof Project) {
-            return +1;
-        }
-        // Both are project-subAssessables. Sort by sequence
-        return $left->getSequence() <=> $right->getSequence();
-    }
-
-
-    /**
-     * Climbs project assessment hierachy to always return an assessable that is not a project sub-assessable
-     *
-     * @param IAssessable $assessable
-     * @return IAssessable
-     */
-    private function getRootAssessment(IAssessable $assessable): IAssessable
-    {
-        $root = $assessable;
-        while ($root->getContext() instanceof Project) {
-            $root = $root->getContext();
-        }
-        return $root;
     }
 
 
@@ -170,5 +111,48 @@ class SortForMarkbook implements IAssessableComparator
         }
         // Both directly in same folder
         return 0;
+    }
+
+
+    /**
+     * Sorts assessments by sequence if both in unit-impl, or due-date directly.
+     * Assessables must be in same unit-impl, or both directly on same folder.
+     *
+     * @param IAssessable $left
+     * @param IAssessable $right
+     * @return int
+     */
+    private function compareBaseSequenceOrDueDate(IAssessable $left, IAssessable $right): int
+    {
+        $baseLeft  = $left->getBaseAssessable();
+        $baseRight = $right->getBaseAssessable();
+
+        // Are they both in the same unit impl
+        if ($baseLeft->getBaseContext() instanceof UnitImplementation\Model) {
+            // Compare by base-assessment sequence
+            return $baseLeft->getSequence() <=> $baseRight->getSequence();
+        }
+        // Both directly on same folder, compare by due-date
+        return $baseLeft->getDueAt()->compare($baseRight->getDueAt());
+    }
+
+
+    /**
+     * Sorts a project and their sub-assessables by project first, then sub-assessments by sequence
+     *
+     * @param IAssessable $left
+     * @param IAssessable $right
+     * @return int
+     */
+    private function compareIsProjectOrSubAssessable(IAssessable $left, IAssessable $right): int
+    {
+        if ($left instanceof Project) {
+            return -1;
+        }
+        if ($right instanceof Project) {
+            return +1;
+        }
+        // Both are project-subAssessables. Sort by sequence
+        return $left->getSequence() <=> $right->getSequence();
     }
 }
