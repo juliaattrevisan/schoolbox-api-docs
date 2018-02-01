@@ -89,10 +89,12 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
             return;
         }
 
+        /*
+         * This now on the assessment, will need to be updated to get from the assessment
         if ($box->isDeleted()) {
             // don't. even. bother.
             return;
-        }
+        }*/
 
         if ($box->getMarkVisibility() == IAssessable::MARK_VISIBILITY_PRIVATE) {
             // don't. even. bother.

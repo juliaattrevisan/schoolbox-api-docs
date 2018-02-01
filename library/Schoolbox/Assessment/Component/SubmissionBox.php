@@ -456,23 +456,6 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
         return $this->accept_online;
     }
 
-    /**
-     * @param  Alaress_Date_Format $created
-     * @return $this
-     */
-    public function setCreated($created)
-    {
-        $this->created = $created;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getCreated()
-    {
-        return $this->created;
-    }
 
     /**
      * @param  Alaress_Date_Format $due_date
@@ -649,35 +632,6 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
     public function getMarkVisibility()
     {
         return $this->mark_visibility;
-    }
-
-    /**
-     * @param  boolean $deleted
-     * @return $this
-     */
-    public function setDeleted($deleted)
-    {
-        $this->deleted = $deleted;
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getDeleted()
-    {
-        return $this->deleted;
-    }
-
-    /**
-     * Is this deleted? (added so there's a consistent method for determining if
-     * a model is deleted)
-     *
-     * @return bool
-     */
-    public function isDeleted()
-    {
-        return $this->getDeleted();
     }
 
     /**
