@@ -965,9 +965,9 @@ class MapperProxy
      *
      * @param string    $column
      * @param int       $value
-     * @param bool      $loadParticipants  Should we load participations?
-     * @param bool      $includeExcluded   If loading participants, should we include excluded participations?
-     * @param null|User $student
+     * @param bool      $loadParticipants Should we load participations?
+     * @param bool      $includeExcluded  If loading participants, should we include excluded participations?
+     * @param null|User $student          If specified, only load this user's interactions
      * @return IAssessable
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws DomainException If user has interaction but not participant record
@@ -1122,7 +1122,7 @@ class MapperProxy
      *
      * @param Collection $collection
      * @param bool       $includeExcluded Should we include explicitly excluded participants in graph?
-     * @param User       $user
+     * @param User       $user            If specified, only load this user's interactions
      * @return Collection|IAssessable[]
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws DomainException If user has interaction but not participant record

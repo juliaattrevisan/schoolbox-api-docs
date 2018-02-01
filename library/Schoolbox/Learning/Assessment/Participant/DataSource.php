@@ -126,7 +126,7 @@ class DataSource
      *
      * @param IAssessable $assessment
      * @param bool        $includeExcluded Should we include explicitly excluded participants in graph?
-     * @param null|User   $user
+     * @param null|User   $user            If specified, only load this user's interactions
      * @return IAssessable $assessment, with participation loaded.
      * @throws UnexpectedValueException If unable to derive project participant collection
      * @throws DomainException If user has interaction but not participant record
@@ -150,7 +150,7 @@ class DataSource
      *
      * @param Collection|IAssessable[] $assessments
      * @param bool                     $includeExcluded Should we include explicitly excluded participants in graph?
-     * @param User|null                $user
+     * @param User|null                $user            If specified, only load this user's interactions
      * @return Collection|IAssessable[] $assessments, with participation loaded.
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws DomainException If user has interaction but not participant record
@@ -186,9 +186,9 @@ class DataSource
      *
      * This method sets the participants into each $assessment
      *
-     * @param IAssessable[]|GenericCollection $assessments Indexed by assessment.id
-     * @param bool                     $includeExcluded Should we include explicitly excluded participants in graph?
-     * @param null|User                       $user
+     * @param IAssessable[]|GenericCollection $assessments     Indexed by assessment.id
+     * @param bool                            $includeExcluded Should we include explicitly excluded participants in graph?
+     * @param null|User                       $user            If specified, only load this user's interactions
      * @throws UnexpectedValueException If unable to merge student collections
      * @throws DomainException If user has interaction but not participant record
      * @throws DefinitionException If unable to locate a specified mapper join

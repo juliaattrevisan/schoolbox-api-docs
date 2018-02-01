@@ -57,25 +57,14 @@ class Visibility
 
         // Is viewer an instructor?
         if ($folderAccessLevel >= UserAccess::ACCESS_WRITE) {
-            if ($showClosed) {
+            if ($this->isVisibleToInstructor($assessment, $viewer, $showClosed, $now)) {
                 return true;
             }
-            if ($this->isNotClosedForInstructor($assessment, $viewer, $now)) {
-                return true;
-            }
-        } // Is viewer a learner (may be a student, or parent of student)?
+        } // Is viewer a learner?
         elseif ($folderAccessLevel === UserAccess::ACCESS_READ) {
             // Is the viewer a participant themselves?
             if ($this->isVisibleToLearner($assessment, $viewer, $showClosed, $now)) {
                 return true;
-            }
-
-            // Are they are parent? Is assessment visible to their children?
-            foreach ($viewer->getChildren() as $child) {
-                // Is the child a participant, an assessment is visible to them?
-                if ($this->isVisibleToLearner($assessment, $child, $showClosed, $now)) {
-                    return true;
-                }
             }
         }
 
@@ -84,15 +73,19 @@ class Visibility
 
 
     /**
-     * Is the assessable not closed for the Instructor?
+     * Is the assessable visible to the Instructor? (Assumes the user is an instructor)
      *
      * @param IAssessable         $assessable
      * @param User                $instructor
+     * @param bool                $showClosed Should we show assessments after their closed date?
      * @param Alaress_Date_Format $now
      * @return bool
      */
-    private function isNotClosedForInstructor(IAssessable $assessable, User $instructor, Alaress_Date_Format $now): bool
+    public function isVisibleToInstructor(IAssessable $assessable, User $instructor, bool $showClosed,  Alaress_Date_Format $now): bool
     {
+        if ($showClosed) {
+            return true;
+        }
         // If instructor is also a participant, respect their custom close date.
         $participant = $assessable->getParticipantIfExtant($instructor);
         $closeDate   = $participant ? $participant->getCloseDate() : $assessable->getCloseAt();
@@ -101,7 +94,7 @@ class Visibility
 
 
     /**
-     * Is the assessable visible to the Learner?
+     * Is the assessable visible to the Learner? (Assumes user is a learner)
      *
      * @param IAssessable         $assessable
      * @param User                $learner
@@ -109,7 +102,7 @@ class Visibility
      * @param Alaress_Date_Format $now
      * @return bool
      */
-    private function isVisibleToLearner(IAssessable $assessable, User $learner, bool $showClosed, Alaress_Date_Format $now): bool
+    public function isVisibleToLearner(IAssessable $assessable, User $learner, bool $showClosed, Alaress_Date_Format $now): bool
     {
         $participant = $assessable->getParticipantIfExtant($learner);
         if (!$participant || $participant->isExcluded()) {

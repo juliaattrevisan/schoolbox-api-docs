@@ -16,11 +16,28 @@
 {% macro dueDate(assessable, user) %}
 {% spaceless %}
     {% import _self as dueDate %}
+    {# Is the current user a participant ? #}
     {% set participant = assessable.participantIfExtant(user) %}
     {% if participant %}
         {{ dueDate.participant(participant) }}
     {% else %}
-        {{ dueDate.assessment(assessable) }}
+        {# Is the user a parent? Check if any of their children are participants #}
+        {% set childParticipant = null %}
+        {% if user.role.parent %}
+            {% for child in user.children if not childParticipant %}
+                {% if assessable.isParticipant(child) %}
+                    {% set childParticipant = assessable.participant(child) %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        {% if childParticipant %}
+            {# We found a child of the parent who is participating, render their due date  #}
+            {{ dueDate.participant(childParticipant) }}
+        {% else %}
+            {# Not a participant, and not a parent of a participant  #}
+            {{ dueDate.assessment(assessable) }}
+        {% endif %}
     {% endif %}
 {% endspaceless %}
 {% endmacro %}
