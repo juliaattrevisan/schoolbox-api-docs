@@ -223,8 +223,6 @@ Usage:
         var $markTypeInput = $('#markType');
         $markTypeInput.on('change', checkRubricTotal);
 
-        var $fractionalTotalWarning = $('[data-rubric-total-fractional]');
-
         // Each time the user changes the value of a descriptor
         $rubric.on('blur keyup', '[data-descriptor-value]', function(){
             checkRubricTotal();
@@ -243,12 +241,6 @@ Usage:
          */
         function checkRubricTotal()
         {
-            // Is this Due Work using 'Total Mark' scheme?
-            if($markTypeInput.val() != {{ markTypeTotalMark }}){
-                $fractionalTotalWarning.hide();
-                return;
-            }
-
             var total = 0;
             $rubric.find('tr[data-sequencer-group]').each(function () {
                 var $row = $(this),
@@ -268,14 +260,7 @@ Usage:
                 total += rowMax;
             });
 
-            total = total.toFixed(5);
-
-            // Does the total contain a fractional component?
-            if(0 != total % 1){
-                $fractionalTotalWarning.show();
-            } else {
-                $fractionalTotalWarning.hide();
-            }
+            total = total.toFixed(2);
         }
         checkRubricTotal();
     });
@@ -328,10 +313,6 @@ Usage:
             <div class="alert-box alert" data-descriptors-changed>Warning! You have changed the value of existing descriptors! This will cause all existing graded student rubrics to be lost.</div>
         </div>
         {% endif %}
-
-        <div class="small-12 columns no-pad">
-            <div class="alert-box alert" data-rubric-total-fractional>This rubric's total mark is not a whole number. The maximum available marks will be rounded down to the nearest whole number.</div>
-        </div>
 
         <div class="small-12 columns no-pad">
             <a href="#" id="apply-resultset" class="button">Apply Result Set</a>
