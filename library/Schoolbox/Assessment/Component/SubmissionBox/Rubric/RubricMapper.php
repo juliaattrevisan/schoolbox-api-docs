@@ -656,7 +656,7 @@ class RubricMapper
     }
 
     /**
-     * Save rubrics selections for a particular Participant
+     * Save rubrics selections for a particular feedback.
      *
      * @param bool[] $descriptors key = descriptor.id, val = whether it is checked
      * @param int    $returnId    Feedback
