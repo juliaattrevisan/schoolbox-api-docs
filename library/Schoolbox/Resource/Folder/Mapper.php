@@ -48,8 +48,6 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Folder\Code as FolderCode;
-use Schoolbox\Mapper\Exception\Deleted as DeletedException;
-
 
 /**
  * Class Mapper
