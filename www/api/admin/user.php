@@ -104,7 +104,7 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
     echo $response;
 
 } elseif (empty($_GET['action'])) {
-    
+
     $response = "<?xml version='1.0' standalone='yes'?>
                  <response>
                     <code>400</code>
@@ -203,6 +203,8 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
                             <message>The user could not be updated. (Message: {$message})</message>
                          </response>";
         }
+
+        echo $response;
     }
 
     /* Delete operation */
