@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 
-use Alaress_Date_Format;
 use Schoolbox;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -152,95 +151,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         }
 
         return $collection;
-    }
-
-
-    /**
-     * Builds list of student's marks for all returns in the given category.
-     *
-     * @param int $category_id
-     * @param int $student_id
-     * @param array $extra_params Any extra filters:
-     *                            * owner - the creator of the submission box
-     *                            * visibility - a list containing the allowed
-     *                              submission box mark visibility values.
-     *                            * from (Alaress_Date_Format)
-     *                            * to (Alaress_Date_Format)
-     *
-     * @return array
-     */
-    public function getStudentMarks($category_id, $student_id, $extra_params = array())
-    {
-        //
-        // Build filters for query
-        $params = array(
-            'category' => $category_id,
-            'student' => $student_id,
-        );
-        $filters = array(
-            'sb.category = :category',
-            'sr.owner = :student',
-            'a.deleted_at IS NULL',
-        );
-        if (!empty($extra_params['owner'])) {
-            $params['owner'] = $extra_params['owner'];
-            $filters[] = 'sb.owner = :owner';
-        }
-        if (!empty($extra_params['visibility'])) {
-            $params = array_merge($params, $this->getArrayParameters($extra_params['visibility'], 'vis'));
-            $filters[] = 'sb.mark_visibility IN ' . $this->getArrayPlaceholders($extra_params['visibility'], 'vis');
-        }
-        // From/to dates
-        if ($extra_params['from'] instanceof Alaress_Date_Format && !$extra_params['from']->isNull()) {
-            $params['from'] = $extra_params['from']->getDatabaseDate();
-            $filters[]      = 'DATE(sb.date) >= :from';
-        }
-        if ($extra_params['to'] instanceof Alaress_Date_Format && !$extra_params['to']->isNull()) {
-            $params['to'] = $extra_params['to']->getDatabaseDate();
-            $filters[]    = 'DATE(sb.date) <= :to';
-        }
-        $filters = implode(' AND ', $filters);
-
-        // Get submission grade group, but only for letter grade submissions
-        $query = "
-            SELECT
-                sb.id AS box_id,
-                sr.mark,
-                sr.norm_mark,
-                sr.published_at,
-                sr.comment,
-                sb.weight,
-                sb.mark_type,
-                sb.submission_grade_group_id
-            FROM {$this->getTable()} sr
-            INNER JOIN {$this->getJoinSql('assessmentModel', 'sb', 'a')}
-            LEFT JOIN {$this->getJoinSql('submission_box', 'sr', 'sb')}
-            WHERE $filters
-            ORDER BY sr.published_at DESC
-        ";
-        $statement = $this->database->prepare($query);
-        $statement->execute($params);
-
-        //
-        // Ignore all but the most recent mark for each submission box.
-        $marks = array();
-        foreach ($statement as $row) {
-            $box_id = $row['box_id'];
-            $mark = $row['norm_mark'];
-            $pretty_mark = $row['mark'];
-            if (!array_key_exists($box_id, $marks)) {
-                $marks[$box_id] = array(
-                    'mark'                      => $mark,
-                    'pretty_mark'               => $pretty_mark,
-                    'comment'                   => $row['comment'],
-                    'date'                      => $row['returned'],
-                    'weight'                    => $row['weight'],
-                    'mark_type'                 => $row['mark_type'],
-                    'submission_grade_group_id' => $row['submission_grade_group_id'],
-                );
-            }
-        }
-        return $marks;
     }
 
 
