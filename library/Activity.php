@@ -13,19 +13,6 @@ class Activity {
 	    $this->db = DeprecatedDatabase::getInstance();
     }
 
-    function submissionDetails($id) {
-        //check for any new work
-        $count['duework'] = $this->newDueWork($id);
-        $count['retwork'] = $this->newReturnedWork($id);
-        $count['onlineAssessments'] = $this->newOnlineAssessments($id);
-        $count['reviewedOnlineAssessments'] = $this->newReviewedOnlineAssessments($id);
-
-        //check for new submissions in category submission boxes
-        $subboxes = $this->newSubmission($id);
-
-        $count['subboxes'] = $subboxes;
-        return $count;
-    }
 
     function set_var($varName, $varContents) {
         $this->t_body->set_var($varName, $varContents);
@@ -192,35 +179,4 @@ class Activity {
 
         return $result['retwork'];
     }
-
-
-    function newSubmission($category) {
-        $query = "
-            SELECT
-                submission_box.name AS description, submission_box.id, count(*) AS `count`
-            FROM
-                submission_box
-            LEFT JOIN submission_log ON
-                submission_log.page = '3'
-                AND submission_box.id = submission_log.sid
-                AND submission_log.user = {$this->db->smartQuote($_SESSION['id'])}
-            INNER JOIN student_submission ON
-                submission_box.id = student_submission.box_id
-            WHERE
-                submission_box.owner = {$this->db->smartQuote($_SESSION['id'])}
-                AND submission_box.deleted = '0'
-                AND submission_box.category = {$this->db->smartQuote($category)}
-                AND (submission_log.datetime IS NULL OR student_submission.submitted > submission_log.datetime)
-                AND submission_box.task_id IS NULL
-            GROUP BY
-                submission_box.name, submission_box.id
-        ";
-        $result = array();
-        $rh = $this->db->query($query);
-        while ($subbox = $this->db->getNextArray($rh)) {
-            $result[$subbox['id']] = $subbox;
-        }
-        return $result;
-    }
-
 }
