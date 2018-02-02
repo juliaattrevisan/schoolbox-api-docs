@@ -94,11 +94,12 @@ class SubmissionReturn extends DeprecatedModel
                     s.max_mark,
                     m.slug
                   FROM ( `" . $this->_table . "` r, submission_box s, folder c )
+                  INNER JOIN assessment a ON s.assessment_id = a.id
                   LEFT JOIN submission_mark_type m ON s.mark_type = m.mark_type_id
                   WHERE r.deleted_at IS NULL
                   AND r.box_id = s.id
                   AND s.category = c.id
-                  AND s.deleted IS FALSE
+                  AND a.deleted_at IS NULL
                   AND r.owner = '$user_id'";
         if ($box_id) {
             $query .= " AND r.box_id = $box_id";
