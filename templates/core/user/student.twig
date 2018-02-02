@@ -398,10 +398,18 @@
                                                 </div>
 
                                                 <!-- Collapsable content -->
-                                                {% if contact.StudentContactMobilePhone or contact.StudentContactOccupPhone or contact.StudentContactDefaultEmail %}
+                                                {% if (contact.StudentContactPhoneActual and not contact.StudentContactSilentPhoneFlag) or contact.StudentContactMobilePhone or contact.StudentContactOccupPhone or contact.StudentContactDefaultEmail %}
                                                     <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-contact-{{ loop.index }}">
                                                         <div class="list-item">
                                                             <div class="small-12">
+
+                                                                {% if contact.StudentContactPhoneActual and not contact.StudentContactSilentPhoneFlag %}
+                                                                    <div class="row">
+                                                                        <div class="column small-12 medium-5"><strong>Home Phone: </strong></div>
+                                                                        <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}">{{ contact.StudentContactPhoneActual }}</a></div>
+                                                                    </div>
+                                                                {% endif %}
+
                                                                 {% if contact.StudentContactMobilePhone %}
                                                                     <div class="row">
                                                                         <div class="column small-12 medium-5"><strong>Mobile Phone: </strong></div>
@@ -455,11 +463,19 @@
                                                             </div>
                                                         </div>
 
-                                                {% if contact.StudentContactSpouseMobilePhone or contact.StudentContactSpouseOccupPhone or contact.StudentContactSpouseDefaultEmail %}
+                                                {% if (contact.StudentContactPhoneActual and not contact.StudentContactSilentPhoneFlag) or contact.StudentContactSpouseMobilePhone or contact.StudentContactSpouseOccupPhone or contact.StudentContactSpouseDefaultEmail %}
                                                     <!-- Collapsable content -->
                                                     <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-spouse-{{ loop.index }}">
                                                         <div class="list-item">
                                                             <div class="small-12">
+
+                                                                {% if contact.StudentContactPhoneActual and not contact.StudentContactSilentPhoneFlag %}
+                                                                    <div class="row">
+                                                                        <div class="column small-12 medium-5"><strong>Home Phone: </strong></div>
+                                                                        <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}">{{ contact.StudentContactPhoneActual }}</a></div>
+                                                                    </div>
+                                                                {% endif %}
+
                                                                 {% if contact.StudentContactSpouseMobilePhone %}
                                                                     <div class="row">
                                                                         <div class="column small-12 medium-5"><strong>Mobile Phone: </strong></div>
@@ -493,17 +509,6 @@
                                             </li>
                                             {% endif %}
 
-                                            {% endif %}
-
-                                            {% if contact.StudentContactPhoneActual and not contact.StudentContactSilentPhoneFlag %}
-                                                <li>
-                                                    <div class="list-item">
-                                                        <div class="card small-12">
-                                                            <span class="icon-phone size-32" title="Home Phone"></span>
-                                                            <p><a href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}">{{ contact.StudentContactPhoneActual }}</a></p>
-                                                        </div>
-                                                    </div>
-                                                </li>
                                             {% endif %}
                                     {% endfor %}
                                 </ul>
