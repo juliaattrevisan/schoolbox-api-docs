@@ -17,8 +17,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfGradable;
-use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfReflection;
+use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
@@ -781,20 +780,17 @@ class Controller extends Assessment\Controller
         }
 
         /* If we're saving the final version of the submission (ie. not a draft) ram the current datetime in
-         * If this requires self-review, then this will always be a draft;
+         * If this requires self-assessment, then this will always be a draft;
          * participant must finalise their response as part of self-review.
          */
-        $selfReviewable =
-            (new ValidSelfReflection())->isSatisfiedBy($this->getUser(), $participant)
-            || (new ValidSelfGradable())->isSatisfiedBy($this->getUser(), $participant)
-        ;
+        $selfAssessed = (new ValidSelfAssessable())->isSatisfiedBy($this->getUser(), $participant);
 
         if ($isFinal) {
 
             /* submitted_at is determined after the next step when creating a self-assessed or self-reflected
              * response. Otherwise, proceed normally
              */
-            if (!$selfReviewable) {
+            if (!$selfAssessed) {
                 $response->setSubmittedAt(Alaress_Date_Format::now());
             }
         }
@@ -821,7 +817,7 @@ class Controller extends Assessment\Controller
          * This screen is shared between self-reflection and non-self-reflection steps
          * Self-reflection's plagscan stubs saving .......happens elsewhere
          */
-        if ($isFinal && !$selfReviewable && $response->getId()) {
+        if ($isFinal && !$selfAssessed && $response->getId()) {
             foreach ($response->getAllFiles() as $currentFile) {
                 if (!$currentFile->getEditableInline()) {
                     $plagscanMapper->saveNewPlagscanStub($currentFile);
@@ -834,8 +830,8 @@ class Controller extends Assessment\Controller
          */
         $this->getResponse()->content->set([
             'postOutput' => [
-                function() use ($plagscanMapper, $isFinal, $selfReviewable, $response) {
-                    if ($isFinal && !$selfReviewable && $response->getId()) {
+                function() use ($plagscanMapper, $isFinal, $selfAssessed, $response) {
+                    if ($isFinal && !$selfAssessed && $response->getId()) {
                         foreach ($response->getAllFiles() as $currentFile) {
                             $filename = $plagscanMapper->plagscanFilename($currentFile);
 
@@ -860,7 +856,7 @@ class Controller extends Assessment\Controller
 
             /* Go to the next step of Self-Assessment/Self-Reflection if appropriate
              */
-            if ($selfReviewable) {
+            if ($selfAssessed) {
                 $rs->redirect->to(
                     $this->getRouter()->generate(
                         'learningDueWorkResponse.getParticularResponseForSelfReflection',
