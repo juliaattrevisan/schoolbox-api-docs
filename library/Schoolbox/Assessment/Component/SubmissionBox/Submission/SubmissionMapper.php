@@ -198,41 +198,6 @@ class SubmissionMapper extends BaseMapper
 
 
     /**
-     * @param int $userId
-     * @param int $boxId
-     * @return ActivityCollection
-     * @throws BaseMapper\DefinitionException
-     * @deprecated 165
-     */
-    public function getHistory($userId, $boxId)
-    {
-        $boxJoin      = $this->getJoinMapper('box_id');
-        $categoryJoin = $boxJoin->getJoinMapper('category');
-
-        $query = "
-            SELECT
-                {$this->getColumnString('ss')},
-                {$boxJoin->getColumnString('sb')},
-                {$categoryJoin->getColumnString('c')}
-            FROM {$this->getTable()} ss
-            LEFT JOIN {$this->getJoinSql('box_id', 'ss', 'sb')}
-            LEFT JOIN {$boxJoin->getJoinSql('category', 'sb', 'c')}
-            WHERE sb.id = :box_id
-            AND ss.owner = :user_id
-            AND ss.submitted_at IS NOT NULL
-            ORDER BY ss.submitted_at DESC
-        ";
-
-        $params = array(
-            'user_id' => $userId,
-            'box_id'  => $boxId,
-        );
-
-        return $this->hydrateActivities($query, $params);
-    }
-
-
-    /**
      * @param string $query
      * @param array  $params
      * @return ActivityCollection

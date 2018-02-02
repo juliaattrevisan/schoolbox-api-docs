@@ -249,55 +249,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         return $marks;
     }
 
-    /**
-     * Retrieves activity list for the student's submission history.
-     *
-     * @param $user_id
-     * @param $box_id
-     *
-     * @return ActivityCollection
-     * @deprecated 165
-     */
-    public function getHistory($user_id, $box_id)
-    {
-        $collection = new ActivityCollection();
-        $factory = new ActivityFactory();
-        $box_join = $this->getJoinMapper('submission_box');
-        $category_join = $box_join->getJoinMapper('category');
-        //
-        // Have hydrateFromRow() in ActivityFactory
-        $query = "
-			SELECT
-				{$this->getColumnString('sr')},
-				{$box_join->getColumnString('sb')},
-				{$category_join->getColumnString('c')},
-				{$this->getJoinColumnString('storage', 'files')},
-				{$this->getJoinColumnString('storage.allowedFileExtension', 'mime')}
-			FROM {$this->getTable()} sr
-			LEFT JOIN {$this->getJoinSql('submission_box', 'sr', 'sb')}
-			LEFT JOIN {$box_join->getJoinSql('category', 'sb', 'c')}
-			LEFT JOIN {$this->getJoinSql('storage', 'sr', 'files')}
-			LEFT JOIN {$this->getJoinSql('storage.allowedFileExtension', 'files', 'mime')}
-			WHERE sr.owner = :user_id
-			AND sb.id = :box_id
-			ORDER BY sr.returned DESC
-		";
-        $statement = $this->database->prepare($query);
-        $params['user_id'] = $user_id;
-        $params['box_id'] = $box_id;
-        foreach ($params as $key => $value) {
-            $statement->bindParam($key, intval($value), \PDO::PARAM_INT);
-        }
-        $statement->execute();
-        foreach ($statement as $row) {
-            $collection->add(
-                $factory->buildFromReturnedWork(
-                    $this->hydrateForActivityList($row)
-                )
-            );
-        }
-        return $collection;
-    }
 
     /**
      * Custom hydration method used by methods that get an activity list.
