@@ -198,34 +198,6 @@ class SubmissionMapper extends BaseMapper
 
 
     /**
-     * @param string $query
-     * @param array  $params
-     * @return ActivityCollection
-     */
-    protected function hydrateActivities($query, $params)
-    {
-        $factory       = new ActivityFactory();
-        $collection    = new ActivityCollection();
-
-        $statement = $this->database->prepare($query);
-
-        foreach ($params as $key => $value) {
-            $statement->bindParam($key, intval($value), \PDO::PARAM_INT);
-        }
-        $statement->execute();
-        foreach ($statement as $row) {
-            $collection->add(
-                $factory->buildFromStudentSubmission(
-                    $this->hydrateForActivityList($row)
-                )
-            );
-        }
-
-        return $collection;
-    }
-
-
-    /**
      * Custom hydration method used by methods that get an activity list.
      *
      * This expects the following aliases:
