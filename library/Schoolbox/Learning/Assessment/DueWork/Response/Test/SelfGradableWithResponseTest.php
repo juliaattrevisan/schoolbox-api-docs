@@ -19,7 +19,7 @@ use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Plan;
 use Schoolbox\User;
 
-class SelfAssessmentWithResponseTest extends TestCase
+class SelfGradableWithResponseTest extends TestCase
 {
     /**
      * @dataProvider provider_validSelfAssessable

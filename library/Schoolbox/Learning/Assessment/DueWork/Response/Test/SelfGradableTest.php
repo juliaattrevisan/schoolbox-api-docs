@@ -22,7 +22,7 @@ use Schoolbox\Learning\Assessment\Task;
 use Schoolbox\User;
 use UnexpectedValueException;
 
-class SelfAssessmentTest extends TestCase
+class SelfGradableTest extends TestCase
 {
 
     /**
