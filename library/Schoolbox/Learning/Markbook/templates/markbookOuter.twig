@@ -42,7 +42,9 @@
             /* Controls for Averages and Dynamic updates for input fields
              */
             $('[data-mark-sheet]').marksheetAverages();
-            $('[data-mark-sheet]').marksheetInputs();
+
+            // Formally disable setting of averages (they have been gone for a while)
+            // $('[data-mark-sheet]').marksheetInputs();
 
             // Enable the download report menu
             $('#report_actions').foundation();
