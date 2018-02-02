@@ -47,11 +47,10 @@ class ValidAssessmentType implements IAuthorizationRule
     {
         $assessable     = $this->findAssessment($params);
         $assessmentType = AssessmentType::objectToString($assessable);
-        if (in_array($assessmentType, $this->validTypes, true)) {
+        if (\in_array($assessmentType, $this->validTypes, true)) {
             return true;
         }
         throw new Forbidden("Invalid assessment type. Found: {$assessmentType}");
-
     }
 
 
