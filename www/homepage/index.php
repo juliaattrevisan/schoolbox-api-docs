@@ -10,6 +10,7 @@
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use \Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 $folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
 $termMapper = Schoolbox\Assessment\Term\Mapper::getInstance();
@@ -72,13 +73,13 @@ elseif (!is_numeric($this->arg[0])) {
  * Check that it's not softdeleted
  */
 if (!($folder instanceof \Schoolbox\Resource\Folder\Model) || $folder->isDeleted()) {
-    error(18);
+    error(ErrorMapper::ERROR_SUBJECT_DELETED);
 }
 
 // confirm that the user has permission to view this page
 $access = \Schoolbox\Permission\Access\Access::getInstance();
 if (($actualPermission = $access->getFolderAccess($this->getDi()->get('session')->get('user'), $folder->getId())) < READ_ACCESS) {
-    error(14);
+    error(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
 }
 
 // If I'm a write level user, I can downgrade myself to read access

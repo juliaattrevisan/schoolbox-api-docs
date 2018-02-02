@@ -546,18 +546,18 @@ class UserAccessMapper extends Mapper
                 foreach ($externalSubjectList as $currentSubject) {
 
                     foreach ($codes as $code) {
+                        //If the code has a '/' it might not contain a campus
+                        //The class code itself may have a '/' in it. Check for exact match first
+                        if (strtolower($currentSubject["code"]) == strtolower($code)) {
+                            return true;
+                        }
 
-                        // Check if there is a campus mangled in the class code
-
+                        //Then check if there is a campus mangled in the class code
                         if (strpos($code, '/') !== false) {
-                            $codeArray = explode('/', $code);
+                            $codeArray = explode('/', $code, 2);
                             if (strtolower($currentSubject["code"]) == strtolower($codeArray[1]) &&
                                 strtolower($currentSubject["campusCode"]) == strtolower($codeArray[0])
                             ) {
-                                return true;
-                            }
-                        } else {
-                            if (strtolower($currentSubject["code"]) == strtolower($code)) {
                                 return true;
                             }
                         }
