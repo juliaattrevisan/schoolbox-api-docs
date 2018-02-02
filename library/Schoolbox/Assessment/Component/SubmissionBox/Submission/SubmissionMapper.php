@@ -198,36 +198,6 @@ class SubmissionMapper extends BaseMapper
 
 
     /**
-     * Custom hydration method used by methods that get an activity list.
-     *
-     * This expects the following aliases:
-     * * ss:  this submission
-     * * sb:  submission box
-     * * c:   category
-     * * h:   storage
-     * * afe: allowed file extension
-     *
-     * @param array $row
-     * @return Submission
-     * @throws BaseMapper\DefinitionException
-     * @throws MapperException
-     */
-    protected function hydrateForActivityList($row) {
-        $boxJoin = $this->getJoinMapper('box_id');
-        $categoryJoin = $boxJoin->getJoinMapper('category');
-
-        $submission = $this->hydrate($row, 'ss');
-        $box        = $boxJoin->hydrate($row, 'sb');
-        $category   = $categoryJoin->hydrate($row, 'c');
-
-        $box->setCategory($category);
-        $submission->setSubmissionBox($box);
-
-        return $submission;
-    }
-
-
-    /**
      * Retrieves draft submissions for this user and box, ordered by most recent first.
      *
      * @param int $user_id

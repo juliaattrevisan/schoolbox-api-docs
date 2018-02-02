@@ -251,44 +251,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
 
 
     /**
-     * Custom hydration method used by methods that get an activity list.
-     *
-     * This expects the following aliases:
-     * * sr:   this return
-     * * sb:   submission box
-     * * c:    category
-     * * file: attached storage, if applicable
-     *
-     * @param array $row
-     *
-     * @return ReturnedWork
-     */
-    protected function hydrateForActivityList($row)
-    {
-        $box_join      = $this->getJoinMapper('submission_box');
-        $category_join = $box_join->getJoinMapper('category');
-        $storage_join  = $this->getJoinMapper('storage');
-        $mime_join     = $storage_join->getJoinMapper('allowedFileExtension');
-
-        $return   = $this->hydrate($row, 'sr');
-        $box      = $box_join->hydrate($row, 'sb');
-        $category = $category_join->hydrate($row, 'c');
-
-        $box->setCategory($category);
-        $return->setSubmissionBox($box);
-
-        if ($row['files.hash']) {
-            $storage  = $storage_join->hydrate($row, 'files');
-            $mime     = $mime_join->hydrate($row, 'mime');
-
-            $storage->setMimetype($mime);
-            $return->setStorage($storage);
-        }
-
-        return $return;
-    }
-
-    /**
      * Retrieves the number of returns that have been made on each box in a
      * list.
      *
