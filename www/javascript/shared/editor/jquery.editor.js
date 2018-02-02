@@ -407,5 +407,21 @@
 
             });
         }
-	}
+	};
+
+    // Remove unsupported table options on table properties dialog open
+    CKEDITOR.on('dialogDefinition', function(ev) {
+        var dialogName = ev.data.name;
+        var dialogDefinition = ev.data.definition;
+
+        if (dialogName === 'table' || dialogName === 'tableProperties') {
+            var contents = dialogDefinition.getContents('info');
+            
+            contents.remove('txtCellSpace'); // Cell spacing table attribute is overridden by css, and deprecated in HTML5
+            contents.remove('txtCellPad'); // Cell padding table attribute is overridden by css, and deprecated in HTML5
+            contents.remove('txtCaption'); // table caption is deprecated HTML5
+            contents.remove('txtSummary'); // table summary is deprecated in HTML5
+        }
+    });
+
 })(jQuery);
