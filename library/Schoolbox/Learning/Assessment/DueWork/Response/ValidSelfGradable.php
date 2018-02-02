@@ -2,7 +2,7 @@
 /**
  * ValidSelfReflection
  *
- * This (assessment, user) combination is currently valid for self-reflection
+ * This (assessment, user) combination is currently valid for self-grading
  *
  * TODO: Can you self-reflect on behalf of someone else, via SOBO?
  *
@@ -17,7 +17,7 @@ use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
 use UnexpectedValueException;
 
-class ValidSelfGradable extends ValidSelfReflection
+class ValidSelfGradable extends ValidSelfAssessable
 {
 
     /**

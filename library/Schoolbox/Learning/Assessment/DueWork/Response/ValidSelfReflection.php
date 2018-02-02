@@ -3,6 +3,7 @@
  * ValidSelfReflection
  *
  * This (assessment, user) combination is currently valid for self-reflection
+ * (but not self-grading)
  *
  * TODO: Can you self-reflect on behalf of someone else, via SOBO?
  *
@@ -13,75 +14,12 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
-use Schoolbox\Learning\Assessment\DueWork;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
 use UnexpectedValueException;
 
-class ValidSelfReflection
+class ValidSelfReflection extends ValidSelfAssessable
 {
-
-    /**
-     * The currently-logged-in user
-     *
-     * @var User
-     */
-    protected $user;
-
-    /**
-     * @var IAssessable
-     */
-    protected $assessment;
-
-    /**
-     * @var Participant
-     */
-    protected $participant;
-
-
-    /**
-     * Helper method to avoid repeated type-hints and instanceof checks
-     * Will throw a type error if participant is not for a dueWork
-     *
-     * @param Participant $participant
-     * @return DueWork\Model|IAssessable
-     */
-    protected function getDueWork(Participant $participant): DueWork\Model
-    {
-        return $participant->getAssessable();
-    }
-
-
-    /**
-     * Participant is the same as current logged-in user
-     *
-     * @param User        $user
-     * @param Participant $participant
-     * @return bool
-     */
-    protected function isViewingOwnParticipation(User $user, Participant $participant): bool
-    {
-        return $user->getId() === $participant->getUser()->getId();
-
-        /* TODO: Can you self-reflect on behalf of someone else, via SOBO?
-         */
-    }
-
-
-    /**
-     * The IAssessable is a Due Work
-     * Other assessment types don't support self-reflection here
-     *
-     * @param Participant $participant
-     * @return bool
-     */
-    protected function isDueWork(Participant $participant): bool
-    {
-        return $participant->getAssessable() instanceof DueWork\Model;
-    }
-
-
     /**
      * The IAssessable is set to Self-Reflect
      *
@@ -93,25 +31,6 @@ class ValidSelfReflection
     {
         return $this->getDueWork($participant)->isSelfReflectableOnly();
     }
-
-
-    /**
-     * The Participant has at least one IResponse
-     *
-     * I am making a logical leap and assuming that the IResponse is a draft when
-     * attempting a self-reflection, and only Submitted officially after that step
-     * so I can't use $this->participant->hasSubmittedResponse()
-     *
-     * @param Participant $participant
-     * @return bool
-     */
-    protected function hasDraftResponse(Participant $participant): bool
-    {
-        $mostRecentResponse = $participant->findMostRecentResponse();
-
-        return $mostRecentResponse && !$mostRecentResponse->isSubmitted();
-    }
-
 
     /**
      * The user can start the self-reflection process

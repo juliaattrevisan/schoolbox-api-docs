@@ -2,7 +2,8 @@
 /**
  * ValidSelfReflection
  *
- * This (assessment, user) combination is currently valid for self-reflection
+ * This (assessment, user) combination is currently valid for self-grading,
+ * and also has a draft response that can be published.
  *
  * TODO: Can you self-reflect on behalf of someone else, via SOBO?
  *
