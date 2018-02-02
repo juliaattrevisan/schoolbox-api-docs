@@ -10,9 +10,6 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox\Submission;
 
 use PDOStatement;
-use Schoolbox\Assessment\Activity;
-use Schoolbox\Assessment\ActivityCollection;
-use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;

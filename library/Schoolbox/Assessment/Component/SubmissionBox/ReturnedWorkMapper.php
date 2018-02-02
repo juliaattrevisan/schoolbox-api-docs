@@ -11,16 +11,10 @@ namespace Schoolbox\Assessment\Component\SubmissionBox;
 
 use Alaress_Date_Format;
 use Schoolbox;
-use Schoolbox\Assessment\ActivityFactory;
-use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Mapper as ReturnedWorkFileMapper;
-use Schoolbox\Collection;
 use PDOStatement;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\UserMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission as StudentSubmission;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
 use Schoolbox\GenericCollection;
 
