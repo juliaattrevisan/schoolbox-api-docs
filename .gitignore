@@ -39,6 +39,5 @@ www/css/foundation/utils/_custom.scss
 post-provision.sh
 .idea/
 browscap.ini
-.*.lock
 *.lock
 version.json
