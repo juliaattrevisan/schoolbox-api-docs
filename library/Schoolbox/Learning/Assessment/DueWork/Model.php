@@ -642,7 +642,7 @@ class Model extends AbstractAssessment
         if (null === $this->selfReviewable) {
             throw new UnexpectedValueException('Property not set');
         }
-        $selfAssessableStates = [SubmissionBox::SELF_REVIEWABLE_FULL, SubmissionBox::SELF_REVIEWABLE_FULL];
+        $selfAssessableStates = [SubmissionBox::SELF_REVIEWABLE_FULL, SubmissionBox::SELF_REVIEWABLE_REFLECT_ONLY];
         return \in_array($this->selfReviewable, $selfAssessableStates, true);
     }
 

@@ -51,10 +51,10 @@
                 <li class="icon-calendar">{{ dueDate.assessment(assessment) }}</li>
             {% endif %}
 
-            {# Self Assessment/Reflection state #}
-            {% if assessment.isSelfAssessable %}
+            {# Due work's self-gradability state #}
+            {% if assessment.isSelfGradable %}
                 {% set selfReflectSuffix = 'includes ' ~ locale.selfAssessment.proper %}
-            {% elseif assessment.isSelfReflectable %}
+            {% elseif assessment.isSelfReflectableOnly %}
                 {% set selfReflectSuffix = 'includes ' ~ locale.selfReflection.proper %}
             {% else %}
                 {% set selfReflectSuffix = '' %}
