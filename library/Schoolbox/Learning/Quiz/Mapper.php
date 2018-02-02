@@ -12,7 +12,6 @@ use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
-use Schoolbox\Assessment\IActivityMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
