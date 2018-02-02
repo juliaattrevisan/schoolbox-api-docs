@@ -1715,7 +1715,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
               LEFT JOIN `course_implementation`                 AS `ci`   ON `ci`.`id`       = `cui`.`course_implementation_id` AND `ci`.deleted_at IS NULL 
               LEFT JOIN `task`                                  AS `t`    ON `a`.`id`        = `t`.`assessment_id` AND `t`.deleted_at IS NULL 
               LEFT JOIN `assess`                                AS `q`    ON `a`.`id`        = `q`.`assessment_id` AND `q`.deleted_at IS NULL 
-              LEFT JOIN `submission_box`                        AS `d`    ON `a`.`id`        = `d`.`assessment_id` AND `d`.deleted = 0 
+              LEFT JOIN `submission_box`                        AS `d`    ON `a`.`id`        = `d`.`assessment_id`
               LEFT JOIN `task_completion`                       AS `tc`   ON `t`.`id`        = `tc`.`task_id` AND `tc`.deleted_at IS NULL 
               LEFT JOIN `assess_attempt`                        AS `qa`   ON `q`.`assess_id` = `qa`.`assess_id` AND `qa`.deleted_at IS NULL 
               LEFT JOIN `student_submission`                    AS `ss`   ON `ss`.`box_id`   = `d`.id AND `ss`.deleted_at IS NULL 
@@ -1853,7 +1853,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
               LEFT JOIN `task`                                  AS `tk`   ON `tk`.`assessment_id` = `a`.`id` AND `tk`.deleted_at IS NULL 
               LEFT JOIN `assess`                                AS `qz`   ON `qz`.`assessment_id` = `a`.`id` AND `qz`.deleted_at IS NULL 
-              LEFT JOIN `submission_box`                        AS `dw`   ON `dw`.`assessment_id` = `a`.`id` AND `dw`.deleted = 0 
+              LEFT JOIN `submission_box`                        AS `dw`   ON `dw`.`assessment_id` = `a`.`id`
 
               LEFT JOIN `task_completion`                       AS `tkc`  ON `tkc`.`task_id` = `tk`.`id` AND `tkc`.deleted_at IS NULL 
               LEFT JOIN `assess_attempt`                        AS `qza`  ON `qza`.`assess_id` = `qz`.`assess_id` AND `qza`.deleted_at IS NULL 

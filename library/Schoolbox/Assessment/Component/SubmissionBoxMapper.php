@@ -332,383 +332,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         return $years;
     }
 
-    /**
-    * Conversion of SubmissionBoxHandler->getAllYearsByUser().
-    *
-    * @todo move to a more appropriate class?
-    *
-    * This could get a list of categories which have submissions, and pass to
-    * CategoryMapper->getByIds()?
-    *
-    * @param int                  $user_id  The user ID to retrieve for.
-    * @param \Alaress_Date_Format $from
-    * @param \Alaress_Date_Format $to
-    *
-    * @return array
-    */
-    public function submittedToCategoryList($user_id, \Alaress_Date_Format $from, \Alaress_Date_Format $to)
-    {
-        $parts = [
-            '(ss.owner = :user_id OR sr.owner = :user_id)',
-            'sb.deleted IS FALSE',
-        ];
-        $params['user_id'] = $user_id;
-        if (!$from->isNull()) {
-            $params['from'] = $from->getDatabaseDate();
-            $parts[]        = 'DATE(sb.date) >= :from';
-        }
-        if (!$to->isNull()) {
-            $params['to'] = $to->getDatabaseDate();
-            $parts[]      = 'DATE(sb.date) <= :to';
-        }
-        $wherePart = implode(' AND ', $parts);
-        $query     = "
-			SELECT folder.id, folder.name, GROUP_CONCAT(cc.code) AS code
-			FROM folder
-			LEFT JOIN folder_code cc ON folder.id = cc.folder_id AND cc.deleted_at IS NULL
-			WHERE folder.id IN (
-				SELECT DISTINCT sb.category
-				FROM submission_box sb
-				LEFT JOIN student_submission ss ON ss.box_id = sb.id
-				LEFT JOIN submission_return  sr ON sr.box_id = sb.id
-				WHERE $wherePart
-			)
-			GROUP BY folder.id
-			ORDER BY folder.name";
-
-        $statement = $this->database->prepare($query);
-        $statement->execute($params);
-        return $statement->fetchAll();
-    }
-
-
-    /**
-    * Conversion of SubmissionBoxHandler->getAllDueWork().
-    *
-    * @todo Implement this as an activity list instead of an array return
-    *
-    * @param int                  $user_id    The user ID to retrieve for.
-    * @param array                $categories The categories to search for.
-    * @param \Alaress_Date_Format $from
-    * @param \Alaress_Date_Format $to
-    *
-    * @return array
-    */
-    public function getAllDueWork($user_id, $categories, \Alaress_Date_Format $from, \Alaress_Date_Format $to)
-    {
-        // Submission box: hydrate with category, student submissions and returns.
-        $parts = [
-            'b.deleted = 0',
-            "b.category IN {$this->getArrayPlaceholders($categories, 'category')}",
-        ];
-        $params = $this->getArrayParameters($categories, 'category');
-        $params['user_id'] = $user_id;
-        if (!$from->isNull()) {
-            $params['from'] = $from->getDatabaseDate();
-            $parts[]        = 'DATE(b.date) >= :from';
-        }
-        if (!$to->isNull()) {
-            $params['to'] = $to->getDatabaseDate();
-            $parts[]      = 'DATE(b.date) <= :to';
-        }
-
-        $wherePart = implode(' AND ', $parts);
-        $query     = "
-			SELECT
-			b.id AS bid,
-			s.id AS sid,
-			r.id AS rid,
-			UNIX_TIMESTAMP(b.late_date) AS lateDate,
-			UNIX_TIMESTAMP(b.date) AS dueDate,
-			c.name AS categoryName,
-			b.name,
-			b.description,
-			r.mark,
-			r.norm_mark,
-			r.comment,
-			b.mark_visibility,
-			b.self_assessable,
-			b.self_reflectable,
-			b.created, s.submitted_at, r.published_at
-			FROM submission_box b
-			LEFT JOIN folder c ON c.id = b.category
-			LEFT JOIN student_submission s ON s.box_id = b.id AND (s.owner = :user_id OR s.owner IS NULL)
-			LEFT JOIN submission_return  r ON r.box_id = b.id AND (r.owner = :user_id OR r.owner IS NULL)
-			WHERE $wherePart
-			GROUP BY b.id
-			ORDER BY categoryName, b.created DESC, s.submitted_at DESC, r.published_at DESC
-		";
-
-        $statement = $this->database->prepare($query);
-        $statement->execute($params);
-        return $statement->fetchAll();
-    }
-
-    /**
-    * Gets the list of activities related to submission boxes.
-    *
-    * The following activities are retrieved:
-    *
-    * * New submission boxes
-    * * Overdue submission boxes, which the user hasn't submitted work for
-    *   (The implementation in Submission->getActivityLog() appears to fetch
-    *    submission boxes which the user has submitted work for)
-    * * Closed submission boxes
-    *
-    * @param int   $user_id    The user for who activities are fetched for.
-    * @param int   $limit      The max number of activities to be fetched.
-    * @param array $categories The categories to fetch activities for.
-    *
-    * @return ActivityCollection
-    */
-    public function getActivities($user_id, $limit, $categories)
-    {
-        $factory    = new ActivityFactory();
-        $collection = new ActivityCollection();
-        $queries = array(
-            array(
-                'event' => 'new',
-                'query' => "
-					SELECT
-						{$this->getColumnString('sb')},
-						{$this->getJoinMapper('category')->getColumnString('c')}
-					FROM {$this->getTable()} sb
-					LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
-					WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
-					AND sb.open_date < NOW()
-					AND sb.deleted IS FALSE
-					ORDER BY sb.open_date DESC
-					LIMIT :limit
-				",
-                'date_field' => 'openDate',
-                'limit'      => $limit,
-            ),
-            array(
-                //
-                // Overdue: shouldn't this be for items which a student hasn't
-                // submitted, instead of one which they have?
-                'event' => 'overdue',
-                'query' => "
-					SELECT
-						{$this->getColumnString('sb')},
-						{$this->getJoinMapper('category')->getColumnString('c')}
-					FROM {$this->getTable()} sb
-					LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
-					LEFT JOIN {$this->getJoinSql('submission', 'sb', 'sm')} AND sm.owner = :user_id
-					WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
-					AND sm.id IS NULL
-					AND sb.deleted IS FALSE
-					AND sb.accept_submission = 1
-					AND sb.date < NOW()
-					ORDER BY sb.date DESC
-					LIMIT :limit
-				",
-                'date_field' => 'dueDate',
-                'limit'      => $limit,
-                'user_id'    => $user_id,
-            ),
-            array(
-                'event' => 'closed',
-                'query' => "
-					SELECT
-						{$this->getColumnString('sb')},
-						{$this->getJoinMapper('category')->getColumnString('c')}
-					FROM {$this->getTable()} sb
-					LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
-					WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
-					AND sb.deleted IS FALSE
-					AND sb.accept_submission = 1
-					AND sb.late_date < NOW()
-					ORDER BY sb.late_date DESC
-					LIMIT :limit
-				",
-                'date_field' => 'lateDate',
-                'limit'      => $limit,
-            ),
-        );
-
-        foreach ($queries as $query) {
-            $statement = $this->database->prepare($query['query']);
-            $params    = $this->getArrayParameters($categories, 'category');
-            if (!empty($query['limit'])) {
-                $params['limit'] = $query['limit'];
-            }
-            if (!empty($query['user_id'])) {
-                $params['user_id'] = $query['user_id'];
-            }
-            foreach ($params as $key => $value) {
-                $statement->bindParam($key, intval($value), PDO::PARAM_INT);
-            }
-            $statement->execute();
-
-            foreach ($statement as $row) {
-                $box = $this->hydrate($row, 'sb');
-                $box->setCategory($this->getJoinMapper('category')->hydrate($row, 'c'));
-                $collection->add($factory->buildFromSubmissionBox($box, $query['event']));
-            }
-        }
-
-        return $collection;
-    }
-
-    /**
-     * Gets the list of upcoming activities for submission boxes.
-     *
-     * The following activities are retrieved:
-     *
-     * * Upcoming submission boxes, which the user hasn't submitted work for
-     *
-     * @param int|null  $user_id    The user for whom activities are fetched, or null if any.
-     * @param int       $limit      The max number of activities to be fetched, or 0 if all.
-     * @param array|int $categories The category/ies to fetch activities for.
-     *
-     * @return ActivityCollection|Activity[]
-     */
-    public function getUpcomingActivities($user_id, $limit, $categories)
-    {
-        if (!is_array($categories)) {
-            $categories = array($categories);
-        }
-        //
-        // All submission boxes that are due in the future.
-        $submission_mapper = $this->getJoinMapper('submission');
-
-        $lim = $limit ? 'LIMIT :limit' : '';
-
-        if (is_null($user_id)) {
-            $selectCount = '';
-            $having = '';
-        } else {
-            // NOTICE THE COMMA!
-            $selectCount = "
-                , (
-                  SELECT COUNT(*) FROM {$submission_mapper->getTable()} sm
-                  WHERE sb.id=sm.submission_box_id AND sm.owner = :user_id
-                )
-                AS submission_count
-            ";
-            $having = "HAVING (submission_count = 0 OR sb.multi_submission IS TRUE)";
-        }
-
-        $query = "
-			SELECT
-				{$this->getColumnString('sb')},
-				{$this->getJoinMapper('category')->getColumnString('c')}
-				$selectCount
-			FROM {$this->getTable()} sb
-			LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
-			WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
-			AND sb.late_date > NOW()
-			AND sb.deleted IS FALSE
-			$having
-			ORDER BY sb.date ASC
-			$lim
-		";
-        $statement = $this->database->prepare($query);
-
-        if (!is_null($user_id)) {
-            $statement->bindValue('user_id', $user_id, PDO::PARAM_INT);
-        }
-
-        if ($limit) {
-            $statement->bindValue('limit', intval($limit), PDO::PARAM_INT);
-        }
-
-        foreach ($this->getArrayParameters($categories, 'category') as $param => $value) {
-            $statement->bindValue($param, $value, PDO::PARAM_INT);
-        }
-        $statement->execute();
-        $boxes = $this->hydrateList($statement, 'sb', function($mapper, $model, $row) {
-            /**
-             * @var SubmissionBox $model
-             * @var self $mapper
-             */
-            $model->setCategory($mapper->getJoinMapper('category')->hydrate($row, 'c'));
-            return $model;
-        });
-
-        $factory    = new ActivityFactory();
-        $collection = new ActivityCollection();
-        foreach ($boxes as $box) {
-            $collection->add($factory->buildFromSubmissionBox($box, 'upcoming'));
-        }
-        return $collection;
-    }
-
-
-    /**
-    * Retrieves all submission boxes which take online submissions within a
-    * given category.
-    *
-    * @param User     $user     The user to filter submissions for
-    * @param Folder\Model $category If set, restrict results to this category.
-    *
-    * @return Collection
-    */
-    public function getSubmittable(User $user, Folder\Model $category = null)
-    {
-        /** @var Folder\Mapper $cat_mapper */
-        $cat_mapper = $this->getJoinMapper('category');
-
-        //
-        // only use the external user if the external DB is set up.
-        if ($this->getConfigLoader()->get('external_enable')) {
-            $cat_mapper->setExternalUser(new \External_User());
-        }
-        $user_categories = $cat_mapper->findForUser($user, true);
-        $cat_ids         = array();
-        foreach ($user_categories as $cat) {
-            $cat_ids[] = $cat->getId();
-        }
-
-        if ($category) {
-            $cat_ids = array_intersect($cat_ids, array($category->getId()));
-        }
-
-        //
-        // Get list of valid categories for the given user.
-        $params      = array();
-        $where_parts = array(
-            'sb.open_date <= NOW()',
-            'sb.late_date > NOW()',
-            'sb.accept_submission IS TRUE',
-            'sb.deleted IS FALSE',
-        );
-        if ($cat_ids) {
-            $params        = $this->getArrayParameters($cat_ids, 'cat');
-            $where_parts[] = 'sb.category IN '.$this->getArrayPlaceholders($cat_ids, 'cat');
-        }
-        $where = implode(' AND ', $where_parts);
-        $query = "
-			SELECT {$this->getColumnString('sb')}, {$cat_mapper->getColumnString('c')}
-			FROM {$this->getTable()} sb
-			INNER JOIN {$this->getJoinSql('category', 'sb', 'c')}
-			WHERE $where
-			ORDER BY c.name ASC
-		";
-        $statement = $this->database->prepare($query);
-        $statement->execute($params);
-
-        //
-        // Load categories.
-        $collection = $this->hydrateList($statement, 'sb', function($mapper, $model, $row) use ($cat_mapper) {
-            /** @var SubmissionBox $model */
-            $model->setCategory($cat_mapper->hydrate($row, 'c'));
-            return $model;
-        });
-
-        //
-        // Load category codes too.
-        /** @var Folder\Code\Mapper $code_mapper */
-        $code_mapper = $cat_mapper->getJoinMapper('codes');
-        $code_mapper->applyCodesToCategories($collection,
-            function ($item) {
-                /** @var SubmissionBox $item */
-                return $item->getCategory();
-            }
-        );
-        return $collection;
-    }
 
     /**
     * Gets all submission boxes that are due within the given date span.
@@ -730,18 +353,19 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $cat_mapper  = $this->getJoinMapper('category');
         $user_mapper = $this->getJoinMapper('owner');
         $query = "
-			SELECT
-				{$this->getColumnString('sb')},
-				{$cat_mapper->getColumnString('c')},
-				{$user_mapper->getColumnString('u')}
-			FROM {$this->getTable()} sb
-			LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
-			LEFT JOIN {$this->getJoinSql('owner',    'sb', 'u')}
-			WHERE sb.category IN {$this->getArrayPlaceholders($category_list, 'category')}
-			AND sb.date BETWEEN :from_date AND :to_date
-			AND sb.deleted IS FALSE
-			ORDER BY sb.date ASC
-		";
+            SELECT
+                {$this->getColumnString('sb')},
+                {$cat_mapper->getColumnString('c')},
+                {$user_mapper->getColumnString('u')}
+            FROM {$this->getTable()} sb
+            INNER JOIN {$this->getJoinSql('assessmentModel', 'sb', 'a')}
+            LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
+            LEFT JOIN {$this->getJoinSql('owner',    'sb', 'u')}
+            WHERE sb.category IN {$this->getArrayPlaceholders($category_list, 'category')}
+            AND sb.date BETWEEN :from_date AND :to_date
+            AND a.deleted_at IS NULL
+            ORDER BY sb.date ASC
+        ";
 
         //
         // Build parameters
@@ -869,21 +493,22 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 
         $stmt = $this->database->prepare(
             "
-			SELECT
-				{$this->getColumnString('sb')},
-				{$this->getJoinColumnString('category', 'c')},
-				{$this->getJoinColumnString('owner', 'u')}
-			FROM
-				`{$this->getTable()}` `sb`
-				LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
-				INNER JOIN {$this->getJoinSql('owner', 'sb', 'u', true)}
-			WHERE
-				`sb`.`category` = :cat_id
-				AND ( `sb`.`open_date` < :time OR `sb`.`date` < :time )
-				AND `sb`.`deleted` = 0
-			ORDER BY `sb`.`open_date` DESC, `sb`.`date` DESC
-			LIMIT $offset, $limit
-		"
+            SELECT
+                {$this->getColumnString('sb')},
+                {$this->getJoinColumnString('category', 'c')},
+                {$this->getJoinColumnString('owner', 'u')}
+            FROM
+                `{$this->getTable()}` `sb`
+                LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
+                INNER JOIN {$this->getJoinSql('owner', 'sb', 'u', true)}
+                INNER JOIN {$this->getJoinSql('assessmentModel', 'sb', 'a')}
+            WHERE
+                `sb`.`category` = :cat_id
+                AND ( `sb`.`open_date` < :time OR `sb`.`date` < :time )
+                AND `a`.`deleted_at` IS NOT NULL
+            ORDER BY `sb`.`open_date` DESC, `sb`.`date` DESC
+            LIMIT $offset, $limit
+        "
         );
 
         $stmt->execute(array(

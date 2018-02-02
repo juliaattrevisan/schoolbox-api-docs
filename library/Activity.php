@@ -13,24 +13,6 @@ class Activity {
 	    $this->db = DeprecatedDatabase::getInstance();
     }
 
-    function submissionDetails($id) {
-        //check for any new work
-        $count['duework'] = $this->newDueWork($id);
-        $count['retwork'] = $this->newReturnedWork($id);
-        $count['onlineAssessments'] = $this->newOnlineAssessments($id);
-        $count['reviewedOnlineAssessments'] = $this->newReviewedOnlineAssessments($id);
-
-        //check for new submissions in category submission boxes
-        $subboxes = $this->newSubmission($id);
-
-        $count['subboxes'] = $subboxes;
-        return $count;
-    }
-
-    function set_var($varName, $varContents) {
-        $this->t_body->set_var($varName, $varContents);
-    }
-
 
     function lastCatVisit($id) {
         //get last visit to category
@@ -43,28 +25,6 @@ class Activity {
         }
     }
 
-
-    function lastDueWorkVisit() {
-        //get the last visit by a student to due work
-        $query = "SELECT datetime FROM submission_log WHERE page = '1' AND user = '" . $_SESSION['id'] . "'";
-        $result = $this->db->getRow($query);
-        if ($result['datetime']) {
-            return $result['datetime'];
-        } else {
-            return "0000-00-00";
-        }
-    }
-
-    function lastReturnedWorkVisit() {
-        //get last visit to returned work
-        $query = "SELECT datetime FROM submission_log WHERE page = '2' AND user = '" . $_SESSION['id'] . "'";
-        $result = $this->db->getRow($query);
-        if ($result['datetime']) {
-            return $result['datetime'];
-        } else {
-            return "0000-00-00";
-        }
-    }
 
     function newCategory($id) {
 
@@ -115,124 +75,6 @@ class Activity {
         $count['wiki'] = $result['wikicount'];
 
         return $count;
-    }
-
-    /**
-     * Get a count of how many new online assessments have been created after
-     * the last time the user visited the homepage.
-     *
-     * @param <type> $category_id
-     * @return <type>
-     */
-    function newOnlineAssessments($category_id) {
-        $lastvisit = $this->lastDueWorkVisit();
-
-        $query = "SELECT COUNT(assess_id) AS onlineAssessments
-                  FROM assess
-                  WHERE category_id = '$category_id'
-                  AND created_at > '$lastvisit'
-                  AND user_id != '" . $_SESSION['id'] . "'
-                  AND deleted_at IS NULL";
-
-        $result = $this->db->getRow($query);
-
-        return $result['onlineAssessments'];
-    }
-
-    /**
-     * Find out which assessments have been reviewed since you last checked.
-     *
-     * @param <type> $category_id
-     * @return <type>
-     */
-    function newReviewedOnlineAssessments($category_id) {
-        $lastvisit = $this->lastDueWorkVisit();
-
-        $query = "SELECT COUNT(attempt_id) AS reviewedOnlineAssessments
-                  FROM assess
-                  LEFT JOIN assess_attempt ON assess.assess_id = assess_attempt.assess_id
-                  WHERE assess.category_id = '$category_id'
-                  AND assess_attempt.reviewed_at IS NOT NULL
-                  AND assess_attempt.reviewed_at > '$lastvisit'
-                  AND assess_attempt.user_id = '" . $_SESSION['id'] . "'";
-
-        $result = $this->db->getRow($query);
-
-        return $result['reviewedOnlineAssessments'];
-    }
-
-    function newDueWork($id) {
-        $lastvisit = $this->lastDueWorkVisit();
-
-        //check for due work (* currently does not check if work has been returned *)
-        $query = "SELECT COUNT(id) AS duework FROM submission_box WHERE category = '$id' AND created > '$lastvisit' AND owner != '" . $_SESSION['id'] . "' AND deleted = 0 AND task_id IS NULL";
-        $result = $this->db->getRow($query);
-
-        return $result['duework'];
-    }
-
-    function countDueWork($id) {
-        //returns total active submission boxes for category
-
-        $query = "SELECT COUNT(sub.id) as submitted, COUNT(box.id) as total FROM submission_box AS box
-			LEFT JOIN student_submission AS sub ON sub.box_id = box.id AND sub.owner = '" . $_SESSION['id'] . "'
-			WHERE box.category = '$id' AND box.deleted = '0' AND box.owner != '" . $_SESSION['id'] . "' AND task_id IS NULL";
-
-        $result = $this->db->getRow($query);
-
-        return $result['total'] - $result['submitted'];
-    }
-
-    function newReturnedWork($id) {
-        $lastvisit = $this->lastReturnedWorkVisit();
-
-        //check for returned work
-        $query = "SELECT COUNT(submission_return.id) AS retwork FROM submission_return, submission_box WHERE
-			submission_return.box_id = submission_box.id AND category = '$id' 
-			AND submission_return.owner = '" . $_SESSION['id'] . "' AND returned > '$lastvisit' AND task_id IS NULL";
-        $result = $this->db->getRow($query);
-
-        return $result['retwork'];
-    }
-
-    function countReturnedWork() {
-        //check for returned work
-        $query = "SELECT COUNT(submission_return.id) AS retwork FROM submission_return WHERE
-				owner = '" . $_SESSION['id'] . "' AND deleted = '0'";
-
-        $result = $this->db->getRow($query);
-
-        return $result['retwork'];
-    }
-
-
-    function newSubmission($category) {
-        $query = "
-            SELECT
-                submission_box.name AS description, submission_box.id, count(*) AS `count`
-            FROM
-                submission_box
-            LEFT JOIN submission_log ON
-                submission_log.page = '3'
-                AND submission_box.id = submission_log.sid
-                AND submission_log.user = {$this->db->smartQuote($_SESSION['id'])}
-            INNER JOIN student_submission ON
-                submission_box.id = student_submission.box_id
-            WHERE
-                submission_box.owner = {$this->db->smartQuote($_SESSION['id'])}
-                AND submission_box.deleted = '0'
-                AND submission_box.category = {$this->db->smartQuote($category)}
-                AND (submission_log.datetime IS NULL OR student_submission.submitted > submission_log.datetime)
-                AND submission_box.task_id IS NULL
-            GROUP BY
-                submission_box.name, submission_box.id
-        ";
-        $result = array();
-        $rh = $this->db->query($query);
-        while ($subbox = $this->db->getNextArray($rh)) {
-            $result[$subbox['id']] = $subbox;
-        }
-        return $result;
     }
 
 }

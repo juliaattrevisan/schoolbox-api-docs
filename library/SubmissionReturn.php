@@ -77,35 +77,6 @@ class SubmissionReturn extends DeprecatedModel
     /**
      * @deprecated
      *
-     * @param     $user_id
-     * @param int $box_id
-     * @return array|bool|null
-     */
-    function getOneByUser($user_id, $box_id = 0)
-    {
-        $query = "SELECT
-                    r.*,
-                    c.name categoryName,
-                    s.name,
-                    s.description,
-                    -1 AS fid
-                  FROM ( `" . $this->_table . "` r, submission_box s, folder c )
-                  WHERE r.deleted_at IS NULL
-                  AND r.box_id = s.id
-                  AND s.category = c.id
-                  AND s.deleted IS FALSE
-                  AND r.owner = '$user_id'";
-        if ($box_id) {
-            $query .= " AND r.box_id = $box_id";
-        }
-        $query .= " ORDER BY published_at DESC";
-        return $this->db->getRow($query);
-    }
-
-
-    /**
-     * @deprecated
-     *
      * @param      $user_id
      * @param int  $box_id
      * @param bool $limit
@@ -123,11 +94,12 @@ class SubmissionReturn extends DeprecatedModel
                     s.max_mark,
                     m.slug
                   FROM ( `" . $this->_table . "` r, submission_box s, folder c )
+                  INNER JOIN assessment a ON s.assessment_id = a.id
                   LEFT JOIN submission_mark_type m ON s.mark_type = m.mark_type_id
                   WHERE r.deleted_at IS NULL
                   AND r.box_id = s.id
                   AND s.category = c.id
-                  AND s.deleted IS FALSE
+                  AND a.deleted_at IS NULL
                   AND r.owner = '$user_id'";
         if ($box_id) {
             $query .= " AND r.box_id = $box_id";
