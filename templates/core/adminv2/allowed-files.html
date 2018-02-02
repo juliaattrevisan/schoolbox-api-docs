@@ -113,9 +113,8 @@
         });
 
         // form buttons
-        $(document).on('click', '[data-interaction-save]', function (event) {
+        $(document).on('click', '[data-interaction-save]', function () {
             $(this).closest('form').submit();
-            event.preventDefault();
         });
 
         $(document).on('click', '[data-interaction-cancel]', function (event) {
