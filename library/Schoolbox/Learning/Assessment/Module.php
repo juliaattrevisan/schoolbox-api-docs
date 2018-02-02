@@ -16,6 +16,7 @@ use OutOfBoundsException;
 use Schoolbox\Learning\Authorizer\Rule\CanRespondToAssessment;
 use Schoolbox\Learning\Authorizer\Rule\CanSeeAssessment;
 use Schoolbox\Learning\Authorizer\Rule\IsAssessmentOpen;
+use Schoolbox\Learning\Authorizer\Rule\ValidAssessmentType;
 use Schoolbox\Learning\Authorizer\Rule\IsDeletionUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsModifyUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
@@ -527,23 +528,26 @@ class Module extends BaseModule
 
 
     /**
-     * @return Rule\Any
+     * @return Rule\IAuthorizationRule
      * @throws \InvalidArgumentException If required objects not found in route params
      * @throws NotFound If unable to find assessment context in route params
      */
     private function buildAuthRuleCanAcknowledgeSubmission()
     {
-        return new Rule\Any(
-            new Rule\All(
-                new Rule\IsSuperuser(),
-                new ParticipantHasNoInteractions()
-            ),
-            new Rule\All(
-                new Rule\HasRole(Role::STAFF),
-                $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
-                new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
-                new CanRespondToAssessment($this->getAccess()),
-                new ParticipantHasNoInteractions()
+        return new Rule\All(
+            new ValidAssessmentType([AssessmentType::TYPE_DUE_WORK]),
+            new Rule\Any(
+                new Rule\All(
+                    new Rule\IsSuperuser(),
+                    new ParticipantHasNoInteractions()
+                ),
+                new Rule\All(
+                    new Rule\HasRole(Role::STAFF),
+                    $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
+                    new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
+                    new CanRespondToAssessment($this->getAccess()),
+                    new ParticipantHasNoInteractions()
+                )
             )
         );
     }

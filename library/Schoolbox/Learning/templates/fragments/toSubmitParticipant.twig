@@ -30,20 +30,22 @@
         </div>
     {% else %}
         {% if isDueWork %}
+            {% set ackReceipt = routeLookupIfAuthorized('learningAssessment.postPendingAcknowledge', {
+                assessmentId: assessment.Id,
+                assessment:   assessment,
+                studentId:    participant.user.id,
+                student:      participant.user,
+                participant:  participant
+            }) %}
             {% set href = routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id}) %}
             {% set title = 'View and ' ~ locale.grades ~ ' submission' %}
         {% else %}
+            {% set ackReceipt = '' %}
             {% set href = '/search/user/' ~ participant.user.id %}
             {% set title = 'View student profile' %}
         {% endif %}
 
-        {% set ackReceipt = routeLookupIfAuthorized('learningAssessment.postPendingAcknowledge', {
-            assessmentId: assessment.Id,
-            assessment:   assessment,
-            studentId:    participant.user.id,
-            student:      participant.user,
-            participant:  participant
-        }) %}
+
         <div class="{% if ackReceipt %}small-6 medium-8 large-10{% else %}small-12{% endif %} columns no-pad">
             <a class="link-row" href="{{ href }}" title="{{ title }}">
                 <div class="compact card">
