@@ -416,8 +416,7 @@
 
         if (dialogName === 'table' || dialogName === 'tableProperties') {
             var contents = dialogDefinition.getContents('info');
-
-            contents.remove('txtBorder'); // Border table attribute is overridden by css, and deprecated in HTML5
+            
             contents.remove('txtCellSpace'); // Cell spacing table attribute is overridden by css, and deprecated in HTML5
             contents.remove('txtCellPad'); // Cell padding table attribute is overridden by css, and deprecated in HTML5
             contents.remove('txtCaption'); // table caption is deprecated HTML5
