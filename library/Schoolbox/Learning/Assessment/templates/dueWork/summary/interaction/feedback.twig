@@ -50,6 +50,12 @@
     {% endif %}
 {% endif %}
 
+{% if not url %}
+    {# Just link to reviewer's profile #}
+    {% set url = '/search/user/' ~ currentFeedback.reviewer.id %}
+    {% set tooltip = 'View Profile' %}
+{% endif %}
+
 <ul class="information-list reply">
     <li class="actions-small-2">
         <div class="list-item flex-grade">
