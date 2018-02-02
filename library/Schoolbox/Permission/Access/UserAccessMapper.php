@@ -554,7 +554,7 @@ class UserAccessMapper extends Mapper
 
                         //Then check if there is a campus mangled in the class code
                         if (strpos($code, '/') !== false) {
-                            $codeArray = explode('/', $code);
+                            $codeArray = explode('/', $code, 2);
                             if (strtolower($currentSubject["code"]) == strtolower($codeArray[1]) &&
                                 strtolower($currentSubject["campusCode"]) == strtolower($codeArray[0])
                             ) {
