@@ -58,7 +58,6 @@ abstract class Calendar_Layout_Full_Abstract
         $this->setUser($user);
         $this->setViewer($viewer);
         $this->setGroupHandler(new Group());
-        $this->setSubStuHandler(new SubmissionStudent());
         $this->setPage($page);
         $this->setDate($date);
         $this->setCategoryList($this->getGroupHandler()->involvedInCategoryList($user->getId()));
@@ -299,26 +298,6 @@ abstract class Calendar_Layout_Full_Abstract
     protected function getGroupHandler()
     {
         return $this->groupHandler;
-    }
-
-    /**
-     * Set sub stu handler
-     *
-     * @param $subStuHandler
-     */
-    protected function setSubStuHandler($subStuHandler)
-    {
-        $this->subStuHandler = $subStuHandler;
-    }
-
-    /**
-     * Get sub stu handler
-     *
-     * @return null
-     */
-    protected function getSubStuHandler()
-    {
-        return $this->subStuHandler;
     }
 
     /**
