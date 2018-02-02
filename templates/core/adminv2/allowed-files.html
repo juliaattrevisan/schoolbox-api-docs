@@ -113,10 +113,6 @@
         });
 
         // form buttons
-        $(document).on('click', '[data-interaction-save]', function () {
-            $(this).closest('form').submit();
-        });
-
         $(document).on('click', '[data-interaction-cancel]', function (event) {
             event.preventDefault();
             var container = $(this).closest('[data-interaction-container]');
@@ -124,7 +120,6 @@
             var form      = container.find('[data-interaction-inline-form]');
             form.slideUp();
             display.slideDown();
-
         });
 
         $(document).on('click', '[data-interaction-new]', function (event) {
@@ -316,8 +311,8 @@
                                 <div class="row">
                                     <div class="column">
                                         <ul class="flex-list buttons">
-                                            <li><input type="submit" data-interaction-save value="Save" /></li>
-                                            <li><button data-interaction-cancel >Cancel</button></li>
+                                            <li><input type="submit" value="Save" /></li>
+                                            <li><button data-interaction-cancel>Cancel</button></li>
                                         </ul>
                                     </div>
                                 </div>
