@@ -5,6 +5,16 @@
 
         $(document).on('click', '[data-interaction-modify]', function (event) {
             event.preventDefault();
+
+            //Slide up all other forms first
+            $(document).find('[data-interaction-container]').each( function() {
+                var display = $(this).find('[data-interaction-display]');
+                var form = $(this).find('[data-interaction-inline-form]');
+                form.slideUp();
+                display.slideDown();
+            });
+
+
             var container = $(this).closest('[data-interaction-container]');
             var display   = container.find('[data-interaction-display]');
             var form      = container.find('[data-interaction-inline-form]');
@@ -112,14 +122,7 @@
             form.submit();
         });
 
-
         // form buttons
-
-        $(document).on('click', '[data-interaction-save]', function (event) {
-            event.preventDefault();
-            $(this).closest('form').submit();
-        });
-
         $(document).on('click', '[data-interaction-cancel]', function (event) {
             event.preventDefault();
             var container = $(this).closest('[data-interaction-container]');
@@ -127,7 +130,6 @@
             var form      = container.find('[data-interaction-inline-form]');
             form.slideUp();
             display.slideDown();
-
         });
 
         $(document).on('click', '[data-interaction-new]', function (event) {
@@ -319,8 +321,8 @@
                                 <div class="row">
                                     <div class="column">
                                         <ul class="flex-list buttons">
-                                            <li><input type="submit" data-interaction-save value="Save" /></li>
-                                            <li><button data-interaction-cancel >Cancel</button></li>
+                                            <li><input type="submit" value="Save" /></li>
+                                            <li><button data-interaction-cancel>Cancel</button></li>
                                         </ul>
                                     </div>
                                 </div>
