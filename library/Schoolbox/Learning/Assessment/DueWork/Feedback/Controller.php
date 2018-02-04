@@ -107,8 +107,7 @@ class Controller extends Base
             // If there was none, copy it from the last feedback
             if (!$this->processRubric($participant, $post, $feedback)) {
                 $assessment = $participant->getAssessable();
-                if (
-                    $feedback instanceof DueWork\Feedback\Model
+                if ($feedback instanceof DueWork\Feedback\Model
                     && $mostRecentFeedback instanceof DueWork\Feedback\Model
                     && $assessment instanceof DueWork\Model
                     && $assessment->getUseRubric()
