@@ -84,15 +84,6 @@ class Model extends AbstractAssessment
 
 
     /**
-     * @inheritdoc
-     */
-    public function isSelfAssessable(): bool
-    {
-        // Quiz are not self-assessable
-        return false;
-    }
-
-    /**
      * Feedback is required if latest attempt exists, is submitted, and is unreviewed.
 
      *

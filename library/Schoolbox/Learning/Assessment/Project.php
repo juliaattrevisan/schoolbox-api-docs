@@ -69,23 +69,6 @@ class Project extends AbstractAssessment implements AssessmentContext
 
 
     /**
-     * @inheritdoc
-     */
-    public function isSelfAssessable(): bool
-    {
-        // Projects are self-assessable if they contain 1 or more sub-assessments, all of which are self-assessable
-        if (0 === $this->assessables->count()) {
-            return false;
-        }
-        foreach ($this->assessables as $subAssessable) {
-            if (!$subAssessable->isSelfAssessable()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
      * This project is a specification if the context it's within is one.
      *
      * @return bool
