@@ -36,9 +36,9 @@ class SubmissionBox implements IAssessableDataModel
     use AssessmentModelTrait;
 
     // Can learners give themselves feedback?
-    public const SELF_REVIEWABLE_NONE         = 'none';         // only instructors can review
-    public const SELF_REVIEWABLE_REFLECT_ONLY = 'reflect-only'; // learner can only reflect on their work
-    public const SELF_REVIEWABLE_FULL         = 'full';         // learner can give themselves a grade
+    public const SELF_REVIEWABILITY_NONE         = 'none';         // only instructors can review
+    public const SELF_REVIEWABILITY_REFLECT_ONLY = 'reflect-only'; // learner can only reflect on their work, but not give grades
+    public const SELF_REVIEWABILITY_FULL         = 'full';         // learner can give reflect and give grades
 
     /**
      * @var int
@@ -179,10 +179,10 @@ class SubmissionBox implements IAssessableDataModel
     /**
      * Can learners reflect on or grade their own submissions?
      *
-     * @see SubmissionBox::SELF_REVIEWABLE_NONE and adjacent constants
+     * @see SubmissionBox::SELF_REVIEWABILITY_NONE and adjacent constants
      * @var string
      */
-    private $selfReviewable;
+    private $selfReviewability;
 
 
     public function __construct()
@@ -853,18 +853,18 @@ class SubmissionBox implements IAssessableDataModel
     /**
      * @return null|string
      */
-    public function getSelfReviewable(): ?string
+    public function getSelfReviewability(): ?string
     {
-        return $this->selfReviewable;
+        return $this->selfReviewability;
     }
 
     /**
-     * @param string $selfReviewable
+     * @param string $selfReviewability
      * @return SubmissionBox
      */
-    public function setSelfReviewable(string $selfReviewable): self
+    public function setSelfReviewability(string $selfReviewability): self
     {
-        $this->selfReviewable = $selfReviewable;
+        $this->selfReviewability = $selfReviewability;
         return $this;
     }
 }

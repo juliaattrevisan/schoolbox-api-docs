@@ -48,15 +48,15 @@ class SelfReflectionTest extends TestCase
         /* This assessment is correctly set up to start Self Reflection
          */
         $correctAssessment = (new DueWork\Model())
-            ->setSelfReviewable(SubmissionBox::SELF_REVIEWABLE_REFLECT_ONLY);
+            ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_REFLECT_ONLY);
 
         /* This assessment is incorrectly set up to start Self Reflection
          */
         $incorrectAssessment1 = (new DueWork\Model())
-            ->setSelfReviewable(SubmissionBox::SELF_REVIEWABLE_FULL);
+            ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL);
 
         $incorrectAssessment2 = (new DueWork\Model())
-            ->setSelfReviewable(SubmissionBox::SELF_REVIEWABLE_NONE);
+            ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE);
 
         /* Test everything
          */

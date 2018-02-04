@@ -67,7 +67,6 @@ class Project extends AbstractAssessment implements AssessmentContext
         $this->setSummator($summator);
     }
 
-
     /**
      * This project is a specification if the context it's within is one.
      *

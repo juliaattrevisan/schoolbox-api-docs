@@ -51,15 +51,15 @@ class SelfGradableTest extends TestCase
         /* This assessment is correctly set up to start Self Assessment
          */
         $correctAssessment = (new DueWork\Model())
-            ->setSelfReviewable(SubmissionBox::SELF_REVIEWABLE_FULL);
+            ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL);
 
         /* This assessment is incorrectly set up to start Self Assessment
          */
         $incorrectAssessment1 = (new DueWork\Model())
-            ->setSelfReviewable(SubmissionBox::SELF_REVIEWABLE_REFLECT_ONLY);
+            ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_REFLECT_ONLY);
 
         $incorrectAssessment2 = (new DueWork\Model())
-            ->setSelfReviewable(SubmissionBox::SELF_REVIEWABLE_NONE);
+            ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE);
 
         /* Test everything
          */

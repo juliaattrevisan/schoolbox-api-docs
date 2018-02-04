@@ -43,7 +43,7 @@ class SelfReflectionWithResponseTest extends TestCase
         $student = (new User())->setId(230);
 
         $correctAssessment = (new DueWork\Model())
-            ->setSelfReviewable(SubmissionBox::SELF_REVIEWABLE_REFLECT_ONLY);
+            ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_REFLECT_ONLY);
 
         /* This participation is correctly set up to conclude Self Assessment
          */

@@ -82,7 +82,6 @@ class Model extends AbstractAssessment
         return $this;
     }
 
-
     /**
      * Feedback is required if latest attempt exists, is submitted, and is unreviewed.
 

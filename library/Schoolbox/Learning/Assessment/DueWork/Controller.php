@@ -783,14 +783,14 @@ class Controller extends Assessment\Controller
          * If this requires self-assessment, then this will always be a draft;
          * participant must finalise their response as part of self-review.
          */
-        $selfAssessed = (new ValidSelfAssessable())->isSatisfiedBy($this->getUser(), $participant);
+        $selfAssessable = (new ValidSelfAssessable())->isSatisfiedBy($this->getUser(), $participant);
 
         if ($isFinal) {
 
             /* submitted_at is determined after the next step when creating a self-assessed or self-reflected
              * response. Otherwise, proceed normally
              */
-            if (!$selfAssessed) {
+            if (!$selfAssessable) {
                 $response->setSubmittedAt(Alaress_Date_Format::now());
             }
         }
@@ -817,7 +817,7 @@ class Controller extends Assessment\Controller
          * This screen is shared between self-reflection and non-self-reflection steps
          * Self-reflection's plagscan stubs saving .......happens elsewhere
          */
-        if ($isFinal && !$selfAssessed && $response->getId()) {
+        if ($isFinal && !$selfAssessable && $response->getId()) {
             foreach ($response->getAllFiles() as $currentFile) {
                 if (!$currentFile->getEditableInline()) {
                     $plagscanMapper->saveNewPlagscanStub($currentFile);
@@ -830,8 +830,8 @@ class Controller extends Assessment\Controller
          */
         $this->getResponse()->content->set([
             'postOutput' => [
-                function() use ($plagscanMapper, $isFinal, $selfAssessed, $response) {
-                    if ($isFinal && !$selfAssessed && $response->getId()) {
+                function() use ($plagscanMapper, $isFinal, $selfAssessable, $response) {
+                    if ($isFinal && !$selfAssessable && $response->getId()) {
                         foreach ($response->getAllFiles() as $currentFile) {
                             $filename = $plagscanMapper->plagscanFilename($currentFile);
 
@@ -856,7 +856,7 @@ class Controller extends Assessment\Controller
 
             /* Go to the next step of Self-Assessment/Self-Reflection if appropriate
              */
-            if ($selfAssessed) {
+            if ($selfAssessable) {
                 $rs->redirect->to(
                     $this->getRouter()->generate(
                         'learningDueWorkResponse.getParticularResponseForSelfReflection',
@@ -986,10 +986,10 @@ class Controller extends Assessment\Controller
             'attachzone'         => $zoneFactory->buildForAssessment($assessment)->getTwigContext(),
             'allMarkTypes'       => $this->getAllMarkTypes($assessment),
             'allGradeSchemes'    => $this->getAllGradeSchemes(),
-            'selfReviewTypes'   => [
-                'none'    => SubmissionBox::SELF_REVIEWABLE_NONE,
-                'reflect' => SubmissionBox::SELF_REVIEWABLE_REFLECT_ONLY,
-                'grade'   => SubmissionBox::SELF_REVIEWABLE_FULL,
+            'selfReviewTypes' => [
+                'none'    => SubmissionBox::SELF_REVIEWABILITY_NONE,
+                'reflect' => SubmissionBox::SELF_REVIEWABILITY_REFLECT_ONLY,
+                'full'    => SubmissionBox::SELF_REVIEWABILITY_FULL,
             ],
         ];
 

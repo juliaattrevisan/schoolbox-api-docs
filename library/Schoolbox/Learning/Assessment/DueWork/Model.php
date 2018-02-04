@@ -99,11 +99,11 @@ class Model extends AbstractAssessment
 
     /**
      * @var string
-     * @see SubmissionBox::SELF_REVIEWABLE_NONE
-     * @see SubmissionBox::SELF_REVIEWABLE_REFLECT_ONLY
-     * @see SubmissionBox::SELF_REVIEWABLE_FULL
+     * @see SubmissionBox::SELF_REVIEWABILITY_NONE
+     * @see SubmissionBox::SELF_REVIEWABILITY_REFLECT_ONLY
+     * @see SubmissionBox::SELF_REVIEWABILITY_FULL
      */
-    private $selfReviewable;
+    private $selfReviewability;
 
 
     /**
@@ -614,19 +614,19 @@ class Model extends AbstractAssessment
     /**
      * @return null|string
      */
-    public function getSelfReviewable(): ?string
+    public function getSelfReviewability(): ?string
     {
-        return $this->selfReviewable;
+        return $this->selfReviewability;
     }
 
 
     /**
-     * @param string $selfReviewable
+     * @param string $selfReviewability
      * @return $this
      */
-    public function setSelfReviewable(string $selfReviewable): self
+    public function setSelfReviewability(string $selfReviewability): self
     {
-        $this->selfReviewable = $selfReviewable;
+        $this->selfReviewability = $selfReviewability;
         return $this;
     }
 
@@ -640,11 +640,11 @@ class Model extends AbstractAssessment
      */
     public function isSelfAssessable(): bool
     {
-        if (null === $this->selfReviewable) {
+        if (null === $this->selfReviewability) {
             throw new UnexpectedValueException('Property not set');
         }
-        $selfAssessableStates = [SubmissionBox::SELF_REVIEWABLE_REFLECT_ONLY, SubmissionBox::SELF_REVIEWABLE_FULL];
-        return \in_array($this->selfReviewable, $selfAssessableStates, true);
+        $selfAssessableStates = [SubmissionBox::SELF_REVIEWABILITY_REFLECT_ONLY, SubmissionBox::SELF_REVIEWABILITY_FULL];
+        return \in_array($this->selfReviewability, $selfAssessableStates, true);
     }
 
     /**
@@ -657,10 +657,10 @@ class Model extends AbstractAssessment
      */
     public function isSelfReflectableOnly(): bool
     {
-        if (null === $this->selfReviewable) {
+        if (null === $this->selfReviewability) {
             throw new UnexpectedValueException('Property not set');
         }
-        return $this->selfReviewable === SubmissionBox::SELF_REVIEWABLE_REFLECT_ONLY;
+        return $this->selfReviewability === SubmissionBox::SELF_REVIEWABILITY_REFLECT_ONLY;
     }
 
 
@@ -672,9 +672,9 @@ class Model extends AbstractAssessment
      */
     public function isSelfGradable(): bool
     {
-        if (null === $this->selfReviewable) {
+        if (null === $this->selfReviewability) {
             throw new UnexpectedValueException('Property not set');
         }
-        return $this->selfReviewable === SubmissionBox::SELF_REVIEWABLE_FULL;
+        return $this->selfReviewability === SubmissionBox::SELF_REVIEWABILITY_FULL;
     }
 }

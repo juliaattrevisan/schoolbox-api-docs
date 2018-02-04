@@ -50,15 +50,15 @@ class SelfAssessableTest extends TestCase
         /* This assessment is correctly set up to start Self Assessment
          */
         $correctAssessment1 = (new DueWork\Model())
-            ->setSelfReviewable(SubmissionBox::SELF_REVIEWABLE_FULL);
+            ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL);
 
         /* This assessment is also set up to start Self Assessment
          */
         $correctAssessment2 = (new DueWork\Model())
-            ->setSelfReviewable(SubmissionBox::SELF_REVIEWABLE_REFLECT_ONLY);
+            ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_REFLECT_ONLY);
 
         $incorrectAssessment = (new DueWork\Model())
-            ->setSelfReviewable(SubmissionBox::SELF_REVIEWABLE_NONE);
+            ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE);
 
         /* Test everything
          */

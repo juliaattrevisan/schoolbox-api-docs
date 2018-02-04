@@ -89,7 +89,7 @@ class DueWorkTest extends TestCase
             )
             ->setMarkScheme(new None())
             ->setUseRubric(true)
-            ->setSelfReviewable(SubmissionBox::SELF_REVIEWABLE_FULL)
+            ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL)
         ;
 
         /** @var DueWorkModel $dueWorkModel */
@@ -173,7 +173,7 @@ class DueWorkTest extends TestCase
                     ->setContext($context)
                     ->setMarkScheme(new None())
                     ->setWorkType(new WorkType())
-                    ->setSelfReviewable(SubmissionBox::SELF_REVIEWABLE_FULL),
+                    ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL),
                 DueWorkModel\MarkType::TYPE_NONE,
                 null,
                 null,
@@ -183,7 +183,7 @@ class DueWorkTest extends TestCase
                     ->setContext($context)
                     ->setMarkScheme(new Percentage())
                     ->setWorkType(new WorkType())
-                    ->setSelfReviewable(SubmissionBox::SELF_REVIEWABLE_FULL),
+                    ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL),
                 DueWorkModel\MarkType::TYPE_PERCENT,
                 null,
                 null,
@@ -193,7 +193,7 @@ class DueWorkTest extends TestCase
                     ->setContext($context)
                     ->setMarkScheme((new TotalMarkWholeNumber(10)))
                     ->setWorkType(new WorkType())
-                    ->setSelfReviewable(SubmissionBox::SELF_REVIEWABLE_FULL),
+                    ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL),
                 DueWorkModel\MarkType::TYPE_TOTAL,
                 10,
                 null,
@@ -209,7 +209,7 @@ class DueWorkTest extends TestCase
                             )
                     ))
                     ->setWorkType(new WorkType())
-                    ->setSelfReviewable(SubmissionBox::SELF_REVIEWABLE_FULL),
+                    ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL),
                 DueWorkModel\MarkType::TYPE_LETTER,
                 null,
                 7,
@@ -266,7 +266,7 @@ class DueWorkTest extends TestCase
                     ->setContext($context)
                     ->setAcceptsMultiple()
                     ->setWorkType(new WorkType())
-                    ->setSelfReviewable(SubmissionBox::SELF_REVIEWABLE_FULL),
+                    ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL),
                  true,
                  true,
             ],
@@ -275,7 +275,7 @@ class DueWorkTest extends TestCase
                     ->setContext($context)
                     ->setAcceptsSingle()
                     ->setWorkType(new WorkType())
-                    ->setSelfReviewable(SubmissionBox::SELF_REVIEWABLE_FULL),
+                    ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL),
                 true,
                 false,
             ],
@@ -284,7 +284,7 @@ class DueWorkTest extends TestCase
                     ->setContext($context)
                     ->setAcceptsNone()
                     ->setWorkType(new WorkType())
-                    ->setSelfReviewable(SubmissionBox::SELF_REVIEWABLE_FULL),
+                    ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL),
                 false,
                 false,
             ],
@@ -355,7 +355,7 @@ class DueWorkTest extends TestCase
                 ->add($storage3)
             )
             ->setMarkType($this->buildMarkType())
-            ->setSelfReviewable(DueWorkModel::SELF_REVIEWABLE_FULL)
+            ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL)
         ;
 
         /** @var DueWork $dueWork */
@@ -441,7 +441,7 @@ class DueWorkTest extends TestCase
                     ->setAcceptOnline(true)
                     ->setAcceptMultiple(true)
                     ->setMarkType($this->buildMarkType())
-                    ->setSelfReviewable(DueWorkModel::SELF_REVIEWABLE_FULL),
+                    ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 true,
                 true,
             ],
@@ -451,7 +451,7 @@ class DueWorkTest extends TestCase
                     ->setAcceptOnline(true)
                     ->setAcceptMultiple(false)
                     ->setMarkType($this->buildMarkType())
-                    ->setSelfReviewable(DueWorkModel::SELF_REVIEWABLE_FULL),
+                    ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 true,
                 false,
             ],
@@ -461,7 +461,7 @@ class DueWorkTest extends TestCase
                     ->setAcceptOnline(false)
                     ->setAcceptMultiple(false)
                     ->setMarkType($this->buildMarkType())
-                    ->setSelfReviewable(DueWorkModel::SELF_REVIEWABLE_FULL),
+                    ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 false,
                 false,
             ],
@@ -471,7 +471,7 @@ class DueWorkTest extends TestCase
                     ->setAcceptOnline(false)
                     ->setAcceptMultiple(true)
                     ->setMarkType($this->buildMarkType())
-                    ->setSelfReviewable(DueWorkModel::SELF_REVIEWABLE_FULL),
+                    ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 false,
                 false,
             ],
@@ -513,7 +513,7 @@ class DueWorkTest extends TestCase
                 (new DueWorkModel())
                     ->setAssessmentModel($assessmentModel)
                     ->setMarkType($this->buildMarkType())
-                    ->setSelfReviewable(DueWorkModel::SELF_REVIEWABLE_FULL),
+                    ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 None::class,
                 null,
                 null,
@@ -522,7 +522,7 @@ class DueWorkTest extends TestCase
                 (new DueWorkModel())
                     ->setAssessmentModel($assessmentModel)
                     ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_PERCENT))
-                    ->setSelfReviewable(DueWorkModel::SELF_REVIEWABLE_FULL),
+                    ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 Percentage::class,
                 null,
                 null,
@@ -534,7 +534,7 @@ class DueWorkTest extends TestCase
                     ->setGradeGroup((new DueWorkModel\GradeLevel\Group\Model())->setId(1)->addGradeLevel(
                         new DueWorkModel\GradeLevel\Model()
                     ))
-                    ->setSelfReviewable(DueWorkModel::SELF_REVIEWABLE_FULL),
+                    ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 LetterGrade::class,
                 null,
                 1,
@@ -544,7 +544,7 @@ class DueWorkTest extends TestCase
                     ->setAssessmentModel($assessmentModel)
                     ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_TOTAL))
                     ->setMaxMark(15)
-                    ->setSelfReviewable(DueWorkModel::SELF_REVIEWABLE_FULL),
+                    ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 TotalMarkWholeNumber::class,
                 15,
                 null

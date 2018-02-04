@@ -72,9 +72,9 @@
 
     <label>Self-Reflection
         <select name="self_reviewable">
-            <option value="{{ selfReviewTypes.none }}" {% if assessment.selfReviewable == selfReviewTypes.none %}selected{% endif %}>None</option>
-            <option value="{{ selfReviewTypes.reflect }}" {% if assessment.selfReviewable == selfReviewTypes.reflect %}selected{% endif %}>Self-Reflect</option>
-            <option value="{{ selfReviewTypes.grade }}" {% if assessment.selfReviewable == selfReviewTypes.grade %}selected{% endif %}>Self-Reflect + Self-Assess</option>
+            <option value="{{ selfReviewTypes.none }}" {% if assessment.selfReviewability == selfReviewTypes.none %}selected{% endif %}>None</option>
+            <option value="{{ selfReviewTypes.reflect }}" {% if assessment.selfReviewability == selfReviewTypes.reflect %}selected{% endif %}>Self-Reflect</option>
+            <option value="{{ selfReviewTypes.full }}" {% if assessment.selfReviewability == selfReviewTypes.full %}selected{% endif %}>Self-Reflect + Self-Assess</option>
         </select>
     </label>
 

@@ -99,7 +99,7 @@ class ProjectTest extends TestCase
                     ->setTitle('Sub-work')
                     ->setSequence(3)
                     ->setWorkType(new WorkType())
-                    ->setSelfReviewable(SubmissionBox::SELF_REVIEWABLE_FULL)
+                    ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL)
                 );
 
         /** @var ProjectModel $projectModel */
@@ -308,7 +308,7 @@ class ProjectTest extends TestCase
             ->setOwner($this->teacher2)
             ->setAssessmentModel((new AssessmentModel())->setId(3))
             ->setMarkType($this->buildMarkType())
-            ->setSelfReviewable(DueWorkModel::SELF_REVIEWABLE_FULL);
+            ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL);
 
 
         $projectModel->getAssessments()
@@ -583,12 +583,12 @@ class ProjectTest extends TestCase
                                 (new DueWorkModel())
                                     ->setId(3)
                                     ->setMarkType($this->buildMarkType())
-                                    ->setSelfReviewable(DueWorkModel::SELF_REVIEWABLE_FULL)
+                                    ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL)
                             )
                     )
             )
             ->setMarkType($this->buildMarkType())
-            ->setSelfReviewable(DueWorkModel::SELF_REVIEWABLE_FULL);
+            ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL);
 
         $projectModel->getAssessments()
                      ->add($subTask->getAssessmentModel()->setSubObject($subTask))
@@ -684,10 +684,10 @@ class ProjectTest extends TestCase
                                 ->setId(3)
                                 ->setTitle('Sub-work')
                                 ->setWorkType(new WorkType())
-                                ->setSelfReviewable(SubmissionBox::SELF_REVIEWABLE_FULL)
+                                ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL)
                         )
                         ->setWorkType(new WorkType())
-                        ->setSelfReviewable(SubmissionBox::SELF_REVIEWABLE_FULL)
+                        ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL)
                 );
 
         /** @var ProjectModel $projectModel */

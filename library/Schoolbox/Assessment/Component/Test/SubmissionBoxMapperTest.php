@@ -37,7 +37,7 @@ class SubmissionBoxMapperTest extends TestCase {
 			'accept_submission' => true,
 			'multi_submission'  => false,
 			'max_mark'          => 100,
-            'self_reviewable'   => SubmissionBox::SELF_REVIEWABLE_NONE,
+            'self_reviewability' => SubmissionBox::SELF_REVIEWABILITY_NONE,
 		);
 		$box = $this->object->hydrate($data);
 		$this->assertInstanceOf('Schoolbox\\Assessment\\Component\\SubmissionBox', $box);

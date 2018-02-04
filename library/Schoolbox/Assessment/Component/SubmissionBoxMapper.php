@@ -62,7 +62,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $this->uses('rubric_group_marks', self::TYPE_BOOLEAN, null, 'markedPerRubricGroup');
         $this->uses('mark_visibility', self::TYPE_INTEGER);
         $this->uses('skip_unsubmitted', self::TYPE_BOOLEAN);
-        $this->uses('self_reviewable', self::TYPE_STRING);
+        $this->uses('self_reviewability', self::TYPE_STRING);
 
         $this->joins('category', Folder\Mapper::class); // TODO deprecated, retained for legacy compatibility only
         $this->joins('owner', Schoolbox\UserMapper::class);

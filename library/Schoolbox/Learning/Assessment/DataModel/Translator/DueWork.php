@@ -101,7 +101,7 @@ class DueWork implements IAssessmentTypeTranslator
         null === $domainObject->getUseRubric()         || $dataModel->setUseRubric($domainObject->getUseRubric());
         null === $domainObject->getMarkPerCapability() || $dataModel->setMarkedPerRubricGroup($domainObject->getMarkPerCapability());
         null === $domainObject->getCreator()           || $dataModel->setOwner($domainObject->getCreator());
-        null === $domainObject->getSelfReviewable()    || $dataModel->setSelfReviewable($domainObject->getSelfReviewable());
+        null === $domainObject->getSelfReviewability() || $dataModel->setSelfReviewability($domainObject->getSelfReviewability());
 
         if (null !== $domainObject->isAcceptSingle() && null !== $domainObject->isAcceptMulti()) {
             $dataModel->setAcceptOnline($domainObject->isAcceptSingle() || $domainObject->isAcceptMulti());
@@ -153,7 +153,7 @@ class DueWork implements IAssessmentTypeTranslator
         null === $dataModel->getMaxMark() || $domainObject->setMaxMark($dataModel->getMaxMark());
         null === $dataModel->getGradeGroup() || $domainObject->setGradeGroup($dataModel->getGradeGroup());
         null === $dataModel->getMarkVisibility() || $domainObject->setMarkVisibility($dataModel->getMarkVisibility());
-        null === $dataModel->getSelfReviewable() || $domainObject->setSelfReviewable($dataModel->getSelfReviewable());
+        null === $dataModel->getSelfReviewability() || $domainObject->setSelfReviewability($dataModel->getSelfReviewability());
 
         // Has Rubric?
         if ($dataModel->getUseRubric()) {
