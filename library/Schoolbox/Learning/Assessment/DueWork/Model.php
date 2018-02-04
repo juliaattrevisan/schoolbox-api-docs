@@ -206,8 +206,8 @@ class Model extends AbstractAssessment
 
         /* Allow draft responses in single submission assessments
          */
-        if ($this->isAcceptSingle() && $responses->count() && $responses->first()->isSubmitted()) {
-            throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_MULTIPLE_RESPONSE);
+        if ($this->isAcceptSingle()) {
+            $this->assertNoPublishedResponses($responses);
         }
     }
 
@@ -223,13 +223,7 @@ class Model extends AbstractAssessment
     public function assertAcceptAcknowledgement(Collection $responses)
     {
         $this->assertOpen();
-
-        // Only non-draft responses count
-        foreach ($responses as $response) {
-            if ($response->isSubmitted()) {
-                throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_MULTIPLE_RESPONSE);
-            }
-        }
+        $this->assertNoPublishedResponses($responses);
     }
 
     /**
@@ -245,6 +239,19 @@ class Model extends AbstractAssessment
 
         if (\Alaress_Date_Format::now()->gt($this->getCloseAt())) {
             throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_CLOSED);
+        }
+    }
+
+    /**
+     * @param Collection|IResponse[] $responses
+     * @throws DomainException
+     */
+    private function assertNoPublishedResponses(Collection $responses)
+    {
+        foreach ($responses as $response) {
+            if ($response->isSubmitted()) {
+                throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_MULTIPLE_RESPONSE);
+            }
         }
     }
 
