@@ -1,7 +1,5 @@
 <?php
 /**
- * ValidSelfReflection
- *
  * This (assessment, user) combination is currently valid for self-grading
  *
  * TODO: Can you self-reflect on behalf of someone else, via SOBO?
@@ -19,22 +17,21 @@ use UnexpectedValueException;
 
 class ValidSelfGradable extends ValidSelfAssessable
 {
-
     /**
-     * The IAssessable is set to Self-Assess
+     * The IAssessable is set to Self-Grade
      *
      * @param Participant $participant
      * @return bool
-     * @throws UnexpectedValueException If due work model not hydrated
+     * @throws UnexpectedValueException If due-work model is not hydrated
      */
     protected function isSelfGradable(Participant $participant): bool
     {
         return $this->getDueWork($participant)->isSelfGradable();
     }
 
-
     /**
-     * The user can start the self-assessment process
+     * The currently logged-in user can self-reflect on the specified Participant's IResponse
+     * only when the following conditions are met
      *
      * @param User        $user
      * @param Participant $participant

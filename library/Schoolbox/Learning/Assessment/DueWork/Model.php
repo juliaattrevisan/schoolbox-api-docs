@@ -624,15 +624,16 @@ class Model extends AbstractAssessment
      * @param string $selfReviewable
      * @return $this
      */
-    public function setSelfReviewable(string $selfReviewable)
+    public function setSelfReviewable(string $selfReviewable): self
     {
         $this->selfReviewable = $selfReviewable;
         return $this;
     }
 
-
     /**
-     * Determine whether this due work is self-assessable
+     * Can learners give feedback on their own submissions?
+     *
+     * Returns TRUE if the assessment is set to reflect-only or full
      *
      * @return bool
      * @throws UnexpectedValueException If property is not set
@@ -642,10 +643,9 @@ class Model extends AbstractAssessment
         if (null === $this->selfReviewable) {
             throw new UnexpectedValueException('Property not set');
         }
-        $selfAssessableStates = [SubmissionBox::SELF_REVIEWABLE_FULL, SubmissionBox::SELF_REVIEWABLE_REFLECT_ONLY];
+        $selfAssessableStates = [SubmissionBox::SELF_REVIEWABLE_REFLECT_ONLY, SubmissionBox::SELF_REVIEWABLE_FULL];
         return \in_array($this->selfReviewable, $selfAssessableStates, true);
     }
-
 
     /**
      * Can learners *only* reflect on their own work?
@@ -665,7 +665,7 @@ class Model extends AbstractAssessment
 
 
     /**
-     * Can learners grade their own work?
+     * Returns whether students can create feedback with marks on their own submissions.
      *
      * @return bool
      * @throws UnexpectedValueException If property is not set
