@@ -12,6 +12,7 @@ use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Task;
 use Schoolbox\User;
 use InvalidArgumentException;
 use Schoolbox\Learning\Assessment\DueWork;
@@ -58,17 +59,17 @@ class CanSelfAssess implements IAuthorizationRule
         $participant = $params['participant'];
         $assessment = $participant->getAssessable();
 
-        if(!$assessment->isSelfAssessable()){
-            throw new Unauthorized('', Error\Mapper::ERROR_NO_SELF_ASSESS);
-        }
-
         // Check logged in user is the participant
         if ($user->getId() != $participant->getUser()->getId()) {
             throw new Unauthorized();
         }
 
-        // DueWork must have a submitted response to self-assess
-        if($assessment instanceof DueWork\Model){
+        // DueWork must allow either self-reflect or self-grade, and have a submitted response, to self-assess
+        if ($assessment instanceof DueWork\Model) {
+            if (!$assessment->isSelfAssessable()) {
+                throw new Unauthorized('', Error\Mapper::ERROR_NO_SELF_ASSESS);
+            }
+
             // TODO - this is ambiguous. The response being self-assessed should be specified in the route args
             $mostRecentResponse = $participant->findMostRecentResponse();
 
@@ -83,9 +84,20 @@ class CanSelfAssess implements IAuthorizationRule
             if ($mostRecentResponse->isSubmitted()) {
                 throw new Unauthorized('', Error\Mapper::ERROR_COMPLETE_BEFORE_SELF_REFLECT);
             }
+
+            // If a due work passes this gauntlet: it's self-assessable
+            return true;
         }
 
-        // Assessment is self-assessable and logged in user is the participant, good to go
-        return true;
+        // Tasks can be self-assessed if their self-assess flag is on
+        if ($assessment instanceof Task\Model) {
+            if (!$assessment->isSelfAssessable()) {
+                throw new Unauthorized('', Error\Mapper::ERROR_NO_SELF_ASSESS);
+            }
+            return true;
+        }
+
+        // No other type of assessment can be
+        throw new Unauthorized('', Error\Mapper::ERROR_NO_SELF_ASSESS);
     }
 }
