@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Assessment\Test\DataModel\Translator;
 
 use Alaress_Date_Format;
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Quiz\Model as QuizModel;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
@@ -98,8 +99,7 @@ class ProjectTest extends TestCase
                     ->setTitle('Sub-work')
                     ->setSequence(3)
                     ->setWorkType(new WorkType())
-                    ->setSelfAssessable(true)
-                    ->setSelfReflectable(true)
+                    ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL)
                 );
 
         /** @var ProjectModel $projectModel */
@@ -308,8 +308,7 @@ class ProjectTest extends TestCase
             ->setOwner($this->teacher2)
             ->setAssessmentModel((new AssessmentModel())->setId(3))
             ->setMarkType($this->buildMarkType())
-            ->setSelfReflectable(true)
-            ->setSelfAssessable(true);
+            ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL);
 
 
         $projectModel->getAssessments()
@@ -584,14 +583,12 @@ class ProjectTest extends TestCase
                                 (new DueWorkModel())
                                     ->setId(3)
                                     ->setMarkType($this->buildMarkType())
-                                    ->setSelfAssessable(true)
-                                    ->setSelfReflectable(true)
+                                    ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL)
                             )
                     )
             )
             ->setMarkType($this->buildMarkType())
-            ->setSelfReflectable(true)
-            ->setSelfAssessable(true);
+            ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL);
 
         $projectModel->getAssessments()
                      ->add($subTask->getAssessmentModel()->setSubObject($subTask))
@@ -687,12 +684,10 @@ class ProjectTest extends TestCase
                                 ->setId(3)
                                 ->setTitle('Sub-work')
                                 ->setWorkType(new WorkType())
-                                ->setSelfReflectable(true)
-                                ->setSelfAssessable(true)
+                                ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL)
                         )
                         ->setWorkType(new WorkType())
-                        ->setSelfReflectable(true)
-                        ->setSelfAssessable(true)
+                        ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL)
                 );
 
         /** @var ProjectModel $projectModel */

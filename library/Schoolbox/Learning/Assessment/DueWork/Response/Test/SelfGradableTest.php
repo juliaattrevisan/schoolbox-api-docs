@@ -12,25 +12,29 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DueWork\Response\Test;
 
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Learning\Assessment\DueWork;
-use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessment;
+use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfGradable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Plan;
 use Schoolbox\Learning\Assessment\Quiz;
 use Schoolbox\Learning\Assessment\Task;
 use Schoolbox\User;
+use UnexpectedValueException;
 
-class SelfAssessmentTest extends TestCase
+class SelfGradableTest extends TestCase
 {
+
     /**
      * @dataProvider provider_validSelfAssessable
-     * @param User        $currentUser  The user currently "logged in"
-     * @param Participant $participant  The user whose trying to start self-assessment
+     * @param User        $currentUser The user currently "logged in"
+     * @param Participant $participant The user whose trying to start self-assessment
      * @param int         $expected
+     * @throws UnexpectedValueException If due work model not hydrated
      */
     public function testValidSelfAssessable(User $currentUser, Participant $participant, $expected)
     {
-        $validation = new ValidSelfAssessment();
+        $validation = new ValidSelfGradable();
 
         $this->assertEquals($expected, $validation->isSatisfiedBy($currentUser, $participant));
     }
@@ -47,18 +51,15 @@ class SelfAssessmentTest extends TestCase
         /* This assessment is correctly set up to start Self Assessment
          */
         $correctAssessment = (new DueWork\Model())
-            ->setSelfAssessable(true)
-            ->setSelfReflectable(true);
+            ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL);
 
         /* This assessment is incorrectly set up to start Self Assessment
          */
         $incorrectAssessment1 = (new DueWork\Model())
-            ->setSelfAssessable(false)
-            ->setSelfReflectable(true);
+            ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_REFLECT_ONLY);
 
         $incorrectAssessment2 = (new DueWork\Model())
-            ->setSelfAssessable(false)
-            ->setSelfReflectable(false);
+            ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE);
 
         /* Test everything
          */

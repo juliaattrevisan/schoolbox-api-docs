@@ -10,27 +10,27 @@ namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 use Alaress\Authorizer\Failure\Forbidden;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\DueWork\Authorizer\Rule\CanSelfAssess;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
-use Schoolbox\Learning\Authorizer\Rule\CanSelfAssess;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
-use Alaress\Twig\Loader\IChainLoader;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 class Module extends BaseModule
 {

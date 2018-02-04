@@ -35,6 +35,11 @@ class SubmissionBox implements IAssessableDataModel
     use HasCurriculumNodes;
     use AssessmentModelTrait;
 
+    // Can learners give themselves feedback?
+    public const SELF_REVIEWABILITY_NONE         = 'none';         // only instructors can review
+    public const SELF_REVIEWABILITY_REFLECT_ONLY = 'reflect-only'; // learner can only reflect on their work, but not give grades
+    public const SELF_REVIEWABILITY_FULL         = 'full';         // learner can give reflect and give grades
+
     /**
      * @var int
      */
@@ -171,11 +176,14 @@ class SubmissionBox implements IAssessableDataModel
      */
     private $submissions;
 
-    /** @var bool */
-    protected $selfAssessable;
+    /**
+     * Can learners reflect on or grade their own submissions?
+     *
+     * @see SubmissionBox::SELF_REVIEWABILITY_NONE and adjacent constants
+     * @var string
+     */
+    private $selfReviewability;
 
-    /** @var bool */
-    protected $selfReflectable;
 
     public function __construct()
     {
@@ -841,62 +849,22 @@ class SubmissionBox implements IAssessableDataModel
         return $this->getAssessmentModel()->getId();
     }
 
-    /**
-     * @deprecated mapper method
-     * @return boolean
-     */
-    public function getSelfAssessable()
-    {
-        return $this->isSelfAssessable();
-    }
-
 
     /**
-     * @param boolean $selfAssessable
-     * @return static
+     * @return null|string
      */
-    public function setSelfAssessable($selfAssessable)
+    public function getSelfReviewability(): ?string
     {
-        $this->selfAssessable = $selfAssessable;
-        return $this;
-    }
-
-
-    /**
-     * Determine whether a submissionBox is self-assessable
-     *
-     * @return bool
-     */
-    public function isSelfAssessable()
-    {
-        return $this->selfAssessable;
+        return $this->selfReviewability;
     }
 
     /**
-     * @deprecated mapper method
-     * @return boolean
+     * @param string $selfReviewability
+     * @return SubmissionBox
      */
-    public function getSelfReflectable()
+    public function setSelfReviewability(string $selfReviewability): self
     {
-        return $this->isSelfReflectable();
-    }
-
-    /**
-     * @return null|bool
-     */
-    public function isSelfReflectable(): ?bool
-    {
-        return $this->selfReflectable;
-    }
-
-
-    /**
-     * @param bool $selfReflectable
-     * @return static
-     */
-    public function setSelfReflectable(bool $selfReflectable)
-    {
-        $this->selfReflectable = $selfReflectable;
+        $this->selfReviewability = $selfReviewability;
         return $this;
     }
 }

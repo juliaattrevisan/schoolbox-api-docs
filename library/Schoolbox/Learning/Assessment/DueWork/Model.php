@@ -11,8 +11,10 @@
 namespace Schoolbox\Learning\Assessment\DueWork;
 
 use DomainException;
+use UnexpectedValueException;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use \Schoolbox\Collection;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
@@ -42,20 +44,6 @@ class Model extends AbstractAssessment
      */
     public const ACCEPT_ONLINE_MULTI = 2;
 
-    /**
-     * Do not accept self-reflection at all
-     */
-    public const SELF_REFLECTION_NONE = 0;
-
-    /**
-     * Accept only student self-reflection (no marking or rubric grades available)
-     */
-    public const SELF_REFLECTION_REFLECT_ONLY = 1;
-
-    /**
-     * Accept full student self-assessment (marking and rubric grades available)
-     */
-    public const SELF_REFLECTION_FULL = 2;
 
     /**
      * All the Files that are part of the Due Work specification
@@ -110,18 +98,13 @@ class Model extends AbstractAssessment
     private $maxMark;
 
     /**
-     * Students may self-assess their submission to the Due Work, if selfAssessable is true
-     *
-     * @var bool
+     * @var string
+     * @see SubmissionBox::SELF_REVIEWABILITY_NONE
+     * @see SubmissionBox::SELF_REVIEWABILITY_REFLECT_ONLY
+     * @see SubmissionBox::SELF_REVIEWABILITY_FULL
      */
-    protected $selfAssessable;
+    private $selfReviewability;
 
-    /**
-     * Students may self-reflect their submission to the Due Work, if selfReflectable is true
-     *
-     * @var bool
-     */
-    protected $selfReflectable;
 
     /**
      * Model constructor.
@@ -627,99 +610,71 @@ class Model extends AbstractAssessment
         return Feedback\Model::class;
     }
 
+
     /**
-     * @return boolean
+     * @return null|string
      */
-    public function getSelfAssessable()
+    public function getSelfReviewability(): ?string
     {
-        return $this->selfAssessable;
+        return $this->selfReviewability;
     }
 
-    /**
-     * @param boolean $selfAssessable
-     * @return static
-     */
-    public function setSelfAssessable(bool $selfAssessable)
-    {
-        $this->selfAssessable = $selfAssessable;
-        return $this;
-    }
 
     /**
-    * Determine whether this due work is self-assessable
-    *
-    * @return bool
-    */
-    public function isSelfAssessable()
-    {
-        return $this->selfAssessable;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getSelfReflectable() : ?bool
-    {
-        return $this->selfReflectable;
-    }
-
-    /**
-     * @param bool $selfReflectable
-     * @return static
-     */
-    public function setSelfReflectable(bool $selfReflectable)
-    {
-        $this->selfReflectable = $selfReflectable;
-        return $this;
-    }
-
-    /**
-     * Alias for `getSelfReflectable()`
-     *
-     * @return bool
-     */
-    public function isSelfReflectable() : ?bool
-    {
-        return $this->selfReflectable;
-    }
-
-    /**
-     * Set self-assessment and reflection based on a `self::SELF_REFLECTION_*`
-     * constant.
-     *
-     * @param int $selfReflectionType a `self::SELF_REFLECTION_*` constant
+     * @param string $selfReviewability
      * @return $this
      */
-    public function setSelfReflectionType(int $selfReflectionType): self
+    public function setSelfReviewability(string $selfReviewability): self
     {
-        switch ($selfReflectionType) {
-            case self::SELF_REFLECTION_REFLECT_ONLY:
-                $this->setSelfReflectable(true)->setSelfAssessable(false);
-                break;
-            case self::SELF_REFLECTION_FULL:
-                $this->setSelfReflectable(true)->setSelfAssessable(true);
-                break;
-            case self::SELF_REFLECTION_NONE:
-            default:
-                $this->setSelfReflectable(false)->setSelfAssessable(false);
-                break;
-        }
+        $this->selfReviewability = $selfReviewability;
         return $this;
     }
 
     /**
-     * Get self-reflection type.
+     * Can learners give feedback on their own submissions?
      *
-     * @return int a `self::SELF_REFLECTION_*` constant
+     * Returns TRUE if the assessment is set to reflect-only or full
+     *
+     * @return bool
+     * @throws UnexpectedValueException If property is not set
      */
-    public function getSelfReflectionType(): int
+    public function isSelfAssessable(): bool
     {
-        $selfReflectable = $this->isSelfReflectable();
-        $selfAssessable  = $this->isSelfAssessable();
-        if (!$selfReflectable) {
-            return self::SELF_REFLECTION_NONE;
-        } else {
-            return $selfAssessable ? self::SELF_REFLECTION_FULL : self::SELF_REFLECTION_REFLECT_ONLY;
+        if (null === $this->selfReviewability) {
+            throw new UnexpectedValueException('Property not set');
         }
+        $selfAssessableStates = [SubmissionBox::SELF_REVIEWABILITY_REFLECT_ONLY, SubmissionBox::SELF_REVIEWABILITY_FULL];
+        return \in_array($this->selfReviewability, $selfAssessableStates, true);
+    }
+
+    /**
+     * Can learners *only* reflect on their own work?
+     *
+     * Returns FALSE if the assessment is self-gradable
+     *
+     * @return bool
+     * @throws UnexpectedValueException If property is not set
+     */
+    public function isSelfReflectableOnly(): bool
+    {
+        if (null === $this->selfReviewability) {
+            throw new UnexpectedValueException('Property not set');
+        }
+        return $this->selfReviewability === SubmissionBox::SELF_REVIEWABILITY_REFLECT_ONLY;
+    }
+
+
+    /**
+     * Returns whether students can create feedback with marks on their own submissions.
+     *
+     * @return bool
+     * @throws UnexpectedValueException If property is not set
+     */
+    public function isSelfGradable(): bool
+    {
+        if (null === $this->selfReviewability) {
+            throw new UnexpectedValueException('Property not set');
+        }
+        return $this->selfReviewability === SubmissionBox::SELF_REVIEWABILITY_FULL;
     }
 }

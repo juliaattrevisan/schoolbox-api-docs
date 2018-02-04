@@ -12,13 +12,14 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DueWork\Response\Test;
 
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Learning\Assessment\DueWork;
-use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessmentWithResponse;
+use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfGradableWithResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Plan;
 use Schoolbox\User;
 
-class SelfAssessmentWithResponseTest extends TestCase
+class SelfGradableWithResponseTest extends TestCase
 {
     /**
      * @dataProvider provider_validSelfAssessable
@@ -28,7 +29,7 @@ class SelfAssessmentWithResponseTest extends TestCase
      */
     public function testValidSelfAssessable(User $currentUser, Participant $participant, $expected)
     {
-        $validation = new ValidSelfAssessmentWithResponse();
+        $validation = new ValidSelfGradableWithResponse();
 
         $this->assertEquals($expected, $validation->isSatisfiedBy($currentUser, $participant));
     }
@@ -42,8 +43,7 @@ class SelfAssessmentWithResponseTest extends TestCase
         $student = (new User())->setId(230);
 
         $correctAssessment = (new DueWork\Model())
-            ->setSelfAssessable(true)
-            ->setSelfReflectable(true);
+            ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL);
 
         /* This participation is correctly set up to conclude Self Assessment
          */

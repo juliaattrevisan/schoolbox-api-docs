@@ -2,7 +2,8 @@
 /**
  * ValidSelfReflection
  *
- * This (assessment, user) combination is currently valid for self-reflection
+ * This (assessment, user) combination is currently valid for self-reflection,
+ * and also has a draft response that can be published.
  *
  * TODO: Can you self-reflect on behalf of someone else, via SOBO?
  *
@@ -15,6 +16,7 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
+use UnexpectedValueException;
 
 class ValidSelfReflectionWithResponse extends ValidSelfReflection
 {
@@ -26,6 +28,7 @@ class ValidSelfReflectionWithResponse extends ValidSelfReflection
      * @param User        $user
      * @param Participant $participant
      * @return bool
+     * @throws UnexpectedValueException If due work model not hydrated
      */
     public function isSatisfiedBy(User $user, Participant $participant): bool
     {
@@ -36,7 +39,7 @@ class ValidSelfReflectionWithResponse extends ValidSelfReflection
          */
         if ($this->isDueWork($participant)) {
             return $this->isViewingOwnParticipation($user, $participant)
-                && $this->isSelfReflectable($participant)
+                && $this->isSelfReflectableOnly($participant)
                 && $this->hasDraftResponse($participant);
         }
 

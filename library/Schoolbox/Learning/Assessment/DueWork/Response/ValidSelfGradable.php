@@ -1,8 +1,6 @@
 <?php
 /**
- * ValidSelfReflection
- *
- * This (assessment, user) combination is currently valid for self-reflection
+ * This (assessment, user) combination is currently valid for self-grading
  *
  * TODO: Can you self-reflect on behalf of someone else, via SOBO?
  *
@@ -15,28 +13,30 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
+use UnexpectedValueException;
 
-class ValidSelfAssessment extends ValidSelfReflection
+class ValidSelfGradable extends ValidSelfAssessable
 {
-
     /**
-     * The IAssessable is set to Self-Assess
+     * The IAssessable is set to Self-Grade
      *
      * @param Participant $participant
      * @return bool
+     * @throws UnexpectedValueException If due-work model is not hydrated
      */
-    protected function isSelfAssessable(Participant $participant): bool
+    protected function isSelfGradable(Participant $participant): bool
     {
-        return $participant->getAssessable()->isSelfAssessable();
+        return $this->getDueWork($participant)->isSelfGradable();
     }
 
-
     /**
-     * The user can start the self-assessment process
+     * The currently logged-in user can self-reflect on the specified Participant's IResponse
+     * only when the following conditions are met
      *
      * @param User        $user
      * @param Participant $participant
      * @return bool
+     * @throws UnexpectedValueException If due work model not hydrated
      */
     public function isSatisfiedBy(User $user, Participant $participant): bool
     {
@@ -47,8 +47,7 @@ class ValidSelfAssessment extends ValidSelfReflection
          */
         if ($this->isDueWork($participant)) {
             return $this->isViewingOwnParticipation($user, $participant)
-                && $this->isSelfAssessable($participant)
-                && $this->isSelfReflectable($participant);
+                && $this->isSelfGradable($participant);
         }
 
         return false;

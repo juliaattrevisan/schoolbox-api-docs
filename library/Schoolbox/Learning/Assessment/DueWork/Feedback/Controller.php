@@ -12,8 +12,7 @@ use PDOException;
 use RangeException;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessment;
-use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfReflection;
+use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessable;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
@@ -200,9 +199,9 @@ class Controller extends Base
             /* If this is a self-assessment or self reflection, also set submitted_at on the Response
              * when publishing the Feedback itself
              */
-            $selfReflected = (new ValidSelfReflection())->isSatisfiedBy($this->getUser(), $participant);
+            $selfAssessed = (new ValidSelfAssessable())->isSatisfiedBy($this->getUser(), $participant);
 
-            if ($selfReflected && !$response->isSubmitted() && $this->getRequest()->post->get('publish')) {
+            if ($selfAssessed && !$response->isSubmitted() && $this->getRequest()->post->get('publish')) {
                 $response->setSubmittedAt(\Alaress_Date_Format::now());
 
                 $this->responseDataSource->save($response);

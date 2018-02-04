@@ -17,7 +17,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfReflection;
+use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
@@ -780,18 +780,17 @@ class Controller extends Assessment\Controller
         }
 
         /* If we're saving the final version of the submission (ie. not a draft) ram the current datetime in
-         * Only need to check selfReflectable. selfReflectable is a prerequisite for selfAssessment, but the
-         * behaviour is the same in both selfReflectable and selfAssessment scenarios for setting up a new
-         * draft submission.
+         * If this requires self-assessment, then this will always be a draft;
+         * participant must finalise their response as part of self-review.
          */
-        $selfReflectable = (new ValidSelfReflection())->isSatisfiedBy($this->getUser(), $participant);
+        $selfAssessable = (new ValidSelfAssessable())->isSatisfiedBy($this->getUser(), $participant);
 
         if ($isFinal) {
 
             /* submitted_at is determined after the next step when creating a self-assessed or self-reflected
              * response. Otherwise, proceed normally
              */
-            if (!$selfReflectable) {
+            if (!$selfAssessable) {
                 $response->setSubmittedAt(Alaress_Date_Format::now());
             }
         }
@@ -818,7 +817,7 @@ class Controller extends Assessment\Controller
          * This screen is shared between self-reflection and non-self-reflection steps
          * Self-reflection's plagscan stubs saving .......happens elsewhere
          */
-        if ($isFinal && !$selfReflectable && $response->getId()) {
+        if ($isFinal && !$selfAssessable && $response->getId()) {
             foreach ($response->getAllFiles() as $currentFile) {
                 if (!$currentFile->getEditableInline()) {
                     $plagscanMapper->saveNewPlagscanStub($currentFile);
@@ -831,8 +830,8 @@ class Controller extends Assessment\Controller
          */
         $this->getResponse()->content->set([
             'postOutput' => [
-                function() use ($plagscanMapper, $isFinal, $selfReflectable, $response) {
-                    if ($isFinal && !$selfReflectable && $response->getId()) {
+                function() use ($plagscanMapper, $isFinal, $selfAssessable, $response) {
+                    if ($isFinal && !$selfAssessable && $response->getId()) {
                         foreach ($response->getAllFiles() as $currentFile) {
                             $filename = $plagscanMapper->plagscanFilename($currentFile);
 
@@ -857,7 +856,7 @@ class Controller extends Assessment\Controller
 
             /* Go to the next step of Self-Assessment/Self-Reflection if appropriate
              */
-            if ($selfReflectable) {
+            if ($selfAssessable) {
                 $rs->redirect->to(
                     $this->getRouter()->generate(
                         'learningDueWorkResponse.getParticularResponseForSelfReflection',
@@ -987,10 +986,10 @@ class Controller extends Assessment\Controller
             'attachzone'         => $zoneFactory->buildForAssessment($assessment)->getTwigContext(),
             'allMarkTypes'       => $this->getAllMarkTypes($assessment),
             'allGradeSchemes'    => $this->getAllGradeSchemes(),
-            'selfReflectTypes'   => [
-                'none'    => Model::SELF_REFLECTION_NONE,
-                'reflect' => Model::SELF_REFLECTION_REFLECT_ONLY,
-                'assess'  => Model::SELF_REFLECTION_FULL,
+            'selfReviewTypes' => [
+                'none'    => SubmissionBox::SELF_REVIEWABILITY_NONE,
+                'reflect' => SubmissionBox::SELF_REVIEWABILITY_REFLECT_ONLY,
+                'full'    => SubmissionBox::SELF_REVIEWABILITY_FULL,
             ],
         ];
 
