@@ -98,6 +98,13 @@ class HeaderCheckTest extends TestCase
                 'serverVars' => [],
                 'expectedResult' => false,
             ],
+            'malformedOrigin' => [
+                'serverVars' => [
+                    'HTTP_ORIGIN' => 'file://',
+                    'HTTP_HOST'   => '192.168.36.10',
+                ],
+                'expectedResult' => false,
+            ],
         ];
     }
 
