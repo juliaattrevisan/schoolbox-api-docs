@@ -56,16 +56,6 @@ trait DueWorkTrait
     protected $attachedFiles;
 
     /**
-     * @var bool
-     */
-    protected $selfAssessable;
-
-    /**
-     * @var bool
-     */
-    protected $selfReflectable;
-
-    /**
      * @var string
      */
     private $selfReviewable;
