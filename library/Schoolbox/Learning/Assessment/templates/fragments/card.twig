@@ -6,11 +6,7 @@
         <div class="card wrap-down small-12">
             <div class="{{ icon.renderClass(assessable) }}" title="{{ assessable.getTypeName }}"></div>
 
-            {% if student %}
-                {% set route = routeLookupIfAuthorized('learningAssessment.getSummary',{assessmentId: assessable.id, studentId: student.id, student: student, assessment: assessable})  %}
-            {% else %}
-                {% set route = routeLookupIfAuthorized('learningAssessment.getPreview',{assessmentId: assessable.id, assessment: assessable}) %}
-            {% endif %}
+            {% set route = routeLookupIfAuthorized('learningAssessment.getSummary',{assessmentId: assessable.id, studentId: student.id, student: student, assessment: assessable})  %}
 
             {% block link %}
                 {% if route %}

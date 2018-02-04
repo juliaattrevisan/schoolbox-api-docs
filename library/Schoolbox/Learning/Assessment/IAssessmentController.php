@@ -107,16 +107,6 @@ interface IAssessmentController
     public function getStatus(IAssessable $assessment);
 
     /**
-     * @api   GET /learning/assessments/:assessmentId/preview
-     * @level 165
-     *
-     * @param IAssessable $assessment
-     * @return void
-     */
-    public function getPreview(IAssessable $assessment);
-
-
-    /**
      * @api   GET /learning/assessments/:assessmentId/:studentId
      * @level 165
      *

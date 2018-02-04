@@ -142,7 +142,6 @@ class Module extends BaseModule
         $this->register('GET',   "$assRoute/submissions/download",   'downloadSubmissions',      $canWrite,         $preloadAssessment); // a || c
 
         $this->register('GET',   "$assRoute/$studentParam",          'getSummary',               $canViewSummary,   $preloadParticipant); // s || p
-        $this->register('GET',   "$assRoute/preview",                'getPreview',               $canWrite,         $preloadAssessment);  // s || p
         $this->register('GET',   "$assRoute/$studentParam/submit",   'getCreateResponseForm',    $canSubmit,        $preloadParticipant); // p
         $this->register('POST',  "$assRoute/$studentParam/submit",   'postCreateResponse',       $canSubmit,        $preloadParticipant); // p
         $this->register('POST',  "$assRoute/$studentParam/received", 'postStatusAcknowledge',    $canAckSubmission, $preloadParticipant); // p
@@ -611,6 +610,7 @@ class Module extends BaseModule
         );
     }
 
+    // will throw invalid arg if route params incorrect
     /** @noinspection PhpDocRedundantThrowsInspection */
     /**
      * To view a summary page requires:
@@ -622,12 +622,12 @@ class Module extends BaseModule
      * @return Rule\IAuthorizationRule
      * @throws InvalidArgumentException If required route param not found
      * @throws InvalidPath If URL does not exist for this user
+     * @throws NotFound
      */
     private function buildAuthRuleCanViewSummary(): Rule\IAuthorizationRule
     {
         return new Rule\All(
             new AssessmentNotDeleted(),
-            new IsImplementation(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new CanPreview(),
@@ -635,5 +635,4 @@ class Module extends BaseModule
             )
         );
     }
-
 }

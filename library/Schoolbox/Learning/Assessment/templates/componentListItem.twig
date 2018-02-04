@@ -38,15 +38,6 @@
                 {% endfor %}
             {% endif %}
 
-            {# TODO SA-5769 this should not be necessary #}
-            {% if not viewRoute %}
-                {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getPreview', {
-                    assessmentId: assessable.id,
-                    assessment: assessable
-                }) %}
-            {% endif %}
-
-
             {% if viewRoute %}<a href="{{ viewRoute }}">{% endif %}
                 <h3 data-assessment-title>{{ assessable.title }}</h3>
             {% if viewRoute %}</a>{% endif %}
