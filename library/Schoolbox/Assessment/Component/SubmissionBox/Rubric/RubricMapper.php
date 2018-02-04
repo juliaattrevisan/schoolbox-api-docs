@@ -661,7 +661,7 @@ class RubricMapper
      * @param bool[] $descriptors key = descriptor.id, val = whether it is checked
      * @param int    $returnId    Feedback
      */
-    public function saveForFeedback(array $descriptors = [], $returnId)
+    public function saveForFeedback(array $descriptors, $returnId)
     {
         $descriptorMapper = DescriptorMapper::getInstance();
         $markMapper       = MarkMapper::getInstance();
