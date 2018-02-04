@@ -103,15 +103,18 @@ class Controller extends Base
         try {
             $feedback = $this->processFeedback($participant, $mostRecentFeedback, $post);
 
-            // Don't process rubric; just copy from the last one
-            $assessment = $participant->getAssessable();
-            if (
-                $feedback instanceof DueWork\Feedback\Model
-                && $mostRecentFeedback instanceof DueWork\Feedback\Model
-                && $assessment instanceof DueWork\Model
-                && $assessment->getUseRubric()
-            ) {
-                $this->rubricMapper->copySelections($mostRecentFeedback->getId(), $feedback->getId());
+            // Try to process a rubric.
+            // If there was none, copy it from the last feedback
+            if (!$this->processRubric($participant, $post, $feedback)) {
+                $assessment = $participant->getAssessable();
+                if (
+                    $feedback instanceof DueWork\Feedback\Model
+                    && $mostRecentFeedback instanceof DueWork\Feedback\Model
+                    && $assessment instanceof DueWork\Model
+                    && $assessment->getUseRubric()
+                ) {
+                    $this->rubricMapper->copySelections($mostRecentFeedback->getId(), $feedback->getId());
+                }
             }
         }
         catch (RangeException $e) {
@@ -176,17 +179,20 @@ class Controller extends Base
      * @param Participant $participant
      * @param array       $post
      * @param IFeedback   $feedback
+     * @return bool Was a rubric processed?
      */
     protected function processRubric(Participant $participant, array $post, IFeedback $feedback)
     {
-        if(!$participant->getAssessable() instanceof DueWork\Model){
-            return;
+        if (!$participant->getAssessable() instanceof DueWork\Model){
+            return false;
         }
 
         // Did we just give some rubric marks?
-        if (is_array($post['rubric'])) {
+        if (\is_array($post['rubric'])) {
             $this->rubricMapper->saveForFeedback($post['rubric']['descriptors'], $feedback->getId());
+            return true;
         }
+        return false;
     }
 
     /**
