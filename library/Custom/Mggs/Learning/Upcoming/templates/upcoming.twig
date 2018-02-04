@@ -427,7 +427,7 @@
             }
 
             // regardless of whether or not this is a placeholder, set a known data attr for indexing
-            var wk = calEvent.start.year() + 'W' + calEvent.start.week();
+            var wk = calEvent.start.year() + 'W' + calEvent.start.format('ww');
             $element.attr('data-wk', wk);
 
             if (isPlaceholder) {
