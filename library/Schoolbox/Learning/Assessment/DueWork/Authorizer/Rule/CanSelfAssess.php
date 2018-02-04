@@ -6,16 +6,15 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Authorizer\Rule;
+namespace Schoolbox\Learning\Assessment\DueWork\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
-use Schoolbox\Error;
-use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\Assessment\Task;
-use Schoolbox\User;
 use InvalidArgumentException;
+use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\User;
 
 /**
  * Class CanSelfAssess
