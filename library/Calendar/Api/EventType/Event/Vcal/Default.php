@@ -169,10 +169,11 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
                 // Cache step 2: Expand VCAL into event collection.
                 // The expanded events depend on the start and end time, not
                 // just the VCAL file.
-                $serializedEvents = Alaress\Redis::getInstance()->cacheFunctionCall(
+                /** @var \Sabre\VObject\Document $allEvents */
+                $allEvents = Alaress\Redis::getInstance()->cacheFunctionCall(
                     'vcal.' . $decodedConfig->getUrl(),
                     function ($params) {
-                        list($source, $startTimestamp, $endTimestamp) = $params;
+                        [$source, $startTimestamp, $endTimestamp] = $params;
                         // You provided UTF-16? Proceed to UTF-8
                         if (preg_match('/^(\x{FF}\x{FE})|(\x{FE}\x{FF})/', $source)) {
                             $source = mb_convert_encoding($source, 'UTF-8', 'UTF-16');
@@ -191,13 +192,18 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
                                 new DateTime('@' . $endTimestamp)
                             );
                         }
-                        return serialize($allEvents);
+                        return $allEvents;
                     },
-                    array($source, $startTimestamp, $endTimestamp),
+                    [$source, $startTimestamp, $endTimestamp],
                     $cache->getCachedTime()
                 );
-                /** @var \Sabre\VObject\Document $allEvents */
-                $allEvents        = unserialize($serializedEvents);
+
+                // If that returned a string: it's retrieving a cached serialized version.
+                // Unserialize it.
+                // TODO remove this check in a later version
+                if (is_string($allEvents)) {
+                    $allEvents = unserialize($allEvents);
+                }
             } catch (Exception $e) {
                 /* Some google calendars don't follow sabre's expected format?
                 echo $decodedConfig->getUrl();
