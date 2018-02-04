@@ -56,7 +56,7 @@ class Module extends BaseModule
                         return $params['participant']->getAssessable()->getContext()->getFolder()->getId();
                     }
                     throw new Forbidden('User does not have homepage access');
-                }, Access::getInstance()),
+                }, $this->getAccess()),
                 new IsInteractionUnLocked(new Assessment\LockedChecker($this->getTermMapper()))
             ),
             new CanSelfAssess()
@@ -73,7 +73,7 @@ class Module extends BaseModule
                         return $assessable->getContext()->getFolder()->getId();
                     }
                     throw new Forbidden('User does not have homepage access');
-                }, Access::getInstance()),
+                }, $this->getAccess()),
                 new IsInteractionUnLocked(new Assessment\LockedChecker($this->getTermMapper()))
             )
         );
@@ -202,7 +202,7 @@ class Module extends BaseModule
             'assessmentDataSource'  => $injector->lazyGet('assessmentDataSource'),
             'userMapper'            => $this->getMapperFactory()->get(UserMapper::class),
             'responseDataSource'    => $injector->lazyGet('responseDataSource'),
-            'rubricMarkMapper'      => $this->getMapperFactory()->get(Rubric\MarkMapper::class),
+            'rubricMapper'          => $this->getMapperFactory()->get(Rubric\RubricMapper::class),
             'returnedWorkMapper'    => $this->getMapperFactory()->get(ReturnedWorkMapper::class),
         ];
     }
@@ -300,6 +300,16 @@ class Module extends BaseModule
 
         throw new MapperException("Feedback '{$feedbackId}' not found for assessment '{$assessmentId}'.");
     }
+
+
+    /**
+     * @return Access
+     */
+    private function getAccess()
+    {
+        return $this->getMapperFactory()->get(Access::class);
+    }
+
 
     /**
      * @return Mapper|UserMapper

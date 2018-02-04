@@ -18,12 +18,12 @@ use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\DueWork;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\UserMapper;
 use Alaress_Date_Format;
 
@@ -45,8 +45,8 @@ class Controller extends Base
     /** @var UserMapper */
     protected $userMapper;
 
-    /** @var Rubric\MarkMapper */
-    private $rubricMarkMapper;
+    /** @var Rubric\RubricMapper */
+    private $rubricMapper;
 
     /** @var ReturnedWorkMapper */
     private $returnedWorkMapper;
@@ -62,7 +62,7 @@ class Controller extends Base
      * @param AssessmentDataSource  $assessmentDataSource
      * @param ResponseDataSource    $responseDataSource
      * @param UserMapper            $userMapper
-     * @param Rubric\MarkMapper     $rubricMarkMapper
+     * @param Rubric\RubricMapper   $rubricMapper
      * @param ReturnedWorkMapper    $returnedWorkMapper
      * @param Plagscan\Mapper       $plagscanMapper
      */
@@ -72,7 +72,7 @@ class Controller extends Base
         AssessmentDataSource $assessmentDataSource,
         ResponseDataSource $responseDataSource,
         UserMapper $userMapper,
-        Rubric\MarkMapper $rubricMarkMapper,
+        Rubric\RubricMapper $rubricMapper,
         ReturnedWorkMapper $returnedWorkMapper,
         Plagscan\Mapper $plagscanMapper
     ) {
@@ -81,7 +81,7 @@ class Controller extends Base
         $this->assessmentDataSource  = $assessmentDataSource;
         $this->responseDataSource    = $responseDataSource;
         $this->userMapper            = $userMapper;
-        $this->rubricMarkMapper      = $rubricMarkMapper;
+        $this->rubricMapper          = $rubricMapper;
         $this->returnedWorkMapper    = $returnedWorkMapper;
         $this->plagscanMapper        = $plagscanMapper;
     }
@@ -98,11 +98,23 @@ class Controller extends Base
     public function postParticipantFeedback(Participant $participant)
     {
         $mostRecentFeedback = $participant->findMostRecentFeedback();
-        $post = $this->getRequest()->post->getArrayCopy();
+        $post               = $this->getRequest()->post->getArrayCopy();
 
         try {
             $feedback = $this->processFeedback($participant, $mostRecentFeedback, $post);
-            $this->processRubric($participant, $post, $feedback);
+
+            // Try to process a rubric.
+            // If there was none, copy it from the last feedback
+            if (!$this->processRubric($participant, $post, $feedback)) {
+                $assessment = $participant->getAssessable();
+                if ($feedback instanceof DueWork\Feedback\Model
+                    && $mostRecentFeedback instanceof DueWork\Feedback\Model
+                    && $assessment instanceof DueWork\Model
+                    && $assessment->getUseRubric()
+                ) {
+                    $this->rubricMapper->copySelections($mostRecentFeedback->getId(), $feedback->getId());
+                }
+            }
         }
         catch (RangeException $e) {
             $this->sendError('Invalid mark provided');
@@ -166,18 +178,20 @@ class Controller extends Base
      * @param Participant $participant
      * @param array       $post
      * @param IFeedback   $feedback
+     * @return bool Was a rubric processed?
      */
     protected function processRubric(Participant $participant, array $post, IFeedback $feedback)
     {
-        if(!$participant->getAssessable() instanceof DueWork\Model){
-            return;
+        if (!$participant->getAssessable() instanceof DueWork\Model){
+            return false;
         }
 
         // Did we just give some rubric marks?
-        if (is_array($post['rubric'])) {
-            $rubMap = RubricMapper::getInstance();
-            $rubMap->saveForParticipant($participant, $post['rubric']['descriptors'], $feedback->getId());
+        if (\is_array($post['rubric'])) {
+            $this->rubricMapper->saveForFeedback($post['rubric']['descriptors'], $feedback->getId());
+            return true;
         }
+        return false;
     }
 
     /**
