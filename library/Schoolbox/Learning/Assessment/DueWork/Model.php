@@ -11,6 +11,7 @@
 namespace Schoolbox\Learning\Assessment\DueWork;
 
 use DomainException;
+use Schoolbox\Learning\Assessment\IResponse;
 use UnexpectedValueException;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric;
@@ -192,10 +193,10 @@ class Model extends AbstractAssessment
      *      - If the assessment only accepts single, and a submitted response already exists for this participant
      *      - You're not a student of this assessment's class (folder)
      *
-     * @param Collection $responses
+     * @param Collection|IResponse[] $responses
      * @throws DomainException
      */
-    public function assertAcceptSubmission(\Schoolbox\Collection $responses)
+    public function assertAcceptSubmission(Collection $responses)
     {
         $this->assertOpen();
 
@@ -213,15 +214,22 @@ class Model extends AbstractAssessment
     /**
      * Can a participant create an acknowledgement response?
      *
-     * This action is only available to open due works, but is open as long as
-     * the due work is open regardless of how many responses the participant
-     * has created.
+     * This action is only available to open due works that the participant has
+     * not yet responded to.
      *
+     * @param Collection|IResponse[] $responses
      * @throws DomainException
      */
-    public function assertAcceptAcknowledgement()
+    public function assertAcceptAcknowledgement(Collection $responses)
     {
         $this->assertOpen();
+
+        // Only non-draft responses count
+        foreach ($responses as $response) {
+            if ($response->isSubmitted()) {
+                throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_MULTIPLE_RESPONSE);
+            }
+        }
     }
 
     /**

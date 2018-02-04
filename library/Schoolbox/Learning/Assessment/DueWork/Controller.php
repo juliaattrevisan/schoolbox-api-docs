@@ -284,7 +284,7 @@ class Controller extends Assessment\Controller
         } catch (DomainException $e) {
             $twigData['submissionsBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
             try {
-                $assessment->assertAcceptAcknowledgement();
+                $assessment->assertAcceptAcknowledgement($allResponses);
             } catch (DomainException $e) {
                 $twigData['acknowlegementBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
             }
