@@ -106,7 +106,7 @@
             {% endif %}
         {% elseif not acknowlegementBlocked %}
             {% if selfAcknowledgeRoute %}
-                {% set requiresReflection = participant.assessable.isSelfAssessable or participant.assessable.isSelfReflectable %}
+                {% set requiresReflection = participant.assessable.isSelfAssessable %}
                 <button class="submit expand"
                         data-action-self-reflect
                         data-confirm-dialog-header="Have you submitted your work?"

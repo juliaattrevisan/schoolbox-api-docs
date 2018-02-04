@@ -946,8 +946,7 @@ class Controller extends Assessment\Controller
     public function postSelfAcknowledge(Participant $participant)
     {
         $assessment = $participant->getAssessable();
-        $selfReview = $assessment instanceof Model
-                      && ($assessment->isSelfAssessable() || $assessment->isSelfReflectable());
+        $selfReview = $assessment instanceof Model && $assessment->isSelfAssessable();
 
         // Route and arguments for location to redirect to once acknowledged.
         $route      = 'learningAssessment.getSummary';
