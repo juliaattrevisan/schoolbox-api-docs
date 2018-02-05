@@ -125,8 +125,12 @@ class Factory
     public function getExternalDatabase(IConfigLoader $config)
     {
         switch ($config->get('external_type')) {
-            // Microsoft SQL Server
 
+            // Schoolbox connector: just return internal DB
+            case 'schoolbox':
+                return $this->getInternalDatabase();
+
+            // Microsoft SQL Server
             case 'tass':
             case 'synergetic':
             case 'schoolpro':
@@ -136,25 +140,19 @@ class Factory
             case 'doublefirst':
             case 'humanedge':
             case 'schooledge':
-
                 $connectorExternal = $this->factory->createMssql();
                 break;
 
             // MySQL
-
-            case 'schoolbox':
-                return $this->getInternalDatabase();
-                break;
             case 'denbigh':
                 $connectorExternal = $this->factory->createMysql();
                 break;
 
             // IBM DB2
             case 'edumate':
-
                 $connectorExternal = $this->factory->createDb2();
                 break;
-        };
+        }
 
         if (!isset($connectorExternal)) {
             throw new DatabaseException("Unknown external database type.");
@@ -183,8 +181,6 @@ class Factory
     {
         $statement = $connectorInternal->prepareQuery("SELECT `value` FROM `config` WHERE name LIKE 'date_timezone'");
         $statement->execute();
-        $result = $statement->fetchColumn();
-
-        return $result;
+        return $statement->fetchColumn();
     }
 }
