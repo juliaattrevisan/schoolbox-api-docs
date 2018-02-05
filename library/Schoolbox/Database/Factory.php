@@ -122,9 +122,9 @@ class Factory
      *
      * @return IConnector Return the external connector appropriate for the SIS
      */
-    public function getExternalDatabase($config)
+    public function getExternalDatabase(IConfigLoader $config)
     {
-        switch ($config['external_type']) {
+        switch ($config->get('external_type')) {
             // Microsoft SQL Server
 
             case 'tass':
@@ -161,10 +161,10 @@ class Factory
         }
 
         $connectorExternal->connect(
-            $config['external_db_host'],
-            $config['external_db_db'],
-            $config['external_db_user'],
-            $config['external_db_passwd']
+            $config->get('external_db_host'),
+            $config->get('external_db_db'),
+            $config->get('external_db_user'),
+            $config->get('external_db_passwd')
         );
 
         return $connectorExternal;
