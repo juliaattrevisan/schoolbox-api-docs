@@ -136,7 +136,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
     {
         $dayNumber = $this->getDayNumber($campus, $now);
         $time      = $now
-            ? new Alaress_Date_Format($now, Alaress_Date_Format::TIMESTAMP)
+            ? Alaress_Date_Format::newFromTimestamp($now)
             : Alaress_Date_Format::now();
 
         $periodStatement = $this->internalDatabase->executeQuery(
