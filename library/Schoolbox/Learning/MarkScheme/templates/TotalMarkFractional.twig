@@ -15,9 +15,9 @@
     feedback:    feedback,
     tabIndex:    tabIndex,
     placeholder: readonly ? '(no mark given)' : 'Mark out of ' ~ markScheme.totalMark | number_format(2),
-    limit:       markScheme.totalMark,
+    limit:       markScheme.totalMark  | number_format(2),
     maxLength:   16,
-    inputTitle:  'Maximum Mark: ' ~ markScheme.totalMark,
+    inputTitle:  'Maximum Mark: ' ~ markScheme.totalMark | number_format(2),
     errors:      errors,
     readonly:    readonly
     } only %}
@@ -27,9 +27,9 @@
     feedback:    feedback,
     tabIndex:    tabIndex,
     placeholder: readonly ? '(no mark given)' : 'Mark out of ' ~ markScheme.totalMark | number_format(0),
-    limit:       markScheme.totalMark,
+    limit:       markScheme.totalMark | number_format(0),
     maxLength:   16,
-    inputTitle:  'Maximum Mark: ' ~ markScheme.totalMark,
+    inputTitle:  'Maximum Mark: ' ~ markScheme.totalMark | number_format(0),
     errors:      errors,
     readonly:    readonly
     } only %}
