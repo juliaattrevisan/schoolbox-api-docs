@@ -167,6 +167,8 @@ class Factory
             $config->get('external_db_passwd')
         );
 
+        $connectorExternal->setTimezone($this->fetchTimezone($this->getInternalDatabase()));
+
         return $connectorExternal;
     }
 
