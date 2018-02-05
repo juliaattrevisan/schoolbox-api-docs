@@ -219,10 +219,10 @@ trait DueWorkTrait
     }
 
     /**
-     * @param string $selfReviewable
+     * @param null|string $selfReviewable
      * @return $this
      */
-    public function setSelfReviewable(string $selfReviewable): self
+    public function setSelfReviewable(?string $selfReviewable): self
     {
         $this->selfReviewable = $selfReviewable;
         return $this;
