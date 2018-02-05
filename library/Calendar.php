@@ -579,11 +579,19 @@ class Calendar extends DeprecatedModel
         $dateQueryParts = array();
         if (isset($startTimestamp)) {
             // Start timestamp: don't get events which end before or on that time
-            $dateQueryParts[] = sprintf("DATE(end_datetime) < DATE(FROM_UNIXTIME('%d'))", $startTimestamp);
+            $adf              = new Alaress_Date_Format($startTimestamp, Alaress_Date_Format::TIMESTAMP);
+            $dateQueryParts[] = sprintf(
+                "DATE(end_datetime) < '%s'",
+                $adf->getUsingFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+            );
         }
         if (isset($endTimestamp)) {
             // End timestamp: don't get events which start after that time
-            $dateQueryParts[] = sprintf("DATE(start_datetime) >= DATE(FROM_UNIXTIME('%d'))", $endTimestamp);
+            $adf              = new Alaress_Date_Format($endTimestamp, Alaress_Date_Format::TIMESTAMP);
+            $dateQueryParts[] = sprintf(
+                "DATE(start_datetime) >= '%s'",
+                $adf->getUsingFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+            );
         }
         if (!empty($dateQueryParts)) {
             $dateQuery = "AND (NOT (".implode(' OR ', $dateQueryParts).'))';
