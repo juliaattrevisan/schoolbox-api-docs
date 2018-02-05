@@ -32,6 +32,30 @@ class Factory
     protected static $connectorInternal;
 
     /**
+     * An instance of this object
+     *
+     * @deprecated
+     * @var self
+     */
+    private static $instance;
+
+    /**
+     * Retrieve a static instance of this factory.
+     * TODO: Once we've got DI accessible everywhere this is currently used this should no longer required
+     *
+     * @deprecated
+     * @return self
+     */
+    private static function getInstance()
+    {
+        if (!isset(self::$instance)) {
+            self::$instance = new self(new DatabaseFactory());
+        }
+
+        return self::$instance;
+    }
+
+    /**
      * Retrieves static instance of external database connection (used in External connectors)
      * TODO: Once we've got DI accessible everywhere this is currently used this should no longer required
      *
@@ -41,59 +65,7 @@ class Factory
     public static function getInstanceExternal()
     {
         if (!isset(self::$connectorExternal)) {
-            $config  = ConfigMapper::getInstance();
-            $factory = new DatabaseFactory();
-
-            switch ($config->get('external_type')) {
-                // Microsoft SQL Server
-
-                case 'tass':
-                case 'synergetic':
-                case 'schoolpro':
-                case 'pcschools':
-                case 'maze':
-                case 'isams':
-                case 'doublefirst':
-                case 'humanedge':
-                case 'schooledge':
-
-                    $database = $factory->createMssql();
-                    break;
-
-                // MySQL
-
-                case 'schoolbox':
-                    return self::getInstanceInternal();
-                    break;
-
-                case 'denbigh':
-                    $database = $factory->createMysql();
-                    break;
-
-                // IBM DB2
-
-                case 'edumate':
-
-                    $database = $factory->createDb2();
-                    break;
-
-                default:
-                    throw new DatabaseException("Unknown external database type.");
-                    break;
-            };
-
-            // This will throw an exception on error
-
-            $database->connect(
-                $config->get('external_db_host'),
-                $config->get('external_db_db'),
-                $config->get('external_db_user'),
-                $config->get('external_db_passwd')
-            );
-
-            // So only cache the instance on success
-
-            self::$connectorExternal = $database;
+            self::$connectorExternal = self::getInstance()->getExternalDatabase(ConfigMapper::getInstance());
         }
 
         return self::$connectorExternal;
@@ -109,21 +81,7 @@ class Factory
     public static function getInstanceInternal()
     {
         if (!isset(self::$connectorInternal)) {
-            $factory  = new DatabaseFactory();
-            $database = $factory->createMysql();
-
-            // This will throw an exception on error
-
-            $database->connect(
-                SQL_host,
-                SQL_db,
-                SQL_user,
-                SQL_passwd
-            );
-
-            // So only cache the instance on success
-
-            self::$connectorInternal = $database;
+            self::$connectorInternal = self::getInstance()->getInternalDatabase();
         }
 
         return self::$connectorInternal;
