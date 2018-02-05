@@ -246,7 +246,8 @@ class Controller extends Assessment\Controller
             $feedbackRubricContexts[$feedback->getId()] = $rubricContext->generateForFeedback(
                 $feedback,
                 $this->getUser(),
-                $this->getAccess()
+                $this->getAccess(),
+                false
             );
         }
 
