@@ -46,7 +46,8 @@ Usage:
 {% block participantCarousel %}
     {% include '@learningDueWorkResponse/inlineGrading/fragments/participantCarousel.twig' with {
         carousel: carousel,
-        participant: participant
+        participant: participant,
+        assessment: assessment
     } only %}
 {% endblock %}
 
