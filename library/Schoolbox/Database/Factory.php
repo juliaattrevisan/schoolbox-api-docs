@@ -5,7 +5,7 @@ namespace Schoolbox\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Factory as DatabaseFactory;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Loader;
 use Schoolbox\IConfigLoader;
 
 class Factory
@@ -65,7 +65,7 @@ class Factory
     public static function getInstanceExternal()
     {
         if (!isset(self::$connectorExternal)) {
-            self::$connectorExternal = self::getInstance()->getExternalDatabase(ConfigMapper::getInstance());
+            self::$connectorExternal = self::getInstance()->getExternalDatabase(new Loader());
         }
 
         return self::$connectorExternal;
