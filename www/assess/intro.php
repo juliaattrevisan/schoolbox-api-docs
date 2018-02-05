@@ -180,11 +180,21 @@ if (empty($assess['description'])) {
 /* Section list and question count
  */
 if (is_array($allSummary) && count($allSummary)) {
+
+    $numQuestions = 0;
+
     foreach ($allSummary as $currentSummary) {
+
+        if($currentSummary['pool'] > 0 && $currentSummary['pool'] < $currentSummary['numQuestions']) {
+            $numQuestions = $currentSummary['pool'];
+        } else {
+            $numQuestions = $currentSummary['numQuestions'];
+        }
+
         $this->setVar(array(
-            'SECTION_SEQUENCE' => $currentSummary['sequence'],
-            'SECTION_TITLE' => Scrub::text($currentSummary['title']),
-            'SECTION_NUMQUESTIONS' => $currentSummary['pool'] > 0 ? $currentSummary['pool'] : $currentSummary['numQuestions'],
+        'SECTION_SEQUENCE' => $currentSummary['sequence'],
+        'SECTION_TITLE' => Scrub::text($currentSummary['title']),
+        'SECTION_NUMQUESTIONS' => $numQuestions,
         ));
 
         $this->parse('section_block', 'section', 'true');
