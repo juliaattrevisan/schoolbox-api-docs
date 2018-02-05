@@ -110,6 +110,7 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
     public function getTeacherName($classCode)
     {
         $classQuery = $this->getClassCodeQuery($classCode);
+        $teachers = [];
 
         // As far as I can interpret:
         // Use base staff if there is no TimetableClassStaff in TimetableClassInstanceStaff
@@ -161,7 +162,13 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
 
             ORDER BY code ASC
         ";
-        return $this->getDatabase()->getAll($query);
+
+        $statement = $this->getDatabase()->query($query);
+        while ($teacher = $statement->fetch()) {
+            $teachers[] = $teacher['code'];
+        }
+
+        return array_unique($teachers);
     }
 
     /**
