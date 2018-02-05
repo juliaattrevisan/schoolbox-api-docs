@@ -106,21 +106,23 @@
             {% endif %}
         {% elseif not acknowlegementBlocked %}
             {% if selfAcknowledgeRoute %}
-                {% set requiresReflection = participant.assessable.isSelfAssessable %}
-                <button class="submit expand"
-                        data-action-self-reflect
-                        data-confirm-dialog-header="Have you submitted your work?"
-                        data-confirm-dialog-text="
-                            This action will inform your teacher that you have submitted your work.
-                            {% if requiresReflection %}
-                                Next, you will then be asked to reflect upon what you have submitted.
-                            {% endif %}
-                        "
-                        data-confirm-dialog-confirm-label="Proceed"
-                        data-confirm-dialog-cancel-label="Cancel"
-                >
-                    I have submitted my work in person
-                </button>
+                {% if USER.id == participant.user.id %}
+                    {% set requiresReflection = participant.assessable.isSelfAssessable %}
+                    <button class="submit expand"
+                            data-action-self-reflect
+                            data-confirm-dialog-header="Have you submitted your work?"
+                            data-confirm-dialog-text="
+                                This action will inform your teacher that you have submitted your work.
+                                {% if requiresReflection %}
+                                    Next, you will then be asked to reflect upon what you have submitted.
+                                {% endif %}
+                            "
+                            data-confirm-dialog-confirm-label="Proceed"
+                            data-confirm-dialog-cancel-label="Cancel"
+                    >
+                        I have submitted my work in person
+                    </button>
+                {% endif %}
             {% endif %}
         {% endif %}
         <div class="toast" data-toast></div>
