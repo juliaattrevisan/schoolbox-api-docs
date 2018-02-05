@@ -277,11 +277,17 @@ class Controller extends Assessment\Controller
             'authoritativeFeedback' => $participant->findAuthoritativeVisibleFeedback($this->getUser()),
         ];
 
+        $twigData['submissionsBlocked']    = false;
+        $twigData['acknowlegementBlocked'] = false;
         try {
             $assessment->assertAcceptSubmission($allResponses);
-            $twigData['submissionsBlocked'] = false;
         } catch (DomainException $e) {
             $twigData['submissionsBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
+            try {
+                $assessment->assertAcceptAcknowledgement($allResponses);
+            } catch (DomainException $e) {
+                $twigData['acknowlegementBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
+            }
         }
 
         $this->getResponse()->content->set(
@@ -898,11 +904,80 @@ class Controller extends Assessment\Controller
     {
         $assessment = $participant->getAssessable();
         try {
-            $response = $this->persistEmptySobo($participant);
+            $response = $this->persistAcknowledgementResponse($participant, Alaress_Date_Format::now());
             $data = [
                 'success'       => true,
                 'id'            => $response->getId(),
                 'submittedLate' => $assessment->isOverdue() || $assessment->isPastClose(),
+            ];
+            $code = 200;
+        } catch (\PDOException $e) {
+            $data = [
+                'success' => false,
+                'message' => $e->getMessage(),
+            ];
+            $code = 403;
+        }
+        $this->getResponse()->status->set($code);
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
+    }
+
+
+    /**
+     * Action for a due work participant to create an empty acknowledgement
+     * response.
+     *
+     * If the assessment doesn't allow self-reflect or self-assessment, this
+     * will simply create the acknowledgement response.
+     *
+     * If it does, it will:
+     * * Redirect to the self-reflect screen for the most recent draft response
+     *   so the participant may reflect on their work, and publish from there
+     * * If there is no draft; a new draft acknowledgement response will be
+     *   created, and then will redirect to the self-reflect screen for that
+     *   response
+     *
+     * TODO merge common code w/ postPendingAcknowledge, postStatusAcknowledge
+     *
+     * @param Participant $participant
+     * @api   POST /learning/assessments/:assessmentId/:studentId/ackDraft
+     * @level 18.0
+     */
+    public function postSelfAcknowledge(Participant $participant)
+    {
+        $assessment = $participant->getAssessable();
+        $selfReview = $assessment instanceof Model && $assessment->isSelfAssessable();
+
+        // Route and arguments for location to redirect to once acknowledged.
+        $route      = 'learningAssessment.getSummary';
+        $params     = [
+            'participant'  => $participant,
+            'assessment'   => $assessment,
+            'assessmentId' => $assessment->getId(),
+            'student'      => $participant->getUser(),
+            'studentId'    => $participant->getUser()->getId(),
+        ];
+
+        try {
+            if ($selfReview) {
+                $response = $participant->findMostRecentDraftResponse();
+                if (!$response) {
+                    $response = $this->persistAcknowledgementResponse($participant, null);
+                }
+
+                $route                = 'learningDueWorkResponse.getParticularResponseForSelfReflection';
+                $params['response']   = $response;
+                $params['responseId'] = $response->getId();
+
+            } else {
+                $response = $this->persistAcknowledgementResponse($participant, Alaress_Date_Format::now());
+            }
+
+            $data = [
+                'success'       => true,
+                'id'            => $response->getId(),
+                'submittedLate' => $assessment->isOverdue() || $assessment->isPastClose(),
+                'location'      => $this->getRouteIfAuthorized($route, $params, $this->getUser()),
             ];
             $code = 200;
         } catch (\PDOException $e) {
@@ -930,7 +1005,7 @@ class Controller extends Assessment\Controller
     public function postPendingAcknowledge(Participant $participant)
     {
         try {
-            $this->persistEmptySobo($participant);
+            $this->persistAcknowledgementResponse($participant, Alaress_Date_Format::now());
             $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learning/fragments/toMarkParticipant.twig', [
                 'participant' => $participant,
                 'assessment'  => $participant->getAssessable(),
@@ -950,18 +1025,19 @@ class Controller extends Assessment\Controller
     /**
      * Common logic for 'dueWork status' and 'pending assessments' pages 'acknowledgement of submission receipt'.
      *
-     * @param Participant $participant
+     * @param Participant              $participant
+     * @param Alaress_Date_Format|null $submittedDate Date this was submitted at, null if draft
      * @return Submission
      * @throws \PDOException If something went wrong in the save process
      */
-    private function persistEmptySobo(Participant $participant)
+    private function persistAcknowledgementResponse(Participant $participant, ?Alaress_Date_Format $submittedDate)
     {
         $assessment = $participant->getAssessable();
         $response   = $this->dueWorkResponseMapper->createModel()
             ->setAssessable($assessment)
             ->setSubmittedBy($this->getUser())
             ->setSubmittedOnBehalfOf($participant->getUser())
-            ->setSubmittedAt(Alaress_Date_Format::now())
+            ->setSubmittedAt($submittedDate)
             ->setCreatedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now());
 

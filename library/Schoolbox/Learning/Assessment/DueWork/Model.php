@@ -11,6 +11,7 @@
 namespace Schoolbox\Learning\Assessment\DueWork;
 
 use DomainException;
+use Schoolbox\Learning\Assessment\IResponse;
 use UnexpectedValueException;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric;
@@ -192,10 +193,45 @@ class Model extends AbstractAssessment
      *      - If the assessment only accepts single, and a submitted response already exists for this participant
      *      - You're not a student of this assessment's class (folder)
      *
-     * @param Collection $responses
+     * @param Collection|IResponse[] $responses
      * @throws DomainException
      */
-    public function assertAcceptSubmission(\Schoolbox\Collection $responses)
+    public function assertAcceptSubmission(Collection $responses)
+    {
+        $this->assertOpen();
+
+        if ($this->isAcceptNone()) {
+            throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_ONLINE_RESPONSE);
+        }
+
+        /* Allow draft responses in single submission assessments
+         */
+        if ($this->isAcceptSingle()) {
+            $this->assertNoPublishedResponses($responses);
+        }
+    }
+
+    /**
+     * Can a participant create an acknowledgement response?
+     *
+     * This action is only available to open due works that the participant has
+     * not yet responded to.
+     *
+     * @param Collection|IResponse[] $responses
+     * @throws DomainException
+     */
+    public function assertAcceptAcknowledgement(Collection $responses)
+    {
+        $this->assertOpen();
+        $this->assertNoPublishedResponses($responses);
+    }
+
+    /**
+     * Assert whether this due work is open.
+     *
+     * @throws DomainException
+     */
+    private function assertOpen()
     {
         if ($this->getOpenAt()->gt(\Alaress_Date_Format::now())) {
             throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NOT_YET_OPEN);
@@ -204,15 +240,18 @@ class Model extends AbstractAssessment
         if (\Alaress_Date_Format::now()->gt($this->getCloseAt())) {
             throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_CLOSED);
         }
+    }
 
-        if ($this->isAcceptNone()) {
-            throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_ONLINE_RESPONSE);
-        }
-
-        /* Allow draft responses in single submission assessments
-         */
-        if ($this->isAcceptSingle() && $responses->count() && $responses->first()->isSubmitted()) {
-            throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_MULTIPLE_RESPONSE);
+    /**
+     * @param Collection|IResponse[] $responses
+     * @throws DomainException
+     */
+    private function assertNoPublishedResponses(Collection $responses)
+    {
+        foreach ($responses as $response) {
+            if ($response->isSubmitted()) {
+                throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_MULTIPLE_RESPONSE);
+            }
         }
     }
 

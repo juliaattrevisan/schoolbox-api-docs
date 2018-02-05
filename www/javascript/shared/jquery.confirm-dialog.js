@@ -63,7 +63,18 @@
             cancelLabel: 'No',
             format: 'text'
         };
-        var settings = $.extend(true, {}, defaults, options);
+
+        // Allow passing of defaults in data-vars
+        // Override defaults, but not passed-in options
+        var dataOptions = {};
+        Object.keys(defaults).forEach(function (key) {
+            var dataOption = element.data('confirmDialog-'+key);
+            if (dataOption) {
+                dataOptions[key] = dataOption;
+            }
+        });
+
+        var settings = $.extend(true, {}, defaults, dataOptions, options);
 
         var modal        = $('<div data-reveal class="reveal-modal" />');
         var h2 = $('<h2 />');

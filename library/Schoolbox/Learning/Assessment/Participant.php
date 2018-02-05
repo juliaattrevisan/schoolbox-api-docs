@@ -237,7 +237,11 @@ class Participant
     public function findMostRecentDraftResponse(): ?IResponse
     {
         if ($this->allResponses->count()) {
-            return $this->allResponses->filterBy('submittedAt', true)->sortBy('submittedAt', 'desc')->first();
+            return $this->allResponses->filter(
+                function (IResponse $response) {
+                    return !$response->getSubmittedAt() || $response->getSubmittedAt()->isNull();
+                }
+            )->sortBy('createdAt', 'desc')->first();
         }
 
         return null;
