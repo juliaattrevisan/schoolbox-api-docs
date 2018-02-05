@@ -6,8 +6,8 @@
  #}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 <ul class="meta">
-    <li class="icon-calendar">{{ dueDate.dueDate(assessment, student ?: USER) }}</li>
-    <li class="{{ icon }}">{{ assessment.typeName }}</li>
+    {% include '@learning/fragments/meta/dueDate.twig' %}
+    {% include '@learning/fragments/meta/workType.twig' %}
     {% if student.id != user.id %}
     <li class="icon-staff-students">{{ student.fullname }}</li>
     {% endif %}
