@@ -410,6 +410,18 @@ class SitePage extends Page
 
         $this->renderScriptIncludes();
 
+        // Check if the user is being impersonated
+        $impersonated = false;
+        if ($this->user instanceof User) {
+            if (isset($_SESSION['previous']['user'])) {
+                /** @var User $previousUser */
+                $previousUser = $_SESSION['previous']['user'];
+                if ($previousUser->isSuperuser()) {
+                    $impersonated = true;
+                }
+            }
+        }
+
         if ($this->user instanceof User) {
             $this->renderInstantMessages();
         } else {
@@ -419,9 +431,9 @@ class SitePage extends Page
 
         $config = new \Schoolbox\Config\Loader();
 
-        /**
+        /**************************************************
          * Alaress Google Analytics
-         */
+         *************************************************/
         $this->setBlock('headerTpl', 'google_analytics', 'google_analytics_block');
         $this->setBlock('google_analytics', 'ga_user_events', 'ga_user_events_block');
         $this->setBlock('ga_user_events', 'ga_year_event', 'ga_year_event_block');
@@ -436,6 +448,7 @@ class SitePage extends Page
         ]);
 
         if ($this->user instanceof User) {
+
             $this->setVar([
                 'ROLE_NAME' => $this->user->getRole()->getName(),
                 'ROLE_TYPE' => $this->user->getRole()->getType(),
@@ -451,34 +464,11 @@ class SitePage extends Page
 
             // If the user has come from a previous session and is a superuser: we're going to log this
             // as impersonated. All others will be considered a legitimate switch and logged normally.
-            $impersonated = false;
-            if (isset($_SESSION['previous']['user'])) {
-                /** @var User $previousUser */
-                $previousUser = $_SESSION['previous']['user'];
-                if ($previousUser->isSuperuser()) {
-                    $impersonated = true;
-                }
-            }
 
             if ($impersonated) {
                 $this->parse('ga_impersonated_block', 'ga_impersonated');
             } else {
                 $this->setVar('ga_impersonated_block', '');
-            }
-
-            // Enable the feature tour only if the user is not impersonated: see SA-5927
-            if (! $impersonated) {
-                $this->setBlock('headerTpl', 'tour_script', 'tour_script_block');
-
-                $toursEnabled = $config->get('tours_enabled');
-                if ($toursEnabled) {
-                    $request    = parse_url($_SERVER['REQUEST_URI']);
-                    $encodedUrl = Redirect::encode($request['path']);
-                    $this->setVar('TOUR_ROUTE', $this->routeLookup('tour.getTours', ['url' => $encodedUrl]));
-                    $this->parse('tour_script_block', 'tour_script', true);
-                } else {
-                    $this->setVar('tour_script_block');
-                }
             }
 
             $this->parse('ga_user_events_block', 'ga_user_events');
@@ -487,19 +477,36 @@ class SitePage extends Page
             $this->setVar('ga_user_events_block', '');
         }
 
-
-
-
-
         if ($optIn) {
             $this->parse('google_analytics_block', 'google_analytics');
         } else {
             $this->setVar('google_analytics_block', '');
         }
 
-        /**
+        /**************************************************
+         * Feature tour
+         *************************************************/
+
+        if ($this->user instanceof User) {
+            // Enable the feature tour only if the user is not impersonated: see SA-5927
+            if (!$impersonated) {
+                $this->setBlock('headerTpl', 'tour_script', 'tour_script_block');
+
+                $toursEnabled = $config->get('tours_enabled');
+                if ($toursEnabled) {
+                    $request = parse_url($_SERVER['REQUEST_URI']);
+                    $encodedUrl = Redirect::encode($request['path']);
+                    $this->setVar('TOUR_ROUTE', $this->routeLookup('tour.getTours', ['url' => $encodedUrl]));
+                    $this->parse('tour_script_block', 'tour_script', true);
+                } else {
+                    $this->setVar('tour_script_block');
+                }
+            }
+        }
+
+        /**************************************************
          * Support and Feedback custom link
-         */
+         *************************************************/
         $this->setBlock('footerTpl', 'feedback_link', 'feedback_link_block');
 
         $feedbackText = $config->get('feedback_text');
@@ -510,7 +517,6 @@ class SitePage extends Page
         } else {
             $this->setVar('feedback_link_block', '');
         }
-
 
         $this->parse('MAIN_HEADER_REGION', 'headerTpl');
         $this->parse('MAIN_FOOTER_REGION', 'footerTpl');
