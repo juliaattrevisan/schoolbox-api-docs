@@ -18,8 +18,12 @@ class ResponsesOnly extends Full
      * We only need Submitted Responses here
      * @inheritdoc
      */
-    protected function recombine($includeUnpublishedFeedback, $includeDraftResponses, $minimumVisibility)
-    {
+    protected function recombine(
+        $includeUnpublishedSelfReflectionFeedback,
+        $includeUnpublishedInstructorFeedback,
+        $includeDraftResponses,
+        $minimumVisibility
+    ) {
         /** @var Submission $currentResponse */
         foreach ($this->getParticipant()->getAllResponses() as $currentResponse) {
 

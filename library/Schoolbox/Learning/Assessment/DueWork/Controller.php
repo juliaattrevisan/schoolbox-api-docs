@@ -243,13 +243,12 @@ class Controller extends Assessment\Controller
         $rubricContext          = new RubricContext($this->rubricMapper);
         $feedbackRubricContexts = [];
         foreach ($participant->getAllFeedbacks() as $feedback) {
-            if ($feedback->isPublished()) {
-                $feedbackRubricContexts[$feedback->getId()] = $rubricContext->generateForFeedback(
-                    $feedback,
-                    $this->getUser(),
-                    $this->getAccess()
-                );
-            }
+            $feedbackRubricContexts[$feedback->getId()] = $rubricContext->generateForFeedback(
+                $feedback,
+                $this->getUser(),
+                $this->getAccess(),
+                false
+            );
         }
 
         /* Find all the records spawned by $participant

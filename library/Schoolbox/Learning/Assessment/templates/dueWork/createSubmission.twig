@@ -212,8 +212,6 @@ Data:
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
-{% import '@learning/macro/dueDate.twig' as dueDate %}
-
 {% set isSubmitOnBehalfOf = USER.id != student.id %}
 {% set requiresReflection = not isSubmitOnBehalfOf and assessment.selfAssessable %}
 
@@ -221,8 +219,8 @@ Data:
     <div class="small-12 island">
         <h1>{{ assessment.title }}</h1>
         <ul class="meta">
-            <li class="icon-calendar">{{ dueDate.dueDate(assessment, student) }}</li>
-            <li class="icon-due-work">{{ assessment.typeName }}</li>
+            {% include '@learning/fragments/meta/dueDate.twig' %}
+            {% include '@learning/fragments/meta/workType.twig' %}
         </ul>
 
         {% if assessment.description | length %}

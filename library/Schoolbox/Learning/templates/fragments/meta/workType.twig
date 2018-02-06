@@ -1,0 +1,11 @@
+{% import '@learningAssessment/project/macro/icon.twig' as icon %}
+
+{% if assessment.isSelfGradable %}
+    {% set selfReflectSuffix = 'includes ' ~ locale.selfAssessment.proper %}
+{% elseif assessment.isSelfReflectableOnly %}
+    {% set selfReflectSuffix = 'includes ' ~ locale.selfReflection.proper %}
+{% else %}
+    {% set selfReflectSuffix = '' %}
+{% endif %}
+
+<li class="{{ icon.renderClass(assessment) }}">{{ assessment.typeName }} {{ selfReflectSuffix }}</li>

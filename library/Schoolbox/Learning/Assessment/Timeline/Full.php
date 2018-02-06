@@ -57,51 +57,63 @@ class Full
 
 
     /**
-     * Get the timeline, as seen by a teacher on their child's summary page
-     * As a parent, you cannot see draft submissions or unpublished feedback,
-     * and can only see feedback if the assessment allows parents to see it.
+     * Get the timeline, as seen by a teacher on their child's summary page.
+     * As a parent, you:
+     * * cannot see unpublished self-reflection feedback
+     * * cannot see unpublished instructor feedback
+     * * cannot see draft responses
+     * * can see published feedback if assessment allows parents to see it
      *
      * @return Collection
      */
     public function getForParent()
     {
-        return $this->getTimeline(false, false, AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT);
+        return $this->getTimeline(false, false, false, AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT);
     }
 
     /**
      * Get the timeline, as seen by a teacher grading a student.
-     * As a teacher, you cannot see submissions the student has drafted but not yet submitted.
+     * As a teacher, you:
+     * * cannot see unpublished self-reflection feedback
+     * * can see unpublished instructor feedback
+     * * cannot see draft responses
+     * * can see published feedback
      *
      * @return Collection
      */
     public function getForTeacher()
     {
-        return $this->getTimeline(true, false, AbstractAssessment::MARK_VISIBILITY_PRIVATE);
+        return $this->getTimeline(false, true, false, AbstractAssessment::MARK_VISIBILITY_PRIVATE);
     }
 
 
     /**
-     * Get the timeline, as seen by a student on their summary page
-     * As a student, you cannot see feedback the teacher has drafted but not yet published,
-     * and can only see feedback if the assessment allows students to see it.
+     * Get the timeline, as seen by a student on their summary page.
+     * As a student, you:
+     * * can see unpublished self-reflection feedback
+     * * cannot see unpublished instructor feedback
+     * * can see draft responses
+     * * can see published feedback if assessment allows students to see it
      *
      * @return Collection
      */
     public function getForStudent()
     {
-        return $this->getTimeline(false, true, AbstractAssessment::MARK_VISIBILITY_STUDENT);
+        return $this->getTimeline(true, false, true, AbstractAssessment::MARK_VISIBILITY_STUDENT);
     }
 
 
     /**
-     * Get the admin-only form of a timeline, including EVERYTHING for when you need to perform admin functions
-     * As an admin, you can see damn well everything.
+     * Get the admin-only form of a timeline, including EVERYTHING for when you
+     * need to perform admin functions.
+     * As an admin, you:
+     * * can see damn well everything
      *
      * @return Collection
      */
     public function getForAdmin()
     {
-        return $this->getTimeline(true, true, AbstractAssessment::MARK_VISIBILITY_PRIVATE);
+        return $this->getTimeline(true, true, true, AbstractAssessment::MARK_VISIBILITY_PRIVATE);
     }
 
 
@@ -146,16 +158,26 @@ class Full
      * Recombine if required, otherwise return a cached
      * version of the recombination because reasons
      *
-     * @param bool $includeUnpublishedFeedback
+     * @param bool $includeUnpublishedSelfReflectionFeedback
+     * @param bool $includeUnpublishedInstructorFeedback
      * @param bool $includeDraftResponses
      * @param int  $minimumVisibility          Assessment mark's visibility must be at least this
      * @return Collection
      */
-    protected function getTimeline($includeUnpublishedFeedback, $includeDraftResponses, $minimumVisibility)
-    {
+    protected function getTimeline(
+        $includeUnpublishedSelfReflectionFeedback,
+        $includeUnpublishedInstructorFeedback,
+        $includeDraftResponses,
+        $minimumVisibility
+    ) {
         // TODO evaluate the appropriateness of caching here
 //        if (!$this->getHasRecombined()) {
-        $this->recombine($includeUnpublishedFeedback, $includeDraftResponses, $minimumVisibility);
+        $this->recombine(
+            $includeUnpublishedSelfReflectionFeedback,
+            $includeUnpublishedInstructorFeedback,
+            $includeDraftResponses,
+            $minimumVisibility
+        );
 //            $this->setHasRecombined(true);
 //        }
 
@@ -168,15 +190,46 @@ class Full
      *
      * 1 + 1 = 1
      *
-     * @param bool $includeUnpublishedFeedback
+     * @param bool $includeUnpublishedSelfReflectionFeedback
+     * @param bool $includeUnpublishedInstructorFeedback
      * @param bool $includeDraftResponses
      * @param int  $minimumVisibility
      */
-    protected function recombine($includeUnpublishedFeedback, $includeDraftResponses, $minimumVisibility)
-    {
+    protected function recombine(
+        $includeUnpublishedSelfReflectionFeedback,
+        $includeUnpublishedInstructorFeedback,
+        $includeDraftResponses,
+        $minimumVisibility
+    ) {
         $processedFeedback = [];
 
         $isFeedbackVisible = $this->getParticipant()->getAssessable()->getMarkVisibility() >= $minimumVisibility;
+
+        // Filter for feedback display:
+        // If somehow not due work feedback: exclude
+        // If a self-assess:                 if published show,
+        //                                   if not respect $includeUnpublishedSelfReflectionFeedback
+        // If instructor:                    if published respect $isFeedbackVisible,
+        //                                   if not respect $includeUnpublishedInstructorFeedback
+        $feedbackFilter = function (IFeedback $feedback) use (
+            $includeUnpublishedSelfReflectionFeedback,
+            $includeUnpublishedInstructorFeedback,
+            $isFeedbackVisible
+        ) {
+            if ($feedback instanceof Duework\Feedback\Model) {
+                if ($feedback->isSelfReflected() || $feedback->isSelfAssessed()) {
+                    if ($feedback->isPublished()) {
+                        return true;
+                    }
+                    return $includeUnpublishedSelfReflectionFeedback;
+                }
+                if ($feedback->isPublished()) {
+                    return $isFeedbackVisible;
+                }
+                return $includeUnpublishedInstructorFeedback;
+            }
+            return false;
+        };
 
         /** @var DueWork\Response\Model $currentResponse */
         foreach ($this->getParticipant()->getAllResponses() as $currentResponse) {
@@ -185,26 +238,9 @@ class Full
              */
             if ($includeDraftResponses || $currentResponse->isSubmitted()) {
 
-                /* If $includeUnpublishedFeedback is false,
-                 * Filter out unpublished Feedback from each $response
-                 *
-                 * Otherwise just use the stack that was given to us
-                 * which has the unpublished feedbacks in there already
-                 */
-                $includedFeedback = new Collection();
-                if ($isFeedbackVisible) {
-                    if ($includeUnpublishedFeedback) {
-                        $includedFeedback = $currentResponse->getAllFeedback();
-
-                    } else {
-                        /** @var DueWork\Feedback\Model $currentFeedback */
-                        foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
-                            if ($currentFeedback->isPublished()) {
-                                $includedFeedback->add($currentFeedback);
-                            }
-                        }
-                    }
-                }
+                // Exclude feedback which doesn't match the filter
+                /** @var Duework\Feedback\Model[] $includedFeedback */
+                $includedFeedback = $currentResponse->getAllFeedback()->filter($feedbackFilter);
 
                 /* Maintain a list of all the Feedbacks that were discovered
                  * as being part of Responses to ensure they don't get duped
@@ -237,23 +273,23 @@ class Full
                  */
                 $currentResponse->getAllFiles()->sortBy('filename', 'asc');
 
+                // Exclude all feedback except ones explicitly allowed
+                $currentResponse->setAllFeedback($includedFeedback);
+
                 $this->getRecombined()->add($currentResponse);
             }
         }
 
-        /* Only grab unique Floating Feedbacks
+        /* Only grab unique Floating Feedbacks that match the filter
          */
         if ($isFeedbackVisible) {
             foreach ($this->getParticipant()->getAllFeedbacks() as $currentFeedback) {
-                if (!in_array($currentFeedback->getId(), $processedFeedback)) {
+                if (!\in_array($currentFeedback->getId(), $processedFeedback, true)
+                    && $feedbackFilter($currentFeedback)
+                ) {
+                    $this->getRecombined()->add($currentFeedback);
 
-                    /* Only show Published feedbacks
-                     */
-                    if ($includeUnpublishedFeedback || $currentFeedback->isPublished()) {
-                        $this->getRecombined()->add($currentFeedback);
-
-                        $processedFeedback[] = $currentFeedback->getId();
-                    }
+                    $processedFeedback[] = $currentFeedback->getId();
                 }
             }
         }

@@ -1,29 +1,59 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
-{# Associated Feedback
+{#
+ # Self-reflection/assessment:
+ # Go to self-assess screen to resume
+ #
+ # Associated Feedback
  # Go to Inline Grader to resume
  #
  # Floating Feedback
  # Go to Quickmark to resume
  #}
-{% if currentFeedback.response.id %}
-    {% if not currentFeedback.isPublished %}
-        {% set url = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {
-            assessmentId: currentFeedback.assessable.id,
-            studentId: currentFeedback.response.submittedOnBehalfOf.id,
-            responseId: responseId,
-            response: currentFeedback.response,
-            participant: participant
-        }) %}
-        {% set tooltip = 'Resume Inline ' ~ locale.grading.proper %}
-    {% endif %}
-{% else %}
-    {% if not currentFeedback.isPublished %}
+{% set url     = null %}
+{% set tooltip = null %}
+{% if not currentFeedback.isPublished %}
+    {% if currentFeedback.response.id %}
+        {% if currentFeedback.isSelfAssessed %}
+            {% set url = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponseForSelfReflection', {
+                assessmentId: currentFeedback.assessable.id,
+                studentId: currentFeedback.response.submittedOnBehalfOf.id,
+                responseId: responseId,
+                response: currentFeedback.response,
+                participant: participant
+            }) %}
+            {% set tooltip = 'Resume ' ~ locale.selfAssessment.proper %}
+        {% elseif currentFeedback.isSelfReflected %}
+            {% set url = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponseForSelfReflection', {
+                assessmentId: currentFeedback.assessable.id,
+                studentId: currentFeedback.response.submittedOnBehalfOf.id,
+                responseId: responseId,
+                response: currentFeedback.response,
+                participant: participant
+            }) %}
+            {% set tooltip = 'Resume ' ~ locale.selfReflection.proper %}
+        {% else %}
+            {% set url = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {
+                assessmentId: currentFeedback.assessable.id,
+                studentId: currentFeedback.response.submittedOnBehalfOf.id,
+                responseId: responseId,
+                response: currentFeedback.response,
+                participant: participant
+            }) %}
+            {% set tooltip = 'Resume Inline ' ~ locale.grading.proper %}
+        {% endif %}
+    {% else %}
         {% set url = routeLookupIfAuthorized('learningAssessment.getStatus', {
             assessmentId: currentFeedback.assessable.id,
             assessment: currentFeedback.assessable
         }) %}
         {% set tooltip = 'Resume Quickmark' %}
     {% endif %}
+{% endif %}
+
+{% if not url %}
+    {# Just link to reviewer's profile #}
+    {% set url = '/search/user/' ~ currentFeedback.reviewer.id %}
+    {% set tooltip = 'View Profile' %}
 {% endif %}
 
 <ul class="information-list reply">
@@ -35,12 +65,16 @@
                 {% endif %}
                     <img src="/portrait.php?userId={{ currentFeedback.reviewer.externalId }}&amp;size=square64" alt="">
                     <p>
-                        {% if currentFeedback.published %}
-                            Feedback
-                        {% else %}
-                            Draft Feedback
+                        {% if not currentFeedback.published %}
+                            Draft
                         {% endif %}
-                        by {{ currentFeedback.reviewer.fullname }}
+                        {% if currentFeedback.isSelfAssessed %}
+                            {{ locale.selfAssessment.proper }}
+                        {% elseif currentFeedback.isSelfReflected %}
+                            {{ locale.selfReflection.proper }}
+                        {% else %}
+                            Feedback by {{ currentFeedback.reviewer.fullname }}
+                        {% endif %}
                         {% if currentFeedback.response.id %}
                         <span class="pipe meta">
                             {{ currentFeedback.published ? currentFeedback.publishedAt.short : currentFeedback.updatedAt.short }}
@@ -96,8 +130,10 @@
                  data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}"
                  {% endif %}>
                 {% include '@rubric/grid.twig' with {
-                    rubric: feedbackRubricContexts[currentFeedback.id].rubric,
-                    markVisibility: participant.assessable.isFeedbackVisibleToUser(USER)
+                    rubric:         feedbackRubricContexts[currentFeedback.id].rubric,
+                    markVisibility: currentFeedback.isSelfAssessed
+                                    or currentFeedback.isSelfReflected
+                                    or participant.assessable.isFeedbackVisibleToUser(USER),
                 } only %}
             </div>
         {% endif %}
