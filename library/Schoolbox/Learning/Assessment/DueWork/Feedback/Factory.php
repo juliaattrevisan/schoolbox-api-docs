@@ -78,9 +78,17 @@ class Factory
     private $hasRubric;
 
     /**
+     * By which work-flow was the feedback created
+     *
+     * @var string
+     */
+    private $reviewRoute;
+
+    /**
      * @var DueWorkResponse
      */
     private $response;
+
 
     /**
      * Factory constructor.
@@ -94,6 +102,7 @@ class Factory
      * @param string                                        $publish   one of ['0'|'1']
      * @param array                                         $files
      * @param bool                                          $hasRubric
+     * @param string                                        $reviewRoute
      * @param DueWorkResponse|null                          $response
      */
     public function __construct(
@@ -106,18 +115,20 @@ class Factory
         $publish,
         $files,
         $hasRubric,
+        string $reviewRoute,
         DueWorkResponse $response = null
     ) {
         $this->dueWorkFeedbackDataSource = $dueWorkFeedbackDataSource;
-        $this->participant = $participant;
-        $this->currentUser = $currentUser;
-        $this->mostRecentFeedback = $mostRecentFeedback;
-        $this->mark = $mark;
-        $this->comment = $comment;
-        $this->publish = $publish;
-        $this->files = $files;
-        $this->hasRubric = $hasRubric;
-        $this->response = $response;
+        $this->participant               = $participant;
+        $this->currentUser               = $currentUser;
+        $this->mostRecentFeedback        = $mostRecentFeedback;
+        $this->mark                      = $mark;
+        $this->comment                   = $comment;
+        $this->publish                   = $publish;
+        $this->files                     = $files;
+        $this->hasRubric                 = $hasRubric;
+        $this->reviewRoute               = $reviewRoute;
+        $this->response                  = $response;
     }
 
     /**
@@ -143,9 +154,10 @@ class Factory
         }
 
         // mutate model found, and save
-        $postMark    = trim($this->mark);
-        $postComment = trim($this->comment);
-        $postPublish = trim($this->publish);
+        $postMark        = trim($this->mark);
+        $postComment     = trim($this->comment);
+        $postReviewRoute = trim($this->reviewRoute);
+        $postPublish     = trim($this->publish);
 
         /**
          * Check if there's any content to this feedback
@@ -171,6 +183,7 @@ class Factory
         /** @var DueWorkFeedback $feedback */
         $feedback
             ->setReviewer($this->currentUser)
+            ->setReviewRoute($postReviewRoute)
             ->setUpdatedAt(\Alaress_Date_Format::now())
             ->setComment($postComment);
 

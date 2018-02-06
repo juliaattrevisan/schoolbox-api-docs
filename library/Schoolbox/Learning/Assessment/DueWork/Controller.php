@@ -168,6 +168,7 @@ class Controller extends Assessment\Controller
             'download'       => $this->hasDownloadableSubmissionFiles($assessment),
             'rubricMarks'    => Rubric\MarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
             'interactionLocked' => (new Assessment\LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment),
+            'reviewRoute'    => SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR,
         ];
 
         $this->getResponse()->content->set(

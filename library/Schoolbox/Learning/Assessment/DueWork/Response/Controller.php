@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanMapper;
@@ -120,6 +121,13 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_COMPLETE_BEFORE_SELF_REFLECT);
         }
 
+        $reviewRoute = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
+        if ($selfReflectedWithResponse) {
+            $reviewRoute = ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION;
+        } elseif ($selfAssessedWithResponse) {
+            $reviewRoute = ReturnedWork::REVIEW_ROUTE_SELF_GRADING;
+        }
+
         /* For the last bread node
          */
         $breadcrumbNode = 'Self Assessment/Reflection';
@@ -161,6 +169,7 @@ class Controller extends Base
              */
             'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
             'interactionLocked' => $isInteractionLocked,
+            'reviewRoute'       => $reviewRoute,
         ];
 
         /* Rubrics data

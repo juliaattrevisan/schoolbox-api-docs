@@ -14,6 +14,7 @@
      - errors:           string[]  Admin-configured submission states, eg 'Absent', 'Pending', 'Not Submitted' etc
      - markSchemeName:   string    filename of markScheme template fragment
      - interactionLocked: bool Is the assessment locked for interactions because it is due in an archived term?
+     - reviewRoute:      string  The workflow by which this feedback is being given
 
 #}
 {% extends '@learningAssessment/status.twig' %}
@@ -107,6 +108,8 @@
             {% endif %}
 
             <input type="hidden" name="responseId" value="{{ response.id }}"/>
+            <input type="hidden" name="review_route" value="{{ reviewRoute }}"/>
+
 
             <div class="row">
                 {% if 'none' != markSchemeName | lower %}

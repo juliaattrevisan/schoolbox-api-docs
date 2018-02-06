@@ -289,6 +289,7 @@ class Controller extends Base
             $postVars['publish'],
             $postVars['attachment'],
             $hasRubric,
+            $postVars['review_route'],
             $response
         );
 
