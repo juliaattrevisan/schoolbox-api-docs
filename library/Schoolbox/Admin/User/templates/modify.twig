@@ -606,14 +606,6 @@
             }
         });
 
-        $.validator.addMethod('emailTrimmed', function(value, element) {
-            // If field contains just whitespace...pass
-            if ($.trim(value).length < 1) {
-                return true;
-            }
-            return jQuery.validator.methods.email.call(this, $.trim(value), element);
-        }, 'Please enter a valid email address')
-
         {# Validate user details#}
 
         $('form[data-validatable-as="userDetails"]').alaressValidate({
