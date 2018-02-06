@@ -464,9 +464,12 @@ class SitePage extends Page
                 $this->parse('ga_impersonated_block', 'ga_impersonated');
             } else {
                 $this->setVar('ga_impersonated_block', '');
+            }
+
+            // Enable the feature tour only if the user is not impersonated: see SA-5927
+            if (! $impersonated) {
                 $this->setBlock('headerTpl', 'tour_script', 'tour_script_block');
 
-                // Enable the feature tour only if the user is not impersonated: see SA-5927
                 $toursEnabled = $config->get('tours_enabled');
                 if ($toursEnabled) {
                     $request    = parse_url($_SERVER['REQUEST_URI']);
@@ -476,7 +479,6 @@ class SitePage extends Page
                 } else {
                     $this->setVar('tour_script_block');
                 }
-
             }
 
             $this->parse('ga_user_events_block', 'ga_user_events');
