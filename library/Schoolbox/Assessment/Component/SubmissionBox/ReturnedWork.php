@@ -28,6 +28,12 @@ class ReturnedWork implements ISoftDeletable
     use UpdatedAtDate;
     use DeletedAtDate;
 
+    // By which work-flow did this feedback come into existence?
+    public const REVIEW_ROUTE_INSTRUCTOR      = 'instructor';      // normal teacher marking a student
+    public const REVIEW_ROUTE_SELF_REFLECTION = 'self-reflection'; // learner self-reflection
+    public const REVIEW_ROUTE_SELF_GRADING    = 'self-grading';    // learner self-grading
+
+
     /**
      * @var SubmissionBox
      */
@@ -88,6 +94,16 @@ class ReturnedWork implements ISoftDeletable
      * @var ReturnedWork\SingleFile\Model[]|Collection
      */
     private $files;
+
+    /**
+     * By which work-flow was this review created?
+     *
+     * @var string
+     * @see ReturnedWork::REVIEW_ROUTE_INSTRUCTOR
+     * @see ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION
+     * @see ReturnedWork::REVIEW_ROUTE_SELF_GRADING
+     */
+    private $reviewRoute;
 
 
     /**
@@ -351,4 +367,23 @@ class ReturnedWork implements ISoftDeletable
         return $this;
     }
 
+
+    /**
+     * @return null|string
+     */
+    public function getReviewRoute(): ?string
+    {
+        return $this->reviewRoute;
+    }
+
+
+    /**
+     * @param string $reviewRoute
+     * @return $this
+     */
+    public function setReviewRoute(string $reviewRoute): self
+    {
+        $this->reviewRoute = $reviewRoute;
+        return $this;
+    }
 }

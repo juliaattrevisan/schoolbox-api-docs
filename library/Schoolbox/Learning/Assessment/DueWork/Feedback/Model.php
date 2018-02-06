@@ -12,6 +12,8 @@ namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
 use \Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\AbstractFeedback;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use UnexpectedValueException;
 
 class Model extends AbstractFeedback
 {
@@ -24,12 +26,68 @@ class Model extends AbstractFeedback
     protected $allFiles;
 
     /**
+     * By which work-flow was this feedback created?
+     *
+     * @var string
+     * @see ReturnedWork::REVIEW_ROUTE_INSTRUCTOR and adjacent constants
+     */
+    private $reviewRoute;
+
+    /**
      * Model constructor.
      */
     public function __construct()
     {
         $this->setAllFiles(new Collection());
     }
+
+
+    /**
+     * Returns whether this feedback was given by an instructor in the standard marking work-flow
+     *
+     * @return bool
+     * @throws UnexpectedValueException If method called on an un-hydrated model
+     */
+    public function isInstructorGiven(): bool
+    {
+        if (null === $this->reviewRoute) {
+            throw new UnexpectedValueException('Unable to determine review route. Property is null');
+        }
+        return ReturnedWork::REVIEW_ROUTE_INSTRUCTOR === $this->reviewRoute;
+    }
+
+
+    /**
+     * Returns whether this feedback was created via one of the self-assessment work-flows
+     * (as opposed to merely an instructor marking themselves via the normal grading process)
+     *
+     * @return bool
+     * @throws UnexpectedValueException If model property is not hydrated
+     */
+    public function isSelfAssessment(): bool
+    {
+        if (null === $this->reviewRoute) {
+            throw new UnexpectedValueException('Unable to determine review route. Property is null');
+        }
+        $selfAssessedReviewRoutes = [ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION, ReturnedWork::REVIEW_ROUTE_SELF_GRADING];
+        return \in_array($this->reviewRoute, $selfAssessedReviewRoutes, true);
+    }
+
+
+    /**
+     * Returns whether this feedback was created via the learner self-grade work-flow
+     *
+     * @return bool
+     * @throws UnexpectedValueException If model property is not hydrated
+     */
+    public function isSelfGrading(): bool
+    {
+        if (null === $this->reviewRoute) {
+            throw new UnexpectedValueException('Unable to determine review route. Property is null');
+        }
+        return ReturnedWork::REVIEW_ROUTE_SELF_GRADING === $this->reviewRoute;
+    }
+
 
     /* Getters/Setters
      */
@@ -54,30 +112,21 @@ class Model extends AbstractFeedback
 
 
     /**
-     * The author of the feedback is the same as the person who receives it
-     * The feedback has normalised marks
-     *
-     * @return bool
+     * @return null|string
      */
-    public function isSelfAssessed(): bool
+    public function getReviewRoute(): ?string
     {
-        $reviewerIsSubmissionAuthor = ($this->getReviewee()->getId() === $this->getReviewer()->getId());
-        $feedbackHasNormalisedMarks = $this->getNormalisedMark() !== null;
-
-        return $reviewerIsSubmissionAuthor && $feedbackHasNormalisedMarks;
+        return $this->reviewRoute;
     }
 
-    /**
-     * The author of the feedback is the same as the person who receives it
-     * The feedback does not have normalised marks
-     *
-     * @return bool
-     */
-    public function isSelfReflected(): bool
-    {
-        $reviewerIsSubmissionAuthor = ($this->getReviewee()->getId() === $this->getReviewer()->getId());
-        $feedbackHasNormalisedMarks = $this->getNormalisedMark() === null;
 
-        return $reviewerIsSubmissionAuthor && $feedbackHasNormalisedMarks;
+    /**
+     * @param string $reviewRoute
+     * @return $this
+     */
+    public function setReviewRoute(string $reviewRoute): self
+    {
+        $this->reviewRoute = $reviewRoute;
+        return $this;
     }
 }
