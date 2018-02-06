@@ -86,7 +86,7 @@ if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($survey['duration
 
 /* Continue once you get past checks
  */
-$author = UserMapper::getInstance()->findById($survey['user_id']);
+$author = UserMapper::getInstance()->findByIdWithFallback($survey['user_id']);
 $folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($survey['category_id']);
 
 $allSummary = $surveyHandler->getIntroSummary($survey['assess_id']);
