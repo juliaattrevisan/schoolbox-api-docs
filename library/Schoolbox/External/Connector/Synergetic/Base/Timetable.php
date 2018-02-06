@@ -125,7 +125,7 @@ class Timetable extends Base implements ITimetable
                                 c1.ClassCampus AS campus,
                                 c2.description AS name,
                                 luFileType.Description AS type
-                FROM            SubjectClassStaff c1
+                FROM            Timetable c1
                 INNER JOIN      SubjectClasses c2 ON
                                     c1.FileType = c2.FileType AND
                                     c1.FileYear = c2.FileYear AND
