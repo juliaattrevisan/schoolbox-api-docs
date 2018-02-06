@@ -260,7 +260,6 @@ class UserMapper extends Mapper
             SELECT {$this->getColumnString()}, IF(su.id, 1, 0) as `superuser`,
                     {$this->getJoinColumnString('role', 'g')},
                     {$this->getJoinColumnString('userCampus', 'c')},
-                    `v_c`.`defaultCampus`, -- we need this attribute from the join table
                     {$this->getJoinColumnString('schoolHouse', 'h')},
                     {$this->getColumnString('lu')}
             FROM `user`

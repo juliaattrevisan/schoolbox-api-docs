@@ -78,7 +78,7 @@ class Session
         //Clear all remnants of past sessions
         $this->destroy();
 
-        $user = $userMapper->findByUsername($username, ['order' => ['v_c.defaultCampus' => 'DESC']]);
+        $user = $userMapper->findByUsername($username);
 
         $ip = self::getIP();
 
