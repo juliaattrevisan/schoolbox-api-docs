@@ -1,4 +1,7 @@
 <?php
+
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+
 /**
  * Tasks
  *
@@ -92,6 +95,7 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 			}
 
 			$submissionReturn->setMarker($submissionBox->getOwner());
+            $submissionReturn->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
 
 			/* Assign owner id
 			 */
