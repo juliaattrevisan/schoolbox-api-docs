@@ -106,11 +106,18 @@ class HeaderCheck
         // Need to add a scheme if there is none before we get a host,
         // otherwise it thinks a naked IP or hostname is a path.
         $scheme = parse_url($url, PHP_URL_SCHEME);
+        if (false === $scheme) {
+            return null;
+        }
         if (null === $scheme) {
             $url = 'http://'.$url;
         }
 
         // Now get a host
-        return parse_url($url, PHP_URL_HOST);
+        $host = parse_url($url, PHP_URL_HOST);
+        if (false === $host) {
+            return null;
+        }
+        return $host;
     }
 }
