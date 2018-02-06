@@ -609,7 +609,6 @@
         $.validator.addMethod('emailTrimmed', function(value, element) {
             // If field contains just whitespace...pass
             if ($.trim(value).length < 1) {
-                $(element).val(''); // clear the field so we're not writing spaces to the DB
                 return true;
             }
             return jQuery.validator.methods.email.call(this, value, element);
