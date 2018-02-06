@@ -431,9 +431,9 @@ class SitePage extends Page
 
         $config = new \Schoolbox\Config\Loader();
 
-        /**************************************************
-         * Alaress Google Analytics
-         *************************************************/
+        // -----------------------------------------------
+        // Alaress Google Analytics
+        // -----------------------------------------------
         $this->setBlock('headerTpl', 'google_analytics', 'google_analytics_block');
         $this->setBlock('google_analytics', 'ga_user_events', 'ga_user_events_block');
         $this->setBlock('ga_user_events', 'ga_year_event', 'ga_year_event_block');
@@ -483,9 +483,9 @@ class SitePage extends Page
             $this->setVar('google_analytics_block', '');
         }
 
-        /**************************************************
-         * Feature tour
-         *************************************************/
+        // -----------------------------------------------
+        // Feature tour
+        // -----------------------------------------------
 
         if ($this->user instanceof User) {
             // Enable the feature tour only if the user is not impersonated: see SA-5927
@@ -504,9 +504,9 @@ class SitePage extends Page
             }
         }
 
-        /**************************************************
-         * Support and Feedback custom link
-         *************************************************/
+        // -----------------------------------------------
+        // Support and Feedback custom link
+        // -----------------------------------------------
         $this->setBlock('footerTpl', 'feedback_link', 'feedback_link_block');
 
         $feedbackText = $config->get('feedback_text');
