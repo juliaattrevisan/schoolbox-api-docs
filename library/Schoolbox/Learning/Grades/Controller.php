@@ -33,6 +33,9 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use LogicException;
 use TypeError;
 use UnexpectedValueException;
+use DomainException;
+use InvalidArgumentException;
+use ReflectionException;
 
 class Controller extends Base
 {
@@ -220,6 +223,8 @@ class Controller extends Base
      * @throws DefinitionException If specified mapper join is not defined
      * @throws Filter\BrokenFilterException If a injected filter is unable to be processed
      * @throws \Schoolbox\Mapper\Exception If a database column alias is incorrect
+     * @throws LogicException If cyclic graph detected
+     * @throws UnexpectedValueException If unable to merge student collections
      */
     public function getGradesForSubject(User $viewee, Term\Model $term, Folder\Model $subject)
     {
@@ -249,16 +254,8 @@ class Controller extends Base
                 AssessmentFilters\TemporalState\Definition::KEY_CLOSED,
             ]
         ];
-        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
-        $assessments   = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
-
-
-        $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, false, $viewee)
-                                                   ->filter(function (IAssessable $a) use ($viewee) {
-                                                       return $a->isParticipant($viewee);
-                                                   });
-
-        $markbook      = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
+        $assessments = $this->findByFiltersWithParticipants($filters, $viewee);
+        $markbook    = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
 
         // Load conversation history (this also implicitly loads folder's teachers)
         $conversation = new Conversation($this->getConfigLoader(), $viewee, $subject);
@@ -285,19 +282,20 @@ class Controller extends Base
         );
     }
 
-
     /**
      * @param User         $viewee
      * @param Term\Model   $term
      * @param Folder\Model $subject
-     * @throws \InvalidArgumentException If unable to find the filter mapper class
-     * @throws \ReflectionException If the specified class does not exist
-     * @throws \DomainException If this class has not defined what entity it is filtering
+     * @throws InvalidArgumentException If unable to find the filter mapper class
+     * @throws ReflectionException If the specified class does not exist
+     * @throws DomainException If this class has not defined what entity it is filtering
      * @throws Filter\BrokenFilterException If a filter is unable to be processed
      * @throws ServiceNotFound If unable to locate HTML web Output
      * @throws DefinitionException If specified mapper join is not defined
-     * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
+     * @throws LogicException If cyclic graph detected during assessment translation
+     * @throws UnexpectedValueException If unable to merge student collections
      * @todo convert to a GET route
+     *
      */
     public function postReport(User $viewee, Term\Model $term, Folder\Model $subject)
     {
@@ -330,14 +328,7 @@ class Controller extends Base
             ]
         ]);
 
-        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
-
-        // Fetch assessments & participants
-        $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
-        $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, false, $viewee)
-                                                   ->filter(function (IAssessable $a) use ($viewee) {
-                                                       return $a->isParticipant($viewee);
-                                                   });
+        $assessments = $this->findByFiltersWithParticipants($filters, $viewee);
 
         // Show the graph for:
         // * instructors (always)
@@ -519,6 +510,30 @@ class Controller extends Base
         });
 
         return $this->rubricMapper->getLongitudinal($dueWorksWithVisibleMarks, $student);
+    }
+
+
+    /**
+     * @param array $filters
+     * @param User  $viewee
+     * @return GenericCollection|IAssessable[]|static
+     * @throws DomainException If MarkType is invalid for the assessment, or user has interaction but not participant record
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws LogicException If cyclic graph detected
+     * @throws DefinitionException If unable to locate a specified mapper join
+     * @throws UnexpectedValueException If unable to merge student collections
+     */
+    private function findByFiltersWithParticipants(array $filters, User $viewee)
+    {
+        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
+
+        // Fetch assessments & participants
+        $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
+        $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, false, $viewee)
+                                                   ->filter(function (IAssessable $a) use ($viewee) {
+                                                       return $a->isParticipant($viewee);
+                                                   });
+        return $assessments;
     }
 
 
