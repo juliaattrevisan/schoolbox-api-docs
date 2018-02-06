@@ -611,7 +611,7 @@
             if ($.trim(value).length < 1) {
                 return true;
             }
-            return jQuery.validator.methods.email.call(this, value, element);
+            return jQuery.validator.methods.email.call(this, $.trim(value), element);
         }, 'Please enter a valid email address')
 
         {# Validate user details#}
