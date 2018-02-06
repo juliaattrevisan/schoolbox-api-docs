@@ -141,7 +141,6 @@ Usage:
         <form method="post" data-feedback-form action="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postResponseFeedback', {assessmentId: assessment.id, studentId: participant.user.id, responseId: response.id, participant: participant}) }}">
             <section>
                 <input type="hidden" name="responseId" value="{{ response.id }}" />
-                <input type="hidden" name="review_route" value="{{ reviewRoute }}" />
 
                 {# Settings for the rubric grid #}
                 {% set showDescriptorValue = true %}
