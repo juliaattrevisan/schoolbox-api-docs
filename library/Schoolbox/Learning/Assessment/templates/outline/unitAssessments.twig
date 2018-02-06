@@ -45,7 +45,7 @@
                         }) %}
 
                         {# No route for own participation, what about children ?#}
-                        {% if not href and USER.role.parent %}
+                        {% if not href %}
                             {% for child in USER.children if not href %}
                                 {% set href = routeLookupIfAuthorized('learningAssessment.getSummary', {
                                     assessmentId: assessment.id,

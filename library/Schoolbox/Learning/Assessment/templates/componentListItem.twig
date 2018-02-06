@@ -19,8 +19,8 @@
                 studentId: USER.id,
                 student: USER
             }) %}
-            {# No route for own participation, what about children ?#}
-            {% if not viewRoute and USER.role.parent %}
+            {# No route for own participation, what about children ? #}
+            {% if not viewRoute %}
                 {% for child in USER.children if not viewRoute %}
                     {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
                         assessmentId: assessable.id,
