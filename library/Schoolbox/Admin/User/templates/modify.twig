@@ -612,8 +612,7 @@
                 $(element).val(''); // clear the field so we're not writing spaces to the DB
                 return true;
             }
-            // TODO this isn't returning true for a valid email address, WHY
-            jQuery.validator.methods.email.call(this, value, element);
+            return jQuery.validator.methods.email.call(this, value, element);
         }, 'Please enter a valid email address')
 
         {# Validate user details#}
