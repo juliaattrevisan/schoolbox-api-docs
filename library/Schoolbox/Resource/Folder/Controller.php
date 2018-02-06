@@ -28,6 +28,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Exception as ResourceException;
+use Schoolbox\Resource\Exception;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
@@ -497,6 +498,15 @@ class Controller extends BaseController
         // apply Class Codes
         if($user->isSuperuser()){
             $classCodes = $model->getInherit() ? '' : $postData['code'];
+
+            $classCodeArray = explode(',', $classCodes);
+
+            foreach ($classCodeArray as $code) {
+                if (strlen(trim($code)) > 20) {
+                    throw new Exception("Class code exceeds 20 charachters");
+                }
+            }
+
             $this->setClassCodesOnFolder($model, $classCodes, $user);
         } elseif($existingFolder) {
             $model->setCodes($existingFolder->getCodes());
