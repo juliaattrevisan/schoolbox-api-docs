@@ -265,6 +265,8 @@ Usage:
                 total += rowMax;
             });
 
+            total = total.toFixed(5);
+
             // Does the total contain a fractional component?
             if(0 != total % 1){
                 $fractionalTotalWarning.show();
