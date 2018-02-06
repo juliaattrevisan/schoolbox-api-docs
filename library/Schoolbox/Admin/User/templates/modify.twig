@@ -606,11 +606,21 @@
             }
         });
 
+        $.validator.addMethod('emailTrimmed', function(value, element) {
+            // If field contains just whitespace...pass
+            if ($.trim(value).length < 1) {
+                $(element).val(''); // clear the field so we're not writing spaces to the DB
+                return true;
+            }
+            // TODO this isn't returning true for a valid email address, WHY
+            jQuery.validator.methods.email.call(this, value, element);
+        }, 'Please enter a valid email address')
+
         {# Validate user details#}
 
         $('form[data-validatable-as="userDetails"]').alaressValidate({
             rules: {
-                'alt_email':        { email: true },
+                'alt_email':        { emailTrimmed: true },
                 'firstname':        { required: true },
                 'lastname':         { required: true },
                 'campus[]':         { required: true }
@@ -618,7 +628,7 @@
             messages: {
                 'firstname':        { require_from_group: "Please enter either a first name or surname" },
                 'lastname':         { require_from_group: "Please enter either a first name or surname" },
-                'alt_email':        "If you are entering an alternative email, please ensure it's a valid address",
+                'alt_email':        "Please enter a valid email address",
                 'campus[]':         { required: 'Users must be involved in at least one campus' }
             }
         });
