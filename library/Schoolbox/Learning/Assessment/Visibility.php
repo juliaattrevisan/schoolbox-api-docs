@@ -52,6 +52,10 @@ class Visibility
      */
     public function isVisibleToUser(IAssessable $assessment, User $viewer, bool $showClosed): bool
     {
+        if ($viewer->getRole()->isStaff()) {
+            return true;
+        }
+
         $folderAccessLevel = $this->access->getFolderAccess($viewer, $assessment->getBaseContext()->getFolder()->getId());
         $now               = Alaress_Date_Format::now();
 

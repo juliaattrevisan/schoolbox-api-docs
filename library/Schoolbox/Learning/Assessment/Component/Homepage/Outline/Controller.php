@@ -136,7 +136,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                     $this->getUser()
                 )->filter(function (IAssessable $activity) use ($visibility, $now) {
                     // Check user's own participation
-                    if ($visibility->isVisibleToLearner($activity, $this->getUser(), true, $now)) {
+                    if ($visibility->isVisibleToUser($activity, $this->getUser(), true)) {
                         return true;
                     }
                     // If a parent, check their children's participations, un-setting children who do not have visibility
