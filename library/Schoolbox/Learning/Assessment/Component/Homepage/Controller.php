@@ -16,6 +16,7 @@ use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\DueDateSortStrategy;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Participant\AssessmentFilter;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -64,7 +65,6 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
         }
 
         try {
-            $visibility = new Visibility($this->getAccess());
             $now        = Alaress_Date_Format::now();
             $showClosed = $this->getConfig('showClosed');
 
@@ -76,33 +76,18 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
             ];
 
             if (!$showClosed) {
-                $options['closed_before'] = Alaress_Date_Format::now();
+                $options['closed_before'] = $now;
             }
 
+            $mutator = new AssessmentFilter($this->getUser(), new Visibility($this->getAccess()), $now, $showClosed);
             $this->assessments = $this->getAssessmentMapper()
                 ->findAllByFolderIdForReview(
                     $this->getSource()->getId(),
                     $this->getUser(),
                     $options
                 )
-                ->filter(
-                    function (IAssessable $activity) use ($visibility, $showClosed, $now) {
-                        // Check user's own participation
-                        if ($visibility->isVisibleToUser($activity, $this->getUser(), $showClosed)) {
-                            return true;
-                        }
-                        // If a parent, check their children's participations, un-setting children who do not have visibility
-                        $isVisibleViaChild = false;
-                        foreach ($this->getUser()->getChildren() as $child) {
-                            if ($visibility->isVisibleToLearner($activity, $child, $showClosed, $now)) {
-                                $isVisibleViaChild = true;
-                            } elseif ($activity->isParticipant($child)) {
-                                $activity->unsetUserParticipation($child);
-                            }
-                        }
-                        return $isVisibleViaChild;
-                    }
-                )
+                ->map([$mutator, 'map'])
+                ->filter([$mutator, 'filter'])
                 ->sortByCallback(new DueDateSortStrategy($this->getUser()))
                 ->limit($this->getConfig('size') ?: null);
 

@@ -16,6 +16,7 @@ namespace Schoolbox\Learning\Assessment\Component\Homepage\Outline;
 use Component_Instance;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Participant\AssessmentFilter;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
@@ -129,27 +130,15 @@ class Controller extends Component_Homepage_ControllerAbstract
                 // In any case, load only my interactions - if I'm not a participant, there will be nothing.
                 // also omit anything that is not yet published (there's no easy way to apply this filter to the query)
 
-                $visibility  = new Visibility($this->getAccess());
                 $now         = Alaress_Date_Format::now();
-                $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdsForCourseOutline(
-                    $uiIds,
-                    $this->getUser()
-                )->filter(function (IAssessable $activity) use ($visibility, $now) {
-                    // Check user's own participation
-                    if ($visibility->isVisibleToUser($activity, $this->getUser(), true)) {
-                        return true;
-                    }
-                    // If a parent, check their children's participations, un-setting children who do not have visibility
-                    $isVisibleViaChild = false;
-                    foreach ($this->getUser()->getChildren() as $child) {
-                        if ($visibility->isVisibleToLearner($activity, $child, true, $now)) {
-                            $isVisibleViaChild = true;
-                        } elseif ($activity->isParticipant($child)) {
-                            $activity->unsetUserParticipation($child);
-                        }
-                    }
-                    return $isVisibleViaChild;
-                });
+                $mutator     = new AssessmentFilter($this->getUser(), new Visibility($this->getAccess()), $now, true);
+                $assessments = $this->assessmentMapperProxy
+                    ->findAllByUnitImplementationIdsForCourseOutline(
+                        $uiIds,
+                        $this->getUser()
+                    )
+                    ->map([$mutator, 'map'])
+                    ->filter([$mutator, 'filter']);
             } else {
                 // I'm an instructor - load all participants.
                 $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdsForCourseOutline($uiIds);
