@@ -39,9 +39,11 @@ class Visibility
     /**
      * Determines if the specified user can see an IAssessable (but not necessarily its details or participant interactions)
      *
+     * * Staff       - can see anytime (so long as not past close and we are hiding closed)
      * * Instructor  - can see anytime (so long as not past close and we are hiding closed)
      * * Learner     - can only see if a participant (or parent of participant), and after publish date
      *
+     * Staff      - is considered any user with role-type of 'staff'
      * Instructor - is considered any user with WRITE+ perm to folder
      * Learner    - is considered any user with READ perm to folder
      *
@@ -52,14 +54,15 @@ class Visibility
      */
     public function isVisibleToUser(IAssessable $assessment, User $viewer, bool $showClosed): bool
     {
-        if ($viewer->getRole()->isStaff()) {
+        $now = Alaress_Date_Format::now();
+
+        /** @noinspection NotOptimalIfConditionsInspection */
+        if ($viewer->getRole()->isStaff() && $this->isVisibleToStaff($assessment, $viewer, $showClosed, $now)) {
             return true;
         }
 
-        $folderAccessLevel = $this->access->getFolderAccess($viewer, $assessment->getBaseContext()->getFolder()->getId());
-        $now               = Alaress_Date_Format::now();
-
         // Is viewer an instructor?
+        $folderAccessLevel = $this->access->getFolderAccess($viewer, $assessment->getBaseContext()->getFolder()->getId());
         if ($folderAccessLevel >= UserAccess::ACCESS_WRITE) {
             if ($this->isVisibleToInstructor($assessment, $viewer, $showClosed, $now)) {
                 return true;
@@ -92,6 +95,27 @@ class Visibility
         }
         // If instructor is also a participant, respect their custom close date.
         $participant = $assessable->getParticipantIfExtant($instructor);
+        $closeDate   = $participant ? $participant->getCloseDate() : $assessable->getCloseAt();
+        return $now->lt($closeDate);
+    }
+
+
+    /**
+     * Is the assessable visible to a staff member? (Assumes the user has a staff role type)
+     *
+     * @param IAssessable         $assessable
+     * @param User                $staff
+     * @param bool                $showClosed Should we show assessments after their closed date?
+     * @param Alaress_Date_Format $now
+     * @return bool
+     */
+    public function isVisibleToStaff(IAssessable $assessable, User $staff, bool $showClosed, Alaress_Date_Format $now): bool
+    {
+        if ($showClosed) {
+            return true;
+        }
+        // If staff member is also a participant, respect their custom close date.
+        $participant = $assessable->getParticipantIfExtant($staff);
         $closeDate   = $participant ? $participant->getCloseDate() : $assessable->getCloseAt();
         return $now->lt($closeDate);
     }
