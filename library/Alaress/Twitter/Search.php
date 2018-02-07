@@ -65,14 +65,15 @@ class Alaress_Twitter_Search
     public function load()
     {
         $processed = array();
-        $resource = 'https://api.twitter.com/1.1/search/tweets.json';
+        $resource = 'https://api.twitter.com/1.1/search/tweets.json?tweet_mode=extended';
         $params = $this->generateParameters();
 
         if (!empty($params)) {
             $cache = new Alaress_Twitter_Cache();
             $cache->init($resource, $params);
-
             $all_tweets = $cache->load();
+            // TODO remove this line when testing is finished
+//            $all_tweets = unserialize(file_get_contents('/vagrant/data/cache/stream/twitter_068c279d52e1d2b22e9b4ac905f923fe.txt'));
 
             if (is_array($all_tweets)) {
                 foreach ($all_tweets as $result) {
