@@ -19,16 +19,32 @@ use Schoolbox\User;
 class AssessmentListMutatorTest extends TestCase
 {
     /**
+     * @var User
+     */
+    private $student;
+
+    /**
+     * @var User
+     */
+    private $parent;
+
+    public function setUp()
+    {
+        $this->student = (new User())->setId(9);
+        $this->parent  = (new User())->setId(10);
+        $this->parent->getChildren()->setOffset(9, $this->student);
+    }
+
+    /**
      * Test list mutator as a participant.
      */
     public function testUser()
     {
         // Set up assessment list
-        $user        = (new User())->setId(9);
         $assessment1 = new DueWork\Model();
         $plan1       = new Plan($assessment1);
         $plan1->getParticipants()
-              ->setOffset(9, new Participant($user, $plan1));
+              ->setOffset(9, new Participant($this->student, $plan1));
         $assessment1
             ->setId(1)
             ->getPlans()->add($plan1)
@@ -36,7 +52,7 @@ class AssessmentListMutatorTest extends TestCase
         $assessment2 = new DueWork\Model();
         $plan2       = new Plan($assessment2);
         $plan2->getParticipants()
-              ->setOffset(9, new Participant($user, $plan2));
+              ->setOffset(9, new Participant($this->student, $plan2));
         $assessment2
             ->setId(2)
             ->getPlans()->add($plan2)
@@ -59,7 +75,7 @@ class AssessmentListMutatorTest extends TestCase
             ->method('isVisibleToLearner')
             ->willReturn(false);
 
-        $mutator = new AssessmentListMutator($user, $mockVisibility, \Alaress_Date_Format::now(), true);
+        $mutator = new AssessmentListMutator($this->student, $mockVisibility, \Alaress_Date_Format::now(), true);
 
         $mappedAssessments = $assessments->map([$mutator, 'map']);
         $this->assertCount(2, $mappedAssessments);
@@ -75,13 +91,10 @@ class AssessmentListMutatorTest extends TestCase
      */
     public function testParentOfUser()
     {
-        $user        = (new User())->setId(9);
-        $parent      = (new User())->setId(10);
-        $parent->getChildren()->setOffset(9, $user);
         $assessment1 = new DueWork\Model();
         $plan1       = new Plan($assessment1);
         $plan1->getParticipants()
-              ->setOffset(9, new Participant($user, $plan1));
+              ->setOffset(9, new Participant($this->student, $plan1));
         $assessment1
             ->setId(1)
             ->getPlans()->add($plan1)
@@ -89,7 +102,7 @@ class AssessmentListMutatorTest extends TestCase
         $assessment2 = new DueWork\Model();
         $plan2       = new Plan($assessment2);
         $plan2->getParticipants()
-              ->setOffset(9, new Participant($user, $plan2));
+              ->setOffset(9, new Participant($this->student, $plan2));
         $assessment2
             ->setId(2)
             ->getPlans()->add($plan2)
@@ -112,7 +125,7 @@ class AssessmentListMutatorTest extends TestCase
                 return $v->getId() === 1;
             });;
 
-        $mutator = new AssessmentListMutator($parent, $mockVisibility, \Alaress_Date_Format::now(), true);
+        $mutator = new AssessmentListMutator($this->parent, $mockVisibility, \Alaress_Date_Format::now(), true);
 
         $mappedAssessments = $assessments->map([$mutator, 'map']);
         $this->assertCount(2, $mappedAssessments);
