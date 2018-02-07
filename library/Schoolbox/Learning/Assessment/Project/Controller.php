@@ -234,10 +234,15 @@ class Controller extends Assessment\Controller
         $subActivities = $project->getAssessables();
 
         // filter out any sub-activities that have not yet been published
-        $visibility = new Assessment\Visibility($this->getAccess());
-        $subActivities = $subActivities->filter(function (IAssessable $activity) use ($student, $visibility) {
-            return $activity->isParticipant($student) && $visibility->isVisibleToUser($activity, $this->getUser(), true);
-        });
+        $visibility    = new Assessment\Visibility($this->getAccess());
+        $now           = Alaress_Date_Format::now();
+        $mutator       = new Participant\AssessmentListMutator($this->getUser(), $visibility, $now, true);
+        $subActivities = $subActivities
+            ->map([$mutator, 'map'])
+            ->filter(function (IAssessable $activity) use ($student, $visibility, $mutator, $now) {
+                return $mutator->filter($activity)
+                    && $visibility->isVisibleToLearner($activity, $student, true, $now);
+            });
 
         // hack the project object for good measure
         $project->setAssessables($subActivities);
