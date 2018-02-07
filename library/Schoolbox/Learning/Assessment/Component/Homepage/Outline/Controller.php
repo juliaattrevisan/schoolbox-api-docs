@@ -16,7 +16,7 @@ namespace Schoolbox\Learning\Assessment\Component\Homepage\Outline;
 use Component_Instance;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Participant\AssessmentFilter;
+use Schoolbox\Learning\Assessment\Participant\AssessmentListMutator;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
@@ -131,7 +131,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 // also omit anything that is not yet published (there's no easy way to apply this filter to the query)
 
                 $now         = Alaress_Date_Format::now();
-                $mutator     = new AssessmentFilter($this->getUser(), new Visibility($this->getAccess()), $now, true);
+                $mutator     = new AssessmentListMutator($this->getUser(), new Visibility($this->getAccess()), $now, true);
                 $assessments = $this->assessmentMapperProxy
                     ->findAllByUnitImplementationIdsForCourseOutline(
                         $uiIds,

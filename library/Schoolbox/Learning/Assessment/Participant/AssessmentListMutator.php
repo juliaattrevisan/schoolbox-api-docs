@@ -17,6 +17,8 @@ use Schoolbox\User;
  * Strategy for filtering out participants who can't view an assessment,
  * and for then filtering the list of assessments.
  *
+ * Called a "mutator" because it facilitates both mapping and filtering.
+ *
  * Usage:
  * ```
  * $filter = new AssessmentFilter(...);
@@ -26,7 +28,7 @@ use Schoolbox\User;
  * ;
  * ```
  */
-class AssessmentFilter
+class AssessmentListMutator
 {
     /**
      * The user for whom assessments are filtered; usually the logged-in user.

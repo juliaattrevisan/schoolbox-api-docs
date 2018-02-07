@@ -16,7 +16,7 @@ use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\DueDateSortStrategy;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Participant\AssessmentFilter;
+use Schoolbox\Learning\Assessment\Participant\AssessmentListMutator;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -79,7 +79,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
                 $options['closed_before'] = $now;
             }
 
-            $mutator = new AssessmentFilter($this->getUser(), new Visibility($this->getAccess()), $now, $showClosed);
+            $mutator = new AssessmentListMutator($this->getUser(), new Visibility($this->getAccess()), $now, $showClosed);
             $this->assessments = $this->getAssessmentMapper()
                 ->findAllByFolderIdForReview(
                     $this->getSource()->getId(),
