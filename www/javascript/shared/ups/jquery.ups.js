@@ -961,7 +961,17 @@
          */
         function initExpandAll() {
             $(config.element).find('[data-expand-all]').click(function(event) {
+
+                var parentCollapsed = $(this).attr('data-collapse-state') === 'collapsed';
+
+                if (parentCollapsed) {
+                    $(this).attr('data-collapse-state', 'uncollapsed');
+                } else {
+                    $(this).attr('data-collapse-state', 'collapsed');
+                }
+
                 $.fn.executeIconToggle($(this));
+
 
                 $.each($(config.element).find('[data-rule]'), function(index, element) {
                     var ruleId = 'rule-' + $(element).attr('data-rule');
@@ -969,7 +979,12 @@
                     var component = $(element).find('[data-collapsable='+ruleId+'-contents]');
                     var icon = $(element).find('[data-collapser='+ruleId+'-contents]');
 
-                    $.fn.executeCollapsable(component, icon);
+                    var childCollapsed = component.attr('data-collapse-state') ===  'collapsed';
+
+                    // I have NFI idea why this is not '!=', but is works like this
+                    if (childCollapsed == parentCollapsed) {
+                        $.fn.executeCollapsable(component, icon);
+                    }
                 });
             });
         }
