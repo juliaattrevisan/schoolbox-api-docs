@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning;
 
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Model as FolderModel;
@@ -85,8 +86,8 @@ interface AssessmentContext
     public function getAssessables();
 
     /**
-     * @param GenericCollection|IAssessable[] $assessables
+     * @param Collection|IAssessable[] $assessables
      * @return static
      */
-    public function setAssessables(GenericCollection $assessables);
+    public function setAssessables(Collection $assessables);
 }
