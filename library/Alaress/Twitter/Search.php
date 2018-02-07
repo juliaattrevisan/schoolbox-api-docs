@@ -86,25 +86,30 @@ class Alaress_Twitter_Search
                         continue;
                     }
 
+                    $fulltext = $result->full_text;
+
+                    // Text is in a different variable now; need to change it to full_text
                     if (isset($result->retweeted_status)) {
                         $processed[] = array(
-                            'text'     => $this->getFilter()->filterText($result->retweeted_status->text),
+                            'full_text'     => $this->getFilter()->filterText($result->retweeted_status->full_text),
                             'action'   => 'Retweeted by ' . $result->user->name,
                             'date'     => $result->created_at,
                             'fullname' => $result->retweeted_status->user->name,
                             'author'   => $result->retweeted_status->user->screen_name,
                             'avatar'   => str_replace('_normal', '_bigger', $result->retweeted_status->user->profile_image_url),
-                            'media'    => $result->retweeted_status->entities->media,
+                            'media'    => $result->retweeted_status->extended_entities->media,
+                            'id'       => $result->id
                         );
                     } else {
                         $processed[] = array(
-                            'text'     => $this->getFilter()->filterText($result->text),
+                            'full_text'     => $this->getFilter()->filterText($result->full_text),
                             'action'   => 'Tweeted',
                             'date'     => $result->created_at,
                             'fullname' => $result->user->name,
                             'author'   => $result->user->screen_name,
                             'avatar'   => str_replace('_normal', '_bigger', $result->user->profile_image_url),
-                            'media'    => $result->entities->media,
+                            'media'    => $result->extended_entities->media,
+                            'id'       => $result->id
                         );
                     }
                 }

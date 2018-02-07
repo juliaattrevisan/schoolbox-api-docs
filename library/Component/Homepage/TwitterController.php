@@ -122,13 +122,15 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
 
                 $avatarUrl = UriFactory::factory($currentTweet['avatar']);
                 $avatarUrl->setScheme(null);
+                // TODO stuff here
                 $this->setVar([
-                    'TWEET_TEXT'     => Scrub::html($currentTweet['text']),
+                    'TWEET_TEXT'     => Scrub::html($currentTweet['full_text']),
                     'TWEET_ACTION'   => Scrub::text($currentTweet['action']),
                     'TWEET_DATE'     => $date->getShort(),
                     'TWEET_AUTHOR'   => Scrub::text($currentTweet['author']),
                     'TWEET_FULLNAME' => Scrub::text($currentTweet['fullname']),
-                    'TWEET_AVATAR'   => Scrub::text($avatarUrl)
+                    'TWEET_AVATAR'   => Scrub::text($avatarUrl),
+                    'TWEET_ID'       => Scrub::text($currentTweet['id'])
                 ]);
 
                 if (is_array($currentTweet['media']) && count($currentTweet['media'])) {
@@ -161,6 +163,8 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
             $q .= '%20';
         }
         $q .= urlencode($this->getConfig('keywords'));
+
+        $q .= urlencode("&tweet_mode=extended");
 
         $this->setVar('SEARCH_URL', $q);
 
