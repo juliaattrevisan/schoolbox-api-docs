@@ -27,7 +27,8 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
         $this->setBlock($templateHandle, 'twitter_feed', 'twitter_feed_block');
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
         $this->setBlock('twitter_feed', 'tweet', 'tweet_block');
-        $this->setBlock('tweet', 'tweet_media_thumbnails', 'tweet_media_thumbnails_block');
+        $this->setBlock('tweet', 'tweet_media', 'tweet_media_block');
+        $this->setBlock('tweet_media', 'tweet_media_thumbnails', 'tweet_media_thumbnails_block');
         $this->setVar('tweet_block', '');
 
         $emptyState = false;
@@ -137,8 +138,10 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
                         $this->setVar('TWEET_MEDIA_URL', $currentMedia->media_url_https);
                         $this->parse('tweet_media_thumbnails_block', 'tweet_media_thumbnails', true);
                     }
+                    $this->parse('tweet_media_block', 'tweet_media', true);
 
                 } else {
+                    $this->setVar('tweet_media_block', '');
                     $this->setVar('tweet_media_thumbnails_block', '');
                 }
 
@@ -146,6 +149,7 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
 
                 /* Clear children after parsing out the parent
                  */
+                $this->setVar('tweet_media_block', '');
                 $this->setVar('tweet_media_thumbnails_block', '');
             }
 
