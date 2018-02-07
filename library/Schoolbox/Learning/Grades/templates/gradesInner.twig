@@ -96,8 +96,8 @@
                                         {# TODO convert this to AJAX #}
 
                                         {% if canSeeShowcaseButton %}
-                                            <a class="icon-showcase" data-assessment-id="{{ assessment.id }}" title="Publish to ePortfolio"></a>
-                                            <a data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0"></a>
+                                            <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0"
+                                                                                    data-assessment-id="{{ assessment.id }}" title="Publish to ePortfolio"></a>
                                             <form action="/eportfolio/showcase/modifyForm.php" method="post" data-publish-to-eportfolio-form="{{ assessment.id }}">
                                                 <input type="hidden" name="action" value="publish">
                                                 <input type="hidden" name="userId" value="{{ student.id }}">
@@ -106,9 +106,7 @@
                                             <script type="text/javascript">
                                                 $(function() {
                                                     {# Publish to ePortfolio #}
-                                                    $('[data-publish-to-eportfolio-form="{{ assessment.id }}"]').eportfolio_publish({
-                                                        activator: '[data-publish-to-eportfolio="{{ assessment.id }}"]'
-                                                    });
+
 
                                                     console.log('[data-publish-to-eportfolio="{{ assessment.id }}"]');
 
@@ -124,7 +122,10 @@
                                                         $(this).confirmDialog({
                                                             text: 'Are you sure you showcase this work? It will be visible to others on your ePortfolio.',
                                                             confirmEvent: function() {
-                                                                $('[data-publish-to-eportfolio="'+assessmentId+'"]').click()
+                                                                //$('[data-publish-to-eportfolio="'+assessmentId+'"]').click()
+                                                                $('[data-publish-to-eportfolio-form="{{ assessment.id }}"]').eportfolio_publish({
+                                                                    activator: '[data-publish-to-eportfolio="{{ assessment.id }}"]'
+                                                                });
                                                             }
                                                         });
                                                     });
