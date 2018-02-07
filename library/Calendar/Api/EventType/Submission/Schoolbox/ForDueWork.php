@@ -12,7 +12,6 @@
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
 
 class Calendar_Api_EventType_Submission_Schoolbox_ForDueWork extends Calendar_Api_EventType_Submission_Schoolbox_Default
@@ -29,11 +28,10 @@ class Calendar_Api_EventType_Submission_Schoolbox_ForDueWork extends Calendar_Ap
         int $connectorId,
         User $user,
         Assessment\MapperProxy $assessmentDataSource,
-        Participant\DataSource $participantDataSource,
         Visibility             $visibility,
         Timetable_ColourManager $colourManager
     ) {
-        parent::__construct($connectorId, $user, $assessmentDataSource, $participantDataSource, $visibility);
+        parent::__construct($connectorId, $user, $assessmentDataSource, $visibility);
         $this->colourManager = $colourManager;
     }
 

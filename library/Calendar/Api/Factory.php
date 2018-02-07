@@ -161,7 +161,6 @@ class Calendar_Api_Factory
                     $connectorId,
                     $user,
                     $this->assessmentDataSource,
-                    $this->participantDataSource,
                     new Visibility(Access::getInstance())
                 );
             case Calendar_Api_EventType_Submission_Schoolbox_ForDueWork::class:
@@ -169,7 +168,6 @@ class Calendar_Api_Factory
                     $connectorId,
                     $user,
                     $this->assessmentDataSource,
-                    $this->participantDataSource,
                     new Visibility(Access::getInstance()),
                     new Timetable_ColourManager(Timetable_ColourMapper::getInstance()->findAll())
                 );

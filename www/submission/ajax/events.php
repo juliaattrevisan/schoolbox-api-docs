@@ -27,12 +27,8 @@ try {
     error($e->getCode());
 }
 
-/**
- * @var Assessment\MapperProxy $assessmentDataSource
- * @var Participant\DataSource $participantDataSource
- */
+/** @var Assessment\MapperProxy $assessmentDataSource */
 $assessmentDataSource  = $this->getDi()->get('assessmentDataSource');
-$participantDataSource = $this->getDi()->get('participantDataSource');
 $visibility            = new Visibility(Access::getInstance());
 $config                = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_Submission_Schoolbox_ForDueWork::class);
 $colourManager         = new Timetable_ColourManager(Timetable_ColourMapper::getInstance()->findAll());
@@ -40,7 +36,6 @@ $calendarApi           = new Calendar_Api_EventType_Submission_Schoolbox_ForDueW
     $config->getId(),
     $user,
     $assessmentDataSource,
-    $participantDataSource,
     $visibility,
     $colourManager
 );

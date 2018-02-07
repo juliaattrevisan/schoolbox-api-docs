@@ -24,7 +24,7 @@ abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType
     private $connectorId;
 
     /**
-     * An instance of User
+     * The user whose calendar we are viewing (not the current session user)
      *
      * @var Schoolbox\User
      */
