@@ -966,8 +966,10 @@
 
                 if (parentCollapsed) {
                     $(this).attr('data-collapse-state', 'uncollapsed');
+                    parentCollapsed = false;
                 } else {
                     $(this).attr('data-collapse-state', 'collapsed');
+                    parentCollapsed = true;
                 }
 
                 $.fn.executeIconToggle($(this));
@@ -982,7 +984,7 @@
                     var childCollapsed = component.attr('data-collapse-state') ===  'collapsed';
 
                     // I have NFI idea why this is not '!=', but is works like this
-                    if (childCollapsed == parentCollapsed) {
+                    if (childCollapsed != parentCollapsed) {
                         $.fn.executeCollapsable(component, icon);
                     }
                 });
