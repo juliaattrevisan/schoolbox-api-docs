@@ -26,12 +26,12 @@
             </div>
         {% endif %}
 
-        <form id="forgottenPassword" action="{{ routeLookup('userPasswordReset.createRequest') }}" method="post" class="top">
+        <form novalidate id="forgottenPassword" action="{{ routeLookup('userPasswordReset.createRequest') }}" method="post" class="top">
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label for="email">Email / Username</label>
-                        <input class="input_text" type="text" name="email" id="email" value="{{ email|e('html_attr') }}" />
+                        <input class="input_text" type="email" name="email" id="email" value="{{ email|e('html_attr') }}" />
                     </div>
                 </fieldset>
             </section>
