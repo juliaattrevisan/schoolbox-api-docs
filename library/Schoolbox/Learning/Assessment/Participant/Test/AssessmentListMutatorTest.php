@@ -28,23 +28,25 @@ class AssessmentListMutatorTest extends TestCase
      */
     private $parent;
 
+    /**
+     * @var GenericCollection|IAssessable[]
+     */
+    private $assessments;
+
+    /**
+     * Set up student, parent, user methods
+     */
     public function setUp()
     {
         $this->student = (new User())->setId(9);
         $this->parent  = (new User())->setId(10);
-        $this->parent->getChildren()->setOffset(9, $this->student);
-    }
+        $this->parent->getChildren()->setOffset($this->student->getId(), $this->student);
 
-    /**
-     * Test list mutator as a participant.
-     */
-    public function testUser()
-    {
-        // Set up assessment list
+        // Set up assessments
         $assessment1 = new DueWork\Model();
         $plan1       = new Plan($assessment1);
         $plan1->getParticipants()
-              ->setOffset(9, new Participant($this->student, $plan1));
+              ->setOffset($this->student->getId(), new Participant($this->student, $plan1));
         $assessment1
             ->setId(1)
             ->getPlans()->add($plan1)
@@ -52,16 +54,22 @@ class AssessmentListMutatorTest extends TestCase
         $assessment2 = new DueWork\Model();
         $plan2       = new Plan($assessment2);
         $plan2->getParticipants()
-              ->setOffset(9, new Participant($this->student, $plan2));
+              ->setOffset($this->student->getId(), new Participant($this->student, $plan2));
         $assessment2
             ->setId(2)
             ->getPlans()->add($plan2)
         ;
 
-        $assessments = (new GenericCollection(IAssessable::class))
-            ->setOffset(1, $assessment1)
-            ->setOffset(2, $assessment2);
+        $this->assessments = (new GenericCollection(IAssessable::class))
+            ->setOffset($assessment1->getId(), $assessment1)
+            ->setOffset($assessment2->getId(), $assessment2);
+    }
 
+    /**
+     * Test list mutator as a participant.
+     */
+    public function testUser()
+    {
         // mock of visibility: pretend 1 visible, 2 not
         $mockVisibility = $this->createMock(Visibility::class);
         $mockVisibility
@@ -77,9 +85,13 @@ class AssessmentListMutatorTest extends TestCase
 
         $mutator = new AssessmentListMutator($this->student, $mockVisibility, \Alaress_Date_Format::now(), true);
 
-        $mappedAssessments = $assessments->map([$mutator, 'map']);
+        // Mapping: won't have filtered any participants
+        $mappedAssessments = $this->assessments->map([$mutator, 'map']);
         $this->assertCount(2, $mappedAssessments);
+        $this->assertCount(1, $mappedAssessments[1]->getAllParticipants());
+        $this->assertCount(1, $mappedAssessments[2]->getAllParticipants());
 
+        // Filtering: has filtered out assessment 2, as $student isn't participating
         $filteredAssessments = $mappedAssessments->filter([$mutator, 'filter']);
         $this->assertCount(1, $filteredAssessments);
         $this->assertArrayHasKey(1, $filteredAssessments);
@@ -91,28 +103,7 @@ class AssessmentListMutatorTest extends TestCase
      */
     public function testParentOfUser()
     {
-        $assessment1 = new DueWork\Model();
-        $plan1       = new Plan($assessment1);
-        $plan1->getParticipants()
-              ->setOffset(9, new Participant($this->student, $plan1));
-        $assessment1
-            ->setId(1)
-            ->getPlans()->add($plan1)
-        ;
-        $assessment2 = new DueWork\Model();
-        $plan2       = new Plan($assessment2);
-        $plan2->getParticipants()
-              ->setOffset(9, new Participant($this->student, $plan2));
-        $assessment2
-            ->setId(2)
-            ->getPlans()->add($plan2)
-        ;
-
-        $assessments = (new GenericCollection(IAssessable::class))
-            ->setOffset(1, $assessment1)
-            ->setOffset(2, $assessment2);
-
-        // mock of visibility: pretend 1 visible, 2 not
+        // mock of visibility: pretend 2 visible, 1 not
         $mockVisibility = $this->createMock(Visibility::class);
         $mockVisibility
             ->expects($this->any())
@@ -122,19 +113,21 @@ class AssessmentListMutatorTest extends TestCase
             ->expects($this->any())
             ->method('isVisibleToLearner')
             ->willReturnCallback(function (IAssessable $v) {
-                return $v->getId() === 1;
-            });;
+                return $v->getId() === 2;
+            });
 
         $mutator = new AssessmentListMutator($this->parent, $mockVisibility, \Alaress_Date_Format::now(), true);
 
-        $mappedAssessments = $assessments->map([$mutator, 'map']);
+        // Mapping: has filtered out $parent's child from assessment 1
+        $mappedAssessments = $this->assessments->map([$mutator, 'map']);
         $this->assertCount(2, $mappedAssessments);
-        $this->assertCount(1, $mappedAssessments[1]->getAllParticipants());
-        $this->assertCount(0, $mappedAssessments[2]->getAllParticipants());
+        $this->assertCount(0, $mappedAssessments[1]->getAllParticipants());
+        $this->assertCount(1, $mappedAssessments[2]->getAllParticipants());
 
+        // Filtering: has filtered out assessment 1, as $student isn't participating
         $filteredAssessments = $mappedAssessments->filter([$mutator, 'filter']);
         $this->assertCount(1, $filteredAssessments);
-        $this->assertArrayHasKey(1, $filteredAssessments);
-        $this->assertArrayNotHasKey(2, $filteredAssessments);
+        $this->assertArrayNotHasKey(1, $filteredAssessments);
+        $this->assertArrayHasKey(2, $filteredAssessments);
     }
 }
