@@ -110,8 +110,17 @@ Data:
                                     {% set stats = assessmentStats[assessable.id] %}
                                     {% import '@learningAssessment/project/macro/icon.twig' as icon %}
 
+                                    {% set statusRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessable.id, assessment: assessable}) %}
+                                    {% if assessable is quiz %}
+                                        {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessable.id, assessment: assessable}) %}
+                                    {% else %}
+                                        {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id, assessment: assessable}) %}
+                                    {% endif %}
+                                    {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id, assessment: assessable}) %}
+                                    {% set hasActions = statusRoute or modifyRoute or deleteRoute %}
+
                                     <li data-assessment="{{ assessable.id }}" data-assessment-title="{{ assessable.title }}">
-                                        <div class="actions-small-1">
+                                        <div{% if hasActions %} class="actions-small-1"{% endif %}>
                                             <div class="grip"></div>
                                             <div class="list-item">
                                                 <div class="card small-12 wrap-down">
@@ -139,28 +148,16 @@ Data:
                                                     {% endif %}
                                                 </div>
                                             </div>
-                                            <nav>
-                                                <nav><a href="#" class="icon-more" data-dropdown="project-options{{ assessable.id }}" aria-expanded="false" title="Actions"></a></nav>
-                                            </nav>
-                                            <ul data-dropdown-content class="f-dropdown" id="project-options{{ assessable.id }}">
-                                                {% set viewRoute   = routeLookupIfAuthorized('learningAssessment.getAssessment', {assessmentId: assessable.id}) %}
-                                                {% if viewRoute and assessment.baseContext is not unitSpecification %}
-                                                    <li><a class="icon-progress" href="{{ viewRoute }}">View Status</a></li>
-                                                {% endif %}
-                                                {% if assessable is quiz %}
-                                                    {% if isRouteAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessable.id, assessment: assessable}) %}
-                                                        <li><a href="{{ routeLookup('learningQuiz.getQuizSummary', {assessmentId: assessable.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-modify">Modify</a></li>
-                                                    {% endif %}
-                                                {% else %}
-                                                    {% if isRouteAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id, assessment: assessable}) %}
-                                                        <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-modify">Modify</a></li>
-                                                    {% endif %}
-                                                {% endif %}
-
-                                                {% if isRouteAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id, assessment: assessable}) %}
-                                                    <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-delete" data-delete="{{ assessable.id }}">Delete</a></li>
-                                                {% endif %}
-                                            </ul>
+                                            {% if hasActions %}
+                                                <nav>
+                                                    <nav><a href="#" class="icon-more" data-dropdown="project-options{{ assessable.id }}" aria-expanded="false" title="Actions"></a></nav>
+                                                </nav>
+                                                <ul data-dropdown-content class="f-dropdown" id="project-options{{ assessable.id }}">
+                                                    {% if statusRoute %}<li><a href="{{ viewRoute }}" class="icon-progress">View Status</a></li>{% endif %}
+                                                    {% if modifyRoute %}<li><a href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-modify">Modify</a></li>{% endif %}
+                                                    {% if deleteRoute %}<li><a href="{{ deleteRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-delete" data-delete="{{ assessable.id }}">Delete</a></li>{% endif %}
+                                                </ul>
+                                            {% endif %}
                                         </div>
                                     </li>
 
