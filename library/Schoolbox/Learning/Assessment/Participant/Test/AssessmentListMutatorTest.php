@@ -18,6 +18,9 @@ use Schoolbox\User;
 
 class AssessmentListMutatorTest extends TestCase
 {
+    /**
+     * Test list mutator as a participant.
+     */
     public function testUser()
     {
         // Set up assessment list
@@ -36,60 +39,89 @@ class AssessmentListMutatorTest extends TestCase
               ->setOffset(9, new Participant($user, $plan2));
         $assessment2
             ->setId(2)
-            ->getPlans()->add($plan1)
+            ->getPlans()->add($plan2)
         ;
 
         $assessments = (new GenericCollection(IAssessable::class))
             ->setOffset(1, $assessment1)
             ->setOffset(2, $assessment2);
 
-        // mock of visibility: pretend all visible
+        // mock of visibility: pretend 1 visible, 2 not
         $mockVisibility = $this->createMock(Visibility::class);
         $mockVisibility
             ->expects($this->any())
             ->method('isVisibleToUser')
-            ->willReturn(true);
+            ->willReturnCallback(function (IAssessable $v) {
+                return $v->getId() === 1;
+            });
+        $mockVisibility
+            ->expects($this->any())
+            ->method('isVisibleToLearner')
+            ->willReturn(false);
 
-        $mutator = new AssessmentListMutator(
-            new User(),
-            $mockVisibility,
-            \Alaress_Date_Format::now(),
-            true
-        );
+        $mutator = new AssessmentListMutator($user, $mockVisibility, \Alaress_Date_Format::now(), true);
+
+        $mappedAssessments = $assessments->map([$mutator, 'map']);
+        $this->assertCount(2, $mappedAssessments);
+
+        $filteredAssessments = $mappedAssessments->filter([$mutator, 'filter']);
+        $this->assertCount(1, $filteredAssessments);
+        $this->assertArrayHasKey(1, $filteredAssessments);
+        $this->assertArrayNotHasKey(2, $filteredAssessments);
+    }
+
+    /**
+     * Test list mutator as the parent of a participant.
+     */
+    public function testParentOfUser()
+    {
+        $user        = (new User())->setId(9);
+        $parent      = (new User())->setId(10);
+        $parent->getChildren()->setOffset(9, $user);
+        $assessment1 = new DueWork\Model();
+        $plan1       = new Plan($assessment1);
+        $plan1->getParticipants()
+              ->setOffset(9, new Participant($user, $plan1));
+        $assessment1
+            ->setId(1)
+            ->getPlans()->add($plan1)
+        ;
+        $assessment2 = new DueWork\Model();
+        $plan2       = new Plan($assessment2);
+        $plan2->getParticipants()
+              ->setOffset(9, new Participant($user, $plan2));
+        $assessment2
+            ->setId(2)
+            ->getPlans()->add($plan2)
+        ;
+
+        $assessments = (new GenericCollection(IAssessable::class))
+            ->setOffset(1, $assessment1)
+            ->setOffset(2, $assessment2);
+
+        // mock of visibility: pretend 1 visible, 2 not
+        $mockVisibility = $this->createMock(Visibility::class);
+        $mockVisibility
+            ->expects($this->any())
+            ->method('isVisibleToUser')
+            ->willReturn(false);
+        $mockVisibility
+            ->expects($this->any())
+            ->method('isVisibleToLearner')
+            ->willReturnCallback(function (IAssessable $v) {
+                return $v->getId() === 1;
+            });;
+
+        $mutator = new AssessmentListMutator($parent, $mockVisibility, \Alaress_Date_Format::now(), true);
 
         $mappedAssessments = $assessments->map([$mutator, 'map']);
         $this->assertCount(2, $mappedAssessments);
         $this->assertCount(1, $mappedAssessments[1]->getAllParticipants());
-        $this->assertCount(1, $mappedAssessments[2]->getAllParticipants());
+        $this->assertCount(0, $mappedAssessments[2]->getAllParticipants());
 
         $filteredAssessments = $mappedAssessments->filter([$mutator, 'filter']);
-        $this->assertCount(2, $filteredAssessments);
-
-
-        // mock of visibility: pretend all visible
-        $mockInvisibility = $this->createMock(Visibility::class);
-        $mockInvisibility
-            ->expects($this->any())
-            ->method('isVisibleToUser')
-            ->willReturn(false);
-
-        $mutator = new AssessmentListMutator(
-            new User(),
-            $mockInvisibility,
-            \Alaress_Date_Format::now(),
-            true
-        );
-
-        $mappedAssessments = $assessments->map([$mutator, 'map']);
-        $this->assertCount(0, $mappedAssessments);
-
-        $filteredAssessments = $mappedAssessments->filter([$mutator, 'filter']);
-        $this->assertCount(0, $filteredAssessments);
-
-    }
-
-    public function testParentOfUser()
-    {
-        //
+        $this->assertCount(1, $filteredAssessments);
+        $this->assertArrayHasKey(1, $filteredAssessments);
+        $this->assertArrayNotHasKey(2, $filteredAssessments);
     }
 }
