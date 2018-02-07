@@ -30,7 +30,7 @@ class Mapper extends BaseMapper implements IExceptionGenerator
     const ERROR_FILE_TYPE = 11;
     const ERROR_PERM_CATEGORY_DELETE_SUBFOLDERS = 12;
     const ERROR_CATEGORY_DELETED = 13;
-    const ERROR_PERM_CATEGORY_VIEW = 14;
+
     const ERROR_INVALID_DATE = 15;
     const ERROR_ACCOUNT_VALIDATION = 16;
     const ERROR_PERM_SUBMISSION = 17;

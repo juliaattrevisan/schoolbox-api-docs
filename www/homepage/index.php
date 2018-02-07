@@ -79,7 +79,7 @@ if (!($folder instanceof \Schoolbox\Resource\Folder\Model) || $folder->isDeleted
 // confirm that the user has permission to view this page
 $access = \Schoolbox\Permission\Access\Access::getInstance();
 if (($actualPermission = $access->getFolderAccess($this->getDi()->get('session')->get('user'), $folder->getId())) < READ_ACCESS) {
-    error(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 // If I'm a write level user, I can downgrade myself to read access
