@@ -110,10 +110,6 @@
                                             <script type="text/javascript">
                                                 $(function () {
                                                     {# Publish to ePortfolio #}
-
-
-                                                    console.log('[data-publish-to-eportfolio="{{ assessment.id }}"]');
-
                                                     $('[data-assessment-id]').click(function (event) {
                                                         event.preventDefault();
 
@@ -121,12 +117,9 @@
 
                                                         var assessmentId = element.data("assessmentId");
 
-                                                        console.log('[data-publish-to-eportfolio="' + assessmentId + '"]');
-
                                                         $(this).confirmDialog({
                                                             text: 'Are you sure you want to showcase this work? That means others will be able to see it.',
                                                             confirmEvent: function () {
-                                                                //$('[data-publish-to-eportfolio="'+assessmentId+'"]').click()
                                                                 $('[data-publish-to-eportfolio-form="{{ assessment.id }}"]').eportfolio_publish({
                                                                     activator: '[data-publish-to-eportfolio="{{ assessment.id }}"]'
                                                                 });
