@@ -57,14 +57,16 @@
                         <article>
                             <p>{TWEET_TEXT}</p>
                             <!-- BEGIN tweet_media_first -->
-                            <a class="image-popup-vertical-fit" href="{TWEET_MEDIA_URL}" rel="lightbox[{TWEET_ID}-{COMPONENT_INSTANCE_ID}]">
-                                <img src="{TWEET_MEDIA_URL}:small" />
-                            </a>
+                            <div class="small-12">
+                                <a class="image-popup-vertical-fit" href="{TWEET_MEDIA_URL}" rel="lightbox[{TWEET_ID}-{COMPONENT_INSTANCE_ID}]">
+                                    <img class="tweet-image-first" src="{TWEET_MEDIA_URL}:small" />
+                                </a>
+                            </div>
                             <!-- END tweet_media_first -->
 
-                            <div class="row">
+                            <div class="tweet-image-thumbnails row">
                                 <!-- BEGIN tweet_media_thumbnails -->
-                                <div class="small-12 medium-4 columns tweet-image-thumbnail">
+                                <div class="small-4 columns">
                                     <a class="image-popup-vertical-fit" href="{TWEET_MEDIA_URL}" rel="lightbox[{TWEET_ID}-{COMPONENT_INSTANCE_ID}]">
                                         <img src="{TWEET_MEDIA_URL}:small" />
                                     </a>
@@ -90,8 +92,11 @@
 
 <!-- TODO move this out into main css -->
 <style>
-    .tweet-image-thumbnail {
-        padding: 0;
+    .tweet-image-thumbnails {
+        padding-top: 1rem;
+    }
+    .tweet-image-first {
+        width: 100%;
     }
 </style>
 
