@@ -3,7 +3,7 @@
 {% block eventBubbleButtons %}
 <div>
     {% if renderer.user.role.type == 'staff' %}
-        {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: event.assessment.id }) %}
+        {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getAssessment', {assessmentId: event.assessment.id }) %}
     {% else %}
         {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: event.assessment.id, assessment: event.assessment, studentId: renderer.user.id, student: renderer.user }) %}
     {% endif %}

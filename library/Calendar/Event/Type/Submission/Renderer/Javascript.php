@@ -165,7 +165,7 @@ class Javascript extends Base
         $moreDetailsLink = '';
         if ($this->getUser()->getRole()->isStaff()) {
             $moreDetailsLink = $this->getRouteIfAuthorized(
-                'learningAssessment.getStatus',
+                'learningAssessment.getAssessment',
                 [
                     'assessment'   => $this->getEvent()->getAssessment(),
                     'assessmentId' => $this->getEvent()->getEventId(),
