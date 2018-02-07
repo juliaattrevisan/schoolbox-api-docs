@@ -89,21 +89,25 @@ class AssessmentFilter
     {
         // pre-compute visibility for user check, so that the filter doesn't
         // need to re-check
-        $this->visibilityCache[$assessment->getId()] = $visibility = $this->visibility->isVisibleToUser(
+        $assessmentId = $assessment->getId();
+        $this->visibilityCache[$assessmentId] = $this->visibility->isVisibleToUser(
             $assessment,
             $this->user,
             $this->showClosed
         );
-        if ($visibility) {
+        if ($this->visibilityCache[$assessmentId]) {
             return $assessment;
         }
 
-        // Unset children who don't have visibility
+        // Unset children who don't have visibility, and set visibility
+        // based on that factor
         foreach ($this->user->getChildren() as $child) {
-            if ($assessment->isParticipant($child)
-                && !$this->visibility->isVisibleToLearner($assessment, $child, $this->showClosed, $this->now)
-            ) {
-                $assessment->unsetUserParticipation($child);
+            if ($assessment->isParticipant($child)) {
+                if ($this->visibility->isVisibleToLearner($assessment, $child, $this->showClosed, $this->now)) {
+                    $this->visibilityCache[$assessmentId] = true;
+                } else {
+                    $assessment->unsetUserParticipation($child);
+                }
             }
         }
         return $assessment;
@@ -121,20 +125,7 @@ class AssessmentFilter
      */
     public function filter(IAssessable $assessment): bool
     {
-        // Use pre-computed visibility if it's present
-        $visibility =
-            $this->visibilityCache[$assessment->getId()]
-            ?? $this->visibility->isVisibleToUser($assessment, $this->user, $this->showClosed);
-        if ($visibility) {
-            return true;
-        }
-
-        // If a parent, check whether their children are participants
-        foreach ($this->user->getChildren() as $child) {
-            if ($assessment->isParticipant($child)) {
-                return true;
-            }
-        }
-        return false;
+        // Use pre-computed visibility if it's present, otherwise exit
+        return $this->visibilityCache[$assessment->getId()] ?? false;
     }
 }
