@@ -117,7 +117,7 @@ Data:
                                                 <div class="card small-12 wrap-down">
                                                     <div class="{{ icon.renderClass(assessable) }}" title="{{ assessable.getTypeName }}"></div>
 
-                                                    {% set route = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessable.id, assessment: assessable, studentId: USER.id, student: student}) %}
+                                                    {% set route = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessable.id, assessment: assessable, studentId: USER.id, student: USER}) %}
                                                     {% if route %}<a href="{{ route }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">{% endif %}
                                                         <h3>{{ assessable.title }}</h3>
                                                         {% if route %}</a>{% endif %}
