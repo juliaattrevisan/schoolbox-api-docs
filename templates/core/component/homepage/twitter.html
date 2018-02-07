@@ -57,9 +57,9 @@
                         <article>
                             <p>{TWEET_TEXT}</p>
 
-                            <div class="tweet-image-thumbnails">
+                            <div class="tweet-image-thumbnails row">
                                 <!-- BEGIN tweet_media_thumbnails -->
-                                <div class="tweet-thumbnail" style="background-image: url({TWEET_MEDIA_URL}); ">
+                                <div class="tweet-thumbnail small-4 columns" style="background-image: url({TWEET_MEDIA_URL}); ">
                                     <a class="image-popup-vertical-fit" href="{TWEET_MEDIA_URL}" rel="lightbox[{TWEET_ID}-{COMPONENT_INSTANCE_ID}]">
                                     </a>
                                 </div>
@@ -87,9 +87,6 @@
     .tweet-image-thumbnails {
         padding-top: 1rem;
         display: inline-block;
-    }
-    .tweet-image-first {
-        text-align: center;
     }
 
     .tweet-thumbnail {

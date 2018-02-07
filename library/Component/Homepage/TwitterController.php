@@ -122,7 +122,6 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
 
                 $avatarUrl = UriFactory::factory($currentTweet['avatar']);
                 $avatarUrl->setScheme(null);
-                // TODO stuff here
                 $this->setVar([
                     'TWEET_TEXT'     => Scrub::html($currentTweet['full_text']),
                     'TWEET_ACTION'   => Scrub::text($currentTweet['action']),
