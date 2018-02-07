@@ -433,7 +433,7 @@ class Controller extends Base
         $user->setExternalId($post['database_id'] == '' ? null : $post['database_id']);
         $user->getRole()->setId($post['group']);
         $user->setPositionTitle($post['position_title']);
-        $user->setAltEmail(trim($post['alt_email']) == '' ? null : $post['alt_email']);
+        $user->setAltEmail(trim($post['alt_email']) == '' ? null : trim($post['alt_email']));
         $user->setYear($post['year'] == '' ? null : $post['year']);
         $user->setSchoolHouse($house);
         $user->setResidentialHouse($resHouse);
