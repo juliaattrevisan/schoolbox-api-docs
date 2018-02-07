@@ -47,37 +47,32 @@
                     <div class="small-12 compact card wrap-down">
                         {% set title = attribute(locale, assessment.typeName|lower) is defined ? attribute(locale, assessment.typeName|lower).proper : assessment.typeName %}
 
-                        {# Special case for project. TODO consider making these route names more semanticly informative #}
-                        {% if assessment is project %}
-                            {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
-                        {% else %}
-                            {# You can see an assessment, but not visit its summary page if you are a parent, with a child participating, but system is configured to hide due work details #}
-                            {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
-                                assessmentId: assessment.id,
-                                assessment: assessment,
-                                studentId: USER.id,
-                                student: USER
-                            }) %}
+                        {# You can see an assessment, but not visit its summary page if you are a parent, with a child participating, but system is configured to hide due work details #}
+                        {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
+                            assessmentId: assessment.id,
+                            assessment: assessment,
+                            studentId: USER.id,
+                            student: USER
+                        }) %}
 
-                            {# No route for own participation, what about children ?#}
-                            {% if not viewRoute %}
-                                {% for child in USER.children if not viewRoute %}
-                                    {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
-                                        assessmentId: assessment.id,
-                                        assessment: assessment,
-                                        studentId: child.id,
-                                        student: child
-                                    }) %}
-                                {% endfor %}
-                            {% endif %}
-
-                            {# TODO SA-5769 this should not be necessary #}
-                            {% if not viewRoute %}
-                                {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getPreview', {
+                        {# No route for own participation, what about children ?#}
+                        {% if not viewRoute %}
+                            {% for child in USER.children if not viewRoute %}
+                                {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
                                     assessmentId: assessment.id,
-                                    assessment: assessment
+                                    assessment: assessment,
+                                    studentId: child.id,
+                                    student: child
                                 }) %}
-                            {% endif %}
+                            {% endfor %}
+                        {% endif %}
+
+                        {# TODO SA-5769 this should not be necessary #}
+                        {% if not viewRoute %}
+                            {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getPreview', {
+                                assessmentId: assessment.id,
+                                assessment: assessment
+                            }) %}
                         {% endif %}
 
                         {# Don't render a link if you are unable to view the details #}
