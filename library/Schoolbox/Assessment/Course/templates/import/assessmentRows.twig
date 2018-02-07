@@ -35,7 +35,7 @@
         // Copy unit date into the field
         $('[data-course-unit-date]').click(function() {
             var date = $(this).attr('data-course-unit-date');
-            var $input = $(this).prev('.input-group').find('input');
+            var $input = $(this).prevAll('.input-group').find('input');
             $input.val(date).trigger('change');
 
             // Sync dates as required
