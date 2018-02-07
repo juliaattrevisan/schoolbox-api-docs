@@ -110,14 +110,16 @@
                                             <script type="text/javascript">
                                                 $(function () {
                                                     {# Publish to ePortfolio #}
-                                                    $('[data-assessment-id]').click(function (event) {
+                                                    $('[data-publish-to-eportfolio]').click(function (event) {
                                                         event.preventDefault();
+
+                                                        var assessmentId = $(this).data('publishToEportfolio');
 
                                                         $(this).confirmDialog({
                                                             text: 'Are you sure you want to showcase this work? That means others will be able to see it.',
                                                             confirmEvent: function () {
-                                                                $('[data-publish-to-eportfolio-form="{{ assessment.id }}"]').eportfolio_publish({
-                                                                    activator: '[data-publish-to-eportfolio="{{ assessment.id }}"]'
+                                                                $('[data-publish-to-eportfolio-form="' + assessmentId + '"]').eportfolio_publish({
+                                                                    activator: '[data-publish-to-eportfolio="' + assessmentId + '"]'
                                                                 });
                                                             }
                                                         });
