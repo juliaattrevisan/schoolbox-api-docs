@@ -126,10 +126,15 @@ Data:
                                                 <div class="card small-12 wrap-down">
                                                     <div class="{{ icon.renderClass(assessable) }}" title="{{ assessable.getTypeName }}"></div>
 
-                                                    {% set route = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessable.id, assessment: assessable, studentId: USER.id, student: USER}) %}
-                                                    {% if route %}<a href="{{ route }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">{% endif %}
+                                                    {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessable.id, assessment: assessable, studentId: USER.id, student: USER}) %}
+
+                                                    {# TODO SA-5769 this should not be necessary #}
+                                                    {% if not viewRoute %}
+                                                        {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getPreview', {assessmentId: assessable.id, assessment: assessable}) %}
+                                                    {% endif %}
+                                                    {% if viewRoute %}<a href="{{ viewRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">{% endif %}
                                                         <h3>{{ assessable.title }}</h3>
-                                                        {% if route %}</a>{% endif %}
+                                                    {% if viewRoute %}</a>{% endif %}
 
                                                     {% if assessable.getDueAt.isNull == false %}
                                                         <p class="meta">{{ dueDate.assessment(assessable) }}</p>
