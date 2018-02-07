@@ -113,10 +113,6 @@
                                                     $('[data-assessment-id]').click(function (event) {
                                                         event.preventDefault();
 
-                                                        var element = $(this);
-
-                                                        var assessmentId = element.data("assessmentId");
-
                                                         $(this).confirmDialog({
                                                             text: 'Are you sure you want to showcase this work? That means others will be able to see it.',
                                                             confirmEvent: function () {
@@ -129,7 +125,6 @@
                                                 });
                                             </script>
                                         {% endif %}
-
                                     {% endif %}
                                 </nav>
                             </li>
