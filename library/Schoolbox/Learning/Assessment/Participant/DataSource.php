@@ -199,6 +199,10 @@ class DataSource
 
         $dynamicPlans = new GenericCollection(PlanObject::class);
         foreach ($assessments as $assessment) {
+            // Projects do not have persisted plans and participants.
+            if($assessment instanceof Project){
+                continue;
+            }
             $dynamicPlan = $assessment->getDynamicPlan();
             if ($dynamicPlan) {
                 $dynamicPlans->add($dynamicPlan);
