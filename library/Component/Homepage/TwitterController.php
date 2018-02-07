@@ -27,7 +27,6 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
         $this->setBlock($templateHandle, 'twitter_feed', 'twitter_feed_block');
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
         $this->setBlock('twitter_feed', 'tweet', 'tweet_block');
-        $this->setBlock('tweet', 'tweet_media_first', 'tweet_media_first_block');
         $this->setBlock('tweet', 'tweet_media_thumbnails', 'tweet_media_thumbnails_block');
         $this->setVar('tweet_block', '');
 
@@ -135,17 +134,12 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
                 ]);
 
                 if (is_array($currentTweet['media']) && count($currentTweet['media'])) {
-                    // TODO put first image big
-                    $this->setVar('TWEET_MEDIA_URL', $currentTweet['media'][0]->media_url_https);
-                    $this->parse('tweet_media_first_block', 'tweet_media_first');
-
-                    foreach (array_slice($currentTweet['media'], 1) as $currentMedia) {
+                    foreach ($currentTweet['media'] as $currentMedia) {
                         $this->setVar('TWEET_MEDIA_URL', $currentMedia->media_url_https);
                         $this->parse('tweet_media_thumbnails_block', 'tweet_media_thumbnails', true);
                     }
 
                 } else {
-                    $this->setVar('tweet_media_first_block', '');
                     $this->setVar('tweet_media_thumbnails_block', '');
                 }
 
