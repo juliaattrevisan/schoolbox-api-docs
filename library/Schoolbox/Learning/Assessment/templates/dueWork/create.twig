@@ -251,7 +251,7 @@
             }
 
             $row.find('[data-descriptor-value]').each(function () {
-                var i = parseInt($(this).val());
+                var i = parseFloat($(this).val());
 
                 if (!isNaN(i)) {
                     rowMax = Math.max(rowMax, i);
@@ -261,6 +261,8 @@
 
             max += rowMax;
         });
+
+        max = parseInt(max);
 
         $('#maxMark').val(max);
     }
