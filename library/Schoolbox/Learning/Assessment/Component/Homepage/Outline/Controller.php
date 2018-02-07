@@ -130,25 +130,22 @@ class Controller extends Component_Homepage_ControllerAbstract
                 // also omit anything that is not yet published (there's no easy way to apply this filter to the query)
 
                 $visibility  = new Visibility($this->getAccess());
-                $isParent    = $this->getUser()->getRole()->isParent();
                 $now         = Alaress_Date_Format::now();
                 $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdsForCourseOutline(
                     $uiIds,
                     $this->getUser()
-                )->filter(function (IAssessable $activity) use ($visibility, $isParent, $now) {
+                )->filter(function (IAssessable $activity) use ($visibility, $now) {
                     // Check user's own participation
-                    if ($visibility->isVisibleToUser($activity, $this->getUser(), true)) {
+                    if ($visibility->isVisibleToLearner($activity, $this->getUser(), true, $now)) {
                         return true;
                     }
                     // If a parent, check their children's participations, un-setting children who do not have visibility
                     $isVisibleViaChild = false;
-                    if ($isParent) {
-                        foreach ($this->getUser()->getChildren() as $child) {
-                            if ($visibility->isVisibleToLearner($activity, $child, true, $now)) {
-                                $isVisibleViaChild = true;
-                            } elseif ($activity->isParticipant($child)) {
-                                $activity->unsetUserParticipation($child);
-                            }
+                    foreach ($this->getUser()->getChildren() as $child) {
+                        if ($visibility->isVisibleToLearner($activity, $child, true, $now)) {
+                            $isVisibleViaChild = true;
+                        } elseif ($activity->isParticipant($child)) {
+                            $activity->unsetUserParticipation($child);
                         }
                     }
                     return $isVisibleViaChild;

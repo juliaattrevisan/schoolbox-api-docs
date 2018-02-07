@@ -65,7 +65,6 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
 
         try {
             $visibility = new Visibility($this->getAccess());
-            $isParent   = $this->getUser()->getRole()->isParent();
             $now        = Alaress_Date_Format::now();
             $showClosed = $this->getConfig('showClosed');
 
@@ -87,21 +86,18 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
                     $options
                 )
                 ->filter(
-                    function (IAssessable $activity) use ($visibility, $isParent, $showClosed, $now)
-                    {
+                    function (IAssessable $activity) use ($visibility, $showClosed, $now) {
                         // Check user's own participation
                         if ($visibility->isVisibleToUser($activity, $this->getUser(), $showClosed)) {
                             return true;
                         }
                         // If a parent, check their children's participations, un-setting children who do not have visibility
                         $isVisibleViaChild = false;
-                        if ($isParent) {
-                            foreach ($this->getUser()->getChildren() as $child) {
-                                if ($visibility->isVisibleToLearner($activity, $child, $showClosed, $now)) {
-                                    $isVisibleViaChild = true;
-                                } elseif ($activity->isParticipant($child)) {
-                                    $activity->unsetUserParticipation($child);
-                                }
+                        foreach ($this->getUser()->getChildren() as $child) {
+                            if ($visibility->isVisibleToLearner($activity, $child, $showClosed, $now)) {
+                                $isVisibleViaChild = true;
+                            } elseif ($activity->isParticipant($child)) {
+                                $activity->unsetUserParticipation($child);
                             }
                         }
                         return $isVisibleViaChild;
