@@ -27,8 +27,19 @@
             {% set completionGradient = (completionCount / studentCount) * 100 %}
         {% endif %}
 
+        {# What routes are available to this user ? #}
+        {% set statusRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
+        {% if assessment is quiz %}
+            {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessment.id, assessment: assessment}) %}
+        {% else %}
+            {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
+        {% endif %}
+        {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id, assessment: assessment}) %}
+        {% set isActionRoutes = statusRoute or modifyRoute or deleteRoute %}
+        {% set actionCount = (isActionRoutes ? 1 : 0) + (isParticipant ? 1 : 0) %}
+
         <li class="interact" data-unit-assessment="{{ assessment.id }}">
-            <div class="actions-small-1">
+            <div{% if actionCount %} class="actions-small-{{ actionCount }}"{% endif %}>
                 {% if canWrite %}
                     <div class="grip compact"></div>
                 {% endif %}
@@ -63,10 +74,10 @@
                                 <p>{{ assessment.title }}</p>
                             </a>
                         {% else %}
-                            <span title="{{ title }}">
+                            <div title="{{ title }}">
                                 <span class="{{ icon.renderClass(assessment) }}"></span>
                                 <p>{{ assessment.title }}</p>
-                            </span>
+                            </div>
                         {% endif %}
 
                         {##
@@ -86,48 +97,27 @@
                         {% endif %}
                     </div>
                 </div>
-                <nav>
-                    {##
-                     # Buttons
-                     #
-                     # Teacher: sees nav
-                     # Participant: sees complete task button (if of course it's a task that's self-assessable)
-                     #}
-                    {% if canWrite %}
-                        <a href="#" class="icon-more" data-dropdown="options-task{{ assessment.id }}" aria-expanded="false" title="Actions"></a>
-                    {% elseif isParticipant %}
-                        {% include '@learningAssessment/fragments/progressTick.twig' with {
-                            assessment: assessment,
-                            participant: assessment.getParticipant(USER)
-                        } only %}
-                    {#{% elseif isParticipant and not (assessment is project) %}#}
-                        {#{% set participant                 = assessment.getParticipant(USER) %}#}
-                        {#{% set latestResponse              = participant.findMostRecentSubmittedResposne %}#}
-                        {#{% set isMarkedByTeacherAsComplete = latestResponse and latestResponse.teacherAssessed and latestResponse.markedComplete %}#}
-                        {#{% include '@learningAssessment/fragments/progressTick.twig' with {#}
-                        {#participant: participant,#}
-                        {#disabled: not assessment.isOpen or not assessment.isSelfAssessable or isMarkedByTeacherAsComplete#}
-                        {#} only %}#}
-                    {% endif %}
-                </nav>
-                {% if canWrite  %}
+
+                {% if isActionRoutes or isParticipant %}
+                    <nav>
+                        {% if isParticipant %}
+                            {# TODO known bug SA-5984. Participant progress icon renders incorrectly if part of multiple actions. #}
+                            {% include '@learningAssessment/fragments/progressTick.twig' with {
+                                assessment: assessment,
+                                participant: assessment.getParticipant(USER)
+                            } only %}
+                        {% endif %}
+                        {% if isActionRoutes %}
+                            <a href="#" class="icon-more" data-dropdown="options-task{{ assessment.id }}" aria-expanded="false" title="Actions"></a>
+                        {% endif %}
+                    </nav>
+                {% endif %}
+
+                {% if isActionRoutes %}
                     <ul data-dropdown-content class="f-dropdown" id="options-task{{ assessment.id }}">
-                        <li><a href="{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) }}" class="icon-progress">View Status</a></li>
-                        {% if assessment is quiz %}
-                            {% set url = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessment.id, assessment: assessment}) %}
-                            {% if url %}
-                                <li><a href="{{ url }}" class="icon-modify" title="Modify this {{ locale.assessment }}">Modify</a></li>
-                            {% endif %}
-                        {% else %}
-                            {% set url = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
-                            {% if url %}
-                                <li><a href="{{ url }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-modify" data-interaction="open_edit_task_form" title="Modify this {{ locale.assessment }}">Modify</a></li>
-                            {%  endif %}
-                        {% endif %}
-                        {% set url = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id, assessment: assessment}) %}
-                        {% if url %}
-                            <li><a href="{{ url }}" class="icon-delete" data-action="delete" title="Delete this {{ locale.assessment }}">Delete</a></li>
-                        {% endif %}
+                        {% if statusRoute %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
+                        {% if modifyRoute %}<li><a href="{{ modifyRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-modify" title="Modify this {{ locale.assessment }}">Modify</a></li>{% endif %}
+                        {% if deleteRoute %}<li><a href="{{ deleteRoute }}" class="icon-delete" data-action="delete" title="Delete this {{ locale.assessment }}">Delete</a></li>{% endif %}
                     </ul>
                 {% endif %}
             </div>
