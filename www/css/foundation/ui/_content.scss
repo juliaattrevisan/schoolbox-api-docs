@@ -1300,9 +1300,14 @@ tr:hover{
 		right: $reveal-close-right;
 	}
 
-    form:not(.dzone) {
-        margin-left: -1rem;
-        margin-right: -1rem;
+    // Fix spacing for forms inside modals that have columns
+    form.has-columns {
+        margin-left: -.875rem;
+        margin-right: -.875rem;
+
+        fieldset {
+            padding: 0;
+        }
     }
 }
 
