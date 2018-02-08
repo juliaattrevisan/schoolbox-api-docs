@@ -240,29 +240,30 @@ class Controller extends Assessment\Controller
         }
 
         // Generate rubric context for every feedback
-        $rubricContext          = new RubricContext($this->rubricMapper);
-        $feedbackRubricContexts = [];
-        $timeline               = (new FullTimeline($participant))->getForUser($this->getUser());
+        $rubricContext = new RubricContext($this->rubricMapper);
+        $timeline      = (new FullTimeline($participant))->getForUser($this->getUser());
+
+        // Load and show only rubric grids for feedback in the timeline
+        // TODO consider integrating into timeline generator
+        /** @var Feedback\Model[] $timelineFeedback */
+        $timelineFeedback = [];
         foreach ($timeline as $timelineItem) {
-            if ($timelineItem instanceof Assessment\IFeedback) {
-                // Rules for showing draft feedbacks:
-                // * use what's in the timeline
-                $feedbackRubricContexts[$timelineItem->getId()] = $rubricContext->generateForFeedback(
-                    $timelineItem,
-                    $this->getUser(),
-                    $this->getAccess(),
-                    false
-                );
+            if ($timelineItem instanceof Feedback\Model) {
+                $timelineFeedback[] = $timelineItem;
             } elseif ($timelineItem instanceof Assessment\IResponse) {
                 foreach ($timelineItem->getAllFeedback() as $feedback) {
-                    $feedbackRubricContexts[$feedback->getId()] = $rubricContext->generateForFeedback(
-                        $feedback,
-                        $this->getUser(),
-                        $this->getAccess(),
-                        false
-                    );
+                    $timelineFeedback[] = $feedback;
                 }
             }
+        }
+        $feedbackRubricContexts = [];
+        foreach ($timelineFeedback as $feedback) {
+            $feedbackRubricContexts[$feedback->getId()] = $rubricContext->generateForFeedback(
+                $feedback,
+                $this->getUser(),
+                $this->getAccess(),
+                false
+            );
         }
 
         /* Find all the records spawned by $participant
