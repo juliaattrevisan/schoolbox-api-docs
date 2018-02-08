@@ -77,7 +77,7 @@
     </div>
     <div class="small-6 island">
 
-        {% if assessment.isFeedbackVisibleToUser(USER) and assessment.humanReadableMark(participant, true) is not null %}
+        {% if assessment.isFeedbackVisibleToUser(USER) and participant and assessment.humanReadableMark(participant, true) is not null %}
             <h2 class="subheader">{{ locale.project }} {{ locale.grades }}</h2>
             <section>
                 <div class="grade content">

@@ -21,6 +21,7 @@ use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Error;
+use Schoolbox\User;
 
 class Controller extends Assessment\Controller
 {
@@ -57,10 +58,12 @@ class Controller extends Assessment\Controller
      * @api   GET /learning/assessments/:assessmentId/:studentId/submit
      * @level 165
      *
-     * @param Participant $participant
+     * @param IAssessable $assessment
+     * @param User        $student
      * @return void
+     * @throws NotFound
      */
-    public function getCreateResponseForm(Participant $participant)
+    public function getCreateResponseForm(IAssessable $assessment, User $student): void
     {
         // route not implemented
         throw new NotFound();
@@ -71,10 +74,11 @@ class Controller extends Assessment\Controller
      * @api   POST /learning/assessments/:assessmentId/:studentId/submit
      * @level 165
      *
-     * @param Participant $participant
-     * @return void
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @throws NotFound
      */
-    public function postCreateResponse(Participant $participant)
+    public function postCreateResponse(IAssessable $assessment, User $student): void
     {
         // route not implemented
         throw new NotFound();
@@ -216,22 +220,17 @@ class Controller extends Assessment\Controller
 
     }
 
+
     /**
-     * Display appropriate landing page based on role
-     *
      * @api   GET /learning/assessments/:assessmentId/:userId
      * @level 165
-     * @param Participant $participant
+     * @param IAssessable|Project $assessment
+     * @param User                $student
      * @throws ServiceNotFound If unable to find web renderer
-     * @throws Application\Exception If project in future and user has <= READ access
      */
-    public function getSummary(Participant $participant)
+    public function getSummary(IAssessable $assessment, User $student): void
     {
-        /** @var Assessment\Project $project */
-        $project = $participant->getAssessable();
-        $student = $participant->getUser();
-
-        $subActivities = $project->getAssessables();
+        $subActivities = $assessment->getAssessables();
 
         // filter out any sub-activities that have not yet been published
         $visibility    = new Assessment\Visibility($this->getAccess());
@@ -239,21 +238,21 @@ class Controller extends Assessment\Controller
         $mutator       = new Participant\AssessmentListMutator($this->getUser(), $visibility, $now, true);
         $subActivities = $subActivities
             ->map([$mutator, 'map'])
-            ->filter(function (IAssessable $activity) use ($student, $visibility, $mutator, $now) {
-                return $mutator->filter($activity)
-                    && $visibility->isVisibleToLearner($activity, $student, true, $now);
+            ->filter([$mutator, 'filter'])
+            ->filter(function(IAssessable $subAssessable) use ($student) {
+                // If a parent, only show sub-assessments if the current viewee is participating
+                return !(!$subAssessable->isParticipant($student) && $this->getUser()->getRole()->isParent());
             });
 
         // hack the project object for good measure
-        $project->setAssessables($subActivities);
-
+        $assessment->setAssessables($subActivities);
 
         // Ideally make this an instance var instead of instantiating all the time
         // Except you can't, $this->getRouter() returns null in __construct()?
         $twigData = [
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($project, $this->getUser())->add([ $project->getTitle(), '' ]),
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '' ]),
             'student'     => $student,
-            'assessment'  => $project,
+            'assessment'  => $assessment,
         ];
 
         $this->getResponse()->content->set(

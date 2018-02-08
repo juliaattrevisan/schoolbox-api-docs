@@ -155,28 +155,30 @@ class Controller extends Assessment\Controller
      *
      * @api   GET /learning/assessments/:assessmentId/:userId
      * @level 165
-     * @param Participant $participant
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @throws \Schoolbox\Application\Exception\Exception
      */
-    public function getSummary(Participant $participant)
+    public function getSummary(IAssessable $assessment, User $student): void
     {
-        $assessment = $participant->getAssessable();
+        $participant = $assessment->getParticipantIfExtant($student);
 
         // Has user not yet attempted the quiz
-        if ($participant->getAllResponses()->count() == 0) {
+        if (!$participant || !$participant->getAllResponses()->count()) {
             $this->redirectToSummaryOrIntro($this->getUser(), $participant->getUser(), $assessment);
             return;
         }
 
         // Get latest attempt's finish date.
-        $latestResponse = $participant->findMostRecentResponse();
-        $latestAttempt  = $this->quizAttemptMapper->findById($latestResponse->getId());
-        $finishDate     = $latestAttempt->getFinish();
+        $latestResponse = $participant ? $participant->findMostRecentResponse() : null;
+        $latestAttempt  = $latestResponse ? $this->quizAttemptMapper->findById($latestResponse->getId()) : null;
+        $finishDate     = $latestAttempt ? $latestAttempt->getFinish() : null;
 
         // Is the attempt in progress ?
         if (is_null($finishDate) || $finishDate instanceof \Alaress_Date_NullDate) {
 
             // Is the current session user the specified participant?
-            if ($this->getUser()->getId() == $participant->getUser()->getId()){
+            if ($this->getUser()->getId() == $student->getId()){
                 // redirect to a place where they can continue the attempt
                 $quiz     = $this->getQuizForAssessmentId($assessment->getId());
                 $sections = $this->quizSectionMapper->findByColumn('assess_id', $quiz->getId());
@@ -197,7 +199,7 @@ class Controller extends Assessment\Controller
 
         // Not in progress (or you're a teacher - this redirect eventually
         // shunts you off to the Attempts List for a particular student)
-        $this->redirectToSummaryOrIntro($this->getUser(), $participant->getUser(), $assessment);
+        $this->redirectToSummaryOrIntro($this->getUser(), $student, $assessment);
     }
 
 
@@ -269,10 +271,12 @@ class Controller extends Assessment\Controller
      * @api   GET /learning/assessments/:assessmentId/:studentId/submit
      * @level 165
      *
-     * @param Participant $participant
+     * @param IAssessable $assessment
+     * @param User        $student
      * @return void
+     * @throws NotFound
      */
-    public function getCreateResponseForm(Participant $participant)
+    public function getCreateResponseForm(IAssessable $assessment, User $student): void
     {
         // this page does not exist
         throw new NotFound();
@@ -283,10 +287,11 @@ class Controller extends Assessment\Controller
      * @api   POST /learning/assessments/:assessmentId/:studentId/submit
      * @level 165
      *
-     * @param Participant $participant
-     * @return void
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @throws NotFound
      */
-    public function postCreateResponse(Participant $participant)
+    public function postCreateResponse(IAssessable $assessment, User $student): void
     {
         // this page does not exist
         throw new NotFound();

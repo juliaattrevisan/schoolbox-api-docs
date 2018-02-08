@@ -12,6 +12,7 @@ use Alaress\Web;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\User;
 
 interface IAssessmentController
 {
@@ -114,31 +115,36 @@ interface IAssessmentController
      */
     public function getPreview(IAssessable $assessment);
 
+
     /**
      * @api   GET /learning/assessments/:assessmentId/:studentId
      * @level 165
      *
-     * @param Participant $participant
+     * @param IAssessable $assessment
+     * @param User        $student
      * @return void
      */
-    public function getSummary(Participant $participant);
+    public function getSummary(IAssessable $assessment, User $student): void;
+
 
     /**
      * @api   GET /learning/assessments/:assessmentId/:studentId/submit
      * @level 165
      *
-     * @param Participant $participant
+     * @param IAssessable $assessment
+     * @param User        $student
      * @return void
      */
-    public function getCreateResponseForm(Participant $participant);
+    public function getCreateResponseForm(IAssessable $assessment, User $student): void;
+
 
     /**
      * @api   POST /learning/assessments/:assessmentId/:studentId/submit
      * @level 165
      *
-     * @param Participant $participant
-     * @return void
+     * @param IAssessable $assessment
+     * @param User        $student
      */
-    public function postCreateResponse(Participant $participant);
+    public function postCreateResponse(IAssessable $assessment, User $student): void;
 
 }

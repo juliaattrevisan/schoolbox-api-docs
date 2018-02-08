@@ -22,6 +22,7 @@ use Schoolbox\Preview\Factory as PreviewFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
@@ -164,32 +165,35 @@ class Controller extends Assessment\Controller
         );
     }
 
+
     /**
      * Display appropriate landing page based on role
      *
      * @api   GET /learning/assessments/:assessmentId/:userId
      * @level 165
-     * @param Participant $participant
+     * @param IAssessable|Task $assessment
+     * @param User        $student
      * @throws ServiceNotFound
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
-    public function getSummary(Participant $participant)
+    public function getSummary(IAssessable $assessment, User $student): void
     {
-        /** @var Task $task */
-        $task = $participant->getAssessable();
+        $participant = $assessment->getParticipantIfExtant($student);
         $previewFragment = [];
 
         /* If there was a specified url, it could be to some external location
          * or even to a storage file on this server - use the PreviewFactory to
          * decide which one it is
          */
-        if ($task->getUrl()) {
-            $previewFragment = (new PreviewFactory($this->getRouter()))->urlFragment($task->getUrl(), $this->getUser());
+        if ($assessment->getUrl()) {
+            $previewFragment = (new PreviewFactory($this->getRouter()))->urlFragment($assessment->getUrl(), $this->getUser());
 
-            if ($previewFragment['type'] == 'redirect' && !$task->getDescription()) {
+            if ($previewFragment['type'] == 'redirect' && !$assessment->getDescription()) {
 
                 /* Just forward if we only have a URL
                  */
-                $this->getResponse()->redirect->temporaryRedirect($task->getUrl());
+                $this->getResponse()->redirect->temporaryRedirect($assessment->getUrl());
                 return;
             }
             elseif ($previewFragment['type'] == 'image') {
@@ -210,7 +214,7 @@ class Controller extends Assessment\Controller
                  */
                 $previewFragment['fragment'] = $this->buildUnthemedHtmlOutput($previewFragment['twig']['template'], $previewFragment['twig']['data'])->getAsString();
             }
-            elseif ($foundHash = preg_match('/hash=([a-zA-Z0-9]+)/', $task->getUrl(), $matches)) {
+            elseif ($foundHash = preg_match('/hash=([a-zA-Z0-9]+)/', $assessment->getUrl(), $matches)) {
 
                 /* Other regular files
                  *
@@ -230,13 +234,13 @@ class Controller extends Assessment\Controller
         if ($this->getRequest()->query->get(Redirect::RETURN_URL)) {
             $returnUrl = Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL));
         } else {
-            $returnUrl = '/homepage/'.$task->getBaseContext()->getFolder()->getId();
+            $returnUrl = '/homepage/'.$assessment->getBaseContext()->getFolder()->getId();
         }
 
         $twigData = [
-            'breadcrumbs'  => $this->getBakery()->produceFromAssessment($task, $this->getUser())->add([ $task->getTitle(), '' ]),
-            'assessment'   => $task,
-            'hasWritePerm' => $this->getAccess()->isInstructor($this->getUser(), $task->getBaseContext()->getFolder()),
+            'breadcrumbs'  => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
+            'assessment'   => $assessment,
+            'hasWritePerm' => $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder()),
             'preview'      => $previewFragment,
             'participant'  => $participant,
             'returnUrl'    => $returnUrl,
@@ -255,10 +259,11 @@ class Controller extends Assessment\Controller
      * @api   GET /learning/assessments/:assessmentId/:studentId/submit
      * @level 165
      *
-     * @param Participant $participant
-     * @return void
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @throws NotFound
      */
-    public function getCreateResponseForm(Participant $participant)
+    public function getCreateResponseForm(IAssessable $assessment, User $student): void
     {
         // this page does not exist
         throw new NotFound();
@@ -273,26 +278,31 @@ class Controller extends Assessment\Controller
      * @api   POST /learning/assessments/:assessmentId/:studentId/submit
      * @level 165
      *
-     * @param Participant $participant
-     * @var string[] $_POST
-     * @var int      $_POST['status']    The proposed completion status
+     * @param IAssessable|Model $assessment
+     * @param User              $student
      * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Aura\Web\Exception\InvalidStatusCode
+     * @throws \PDOException
      */
-    public function postCreateResponse(Participant $participant)
+    public function postCreateResponse(IAssessable $assessment, User $student): void
     {
         // Did user mark (regardless of who they are) the task as incomplete ?
         $isMarkedComplete = $this->getRequest()->post->getInt('status') != TaskCompletion::STATUS_INCOMPLETE;
 
         $response = (new TaskResponse())
-            ->setAssessable($participant->getAssessable())
-            ->setSubmittedOnBehalfOf($participant->getUser())
+            ->setAssessable($assessment)
+            ->setSubmittedOnBehalfOf($student)
             ->setSubmittedBy($this->getUser())
             // TODO figure out whether to set create time as now, or set it as a created timestamp in mapper
             ->setCreatedAt(\Alaress_Date_Format::now())
             ->setMarkedComplete($isMarkedComplete);
 
         try{
-            $this->assertSaveability($participant, $response);
+            $participant = $assessment->getParticipantIfExtant($student);
+            if ($participant) {
+                $this->assertSaveability($participant, $response);
+            }
         } catch (\UnexpectedValueException $e){
 
             // Cast reason to standardised/localised representation
@@ -324,8 +334,8 @@ class Controller extends Assessment\Controller
                 $this->getRouter()->generate(
                     'learningAssessment.getSummary',
                     [
-                        'assessmentId' => $participant->getAssessable()->getId(),
-                        'studentId'    => $participant->getUser()->getId(),
+                        'assessmentId' => $assessment->getId(),
+                        'studentId'    => $student->getId(),
                     ]
                 )
             );

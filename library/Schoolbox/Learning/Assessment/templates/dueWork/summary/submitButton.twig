@@ -1,20 +1,32 @@
+{#
+Data:
+    submissionsBlocked
+    acknowlegementBlocked
+    assessment            DueWork\Model
+    student               User
+#}
 <div class="row">
     <div class="small-12 columns">
         {% if not submissionsBlocked %}
-            {% set submitRoute = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', { assessmentId: participant.assessable.id, studentId: participant.user.id, assessment: participant.assessable, participant: participant }) %}
+            {% set submitRoute = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', {
+                assessmentId: assessment.id,
+                assessment: assessment,
+                studentId: student.id,
+                student: student
+            }) %}
             {% if submitRoute %}
                 {% set submitText %}{% spaceless %}
                     Create submission
-                    {% if USER.id != participant.user.id %}
-                        on behalf of {{ participant.user.fullname }}
+                    {% if USER.id != student.id %}
+                        on behalf of {{ student.fullname }}
                     {% endif %}
                 {% endspaceless %}{% endset %}
                 <a class="submit button expand" href="{{ submitRoute }}">{{ submitText }}</a>
             {% endif %}
         {% elseif not acknowlegementBlocked %}
             {% if selfAcknowledgeRoute %}
-                {% if USER.id == participant.user.id %}
-                    {% set requiresReflection = participant.assessable.isSelfAssessable %}
+                {% if USER.id == student.id %}
+                    {% set requiresReflection = assessment.isSelfAssessable %}
                     <button class="submit expand"
                             data-action-self-reflect
                             data-confirm-dialog-header="Have you submitted your work?"
