@@ -115,15 +115,6 @@ abstract class AbstractFeedback implements IFeedback
     }
 
 
-    /**
-     * @inheritdoc
-     */
-    public function isSelfAssessed()
-    {
-        return $this->getReviewee()->getId() == $this->getReviewer()->getId();
-    }
-
-
     /* Getters/Setters
      */
 

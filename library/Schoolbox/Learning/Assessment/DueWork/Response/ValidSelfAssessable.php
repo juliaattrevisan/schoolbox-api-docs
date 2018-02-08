@@ -121,6 +121,14 @@ class ValidSelfAssessable
      */
     public function isSatisfiedBy(User $user, Participant $participant): bool
     {
+        /* TODO - this has a known bug - see SA-5980;
+         * Consider case where:
+         * * Assessment is self-assessable,
+         * * User is an Instructor, and a participant
+         * * User is looking at their own inline grader page via normal marking workflow
+         * This currently returns a false positive.
+         */
+
         /* Since I can't guarantee that the Participation's IAssessable is a DueWork\Model
          * there's a sequential dependency that must be obeyed - the IAssessable has to be a
          * DueWork\Model before an isSelfReflectable() check can be performed, otherwise

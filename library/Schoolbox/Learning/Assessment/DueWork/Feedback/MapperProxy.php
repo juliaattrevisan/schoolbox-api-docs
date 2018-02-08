@@ -116,6 +116,10 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setPublishedAt($submissionReturn->getPublishedAt())
                 ->setDeletedAt($submissionReturn->getDeletedAt());
 
+            if (null !== $submissionReturn->getReviewRoute()) {
+                $feedback->setReviewRoute($submissionReturn->getReviewRoute());
+            }
+
             /* Returns don't have to be associated with Submissions
              * This relation is optional
              */
@@ -166,6 +170,10 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setUpdatedAt($domainObject->getUpdatedAt())
                 ->setPublishedAt($domainObject->getPublishedAt())
                 ->setDeletedAt($domainObject->getDeletedAt());
+
+            if (null !== $domainObject->getReviewRoute()) {
+                $dataModel->setReviewRoute($domainObject->getReviewRoute());
+            }
 
             // This feedback doesn't have to be tied to a particular response.
             if ($domainObject->getResponse() instanceof IResponse) {

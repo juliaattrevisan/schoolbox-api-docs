@@ -202,7 +202,7 @@ class RubricContext
             $feedback->getId()
         );
         // Post-process: if self-reflect, remove descriptor values
-        if ($feedback->isSelfReflected()) {
+        if ($feedback->isSelfReflectionOnly()) {
             foreach ($rubric['rubric']['descriptors'] ?? [] as $indicatorId => $descriptors) {
                 foreach ($descriptors as $level => $descriptor) {
                     $rubric['rubric']['descriptors'][$indicatorId][$level]['value'] = null;

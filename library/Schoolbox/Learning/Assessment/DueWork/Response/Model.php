@@ -15,7 +15,7 @@ use Alaress_Date_NullDate;
 use \Schoolbox\Collection;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Learning\Assessment\DueWork\Feedback;
-
+use UnexpectedValueException;
 use \Schoolbox\Learning\Assessment\AbstractResponse;
 
 /**
@@ -160,13 +160,14 @@ class Model extends AbstractResponse
      * Returns the most recent published self-reflected feedback for this submission
      *
      * @return null|Feedback\Model
+     * @throws UnexpectedValueException  If due-work feedback object property is not hydrated
      */
     public function findMostRecentPublishedSelfReflectedFeedback(): ?Feedback\Model
     {
         /** @var Feedback\Model $mostRecentFeedback */
         $mostRecentFeedback = null;
         foreach ($this->getAllFeedback() as $feedback) {
-            if (!$feedback->isPublished() || !$feedback->isSelfAssessed()) {
+            if (!$feedback->isPublished() || !$feedback->isSelfAssessment()) {
                 continue;
             }
             if (!$mostRecentFeedback || $feedback->getPublishedAt()->gt($mostRecentFeedback->getPublishedAt())) {

@@ -10,6 +10,7 @@ use Alaress\Web\Controller\Base;
 use Aura\Web\Request\Values as RequestValues;
 use PDOException;
 use RangeException;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessable;
@@ -26,6 +27,8 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\UserMapper;
 use Alaress_Date_Format;
+use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfGradable;
+use UnexpectedValueException;
 
 class Controller extends Base
 {
@@ -101,7 +104,7 @@ class Controller extends Base
         $post               = $this->getRequest()->post->getArrayCopy();
 
         try {
-            $feedback = $this->processFeedback($participant, $mostRecentFeedback, $post);
+            $feedback = $this->processFeedback($participant, $post, ReturnedWork::REVIEW_ROUTE_INSTRUCTOR, $mostRecentFeedback);
 
             // Try to process a rubric.
             // If there was none, copy it from the last feedback
@@ -194,28 +197,49 @@ class Controller extends Base
         return false;
     }
 
+
     /**
      * Create a Feedback that is associated with a particular Response
      *
      * @api POST /learning/assessments/{assessmentId}/{studentId}/{responseId}/feedback
-     * @param Participant $participant
+     * @param Participant            $participant
      * @param DueWork\Response\Model $response
      * @throws \Alaress\Web\Controller\Exception
+     *
+     * @throws UnexpectedValueException If due work model is not sufficiently hydrated
      */
     public function postResponseFeedback(Participant $participant, DueWork\Response\Model $response)
     {
         $mostRecentFeedback = $participant->findMostRecentFeedback();
+        $post               = $this->getRequest()->post->getArrayCopy();
+
+        /* If this is a self-assessment or self reflection, also set submitted_at on the Response
+         * when publishing the Feedback itself
+         */
+        $isSelfAssessment = (new ValidSelfAssessable())->isSatisfiedBy($this->getUser(), $participant);
+        $isSelfGrading    = (new ValidSelfGradable())->isSatisfiedBy($this->getUser(), $participant);
+
+        /* TODO - this has a known bug - see SA-5980;
+         * Consider case where:
+         * * Assessment is self-assessable,
+         * * User is an Instructor
+         * * User is a participant
+         * * User is looking at their own inline grader page via normal marking workflow
+         * This currently returns a false positive.
+         */
+        if ($isSelfAssessment) {
+            $reviewRoute = $isSelfGrading
+                ? ReturnedWork::REVIEW_ROUTE_SELF_GRADING
+                : ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION;
+        } else {
+            $reviewRoute = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
+        }
 
         try {
-            $feedback = $this->processFeedback($participant, $mostRecentFeedback, $this->getRequest()->post, $response);
-            $this->processRubric($participant, $this->getRequest()->post->getArrayCopy(), $feedback);
+            $feedback = $this->processFeedback($participant, $post, $reviewRoute, $mostRecentFeedback, $response);
+            $this->processRubric($participant, $post, $feedback);
 
-            /* If this is a self-assessment or self reflection, also set submitted_at on the Response
-             * when publishing the Feedback itself
-             */
-            $selfAssessed = (new ValidSelfAssessable())->isSatisfiedBy($this->getUser(), $participant);
-
-            if ($selfAssessed && !$response->isSubmitted() && $this->getRequest()->post->get('publish')) {
+            if ($isSelfAssessment && !$response->isSubmitted() && $this->getRequest()->post->get('publish')) {
                 $response->setSubmittedAt(\Alaress_Date_Format::now());
 
                 $this->responseDataSource->save($response);
@@ -262,21 +286,27 @@ class Controller extends Base
         }
     }
 
+
     /**
      * Process feedback
      *
      * This method is shared between the Quickmark (postParticipantFeedback) and the
      * Inline Grader (postResponseFeedback) methods so they behave similarly
      *
-     * @param Participant         $participant
-     * @param IFeedback|null      $mostRecentFeedback
-     * @param RequestValues|array $postVars
-     * @param IResponse|null      $response
+     * @param Participant    $participant
+     * @param array          $postVars
+     * @param string         $reviewRoute By which mechanism is this feedback being generated?
+     * @param IFeedback|null $mostRecentFeedback
+     * @param IResponse|null $response
      * @return DueWork\Feedback\Model
-     * @throws \Alaress\Web\Controller\Exception
      */
-    private function processFeedback(Participant $participant, IFeedback $mostRecentFeedback = null, $postVars, IResponse $response = null)
-    {
+    private function processFeedback(
+        Participant $participant,
+        array $postVars,
+        string $reviewRoute,
+        IFeedback $mostRecentFeedback = null,
+        IResponse $response = null
+    ):Model {
         $hasRubric = array_key_exists('rubric', $postVars);
 
         $dueWorkFeedbackFactory = new DueWork\Feedback\Factory(
@@ -289,6 +319,7 @@ class Controller extends Base
             $postVars['publish'],
             $postVars['attachment'],
             $hasRubric,
+            $reviewRoute,
             $response
         );
 

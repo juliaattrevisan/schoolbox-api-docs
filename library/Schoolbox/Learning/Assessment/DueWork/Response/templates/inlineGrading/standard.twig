@@ -22,6 +22,7 @@ Usage:
     plagscanEnabled   bool
     rubricContext     null|array
     interactionLocked bool                             Is the assessment due in an archived term?
+    reviewRoute       string                           The mechansim by which feedback is being given
  #}
 
 {# Required in both self-assess/reflect and regular staff inline grading
@@ -181,7 +182,7 @@ Usage:
                             <ul class="information-list threaded">
                                 <li>
                                     <h2 class="subheader">{% spaceless %}
-                                            {% if latestSelfReflectedFeedback.isSelfAssessed %}
+                                            {% if latestSelfReflectedFeedback.isSelfGrading %}
                                                 {{ locale.selfAssessment.proper }}
                                             {% else %}
                                                 {{ locale.selfReflection.proper }}

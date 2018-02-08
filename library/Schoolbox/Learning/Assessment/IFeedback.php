@@ -31,14 +31,6 @@ interface IFeedback
     public function isDraft();
 
 
-    /**
-     * Is this a self-given feedback?
-     *
-     * @return bool
-     */
-    public function isSelfAssessed();
-
-
     /* Getters/Setters
      */
 

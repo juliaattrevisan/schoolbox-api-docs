@@ -13,7 +13,7 @@
 {% set tooltip = null %}
 {% if not currentFeedback.isPublished %}
     {% if currentFeedback.response.id %}
-        {% if currentFeedback.isSelfAssessed %}
+        {% if currentFeedback.isSelfGrading %}
             {% set url = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponseForSelfReflection', {
                 assessmentId: currentFeedback.assessable.id,
                 studentId: currentFeedback.response.submittedOnBehalfOf.id,
@@ -22,7 +22,7 @@
                 participant: participant
             }) %}
             {% set tooltip = 'Resume ' ~ locale.selfAssessment.proper %}
-        {% elseif currentFeedback.isSelfReflected %}
+        {% elseif currentFeedback.isSelfReflectionOnly %}
             {% set url = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponseForSelfReflection', {
                 assessmentId: currentFeedback.assessable.id,
                 studentId: currentFeedback.response.submittedOnBehalfOf.id,
@@ -68,9 +68,9 @@
                         {% if not currentFeedback.published %}
                             Draft
                         {% endif %}
-                        {% if currentFeedback.isSelfAssessed %}
+                        {% if currentFeedback.isSelfGrading %}
                             {{ locale.selfAssessment.proper }}
-                        {% elseif currentFeedback.isSelfReflected %}
+                        {% elseif currentFeedback.isSelfReflectionOnly %}
                             {{ locale.selfReflection.proper }}
                         {% else %}
                             Feedback by {{ currentFeedback.reviewer.fullname }}
@@ -131,8 +131,7 @@
                  {% endif %}>
                 {% include '@rubric/grid.twig' with {
                     rubric:         feedbackRubricContexts[currentFeedback.id].rubric,
-                    markVisibility: currentFeedback.isSelfAssessed
-                                    or currentFeedback.isSelfReflected
+                    markVisibility: currentFeedback.isSelfAssessment
                                     or participant.assessable.isFeedbackVisibleToUser(USER),
                 } only %}
             </div>
