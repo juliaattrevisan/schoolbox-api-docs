@@ -50,7 +50,7 @@
 
 {% block config %}
 
-    {% set latestFeedback    = participant.findMostRecentFeedback %}
+    {% set latestFeedback    = participant.findMostRecentInstructorGivenFeedback %}
     {% set latestResponse    = participant.findMostRecentSubmittedResponse %}
     {% set multipleResponses = participant.allResponses | length > 1 %}
 
@@ -178,7 +178,7 @@
     {% endif %}
 
     {# Action Bar #}
-    {% set feedback            = participant.findMostRecentFeedback %}
+    {% set feedback            = participant.findMostRecentInstructorGivenFeedback %}
     {% set isDraftFeedback     = feedback and not feedback.published %}
     {% set isPublishedFeedback = feedback and feedback.published %}
     {% set actionStyle         = isDraftFeedback or attachedMsg or pAckReceipt ? '' : 'display: none;' %}

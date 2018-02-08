@@ -3,13 +3,13 @@
 
     Usage: [
         participant:  Participant
-        feedback:     IFeedback      If not set, participant.findMostRecentFeedback
+        feedback:     IFeedback      If not set, participant.findMostRecentInstructorGivenFeedback
         tabindex:     int
         readonly:     bool           Should textarea be rendered as readonly?
     ]
 #}
 {% if feedback is null %}
-    {% set feedback = participant.findMostRecentFeedback %}
+    {% set feedback = participant.findMostRecentInstructorGivenFeedback %}
 {% endif %}
 
 <label>Comment
