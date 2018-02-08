@@ -13,7 +13,7 @@
 {% set tooltip = null %}
 {% if not currentFeedback.isPublished %}
     {% if currentFeedback.response.id %}
-        {% if currentFeedback.isSelfAssessed %}
+        {% if currentFeedback.isSelfGrading %}
             {% set url = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponseForSelfReflection', {
                 assessmentId: currentFeedback.assessable.id,
                 studentId: currentFeedback.response.submittedOnBehalfOf.id,
@@ -68,7 +68,7 @@
                         {% if not currentFeedback.published %}
                             Draft
                         {% endif %}
-                        {% if currentFeedback.isSelfAssessed %}
+                        {% if currentFeedback.isSelfGrading %}
                             {{ locale.selfAssessment.proper }}
                         {% elseif currentFeedback.isSelfReflectionOnly %}
                             {{ locale.selfReflection.proper }}
