@@ -72,6 +72,9 @@ abstract class AbstractResponse implements IResponse
         /** @var IFeedback $mostRecentFeedback */
         $mostRecentFeedback = null;
         foreach ($this->getAllFeedback() as $feedback) {
+            if ($feedback instanceof ISelfAssessableFeedback && $feedback->isSelfAssessment()) {
+                continue;
+            }
             if (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt())) {
                 $mostRecentFeedback = $feedback;
             }
@@ -87,6 +90,9 @@ abstract class AbstractResponse implements IResponse
         /** @var IFeedback $mostRecentFeedback */
         $mostRecentFeedback = null;
         foreach($this->getAllFeedback() as $feedback){
+            if ($feedback instanceof ISelfAssessableFeedback && $feedback->isSelfAssessment()) {
+                continue;
+            }
             if($feedback->isPublished()){
                 if(!$mostRecentFeedback || $feedback->getPublishedAt()->gt($mostRecentFeedback->getPublishedAt())){
                     $mostRecentFeedback = $feedback;
@@ -101,7 +107,17 @@ abstract class AbstractResponse implements IResponse
      */
     public function findMostRecentSelfAssessedFeedback(): ?IFeedback
     {
-        return null;
+        /** @var IFeedback $mostRecentFeedback */
+        $mostRecentFeedback = null;
+        foreach ($this->getAllFeedback() as $feedback) {
+            if (!($feedback instanceof ISelfAssessableFeedback && $feedback->isSelfAssessment())) {
+                continue;
+            }
+            if (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt())) {
+                $mostRecentFeedback = $feedback;
+            }
+        }
+        return $mostRecentFeedback;
     }
 
     /**
@@ -109,7 +125,19 @@ abstract class AbstractResponse implements IResponse
      */
     public function findMostRecentSelfAssessedPublishedFeedback(): ?IFeedback
     {
-        return null;
+        /** @var IFeedback $mostRecentFeedback */
+        $mostRecentFeedback = null;
+        foreach($this->getAllFeedback() as $feedback){
+            if (!($feedback instanceof ISelfAssessableFeedback && $feedback->isSelfAssessment())) {
+                continue;
+            }
+            if($feedback->isPublished()){
+                if(!$mostRecentFeedback || $feedback->getPublishedAt()->gt($mostRecentFeedback->getPublishedAt())){
+                    $mostRecentFeedback = $feedback;
+                }
+            }
+        }
+        return $mostRecentFeedback;
     }
 
     /* Getters/Setters
