@@ -47,6 +47,10 @@ Data:
             }, 5 * 1000);
         };
 
+        var suspendAutosave = function () {
+            clearTimeout(autosaveTimeout);
+        };
+
         // The autosave pre-submit method - called by the autosave method. Calls the actual submit method if the textbox has changed.
 
         var autosavePresubmit = function () {
@@ -157,11 +161,14 @@ Data:
             }
         });
 
+        // Empty dialog:
+        // On closing, restore the autosave
         var emptyDialog = $('#empty-dialog');
         emptyDialog.on('click', '[data-interaction="close"]', function (e) {
             e.preventDefault();
             emptyDialog.foundation('reveal', 'close');
         });
+        emptyDialog.on('close.fndtn.reveal', initAutosave);
 
         var confirmDialog = $('#confirm-dialog');
 
@@ -169,6 +176,11 @@ Data:
             var form = $(this).closest('form'),
                 dialog = confirmDialog,
                 submit = form.find(':submit');
+
+            /* Disable draft autosaving while actually submitting;
+             * restore once we actually know what's going to happen
+             */
+            suspendAutosave();
 
             if (!allowSubmit()) {
                 // prevent submission without SOMETHING to submit
@@ -197,10 +209,6 @@ Data:
             else {
                 // checks pass: go for broke
                 submit.prop('disabled', true);
-
-                /* Disable draft autosaving while actually submitting
-                 */
-                clearTimeout(autosaveTimeout);
 
                 form.submit();
             }
