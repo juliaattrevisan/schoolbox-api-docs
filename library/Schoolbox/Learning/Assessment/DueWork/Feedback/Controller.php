@@ -100,12 +100,21 @@ class Controller extends Base
      */
     public function postParticipantFeedback(Participant $participant)
     {
-        // TODO base feedback type to fetch based on whether this is self-assess or instructor
-        $mostRecentFeedback = $participant->findMostRecentInstructorGivenFeedback();
+        // What kind of feedback am I creating?
+        $reviewRoute      = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
+        $isSelfAssessment = (new ValidSelfAssessable())->isSatisfiedBy($this->getUser(), $participant);
+        if ($isSelfAssessment) {
+            $reviewRoute = (new ValidSelfGradable())->isSatisfiedBy($this->getUser(), $participant)
+                ? ReturnedWork::REVIEW_ROUTE_SELF_GRADING
+                : ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION;
+        }
         $post               = $this->getRequest()->post->getArrayCopy();
+        $mostRecentFeedback = $isSelfAssessment
+            ? $participant->findMostRecentSelfAssessedFeedback()
+            : $participant->findMostRecentInstructorGivenFeedback();
 
         try {
-            $feedback = $this->processFeedback($participant, $post, ReturnedWork::REVIEW_ROUTE_INSTRUCTOR, $mostRecentFeedback);
+            $feedback = $this->processFeedback($participant, $post, $reviewRoute, $mostRecentFeedback);
 
             // Try to process a rubric.
             // If there was none, copy it from the last feedback
@@ -211,15 +220,12 @@ class Controller extends Base
      */
     public function postResponseFeedback(Participant $participant, DueWork\Response\Model $response)
     {
-        // TODO base feedback type to fetch based on whether this is self-assess or instructor
-        $mostRecentFeedback = $participant->findMostRecentInstructorGivenFeedback();
         $post               = $this->getRequest()->post->getArrayCopy();
 
         /* If this is a self-assessment or self reflection, also set submitted_at on the Response
          * when publishing the Feedback itself
          */
         $isSelfAssessment = (new ValidSelfAssessable())->isSatisfiedBy($this->getUser(), $participant);
-        $isSelfGrading    = (new ValidSelfGradable())->isSatisfiedBy($this->getUser(), $participant);
 
         /* TODO - this has a known bug - see SA-5980;
          * Consider case where:
@@ -230,12 +236,16 @@ class Controller extends Base
          * This currently returns a false positive.
          */
         if ($isSelfAssessment) {
-            $reviewRoute = $isSelfGrading
+            $reviewRoute = (new ValidSelfGradable())->isSatisfiedBy($this->getUser(), $participant)
                 ? ReturnedWork::REVIEW_ROUTE_SELF_GRADING
                 : ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION;
         } else {
             $reviewRoute = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
         }
+
+        $mostRecentFeedback = $isSelfAssessment
+            ? $participant->findMostRecentSelfAssessedFeedback()
+            : $participant->findMostRecentInstructorGivenFeedback();
 
         try {
             $feedback = $this->processFeedback($participant, $post, $reviewRoute, $mostRecentFeedback, $response);
