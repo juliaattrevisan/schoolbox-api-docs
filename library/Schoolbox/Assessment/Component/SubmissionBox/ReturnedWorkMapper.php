@@ -16,6 +16,7 @@ use PDOStatement;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Assessment\Participant;
 
 /**
  * Class ReturnedWorkMapper
@@ -28,6 +29,23 @@ use Schoolbox\GenericCollection;
  */
 class ReturnedWorkMapper extends Schoolbox\Mapper
 {
+
+    /**
+     * @var Participant\Plan\InteractionIntegrityChecker
+     */
+    private $interactionChecker;
+
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->interactionChecker = new Participant\Plan\InteractionIntegrityChecker(
+            Participant\Plan\Mapper::getInstance(),
+            Participant\Mapper::getInstance()
+        );
+    }
+
+
     protected function mapping()
     {
         $this->hasTable('submission_return');
@@ -61,6 +79,49 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteReturnedWorkFiles'));
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'syncToMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'persistFiles'));
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
+    }
+
+
+    /**
+     * @param ReturnedWork      $object
+     * @param ReturnedWork|null $previous
+     * @return bool
+     * @throws Schoolbox\Mapper\DefinitionException
+     * @throws Participant\Plan\InvalidState If permitting the save would cause the system to enter an invalid state
+     * @throws \InvalidArgumentException If assessment not sufficiently hydrated
+     */
+    public function canParticipate(ReturnedWork $object, ReturnedWork $previous = null): bool
+    {
+        if($previous){
+            // If an update, assume the system is still valid
+            return true;
+        }
+        $assessment = $this->getSubmissionBoxMapper()->findById($object->getSubmissionBox()->getId())->getAssessmentModel();
+        return $this->interactionChecker->assertCanReceiveInteractions($object->getOwner(), $assessment);
+    }
+
+
+    /**
+     * @param ReturnedWork      $object
+     * @param ReturnedWork|null $previous
+     * @return bool
+     * @throws Participant\Plan\InvalidState If permitting the save would cause the system to enter an invalid state
+     * @throws Schoolbox\Mapper\DefinitionException
+     * @throws Schoolbox\Mapper\Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException If assessment not sufficiently hydrated
+     */
+    public function insertParticipation(ReturnedWork $object, ReturnedWork $previous = null): bool
+    {
+        if($previous){
+            // If an update, assume the participation record already exists
+            return true;
+        }
+        $assessment = $this->getSubmissionBoxMapper()->findById($object->getSubmissionBox()->getId())->getAssessmentModel();
+        return $this->interactionChecker->checkFirstInteraction($object->getOwner(), $assessment);
     }
 
 
@@ -230,5 +291,15 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
             $file->setReturn($object);
         }
         $joinMapper->save($addedFiles);
+    }
+
+
+    /**
+     * @return Schoolbox\Mapper|SubmissionBoxMapper
+     * @throws Schoolbox\Mapper\DefinitionException
+     */
+    private function getSubmissionBoxMapper(): SubmissionBoxMapper
+    {
+        return $this->getJoinMapper('submission_box');
     }
 }
