@@ -217,7 +217,7 @@ class Controller extends Base
 
         $filters = $filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $page);
 
-        $filters = $filterFactoryFactory->checkTeacherFolders($filters, $this->getUser(), $viewee);
+        $filters = $filterFactoryFactory->checkTeacherFolders($filters, $viewee);
 
         // Ensure that assessments are not Assessment Specs
         $filters = array_merge($filters, [

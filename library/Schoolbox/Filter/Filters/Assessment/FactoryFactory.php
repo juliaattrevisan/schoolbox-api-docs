@@ -112,18 +112,14 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
      * An assessment-specific function to ensure that if the admin disables the teacher-folder filter
      * then we fall back to the viewee's involved classes and groups.
      *
-     * Also users that the user is an instructor of any filtered-to teacher-folder.
-     *
      * @param null[]|Collection[] $filters
-     * @param User                $user
      * @param User                $viewee
      * @return null[]|Collection[]
      */
-    public function checkTeacherFolders(array $filters, User $user, User $viewee)
+    public function checkTeacherFolders(array $filters, User $viewee)
     {
         /** @var Folder\Mapper $folderMapper */
         $folderMapper = $this->getMapperFactory()->get(Folder\Mapper::class);
-        $access       = Access::getInstance();
 
         // No teacher-folder filter ? (Either not defined or set to NULL)
         if (!isset($filters[FolderFilter\TeacherInvolved\Definition::class])) {
@@ -134,15 +130,6 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
             foreach ($involvedFolders as $involvedFolder) {
                 $folderId                                                           = $involvedFolder->getId();
                 $filters[FolderFilter\TeacherInvolved\Definition::class][$folderId] = $folderId;
-            }
-        }
-
-        /** @var Collection $teacherFolderFilter */
-        $teacherFolderFilter = $filters[FolderFilter\TeacherInvolved\Definition::class];
-        foreach ($teacherFolderFilter as $folderId) {
-            $folder = $folderMapper->createModel($folderId);
-            if (!$access->isInstructor($user, $folder)) {
-                $filters[FolderFilter\TeacherInvolved\Definition::class]->offsetUnset($folderId);
             }
         }
 
