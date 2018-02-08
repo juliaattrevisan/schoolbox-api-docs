@@ -12,13 +12,6 @@ namespace Schoolbox\Learning\Assessment;
 interface ISelfAssessableFeedback extends IFeedback
 {
     /**
-     * Was this feedback given by an instructor?
-     *
-     * @return bool
-     */
-    public function isInstructorGiven(): bool;
-
-    /**
      * Was this feedback a self-assessment of the participant's own work?
      *
      * @return bool
