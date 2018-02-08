@@ -242,13 +242,27 @@ class Controller extends Assessment\Controller
         // Generate rubric context for every feedback
         $rubricContext          = new RubricContext($this->rubricMapper);
         $feedbackRubricContexts = [];
-        foreach ($participant->getAllFeedbacks() as $feedback) {
-            $feedbackRubricContexts[$feedback->getId()] = $rubricContext->generateForFeedback(
-                $feedback,
-                $this->getUser(),
-                $this->getAccess(),
-                false
-            );
+        $timeline               = (new FullTimeline($participant))->getForUser($this->getUser());
+        foreach ($timeline as $timelineItem) {
+            if ($timelineItem instanceof Assessment\IFeedback) {
+                // Rules for showing draft feedbacks:
+                // * use what's in the timeline
+                $feedbackRubricContexts[$timelineItem->getId()] = $rubricContext->generateForFeedback(
+                    $timelineItem,
+                    $this->getUser(),
+                    $this->getAccess(),
+                    false
+                );
+            } elseif ($timelineItem instanceof Assessment\IResponse) {
+                foreach ($timelineItem->getAllFeedback() as $feedback) {
+                    $feedbackRubricContexts[$feedback->getId()] = $rubricContext->generateForFeedback(
+                        $feedback,
+                        $this->getUser(),
+                        $this->getAccess(),
+                        false
+                    );
+                }
+            }
         }
 
         /* Find all the records spawned by $participant
@@ -262,7 +276,7 @@ class Controller extends Assessment\Controller
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'participant' => $participant,
-            'timeline'    => (new FullTimeline($participant))->getForUser($this->getUser()),
+            'timeline'    => $timeline,
 
             /* Plagscan status
              */
