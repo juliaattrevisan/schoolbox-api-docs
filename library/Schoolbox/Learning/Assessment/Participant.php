@@ -295,7 +295,6 @@ class Participant
      */
     public function findMostRecentInstructorGivenPublishedFeedback(): ?IFeedback
     {
-        // TODO consider whether filterBy should be updatedAt or publishedAt
         return $this->allFeedbacks
             ->filter(new InstructorGivenFilter())
             ->filterBy('isPublished', true)

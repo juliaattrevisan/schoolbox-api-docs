@@ -85,7 +85,7 @@ abstract class AbstractResponse implements IResponse
         return $this->getAllFeedback()
                     ->filter(new InstructorGivenFilter())
                     ->filterBy('isPublished', true)
-                    ->sortBy('publishedAt', 'desc')
+                    ->sortBy('updatedAt', 'desc')
                     ->first();
     }
 
@@ -108,7 +108,7 @@ abstract class AbstractResponse implements IResponse
         return $this->getAllFeedback()
                     ->filter(new SelfAssessmentFilter())
                     ->filterBy('isPublished', true)
-                    ->sortBy('publishedAt', 'desc')
+                    ->sortBy('updatedAt', 'desc')
                     ->first();
     }
 
