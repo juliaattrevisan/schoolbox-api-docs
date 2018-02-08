@@ -75,6 +75,21 @@ class Model extends AbstractFeedback
 
 
     /**
+     * Returns whether this feedback was created via the learner self-reflect work-flow
+     *
+     * @return bool
+     * @throws UnexpectedValueException If property is not set
+     */
+    public function isSelfReflectionOnly(): bool
+    {
+        if (null === $this->reviewRoute) {
+            throw new UnexpectedValueException('Unable to determine review route. Property is null');
+        }
+        return ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION === $this->reviewRoute;
+    }
+
+
+    /**
      * Returns whether this feedback was created via the learner self-grade work-flow
      *
      * @return bool

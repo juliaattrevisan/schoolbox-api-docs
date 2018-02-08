@@ -217,7 +217,7 @@ class Full
             $isFeedbackVisible
         ) {
             if ($feedback instanceof Duework\Feedback\Model) {
-                if ($feedback->isSelfReflected() || $feedback->isSelfAssessed()) {
+                if ($feedback->isSelfAssessment()) {
                     if ($feedback->isPublished()) {
                         return true;
                     }
