@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Assessment\DueWork;
 
 use DomainException;
 use Schoolbox\Learning\Assessment\IResponse;
+use Schoolbox\Learning\Assessment\ISelfAssessable;
 use UnexpectedValueException;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric;
@@ -23,7 +24,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Assessment\Participant;
 
-class Model extends AbstractAssessment
+class Model extends AbstractAssessment implements ISelfAssessable
 {
     /**
      * @var string
