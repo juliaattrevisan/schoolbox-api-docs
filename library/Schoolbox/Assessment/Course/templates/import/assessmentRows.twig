@@ -36,6 +36,14 @@
         $('[data-course-unit-date]').click(function() {
             var date = $(this).attr('data-course-unit-date');
             var $input = $(this).prevAll('.input-group').find('input');
+
+            //The unit date is already validated, so hide error message if there is one
+            var error = $(this).prev('.error');
+
+            console.log(error);
+
+            error.remove();
+
             $input.val(date).trigger('change');
 
             // Sync dates as required
