@@ -100,15 +100,9 @@ class Controller extends Base
      */
     public function postParticipantFeedback(Participant $participant)
     {
-        // What kind of feedback am I creating?
-        $reviewRoute      = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
-        $isSelfAssessment = (new ValidSelfAssessable())->isSatisfiedBy($this->getUser(), $participant);
-        if ($isSelfAssessment) {
-            $reviewRoute = (new ValidSelfGradable())->isSatisfiedBy($this->getUser(), $participant)
-                ? ReturnedWork::REVIEW_ROUTE_SELF_GRADING
-                : ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION;
-        }
+        $reviewRoute        = $this->determineReviewRoute($participant);
         $post               = $this->getRequest()->post->getArrayCopy();
+        $isSelfAssessment   = $reviewRoute !== ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
         $mostRecentFeedback = $isSelfAssessment
             ? $participant->findMostRecentSelfAssessedFeedback()
             : $participant->findMostRecentInstructorGivenFeedback();
@@ -220,29 +214,9 @@ class Controller extends Base
      */
     public function postResponseFeedback(Participant $participant, DueWork\Response\Model $response)
     {
+        $reviewRoute        = $this->determineReviewRoute($participant);
         $post               = $this->getRequest()->post->getArrayCopy();
-
-        /* If this is a self-assessment or self reflection, also set submitted_at on the Response
-         * when publishing the Feedback itself
-         */
-        $isSelfAssessment = (new ValidSelfAssessable())->isSatisfiedBy($this->getUser(), $participant);
-
-        /* TODO - this has a known bug - see SA-5980;
-         * Consider case where:
-         * * Assessment is self-assessable,
-         * * User is an Instructor
-         * * User is a participant
-         * * User is looking at their own inline grader page via normal marking workflow
-         * This currently returns a false positive.
-         */
-        if ($isSelfAssessment) {
-            $reviewRoute = (new ValidSelfGradable())->isSatisfiedBy($this->getUser(), $participant)
-                ? ReturnedWork::REVIEW_ROUTE_SELF_GRADING
-                : ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION;
-        } else {
-            $reviewRoute = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
-        }
-
+        $isSelfAssessment   = $reviewRoute !== ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
         $mostRecentFeedback = $isSelfAssessment
             ? $participant->findMostRecentSelfAssessedFeedback()
             : $participant->findMostRecentInstructorGivenFeedback();
@@ -388,6 +362,33 @@ class Controller extends Base
     protected function getFeedbackDataSource()
     {
         return $this->feedbackDataSource;
+    }
+
+
+    /**
+     * What's the review route?
+     *
+     * @param Participant $participant
+     * @return string
+     */
+    private function determineReviewRoute(Participant $participant): string
+    {
+        $reviewRoute      = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
+        $isSelfAssessment = (new ValidSelfAssessable())->isSatisfiedBy($this->getUser(), $participant);
+        /* TODO - this has a known bug - see SA-5980;
+         * Consider case where:
+         * * Assessment is self-assessable,
+         * * User is an Instructor
+         * * User is a participant
+         * * User is looking at their own inline grader page via normal marking workflow
+         * This currently returns a false positive.
+         */
+        if ($isSelfAssessment) {
+            $reviewRoute = (new ValidSelfGradable())->isSatisfiedBy($this->getUser(), $participant)
+                ? ReturnedWork::REVIEW_ROUTE_SELF_GRADING
+                : ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION;
+        }
+        return $reviewRoute;
     }
 
 }
