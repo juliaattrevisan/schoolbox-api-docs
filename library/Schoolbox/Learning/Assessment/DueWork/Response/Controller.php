@@ -140,7 +140,7 @@ class Controller extends Base
         }
 
         // The zone which contains the files
-        $latestFeedback    = $participant->findMostRecentInstructorGivenFeedback();
+        $latestFeedback    = $participant->findMostRecentSelfAssessedFeedback();
         $attachZoneFactory = new Attachzone\Factory();
         $attachZone        = $attachZoneFactory->buildForDueWorkFeedback($latestFeedback);
 
@@ -195,7 +195,7 @@ class Controller extends Base
     }
 
     /**
-     * Get the contents of a particular $response
+     * Get the contents of a particular $response for instructor marking.
      *
      * Show the specified kami doc in an inline window if available;
      * otherwise display html/audio/video/image contents differently, inline with the dom
