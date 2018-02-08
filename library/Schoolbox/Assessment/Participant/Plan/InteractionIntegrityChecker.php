@@ -14,6 +14,7 @@ use Schoolbox\User;
 use PDOException;
 use Schoolbox\Mapper as SchoolboxMapper;
 use UnexpectedValueException;
+use InvalidArgumentException;
 
 /**
  * Responsible for checking whether a participant interaction is the first for a [assessment:user] combination.
@@ -59,9 +60,12 @@ class InteractionIntegrityChecker
      * @return bool
      * @throws SchoolboxMapper\DefinitionException
      * @throws InvalidState If inserting an interaction would cause the system to enter an invalid state
+     * @throws InvalidArgumentException If assessment not sufficiently hydrated
      */
     public function assertCanReceiveInteractions(User $student, Assessment\Model $assessment): bool
     {
+        $this->loadPlansAndParticipants($assessment);
+
         $participant = $this->findParticipation($student, $assessment);
 
         if ($participant) {
@@ -90,13 +94,20 @@ class InteractionIntegrityChecker
      * @throws UnexpectedValueException
      * @throws SchoolboxMapper\DefinitionException
      * @throws InvalidState If we detect we've just put the system into an invalid state
+     * @throws InvalidArgumentException If assessment not sufficiently hydrated
      */
     public function checkFirstInteraction(User $student, Assessment\Model $assessment): bool
     {
+        $this->loadPlansAndParticipants($assessment);
         $participant = $this->findParticipation($student, $assessment);
 
-        // User does not yet have a participation record?
-        if (!$participant) {
+        // Does user have a participation record?
+        if ($participant) {
+            if ($participant->isExcluded()) {
+                // Did we find an exclusion record? You must not create interactions.
+                throw new InvalidState("User ({$student->getId()}) has participation exclusion ({$participant->getId()})");
+            }
+        } else {
             $dynamicPlan = $assessment->getDynamicPlan();
             if (!$dynamicPlan) {
                 throw new InvalidState("User ({$student->getId()}) has no participation, but assessment ({$assessment->getId()}) has no dynamic plan");
@@ -105,8 +116,30 @@ class InteractionIntegrityChecker
                                                    ->setUser($student)
                                                    ->setPlan($dynamicPlan);
             $this->participantMapper->save($participant);
+            $dynamicPlan->getParticipants()[$student->getId()] = $participant;
         }
         return true;
+    }
+
+
+    /**
+     * Load this assessment's plans and participants
+     *
+     * @param Assessment\Model $assessment
+     * @throws SchoolboxMapper\DefinitionException
+     * @throws InvalidArgumentException If assessment is not sufficiently hydrated
+     */
+    private function loadPlansAndParticipants(Assessment\Model $assessment): void
+    {
+        if (null === $assessment->getId()) {
+            throw new InvalidArgumentException('Assessment id not set');
+        }
+        $plans = $assessment->getPlans()->emptyClone();
+        foreach ($this->planMapper->findPlansAndParticipantsForAssessments([$assessment->getId()]) as $plan) {
+            $plan->setAssessment($assessment);
+            $plans[$plan->getId()] = $plan;
+        }
+        $assessment->setPlans($plans);
     }
 
 
@@ -114,11 +147,10 @@ class InteractionIntegrityChecker
      * @param User             $student
      * @param Assessment\Model $assessment
      * @return null|Participant\Model
-     * @throws SchoolboxMapper\DefinitionException
      */
     private function findParticipation(User $student, Assessment\Model $assessment): ?Participant\Model
     {
-        foreach ($this->planMapper->findPlansAndParticipantsForAssessments([$assessment->getId()]) as $plan) {
+        foreach ($assessment->getPlans() as $plan) {
             foreach ($plan->getParticipants() as $participant) {
                 // TODO A-4539 fix unreliable hydration type bug
                 if ($participant->getUser()->getId() == $student->getId()) {
