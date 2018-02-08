@@ -23,7 +23,7 @@ interface IResponse
      *
      * @return IFeedback|null
      */
-    public function findMostRecentFeedback();
+    public function findMostRecentInstructorGivenFeedback(): ?IFeedback;
 
     /**
      * Find the most recent Published Feedback with a non-null Mark value,
@@ -31,7 +31,23 @@ interface IResponse
      *
      * @return IFeedback|null
      */
-    public function findMostRecentPublishedFeedback();
+    public function findMostRecentPublishedInstructorGivenFeedback(): ?IFeedback;
+
+    /**
+     * Find the most recent self-assessed Feedback with a non-null Mark value,
+     * based on its 'publishedAt' property
+     *
+     * @return IFeedback|null
+     */
+    public function findMostRecentSelfAssessedFeedback(): ?IFeedback;
+
+    /**
+     * Find the most recent self-assessed Published Feedback with a non-null Mark value,
+     * based on its 'publishedAt' property
+     *
+     * @return IFeedback|null
+     */
+    public function findMostRecentSelfAssessedPublishedFeedback(): ?IFeedback;
 
 
     /**

@@ -253,7 +253,7 @@ class Controller extends Base
         // * Nothing
         $latestFeedback = null;
         if ($response) {
-            $latestFeedback = $response->findMostRecentFeedback();
+            $latestFeedback = $response->findMostRecentInstructorGivenFeedback();
         }
         $latestFeedback = $latestFeedback ?? $participant->findMostRecentInstructorGivenFeedback();
 

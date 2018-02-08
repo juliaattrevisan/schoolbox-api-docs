@@ -67,7 +67,7 @@ abstract class AbstractResponse implements IResponse
     /**
      * @inheritdoc
      */
-    public function findMostRecentFeedback()
+    public function findMostRecentInstructorGivenFeedback(): ?IFeedback
     {
         /** @var IFeedback $mostRecentFeedback */
         $mostRecentFeedback = null;
@@ -82,7 +82,7 @@ abstract class AbstractResponse implements IResponse
     /**
      * @inheritdoc
      */
-    public function findMostRecentPublishedFeedback()
+    public function findMostRecentPublishedInstructorGivenFeedback(): ?IFeedback
     {
         /** @var IFeedback $mostRecentFeedback */
         $mostRecentFeedback = null;
@@ -94,6 +94,22 @@ abstract class AbstractResponse implements IResponse
             }
         }
         return $mostRecentFeedback;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function findMostRecentSelfAssessedFeedback(): ?IFeedback
+    {
+        return null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function findMostRecentSelfAssessedPublishedFeedback(): ?IFeedback
+    {
+        return null;
     }
 
     /* Getters/Setters
