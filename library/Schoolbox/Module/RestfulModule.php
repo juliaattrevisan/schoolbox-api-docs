@@ -34,9 +34,6 @@ abstract class RestfulModule extends AlaressModule
     /** @var RestfulModule */
     protected $context = null;
 
-    /** @var Mapper */
-    protected $mapper;
-
     /** @var string */
     protected $mapperClass;
 
@@ -139,14 +136,14 @@ abstract class RestfulModule extends AlaressModule
 
         $this->addRoutePreload($matcher, '(?:createEntity)', function () {
             return [
-                'entity' => $this->mapper->createModel()
+                'entity' => $this->getMapper()->createModel()
             ];
         });
 
             // these routes will just spawn new entities, but if context exists, it is required
         $this->addRoutePreload($matcher, '(?:getCreateForm)', function ($params) {
             $args = [
-                'entity' => $this->mapper->createModel()
+                'entity' => $this->getMapper()->createModel()
             ];
 
             if ($this->context) {
