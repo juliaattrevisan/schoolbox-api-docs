@@ -14,6 +14,8 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\Feedback\InstructorGivenFilter;
+use Schoolbox\Learning\Assessment\Feedback\SelfAssessmentFilter;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use \Schoolbox\User;
 use \DomainException;
@@ -277,20 +279,10 @@ class Participant
      */
     public function findMostRecentInstructorGivenFeedback(): ?IFeedback
     {
-        /** @var IFeedback $mostRecentFeedback */
-        $mostRecentFeedback = null;
-
-        /** @var IFeedback $feedback */
-        foreach ($this->allFeedbacks as $feedback) {
-            // Self-assessed is skipped
-            if ($feedback instanceof ISelfAssessableFeedback && $feedback->isSelfAssessment()) {
-                continue;
-            }
-            if (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt())) {
-                $mostRecentFeedback = $feedback;
-            }
-        }
-        return $mostRecentFeedback;
+        return $this->allFeedbacks
+            ->filter(new InstructorGivenFilter())
+            ->sortBy('updatedAt', 'desc')
+            ->first();
     }
 
 
@@ -303,22 +295,12 @@ class Participant
      */
     public function findMostRecentInstructorGivenPublishedFeedback(): ?IFeedback
     {
-        /** @var IFeedback $mostRecentFeedback */
-        $mostRecentFeedback = null;
-
-        /** @var IFeedback $feedback */
-        foreach ($this->allFeedbacks as $feedback) {
-            // Self-assessed is skipped
-            if ($feedback instanceof ISelfAssessableFeedback && $feedback->isSelfAssessment()) {
-                continue;
-            }
-            // TODO un-copypaste this
-            // TODO should this be updatedAt or publishedAt?
-            if ($feedback->isPublished() && (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt()))) {
-                $mostRecentFeedback = $feedback;
-            }
-        }
-        return $mostRecentFeedback;
+        // TODO consider whether filterBy should be updatedAt or publishedAt
+        return $this->allFeedbacks
+            ->filter(new InstructorGivenFilter())
+            ->filterBy('isPublished', true)
+            ->sortBy('updatedAt', 'desc')
+            ->first();
     }
 
 
@@ -329,20 +311,10 @@ class Participant
      */
     public function findMostRecentSelfAssessedFeedback(): ?IFeedback
     {
-        /** @var IFeedback $mostRecentFeedback */
-        $mostRecentFeedback = null;
-
-        /** @var IFeedback $feedback */
-        foreach ($this->allFeedbacks as $feedback) {
-            // Non self-assessed is skipped
-            if (!($feedback instanceof ISelfAssessableFeedback && $feedback->isSelfAssessment())) {
-                continue;
-            }
-            if (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt())) {
-                $mostRecentFeedback = $feedback;
-            }
-        }
-        return $mostRecentFeedback;
+        return $this->allFeedbacks
+            ->filter(new SelfAssessmentFilter())
+            ->sortBy('updatedAt', 'desc')
+            ->first();
     }
 
 
@@ -353,20 +325,11 @@ class Participant
      */
     public function findMostRecentSelfAssessedPublishedFeedback(): ?IFeedback
     {
-        /** @var IFeedback $mostRecentFeedback */
-        $mostRecentFeedback = null;
-
-        /** @var IFeedback $feedback */
-        foreach ($this->allFeedbacks as $feedback) {
-            // Non self-assessed is skipped
-            if (!($feedback instanceof ISelfAssessableFeedback && $feedback->isSelfAssessment())) {
-                continue;
-            }
-            if ($feedback->isPublished() && (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt()))) {
-                $mostRecentFeedback = $feedback;
-            }
-        }
-        return $mostRecentFeedback;
+        return $this->allFeedbacks
+            ->filter(new SelfAssessmentFilter())
+            ->filterBy('isPublished', true)
+            ->sortBy('updatedAt', 'desc')
+            ->first();
     }
 
 
