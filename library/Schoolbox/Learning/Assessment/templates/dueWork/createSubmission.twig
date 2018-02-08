@@ -69,7 +69,7 @@ Data:
 
             /* Disable actual submit button
              */
-            $("[data-action-save]").prop('disabled', true);
+            var submitButtons = $("[data-action-save], [data-action-self-reflect]").prop('disabled', true);
 
             // Submit form via AJAX
             var formContents = form.serializeArray();
@@ -90,7 +90,7 @@ Data:
 
                     /* Re-enable submit
                      */
-                    $("[data-action-save]").prop('disabled', false);
+                    submitButtons.prop('disabled', false);
                 },
                 success: function (responseText) {
 
