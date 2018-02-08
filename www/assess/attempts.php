@@ -17,38 +17,41 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
 use \Schoolbox\Permission\Access\Access;
 use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Error;
 
 $groupHandler = new Group();
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
 $attemptHandler = new Assess_Attempt();
 $responseHandler = new Assess_Response();
+[$quizId, $userId] = $this->arg;
+$assess = $assessHandler->getByID($quizId);
 
-$assess = $assessHandler->getByID($this->arg[0]);
 
 if (!$assess) {
     error(112);
 }
 
-if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
+if (!$assessHandler->isValidUrlAccess($quizId)) {
     $this->pageNotFound();
 }
 
-if ($assessHandler->isDeleted($this->arg[0])) {
+if ($assessHandler->isDeleted($quizId)) {
     error(112);
 }
 
-if (!is_numeric($this->arg[1])) {
+if (!is_numeric($userId)) {
 	error(19);
 }
 
-if ($groupHandler->isStudent() && ($_SESSION['user']->getId() != $this->arg[1])) {
+if ($groupHandler->isStudent() && ($_SESSION['user']->getId() != $userId)) {
 	error(19);
 }
 
 try {
     $userMapper = UserMapper::getInstance();
-    $user = $userMapper->findById($this->arg[1]);
+    $user = $userMapper->findById($userId);
 } catch (Schoolbox\Mapper\Exception $e) {
     error(19);
     exit;
@@ -60,6 +63,34 @@ try {
 }
 catch (\Exception $e) {
     error(117);
+}
+
+// Check user can participate
+$participant = Schoolbox\Assessment\Participant\Mapper::getInstance()->findForAssessmentAndUser(
+    Assessment\Mapper::getInstance()->createModel($assess['assessment_id']),
+    UserMapper::getInstance()->createModel($userId)
+);
+if ($participant) {
+    // User has a participation record, are they excluded?
+    if ($participant->isExcluded()) {
+        $this->pageNotFound();
+    }
+} else {
+// Not yet a participant, does a dynamic plan exist for them to be inserted into if they have WRITE+ perm
+    if (!Access::getInstance()->isInstructor($user, $folder)) {
+        $this->pageNotFound();
+    }
+    $plans            = Schoolbox\Assessment\Participant\Plan\Mapper::getInstance()->findPlansAndParticipantsForAssessments([$assess['assessment_id']]);
+    $dynamicPlanFound = false;
+    foreach ($plans as $plan) {
+        if ($plan->isDynamic()) {
+            $dynamicPlanFound = true;
+            break;
+        }
+    }
+    if (!$dynamicPlanFound) {
+        $this->pageNotFound();
+    }
 }
 
 $this->setFile(TEMPLATE_content, 'assess/attempts.html');
@@ -109,7 +140,7 @@ if ($perm >= UserAccess::ACCESS_WRITE) {
 
 /* Iterate
  */
-$allAttempts = $attemptHandler->getListForUser($this->arg[0], $this->arg[1]);
+$allAttempts = $attemptHandler->getListForUser($quizId, $userId);
 
 if (is_array($allAttempts) && count($allAttempts)) {
     $i = 0;
@@ -126,10 +157,10 @@ if (is_array($allAttempts) && count($allAttempts)) {
         $canStudentReview = false;
         $reviewUrl = 'studentReview';
 
-        $firstSection = $sectionHandler->getFirst($this->arg[0]);
+        $firstSection = $sectionHandler->getFirst($quizId);
 
         $this->setVar(array(
-            'ATTEMPT_ASSESS_ID' => $this->arg[0],
+            'ATTEMPT_ASSESS_ID' => $quizId,
             'ATTEMPT_SECTION_ID' => $firstSection['section_id'],
             'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
         ));
@@ -175,7 +206,7 @@ if (is_array($allAttempts) && count($allAttempts)) {
                     $canReview = true;
                     $reviewUrl = 'review';
                 }
-                elseif ($groupHandler->isStudent() || $groupHandler->isParentOfChild($this->arg[1])) {
+                elseif ($groupHandler->isStudent() || $groupHandler->isParentOfChild($userId)) {
                     $canStudentReview = true;
                 }
 			}
