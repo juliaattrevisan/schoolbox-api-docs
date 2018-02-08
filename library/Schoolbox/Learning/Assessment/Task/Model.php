@@ -105,8 +105,8 @@ class Model extends AbstractAssessment
 
         // The authoritative task feedback is always the latest one
         return $publishedOnly
-            ? $participant->findMostRecentPublishedFeedback()
-            : $participant->findMostRecentFeedback();
+            ? $participant->findMostRecentInstructorGivenPublishedFeedback()
+            : $participant->findMostRecentInstructorGivenFeedback();
     }
 
     /**

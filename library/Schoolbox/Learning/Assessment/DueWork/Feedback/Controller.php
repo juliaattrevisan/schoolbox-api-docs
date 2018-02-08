@@ -100,7 +100,7 @@ class Controller extends Base
      */
     public function postParticipantFeedback(Participant $participant)
     {
-        $mostRecentFeedback = $participant->findMostRecentFeedback();
+        $mostRecentFeedback = $participant->findMostRecentInstructorGivenFeedback();
         $post               = $this->getRequest()->post->getArrayCopy();
 
         try {
@@ -210,7 +210,7 @@ class Controller extends Base
      */
     public function postResponseFeedback(Participant $participant, DueWork\Response\Model $response)
     {
-        $mostRecentFeedback = $participant->findMostRecentFeedback();
+        $mostRecentFeedback = $participant->findMostRecentInstructorGivenFeedback();
         $post               = $this->getRequest()->post->getArrayCopy();
 
         /* If this is a self-assessment or self reflection, also set submitted_at on the Response

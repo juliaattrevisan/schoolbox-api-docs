@@ -275,7 +275,7 @@ class Participant
      *
      * @return null|IFeedback
      */
-    public function findMostRecentFeedback()
+    public function findMostRecentInstructorGivenFeedback(): ?IFeedback
     {
         /** @var IFeedback $mostRecentFeedback */
         $mostRecentFeedback = null;
@@ -297,7 +297,7 @@ class Participant
      *
      * @return null|IFeedback
      */
-    public function findMostRecentPublishedFeedback()
+    public function findMostRecentInstructorGivenPublishedFeedback(): ?IFeedback
     {
         /** @var IFeedback $mostRecentFeedback */
         $mostRecentFeedback = null;
@@ -309,6 +309,28 @@ class Participant
             }
         }
         return $mostRecentFeedback;
+    }
+
+
+    /**
+     * Find the most recent self-assessed Feedback for an Assessment for this Participant
+     *
+     * @return null|IFeedback
+     */
+    public function findMostRecentSelfAssessedFeedback(): ?IFeedback
+    {
+        return null;
+    }
+
+
+    /**
+     * Find the most recent self-assessed published Feedback for an Assessment for this Participant
+     *
+     * @return null|IFeedback
+     */
+    public function findMostRecentSelfAssessedPublishedFeedback(): ?IFeedback
+    {
+        return null;
     }
 
 

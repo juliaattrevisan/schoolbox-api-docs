@@ -270,8 +270,8 @@ class TaskTest extends TestCase
 
         /* The most recent feedback is published
          */
-        $this->assertEquals(883, $task->getParticipant($this->hodes)->findMostRecentFeedback()->getId());
-        $this->assertEquals(883, $task->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getId());
+        $this->assertEquals(883, $task->getParticipant($this->hodes)->findMostRecentInstructorGivenFeedback()->getId());
+        $this->assertEquals(883, $task->getParticipant($this->hodes)->findMostRecentInstructorGivenPublishedFeedback()->getId());
     }
 
 
@@ -313,14 +313,14 @@ class TaskTest extends TestCase
 
         /* The most recent feedback was published 2016-09-15 01:27:33
          */
-        $this->assertEquals(883, $task->getParticipant($this->hodes)->findMostRecentFeedback()->getId());
-        $this->assertEquals(883, $task->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getId());
+        $this->assertEquals(883, $task->getParticipant($this->hodes)->findMostRecentInstructorGivenFeedback()->getId());
+        $this->assertEquals(883, $task->getParticipant($this->hodes)->findMostRecentInstructorGivenPublishedFeedback()->getId());
 
         /* Most recent feedback has a normalised mark of null
          * Tasks always return null for normalised marks
          */
-        $this->assertEquals(null, $task->getParticipant($this->hodes)->findMostRecentFeedback()->getNormalisedMark());
-        $this->assertEquals(true, $task->getParticipant($this->hodes)->findMostRecentFeedback()->isPublished());
+        $this->assertEquals(null, $task->getParticipant($this->hodes)->findMostRecentInstructorGivenFeedback()->getNormalisedMark());
+        $this->assertEquals(true, $task->getParticipant($this->hodes)->findMostRecentInstructorGivenFeedback()->isPublished());
     }
 
 
@@ -353,14 +353,14 @@ class TaskTest extends TestCase
 
         /* The most recent feedback was published 2016-09-15 01:27:33
          */
-        $this->assertEquals(883, $task->getParticipant($this->hodes)->findMostRecentFeedback()->getId());
-        $this->assertEquals(883, $task->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getId());
+        $this->assertEquals(883, $task->getParticipant($this->hodes)->findMostRecentInstructorGivenFeedback()->getId());
+        $this->assertEquals(883, $task->getParticipant($this->hodes)->findMostRecentInstructorGivenPublishedFeedback()->getId());
 
         /* Most recent feedback has a normalised mark of null
          * Tasks always return null for normalised marks
          */
-        $this->assertEquals(null, $task->getParticipant($this->hodes)->findMostRecentFeedback()->getNormalisedMark());
-        $this->assertEquals(true, $task->getParticipant($this->hodes)->findMostRecentFeedback()->isPublished());
+        $this->assertEquals(null, $task->getParticipant($this->hodes)->findMostRecentInstructorGivenFeedback()->getNormalisedMark());
+        $this->assertEquals(true, $task->getParticipant($this->hodes)->findMostRecentInstructorGivenFeedback()->isPublished());
     }
 }
 

@@ -598,13 +598,13 @@ class DueWorkTest extends TestCase
         /* The most recent feedback is the unpublished one
          * This is 3385 and its currently drafted normalised mark of -3
          */
-        $this->assertEquals(4223, $dueWork->getParticipant($this->hodes)->findMostRecentFeedback()->getId());
-        $this->assertEquals(37, $dueWork->getParticipant($this->hodes)->findMostRecentFeedback()->getNormalisedMark());
+        $this->assertEquals(4223, $dueWork->getParticipant($this->hodes)->findMostRecentInstructorGivenFeedback()->getId());
+        $this->assertEquals(37, $dueWork->getParticipant($this->hodes)->findMostRecentInstructorGivenFeedback()->getNormalisedMark());
 
         /* Published Marks exist in 3385, which was published 2016-08-03 14:15:16 (which is
          * also after $submission was spawned on 2016-08-01 09:00:00)
          */
-        $this->assertEquals(3385, $dueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getId());
+        $this->assertEquals(3385, $dueWork->getParticipant($this->hodes)->findMostRecentInstructorGivenPublishedFeedback()->getId());
     }
 
 
@@ -736,15 +736,15 @@ class DueWorkTest extends TestCase
 
         /* The most recently published feedback is 4236
          */
-        $this->assertEquals(4236, $dueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getId());
+        $this->assertEquals(4236, $dueWork->getParticipant($this->hodes)->findMostRecentInstructorGivenPublishedFeedback()->getId());
 
         /* The most recent feedback is also 4236
          */
-        $this->assertEquals(4236, $dueWork->getParticipant($this->hodes)->findMostRecentFeedback()->getId());
+        $this->assertEquals(4236, $dueWork->getParticipant($this->hodes)->findMostRecentInstructorGivenFeedback()->getId());
 
         /* The mark for hodes should be 100
          */
-        $this->assertEquals(100, $dueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getNormalisedMark());
+        $this->assertEquals(100, $dueWork->getParticipant($this->hodes)->findMostRecentInstructorGivenPublishedFeedback()->getNormalisedMark());
     }
 
 
@@ -826,15 +826,15 @@ class DueWorkTest extends TestCase
 
         /* The most recently published feedback is 4223
          */
-        $this->assertEquals(4223, $dueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getId());
+        $this->assertEquals(4223, $dueWork->getParticipant($this->hodes)->findMostRecentInstructorGivenPublishedFeedback()->getId());
 
         /* The most recent feedback is also 4223
          */
-        $this->assertEquals(4223, $dueWork->getParticipant($this->hodes)->findMostRecentFeedback()->getId());
+        $this->assertEquals(4223, $dueWork->getParticipant($this->hodes)->findMostRecentInstructorGivenFeedback()->getId());
 
         /* The mark for hodes should be 37
          */
-        $this->assertEquals(37, $dueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getNormalisedMark());
+        $this->assertEquals(37, $dueWork->getParticipant($this->hodes)->findMostRecentInstructorGivenPublishedFeedback()->getNormalisedMark());
     }
 
 }

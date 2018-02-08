@@ -157,7 +157,7 @@ class Model extends AbstractAssessment
         }
 
         // One or more responses and no feedback ?
-        $latestPublishedFeedback = $participant->findMostRecentPublishedFeedback();
+        $latestPublishedFeedback = $participant->findMostRecentInstructorGivenPublishedFeedback();
         if (!$latestPublishedFeedback) {
             return true;
         }
@@ -309,8 +309,8 @@ class Model extends AbstractAssessment
 
         // DueWork takes the mark from latest feedback
         return $publishedOnly
-            ? $participant->findMostRecentPublishedFeedback()
-            : $participant->findMostRecentFeedback();
+            ? $participant->findMostRecentInstructorGivenPublishedFeedback()
+            : $participant->findMostRecentInstructorGivenFeedback();
     }
 
 

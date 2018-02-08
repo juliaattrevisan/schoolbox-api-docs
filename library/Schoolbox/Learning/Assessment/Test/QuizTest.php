@@ -412,21 +412,21 @@ class QuizTest extends TestCase
 
         /* The most recent feedback is 99759
          */
-        $this->assertEquals(99759, $quiz->getParticipant($this->bsalem)->findMostRecentFeedback()->getId());
+        $this->assertEquals(99759, $quiz->getParticipant($this->bsalem)->findMostRecentInstructorGivenFeedback()->getId());
 
         /* The most recent feedback is also published
          */
-        $this->assertEquals(99759, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback()->getId());
+        $this->assertEquals(99759, $quiz->getParticipant($this->bsalem)->findMostRecentInstructorGivenPublishedFeedback()->getId());
 
         /* Quiz's Normalised Mark is derived. It does not use the getter/setter
          * for Normalised Mark like the other Assessables
          */
-        $this->assertNotEquals(83, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback()->getNormalisedMark());
+        $this->assertNotEquals(83, $quiz->getParticipant($this->bsalem)->findMostRecentInstructorGivenPublishedFeedback()->getNormalisedMark());
 
         /* Test its derived stuff instead
          * 7 / 20 = 35.0
          */
-        $this->assertEquals(35.0, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback()->getNormalisedMark());
+        $this->assertEquals(35.0, $quiz->getParticipant($this->bsalem)->findMostRecentInstructorGivenPublishedFeedback()->getNormalisedMark());
     }
 
 
@@ -633,19 +633,19 @@ class QuizTest extends TestCase
 
         /* The most recent feedback is 99762
          */
-        $this->assertEquals(99762, $quiz->getParticipant($this->bsalem)->findMostRecentFeedback()->getId());
+        $this->assertEquals(99762, $quiz->getParticipant($this->bsalem)->findMostRecentInstructorGivenFeedback()->getId());
 
         /* The most recent feedback is also published
          */
-        $this->assertEquals(99762, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback()->getId());
+        $this->assertEquals(99762, $quiz->getParticipant($this->bsalem)->findMostRecentInstructorGivenPublishedFeedback()->getId());
 
         /* Quiz's Normalised Mark is derived. It does not use the getter/setter
          * for Normalised Mark like the other Assessables
          */
-        $this->assertNotEquals(83, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback()->getNormalisedMark());
+        $this->assertNotEquals(83, $quiz->getParticipant($this->bsalem)->findMostRecentInstructorGivenPublishedFeedback()->getNormalisedMark());
 
         /* Test its derived stuff instead
          */
-        $this->assertEquals(60, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback()->getNormalisedMark());
+        $this->assertEquals(60, $quiz->getParticipant($this->bsalem)->findMostRecentInstructorGivenPublishedFeedback()->getNormalisedMark());
     }
 }

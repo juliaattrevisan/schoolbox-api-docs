@@ -140,7 +140,7 @@ class Controller extends Base
         }
 
         // The zone which contains the files
-        $latestFeedback    = $participant->findMostRecentFeedback();
+        $latestFeedback    = $participant->findMostRecentInstructorGivenFeedback();
         $attachZoneFactory = new Attachzone\Factory();
         $attachZone        = $attachZoneFactory->buildForDueWorkFeedback($latestFeedback);
 
@@ -255,7 +255,7 @@ class Controller extends Base
         if ($response) {
             $latestFeedback = $response->findMostRecentFeedback();
         }
-        $latestFeedback = $latestFeedback ?? $participant->findMostRecentFeedback();
+        $latestFeedback = $latestFeedback ?? $participant->findMostRecentInstructorGivenFeedback();
 
         // The zone which contains the files
         $attachZoneFactory = new Attachzone\Factory();

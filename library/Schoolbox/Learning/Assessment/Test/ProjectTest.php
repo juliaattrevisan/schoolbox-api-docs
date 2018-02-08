@@ -224,17 +224,17 @@ class ProjectTest extends TestCase
 
         /* I should be able to access each one's normalised mark from here
          */
-        $this->assertEquals(null, $projectTask->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getNormalisedMark());
-        $this->assertEquals(100, $projectDueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getNormalisedMark());
+        $this->assertEquals(null, $projectTask->getParticipant($this->hodes)->findMostRecentInstructorGivenPublishedFeedback()->getNormalisedMark());
+        $this->assertEquals(100, $projectDueWork->getParticipant($this->hodes)->findMostRecentInstructorGivenPublishedFeedback()->getNormalisedMark());
 
         /* Quiz's Normalised Mark is derived. It does not use the getter/setter
          * for Normalised Mark like the other Assessables
          */
-        $this->assertNotEquals(83, $projectQuiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback()->getNormalisedMark());
+        $this->assertNotEquals(83, $projectQuiz->getParticipant($this->bsalem)->findMostRecentInstructorGivenPublishedFeedback()->getNormalisedMark());
 
         /* Test its derived stuff instead
          */
-        $this->assertEquals(60, $projectQuiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback()->getNormalisedMark());
+        $this->assertEquals(60, $projectQuiz->getParticipant($this->bsalem)->findMostRecentInstructorGivenPublishedFeedback()->getNormalisedMark());
     }
 
 
