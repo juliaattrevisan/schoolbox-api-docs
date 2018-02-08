@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\User;
 
 class GridGenerator
@@ -128,8 +129,9 @@ class GridGenerator
      */
     public function applyStudentMarkForResponse(bool $publishedOnly, int $responseId): Rubric
     {
-        $pb = $this->buildDefaultPb();
-        $pb->equals('sr.student_submission_id', $responseId);
+        $pb = $this->buildDefaultPb()
+                   ->equals('sr.student_submission_id', $responseId)
+                   ->equals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
 
         if ($publishedOnly) {
             $pb->notNull('sr.published_at');
