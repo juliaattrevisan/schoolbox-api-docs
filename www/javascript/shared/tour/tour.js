@@ -1,5 +1,5 @@
-"use strict";
 $(function () {
+    "use strict";
 
     /**
      * Custom events that can be inserted into the `tour_step_event` and triggered on step open or close
