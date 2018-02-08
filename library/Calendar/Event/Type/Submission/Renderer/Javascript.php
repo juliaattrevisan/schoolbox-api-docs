@@ -162,6 +162,7 @@ class Javascript extends Base
             ]
         );
 
+        $moreDetailsLink = '';
         if ($this->getUser()->getRole()->isStaff()) {
             $moreDetailsLink = $this->getRouteIfAuthorized(
                 'learningAssessment.getAssessment',
@@ -170,7 +171,8 @@ class Javascript extends Base
                     'assessmentId' => $this->getEvent()->getEventId(),
                 ]
             );
-        } else {
+        }
+        if (!$moreDetailsLink) {
             $moreDetailsLink = $this->getRouteIfAuthorized(
                 'learningAssessment.getSummary',
                 [

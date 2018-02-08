@@ -105,7 +105,7 @@ class Controller extends BaseController
         });
 
         // Load participants into imported assessments
-        $imported = $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($imported);
+        $imported = $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($imported, false);
 
         $data = [
             'assessmentSpec'   => $assessmentSpec,

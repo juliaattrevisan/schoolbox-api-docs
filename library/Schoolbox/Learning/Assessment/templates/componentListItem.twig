@@ -1,42 +1,73 @@
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 
-{% set viewRoute = routeLookupIfAuthorized('learningAssessment.getAssessment', {assessmentId: assessable.id, assessment: assessable}) %}
+{# What action-tot routes are available to this user ? #}
+{% set statusRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessable.id, assessment: assessable}) %}
 {% if assessable is quiz %}
     {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessable.id, assessment: assessable}) %}
 {% else %}
     {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id, assessment: assessable}) %}
 {% endif %}
 {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id, assessment: assessable}) %}
+{% set isActionRoutes = statusRoute or modifyRoute or deleteRoute %}
 
-<li id="component-assessment-{{ assessable.id }}" class="actions-small-1" data-assessment="{{ assessable.id }}" data-assessment-title="{{  assessable.title }}">
+<li
+    id="component-assessment-{{ assessable.id }}"
+    class="{% block actionsClass %}{% if isActionRoutes %}actions-small-1{% endif %}{% endblock %}"
+    data-assessment="{{ assessable.id }}"
+    data-assessment-title="{{  assessable.title }}"
+>
     <div class="list-item">
         <div class="card small-12">
-            {% if assessable.isParticipant(USER) or canWrite %}
-                {% set href = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessable.id, assessment: assessable, studentId: USER.id}) %}
-            {%  else %}
-                {% set href = routeLookupIfAuthorized('learningAssessment.getPreview', {assessmentId: assessable.id, assessment: assessable}) %}
+
+            {# You can see an assessment, but not visit its summary page if you are a parent, with a child participating, but system is configured to hide due work details #}
+            {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
+                assessmentId: assessable.id,
+                assessment: assessable,
+                studentId: USER.id,
+                student: USER
+            }) %}
+            {# No route for own participation, what about children ? #}
+            {% if not viewRoute %}
+                {% for child in USER.children if not viewRoute %}
+                    {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
+                        assessmentId: assessable.id,
+                        assessment: assessable,
+                        studentId: child.id,
+                        student: child
+                    }) %}
+                {% endfor %}
             {% endif %}
-            {% if viewRoute %}<a href="{{ href }}">{% endif %}
+
+            {# TODO SA-5769 this should not be necessary #}
+            {% if not viewRoute %}
+                {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getPreview', {
+                    assessmentId: assessable.id,
+                    assessment: assessable
+                }) %}
+            {% endif %}
+
+
+            {% if viewRoute %}<a href="{{ viewRoute }}">{% endif %}
                 <h3 data-assessment-title>{{ assessable.title }}</h3>
             {% if viewRoute %}</a>{% endif %}
             <p class="meta">{{ dueDate.dueDate(assessable, USER) }}</p>
         </div>
     </div>
-    {% if (modifyRoute or deleteRoute) and not readOnly %}
-        <nav><a href="#" class="icon-more" data-dropdown="duework-options{{ assessable.id }}" aria-expanded="false" title="Actions"></a></nav>
+    <nav>
+        {# TODO known bug SA-5984. Participant progress icon renders incorrectly if part of multiple actions. #}
+        {% block extraNavItems %}{% endblock %}
+        {% if isActionRoutes %}
+            <a href="#" class="icon-more" data-dropdown="duework-options{{ assessable.id }}" aria-expanded="false" title="Actions"></a>
+        {% endif %}
+    </nav>
+    {% if isActionRoutes %}
         <ul data-dropdown-content class="f-dropdown" id="duework-options{{ assessable.id }}">
             {% spaceless %}
-                {% if modifyRoute %}
-                <li><a class="icon-progress" href="{{ viewRoute }}">View Status</a></li>
-                <li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify</a></li>
-                {% endif %}
-                {% if deleteRoute %}
-                    <li><a class="icon-delete" href="{{ deleteRoute }}" data-action="delete" data-id="{{ assessable.id }}">Delete</a></li>
-                {% endif %}
+                {% if statusRoute %}<li><a class="icon-progress" href="{{ statusRoute }}">View Status</a></li>{% endif %}
+                {% if modifyRoute %}<li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify</a></li>{% endif %}
+                {% if deleteRoute %}<li><a class="icon-delete" href="{{ deleteRoute }}" data-action="delete" data-id="{{ assessable.id }}">Delete</a></li>{% endif %}
             {% endspaceless %}
         </ul>
-    {% else %}
-        <nav>{% block extraNavItems %}{% endblock %}</nav>
     {% endif %}
 
     {% if not compact %}

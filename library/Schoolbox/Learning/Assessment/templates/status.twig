@@ -32,6 +32,8 @@
             <h1>Status of {{ assessment.title }}</h1>
         </div>
     </div>
+
+    {# TODO Known bug SA-5985 - this nav tot should not appear if no actions are available (eg user is staff with read access only) #}
     <nav>
         <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
     </nav>

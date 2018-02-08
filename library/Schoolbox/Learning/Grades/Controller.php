@@ -29,6 +29,13 @@ use Schoolbox\Filter\Page as FilterPage;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
 use Schoolbox\Learning\Assessment\DueWork;
+use Alaress\Database\Predicate\InvalidColumnException;
+use LogicException;
+use TypeError;
+use UnexpectedValueException;
+use DomainException;
+use InvalidArgumentException;
+use ReflectionException;
 
 class Controller extends Base
 {
@@ -143,23 +150,35 @@ class Controller extends Base
      * @param Term\Model $term
      * @throws DefinitionException If a required mapper join is not defined
      * @throws ServiceNotFound If unable to locate HTML web Output
+     * @throws TypeError If a PredicateBuilder method is called with wrong data type
+     * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
+     * @throws LogicException If cyclic graph detected during translation
+     * @throws UnexpectedValueException If unable to merge project participant collections
      */
     public function getGrades(User $viewee, Term\Model $term)
     {
         // Add folders with response or feedback
         $folders = $this->findFoldersWithStudentInteractions($viewee, $term);
 
+        // Get all assessments for this user in the specified term, grouped by folder
+        $assessmentsPerFolder = $this->assessmentMapperProxy
+            ->findAllByStudent($viewee, false, $term)
+            ->filter(function (IAssessable $a) use ($viewee) {
+                return $a->isParticipant($viewee);
+            })
+            ->groupByCallback(function (IAssessable $assessment) {
+                return $assessment->getBaseContext()->getFolder()->getId();
+            });
+
+        /** @var GenericCollection|Folder\Model[] $folders */
+        $folders = $folders->filter(function (Folder\Model $folder) use ($assessmentsPerFolder) {
+            return $assessmentsPerFolder->keyExists($folder->getId());
+        });
+
         // Load Teachers
         foreach($folders as $folder) {
             $folder->loadTeachers();
         }
-
-        // Get all assessments for this user in the specified term, grouped by folder
-        $assessmentsPerFolder = $this->assessmentMapperProxy
-                                     ->findAllByStudent($viewee, false, $term)
-                                     ->groupByCallback(function (IAssessable $assessment) {
-                                         return $assessment->getBaseContext()->getFolder()->getId();
-                                     });
 
         $showOverallGrade = $this->getConfigLoader()
                                  ->get('show_overall_grade');
@@ -175,7 +194,6 @@ class Controller extends Base
                 $markbooks->setOffset($folderId, new Markbook($assessments, $this->defaultGradeGroup, $this->getUser()));
             }
         }
-
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/summary.twig', [
             'student'          => $viewee,
@@ -205,6 +223,8 @@ class Controller extends Base
      * @throws DefinitionException If specified mapper join is not defined
      * @throws Filter\BrokenFilterException If a injected filter is unable to be processed
      * @throws \Schoolbox\Mapper\Exception If a database column alias is incorrect
+     * @throws LogicException If cyclic graph detected
+     * @throws UnexpectedValueException If unable to merge student collections
      */
     public function getGradesForSubject(User $viewee, Term\Model $term, Folder\Model $subject)
     {
@@ -234,10 +254,8 @@ class Controller extends Base
                 AssessmentFilters\TemporalState\Definition::KEY_CLOSED,
             ]
         ];
-        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
-        $assessments   = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
-        $assessments   = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, $viewee);
-        $markbook      = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
+        $assessments = $this->findByFiltersWithParticipants($filters, $viewee);
+        $markbook    = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
 
         // Load conversation history (this also implicitly loads folder's teachers)
         $conversation = new Conversation($this->getConfigLoader(), $viewee, $subject);
@@ -264,19 +282,20 @@ class Controller extends Base
         );
     }
 
-
     /**
      * @param User         $viewee
      * @param Term\Model   $term
      * @param Folder\Model $subject
-     * @throws \InvalidArgumentException If unable to find the filter mapper class
-     * @throws \ReflectionException If the specified class does not exist
-     * @throws \DomainException If this class has not defined what entity it is filtering
+     * @throws InvalidArgumentException If unable to find the filter mapper class
+     * @throws ReflectionException If the specified class does not exist
+     * @throws DomainException If this class has not defined what entity it is filtering
      * @throws Filter\BrokenFilterException If a filter is unable to be processed
      * @throws ServiceNotFound If unable to locate HTML web Output
      * @throws DefinitionException If specified mapper join is not defined
-     * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
+     * @throws LogicException If cyclic graph detected during assessment translation
+     * @throws UnexpectedValueException If unable to merge student collections
      * @todo convert to a GET route
+     *
      */
     public function postReport(User $viewee, Term\Model $term, Folder\Model $subject)
     {
@@ -309,11 +328,7 @@ class Controller extends Base
             ]
         ]);
 
-        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
-
-        // Fetch assessments & participants
-        $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
-        $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments);
+        $assessments = $this->findByFiltersWithParticipants($filters, $viewee);
 
         // Show the graph for:
         // * instructors (always)
@@ -495,6 +510,30 @@ class Controller extends Base
         });
 
         return $this->rubricMapper->getLongitudinal($dueWorksWithVisibleMarks, $student);
+    }
+
+
+    /**
+     * @param array $filters
+     * @param User  $viewee
+     * @return GenericCollection|IAssessable[]|static
+     * @throws DomainException If MarkType is invalid for the assessment, or user has interaction but not participant record
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws LogicException If cyclic graph detected
+     * @throws DefinitionException If unable to locate a specified mapper join
+     * @throws UnexpectedValueException If unable to merge student collections
+     */
+    private function findByFiltersWithParticipants(array $filters, User $viewee)
+    {
+        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
+
+        // Fetch assessments & participants
+        $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
+        $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, false, $viewee)
+                                                   ->filter(function (IAssessable $a) use ($viewee) {
+                                                       return $a->isParticipant($viewee);
+                                                   });
+        return $assessments;
     }
 
 

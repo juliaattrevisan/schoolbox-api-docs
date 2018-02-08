@@ -29,6 +29,7 @@ use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use PDO;
 use Schoolbox\Assessment\Participant\Plan;
 use UnderflowException;
+use Alaress\Database\Predicate\InvalidColumnException;
 
 /**
  * Class Mapper
@@ -553,8 +554,7 @@ class Mapper extends BaseMapper
      *
      * @return GenericCollection|Model[]
      * @throws BaseMapper\DefinitionException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \InvalidArgumentException
+     * @throws InvalidColumnException If Predicate builder caller with invalid column name
      */
     public function findForFolderAndParticipant(
         array $folderIds,
@@ -622,7 +622,13 @@ class Mapper extends BaseMapper
         if (0 === \count($idList)) {
             return $this->createCollection();
         }
-        $builder->in('id', $idList);
+        try {
+            $builder->in('id', $idList);
+        } catch (UnderflowException $e) {
+            // Should be impossible to trigger as we have checked for empty array. But handle here to simplify calling code.
+            return $this->createCollection();
+        }
+
         return $this->findByPredicatesForParticipant($builder, $participantUser, $options);
     }
 

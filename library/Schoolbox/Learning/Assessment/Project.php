@@ -18,6 +18,7 @@
 namespace Schoolbox\Learning\Assessment;
 
 use InvalidArgumentException;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
@@ -573,6 +574,24 @@ class Project extends AbstractAssessment implements AssessmentContext
         return $clone;
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function unsetUserParticipation(User $user): bool
+    {
+        // Remove from this project.
+        $userRemoved = parent::unsetUserParticipation($user);
+
+        // And remove from sub-assessables.
+        foreach ($this->assessables as $subAssessable) {
+            if ($subAssessable->unsetUserParticipation($user)) {
+                $userRemoved = true;
+            }
+        }
+        return $userRemoved;
+    }
+
     /* Getters/Setters
      */
 
@@ -585,10 +604,10 @@ class Project extends AbstractAssessment implements AssessmentContext
     }
 
     /**
-     * @param GenericCollection|IAssessable[] $assessables
+     * @param Collection|IAssessable[] $assessables
      * @return self
      */
-    public function setAssessables(GenericCollection $assessables)
+    public function setAssessables(Collection $assessables)
     {
         $this->assessables->replaceWith($assessables);
         return $this;

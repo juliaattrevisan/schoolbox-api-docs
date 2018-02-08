@@ -19,6 +19,7 @@ use Schoolbox\External\SubjectCollection;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use DomainException;
 
 class User implements JsonSerializable, ISoftDeletable
 {
@@ -199,6 +200,11 @@ class User implements JsonSerializable, ISoftDeletable
     protected $teacherCollection;
 
     /**
+     * @var GenericCollection|User[]
+     */
+    private $children;
+
+    /**
      * Build default empty objects so things don't explode
      */
     public function __construct()
@@ -208,6 +214,7 @@ class User implements JsonSerializable, ISoftDeletable
         $this->setConfigLoader(new ConfigLoader());
         $this->setLinkedUser(new Collection(array()));
         $this->setRole(new Role());
+        $this->children = new GenericCollection(self::class);
     }
 
     /**
@@ -963,15 +970,22 @@ class User implements JsonSerializable, ISoftDeletable
     /**
      * Is this user a parent of $child?
      *
-     * Requires that `loadParents()` has been called on $child.
+     * Requires that either:
+     * - `loadParents()` has been called on $child, or
+     * - this user is the current session user (and hence their children were loaded during session creation)
      *
      * @param  User $child
      * @return bool
      */
-    public function isParentOf(User $child)
+    public function isParentOf(User $child): bool
     {
         foreach ($child->getParents() as $parent) {
             if ($parent->getId() == $this->getId()) {
+                return true;
+            }
+        }
+        foreach ($this->children as $currentChild) {
+            if ($currentChild->getId() == $child->getId()) {
                 return true;
             }
         }
@@ -1310,6 +1324,27 @@ class User implements JsonSerializable, ISoftDeletable
      */
     public function setTeacherCollection($teacherCollection) {
         $this->teacherCollection = $teacherCollection;
+        return $this;
+    }
+
+
+    /**
+     * @return GenericCollection|User[]
+     */
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+
+    /**
+     * @param Collection|User[] $children
+     * @return $this
+     * @throws DomainException If collection has wrong member-item type
+     */
+    public function setChildren(Collection $children): self
+    {
+        $this->children->replaceWith($children);
         return $this;
     }
 }

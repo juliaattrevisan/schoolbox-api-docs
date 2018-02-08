@@ -182,7 +182,7 @@ class Module extends BaseModule
     private function preloadParticipant(array $params)
     {
         try {
-            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
+            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], false);
         }
         catch (\Schoolbox\Mapper\Exception $e) {
             throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
@@ -251,7 +251,7 @@ class Module extends BaseModule
         /* Die early when requested Assessment doesn't exist
          */
         try {
-            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
+            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], false);
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }

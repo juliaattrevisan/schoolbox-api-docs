@@ -27,35 +27,66 @@
             {% set completionGradient = (completionCount / studentCount) * 100 %}
         {% endif %}
 
+        {# What routes are available to this user ? #}
+        {% set statusRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
+        {% if assessment is quiz %}
+            {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessment.id, assessment: assessment}) %}
+        {% else %}
+            {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
+        {% endif %}
+        {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id, assessment: assessment}) %}
+        {% set isActionRoutes = statusRoute or modifyRoute or deleteRoute %}
+        {% set actionCount = (isActionRoutes ? 1 : 0) + (isParticipant ? 1 : 0) %}
+
         <li class="interact" data-unit-assessment="{{ assessment.id }}">
-            <div class="actions-small-1">
+            <div{% if actionCount %} class="actions-small-{{ actionCount }}"{% endif %}>
                 {% if canWrite %}
                     <div class="grip compact"></div>
                 {% endif %}
                 <div class="list-item">
                     <div class="small-12 compact card wrap-down">
-                        {##
-                        #  Special case for projects, to take teachers to status page rather than summary
-                        #}
-                        {% if canWrite and assessment is project %}
-                            {% set href = routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) %}
-                        {% else %}
-                            {% if isParticipant or canWrite %}
-                                {% set href = routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: USER.id}) %}
-                            {%  else %}
-                                {% set href = routeLookup('learningAssessment.getPreview', {assessmentId: assessment.id}) %}
-                            {% endif %}
+                        {% set title = attribute(locale, assessment.typeName|lower) is defined ? attribute(locale, assessment.typeName|lower).proper : assessment.typeName %}
+
+                        {# You can see an assessment, but not visit its summary page if you are a parent, with a child participating, but system is configured to hide due work details #}
+                        {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
+                            assessmentId: assessment.id,
+                            assessment: assessment,
+                            studentId: USER.id,
+                            student: USER
+                        }) %}
+
+                        {# No route for own participation, what about children ?#}
+                        {% if not viewRoute %}
+                            {% for child in USER.children if not viewRoute %}
+                                {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
+                                    assessmentId: assessment.id,
+                                    assessment: assessment,
+                                    studentId: child.id,
+                                    student: child
+                                }) %}
+                            {% endfor %}
                         {% endif %}
 
-                        <a title="{% if attribute(locale, assessment.typeName|lower) is defined %}
-                                    {{ attribute(locale, assessment.typeName|lower).proper }}
-                                  {% else %}
-                                    {{ assessment.typeName }}
-                                  {% endif %}"
-                           href="{{ href }}?{{ returnUrlName }}={{ encodedReturnUrl }}">
-                            <span class="{{ icon.renderClass(assessment) }}"></span>
-                            <p>{{ assessment.title }}</p>
-                        </a>
+                        {# TODO SA-5769 this should not be necessary #}
+                        {% if not viewRoute %}
+                            {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getPreview', {
+                                assessmentId: assessment.id,
+                                assessment: assessment
+                            }) %}
+                        {% endif %}
+
+                        {# Don't render a link if you are unable to view the details #}
+                        {% if viewRoute %}
+                            <a title="{{ title }}" href="{{ viewRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}">
+                                <span class="{{ icon.renderClass(assessment) }}"></span>
+                                <p>{{ assessment.title }}</p>
+                            </a>
+                        {% else %}
+                            <div title="{{ title }}">
+                                <span class="{{ icon.renderClass(assessment) }}"></span>
+                                <p>{{ assessment.title }}</p>
+                            </div>
+                        {% endif %}
 
                         {##
                          # Metadata
@@ -74,48 +105,27 @@
                         {% endif %}
                     </div>
                 </div>
-                <nav>
-                    {##
-                     # Buttons
-                     #
-                     # Teacher: sees nav
-                     # Participant: sees complete task button (if of course it's a task that's self-assessable)
-                     #}
-                    {% if canWrite %}
-                        <a href="#" class="icon-more" data-dropdown="options-task{{ assessment.id }}" aria-expanded="false" title="Actions"></a>
-                    {% elseif isParticipant %}
-                        {% include '@learningAssessment/fragments/progressTick.twig' with {
-                            assessment: assessment,
-                            participant: assessment.getParticipant(USER)
-                        } only %}
-                    {#{% elseif isParticipant and not (assessment is project) %}#}
-                        {#{% set participant                 = assessment.getParticipant(USER) %}#}
-                        {#{% set latestResponse              = participant.findMostRecentSubmittedResposne %}#}
-                        {#{% set isMarkedByTeacherAsComplete = latestResponse and latestResponse.teacherAssessed and latestResponse.markedComplete %}#}
-                        {#{% include '@learningAssessment/fragments/progressTick.twig' with {#}
-                        {#participant: participant,#}
-                        {#disabled: not assessment.isOpen or not assessment.isSelfAssessable or isMarkedByTeacherAsComplete#}
-                        {#} only %}#}
-                    {% endif %}
-                </nav>
-                {% if canWrite  %}
+
+                {% if isActionRoutes or isParticipant %}
+                    <nav>
+                        {% if isParticipant %}
+                            {# TODO known bug SA-5984. Participant progress icon renders incorrectly if part of multiple actions. #}
+                            {% include '@learningAssessment/fragments/progressTick.twig' with {
+                                assessment: assessment,
+                                participant: assessment.getParticipant(USER)
+                            } only %}
+                        {% endif %}
+                        {% if isActionRoutes %}
+                            <a href="#" class="icon-more" data-dropdown="options-task{{ assessment.id }}" aria-expanded="false" title="Actions"></a>
+                        {% endif %}
+                    </nav>
+                {% endif %}
+
+                {% if isActionRoutes %}
                     <ul data-dropdown-content class="f-dropdown" id="options-task{{ assessment.id }}">
-                        <li><a href="{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) }}" class="icon-progress">View Status</a></li>
-                        {% if assessment is quiz %}
-                            {% set url = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessment.id, assessment: assessment}) %}
-                            {% if url %}
-                                <li><a href="{{ url }}" class="icon-modify" title="Modify this {{ locale.assessment }}">Modify</a></li>
-                            {% endif %}
-                        {% else %}
-                            {% set url = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
-                            {% if url %}
-                                <li><a href="{{ url }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-modify" data-interaction="open_edit_task_form" title="Modify this {{ locale.assessment }}">Modify</a></li>
-                            {%  endif %}
-                        {% endif %}
-                        {% set url = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id, assessment: assessment}) %}
-                        {% if url %}
-                            <li><a href="{{ url }}" class="icon-delete" data-action="delete" title="Delete this {{ locale.assessment }}">Delete</a></li>
-                        {% endif %}
+                        {% if statusRoute %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
+                        {% if modifyRoute %}<li><a href="{{ modifyRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-modify" title="Modify this {{ locale.assessment }}">Modify</a></li>{% endif %}
+                        {% if deleteRoute %}<li><a href="{{ deleteRoute }}" class="icon-delete" data-action="delete" title="Delete this {{ locale.assessment }}">Delete</a></li>{% endif %}
                     </ul>
                 {% endif %}
             </div>

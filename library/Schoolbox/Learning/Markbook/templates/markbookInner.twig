@@ -47,12 +47,12 @@
                     {% for assessment in markbook.assessments %}
                     <th data-assessment="{{ assessment.id }}">
                         <div>
-                                <span>
-                                    <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}" title="{{ assessment.title }}">
-                                        {{ assessment.title }}
-                                    </a><br/>
-                                    <span class="meta">{{ assessment.typeName }}</span>
-                                </span>
+                            {# A teacher clicking an assessment from the markbook is most likely interested in seeing more granular results #}
+                            {% set href = routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) %}
+                            <span>
+                                <a href="{{ href }}" title="{{ assessment.title }}">{{ assessment.title }}</a><br/>
+                                <span class="meta">{{ assessment.typeName }}</span>
+                            </span>
                         </div>
                     </th>
                     {% endfor %}
@@ -113,9 +113,9 @@
                     </td>
 
                     {% for assessment in markbook.assessments %}
-                        <td class="column-{{ assessment.id }}" data-assessment="{{ assessment.id }}">
-                            {% if assessment.isParticipant(student) %}
-                                {% set participant = assessment.getParticipant(student) %}
+                        {% set participant = assessment.getParticipantIfExtant(student) %}
+                        <td class="column-{{ assessment.id }}{% if not participant %} excluded{% endif %}" data-assessment="{{ assessment.id }}">
+                            {% if participant %}
                                 {% if assessment is task %}
                                    {# An icon that shows if the student has attempted the task or not #}
                                     {% if studentCount < functionDegradeLimit %}
@@ -151,8 +151,6 @@
                                        href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"
                                        title="{{ participant.mostRecentFeedback.comment }}">{{ label }}</a>
                                 {% endif %}
-                            {% else %}
-                                –
                             {% endif %}
                         </td>
                     {% endfor %}

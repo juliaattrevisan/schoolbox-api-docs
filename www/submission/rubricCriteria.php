@@ -135,11 +135,11 @@ if (count($criterionCollection)) {
                     $this->setVar(
                         'CRITERION_ASSESSMENT_HREF',
                         $this->routeLookup(
-                            'learningAssessment.getAssessment',
+                            'learningAssessment.getUpdateAssessmentForm',
                             [
-                                'assessmentId' => $assessment['id']
+                                'assessmentId' => $assessment['id'],
                             ]
-                        )
+                        ) . "#rb[{$assessment['submission_box_id']}][criterion][{$crit->getId()}][on]"
                     );
                     $this->setVar('CRITERION_ASSESSMENT_TITLE', $assessment['title']);
                     $this->parse('criterion_assessment_block', 'criterion_assessment', true);

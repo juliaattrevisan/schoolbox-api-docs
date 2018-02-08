@@ -24,9 +24,6 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
     /** @var AssessmentDataSource */
     private $assessmentDataSource;
 
-    /** @var Participant\DataSource */
-    private $participantDataSource;
-
     /** @var Visibility */
     private $visibility;
 
@@ -37,20 +34,17 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
      * @param int                    $connectorId
      * @param User                   $user
      * @param AssessmentDataSource   $assessmentDataSource
-     * @param Participant\DataSource $participantDataSource
      * @param Visibility             $visibility
      */
     public function __construct(
         int $connectorId,
         User $user,
         AssessmentDataSource $assessmentDataSource,
-        Participant\DataSource $participantDataSource,
         Visibility $visibility
     ) {
         parent::__construct($connectorId, $user);
         $this->calendarHandler       = new Calendar();
         $this->assessmentDataSource  = $assessmentDataSource;
-        $this->participantDataSource = $participantDataSource;
         $this->visibility            = $visibility;
     }
 
@@ -101,11 +95,6 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
         } else {
             $assessables = $this->assessmentDataSource->findAllByStaff($this->getUser(), $term);
         }
-
-        // Having a staff role does not guarantee WRITE+ perm to a assessment's folder.
-        // We need to load the current user's participation so users without WRITE+ perm can see the assessment
-        // by virtue of their participation.
-        $this->participantDataSource->loadParticipationIntoAssessmentCollection($assessables, $this->getUser());
 
         foreach ($assessables as $assessment) {
             // Permission check to see the assessment

@@ -235,6 +235,7 @@ interface IAssessable extends ISoftDeletable
      *
      * @param User $user
      * @return bool
+     * @todo rename to isNonExcludedParticipant() for clarity
      */
     public function isParticipant(User $user);
 
@@ -258,6 +259,15 @@ interface IAssessable extends ISoftDeletable
      * @return Participant|null
      */
     public function getParticipantIfExtant(User $user);
+
+
+    /**
+     * Removes the specified user's participation from this IAssessment.
+     *
+     * @param User $user
+     * @return bool TRUE if user was removed, FALSE if user was not found
+     */
+    public function unsetUserParticipation(User $user): bool;
 
 
     /**

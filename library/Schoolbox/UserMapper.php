@@ -896,4 +896,17 @@ class UserMapper extends Mapper
         $query = "UPDATE event SET owner = :toId WHERE owner = :fromId";
         $this->database->query($query, $params);
     }
+
+
+    /**
+     * Finds a user by username
+     *
+     * @param string $username
+     * @param array  $options
+     * @return null|User
+     */
+    public function findByUsername(string $username, array $options = []): ?User
+    {
+        return $this->findByColumn('username', $username, $options)->first();
+    }
 }

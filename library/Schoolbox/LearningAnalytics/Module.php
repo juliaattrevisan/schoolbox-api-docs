@@ -128,10 +128,13 @@ class Module extends BaseModule
      * @var GenericCollection|UnitImplementation[] return['unitImplementations']
      * @var Term                                   return['term']
      * @var null|Folder                            return['selectedClassFolder']
-     * @throws MapperException
      * @throws ApplicationException
-     * @throws \InvalidArgumentException
+     * @throws MapperException
+     * @throws Mapper\DefinitionException
      * @throws ServiceNotFound
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \UnexpectedValueException
      */
     private function loadDependencies(array $params)
     {
@@ -227,7 +230,7 @@ class Module extends BaseModule
         $unitImplsInTerm = $this->getUnitImplementationMapper()->createCollection();
 
         // Load Participants into relevant Assessments
-        $dueAssessments = $this->getParticipantDataSource()->loadParticipationIntoAssessmentCollection($dueAssessments);
+        $dueAssessments = $this->getParticipantDataSource()->loadParticipationIntoAssessmentCollection($dueAssessments, false);
         foreach ($dueAssessments as $assessment) {
             $unitImplsInTerm->setOffset($assessment->getContext()->getId(), $assessment->getContext());
         }

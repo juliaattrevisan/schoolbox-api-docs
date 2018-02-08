@@ -18,10 +18,14 @@ use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Mapper\DefinitionException;
+use UnexpectedValueException;
+use Aura\Di\Exception\ServiceNotFound;
+use Aura\Router\Exception\RouteNotFound;
+use Schoolbox\Application\Exception as ApplicationException;
+use Aura\Web\Exception\InvalidStatusCode;
 
 abstract class Controller extends ListController implements IAssessmentController
 {
@@ -65,6 +69,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $this->termMapper      = $termMapper;
     }
 
+
     /**
      * Get the form for creating a new assessment in a particular context
      *
@@ -72,6 +77,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @level 165
      *
      * @param AssessmentContext $context
+     * @throws DomainException If user has interaction but not participant record
+     * @throws ServiceNotFound If unable to locate HTML web Output renderer in DI
+     * @throws DefinitionException If unable to locate a specified mapper join
+     * @throws UnexpectedValueException If unable to derive a project's participant collection
      */
     public function getCreateAssessmentForm(AssessmentContext $context)
     {
@@ -83,7 +92,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         // create a dynamic plan on the assessment to get started
         $assessment->getPlans()->add((new Plan($assessment))->setIsDynamic(true));
 
-        $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment);
+        $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, true);
 
         $data = $this->getAssessmentAsTwigArray($context, $assessment);
 
@@ -244,54 +253,37 @@ abstract class Controller extends ListController implements IAssessmentControlle
         }
     }
 
+
     /**
      * Redirect method
      *
-     * Sends you to a status or summary screen depending on who is
+     * Sends you to a status, summary, or preview screen depending on who is
      * currently logged in and what they are viewing
      *
      * @api GET /learning/assessment/:assessmentId
      * @param IAssessable $assessment
+     * @throws RouteNotFound If unable to generate a requested route
+     * @throws InvalidStatusCode If we attempt to set an invalid HTTP response code
+     * @deprecated
+     * @todo This route is very fragile. Its auth check (loggedIn) is potentially misleading.
+     *       Callers are the best informed on whether they wish to view a single user's intersection with
+     *       the assessment (summary), or a group of users (create/modify/markbook/status etc)
      */
     public function getAssessment(IAssessable $assessment)
     {
-        /* Check permission and default to page based on access level of user */
-
-        $folder = $assessment->getBaseContext()->getFolder();
-
-        $perms = $this->getAccess()->getFolderAccess($this->getUser(), $folder->getId());
-        /* If you're a staff, get redirected to a Status overview
-         */
-        if ($assessment->isSpecification() && $perms >= UserAccess::ACCESS_READ) {
-            // Preview assessment in specification context
-            $redirect = $this->getRouter()->generate('learningAssessment.getPreview', ['assessmentId' => $assessment->getId()]);
-        }
-        elseif ($perms >= UserAccess::ACCESS_WRITE) {
-            $redirect = $this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]);
-        }
-        elseif ($assessment->isParticipant($this->getUser())) {
-            // If you're a student, get redirected to the summary
-            $redirect = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId(), 'studentId' => $this->getUser()->getId()]);
-        }
-        elseif ($perms >= UserAccess::ACCESS_READ) {
-            $redirect = $this->getRouter()->generate('learningAssessment.getPreview', ['assessmentId' => $assessment->getId()]);
-        }
-
-        if($redirect) {
+        try {
+            $redirect      = $this->determineGetAssessmentRedirect($assessment);
             $redirOverride = $this->getRequest()->query->get(Redirect::RETURN_URL);
-
             if ($redirOverride) {
-                $redirect .= "?" . Redirect::RETURN_URL . "=" . $redirOverride;
+                $redirect .= '?' . Redirect::RETURN_URL . "={$redirOverride}";
             }
-
             $this->getResponse()->redirect->to($redirect);
-            return;
+        } catch (ApplicationException\Exception $e) {
+            // As far as this user is concerned, this resource does not exist.
+            $this->getResponse()->status->setCode(404);
         }
-
-        /* Everyone else sees The Nothing
-         */
-        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
     }
+
 
     /**
      * @param AssessmentContext $context
@@ -340,61 +332,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
         return $data;
     }
 
-
-    /**
-     * Return whether or not the given user is allowed to see the given participation
-     *
-     * @param User        $user
-     * @param Participant $participant
-     * @return bool
-     */
-    protected function userCanViewParticipation(User $user, Participant $participant)
-    {
-        $student = $participant->getUser();
-
-        // staff can always see
-        if ($user->getRole()->isStaff()) {
-            return true;
-        }
-
-        // student can see own
-        if ($student->getId() == $user->getId()) {
-            return true;
-        }
-
-        // filter guests, and other students
-        if (!$user->getRole()->isParent()) {
-            return false;
-        }
-
-        // parent can see ... IF config allows
-        if ($this->getConfigLoader()->get('restrict_student_submission')) {
-            return false;
-        }
-
-        // parents are limited to their own children (this is expensive so definitely do this last!)
-        $student->loadParents();
-        if ($student->isChildOf($user)) {
-            return true;
-        }
-
-        // failed all checks: bounce 'em!
-        return false;
-    }
-
-    /**
-     * Assert that the current session user is allowed to see the given participation
-     * TODO consider pushing this up into the module
-     *
-     * @param Participant $participant
-     */
-    protected function assertParticipantAccess(Participant $participant)
-    {
-        if (!$this->userCanViewParticipation($this->getUser(), $participant)) {
-            // could probably throw a 403, but that would give away the fact that, yes, the student is a participant of that assessment
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-        }
-    }
 
     /**
      * All the possible Mark Types to choose from for this particular $assessmentType
@@ -515,5 +452,79 @@ abstract class Controller extends ListController implements IAssessmentControlle
     protected function getTermMapper()
     {
         return $this->termMapper;
+    }
+
+
+    /**
+     * Returns a redirect route, or throw an exception.
+     *
+     * Order of preference:
+     * * A spec?          => Preview (must be able to simulate participation, but not create interactions)
+     * * Status viewable? => Status
+     * * A participant?   => Summary
+     * * Write access?    => Preview (so they may become a participant if desired)
+     *
+     * @param IAssessable $assessment
+     * @return string
+     * @throws RouteNotFound If unable to generate a requested route
+     * @throws ApplicationException\Exception If current user should not have permission to view this page
+     */
+    private function determineGetAssessmentRedirect(IAssessable $assessment): string
+    {
+        // Specs should only be previewed
+        $previewRoute = $this->getRouteIfAuthorized('learningAssessment.getPreview', [
+            'assessment'   => $assessment,
+            'assessmentId' => $assessment->getId(),
+        ], $this->getUser());
+        if ($previewRoute && $assessment->isSpecification()) {
+            // Preview assessment in specification context
+            return $previewRoute;
+        }
+
+
+        // Is status page viewable?
+        $statusRoute = $this->getRouteIfAuthorized('learningAssessment.getStatus', [
+            'assessment'   => $assessment,
+            'assessmentId' => $assessment->getId(),
+        ], $this->getUser());
+        if ($statusRoute) {
+            return $statusRoute;
+        }
+
+
+        // Participants should go to their summary page
+        if ($assessment->isParticipant($this->getUser())) {
+            $summaryRoute = $this->getRouteIfAuthorized('learningAssessment.getSummary', [
+                'assessmentId' => $assessment->getId(),
+                'assessment'   => $assessment,
+                'studentId'    => $this->getUser()->getId(),
+                'student'      => $this->getUser(),
+            ]);
+            if ($summaryRoute) {
+                return $summaryRoute;
+            }
+        }
+
+        // If a parent of a participant, go to the summary page of the first non-excluded participant, if parents can READ+ folder context
+        // TODO - this is not ideal. Consider a teacher has N children participating in the assessment
+        /** @var mixed[][] $children */
+        foreach ($this->getUser()->getChildren() as $child) {
+            $childSummaryRoute = $this->getRouteIfAuthorized('learningAssessment.getSummary', [
+                'assessmentId' => $assessment->getId(),
+                'assessment'   => $assessment,
+                'studentId'    => $child->getId(),
+                'student'      => $child,
+            ]);
+            if ($childSummaryRoute) {
+                return $childSummaryRoute;
+            }
+        }
+
+        // Does user have permission to view the preview route?
+        if ($previewRoute) {
+            return $previewRoute;
+        }
+
+        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
     }
 }

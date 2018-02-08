@@ -227,35 +227,25 @@ class Controller extends Assessment\Controller
      */
     public function getSummary(Participant $participant)
     {
-        $this->assertParticipantAccess($participant);
-
         /** @var Assessment\Project $project */
         $project = $participant->getAssessable();
         $student = $participant->getUser();
 
         $subActivities = $project->getAssessables();
 
-        // obtain user access level
-        $access = $this->getAccess()->getFolderAccess($this->getUser(), $project->getBaseContext()->getFolder()->getId());
-
-        if ($access < UserAccess::ACCESS_WRITE) {
-            // if you have read or less, you have additional restrictions
-            if ($project->getPublishAt()->isFuture()) {
-                // un-published projects are not visible to learners
-                throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_PERM_PAGE_VIEW);
-            }
-
-            // this isn't cached in the factory method... for some reason...
-            $now = Alaress_Date_Format::now();
-
-            // filter out any sub-activities that have not yet been published
-            $subActivities = $subActivities->filter(function (IAssessable $activity) use ($now) {
-                return $activity->getPublishAt()->lte($now);
+        // filter out any sub-activities that have not yet been published
+        $visibility    = new Assessment\Visibility($this->getAccess());
+        $now           = Alaress_Date_Format::now();
+        $mutator       = new Participant\AssessmentListMutator($this->getUser(), $visibility, $now, true);
+        $subActivities = $subActivities
+            ->map([$mutator, 'map'])
+            ->filter(function (IAssessable $activity) use ($student, $visibility, $mutator, $now) {
+                return $mutator->filter($activity)
+                    && $visibility->isVisibleToLearner($activity, $student, true, $now);
             });
 
-            // hack the project object for good measure
-            $project->setAssessables($subActivities);
-        }
+        // hack the project object for good measure
+        $project->setAssessables($subActivities);
 
 
         // Ideally make this an instance var instead of instantiating all the time

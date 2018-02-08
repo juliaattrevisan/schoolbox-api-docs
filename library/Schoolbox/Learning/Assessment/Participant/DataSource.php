@@ -125,16 +125,18 @@ class DataSource
      *       as it is more efficient when loading responses and feedbacks.
      *
      * @param IAssessable $assessment
-     * @param null|User   $user
+     * @param bool        $includeExcluded Should we include explicitly excluded participants in graph?
+     * @param null|User   $user            If specified, only load this user's interactions
      * @return IAssessable $assessment, with participation loaded.
-     * @throws UnexpectedValueException If unable to merge student collections
+     * @throws UnexpectedValueException If unable to derive project participant collection
      * @throws DomainException If user has interaction but not participant record
      * @throws DefinitionException If unable to locate a specified mapper join
      */
-    public function loadParticipationIntoAssessment(IAssessable $assessment, User $user = null): IAssessable
+    public function loadParticipationIntoAssessment(IAssessable $assessment, bool $includeExcluded, User $user = null): IAssessable
     {
         $collection = $this->loadParticipationIntoAssessmentCollection(
             new GenericCollection(IAssessable::class, [$assessment]),
+            $includeExcluded,
             $user
         );
         return $collection->first();
@@ -147,20 +149,21 @@ class DataSource
      * This includes records for responses and feedbacks for every participant in each assessment.
      *
      * @param Collection|IAssessable[] $assessments
-     * @param User|null                $user
+     * @param bool                     $includeExcluded Should we include explicitly excluded participants in graph?
+     * @param User|null                $user            If specified, only load this user's interactions
      * @return Collection|IAssessable[] $assessments, with participation loaded.
-     * @throws UnexpectedValueException If unable to merge student collections
-     * @throws DomainException If user has interaction but not participant record
      * @throws DefinitionException If unable to locate a specified mapper join
+     * @throws DomainException If user has interaction but not participant record
+     * @throws UnexpectedValueException If unable to derive project participant collection
      */
-    public function loadParticipationIntoAssessmentCollection(Collection $assessments, User $user = null): Collection
+    public function loadParticipationIntoAssessmentCollection(Collection $assessments, bool $includeExcluded, User $user = null): Collection
     {
         /** @var Collection|IAssessable[] $assessableWithDescendants */
         $assessableWithDescendants = new GenericCollection(IAssessable::class);
         $this->mergeSubAssessments($assessableWithDescendants, $assessments);
 
         // Load participants for all assessments, plus activities in projects
-        $this->findForAssessmentCollection($assessableWithDescendants, $user);
+        $this->findForAssessmentCollection($assessableWithDescendants, $includeExcluded, $user);
 
         // Insert project participant objects into any project
         foreach ($assessableWithDescendants as $assessable) {
@@ -183,24 +186,31 @@ class DataSource
      *
      * This method sets the participants into each $assessment
      *
-     * @param IAssessable[]|GenericCollection $assessments Indexed by assessment.id
-     * @param null|User                       $user
+     * @param IAssessable[]|GenericCollection $assessments     Indexed by assessment.id
+     * @param bool                            $includeExcluded Should we include explicitly excluded participants in graph?
+     * @param null|User                       $user            If specified, only load this user's interactions
      * @throws UnexpectedValueException If unable to merge student collections
      * @throws DomainException If user has interaction but not participant record
      * @throws DefinitionException If unable to locate a specified mapper join
      */
-    protected function findForAssessmentCollection(GenericCollection $assessments, User $user = null): void
+    protected function findForAssessmentCollection(GenericCollection $assessments, bool $includeExcluded, User $user = null): void
     {
         $this->loadPlansAndParticipants($assessments);
 
         $dynamicPlans = new GenericCollection(PlanObject::class);
         foreach ($assessments as $assessment) {
+            // Projects do not have persisted plans and participants.
+            if($assessment instanceof Project){
+                continue;
+            }
             $dynamicPlan = $assessment->getDynamicPlan();
             if ($dynamicPlan) {
                 $dynamicPlans->add($dynamicPlan);
             }
         }
 
+        // We do need excluded participants to be present to determine whether to whether to
+        // insert students as dynamic participants.
         $this->loadDynamicPlanParticipants($dynamicPlans);
 
         // Add Responses
@@ -215,14 +225,29 @@ class DataSource
             $this->feedbackDataSource->findForAssessmentCollection($assessments, $user)
         );
 
-        // Sort by name after all that
-        // TODO this won't work now that we have IAssessable->Plan->Participants. Should we cache on IAssessable?
-        // TODO probably should make this a view-layer responsibility.
-        // TODO You could do $twigContext[participants] = $assessable->getParticipants()->sort(SortableFunctionObject)
-//        foreach ($assessments as $assessment) {
-//            $participants = $assessment->getAllParticipants()->sortByCallback([$this, 'sortCallback']);
-//            $assessment->setAllParticipants($participants);
-//        }
+        if (!$includeExcluded) {
+            // But we may wish to then remove these participants so they are not present in the domain graph
+            $this->removeExcludedParticipants($assessments);
+        }
+    }
+
+
+    /**
+     * Strips any excluded participants from assessment plans so that they are not present in domain graph.
+     *
+     * @param GenericCollection|IAssessable[] $assessables
+     */
+    private function removeExcludedParticipants(GenericCollection $assessables): void
+    {
+        foreach ($assessables as $assessable) {
+            foreach ($assessable->getPlans() as $plan) {
+                foreach ($plan->getParticipants() as $idx => $participant) {
+                    if ($participant->isExcluded()) {
+                        $plan->getParticipants()->offsetUnset($idx);
+                    }
+                }
+            }
+        }
     }
 
 
@@ -232,25 +257,15 @@ class DataSource
      */
     private function loadDynamicPlanParticipants(GenericCollection $dynamicPlans): void
     {
-        // TODO SA-5354 - fetch excluded users, grouped by assessment
-        /** @var User[][]|Collection $excludedUsers Indexed by assessment.id, user.id */
-        $excludedUsers = new Collection();
-
-
         // Load dynamic participants into dynamic plans
         foreach ($dynamicPlans as $dynamicPlan) {
             $assessment           = $dynamicPlan->getAssessable();
             $explicitParticipants = $assessment->getAllParticipants();
-            $excludedUsers        = $excludedUsers[$assessment->getId()];
 
             // It's acceptable to findAllStudents in a loop for now, because the list is cached
             foreach ($this->findAllStudentsForAssessment($assessment) as $user) {
-                // Is this user already an explicit participant?
+                // Is this user already an explicit participant? (Either an inclusion or exclusion)
                 if ($explicitParticipants->keyExists($user->getId())) {
-                    continue;
-                }
-                // Is this user excluded?
-                if ($excludedUsers && $excludedUsers->keyExists($user->getId())) {
                     continue;
                 }
                 $dynamicPlan->getParticipants()[$user->getId()] = new ParticipantObject($user, $dynamicPlan);
@@ -424,7 +439,7 @@ class DataSource
 
 
     /**
-     * Loads all Plans and Participants into the Assessables
+     * Loads all Plans and Participants (including exclusions) into the Assessables
      *
      * @param IAssessable[]|GenericCollection $assessables Indexed by assessment.id
      * @throws DefinitionException If unable to locate a specified mapper join

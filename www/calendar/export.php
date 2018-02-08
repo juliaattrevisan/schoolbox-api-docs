@@ -127,18 +127,13 @@ try {
             $page = new SitePage(false);
             $page->setDi($kernel->getDependencyInjector());
 
-            /**
-             * @var MapperProxy $assessmentDataSource
-             * @var Participant\DataSource $participantDataSource
-             */
+            /** @var MapperProxy $assessmentDataSource */
             $assessmentDataSource  = $page->getDi()->get('assessmentDataSource');
-            $participantDataSource = $page->getDi()->get('participantDataSource');
             $visibility            = new Visibility(Access::getInstance());
             $api                   = new Calendar_Api_EventType_Submission_Schoolbox_Default(
                 getConnectorId(Calendar_Api_EventType_Submission_Schoolbox_Default::class),
                 $user,
                 $assessmentDataSource,
-                $participantDataSource,
                 $visibility
             );
             $filename = 'duework';

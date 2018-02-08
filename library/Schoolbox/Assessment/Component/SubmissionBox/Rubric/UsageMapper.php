@@ -112,14 +112,15 @@ class UsageMapper extends Schoolbox\Mapper {
      * This does not include deleted assessments.
      *
      * @param  int $criterionId
-     * @return array[] id: the assessment's ID, title: the assessment's title
+     * @return array[] id: the assessment's ID, title: the assessment's title, 'submission_box_id': the box's id
      */
     public function findUsage($criterionId)
     {
         $query = "
             SELECT DISTINCT
                 a.id,
-                a.title
+                a.title,
+                submission_box_id
             FROM {$this->getTable()} ru
             INNER JOIN {$this->getJoinSql('submission_box', 'ru', 'sb')}
             INNER JOIN {$this->getJoinSql('submission_box.assessmentModel', 'sb', 'a')}

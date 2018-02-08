@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning\Course\DataModel;
 
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DataModel\IAssessmentContextDataModel;
@@ -62,10 +63,10 @@ abstract class AbstractUnit implements ISoftDeletable, AssessmentContext, IAsses
     }
 
     /**
-     * @param GenericCollection|IAssessable[] $assessables
+     * @param Collection|IAssessable[] $assessables
      * @return static
      */
-    public function setAssessables(GenericCollection $assessables)
+    public function setAssessables(Collection $assessables)
     {
         $this->assessables->replaceWith($assessables);
         return $this;
