@@ -540,6 +540,15 @@ class External_Synergetic_User implements External_UserInterface
             $filters .= " AND StudentForm = :form";
         }
 
+        if ($this->config->get('external_synergetic_student_contact_types') === '') {
+            // No relationships were found, use the default values we had before introducing this feature
+            $studentContactTypes = ['SC1','SC2','SC3'];
+        } else {
+            $studentContactTypes = explode(',', $this->config->get('external_synergetic_student_contact_types'));
+        }
+
+        $contactTypes = Builder::getArrayBindings($studentContactTypes, 'types');
+
         // Now can build the query string
 
         $query = "
@@ -603,7 +612,7 @@ class External_Synergetic_User implements External_UserInterface
                             Semester.FileSemester = vStudentContactAllAddress.FileSemester AND
                             Semester.FileYear = vStudentContactAllAddress.FileYear AND
                             Semester.SystemCurrentFlag = 1
-            WHERE       StudentContactType IN ('SC1', 'SC2', 'SC3')
+            WHERE       StudentContactType IN ({$contactTypes['placeholders']})
                         {$filters}
             ORDER BY    StudentSurname, 
                         StudentID, 
@@ -695,7 +704,7 @@ class External_Synergetic_User implements External_UserInterface
                             Semester.FileSemester = vStudentContactAllAddress.FileSemester AND
                             Semester.FileYear = vStudentContactAllAddress.FileYear AND
                             Semester.SystemCurrentFlag = 1
-            WHERE       StudentContactType IN ('SC1', 'SC2', 'SC3') AND 
+            WHERE       StudentContactType IN ({$contactTypes['placeholders']}) AND 
                         StudentBoarder = 'B'
             ORDER BY    StudentSurname, 
                         StudentID, 
@@ -713,6 +722,15 @@ class External_Synergetic_User implements External_UserInterface
         if (!$this->isExternalIdValid($externalUserId)) {
             return [];
         }
+
+        if ($this->config->get('external_synergetic_student_contact_types') === '') {
+            // No relationships were found, use the default values we had before introducing this feature
+            $studentContactTypes = ['SC1','SC2','SC3'];
+        } else {
+            $studentContactTypes = explode(',', $this->config->get('external_synergetic_student_contact_types'));
+        }
+
+        $contactTypes = Builder::getArrayBindings($studentContactTypes, 'types');
 
         $query =
         "
@@ -745,7 +763,7 @@ class External_Synergetic_User implements External_UserInterface
                                 Semester.FileYear = a.FileYear AND
                                 Semester.SystemCurrentFlag = 1
             WHERE           StudentID = :externalId AND
-                            StudentContactType IN ('SC1', 'SC2', 'SC3')
+                            StudentContactType IN ({$contactTypes['placeholders']})
         ";
 
         $iteratorContacts = $this->getConnector()->getQueryIterator($query, ['externalId' => $externalUserId]);
@@ -948,7 +966,7 @@ class External_Synergetic_User implements External_UserInterface
 
         if ($this->config->get('external_synergetic_student_contact_types') === '') {
             // No relationships were found, use the default values we had before introducing this feature
-            $studentContactTypes = ['SC1','SC2'];
+            $studentContactTypes = ['SC1','SC2','SC3'];
         } else {
             $studentContactTypes = explode(',', $this->config->get('external_synergetic_student_contact_types'));
         }
