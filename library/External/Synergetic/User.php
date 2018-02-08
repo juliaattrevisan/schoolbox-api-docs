@@ -623,7 +623,7 @@ class External_Synergetic_User implements External_UserInterface
         // Now that we have created the query, time to shove it across to the database with
         // the appropriate parameters
 
-        $iteratorContacts = $this->getConnector()->getQueryIterator($query, $bindings);
+        $iteratorContacts = $this->getConnector()->getQueryIterator($query, array_merge($bindings, $contactTypes['bindings']));
 
         $contactList = [];
 
@@ -661,6 +661,15 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getStudentBoarderContactListExtended()
     {
+        if ($this->config->get('external_synergetic_student_contact_types') === '') {
+            // No relationships were found, use the default values we had before introducing this feature
+            $studentContactTypes = ['SC1','SC2','SC3'];
+        } else {
+            $studentContactTypes = explode(',', $this->config->get('external_synergetic_student_contact_types'));
+        }
+
+        $contactTypes = Builder::getArrayBindings($studentContactTypes, 'types');
+
         $query =
         "
             SELECT      StudentID,
@@ -710,6 +719,8 @@ class External_Synergetic_User implements External_UserInterface
                         StudentID, 
                         StudentContactType
         ";
+
+        $this->getConnector()->getQueryIterator($query, $contactTypes['bindings']);
 
         return $this->getConnector()->executeQuery($query)->fetchAll();
     }
@@ -766,7 +777,7 @@ class External_Synergetic_User implements External_UserInterface
                             StudentContactType IN ({$contactTypes['placeholders']})
         ";
 
-        $iteratorContacts = $this->getConnector()->getQueryIterator($query, ['externalId' => $externalUserId]);
+        $iteratorContacts = $this->getConnector()->getQueryIterator($query, array_merge($contactTypes['bindings'], ['externalId' => $externalUserId]));
 
         $contactList = [];
 
