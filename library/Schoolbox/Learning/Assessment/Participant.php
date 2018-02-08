@@ -15,6 +15,7 @@ namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Feedback\InstructorGivenFilter;
+use Schoolbox\Learning\Assessment\Feedback\PublishedFilter;
 use Schoolbox\Learning\Assessment\Feedback\SelfAssessmentFilter;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use \Schoolbox\User;
@@ -296,8 +297,8 @@ class Participant
     public function findMostRecentInstructorGivenPublishedFeedback(): ?IFeedback
     {
         return $this->allFeedbacks
+            ->filter(new PublishedFilter())
             ->filter(new InstructorGivenFilter())
-            ->filterBy('isPublished', true)
             ->sortBy('updatedAt', 'desc')
             ->first();
     }
@@ -325,8 +326,8 @@ class Participant
     public function findMostRecentSelfAssessedPublishedFeedback(): ?IFeedback
     {
         return $this->allFeedbacks
+            ->filter(new PublishedFilter())
             ->filter(new SelfAssessmentFilter())
-            ->filterBy('isPublished', true)
             ->sortBy('updatedAt', 'desc')
             ->first();
     }

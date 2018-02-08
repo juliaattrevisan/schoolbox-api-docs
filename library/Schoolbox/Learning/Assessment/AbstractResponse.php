@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Assessment;
 
 use \Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\Feedback\InstructorGivenFilter;
+use Schoolbox\Learning\Assessment\Feedback\PublishedFilter;
 use Schoolbox\Learning\Assessment\Feedback\SelfAssessmentFilter;
 use \Schoolbox\User;
 use \Schoolbox\Mapper\Traits\Model\Id;
@@ -83,8 +84,8 @@ abstract class AbstractResponse implements IResponse
     public function findMostRecentPublishedInstructorGivenFeedback(): ?IFeedback
     {
         return $this->getAllFeedback()
+                    ->filter(new PublishedFilter())
                     ->filter(new InstructorGivenFilter())
-                    ->filterBy('isPublished', true)
                     ->sortBy('updatedAt', 'desc')
                     ->first();
     }
@@ -106,8 +107,8 @@ abstract class AbstractResponse implements IResponse
     public function findMostRecentSelfAssessedPublishedFeedback(): ?IFeedback
     {
         return $this->getAllFeedback()
+                    ->filter(new PublishedFilter())
                     ->filter(new SelfAssessmentFilter())
-                    ->filterBy('isPublished', true)
                     ->sortBy('updatedAt', 'desc')
                     ->first();
     }
