@@ -100,6 +100,7 @@ class Controller extends Base
      */
     public function postParticipantFeedback(Participant $participant)
     {
+        // TODO base feedback type to fetch based on whether this is self-assess or instructor
         $mostRecentFeedback = $participant->findMostRecentInstructorGivenFeedback();
         $post               = $this->getRequest()->post->getArrayCopy();
 
@@ -210,6 +211,7 @@ class Controller extends Base
      */
     public function postResponseFeedback(Participant $participant, DueWork\Response\Model $response)
     {
+        // TODO base feedback type to fetch based on whether this is self-assess or instructor
         $mostRecentFeedback = $participant->findMostRecentInstructorGivenFeedback();
         $post               = $this->getRequest()->post->getArrayCopy();
 
