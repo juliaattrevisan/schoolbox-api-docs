@@ -120,6 +120,9 @@
             $(config.assessmentList).on('click', '[data-draft="publish"]', function (e) {
                 e.preventDefault();
 
+                // Allow no other save actions nao whilst this one is running
+                window.clearTimeout(tt);
+
                 var $participant = $(this).closest('[data-participant]'),
                     $form        = $participant.find('[data-feedback-form]'),
                     $actionBar   = $participant.find('[data-action-bar]'),
@@ -184,6 +187,9 @@
                 }).fail(function (xhr) {
                     toast.call($participant, xhr.responseText, false, false);
                     $btnPublish.removeAttr('disabled').text(config.publishText);
+
+                    // Restore save actions nao
+                    timeoutUpdate();
                 });
             });
         }
