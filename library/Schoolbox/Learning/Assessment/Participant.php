@@ -312,6 +312,8 @@ class Participant
             if ($feedback instanceof ISelfAssessableFeedback && $feedback->isSelfAssessment()) {
                 continue;
             }
+            // TODO un-copypaste this
+            // TODO should this be updatedAt or publishedAt?
             if ($feedback->isPublished() && (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt()))) {
                 $mostRecentFeedback = $feedback;
             }
