@@ -11,6 +11,7 @@
 namespace Schoolbox\Learning\Assessment\Test;
 
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork as DueWorkDataModel;
 use \Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
@@ -99,6 +100,7 @@ class TimelineTest extends TestCase
             ->setReviewee($student)
             ->setReviewer($teacher)
             ->setAssessable($assessment)
+            ->setReviewRoute(DueWorkDataModel::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $response1->getAllFeedback()->add($feedback1);
@@ -143,6 +145,7 @@ class TimelineTest extends TestCase
             ->setReviewee($student)
             ->setReviewer($teacher)
             ->setAssessable($assessment)
+            ->setReviewRoute(DueWorkDataModel::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-01 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $feedback2 = new Feedback();
@@ -151,6 +154,7 @@ class TimelineTest extends TestCase
             ->setReviewee($student)
             ->setReviewer($teacher)
             ->setAssessable($assessment)
+            ->setReviewRoute(DueWorkDataModel::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $response1->setAllFeedback((new Collection())
@@ -198,6 +202,7 @@ class TimelineTest extends TestCase
             ->setReviewee($student)
             ->setReviewer($teacher)
             ->setAssessable($assessment)
+            ->setReviewRoute(DueWorkDataModel::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-01 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $response1->getAllFeedback()->add($feedback1);
@@ -216,6 +221,7 @@ class TimelineTest extends TestCase
             ->setReviewee($student)
             ->setReviewer($teacher)
             ->setAssessable($assessment)
+            ->setReviewRoute(DueWorkDataModel::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $response1->getAllFeedback()->add($feedback2);
@@ -234,6 +240,7 @@ class TimelineTest extends TestCase
             ->setReviewee($student)
             ->setReviewer($teacher)
             ->setAssessable($assessment)
+            ->setReviewRoute(DueWorkDataModel::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-23 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $response1->getAllFeedback()->add($feedback3);
@@ -283,6 +290,7 @@ class TimelineTest extends TestCase
             ->setReviewee($student)
             ->setReviewer($teacher)
             ->setAssessable($assessment)
+            ->setReviewRoute(DueWorkDataModel::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-01 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $response1->getAllFeedback()->add($feedback1);
@@ -301,6 +309,7 @@ class TimelineTest extends TestCase
             ->setReviewee($student)
             ->setReviewer($teacher)
             ->setAssessable($assessment)
+            ->setReviewRoute(DueWorkDataModel::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $response2->getAllFeedback()->add($feedback2);
@@ -319,6 +328,7 @@ class TimelineTest extends TestCase
             ->setReviewee($student)
             ->setReviewer($teacher)
             ->setAssessable($assessment)
+            ->setReviewRoute(DueWorkDataModel::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-23 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $response3->getAllFeedback()->add($feedback3);
@@ -331,6 +341,7 @@ class TimelineTest extends TestCase
             ->setReviewee($student)
             ->setReviewer($teacher)
             ->setAssessable($assessment)
+            ->setReviewRoute(DueWorkDataModel::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(new \Alaress_Date_Format('2016-11-01 00:00:01', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $floating2 = new Feedback();
@@ -339,6 +350,7 @@ class TimelineTest extends TestCase
             ->setReviewee($student)
             ->setReviewer($teacher)
             ->setAssessable($assessment)
+            ->setReviewRoute(DueWorkDataModel::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(new \Alaress_Date_Format('2016-11-01 01:01:01', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $floating3 = new Feedback();
@@ -347,6 +359,7 @@ class TimelineTest extends TestCase
             ->setReviewee($student)
             ->setReviewer($teacher)
             ->setAssessable($assessment)
+            ->setReviewRoute(DueWorkDataModel::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(new \Alaress_Date_Format('2016-11-01 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $plan        = $this->linker->createAndLinkPlan($assessment);
@@ -393,6 +406,7 @@ class TimelineTest extends TestCase
         $feedback1
             ->setId(11)
             ->setAssessable($assessment)
+            ->setReviewRoute(DueWorkDataModel::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(null);
 
         $response1->getAllFeedback()->add($feedback1);
@@ -407,6 +421,7 @@ class TimelineTest extends TestCase
         $feedback2
             ->setId(22)
             ->setAssessable($assessment)
+            ->setReviewRoute(DueWorkDataModel::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(null);
 
         $response2->getAllFeedback()->add($feedback2);
@@ -421,6 +436,7 @@ class TimelineTest extends TestCase
         $feedback3
             ->setId(33)
             ->setAssessable($assessment)
+            ->setReviewRoute(DueWorkDataModel::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(null);
 
         $response3->getAllFeedback()->add($feedback3);
@@ -431,18 +447,21 @@ class TimelineTest extends TestCase
         $floating1
             ->setId(111)
             ->setAssessable($assessment)
+            ->setReviewRoute(DueWorkDataModel::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(null);
 
         $floating2 = new Feedback();
         $floating2
             ->setId(222)
             ->setAssessable($assessment)
+            ->setReviewRoute(DueWorkDataModel::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(null);
 
         $floating3 = new Feedback();
         $floating3
             ->setId(333)
             ->setAssessable($assessment)
+            ->setReviewRoute(DueWorkDataModel::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(null);
 
         $plan        = $this->linker->createAndLinkPlan($assessment);
