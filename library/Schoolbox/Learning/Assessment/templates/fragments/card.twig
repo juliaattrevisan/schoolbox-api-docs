@@ -37,10 +37,11 @@
 
     {% block nav %}
     <nav>
-        {% if student %}
+        {% set participant = assessable.getParticipantIfExtant(student) %}
+        {% if participant %}
             {% include '@learningAssessment/fragments/progressTick.twig' with {
                 assessment: assessable,
-                participant: assessable.getParticipant(student)
+                participant: participant
             } only %}
         {% endif %}
     </nav>
