@@ -145,6 +145,7 @@ class Javascript extends \Calendar\Event\Type\Submission\Renderer\Javascript
         $meta['status']       = $status;
         $meta['completed']    = $status === 'reviewed';
         $meta['assessmentId'] = $this->getEvent()->getAssessment()->getId();
+        $meta['isProject']    = $this->getEvent()->getAssessment() instanceof Project;
 
         return $meta;
     }

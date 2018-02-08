@@ -395,6 +395,11 @@
                 return false;
             }
 
+            // in this view, we don't show projects
+            if (calEvent.data.meta.isProject) {
+                return false;
+            }
+
             // rip off the resizers
             $element.removeClass('fc-resizable').find('.fc-resizer').remove();
 
