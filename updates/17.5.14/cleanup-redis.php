@@ -38,7 +38,7 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
     foreach ($keys as $key) {
         $val = $redis->get($key);
         $len = strlen($val);
-        $log->info(sprintf('[MATCH] %s (%d bytes) matched', $key, $len));
+        $log->debug(sprintf('[MATCH] %s (%d bytes) matched', $key, $len));
         $redis->del($key);
         $deletions[$key] = $len;
     }
