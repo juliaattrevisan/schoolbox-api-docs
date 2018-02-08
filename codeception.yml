@@ -23,7 +23,8 @@ suites:
         extensions:
             enabled:
                 - Codeception\Extension\RunProcess:
-                  - '/usr/lib/chromium-browser/chromedriver --url-base=/wd/hub'
+                    0: '/usr/lib/chromium-browser/chromedriver --url-base=/wd/hub'
+                    sleep: 5
 
 extensions:
     enabled:
