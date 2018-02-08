@@ -282,6 +282,10 @@ class Participant
 
         /** @var IFeedback $feedback */
         foreach ($this->allFeedbacks as $feedback) {
+            // Self-assessed is skipped
+            if ($feedback instanceof ISelfAssessableFeedback && $feedback->isSelfAssessment()) {
+                continue;
+            }
             if (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt())) {
                 $mostRecentFeedback = $feedback;
             }
@@ -304,6 +308,10 @@ class Participant
 
         /** @var IFeedback $feedback */
         foreach ($this->allFeedbacks as $feedback) {
+            // Self-assessed is skipped
+            if ($feedback instanceof ISelfAssessableFeedback && $feedback->isSelfAssessment()) {
+                continue;
+            }
             if ($feedback->isPublished() && (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt()))) {
                 $mostRecentFeedback = $feedback;
             }
@@ -319,7 +327,20 @@ class Participant
      */
     public function findMostRecentSelfAssessedFeedback(): ?IFeedback
     {
-        return null;
+        /** @var IFeedback $mostRecentFeedback */
+        $mostRecentFeedback = null;
+
+        /** @var IFeedback $feedback */
+        foreach ($this->allFeedbacks as $feedback) {
+            // Non self-assessed is skipped
+            if (!($feedback instanceof ISelfAssessableFeedback && $feedback->isSelfAssessment())) {
+                continue;
+            }
+            if (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt())) {
+                $mostRecentFeedback = $feedback;
+            }
+        }
+        return $mostRecentFeedback;
     }
 
 
@@ -330,7 +351,20 @@ class Participant
      */
     public function findMostRecentSelfAssessedPublishedFeedback(): ?IFeedback
     {
-        return null;
+        /** @var IFeedback $mostRecentFeedback */
+        $mostRecentFeedback = null;
+
+        /** @var IFeedback $feedback */
+        foreach ($this->allFeedbacks as $feedback) {
+            // Non self-assessed is skipped
+            if (!($feedback instanceof ISelfAssessableFeedback && $feedback->isSelfAssessment())) {
+                continue;
+            }
+            if ($feedback->isPublished() && (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt()))) {
+                $mostRecentFeedback = $feedback;
+            }
+        }
+        return $mostRecentFeedback;
     }
 
 
