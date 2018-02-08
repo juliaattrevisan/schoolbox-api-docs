@@ -11,6 +11,8 @@
 namespace Schoolbox\Learning\Assessment;
 
 use \Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\Feedback\InstructorGivenFilter;
+use Schoolbox\Learning\Assessment\Feedback\SelfAssessmentFilter;
 use \Schoolbox\User;
 use \Schoolbox\Mapper\Traits\Model\Id;
 use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -69,17 +71,10 @@ abstract class AbstractResponse implements IResponse
      */
     public function findMostRecentInstructorGivenFeedback(): ?IFeedback
     {
-        /** @var IFeedback $mostRecentFeedback */
-        $mostRecentFeedback = null;
-        foreach ($this->getAllFeedback() as $feedback) {
-            if ($feedback instanceof ISelfAssessableFeedback && $feedback->isSelfAssessment()) {
-                continue;
-            }
-            if (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt())) {
-                $mostRecentFeedback = $feedback;
-            }
-        }
-        return $mostRecentFeedback;
+        return $this->getAllFeedback()
+                    ->filter(new InstructorGivenFilter())
+                    ->sortBy('updatedAt', 'desc')
+                    ->first();
     }
 
     /**
@@ -87,19 +82,11 @@ abstract class AbstractResponse implements IResponse
      */
     public function findMostRecentPublishedInstructorGivenFeedback(): ?IFeedback
     {
-        /** @var IFeedback $mostRecentFeedback */
-        $mostRecentFeedback = null;
-        foreach($this->getAllFeedback() as $feedback){
-            if ($feedback instanceof ISelfAssessableFeedback && $feedback->isSelfAssessment()) {
-                continue;
-            }
-            if($feedback->isPublished()){
-                if(!$mostRecentFeedback || $feedback->getPublishedAt()->gt($mostRecentFeedback->getPublishedAt())){
-                    $mostRecentFeedback = $feedback;
-                }
-            }
-        }
-        return $mostRecentFeedback;
+        return $this->getAllFeedback()
+                    ->filter(new InstructorGivenFilter())
+                    ->filterBy('isPublished', true)
+                    ->sortBy('publishedAt', 'desc')
+                    ->first();
     }
 
     /**
@@ -107,17 +94,10 @@ abstract class AbstractResponse implements IResponse
      */
     public function findMostRecentSelfAssessedFeedback(): ?IFeedback
     {
-        /** @var IFeedback $mostRecentFeedback */
-        $mostRecentFeedback = null;
-        foreach ($this->getAllFeedback() as $feedback) {
-            if (!($feedback instanceof ISelfAssessableFeedback && $feedback->isSelfAssessment())) {
-                continue;
-            }
-            if (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt())) {
-                $mostRecentFeedback = $feedback;
-            }
-        }
-        return $mostRecentFeedback;
+        return $this->getAllFeedback()
+                    ->filter(new SelfAssessmentFilter())
+                    ->sortBy('updatedAt', 'desc')
+                    ->first();
     }
 
     /**
@@ -125,19 +105,11 @@ abstract class AbstractResponse implements IResponse
      */
     public function findMostRecentSelfAssessedPublishedFeedback(): ?IFeedback
     {
-        /** @var IFeedback $mostRecentFeedback */
-        $mostRecentFeedback = null;
-        foreach($this->getAllFeedback() as $feedback){
-            if (!($feedback instanceof ISelfAssessableFeedback && $feedback->isSelfAssessment())) {
-                continue;
-            }
-            if($feedback->isPublished()){
-                if(!$mostRecentFeedback || $feedback->getPublishedAt()->gt($mostRecentFeedback->getPublishedAt())){
-                    $mostRecentFeedback = $feedback;
-                }
-            }
-        }
-        return $mostRecentFeedback;
+        return $this->getAllFeedback()
+                    ->filter(new SelfAssessmentFilter())
+                    ->filterBy('isPublished', true)
+                    ->sortBy('publishedAt', 'desc')
+                    ->first();
     }
 
     /* Getters/Setters
