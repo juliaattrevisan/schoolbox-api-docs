@@ -10,10 +10,7 @@ namespace Schoolbox\Learning\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Failure\Unauthorized;
-use Alaress\Authorizer\Rule\IAuthorizationRule;
 use InvalidArgumentException;
-use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
@@ -36,7 +33,7 @@ use Schoolbox\User;
  *
  * Note this does not permit non-participants with WRITE+ perm to see this page. That is outside this rule's responsibility.
  */
-class CanSeeParticipation implements IAuthorizationRule
+class CanSeeParticipation extends AbstractParticipationRule
 {
 
     /** @var Access */
@@ -121,41 +118,5 @@ class CanSeeParticipation implements IAuthorizationRule
         }
 
         throw new Unauthorized();
-    }
-
-
-    /**
-     * @param array $params
-     * @return IAssessable
-     * @throws InvalidArgumentException If unable to locate an assessable instance in route params
-     */
-    private function findAssessable(array $params): IAssessable
-    {
-        if ($params['assessment'] instanceof IAssessable) {
-            return $params['assessment'];
-        }
-        if ($params['participant'] instanceof Participant) {
-            return $params['participant']->getAssessable();
-        }
-        throw new InvalidArgumentException('Unable to locate an assessable instance in route params');
-        // TODO: Log to sentry
-    }
-
-
-    /**
-     * @param array $params
-     * @return User
-     * @throws InvalidArgumentException If unable to locate a student User instance in route params
-     */
-    private function findStudent(array $params): User
-    {
-        if ($params['student'] instanceof User) {
-            return $params['student'];
-        }
-        if ($params['participant'] instanceof Participant) {
-            return $params['participant']->getUser();
-        }
-        throw new InvalidArgumentException('Unable to locate an student User instance in route params');
-        // TODO: Log to sentry
     }
 }

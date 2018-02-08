@@ -9,13 +9,10 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\InvalidPath;
-use Alaress\Authorizer\Rule\IAuthorizationRule;
-use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
 use InvalidArgumentException;
 
-class AssessmentNotDeleted implements IAuthorizationRule
+class AssessmentNotDeleted extends AbstractAssessableRule
 {
 
     /**
@@ -30,23 +27,5 @@ class AssessmentNotDeleted implements IAuthorizationRule
         if ($assessable->isDeleted()) {
             throw new InvalidPath("Assessment (id: {$assessable->getId()}) is deleted");
         }
-    }
-
-
-    /**
-     * @param array $params
-     * @return IAssessable
-     * @throws InvalidArgumentException If an IAssessable was unable to be found in route params
-     */
-    private function findAssessable(array $params): IAssessable
-    {
-        if ($params['assessment'] instanceof IAssessable) {
-            return $params['assessment'];
-        }
-        if ($params['participant'] instanceof Participant) {
-            return $params['participant']->getAssessable();
-        }
-        throw new InvalidArgumentException('Unable to locate an assessable instance in route params');
-        //TO DO: Log to sentry
     }
 }

@@ -28,7 +28,7 @@ class StudentCanViewFeedback extends AbstractCanViewFeedback
             throw new \InvalidArgumentException('User object required.');
         }
 
-        $assessment = $this->findAssessment($params);
+        $assessment = $this->findAssessable($params);
         $student    = $this->findStudent($params);
 
         // If there's feedback, check it's published

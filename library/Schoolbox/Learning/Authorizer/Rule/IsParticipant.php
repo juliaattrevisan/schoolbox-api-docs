@@ -9,29 +9,24 @@
 
 namespace Schoolbox\Learning\Authorizer\Rule;
 
-use Alaress\Authorizer\Rule\IAuthorizationRule;
-use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Alaress\Authorizer\Failure\Unauthorized;
+use InvalidArgumentException;
 
-class IsParticipant implements IAuthorizationRule
+class IsParticipant extends AbstractParticipationRule
 {
+
     /**
      * {@inheritdoc}
      */
-    public function authorize(array $params = array(), User $user = null)
+    public function authorize(array $params = [], User $user = null)
     {
-
-        /* Block students seeing other students' outcomes */
-        if ($params['participant'] instanceof Participant) {
-            if ($user->getId() == $params['participant']->getUser()->getId()) {
-                return true;
-            }
-        } else {
-            throw new \InvalidArgumentException('participant param is not an instance of \Schoolbox\Learning\Assessment\Participant');
+        if (!$user) {
+            throw new InvalidArgumentException('No user found to authorize');
         }
-
+        if ($user->getId() == $this->findStudent($params)->getId()) {
+            return true;
+        }
         throw new Unauthorized();
     }
 }

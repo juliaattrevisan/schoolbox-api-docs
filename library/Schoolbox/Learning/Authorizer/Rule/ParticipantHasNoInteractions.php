@@ -8,40 +8,31 @@
 namespace Schoolbox\Learning\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\Unauthorized;
-use Alaress\Authorizer\Rule\IAuthorizationRule;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
+use InvalidArgumentException;
 
-class ParticipantHasNoInteractions implements IAuthorizationRule
+/**
+ * Checks the user is a participant, and has no non-draft interactions
+ */
+class ParticipantHasNoInteractions extends AbstractParticipationRule
 {
 
     /**
      * Only allow if participant has no submitted responses and no published feedback
      *
      * @inheritdoc
-     * @throws \InvalidArgumentException If unable to find a Participant object in route params
+     * @throws InvalidArgumentException If unable to find a Participant object in route params
      * @throws Unauthorized If Participant has any non-draft responses or feedback
      */
     public function authorize(array $params = [], User $user = null)
     {
-        $participant = $this->findParticipant($params);
-        if ($participant->hasSubmittedResponse() || $participant->hasPublishedFeedback()) {
+        $assessable  = $this->findAssessable($params);
+        $student     = $this->findStudent($params);
+        $participant = $assessable->getParticipantIfExtant($student);
+
+        if ($participant && ($participant->hasSubmittedResponse() || $participant->hasPublishedFeedback())) {
             throw new Unauthorized();
         }
         return true;
-    }
-
-
-    /**
-     * @param array $params
-     * @return Participant
-     * @throws \InvalidArgumentException If unable to find a Participant object in route params
-     */
-    private function findParticipant(array $params)
-    {
-        if (isset($params['participant']) && $params['participant'] instanceof Participant) {
-            return $params['participant'];
-        }
-        throw new \InvalidArgumentException('Unable to find a Participant object in route params');
     }
 }
