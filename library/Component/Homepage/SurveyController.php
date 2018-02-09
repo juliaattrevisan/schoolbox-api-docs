@@ -76,6 +76,8 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
             $this->setBlock('survey', 'surveyLink', 'surveyLink_block');
             $this->setBlock('survey', 'resumeLink', 'resumeLink_block');
             $this->setBlock('survey', 'reviewLink', 'reviewLink_block');
+            $this->setBlock('survey', 'authorLinkOpen', 'authorLinkOpen_block');
+            $this->setBlock('survey', 'authorLinkClose', 'authorLinkClose_block');
 
             $this->setVar([
                 'empty_state_block' => '',
@@ -194,6 +196,13 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                             }
                         }
 
+                        if ($author->isDeleted()) {
+                            $this->setVar('authorLinkOpen_block', '');
+                            $this->setVar('authorLinkClose_block', '');
+                        } else {
+                            $this->parse('authorLinkOpen_block', 'authorLinkOpen');
+                            $this->parse('authorLinkClose_block', 'authorLinkClose');
+                        }
                         /* This allows all users with write access to modify
                          */
                         $this->setVar('teacherLink_block', '');
