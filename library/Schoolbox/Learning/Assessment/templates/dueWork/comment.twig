@@ -8,9 +8,6 @@
         readonly:     bool           Should textarea be rendered as readonly?
     ]
 #}
-{% if feedback is null %}
-    {% set feedback = participant.findMostRecentInstructorGivenFeedback %}
-{% endif %}
 
 <label>Comment
     <textarea
