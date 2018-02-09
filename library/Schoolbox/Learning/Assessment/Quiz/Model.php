@@ -170,8 +170,8 @@ class Model extends AbstractAssessment
     public function getAuthoritativeFeedback(Participant $participant, $publishedOnly)
     {
         $attempt = $this->getAuthoritativeResponse($participant, $publishedOnly);
-        return $attempt && $attempt->hasFeedback()
-            ? $attempt->getAllFeedback()->first()
+        return $attempt
+            ? $attempt->findMostRecentPublishedInstructorGivenFeedback()
             : null;
     }
 
