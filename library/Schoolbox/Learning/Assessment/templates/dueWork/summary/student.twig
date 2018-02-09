@@ -1,9 +1,14 @@
 {#
 Data:
-    assessment  DueWork\Model
-    student     User
-    participant null|Participant\Model
-    ...
+    assessment            DueWork\Model
+    student               User
+    participant           null|Participant\Model
+    breadcrumbs
+    submissionsBlocked    false|string  A string message if blocked, false if not blocked
+    acknowlegementBlocked false|string  A string message if blocked, false if not blocked
+    authoritativeFeedback null|DueWork\Feedback\Model
+    emptyRubricContext
+    timeline
 #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
@@ -60,7 +65,12 @@ Data:
 <div class="row actions-small-1">
     <div class="small-12 columns">
         <h1>{{ assessment.title }}</h1>
-        {% include '@learningAssessment/meta.twig' with {assessment: assessment, submissionsBlocked: submissionsBlocked, student: student, user: USER, icon: 'icon-due-work'} %}
+        {% include '@learningAssessment/meta.twig' with {
+            assessment: assessment,
+            submissionsBlocked: submissionsBlocked,
+            student: student,
+            icon: 'icon-due-work'
+        } only %}
     </div>
     {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
     {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
@@ -100,11 +110,21 @@ Data:
 
 {# Submit button: goes underneath history if it's empty, above history if not #}
 {% if timeline is not empty %}
-    {% include '@learningAssessment/dueWork/summary/submitButton.twig' %}
+    {% include '@learningAssessment/dueWork/summary/submitButton.twig' with {
+        submissionsBlocked: submissionsBlocked,
+        acknowlegementBlocked: acknowlegementBlocked,
+        assessment: assessment,
+        student: student
+    } only%}
 {% endif %}
 
 {% include '@learningAssessment/dueWork/history.twig' %}
 
 {% if timeline is empty %}
-    {% include '@learningAssessment/dueWork/summary/submitButton.twig' %}
+    {% include '@learningAssessment/dueWork/summary/submitButton.twig' with {
+        submissionsBlocked: submissionsBlocked,
+        acknowlegementBlocked: acknowlegementBlocked,
+        assessment: assessment,
+        student: student
+    } only %}
 {% endif %}
