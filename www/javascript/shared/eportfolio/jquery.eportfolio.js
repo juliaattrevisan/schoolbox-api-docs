@@ -60,7 +60,7 @@
                 $(config.activator).attr('data-publish-status', 1);
 
                 $(config.label).toastActivate({
-                    text: 'Sending to showcase'
+                    text: 'Sending to ePortfolio'
                 });
 
                 /* Ajax the Publish action
@@ -71,7 +71,7 @@
                     data: config.element.serialize(), // serializes the form's elements.
                     success: function (data) {
                         $(config.label).toastTimeout({
-                            text: 'Activity showcased'
+                            text: 'Work published to ePortfolio'
                         });
 
                         /* Re-enable button

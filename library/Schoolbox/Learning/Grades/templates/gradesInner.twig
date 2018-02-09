@@ -96,8 +96,6 @@
                                            title="View Attempts"></a>
                                     {% endif %}
                                     {% if assessment is dueWork and feedback and student.eportfolioEnable %}
-                                        {# TODO convert this to AJAX #}
-
                                         {% if canSeeShowcaseButton %}
                                             <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0"
                                                title="Publish to ePortfolio"></a>
@@ -116,7 +114,8 @@
                                                         var assessmentId = $(this).data('publishToEportfolio');
 
                                                         $(this).confirmDialog({
-                                                            text: 'Are you sure you want to showcase this work? That means others will be able to see it.',
+                                                            header: "Publish to ePortfolio Showcase",
+                                                            text: 'Are you sure you want to publish this work to your ePortfolio showcase? This will make the work visible to everyone.',
                                                             confirmEvent: function () {
                                                                 $('[data-publish-to-eportfolio-form="' + assessmentId + '"]').eportfolio_publish({
                                                                     activator: '[data-publish-to-eportfolio="' + assessmentId + '"]'
@@ -133,7 +132,7 @@
                         {% endif %}
                     {% endfor %}
                 </ul>
-                <div class="toast" data-alert="" id="publish-to-eportfolio-label">Activity showcased</div>
+                <div class="toast" data-alert="" id="publish-to-eportfolio-label"></div>
             </section>
         </div>
     </div>
