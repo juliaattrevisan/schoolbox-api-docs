@@ -443,12 +443,7 @@ abstract class AbstractAssessment implements IAssessable
     {
         $this->assertSameAssessment($participant);
 
-        foreach ($participant->getAllFeedbacks() as $feedback) {
-            if ($feedback->isPublished()) {
-                return true;
-            }
-        }
-        return false;
+        return (null !== $participant->findMostRecentInstructorGivenPublishedFeedback());
     }
 
 
