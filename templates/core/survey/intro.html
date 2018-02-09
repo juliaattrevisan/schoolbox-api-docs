@@ -7,7 +7,15 @@
             <li class="icon-calendar" title="To be completed by"><time>{ASSESS_FINISH}</time></li>
             <li class="icon-home" title="Located in"><a href="/homepage/{ASSESS_FOLDER_ID}">{ASSESS_FOLDER}</a></li>
             <li class="icon-staff-students" title="Created by">
-                <a href="/search/user/{ASSESS_AUTHOR_ID}">{ASSESS_AUTHOR}</a>
+                <!-- Conditional blocks to handle linking of soft-deleted authors. -->
+
+                <!-- BEGIN author_link_open -->
+                <a href="/search/user/{ASSESS_AUTHOR_ID}">
+                <!-- END author_link_open -->
+                {ASSESS_AUTHOR}
+                <!-- BEGIN author_link_close -->
+                </a>
+                <!-- END author_link_close -->
             </li>
         </ul>
     </div>
