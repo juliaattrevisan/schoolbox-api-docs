@@ -181,8 +181,8 @@ class Controller extends Base
             $assessment->setRubric($rubricMapper->findByDueWork($assessment));
         }
 
-        $rubricData = (new InlineGrader\Rubric($assessment, $participant, $this->getUser(), $response, $isInteractionLocked, $rubricContext))->generate();
-        $data = array_merge($data, $rubricData);
+        $selfReflectionData = (new SelfReflection\Rubric($assessment, $participant, $response, $rubricContext))->generate();
+        $data['rubricContext'] = $selfReflectionData['learnerRubricContext'];
 
         /* Figure out who's actually here and what screen to show
          */
