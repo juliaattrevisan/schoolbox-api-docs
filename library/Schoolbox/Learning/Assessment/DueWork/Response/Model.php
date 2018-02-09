@@ -159,6 +159,7 @@ class Model extends AbstractResponse
     /**
      * Returns the most recent published self-reflected feedback for this submission
      *
+     * @deprecated use `$this->findMostRecentSelfAssessedPublishedFeedback` instead
      * @return null|Feedback\Model
      * @throws UnexpectedValueException  If due-work feedback object property is not hydrated
      */
