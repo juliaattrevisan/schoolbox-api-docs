@@ -169,10 +169,9 @@ class Model extends AbstractAssessment
      */
     public function getAuthoritativeFeedback(Participant $participant, $publishedOnly)
     {
-        $attempt = $this->getAuthoritativeResponse($participant, $publishedOnly);
-        return $attempt
-            ? $attempt->findMostRecentPublishedInstructorGivenFeedback()
-            : null;
+        return $publishedOnly
+            ? $participant->findMostRecentInstructorGivenPublishedFeedback()
+            : $participant->findMostRecentInstructorGivenFeedback();
     }
 
     /**
