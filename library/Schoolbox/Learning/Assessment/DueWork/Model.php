@@ -153,7 +153,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
 
         // No responses, or latest response has published feedback already ?
         $latestSubmittedResponse = $participant->findMostRecentSubmittedResponse();
-        if (!$latestSubmittedResponse || $latestSubmittedResponse->hasPublishedFeedback()) {
+        if (!$latestSubmittedResponse || $latestSubmittedResponse->findMostRecentPublishedInstructorGivenFeedback()) {
             return false;
         }
 

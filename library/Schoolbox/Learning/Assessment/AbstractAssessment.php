@@ -401,13 +401,8 @@ abstract class AbstractAssessment implements IAssessable
                 break;
             }
         }
-        $hasPublishedFeedback = false;
-        foreach ($participant->getAllFeedbacks() as $feedback) {
-            if ($feedback->isPublished()) {
-                $hasPublishedFeedback = true;
-                break;
-            }
-        }
+
+        $hasPublishedFeedback = (null !== $participant->findMostRecentInstructorGivenFeedback());
 
         // No Submitted Responses and No Published Feedback?
         return !$hasSubmittedResponse && !$hasPublishedFeedback;
