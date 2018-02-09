@@ -86,7 +86,6 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
 
             $attemptHandler = new Survey_Attempt();
             $sectionHandler = new Survey_Section();
-            $userHandler = new User();
 
             if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                 $this->parse('createSurvey_block', 'createSurvey');
