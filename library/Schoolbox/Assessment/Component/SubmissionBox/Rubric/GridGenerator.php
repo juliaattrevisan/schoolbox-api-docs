@@ -104,11 +104,10 @@ class GridGenerator
      *
      * @param bool $publishedOnly Whether to exclude draft marks
      * @param int  $responseId
-     * @param User $student
      *
      * @return Rubric
      */
-    public function applyStudentMarkForSelfReflectableResponse(bool $publishedOnly, int $responseId, User $student): Rubric
+    public function applyStudentMarkForSelfReflectableResponse(bool $publishedOnly, int $responseId): Rubric
     {
         $pb = $this->buildDefaultPb()
                    ->equals('sr.student_submission_id', $responseId)

@@ -53,7 +53,7 @@ class RubricContext
 
         /* Spawn rubric grid
          */
-        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMarkForSelfReflectableResponse(false, $responseId, $student);
+        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMarkForSelfReflectableResponse(false, $responseId);
         $context['rubric'] = $dueWork->getRubric()->toContext();
 
         return $context;
