@@ -110,9 +110,10 @@ class GridGenerator
      */
     public function applyStudentMarkForSelfReflectableResponse(bool $publishedOnly, int $responseId, User $student): Rubric
     {
-        $pb = $this->buildDefaultPb();
-        $pb->equals('sr.student_submission_id', $responseId);
-        $pb->equals('sr.marker', $student->getId());
+        $pb = $this->buildDefaultPb()
+                   ->equals('sr.student_submission_id', $responseId)
+                   ->notEquals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
+
         if ($publishedOnly) {
             $pb->notNull('sr.published_at');
         }
