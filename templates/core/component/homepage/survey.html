@@ -46,9 +46,14 @@
                                 <p class="meta">{SURVEY_FINISH_DATE}</p>
 
                                 <p class="meta">
-                                    <!-- TODO fix this for deleted users -->
                                     Created by
-                                    <a href='/search/user/{SURVEY_USER_ID}'>{SURVEY_USER_FIRSTNAME} {SURVEY_USER_LASTNAME}</a>
+                                    <!-- BEGIN author_link_open -->
+                                        <a href='/search/user/{SURVEY_USER_ID}'>
+                                    <!-- END author_link_open -->
+                                    {SURVEY_USER_FIRSTNAME} {SURVEY_USER_LASTNAME}
+                                    <!-- BEGIN author_link_close -->
+                                        </a>
+                                    <!-- END author_link_close -->
                                     {SURVEY_CREATED}
                                 </p>
                             </div>
