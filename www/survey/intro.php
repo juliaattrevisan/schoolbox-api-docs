@@ -98,6 +98,8 @@ $assessFinishDate = new Alaress_Date_Format(strtotime($survey['finish']), 'U');
 $this->setFile(TEMPLATE_content, 'survey/intro.html');
 $this->setBlock(TEMPLATE_content, 'section', 'section_block');
 $this->setBlock(TEMPLATE_content, 'startTest', 'startTest_block');
+$this->setBlock(TEMPLATE_content, 'author_link_open', 'author_link_open_block');
+$this->setBlock(TEMPLATE_content, 'author_link_close', 'author_link_close_block');
 $this->setBlock(TEMPLATE_content, 'has_assess_description', 'has_assess_description_block');
 $this->setTitle('Assessment: ' . Scrub::text($survey['title']));
 
@@ -123,6 +125,15 @@ if (empty($survey['description'])) {
     $this->setVar('has_assess_description_block', '');
 } else {
     $this->parse('has_assess_description_block', 'has_assess_description', true);
+}
+
+if ($author->isDeleted()) {
+    // Don't link the authors name if they are deleted
+    $this->setVar('author_link_open_block', '');
+    $this->setVar('author_link_close_block', '');
+} else {
+    $this->parse('author_link_open_block', 'author_link_open', true);
+    $this->parse('author_link_close_block', 'author_link_close', true);
 }
 
 /* Section list and question count
