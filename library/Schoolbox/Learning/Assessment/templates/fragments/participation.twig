@@ -8,11 +8,11 @@
 #}
 <fieldset class="content collapsible" id="participation-container">
 
-    <legend data-collapser="participation" class="icon-up-arrow">
+    <legend data-collapser="participation" class="icon-down-arrow">
         Participation and Learning Plans
     </legend>
 
-    <div class="small-12 columns" data-collapsable="participation" data-collapse-state="collapsed">
+    <div class="column small-12 hide" data-collapsable="participation" data-collapse-state="collapsed">
         {% if assessment.allParticipants | length %}
             <div id="participation-settings">
                 <div class="row">
@@ -120,3 +120,9 @@
         {% endif %}
     </div>
 </fieldset>
+
+<script type="text/javascript">
+    $(function () {
+        $('[data-collapser]').collapsable();
+    });
+</script>
