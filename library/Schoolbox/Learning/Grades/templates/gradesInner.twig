@@ -37,10 +37,10 @@
 
     {% if longitudinalRubric %}
         {% include '@learningGrades/fragments/longitudinalRubric.twig' with {
-            longitudinalRubric: longitudinalRubric,
-            student:            student,
-            assessments:        markbook.assessments,
-            returnUrlSuffix:    returnUrlSuffix
+        longitudinalRubric: longitudinalRubric,
+        student:            student,
+        assessments:        markbook.assessments,
+        returnUrlSuffix:    returnUrlSuffix
         } only %}
     {% endif %}
 
@@ -61,7 +61,8 @@
                                                 <h3>{{ assessment.title }}</h3>
                                             </a>
                                             <p>
-                                                <span class="meta">{{ assessment.typeName }}</span><span class="pipe meta">{{ dueDate.dueDate(assessment, student) }}</span>
+                                                <span class="meta">{{ assessment.typeName }}</span><span
+                                                        class="pipe meta">{{ dueDate.dueDate(assessment, student) }}</span>
                                             </p>
                                             {% include '@learningAssessment/fragments/statusLine.twig' with { assessable: assessment, student: student} only %}
                                         </div>
@@ -81,7 +82,7 @@
                                                 {% endif %}
                                                 {% set feedback = participant.findAuthoritativeVisibleFeedback(USER) %}
                                                 {% if feedback %}
-                                                    <p class="comment">{{ feedback.comment | nl2br  }}</p>
+                                                    <p class="comment">{{ feedback.comment | nl2br }}</p>
                                                 {% endif %}
                                             {% endif %}
                                         </div>
@@ -90,35 +91,48 @@
 
                                 <nav>
                                     {% if assessment is quiz and participant.allResponses | length %}
-                                        <a class="icon-view" href="{{ routeLookup('learningQuiz.getQuizAttemptsByUser', {assessmentId: assessment.id, userId: student.id}) }}" title="View Attempts"></a>
+                                        <a class="icon-view"
+                                           href="{{ routeLookup('learningQuiz.getQuizAttemptsByUser', {assessmentId: assessment.id, userId: student.id}) }}"
+                                           title="View Attempts"></a>
                                     {% endif %}
                                     {% if assessment is dueWork and feedback and student.eportfolioEnable %}
-                                        {# TODO convert this to AJAX #}
-
                                         {% if canSeeShowcaseButton %}
-                                            <a class="icon-showcase" title="Publish to ePortfolio" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0"></a>
-                                            <form action="/eportfolio/showcase/modifyForm.php" method="post" data-publish-to-eportfolio-form="{{ assessment.id }}">
+                                            <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0"
+                                               title="Publish to ePortfolio"></a>
+                                            <form action="/eportfolio/showcase/modifyForm.php" method="post"
+                                                  data-publish-to-eportfolio-form="{{ assessment.id }}">
                                                 <input type="hidden" name="action" value="publish">
                                                 <input type="hidden" name="userId" value="{{ student.id }}">
                                                 <input type="hidden" name="assessmentId" value="{{ assessment.id }}">
                                             </form>
                                             <script type="text/javascript">
-                                                $(function() {
+                                                $(function () {
                                                     {# Publish to ePortfolio #}
-                                                    $('[data-publish-to-eportfolio-form="{{ assessment.id }}"]').eportfolio_publish({
-                                                        activator: '[data-publish-to-eportfolio="{{ assessment.id }}"]'
+                                                    $('[data-publish-to-eportfolio]').click(function (event) {
+                                                        event.preventDefault();
+
+                                                        var assessmentId = $(this).data('publishToEportfolio');
+
+                                                        $(this).confirmDialog({
+                                                            header: "Publish to ePortfolio Showcase",
+                                                            text: 'Are you sure you want to publish this work to your ePortfolio showcase? This will make the work visible to everyone.',
+                                                            confirmEvent: function () {
+                                                                $('[data-publish-to-eportfolio-form="' + assessmentId + '"]').eportfolio_publish({
+                                                                    activator: '[data-publish-to-eportfolio="' + assessmentId + '"]'
+                                                                });
+                                                            }
+                                                        });
                                                     });
                                                 });
                                             </script>
                                         {% endif %}
-                                        
                                     {% endif %}
                                 </nav>
                             </li>
                         {% endif %}
                     {% endfor %}
                 </ul>
-                <div class="toast" data-alert="" id="publish-to-eportfolio-label">Activity showcased</div>
+                <div class="toast" data-alert="" id="publish-to-eportfolio-label"></div>
             </section>
         </div>
     </div>

@@ -48,44 +48,39 @@
          */
         function publishToEportfolio() {
 
-            /* Event listener
+            /* If it's not already publishing, allow transaction
+             * Otherwise just ignore the click
+             *
+             * This prevents mass apm spam
              */
-            $(config.activator).click(function(event) {
-                event.preventDefault();
+            if ($(config.activator).attr('data-publish-status') == 0) {
 
-                /* If it's not already publishing, allow transaction
-                 * Otherwise just ignore the click
-                 *
-                 * This prevents mass apm spam
+                /* Indicate that we're currently publishing this
                  */
-                if ($(config.activator).attr('data-publish-status') == 0) {
+                $(config.activator).attr('data-publish-status', 1);
 
-                    /* Indicate that we're currently publishing this
-                     */
-                    $(config.activator).attr('data-publish-status', 1);
+                $(config.label).toastActivate({
+                    text: 'Sending to ePortfolio'
+                });
 
-                    $(config.label).toastActivate({
-                        text: 'Sending to showcase'
-                    });
+                /* Ajax the Publish action
+                 */
+                $.ajax({
+                    type: "POST",
+                    url: config.element.attr('action'),
+                    data: config.element.serialize(), // serializes the form's elements.
+                    success: function (data) {
+                        $(config.label).toastTimeout({
+                            text: 'Work published to ePortfolio'
+                        });
 
-                    /* Ajax the Publish action
-                     */
-                    $.ajax({
-                        type: "POST",
-                        url: config.element.attr('action'),
-                        data: config.element.serialize(), // serializes the form's elements.
-                        success: function (data) {
-                            $(config.label).toastTimeout({
-                                text: 'Activity showcased'
-                            });
+                        /* Re-enable button
+                         */
+                        $(config.activator).attr('data-publish-status', 0);
+                    }
+                });
+            }
 
-                            /* Re-enable button
-                             */
-                            $(config.activator).attr('data-publish-status', 0);
-                        }
-                    });
-                }
-            });
         }
     }
 }(jQuery));
