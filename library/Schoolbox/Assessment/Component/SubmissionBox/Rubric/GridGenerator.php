@@ -113,7 +113,9 @@ class GridGenerator
         $pb = $this->buildDefaultPb();
         $pb->equals('sr.student_submission_id', $responseId);
         $pb->equals('sr.marker', $student->getId());
-        $pb->notNull('sr.published_at');
+        if ($publishedOnly) {
+            $pb->notNull('sr.published_at');
+        }
 
         return $this->applyStudentMarkQuery($publishedOnly, $pb);
     }
