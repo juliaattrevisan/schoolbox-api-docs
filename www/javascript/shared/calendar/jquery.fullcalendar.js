@@ -53,6 +53,9 @@ function Calendar(id, bubbleId, opts) {
             views: {
                 day: {
                     titleFormat: 'dddd, MMM D YYYY'
+                },
+                week: {
+                    columnFormat: 'ddd D/M'
                 }
             },
             timeFormat: 'h(:mm)a',
