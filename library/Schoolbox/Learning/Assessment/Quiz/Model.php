@@ -148,7 +148,7 @@ class Model extends AbstractAssessment
             }
 
             // If published-only, skip if no published feedback
-            if ($publishedOnly && (!$attempt->hasFeedback() || !$attempt->getAllFeedback()[0]->isPublished())) {
+            if ($publishedOnly && !$attempt->findMostRecentPublishedInstructorGivenFeedback()) {
                 continue;
             }
 
