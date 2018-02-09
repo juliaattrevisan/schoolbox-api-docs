@@ -53,6 +53,7 @@ interface IResponse
     /**
      * Does this IResponse have published feedback?
      *
+     * @deprecated Ask the question whether this has instructor-given or self-assessed feedback instead
      * @return bool
      */
     public function hasPublishedFeedback();
@@ -158,6 +159,7 @@ interface IResponse
     /**
      * Does this IResponse have feedback?
      *
+     * @deprecated Ask the question whether this has instructor-given or self-assessed feedback instead
      * @return bool
      */
     public function hasFeedback();
