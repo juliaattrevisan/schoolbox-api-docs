@@ -17,7 +17,7 @@
         Participation and Learning Plans
     </legend>
 
-    <div class="column small-12 hide" data-collapsable="participation" {% if hasCustomisation %} data-collapse-state="uncollapsed" {% else %} data-collapse-state="collapsed" {% endif %}>
+    <div class="column small-12 {% if not hasCustomisation %}hide{% endif %}" data-collapsable="participation" {% if hasCustomisation %} data-collapse-state="uncollapsed" {% else %} data-collapse-state="collapsed" {% endif %}>
         {% if assessment.allParticipants | length %}
             <div id="participation-settings">
                 <div class="row">
