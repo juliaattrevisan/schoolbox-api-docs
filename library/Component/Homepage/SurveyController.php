@@ -6,10 +6,11 @@
  * @version     SVN: $Id$
  */
 use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\UserMapper;
+
 
 class Component_Homepage_SurveyController extends Component_Homepage_ControllerAbstract
 {
-
 
     /**
      * Prepares data for the render function. Business logic.
@@ -75,6 +76,8 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
             $this->setBlock('survey', 'surveyLink', 'surveyLink_block');
             $this->setBlock('survey', 'resumeLink', 'resumeLink_block');
             $this->setBlock('survey', 'reviewLink', 'reviewLink_block');
+            $this->setBlock('survey', 'authorLinkOpen', 'authorLinkOpen_block');
+            $this->setBlock('survey', 'authorLinkClose', 'authorLinkClose_block');
 
             $this->setVar([
                 'empty_state_block' => '',
@@ -85,7 +88,6 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
 
             $attemptHandler = new Survey_Attempt();
             $sectionHandler = new Survey_Section();
-            $userHandler = new User();
 
             if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                 $this->parse('createSurvey_block', 'createSurvey');
@@ -101,7 +103,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                     if (($this->getContentPermission() >= UserAccess::ACCESS_WRITE) || $surveyHandler->isOpen($currentSurvey)) {
                         $createdTime = new Alaress_Date_Format($currentSurvey['created_at'], 'Y-m-d H:i:s');
 
-                        $author = $userHandler->getByID($currentSurvey['user_id']);
+                        $author = UserMapper::getInstance()->findByIdWithFallback($currentSurvey['user_id']);
 
                         $this->setVar([
                             'SURVEY_ASSESS_ID' => $currentSurvey['assess_id'],
@@ -110,9 +112,9 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                             'SURVEY_FINISH_DATE' => 'Due ' . date('jS M Y', strtotime($currentSurvey['finish'])),
                             'SURVEY_DESCRIPTION' => Scrub::html($currentSurvey['description']),
                             'SURVEY_CREATED' => $createdTime->getRelativeTime(),
-                            'SURVEY_USER_ID' => $author['uid'],
-                            'SURVEY_USER_FIRSTNAME' => $author['firstname'],
-                            'SURVEY_USER_LASTNAME' => $author['lastname'],
+                            'SURVEY_USER_ID' => $author->getId(),
+                            'SURVEY_USER_FIRSTNAME' => $author->getFirstname(),
+                            'SURVEY_USER_LASTNAME' => $author->getLastname(),
                         ]);
 
                         /* Check if you have completed an assessment already
@@ -194,6 +196,13 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                             }
                         }
 
+                        if ($author->isDeleted()) {
+                            $this->setVar('authorLinkOpen_block', '');
+                            $this->setVar('authorLinkClose_block', '');
+                        } else {
+                            $this->parse('authorLinkOpen_block', 'authorLinkOpen');
+                            $this->parse('authorLinkClose_block', 'authorLinkClose');
+                        }
                         /* This allows all users with write access to modify
                          */
                         $this->setVar('teacherLink_block', '');

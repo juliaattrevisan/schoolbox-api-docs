@@ -47,7 +47,13 @@
 
                                 <p class="meta">
                                     Created by
-                                    <a href='/search/user/{SURVEY_USER_ID}'>{SURVEY_USER_FIRSTNAME} {SURVEY_USER_LASTNAME}</a>
+                                    <!-- BEGIN authorLinkOpen -->
+                                        <a href='/search/user/{SURVEY_USER_ID}'>
+                                    <!-- END authorLinkOpen -->
+                                    {SURVEY_USER_FIRSTNAME} {SURVEY_USER_LASTNAME}
+                                    <!-- BEGIN authorLinkClose -->
+                                        </a>
+                                    <!-- END authorLinkClose -->
                                     {SURVEY_CREATED}
                                 </p>
                             </div>
