@@ -101,6 +101,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                     if (($this->getContentPermission() >= UserAccess::ACCESS_WRITE) || $surveyHandler->isOpen($currentSurvey)) {
                         $createdTime = new Alaress_Date_Format($currentSurvey['created_at'], 'Y-m-d H:i:s');
 
+                        // TODO this is returning false on deleted users leading to bug
                         $author = $userHandler->getByID($currentSurvey['user_id']);
 
                         $this->setVar([
