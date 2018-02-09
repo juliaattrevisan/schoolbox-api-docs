@@ -125,9 +125,10 @@
 
                 <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
                     {% include '@learningAssessment/dueWork/comment.twig' with {
-                    participant: participant,
-                    tabIndex:   (loop.index0 * 2) + 2,
-                    readonly:    readonly
+                        feedback:    participant.findMostRecentInstructorGivenFeedback,
+                        participant: participant,
+                        tabIndex:    (loop.index0 * 2) + 2,
+                        readonly:    readonly
                     } only %}
                 </div>
             </div>
