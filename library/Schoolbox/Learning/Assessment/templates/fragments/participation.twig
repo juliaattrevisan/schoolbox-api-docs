@@ -10,25 +10,8 @@
 
     <legend>Participation and Learning Plans</legend>
 
-    {# TODO: either create a global flag for custom participation to be enabled on an assessment, or turn this into an collapsable section
-    <label for="participation-enable">
-        Customise participation and learning plans?
-        <span
-            data-tooltip class="has-tip hint"
-            title="Use this feature to add and remove students from participating in this assessment, or create modified versions for select students.">
-            ?
-        </span>
-    </label>
-    <div class="switch round">
-        <input id="participation-enable" type="checkbox">
-        <label for="participation-enable">
-            <span class="icon-approve"></span>
-            <span class="icon-cancel"></span>
-        </label>
-    </div>
-    #}
     {% if assessment.allParticipants | length %}
-        <div id="participation-settings"> {# class="hide" #}
+        <div id="participation-settings">
             <div class="row">
                 <div class="content small-12 medium-6 large-4 medium-offset-6 large-offset-8 columns" id="mass-buttons">
                     <nav>
