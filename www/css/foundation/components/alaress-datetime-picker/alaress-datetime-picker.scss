@@ -50,10 +50,11 @@ input.datepicker-input {
      */
     .flatpickr-calendar {
         border-radius: 0;
-        margin: 0 auto;
+        margin-top: 1rem;
         border: $pickr-border;
         box-shadow: none;
         position: static;
+        width: auto;
 
         &.arrowTop:before,
         &.arrowTop:after {
@@ -100,6 +101,10 @@ input.datepicker-input {
         span.cur-month:hover {
             background: transparent;
         }
+    }
+
+    .flatpickr-days {
+        width: auto;
     }
 
     .flatpickr-day {
