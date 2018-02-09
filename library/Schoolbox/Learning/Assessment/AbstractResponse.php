@@ -81,7 +81,7 @@ abstract class AbstractResponse implements IResponse
     /**
      * @inheritdoc
      */
-    public function findMostRecentPublishedInstructorGivenFeedback(): ?IFeedback
+    public function findMostRecentInstructorGivenPublishedFeedback(): ?IFeedback
     {
         return $this->getAllFeedback()
                     ->filter(new PublishedFilter())

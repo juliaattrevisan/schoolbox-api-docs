@@ -31,7 +31,7 @@ interface IResponse
      *
      * @return IFeedback|null
      */
-    public function findMostRecentPublishedInstructorGivenFeedback(): ?IFeedback;
+    public function findMostRecentInstructorGivenPublishedFeedback(): ?IFeedback;
 
     /**
      * Find the most recent self-assessed Feedback with a non-null Mark value,
