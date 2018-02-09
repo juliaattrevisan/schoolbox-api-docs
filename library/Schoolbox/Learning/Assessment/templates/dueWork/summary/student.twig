@@ -16,7 +16,7 @@ Data:
 {% set selfAcknowledgeRoute = routeLookupIfAuthorized('learningAssessment.postSelfAcknowledge', {
     assessmentId: assessment.id,
     assessment: assessment,
-    studentId: student.user.id,
+    studentId: student.id,
     student: student
 }) %}
 
@@ -113,6 +113,7 @@ Data:
     {% include '@learningAssessment/dueWork/summary/submitButton.twig' with {
         submissionsBlocked: submissionsBlocked,
         acknowlegementBlocked: acknowlegementBlocked,
+        selfAcknowledgeRoute: selfAcknowledgeRoute,
         assessment: assessment,
         student: student
     } only%}
@@ -124,6 +125,7 @@ Data:
     {% include '@learningAssessment/dueWork/summary/submitButton.twig' with {
         submissionsBlocked: submissionsBlocked,
         acknowlegementBlocked: acknowlegementBlocked,
+        selfAcknowledgeRoute: selfAcknowledgeRoute,
         assessment: assessment,
         student: student
     } only %}
