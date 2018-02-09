@@ -447,10 +447,16 @@ class Session
     {
         // Function to check that host isnt brute forceing the login
         // Returns true if too many logins false if ok
-        $ip = Session::getIP();
-        $graceperiod = time() - Cfg::get('login_grace');
+        $ip          = Session::getIP();
+        $graceperiod = Alaress_Date_Format::now()->addSeconds(0 - Config::get('login_grace'));
 
-        $query = "SELECT id FROM login_log WHERE ip = '$ip' AND login = '0' AND date > FROM_UNIXTIME($graceperiod)";
+        $query = "
+            SELECT id
+            FROM login_log
+            WHERE ip    = '{$this->db->quote($ip)}'
+            AND   login = '0'
+            AND   date  > '{$this->db->quote($graceperiod->getUsingFormat(Alaress_Date_Format::DATABASE_FORMAT))}'
+        ";
         $this->db->query($query);
 
         if ($this->db->countRows() < Cfg::get('login_allowed')) {

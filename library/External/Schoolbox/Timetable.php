@@ -135,7 +135,9 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
     public function getPeriodNumber(Campus $campus, $now = 0, $user = null)
     {
         $dayNumber = $this->getDayNumber($campus, $now);
-        $now       = $now ?: time();
+        $time      = $now
+            ? Alaress_Date_Format::newFromTimestamp($now)
+            : Alaress_Date_Format::now();
 
         $periodStatement = $this->internalDatabase->executeQuery(
             "
@@ -152,12 +154,12 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                 WHERE       tc.campus_id = :campusId
                 AND         tc.start <= DATE(NOW())
                 AND         tc.finish >= DATE(NOW())
-                AND         CAST(FROM_UNIXTIME(:now, '%h:%i:%s') AS TIME) BETWEEN tp.start AND tp.finish
+                AND         :now BETWEEN tp.start AND tp.finish
                 AND         tp.day = :dayNumber
             ",
             [
                 'campusId'  => $campus->getId(),
-                'now'       => $now,
+                'now'       => $time->getUsingFormat(Alaress_Date_Format::DATABASE_TIME_FORMAT),
                 'dayNumber' => $dayNumber,
             ]
         );

@@ -5,7 +5,7 @@ namespace Schoolbox\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Factory as DatabaseFactory;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Loader;
 use Schoolbox\IConfigLoader;
 
 class Factory
@@ -32,6 +32,30 @@ class Factory
     protected static $connectorInternal;
 
     /**
+     * An instance of this object
+     *
+     * @deprecated
+     * @var self
+     */
+    private static $instance;
+
+    /**
+     * Retrieve a static instance of this factory.
+     * TODO: Once we've got DI accessible everywhere this is currently used this should no longer required
+     *
+     * @deprecated
+     * @return self
+     */
+    private static function getInstance()
+    {
+        if (!isset(self::$instance)) {
+            self::$instance = new self(new DatabaseFactory());
+        }
+
+        return self::$instance;
+    }
+
+    /**
      * Retrieves static instance of external database connection (used in External connectors)
      * TODO: Once we've got DI accessible everywhere this is currently used this should no longer required
      *
@@ -41,59 +65,7 @@ class Factory
     public static function getInstanceExternal()
     {
         if (!isset(self::$connectorExternal)) {
-            $config  = ConfigMapper::getInstance();
-            $factory = new DatabaseFactory();
-
-            switch ($config->get('external_type')) {
-                // Microsoft SQL Server
-
-                case 'tass':
-                case 'synergetic':
-                case 'schoolpro':
-                case 'pcschools':
-                case 'maze':
-                case 'isams':
-                case 'doublefirst':
-                case 'humanedge':
-                case 'schooledge':
-
-                    $database = $factory->createMssql();
-                    break;
-
-                // MySQL
-
-                case 'schoolbox':
-                    return self::getInstanceInternal();
-                    break;
-
-                case 'denbigh':
-                    $database = $factory->createMysql();
-                    break;
-
-                // IBM DB2
-
-                case 'edumate':
-
-                    $database = $factory->createDb2();
-                    break;
-
-                default:
-                    throw new DatabaseException("Unknown external database type.");
-                    break;
-            };
-
-            // This will throw an exception on error
-
-            $database->connect(
-                $config->get('external_db_host'),
-                $config->get('external_db_db'),
-                $config->get('external_db_user'),
-                $config->get('external_db_passwd')
-            );
-
-            // So only cache the instance on success
-
-            self::$connectorExternal = $database;
+            self::$connectorExternal = self::getInstance()->getExternalDatabase(new Loader());
         }
 
         return self::$connectorExternal;
@@ -109,21 +81,7 @@ class Factory
     public static function getInstanceInternal()
     {
         if (!isset(self::$connectorInternal)) {
-            $factory  = new DatabaseFactory();
-            $database = $factory->createMysql();
-
-            // This will throw an exception on error
-
-            $database->connect(
-                SQL_host,
-                SQL_db,
-                SQL_user,
-                SQL_passwd
-            );
-
-            // So only cache the instance on success
-
-            self::$connectorInternal = $database;
+            self::$connectorInternal = self::getInstance()->getInternalDatabase();
         }
 
         return self::$connectorInternal;
@@ -164,11 +122,15 @@ class Factory
      *
      * @return IConnector Return the external connector appropriate for the SIS
      */
-    public function getExternalDatabase($config)
+    public function getExternalDatabase(IConfigLoader $config)
     {
-        switch ($config['external_type']) {
-            // Microsoft SQL Server
+        switch ($config->get('external_type')) {
 
+            // Schoolbox connector: just return internal DB
+            case 'schoolbox':
+                return $this->getInternalDatabase();
+
+            // Microsoft SQL Server
             case 'tass':
             case 'synergetic':
             case 'schoolpro':
@@ -178,36 +140,32 @@ class Factory
             case 'doublefirst':
             case 'humanedge':
             case 'schooledge':
-
                 $connectorExternal = $this->factory->createMssql();
                 break;
 
             // MySQL
-
-            case 'schoolbox':
-                return $this->getInternalDatabase();
-                break;
             case 'denbigh':
                 $connectorExternal = $this->factory->createMysql();
                 break;
 
             // IBM DB2
             case 'edumate':
-
                 $connectorExternal = $this->factory->createDb2();
                 break;
-        };
+        }
 
         if (!isset($connectorExternal)) {
             throw new DatabaseException("Unknown external database type.");
         }
 
         $connectorExternal->connect(
-            $config['external_db_host'],
-            $config['external_db_db'],
-            $config['external_db_user'],
-            $config['external_db_passwd']
+            $config->get('external_db_host'),
+            $config->get('external_db_db'),
+            $config->get('external_db_user'),
+            $config->get('external_db_passwd')
         );
+
+        $connectorExternal->setTimezone($this->fetchTimezone($this->getInternalDatabase()));
 
         return $connectorExternal;
     }
@@ -223,8 +181,6 @@ class Factory
     {
         $statement = $connectorInternal->prepareQuery("SELECT `value` FROM `config` WHERE name LIKE 'date_timezone'");
         $statement->execute();
-        $result = $statement->fetchColumn();
-
-        return $result;
+        return $statement->fetchColumn();
     }
 }

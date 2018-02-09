@@ -163,13 +163,17 @@ class EventConnector extends EventMapper
         /* Superusers see everything
          * Skip Rejected events
          */
+        $startDate = \Alaress_Date_Format::newFromTimestamp($startTimestamp)
+                                         ->getUsingFormat(\Alaress_Date_Format::DATABASE_DATE_FORMAT);
+        $endDate   = \Alaress_Date_Format::newFromTimestamp($endTimestamp)
+                                         ->getUsingFormat(\Alaress_Date_Format::DATABASE_DATE_FORMAT);
         if ($this->getUser()->isSuperuser()) {
             $querySelect = '';
             $queryJoin = '';
 
             $params = [
-                'startTimestamp' => $startTimestamp,
-                'endTimestamp' => $endTimestamp,
+                'startDate' => $startDate,
+                'endDate' => $endDate,
                 'rejected' => EventStatusMapper::STATUS_REJECTED,
             ];
         }
@@ -193,8 +197,8 @@ class EventConnector extends EventMapper
             ";
 
             $params = [
-                'startTimestamp' => $startTimestamp,
-                'endTimestamp' => $endTimestamp,
+                'startDate' => $startDate,
+                'endDate' => $endDate,
                 'studentUserId' => $this->getUser()->getId(),
                 'staffUserId' => $this->getUser()->getId(),
                 'rejected' => EventStatusMapper::STATUS_REJECTED,
@@ -234,9 +238,9 @@ class EventConnector extends EventMapper
             INNER JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
             {$queryJoin}
             WHERE
-                DATE(e.end_datetime) >= DATE(FROM_UNIXTIME(:startTimestamp))
+                DATE(e.end_datetime) >= :startDate
                 AND
-                DATE(e.start_datetime) <= DATE(FROM_UNIXTIME(:endTimestamp))
+                DATE(e.start_datetime) <= :endDate
                 AND eotc_metadata.status_id != :rejected
             ORDER BY e.start_datetime, e.end_datetime
         ";

@@ -102,6 +102,28 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
+     * Static constructor: create from Unix timestamp.
+     *
+     * @param int                                $timestamp
+     * @param DateTimeZone|null                  $timezone
+     * @param Alaress_Date_Locale_Interface|null $locale
+     * @return static
+     */
+    public static function newFromTimestamp(
+        int $timestamp,
+        DateTimeZone $timezone = null,
+        Alaress_Date_Locale_Interface $locale = null
+    ) {
+        if (!$locale instanceof Alaress_Date_Locale_Interface) {
+            // @codeCoverageIgnoreStart
+            $locale = new Alaress_Date_Locale_Config();
+            // @codeCoverageIgnoreEnd
+        }
+        // Zero out unset parts - IMO that's the least surprising behavior
+        return new static($timestamp, self::TIMESTAMP, $timezone, $locale);
+    }
+
+    /**
      * Static constructor: creates a new date, with the format based on
      * $locale->localFormat().
      *

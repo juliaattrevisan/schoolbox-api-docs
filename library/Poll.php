@@ -53,12 +53,13 @@ class Poll extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
     {
         $poll   = $this->getById($pollID);
         $cutoff = "";
+        $date = Alaress_Date_Format::now();
         switch ($poll['frequency']) {
             case "hourly":
-                $cutoff = "AND UNIX_TIMESTAMP(created) > " . (time() - 3600);
+                $cutoff = "AND created > '{$this->db->quote($date->addHours(-1)->getUsingFormat(Alaress_Date_Format::DATABASE_FORMAT))}'";
                 break;
             case "daily":
-                $cutoff = "AND UNIX_TIMESTAMP(created) > " . (time() - 86400);
+                $cutoff = "AND created > '{$this->db->quote($date->addDays(-1)->getUsingFormat(Alaress_Date_Format::DATABASE_FORMAT))}'";
                 break;
         }
 
