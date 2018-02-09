@@ -6,7 +6,9 @@ echo "Detected Browser Info:\n\n";
 use BrowscapPHP\Browscap;
 
 $bc = new Browscap();
-//$bc = new Browscap(__DIR__.'/../../');
+$cacheDir = __DIR__.'/../../tools/browscap';
+$adapter = new \WurflCache\Adapter\File([\WurflCache\Adapter\File::DIR => $cacheDir]);
+$bc->setCache($adapter);
 
 $bc->remoteIniUrl = 'http://browscap.org/stream?q=Lite_PHP_BrowsCapINI';
 // Don't attempt to update

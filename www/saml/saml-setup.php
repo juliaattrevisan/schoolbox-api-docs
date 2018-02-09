@@ -103,8 +103,11 @@ function useSAMLKerberos() {
      * Errs on the side of kerberos than non-kerberos
      */
     SAMLDebugLog("IP in kerberos whitelist, attempting browser/platform check");
-//    $bc = new Browscap(__DIR__.'/../../tools/browscap');
     $bc = new Browscap();
+    $cacheDir = __DIR__.'/../../tools/browscap';
+    $adapter = new \WurflCache\Adapter\File([\WurflCache\Adapter\File::DIR => $cacheDir]);
+    $bc->setCache($adapter);
+
     // Don't attempt to update
     $bc->doAutoUpdate = false;
     // Use local version of the browscap.ini file
