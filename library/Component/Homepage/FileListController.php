@@ -84,7 +84,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         $this->setBlock($templateHandle, 'has_file', 'has_file_block');
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
-        $configValue = $this->getConfig('filter');
+        $configValue = (int)$this->getConfig('filter');
         $filter = array();
         $countFilterFields = count($this->filterFields);
         for ($i = 0; $i < $countFilterFields; $i++) {
