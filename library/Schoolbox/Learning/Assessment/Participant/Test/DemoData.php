@@ -474,16 +474,50 @@ class DemoData
 
         $responseY2 = (new Response())
             ->setSubmittedAt(new Alaress_Date_NullDate())
-            ->setUpdatedAt(Alaress_Date_Format::now());
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(1));
         $participantY->getAllResponses()->add($responseY2);
 
         $feedbackY3 = (new Feedback())
             ->setResponse($responseY2)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_SELF_GRADING)
             ->setPublishedAt(new Alaress_Date_NullDate())
-            ->setUpdatedAt(Alaress_Date_Format::now());
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(1));
         $participantY->getAllFeedbacks()->add($feedbackY3);
 
+
+        // User Z: published self-assessed and instructor-given feedback, published self-assessed feedback
+        $participantZ = $linker->createAndLinkParticipant(self::getDemoStudent('Z'), $dueWorkPlan);
+
+        $responseZ1 = (new Response())
+            ->setSubmittedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+        $participantZ->getAllResponses()->add($responseZ1);
+
+        $feedbackZ1 = (new Feedback())
+            ->setResponse($responseZ1)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_SELF_GRADING)
+            ->setPublishedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+        $participantZ->getAllFeedbacks()->add($feedbackZ1);
+
+        $feedbackZ2 = (new Feedback())
+            ->setResponse($responseZ1)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->setPublishedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+        $participantZ->getAllFeedbacks()->add($feedbackZ2);
+
+        $responseZ2 = (new Response())
+            ->setSubmittedAt(Alaress_Date_Format::now()->addDays(1))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(1));
+        $participantZ->getAllResponses()->add($responseZ2);
+
+        $feedbackZ3 = (new Feedback())
+            ->setResponse($responseZ2)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_SELF_GRADING)
+            ->setPublishedAt(Alaress_Date_Format::now()->addDays(1))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(1));
+        $participantZ->getAllFeedbacks()->add($feedbackZ3);
 
         return $dueWork;
     }
