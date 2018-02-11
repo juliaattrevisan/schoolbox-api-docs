@@ -165,22 +165,25 @@ function ipInCIDR ($ip, $cidr) {
         return true;
     }
 
-    list ($network, $mask) = array_map('trim', explode ("/", $cidr));
+    if(stristr($cidr,'/') !== FALSE ) {
+        list ($network, $mask) = array_map('trim', explode("/", $cidr));
 
-    // Fail out invalid addresses
-    if (strlen($network) == 0 || is_null($mask)) {
-        return false;
+        // Fail out invalid addresses
+        if (strlen($network) == 0 || is_null($mask)) {
+            return false;
+        }
+
+        $ip_net = ip2long($network);
+        $ip_mask = ~((1 << (32 - $mask)) - 1);
+
+        $ip_ip = ip2long($ip);
+        $ip_ip_net = $ip_ip & $ip_mask;
+
+        $result = ($ip_ip_net == $ip_net);
+
+        return $result;
     }
-
-    $ip_net = ip2long ($network);
-    $ip_mask = ~((1 << (32 - $mask)) - 1);
-
-    $ip_ip = ip2long ($ip);
-    $ip_ip_net = $ip_ip & $ip_mask;
-
-    $result = ($ip_ip_net == $ip_net);
-
-    return $result;
+    return false;
 }
 
 /**
