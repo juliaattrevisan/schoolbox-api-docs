@@ -402,7 +402,7 @@ abstract class AbstractAssessment implements IAssessable
             }
         }
 
-        $hasPublishedFeedback = (null !== $participant->findMostRecentInstructorGivenFeedback());
+        $hasPublishedFeedback = (null !== $participant->findMostRecentInstructorGivenPublishedFeedback());
 
         // No Submitted Responses and No Published Feedback?
         return !$hasSubmittedResponse && !$hasPublishedFeedback;
