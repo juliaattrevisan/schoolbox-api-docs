@@ -34,7 +34,7 @@
                     {% if config.forgotten_password == '0' %}
                         <p>Username: {{ user.getUsername() }}</p>
                     {% endif %}
-                    <p>Reset Link: <a href="http://parents.saintkentigern.com/passwordReset/{{ reset.getToken()|e('html_attr') }}">http://parents.saintkentigern.com/passwordReset/{{ reset.getToken() }}</a></p>
+                    <p>Reset Link: <a href="http://parents.saintkentigern.com/passwordReset/{{ reset.getToken() }}">http://parents.saintkentigern.com/passwordReset/{{ reset.getToken() }}</a></p>
                 </td>
             </tr>
             <tr>{{ fn.spacer('parents.saintkentigern.com', 8, 0) }}</tr>

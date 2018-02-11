@@ -44,7 +44,7 @@
             <td width="640">
                 <p>Your username to access Schoolbox Help is <strong>{{ user.username }}</strong></p>
                 <p>
-                    <a href="http://{{ config.fqdn|e('html_attr') }}/passwordReset/{{ reset.token|e('html_attr') }}">
+                    <a href="http://{{ config.fqdn }}/passwordReset/{{ reset.token }}">
                         Click here to set your password and access Schoolbox Help now!
                     </a>
                 </p>
