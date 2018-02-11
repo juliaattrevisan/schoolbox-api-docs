@@ -11,6 +11,7 @@
 namespace Schoolbox\Learning\Assessment\Test;
 
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Collection;
 use Schoolbox\User;
 use Schoolbox\Resource\Storage\Model as Storage;
@@ -77,6 +78,7 @@ class DueWorkTest extends TestCase
                 ->setId(1)
                 ->setName($typeName))
             ->setCreator($this->somodio)
+            ->setSelfReviewability(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAttachedFiles((new Collection())
                 ->add((new DueWorkFile())
                     ->setId($files[0]['id'])
@@ -557,6 +559,7 @@ class DueWorkTest extends TestCase
             ->setNormalisedMark(-3)
             ->setComment('This is a flawed piece of work.')
             ->setReviewer($this->celia)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(
                 (new Collection())
                     ->add(
@@ -589,6 +592,7 @@ class DueWorkTest extends TestCase
             ->setNormalisedMark(37)
             ->setComment('Actually it is ok')
             ->setReviewer($this->celia)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-12 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
@@ -675,6 +679,7 @@ class DueWorkTest extends TestCase
             ->setNormalisedMark(-3)
             ->setComment('This is a flawed piece of work.')
             ->setReviewer($this->celia)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles((new Collection())
                 ->add((new DueWorkFeedbackFile())
                     ->setId($feedbackFiles[0]['id'])
@@ -701,6 +706,7 @@ class DueWorkTest extends TestCase
             ->setNormalisedMark(37)
             ->setComment('the oldest published stuff')
             ->setReviewer($this->celia)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-06 22:22:13', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
@@ -714,6 +720,7 @@ class DueWorkTest extends TestCase
             ->setNormalisedMark(100)
             ->setComment('meow - this is the most recently published feedback, despite the ordering in which this appears')
             ->setReviewer($this->celia)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-06 23:43:43', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 23:41:41', \Alaress_Date_Format::DATABASE_FORMAT))
@@ -727,6 +734,7 @@ class DueWorkTest extends TestCase
             ->setNormalisedMark(10)
             ->setComment('this is the second most recent')
             ->setReviewer($this->celia)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-06 23:23:25', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 23:23:23', \Alaress_Date_Format::DATABASE_FORMAT))
@@ -772,6 +780,7 @@ class DueWorkTest extends TestCase
             ->setNormalisedMark(-3)
             ->setComment('This is a flawed piece of work.')
             ->setReviewer($this->celia)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:14:15', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:14:12', \Alaress_Date_Format::DATABASE_FORMAT));
@@ -792,6 +801,7 @@ class DueWorkTest extends TestCase
             ->setNormalisedMark(37)
             ->setComment('The most recently published, but updated after publishing')
             ->setReviewer($this->celia)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
             ->setPublishedAt(new \Alaress_Date_Format('2016-10-06 22:22:13', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
@@ -804,6 +814,7 @@ class DueWorkTest extends TestCase
             ->setAssessable($dueWork)
             ->setNormalisedMark(100)
             ->setReviewer($this->celia)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-06 23:43:43', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 23:41:41', \Alaress_Date_Format::DATABASE_FORMAT))
@@ -817,6 +828,7 @@ class DueWorkTest extends TestCase
             ->setNormalisedMark(10)
             ->setComment('this is the second most recent')
             ->setReviewer($this->celia)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-06 23:23:25', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 23:23:23', \Alaress_Date_Format::DATABASE_FORMAT))
