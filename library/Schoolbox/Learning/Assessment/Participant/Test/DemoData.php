@@ -324,6 +324,7 @@ class DemoData
         $participantQ = $linker->createAndLinkParticipant(self::getDemoStudent('Q'), $dueWorkPlan);
 
         $feedbackQ = (new Feedback())
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now());
         $participantQ->getAllFeedbacks()->add($feedbackQ);
