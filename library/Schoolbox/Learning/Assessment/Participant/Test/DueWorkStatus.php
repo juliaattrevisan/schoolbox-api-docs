@@ -186,6 +186,16 @@ class DueWorkStatus extends TestCase
             [$dueWork->getParticipant(DemoData::getDemoStudent('P')), false],
             [$dueWork->getParticipant(DemoData::getDemoStudent('Q')), true],
             [$dueWork->getParticipant(DemoData::getDemoStudent('R')), false],
+
+            // Self-assessment
+            [$dueWork->getParticipant(DemoData::getDemoStudent('S')), false],
+            [$dueWork->getParticipant(DemoData::getDemoStudent('T')), false],
+            [$dueWork->getParticipant(DemoData::getDemoStudent('U')), false],
+            [$dueWork->getParticipant(DemoData::getDemoStudent('V')), false],
+            [$dueWork->getParticipant(DemoData::getDemoStudent('W')), false],
+            [$dueWork->getParticipant(DemoData::getDemoStudent('X')), true],
+            [$dueWork->getParticipant(DemoData::getDemoStudent('Y')), true],
+            [$dueWork->getParticipant(DemoData::getDemoStudent('Z')), false],
         ];
     }
 
