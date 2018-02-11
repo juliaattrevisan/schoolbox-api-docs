@@ -112,6 +112,18 @@ class DueWorkStatus extends TestCase
             [$dueWork->getParticipant(DemoData::getDemoStudent('P')), false],
             [$dueWork->getParticipant(DemoData::getDemoStudent('Q')), false],
             [$dueWork->getParticipant(DemoData::getDemoStudent('R')), false],
+
+            // Self-assessment
+            [$dueWork->getParticipant(DemoData::getDemoStudent('S')), true],
+            [$dueWork->getParticipant(DemoData::getDemoStudent('T')), false],
+            [$dueWork->getParticipant(DemoData::getDemoStudent('U')), true],
+            // Veronica has submitted a self-assessment, but no response; this can't normally occur,
+            // as self-assessment won't exist without response. Count this as requiring response.
+            [$dueWork->getParticipant(DemoData::getDemoStudent('V')), true],
+            [$dueWork->getParticipant(DemoData::getDemoStudent('W')), false],
+            [$dueWork->getParticipant(DemoData::getDemoStudent('X')), false],
+            [$dueWork->getParticipant(DemoData::getDemoStudent('Y')), false],
+            [$dueWork->getParticipant(DemoData::getDemoStudent('Z')), false],
         ];
     }
 
@@ -138,6 +150,16 @@ class DueWorkStatus extends TestCase
             [$dueWork->getParticipant(DemoData::getDemoStudent('P')), true],
             [$dueWork->getParticipant(DemoData::getDemoStudent('Q')), false],
             [$dueWork->getParticipant(DemoData::getDemoStudent('R')), true],
+
+            // Self-assessment
+            [$dueWork->getParticipant(DemoData::getDemoStudent('S')), false],
+            [$dueWork->getParticipant(DemoData::getDemoStudent('T')), true],
+            [$dueWork->getParticipant(DemoData::getDemoStudent('U')), false],
+            [$dueWork->getParticipant(DemoData::getDemoStudent('V')), false],
+            [$dueWork->getParticipant(DemoData::getDemoStudent('W')), true],
+            [$dueWork->getParticipant(DemoData::getDemoStudent('X')), false],
+            [$dueWork->getParticipant(DemoData::getDemoStudent('Y')), false],
+            [$dueWork->getParticipant(DemoData::getDemoStudent('Z')), true],
         ];
     }
 
