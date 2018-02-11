@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Assessment\Test\MarkScheme;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkSubmission;
 use Schoolbox\Learning\Assessment\Participant;
@@ -2620,7 +2621,8 @@ class AssessableTest extends TestCase
         $dueWork = (new DueWork())
             ->setId(3)
             ->setMaxMark(20)
-            ->setGradeGroup($this->getDummyLetterGradeGroup());
+            ->setGradeGroup($this->getDummyLetterGradeGroup())
+            ->setSelfReviewability(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
 
         $student1 = $this->getDummyStudent(1);
         $student2 = $this->getDummyStudent(2);
@@ -2660,6 +2662,7 @@ class AssessableTest extends TestCase
         $feedback3 = (new DueWorkFeedback())
             ->setId(3)
             ->setReviewee($student3)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setHumanReadableMark('10 / 20')
             ->setNormalisedMark(50.0)
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
@@ -2674,6 +2677,7 @@ class AssessableTest extends TestCase
         $feedback4 = (new DueWorkFeedback())
             ->setId(4)
             ->setReviewee($student4)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setHumanReadableMark('10 / 20')
             ->setNormalisedMark(50.0)
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
@@ -2688,6 +2692,7 @@ class AssessableTest extends TestCase
         $feedback5a = (new DueWorkFeedback())
             ->setId(5)
             ->setReviewee($student5)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setHumanReadableMark('10 / 20')
             ->setNormalisedMark(50.0)
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
@@ -2695,6 +2700,7 @@ class AssessableTest extends TestCase
         $feedback5b = (new DueWorkFeedback())
             ->setId(6)
             ->setReviewee($student5)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setHumanReadableMark('20 / 20')
             ->setNormalisedMark(100.0)
             ->setUpdatedAt($this->getDummyDate('2016-08-10 21:03:19'))
@@ -2713,6 +2719,7 @@ class AssessableTest extends TestCase
         $feedback6 = (new DueWorkFeedback())
             ->setId(7)
             ->setReviewee($student6)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setHumanReadableMark('10 / 20')
             ->setNormalisedMark(50.0)
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
@@ -2731,6 +2738,7 @@ class AssessableTest extends TestCase
         $feedback7a = (new DueWorkFeedback())
             ->setId(8)
             ->setReviewee($student7)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setHumanReadableMark('10 / 20')
             ->setNormalisedMark(50.0)
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
@@ -2738,6 +2746,7 @@ class AssessableTest extends TestCase
         $feedback7b = (new DueWorkFeedback())
             ->setId(9)
             ->setReviewee($student7)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setHumanReadableMark('20 / 20')
             ->setNormalisedMark(100.0)
             ->setUpdatedAt($this->getDummyDate('2016-08-10 21:03:19'))
@@ -2747,6 +2756,7 @@ class AssessableTest extends TestCase
         $feedback8 = (new DueWorkFeedback())
             ->setId(10)
             ->setReviewee($student8)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setHumanReadableMark('10 / 20')
             ->setNormalisedMark(50.0)
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
@@ -2756,6 +2766,7 @@ class AssessableTest extends TestCase
         $feedback9a = (new DueWorkFeedback())
             ->setId(11)
             ->setReviewee($student9)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setHumanReadableMark('10 / 20')
             ->setNormalisedMark(50.0)
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
@@ -2763,6 +2774,7 @@ class AssessableTest extends TestCase
         $feedback9b = (new DueWorkFeedback())
             ->setId(12)
             ->setReviewee($student9)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setHumanReadableMark('20 / 20')
             ->setNormalisedMark(100.0)
             ->setUpdatedAt($this->getDummyDate('2016-08-10 21:03:19'))
