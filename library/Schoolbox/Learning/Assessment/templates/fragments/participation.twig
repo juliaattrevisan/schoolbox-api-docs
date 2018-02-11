@@ -6,130 +6,128 @@
         SASS: www/css/foundation/components/assessment/_participation.scss
         Modal: library/Schoolbox/Learning/Assessment/templates/fragments/participationModal.twig
 #}
-<fieldset id="participation-container">
+<fieldset class="content collapsible" id="participation-container">
+    {% set hasCustomisation = false %}
+    {% for participant in assessment.allParticipants  %}
+        {% if (participant.excludedAt and not participant.excludedAt.null) or participant.plan.name %}
+            {% set hasCustomisation = true %}
+        {% endif %}
+    {% endfor %}
+    <legend data-collapser="participation" {% if hasCustomisation %} class="icon-up-arrow" {% else %} class="icon-down-arrow" {% endif %}>
+        Participation and Learning Plans
+    </legend>
 
-    <legend>Participation and Learning Plans</legend>
-
-    {# TODO: either create a global flag for custom participation to be enabled on an assessment, or turn this into an collapsable section
-    <label for="participation-enable">
-        Customise participation and learning plans?
-        <span
-            data-tooltip class="has-tip hint"
-            title="Use this feature to add and remove students from participating in this assessment, or create modified versions for select students.">
-            ?
-        </span>
-    </label>
-    <div class="switch round">
-        <input id="participation-enable" type="checkbox">
-        <label for="participation-enable">
-            <span class="icon-approve"></span>
-            <span class="icon-cancel"></span>
-        </label>
-    </div>
-    #}
-    {% if assessment.allParticipants | length %}
-        <div id="participation-settings"> {# class="hide" #}
-            <div class="row">
-                <div class="content small-12 medium-6 large-4 medium-offset-6 large-offset-8 columns" id="mass-buttons">
-                    <nav>
-                        <div class="flex-list buttons">
-                            <button
-                                class="button dropdown"
-                                id="customise-dropdown"
-                                data-dropdown="customise-options"
-                                aria-controls="customise-options"
-                                aria-expanded="false"
-                                disabled
-                            >
-                                Modify Participation
-                            </button>
-
-                            <button
-                                class="button icon-more icon hide"
-                                id="plan-dropdown"
-                                data-dropdown="plan-options"
-                                aria-controls="customise-options"
-                                aria-expanded="false"
-                                title="Modify Plans"
-                            >
-                            </button>
-                        </div>
-                        <ul class="f-dropdown" id="customise-options" data-dropdown-content aria-hidden="true">
-                            <li><a href="#" data-participant-change="exclude" class="hide">Exclude from assessment</a></li>
-                            <li><a href="#" data-participant-change="include" class="hide">Include in assessment</a></li>
-                            <li class="separator">Learning Plans</li>
-                            <li><a href="#" data-participant-change="default" class="hide">Remove customisations</a></li>
-                            {% for plan in assessment.plans if not plan.isDynamic %}
-                                <li><a href="#" data-plan-use="{{ plan.id }}" data-plan-name="{{ plan.name }}">{{ plan.name }}</a></li>
-                            {% endfor %}
-                            <li><a href="#" id="participant-customise">Create new plan...</a></li>
-                        </ul>
-                        <ul class="f-dropdown" id="plan-options" data-dropdown-content aria-hidden="true">
-                            <li class="separator">Modify Plans</li>
-                            {% for plan in assessment.plans if not plan.isDynamic %}
-                                <li><a href="#" data-plan-modify="{{ plan.id }}" data-plan-name="{{ plan.name }}">{{ plan.name }}</a></li>
-                            {% endfor %}
-                        </ul>
-                    </nav>
-                </div>
-            </div>
-
-            <ul class="information-list card-selectable" id="participants">
-                {% for participant in assessment.allParticipants %}
-                    {% set user = participant.user %}
-                    {% set userInclude = (not participant.excludedAt) or participant.excludedAt.null %}
-                    {% set userPlanName = userInclude ? (participant.plan.name ?: '(no customisations)') : '(excluded)' %}
-                    {% set userStatus = userInclude ? (participant.plan.name ? 'custom' : 'included') : 'excluded' %}
-
-                    <li data-participant="{{ user.id }}">
-                        <input type="hidden" name="participant-include[{{ user.id }}]" id="participant-include-{{ user.id }}" value="{{ userInclude ? 1 : 0 }}">
-                        <input type="hidden" name="participant-plan[{{ user.id }}]" id="participant-plan-{{ user.id }}"
-                               value="{{ (participant.plan.id and not participant.plan.isDynamic) ? participant.plan.id : 0 }}">
-                        <div data-participant-row>
-                            <div class="selector" data-participant-selector>
-                                <input
-                                        id="participant-{{ user.id }}"
-                                        type="checkbox" value="1"
-                                        name="participant[{{ user.id }}]"
-                                        data-participant-select data-user-id="{{ user.id }}"
-                                        data-user-name="{{ user.fullName }}"
+    <div class="column small-12 {% if not hasCustomisation %}hide{% endif %}" data-collapsable="participation" {% if hasCustomisation %} data-collapse-state="uncollapsed" {% else %} data-collapse-state="collapsed" {% endif %}>
+        {% if assessment.allParticipants | length %}
+            <div id="participation-settings">
+                <div class="row">
+                    <div class="content small-12 medium-6 large-4 medium-offset-6 large-offset-8 columns" id="mass-buttons">
+                        <nav>
+                            <div class="flex-list buttons">
+                                <button
+                                    class="button dropdown"
+                                    id="customise-dropdown"
+                                    data-dropdown="customise-options"
+                                    aria-controls="customise-options"
+                                    aria-expanded="false"
+                                    disabled
                                 >
-                                <label for="participant-{{ user.id }}" class="checkbox-label"></label>
+                                    Modify Participation
+                                </button>
+
+                                <button
+                                    class="button icon-more icon hide"
+                                    id="plan-dropdown"
+                                    data-dropdown="plan-options"
+                                    aria-controls="customise-options"
+                                    aria-expanded="false"
+                                    title="Modify Plans"
+                                >
+                                </button>
                             </div>
-                            <div class="small-12 column">
-                                <div class="row">
-                                    <label for="participant-{{ user.id }}" class="checkbox-label">
-                                        <div class="small-12 medium-6 columns compact card{{ userInclude ? '' : ' participant-excluded' }}">
-                                            <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square32">
-                                            <p>{{ user.fullName }}</p>
-                                        </div>
-                                        <div class="small-12 medium-6 columns meta" data-participant-status="{{ userStatus }}">{{ userPlanName }}</div>
-                                    </label>
+                            <ul class="f-dropdown" id="customise-options" data-dropdown-content aria-hidden="true">
+                                <li><a href="#" data-participant-change="exclude" class="hide">Exclude from assessment</a></li>
+                                <li><a href="#" data-participant-change="include" class="hide">Include in assessment</a></li>
+                                <li class="separator">Learning Plans</li>
+                                <li><a href="#" data-participant-change="default" class="hide">Remove customisations</a></li>
+                                {% for plan in assessment.plans if not plan.isDynamic %}
+                                    <li><a href="#" data-plan-use="{{ plan.id }}" data-plan-name="{{ plan.name }}">{{ plan.name }}</a></li>
+                                {% endfor %}
+                                <li><a href="#" id="participant-customise">Create new plan...</a></li>
+                            </ul>
+                            <ul class="f-dropdown" id="plan-options" data-dropdown-content aria-hidden="true">
+                                <li class="separator">Modify Plans</li>
+                                {% for plan in assessment.plans if not plan.isDynamic %}
+                                    <li><a href="#" data-plan-modify="{{ plan.id }}" data-plan-name="{{ plan.name }}">{{ plan.name }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+
+                <ul class="information-list card-selectable" id="participants">
+                    {% for participant in assessment.allParticipants %}
+                        {% set user = participant.user %}
+                        {% set userInclude = (not participant.excludedAt) or participant.excludedAt.null %}
+                        {% set userPlanName = userInclude ? (participant.plan.name ?: '(no customisations)') : '(excluded)' %}
+                        {% set userStatus = userInclude ? (participant.plan.name ? 'custom' : 'included') : 'excluded' %}
+
+                        <li data-participant="{{ user.id }}">
+                            <input type="hidden" name="participant-include[{{ user.id }}]" id="participant-include-{{ user.id }}" value="{{ userInclude ? 1 : 0 }}">
+                            <input type="hidden" name="participant-plan[{{ user.id }}]" id="participant-plan-{{ user.id }}"
+                                   value="{{ (participant.plan.id and not participant.plan.isDynamic) ? participant.plan.id : 0 }}">
+                            <div data-participant-row>
+                                <div class="selector" data-participant-selector>
+                                    <input
+                                            id="participant-{{ user.id }}"
+                                            type="checkbox" value="1"
+                                            name="participant[{{ user.id }}]"
+                                            data-participant-select data-user-id="{{ user.id }}"
+                                            data-user-name="{{ user.fullName }}"
+                                    >
+                                    <label for="participant-{{ user.id }}" class="checkbox-label"></label>
+                                </div>
+                                <div class="small-12 column">
+                                    <div class="row">
+                                        <label for="participant-{{ user.id }}" class="checkbox-label">
+                                            <div class="small-12 medium-6 columns compact card{{ userInclude ? '' : ' participant-excluded' }}">
+                                                <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square32">
+                                                <p>{{ user.fullName }}</p>
+                                            </div>
+                                            <div class="small-12 medium-6 columns meta" data-participant-status="{{ userStatus }}">{{ userPlanName }}</div>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </li>
-                {% endfor %}
-            </ul>
+                        </li>
+                    {% endfor %}
+                </ul>
 
-        </div>
-        <div id="plan-data">
-            {# load in the existing plans #}
-            {% for plan in assessment.plans if not plan.isDynamic %}
-                {# we don't need the dyna-plan rendered here #}
-                <input type="hidden" name="plans[{{ plan.id }}][id]" value="{{ plan.id }}"/>
-                <input type="hidden" name="plans[{{ plan.id }}][name]" value="{{ plan.name }}" data-saved-plan/>
-                <input type="hidden" name="plans[{{ plan.id }}][description]" value="{{ plan.description }}"/>
-                <input type="hidden" name="plans[{{ plan.id }}][publish_date]" value="{{ plan.publishDate.local }}"/>
-                <input type="hidden" name="plans[{{ plan.id }}][open_date]" value="{{ plan.openDate.local }}"/>
-                <input type="hidden" name="plans[{{ plan.id }}][due_date]" value="{{ plan.dueDate.local }}"/>
-                <input type="hidden" name="plans[{{ plan.id }}][close_date]" value="{{ plan.closeDate.local }}"/>
-            {% endfor %}
-        </div>
-    {% else %}
-        <div class="empty-state">
-            <i class="icon-users"></i>
-            <p>{{ assessment.context.folder.title }} doesn't currently contain any students, so there is no participation to customise.</p>
-        </div>
-    {% endif %}
+            </div>
+            <div id="plan-data">
+                {# load in the existing plans #}
+                {% for plan in assessment.plans if not plan.isDynamic %}
+                    {# we don't need the dyna-plan rendered here #}
+                    <input type="hidden" name="plans[{{ plan.id }}][id]" value="{{ plan.id }}"/>
+                    <input type="hidden" name="plans[{{ plan.id }}][name]" value="{{ plan.name }}" data-saved-plan/>
+                    <input type="hidden" name="plans[{{ plan.id }}][description]" value="{{ plan.description }}"/>
+                    <input type="hidden" name="plans[{{ plan.id }}][publish_date]" value="{{ plan.publishDate.local }}"/>
+                    <input type="hidden" name="plans[{{ plan.id }}][open_date]" value="{{ plan.openDate.local }}"/>
+                    <input type="hidden" name="plans[{{ plan.id }}][due_date]" value="{{ plan.dueDate.local }}"/>
+                    <input type="hidden" name="plans[{{ plan.id }}][close_date]" value="{{ plan.closeDate.local }}"/>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-users"></i>
+                <p>{{ assessment.context.folder.title }} doesn't currently contain any students, so there is no participation to customise.</p>
+            </div>
+        {% endif %}
+    </div>
 </fieldset>
+
+<script type="text/javascript">
+    $(function () {
+        $('[data-collapser]').collapsable();
+    });
+</script>

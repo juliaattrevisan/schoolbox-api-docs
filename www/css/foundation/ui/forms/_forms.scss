@@ -676,13 +676,13 @@ section > fieldset {
 		font-weight: $header-font-weight;
 	}
 
-	fieldset {
+	fieldset, fieldset.collapsible {
 		float: left;
 		width: 100%;
 		border: none;
 		padding: 1rem 0;
 		margin: 0 0 0.5rem;
-		legend {
+		legend, legend[class^="icon-"], legend[class*=" icon-"], legend[data-collapser] {
 			font-size: $h6-font-size;
 			font-weight: $font-weight-bold;
 			margin-bottom: 0.5rem;
