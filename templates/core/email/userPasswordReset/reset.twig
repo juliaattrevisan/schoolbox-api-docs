@@ -15,12 +15,12 @@
                 <p>
                     {% if user.getEnabled() %}
                         You have requested a password reset for your
-                        account on <a href="http://{{ config.fqdn|e('html_attr') }}/">{{ config.title }}</a>.
+                        account on <a href="http://{{ config.fqdn }}/">{{ config.title }}</a>.
                         Please follow the link below, or copy and paste it into your browser,
                         to reset your password:
                     {% else %}
                         You have requested a password reset for your
-                        account on <a href="http://{{ config.fqdn|e('html_attr') }}/">{{ config.title }}</a>,
+                        account on <a href="http://{{ config.fqdn }}/">{{ config.title }}</a>,
                         but your account is not enabled. You may not reset your password
                         until your account is re-enabled.
                     {% endif %}
@@ -34,7 +34,7 @@
                     {% if config.forgotten_password == '0' %}
                         <p>Username: {{ user.getUsername() }}</p>
                     {% endif %}
-                    <p>Reset Link: <a href="http://{{ config.fqdn|e('html_attr') }}/passwordReset/{{ reset.getToken()|e('html_attr') }}">http://{{ config.fqdn }}/passwordReset/{{ reset.getToken() }}</a></p>
+                    <p>Reset Link: <a href="http://{{ config.fqdn }}/passwordReset/{{ reset.getToken() }}">http://{{ config.fqdn }}/passwordReset/{{ reset.getToken() }}</a></p>
                 </td>
             </tr>
             <tr>{{ fn.spacer(config.fqdn, 8, 0) }}</tr>
