@@ -28,6 +28,10 @@ use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\L10n\Mapper as L10nMapper;
+use Schoolbox\L10n\RosettaStoneFactory;
+use Schoolbox\L10n\RosettaStone;
+use Alaress\Async\Notification\Parameter\Param;
 
 class Notifier extends AbstractModuleNotifier
 {
@@ -52,6 +56,9 @@ class Notifier extends AbstractModuleNotifier
     /** @var UserMapper $userMapper */
     protected $userMapper;
 
+    /** @var RosettaStone $l10n */
+    protected $l10n;
+
     /**
      * @param array $dependencies
      */
@@ -59,6 +66,11 @@ class Notifier extends AbstractModuleNotifier
     {
         if (empty($dependencies["configMapper"])) {
             $dependencies["configMapper"] = ConfigMapper::getInstance();
+        }
+
+        if (empty($dependencies["l10n"])) {
+            $stoneFactory = new RosettaStoneFactory();
+            $dependencies["l10n"] = $stoneFactory->build(L10nMapper::getInstance());
         }
 
         if (empty($dependencies["pastoralAccessMapper"])) {
@@ -108,11 +120,13 @@ class Notifier extends AbstractModuleNotifier
         $timestamp = md5(date("YmdHis"));
 
         $new = $method == self::TRIGGER_CREATED ? "new " : "";
+        $href = "/pastoral/student/{$model->getStudent()->getId()}/record/{$model->getId()}?ts={$timestamp}";
 
         $builder = new Builder();
-        $builder->setTitle("A {$new}pastoral care record has been {$method}")
+        $builder->setTitle("A {$new}:pastoralcare record has been {$method}")
+                ->setParam('pastoralcare', new Param($this->l10n->translate('pastoralCare'), $href))
                 ->setIcon("/portrait.php?size=square32&userId={$pastoral->getOwner()->getExternalId()}")
-                ->setHref("/pastoral/student/{$model->getStudent()->getId()}/record/{$model->getId()}?ts={$timestamp}")
+                ->setHref($href)
                 ->setNamespace($this->getSlug())
                 ->setSeverity(Logger::ERROR)
                 ->addTopic("pastoral.{$model->getId()}.{$method}");
@@ -337,4 +351,25 @@ class Notifier extends AbstractModuleNotifier
 
         return $this;
     }
+
+    /**
+     * @return RosettaStone
+     */
+    public function getL10n(): RosettaStone
+    {
+        return $this->l10n;
+    }
+
+    /**
+     * @param RosettaStone $l10n
+     * @return self|$this
+     */
+    public function setL10n(RosettaStone $l10n)
+    {
+        $this->l10n = $l10n;
+
+        return $this;
+    }
+
+
 }
