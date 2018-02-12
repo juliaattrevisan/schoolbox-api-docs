@@ -14,22 +14,25 @@ Usage:
 <div class="reveal-modal" data-reveal id="reveal-resultset">
     <h2>Apply Result Set</h2>
     <p>Choose a standard result set to apply to this {{ locale.translate('rubricCriterion') }} grid.</p>
-    <p><em><strong>Warning:</strong> this is a destructive action. Any existing level and descriptor data will be replaced with the chosen result set.</em></p>
-    <fieldset>
-        <legend>Available Result Sets</legend>
-        <div class="small-12 columns no-pad">
-            {% for resultSetId, resultSet in resultSets %}
-                <input id="rs-{{ resultSetId }}" type="radio" name="resultset" value="{{ resultSetId }}"{% if loop.first %} checked="checked"{% endif %}/>
-                <label for="rs-{{ resultSetId }}" class="radio-label">
-                    {%- for result in resultSet -%}
-                        {{ result.label }}{% if resultSet|length > 1 and not loop.last %}, {% endif %}
-                    {%- endfor -%}
-                </label>
-            {% endfor %}
-        </div>
-    </fieldset>
-    <a href="#" data-action="applyResultSet" class="submit button">Apply</a>
-    <a href="#" data-action="close" class="button">Cancel</a>
+    <div class="alert-box warning">
+        <strong>Warning:</strong> this is a destructive action. Any existing level and descriptor data will be replaced with the chosen result set.
+    </div>
+    <h3>Available Result Sets</h3>
+    <div class="small-12 columns no-pad">
+        {% for resultSetId, resultSet in resultSets %}
+            <input id="rs-{{ resultSetId }}" type="radio" name="resultset" value="{{ resultSetId }}"{% if loop.first %} checked="checked"{% endif %}/>
+            <label for="rs-{{ resultSetId }}" class="radio-label">
+                {%- for result in resultSet -%}
+                    {{ result.label }}{% if resultSet|length > 1 and not loop.last %}, {% endif %}
+                {%- endfor -%}
+            </label>
+        {% endfor %}
+        <ul class="flex-list buttons">
+            <li><a href="#" data-action="applyResultSet" class="submit button">Apply</a></li>
+            <li><a href="#" data-action="close" class="button">Cancel</a></li>
+        </ul>
+    </div>
+
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     <div data-overlay class="wait-overlay hide">
         <p>
