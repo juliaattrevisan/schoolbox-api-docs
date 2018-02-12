@@ -240,31 +240,14 @@ class Controller extends Assessment\Controller
         }
 
         // Generate rubric context for every feedback
-        $rubricContext = new RubricContext($this->rubricMapper);
-        $timeline      = (new FullTimeline($participant))->getForUser($this->getUser());
-
-        // Load and show only rubric grids for feedback in the timeline
-        // TODO consider integrating into timeline generator
-        /** @var Feedback\Model[] $timelineFeedback */
-        $timelineFeedback = [];
-        foreach ($timeline as $timelineItem) {
-            if ($timelineItem instanceof Feedback\Model) {
-                $timelineFeedback[] = $timelineItem;
-            } elseif ($timelineItem instanceof Assessment\IResponse) {
-                foreach ($timelineItem->getAllFeedback() as $feedback) {
-                    $timelineFeedback[] = $feedback;
-                }
-            }
-        }
-        $feedbackRubricContexts = [];
-        foreach ($timelineFeedback as $feedback) {
-            $feedbackRubricContexts[$feedback->getId()] = $rubricContext->generateForFeedback(
-                $feedback,
-                $this->getUser(),
-                $this->getAccess(),
-                false
-            );
-        }
+        $rubricContext          = new RubricContext($this->rubricMapper);
+        $timeline               = (new FullTimeline($participant))->getForUser($this->getUser());
+        $feedbackRubricContexts = $rubricContext->generateSeriesForTimeline(
+            $timeline,
+            $this->getUser(),
+            $this->getAccess(),
+            false
+        );
 
         /* Find all the records spawned by $participant
          *
