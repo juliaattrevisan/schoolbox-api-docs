@@ -114,7 +114,7 @@ class Controller extends Base {
                         ['order' => ['name' => 'asc',]]
                     ),
                     'calendar' => array(
-                        'date' => $calendarDate->getDatabaseDate(),
+                        'date' => $calendarDate->getDatabase(),
                         'view' => $this->request->query->get('view', 'week'),
                     ),
                     'token' => $_SESSION['key']
