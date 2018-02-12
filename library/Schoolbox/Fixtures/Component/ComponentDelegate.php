@@ -117,7 +117,7 @@ class ComponentDelegate
         $statement = $this->database->prepareQuery($query);
         if ($statement->execute(array(':userId'=>$userId))) {
             $result = $statement->fetchAll(\PDO::FETCH_COLUMN);
-            return $this->getMatchMapper()->findByColumn('id', $result);
+            return $this->sortMatches($this->getMatchMapper()->findByColumn('id', $result));
         }
 
         return new Collection();
