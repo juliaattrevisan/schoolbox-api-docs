@@ -631,26 +631,26 @@ class DueWorkTest extends TestCase
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingSelfAssessedFeedback);
 
         // It exists on participant but not a feedback yet
-        $this->assertEquals(4224, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedFeedback()->getId());
+        $this->assertSame($floatingSelfAssessedFeedback, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedFeedback());
         $this->assertNull($dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedPublishedFeedback());
         $this->assertNull($submission->findMostRecentSelfAssessedFeedback());
         $this->assertNull($submission->findMostRecentSelfAssessedPublishedFeedback());
 
         // It must not affect the authoritative feedback, or its mark
-        $this->assertEquals(4223, $dueWork->getParticipant($this->hodes)->findMostRecentInstructorGivenFeedback()->getId());
+        $this->assertSame($floatingFeedback, $dueWork->getParticipant($this->hodes)->findMostRecentInstructorGivenFeedback());
         $this->assertEquals(-3, $dueWork->getParticipant($this->hodes)->getNormalisedMark(true));
         $this->assertEquals(37, $dueWork->getParticipant($this->hodes)->getNormalisedMark(false));
 
         // Publish it
         $floatingSelfAssessedFeedback
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-12 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
-        $this->assertEquals(4224, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedFeedback()->getId());
-        $this->assertEquals(4224, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedPublishedFeedback()->getId());
+        $this->assertSame($floatingSelfAssessedFeedback, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedFeedback());
+        $this->assertSame($floatingSelfAssessedFeedback, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedPublishedFeedback());
         $this->assertNull($submission->findMostRecentSelfAssessedFeedback());
         $this->assertNull($submission->findMostRecentSelfAssessedPublishedFeedback());
 
         // It still must not affect the authoritative feedback, or its mark
-        $this->assertEquals(4223, $dueWork->getParticipant($this->hodes)->findMostRecentInstructorGivenFeedback()->getId());
+        $this->assertSame($floatingFeedback, $dueWork->getParticipant($this->hodes)->findMostRecentInstructorGivenFeedback());
         $this->assertEquals(-3, $dueWork->getParticipant($this->hodes)->getNormalisedMark(true));
         $this->assertEquals(37, $dueWork->getParticipant($this->hodes)->getNormalisedMark(false));
 
@@ -671,13 +671,13 @@ class DueWorkTest extends TestCase
         // Must be added to both participant and response?
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($selfAssessedFeedbackForSubmission);
 
-        $this->assertEquals(4224, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedFeedback()->getId());
-        $this->assertEquals(4224, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedPublishedFeedback()->getId());
-        $this->assertEquals(4225, $submission->findMostRecentSelfAssessedFeedback()->getId());
+        $this->assertSame($floatingSelfAssessedFeedback, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedFeedback());
+        $this->assertSame($floatingSelfAssessedFeedback, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedPublishedFeedback());
+        $this->assertEquals($selfAssessedFeedbackForSubmission, $submission->findMostRecentSelfAssessedFeedback());
         $this->assertNull($submission->findMostRecentSelfAssessedPublishedFeedback());
 
         // It must not affect the authoritative feedback, or its mark
-        $this->assertEquals(4223, $dueWork->getParticipant($this->hodes)->findMostRecentInstructorGivenFeedback()->getId());
+        $this->assertSame($floatingFeedback, $dueWork->getParticipant($this->hodes)->findMostRecentInstructorGivenFeedback());
         $this->assertEquals(-3, $dueWork->getParticipant($this->hodes)->getNormalisedMark(true));
         $this->assertEquals(37, $dueWork->getParticipant($this->hodes)->getNormalisedMark(false));
 
@@ -686,13 +686,13 @@ class DueWorkTest extends TestCase
             ->setCreatedAt($selfAssessedFeedbackForSubmission->getCreatedAt()->addMonths(2))
             ->setUpdatedAt($selfAssessedFeedbackForSubmission->getUpdatedAt()->addMonths(2));
 
-        $this->assertEquals(4225, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedFeedback()->getId());
-        $this->assertEquals(4224, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedPublishedFeedback()->getId());
-        $this->assertEquals(4225, $submission->findMostRecentSelfAssessedFeedback()->getId());
+        $this->assertSame($selfAssessedFeedbackForSubmission, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedFeedback());
+        $this->assertSame($floatingSelfAssessedFeedback, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedPublishedFeedback());
+        $this->assertEquals($selfAssessedFeedbackForSubmission, $submission->findMostRecentSelfAssessedFeedback());
         $this->assertNull($submission->findMostRecentSelfAssessedPublishedFeedback());
 
         // Still must not affect the authoritative feedback, or its mark
-        $this->assertEquals(4223, $dueWork->getParticipant($this->hodes)->findMostRecentInstructorGivenFeedback()->getId());
+        $this->assertSame($floatingFeedback, $dueWork->getParticipant($this->hodes)->findMostRecentInstructorGivenFeedback());
         $this->assertEquals(-3, $dueWork->getParticipant($this->hodes)->getNormalisedMark(true));
         $this->assertEquals(37, $dueWork->getParticipant($this->hodes)->getNormalisedMark(false));
 
@@ -702,13 +702,13 @@ class DueWorkTest extends TestCase
         $selfAssessedFeedbackForSubmission
             ->setPublishedAt(new \Alaress_Date_Format('2016-07-12 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $this->assertEquals(4224, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedFeedback()->getId());
-        $this->assertEquals(4224, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedPublishedFeedback()->getId());
-        $this->assertEquals(4225, $submission->findMostRecentSelfAssessedFeedback()->getId());
-        $this->assertEquals(4225, $submission->findMostRecentSelfAssessedPublishedFeedback());
+        $this->assertSame($selfAssessedFeedbackForSubmission, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedFeedback());
+        $this->assertSame($floatingSelfAssessedFeedback, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedPublishedFeedback());
+        $this->assertEquals($selfAssessedFeedbackForSubmission, $submission->findMostRecentSelfAssessedFeedback());
+        $this->assertEquals($selfAssessedFeedbackForSubmission, $submission->findMostRecentSelfAssessedFeedback());
 
         // Still must not affect the authoritative feedback, or its mark
-        $this->assertEquals(4223, $dueWork->getParticipant($this->hodes)->findMostRecentInstructorGivenFeedback()->getId());
+        $this->assertSame($floatingFeedback, $dueWork->getParticipant($this->hodes)->findMostRecentInstructorGivenFeedback());
         $this->assertEquals(-3, $dueWork->getParticipant($this->hodes)->getNormalisedMark(true));
         $this->assertEquals(37, $dueWork->getParticipant($this->hodes)->getNormalisedMark(false));
 
@@ -716,13 +716,13 @@ class DueWorkTest extends TestCase
         $selfAssessedFeedbackForSubmission
             ->setPublishedAt($selfAssessedFeedbackForSubmission->getPublishedAt()->addMonths(2));
 
-        $this->assertEquals(4225, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedFeedback()->getId());
-        $this->assertEquals(4225, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedPublishedFeedback()->getId());
-        $this->assertEquals(4225, $submission->findMostRecentSelfAssessedFeedback()->getId());
-        $this->assertEquals(4225, $submission->findMostRecentSelfAssessedPublishedFeedback()->getId());
+        $this->assertSame($selfAssessedFeedbackForSubmission, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedFeedback());
+        $this->assertSame($selfAssessedFeedbackForSubmission, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedPublishedFeedback());
+        $this->assertEquals($selfAssessedFeedbackForSubmission, $submission->findMostRecentSelfAssessedFeedback());
+        $this->assertEquals($selfAssessedFeedbackForSubmission, $submission->findMostRecentSelfAssessedFeedback());
 
         // Still must not affect the authoritative feedback, or its mark
-        $this->assertEquals(4223, $dueWork->getParticipant($this->hodes)->findMostRecentInstructorGivenFeedback()->getId());
+        $this->assertSame($floatingFeedback, $dueWork->getParticipant($this->hodes)->findMostRecentInstructorGivenFeedback());
         $this->assertEquals(-3, $dueWork->getParticipant($this->hodes)->getNormalisedMark(true));
         $this->assertEquals(37, $dueWork->getParticipant($this->hodes)->getNormalisedMark(false));
     }
