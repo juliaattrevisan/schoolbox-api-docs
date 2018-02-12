@@ -8,15 +8,17 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Assessment\Participant;
+use Schoolbox\Breadcrumbs;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\Learning\Assessment\Visibility;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+use Schoolbox\Learning\Quiz\ValidParticipant;
+use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Breadcrumbs;
-use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Resource\Folder;
 
 $assessHandler   = new Assess_Main();
 $attemptHandler  = new Assess_Attempt();
@@ -42,6 +44,23 @@ if ($assessHandler->isDeleted($assess['assess_id'])) {
 // Sanity check on attempt - does it belong to the current user and quiz?
 if (!($attempt['user_id'] == $_SESSION['user']->getId() && $attempt['assess_id'] == $assess['assess_id'])) {
     error(123);
+}
+
+/* Check the folder exists meaningfully
+ */
+try {
+    $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
+}
+catch (Mapper\Exception $e) {
+    error(117);
+}
+
+/* Non-participants are sent to a 404 screen
+ */
+$isValidParticipant = new ValidParticipant(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
+
+if (!$isValidParticipant->isSatisfiedBy($_SESSION['user'], $folder, $assess['assessment_id'])) {
+    $this->pageNotFound();
 }
 
 /* Disabled: doing so will allow teachers to give their test a "dry run" and
