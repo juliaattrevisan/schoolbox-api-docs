@@ -74,23 +74,22 @@ class DatetimeTest extends TestCase {
 	}
 
     /**
+     * @dataProvider getTestHydrate
      * @param null|string $input
      * @param null|bool $expected_output
      */
     public function testHydrate($input = null, $expected_output = null) {
         // Silence errors: date creation warns on invalid but parseable dates
         $hydrated = @$this->object->hydrate($input);
+        // Only interested in if this successfully hydrated into a non-null value
         $this->assertSame(
             $expected_output,
-            $input == null && $hydrated instanceof \Alaress_Date_NullDate ?
-                null :
-                (
-                    $hydrated instanceof DateWrapper && !$hydrated instanceof \Alaress_Date_NullDate
-                )
+            $hydrated instanceof DateWrapper && !$hydrated instanceof \Alaress_Date_NullDate
         );
     }
 
     /**
+     * @dataProvider getTestDehydrate
      * @param mixed $input
      * @param null|string $expected_output
      */
