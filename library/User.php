@@ -573,7 +573,10 @@ class User extends DeprecatedModel
                 $this->db->insert('superusers', array('id' => $id));
             }
             // Filthily notify the binder that there's a new user
-            $this->getUserNotifier()->manualNotifyCreated($id, $_SESSION['user']);
+            if(isset($_SESSION) && isset($_SESSION['user'])) {
+                $this->getUserNotifier()->manualNotifyCreated($id, $_SESSION['user']);
+            }
+
             return $id;
         }
         return false;
