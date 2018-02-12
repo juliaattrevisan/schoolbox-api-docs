@@ -73,20 +73,20 @@ class Propagator implements IPropagator
      * Take a CRUD event and propagate triggers. Returns the key used to store the event in Redis.
      *
      * @param CrudEventInterface $event
-     * @return string
+     * @return null
      */
     public function propagateEvent(CrudEventInterface $event)
     {
         $namespace = "msg:{$this->instanceId}:";
 
-        // drop event serial into redis
-        $redisKey = $this->toRedis($event, "{$namespace}e");
+        // drop event serial into redis (commented out because this will eat all the memory)
+        //$redisKey = $this->toRedis($event, "{$namespace}e");
 
         foreach ($this->splitter->generateTriggers($event) as $trigger) {
             $this->broker->publish($trigger, [ $namespace ]);
         }
 
-        return $redisKey;
+        return null;
     }
 
 
