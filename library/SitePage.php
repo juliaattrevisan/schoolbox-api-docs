@@ -350,6 +350,7 @@ class SitePage extends Page
         }
         $dateFormat = $this->config->get('date_local');
         $dateTimeFormat = $this->config->get('date_local').' '.$this->config->get('date_time');
+        $dateTimeFormatLong = $this->config->get('date_long');
         $templateVar = array(
             'TEMPLATE_YEAR' => date('Y'),
             'SITE_NAME' => $this->config->get('school_name'),
@@ -376,6 +377,7 @@ class SitePage extends Page
             'DATEPICKER_FORMAT' => json_encode(Alaress_Date_Format_Converter::toDatepicker($dateFormat)),
             'MOMENTJS_FORMAT' => json_encode(Alaress_Date_Format_Converter::toMomentJs($dateFormat)),
             'MOMENTJS_FORMAT_DATETIME' => json_encode(Alaress_Date_Format_Converter::toMomentJs($dateTimeFormat)),
+            'MOMENTJS_FORMAT_LOCAL_LONG' => json_encode(Alaress_Date_Format_Converter::toMomentJs($dateTimeFormatLong)),
             'LOCAL_DATE_FORMAT' => $dateFormat,
             'LOCAL_DATETIME_FORMAT' => $dateTimeFormat,
             'SYNERGETIC_SSO' => isset($_SESSION["communityLogin"]) ? 'true' : 'false',
