@@ -169,13 +169,15 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 $path = $dav->getPath();
                 $path = str_replace("{:username}", $user->getUsername(), $path);
                 $path = str_replace("{:yearlevel}", $user->getYear(), $path);
-                $path = str_replace("{:calendaryear}", date("Y"), $path);
-                $path = str_replace("{:graduationyear7}", 7 - $user->getYear() + date("Y"), $path);
-                $path = str_replace("{:graduationyear12}", 12 - $user->getYear() + date("Y"), $path);
-                $path = str_replace("{:graduationyeartwodigit7}", 7 - $user->getYear() + date("y"), $path);
-                $path = str_replace("{:graduationyeartwodigit12}", 12 - $user->getYear() + date("y"), $path);
-                $path = str_replace("{:startyear7}", date("Y") - ($user->getYear() - 7), $path);
-                $path = str_replace("{:startyear12}", date("Y") - ($user->getYear() - 12), $path);
+                $path = str_replace("{:calendaryear}", (int) date("Y"), $path);
+                if(is_numeric($user->getYear())) {
+                    $path = str_replace("{:graduationyear7}", 7 - (int)$user->getYear() + (int)date("Y"), $path);
+                    $path = str_replace("{:graduationyear12}", 12 - (int)$user->getYear() + (int)date("Y"), $path);
+                    $path = str_replace("{:graduationyeartwodigit7}", 7 - (int)$user->getYear() + (int)date("y"), $path);
+                    $path = str_replace("{:graduationyeartwodigit12}", 12 - (int)$user->getYear() + (int)date("y"), $path);
+                    $path = str_replace("{:startyear7}", (int)date("Y") - ((int)$user->getYear() - 7), $path);
+                    $path = str_replace("{:startyear12}", (int)date("Y") - ((int)$user->getYear() - 12), $path);
+                }
 
                 $paths[] = $path;
             }
