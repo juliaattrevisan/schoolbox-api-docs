@@ -13,7 +13,7 @@
 
 namespace Schoolbox\Fixtures\Component;
 
-use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Connector\Base;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\Fixtures\Team\Mapper as TeamMapper;
@@ -52,16 +52,16 @@ class ComponentDelegate
     protected $resultMapper;
 
     /**
-     * @var IConnector
+     * @var Base
      */
     protected $database;
 
     /**
      * Delegate constructor.
      *
-     * @var IConnector $database
+     * @var Base $database
      */
-    public function __construct(IConnector $database)
+    public function __construct(Base $database)
     {
         $this->database = $database;
 
