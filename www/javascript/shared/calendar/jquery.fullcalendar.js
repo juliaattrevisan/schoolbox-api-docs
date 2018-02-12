@@ -55,7 +55,7 @@ function Calendar(id, bubbleId, opts) {
         fullCalendar: {
             views: {
                 day: {
-                    titleFormat: 'dddd, MMM D YYYY'
+                    titleFormat: 'dddd, D MMM YYYY'
                 },
                 week: {
                     columnFormat: 'ddd D/M'
