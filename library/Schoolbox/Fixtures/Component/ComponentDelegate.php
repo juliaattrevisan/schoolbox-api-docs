@@ -83,6 +83,11 @@ class ComponentDelegate
      */
     public function getMatchesForUser($userId, $includeHistorical)
     {
+        $historical = '';
+        if (!$includeHistorical) {
+            $historical = "AND DATE(sportsfixtures_match.start_at) > DATE(NOW())";
+        }
+
         $query = "
             SELECT      sportsfixtures_match.id
             
@@ -114,22 +119,18 @@ class ComponentDelegate
                         sportsfixtures_team_participantuser.user_id = :userId OR
                         sportsfixtures_team_coach.coach_id = :userId OR
                         sportsfixtures_team_user.user_id = :userId)
+                        {$historical}
+                        
+            ORDER BY    sportsfixtures_match.start_at DESC
         ";
 
-
-        if (!$includeHistorical) {
-            $query .= ' AND DATE(sportsfixtures_match.start_at) > DATE(NOW())';
-        }
-        $query .= ' ORDER BY sportsfixtures_match.start_at DESC';
-
         $statement = $this->database->prepareQuery($query);
-        if ( $statement->execute(array(':userId'=>$userId)) ) {
-            $result = $statement->fetchAll(\PDO::FETCH_COLUMN, 0);
+        if ($statement->execute(array(':userId'=>$userId))) {
+            $result = $statement->fetchAll(\PDO::FETCH_COLUMN);
             return $this->getMatchMapper()->findByColumn('id', $result);
         }
 
         return new Collection();
-
     }
 
 

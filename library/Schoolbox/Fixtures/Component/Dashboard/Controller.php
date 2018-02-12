@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Fixtures\Component\Dashboard;
 
+use Alaress\Database\Connector\Base;
 use Alaress\Session\Session;
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
@@ -33,7 +34,10 @@ class Controller extends Component_Dashboard_ControllerAbstract
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
         parent::__construct($instance, $user, $sitepage);
-        $this->setDelegate(new ComponentDelegate($sitepage->getDi()->get('databaseInternal')));
+
+        /** @var Base $databaseInternal */
+        $databaseInternal = $sitepage->getDi()->get('databaseInternal');
+        $this->setDelegate(new ComponentDelegate($databaseInternal));
     }
 
     /**
