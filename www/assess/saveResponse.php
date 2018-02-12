@@ -8,8 +8,9 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Assessment\Participant;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\Quiz\ValidParticipant;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 
@@ -44,6 +45,14 @@ $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
 $assessment       = $assessmentDataSource->findByQuizId($section['assess_id'], $_SESSION['user']);
 $assessmentFolder = $assessment->getBaseContext()->getFolder();
 $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], $assessmentFolder->getId());
+
+/* Non-participants are sent to a 404 screen
+ */
+$isValidParticipant = new ValidParticipant(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
+
+if (!$isValidParticipant->isSatisfiedBy($_SESSION['user'], $assessmentFolder, $assess['assessment_id'])) {
+    $this->pageNotFound();
+}
 
 if ($accessLevel < UserAccess::ACCESS_WRITE) {
     // I can't attempt a spec assessment
