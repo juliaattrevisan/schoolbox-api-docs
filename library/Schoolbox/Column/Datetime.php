@@ -19,12 +19,20 @@ class Datetime implements IColumnType {
 	/** @var Cache|Alaress_Date_Format[] */
 	private $cache = [];
 
+    /**
+     * This value will hydrate to null.
+     */
+    protected const ZERO_VALUE = '0000-00-00 00:00:00';
 
     /**
+     * Constructor
      */
     public function __construct()
     {
         $this->cache = new Cache(function ($value, $inputFormat) {
+            if (!isset($value) || static::ZERO_VALUE === $value) {
+                return new \Alaress_Date_NullDate();
+            }
             return new Alaress_Date_Format($value, $inputFormat);
         });
     }
@@ -37,10 +45,6 @@ class Datetime implements IColumnType {
 	 * @return Alaress_Date_Format
 	 */
 	public function hydrate($value, $mapper = null) {
-        if (!isset($value) || $value == '0000-00-00 00:00:00') {
-            return new \Alaress_Date_NullDate();
-        }
-
         try {
             return clone $this->cache->get($value, [ $value, $this->input_format ]);
 
