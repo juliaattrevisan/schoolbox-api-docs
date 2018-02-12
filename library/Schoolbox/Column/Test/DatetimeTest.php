@@ -43,6 +43,7 @@ class DatetimeTest extends TestCase {
 			array('2012-01-01',          false),
 			array('0000-01-01 01:40:23', true),
 			array('9999-01-01 01:40:23', true),
+            array('0000-00-00 00:00:00', false),
 		);
 	}
 
