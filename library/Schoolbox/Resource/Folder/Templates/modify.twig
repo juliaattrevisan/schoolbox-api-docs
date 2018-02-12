@@ -144,9 +144,9 @@
             var recursiveChecked = $("#recursive").prop("checked");
 
             if (inheritChecked && recursiveChecked) {
-                $("#warning").removeClass("hide");
+                $("[data-alert]").removeClass("hide");
             } else {
-                $("#warning").addClass("hide");
+                $("[data-alert]").addClass("hide");
             }
         });
         $("#recursive").change(function() {
@@ -156,9 +156,9 @@
             var recursiveChecked = $("#recursive").prop("checked");
 
             if (inheritChecked && recursiveChecked) {
-                $("#warning").removeClass("hide");
+                $("[data-alert]").removeClass("hide");
             } else {
-                $("#warning").addClass("hide");
+                $("[data-alert]").addClass("hide");
             }
         });
 
