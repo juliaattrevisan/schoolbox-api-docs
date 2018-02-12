@@ -32,12 +32,12 @@ class ValidParticipant
     /**
      * Only included (non-excluded) participants allowed
      *
-     * @param null|Participant $participant
+     * @param Participant $participant
      * @return bool
      */
-    private function isIncluded(?Participant $participant): bool
+    private function isIncluded(Participant $participant): bool
     {
-        return $participant && !$participant->isExcluded();
+        return !$participant->isExcluded();
     }
 
     /**
@@ -97,6 +97,14 @@ class ValidParticipant
      */
     public function isSatisfiedBy(?Participant $participant, User $user, Folder\Model $folder, int $assessId): bool
     {
-        return $this->isIncluded($participant) || $this->hasDynamicPlan($assessId) || $this->isInstructor($user, $folder);
+        if ($participant) {
+            return $this->isIncluded($participant);
+        }
+
+        if ($this->isInstructor($user, $folder)) {
+            return true;
+        }
+
+        return $this->hasDynamicPlan($assessId);
     }
 }
