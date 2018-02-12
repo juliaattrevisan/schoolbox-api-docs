@@ -15,6 +15,11 @@ class Date extends Datetime implements IColumnType
     protected $output_format = 'Y-m-d';
 
     /**
+     * This value will hydrate to null.
+     */
+    protected const ZERO_VALUE = '0000-00-00';
+
+    /**
      * Either null or a time format accepted by strtotime(), eg '00:00:00'
      *
      * @var string|null

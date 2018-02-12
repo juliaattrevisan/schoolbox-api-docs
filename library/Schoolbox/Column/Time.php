@@ -17,4 +17,9 @@ namespace Schoolbox\Column;
 class Time extends Datetime implements IColumnType {
 	protected $input_format  = 'H:i:s';
 	protected $output_format = 'H:i:s';
+
+    /**
+     * There's no zero value for times.
+     */
+    protected const ZERO_VALUE = null;
 }
