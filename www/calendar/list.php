@@ -110,8 +110,11 @@ if ($calendar->getAllEvents()->count()) {
 
         $this->setVar('EVENT_DATE', $currentEvent->getStartTime()->getLongDateOnly());
 
-        $this->setVar('TWIG_EVENT', $calendar->renderEvent($currentEvent, 'html'));
-        $this->parse('event_block', 'event', true);
+        $htmlEvent = $calendar->renderEvent($currentEvent, 'html');
+        if ($htmlEvent) {
+            $this->setVar('TWIG_EVENT', $htmlEvent);
+            $this->parse('event_block', 'event', true);
+        }
         $lastDate = $currentDate;
     }
 

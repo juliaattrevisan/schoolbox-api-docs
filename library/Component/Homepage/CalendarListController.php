@@ -112,9 +112,12 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
 
             $this->setVar('LIST_DATE', $currentDay->getLongDateOnly());
 
-            $this->setVar('campus_events', $eventRenderer->renderEvent($currentEvent, 'html'));
+            $htmlEvent = $eventRenderer->renderEvent($currentEvent, 'html');
+            if($htmlEvent) {
+                $this->setVar('campus_events', $htmlEvent);
+                $this->parse('campus_events_block', 'campus_events', true);
+            }
 
-            $this->parse('campus_events_block', 'campus_events', true);
 
             $prevDay = $currentDay;
         }

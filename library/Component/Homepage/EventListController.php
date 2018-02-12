@@ -126,9 +126,12 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
                 }
 
                 $this->setVar('LIST_DATE', $currentDay->getLongDateOnly());
-                $this->setVar('group_events', $eventRenderer->renderEvent($currentEvent, 'html'));
-                $this->parse('group_events_block', 'group_events', true);
 
+                $htmlEvent = $eventRenderer->renderEvent($currentEvent, 'html');
+                if  ($htmlEvent) {
+                    $this->setVar('group_events', $htmlEvent);
+                    $this->parse('group_events_block', 'group_events', true);
+                }
                 $prevDay = $currentDay;
             }
 
