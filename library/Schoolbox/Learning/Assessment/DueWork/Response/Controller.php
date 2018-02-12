@@ -265,7 +265,9 @@ class Controller extends Base
 
         // The zone which contains the files
         $attachZoneFactory = new Attachzone\Factory();
-        $attachZone        = $attachZoneFactory->buildForDueWorkFeedback($latestFeedback);
+        $attachZone        = $attachZoneFactory->buildForDueWorkFeedback(
+            $latestFeedback instanceof Feedback ? $latestFeedback : null
+        );
 
         // Is the page being displayed in readonly mode?
         $isInteractionLocked = (new LockedChecker($this->termMapper))->isLockedForInteractions($assessment);
