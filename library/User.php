@@ -514,7 +514,10 @@ class User extends DeprecatedModel
             }
         }
         // Filthily notify the binder that user was updated
-        $this->getUserNotifier()->manualNotifyUpdated($user['id'], $_SESSION['user']);
+        if(isset($_SESSION) && isset($_SESSION['user'])) {
+            $this->getUserNotifier()->manualNotifyUpdated($user['id'], $_SESSION['user']);
+        }
+
         return true;
     }
 
