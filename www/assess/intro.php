@@ -11,12 +11,13 @@
  */
 
 use Schoolbox\Breadcrumbs;
-use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\UserMapper;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Folder;
+use Schoolbox\UserMapper;
 
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
@@ -46,6 +47,29 @@ if (!$assess) {
 
 if ($assessHandler->isDeleted($assess['assess_id'])) {
     error(112);
+}
+
+/* Check the folder exists meaningfully
+ */
+try {
+    $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
+}
+catch (Mapper\Exception $e) {
+    error(117);
+}
+
+// Check user can participate
+$participant = Schoolbox\Assessment\Participant\Mapper::getInstance()->findForAssessmentAndUser(
+    Assessment\Mapper::getInstance()->createModel($assess['assessment_id']),
+    UserMapper::getInstance()->createModel($_SESSION['user']->getId())
+);
+
+/* Non-participants are sent to a 404 screen
+ */
+$isValidParticipant = new \Schoolbox\Learning\Quiz\ValidParticipant(Schoolbox\Assessment\Participant\Plan\Mapper::getInstance());
+
+if (!$isValidParticipant->isSatisfiedBy($participant, $_SESSION['user'], $folder, $assess['assessment_id'])) {
+    $this->pageNotFound();
 }
 
 /* Check if you are in this category, so you can't submit other category's
@@ -113,7 +137,6 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
             error(146);
         }
     }
-
 } else {
     // I can do whatever I want
 }
@@ -121,7 +144,6 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
 /* Continue once you get past checks
  */
 $author = UserMapper::getInstance()->findByIdWithFallback($assess['user_id']);
-$folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assess['category_id']);
 
 $allSummary = $assessHandler->getIntroSummary($assess['assess_id']);
 $allSections = $sectionHandler->getList($assess['assess_id']);
