@@ -37,7 +37,7 @@
         {% if participant %}
             {% include '@learningAssessment/fragments/progressTick.twig' with {
                 assessment: assessable,
-                participant: participant
+                student: participant.user
             } only %}
         {% endif %}
     </nav>

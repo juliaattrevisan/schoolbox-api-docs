@@ -11,7 +11,7 @@
     {% if isParticipant %}
         {% include '@learningAssessment/fragments/progressTick.twig' with {
             assessment: assessable,
-            participant: assessable.getParticipant(USER)
+            student: USER
         } only %}
     {% endif %}
 {% endblock %}

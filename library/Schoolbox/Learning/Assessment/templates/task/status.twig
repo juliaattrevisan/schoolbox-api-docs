@@ -48,8 +48,7 @@
             <div class="small-1">
                 {% include '@learningAssessment/fragments/progressTick.twig' with {
                     assessment:  participant.assessable,
-                    participant: participant,
-                    writable:    writable
+                    student: participant.user
                 } only %}
             </div>
         </div>

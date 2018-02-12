@@ -3,49 +3,27 @@
  #
  # Params:
  # * assessment:  IAssessable  - The assessment object
- # * participant: Participant  - The participant object
- # * writable:    bool        -  Whether the viewee can change the assessment's marking state
- #                               For teacher, it should be false if teacher lacks write+ perm to class folder
- #                               since this fragment is also used in the Markbook
+ # * student:     User         - The relevant student
  #}
 
-{# Hide the grey square where you can't do anything #}
-{% set canInteract = false %}
-
-{# Assessments that are open might require interaction from students #}
-{% if assessment is task and (assessment.isOpen and assessment.isSelfAssessable) or writable %}
-    {# Task that are self-assessed require interaction from students #}
-    {% set canInteract = true %}
-{% endif %}
-
-{# If you can see the button, decide what it can do
- # and how it displays - it might be displayed in a
- # read-only (non-interactive) manner on the Markbook
- #}
-
-{# Tasks have inline interaction #}
-{% if writable %}
-    {% set postRoute = routeLookup('learningAssessment.postCreateResponse', {
-        assessmentId: assessment.id,
-        assessment:   assessment,
-        studentId:    participant.user.id,
-        student:      participant.user
-    }) %}
-{% elseif canInteract %}
+{# Leverage module route logic #}
+{% if assessment is task %}
     {% set postRoute = routeLookupIfAuthorized('learningAssessment.postCreateResponse', {
-        assessmentId: assessment.id,
         assessment:   assessment,
-        studentId:    participant.user.id,
-        student:      participant.user
+        assessmentId: assessment.id,
+        student:      student,
+        studentId:    student.id
     }) %}
 {% endif %}
 
-{% if canInteract and postRoute %}
+{% set participant = assessment.participantIfExtant(student) %}
+
+{% if postRoute %}
     <form action="{{ postRoute }}"
           method="POST"
           class="progress-tick-form"
           data-progress-tick-form="{{ assessment.isSelfAssessable ? 'selfAssessed' : 'teacherAssessed' }}">
-        {% if participant.isResponseRequired %}
+        {% if not participant or participant.isResponseRequired %}
             <a href="#"
                class="no-text progress-tick"
                title="Incomplete"
@@ -63,7 +41,7 @@
         {% endif %}
     </form>
 {% else %}
-    {% if participant.isExcluded or participant.isResponseRequired %}
+    {% if not participant or participant.isExcluded or participant.isResponseRequired %}
         <!-- deliberately empty  -->
     {% elseif participant.isFeedbackRequired %}
         <span class="no-text progress-tick pending" title="Awaiting Feedback"></span>

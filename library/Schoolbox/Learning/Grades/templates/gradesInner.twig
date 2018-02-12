@@ -73,7 +73,7 @@
                                                 {% if assessment is task %}
                                                     {% include '@learningAssessment/fragments/progressTick.twig' with {
                                                     assessment: assessable,
-                                                    participant: participant
+                                                    student: participant.user
                                                     } only %}
                                                 {% else %}
                                                     <div class="grade {{ urgency.marks(assessment.normalisedMark(participant, true)) }}">

@@ -104,7 +104,7 @@
                             {# TODO known bug SA-5984. Participant progress icon renders incorrectly if part of multiple actions. #}
                             {% include '@learningAssessment/fragments/progressTick.twig' with {
                                 assessment: assessment,
-                                participant: assessment.getParticipant(USER)
+                                student: USER
                             } only %}
                         {% endif %}
                         {% if isActionRoutes %}

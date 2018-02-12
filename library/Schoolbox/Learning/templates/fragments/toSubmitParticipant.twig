@@ -24,8 +24,7 @@
             {# An icon that shows if the student has attempted the task or not #}
             {% include '@learningAssessment/fragments/progressTick.twig' with {
                 assessment:  assessment,
-                participant: participant,
-                writable:    true
+                student: participant.user
             } only %}
         </div>
     {% else %}
