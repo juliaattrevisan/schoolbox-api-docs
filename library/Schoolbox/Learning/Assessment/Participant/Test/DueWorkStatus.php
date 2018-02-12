@@ -279,7 +279,7 @@ class DueWorkStatus extends TestCase
 
         $data = [];
         foreach ($dueWork->getAllParticipants() as $participant) {
-            $data[] = [$participant];
+            $data[$participant->getUser()->getFirstname()] = [$participant];
         }
         return $data;
     }
