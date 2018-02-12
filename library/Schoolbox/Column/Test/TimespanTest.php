@@ -88,6 +88,7 @@ class TimespanTest extends TestCase {
     }
 
     /**
+     * @dataProvider getTestHydrate
      * @param null|int $input
      * @param null|DateInterval $expected_output
      */
@@ -96,6 +97,7 @@ class TimespanTest extends TestCase {
     }
 
     /**
+     * @dataProvider getTestDehydrate
      * @param null|int|DateInterval|string $input
      * @param null|int $expected_output
      */

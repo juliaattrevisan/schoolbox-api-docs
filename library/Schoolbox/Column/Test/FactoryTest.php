@@ -47,6 +47,7 @@ class FactoryTest extends BaseTestCase {
 	}
 
     /**
+     * @dataProvider getTestBuild
      * @param string $expected_class
      * @param string $type
      */

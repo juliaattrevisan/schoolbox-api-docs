@@ -96,6 +96,7 @@ class IntervalTest extends TestCase {
     }
 
     /**
+     * @dataProvider getTestHydrate
      * @param null|string $input
      * @param null|IntervalObject $expected_output
      */
@@ -104,6 +105,7 @@ class IntervalTest extends TestCase {
     }
 
     /**
+     * @dataProvider getTestDehydrate
      * @param IntervalObject|DateInterval|int|string $input
      * @param null|int $expected_output
      */
