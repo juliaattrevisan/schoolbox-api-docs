@@ -272,7 +272,10 @@ class DataSource
                     );
                     throw new DomainException($msg);
                 }
-                $participantUser->getAllResponses()[$response->getId()] = $response;
+                if (!$participantUser->isExcluded()) {
+                    // Don't load interactions for excluded participants.
+                    $participantUser->getAllResponses()[$response->getId()] = $response;
+                }
             }
         }
     }
@@ -294,9 +297,9 @@ class DataSource
 
                 //Ensure response user is fully hydrated
                 $feedbackUser    = $this->userMapper->findByIdWithFallback($feedback->getReviewee()->getId());
-                $participantUser = $assessment->getParticipantIfExtant($feedbackUser);
+                $participant = $assessment->getParticipantIfExtant($feedbackUser);
 
-                if (!$participantUser) {
+                if (!$participant) {
                     $msg = sprintf(
                         'User (id: %s) has a feedback (id: %s) for assessment (id: %s) but no participant record',
                         $feedbackUser->getId(),
@@ -305,7 +308,11 @@ class DataSource
                     );
                     throw new DomainException($msg);
                 }
-                $participantUser->getAllFeedbacks()->add($feedback);
+                if ($participant->isExcluded()) {
+                    // Don't load interactions for excluded participants.
+                    continue;
+                }
+                $participant->getAllFeedbacks()->add($feedback);
 
                 // Feedbacks may have a stub response.
                 // If so, use it to find the actual response, and associate them together.
@@ -314,7 +321,7 @@ class DataSource
                 if ($stubResponse && $stubResponse->getId()) {
                     $stubResponseId = $stubResponse->getId();
 
-                    foreach ($participantUser->getAllResponses() as $response) {
+                    foreach ($participant->getAllResponses() as $response) {
                         // For now assume that the types of response and feedback match
                         if ($stubResponseId == $response->getId()) {
                             $response->getAllFeedback()->add($feedback);
