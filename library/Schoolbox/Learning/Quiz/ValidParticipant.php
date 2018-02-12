@@ -95,7 +95,7 @@ class ValidParticipant
      * @param int              $assessId
      * @return bool
      */
-    public function isSatisfiedBy(Participant $participant, User $user, Folder\Model $folder, int $assessId): bool
+    public function isSatisfiedBy(?Participant $participant, User $user, Folder\Model $folder, int $assessId): bool
     {
         return $this->isIncluded($participant) || $this->hasDynamicPlan($assessId) || $this->isInstructor($user, $folder);
     }
