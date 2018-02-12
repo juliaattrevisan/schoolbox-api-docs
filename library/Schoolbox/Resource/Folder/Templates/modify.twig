@@ -139,19 +139,13 @@
         }
 
         $("#inherit").change(function() {
-            console.log("inherit box changed");
-            var inheritChecked = $("#inherit").prop("checked");
-            var recursiveChecked = $("#recursive").prop("checked");
-
-            if (inheritChecked && recursiveChecked) {
-                $("[data-alert]").removeClass("hide");
-            } else {
-                $("[data-alert]").addClass("hide");
-            }
+            showHideClassCodeWarning();
         });
         $("#recursive").change(function() {
-            console.log("recursive box changed");
+            showHideClassCodeWarning();
+        });
 
+        function showHideClassCodeWarning() {
             var inheritChecked = $("#inherit").prop("checked");
             var recursiveChecked = $("#recursive").prop("checked");
 
@@ -160,7 +154,7 @@
             } else {
                 $("[data-alert]").addClass("hide");
             }
-        });
+        }
 
     });
 </script>
