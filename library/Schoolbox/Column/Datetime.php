@@ -37,7 +37,7 @@ class Datetime implements IColumnType {
 	 * @return Alaress_Date_Format
 	 */
 	public function hydrate($value, $mapper = null) {
-        if (!isset($value)) {
+        if (!isset($value) || $value == '0000-00-00 00:00:00') {
             return new \Alaress_Date_NullDate();
         }
 
