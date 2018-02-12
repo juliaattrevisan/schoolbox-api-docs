@@ -510,8 +510,11 @@ class Module extends BaseModule
         return new Rule\Any(
             new Rule\All(
                 new Rule\Any(
-                    // Superuser or instructor and not interaction-locked
-                    new Rule\IsSuperuser(),
+                    // (Superuser + impl) or (instructor + !interaction-locked)
+                    new Rule\All(
+                        new Rule\IsSuperuser(),
+                        new IsImplementation()
+                    ),
                     new Rule\All(
                         $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
                         new IsInteractionUnLocked(new LockedChecker($this->getTermMapper()))
