@@ -105,7 +105,7 @@ class SubmissionMapper extends BaseMapper
             return true;
         }
         $assessment = $this->getSubmissionBoxMapper()->findById($object->getSubmissionBox()->getId())->getAssessmentModel();
-        return $this->interactionChecker->checkFirstInteraction($object->getOwner(), $assessment);
+        return $this->interactionChecker->insertParticipationOnFirstInteraction($object->getOwner(), $assessment);
     }
 
 

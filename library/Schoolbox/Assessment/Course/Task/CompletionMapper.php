@@ -99,7 +99,7 @@ class CompletionMapper extends Mapper {
             return true;
         }
         $assessment = $this->getTaskMapper()->findById($object->getTask()->getId())->getAssessmentModel();
-        return $this->interactionChecker->checkFirstInteraction($object->getStudent(), $assessment);
+        return $this->interactionChecker->insertParticipationOnFirstInteraction($object->getStudent(), $assessment);
     }
 
 

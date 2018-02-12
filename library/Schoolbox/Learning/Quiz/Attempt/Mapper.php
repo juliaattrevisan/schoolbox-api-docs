@@ -111,7 +111,7 @@ class Mapper extends BaseMapper
             return true;
         }
         $assessment = $this->getQuizMapper()->findById($object->getQuiz()->getId())->getAssessmentModel();
-        return $this->interactionChecker->checkFirstInteraction($object->getUser(), $assessment);
+        return $this->interactionChecker->insertParticipationOnFirstInteraction($object->getUser(), $assessment);
     }
 
 

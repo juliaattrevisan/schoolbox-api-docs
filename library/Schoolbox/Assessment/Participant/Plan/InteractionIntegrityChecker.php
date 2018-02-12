@@ -96,7 +96,7 @@ class InteractionIntegrityChecker
      * @throws InvalidState If we detect we've just put the system into an invalid state
      * @throws InvalidArgumentException If assessment not sufficiently hydrated
      */
-    public function checkFirstInteraction(User $student, Assessment\Model $assessment): bool
+    public function insertParticipationOnFirstInteraction(User $student, Assessment\Model $assessment): bool
     {
         $this->loadPlansAndParticipants($assessment);
         $participant = $this->findParticipation($student, $assessment);
@@ -108,6 +108,7 @@ class InteractionIntegrityChecker
                 throw new InvalidState("User ({$student->getId()}) has participation exclusion ({$participant->getId()})");
             }
         } else {
+            // No participation yet. Is there a dynamic plan available to insert them into?
             $dynamicPlan = $assessment->getDynamicPlan();
             if (!$dynamicPlan) {
                 throw new InvalidState("User ({$student->getId()}) has no participation, but assessment ({$assessment->getId()}) has no dynamic plan");
