@@ -11,6 +11,9 @@
 namespace Schoolbox\Learning\Assessment\DueWork;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GridGenerator;
+use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -248,5 +251,46 @@ class RubricContext
         }
 
         return $context;
+    }
+
+
+    /**
+     * Calls `$this->generateForFeedback` for each feedback in `$timeline`,
+     * whether it belongs to a response or not.
+     *
+     * @param IResponse[]|IFeedback[] $timeline      The timeline, from a
+     *                                               `\Schoolbox\Learning\Assessment\Timeline\Full::getFor*` method
+     * @param User                    $currentUser   Current logged-in user
+     * @param Access                  $access        Access determination object
+     * @param bool                    $publishedOnly Get only published items?
+     * @return Collection<int,array> key: feedback ID, value: result from `$this->generateForFeedback`
+     */
+    public function generateSeriesForTimeline(
+        $timeline,
+        User $currentUser,
+        Access $access,
+        $publishedOnly = true
+    ): Collection {
+        $timelineFeedback = [];
+        foreach ($timeline as $timelineItem) {
+            if ($timelineItem instanceof Feedback\Model) {
+                $timelineFeedback[] = $timelineItem;
+            } elseif ($timelineItem instanceof IResponse) {
+                foreach ($timelineItem->getAllFeedback() as $feedback) {
+                    $timelineFeedback[] = $feedback;
+                }
+            }
+        }
+
+        $feedbackRubricContexts = new Collection();
+        foreach ($timelineFeedback as $feedback) {
+            $feedbackRubricContexts[$feedback->getId()] = $this->generateForFeedback(
+                $feedback,
+                $currentUser,
+                $access,
+                $publishedOnly
+            );
+        }
+        return $feedbackRubricContexts;
     }
 }
