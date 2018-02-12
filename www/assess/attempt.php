@@ -9,10 +9,13 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Assessment\Participant;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\Quiz\ValidParticipant;
+use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder;
 
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
@@ -52,6 +55,23 @@ if ($assessHandler->isDeleted($assess['assess_id'])) {
 
 if (!$section) {
     error(115);
+}
+
+/* Check the folder exists meaningfully
+ */
+try {
+    $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
+}
+catch (Mapper\Exception $e) {
+    error(117);
+}
+
+/* Non-participants are sent to a 404 screen
+ */
+$isValidParticipant = new ValidParticipant(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
+
+if (!$isValidParticipant->isSatisfiedBy($_SESSION['user'], $folder, $assess['assessment_id'])) {
+    $this->pageNotFound();
 }
 
 /* Check if you are in this category, so you can't submit other category's
