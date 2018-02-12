@@ -70,27 +70,13 @@ $participant = Schoolbox\Assessment\Participant\Mapper::getInstance()->findForAs
     Assessment\Mapper::getInstance()->createModel($assess['assessment_id']),
     UserMapper::getInstance()->createModel($userId)
 );
-if ($participant) {
-    // User has a participation record, are they excluded?
-    if ($participant->isExcluded()) {
-        $this->pageNotFound();
-    }
-} else {
-// Not yet a participant, does a dynamic plan exist for them to be inserted into if they have WRITE+ perm
-    if (!Access::getInstance()->isInstructor($user, $folder)) {
-        $this->pageNotFound();
-    }
-    $plans            = Schoolbox\Assessment\Participant\Plan\Mapper::getInstance()->findPlansAndParticipantsForAssessments([$assess['assessment_id']]);
-    $dynamicPlanFound = false;
-    foreach ($plans as $plan) {
-        if ($plan->isDynamic()) {
-            $dynamicPlanFound = true;
-            break;
-        }
-    }
-    if (!$dynamicPlanFound) {
-        $this->pageNotFound();
-    }
+
+/* Non-participants are sent to a 404 screen
+ */
+$isValidParticipant = new \Schoolbox\Learning\Quiz\ValidParticipant(Schoolbox\Assessment\Participant\Plan\Mapper::getInstance());
+
+if (!$isValidParticipant->isSatisfiedBy($participant, $user, $folder, $assess['assessment_id'])) {
+    $this->pageNotFound();
 }
 
 $this->setFile(TEMPLATE_content, 'assess/attempts.html');
