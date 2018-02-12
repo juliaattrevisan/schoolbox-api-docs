@@ -83,27 +83,38 @@ class ComponentDelegate
      */
     public function getMatchesForUser($userId, $includeHistorical)
     {
-
-        $query = 'SELECT sportsfixtures_match.id FROM sportsfixtures_match
-                  LEFT JOIN sportsfixtures_team_participantcoach 
-                    ON sportsfixtures_match.id = sportsfixtures_team_participantcoach.match_id 
-                    AND sportsfixtures_team_participantcoach.user_id = :userId
-                  LEFT JOIN sportsfixtures_team_participantuser 
-                    ON sportsfixtures_team_participantuser.match_id = sportsfixtures_match.id 
-                    AND sportsfixtures_team_participantuser.user_id = :userId
-                  LEFT JOIN sportsfixtures_team awayTeam ON sportsfixtures_match.away_team_id = awayTeam.id
-                  LEFT JOIN sportsfixtures_team homeTeam ON sportsfixtures_match.home_team_id = homeTeam.id
-                  LEFT JOIN sportsfixtures_team_coach 
-                    ON (sportsfixtures_team_coach.team_id = awayTeam.id OR sportsfixtures_team_coach.team_id = homeTeam.id) 
-                    AND sportsfixtures_team_coach.coach_id = :userId 
-                  LEFT JOIN sportsfixtures_team_user 
-                    ON (sportsfixtures_team_user.team_id = awayTeam.id OR sportsfixtures_team_user.team_id = homeTeam.id) 
-                    AND sportsfixtures_team_user.user_id = :userId 
-                  WHERE
-                    (sportsfixtures_team_participantcoach.user_id = :userId
-                    OR  sportsfixtures_team_participantuser.user_id = :userId
-                    OR sportsfixtures_team_coach.coach_id = :userId
-                    OR sportsfixtures_team_user.user_id = :userId)';
+        $query = "
+            SELECT      sportsfixtures_match.id
+            
+            FROM        sportsfixtures_match
+            
+            LEFT JOIN   sportsfixtures_team_participantcoach ON
+                        sportsfixtures_match.id = sportsfixtures_team_participantcoach.match_id AND
+                         sportsfixtures_team_participantcoach.user_id = :userId
+                        
+            LEFT JOIN   sportsfixtures_team_participantuser ON
+                        sportsfixtures_team_participantuser.match_id = sportsfixtures_match.id AND
+                        sportsfixtures_team_participantuser.user_id = :userId
+                        
+            LEFT JOIN   sportsfixtures_team awayTeam ON
+                        sportsfixtures_match.away_team_id = awayTeam.id
+            
+            LEFT JOIN   sportsfixtures_team homeTeam ON
+                        sportsfixtures_match.home_team_id = homeTeam.id
+            
+            LEFT JOIN   sportsfixtures_team_coach ON
+                        (sportsfixtures_team_coach.team_id = awayTeam.id OR sportsfixtures_team_coach.team_id = homeTeam.id) AND
+                        sportsfixtures_team_coach.coach_id = :userId 
+            
+            LEFT JOIN   sportsfixtures_team_user ON
+                        (sportsfixtures_team_user.team_id = awayTeam.id OR sportsfixtures_team_user.team_id = homeTeam.id) AND
+                        sportsfixtures_team_user.user_id = :userId
+            
+            WHERE       (sportsfixtures_team_participantcoach.user_id = :userId OR
+                        sportsfixtures_team_participantuser.user_id = :userId OR
+                        sportsfixtures_team_coach.coach_id = :userId OR
+                        sportsfixtures_team_user.user_id = :userId)
+        ";
 
 
         if (!$includeHistorical) {
