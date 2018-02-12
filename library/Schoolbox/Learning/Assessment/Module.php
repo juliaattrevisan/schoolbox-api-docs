@@ -13,6 +13,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use OutOfBoundsException;
 use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
+use Schoolbox\Learning\Authorizer\Rule\CanPreview;
 use Schoolbox\Learning\Authorizer\Rule\CanRespondToAssessment;
 use Schoolbox\Learning\Authorizer\Rule\CanSeeParticipation;
 use Schoolbox\Learning\Authorizer\Rule\IsAssessmentOpen;
@@ -610,24 +611,26 @@ class Module extends BaseModule
         );
     }
 
-
+    /** @noinspection PhpDocRedundantThrowsInspection */
     /**
      * To view a summary page requires:
      * - assessment not soft-deleted
      * - current user is superuser or can see assessment, and
      * - assessment is not an assessment specification
+     * - user is a non-excluded participant or an instructor that has not been excluded
      *
      * @return Rule\IAuthorizationRule
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException If required route param not found
      * @throws InvalidPath If URL does not exist for this user
      */
-    private function buildAuthRuleCanViewSummary()
+    private function buildAuthRuleCanViewSummary(): Rule\IAuthorizationRule
     {
         return new Rule\All(
             new AssessmentNotDeleted(),
             new IsImplementation(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
+                new CanPreview(),
                 new CanSeeParticipation($this->getAccess(), $this->getConfig()->get('restrict_student_submissions'))
             )
         );
