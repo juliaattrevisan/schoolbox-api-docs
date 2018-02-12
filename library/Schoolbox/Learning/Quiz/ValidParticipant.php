@@ -9,8 +9,10 @@
 
 namespace Schoolbox\Learning\Quiz;
 
+use Schoolbox\Assessment\Participant\Mapper as ParticipantMapper;
 use Schoolbox\Assessment\Participant\Model as Participant;
 use Schoolbox\Assessment\Participant\Plan;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
@@ -22,11 +24,13 @@ class ValidParticipant
     /**
      * ValidParticipant constructor.
      *
-     * @param Plan\Mapper $participantPlanMapper
+     * @param Plan\Mapper       $participantPlanMapper
+     * @param ParticipantMapper $participantMapper
      */
-    public function __construct(Plan\Mapper $participantPlanMapper)
+    public function __construct(Plan\Mapper $participantPlanMapper, ParticipantMapper $participantMapper)
     {
         $this->planMapper = $participantPlanMapper;
+        $this->participantMapper = $participantMapper;
     }
 
     /**
@@ -89,14 +93,20 @@ class ValidParticipant
      * 3. Try a dynamic plan
      * 4. Deny access
      *
-     * @param null|Participant $participant
-     * @param User             $user
-     * @param Folder\Model     $folder
-     * @param int              $assessId
+     * @param User         $user
+     * @param Folder\Model $folder
+     * @param int          $assessId
      * @return bool
+     * @throws \Schoolbox\Mapper\Exception
      */
-    public function isSatisfiedBy(?Participant $participant, User $user, Folder\Model $folder, int $assessId): bool
+    public function isSatisfiedBy(User $user, Folder\Model $folder, int $assessId): bool
     {
+        // Check user can participate
+        $participant = $this->participantMapper->findForAssessmentAndUser(
+            Assessment\Mapper::getInstance()->createModel($assessId),
+            $user
+        );
+
         if ($participant) {
             return $this->isIncluded($participant);
         }

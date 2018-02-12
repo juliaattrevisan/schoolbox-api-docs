@@ -58,17 +58,14 @@ catch (Mapper\Exception $e) {
     error(117);
 }
 
-// Check user can participate
-$participant = Schoolbox\Assessment\Participant\Mapper::getInstance()->findForAssessmentAndUser(
-    Assessment\Mapper::getInstance()->createModel($assess['assessment_id']),
-    UserMapper::getInstance()->createModel($_SESSION['user']->getId())
-);
-
 /* Non-participants are sent to a 404 screen
  */
-$isValidParticipant = new \Schoolbox\Learning\Quiz\ValidParticipant(Schoolbox\Assessment\Participant\Plan\Mapper::getInstance());
+$isValidParticipant = new \Schoolbox\Learning\Quiz\ValidParticipant(
+    Schoolbox\Assessment\Participant\Plan\Mapper::getInstance(),
+    Schoolbox\Assessment\Participant\Mapper::getInstance()
+);
 
-if (!$isValidParticipant->isSatisfiedBy($participant, $_SESSION['user'], $folder, $assess['assessment_id'])) {
+if (!$isValidParticipant->isSatisfiedBy($_SESSION['user'], $folder, $assess['assessment_id'])) {
     $this->pageNotFound();
 }
 
