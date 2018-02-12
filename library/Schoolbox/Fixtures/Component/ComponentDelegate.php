@@ -77,11 +77,11 @@ class ComponentDelegate
     /**
      * Gets a collection of matches with only relevant teams and players attached, sorted by 'startAt'
      *
-     * @param int $userId
+     * @param array $userIds
      * @param bool  $includeHistorical Whether to return matches in the past
      * @return Collection|Match[]
      */
-    public function getMatchesForUser($userId, $includeHistorical)
+    public function getMatchesForUsers($userIds, $includeHistorical)
     {
         $historical = '';
         if (!$includeHistorical) {
@@ -93,29 +93,29 @@ class ComponentDelegate
             FROM        sportsfixtures_match
             LEFT JOIN   sportsfixtures_team_participantcoach ON
                         sportsfixtures_match.id = sportsfixtures_team_participantcoach.match_id AND
-                        sportsfixtures_team_participantcoach.user_id = :userId
+                        sportsfixtures_team_participantcoach.user_id IN (:userIds)
             LEFT JOIN   sportsfixtures_team_participantuser ON
                         sportsfixtures_team_participantuser.match_id = sportsfixtures_match.id AND
-                        sportsfixtures_team_participantuser.user_id = :userId       
+                        sportsfixtures_team_participantuser.user_id IN (:userIds)
             LEFT JOIN   sportsfixtures_team awayTeam ON
                         sportsfixtures_match.away_team_id = awayTeam.id
             LEFT JOIN   sportsfixtures_team homeTeam ON
                         sportsfixtures_match.home_team_id = homeTeam.id
             LEFT JOIN   sportsfixtures_team_coach ON
                         (sportsfixtures_team_coach.team_id = awayTeam.id OR sportsfixtures_team_coach.team_id = homeTeam.id) AND
-                        sportsfixtures_team_coach.coach_id = :userId 
+                        sportsfixtures_team_coach.coach_id IN (:userIds) 
             LEFT JOIN   sportsfixtures_team_user ON
                         (sportsfixtures_team_user.team_id = awayTeam.id OR sportsfixtures_team_user.team_id = homeTeam.id) AND
-                        sportsfixtures_team_user.user_id = :userId
-            WHERE       (sportsfixtures_team_participantcoach.user_id = :userId OR
-                        sportsfixtures_team_participantuser.user_id = :userId OR
-                        sportsfixtures_team_coach.coach_id = :userId OR
-                        sportsfixtures_team_user.user_id = :userId)
+                        sportsfixtures_team_user.user_id IN (:userIds)
+            WHERE       (sportsfixtures_team_participantcoach.user_id IN (:userIds) OR
+                        sportsfixtures_team_participantuser.user_id IN (:userIds) OR
+                        sportsfixtures_team_coach.coach_id IN (:userIds) OR
+                        sportsfixtures_team_user.user_id IN (:userIds))
                         {$historical}
         ";
 
         $statement = $this->database->prepareQuery($query);
-        if ($statement->execute(array(':userId'=>$userId))) {
+        if ($statement->execute([':userIds' => implode(',', $userIds)])) {
             $result = $statement->fetchAll(\PDO::FETCH_COLUMN);
             return $this->sortMatches($this->getMatchMapper()->findByColumn('id', $result));
         }
