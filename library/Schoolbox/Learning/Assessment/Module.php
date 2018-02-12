@@ -509,13 +509,18 @@ class Module extends BaseModule
     {
         return new Rule\Any(
             new Rule\All(
-                new Rule\IsSuperuser(),
-                new CanRespondToAssessment($this->getAccess())
-            ),
-            new Rule\All(
-                $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
-                new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
-                new CanRespondToAssessment($this->getAccess())
+                new Rule\Any(
+                    // Superuser or instructor and not interaction-locked
+                    new Rule\IsSuperuser(),
+                    new Rule\All(
+                        $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
+                        new IsInteractionUnLocked(new LockedChecker($this->getTermMapper()))
+                    )
+                ),
+                new Rule\Any(
+                    new CanRespondToAssessment($this->getAccess()), // SOBO
+                    new CanPreview($this->getAccess())              // Preview
+                )
             ),
             new Rule\All(
                 new Rule\IsUser('studentId'),
@@ -615,9 +620,7 @@ class Module extends BaseModule
     /**
      * To view a summary page requires:
      * - assessment not soft-deleted
-     * - current user is superuser or can see assessment, and
-     * - assessment is not an assessment specification
-     * - user is a non-excluded participant or an instructor that has not been excluded
+     * - current user is staff|instructor or can see participation,
      *
      * @return Rule\IAuthorizationRule
      * @throws InvalidArgumentException If required route param not found
@@ -629,8 +632,8 @@ class Module extends BaseModule
         return new Rule\All(
             new AssessmentNotDeleted(),
             new Rule\Any(
-                new Rule\IsSuperuser(),
-                new CanPreview(),
+                new Rule\HasRole(Role::STAFF),
+                $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
                 new CanSeeParticipation($this->getAccess(), $this->getConfig()->get('restrict_student_submissions'))
             )
         );

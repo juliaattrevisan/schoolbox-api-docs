@@ -9,6 +9,8 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\Unauthorized;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use InvalidArgumentException;
 
@@ -23,6 +25,21 @@ class CanPreview extends AbstractParticipationRule
 {
 
     /**
+     * @var Access
+     */
+    private $access;
+
+
+    /**
+     * @param Access $access
+     */
+    public function __construct(Access $access)
+    {
+        $this->access = $access;
+    }
+
+
+    /**
      * Performs an authorization check.
      *
      * @inheritdoc
@@ -30,9 +47,23 @@ class CanPreview extends AbstractParticipationRule
      */
     public function authorize(array $params = [], User $user = null)
     {
-        $assessable    = $this->findAssessable($params);
+        if (!$user) {
+            throw new InvalidArgumentException("No session user available to test permissions");
+        }
+
         $student       = $this->findStudent($params);
+        $assessable    = $this->findAssessable($params);
         $participation = $assessable->getParticipantIfExtant($student);
+
+        // Session user can only preview themselves
+        if ($student->getId() != $user->getId()) {
+            throw new Unauthorized("You may only preview yourself. Student (id: {$student->getId()}) != User (id: {$user->getId()})");
+        }
+
+        // Session user must be an instructor
+        if ($this->access->getFolderAccess($user, $assessable->getBaseContext()->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
+            throw new Unauthorized("Only instructors can preview an assessment.");
+        }
 
         // Is the user explicitly excluded?
         if ($participation && $participation->isExcluded()) {
