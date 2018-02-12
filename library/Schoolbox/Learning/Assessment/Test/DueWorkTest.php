@@ -700,9 +700,10 @@ class DueWorkTest extends TestCase
         // Publish the feedback for response
         // (Less recent than most recent self-assess for now)
         $selfAssessedFeedbackForSubmission
+            ->setUpdatedAt($selfAssessedFeedbackForSubmission->getUpdatedAt()->addMonths(-4))
             ->setPublishedAt(new \Alaress_Date_Format('2016-07-12 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $this->assertSame($selfAssessedFeedbackForSubmission, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedFeedback());
+        $this->assertSame($floatingSelfAssessedFeedback, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedFeedback());
         $this->assertSame($floatingSelfAssessedFeedback, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedPublishedFeedback());
         $this->assertEquals($selfAssessedFeedbackForSubmission, $submission->findMostRecentSelfAssessedFeedback());
         $this->assertEquals($selfAssessedFeedbackForSubmission, $submission->findMostRecentSelfAssessedFeedback());
@@ -714,7 +715,7 @@ class DueWorkTest extends TestCase
 
         // Make it more recent
         $selfAssessedFeedbackForSubmission
-            ->setPublishedAt($selfAssessedFeedbackForSubmission->getPublishedAt()->addMonths(2));
+            ->setUpdatedAt($selfAssessedFeedbackForSubmission->getUpdatedAt()->addMonths(4));
 
         $this->assertSame($selfAssessedFeedbackForSubmission, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedFeedback());
         $this->assertSame($selfAssessedFeedbackForSubmission, $dueWork->getParticipant($this->hodes)->findMostRecentSelfAssessedPublishedFeedback());
