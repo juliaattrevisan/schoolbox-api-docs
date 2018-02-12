@@ -11,14 +11,15 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\Assessment\Participant;
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Quiz\ValidParticipant;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
-use \Schoolbox\Permission\Access\Access;
-use \Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Learning\Assessment\DataModel as Assessment;
-use Schoolbox\Error;
 
 $groupHandler = new Group();
 $assessHandler = new Assess_Main();
@@ -67,10 +68,7 @@ catch (\Exception $e) {
 
 /* Non-participants are sent to a 404 screen
  */
-$isValidParticipant = new \Schoolbox\Learning\Quiz\ValidParticipant(
-    Schoolbox\Assessment\Participant\Plan\Mapper::getInstance(),
-    Schoolbox\Assessment\Participant\Mapper::getInstance()
-);
+$isValidParticipant = new ValidParticipant(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
 
 if (!$isValidParticipant->isSatisfiedBy($user, $folder, $assess['assessment_id'])) {
     $this->pageNotFound();

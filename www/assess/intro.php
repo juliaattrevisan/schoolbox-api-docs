@@ -10,9 +10,11 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Assessment\Participant;
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Quiz\ValidParticipant;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\Access;
@@ -60,10 +62,7 @@ catch (Mapper\Exception $e) {
 
 /* Non-participants are sent to a 404 screen
  */
-$isValidParticipant = new \Schoolbox\Learning\Quiz\ValidParticipant(
-    Schoolbox\Assessment\Participant\Plan\Mapper::getInstance(),
-    Schoolbox\Assessment\Participant\Mapper::getInstance()
-);
+$isValidParticipant = new ValidParticipant(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
 
 if (!$isValidParticipant->isSatisfiedBy($_SESSION['user'], $folder, $assess['assessment_id'])) {
     $this->pageNotFound();
