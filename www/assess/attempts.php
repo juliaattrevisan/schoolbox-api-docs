@@ -16,9 +16,10 @@ use Schoolbox\Breadcrumbs;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Quiz\ValidParticipant;
+use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
 
 $groupHandler = new Group();
@@ -58,11 +59,12 @@ try {
     exit;
 }
 
+/* Check the folder exists meaningfully
+ */
 try {
-    $folderMapper = new FolderMapper();
-    $folder = $folderMapper->findById($assess['category_id']);
+    $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
 }
-catch (\Exception $e) {
+catch (Mapper\Exception $e) {
     error(117);
 }
 
