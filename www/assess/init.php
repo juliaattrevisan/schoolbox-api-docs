@@ -9,13 +9,15 @@
  */
 
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\Quiz;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\UserMapper;
 
 $assessHandler = new Assess_Main();
 $attemptHandler = new Assess_Attempt();
 $userHandler = new User();
+$quizId = $this->arg[0];
 
 /**
  * @var SitePage $this
@@ -23,17 +25,17 @@ $userHandler = new User();
  */
 $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
 
-if (!is_numeric($this->arg[0])) {
+if (!is_numeric($quizId)) {
 	error(112);
 }
 
-if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
+if (!$assessHandler->isValidUrlAccess($quizId)) {
     $this->pageNotFound();
 }
 
 /* Get intro summary for the assessment
  */
-$assess = $assessHandler->getIntro($this->arg[0]);
+$assess = $assessHandler->getIntro($quizId);
 
 if (!$assess) {
 	error(112);
@@ -97,7 +99,15 @@ if (!$attempt) {
     ) {
         error(146);
     } else {
-        $attemptId = $attemptHandler->start($userId, $this->arg[0]);
+        $quizModel     = Quiz\Mapper::getInstance()->createModel($quizId);
+        $attemptMapper = Quiz\Attempt\Mapper::getInstance();
+        $attemptModel  = $attemptMapper->createModel()
+                                       ->setQuiz($quizModel)
+                                       ->setUser(UserMapper::getInstance()->createModel($userId))
+                                       ->setStart(Alaress_Date_Format::now());
+        $attemptMapper->save($attemptModel);
+        $quizModel->getAttempts()->add($attemptModel);
+        $attemptId = $attemptModel->getId();
         // Assign all questions on quiz init, not starting a section.
         // This ensures that a response is created for all answers,
         // so they contribute to total mark. (SB-7928)

@@ -20,6 +20,7 @@ use \Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
+use Schoolbox\Assessment\Participant;
 
 /**
  * @method Model createModel($idValue = null)
@@ -28,6 +29,22 @@ use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
  */
 class Mapper extends BaseMapper
 {
+
+    /**
+     * @var Participant\Plan\InteractionIntegrityChecker
+     */
+    private $interactionChecker;
+
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->interactionChecker = new Participant\Plan\InteractionIntegrityChecker(
+            Participant\Plan\Mapper::getInstance(),
+            Participant\Mapper::getInstance()
+        );
+    }
+
     /**
      * SQL definition
      */
@@ -53,6 +70,48 @@ class Mapper extends BaseMapper
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateExternalMarkbook']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteAnswers']);
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
+    }
+
+
+    /**
+     * @param Model      $object
+     * @param Model|null $previous
+     * @return bool
+     * @throws BaseMapper\DefinitionException
+     * @throws Participant\Plan\InvalidState If permitting the save would cause the system to enter an invalid state
+     */
+    public function canParticipate(Model $object, Model $previous = null): bool
+    {
+        if ($previous) {
+            // If an update, assume the system is still valid
+            return true;
+        }
+        $assessment = $this->getQuizMapper()->findById($object->getQuiz()->getId())->getAssessmentModel();
+        return $this->interactionChecker->assertCanReceiveInteractions($object->getUser(), $assessment);
+    }
+
+
+    /**
+     * @param Model      $object
+     * @param Model|null $previous
+     * @return bool
+     * @throws Participant\Plan\InvalidState If permitting the save would cause the system to enter an invalid state
+     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    public function insertParticipation(Model $object, Model $previous = null): bool
+    {
+        if ($previous) {
+            // If an update, assume the participation record already exists
+            return true;
+        }
+        $assessment = $this->getQuizMapper()->findById($object->getQuiz()->getId())->getAssessmentModel();
+        return $this->interactionChecker->insertParticipationOnFirstInteraction($object->getUser(), $assessment);
     }
 
 
@@ -436,5 +495,15 @@ class Mapper extends BaseMapper
                     ->setUser($user);
             }
         );
+    }
+
+
+    /**
+     * @return BaseMapper|QuizMapper
+     * @throws BaseMapper\DefinitionException
+     */
+    private function getQuizMapper(): QuizMapper
+    {
+        return $this->getJoinMapper('quiz');
     }
 }

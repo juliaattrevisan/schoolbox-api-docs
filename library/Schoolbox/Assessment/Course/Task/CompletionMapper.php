@@ -16,14 +16,31 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Assessment\Participant;
 
 class CompletionMapper extends Mapper {
 
-    protected function mapping() {
+    /**
+     * @var Participant\Plan\InteractionIntegrityChecker
+     */
+    private $interactionChecker;
+
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->interactionChecker = new Participant\Plan\InteractionIntegrityChecker(
+            Participant\Plan\Mapper::getInstance(),
+            Participant\Mapper::getInstance()
+        );
+    }
+
+    protected function mapping()
+    {
         $this->hasTable('task_completion');
         $this->hasModel(Completion::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('task_id', TaskMapper::class, 'id',  null, null, 'task', 'task');
+        $this->joins('task_id', TaskMapper::class, 'id', null, null, 'task', 'task');
         $this->joins('student_id', UserMapper::class, 'id', null, null, 'student', 'student');
         $this->joins('marking_user_id', UserMapper::class, 'id', null, null, 'markingUser', 'marking_user');
         $this->uses('completion_date', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
@@ -31,7 +48,60 @@ class CompletionMapper extends Mapper {
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'preSave']);
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
     }
+
+
+    /**
+     * @param Completion      $object
+     * @param Completion|null $previous
+     * @return bool
+     * @throws Mapper\DefinitionException
+     * @throws Participant\Plan\InvalidState If permitting the save would cause the system to enter an invalid state
+     */
+    public function canParticipate(Completion $object, Completion $previous = null): bool
+    {
+        if ($previous) {
+            // If an update, assume the system is still valid
+            return true;
+        }
+        $assessment = $this->getTaskMapper()->findById($object->getTask()->getId())->getAssessmentModel();
+        return $this->interactionChecker->assertCanReceiveInteractions($object->getStudent(), $assessment);
+    }
+
+
+    /**
+     * @return Mapper|TaskMapper
+     * @throws Mapper\DefinitionException
+     */
+    private function getTaskMapper()
+    {
+        return $this->getJoinMapper('task');
+    }
+
+
+    /**
+     * @param Completion      $object
+     * @param Completion|null $previous
+     * @return bool
+     * @throws Participant\Plan\InvalidState If permitting the save would cause the system to enter an invalid state
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    public function insertParticipation(Completion $object, Completion $previous = null): bool
+    {
+        if ($previous) {
+            // If an update, assume the participation record already exists
+            return true;
+        }
+        $assessment = $this->getTaskMapper()->findById($object->getTask()->getId())->getAssessmentModel();
+        return $this->interactionChecker->insertParticipationOnFirstInteraction($object->getStudent(), $assessment);
+    }
+
 
     /**
      * @return string

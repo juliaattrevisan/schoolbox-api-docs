@@ -774,4 +774,20 @@ class Model implements ISoftDeletable
         $this->plans->replaceWith($plans);
         return $this;
     }
+
+
+    /**
+     * Returns whether this assessment's dynamic plan - if it has one
+     *
+     * @return null|Plan\Model
+     */
+    public function getDynamicPlan(): ?Plan\Model
+    {
+        foreach ($this->plans as $plan) {
+            if ($plan->isDynamic()) {
+                return $plan;
+            }
+        }
+        return null;
+    }
 }

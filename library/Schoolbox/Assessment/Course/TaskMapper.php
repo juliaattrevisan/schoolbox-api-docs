@@ -11,12 +11,12 @@ namespace Schoolbox\Assessment\Course;
 
 use Schoolbox;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Task mapper
  *
  * @method Task createModel($id = null)
+ * @method Task findById($identifierValue)
  */
 class TaskMapper extends Schoolbox\Mapper
 {

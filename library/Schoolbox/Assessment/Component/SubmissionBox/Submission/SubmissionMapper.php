@@ -17,6 +17,7 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as SubmissionFileMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Assessment\Participant;
 
 /**
  * A mapper for a student's submission to a due work.
@@ -27,6 +28,22 @@ use Schoolbox\Mapper\Exception as MapperException;
  */
 class SubmissionMapper extends BaseMapper
 {
+
+    /**
+     * @var Participant\Plan\InteractionIntegrityChecker
+     */
+    private $interactionChecker;
+
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->interactionChecker = new Participant\Plan\InteractionIntegrityChecker(
+            Participant\Plan\Mapper::getInstance(),
+            Participant\Mapper::getInstance()
+        );
+    }
+
     /**
      * @return void
      */
@@ -47,6 +64,48 @@ class SubmissionMapper extends BaseMapper
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'persistFiles' ]);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'softDeleteSubmissionFiles']);
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
+    }
+
+
+    /**
+     * @param Submission      $object
+     * @param Submission|null $previous
+     * @return bool
+     * @throws BaseMapper\DefinitionException
+     * @throws Participant\Plan\InvalidState
+     */
+    public function canParticipate(Submission $object, Submission $previous = null): bool
+    {
+        if($previous){
+            // If an update, assume the system is still valid
+            return true;
+        }
+        $assessment = $this->getSubmissionBoxMapper()->findById($object->getSubmissionBox()->getId())->getAssessmentModel();
+        return $this->interactionChecker->assertCanReceiveInteractions($object->getOwner(), $assessment);
+    }
+
+
+    /**
+     * @param Submission      $object
+     * @param Submission|null $previous
+     * @return bool
+     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     * @throws Participant\Plan\InvalidState
+     */
+    public function insertParticipation(Submission $object, Submission $previous = null): bool
+    {
+        if($previous){
+            // If an update, assume the participation record already exists
+            return true;
+        }
+        $assessment = $this->getSubmissionBoxMapper()->findById($object->getSubmissionBox()->getId())->getAssessmentModel();
+        return $this->interactionChecker->insertParticipationOnFirstInteraction($object->getOwner(), $assessment);
     }
 
 
@@ -250,4 +309,12 @@ class SubmissionMapper extends BaseMapper
         return $return;
     }
 
+    /**
+     * @return BaseMapper|SubmissionBoxMapper
+     * @throws BaseMapper\DefinitionException
+     */
+    private function getSubmissionBoxMapper(): SubmissionBoxMapper
+    {
+        return $this->getJoinMapper('box_id');
+    }
 }
