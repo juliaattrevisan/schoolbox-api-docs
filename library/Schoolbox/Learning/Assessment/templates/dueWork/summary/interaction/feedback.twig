@@ -107,7 +107,7 @@
             {% if hasCollapser %}
                 <a href="#" class="icon-down-arrow" data-collapser="feedback-{{ responseId }}-{{ currentFeedback.id }}"></a>
             {% endif %}
-            {% if deleteRoute %}
+            {% if deleteRoute and deleteIcon %}
                 <a class="icon-delete" data-delete="{{ deleteRoute }}"></a>
             {% endif %}
         </nav>
