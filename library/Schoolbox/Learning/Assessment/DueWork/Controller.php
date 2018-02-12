@@ -553,7 +553,7 @@ class Controller extends Assessment\Controller
             $studentName = $participant->getUser()->formatName('{lastname}, {firstname}');
 
             $row = [$studentName, $participant->getUser()->getExternalId()];
-            $sum = '';
+            $sum = null;
 
             if (count($marks)) {
                 foreach ($marks as $mark) {
