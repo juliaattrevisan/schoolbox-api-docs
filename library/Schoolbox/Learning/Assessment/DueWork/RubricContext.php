@@ -258,30 +258,33 @@ class RubricContext
      * Calls `$this->generateForFeedback` for each feedback in `$timeline`,
      * whether it belongs to a response or not.
      *
-     * @param IResponse[]|IFeedback[] $timeline      The timeline, from a
-     *                                               `\Schoolbox\Learning\Assessment\Timeline\Full::getFor*` method
-     * @param User                    $currentUser   Current logged-in user
-     * @param Access                  $access        Access determination object
-     * @param bool                    $publishedOnly Get only published items?
+     * @param Collection $timeline      The timeline, from `\Schoolbox\Learning\Assessment\Timeline\Full::getFor*`
+     * @param User       $currentUser   Current logged-in user
+     * @param Access     $access        Access determination object
+     * @param bool       $publishedOnly Get only published items?
      * @return Collection<int,array> key: feedback ID, value: result from `$this->generateForFeedback`
      */
     public function generateSeriesForTimeline(
-        $timeline,
+        Collection $timeline,
         User $currentUser,
         Access $access,
         $publishedOnly = true
     ): Collection {
+        // Collate all feedback in timeline
         $timelineFeedback = [];
         foreach ($timeline as $timelineItem) {
             if ($timelineItem instanceof Feedback\Model) {
                 $timelineFeedback[] = $timelineItem;
             } elseif ($timelineItem instanceof IResponse) {
                 foreach ($timelineItem->getAllFeedback() as $feedback) {
-                    $timelineFeedback[] = $feedback;
+                    if ($feedback instanceof Feedback\Model) {
+                        $timelineFeedback[] = $feedback;
+                    }
                 }
             }
         }
 
+        // Get a grid for every feedback in timeline
         $feedbackRubricContexts = new Collection();
         foreach ($timelineFeedback as $feedback) {
             $feedbackRubricContexts[$feedback->getId()] = $this->generateForFeedback(
