@@ -178,6 +178,9 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                     $path = str_replace("{:startyear7}", (int)date("Y") - ((int)$user->getYear() - 7), $path);
                     $path = str_replace("{:startyear12}", (int)date("Y") - ((int)$user->getYear() - 12), $path);
                 }
+                else {
+                    $path = str_replace(["{:graduationyear7}", "{:graduationyear12}", "{:graduationyeartwodigit7}", "{:graduationyeartwodigit12}","{:startyear7}","{:startyear12}"],'', $path);
+                }
 
                 $paths[] = $path;
             }
