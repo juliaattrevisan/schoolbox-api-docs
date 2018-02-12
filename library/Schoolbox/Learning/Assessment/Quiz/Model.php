@@ -96,7 +96,7 @@ class Model extends AbstractAssessment
         $authoritativeResponse = $participant->findMostRecentSubmittedResponse();
 
         // Does participant have a submitted attempt, and is it not reviewed?
-        return $authoritativeResponse && !$authoritativeResponse->hasPublishedFeedback();
+        return $authoritativeResponse && !$authoritativeResponse->findMostRecentInstructorGivenPublishedFeedback();
     }
 
     /**
@@ -148,7 +148,7 @@ class Model extends AbstractAssessment
             }
 
             // If published-only, skip if no published feedback
-            if ($publishedOnly && (!$attempt->hasFeedback() || !$attempt->getAllFeedback()[0]->isPublished())) {
+            if ($publishedOnly && !$attempt->findMostRecentInstructorGivenPublishedFeedback()) {
                 continue;
             }
 
@@ -169,10 +169,9 @@ class Model extends AbstractAssessment
      */
     public function getAuthoritativeFeedback(Participant $participant, $publishedOnly)
     {
-        $attempt = $this->getAuthoritativeResponse($participant, $publishedOnly);
-        return $attempt && $attempt->hasFeedback()
-            ? $attempt->getAllFeedback()->first()
-            : null;
+        return $publishedOnly
+            ? $participant->findMostRecentInstructorGivenPublishedFeedback()
+            : $participant->findMostRecentInstructorGivenFeedback();
     }
 
     /**

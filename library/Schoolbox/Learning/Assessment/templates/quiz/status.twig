@@ -47,7 +47,7 @@
 {% block config %}
 
     {% set latestResponse    = participant.findMostRecentResponse %}
-    {% set latestFeedback    = latestResponse.findMostRecentFeedback %}
+    {% set latestFeedback    = latestResponse.findMostRecentInstructorGivenFeedback %}
     {% set multipleResponses = participant.allResponses | length > 1 %}
 
     {% set isPublished  = latestFeedback.published %}
@@ -125,7 +125,7 @@
 {% block action_bar %}
 
     {% set latestResponse    = participant.findMostRecentResponse %}
-    {% set latestFeedback    = latestResponse.findMostRecentFeedback %}
+    {% set latestFeedback    = latestResponse.findMostRecentInstructorGivenFeedback %}
     {% set canFinish         = latestResponse and not latestResponse.submitted %}
     {% set canPublish        = latestResponse.submitted and (not latestFeedback or not latestFeedback.published) %}
     {% set canDelete         = latestResponse and (not latestFeedback or not latestFeedback.published) %}

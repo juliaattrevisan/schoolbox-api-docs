@@ -23,7 +23,7 @@ interface IResponse
      *
      * @return IFeedback|null
      */
-    public function findMostRecentFeedback();
+    public function findMostRecentInstructorGivenFeedback(): ?IFeedback;
 
     /**
      * Find the most recent Published Feedback with a non-null Mark value,
@@ -31,12 +31,29 @@ interface IResponse
      *
      * @return IFeedback|null
      */
-    public function findMostRecentPublishedFeedback();
+    public function findMostRecentInstructorGivenPublishedFeedback(): ?IFeedback;
+
+    /**
+     * Find the most recent self-assessed Feedback with a non-null Mark value,
+     * based on its 'publishedAt' property
+     *
+     * @return IFeedback|null
+     */
+    public function findMostRecentSelfAssessedFeedback(): ?IFeedback;
+
+    /**
+     * Find the most recent self-assessed Published Feedback with a non-null Mark value,
+     * based on its 'publishedAt' property
+     *
+     * @return IFeedback|null
+     */
+    public function findMostRecentSelfAssessedPublishedFeedback(): ?IFeedback;
 
 
     /**
      * Does this IResponse have published feedback?
      *
+     * @deprecated Ask the question whether this has instructor-given or self-assessed feedback instead
      * @return bool
      */
     public function hasPublishedFeedback();
@@ -142,6 +159,7 @@ interface IResponse
     /**
      * Does this IResponse have feedback?
      *
+     * @deprecated Ask the question whether this has instructor-given or self-assessed feedback instead
      * @return bool
      */
     public function hasFeedback();

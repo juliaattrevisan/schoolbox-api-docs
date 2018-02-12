@@ -14,6 +14,9 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\Feedback\InstructorGivenFilter;
+use Schoolbox\Learning\Assessment\Feedback\PublishedFilter;
+use Schoolbox\Learning\Assessment\Feedback\SelfAssessmentFilter;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use \Schoolbox\User;
 use \DomainException;
@@ -275,18 +278,12 @@ class Participant
      *
      * @return null|IFeedback
      */
-    public function findMostRecentFeedback()
+    public function findMostRecentInstructorGivenFeedback(): ?IFeedback
     {
-        /** @var IFeedback $mostRecentFeedback */
-        $mostRecentFeedback = null;
-
-        /** @var IFeedback $feedback */
-        foreach ($this->allFeedbacks as $feedback) {
-            if (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt())) {
-                $mostRecentFeedback = $feedback;
-            }
-        }
-        return $mostRecentFeedback;
+        return $this->allFeedbacks
+            ->filter(new InstructorGivenFilter())
+            ->sortBy('updatedAt', 'desc')
+            ->first();
     }
 
 
@@ -297,18 +294,42 @@ class Participant
      *
      * @return null|IFeedback
      */
-    public function findMostRecentPublishedFeedback()
+    public function findMostRecentInstructorGivenPublishedFeedback(): ?IFeedback
     {
-        /** @var IFeedback $mostRecentFeedback */
-        $mostRecentFeedback = null;
+        return $this->allFeedbacks
+            ->filter(new PublishedFilter())
+            ->filter(new InstructorGivenFilter())
+            ->sortBy('updatedAt', 'desc')
+            ->first();
+    }
 
-        /** @var IFeedback $feedback */
-        foreach ($this->allFeedbacks as $feedback) {
-            if ($feedback->isPublished() && (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt()))) {
-                $mostRecentFeedback = $feedback;
-            }
-        }
-        return $mostRecentFeedback;
+
+    /**
+     * Find the most recent self-assessed Feedback for an Assessment for this Participant
+     *
+     * @return null|IFeedback
+     */
+    public function findMostRecentSelfAssessedFeedback(): ?IFeedback
+    {
+        return $this->allFeedbacks
+            ->filter(new SelfAssessmentFilter())
+            ->sortBy('updatedAt', 'desc')
+            ->first();
+    }
+
+
+    /**
+     * Find the most recent self-assessed published Feedback for an Assessment for this Participant
+     *
+     * @return null|IFeedback
+     */
+    public function findMostRecentSelfAssessedPublishedFeedback(): ?IFeedback
+    {
+        return $this->allFeedbacks
+            ->filter(new PublishedFilter())
+            ->filter(new SelfAssessmentFilter())
+            ->sortBy('updatedAt', 'desc')
+            ->first();
     }
 
 

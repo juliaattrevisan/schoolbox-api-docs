@@ -81,7 +81,11 @@ class Rubric
              * after self-reflections have been created. However, ignore it if the historic self-reflection isn't
              * for the submission currently being viewed
              */
-            $latestSelfReflectedFeedback = $this->response->findMostRecentPublishedSelfReflectedFeedback();
+            if ($this->response->isDraft()) {
+                $latestSelfReflectedFeedback = $this->response->findMostRecentSelfAssessedFeedback();
+            } else {
+                $latestSelfReflectedFeedback = $this->response->findMostRecentSelfAssessedPublishedFeedback();
+            }
 
             if ($latestSelfReflectedFeedback) {
                 $data['latestSelfReflectedFeedback'] = $latestSelfReflectedFeedback;

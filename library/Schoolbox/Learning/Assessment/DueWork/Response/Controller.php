@@ -140,7 +140,7 @@ class Controller extends Base
         }
 
         // The zone which contains the files
-        $latestFeedback    = $participant->findMostRecentFeedback();
+        $latestFeedback    = $response->findMostRecentSelfAssessedFeedback();
         $attachZoneFactory = new Attachzone\Factory();
         $attachZone        = $attachZoneFactory->buildForDueWorkFeedback($latestFeedback);
 
@@ -184,6 +184,12 @@ class Controller extends Base
         $rubricData = (new InlineGrader\Rubric($assessment, $participant, $this->getUser(), $response, $isInteractionLocked, $rubricContext))->generate();
         $data = array_merge($data, $rubricData);
 
+        // Load self-reflection; if there is one, override the standard grid
+        $selfReflectionData = (new SelfReflection\Rubric($assessment, $participant, $response, $rubricContext))->generate();
+        if (isset($selfReflectionData['learnerRubricContext'])) {
+            $data['rubricContext'] = $selfReflectionData['learnerRubricContext'];
+        }
+
         /* Figure out who's actually here and what screen to show
          */
         if ($selfAssessedWithResponse) {
@@ -195,7 +201,7 @@ class Controller extends Base
     }
 
     /**
-     * Get the contents of a particular $response
+     * Get the contents of a particular $response for instructor marking.
      *
      * Show the specified kami doc in an inline window if available;
      * otherwise display html/audio/video/image contents differently, inline with the dom
@@ -253,13 +259,15 @@ class Controller extends Base
         // * Nothing
         $latestFeedback = null;
         if ($response) {
-            $latestFeedback = $response->findMostRecentFeedback();
+            $latestFeedback = $response->findMostRecentInstructorGivenFeedback();
         }
-        $latestFeedback = $latestFeedback ?? $participant->findMostRecentFeedback();
+        $latestFeedback = $latestFeedback ?? $participant->findMostRecentInstructorGivenFeedback();
 
         // The zone which contains the files
         $attachZoneFactory = new Attachzone\Factory();
-        $attachZone        = $attachZoneFactory->buildForDueWorkFeedback($latestFeedback);
+        $attachZone        = $attachZoneFactory->buildForDueWorkFeedback(
+            $latestFeedback instanceof Feedback ? $latestFeedback : null
+        );
 
         // Is the page being displayed in readonly mode?
         $isInteractionLocked = (new LockedChecker($this->termMapper))->isLockedForInteractions($assessment);

@@ -13,9 +13,10 @@ namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 use \Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\AbstractFeedback;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use Schoolbox\Learning\Assessment\ISelfAssessableFeedback;
 use UnexpectedValueException;
 
-class Model extends AbstractFeedback
+class Model extends AbstractFeedback implements ISelfAssessableFeedback
 {
 
     /**

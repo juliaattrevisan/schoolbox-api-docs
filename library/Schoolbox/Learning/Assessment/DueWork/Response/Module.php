@@ -333,7 +333,7 @@ class Module extends BaseModule
             'kami'        => $kami,
             'participant' => $participant,
             'response'    => $response,
-            'feedback'    => $participant->findMostRecentPublishedFeedback(),
+            'feedback'    => $participant->findMostRecentInstructorGivenPublishedFeedback(),
         ];
     }
 

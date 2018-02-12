@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\Participant\Test;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
 use InvalidArgumentException;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Learning\Assessment\Test\ParticipantLinker;
 use UnexpectedValueException;
 use Schoolbox\GenericCollection;
@@ -80,6 +81,7 @@ class DemoData
             ->setId($id)
             ->setAcceptOnline(true)
             ->setAcceptsMultiple()
+            ->setSelfReviewability(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishAt(Alaress_Date_Format::now()->addDays(-14))
             ->setOpenAt(Alaress_Date_Format::now()->addDays(-7))
             ->setDueAt(Alaress_Date_Format::now()->addDays(+7))
@@ -131,6 +133,7 @@ class DemoData
         $participantE = $linker->createAndLinkParticipant(self::getDemoStudent('E'), $dueWorkPlan);
 
         $feedbackE = (new Feedback())
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(new Alaress_Date_NullDate())
             ->setUpdatedAt(Alaress_Date_Format::now());
         $participantE->getAllFeedbacks()->add($feedbackE);
@@ -140,6 +143,7 @@ class DemoData
         $participantF = $linker->createAndLinkParticipant(self::getDemoStudent('F'), $dueWorkPlan);
 
         $feedbackF = (new Feedback())
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now());
         $participantF->getAllFeedbacks()->add($feedbackF);
@@ -149,11 +153,13 @@ class DemoData
         $participantG = $linker->createAndLinkParticipant(self::getDemoStudent('G'), $dueWorkPlan);
 
         $feedbackG1 = (new Feedback())
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now());
         $participantG->getAllFeedbacks()->add($feedbackG1);
 
         $feedbackG2 = (new Feedback())
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(new Alaress_Date_NullDate())
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantG->getAllFeedbacks()->add($feedbackG2);
@@ -168,6 +174,7 @@ class DemoData
         $participantH->getAllResponses()->add($responseH);
 
         $feedbackH = (new Feedback())
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(new Alaress_Date_NullDate())
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantG->getAllFeedbacks()->add($feedbackH);
@@ -182,6 +189,7 @@ class DemoData
         $participantI->getAllResponses()->add($responseI);
 
         $feedbackI = (new Feedback())
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantI->getAllFeedbacks()->add($feedbackI);
@@ -197,6 +205,7 @@ class DemoData
 
         $feedbackJ = (new Feedback())
             ->setResponse($responseJ)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(new Alaress_Date_NullDate())
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantJ->getAllFeedbacks()->add($feedbackJ);
@@ -213,6 +222,7 @@ class DemoData
 
         $feedbackK = (new Feedback())
             ->setResponse($responseK)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantK->getAllFeedbacks()->add($feedbackK);
@@ -229,6 +239,7 @@ class DemoData
 
         $feedbackL1 = (new Feedback())
             ->setResponse($responseL1)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantL->getAllFeedbacks()->add($feedbackL1);
@@ -249,6 +260,7 @@ class DemoData
         $participantM->getAllResponses()->add($responseM1);
 
         $feedbackM1 = (new Feedback())
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantM->getAllFeedbacks()->add($feedbackM1);
@@ -268,6 +280,7 @@ class DemoData
         $participantN->getAllResponses()->add($responseN1);
 
         $feedbackN1 = (new Feedback())
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantN->getAllFeedbacks()->add($feedbackN1);
@@ -281,6 +294,7 @@ class DemoData
         $participantO = $linker->createAndLinkParticipant(self::getDemoStudent('O'), $dueWorkPlan);
 
         $feedbackO = (new Feedback())
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(new Alaress_Date_NullDate())
             ->setUpdatedAt(Alaress_Date_Format::now());
         $participantO->getAllFeedbacks()->add($feedbackO);
@@ -295,6 +309,7 @@ class DemoData
         $participantP = $linker->createAndLinkParticipant(self::getDemoStudent('P'), $dueWorkPlan);
 
         $feedbackP = (new Feedback())
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(new Alaress_Date_NullDate())
             ->setUpdatedAt(Alaress_Date_Format::now());
         $participantP->getAllFeedbacks()->add($feedbackP);
@@ -309,6 +324,7 @@ class DemoData
         $participantQ = $linker->createAndLinkParticipant(self::getDemoStudent('Q'), $dueWorkPlan);
 
         $feedbackQ = (new Feedback())
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now());
         $participantQ->getAllFeedbacks()->add($feedbackQ);
@@ -323,6 +339,7 @@ class DemoData
         $participantR = $linker->createAndLinkParticipant(self::getDemoStudent('R'), $dueWorkPlan);
 
         $feedbackR = (new Feedback())
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setPublishedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now());
         $participantR->getAllFeedbacks()->add($feedbackR);
@@ -331,6 +348,176 @@ class DemoData
             ->setSubmittedAt(Alaress_Date_Format::now()->addDays(+1))
             ->setUpdatedAt(Alaress_Date_Format::now()->addDays(+1));
         $participantR->getAllResponses()->add($responseR);
+
+
+        // User S: unpublished self-assessed feedback
+        $participantS = $linker->createAndLinkParticipant(self::getDemoStudent('S'), $dueWorkPlan);
+
+        $responseS = (new Response())
+            ->setSubmittedAt(new Alaress_Date_NullDate())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+        $participantS->getAllResponses()->add($responseS);
+
+        $feedbackS = (new Feedback())
+            ->setResponse($responseS)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_SELF_GRADING)
+            ->setPublishedAt(new Alaress_Date_NullDate())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+        $participantS->getAllFeedbacks()->add($feedbackS);
+
+
+        // User T: published self-assessed feedback
+        $participantT = $linker->createAndLinkParticipant(self::getDemoStudent('T'), $dueWorkPlan);
+
+        $responseT = (new Response())
+            ->setSubmittedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+        $participantT->getAllResponses()->add($responseT);
+
+        $feedbackT = (new Feedback())
+            ->setResponse($responseT)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_SELF_GRADING)
+            ->setPublishedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+        $participantT->getAllFeedbacks()->add($feedbackT);
+
+
+        // User U: unpublished self-assessed floating feedback
+        // Business rules state that self-assessed feedback should never be floating, but test anyway.
+        $participantU = $linker->createAndLinkParticipant(self::getDemoStudent('U'), $dueWorkPlan);
+
+        $feedbackU = (new Feedback())
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_SELF_GRADING)
+            ->setPublishedAt(new Alaress_Date_NullDate())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+        $participantU->getAllFeedbacks()->add($feedbackU);
+
+
+        // User V: published self-assessed floating feedback
+        // Business rules state that self-assessed feedback should never be floating, but test anyway.
+        $participantV = $linker->createAndLinkParticipant(self::getDemoStudent('V'), $dueWorkPlan);
+
+        $feedbackV = (new Feedback())
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_SELF_GRADING)
+            ->setPublishedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+        $participantV->getAllFeedbacks()->add($feedbackV);
+
+
+        // User W: published self-assessed, draft instructor-given feedback
+        $participantW = $linker->createAndLinkParticipant(self::getDemoStudent('W'), $dueWorkPlan);
+
+        $responseW = (new Response())
+            ->setSubmittedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+        $participantW->getAllResponses()->add($responseW);
+
+        $feedbackW1 = (new Feedback())
+            ->setResponse($responseW)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_SELF_GRADING)
+            ->setPublishedAt(new Alaress_Date_NullDate())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+        $participantW->getAllFeedbacks()->add($feedbackW1);
+
+        $feedbackW2 = (new Feedback())
+            ->setResponse($responseW)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->setPublishedAt(new Alaress_Date_NullDate())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+        $participantW->getAllFeedbacks()->add($feedbackW2);
+
+
+        // User X: published self-assessed, published instructor-given feedback
+        $participantX = $linker->createAndLinkParticipant(self::getDemoStudent('X'), $dueWorkPlan);
+
+        $responseX = (new Response())
+            ->setSubmittedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+        $participantX->getAllResponses()->add($responseX);
+
+        $feedbackX1 = (new Feedback())
+            ->setResponse($responseX)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_SELF_GRADING)
+            ->setPublishedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+        $participantX->getAllFeedbacks()->add($feedbackX1);
+
+        $feedbackX2 = (new Feedback())
+            ->setResponse($responseX)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->setPublishedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+        $participantX->getAllFeedbacks()->add($feedbackX2);
+
+
+        // User Y: published self-assessed and instructor-given feedback, draft self-assessed feedback
+        $participantY = $linker->createAndLinkParticipant(self::getDemoStudent('Y'), $dueWorkPlan);
+
+        $responseY1 = (new Response())
+            ->setSubmittedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+        $participantY->getAllResponses()->add($responseY1);
+
+        $feedbackY1 = (new Feedback())
+            ->setResponse($responseY1)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_SELF_GRADING)
+            ->setPublishedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+        $participantY->getAllFeedbacks()->add($feedbackY1);
+
+        $feedbackY2 = (new Feedback())
+            ->setResponse($responseY1)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->setPublishedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+        $participantY->getAllFeedbacks()->add($feedbackY2);
+
+        $responseY2 = (new Response())
+            ->setSubmittedAt(new Alaress_Date_NullDate())
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(1));
+        $participantY->getAllResponses()->add($responseY2);
+
+        $feedbackY3 = (new Feedback())
+            ->setResponse($responseY2)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_SELF_GRADING)
+            ->setPublishedAt(new Alaress_Date_NullDate())
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(1));
+        $participantY->getAllFeedbacks()->add($feedbackY3);
+
+
+        // User Z: published self-assessed and instructor-given feedback, published self-assessed feedback
+        $participantZ = $linker->createAndLinkParticipant(self::getDemoStudent('Z'), $dueWorkPlan);
+
+        $responseZ1 = (new Response())
+            ->setSubmittedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+        $participantZ->getAllResponses()->add($responseZ1);
+
+        $feedbackZ1 = (new Feedback())
+            ->setResponse($responseZ1)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_SELF_GRADING)
+            ->setPublishedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+        $participantZ->getAllFeedbacks()->add($feedbackZ1);
+
+        $feedbackZ2 = (new Feedback())
+            ->setResponse($responseZ1)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->setPublishedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+        $participantZ->getAllFeedbacks()->add($feedbackZ2);
+
+        $responseZ2 = (new Response())
+            ->setSubmittedAt(Alaress_Date_Format::now()->addDays(1))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(1));
+        $participantZ->getAllResponses()->add($responseZ2);
+
+        $feedbackZ3 = (new Feedback())
+            ->setResponse($responseZ2)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_SELF_GRADING)
+            ->setPublishedAt(Alaress_Date_Format::now()->addDays(1))
+            ->setUpdatedAt(Alaress_Date_Format::now()->addDays(1));
+        $participantZ->getAllFeedbacks()->add($feedbackZ3);
 
         return $dueWork;
     }
@@ -969,6 +1156,30 @@ class DemoData
                 break;
             case 'R':
                 $user->setFirstname('Rory (Student)');
+                break;
+            case 'S':
+                $user->setFirstname('Steve (Student)');
+                break;
+            case 'T':
+                $user->setFirstname('Tom (Student)');
+                break;
+            case 'U':
+                $user->setFirstname('Ursula (Student)');
+                break;
+            case 'V':
+                $user->setFirstname('Veronica (Student)');
+                break;
+            case 'W':
+                $user->setFirstname('Wally (Student)');
+                break;
+            case 'X':
+                $user->setFirstname('Xavier (Student)');
+                break;
+            case 'Y':
+                $user->setFirstname('Yvonne (Student)');
+                break;
+            case 'Z':
+                $user->setFirstname('Zoe (Student)');
                 break;
             default:
                 throw new InvalidArgumentException("Unknown userChar: $userChar");

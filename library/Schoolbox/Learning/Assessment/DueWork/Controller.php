@@ -241,15 +241,13 @@ class Controller extends Assessment\Controller
 
         // Generate rubric context for every feedback
         $rubricContext          = new RubricContext($this->rubricMapper);
-        $feedbackRubricContexts = [];
-        foreach ($participant->getAllFeedbacks() as $feedback) {
-            $feedbackRubricContexts[$feedback->getId()] = $rubricContext->generateForFeedback(
-                $feedback,
-                $this->getUser(),
-                $this->getAccess(),
-                false
-            );
-        }
+        $timeline               = (new FullTimeline($participant))->getForUser($this->getUser());
+        $feedbackRubricContexts = $rubricContext->generateSeriesForTimeline(
+            $timeline,
+            $this->getUser(),
+            $this->getAccess(),
+            false
+        );
 
         /* Find all the records spawned by $participant
          *
@@ -262,7 +260,7 @@ class Controller extends Assessment\Controller
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'participant' => $participant,
-            'timeline'    => (new FullTimeline($participant))->getForUser($this->getUser()),
+            'timeline'    => $timeline,
 
             /* Plagscan status
              */

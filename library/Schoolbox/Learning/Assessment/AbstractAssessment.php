@@ -401,13 +401,8 @@ abstract class AbstractAssessment implements IAssessable
                 break;
             }
         }
-        $hasPublishedFeedback = false;
-        foreach ($participant->getAllFeedbacks() as $feedback) {
-            if ($feedback->isPublished()) {
-                $hasPublishedFeedback = true;
-                break;
-            }
-        }
+
+        $hasPublishedFeedback = (null !== $participant->findMostRecentInstructorGivenPublishedFeedback());
 
         // No Submitted Responses and No Published Feedback?
         return !$hasSubmittedResponse && !$hasPublishedFeedback;
@@ -448,12 +443,7 @@ abstract class AbstractAssessment implements IAssessable
     {
         $this->assertSameAssessment($participant);
 
-        foreach ($participant->getAllFeedbacks() as $feedback) {
-            if ($feedback->isPublished()) {
-                return true;
-            }
-        }
-        return false;
+        return (null !== $participant->findMostRecentInstructorGivenPublishedFeedback());
     }
 
 

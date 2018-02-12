@@ -50,7 +50,7 @@
 
 {% block config %}
 
-    {% set latestFeedback    = participant.findMostRecentFeedback %}
+    {% set latestFeedback    = participant.findMostRecentInstructorGivenFeedback %}
     {% set latestResponse    = participant.findMostRecentSubmittedResponse %}
     {% set multipleResponses = participant.allResponses | length > 1 %}
 
@@ -125,9 +125,10 @@
 
                 <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
                     {% include '@learningAssessment/dueWork/comment.twig' with {
-                    participant: participant,
-                    tabIndex:   (loop.index0 * 2) + 2,
-                    readonly:    readonly
+                        feedback:    participant.findMostRecentInstructorGivenFeedback,
+                        participant: participant,
+                        tabIndex:    (loop.index0 * 2) + 2,
+                        readonly:    readonly
                     } only %}
                 </div>
             </div>
@@ -178,7 +179,7 @@
     {% endif %}
 
     {# Action Bar #}
-    {% set feedback            = participant.findMostRecentFeedback %}
+    {% set feedback            = participant.findMostRecentInstructorGivenFeedback %}
     {% set isDraftFeedback     = feedback and not feedback.published %}
     {% set isPublishedFeedback = feedback and feedback.published %}
     {% set actionStyle         = isDraftFeedback or attachedMsg or pAckReceipt ? '' : 'display: none;' %}

@@ -355,7 +355,7 @@ class CSV implements IExporter
         if (!$participant) {
             return '';
         }
-        $mostRecentFeedback = $participant->findMostRecentFeedback();
+        $mostRecentFeedback = $participant->findMostRecentInstructorGivenFeedback();
         return $mostRecentFeedback ? $mostRecentFeedback->getComment() : '';
     }
 

@@ -11,6 +11,9 @@
 namespace Schoolbox\Learning\Assessment\DueWork;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GridGenerator;
+use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -53,7 +56,7 @@ class RubricContext
 
         /* Spawn rubric grid
          */
-        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMarkForSelfReflectableResponse(false, $responseId, $student);
+        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMarkForSelfReflectableResponse(false, $responseId);
         $context['rubric'] = $dueWork->getRubric()->toContext();
 
         return $context;
@@ -248,5 +251,49 @@ class RubricContext
         }
 
         return $context;
+    }
+
+
+    /**
+     * Calls `$this->generateForFeedback` for each feedback in `$timeline`,
+     * whether it belongs to a response or not.
+     *
+     * @param Collection $timeline      The timeline, from `\Schoolbox\Learning\Assessment\Timeline\Full::getFor*`
+     * @param User       $currentUser   Current logged-in user
+     * @param Access     $access        Access determination object
+     * @param bool       $publishedOnly Get only published items?
+     * @return Collection<int,array> key: feedback ID, value: result from `$this->generateForFeedback`
+     */
+    public function generateSeriesForTimeline(
+        Collection $timeline,
+        User $currentUser,
+        Access $access,
+        $publishedOnly = true
+    ): Collection {
+        // Collate all feedback in timeline
+        $timelineFeedback = [];
+        foreach ($timeline as $timelineItem) {
+            if ($timelineItem instanceof Feedback\Model) {
+                $timelineFeedback[] = $timelineItem;
+            } elseif ($timelineItem instanceof IResponse) {
+                foreach ($timelineItem->getAllFeedback() as $feedback) {
+                    if ($feedback instanceof Feedback\Model) {
+                        $timelineFeedback[] = $feedback;
+                    }
+                }
+            }
+        }
+
+        // Get a grid for every feedback in timeline
+        $feedbackRubricContexts = new Collection();
+        foreach ($timelineFeedback as $feedback) {
+            $feedbackRubricContexts[$feedback->getId()] = $this->generateForFeedback(
+                $feedback,
+                $currentUser,
+                $access,
+                $publishedOnly
+            );
+        }
+        return $feedbackRubricContexts;
     }
 }
