@@ -63,13 +63,13 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         $day = 1;
 
         $sql = "
-            SELECT DISTINCT   REPLACE(STR(DAY, 2),SPACE(1),'0') + '.' + REPLACE(STR(TIMEOFDAY, 2),SPACE(1),'0') AS NUMBER,
-                              HEADING,
-                              TIME_START,
-                              TIME_END
-            FROM              TIMEPDHD
-            WHERE             SORT_ORDER > 0 AND DAY > 0 AND [TYPE] <> 'Y' AND [DAY] = {$day}
-            ORDER BY          REPLACE(STR(DAY, 2),SPACE(1),'0') + '.' + REPLACE(STR(TIMEOFDAY, 2),SPACE(1),'0')
+            SELECT DISTINCT   CONCAT(DAY, '.', TIMEOFDAY) AS NUMBER, 
+                              HEADING, 
+                              TIME_START, 
+                              TIME_END 
+            FROM              TIMEPDHD 
+            WHERE             SORT_ORDER > 0 AND TYPE <> 'Y' AND DAY = {$day} 
+            ORDER BY          TIME_START
         ";
 
         $timetableDays = $this->getDatabase()->getAll($sql);
@@ -149,7 +149,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      *
      * @return String
      */
-    function getDayName($dayNumber)
+    public function getDayName($dayNumber)
     {
         return 'Day ' . $dayNumber;
     }
