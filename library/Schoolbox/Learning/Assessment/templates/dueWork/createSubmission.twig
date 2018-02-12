@@ -205,6 +205,21 @@ Data:
                 form.submit();
             }
         });
+
+        //Disable rest of form if 'submitted in person' checked
+        $('#editor-submittedInPerson').click(function(element){
+            if(this.checked){
+                console.log("check");
+                $('#submission-upload').hide('slow');
+                $('[name="{{ attachzone.fileVar }}"]').attr('disabled', true);
+                $('#editor-body').attr('disabled', true);
+            } else {
+                console.log("uncheck");
+                $('#submission-upload').show('slow');
+                $('[name="{{ attachzone.fileVar }}"]').attr('disabled', false);
+                $('#editor-body').attr('disabled', false);
+            }
+        });
     });
 </script>
 <!-- END custom_head -->
@@ -260,8 +275,10 @@ Data:
                                     I have submitted my work in person, and don't need to upload or use the editor
                                 {% endif %}
                             </label>
-                            <textarea id="editor-body" name="body" rows="20">{{ editorContents }}</textarea>
-                            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                            <div id="submission-upload">
+                                <textarea id="editor-body" name="body" rows="20">{{ editorContents }}</textarea>
+                                {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                            </div>
                         </div>
                     </section>
 
