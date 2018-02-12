@@ -138,6 +138,30 @@
             $("input[name^='group']").removeClass('required');
         }
 
+        $("#inherit").change(function() {
+            console.log("inherit box changed");
+            var inheritChecked = $("#inherit").prop("checked");
+            var recursiveChecked = $("#recursive").prop("checked");
+
+            if (inheritChecked && recursiveChecked) {
+                $("#warning").removeClass("hide");
+            } else {
+                $("#warning").addClass("hide");
+            }
+        });
+        $("#recursive").change(function() {
+            console.log("recursive box changed");
+
+            var inheritChecked = $("#inherit").prop("checked");
+            var recursiveChecked = $("#recursive").prop("checked");
+
+            if (inheritChecked && recursiveChecked) {
+                $("#warning").removeClass("hide");
+            } else {
+                $("#warning").addClass("hide");
+            }
+        });
+
     });
 </script>
 
@@ -177,7 +201,14 @@
     {% endif %}
 
 </div>
+
 <div class="row">
+    <div class="list-item small-12 island">
+        <div data-alert="" class="alert-box alert hide">
+            Warning! You have chosen to apply permissions to all subfolders. This will remove class codes from those folders.
+        </div>
+    </div>
+
     <div class="list-item small-12 island">
         <form action="/resource/folder/update" method="post" id="folderForm" class="top">
             <input type="hidden" id="parent" name="parent" value="{{ parent.getId }}" />
