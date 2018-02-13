@@ -22,6 +22,7 @@ use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\ValidParticipant;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\UserMapper;
 
 $factory = new Assess_Factory();
 $assessHandler = new Assess_Main();
@@ -51,6 +52,13 @@ if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($as
 	error(127);
 }
 
+try {
+    $user = UserMapper::getInstance()->findById($this->arg[0]);
+}
+catch (Mapper\Exception $e) {
+    error(31);
+}
+
 /* Check the folder exists meaningfully
  */
 try {
@@ -64,7 +72,7 @@ catch (Mapper\Exception $e) {
  */
 $isValidParticipant = new ValidParticipant(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
 
-if (!$isValidParticipant->isSatisfiedBy($_SESSION['user'], $folder, $assess['assessment_id'])) {
+if (!$isValidParticipant->isSatisfiedBy($user, $folder, $assess['assessment_id'])) {
     $this->pageNotFound();
 }
 
