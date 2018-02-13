@@ -15,6 +15,11 @@
 /* Check that you can delete these attempts first
  */
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Participant;
+use Schoolbox\Learning\Quiz\ValidParticipant;
+use Schoolbox\Mapper;
+use Schoolbox\Resource\Folder;
+use Schoolbox\UserMapper;
 
 $attemptsToDelete = [];
 
@@ -39,6 +44,30 @@ $getAttempt = function ($attemptId) use ($attemptHandler, $assessHandler, $group
 
     if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
         throw Schoolbox\Error\Mapper::getInstance()->generateException(Schoolbox\Error\Mapper::ERROR_PERM_ATTEMPT_DELETE);
+    }
+
+    try {
+        $user = UserMapper::getInstance()->findById($attempt['user_id']);
+    }
+    catch (Mapper\Exception $e) {
+        error(31);
+    }
+
+    /* Check the folder exists meaningfully
+     */
+    try {
+        $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
+    }
+    catch (Mapper\Exception $e) {
+        error(117);
+    }
+
+    /* Non-participants are sent to a 404 screen
+     */
+    $isValidParticipant = new ValidParticipant(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
+
+    if (!$isValidParticipant->isSatisfiedBy($user, $folder, $assess['assessment_id'])) {
+        $this->pageNotFound();
     }
 
     return $attempt;
