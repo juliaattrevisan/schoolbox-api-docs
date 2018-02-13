@@ -13,6 +13,12 @@ use Schoolbox\Learning\Quiz\Model as Quiz;
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Assessment\Participant;
+use Schoolbox\Learning\Quiz\ValidParticipant;
+use Schoolbox\Mapper;
+use Schoolbox\Resource\Folder;
+use Schoolbox\UserMapper;
+
 /**
  * u r in a sitepage
  *
@@ -57,6 +63,30 @@ try {
 catch(\Schoolbox\Mapper\Exception $e) {
 	error(118);
 	exit;
+}
+
+try {
+    $user = UserMapper::getInstance()->findById($attempt['user_id']);
+}
+catch (Mapper\Exception $e) {
+    error(31);
+}
+
+/* Check the folder exists meaningfully
+ */
+try {
+    $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
+}
+catch (Mapper\Exception $e) {
+    error(117);
+}
+
+/* Non-participants are sent to a 404 screen
+ */
+$isValidParticipant = new ValidParticipant(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
+
+if (!$isValidParticipant->isSatisfiedBy($user, $folder, $assess['assessment_id'])) {
+    $this->pageNotFound();
 }
 
 if($assess->getUser()->getId() != $sessionUser->getId() && $groupHandler->getPermission($assess->getCategory()->getId()) < WRITE_ACCESS) {
