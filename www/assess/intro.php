@@ -163,13 +163,17 @@ if ($author->isDeleted()) {
     $this->parse('author_link_close_block', 'author_link_close');
 }
 
+/* Looks like everyone has a Plan in some way, regardless if it's custom or default?
+ */
+$participant = $assessment->getParticipantIfExtant($_SESSION['user']);
+
 $this->setVar(array(
     'RETURN_URL_SUFFIX' => isset($_GET["returnUrl"]) ? "?returnUrl=" . $_GET["returnUrl"] : "",
     'ASSESS_ASSESS_ID' => $assess['assess_id'],
     'ASSESS_TITLE' => Scrub::text($assess['title']),
     'ASSESS_DESCRIPTION' => Scrub::html($assess['description']),
-    'ASSESS_START' => $assessment->getOpenAt()->isNull() ? '' : $assessment->getOpenAt()->getShort(),
-    'ASSESS_FINISH' => $assessment->getDueAt()->isNull() ? '' : $assessment->getDueAt()->getShort(),
+    'ASSESS_START' => $participant->getOpenDate()->getShort(),
+    'ASSESS_FINISH' => $participant->getDueDate()->getShort(),
     'FIRST_SECTION' => $allSections[0]['section_id'],
     'ASSESS_AUTHOR' => Scrub::text($author->formatName()),
     'ASSESS_AUTHOR_ID' => $author->getId(),
