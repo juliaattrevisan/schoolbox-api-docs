@@ -161,7 +161,7 @@ class Controller extends Assessment\Controller
                     $previewFragment['file'] = StorageMapper::getInstance()->findByHash($matches[1]);
                 }
                 catch (\Schoolbox\Mapper\Exception $e) {
-                    unset($previewFragment);
+                    $previewFragment = [];
                 }
             }
 
