@@ -116,7 +116,6 @@ class Controller extends Assessment\Controller
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
-        $participant = $assessment->getParticipantIfExtant($student);
         $previewFragment = [];
 
         /* If there was a specified url, it could be to some external location
@@ -177,9 +176,8 @@ class Controller extends Assessment\Controller
         $twigData = [
             'breadcrumbs'  => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'   => $assessment,
-            'hasWritePerm' => $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder()),
+            'student'      => $student,
             'preview'      => $previewFragment,
-            'participant'  => $participant,
             'returnUrl'    => $returnUrl,
         ];
 
