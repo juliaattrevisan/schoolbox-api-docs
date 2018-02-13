@@ -205,6 +205,25 @@ Data:
                 form.submit();
             }
         });
+
+        //Disable rest of form if 'submitted in person' checked
+        $('#editor-submittedInPerson').click(function(element){
+            if(this.checked){
+                $('#submission-upload').hide('slow');
+                $('[name="{{ attachzone.fileVar }}"]').attr('disabled', true);
+                $('#editor-body').attr('disabled', true);
+                if(CKEDITOR.instances['editor-body'].getData().length || $('[name="{{ attachzone.fileVar }}"]').val()) {
+                    $('#submit-warning').show('slow');
+                } else {
+                    $('#submit-warning').hide('slow');
+                }
+            } else {
+                $('#submit-warning').hide('slow');
+                $('#submission-upload').show('slow');
+                $('[name="{{ attachzone.fileVar }}"]').attr('disabled', false);
+                $('#editor-body').attr('disabled', false);
+            }
+        });
     });
 </script>
 <!-- END custom_head -->
@@ -260,8 +279,11 @@ Data:
                                     I have submitted my work in person, and don't need to upload or use the editor
                                 {% endif %}
                             </label>
-                            <textarea id="editor-body" name="body" rows="20">{{ editorContents }}</textarea>
-                            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                            <p id="submit-warning" style="display:none" class="alert alert-box icon-alert">Any previously entered data or uploaded files will not be submitted.</p>
+                            <div id="submission-upload">
+                                <textarea id="editor-body" name="body" rows="20">{{ editorContents }}</textarea>
+                                {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                            </div>
                         </div>
                     </section>
 
