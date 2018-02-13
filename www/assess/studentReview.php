@@ -12,8 +12,13 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-use \Schoolbox\Permission\Access\Access;
-use \Schoolbox\Permission\Access\UserAccess;
+
+use Schoolbox\Assessment\Participant;
+use Schoolbox\Learning\Quiz\ValidParticipant;
+use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder;
 
 $factory         = new Assess_Factory();
 $assessHandler   = new Assess_Main();
@@ -50,6 +55,23 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 
 if (!$section) {
     error(115);
+}
+
+/* Check the folder exists meaningfully
+ */
+try {
+    $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
+}
+catch (Mapper\Exception $e) {
+    error(117);
+}
+
+/* Non-participants are sent to a 404 screen
+ */
+$isValidParticipant = new ValidParticipant(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
+
+if (!$isValidParticipant->isSatisfiedBy($_SESSION['user'], $folder, $assess['assessment_id'])) {
+    $this->pageNotFound();
 }
 
 if (!$attempt) {
