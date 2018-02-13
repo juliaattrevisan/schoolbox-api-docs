@@ -63,7 +63,7 @@
         {% endif %}
     </form>
 {% else %}
-    {% if participant.isResponseRequired %}
+    {% if participant.isExcluded or participant.isResponseRequired %}
         <!-- deliberately empty  -->
     {% elseif participant.isFeedbackRequired %}
         <span class="no-text progress-tick pending" title="Awaiting Feedback"></span>
