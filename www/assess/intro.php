@@ -167,6 +167,8 @@ if ($author->isDeleted()) {
  */
 $participant = $assessment->getParticipantIfExtant($_SESSION['user']);
 
+$assess['description'] = trim($participant->getDescription());
+
 $this->setVar(array(
     'RETURN_URL_SUFFIX' => isset($_GET['returnUrl']) ? '?returnUrl=' . $_GET['returnUrl'] : '',
     'ASSESS_ASSESS_ID' => $assess['assess_id'],
@@ -190,8 +192,6 @@ if ($assessment->isImplementation()) {
 } else {
     $this->setVar('has_assess_due_block', '');
 }
-
-$assess['description'] = trim($assess['description']);
 
 if (empty($assess['description'])) {
     $this->setVar('has_assess_description_block', '');
