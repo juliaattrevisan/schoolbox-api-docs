@@ -255,9 +255,19 @@
     font-family: $font-family-icon;
 }
 
+.icon-education-mainentance:before {
+    content: "\e90e";
+    font-family: $font-family-icon;
+}
+
 .icon-email:before,
 .icon-mail:before {
     content: "\e624";
+    font-family: $font-family-icon;
+}
+
+.icon-eng-second-lang:before {
+    content: "\e90f";
     font-family: $font-family-icon;
 }
 
@@ -369,6 +379,21 @@
 
 .icon-info:before {
     content: "\e639";
+    font-family: $font-family-icon;
+}
+
+.icon-international-baccalaureate:before {
+    content: "\e914";
+    font-family: $font-family-icon;
+}
+
+.icon-integration-student:before {
+    content: "\e910";
+    font-family: $font-family-icon;
+}
+
+.icon-international-student:before {
+    content: "\e911";
     font-family: $font-family-icon;
 }
 
