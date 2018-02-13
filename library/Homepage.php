@@ -157,15 +157,6 @@ class Homepage
 						FROM homepage_config WHERE cid = '{$this->cid}'";
         $colourList = $this->db->getRow($query);
 
-        // use defaults for missing colours
-        $defaultColours = unserialize(HOMEPAGE_colors);
-        if (is_array($colourList)) {
-            foreach ($colourList as $key => $value) {
-                if (empty($value)) {
-                    $colourList[$key] = $defaultColours[$key];
-                }
-            }
-        }
         return $colourList;
     }
 

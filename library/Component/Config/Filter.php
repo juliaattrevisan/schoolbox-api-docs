@@ -34,6 +34,7 @@ class Component_Config_Filter extends Component_Config_Abstract
     {
 
         $filter = array();
+        $configValue = (int)$configValue;
 
         for ($i = 0; $i < count($this->getFilterFields()); $i++) {
             $j = $configValue % 2;
