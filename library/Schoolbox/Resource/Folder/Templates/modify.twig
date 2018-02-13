@@ -198,12 +198,6 @@
 
 <div class="row">
     <div class="list-item small-12 island">
-        <div data-alert="" class="alert-box alert hide">
-            This action will remove class codes from all subfolders!
-        </div>
-    </div>
-
-    <div class="list-item small-12 island">
         <form action="/resource/folder/update" method="post" id="folderForm" class="top">
             <input type="hidden" id="parent" name="parent" value="{{ parent.getId }}" />
             <input type="hidden" name="categoryID" value="{{ folder.getId }}" />
@@ -365,6 +359,12 @@
                         <label for="recursive" class="checkbox-label">Apply these permissions to all subfolders</label>
                     </div>
                 </fieldset>
+
+                <div class="list-item small-12 island">
+                    <div data-alert="" class="alert-box alert hide">
+                        This action will remove class codes from all subfolders!
+                    </div>
+                </div>
 
                 {% endif %}
 
