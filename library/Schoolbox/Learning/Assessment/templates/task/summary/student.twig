@@ -23,9 +23,6 @@ Data:
             }
         });
     });
-
-
-
 </script>
 
 <div class="row">
@@ -70,30 +67,31 @@ Data:
                                          class="hide-for-small-only">
                                     <p>{{ student.formatName }}</p>
 
-                                    <p class="meta">
-                                        {# Are there no responses for this participant ? #}
-                                        {% if not mostRecentResponse %}
+                                    {% if assessment.isImplementation %}
+                                        <p class="meta">
+                                            {# Are there no responses for this participant ? #}
+                                            {% if not mostRecentResponse %}
 
-                                            {# Is this task self-assessable ? #}
-                                            {% if assessment.isSelfAssessable %}
-                                                {% if isViewingOwnSummary %}
-                                                    You {% if assessment.isPastClose %}did not complete{% else %}have not completed{% endif %} this task.
+                                                {# Is this task self-assessable ? #}
+                                                {% if assessment.isSelfAssessable %}
+                                                    {% if isViewingOwnSummary %}
+                                                        You {% if assessment.isPastClose %}did not complete{% else %}have not completed{% endif %} this task.
+                                                    {% else %}
+                                                        {% if assessment.isPastClose %}did not complete{% else %}has not completed{% endif %} this task.
+                                                    {% endif %}
                                                 {% else %}
-                                                    {% if assessment.isPastClose %}did not complete{% else %}has not completed{% endif %} this task.
+                                                    {% if isViewingOwnSummary %}
+                                                        Your teacher {% if assessment.isPastClose %}did not verify{% else %}has not verified{% endif %} that you have completed this task.
+                                                    {% else %}
+                                                        {% if assessment.isPastClose %}was not{% else %}has not been{% endif %} verified as having completed this task.
+                                                    {% endif %}
                                                 {% endif %}
                                             {% else %}
-                                                {% if isViewingOwnSummary %}
-                                                    Your teacher {% if assessment.isPastClose %}did not verify{% else %}has not verified{% endif %} that you have completed this task.
-                                                {% else %}
-                                                    {% if assessment.isPastClose %}was not{% else %}has not been{% endif %} verified as having completed this task.
-                                                {% endif %}
+                                            {% if isViewingOwnSummary %}You were{% else %}was{% endif %} marked as
+                                            {% if mostRecentResponse.isMarkedComplete %}complete{% else %}incomplete{% endif %} on {{ mostRecentResponse.submittedAt.short }}.
                                             {% endif %}
-                                        {% else %}
-                                        {% if isViewingOwnSummary %}You were{% else %}was{% endif %} marked as
-                                        {% if mostRecentResponse.isMarkedComplete %}complete{% else %}incomplete{% endif %} on {{ mostRecentResponse.submittedAt.short }}.
-                                        {% endif %}
-                                    </p>
-
+                                        </p>
+                                    {% endif %}
                                 </a>
                             </div>
                         </div>
