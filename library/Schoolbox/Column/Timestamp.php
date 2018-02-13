@@ -15,6 +15,11 @@ class Timestamp extends Datetime implements IColumnType {
 	protected $input_format  = 'U';
 	protected $output_format = 'U';
 
+    /**
+     * There's no zero value for timestamps.
+     */
+    protected const ZERO_VALUE = null;
+
 	/**
 	 * Overridden to cast result to integer.
 	 *

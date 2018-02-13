@@ -56,6 +56,7 @@ class DecimalTest extends TestCase {
 	}
 
     /**
+     * @dataProvider getTestHydrate
      * @param null|string $input
      * @param null|float $expected_output
      */
@@ -64,6 +65,7 @@ class DecimalTest extends TestCase {
 	}
 
     /**
+     * @dataProvider getTestDehydrate
      * @param null|float $input
      * @param null|float $expected_output
      */

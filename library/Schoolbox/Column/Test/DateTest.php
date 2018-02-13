@@ -43,7 +43,8 @@ class DateTest extends DatetimeTest
             ['2012-01-01',          true],
             ['0000-01-01 01:40:23', true],
             ['9999-01-01 01:40:23', true],
-            ['2012-01', false],
+            ['2012-01',             false],
+            ['0000-00-00',          false],
         ];
     }
 
