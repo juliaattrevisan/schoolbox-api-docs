@@ -196,14 +196,18 @@ class Controller extends Assessment\Controller
         }
 
         // Generate rubric context for every feedback
-        $rubricContext          = new RubricContext($this->rubricMapper);
-        $timeline               = (new FullTimeline($participant))->getForUser($this->getUser());
-        $feedbackRubricContexts = $rubricContext->generateSeriesForTimeline(
-            $timeline,
-            $this->getUser(),
-            $this->getAccess(),
-            false
-        );
+        $rubricContext = new RubricContext($this->rubricMapper);
+        $timeline      = $feedbackRubricContexts = null;
+        if ($participant) {
+            $timeline               = (new FullTimeline($participant))->getForUser($this->getUser());
+            $feedbackRubricContexts = $rubricContext->generateSeriesForTimeline(
+                $timeline,
+                $this->getUser(),
+                $this->getAccess(),
+                false
+            );
+        }
+
 
         /* Find all the records spawned by $participant
          *

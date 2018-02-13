@@ -191,38 +191,6 @@ class Module extends BaseModule
             // obtain the assessment from our other preload
             $student     = $this->getUserMapper()->findById($params['studentId']);
             $assessment  = $this->preloadAssessment($params, $student)['assessment'];
-
-            $access = $this->getAccess()->getFolderAccess($student, $assessment->getContext()->getFolder()->getId());
-
-            /* Allow the currently logged in user to access the student's Assessment Summary
-             *
-             * This allows write-accessors to view a typically read-access page ie. when a teacher
-             * wants to preview a task's summary screen (see SA-2193)
-             *
-             * This pretends the teacher is a participant
-             */
-            if ($access >= UserAccess::ACCESS_WRITE) {
-                $plan = (new Plan($assessment))->setIsDynamic(true); // TODO this is just a temp hack. Fix properly in SA-5769
-                $assessment->getPlans()->add($plan);
-                $participant = new Participant($student, $plan);
-                $plan->getParticipants()[$student->getId()] = $participant;
-
-                /* Suck down all the responses from $assessment and put them into $participant
-                 */
-                /** @var Participant $currentParticipant */
-                foreach ($assessment->getAllParticipants() as $currentParticipant) {
-                    if ($currentParticipant->getUser()->getId() == $student->getId()) {
-
-                        $participant->setAllResponses($currentParticipant->getAllResponses());
-
-                        break;
-                    }
-                }
-            }
-            else {
-                /** @var IAssessable $assessment */
-                $participant = $assessment->getParticipant($student);
-            }
         } catch (UnexpectedValueException $e) {
             // Student isn't a participant
             throw new InvalidPath();
@@ -237,7 +205,7 @@ class Module extends BaseModule
 
         return [
             'assessment'  => $assessment,
-            'student'     => $participant->getUser() //IsParentOfStudent accesses this
+            'student'     => $student, //IsParentOfStudent accesses this
         ];
     }
 
