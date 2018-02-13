@@ -91,11 +91,6 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
         error(19);
     }
 
-    // I can't do this if not a participant
-    if (!$assessment->isParticipant($_SESSION['user'])) {
-        error(19);
-    }
-
     // I can end this quiz if it has expired
 
     // I can't attempt this if it isn't open

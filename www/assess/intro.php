@@ -88,7 +88,7 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
 
     // I can't do this if not a participant
     // However, I can see a preview if I can read this folder
-    if (!$assessment->isParticipant($_SESSION['user'])) {
+    if (!$participant) {
         if ($accessLevel == UserAccess::ACCESS_READ) {
             $readOnly = true;
         } else {
