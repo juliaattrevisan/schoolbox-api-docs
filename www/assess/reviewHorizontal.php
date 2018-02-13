@@ -13,12 +13,15 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Breadcrumbs;
-use Schoolbox\Mapper\Exception as MapperException;
+
+use Schoolbox\Assessment\Participant;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Breadcrumbs;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+use Schoolbox\Learning\Quiz\ValidParticipant;
+use Schoolbox\Mapper;
+use Schoolbox\Resource\Folder;
 
 $factory = new Assess_Factory();
 $assessHandler = new Assess_Main();
@@ -44,23 +47,25 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 	error(112);
 }
 
-try {
-	$category = FolderMapper::getInstance()->findById($assess['category_id']);
-} catch (MapperException $e) {
-	error(112);
-	exit;
-}
-
 if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
 	error(127);
 }
 
+/* Check the folder exists meaningfully
+ */
 try {
-    $folderMapper = new FolderMapper();
-    $folder = $folderMapper->findById($assess['category_id']);
+    $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
 }
-catch (MapperException $e) {
+catch (Mapper\Exception $e) {
     error(117);
+}
+
+/* Non-participants are sent to a 404 screen
+ */
+$isValidParticipant = new ValidParticipant(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
+
+if (!$isValidParticipant->isSatisfiedBy($_SESSION['user'], $folder, $assess['assessment_id'])) {
+    $this->pageNotFound();
 }
 
 $dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
