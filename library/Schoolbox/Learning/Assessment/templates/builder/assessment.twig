@@ -8,9 +8,15 @@ Usage:
 {% import '@learningAssessment/project/macro/icon.twig' as icon %}
 
 {% if assessment is quiz %}
-    {% set textLinkRoute = 'learningQuiz.getQuizSummary' %}
+    {% set textLinkRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {
+        assessmentId: assessment.id,
+        assessment: assessment
+    }) %}
 {% elseif assessment is project %}
-    {% set textLinkRoute = 'learningAssessment.getStatus' %}
+    {% set textLinkRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {
+        assessmentId: assessment.id,
+        assessment: assessment})
+    %}
 {% else %}
     {% set textLinkRoute = '' %}
 {% endif %}
@@ -20,14 +26,10 @@ Usage:
         <div class="grip compact"></div>
         <div class="list-item">
             <div class="card small-12 compact wrap-down">
-                {% if textLinkRoute %}
-                <a href="{{ routeLookup(textLinkRoute, {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}">
-                    {% endif %}
+                {% if textLinkRoute %}<a href="{{ textLinkRoute }}?{{ returnUrlName }}={{ returnUrl }}">{% endif %}
                     <span class="{{ icon.renderClass(assessment) }}"></span>
                     <p>{{ assessment.title }}</p>
-                    {% if textLinkRoute %}
-                </a>
-                {% endif %}
+                {% if textLinkRoute %}</a>{% endif %}
             </div>
         </div>
         <nav>
