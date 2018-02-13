@@ -105,14 +105,16 @@ class ComponentDelegate
             LEFT JOIN   sportsfixtures_team homeTeam ON
                         sportsfixtures_match.home_team_id = homeTeam.id
             LEFT JOIN   sportsfixtures_team_coach ON
-                        (sportsfixtures_team_coach.team_id = awayTeam.id OR sportsfixtures_team_coach.team_id = homeTeam.id) AND
-                        sportsfixtures_team_coach.coach_id IN {$placeholders}
+                        (sportsfixtures_team_coach.team_id = awayTeam.id OR sportsfixtures_team_coach.team_id = homeTeam.id)
+            LEFT JOIN   sportsfixtures_coach ON
+                        sportsfixtures_coach.id = sportsfixtures_team_coach.coach_id AND
+                        sportsfixtures_coach.user_id IN {$placeholders}
             LEFT JOIN   sportsfixtures_team_user ON
                         (sportsfixtures_team_user.team_id = awayTeam.id OR sportsfixtures_team_user.team_id = homeTeam.id) AND
                         sportsfixtures_team_user.user_id IN {$placeholders}
             WHERE       (sportsfixtures_team_participantcoach.user_id IN {$placeholders} OR
                         sportsfixtures_team_participantuser.user_id IN {$placeholders} OR
-                        sportsfixtures_team_coach.coach_id IN {$placeholders} OR
+                        sportsfixtures_coach.user_id IN {$placeholders} OR
                         sportsfixtures_team_user.user_id IN {$placeholders})
                         {$historical}
         ";
