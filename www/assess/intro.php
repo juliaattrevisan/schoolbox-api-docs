@@ -80,20 +80,26 @@ $readOnly         = false;
  */
 $participant = $assessment->getParticipantIfExtant($_SESSION['user']);
 
+/* Special case: participation isn't guaranteed at this point
+ * so we can't get a Plan in all cases e.g. visiting from Course Import as an instructor
+ */
+$plan = [];
+
+if (!$participant) {
+    $plan['description'] = trim($assessment->getDescription());
+    $plan['start'] = $assessment->getOpenAt()->getShort();
+    $plan['finish'] = $assessment->getDueAt()->getShort();
+}
+else {
+    $plan['description'] = trim($participant->getDescription());
+    $plan['start'] = $participant->getOpenDate()->getShort();
+    $plan['finish'] = $participant->getDueDate()->getShort();
+}
+
 if ($accessLevel < UserAccess::ACCESS_WRITE) {
     // I can't attempt a spec assessment
     if ($assessment->isSpecification()) {
         error(19);
-    }
-
-    // I can't do this if not a participant
-    // However, I can see a preview if I can read this folder
-    if (!$participant) {
-        if ($accessLevel == UserAccess::ACCESS_READ) {
-            $readOnly = true;
-        } else {
-            error(19);
-        }
     }
 
     // I can't attempt this if it has expired
@@ -158,7 +164,6 @@ $this->setBlock(TEMPLATE_content, 'author_link_close', 'author_link_close_block'
 
 $this->setTitle('Assessment: ' . Scrub::text($assess['title']));
 
-
 if ($author->isDeleted()) {
     $this->setVar('author_link_open_block', '');
     $this->setVar('author_link_close_block', '');
@@ -167,15 +172,13 @@ if ($author->isDeleted()) {
     $this->parse('author_link_close_block', 'author_link_close');
 }
 
-$assess['description'] = trim($participant->getDescription());
-
 $this->setVar(array(
     'RETURN_URL_SUFFIX' => isset($_GET['returnUrl']) ? '?returnUrl=' . $_GET['returnUrl'] : '',
     'ASSESS_ASSESS_ID' => $assess['assess_id'],
     'ASSESS_TITLE' => Scrub::text($assess['title']),
-    'ASSESS_DESCRIPTION' => Scrub::html($assess['description']),
-    'ASSESS_START' => $participant->getOpenDate()->getShort(),
-    'ASSESS_FINISH' => $participant->getDueDate()->getShort(),
+    'ASSESS_DESCRIPTION' => Scrub::html($plan['description']),
+    'ASSESS_START' => $plan['start'],
+    'ASSESS_FINISH' => $plan['finish'],
     'FIRST_SECTION' => $allSections[0]['section_id'],
     'ASSESS_AUTHOR' => Scrub::text($author->formatName()),
     'ASSESS_AUTHOR_ID' => $author->getId(),
@@ -193,7 +196,7 @@ if ($assessment->isImplementation()) {
     $this->setVar('has_assess_due_block', '');
 }
 
-if (empty($assess['description'])) {
+if ('' === $plan['description']) {
     $this->setVar('has_assess_description_block', '');
 } else {
     $this->parse('has_assess_description_block', 'has_assess_description', true);
