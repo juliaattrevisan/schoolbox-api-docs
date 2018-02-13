@@ -603,9 +603,16 @@ class Module extends BaseModule
         return new Rule\All(
             new AssessmentNotDeleted(),
             new Rule\Any(
-                new Rule\HasRole(Role::STAFF),
-                $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
-                new CanSeeParticipation($this->getAccess(), $this->getConfig()->get('restrict_student_submissions'))
+                // Normal participants (whether explicit or dynamic participants)
+                new CanSeeParticipation($this->getAccess(), $this->getConfig()->get('restrict_student_submissions')),
+                // Instructor/staff viewing assessment details, on their own summary page
+                new Rule\All(
+                    new Rule\Any(
+                        $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
+                        new Rule\HasRole(Role::STAFF)
+                    ),
+                    new IsParticipant()
+                )
             )
         );
     }
