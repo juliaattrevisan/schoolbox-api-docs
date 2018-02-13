@@ -64,12 +64,15 @@
  #}
 {% macro assessment(assessment) %}
     {% spaceless %}
-        {% import '@learning/macro/urgency.twig' as urgency %}
-        <span title="{{ assessment.dueAt.long }}">Due
-            <time datetime="{{ assessment.dueAt }}">{{ assessment.dueAt.relativeDay|replace({' at 11:59pm': ''}) }}</time>
-            {% if assessment.dueAt.isFuture and assessment.dueAt.diffInDays(NOW) < 7 %}
-                (<time datetime="{{ assessment.dueAt }}">{{ assessment.dueAt.relativeTime(null, true) }} remaining</time>)
-            {% endif %}
-        </span>
+        {% set dueAt = assessment.dueAt %}
+        {% if dueAt is not null and not dueAt.isNull %}
+            {% import '@learning/macro/urgency.twig' as urgency %}
+            <span title="{{ dueAt.long }}">Due
+                <time datetime="{{ dueAt }}">{{ dueAt.relativeDay|replace({' at 11:59pm': ''}) }}</time>
+                {% if dueAt.isFuture and dueAt.diffInDays(NOW) < 7 %}
+                    (<time datetime="{{ dueAt }}">{{ dueAt.relativeTime(null, true) }} remaining</time>)
+                {% endif %}
+            </span>
+        {% endif %}
     {% endspaceless %}
 {% endmacro %}
