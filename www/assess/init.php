@@ -73,6 +73,10 @@ $assessment       = $assessmentDataSource->findByQuizId($assess['assess_id'], $_
 $assessmentFolder = $assessment->getBaseContext()->getFolder();
 $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], $assessmentFolder->getId());
 
+/* Looks like everyone has a Plan in some way, regardless if it's custom or default?
+ */
+$participant = $assessment->getParticipantIfExtant($_SESSION['user']);
+
 if ($accessLevel < UserAccess::ACCESS_WRITE) {
     // I can't attempt a spec assessment
     if ($assessment->isSpecification()) {
@@ -85,12 +89,12 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
     }
 
     // I can't attempt this if it has expired
-    if ($assessHandler->isExpired($assess['assess_id'])) {
+    if (\Alaress_Date_Format::now()->gt($participant->getCloseDate())) {
         error(120);
     }
 
     // I can't attempt this if it isn't open
-    if (!$assessHandler->isOpen($assess)) {
+    if (\Alaress_Date_Format::now()->lt($participant->getOpenDate())) {
         error(143);
     }
 
