@@ -138,6 +138,24 @@
             $("input[name^='group']").removeClass('required');
         }
 
+        $("#inherit").change(function() {
+            showHideClassCodeWarning();
+        });
+        $("#recursive").change(function() {
+            showHideClassCodeWarning();
+        });
+
+        function showHideClassCodeWarning() {
+            var inheritChecked = $("#inherit").prop("checked");
+            var recursiveChecked = $("#recursive").prop("checked");
+
+            if (inheritChecked && recursiveChecked) {
+                $("[data-alert]").removeClass("hide");
+            } else {
+                $("[data-alert]").addClass("hide");
+            }
+        }
+
     });
 </script>
 
@@ -177,6 +195,7 @@
     {% endif %}
 
 </div>
+
 <div class="row">
     <div class="list-item small-12 island">
         <form action="/resource/folder/update" method="post" id="folderForm" class="top">
@@ -340,6 +359,12 @@
                         <label for="recursive" class="checkbox-label">Apply these permissions to all subfolders</label>
                     </div>
                 </fieldset>
+
+                <div class="list-item small-12 island">
+                    <div data-alert="" class="alert-box alert hide">
+                        Applying inherited permissions to all subfolders will remove class codes from all subfolders!
+                    </div>
+                </div>
 
                 {% endif %}
 
