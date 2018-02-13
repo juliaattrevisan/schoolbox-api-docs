@@ -117,8 +117,11 @@ class Timetable extends AbstractImporter
                 $class = new ClassEntry();
                 $class
                     ->setCode($key)
-                    ->setDescription($row['Class Description'])
                     ->setName($row['Class Title']);
+
+                if (isset($row['Class Description'])) {
+                    $class->setDescription($row['Class Description']);
+                }
 
                 $result[$key] = [
                     'class'   => $class,
@@ -202,9 +205,13 @@ class Timetable extends AbstractImporter
             $classPeriod = new ClassPeriod();
             $classPeriod
                 ->setClass($result[$key]['class'])
-                ->setRoom($row['Class Room'])
                 ->setTeacher($teacher)
                 ->setPeriod($timetablePeriod);
+
+            if (isset($row['Class Room'])) {
+                $classPeriod->setRoom($row['Class Room']);
+            }
+
             $result[$key]['periods']->add($classPeriod);
         }
         return $result;
