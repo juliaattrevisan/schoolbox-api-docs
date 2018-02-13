@@ -235,14 +235,20 @@ class Controller extends Assessment\Controller
 
         $twigData['submissionsBlocked']    = false;
         $twigData['acknowlegementBlocked'] = false;
-        try {
-            $assessment->assertAcceptSubmission($participant);
-        } catch (DomainException $e) {
-            $twigData['submissionsBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
+
+        if ($assessment->isSpecification()) {
+            $twigData['submissionsBlocked']    = 'Cannot submit to course assessments';
+            $twigData['acknowlegementBlocked'] = 'Cannot submit to course assessments';
+        } else {
             try {
-                $assessment->assertAcceptAcknowledgement($participant);
+                $assessment->assertAcceptSubmission($participant);
             } catch (DomainException $e) {
-                $twigData['acknowlegementBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
+                $twigData['submissionsBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
+                try {
+                    $assessment->assertAcceptAcknowledgement($participant);
+                } catch (DomainException $e) {
+                    $twigData['acknowlegementBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
+                }
             }
         }
 
