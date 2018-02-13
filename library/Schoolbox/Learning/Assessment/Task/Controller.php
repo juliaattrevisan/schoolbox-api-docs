@@ -225,7 +225,8 @@ class Controller extends Assessment\Controller
     public function postCreateResponse(IAssessable $assessment, User $student): void
     {
         // Did user mark (regardless of who they are) the task as incomplete ?
-        $isMarkedComplete = $this->getRequest()->post->getInt('status') != TaskCompletion::STATUS_INCOMPLETE;
+        $completionStatus = $this->getRequest()->post->getInt('status');
+        $isMarkedComplete = $completionStatus != TaskCompletion::STATUS_INCOMPLETE;
 
         $response = (new TaskResponse())
             ->setAssessable($assessment)
@@ -234,6 +235,12 @@ class Controller extends Assessment\Controller
             // TODO figure out whether to set create time as now, or set it as a created timestamp in mapper
             ->setCreatedAt(\Alaress_Date_Format::now())
             ->setMarkedComplete($isMarkedComplete);
+
+        if (TaskCompletion::STATUS_TEACHER_ASSESSED_COMPLETE == $completionStatus) {
+            $feedback = (new Feedback\Model())
+                ->setResponse($response);
+            $response->getAllFeedback()->add($feedback);
+        }
 
         try{
             $participant = $assessment->getParticipantIfExtant($student);
@@ -261,7 +268,7 @@ class Controller extends Assessment\Controller
             $result['success'] = true;
             $result['message'] = 'OK';
             $result['id']      = $response->getId();
-            $result['status']  = $response->getCompletionStatus();
+            $result['status']  = $completionStatus;
             $this->getResponse()->status->setCode(200);
             $this->getResponse()->content->set($this->buildJsonOutput($result));
 
@@ -315,7 +322,10 @@ class Controller extends Assessment\Controller
         // Does the most recent response for the student already have the proposed status?
         if (empty($response->getId())) {
             $mostRecentResponse = $participant->findMostRecentResponse();
-            if ($mostRecentResponse instanceof TaskResponse && $mostRecentResponse->getCompletionStatus() == $response->getCompletionStatus()) {
+            if ($mostRecentResponse instanceof TaskResponse
+                && $mostRecentResponse->getCompletionStatus() == $response->getCompletionStatus()
+                && $mostRecentResponse->hasFeedback() === $response->hasFeedback()
+            ) {
                 throw new \UnexpectedValueException("{$submittedFor->getFullName()} already has status ({$mostRecentResponse->getCompletionStatus()}) for this task");
             }
         }
