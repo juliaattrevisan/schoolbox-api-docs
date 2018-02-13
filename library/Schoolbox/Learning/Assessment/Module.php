@@ -554,7 +554,10 @@ class Module extends BaseModule
                 $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
                 new Rule\HasRole(Role::STAFF)
             ),
-            new IsImplementation()
+            new Rule\Any(
+                new IsImplementation(),
+                new ValidAssessmentType([AssessmentType::TYPE_PROJECT])
+            )
         );
     }
 
