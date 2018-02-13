@@ -9,6 +9,11 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Assessment\Participant;
+use Schoolbox\Learning\Quiz\ValidParticipant;
+use Schoolbox\Mapper;
+use Schoolbox\Resource\Folder;
+
 $assessHandler = new Assess_Main();
 $questionHandler = new Assess_Question();
 $sectionHandler = new Assess_Section();
@@ -32,6 +37,23 @@ if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($as
 
 if (!$question) {
     error(119);
+}
+
+/* Check the folder exists meaningfully
+ */
+try {
+    $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
+}
+catch (Mapper\Exception $e) {
+    error(117);
+}
+
+/* Non-participants are sent to a 404 screen
+ */
+$isValidParticipant = new ValidParticipant(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
+
+if (!$isValidParticipant->isSatisfiedBy($_SESSION['user'], $folder, $assess['assessment_id'])) {
+    $this->pageNotFound();
 }
 
 $factory = new Assess_Factory();
