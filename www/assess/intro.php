@@ -97,7 +97,7 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
     }
 
     // I can't attempt this if it has expired
-    if ($assessHandler->isExpired($assess['assess_id'])) {
+    if (\Alaress_Date_Format::now()->gt($participant->getCloseDate())) {
         error(120);
     }
 
