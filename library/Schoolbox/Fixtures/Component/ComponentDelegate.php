@@ -23,6 +23,7 @@ use \Schoolbox\Fixtures\Match\Mapper as MatchMapper;
 use \Schoolbox\Fixtures\Result\Model as Result;
 use \Schoolbox\Fixtures\Result\Mapper as ResultMapper;
 use Schoolbox\Fixtures\Team\Player\Participant\Mapper as TeamParticipantMapper;
+use Alaress\Database\Predicate\Builder;
 
 class ComponentDelegate
 {
@@ -81,41 +82,44 @@ class ComponentDelegate
      * @param bool  $includeHistorical Whether to return matches in the past
      * @return Collection|Match[]
      */
-    public function getMatchesForUsers($userIds, $includeHistorical)
+    public function getMatchesForUsers(array $userIds, $includeHistorical)
     {
         $historical = '';
         if (!$includeHistorical) {
             $historical = "AND DATE(sportsfixtures_match.start_at) > DATE(NOW())";
         }
 
+        $placeholders = Builder::getArrayPlaceholders($userIds, 'userId');
+
         $query = "
             SELECT      sportsfixtures_match.id
             FROM        sportsfixtures_match
             LEFT JOIN   sportsfixtures_team_participantcoach ON
                         sportsfixtures_match.id = sportsfixtures_team_participantcoach.match_id AND
-                        sportsfixtures_team_participantcoach.user_id IN (:userIds)
+                        sportsfixtures_team_participantcoach.user_id IN {$placeholders}
             LEFT JOIN   sportsfixtures_team_participantuser ON
                         sportsfixtures_team_participantuser.match_id = sportsfixtures_match.id AND
-                        sportsfixtures_team_participantuser.user_id IN (:userIds)
+                        sportsfixtures_team_participantuser.user_id IN {$placeholders}
             LEFT JOIN   sportsfixtures_team awayTeam ON
                         sportsfixtures_match.away_team_id = awayTeam.id
             LEFT JOIN   sportsfixtures_team homeTeam ON
                         sportsfixtures_match.home_team_id = homeTeam.id
             LEFT JOIN   sportsfixtures_team_coach ON
                         (sportsfixtures_team_coach.team_id = awayTeam.id OR sportsfixtures_team_coach.team_id = homeTeam.id) AND
-                        sportsfixtures_team_coach.coach_id IN (:userIds) 
+                        sportsfixtures_team_coach.coach_id IN {$placeholders}
             LEFT JOIN   sportsfixtures_team_user ON
                         (sportsfixtures_team_user.team_id = awayTeam.id OR sportsfixtures_team_user.team_id = homeTeam.id) AND
-                        sportsfixtures_team_user.user_id IN (:userIds)
-            WHERE       (sportsfixtures_team_participantcoach.user_id IN (:userIds) OR
-                        sportsfixtures_team_participantuser.user_id IN (:userIds) OR
-                        sportsfixtures_team_coach.coach_id IN (:userIds) OR
-                        sportsfixtures_team_user.user_id IN (:userIds))
+                        sportsfixtures_team_user.user_id IN {$placeholders}
+            WHERE       (sportsfixtures_team_participantcoach.user_id IN {$placeholders} OR
+                        sportsfixtures_team_participantuser.user_id IN {$placeholders} OR
+                        sportsfixtures_team_coach.coach_id IN {$placeholders} OR
+                        sportsfixtures_team_user.user_id IN {$placeholders})
                         {$historical}
         ";
 
         $statement = $this->database->prepareQuery($query);
-        if ($statement->execute([':userIds' => implode(',', $userIds)])) {
+
+        if ($statement->execute(Builder::getArrayParameters($userIds, 'userId'))) {
             $result = $statement->fetchAll(\PDO::FETCH_COLUMN);
             return $this->sortMatches($this->getMatchMapper()->findByColumn('id', $result));
         }
