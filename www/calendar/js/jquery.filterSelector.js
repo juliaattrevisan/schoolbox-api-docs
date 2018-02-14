@@ -78,7 +78,7 @@
 		function updateItems()
 		{
 			// Build list of filters
-			var filters = { 'personal' : true };
+			var availableClasses = { 'personal' : true };
             $('[data-update-filter]').each(function () {
 				var checked = this.checked;
                 if ($(this)[0].value !== undefined) {
@@ -90,7 +90,7 @@
 
                     for (var j = 0; j < numbers.length; j++) {
                         var reconstitutedName = name + numbers[j];
-                        filters[reconstitutedName] = checked;
+                        availableClasses[reconstitutedName] = checked;
                     }
                 }
             });
@@ -101,30 +101,50 @@
 
 			$('[data-reveal-id]').each(function ()
 			{
-				var classes = $(this)[0].classList;
+                var $this = $(this),
+					groupedClasses = {};
+                if ($this[0].classList.forEach) {
+                    $this[0].classList.forEach(function(className) {
+                        var prefix = className.replace(/^([a-z]+).*/i, '$1');
+                        if (!groupedClasses[prefix]) {
+                            groupedClasses[prefix] = []
+                        }
+                        groupedClasses[prefix].push(className);
+                    });
+                }
 
-				for (var i=0; i<classes.length; i++) {
-                    if (!classes.hasOwnProperty(i)) {
-                        continue;
-                    }
-					// Ignore 'row' class
-					if (classes[i] != 'row') {
-						var found = false, matchesAnyFilter = false;
+                var isRendered = true;
+                $.each(groupedClasses, function(prefix, classes) {
+                    var isFilterSelected = false,
+                        isGroupFilterApplicable = false;
 
-						// Is class in the list of selected rows?
-						if (classes[i] in filters) {
-                            matchesAnyFilter = true;
-							if (filters[classes[i]]) {
-								found = true;
-								break;
+                    for (var i in classes) {
+                        if (!classes.hasOwnProperty(i)) {
+                            continue;
+                        }
+
+                        // If the class is in the list of SELECTABLE classes,
+                        // the filter is applicable.
+                        // Test whether the filter is selected.
+                        if (classes[i] in availableClasses) {
+                            isGroupFilterApplicable = true;
+                            if (availableClasses[classes[i]]) {
+                                isFilterSelected = true;
+                                break;
                             }
-						}
-					}
-				}
+                        }
+                    }
+
+                    // Don't render the event if the filter applies and isn't selected.
+                    if (isGroupFilterApplicable && !isFilterSelected) {
+                        isRendered = false;
+                        return false;
+                    }
+                });
 
                 // Hide if it didn't match in any of the groups, or if nothing at all was found by the
                 // '[data-update-filter]:checked' selector
-                if (!found && matchesAnyFilter) {
+                if (!isRendered) {
                     $(this).hide();
                 } else {
                     $(this).show();
