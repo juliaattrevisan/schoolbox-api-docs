@@ -134,8 +134,11 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
                     $this->setVar('event_block', '');
                 }
 
-                $this->setVar('EVENT_CONTENT', $this->eventRenderer->renderEvent($currentEvent, 'html'));
-                $this->parse("event_block", "event", true);
+                $htmlEvent = $this->eventRenderer->renderEvent($currentEvent, 'html');
+                if ($htmlEvent) {
+                    $this->setVar('EVENT_CONTENT', $htmlEvent);
+                    $this->parse("event_block", "event", true);
+                }
 
                 $prevDay = $currentDay;
             }
