@@ -92,36 +92,36 @@ class ComponentDelegate
         $placeholders = Builder::getArrayPlaceholders($userIds, 'userId');
 
         $query = "
-            SELECT      sportsfixtures_match.id
-            FROM        sportsfixtures_match
-            LEFT JOIN   sportsfixtures_team_participantcoach ON
-                        sportsfixtures_match.id = sportsfixtures_team_participantcoach.match_id AND
-                        sportsfixtures_team_participantcoach.user_id IN {$placeholders} AND 
-                        sportsfixtures_team_participantcoach.deleted_at IS NULL
-            LEFT JOIN   sportsfixtures_team_participantuser ON
-                        sportsfixtures_team_participantuser.match_id = sportsfixtures_match.id AND
-                        sportsfixtures_team_participantuser.user_id IN {$placeholders} AND 
-                        sportsfixtures_team_participantuser.deleted_at IS NULL
-            LEFT JOIN   sportsfixtures_team awayTeam ON
-                        sportsfixtures_match.away_team_id = awayTeam.id AND 
-                        awayTeam.deleted_at IS NULL
-            LEFT JOIN   sportsfixtures_team homeTeam ON
-                        sportsfixtures_match.home_team_id = homeTeam.id AND 
-                        homeTeam.deleted_at IS NULL
-            LEFT JOIN   sportsfixtures_team_coach ON
-                        (sportsfixtures_team_coach.team_id = awayTeam.id OR sportsfixtures_team_coach.team_id = homeTeam.id)
-            LEFT JOIN   sportsfixtures_coach ON
-                        sportsfixtures_coach.id = sportsfixtures_team_coach.coach_id AND
-                        sportsfixtures_coach.user_id IN {$placeholders} AND
-                        sportsfixtures_coach.deleted_at IS NULL
-            LEFT JOIN   sportsfixtures_team_user ON
-                        (sportsfixtures_team_user.team_id = awayTeam.id OR sportsfixtures_team_user.team_id = homeTeam.id) AND
-                        sportsfixtures_team_user.user_id IN {$placeholders}
-            WHERE       (sportsfixtures_team_participantcoach.user_id IN {$placeholders} OR
-                        sportsfixtures_team_participantuser.user_id IN {$placeholders} OR
-                        sportsfixtures_coach.user_id IN {$placeholders} OR
-                        sportsfixtures_team_user.user_id IN {$placeholders})
-                        {$historical}
+            SELECT DISTINCT     sportsfixtures_match.id
+            FROM                sportsfixtures_match
+            LEFT JOIN           sportsfixtures_team_participantcoach ON
+                                sportsfixtures_match.id = sportsfixtures_team_participantcoach.match_id AND
+                                sportsfixtures_team_participantcoach.user_id IN {$placeholders} AND 
+                                sportsfixtures_team_participantcoach.deleted_at IS NULL
+            LEFT JOIN           sportsfixtures_team_participantuser ON
+                                sportsfixtures_team_participantuser.match_id = sportsfixtures_match.id AND
+                                sportsfixtures_team_participantuser.user_id IN {$placeholders} AND 
+                                sportsfixtures_team_participantuser.deleted_at IS NULL
+            LEFT JOIN           sportsfixtures_team awayTeam ON
+                                sportsfixtures_match.away_team_id = awayTeam.id AND 
+                                awayTeam.deleted_at IS NULL
+            LEFT JOIN           sportsfixtures_team homeTeam ON
+                                sportsfixtures_match.home_team_id = homeTeam.id AND 
+                                homeTeam.deleted_at IS NULL
+            LEFT JOIN           sportsfixtures_team_coach ON
+                                (sportsfixtures_team_coach.team_id = awayTeam.id OR sportsfixtures_team_coach.team_id = homeTeam.id)
+            LEFT JOIN           sportsfixtures_coach ON
+                                sportsfixtures_coach.id = sportsfixtures_team_coach.coach_id AND
+                                sportsfixtures_coach.user_id IN {$placeholders} AND
+                                sportsfixtures_coach.deleted_at IS NULL
+            LEFT JOIN           sportsfixtures_team_user ON
+                                (sportsfixtures_team_user.team_id = awayTeam.id OR sportsfixtures_team_user.team_id = homeTeam.id) AND
+                                sportsfixtures_team_user.user_id IN {$placeholders}
+            WHERE               (sportsfixtures_team_participantcoach.user_id IN {$placeholders} OR
+                                sportsfixtures_team_participantuser.user_id IN {$placeholders} OR
+                                sportsfixtures_coach.user_id IN {$placeholders} OR
+                                sportsfixtures_team_user.user_id IN {$placeholders})
+                                {$historical}
         ";
 
         $statement = $this->database->prepareQuery($query);
