@@ -339,7 +339,8 @@ function Calendar(id, bubbleId, opts) {
         organise: function(cal, filterArray, performAjax) {
             performAjax = performAjax === undefined ? true : performAjax
 
-            var flist = {}, selected_classes = ['personal'];
+            var flist = {},
+                selected_classes = { 'personal': true };
             var calendarControls = $(cal.options.filter.parentSelector)
 
             for (var i = 0; i < filterArray.length; i++) {
@@ -348,20 +349,19 @@ function Calendar(id, bubbleId, opts) {
                 flist[i] = [filterArray[i], {}]
 
                 calendarControls.find(cal.options.filter.listSelector + ' .' + filterArray[i] + ' input').each(function() {
-                    var n = $(this).attr('value')
+                    var n = $(this).attr('value'),
+                        checked = this.checked;
                     // show related entries
-                    if(this.checked) {
 
-                        if (n !== undefined) {
-                            var base = n.match(/^\D+/);
-                            if (base) {
-                                flist[i][1][k++] = n
-                                var ids = n.match(/\d+/g);
-                                if (ids) {
-                                    ids.forEach(function (id) {
-                                        selected_classes.push(base + id);
-                                    });
-                                }
+                    if (n !== undefined) {
+                        var base = n.match(/^\D+/);
+                        if (base) {
+                            flist[i][1][k++] = n
+                            var ids = n.match(/\d+/g);
+                            if (ids) {
+                                ids.forEach(function (id) {
+                                    selected_classes[base + id] = checked;
+                                });
                             }
                         }
                     }
@@ -374,11 +374,24 @@ function Calendar(id, bubbleId, opts) {
             calendarControls.find(cal.options.filter.listSelector + ' .events input').each(function() {
                 var n = $(this).attr('value')
                 // show related entries
-                if(this.checked) {
-                    flist[i][1][k++] = n
-                    selected_classes.push(n);
-                }
-            })
+                flist[i][1][k++] = n;
+                selected_classes[n] = this.checked;
+            });
+
+            // // Method for getting if a filter exists
+            // var filterExists = function (filter) {
+            //     return calendarControls.find(cal.options.filter.listSelector + ' #' + filter).length > 0;
+            // };
+            //
+            // var filterSelected = function (filter) {
+            //     return calendarControls.find(cal.options.filter.listSelector + ' #' + filter).length > 0;
+            // };
+
+            // Is a filter selected? TODO cache this
+            var findFilterSelector = function (filter) {
+                return calendarControls.find(cal.options.filter.listSelector + ' input#' + filter);
+            };
+
 
             //
             // Get events, put an 'is_rendered' field on them.
@@ -400,6 +413,8 @@ function Calendar(id, bubbleId, opts) {
                     });
                 }
 
+                // Ignore classes which aren't in my list
+
                 // Is this event rendered?
                 // It must match at least one selected filter in each group
                 // (filters are in event.className) to be rendered.
@@ -411,6 +426,38 @@ function Calendar(id, bubbleId, opts) {
                         is_filter_selected = true;
                     }
                     else {
+
+                        // // Check this class of events.
+                        // $.each(classes, function (classNo, className) {
+                        //     var filter = findFilterSelector(className);
+                        //     // Filter doesn't exist at all? Skip
+                        //     // If nothing was even valid to check, ignore it
+                        //     if (!filter.length) {
+                        //         return true;
+                        //     }
+                        //
+                        //     // Is it checked? break
+                        //     if (filter.prop('checked')) {
+                        //         is_filter_selected = true;
+                        //         return false;
+                        //     }
+                        //
+                        //     // otherwise continue
+                        //     return true;
+                        // });
+
+
+                        for (var i in classes) {
+                            if (classes[i] in selected_classes) {
+                                if (selected_classes[classes[i]]) {
+                                    is_filter_selected = true;
+                                    break;
+                                }
+                            }
+                            // Not in available classes? Ignore for calculation purposes
+                        }
+
+
                         // Check that at least one class in this_classes is in
                         // selected_classes.
                         $.each(selected_classes, function(selected_class_no, selected_class) {
