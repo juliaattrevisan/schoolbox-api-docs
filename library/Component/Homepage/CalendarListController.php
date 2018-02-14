@@ -68,6 +68,8 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
 
         $this->setVar(array(
             'LIST_DATE' => '',
+            'campus_events_day_block' => '',
+            'campus_events_block' => '',
         ));
 
         if($this->getConfig('size') > 0) {
