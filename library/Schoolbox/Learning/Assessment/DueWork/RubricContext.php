@@ -238,7 +238,13 @@ class RubricContext
             return ['rubric' => null];
         }
 
-        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyMarkForFeedback($publishedOnly, $feedbackId);
+        // No feedback ID given: assume I wanted instructor-given mark
+        $gridGenerator = new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student);
+        if ($feedbackId) {
+            $gridGenerator->applyMarkForFeedback($publishedOnly, $feedbackId);
+        } else {
+            $gridGenerator->applyInstructorGivenMark($publishedOnly);
+        }
 
         $context = [
             'rubric' => $dueWork->getRubric()->toContext($currentUser),
