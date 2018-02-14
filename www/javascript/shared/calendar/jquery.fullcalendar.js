@@ -340,7 +340,7 @@ function Calendar(id, bubbleId, opts) {
             performAjax = performAjax === undefined ? true : performAjax
 
             var flist = {},
-                selected_classes = { 'personal': true };
+                availableClasses = { 'personal': true };
             var calendarControls = $(cal.options.filter.parentSelector)
 
             for (var i = 0; i < filterArray.length; i++) {
@@ -360,7 +360,7 @@ function Calendar(id, bubbleId, opts) {
                             var ids = n.match(/\d+/g);
                             if (ids) {
                                 ids.forEach(function (id) {
-                                    selected_classes[base + id] = checked;
+                                    availableClasses[base + id] = checked;
                                 });
                             }
                         }
@@ -375,14 +375,14 @@ function Calendar(id, bubbleId, opts) {
                 var n = $(this).attr('value')
                 // show related entries
                 flist[i][1][k++] = n;
-                selected_classes[n] = this.checked;
+                availableClasses[n] = this.checked;
             });
 
             //
             // Get events, put an 'is_rendered' field on them.
             var events = cal.dom.fullCalendar('clientEvents');
             $.each(events, function(event_no, event) {
-                var is_rendered = true;
+                var isRendered = true;
 
                 // Collate the list of classes into a list grouped by type
                 // (type is the string prefix of the class: for "group14"
@@ -398,33 +398,31 @@ function Calendar(id, bubbleId, opts) {
                     });
                 }
 
-                // Ignore classes which aren't in my list
-
                 // Is this event rendered?
-                // It must match at least one selected filter in each group
-                // (filters are in event.className) to be rendered.
+                // Each group of classes this event has must pass this test to be rendered:
+                // * If this user doesn't have the filter at all, the group passes
+                // * Otherwise, the group passes if the user has selected at least one filter in the group
                 $.each(groupedClasses, function(prefix, classes) {
-                    var is_filter_selected = false,
-                        isAnyFilterMatching = false;
+                    var isFilterSelected = false,
+                        isGroupFilterApplicable = false;
 
                         for (var i in classes) {
-                            if (classes[i] in selected_classes) {
-                                isAnyFilterMatching = true;
-                                if (selected_classes[classes[i]]) {
-                                    is_filter_selected = true;
+                            if (classes[i] in availableClasses) {
+                                isGroupFilterApplicable = true;
+                                if (availableClasses[classes[i]]) {
+                                    isFilterSelected = true;
                                     break;
                                 }
                             }
-                            // Not in available classes? Ignore for calculation purposes
                         }
 
-                    if (isAnyFilterMatching && !is_filter_selected) {
-                        is_rendered = false;
+                    if (isGroupFilterApplicable && !isFilterSelected) {
+                        isRendered = false;
                         return false;
                     }
                 });
                 // disabled until filters are fully fixed
-                 event.is_rendered = is_rendered;
+                 event.is_rendered = isRendered;
             });
 
             //
