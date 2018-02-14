@@ -174,12 +174,12 @@ class GridGenerator
      */
     public function applyStudentMarkForFeedback(bool $publishedOnly, int $feedbackId): Rubric
     {
-        $pb = $this->buildDefaultPb();
+        $pb = $this->buildDefaultPb()
+                   ->equals('sr.id', $feedbackId);
 
         if ($publishedOnly) {
             $pb->notNull('sr.published_at');
         }
-        $pb->equals('sr.id', $feedbackId);
 
         return $this->applyStudentMarkQuery($publishedOnly, $pb);
     }
