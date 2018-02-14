@@ -213,7 +213,7 @@ trait DueWorkTrait
     /**
      * @return string
      */
-    public function getSelfReviewable(): string
+    public function getSelfReviewable(): ?string
     {
         return $this->selfReviewable;
     }
