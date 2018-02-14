@@ -52,13 +52,6 @@ if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($as
 	error(127);
 }
 
-try {
-    $user = UserMapper::getInstance()->findById($this->arg[0]);
-}
-catch (Mapper\Exception $e) {
-    error(31);
-}
-
 /* Check the folder exists meaningfully
  */
 try {
@@ -66,14 +59,6 @@ try {
 }
 catch (Mapper\Exception $e) {
     error(117);
-}
-
-/* Non-participants are sent to a 404 screen
- */
-$isValidParticipant = new ValidParticipant(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
-
-if (!$isValidParticipant->isSatisfiedBy($user, $folder, $assess['assessment_id'])) {
-    $this->pageNotFound();
 }
 
 $dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
@@ -219,17 +204,33 @@ else {
 
 	$readonly = !$term->isMarkableBy($_SESSION['user']);
 
+    $isValidParticipant = new ValidParticipant(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
+
 	/* Load all the questions for this section.
 	 * Note: only show the randomly-selected ones
 	 */
 	$allAttempts = $attemptHandler->getAllAttemptsForQuestion($question['question_id']);
 
+    $this->setVar('attempt_block', '');
+
 	if ($allAttempts) {
 		$j = 1;
 		foreach ($allAttempts as $currentAttempt) {
+            try {
+                $user = UserMapper::getInstance()->findById($currentAttempt['user_id']);
+            }
+            catch (Mapper\Exception $e) {
+                continue;
+            }
 
-			/* Load answer template into answerOption block
-			 */
+            /* Non-participants are ignored
+             */
+            if (!$isValidParticipant->isSatisfiedBy($user, $folder, $assess['assessment_id'])) {
+                continue;
+            }
+
+            /* Load answer template into answerOption block
+             */
 			$this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($currentAttempt['type_id']) . '/reviewBottom.html');
 			$this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 
@@ -282,9 +283,6 @@ else {
 			$this->setVar('answerFormFragment', '');
 			$this->setVar('answerInputs_block', '');
 		}
-	}
-	else {
-		$this->setVar('attempt_block', '');
 	}
 
 	/* Navigation tools
