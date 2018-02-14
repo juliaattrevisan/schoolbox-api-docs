@@ -30,9 +30,6 @@ class Datetime implements IColumnType {
     public function __construct()
     {
         $this->cache = new Cache(function ($value, $inputFormat) {
-            if (!isset($value) || static::ZERO_VALUE === $value) {
-                return new \Alaress_Date_NullDate();
-            }
             return new Alaress_Date_Format($value, $inputFormat);
         });
     }
@@ -45,7 +42,12 @@ class Datetime implements IColumnType {
 	 * @return Alaress_Date_Format
 	 */
 	public function hydrate($value, $mapper = null) {
-        try {
+
+        if (!isset($value) || static::ZERO_VALUE === $value) {
+            return new \Alaress_Date_NullDate();
+        }
+
+	    try {
             return clone $this->cache->get($value, [ $value, $this->input_format ]);
 
         } catch (\Exception $e) {
