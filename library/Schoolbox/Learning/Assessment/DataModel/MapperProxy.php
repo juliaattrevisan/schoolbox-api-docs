@@ -779,7 +779,18 @@ class MapperProxy
             $project = ProjectMapper::getInstance()->findOneByColumn('assessment_id', $context->getAssessmentModel()->getId());
             $context->setId($project->getId());
         }
-        $this->baseMapper->save($dataModel);
+
+        /* TODO Remove this hack in SA-6049
+         * If we are saving a new assessment, we need to save the assessment, then the sub-object (eg assess/box/task/project)
+         * so that the sub-object has the assessment.id available.
+         * BUT!! If an update, we must save the sub-object then the assessment. This is to work-around known issue SA-6049.
+         * The issue is that the updated vs. previous diff during Mapper::save() causes sub-objects to be fetched from cache,
+         * which will mutate your assessment model's composition, meaning you cannot persist joined object identities.
+         */
+        $isCreate = !$dataModel->getId();
+        if ($isCreate) {
+            $this->baseMapper->save($dataModel);
+        }
         // Set fields on the domain model object
         $assessable
             ->setId($dataModel->getId())
@@ -827,6 +838,10 @@ class MapperProxy
                     $this->save($projectAssessable);
                 }
             }
+        }
+        // TODO Remove this hack in SA-6049 (see description above)
+        if (!$isCreate) {
+            $this->baseMapper->save($dataModel);
         }
     }
 
