@@ -191,7 +191,7 @@ $this->setVar(array(
     'ASSESS_AUTHOR_ROLE' => $author->getRole()->getName(),
     'ASSESS_FOLDER' => Scrub::text($folder->getName() . ($folder->getCodeString() ? ' ('.$folder->getCodeString().')': '')),
     'ASSESS_FOLDER_ID' => $folder->getId(),
-    'ASSESS_DURATION' => $assess['duration'] === Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
+    'ASSESS_DURATION' => (int)$assess['duration'] === Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms((int)$assess['duration']),
     'READ_ONLY' => $readOnly,
 ));
 
