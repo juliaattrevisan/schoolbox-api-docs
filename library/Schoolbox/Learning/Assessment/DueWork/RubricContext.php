@@ -56,7 +56,7 @@ class RubricContext
 
         /* Spawn rubric grid
          */
-        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMarkForSelfReflectableResponse(false, $responseId);
+        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applySelfAssessedMarkForResponse(false, $responseId);
         $context['rubric'] = $dueWork->getRubric()->toContext();
 
         return $context;
@@ -81,7 +81,7 @@ class RubricContext
 
         /* Spawn rubric grid
          */
-        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMarkForResponse(false, $responseId);
+        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyInstructorGivenMarkForResponse(false, $responseId);
         $context['rubric'] = $dueWork->getRubric()->toContext();
 
         return $context;
@@ -105,7 +105,7 @@ class RubricContext
 
         /* Spawn rubric grid
          */
-        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMark(false);
+        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyInstructorGivenMark(false);
         $context['rubric'] = $dueWork->getRubric()->toContext();
 
         return $context;
@@ -238,7 +238,7 @@ class RubricContext
             return ['rubric' => null];
         }
 
-        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMarkForFeedback($publishedOnly, $feedbackId);
+        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyMarkForFeedback($publishedOnly, $feedbackId);
 
         $context = [
             'rubric' => $dueWork->getRubric()->toContext($currentUser),

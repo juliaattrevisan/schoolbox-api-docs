@@ -67,7 +67,7 @@ class GridGenerator
      * @param Builder $pb
      * @return Rubric
      */
-    private function applyStudentMarkQuery(bool $publishedOnly, Builder $pb): Rubric
+    private function applyMarkQuery(bool $publishedOnly, Builder $pb): Rubric
     {
         $whereClause = implode(' AND ', $pb->getWhere());
         $dateOrder   = $publishedOnly ? 'sr.published_at' : 'sr.created_at';
@@ -107,7 +107,7 @@ class GridGenerator
      *
      * @return Rubric
      */
-    public function applyStudentMarkForSelfReflectableResponse(bool $publishedOnly, int $responseId): Rubric
+    public function applySelfAssessedMarkForResponse(bool $publishedOnly, int $responseId): Rubric
     {
         $pb = $this->buildDefaultPb()
                    ->equals('sr.student_submission_id', $responseId)
@@ -117,7 +117,7 @@ class GridGenerator
             $pb->notNull('sr.published_at');
         }
 
-        return $this->applyStudentMarkQuery($publishedOnly, $pb);
+        return $this->applyMarkQuery($publishedOnly, $pb);
     }
 
 
@@ -129,7 +129,7 @@ class GridGenerator
      *
      * @return Rubric
      */
-    public function applyStudentMarkForResponse(bool $publishedOnly, int $responseId): Rubric
+    public function applyInstructorGivenMarkForResponse(bool $publishedOnly, int $responseId): Rubric
     {
         $pb = $this->buildDefaultPb()
                    ->equals('sr.student_submission_id', $responseId)
@@ -139,7 +139,7 @@ class GridGenerator
             $pb->notNull('sr.published_at');
         }
 
-        return $this->applyStudentMarkQuery($publishedOnly, $pb);
+        return $this->applyMarkQuery($publishedOnly, $pb);
     }
 
 
@@ -150,7 +150,7 @@ class GridGenerator
      *
      * @return Rubric
      */
-    public function applyStudentMark(bool $publishedOnly): Rubric
+    public function applyInstructorGivenMark(bool $publishedOnly): Rubric
     {
         $pb = $this->buildDefaultPb()
                    ->equals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
@@ -159,7 +159,7 @@ class GridGenerator
             $pb->notNull('sr.published_at');
         }
 
-        return $this->applyStudentMarkQuery($publishedOnly, $pb);
+        return $this->applyMarkQuery($publishedOnly, $pb);
     }
 
 
@@ -172,7 +172,7 @@ class GridGenerator
      *
      * @return Rubric
      */
-    public function applyStudentMarkForFeedback(bool $publishedOnly, int $feedbackId): Rubric
+    public function applyMarkForFeedback(bool $publishedOnly, int $feedbackId): Rubric
     {
         $pb = $this->buildDefaultPb()
                    ->equals('sr.id', $feedbackId);
@@ -181,7 +181,7 @@ class GridGenerator
             $pb->notNull('sr.published_at');
         }
 
-        return $this->applyStudentMarkQuery($publishedOnly, $pb);
+        return $this->applyMarkQuery($publishedOnly, $pb);
     }
 
 
