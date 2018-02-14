@@ -500,7 +500,7 @@
         var $planDueDate = $customiseModal.find('#plan-due-date');
         var $planCloseDate = $customiseModal.find('#plan-close-date');
 
-        var participantArray = $('#participants').find('[data-participant-select]').map(function(){
+        var participantArray = $(defaults.participants).find('[data-participant-select]').map(function(){
             var obj = {id: $(this).data('userId'), name: $(this).data('userName')};
             return obj;
         });
