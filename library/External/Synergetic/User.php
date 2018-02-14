@@ -529,7 +529,7 @@ class External_Synergetic_User implements External_UserInterface
 
         if ($boardingStatus == 'yes') {
             $filters .= " AND StudentBoarder = 'B'";
-        } else {
+        } elseif ($boardingStatus == 'no') {
             $filters .= " AND StudentBoarder <> 'B'";
         }
 
