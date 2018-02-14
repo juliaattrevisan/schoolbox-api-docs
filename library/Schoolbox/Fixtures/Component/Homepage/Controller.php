@@ -14,6 +14,7 @@ use Schoolbox\Fixtures\Component\ComponentDelegate as ComponentDelegate;
 use Schoolbox\User;
 use \Schoolbox\Permission\Access\UserAccess;
 use SitePage;
+use Alaress\Database\Connector\Base;
 
 class Controller extends Component_Homepage_ControllerAbstract
 {
@@ -54,7 +55,10 @@ class Controller extends Component_Homepage_ControllerAbstract
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
         parent::__construct($instance, $user, $sitepage);
-        $this->setDelegate(new ComponentDelegate());
+
+        /** @var Base $databaseInternal */
+        $databaseInternal = $sitepage->getDi()->get('databaseInternal');
+        $this->setDelegate(new ComponentDelegate($databaseInternal));
     }
 
     /**
