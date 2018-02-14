@@ -337,54 +337,52 @@ function Calendar(id, bubbleId, opts) {
         },
 
         organise: function(cal, filterArray, performAjax) {
-            performAjax = performAjax === undefined ? true : performAjax
+            performAjax = performAjax === undefined ? true : performAjax;
 
-            var flist = {}, selected_classes = ['personal'];
-            var calendarControls = $(cal.options.filter.parentSelector)
+            var flist = {},
+                availableClasses = { 'personal': true };
+            var calendarControls = $(cal.options.filter.parentSelector);
 
             for (var i = 0; i < filterArray.length; i++) {
                 // Each filter array can contain a comma-separated list of IDs
-                var k = 0
-                flist[i] = [filterArray[i], {}]
+                var k = 0;
+                flist[i] = [filterArray[i], {}];
 
                 calendarControls.find(cal.options.filter.listSelector + ' .' + filterArray[i] + ' input').each(function() {
-                    var n = $(this).attr('value')
+                    var n = $(this).attr('value'),
+                        checked = this.checked;
                     // show related entries
-                    if(this.checked) {
 
-                        if (n !== undefined) {
-                            var base = n.match(/^\D+/);
-                            if (base) {
-                                flist[i][1][k++] = n
-                                var ids = n.match(/\d+/g);
-                                if (ids) {
-                                    ids.forEach(function (id) {
-                                        selected_classes.push(base + id);
-                                    });
-                                }
+                    if (n !== undefined) {
+                        var base = n.match(/^\D+/);
+                        if (base) {
+                            flist[i][1][k++] = n;
+                            var ids = n.match(/\d+/g);
+                            if (ids) {
+                                ids.forEach(function (id) {
+                                    availableClasses[base + id] = checked;
+                                });
                             }
                         }
                     }
                 })
             }
 
-            var k = 0
-            flist[filterArray.length] = ['events', {}]
+            var l = 0;
+            flist[filterArray.length] = ['events', {}];
 
             calendarControls.find(cal.options.filter.listSelector + ' .events input').each(function() {
-                var n = $(this).attr('value')
+                var n = $(this).attr('value');
                 // show related entries
-                if(this.checked) {
-                    flist[i][1][k++] = n
-                    selected_classes.push(n);
-                }
-            })
+                flist[i][1][l++] = n;
+                availableClasses[n] = this.checked;
+            });
 
             //
             // Get events, put an 'is_rendered' field on them.
             var events = cal.dom.fullCalendar('clientEvents');
             $.each(events, function(event_no, event) {
-                var is_rendered = true;
+                var isRendered = true;
 
                 // Collate the list of classes into a list grouped by type
                 // (type is the string prefix of the class: for "group14"
@@ -401,34 +399,38 @@ function Calendar(id, bubbleId, opts) {
                 }
 
                 // Is this event rendered?
-                // It must match at least one selected filter in each group
-                // (filters are in event.className) to be rendered.
+                // Each group of classes this event has must pass this test to be rendered:
+                // * If this user doesn't have the filter at all, the group passes
+                // * Otherwise, the group passes if the user has selected at least one filter in the group
                 $.each(groupedClasses, function(prefix, classes) {
-                    var is_filter_selected = false;
-                    if (!classes.length) {
-                        // No classes in this filter? Let's say this filter is
-                        // selected.
-                        is_filter_selected = true;
-                    }
-                    else {
-                        // Check that at least one class in this_classes is in
-                        // selected_classes.
-                        $.each(selected_classes, function(selected_class_no, selected_class) {
-                            for (var i in classes) {
-                                if (classes[i] == selected_class) {
-                                    is_filter_selected = true;
-                                    return false;
-                                }
+                    var isFilterSelected = false,
+                        isGroupFilterApplicable = false;
+
+                    for (var i in classes) {
+                        if (!classes.hasOwnProperty(i)) {
+                            continue;
+                        }
+
+                        // If the class is in the list of SELECTABLE classes,
+                        // the filter is applicable.
+                        // Test whether the filter is selected.
+                        if (classes[i] in availableClasses) {
+                            isGroupFilterApplicable = true;
+                            if (availableClasses[classes[i]]) {
+                                isFilterSelected = true;
+                                break;
                             }
-                        });
+                        }
                     }
-                    if (!is_filter_selected) {
-                        is_rendered = false;
+
+                    // Don't render the event if the filter applies and isn't selected.
+                    if (isGroupFilterApplicable && !isFilterSelected) {
+                        isRendered = false;
                         return false;
                     }
                 });
                 // disabled until filters are fully fixed
-                 event.is_rendered = is_rendered;
+                 event.is_rendered = isRendered;
             });
 
             //
@@ -454,7 +456,7 @@ function Calendar(id, bubbleId, opts) {
                 }
             }
         }
-    }
+    };
 
     // preserve the filter and fullCalendar specs
     var filter = $.extend({}, this.options.filter, opts.filter)
