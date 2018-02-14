@@ -323,14 +323,22 @@
             status = '(no customisations)';
             statusValue = 'included';
         } else {
-            $participantCard.addClass('participant-excluded');
-            status = '(excluded)';
-            statusValue = 'excluded';
-
             // Neat solution from https://stackoverflow.com/a/4661989
             if ($participantCard.is("[data-has-interaction]")) {
-                console.log("Gonna show that modalll");
-                // TODO enable modal
+
+                $(this).confirmDialog({
+                    text: 'This student has interactions with this assessment. Excluding this student will hide their interactions throughout Schoolbox. Proceed?',
+                    confirmEvent: function() {
+                        $participantCard.addClass('participant-excluded');
+                        status = '(excluded)';
+                        statusValue = 'excluded';
+                    }
+                });
+
+            } else {
+                $participantCard.addClass('participant-excluded');
+                status = '(excluded)';
+                statusValue = 'excluded';
             }
         }
 
