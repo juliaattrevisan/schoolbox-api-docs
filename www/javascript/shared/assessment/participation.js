@@ -131,9 +131,9 @@
 
                 // Set student back to default if user pressed 'include' they were excluded, or if user pressed 'remove customisations'
                 if ((action === 'include' && isExcluded) || action === 'default') {
-                    updateStudentStatus(studentID, true);
+                    updateStudentStatus(studentID, true, self);
                 } else if (action === 'exclude') {
-                    updateStudentStatus(studentID, false);
+                    updateStudentStatus(studentID, false, self);
                 }
             });
 
@@ -312,7 +312,7 @@
      * @param {int}         studentID             ID of student to update
      * @param {boolean}     include               Whether to set to default, or set to excluded
      */
-    function updateStudentStatus(studentID, include) {
+    function updateStudentStatus(studentID, include, self) {
         var statusValue;
         var status;
         var $participantRow = $(defaults.participants).find('li[data-participant=' + studentID + ']');
@@ -326,10 +326,11 @@
             // Neat solution from https://stackoverflow.com/a/4661989
             if ($participantCard.is("[data-has-interaction]")) {
 
-                $(this).confirmDialog({
+                $(self).confirmDialog({
                     text: 'This student has interactions with this assessment. Excluding this student will hide their interactions throughout Schoolbox. Proceed?',
                     confirmEvent: function() {
                         $participantCard.addClass('participant-excluded');
+                        // TODO these aren't being set
                         status = '(excluded)'; // TODO this isn't working
                         statusValue = 'excluded'; // TODO this isn't working either
                     }
@@ -341,6 +342,9 @@
                 statusValue = 'excluded';
             }
         }
+
+        console.log(statusValue);
+        console.log(status);
 
         // Update the status showing for the student
         $participantRow
