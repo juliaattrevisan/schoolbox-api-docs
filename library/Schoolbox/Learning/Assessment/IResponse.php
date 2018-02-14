@@ -154,7 +154,7 @@ interface IResponse
      *
      * @return bool
      */
-    public function isSubmittedOnTime();
+    public function isSubmittedOnTime(): bool;
 
     /**
      * Does this IResponse have feedback?

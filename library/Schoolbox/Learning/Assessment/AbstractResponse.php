@@ -180,13 +180,16 @@ abstract class AbstractResponse implements IResponse
      *
      * @return bool
      */
-    public function isSubmittedOnTime()
+    public function isSubmittedOnTime(): bool
     {
         if (!$this->isSubmitted()) {
             return false;
         }
-        // assessment.dueAt > response.submittedAt
-        return $this->getAssessable()->getDueAt()->gt($this->getSubmittedAt());
+        // TODO - Remove @noinspection when relationship is made robust - see SA-5866
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $participant = $this->assessable->getParticipant($this->getSubmittedOnBehalfOf());
+
+        return $participant->getDueDate()->gt($this->getSubmittedAt());
     }
 
     /**
