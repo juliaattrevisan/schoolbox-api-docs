@@ -337,16 +337,16 @@ function Calendar(id, bubbleId, opts) {
         },
 
         organise: function(cal, filterArray, performAjax) {
-            performAjax = performAjax === undefined ? true : performAjax
+            performAjax = performAjax === undefined ? true : performAjax;
 
             var flist = {},
                 availableClasses = { 'personal': true };
-            var calendarControls = $(cal.options.filter.parentSelector)
+            var calendarControls = $(cal.options.filter.parentSelector);
 
             for (var i = 0; i < filterArray.length; i++) {
                 // Each filter array can contain a comma-separated list of IDs
-                var k = 0
-                flist[i] = [filterArray[i], {}]
+                var k = 0;
+                flist[i] = [filterArray[i], {}];
 
                 calendarControls.find(cal.options.filter.listSelector + ' .' + filterArray[i] + ' input').each(function() {
                     var n = $(this).attr('value'),
@@ -356,7 +356,7 @@ function Calendar(id, bubbleId, opts) {
                     if (n !== undefined) {
                         var base = n.match(/^\D+/);
                         if (base) {
-                            flist[i][1][k++] = n
+                            flist[i][1][k++] = n;
                             var ids = n.match(/\d+/g);
                             if (ids) {
                                 ids.forEach(function (id) {
@@ -368,13 +368,13 @@ function Calendar(id, bubbleId, opts) {
                 })
             }
 
-            var k = 0
-            flist[filterArray.length] = ['events', {}]
+            var l = 0;
+            flist[filterArray.length] = ['events', {}];
 
             calendarControls.find(cal.options.filter.listSelector + ' .events input').each(function() {
-                var n = $(this).attr('value')
+                var n = $(this).attr('value');
                 // show related entries
-                flist[i][1][k++] = n;
+                flist[i][1][l++] = n;
                 availableClasses[n] = this.checked;
             });
 
@@ -406,16 +406,24 @@ function Calendar(id, bubbleId, opts) {
                     var isFilterSelected = false,
                         isGroupFilterApplicable = false;
 
-                        for (var i in classes) {
-                            if (classes[i] in availableClasses) {
-                                isGroupFilterApplicable = true;
-                                if (availableClasses[classes[i]]) {
-                                    isFilterSelected = true;
-                                    break;
-                                }
-                            }
+                    for (var i in classes) {
+                        if (!classes.hasOwnProperty(i)) {
+                            continue;
                         }
 
+                        // If the class is in the list of SELECTABLE classes,
+                        // the filter is applicable.
+                        // Test whether the filter is selected.
+                        if (classes[i] in availableClasses) {
+                            isGroupFilterApplicable = true;
+                            if (availableClasses[classes[i]]) {
+                                isFilterSelected = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    // Don't render the event if the filter applies and isn't selected.
                     if (isGroupFilterApplicable && !isFilterSelected) {
                         isRendered = false;
                         return false;
@@ -448,7 +456,7 @@ function Calendar(id, bubbleId, opts) {
                 }
             }
         }
-    }
+    };
 
     // preserve the filter and fullCalendar specs
     var filter = $.extend({}, this.options.filter, opts.filter)
