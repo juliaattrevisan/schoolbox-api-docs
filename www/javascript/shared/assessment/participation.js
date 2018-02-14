@@ -313,7 +313,6 @@
      * @param {boolean}     include               Whether to set to default, or set to excluded
      */
     function updateStudentStatus(studentID, include) {
-        // TODO in here, if student has interactions, then display the modal
         var statusValue;
         var status;
         var $participantRow = $(defaults.participants).find('li[data-participant=' + studentID + ']');
@@ -327,6 +326,12 @@
             $participantCard.addClass('participant-excluded');
             status = '(excluded)';
             statusValue = 'excluded';
+
+            // Neat solution from https://stackoverflow.com/a/4661989
+            if ($participantCard.is("[data-has-interaction]")) {
+                console.log("Gonna show that modalll");
+                // TODO enable modal
+            }
         }
 
         // Update the status showing for the student
