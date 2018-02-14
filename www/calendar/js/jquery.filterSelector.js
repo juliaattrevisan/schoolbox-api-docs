@@ -77,54 +77,58 @@
 
 		function updateItems()
 		{
+			// Build list of filters
+			var filters = { 'personal' : true };
+            $('[data-update-filter]').each(function () {
+				var checked = this.checked;
+                if ($(this)[0].value !== undefined) {
+                    // Annoyingly some have commas in their name (eg. group1,2) need to split this
+                    // into two different class names
+
+                    var name = $(this)[0].value.replace(/[^a-zA-Z]/g, '');
+                    var numbers = $(this)[0].value.replace(/[^0-9,]/g, '').split(',');
+
+                    for (var j = 0; j < numbers.length; j++) {
+                        var reconstitutedName = name + numbers[j];
+                        filters[reconstitutedName] = checked;
+                    }
+                }
+            });
+
+            // console.log(filters);
+
 			// At least one filter was selected
 
 			$('[data-reveal-id]').each(function ()
 			{
-				var hide = false;
 				var classes = $(this)[0].classList;
 
-				for (var i=0; i<classes.length; i++)
-				{
+				for (var i=0; i<classes.length; i++) {
+                    if (!classes.hasOwnProperty(i)) {
+                        continue;
+                    }
 					// Ignore 'row' class
+					if (classes[i] != 'row') {
+						var found = false, matchesAnyFilter = false;
 
-					if (classes[i] != 'row' && classes[i] != 'personal')
-					{
-						var found = false;
-
-						$('[data-update-filter]:checked').each(function () {
-
-							if ($(this)[0].value !== undefined)
-							{
-								// Annoyingly some have commas in their name (eg. group1,2) need to split this
-								// into two different class names
-
-								var name = $(this)[0].value.replace(/[^a-zA-Z]/g, '');
-								var numbers = $(this)[0].value.replace(/[^0-9,]/g, '').split(',');
-
-								for (var j = 0; j < numbers.length; j++) {
-									var reconstitutedName = name + numbers[j];
-
-									if (reconstitutedName == classes[i]) {
-										found = true;
-									}
-								}
-							}
-						});
-
-						if (!found)
-							hide = true;
-
-						// Hide if it didn't match in any of the groups, or if nothing at all was found by the
-						// '[data-update-filter]:checked' selector
-
-						if (hide || $('[data-update-filter]:checked').length == 0) {
-							$(this).hide();
-						} else {
-							$(this).show();
+						// Is class in the list of selected rows?
+						if (classes[i] in filters) {
+                            matchesAnyFilter = true;
+							if (filters[classes[i]]) {
+								found = true;
+								break;
+                            }
 						}
 					}
 				}
+
+                // Hide if it didn't match in any of the groups, or if nothing at all was found by the
+                // '[data-update-filter]:checked' selector
+                if (!found && matchesAnyFilter) {
+                    $(this).hide();
+                } else {
+                    $(this).show();
+                }
 			});
 
 			// Hide date headers if there are no events visible inside
