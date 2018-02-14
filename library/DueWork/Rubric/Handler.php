@@ -7,6 +7,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Term;
@@ -73,7 +75,8 @@ class DueWork_Rubric_Handler
         $pb = new Alaress\Database\Predicate\Builder($this->db, '');
         $pb->in('rc.parent_id', $folderIds)
            ->equals('rc.parent_type', Criterion::PARENT_TYPE_CATEGORY)
-           ->greaterThanOrEqualTo('a.due_date', $term->getStart()->getDatabase());
+           ->greaterThanOrEqualTo('a.due_date', $term->getStart()->getDatabase())
+           ->equals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
 
         $finish = $term->getActualFinish();
         if (null !== $finish && !$finish->isNull()) {
