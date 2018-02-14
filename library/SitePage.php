@@ -486,24 +486,17 @@ class SitePage extends Page
         }
 
         // -----------------------------------------------
-        // Feature tour
+        // Feature tours
         // -----------------------------------------------
+        $this->setBlock('headerTpl', 'tour_script', 'tour_script_block');
 
-        if ($this->user instanceof User) {
-            // Enable the feature tour only if the user is not impersonated: see SA-5927
-            if (!$impersonated) {
-                $this->setBlock('headerTpl', 'tour_script', 'tour_script_block');
-
-                $toursEnabled = $config->get('tours_enabled');
-                if ($toursEnabled) {
-                    $request = parse_url($_SERVER['REQUEST_URI']);
-                    $encodedUrl = Redirect::encode($request['path']);
-                    $this->setVar('TOUR_ROUTE', $this->routeLookup('tour.getTours', ['url' => $encodedUrl]));
-                    $this->parse('tour_script_block', 'tour_script', true);
-                } else {
-                    $this->setVar('tour_script_block');
-                }
-            }
+        if ($this->user instanceof User && !$impersonated && $config->get('tours_enabled')) {
+            $request = parse_url($_SERVER['REQUEST_URI']);
+            $encodedUrl = Redirect::encode($request['path']);
+            $this->setVar('TOUR_ROUTE', $this->routeLookup('tour.getTours', ['url' => $encodedUrl]));
+            $this->parse('tour_script_block', 'tour_script', true);
+        } else {
+            $this->setVar('tour_script_block', '');
         }
 
         // -----------------------------------------------
