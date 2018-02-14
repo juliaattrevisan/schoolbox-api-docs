@@ -60,13 +60,8 @@ catch (Mapper\Exception $e) {
     error(117);
 }
 
-/* Non-participants are sent to a 404 screen
- */
 $isValidParticipant = new ValidParticipant(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
-
-if (!$isValidParticipant->isSatisfiedBy($_SESSION['user'], $folder, $assess['assessment_id'])) {
-    $this->pageNotFound();
-}
+$satisfaction = $isValidParticipant->isSatisfiedBy($_SESSION['user'], $folder, $assess['assessment_id']);
 
 /* Check if you are in this category, so you can't submit other category's
  * online assessments unless you are a part of that category.
@@ -112,6 +107,12 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
         error(143);
     }
 
+    /* Non-participating learners are sent to a 404 screen
+     */
+    if (!$satisfaction) {
+        $this->pageNotFound();
+    }
+
     // I can't start this if I have too many attempts
     $numAttempts = $attemptHandler->userHasAttempted($assess['assess_id'], $_SESSION['id']);
     $attempt     = $attemptHandler->getLatestResumableForUser($assess['assess_id'], $_SESSION['id']);
@@ -144,7 +145,11 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
         }
     }
 } else {
-    // I can do whatever I want
+    /* Non-participating instructors have the call-to-action hidden instead of 404
+     */
+    if (!$satisfaction) {
+        $readOnly = true;
+    }
 }
 
 /* Continue once you get past checks
