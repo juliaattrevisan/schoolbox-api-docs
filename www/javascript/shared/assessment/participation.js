@@ -330,8 +330,8 @@
                     text: 'This student has interactions with this assessment. Excluding this student will hide their interactions throughout Schoolbox. Proceed?',
                     confirmEvent: function() {
                         $participantCard.addClass('participant-excluded');
-                        status = '(excluded)';
-                        statusValue = 'excluded';
+                        status = '(excluded)'; // TODO this isn't working
+                        statusValue = 'excluded'; // TODO this isn't working either
                     }
                 });
 
