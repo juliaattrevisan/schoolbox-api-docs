@@ -66,8 +66,9 @@ $this->setBlock('date', 'event', 'event_block');
 
 $this->setVar(
     array(
+        'has_no_events_block' => '',
         'date_block' => '',
-        'has_no_events_block' => ''
+        'event_block' => '',
     )
 );
 
