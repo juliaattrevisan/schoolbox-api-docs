@@ -152,7 +152,8 @@ class GridGenerator
      */
     public function applyStudentMark(bool $publishedOnly): Rubric
     {
-        $pb = $this->buildDefaultPb();
+        $pb = $this->buildDefaultPb()
+                   ->equals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
 
         if ($publishedOnly) {
             $pb->notNull('sr.published_at');
