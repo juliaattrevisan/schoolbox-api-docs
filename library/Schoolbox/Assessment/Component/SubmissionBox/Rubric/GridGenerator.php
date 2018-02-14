@@ -144,21 +144,41 @@ class GridGenerator
 
 
     /**
-     * @param bool     $publishedOnly Whether to exclude draft marks
-     * @param int|null $feedbackId    If supplied, fetch only for this feedback
+     * Applies a student mark.
+     *
+     * @param bool $publishedOnly Whether to exclude draft marks
      *
      * @return Rubric
      */
-    public function applyStudentMark(bool $publishedOnly, ?int $feedbackId = null): Rubric
+    public function applyStudentMark(bool $publishedOnly): Rubric
     {
         $pb = $this->buildDefaultPb();
 
         if ($publishedOnly) {
             $pb->notNull('sr.published_at');
         }
-        if ($feedbackId) {
-            $pb->equals('sr.id', $feedbackId);
+
+        return $this->applyStudentMarkQuery($publishedOnly, $pb);
+    }
+
+
+    /**
+     * Applies a student mark for a given feedback, regardless of whether it's
+     * a self-assessment or instructor-given feedback.
+     *
+     * @param bool $publishedOnly Whether to exclude draft marks
+     * @param int  $feedbackId    The feedback ID
+     *
+     * @return Rubric
+     */
+    public function applyStudentMarkForFeedback(bool $publishedOnly, int $feedbackId): Rubric
+    {
+        $pb = $this->buildDefaultPb();
+
+        if ($publishedOnly) {
+            $pb->notNull('sr.published_at');
         }
+        $pb->equals('sr.id', $feedbackId);
 
         return $this->applyStudentMarkQuery($publishedOnly, $pb);
     }

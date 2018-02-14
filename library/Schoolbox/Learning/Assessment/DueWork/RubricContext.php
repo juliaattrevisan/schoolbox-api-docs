@@ -238,7 +238,7 @@ class RubricContext
             return ['rubric' => null];
         }
 
-        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMark($publishedOnly, $feedbackId);
+        (new GridGenerator($this->rubricMapper, $dueWork->getRubric(), $student))->applyStudentMarkForFeedback($publishedOnly, $feedbackId);
 
         $context = [
             'rubric' => $dueWork->getRubric()->toContext($currentUser),
