@@ -39,9 +39,7 @@
 
             //The unit date is already validated, so hide error message if there is one
             var error = $(this).prev('.error');
-
-            console.log(error);
-
+            
             error.remove();
 
             $input.val(date).trigger('change');
