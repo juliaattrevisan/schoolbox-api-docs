@@ -67,6 +67,7 @@
 
                 <ul class="information-list card-selectable" id="participants">
                     {% for participant in assessment.allParticipants %}
+                        // TODO add in variable with info about interactions
                         {% set user = participant.user %}
                         {% set userInclude = (not participant.excludedAt) or participant.excludedAt.null %}
                         {% set userPlanName = userInclude ? (participant.plan.name ?: '(no customisations)') : '(excluded)' %}

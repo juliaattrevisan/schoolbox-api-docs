@@ -313,6 +313,7 @@
      * @param {boolean}     include               Whether to set to default, or set to excluded
      */
     function updateStudentStatus(studentID, include) {
+        // TODO in here, if student has interactions, then display the modal
         var statusValue;
         var status;
         var $participantRow = $(defaults.participants).find('li[data-participant=' + studentID + ']');
