@@ -69,6 +69,9 @@ class GridGenerator
      */
     private function applyMarkQuery(bool $publishedOnly, Builder $pb): Rubric
     {
+        if ($publishedOnly) {
+            $pb->notNull('sr.published_at');
+        }
         $whereClause = implode(' AND ', $pb->getWhere());
         $dateOrder   = $publishedOnly ? 'sr.published_at' : 'sr.created_at';
 
@@ -113,10 +116,6 @@ class GridGenerator
                    ->equals('sr.student_submission_id', $responseId)
                    ->notEquals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
 
-        if ($publishedOnly) {
-            $pb->notNull('sr.published_at');
-        }
-
         return $this->applyMarkQuery($publishedOnly, $pb);
     }
 
@@ -135,10 +134,6 @@ class GridGenerator
                    ->equals('sr.student_submission_id', $responseId)
                    ->equals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
 
-        if ($publishedOnly) {
-            $pb->notNull('sr.published_at');
-        }
-
         return $this->applyMarkQuery($publishedOnly, $pb);
     }
 
@@ -154,10 +149,6 @@ class GridGenerator
     {
         $pb = $this->buildDefaultPb()
                    ->equals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
-
-        if ($publishedOnly) {
-            $pb->notNull('sr.published_at');
-        }
 
         return $this->applyMarkQuery($publishedOnly, $pb);
     }
@@ -176,10 +167,6 @@ class GridGenerator
     {
         $pb = $this->buildDefaultPb()
                    ->equals('sr.id', $feedbackId);
-
-        if ($publishedOnly) {
-            $pb->notNull('sr.published_at');
-        }
 
         return $this->applyMarkQuery($publishedOnly, $pb);
     }
