@@ -500,15 +500,24 @@
         var $planDueDate = $customiseModal.find('#plan-due-date');
         var $planCloseDate = $customiseModal.find('#plan-close-date');
 
+        var participantArray = $(defaults.participants).find('[data-participant-select]').map(function(){
+            var obj = {id: $(this).data('userId'), name: $(this).data('userName')};
+            return obj;
+        });
+
         // Init Selectize
-        $planParticipants.selectizeSelector({
-            multiple: true,
-            ajax: {
-                url: '/ajax/user.php',
-                type: 'GET',
-                data: {groupID: 0},
-                dataType: 'json'
-            }
+        $planParticipants.selectize({
+            delimiter: ',',
+            options: participantArray,
+            dropdownParent: 'body',
+            plugins: ['remove_button'],
+            create: false,
+            hideSelected: true,
+            createOnBlur: true,
+            persist: false,
+            searchField: 'name',
+            labelField: 'name',
+            valueField: 'id',
         });
         var participantSelectize = $planParticipants[0].selectize;
 
