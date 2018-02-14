@@ -378,21 +378,6 @@ function Calendar(id, bubbleId, opts) {
                 selected_classes[n] = this.checked;
             });
 
-            // // Method for getting if a filter exists
-            // var filterExists = function (filter) {
-            //     return calendarControls.find(cal.options.filter.listSelector + ' #' + filter).length > 0;
-            // };
-            //
-            // var filterSelected = function (filter) {
-            //     return calendarControls.find(cal.options.filter.listSelector + ' #' + filter).length > 0;
-            // };
-
-            // Is a filter selected? TODO cache this
-            var findFilterSelector = function (filter) {
-                return calendarControls.find(cal.options.filter.listSelector + ' input#' + filter);
-            };
-
-
             //
             // Get events, put an 'is_rendered' field on them.
             var events = cal.dom.fullCalendar('clientEvents');
@@ -419,36 +404,12 @@ function Calendar(id, bubbleId, opts) {
                 // It must match at least one selected filter in each group
                 // (filters are in event.className) to be rendered.
                 $.each(groupedClasses, function(prefix, classes) {
-                    var is_filter_selected = false;
-                    if (!classes.length) {
-                        // No classes in this filter? Let's say this filter is
-                        // selected.
-                        is_filter_selected = true;
-                    }
-                    else {
-
-                        // // Check this class of events.
-                        // $.each(classes, function (classNo, className) {
-                        //     var filter = findFilterSelector(className);
-                        //     // Filter doesn't exist at all? Skip
-                        //     // If nothing was even valid to check, ignore it
-                        //     if (!filter.length) {
-                        //         return true;
-                        //     }
-                        //
-                        //     // Is it checked? break
-                        //     if (filter.prop('checked')) {
-                        //         is_filter_selected = true;
-                        //         return false;
-                        //     }
-                        //
-                        //     // otherwise continue
-                        //     return true;
-                        // });
-
+                    var is_filter_selected = false,
+                        isAnyFilterMatching = false;
 
                         for (var i in classes) {
                             if (classes[i] in selected_classes) {
+                                isAnyFilterMatching = true;
                                 if (selected_classes[classes[i]]) {
                                     is_filter_selected = true;
                                     break;
@@ -457,19 +418,7 @@ function Calendar(id, bubbleId, opts) {
                             // Not in available classes? Ignore for calculation purposes
                         }
 
-
-                        // Check that at least one class in this_classes is in
-                        // selected_classes.
-                        $.each(selected_classes, function(selected_class_no, selected_class) {
-                            for (var i in classes) {
-                                if (classes[i] == selected_class) {
-                                    is_filter_selected = true;
-                                    return false;
-                                }
-                            }
-                        });
-                    }
-                    if (!is_filter_selected) {
+                    if (isAnyFilterMatching && !is_filter_selected) {
                         is_rendered = false;
                         return false;
                     }
