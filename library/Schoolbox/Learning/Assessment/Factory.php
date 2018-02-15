@@ -155,8 +155,6 @@ class Factory
         $this->setMarkPerCapability(trim($post['markPerCapability']));
         $this->setMaxMark(trim($post['maxMark']));
 
-        $something = $this->getSelfReviewable();
-
         if (isset($post['self_reviewable'])) {
             // Value has come though from the form, use that
             $this->setSelfReviewable($post['self_reviewable']);
