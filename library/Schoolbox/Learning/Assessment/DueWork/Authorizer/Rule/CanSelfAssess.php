@@ -9,12 +9,12 @@
 namespace Schoolbox\Learning\Assessment\DueWork\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\Unauthorized;
-use Alaress\Authorizer\Rule\IAuthorizationRule;
 use InvalidArgumentException;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DueWork;
-use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Authorizer\Rule\AbstractParticipationRule;
 use Schoolbox\User;
+use UnexpectedValueException;
 
 /**
  * Class CanSelfAssess
@@ -29,8 +29,9 @@ use Schoolbox\User;
  *
  * @package Schoolbox\Learning\Authorizer\Rule
  */
-class CanSelfAssess implements IAuthorizationRule
+class CanSelfAssess extends AbstractParticipationRule
 {
+
     /**
      * Performs an authorization check.
      *
@@ -42,6 +43,7 @@ class CanSelfAssess implements IAuthorizationRule
      *                                  or if the assessment isn't a due work
      * @throws Unauthorized If assessment is not self-assessable, there's no response, or user is not the participant
      * @return bool
+     * @throws UnexpectedValueException
      */
     public function authorize(array $params = [], User $user = null)
     {
@@ -50,14 +52,11 @@ class CanSelfAssess implements IAuthorizationRule
             throw new Unauthorized();
         }
 
-        // Grab the participant and assessment from $params
-        if (empty($params['participant']) || !$params['participant'] instanceof Participant) {
-            throw new InvalidArgumentException("Cannot check auth, need a participant param of 'participant'");
-        }
+        $assessment  = $this->findAssessable($params);
+        $student     = $this->findStudent($params);
 
-        /** @var Participant $participant */
-        $participant = $params['participant'];
-        $assessment = $participant->getAssessable();
+        // If a response has been submitted for self-assessment, we are guaranteed to find a participation record.
+        $participant = $assessment->getParticipant($student);
 
         // Only due works may be self-assessed.
         // Task self-assessment is a different, and probably misnamed concept.
