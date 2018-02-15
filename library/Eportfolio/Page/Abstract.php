@@ -249,13 +249,12 @@ abstract class Eportfolio_Page_Abstract {
      */
 	protected function getLatestReturn(User $user, SubmissionBox $box)
     {
-        // TODO use findByPredicates() in SA-1543 when it becomes available
 		$mapper = \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper::getInstance();
-
-		$columnList = [
-            'box_id' => $box->getId(),
-            'owner'  => $user->getId(),
-        ];
+		$pb     = $mapper->getPredicateBuilder()
+            ->equals('box_id', $box->getId())
+            ->equals('owner', $user->getId())
+            ->equals('review_route', SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+        ;
 
 		$options = [
 		    'order' => [
@@ -263,7 +262,7 @@ abstract class Eportfolio_Page_Abstract {
             ],
 		    'limit' => 1,
         ];
-		return $mapper->findByColumnList($columnList, $options)->first();
+		return $mapper->findByPredicates($pb, $options)->first();
 	}
 
 	/* Getters/Setters
