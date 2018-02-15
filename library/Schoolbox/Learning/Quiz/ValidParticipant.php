@@ -69,13 +69,13 @@ class ValidParticipant
     /**
      * Does a dynamic plan exist?
      *
-     * @param $assessId
+     * @param $assessmentId
      * @return bool
      * @throws Mapper\DefinitionException
      */
-    private function hasDynamicPlan($assessId): bool
+    private function hasDynamicPlan($assessmentId): bool
     {
-        $plans = $this->planMapper->findPlansAndParticipantsForAssessments([ $assessId ]);
+        $plans = $this->planMapper->findPlansAndParticipantsForAssessments([ $assessmentId ]);
 
         /* If plans existed, investigate each
          *
@@ -102,16 +102,16 @@ class ValidParticipant
      *
      * @param User         $user
      * @param Folder\Model $folder
-     * @param int          $assessId
+     * @param int          $assessmentId
      * @return bool
      * @throws Mapper\DefinitionException
      * @throws Mapper\Exception
      */
-    public function isSatisfiedBy(User $user, Folder\Model $folder, int $assessId): bool
+    public function isSatisfiedBy(User $user, Folder\Model $folder, int $assessmentId): bool
     {
         // Check user can participate
         $participant = $this->participantMapper->findForAssessmentAndUser(
-            Assessment\Mapper::getInstance()->createModel($assessId),
+            Assessment\Mapper::getInstance()->createModel($assessmentId),
             $user
         );
 
@@ -123,6 +123,6 @@ class ValidParticipant
             return true;
         }
 
-        return $this->hasDynamicPlan($assessId);
+        return $this->hasDynamicPlan($assessmentId);
     }
 }
