@@ -20,6 +20,15 @@ use Schoolbox\User;
 
 class ValidParticipant
 {
+    /**
+     * @var Plan\Mapper
+     */
+    private $planMapper;
+
+    /**
+     * @var ParticipantMapper
+     */
+    private $participantMapper;
 
     /**
      * ValidParticipant constructor.
