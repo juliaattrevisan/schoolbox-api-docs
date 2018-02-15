@@ -52,8 +52,8 @@ class Module extends BaseModule
             new Rule\IsSuperuser(),
             new Rule\All(
                 new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function ($params) {
-                    if ($params['participant'] instanceof Participant) {
-                        return $params['participant']->getAssessable()->getContext()->getFolder()->getId();
+                    if ($params['assessment'] instanceof Assessment\DueWork\Model) {
+                        return $params['assessment']->getBaseContext()->getFolder()->getId();
                     }
                     throw new Forbidden('User does not have homepage access');
                 }, $this->getAccess()),
