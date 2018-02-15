@@ -15,7 +15,7 @@ use Schoolbox\Breadcrumbs;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\Learning\Quiz\ValidParticipant;
+use Schoolbox\Learning\Quiz\ValidUserViewsAssessment;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\Access;
@@ -61,8 +61,8 @@ catch (Mapper\Exception $e) {
     error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
 }
 
-$isValidParticipant = new ValidParticipant(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
-$satisfaction = $isValidParticipant->isSatisfiedBy($_SESSION['user'], $folder, $assess['assessment_id']);
+$canViewAssessment = new ValidUserViewsAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
+$satisfaction = $canViewAssessment->isSatisfiedBy($_SESSION['user'], $folder, $assess['assessment_id']);
 
 /* Check if you are in this category, so you can't submit other category's
  * online assessments unless you are a part of that category.

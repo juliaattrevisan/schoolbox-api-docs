@@ -1,6 +1,6 @@
 <?php
 /**
- * ValidParticipant
+ * ValidUserViewsAssessment
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
@@ -18,7 +18,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 
-class ValidParticipant
+class ValidUserViewsAssessment
 {
     /**
      * @var Plan\Mapper
@@ -31,7 +31,7 @@ class ValidParticipant
     private $participantMapper;
 
     /**
-     * ValidParticipant constructor.
+     * ValidUserViewsAssessment constructor.
      *
      * @param Plan\Mapper       $participantPlanMapper
      * @param ParticipantMapper $participantMapper

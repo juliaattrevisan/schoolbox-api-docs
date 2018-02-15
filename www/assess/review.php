@@ -17,7 +17,7 @@
 use Schoolbox\Assessment\Participant;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Quiz\ValidParticipant;
+use Schoolbox\Learning\Quiz\ValidUserViewsAssessment;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
@@ -100,9 +100,9 @@ catch (Mapper\Exception $e) {
 
 /* Non-participants are sent to a 404 screen
  */
-$isValidParticipant = new ValidParticipant(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
+$canViewAssessment = new ValidUserViewsAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
 
-if (!$isValidParticipant->isSatisfiedBy($user, $folder, $assess['assessment_id'])) {
+if (!$canViewAssessment->isSatisfiedBy($user, $folder, $assess['assessment_id'])) {
     $this->pageNotFound();
 }
 

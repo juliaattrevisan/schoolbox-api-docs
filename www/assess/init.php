@@ -12,7 +12,7 @@ use Schoolbox\Assessment\Participant;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Quiz;
-use Schoolbox\Learning\Quiz\ValidParticipant;
+use Schoolbox\Learning\Quiz\ValidUserViewsAssessment;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -61,9 +61,9 @@ catch (Mapper\Exception $e) {
 
 /* Non-participants are sent to a 404 screen
  */
-$isValidParticipant = new ValidParticipant(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
+$canViewAssessment = new ValidUserViewsAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
 
-if (!$isValidParticipant->isSatisfiedBy($_SESSION['user'], $folder, $assess['assessment_id'])) {
+if (!$canViewAssessment->isSatisfiedBy($_SESSION['user'], $folder, $assess['assessment_id'])) {
     $this->pageNotFound();
 }
 

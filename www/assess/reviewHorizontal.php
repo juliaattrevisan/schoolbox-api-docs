@@ -20,7 +20,7 @@ use Schoolbox\Breadcrumbs;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\Learning\Quiz\ValidParticipant;
+use Schoolbox\Learning\Quiz\ValidUserViewsAssessment;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
@@ -205,7 +205,7 @@ else {
 
 	$readonly = !$term->isMarkableBy($_SESSION['user']);
 
-    $isValidParticipant = new ValidParticipant(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
+    $canViewAssessment = new ValidUserViewsAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
 
 	/* Load all the questions for this section.
 	 * Note: only show the randomly-selected ones
@@ -226,7 +226,7 @@ else {
 
             /* Non-participants are ignored
              */
-            if (!$isValidParticipant->isSatisfiedBy($user, $folder, $assess['assessment_id'])) {
+            if (!$canViewAssessment->isSatisfiedBy($user, $folder, $assess['assessment_id'])) {
                 continue;
             }
 
