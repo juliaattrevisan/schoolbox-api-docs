@@ -211,9 +211,9 @@ trait DueWorkTrait
     }
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getSelfReviewable(): string
+    public function getSelfReviewable(): ?string
     {
         return $this->selfReviewable;
     }

@@ -154,7 +154,14 @@ class Factory
         $this->setUseRubric(trim($post['useRubric']));
         $this->setMarkPerCapability(trim($post['markPerCapability']));
         $this->setMaxMark(trim($post['maxMark']));
-        $this->setSelfReviewable($post['self_reviewable']);
+
+        if (isset($post['self_reviewable'])) {
+            // Value has come though from the form, use that
+            $this->setSelfReviewable($post['self_reviewable']);
+        } else {
+            // Value has not come through from the form (FF turned off) - set to null so that this won't be updated
+            $this->setSelfReviewable(null);
+        }
 
         $this->setRubricData($post[$post['formField']]);
 

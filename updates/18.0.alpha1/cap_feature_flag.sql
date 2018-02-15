@@ -1,2 +1,2 @@
 INSERT INTO `config`
-VALUES (null, 'custom_assessment_participation', 1, 'Custom Assesment Participation', 'Allows custom participation to be set for assessments. Disabling this feature will not undo customisations made.', 3, null, 15, 'true', 'false', 'true')
+VALUES (null, 'custom_assessment_participation', 1, 'Custom Assessment Participation', 'Allows custom participation to be set for assessments. Disabling this feature will not undo customisations made.', 3, null, 15, 'true', 'false', 'true')
