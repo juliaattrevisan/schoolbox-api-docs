@@ -331,7 +331,8 @@ class Module extends BaseModule
 
         return [
             'kami'        => $kami,
-            'participant' => $participant,
+            'assessment'  => $assessment,
+            'student'     => $participant->getUser(),
             'response'    => $response,
             'feedback'    => $participant->findMostRecentInstructorGivenPublishedFeedback(),
         ];
