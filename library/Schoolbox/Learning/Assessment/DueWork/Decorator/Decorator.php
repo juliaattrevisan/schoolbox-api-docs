@@ -12,6 +12,7 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Decorator;
 
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\DecoratorInterface;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -98,8 +99,12 @@ class Decorator implements DecoratorInterface
         $assessment->setMarkPerCapability($this->getMarkPerCapability());
 
         if ($this->getSelfReviewable() !== null) {
+            // Something has come through from post, set to that
             $assessment->setSelfReviewability($this->getSelfReviewable());
-        }
+        } elseif ($assessment->getSelfReviewability() === null) {
+            // $assessment doesn't have an existing setting - set to default
+            $assessment->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE);
+        } // Otherwise let the existing setting persist
 
 
 
