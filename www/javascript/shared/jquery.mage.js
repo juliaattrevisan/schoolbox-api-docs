@@ -398,11 +398,10 @@
              * Check by id first, then check by name to stay synonymous with editor.js start();
              * It doesn't really matter which order you choose, for for the sake of similarity...
              */
-            if ($ckEditorById != undefined) {
+            if ($ckEditorById !== undefined) {
                 $textArea.html($ckEditorById.getData());
                 $textArea.val($ckEditorById.getData());
-            }
-            else if ($ckEditorByName != undefined) {
+            } else if ($ckEditorByName !== undefined) {
                 $textArea.html($ckEditorByName.getData());
                 $textArea.val($ckEditorByName.getData());
             }
