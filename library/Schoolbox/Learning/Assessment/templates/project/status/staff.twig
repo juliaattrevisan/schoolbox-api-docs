@@ -153,7 +153,7 @@ Data:
                                                     <nav><a href="#" class="icon-more" data-dropdown="project-options{{ assessable.id }}" aria-expanded="false" title="Actions"></a></nav>
                                                 </nav>
                                                 <ul data-dropdown-content class="f-dropdown" id="project-options{{ assessable.id }}">
-                                                    {% if statusRoute %}<li><a href="{{ viewRoute }}" class="icon-progress">View Status</a></li>{% endif %}
+                                                    {% if statusRoute %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
                                                     {% if modifyRoute %}<li><a href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-modify">Modify</a></li>{% endif %}
                                                     {% if deleteRoute %}<li><a href="{{ deleteRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-delete" data-delete="{{ assessable.id }}">Delete</a></li>{% endif %}
                                                 </ul>
