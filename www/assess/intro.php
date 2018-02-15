@@ -83,13 +83,13 @@ try {
     $participant = $assessment->getParticipant($_SESSION['user']);
 
     $plan['description'] = trim($participant->getDescription());
-    $plan['start'] = $participant->getOpenDate()->getShort();
-    $plan['finish'] = $participant->getDueDate()->getShort();
+    $plan['start'] = $participant->getOpenDate();
+    $plan['finish'] = $participant->getDueDate();
 }
 catch (\UnexpectedValueException $e) {
     $plan['description'] = trim($assessment->getDescription());
-    $plan['start'] = $assessment->getOpenAt()->getShort();
-    $plan['finish'] = $assessment->getDueAt()->getShort();
+    $plan['start'] = $assessment->getOpenAt();
+    $plan['finish'] = $assessment->getDueAt();
 }
 
 if ($accessLevel < UserAccess::ACCESS_WRITE) {
@@ -99,12 +99,12 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
     }
 
     // I can't attempt this if it has expired
-    if (\Alaress_Date_Format::now()->gt($participant->getCloseDate())) {
+    if (\Alaress_Date_Format::now()->gt($plan['start']->getCloseDate())) {
         error(120);
     }
 
     // I can't attempt this if it isn't open
-    if (\Alaress_Date_Format::now()->lt($participant->getOpenDate())) {
+    if (\Alaress_Date_Format::now()->lt($plan['finish']->getOpenDate())) {
         error(143);
     }
 
@@ -183,8 +183,8 @@ $this->setVar(array(
     'ASSESS_ASSESS_ID' => $assess['assess_id'],
     'ASSESS_TITLE' => Scrub::text($assess['title']),
     'ASSESS_DESCRIPTION' => Scrub::html($plan['description']),
-    'ASSESS_START' => $plan['start'],
-    'ASSESS_FINISH' => $plan['finish'],
+    'ASSESS_START' => $plan['start']->getShort(),
+    'ASSESS_FINISH' => $plan['finish']->getShort(),
     'FIRST_SECTION' => $allSections[0]['section_id'],
     'ASSESS_AUTHOR' => Scrub::text($author->formatName()),
     'ASSESS_AUTHOR_ID' => $author->getId(),
