@@ -13,7 +13,7 @@ use Schoolbox\Assessment\Participant\Mapper as ParticipantMapper;
 use Schoolbox\Assessment\Participant\Model as Participant;
 use Schoolbox\Assessment\Participant\Plan;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
-use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
@@ -65,20 +65,17 @@ class ValidParticipant
         return Access::getInstance()->isInstructor($user, $folder);
     }
 
+
     /**
      * Does a dynamic plan exist?
      *
      * @param $assessId
      * @return bool
+     * @throws Mapper\DefinitionException
      */
     private function hasDynamicPlan($assessId): bool
     {
-        try {
-            $plans = $this->planMapper->findPlansAndParticipantsForAssessments([ $assessId ]);
-        }
-        catch (DefinitionException $e) {
-            return false;
-        }
+        $plans = $this->planMapper->findPlansAndParticipantsForAssessments([ $assessId ]);
 
         /* If plans existed, investigate each
          *
@@ -96,6 +93,7 @@ class ValidParticipant
         return false;
     }
 
+
     /**
      * 1. Only included (non-excluded) people can do this quiz
      * 2. User might be an Instructor; Instructors can do the quiz for testing
@@ -106,7 +104,8 @@ class ValidParticipant
      * @param Folder\Model $folder
      * @param int          $assessId
      * @return bool
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
      */
     public function isSatisfiedBy(User $user, Folder\Model $folder, int $assessId): bool
     {
