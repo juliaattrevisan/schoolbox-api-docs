@@ -369,20 +369,44 @@
             return;
         }
 
+        /* Find textareas with a name attribute
+         */
         var $textAreas = elem.closest(this.options.submittable).find('textarea[name]');
+
         $textAreas.each(function(idx, elem){
             var $textArea = $(elem);
-            var $ckEditor = CKEDITOR.instances[$textArea.attr('name')];
+            var $ckEditorById = CKEDITOR.instances[$textArea.attr('id')];
+            var $ckEditorByName = CKEDITOR.instances[$textArea.attr('name')];
 
             // Does there exist a CK Editor instance for this text area?
-            if ($ckEditor != undefined) {
-                // do both because different browsers (*cough*firefail*cough*) can't handle textarea.val() as part of form serialization
-                $textArea.html($ckEditor.getData());
-                $textArea.val($ckEditor.getData());
+            //
+            // Update textareas in two different ways  because different browsers (*cough*firefail*cough*) can't
+            // handle textarea.val() as part of form serialization
+
+            /* Note that ckeditors can spawn via an id or a name attribute.
+             * The attribute that was used when they spawned is the array key for CKEDITOR.instances[] literal.
+             *
+             * Name and id attributes do not have to be identical, so we have to check both because at this location
+             * we don't know how a ckeditor was spawned/initialised
+             *
+             * ids are unique on the page and ckeditor can't natively handle multiple textareas with the same name
+             * attribute. An id cannot match to multiple inputs. A name cannot match to multiple inputs.
+             *
+             * So we can make a reasonable conclusion that a $textArea's id, or its name, must be in the
+             * ckeditor.instances literal, for the current $textArea that we're examining.
+             *
+             * Check by id first, then check by name to stay synonymous with editor.js start();
+             * It doesn't really matter which order you choose, for for the sake of similarity...
+             */
+            if ($ckEditorById !== undefined) {
+                $textArea.html($ckEditorById.getData());
+                $textArea.val($ckEditorById.getData());
+            } else if ($ckEditorByName !== undefined) {
+                $textArea.html($ckEditorByName.getData());
+                $textArea.val($ckEditorByName.getData());
             }
         });
     }
-
 
     /**
      * Submits the requested XHR, binds the listeners, then returns the Promise.
