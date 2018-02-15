@@ -103,7 +103,7 @@ class GridGenerator
 
 
     /**
-     * Alias to applyStudentMark() for a particular IResponse instance
+     * Applies the most recent self-assessed mark for a particular IResponse instance
      *
      * @param bool $publishedOnly Whether to exclude draft marks
      * @param int  $responseId
@@ -121,7 +121,7 @@ class GridGenerator
 
 
     /**
-     * Alias to applyStudentMark() for a particular IResponse instance
+     * Applies the most recent instructor-given mark for a particular IResponse instance
      *
      * @param bool   $publishedOnly Whether to exclude draft marks
      * @param int    $responseId
@@ -139,7 +139,7 @@ class GridGenerator
 
 
     /**
-     * Applies a student mark.
+     * Applies the most recent instructor-given mark.
      *
      * @param bool $publishedOnly Whether to exclude draft marks
      *
