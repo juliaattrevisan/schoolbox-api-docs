@@ -12,6 +12,7 @@
 
 use Schoolbox\Assessment\Participant;
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Quiz\ValidParticipant;
@@ -57,7 +58,7 @@ try {
     $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
 }
 catch (Mapper\Exception $e) {
-    error(117);
+    error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
 }
 
 $isValidParticipant = new ValidParticipant(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());

@@ -10,6 +10,7 @@
 
 use Schoolbox\Assessment\Participant;
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
@@ -52,7 +53,7 @@ try {
     $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
 }
 catch (Mapper\Exception $e) {
-    error(117);
+    error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
 }
 
 /* Non-participants are sent to a 404 screen

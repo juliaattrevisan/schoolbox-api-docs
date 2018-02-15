@@ -17,6 +17,7 @@
 use Schoolbox\Assessment\Participant;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\ValidParticipant;
@@ -58,7 +59,7 @@ try {
     $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
 }
 catch (Mapper\Exception $e) {
-    error(117);
+    error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
 }
 
 $dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);

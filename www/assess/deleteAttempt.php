@@ -16,6 +16,7 @@
  */
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Participant;
+use Schoolbox\Error;
 use Schoolbox\Learning\Quiz\ValidParticipant;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
@@ -50,7 +51,7 @@ $getAttempt = function ($attemptId) use ($attemptHandler, $assessHandler, $group
         $user = UserMapper::getInstance()->findById($attempt['user_id']);
     }
     catch (Mapper\Exception $e) {
-        error(31);
+        error(Error\Mapper::ERROR_USER_NOT_FOUND);
     }
 
     /* Check the folder exists meaningfully
@@ -59,7 +60,7 @@ $getAttempt = function ($attemptId) use ($attemptHandler, $assessHandler, $group
         $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
     }
     catch (Mapper\Exception $e) {
-        error(117);
+        error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
     }
 
     /* Non-participants are sent to a 404 screen
