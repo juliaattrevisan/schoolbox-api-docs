@@ -1,4 +1,4 @@
-[class^="icon-"], [class*=" icon-"] {
+[class^='icon-'], [class*=' icon-'] {
     @include contrast-bg();
     &:before {
         speak: none;
@@ -15,8 +15,8 @@
     }
 }
 
-.icon [class^="icon-"],
-.icon [class*=" icon-"] {
+.icon [class^='icon-'],
+.icon [class*=' icon-'] {
     &:before {
         text-align: center;
         width: 100%;
@@ -58,743 +58,743 @@
 // Icons
 .icon-add:before,
 .icon-plus:before {
-    content: "\e600";
+    content: '\e600';
     font-family: $font-family-icon;
 }
 
 .icon-advanced-list:before {
-    content: "\e601";
+    content: '\e601';
     font-family: $font-family-icon;
 }
 
 .icon-alert:before {
-    content: "\e602";
+    content: '\e602';
     font-family: $font-family-icon;
 }
 
 .icon-anchor:before {
-    content: "\e603";
+    content: '\e603';
     font-family: $font-family-icon;
 }
 
 .icon-approve:before,
 .icon-tick:before {
-    content: "\e604";
+    content: '\e604';
     font-family: $font-family-icon;
 }
 
 .icon-archive:before {
-    content: "\e902";
+    content: '\e902';
     font-family: $font-family-icon;
 }
 
 .icon-attach:before {
-    content: "\e605";
+    content: '\e605';
     font-family: $font-family-icon;
 }
 
 .icon-audio:before {
-    content: "\e606";
+    content: '\e606';
     font-family: $font-family-icon;
 }
 
 .icon-boarder-leave:before {
-    content: "\e607";
+    content: '\e607';
     font-family: $font-family-icon;
 }
 
 .icon-breadcrumbs:before {
-    content: "\e608";
+    content: '\e608';
     font-family: $font-family-icon;
 }
 
 .icon-calendar:before {
-    content: "\e609";
+    content: '\e609';
     font-family: $font-family-icon;
 }
 
 .icon-chat:before {
-    content: "\e60a";
+    content: '\e60a';
     font-family: $font-family-icon;
 }
 
 .icon-class-list:before {
-    content: "\e60b";
+    content: '\e60b';
     font-family: $font-family-icon;
 }
 
 .icon-click-view:before {
-    content: "\e60c";
+    content: '\e60c';
     font-family: $font-family-icon;
 }
 
 .icon-close:before,
 .icon-cancel:before,
 .icon-x:before {
-    content: "\e60d";
+    content: '\e60d';
     font-family: $font-family-icon;
 }
 
 .icon-collab-docs:before {
-    content: "\e60e";
+    content: '\e60e';
     font-family: $font-family-icon;
 }
 
 .icon-collapse:before,
 .icon-minus:before {
-    content: "\e60f";
+    content: '\e60f';
     font-family: $font-family-icon;
 }
 
 .icon-comment:before,
 .icon-blog:before {
-    content: "\e610";
+    content: '\e610';
     font-family: $font-family-icon;
 }
 
 .icon-components:before {
-    content: "\e611";
+    content: '\e611';
     font-family: $font-family-icon;
 }
 
 .icon-copy:before {
-    content: "\e612";
+    content: '\e612';
     font-family: $font-family-icon;
 }
 
 .icon-countdown:before {
-    content: "\e613";
+    content: '\e613';
     font-family: $font-family-icon;
 }
 
 .icon-course-builder:before,
 .icon-course:before {
-    content: "\e614";
+    content: '\e614';
     font-family: $font-family-icon;
 }
 
 .icon-course-outline:before {
-    content: "\e615";
+    content: '\e615';
     font-family: $font-family-icon;
 }
 
 .icon-criteria:before {
-    content: "\e616";
+    content: '\e616';
     font-family: $font-family-icon;
 }
 
 .icon-curriculum:before {
-    content: "\e617";
+    content: '\e617';
     font-family: $font-family-icon;
 }
 
 .icon-curriculum-details:before {
-    content: "\e618";
+    content: '\e618';
     font-family: $font-family-icon;
 }
 
 .icon-danger:before {
-    content: "\e619";
+    content: '\e619';
     font-family: $font-family-icon;
 }
 
 .icon-day-view:before {
-    content: "\e61a";
+    content: '\e61a';
     font-family: $font-family-icon;
 }
 
 .icon-delete:before,
 .icon-bin:before {
-    content: "\e61b";
+    content: '\e61b';
     font-family: $font-family-icon;
 }
 
 .icon-directory:before {
-    content: "\e61c";
+    content: '\e61c';
     font-family: $font-family-icon;
 }
 
 .icon-division:before {
-    content: "\e904";
+    content: '\e904';
     font-family: $font-family-icon;
 }
 
 .icon-document:before {
-    content: "\e61d";
+    content: '\e61d';
     font-family: $font-family-icon;
 }
 
 .icon-download:before {
-    content: "\e61e";
+    content: '\e61e';
     font-family: $font-family-icon;
 }
 
 .icon-drag-drop:before {
-    content: "\e61f";
+    content: '\e61f';
     font-family: $font-family-icon;
 }
 
 .icon-drop-box:before {
-    content: "\e620";
+    content: '\e620';
     font-family: $font-family-icon;
 }
 
 .icon-dropdown:before {
-    content: "\e621";
+    content: '\e621';
     font-family: $font-family-icon;
 }
 
 .icon-due-work:before,
 .icon-submissions:before {
-    content: "\e622";
+    content: '\e622';
     font-family: $font-family-icon;
 }
 
 .icon-edit-columns:before {
-    content: "\e623";
+    content: '\e623';
     font-family: $font-family-icon;
 }
 
 .icon-education-mainentance:before {
-    content: "\e90e";
+    content: '\e90e';
     font-family: $font-family-icon;
 }
 
 .icon-email:before,
 .icon-mail:before {
-    content: "\e624";
+    content: '\e624';
     font-family: $font-family-icon;
 }
 
 .icon-eng-second-lang:before {
-    content: "\e90f";
+    content: '\e90f';
     font-family: $font-family-icon;
 }
 
 .icon-eportfolio:before {
-    content: "\e625";
+    content: '\e625';
     font-family: $font-family-icon;
 }
 
 .icon-equals:before {
-    content: "\e626";
+    content: '\e626';
     font-family: $font-family-icon;
 }
 
 .icon-export:before {
-    content: "\e627";
+    content: '\e627';
     font-family: $font-family-icon;
 }
 
 .icon-favourite:before,
 .icon-star:before {
-    content: "\e628";
+    content: '\e628';
     font-family: $font-family-icon;
 }
 
 .icon-files:before {
-    content: "\e629";
+    content: '\e629';
     font-family: $font-family-icon;
 }
 
 .icon-filter:before {
-    content: "\e62a";
+    content: '\e62a';
     font-family: $font-family-icon;
 }
 
 .icon-folder:before {
-    content: "\e62b";
+    content: '\e62b';
     font-family: $font-family-icon;
 }
 
 .icon-forms:before {
-    content: "\e62c";
+    content: '\e62c';
     font-family: $font-family-icon;
 }
 
 .icon-forum:before {
-    content: "\e62d";
+    content: '\e62d';
     font-family: $font-family-icon;
 }
 
 .icon-google-drive:before {
-    content: "\e62e";
+    content: '\e62e';
     font-family: $font-family-icon;
 }
 
 .icon-grip:before {
-    content: "\e62f";
+    content: '\e62f';
     font-family: $font-family-icon;
 }
 
 .icon-players:before,
 .icon-group:before,
 .icon-team:before {
-    content: "\e630";
+    content: '\e630';
     font-family: $font-family-icon;
 }
 
 .icon-group-managers:before {
-    content: "\e631";
+    content: '\e631';
     font-family: $font-family-icon;
 }
 
 .icon-help:before,
 .icon-questionmark:before {
-    content: "\e632";
+    content: '\e632';
     font-family: $font-family-icon;
 }
 
 .icon-history:before {
-    content: "\e633";
+    content: '\e633';
     font-family: $font-family-icon;
 }
 
 .icon-home:before,
 .icon-house:before {
-    content: "\e634";
+    content: '\e634';
     font-family: $font-family-icon;
 }
 
 .icon-homepagefeed:before {
-    content: "\e635";
+    content: '\e635';
     font-family: $font-family-icon;
 }
 
 .icon-image:before {
-    content: "\e636";
+    content: '\e636';
     font-family: $font-family-icon;
 }
 
 .icon-image-gallery:before {
-    content: "\e637";
+    content: '\e637';
     font-family: $font-family-icon;
 }
 
 .icon-image-slideshow:before,
 .icon-play:before {
-    content: "\e638";
+    content: '\e638';
     font-family: $font-family-icon;
 }
 
 .icon-info:before {
-    content: "\e639";
+    content: '\e639';
     font-family: $font-family-icon;
 }
 
 .icon-international-baccalaureate:before {
-    content: "\e914";
+    content: '\e914';
     font-family: $font-family-icon;
 }
 
 .icon-integration-student:before {
-    content: "\e910";
+    content: '\e910';
     font-family: $font-family-icon;
 }
 
 .icon-international-student:before {
-    content: "\e911";
+    content: '\e911';
     font-family: $font-family-icon;
 }
 
 .icon-link:before {
-    content: "\e63a";
+    content: '\e63a';
     font-family: $font-family-icon;
 }
 
 .icon-itineraryitem:before,
 .icon-list:before {
-    content: "\e63b";
+    content: '\e63b';
     font-family: $font-family-icon;
 }
 
 .icon-list-view:before {
-    content: "\e63c";
+    content: '\e63c';
     font-family: $font-family-icon;
 }
 
 .icon-location:before,
 .icon-venue:before {
-    content: "\e63d";
+    content: '\e63d';
     font-family: $font-family-icon;
 }
 
 .icon-locked:before,
 .icon-padlock:before {
-    content: "\e63e";
+    content: '\e63e';
     font-family: $font-family-icon;
 }
 
 .icon-logout:before {
-    content: "\e63f";
+    content: '\e63f';
     font-family: $font-family-icon;
 }
 
 .icon-lti:before {
-    content: "\e90d";
+    content: '\e90d';
     font-family: $font-family-icon;
 }
 
 .icon-match:before {
-    content: "\e903";
+    content: '\e903';
     font-family: $font-family-icon;
 }
 
 .icon-menu:before,
 .icon-hamburger:before {
-    content: "\e640";
+    content: '\e640';
     font-family: $font-family-icon;
 }
 
 .icon-mic:before {
-    content: "\e641";
+    content: '\e641';
     font-family: $font-family-icon;
 }
 
 .icon-mic-muted:before {
-    content: "\e642";
+    content: '\e642';
     font-family: $font-family-icon;
 }
 
 .icon-mic-recording:before {
-    content: "\e643";
+    content: '\e643';
     font-family: $font-family-icon;
 }
 
 .icon-mobile:before {
-    content: "\e644";
+    content: '\e644';
     font-family: $font-family-icon;
 }
 
 .icon-modify:before,
 .icon-pen:before {
-    content: "\e645";
+    content: '\e645';
     font-family: $font-family-icon;
 }
 
 .icon-month-view:before {
-    content: "\e646";
+    content: '\e646';
     font-family: $font-family-icon;
 }
 
 .icon-more:before,
 .icon-overflow:before {
-    content: "\e647";
+    content: '\e647';
     font-family: $font-family-icon;
 }
 
 .icon-mute:before {
-    content: "\e648";
+    content: '\e648';
     font-family: $font-family-icon;
 }
 
 .icon-network:before {
-    content: "\e649";
+    content: '\e649';
     font-family: $font-family-icon;
 }
 
 .icon-news:before {
-    content: "\e64a";
+    content: '\e64a';
     font-family: $font-family-icon;
 }
 
 .icon-next:before,
 .icon-goto:before {
-    content: "\e64b";
+    content: '\e64b';
     font-family: $font-family-icon;
 }
 
 .icon-notifications:before,
 .icon-bell:before {
-    content: "\e64c";
+    content: '\e64c';
     font-family: $font-family-icon;
 }
 
 .icon-office-365:before {
-    content: "\e64e";
+    content: '\e64e';
     font-family: $font-family-icon;
 }
 
 .icon-open:before {
-    content: "\e64f";
+    content: '\e64f';
     font-family: $font-family-icon;
 }
 
 .icon-pause:before {
-    content: "\e650";
+    content: '\e650';
     font-family: $font-family-icon;
 }
 
 .icon-phone:before {
-    content: "\e651";
+    content: '\e651';
     font-family: $font-family-icon;
 }
 
 .icon-pinterest:before {
-    content: "\e652";
+    content: '\e652';
     font-family: $font-family-icon;
 }
 
 .icon-podcast:before {
-    content: "\e653";
+    content: '\e653';
     font-family: $font-family-icon;
 }
 
 .icon-poll:before {
-    content: "\e654";
+    content: '\e654';
     font-family: $font-family-icon;
 }
 
 .icon-position:before {
-    content: "\e905";
+    content: '\e905';
     font-family: $font-family-icon;
 }
 
 .icon-previous:before {
-    content: "\e655";
+    content: '\e655';
     font-family: $font-family-icon;
 }
 
 .icon-print:before {
-    content: "\e656";
+    content: '\e656';
     font-family: $font-family-icon;
 }
 
 .icon-project:before {
-    content: "\e90c";
+    content: '\e90c';
     font-family: $font-family-icon;
 }
 
 .icon-result:before,
 .icon-progress:before,
 .icon-report:before {
-    content: "\e657";
+    content: '\e657';
     font-family: $font-family-icon;
 }
 
 .icon-quiz:before {
-    content: "\e658";
+    content: '\e658';
     font-family: $font-family-icon;
 }
 
 .icon-random-image:before {
-    content: "\e659";
+    content: '\e659';
     font-family: $font-family-icon;
 }
 
 .icon-refresh:before {
-    content: "\e65a";
+    content: '\e65a';
     font-family: $font-family-icon;
 }
 
 .icon-reply:before {
-    content: "\e65b";
+    content: '\e65b';
     font-family: $font-family-icon;
     display: inline-block;
     transform: rotateY(180deg);
 }
 
 .icon-resource-booking:before {
-    content: "\e65c";
+    content: '\e65c';
     font-family: $font-family-icon;
 }
 
 .icon-rss:before {
-    content: "\e65d";
+    content: '\e65d';
     font-family: $font-family-icon;
 }
 
 .icon-icons:before {
-    content: "\e65e";
+    content: '\e65e';
     font-family: $font-family-icon;
 }
 
 .icon-schoolbox:before {
-    content: "\e65f";
+    content: '\e65f';
     font-family: $font-family-icon;
 }
 
 .icon-search:before {
-    content: "\e660";
+    content: '\e660';
     font-family: $font-family-icon;
 }
 
 .icon-settings:before,
 .icon-cog:before {
-    content: "\e661";
+    content: '\e661';
     font-family: $font-family-icon;
 }
 
 .icon-showcase:before,
 .icon-trophy:before {
-    content: "\e662";
+    content: '\e662';
     font-family: $font-family-icon;
 }
 
 .icon-shuffle:before {
-    content: "\e663";
+    content: '\e663';
     font-family: $font-family-icon;
 }
 
 .icon-social-stream:before {
-    content: "\e664";
+    content: '\e664';
     font-family: $font-family-icon;
 }
 
 .icon-sport:before,
 .icon-ball:before {
-    content: "\e665";
+    content: '\e665';
     font-family: $font-family-icon;
 }
 
 .icon-staff:before,
 .icon-users:before,
 .icon-pastoral:before {
-    content: "\e666";
+    content: '\e666';
     font-family: $font-family-icon;
 }
 
 .icon-player:before,
 .icon-staff-students:before,
 .icon-user:before {
-    content: "\e667";
+    content: '\e667';
     font-family: $font-family-icon;
 }
 
 .icon-surveys:before {
-    content: "\e668";
+    content: '\e668';
     font-family: $font-family-icon;
 }
 
 .icon-synergetic:before {
-    content: "\e669";
+    content: '\e669';
     font-family: $font-family-icon;
 }
 
 .icon-task:before {
-    content: "\e66a";
+    content: '\e66a';
     font-family: $font-family-icon;
 }
 
 .icon-teacher:before,
 .icon-graduate:before {
-    content: "\e66b";
+    content: '\e66b';
     font-family: $font-family-icon;
 }
 
 .icon-textbox:before {
-    content: "\e66c";
+    content: '\e66c';
     font-family: $font-family-icon;
 }
 
 .icon-tiles:before {
-    content: "\e66d";
+    content: '\e66d';
     font-family: $font-family-icon;
 }
 
 .icon-timetable:before,
 .icon-clock:before {
-    content: "\e66e";
+    content: '\e66e';
     font-family: $font-family-icon;
 }
 
 .icon-time-value:before,
 .icon-hourglass:before {
-    content: "\e66f";
+    content: '\e66f';
     font-family: $font-family-icon;
 }
 
 .icon-twitter:before {
-    content: "\e670";
+    content: '\e670';
     font-family: $font-family-icon;
 }
 
 .icon-undo:before {
-    content: "\e671";
+    content: '\e671';
     font-family: $font-family-icon;
 }
 
 .icon-unlocked:before {
-    content: "\e672";
+    content: '\e672';
     font-family: $font-family-icon;
 }
 
 .icon-up-arrow:before {
-    content: "\e900";
+    content: '\e900';
     font-family: $font-family-icon;
 }
 
 .icon-down-arrow:before {
-    content: "\e901";
+    content: '\e901';
     font-family: $font-family-icon;
 }
 
 .icon-unit:before {
-    content: "\e90b";
+    content: '\e90b';
     font-family: $font-family-icon;
 }
 
 .icon-up-down:before {
-    content: "\e800";
+    content: '\e800';
     font-family: $font-family-icon;
 }
 
 .icon-upload:before {
-    content: "\e673";
+    content: '\e673';
     font-family: $font-family-icon;
 }
 
 .icon-video:before {
-    content: "\e674";
+    content: '\e674';
     font-family: $font-family-icon;
 }
 
 .icon-view:before,
 .icon-eye:before {
-    content: "\e675";
+    content: '\e675';
     font-family: $font-family-icon;
 }
 
 .icon-weather:before,
 .icon-mostly-cloudy:before {
-    content: "\e906";
+    content: '\e906';
     font-family: $font-family-icon;
 }
 
 .icon-thunder:before,
 .icon-storm:before {
-    content: "\e909";
+    content: '\e909';
     font-family: $font-family-icon;
 }
 
 .icon-rain:before {
-    content: "\e90a";
+    content: '\e90a';
     font-family: $font-family-icon;
 }
 
 .icon-cloud:before,
 .icon-cloudy:before {
-    content: "\e907";
+    content: '\e907';
     font-family: $font-family-icon;
 }
 
 .icon-clear:before,
 .icon-sunny:before {
-    content: "\e908";
+    content: '\e908';
     font-family: $font-family-icon;
 }
 
 .icon-week-view:before {
-    content: "\e677";
+    content: '\e677';
     font-family: $font-family-icon;
 }
 
 .icon-wiki:before {
-    content: "\e678";
+    content: '\e678';
     font-family: $font-family-icon;
 }
 
 .icon-wolfram-alpha:before {
-    content: "\e64d";
+    content: '\e64d';
     font-family: $font-family-icon;
 }
