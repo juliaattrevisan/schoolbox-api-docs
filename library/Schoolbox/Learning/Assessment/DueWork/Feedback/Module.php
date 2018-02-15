@@ -106,7 +106,8 @@ class Module extends BaseModule
          */
         $preloadParticipant = function ($params) {
             return [
-                'participant' => $this->preloadParticipant($params['assessmentId'], $params['studentId']),
+                'assessment' => $this->preloadAssessable($params['assessmentId']),
+                'student'    => $this->getUserDataSource()->findById($params['studentId']),
             ];
         };
 
@@ -134,8 +135,9 @@ class Module extends BaseModule
          */
         $preloadParticipantAndResponse = function ($params) {
             return [
-                'participant' => $this->preloadParticipant($params['assessmentId'], $params['studentId']),
-                'response'    => $this->preloadResponse($params['assessmentId'], $params['responseId']),
+                'assessment' => $this->preloadAssessable($params['assessmentId']),
+                'student'    => $this->getUserDataSource()->findById($params['studentId']),
+                'response'   => $this->preloadResponse($params['assessmentId'], $params['responseId']),
             ];
         };
 
