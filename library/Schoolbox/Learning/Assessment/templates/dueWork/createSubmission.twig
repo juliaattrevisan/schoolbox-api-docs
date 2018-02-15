@@ -47,6 +47,10 @@ Data:
             }, 5 * 1000);
         };
 
+        var suspendAutosave = function () {
+            clearTimeout(autosaveTimeout);
+        };
+
         // The autosave pre-submit method - called by the autosave method. Calls the actual submit method if the textbox has changed.
 
         var autosavePresubmit = function () {
@@ -63,13 +67,15 @@ Data:
             }
         };
 
+        var submitButtons = $("[data-action-save], [data-action-self-reflect]");
+
         // The autosave submit method
 
         var autosaveAjaxSubmit = function () {
 
             /* Disable actual submit button
              */
-            $("[data-action-save]").prop('disabled', true);
+            submitButtons.prop('disabled', true);
 
             // Submit form via AJAX
             var formContents = form.serializeArray();
@@ -90,7 +96,7 @@ Data:
 
                     /* Re-enable submit
                      */
-                    $("[data-action-save]").prop('disabled', false);
+                    submitButtons.prop('disabled', false);
                 },
                 success: function (responseText) {
 
@@ -131,22 +137,6 @@ Data:
             return (Boolean)(inlineLen || filesLen || submittedInPersonCheckbox.prop('checked'));
         };
 
-        {# Allow creation of a stub response when someone uses Submit In Person
-         # This stub response is associated with the feedback that Self Reflection/Self Assessment creates
-         # It must exist for this workflow to function
-         #}
-        $("[data-action-self-reflect]").click(function(e) {
-            e.preventDefault();
-
-            if (!allowSubmit()) {
-                {# prevent self-reflection without SOMETHING to reflect upon #}
-                emptyDialog.foundation('reveal', 'open');
-            } else {
-                {# Allow form to submit as normal #}
-                $('#editor-form').submit();
-            }
-        });
-
         /* Spawn editors
          */
         $.fn.alaressEditor({
@@ -165,7 +155,7 @@ Data:
 
         var confirmDialog = $('#confirm-dialog');
 
-        $("[data-action-save]").click(function (e) {
+        submitButtons.click(function (e) {
             var form = $(this).closest('form'),
                 dialog = confirmDialog,
                 submit = form.find(':submit');
@@ -183,6 +173,11 @@ Data:
                     event.preventDefault();
 
                     submit.prop('disabled', true);
+
+                    /* Disable draft autosaving while actually submitting
+                     */
+                    suspendAutosave();
+
                     form.submit();
                 });
 
@@ -200,7 +195,7 @@ Data:
 
                 /* Disable draft autosaving while actually submitting
                  */
-                clearTimeout(autosaveTimeout);
+                suspendAutosave();
 
                 form.submit();
             }

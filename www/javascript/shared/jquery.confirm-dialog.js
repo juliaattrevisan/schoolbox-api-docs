@@ -80,14 +80,21 @@
         var h2 = $('<h2 />');
         h2.text(settings.header );
 
-        var okayButton   = $('<a href="#" class="button submit" />').text(settings.confirmLabel).on('click.confirmDialog', function(e) {
+        var okayButton   = $('<a href="#" class="button submit" />').text(settings.confirmLabel),
+            cancelButton = $('<a href="#" class="button" />').text(settings.cancelLabel),
+            buttons      = $().add(okayButton).add(cancelButton);
+        okayButton.on('click.confirmDialog', function(e) {
+            // Immediately prevent further click events
+            buttons.off('click.confirmDialog');
             e.preventDefault();
             settings.confirmEvent(element);
             // Don't trigger cancelEvent if I pressed OK
             modal.off('close.fndtn.reveal.cancel');
             modal.foundation('reveal', 'close');
         });
-        var cancelButton = $('<a href="#" class="button" />').text(settings.cancelLabel).on('click.confirmDialog', function(e) {
+        cancelButton.on('click.confirmDialog', function(e) {
+            // Immediately prevent further click events
+            buttons.off('click.confirmDialog');
             e.preventDefault();
             // Cancel button doesn't trigger cancelEvent directly;
             // closing the modal does.
