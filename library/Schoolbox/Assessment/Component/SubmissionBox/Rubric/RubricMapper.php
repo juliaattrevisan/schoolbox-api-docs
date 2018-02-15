@@ -21,7 +21,6 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\IMapper;
 use Schoolbox\Learning\Assessment\DueWork;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
@@ -451,7 +450,7 @@ class RubricMapper
     {
         $grid = $this->findBySubmissionBox($box);
 
-        return (new GridGenerator($this, $grid, $student))->applyStudentMark(true);
+        return (new GridGenerator($this, $grid, $student))->applyInstructorGivenMark(true);
     }
 
     /**
@@ -952,8 +951,9 @@ class RubricMapper
         $pb = new Builder($this->database, '');
 
         $pb
-            ->in('sb.assessment_id', $dueWorks->getColumnValues('id'))
+            ->in('sb.assessment_id', $dueWorks->getPropertyValues('id'))
             ->equals('sr.owner', $student->getId())
+            ->equals('sr.review_route', SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->notNull('sr.published_at')
             ->isTrue('rm.valid')
             ->isNull('sr.deleted_at')

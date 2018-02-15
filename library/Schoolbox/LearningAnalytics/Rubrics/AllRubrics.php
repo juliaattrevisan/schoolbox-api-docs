@@ -47,6 +47,7 @@ class AllRubrics
      */
     public function __construct(GenericCollection $unitImplementations, Term\Model $term)
     {
+        // TODO attempt to remove reliance on deprecated class
         $rubricHandler = new DueWork_Rubric_Handler();
 
         $folderIds = $unitImplementations->map(function (UnitImplementation\Model $unitImpl) {

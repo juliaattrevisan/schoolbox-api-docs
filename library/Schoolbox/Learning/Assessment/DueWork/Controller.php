@@ -506,7 +506,7 @@ class Controller extends Assessment\Controller
             $studentId = $participant->getUser()->getId();
 
             // this will modify the "selection" of descriptors in the grid
-            (new Rubric\GridGenerator($this->rubricMapper, $rubric, $participant->getUser()))->applyStudentMark(true);
+            (new Rubric\GridGenerator($this->rubricMapper, $rubric, $participant->getUser()))->applyInstructorGivenMark(true);
 
             foreach ($rubric->getSumPerGroup() as $group) {
                 foreach ($group->getAllCriteria() as $criterion) {

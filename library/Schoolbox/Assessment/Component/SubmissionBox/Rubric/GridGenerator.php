@@ -49,7 +49,7 @@ class GridGenerator
      *
      * @return Rubric
      */
-    public function applyMark(array $selectedDescriptorIds): Rubric
+    private function applyMark(array $selectedDescriptorIds): Rubric
     {
         foreach ($this->grid->getAllDescriptors() as $descriptor) {
             $selected = \in_array($descriptor->getId(), $selectedDescriptorIds, false);
@@ -67,8 +67,11 @@ class GridGenerator
      * @param Builder $pb
      * @return Rubric
      */
-    private function applyStudentMarkQuery(bool $publishedOnly, Builder $pb): Rubric
+    private function applyMarkQuery(bool $publishedOnly, Builder $pb): Rubric
     {
+        if ($publishedOnly) {
+            $pb->notNull('sr.published_at');
+        }
         $whereClause = implode(' AND ', $pb->getWhere());
         $dateOrder   = $publishedOnly ? 'sr.published_at' : 'sr.created_at';
 
@@ -100,67 +103,72 @@ class GridGenerator
 
 
     /**
-     * Alias to applyStudentMark() for a particular IResponse instance
+     * Applies the most recent self-assessed mark for a particular IResponse instance
      *
      * @param bool $publishedOnly Whether to exclude draft marks
      * @param int  $responseId
      *
      * @return Rubric
      */
-    public function applyStudentMarkForSelfReflectableResponse(bool $publishedOnly, int $responseId): Rubric
+    public function applySelfAssessedMarkForResponse(bool $publishedOnly, int $responseId): Rubric
     {
         $pb = $this->buildDefaultPb()
                    ->equals('sr.student_submission_id', $responseId)
                    ->notEquals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
 
-        if ($publishedOnly) {
-            $pb->notNull('sr.published_at');
-        }
-
-        return $this->applyStudentMarkQuery($publishedOnly, $pb);
+        return $this->applyMarkQuery($publishedOnly, $pb);
     }
 
 
     /**
-     * Alias to applyStudentMark() for a particular IResponse instance
+     * Applies the most recent instructor-given mark for a particular IResponse instance
      *
      * @param bool   $publishedOnly Whether to exclude draft marks
      * @param int    $responseId
      *
      * @return Rubric
      */
-    public function applyStudentMarkForResponse(bool $publishedOnly, int $responseId): Rubric
+    public function applyInstructorGivenMarkForResponse(bool $publishedOnly, int $responseId): Rubric
     {
         $pb = $this->buildDefaultPb()
                    ->equals('sr.student_submission_id', $responseId)
                    ->equals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
 
-        if ($publishedOnly) {
-            $pb->notNull('sr.published_at');
-        }
-
-        return $this->applyStudentMarkQuery($publishedOnly, $pb);
+        return $this->applyMarkQuery($publishedOnly, $pb);
     }
 
 
     /**
-     * @param bool     $publishedOnly Whether to exclude draft marks
-     * @param int|null $feedbackId    If supplied, fetch only for this feedback
+     * Applies the most recent instructor-given mark.
+     *
+     * @param bool $publishedOnly Whether to exclude draft marks
      *
      * @return Rubric
      */
-    public function applyStudentMark(bool $publishedOnly, ?int $feedbackId = null): Rubric
+    public function applyInstructorGivenMark(bool $publishedOnly): Rubric
     {
-        $pb = $this->buildDefaultPb();
+        $pb = $this->buildDefaultPb()
+                   ->equals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
 
-        if ($publishedOnly) {
-            $pb->notNull('sr.published_at');
-        }
-        if ($feedbackId) {
-            $pb->equals('sr.id', $feedbackId);
-        }
+        return $this->applyMarkQuery($publishedOnly, $pb);
+    }
 
-        return $this->applyStudentMarkQuery($publishedOnly, $pb);
+
+    /**
+     * Applies a student mark for a given feedback, regardless of whether it's
+     * a self-assessment or instructor-given feedback.
+     *
+     * @param bool $publishedOnly Whether to exclude draft marks
+     * @param int  $feedbackId    The feedback ID
+     *
+     * @return Rubric
+     */
+    public function applyMarkForFeedback(bool $publishedOnly, int $feedbackId): Rubric
+    {
+        $pb = $this->buildDefaultPb()
+                   ->equals('sr.id', $feedbackId);
+
+        return $this->applyMarkQuery($publishedOnly, $pb);
     }
 
 
