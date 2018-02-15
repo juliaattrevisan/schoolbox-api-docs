@@ -211,7 +211,7 @@ trait DueWorkTrait
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getSelfReviewable(): ?string
     {

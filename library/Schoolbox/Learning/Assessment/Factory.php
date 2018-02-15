@@ -155,15 +155,14 @@ class Factory
         $this->setMarkPerCapability(trim($post['markPerCapability']));
         $this->setMaxMark(trim($post['maxMark']));
 
+        $something = $this->getSelfReviewable();
+
         if (isset($post['self_reviewable'])) {
             // Value has come though from the form, use that
             $this->setSelfReviewable($post['self_reviewable']);
-        } elseif ($this->getSelfReviewable()) {
-            // Value has not come through from the form (FF turned off) and it has an existing setting - persist
-            $this->setSelfReviewable($this->getSelfReviewable());
         } else {
-            // Value has not come through from the form (FF turned off) and no existing setting - default to none
-            $this->setSelfReviewable('none');
+            // Value has not come through from the form (FF turned off) - set to null so that this won't be updated
+            $this->setSelfReviewable(null);
         }
 
         $this->setRubricData($post[$post['formField']]);
