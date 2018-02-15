@@ -29,6 +29,8 @@ abstract class AbstractAssessableRule implements IAuthorizationRule
             return $params['assessment'];
         }
         if (isset($params['participant']) && $params['participant'] instanceof Participant) {
+            // TODO deprecated in 18.0. Remove for 18.1.
+            trigger_error("'participant' route arg is deprecated", E_DEPRECATED);
             /** @var Participant $participant */
             $participant = $params['participant'];
             return $participant->getAssessable();
