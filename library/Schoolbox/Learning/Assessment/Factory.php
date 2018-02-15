@@ -163,7 +163,7 @@ class Factory
             $this->setSelfReviewable($this->getSelfReviewable());
         } else {
             // Value has not come through from the form (FF turned off) and no existing setting - default to none
-            $this->setSelfReviewable(0);
+            $this->setSelfReviewable('none');
         }
 
         $this->setRubricData($post[$post['formField']]);
