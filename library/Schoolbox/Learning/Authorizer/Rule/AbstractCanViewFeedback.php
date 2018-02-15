@@ -25,18 +25,14 @@ abstract class AbstractCanViewFeedback extends AbstractParticipationRule
      */
     protected function findStudent(array $params): User
     {
-        if (isset($params['student']) && $params['student'] instanceof User) {
-            return $params['student'];
-        }
-        if (isset($params['participant']) && $params['participant'] instanceof Participant) {
-            /** @var Participant $participant */
-            $participant = $params['participant'];
-            return $participant->getUser();
-        }
-        if (isset($params['response']) && $params['response'] instanceof Response\Model) {
-            /** @var Response\Model $response */
-            $response = $params['response'];
-            return $response->getSubmittedBy();
+        try {
+            return parent::findStudent($params);
+        } catch (InvalidArgumentException $e) {
+            if (isset($params['response']) && $params['response'] instanceof Response\Model) {
+                /** @var Response\Model $response */
+                $response = $params['response'];
+                return $response->getSubmittedBy();
+            }
         }
         throw new \InvalidArgumentException('Unable to locate a student in supplied params');
     }
