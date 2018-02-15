@@ -34,8 +34,7 @@
                 assessmentId: assessment.Id,
                 assessment:   assessment,
                 studentId:    participant.user.id,
-                student:      participant.user,
-                participant:  participant
+                student:      participant.user
             }) %}
             {% set href = routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id}) %}
             {% set title = 'View and ' ~ locale.grades ~ ' submission' %}

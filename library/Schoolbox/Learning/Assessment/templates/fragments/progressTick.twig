@@ -25,9 +25,19 @@
 
 {# Tasks have inline interaction #}
 {% if writable %}
-    {% set postRoute = routeLookup('learningAssessment.postCreateResponse', {assessmentId: assessment.id, participant: participant, studentId: participant.user.id}) %}
+    {% set postRoute = routeLookup('learningAssessment.postCreateResponse', {
+        assessmentId: assessment.id,
+        assessment:   assessment,
+        studentId:    participant.user.id,
+        student:      participant.user
+    }) %}
 {% elseif canInteract %}
-    {% set postRoute = routeLookupIfAuthorized('learningAssessment.postCreateResponse', {assessmentId: assessment.id, participant: participant, studentId: participant.user.id}) %}
+    {% set postRoute = routeLookupIfAuthorized('learningAssessment.postCreateResponse', {
+        assessmentId: assessment.id,
+        assessment:   assessment,
+        studentId:    participant.user.id,
+        student:      participant.user
+    }) %}
 {% endif %}
 
 {% if canInteract and postRoute %}
