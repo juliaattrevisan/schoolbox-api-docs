@@ -950,11 +950,10 @@ class Controller extends Assessment\Controller
         // Route and arguments for location to redirect to once acknowledged.
         $route      = 'learningAssessment.getSummary';
         $params     = [
-            'participant'  => $participant,
             'assessment'   => $assessment,
             'assessmentId' => $assessment->getId(),
-            'student'      => $participant->getUser(),
-            'studentId'    => $participant->getUser()->getId(),
+            'student'      => $student,
+            'studentId'    => $student->getId(),
         ];
 
         try {
