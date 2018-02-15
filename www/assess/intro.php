@@ -85,11 +85,13 @@ try {
     $plan['description'] = trim($participant->getDescription());
     $plan['start'] = $participant->getOpenDate();
     $plan['finish'] = $participant->getDueDate();
+    $plan['close'] = $participant->getCloseDate();
 }
 catch (\UnexpectedValueException $e) {
     $plan['description'] = trim($assessment->getDescription());
     $plan['start'] = $assessment->getOpenAt();
     $plan['finish'] = $assessment->getDueAt();
+    $plan['close'] = $assessment->getCloseAt();
 }
 
 if ($accessLevel < UserAccess::ACCESS_WRITE) {
@@ -99,12 +101,12 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
     }
 
     // I can't attempt this if it has expired
-    if (\Alaress_Date_Format::now()->gt($plan['start']->getCloseDate())) {
+    if (\Alaress_Date_Format::now()->gt($plan['close'])) {
         error(120);
     }
 
     // I can't attempt this if it isn't open
-    if (\Alaress_Date_Format::now()->lt($plan['finish']->getOpenDate())) {
+    if (\Alaress_Date_Format::now()->lt($plan['start'])) {
         error(143);
     }
 
