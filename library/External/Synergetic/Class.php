@@ -27,7 +27,7 @@ class External_Synergetic_Class implements External_ClassInterface
     function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
-        $this->externalUser = new External_User('synergetic');
+        $this->setExternalUser(new External_User('synergetic'));
     }
 
     /**
@@ -91,14 +91,15 @@ class External_Synergetic_Class implements External_ClassInterface
         /** @var Schoolbox\User $sessionUser */
         $sessionUser = isset($_SESSION['user']) ? $_SESSION['user'] : null;
         $userExternalId = $sessionUser instanceof \Schoolbox\User ? $sessionUser->getExternalId() : null;
-        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($userExternalId));
-        $fileYear = $this->database->quote($this->externalUser->getCurrentYear($userExternalId));
+        $fileSemester = $this->getDatabase()->quote($this->getExternalUser()->getCurrentSemester($userExternalId));
+        $fileYear = $this->getDatabase()->quote($this->getExternalUser()->getCurrentYear($userExternalId));
 
         $query = "
         SELECT DISTINCT StudentClasses.StudentSurname as lastname, StudentClasses.StudentPreferred as firstname,
                         StudentClasses.StudentYearLevelDescription as yearlevel,
                         StudentClasses.StudentHouseDescription as house,
-                        vStudents.StudentMedicalAlert, vStudents.StudentSpecialNeedsFlag,
+                        vStudents.StudentMedicalAlert, 
+                        vStudents.StudentSpecialNeedsFlag,
                         vStudents.StudentTutorDescription,
                         StudentClasses.StudentID as synergy_id, StudentClasses.ClassCampus
         FROM    dbo.vStudentClasses StudentClasses
@@ -148,22 +149,6 @@ class External_Synergetic_Class implements External_ClassInterface
         }
 
         return array_unique($teachers);
-    }
-
-    /**
-     * @param $database
-     */
-    private function setDatabase($database)
-    {
-        $this->database = $database;
-    }
-
-    /**
-     * @return MSSQL
-     */
-    private function getDatabase()
-    {
-        return $this->database;
     }
 
     /**
@@ -231,5 +216,37 @@ class External_Synergetic_Class implements External_ClassInterface
         }
         $query = strtr($query, $params);
         return $this->getDatabase()->getAll($query);
+    }
+
+    /**
+     * @param $database
+     */
+    private function setDatabase($database)
+    {
+        $this->database = $database;
+    }
+
+    /**
+     * @return MSSQL
+     */
+    protected function getDatabase()
+    {
+        return $this->database;
+    }
+
+    /**
+     * @return External_UserInterface
+     */
+    protected function getExternalUser(): External_UserInterface
+    {
+        return $this->externalUser;
+    }
+
+    /**
+     * @param External_UserInterface $externalUser
+     */
+    public function setExternalUser(External_UserInterface $externalUser)
+    {
+        $this->externalUser = $externalUser;
     }
 }

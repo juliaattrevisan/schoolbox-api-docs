@@ -28,6 +28,14 @@ if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser())
     $this->setBlock('student_list', 'select_student', 'select_student_block');
     $this->setBlock('student_list', 'medical', 'medical_block');
     $this->setBlock('student_list', 'special', 'special_block');
+
+    $this->setBlock('student_list', 'nonresident', 'nonresident_block');
+    $this->setBlock('student_list', 'ib', 'ib_block');
+    $this->setBlock('student_list', 'esl', 'esl_block');
+    $this->setBlock('student_list', 'tsi', 'tsi_block');
+    $this->setBlock('student_list', 'integration', 'integration_block');
+    $this->setBlock('student_list', 'ema', 'ema_block');
+
     $this->setBlock('student_list', 'name_with_link', 'name_with_link_block');
     $this->setBlock('student_list', 'name_without_link', 'name_without_link_block');
     $this->setBlock('student_list', 'actions', 'actions_block');
@@ -186,6 +194,44 @@ if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser())
             } else {
                 $this->setVar('special_block', '');
             }
+
+            // Start custom for SCC
+            if (!empty($student['StudentNonResidentFlag'])) {
+                $this->parse('nonresident_block', 'nonresident');
+            } else {
+                $this->setVar('nonresident_block', '');
+            }
+
+            if (!empty($student['StudentIBFlag'])) {
+                $this->parse('ib_block', 'ib');
+            } else {
+                $this->setVar('ib_block', '');
+            }
+
+            if (!empty($student['EnglishSecondFlag'])) {
+                $this->parse('esl_block', 'esl');
+            } else {
+                $this->setVar('esl_block', '');
+            }
+
+            if (!empty($student['StudentTSIFlag'])) {
+                $this->parse('tsi_block', 'tsi');
+            } else {
+                $this->setVar('tsi_block', '');
+            }
+
+            if (!empty($student['IntegrationFlag'])) {
+                $this->parse('integration_block', 'integration');
+            } else {
+                $this->setVar('integration_block', '');
+            }
+
+            if (!empty($student['EMAFlag'])) {
+                $this->parse('ema_block', 'ema');
+            } else {
+                $this->setVar('ema_block', '');
+            }
+            // End custom for SCC
 
             /* If the user has an enabled eportfolio, enable link
              */
