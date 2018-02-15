@@ -84,7 +84,12 @@ $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], $a
 
 /* Looks like everyone has a Plan in some way, regardless if it's custom or default?
  */
-$participant = $assessment->getParticipantIfExtant($_SESSION['user']);
+try {
+    $participant = $assessment->getParticipant($_SESSION['user']);
+}
+catch (\UnexpectedValueException $e) {
+    error(Error\Mapper::ERROR_NONPARTICIPANT);
+}
 
 if ($accessLevel < UserAccess::ACCESS_WRITE) {
     // I can't attempt a spec assessment

@@ -72,24 +72,24 @@ $assessmentFolder = $assessment->getBaseContext()->getFolder();
 $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], $assessmentFolder->getId());
 $readOnly         = false;
 
-/* Looks like everyone has a Plan in some way, regardless if it's custom or default?
- */
-$participant = $assessment->getParticipantIfExtant($_SESSION['user']);
-
 /* Special case: participation isn't guaranteed at this point
  * so we can't get a Plan in all cases e.g. visiting from Course Import as an instructor
  */
 $plan = [];
 
-if (!$participant) {
-    $plan['description'] = trim($assessment->getDescription());
-    $plan['start'] = $assessment->getOpenAt()->getShort();
-    $plan['finish'] = $assessment->getDueAt()->getShort();
-}
-else {
+/* Looks like everyone has a Plan in some way, regardless if it's custom or default?
+ */
+try {
+    $participant = $assessment->getParticipant($_SESSION['user']);
+
     $plan['description'] = trim($participant->getDescription());
     $plan['start'] = $participant->getOpenDate()->getShort();
     $plan['finish'] = $participant->getDueDate()->getShort();
+}
+catch (\UnexpectedValueException $e) {
+    $plan['description'] = trim($assessment->getDescription());
+    $plan['start'] = $assessment->getOpenAt()->getShort();
+    $plan['finish'] = $assessment->getDueAt()->getShort();
 }
 
 if ($accessLevel < UserAccess::ACCESS_WRITE) {
