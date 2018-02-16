@@ -8,146 +8,152 @@
  * @version     SVN: $Id$
  */
 
-use \Schoolbox\User;
-use \Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\User;
 
-abstract class Eportfolio_Page_Abstract {
+abstract class Eportfolio_Page_Abstract
+{
 
-	/**
-	 * An instance of sitepage
-	 *
-	 * @var SitePage
-	 */
-	protected $page = null;
+    /**
+     * An instance of sitepage
+     *
+     * @var SitePage
+     */
+    protected $page = null;
 
-	/**
-	 * The id of the page being viewed
-	 *
-	 * @var int
-	 */
-	protected $pageId = -1;
+    /**
+     * The id of the page being viewed
+     *
+     * @var int
+     */
+    protected $pageId = -1;
 
-	/**
-	 * The user record for the owner of the page being viewed
-	 *
-	 * @var \Schoolbox\User
-	 */
-	protected $user = null;
+    /**
+     * The user record for the owner of the page being viewed
+     *
+     * @var \Schoolbox\User
+     */
+    protected $user = null;
 
-	/**
-	 * An instance of userHandler
-	 *
-	 * @var User
-	 */
-	protected $userHandler = null;
+    /**
+     * An instance of userHandler
+     *
+     * @var User
+     */
+    protected $userHandler = null;
 
-	/**
-	 * An instance of groupHandler
-	 *
-	 * @var Group
-	 */
-	protected $groupHandler = null;
+    /**
+     * An instance of groupHandler
+     *
+     * @var Group
+     */
+    protected $groupHandler = null;
 
-	/**
-	 * An instance of eportfolioHandler
-	 *
-	 * @var Eportfolio
-	 */
-	protected $eportfolioHandler = null;
+    /**
+     * An instance of eportfolioHandler
+     *
+     * @var Eportfolio
+     */
+    protected $eportfolioHandler = null;
 
-	/**
-	 * The template file to use
-	 *
-	 * @var string
-	 */
-	protected $templateFile = '';
+    /**
+     * The template file to use
+     *
+     * @var string
+     */
+    protected $templateFile = '';
 
-	/**
-	 * A const equivalent corresponding to READ_ACCESS or WRITE_ACCESS etc.
-	 *
-	 * This value is set in the factory, where a different class determines
-	 * the actual value.
-	 *
-	 * @var int
-	 */
-	protected $permission = -1;
+    /**
+     * A const equivalent corresponding to READ_ACCESS or WRITE_ACCESS etc.
+     *
+     * This value is set in the factory, where a different class determines
+     * the actual value.
+     *
+     * @var int
+     */
+    protected $permission = -1;
 
-	/**
-	 * Constructor
-	 *
-	 * @param $page
-	 * @param $userId
-	 * @param $pageId
-	 * @param $permission
-	 */
-	public function __construct($page, $userId, $pageId, $permission) {
-		$this->setPage($page);
-		$this->setPageId($pageId);
-		$this->setUserHandler(new \Schoolbox\User());
-		$this->setGroupHandler(new Group());
-		$this->setPermission($permission);
+    /**
+     * Constructor
+     *
+     * @param $page
+     * @param $userId
+     * @param $pageId
+     * @param $permission
+     */
+    public function __construct($page, $userId, $pageId, $permission)
+    {
+        $this->setPage($page);
+        $this->setPageId($pageId);
+        $this->setUserHandler(new \Schoolbox\User());
+        $this->setGroupHandler(new Group());
+        $this->setPermission($permission);
 
-		/* Check that the user exists
-		 */
-		$this->validateUser($userId);
+        /* Check that the user exists
+         */
+        $this->validateUser($userId);
 
-		/* If the user is valid, initiate everything
-		 */
-		$this->setEportfolioHandler(new Eportfolio($this->getUserId(), $this->getPageId()));
+        /* If the user is valid, initiate everything
+         */
+        $this->setEportfolioHandler(new Eportfolio($this->getUserId(), $this->getPageId()));
 
-		/* Initialise classes and collections
-		 */
-		$this->initialise();
+        /* Initialise classes and collections
+         */
+        $this->initialise();
 
-		/* Setup template and stuff
-		 */
-		$this->setup();
+        /* Setup template and stuff
+         */
+        $this->setup();
 
-		/* Set up page list
-		 */
-		$this->setupPageList();
-	}
+        /* Set up page list
+         */
+        $this->setupPageList();
+    }
 
-	abstract protected function initialise();
-	abstract protected function setup();
-	abstract protected function render();
+    abstract protected function initialise();
 
-	/**
-	 * Validate the user id to check that the user exists
-	 * If he does, remember his info
-	 *
-	 * @param $userId
-	 */
-	protected function validateUser($userId) {
+    abstract protected function setup();
 
-		/* Retrieve the user ID from the URI, must be an integer and at least 1 character long
-		 */
+    abstract protected function render();
+
+    /**
+     * Validate the user id to check that the user exists
+     * If he does, remember his info
+     *
+     * @param $userId
+     */
+    protected function validateUser($userId)
+    {
+
+        /* Retrieve the user ID from the URI, must be an integer and at least 1 character long
+         */
         $user = null;
-		if (preg_match('/^\d+$/', $userId)) {
+        if (preg_match('/^\d+$/', $userId)) {
             try {
                 $user = \Schoolbox\UserMapper::getInstance()->findById($userId);
+            } catch (\Schoolbox\Mapper\Exception $e) {
             }
-            catch (\Schoolbox\Mapper\Exception $e) {}
-		}
+        }
 
-		/* if we still have no user, advise that these are not the droids you're looking for
-		 */
-		if (!($user instanceof \Schoolbox\User)) {
-			error(18);
-		}
+        /* if we still have no user, advise that these are not the droids you're looking for
+         */
+        if (!($user instanceof \Schoolbox\User)) {
+            error(18);
+        }
 
-		$this->setUser($user);
-	}
+        $this->setUser($user);
+    }
 
-	/**
-	 * Set up blocks for the list of pages
-	 */
-	private function setupPageList() {
-		$this->getPage()->setBlock(TEMPLATE_content, 'eportfolio_page', 'eportfolio_page_block');
+    /**
+     * Set up blocks for the list of pages
+     */
+    private function setupPageList()
+    {
+        $this->getPage()->setBlock(TEMPLATE_content, 'eportfolio_page', 'eportfolio_page_block');
 
 
-		/* Optional add-page butonye
-		 */
+        /* Optional add-page butonye
+         */
         $this->getPage()->setBlock(TEMPLATE_content, 'can_add_page', 'can_add_page_block');
 
         $this->getPage()->setVar('can_add_page_block', '');
@@ -159,69 +165,70 @@ abstract class Eportfolio_Page_Abstract {
         /* Only show the showcase tab if there is something to see */
         $this->getPage()->setBlock(TEMPLATE_content, 'showcase_page', 'showcase_page_block');
 
-        if(\Eportfolio\ShowcaseMapper::getInstance()->countByColumn('uid',$this->getUserId())) {
+        if (\Eportfolio\ShowcaseMapper::getInstance()->countByColumn('uid', $this->getUserId())) {
             $this->getPage()->parse('showcase_page_block', 'showcase_page');
+        } else {
+            $this->getPage()->setVar('showcase_page_block', '');
         }
-        else {
-            $this->getPage()->setVar('showcase_page_block','');
-        }
 
-	}
+    }
 
-	/**
-	 * Render a list of pages
-	 */
-	private function renderPageList() {
-		$pageMapper = new Eportfolio\PageMapper();
+    /**
+     * Render a list of pages
+     */
+    private function renderPageList()
+    {
+        $pageMapper = new Eportfolio\PageMapper();
 
-		$allPages = $pageMapper->findViewablePages($_SESSION['id'], $this->getUserId());
+        $allPages = $pageMapper->findViewablePages($_SESSION['id'], $this->getUserId());
 
-		$this->getPage()->setVar('eportfolio_page_block', '');
+        $this->getPage()->setVar('eportfolio_page_block', '');
 
-		if ($allPages->count()) {
-			foreach ($allPages as $currentPage) {
-				/** @var Eportfolio\Page $currentPage */
-				if (!$currentPage->isDeleted()) {
-					$this->getPage()->setVar(array(
-						'EPORTFOLIO_PAGE_ID' => $currentPage->getPageId(),
-						'EPORTFOLIO_PAGE_NAME' => Scrub::text($currentPage->getPageTitle()),
+        if ($allPages->count()) {
+            foreach ($allPages as $currentPage) {
+                /** @var Eportfolio\Page $currentPage */
+                if (!$currentPage->isDeleted()) {
+                    $this->getPage()->setVar([
+                        'EPORTFOLIO_PAGE_ID'      => $currentPage->getPageId(),
+                        'EPORTFOLIO_PAGE_NAME'    => Scrub::text($currentPage->getPageTitle()),
                         'EPORTFOLIO_CURRENT_PAGE' => $currentPage->getPageId() == $this->getPageId() ? 'class="active"' : '',
-					));
+                    ]);
 
-					$this->getPage()->parse('eportfolio_page_block', 'eportfolio_page', true);
-				}
-			}
-		}
+                    $this->getPage()->parse('eportfolio_page_block', 'eportfolio_page', true);
+                }
+            }
+        }
 
-		/* For the hardcoded pages
-		 */
-		$this->getPage()->setVar(array(
-			'EPORTFOLIO_PAGE_USER_ID' => $this->getUserId(),
-		));
-	}
+        /* For the hardcoded pages
+         */
+        $this->getPage()->setVar([
+            'EPORTFOLIO_PAGE_USER_ID' => $this->getUserId(),
+        ]);
+    }
 
-	/**
-	 * Common elements rendered on all pages can be established here
-	 */
-	public function renderPage() {
+    /**
+     * Common elements rendered on all pages can be established here
+     */
+    public function renderPage()
+    {
 
-		/* Render page list
-		 */
-		$this->renderPageList();
+        /* Render page list
+         */
+        $this->renderPageList();
 
-		/* A rendering hook method
-		 */
-		$this->render();
-	}
+        /* A rendering hook method
+         */
+        $this->render();
+    }
 
     /**
      * Get the latest entry for a Submission History
      *
-     * @param User $user
+     * @param User          $user
      * @param SubmissionBox $box
      * @return \Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission
      */
-	protected function getLatestSubmission(User $user, SubmissionBox $box)
+    protected function getLatestSubmission(User $user, SubmissionBox $box)
     {
         // TODO use findByPredicates() in SA-1543 when it becomes available
         $mapper = \Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper::getInstance();
@@ -238,196 +245,212 @@ abstract class Eportfolio_Page_Abstract {
             'limit' => 1,
         ];
         return $mapper->findByColumnList($columnList, $options)->first();
-	}
+    }
 
     /**
      * Get the latest entry for a Returned Work history
      *
-     * @param User $user
+     * @param User          $user
      * @param SubmissionBox $box
      * @return SubmissionBox\ReturnedWork
      */
-	protected function getLatestReturn(User $user, SubmissionBox $box)
+    protected function getLatestReturn(User $user, SubmissionBox $box)
     {
-        // TODO use findByPredicates() in SA-1543 when it becomes available
-		$mapper = \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper::getInstance();
+        $mapper = \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper::getInstance();
+        $pb     = $mapper->getPredicateBuilder()
+                         ->equals('box_id', $box->getId())
+                         ->equals('owner', $user->getId())
+                         ->equals('review_route', SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
 
-		$columnList = [
-            'box_id' => $box->getId(),
-            'owner'  => $user->getId(),
-        ];
-
-		$options = [
-		    'order' => [
-		        'published_at' => 'DESC',
+        $options = [
+            'order' => [
+                'published_at' => 'DESC',
             ],
-		    'limit' => 1,
+            'limit' => 1,
         ];
-		return $mapper->findByColumnList($columnList, $options)->first();
-	}
+        return $mapper->findByPredicates($pb, $options)->first();
+    }
 
-	/* Getters/Setters
-	 */
+    /* Getters/Setters
+     */
 
-	/**
-	 * Set page id
-	 *
-	 * @param int $pageId
-	 */
-	protected function setPageId($pageId) {
-		$this->pageId = $pageId;
-	}
+    /**
+     * Set page id
+     *
+     * @param int $pageId
+     */
+    protected function setPageId($pageId)
+    {
+        $this->pageId = $pageId;
+    }
 
-	/**
-	 * Get page id
-	 *
-	 * @return int
-	 */
-	public function getPageId() {
-		return $this->pageId;
-	}
+    /**
+     * Get page id
+     *
+     * @return int
+     */
+    public function getPageId()
+    {
+        return $this->pageId;
+    }
 
-	/**
-	 * Get the user id for a person who exists
-	 *
-	 * @return mixed
-	 */
-	public function getUserId() {
-		return $this->user->getId();
-	}
+    /**
+     * Get the user id for a person who exists
+     *
+     * @return mixed
+     */
+    public function getUserId()
+    {
+        return $this->user->getId();
+    }
 
-	/**
-	 * Get the page owner's name
-	 *
-	 * @return string
-	 */
-	protected function getUserName() {
-		return $this->getUser()->formatName();
-	}
+    /**
+     * Get the page owner's name
+     *
+     * @return string
+     */
+    protected function getUserName()
+    {
+        return $this->getUser()->formatName();
+    }
 
-	/**
-	 * Set page
-	 *
-	 * @param SitePage $page
-	 */
-	protected function setPage($page) {
-		$this->page = $page;
-	}
+    /**
+     * Set page
+     *
+     * @param SitePage $page
+     */
+    protected function setPage($page)
+    {
+        $this->page = $page;
+    }
 
-	/**
-	 * Get page
-	 *
-	 * @return SitePage
-	 */
-	protected function getPage() {
-		return $this->page;
-	}
+    /**
+     * Get page
+     *
+     * @return SitePage
+     */
+    protected function getPage()
+    {
+        return $this->page;
+    }
 
-	/**
-	 * Set template file
-	 *
-	 * @param string $templateFile
-	 */
-	protected function setTemplateFile($templateFile) {
-		$this->templateFile = $templateFile;
-	}
+    /**
+     * Set template file
+     *
+     * @param string $templateFile
+     */
+    protected function setTemplateFile($templateFile)
+    {
+        $this->templateFile = $templateFile;
+    }
 
-	/**
-	 * Get template file
-	 *
-	 * @return string
-	 */
-	protected function getTemplateFile() {
-		return $this->templateFile;
-	}
+    /**
+     * Get template file
+     *
+     * @return string
+     */
+    protected function getTemplateFile()
+    {
+        return $this->templateFile;
+    }
 
-	/**
-	 * Set user
-	 *
-	 * @param \Schoolbox\User $user
-	 */
-	protected function setUser($user) {
-		$this->user = $user;
-	}
+    /**
+     * Set user
+     *
+     * @param \Schoolbox\User $user
+     */
+    protected function setUser($user)
+    {
+        $this->user = $user;
+    }
 
-	/**
-	 * Get user
-	 *
-	 * @return \Schoolbox\User
-	 */
-	public function getUser() {
-		return $this->user;
-	}
+    /**
+     * Get user
+     *
+     * @return \Schoolbox\User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
 
-	/**
-	 * Set user handler
-	 *
-	 * @param \Schoolbox\User $userHandler
-	 */
-	protected function setUserHandler($userHandler) {
-		$this->userHandler = $userHandler;
-	}
+    /**
+     * Set user handler
+     *
+     * @param \Schoolbox\User $userHandler
+     */
+    protected function setUserHandler($userHandler)
+    {
+        $this->userHandler = $userHandler;
+    }
 
-	/**
-	 * Get user handler
-	 *
-	 * @return \Schoolbox\User
-	 */
-	protected function getUserHandler() {
-		return $this->userHandler;
-	}
+    /**
+     * Get user handler
+     *
+     * @return \Schoolbox\User
+     */
+    protected function getUserHandler()
+    {
+        return $this->userHandler;
+    }
 
-	/**
-	 * Set eportfolio handler
-	 *
-	 * @param Eportfolio $eportfolioHandler
-	 */
-	protected function setEportfolioHandler($eportfolioHandler) {
-		$this->eportfolioHandler = $eportfolioHandler;
-	}
+    /**
+     * Set eportfolio handler
+     *
+     * @param Eportfolio $eportfolioHandler
+     */
+    protected function setEportfolioHandler($eportfolioHandler)
+    {
+        $this->eportfolioHandler = $eportfolioHandler;
+    }
 
-	/**
-	 * Get eportfolio handler
-	 *
-	 * @return Eportfolio
-	 */
-	protected function getEportfolioHandler() {
-		return $this->eportfolioHandler;
-	}
+    /**
+     * Get eportfolio handler
+     *
+     * @return Eportfolio
+     */
+    protected function getEportfolioHandler()
+    {
+        return $this->eportfolioHandler;
+    }
 
-	/**
-	 * Set group handler
-	 *
-	 * @param Group $groupHandler
-	 */
-	protected function setGroupHandler($groupHandler) {
-		$this->groupHandler = $groupHandler;
-	}
+    /**
+     * Set group handler
+     *
+     * @param Group $groupHandler
+     */
+    protected function setGroupHandler($groupHandler)
+    {
+        $this->groupHandler = $groupHandler;
+    }
 
-	/**
-	 * Get group handler
-	 *
-	 * @return Group
-	 */
-	protected function getGroupHandler() {
-		return $this->groupHandler;
-	}
+    /**
+     * Get group handler
+     *
+     * @return Group
+     */
+    protected function getGroupHandler()
+    {
+        return $this->groupHandler;
+    }
 
-	/**
-	 * Set permission value
-	 *
-	 * @param int $permission
-	 */
-	public function setPermission($permission) {
-		$this->permission = $permission;
-	}
+    /**
+     * Set permission value
+     *
+     * @param int $permission
+     */
+    public function setPermission($permission)
+    {
+        $this->permission = $permission;
+    }
 
-	/**
-	 * Get permission value
-	 *
-	 * @return int
-	 */
-	public function getPermission() {
-		return $this->permission;
-	}
+    /**
+     * Get permission value
+     *
+     * @return int
+     */
+    public function getPermission()
+    {
+        return $this->permission;
+    }
 }
