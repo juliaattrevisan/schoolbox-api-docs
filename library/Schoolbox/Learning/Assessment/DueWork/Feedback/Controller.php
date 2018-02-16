@@ -118,8 +118,12 @@ class Controller extends Base
                     && $mostRecentFeedback instanceof DueWork\Feedback\Model
                     && $assessment instanceof DueWork\Model
                     && $assessment->getUseRubric()
+                    && $feedback->getId() != $mostRecentFeedback->getId()
                 ) {
                     $this->rubricMapper->copySelections($mostRecentFeedback->getId(), $feedback->getId());
+                } else {
+                    //We have deselected a rubric, and want to save empty
+                    $this->rubricMapper->saveForFeedback([], $feedback->getId());
                 }
             }
         }
