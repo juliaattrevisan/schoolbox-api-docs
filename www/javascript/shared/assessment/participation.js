@@ -311,6 +311,7 @@
      *
      * @param {int}         studentID             ID of student to update
      * @param {boolean}     include               Whether to set to default, or set to excluded
+     * @param {Object}      self
      */
     function updateStudentStatus(studentID, include, self) {
         var statusValue;
@@ -323,19 +324,17 @@
             status = '(no customisations)';
             statusValue = 'included';
         } else {
-            console.log("hello world");
-            console.log($participantCard.is("[data-has-interaction]"));
             // Neat solution from https://stackoverflow.com/a/4661989
             if ($participantCard.is("[data-has-interaction]")) {
 
-                $(this).confirmDialog({
+                $(self).confirmDialog({
                     text: 'There is a student submission and/or teacher feedback attached to this item. Excluding the student will remove all access to the submission and/or feedback. Proceed?',
                     confirmEvent: function() {
                         console.log("Firing the confirm event");
                         $participantCard.addClass('participant-excluded');
-                        // TODO these aren't being set
-                        status = '(excluded)'; // TODO this isn't working
-                        statusValue = 'excluded'; // TODO this isn't working either
+                        // TODO these aren't being set, because (presumably) they are being treated as local to this function
+                        status = '(excluded)';
+                        statusValue = 'excluded';
                     }
                 });
 
@@ -346,8 +345,8 @@
             }
         }
 
-        console.log(statusValue);
-        console.log(status);
+        console.log("StatusValue after include/exclude conditional: " + statusValue);
+        console.log("Status after include/exclude conditional: " + status);
 
         // Update the status showing for the student
         $participantRow
