@@ -188,8 +188,8 @@ class Module extends BaseModule
             throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
-        $participant = null;
         $response = null;
+        $student  = null;
 
         /* If a responseId was provided, load that particular response up
          */
@@ -200,13 +200,13 @@ class Module extends BaseModule
             foreach ($assessment->getAllParticipants() as $p) {
                 foreach ($p->getAllResponses() as $r) {
                     if ($r->getId() == $params['responseId']) {
-                        $response    = $r;
-                        $participant = $p;
+                        $response = $r;
+                        $student  = $p->getUser();
                         break 2;
                     }
                 }
             }
-            if (!isset($participant, $response)) {
+            if (!isset($student, $response)) {
                 throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
             }
         }
@@ -215,8 +215,7 @@ class Module extends BaseModule
         elseif ($params['studentId']) {
             try {
                 $response = null;
-                $student = \Schoolbox\UserMapper::getInstance()->findById($params['studentId']);
-                $participant = $assessment->getParticipant($student);
+                $student  = \Schoolbox\UserMapper::getInstance()->findById($params['studentId']);
             }
             catch (\Schoolbox\Mapper\Exception $e) {
                 throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
@@ -224,9 +223,9 @@ class Module extends BaseModule
         }
 
         return [
-            'assessment' => $assessment,
-            'participant' => $participant,
-            'response' => $response,
+            'assessment'  => $assessment,
+            'response'    => $response,
+            'student'     => $student,
         ];
     }
 
@@ -274,9 +273,9 @@ class Module extends BaseModule
 
         return [
             'assessment' => $assessment,
-            'response' => $response,
-            'plagscan' => $plagscanDocument->setHtml($html), /* restore cached HTML value */
-            'participant' => $participant
+            'response'   => $response,
+            'plagscan'   => $plagscanDocument->setHtml($html), /* restore cached HTML value */
+            'student'    => $participant->getUser(),
         ];
     }
 

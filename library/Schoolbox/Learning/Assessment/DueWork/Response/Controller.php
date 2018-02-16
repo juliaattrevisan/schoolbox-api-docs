@@ -37,6 +37,7 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Learning\InlineGrader\Kami;
 use GuzzleHttp\Client;
+use Schoolbox\User;
 
 class Controller extends Base
 {
@@ -91,9 +92,12 @@ class Controller extends Base
     /**
      * Get the contents of a particular $response for the purposes of Self Reflection
      *
-     * @param DueWork     $assessment
-     * @param Participant $participant
-     * @param Model       $response
+     * @api   GET /learning/assessments/:assessmentId/:studentId/responses/self/:responseId
+     * @level 18.0
+     *
+     * @param DueWork $assessment
+     * @param User    $student
+     * @param Model   $response
      * @throws ApplicationException\Exception When trying to access a draft Response when you shouldn't
      * @throws ServiceNotFound If unable to locate HTML web Output
      * @throws \Aura\Router\Exception\RouteNotFound If cannot generate a requested route
@@ -104,10 +108,11 @@ class Controller extends Base
      */
     public function getParticularResponseForSelfReflection(
         DueWork $assessment,
-        Participant $participant,
+        User $student,
         Model $response
     ): void
     {
+        $participant = $assessment->getParticipant($student);
 
         /* Self-Assessment/Self Reflection: the response must be provided from the url param
          * Assume this is the one to load. To continue with his part of self-assessment workflow check the
@@ -208,9 +213,9 @@ class Controller extends Base
      *
      * I can't call it getResponse() lol wups
      *
-     * @param DueWork     $assessment
-     * @param Participant $participant
-     * @param Model       $response
+     * @param DueWork $assessment
+     * @param User    $student
+     * @param Model   $response
      * @throws ApplicationException\Exception When trying to access a draft Response when you shouldn't
      * @throws ServiceNotFound If unable to locate HTML web Output
      * @throws \Aura\Router\Exception\RouteNotFound If cannot generate a requested route
@@ -221,9 +226,11 @@ class Controller extends Base
      */
     public function getParticularResponse(
         DueWork $assessment,
-        Participant $participant,
+        User $student,
         Model $response = null
     ): void {
+
+        $participant = $assessment->getParticipant($student);
 
         /* Module doesn't have access to $this->getUser()
          *
@@ -481,10 +488,10 @@ class Controller extends Base
     /**
      * @api   DELETE /assessments/:assessmentId/response/:responseId
      * @level 165
-     * @param Participant $participant
+     * @param IAssessable $assessment
      * @param Model $response
      */
-    public function deleteParticularResponse(Participant $participant, Model $response)
+    public function deleteParticularResponse(IAssessable $assessment, Model $response)
     {
         $code = 204;
         $data = [];

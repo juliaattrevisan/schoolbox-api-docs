@@ -30,6 +30,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -105,8 +106,10 @@ class Module extends BaseModule
          * @throws \Aura\Di\Exception\ServiceNotFound
          */
         $preloadParticipant = function ($params) {
+            $student = $this->getUserDataSource()->findById($params['studentId']);
             return [
-                'participant' => $this->preloadParticipant($params['assessmentId'], $params['studentId']),
+                'assessment' => $this->preloadAssessableWithStudentParticipation($params['assessmentId'], $student),
+                'student'    => $student,
             ];
         };
 
@@ -132,10 +135,10 @@ class Module extends BaseModule
          * @throws MapperException\Deleted
          * @throws \Aura\Di\Exception\ServiceNotFound
          */
-        $preloadParticipantAndResponse = function ($params) {
-            return [
-                'participant' => $this->preloadParticipant($params['assessmentId'], $params['studentId']),
-                'response'    => $this->preloadResponse($params['assessmentId'], $params['responseId']),
+        $preloadParticipantAndResponse = function ($params) use ($preloadParticipant) {
+            $preloadedParticipant = $preloadParticipant($params);
+            return $preloadedParticipant + [
+                'response' => $this->preloadResponse($params['assessmentId'], $params['responseId']),
             ];
         };
 
@@ -218,25 +221,6 @@ class Module extends BaseModule
     }
 
     /**
-     * @param $assessmentId
-     * @param $studentId
-     *
-     * @return Participant
-     * @throws MapperException
-     * @throws MapperException\Deleted
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     */
-    protected function preloadParticipant($assessmentId, $studentId)
-    {
-        $assessment = $this->getAssessmentDataSource()->findById($assessmentId);
-        $student    = $this->getUserDataSource()->findById($studentId);
-
-        $assessment = $this->getParticipantDataSource()->loadParticipationIntoAssessment($assessment, false, $student);
-
-        return $assessment->getParticipant($student);
-    }
-
-    /**
      * @param int $assessmentId
      *
      * @return IAssessable
@@ -247,6 +231,21 @@ class Module extends BaseModule
     protected function preloadAssessable($assessmentId)
     {
         return $this->getAssessmentDataSource()->findById($assessmentId);
+    }
+
+    /**
+     * @param int  $assessmentId
+     * @param User $student
+     *
+     * @return IAssessable
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    protected function preloadAssessableWithStudentParticipation($assessmentId, User $student)
+    {
+        $assessable = $this->preloadAssessable($assessmentId);
+        return $this->getParticipantDataSource()->loadParticipationIntoAssessment($assessable, false, $student);
     }
 
     /**

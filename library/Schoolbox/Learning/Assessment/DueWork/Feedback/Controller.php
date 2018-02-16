@@ -15,6 +15,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessable;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
@@ -25,6 +26,7 @@ use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSourc
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Alaress_Date_Format;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfGradable;
@@ -96,10 +98,12 @@ class Controller extends Base
      *
      * @api   POST /learning/assessments/{assessmentId}/{studentId}/feedback
      * @level 165
-     * @param Participant $participant
+     * @param DueWork\Model $assessment
+     * @param User          $student
      */
-    public function postParticipantFeedback(Participant $participant)
+    public function postParticipantFeedback(DueWork\Model $assessment, User $student)
     {
+        $participant        = $assessment->getParticipant($student);
         $reviewRoute        = $this->determineReviewRoute($participant);
         $post               = $this->getRequest()->post->getArrayCopy();
         $isSelfAssessment   = $reviewRoute !== ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
@@ -113,7 +117,6 @@ class Controller extends Base
             // Try to process a rubric.
             // If there was none, copy it from the last feedback
             if (!$this->processRubric($participant, $post, $feedback)) {
-                $assessment = $participant->getAssessable();
                 if ($feedback instanceof DueWork\Feedback\Model
                     && $mostRecentFeedback instanceof DueWork\Feedback\Model
                     && $assessment instanceof DueWork\Model
@@ -206,14 +209,16 @@ class Controller extends Base
      * Create a Feedback that is associated with a particular Response
      *
      * @api POST /learning/assessments/{assessmentId}/{studentId}/{responseId}/feedback
-     * @param Participant            $participant
+     * @param DueWork\Model          $assessment
+     * @param User                   $student
      * @param DueWork\Response\Model $response
      * @throws \Alaress\Web\Controller\Exception
      *
      * @throws UnexpectedValueException If due work model is not sufficiently hydrated
      */
-    public function postResponseFeedback(Participant $participant, DueWork\Response\Model $response)
+    public function postResponseFeedback(DueWork\Model $assessment, User $student, DueWork\Response\Model $response)
     {
+        $participant        = $assessment->getParticipant($student);
         $reviewRoute        = $this->determineReviewRoute($participant);
         $post               = $this->getRequest()->post->getArrayCopy();
         $isSelfAssessment   = $reviewRoute !== ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
