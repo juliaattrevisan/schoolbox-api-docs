@@ -91,6 +91,9 @@ class Controller extends Base
     /**
      * Get the contents of a particular $response for the purposes of Self Reflection
      *
+     * @api   GET /learning/assessments/:assessmentId/:studentId/responses/self/:responseId
+     * @level 18.0
+     *
      * @param DueWork     $assessment
      * @param Participant $participant
      * @param Model       $response
