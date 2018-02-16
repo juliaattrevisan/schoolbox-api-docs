@@ -330,11 +330,15 @@
                 $(self).confirmDialog({
                     text: 'There is a student submission and/or teacher feedback attached to this item. Excluding the student will remove all access to the submission and/or feedback. Proceed?',
                     confirmEvent: function() {
-                        console.log("Firing the confirm event");
                         $participantCard.addClass('participant-excluded');
-                        // TODO these aren't being set, because (presumably) they are being treated as local to this function
                         status = '(excluded)';
                         statusValue = 'excluded';
+
+                        // Update the status showing for the student
+                        $participantRow
+                            .find('div[data-participant-status]')
+                            .attr('data-participant-status', statusValue)
+                            .text(status);
                     }
                 });
 
@@ -344,9 +348,6 @@
                 statusValue = 'excluded';
             }
         }
-
-        console.log("StatusValue after include/exclude conditional: " + statusValue);
-        console.log("Status after include/exclude conditional: " + status);
 
         // Update the status showing for the student
         $participantRow
