@@ -58,7 +58,7 @@
     {% set canPublish   = latestFeedback and not isPublished %}
 
     {% set pActionResponses  = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', routeArgs) %}
-    {% set fbUrl             = routeLookupIfAuthorized('learningDueWorkFeedback.postParticipantFeedback', { assessmentId: participant.assessable.id, studentId: participant.user.id, participant: participant }) %}
+    {% set fbUrl             = routeLookupIfAuthorized('learningDueWorkFeedback.postParticipantFeedback', routeArgs) %}
     {% set pActionSobo       = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', routeArgs) %}
     {% set pAckReceipt       = routeLookupIfAuthorized('learningAssessment.postStatusAcknowledge', routeArgs) %}
 

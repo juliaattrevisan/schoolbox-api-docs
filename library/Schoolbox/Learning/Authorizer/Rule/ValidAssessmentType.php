@@ -9,15 +9,12 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\Forbidden;
-use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Schoolbox\Learning\Assessment\AssessmentType;
-use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
 use InvalidArgumentException;
 use UnexpectedValueException;
 
-class ValidAssessmentType implements IAuthorizationRule
+class ValidAssessmentType extends AbstractAssessableRule
 {
 
     /** @var string[] */
@@ -45,31 +42,11 @@ class ValidAssessmentType implements IAuthorizationRule
      */
     public function authorize(array $params = [], User $user = null)
     {
-        $assessable     = $this->findAssessment($params);
+        $assessable     = $this->findAssessable($params);
         $assessmentType = AssessmentType::objectToString($assessable);
         if (\in_array($assessmentType, $this->validTypes, true)) {
             return true;
         }
         throw new Forbidden("Invalid assessment type. Found: {$assessmentType}");
-    }
-
-
-    /**
-     * @param array $params
-     * @return IAssessable
-     * @throws InvalidArgumentException If unable to locate an Assessment instance in $params
-     * @todo Move this method to an assessment rule abstract
-     */
-    private function findAssessment(array $params): IAssessable
-    {
-        if (isset($params['assessment']) && $params['assessment'] instanceof IAssessable) {
-            return $params['assessment'];
-        }
-        if (isset($params['participant']) && $params['participant'] instanceof Participant) {
-            /** @var Participant $participant */
-            $participant = $params['participant'];
-            return $participant->getAssessable();
-        }
-        throw new \InvalidArgumentException('Unable to locate an assessment instance in $params');
     }
 }

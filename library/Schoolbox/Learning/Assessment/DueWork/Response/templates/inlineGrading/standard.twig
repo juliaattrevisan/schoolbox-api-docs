@@ -138,7 +138,13 @@ Usage:
 {# Grading logic and structure #}
 <div class="row mark-scheme" id="assessment-status" data-participant>
     <fieldset class="small-12 island">
-        <form method="post" data-feedback-form action="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postResponseFeedback', {assessmentId: assessment.id, studentId: participant.user.id, responseId: response.id, participant: participant}) }}">
+        <form method="post" data-feedback-form action="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postResponseFeedback', {
+            assessmentId: assessment.id,
+            studentId:    participant.user.id,
+            responseId:   response.id,
+            assessment:   assessment,
+            student:      participant.user
+        }) }}">
             <section>
                 <input type="hidden" name="responseId" value="{{ response.id }}" />
 

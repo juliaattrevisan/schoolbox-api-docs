@@ -7,7 +7,8 @@
         studentId:    participant.user.id,
         responseId:   currentInteraction.id,
         response:     currentInteraction,
-        participant:  participant
+        assessment:   currentInteraction.assessable,
+        student:      participant.user
     }) %}
     {% if url %}
         {% set tooltip = 'View in Inline Grader' %}
@@ -21,7 +22,7 @@
             assessmentId: currentInteraction.assessable.id,
             studentId:    participant.user.id,
             assessment:   currentInteraction.assessable,
-            participant:  participant
+            student:      participant.user
         }) %}
         {% if url %}
             {% set tooltip = 'Resume Submission' %}

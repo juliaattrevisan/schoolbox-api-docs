@@ -237,7 +237,7 @@ class Module extends BaseModule
         }
 
         return [
-            'participant' => $participant,
+            'assessment'  => $assessment,
             'student'     => $participant->getUser() //IsParentOfStudent accesses this
         ];
     }

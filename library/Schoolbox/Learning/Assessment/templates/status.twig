@@ -88,7 +88,13 @@
             <ul class="information-list {{ listClass }}">
             {% for participant in assessment.allParticipants %}
 
-                {% set routeArgs = { viewee: participant.user, assessmentId: assessment.id, assessment: assessment, student: participant.user, studentId: participant.user.id, participant: participant } %}
+                {% set routeArgs = {
+                    viewee: participant.user,
+                    assessmentId: assessment.id,
+                    assessment: assessment,
+                    student: participant.user,
+                    studentId: participant.user.id
+                } %}
 
                 {% set pActionSummary   = routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) %}
                 {% set pActionResponses = '' %}

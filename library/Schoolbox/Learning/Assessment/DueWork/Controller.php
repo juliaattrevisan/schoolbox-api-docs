@@ -221,19 +221,16 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * Display appropriate landing page based on role
-     *
      * @api   GET /learning/assessments/:assessmentId/:userId
      * @level 165
      *
-     * @param Participant $participant
-     * @throws NotFound
+     * @param IAssessable|Model $assessment
+     * @param User        $student
+     * @throws ServiceNotFound
      */
-    public function getSummary(Participant $participant)
+    public function getSummary(IAssessable $assessment, User $student): void
     {
-        /** @var Model $assessment */
-        $assessment = $participant->getAssessable();
-        $student    = $participant->getUser();
+        $participant = $assessment->getParticipantIfExtant($student);
 
         if($assessment->getUseRubric()){
             $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
@@ -255,10 +252,12 @@ class Controller extends Assessment\Controller
          */
 
         /** @var SubmissionFile $submission */
-        $allResponses = $participant->getAllResponses();
+        $allResponses = $participant ? $participant->getAllResponses() : new Collection();
 
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
+            'assessment'  => $assessment,
+            'student'     => $student,
             'participant' => $participant,
             'timeline'    => $timeline,
 
@@ -271,7 +270,7 @@ class Controller extends Assessment\Controller
             'emptyRubricContext' => $rubricContext->generateBasic($assessment, $student),
             'feedbackRubricContexts' => $feedbackRubricContexts,
 
-            'authoritativeFeedback' => $participant->findAuthoritativeVisibleFeedback($this->getUser()),
+            'authoritativeFeedback' => $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null,
         ];
 
         $twigData['submissionsBlocked']    = false;
@@ -593,27 +592,26 @@ class Controller extends Assessment\Controller
         return $contents;
     }
 
+
     /**
      * Displays a form enabling a student to create Submission for a Due Work
      *
      * @api   GET /learning/assessment/:assessmentId/:participantId/submit
      * @level 165
-     * @param Participant $participant
+     * @param IAssessable|Model $assessment
+     * @param User              $student
      * @throws ServiceNotFound If unable to locate HTML web Output in DI
      */
-    public function getCreateResponseForm(Participant $participant)
+    public function getCreateResponseForm(IAssessable $assessment, User $student): void
     {
-        /** @var Model $assessment */
-        $assessment = $participant->getAssessable();
-        $student    = $participant->getUser();
+        $participant = $assessment->getParticipantIfExtant($student);
 
         /* Find all the records spawned by $participant
          *
          * Order them by submitted time to find the most recent, and use that
          */
 
-        /** @var SubmissionFile $submission */
-        $allResponses = $participant->getAllResponses();
+        $allResponses = $participant ? $participant->getAllResponses() : new Collection();
 
         /* Otherwise continue
          */
@@ -686,22 +684,21 @@ class Controller extends Assessment\Controller
      * Save a Response, on behalf of a User, for a particular Assessment
      *
      * @api POST /learning/assessments/:assessmentId/:studentId/submit
-     * @param Participant $participant
+     * @param IAssessable|Model $assessment
+     * @param User              $student
      * @return void
-     * @throws RouteNotFound If unable to generate a specified Route
-     * @throws \PDOException If unable to save the Response
-     * @throws ApplicationException\Exception If not accepting submissions
-     * @throws MapperException\Deleted If specified Response is deleted
      * @throws MapperException If unable to create new Response object
+     * @throws MapperException\Deleted If specified Response is deleted
+     * @throws RouteNotFound If unable to generate a specified Route
+     * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \LogicException If files are not saved prior to insertion into kami upload queue
+     * @throws \PDOException If unable to save the Response
+     * @throws \UnexpectedValueException
      */
-    public function postCreateResponse(Participant $participant): void
+    public function postCreateResponse(IAssessable $assessment, User $student): void
     {
         $rq = $this->getRequest();
         $rs = $this->getResponse();
-
-        /** @var Model $assessment */
-        $assessment = $participant->getAssessable();
 
         /* Set in javascript when automatically saving a draft
          * Careful the negation
@@ -716,7 +713,7 @@ class Controller extends Assessment\Controller
             // Create a new response
             $response = $this->dueWorkResponseMapper->createModel()
                 ->setSubmittedBy($this->getUser())
-                ->setSubmittedOnBehalfOf($participant->getUser())
+                ->setSubmittedOnBehalfOf($student)
                 ->setCreatedAt(Alaress_Date_Format::now())
                 ->setUpdatedAt(Alaress_Date_Format::now());
         }
@@ -757,7 +754,7 @@ class Controller extends Assessment\Controller
                             'learningAssessment.getCreateResponseForm',
                             [
                                 'assessmentId' => $assessment->getId(),
-                                'studentId'    => $participant->getUser()->getId(),
+                                'studentId'    => $student->getId(),
                             ]
                         )
                     );
@@ -786,7 +783,8 @@ class Controller extends Assessment\Controller
          * If this requires self-assessment, then this will always be a draft;
          * participant must finalise their response as part of self-review.
          */
-        $selfAssessable = (new ValidSelfAssessable())->isSatisfiedBy($this->getUser(), $participant);
+        $participant    = $assessment->getParticipantIfExtant($student);
+        $selfAssessable = $participant ? (new ValidSelfAssessable())->isSatisfiedBy($this->getUser(), $participant) : false;
 
         if ($isFinal) {
 
@@ -865,7 +863,7 @@ class Controller extends Assessment\Controller
                         'learningDueWorkResponse.getParticularResponseForSelfReflection',
                         [
                             'assessmentId' => $assessment->getId(),
-                            'studentId'    => $participant->getUser()->getId(),
+                            'studentId'    => $student->getId(),
                             'responseId'   => $response->getId()
                         ]
                     )
@@ -878,7 +876,7 @@ class Controller extends Assessment\Controller
                         'learningAssessment.getSummary',
                         [
                             'assessmentId' => $assessment->getId(),
-                            'studentId'    => $participant->getUser()->getId(),
+                            'studentId'    => $student->getId(),
                         ]
                     )
                 );
@@ -893,13 +891,14 @@ class Controller extends Assessment\Controller
      * Creates an empty SOBO. Needs a different route to postCreateResponse()
      * to cater for different auth rules.
      *
-     * @param Participant $participant
+     * @param IAssessable|Model $assessment
+     * @param User              $student
      * @api   POST /learning/assessments/:assessmentId/:studentId/received
      * @level 17.0
      */
-    public function postStatusAcknowledge(Participant $participant)
+    public function postStatusAcknowledge(IAssessable $assessment, User $student)
     {
-        $assessment = $participant->getAssessable();
+        $participant = $assessment->getParticipant($student);
         try {
             $response = $this->persistAcknowledgementResponse($participant, Alaress_Date_Format::now());
             $data = [
@@ -936,23 +935,25 @@ class Controller extends Assessment\Controller
      *
      * TODO merge common code w/ postPendingAcknowledge, postStatusAcknowledge
      *
-     * @param Participant $participant
+     * @param IAssessable|Model $assessment
+     * @param User              $student
+     * @throws RouteNotFound
+     * @throws \UnexpectedValueException
      * @api   POST /learning/assessments/:assessmentId/:studentId/ackDraft
      * @level 18.0
      */
-    public function postSelfAcknowledge(Participant $participant)
+    public function postSelfAcknowledge(IAssessable $assessment, User $student)
     {
-        $assessment = $participant->getAssessable();
+        $participant = $assessment->getParticipant($student);
         $selfReview = $assessment instanceof Model && $assessment->isSelfAssessable();
 
         // Route and arguments for location to redirect to once acknowledged.
         $route      = 'learningAssessment.getSummary';
         $params     = [
-            'participant'  => $participant,
             'assessment'   => $assessment,
             'assessmentId' => $assessment->getId(),
-            'student'      => $participant->getUser(),
-            'studentId'    => $participant->getUser()->getId(),
+            'student'      => $student,
+            'studentId'    => $student->getId(),
         ];
 
         try {
@@ -995,12 +996,14 @@ class Controller extends Assessment\Controller
      * Creates an empty SOBO. Needs a different route to postCreateResponse()
      * to cater for different auth rules.
      *
-     * @param Participant $participant
+     * @param IAssessable|Model $assessment
+     * @param User              $student
      * @api   POST /learning/assessments/:assessmentId/:studentId/ack
      * @level 17.0
      */
-    public function postPendingAcknowledge(Participant $participant)
+    public function postPendingAcknowledge(IAssessable $assessment, User $student)
     {
+        $participant = $assessment->getParticipant($student);
         try {
             $this->persistAcknowledgementResponse($participant, Alaress_Date_Format::now());
             $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learning/fragments/toMarkParticipant.twig', [

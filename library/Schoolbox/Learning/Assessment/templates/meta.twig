@@ -1,6 +1,5 @@
 {##
  # assessment   an IAssesssable instance
- # user         the currently-logged-in user
  # student      the student currently being viewed
  # icon         a css class representing the assessable
  #}
@@ -8,7 +7,7 @@
 <ul class="meta">
     {% include '@learning/fragments/meta/dueDate.twig' %}
     {% include '@learning/fragments/meta/workType.twig' %}
-    {% if student.id != user.id %}
+    {% if student.id != USER.id %}
     <li class="icon-staff-students">{{ student.fullname }}</li>
     {% endif %}
     {% if submissionsBlocked %}

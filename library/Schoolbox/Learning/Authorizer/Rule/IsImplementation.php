@@ -9,13 +9,11 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\InvalidPath;
-use Alaress\Authorizer\Rule\IAuthorizationRule;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
 use InvalidArgumentException;
 
-class IsImplementation implements IAuthorizationRule
+class IsImplementation extends AbstractAssessableRule
 {
 
     /**
@@ -26,12 +24,7 @@ class IsImplementation implements IAuthorizationRule
      */
     public function authorize(array $params = [], User $user = null)
     {
-        if (!isset($params['assessment']) && !isset($params['participant'])) {
-            throw new InvalidArgumentException('No assessment or participant preloaded');
-        }
-        /** @var IAssessable $assessment */
-        $assessment = $params['assessment'] ?: $params['participant']->getAssessable();
-        if ($assessment->getBaseContext() instanceof UnitSpecification\Model) {
+        if ($this->findAssessable($params)->getBaseContext() instanceof UnitSpecification\Model) {
             throw new InvalidPath('Assessment is a Specification');
         }
     }

@@ -1,10 +1,24 @@
+{#
+Data:
+    assessment            DueWork\Model
+    student               User
+    participant           null|Participant\Model
+    breadcrumbs
+    submissionsBlocked    false|string  A string message if blocked, false if not blocked
+    acknowlegementBlocked false|string  A string message if blocked, false if not blocked
+    authoritativeFeedback null|DueWork\Feedback\Model
+    emptyRubricContext
+    timeline
+#}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
-{% set selfAcknowledgeRoute = routeLookupIfAuthorized(
-    'learningAssessment.postSelfAcknowledge',
-    { assessmentId: participant.assessable.id, studentId: participant.user.id, assessment: participant.assessable, participant: participant }
-) %}
+{% set selfAcknowledgeRoute = routeLookupIfAuthorized('learningAssessment.postSelfAcknowledge', {
+    assessmentId: assessment.id,
+    assessment: assessment,
+    studentId: student.id,
+    student: student
+}) %}
 
 {% autoescape 'js' %}
 <script type="text/javascript">
@@ -50,11 +64,16 @@
 
 <div class="row actions-small-1">
     <div class="small-12 columns">
-        <h1>{{ participant.assessable.title }}</h1>
-        {% include '@learningAssessment/meta.twig' with {assessment: participant.assessable, submissionsBlocked: submissionsBlocked, student: participant.user, user: USER, icon: 'icon-due-work'} %}
+        <h1>{{ assessment.title }}</h1>
+        {% include '@learningAssessment/meta.twig' with {
+            assessment: assessment,
+            submissionsBlocked: submissionsBlocked,
+            student: student,
+            icon: 'icon-due-work'
+        } only %}
     </div>
-    {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: participant.assessable.id, assessment: participant.assessable}) %}
-    {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: participant.assessable.id, assessment: participant.assessable}) %}
+    {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
+    {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
     {% if viewRoute or modifyRoute %}
     <nav>
         <a href="#" class="icon-more" data-dropdown="header-options" title="Actions"></a>
@@ -72,7 +91,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        {% include '@learningAssessment/dueWork/summary/description.twig' with {assessment: participant.assessable, participant: participant} only %}
+        {% include '@learningAssessment/dueWork/summary/description.twig' with {assessment: assessment, participant: participant} only %}
     </div>
 </div>
 
@@ -91,11 +110,23 @@
 
 {# Submit button: goes underneath history if it's empty, above history if not #}
 {% if timeline is not empty %}
-    {% include '@learningAssessment/dueWork/summary/submitButton.twig' %}
+    {% include '@learningAssessment/dueWork/summary/submitButton.twig' with {
+        submissionsBlocked: submissionsBlocked,
+        acknowlegementBlocked: acknowlegementBlocked,
+        selfAcknowledgeRoute: selfAcknowledgeRoute,
+        assessment: assessment,
+        student: student
+    } only%}
 {% endif %}
 
 {% include '@learningAssessment/dueWork/history.twig' %}
 
 {% if timeline is empty %}
-    {% include '@learningAssessment/dueWork/summary/submitButton.twig' %}
+    {% include '@learningAssessment/dueWork/summary/submitButton.twig' with {
+        submissionsBlocked: submissionsBlocked,
+        acknowlegementBlocked: acknowlegementBlocked,
+        selfAcknowledgeRoute: selfAcknowledgeRoute,
+        assessment: assessment,
+        student: student
+    } only %}
 {% endif %}

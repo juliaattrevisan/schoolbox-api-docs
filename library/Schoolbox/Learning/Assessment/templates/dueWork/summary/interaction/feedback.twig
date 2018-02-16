@@ -8,6 +8,11 @@
  #
  # Floating Feedback
  # Go to Quickmark to resume
+Data:
+    currentFeedback  DueWork\Feedback\Model
+    responseId
+    participant
+    feedbackRubricContexts
  #}
 {% set url     = null %}
 {% set tooltip = null %}
@@ -19,7 +24,8 @@
                 studentId: currentFeedback.response.submittedOnBehalfOf.id,
                 responseId: responseId,
                 response: currentFeedback.response,
-                participant: participant
+                assessment: assessment,
+                student: student
             }) %}
             {% set tooltip = 'Resume ' ~ locale.selfAssessment.proper %}
         {% elseif currentFeedback.isSelfReflectionOnly %}
@@ -28,7 +34,8 @@
                 studentId: currentFeedback.response.submittedOnBehalfOf.id,
                 responseId: responseId,
                 response: currentFeedback.response,
-                participant: participant
+                assessment: assessment,
+                student: student
             }) %}
             {% set tooltip = 'Resume ' ~ locale.selfReflection.proper %}
         {% else %}
@@ -37,7 +44,8 @@
                 studentId: currentFeedback.response.submittedOnBehalfOf.id,
                 responseId: responseId,
                 response: currentFeedback.response,
-                participant: participant
+                assessment: assessment,
+                student: student
             }) %}
             {% set tooltip = 'Resume Inline ' ~ locale.grading.proper %}
         {% endif %}

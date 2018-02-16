@@ -8,11 +8,9 @@
 namespace Schoolbox\Learning\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\Unauthorized;
-use Alaress\Authorizer\Rule\IAuthorizationRule;
 use InvalidArgumentException;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LockedChecker;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
 
 /**
@@ -20,7 +18,7 @@ use Schoolbox\User;
  *
  * Does NOT short-circuit for SuperUsers - the module should combine Rules to achieve that effect if desired.
  */
-abstract class IsUnLocked implements IAuthorizationRule
+abstract class IsUnLocked extends AbstractAssessableRule
 {
     /** @var LockedChecker */
     private $lockedChecker;
@@ -45,9 +43,7 @@ abstract class IsUnLocked implements IAuthorizationRule
      */
     public function authorize(array $params = [], User $user = null)
     {
-        $assessment = $this->getAssessment($params);
-
-        if ($this->isLocked($assessment)) {
+        if ($this->isLocked($this->findAssessable($params))) {
             throw new Unauthorized();
         }
     }
@@ -59,31 +55,6 @@ abstract class IsUnLocked implements IAuthorizationRule
      */
     abstract protected function isLocked(IAssessable $assessment);
 
-    /**
-     * Find the assessment in the hydrated params
-     *
-     * @param array $params
-     * @return IAssessable
-     * @throws InvalidArgumentException If unable to locate an assessment object
-     */
-    private function getAssessment(array $params)
-    {
-        // Was an assessment injected?
-
-        if (isset($params['assessment']) && $params['assessment'] instanceof IAssessable) {
-            return $params['assessment'];
-        }
-
-        // Is a participant available?
-
-        if (isset($params['participant']) && $params['participant'] instanceof Participant) {
-            /** @var Participant $participant */
-            $participant = $params['participant'];
-            return $participant->getAssessable();
-        }
-
-        throw new InvalidArgumentException("Unable to locate an 'assessment' instance in params.");
-    }
 
     // Getters & Setters
 
