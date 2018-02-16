@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Rubric\Criteria;
 
 
+use function GuzzleHttp\is_host_in_noproxy;
 use Schoolbox\Assessment\Rubric\DescriptorList;
 
 class Criterion extends DescriptorList
@@ -30,11 +31,12 @@ class Criterion extends DescriptorList
         $total = 0;
 
         foreach ($this->descriptors as $descriptor) {
-            $total = max($total, $descriptor->getTotal());
+            if(!is_numeric($descriptor->getTotal())) {
+                $total = max($total, $descriptor->getTotal());
+            }
         }
 
         return $total;
-
     }
 
 

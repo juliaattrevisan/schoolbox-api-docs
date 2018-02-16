@@ -25,7 +25,9 @@ class Level extends DescriptorList
         $total = 0;
 
         foreach ($this->descriptors as $descriptor) {
-            $total += $descriptor->getTotal();
+            if(!is_numeric($descriptor->getTotal())) {
+                $total += $descriptor->getTotal();
+            }
         }
 
         return $total;
