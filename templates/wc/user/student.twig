@@ -1,6 +1,7 @@
 {% extends '@core/user/student.twig' %}
 
 {% block buttons %}
+    {{ parent() }}
     {% if showButtons %}
         <li><a href="/synergetic/mydetails?id={{user.getExternalId()}}" class="icon-info">Medical</a></li>
         <li><a href="/synergetic/absences?id={{user.getExternalId()}}" class="icon-user">Absences</a></li>
