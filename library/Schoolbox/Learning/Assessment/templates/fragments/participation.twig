@@ -68,7 +68,7 @@
                 <ul class="information-list card-selectable" id="participants">
                     {% for participant in assessment.allParticipants %}
                         {% set user = participant.user %}
-                        {% set hasInteraction = (participant.allResponses|length) > 0 and (participant.allFeedbacks|length) > 0 %}
+                        {% set hasInteraction = (participant.allResponses|length) > 0 or (participant.allFeedbacks|length) > 0 %}
                         {% set userInclude = (not participant.excludedAt) or participant.excludedAt.null %}
                         {% set userPlanName = userInclude ? (participant.plan.name ?: '(no customisations)') : '(excluded)' %}
                         {% set userStatus = userInclude ? (participant.plan.name ? 'custom' : 'included') : 'excluded' %}

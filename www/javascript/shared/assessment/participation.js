@@ -323,12 +323,15 @@
             status = '(no customisations)';
             statusValue = 'included';
         } else {
+            console.log("hello world");
+            console.log($participantCard.is("[data-has-interaction]"));
             // Neat solution from https://stackoverflow.com/a/4661989
             if ($participantCard.is("[data-has-interaction]")) {
 
-                $(self).confirmDialog({
-                    text: 'This student has interactions with this assessment. Excluding this student will hide their interactions throughout Schoolbox. Proceed?',
+                $(this).confirmDialog({
+                    text: 'There is a student submission and/or teacher feedback attached to this item. Excluding the student will remove all access to the submission and/or feedback. Proceed?',
                     confirmEvent: function() {
+                        console.log("Firing the confirm event");
                         $participantCard.addClass('participant-excluded');
                         // TODO these aren't being set
                         status = '(excluded)'; // TODO this isn't working
