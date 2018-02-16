@@ -189,7 +189,8 @@ class Module extends BaseModule
         }
 
         $participant = null;
-        $response = null;
+        $response    = null;
+        $student     = null;
 
         /* If a responseId was provided, load that particular response up
          */
@@ -202,6 +203,7 @@ class Module extends BaseModule
                     if ($r->getId() == $params['responseId']) {
                         $response    = $r;
                         $participant = $p;
+                        $student     = $p->getUser();
                         break 2;
                     }
                 }
@@ -224,9 +226,10 @@ class Module extends BaseModule
         }
 
         return [
-            'assessment' => $assessment,
+            'assessment'  => $assessment,
             'participant' => $participant,
-            'response' => $response,
+            'response'    => $response,
+            'student'     => $student,
         ];
     }
 
@@ -273,10 +276,11 @@ class Module extends BaseModule
         }
 
         return [
-            'assessment' => $assessment,
-            'response' => $response,
-            'plagscan' => $plagscanDocument->setHtml($html), /* restore cached HTML value */
-            'participant' => $participant
+            'assessment'  => $assessment,
+            'response'    => $response,
+            'plagscan'    => $plagscanDocument->setHtml($html), /* restore cached HTML value */
+            'participant' => $participant,
+            'student'     => $participant->getUser(),
         ];
     }
 

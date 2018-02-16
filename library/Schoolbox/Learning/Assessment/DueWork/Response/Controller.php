@@ -37,6 +37,7 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Learning\InlineGrader\Kami;
 use GuzzleHttp\Client;
+use Schoolbox\User;
 
 class Controller extends Base
 {
@@ -94,9 +95,9 @@ class Controller extends Base
      * @api   GET /learning/assessments/:assessmentId/:studentId/responses/self/:responseId
      * @level 18.0
      *
-     * @param DueWork     $assessment
-     * @param Participant $participant
-     * @param Model       $response
+     * @param DueWork $assessment
+     * @param User    $student
+     * @param Model   $response
      * @throws ApplicationException\Exception When trying to access a draft Response when you shouldn't
      * @throws ServiceNotFound If unable to locate HTML web Output
      * @throws \Aura\Router\Exception\RouteNotFound If cannot generate a requested route
@@ -107,10 +108,11 @@ class Controller extends Base
      */
     public function getParticularResponseForSelfReflection(
         DueWork $assessment,
-        Participant $participant,
+        User $student,
         Model $response
     ): void
     {
+        $participant = $assessment->getParticipant($student);
 
         /* Self-Assessment/Self Reflection: the response must be provided from the url param
          * Assume this is the one to load. To continue with his part of self-assessment workflow check the
