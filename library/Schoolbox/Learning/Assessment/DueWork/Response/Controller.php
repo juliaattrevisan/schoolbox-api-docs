@@ -213,9 +213,9 @@ class Controller extends Base
      *
      * I can't call it getResponse() lol wups
      *
-     * @param DueWork     $assessment
-     * @param Participant $participant
-     * @param Model       $response
+     * @param DueWork $assessment
+     * @param User    $student
+     * @param Model   $response
      * @throws ApplicationException\Exception When trying to access a draft Response when you shouldn't
      * @throws ServiceNotFound If unable to locate HTML web Output
      * @throws \Aura\Router\Exception\RouteNotFound If cannot generate a requested route
@@ -226,9 +226,11 @@ class Controller extends Base
      */
     public function getParticularResponse(
         DueWork $assessment,
-        Participant $participant,
+        User $student,
         Model $response = null
     ): void {
+
+        $participant = $assessment->getParticipant($student);
 
         /* Module doesn't have access to $this->getUser()
          *
@@ -486,10 +488,10 @@ class Controller extends Base
     /**
      * @api   DELETE /assessments/:assessmentId/response/:responseId
      * @level 165
-     * @param Participant $participant
+     * @param IAssessable $assessment
      * @param Model $response
      */
-    public function deleteParticularResponse(Participant $participant, Model $response)
+    public function deleteParticularResponse(IAssessable $assessment, Model $response)
     {
         $code = 204;
         $data = [];
