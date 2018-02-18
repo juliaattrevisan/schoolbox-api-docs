@@ -115,7 +115,7 @@ class Notifier extends AbstractModuleNotifier
         $bob      = new Builder();
 
         // Only do this for dynamic plans; all others have participants assigned manually
-        if ($plan->isDynamic()) {
+        if (!$plan->isDynamic()) {
             return $envelope;
         }
 
