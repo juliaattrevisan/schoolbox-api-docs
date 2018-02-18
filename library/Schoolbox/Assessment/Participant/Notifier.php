@@ -85,6 +85,7 @@ class Notifier extends AbstractModuleNotifier
         if ($assessment->getDueWork()) {
             // Proc due work notifs to this participant and parents
             // TODO figure out where the base due date's at
+            // TODO figure out how to retract any notif sent for a dynamic plan
             $bundle->attach(
                 self::TRIGGER_DUEWORK_OPEN,
                 ($participant->getPlan()->getOpenDate() ?? $assessment->getOpenDate())->getUnixTimeStamp()
