@@ -119,6 +119,11 @@ class Notifier extends AbstractModuleNotifier
         $envelope = new Envelope();
         $bob      = new Builder();
 
+        // Send nothing to excluded participants
+        if ($participant->isExcluded()) {
+            return $envelope;
+        }
+
         // Hopefully I don't have to hydrate this myself
         $assessment  = $participant->getPlan()->getAssessment();
         $folder      = $assessment->getAssessmentContext()->getFolder();
