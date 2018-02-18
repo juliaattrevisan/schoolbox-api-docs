@@ -14,6 +14,11 @@ class External_Pcschools_Class implements External_ClassInterface
     private $database;
 
     /**
+     * Students that have left the school are in this year
+     */
+    private const LEFT_YEAR = 99;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -32,17 +37,15 @@ class External_Pcschools_Class implements External_ClassInterface
      * synergy_id,
      * ClassCampus
      *
-     * @param $classCode
+     * @param string $classCodes
      *
      * @return array
      */
     public function getStudents($classCodes)
     {
-        $query = $this->getTimefileFilter($classCodes);
+        $codeQuery = $this->getTimefileFilter($classCodes);
 
-        return $this->getDatabase()->trimAll(
-            $this->getDatabase()->getAll("
-                SELECT DISTINCT
+        $query = "SELECT DISTINCT
                     st.LEGAL_SURNAME AS lastname,
                     st.GIVEN_NAME AS firstname,
                     st.CURRENT_YEAR AS yearlevel,
@@ -61,10 +64,10 @@ class External_Pcschools_Class implements External_ClassInterface
                 INNER JOIN SUBJECT s  ON tf.SUBJECT = s.NO
                 INNER JOIN STUDENT st ON su.STUDKEY = st.STUDKEY
                 WHERE 
-                    st.CURRENT_YEAR <> 99 AND
-                    {$query};
-            ")
-        );
+                    st.CURRENT_YEAR <> ".self::LEFT_YEAR." AND
+                    {$codeQuery};";
+
+        return $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
     }
 
     /**
@@ -113,9 +116,9 @@ class External_Pcschools_Class implements External_ClassInterface
                 $filter .= " AND tf.TIME_PERIOD = {$this->getDatabase()->smartQuote($timePeriod)}";
             }
 
-            $query[] = $filter;
+            $query[] = '('.$filter.')';
         }
-        $query = implode(' OR ', $query);
+        $query = '('.implode(' OR ', $query).')';
 
         return $query;
     }
