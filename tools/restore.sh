@@ -86,6 +86,8 @@ readsqlconfig() {
 	tempsqlwebsocketportssl=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='websocket_port_ssl'" 2>/dev/null`;
 	tempsqlexternaldbhost=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='external_db_host'" 2>/dev/null`;
 	tempsqlexternalportal=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='external_portal'" 2>/dev/null`;
+	tempsqlsamlprivate=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='saml_private_cert'" 2>/dev/null`;
+	tempsqlsamlpublic=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='saml_public_cert'" 2>/dev/null`;
 }
 
 setsqlconfig() {
@@ -99,6 +101,8 @@ setsqlconfig() {
 	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlwebsocketportssl' WHERE name='websocket_port_ssl'";
 	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlexternaldbhost' WHERE name='external_db_host'";
 	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlexternalportal' WHERE name='external_portal'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamlprivate' WHERE name='saml_private_cert'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamlpublic' WHERE name='saml_public_cert'";
 }
 
 tempconffile="$conffile";
