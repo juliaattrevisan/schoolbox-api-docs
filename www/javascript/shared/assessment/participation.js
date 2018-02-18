@@ -345,6 +345,7 @@
             }
         }
 
+
         updateStatus(status, statusValue, $participantRow);
 
         // Adjust the hidden value for include
@@ -354,9 +355,14 @@
         $participantRow.find('#participant-plan-' + studentID).val(0);
 
 
-
+        /**
+         * Update the UI and DOM with the new status for a participant
+         *
+         * @param {string}      status              Customisation status for the participant, displayed to the user
+         * @param {string}      statusValue         Customisation status for the participant, used as a data attribute
+         * @param {Object}      $participant        DOM element for the participant
+         */
         function updateStatus(status, statusValue, $participant) {
-            // Update the status showing for the student
             $participant
                 .find('div[data-participant-status]')
                 .attr('data-participant-status', statusValue)
