@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 
 use Aura\Di;
@@ -35,7 +36,7 @@ $kernel->run(function (Di\Container $di, $loop, $log, $opts) {
     // Generate a certificate signing request
     $csr = openssl_csr_new($dn, $privkey, $config);
 
-    // Generate a self-signed cert, valid for 365 days
+    // Generate a self-signed cert, valid for 3650 days (10 years)
     $x509 = openssl_csr_sign($csr, null, $privkey, $days=3650, array('digest_alg' => 'sha256'));
 
     // Save your private key, CSR and self-signed cert for later use
