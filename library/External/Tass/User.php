@@ -66,7 +66,7 @@ class External_Tass_User implements External_UserInterface
         $emailList = array();
         $db = $this->getDatabase();
         $idList    = implode(',', array_map(array($db, 'smartQuote'), $synergyIds));
-        
+
         if (empty($idList)) {
             return array();
         }
@@ -167,7 +167,7 @@ class External_Tass_User implements External_UserInterface
         FROM student AS s
         LEFT JOIN house AS h ON s.house=h.hse_code AND s.cmpy_code=h.cmpy_code
         -- LEFT JOIN parent AS p ON s.par_code=p.par_code AND s.cmpy_code=p.cmpy_code
-        LEFT JOIN teacher AS t ON s.pctut_grp=t.pctut_grp AND s.cmpy_code=t.cmpy_code
+        LEFT JOIN teacher AS t ON s.pctut_grp=t.pctut_grp AND t.curr_flg = 'Y' AND s.cmpy_code=t.cmpy_code
         WHERE stud_code = '$tassID'
         ";
         $student = $this->getDatabase()->trimRow($this->getDatabase()->getRow($query));
@@ -407,7 +407,7 @@ class External_Tass_User implements External_UserInterface
                     FROM studcommrules as scr
                     WHERE cmpy_code = {$companyCode}
                     AND par_code = {$this->getDatabase()->smartQuote($parentCode)}
-                    AND add_num IN({$addnum}) 
+                    AND add_num IN({$addnum})
                 ";
 
                 if (!empty($typecode)) {
@@ -612,7 +612,7 @@ class External_Tass_User implements External_UserInterface
 
         // pia_sfaccess: only join the relevant paraddress
         // no pia_sfaccess: get all paraddress
-        
+
         $database = $this->getDatabase();
         $query = "
             SELECT
