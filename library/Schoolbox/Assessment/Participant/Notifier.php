@@ -44,13 +44,13 @@ class Notifier extends AbstractModuleNotifier
     private const TRIGGER_QUIZ_UPDATED  = 'quizUpdated';
 
     /**
-     * Irrelevant as this could notify about different things
+     * Irrelevant as this could notify about different things, but must exist.
      *
-     * @return string|void
+     * @return string
      */
-    protected function getSlug()
+    protected function getSlug(): string
     {
-        return '';
+        return NSMapper::NS_DUEWORK;
     }
 
     /**

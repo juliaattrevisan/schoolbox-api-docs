@@ -30,18 +30,19 @@ class Notifier extends AbstractModuleNotifier
 {
     private const TRIGGER_DUEWORK_OPEN = 'dueworkOpen';
 
-
     /**
      * @var UserAccessMapper
      */
     private $userAccessMapper;
 
     /**
-     * @return string|void
+     * Irrelevant as this could notify about different things, but must exist.
+     *
+     * @return string
      */
-    protected function getSlug()
+    protected function getSlug(): string
     {
-        return '';
+        return NSMapper::NS_DUEWORK;
     }
 
     /**
