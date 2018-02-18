@@ -65,8 +65,12 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
                 $j = 0;
                 foreach ($fileList as $file) {
                     if (!$file->getOwner() instanceof \Schoolbox\User) {
-                        $link = "Unknown User";
-                    } else {
+                        $link = 'Unknown User';
+                    }
+                    else if($file->getOwner()->isDeleted()) {
+                        $link = $file->getOwner()->formatName();
+                    }
+                    else {
                         $link = "<a href='/search/user/{$file->getOwner()->getId()}'>{$file->getOwner()->formatName()}</a>";
                     }
 
