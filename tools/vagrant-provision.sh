@@ -161,14 +161,7 @@ rm -rf /vagrant/data/cache;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Setting up browscap cache";
 mkdir -p /vagrant/tools/browscap;
-find /vagrant/tools/browscap/cache.php -mtime +7 -type f -exec rm -vf {} \;
-if [ ! -f /vagrant/tools/browscap/cache.php ];
-then
-    php tools/ci/build-browscap-cache.php >/dev/null 2>&1;
-    mv -f cache.php /vagrant/tools/browscap/cache.php;
-    rm -f /vagrant/tools/browscap/browscap.ini;
-    touch /vagrant/tools/browscap/browscap.ini;
-fi
+/vagrant/vendor/browscap/browscap-php/bin/browscap-php browscap:update --cache=/vagrant/tools/browscap/ --remote-file=Lite_PHP_BrowscapINI
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Loading Schoolbox MySQL Demo data";
 mysql --defaults-extra-file=/root/.my.cnf -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';";

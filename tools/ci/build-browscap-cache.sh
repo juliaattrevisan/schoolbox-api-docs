@@ -12,7 +12,7 @@ echo "operating in dir: `pwd`";
 branch='master';
 if [ ! -z $1 ];
 then
-        branch="$1";
+	branch="$1";
 fi
 
 echo "Branch: $branch";
@@ -29,25 +29,18 @@ then
 fi
 
 echo "Building PHP Browscap Cache file";
-php tools/ci/build-browscap-cache.php;
+vendor/browscap/browscap-php/bin/browscap-php browscap:update --cache=$instdir/tools/browscap/ --remote-file=Lite_PHP_BrowscapINI
 if [ $? -ne 0 ];
 then
 	echo "Build encountered an error";
 	exit 1;
 fi
 
-if [ ! -f 'cache.php' ];
-then
-	echo "cache.php not found";
-	exit 1;
-fi
-
 echo "Creating artifact directory";
 mkdir -vp $initialdir/browscap-artifacts;
 
-echo "Copying artifact";
-gzip cache.php;
-cp -vf cache.php.gz $initialdir/browscap-artifacts/"$branch"-cache.php.gz;
+echo "Archiving Cache Directory"
+tar czvf $initialdir/browscap-artifacts/"$branch"-cache.tar.gz tools/browscap;
 
 echo "Artifact List: `readlink -f $initialdir/browscap-artifacts/`";
 ls -lhR $initialdir/browscap-artifacts/;
