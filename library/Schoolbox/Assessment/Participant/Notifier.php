@@ -28,20 +28,20 @@ use Schoolbox\User;
 class Notifier extends AbstractModuleNotifier
 {
     private const TRIGGER_DUEWORK_OPEN        = 'dueWorkOpen';
-    private const TRIGGER_DUEWORK_UPDATED     = 'dueWorkUpdated';
-    private const TRIGGER_DUEWORK_UPCOMING    = 'dueWorkUpcoming';
-    private const TRIGGER_DUEWORK_OVERDUE     = 'dueWorkOverdue';
-    private const TRIGGER_DUEWORK_CLOSED      = 'dueWorkClosed';
-    private const TRIGGER_DUEWORK_DATECHANGED = 'dueWorkDatechanged';
-    private const TRIGGER_DUEWORK_RENAMED     = 'dueWorkRenamed';
-
-    private const DUEWORK_UPCOMING_WINDOW = 2;
-
-    private const TRIGGER_QUIZ_CLOSED   = 'quizClosed';
-    private const TRIGGER_QUIZ_OPEN     = 'quizOpen';
-    private const TRIGGER_QUIZ_OVERDUE  = 'quizOverdue';
-    private const TRIGGER_QUIZ_UPCOMING = 'quizUpcoming';
-    private const TRIGGER_QUIZ_UPDATED  = 'quizUpdated';
+//    private const TRIGGER_DUEWORK_UPDATED     = 'dueWorkUpdated';
+//    private const TRIGGER_DUEWORK_UPCOMING    = 'dueWorkUpcoming';
+//    private const TRIGGER_DUEWORK_OVERDUE     = 'dueWorkOverdue';
+//    private const TRIGGER_DUEWORK_CLOSED      = 'dueWorkClosed';
+//    private const TRIGGER_DUEWORK_DATECHANGED = 'dueWorkDatechanged';
+//    private const TRIGGER_DUEWORK_RENAMED     = 'dueWorkRenamed';
+//
+//    private const DUEWORK_UPCOMING_WINDOW = 2;
+//
+//    private const TRIGGER_QUIZ_CLOSED   = 'quizClosed';
+//    private const TRIGGER_QUIZ_OPEN     = 'quizOpen';
+//    private const TRIGGER_QUIZ_OVERDUE  = 'quizOverdue';
+//    private const TRIGGER_QUIZ_UPCOMING = 'quizUpcoming';
+//    private const TRIGGER_QUIZ_UPDATED  = 'quizUpdated';
 
     /**
      * Irrelevant as this could notify about different things, but must exist.
@@ -62,6 +62,24 @@ class Notifier extends AbstractModuleNotifier
     {
         // Dunno what dependencies this has yet
         parent::loadDependencies();
+    }
+
+    /**
+     * Copypasted from pastoral comment notifier.
+     *
+     * I prefer this way anyway, it divorces notifiers from role type.
+     *
+     * TODO try to remove this and play within rules of the standard callback system
+     *
+     * @param string $label
+     *
+     * @return array
+     */
+    public function retrieveCallbacks($label): array
+    {
+        return [
+            [$this, "notify" . ucfirst($label)],
+        ];
     }
 
     /**
@@ -114,7 +132,7 @@ class Notifier extends AbstractModuleNotifier
      * @throws \InvalidArgumentException If a required property was not set
      * @return Envelope
      */
-    public function notifyStudentDueWorkOpen(Model $participant, User $effector): Envelope
+    public function notifyDueWorkOpen(Model $participant, User $effector): Envelope
     {
         $envelope = new Envelope();
         $bob      = new Builder();

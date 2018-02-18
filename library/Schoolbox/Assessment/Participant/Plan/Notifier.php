@@ -60,6 +60,24 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
+     * Copypasted from pastoral comment notifier.
+     *
+     * I prefer this way anyway, it divorces notifiers from role type.
+     *
+     * TODO try to remove this and play within rules of the standard callback system
+     *
+     * @param string $label
+     *
+     * @return array
+     */
+    public function retrieveCallbacks($label): array
+    {
+        return [
+            [$this, "notify" . ucfirst($label)],
+        ];
+    }
+
+    /**
      * If created, raise a notification. No conditions, no other functions. That's it.
      *
      * @param TriggerBundle $bundle
@@ -109,7 +127,7 @@ class Notifier extends AbstractModuleNotifier
      * @throws \InvalidArgumentException If a required property was not set
      * @return Envelope
      */
-    public function notifyStudentDueWorkOpen(Model $plan, User $effector): Envelope
+    public function notifyDueWorkOpen(Model $plan, User $effector): Envelope
     {
         $envelope = new Envelope();
         $bob      = new Builder();
