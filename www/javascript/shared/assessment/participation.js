@@ -334,7 +334,7 @@
                         status = '(excluded)';
                         statusValue = 'excluded';
 
-                        updateStatus(status, statusValue);
+                        updateStatus(status, statusValue, $participantRow);
                     }
                 });
 
@@ -345,7 +345,7 @@
             }
         }
 
-        updateStatus(status, statusValue);
+        updateStatus(status, statusValue, $participantRow);
 
         // Adjust the hidden value for include
         $('#participant-include-' + studentID).val(include ? 1 : 0);
@@ -355,9 +355,9 @@
 
 
 
-        function updateStatus(status, statusValue) {
+        function updateStatus(status, statusValue, $participant) {
             // Update the status showing for the student
-            $participantRow
+            $participant
                 .find('div[data-participant-status]')
                 .attr('data-participant-status', statusValue)
                 .text(status);
