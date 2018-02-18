@@ -63,11 +63,11 @@ class Controller extends Component_Dashboard_ControllerAbstract
             /** @var Session $session */
             $session  = $this->getSitePage()->getDi()->get('session');
             $children = $session->get('children') ?: [];
-            $childIds = [];
+            $userIds = [$this->getUser()->getId()];
             foreach ($children as $child) {
-                $childIds[] = $child['id'];
+                $userIds[] = $child['id'];
             }
-            $matches = $matches->mergeUnique($this->getDelegate()->getMatchesForUsers($childIds, $getHistorical),'id');
+            $matches = $matches->mergeUnique($this->getDelegate()->getMatchesForUsers($userIds, $getHistorical),'id');
         } else {
             $matches = $this->getDelegate()->getMatchesForUsers([$this->getUser()->getId()], $getHistorical);
         }
