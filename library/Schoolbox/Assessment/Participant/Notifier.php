@@ -11,7 +11,6 @@ namespace Schoolbox\Assessment\Participant;
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
-use function GuzzleHttp\Psr7\build_query;
 use Monolog\Logger;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -146,7 +145,7 @@ class Notifier extends AbstractModuleNotifier
                 'cat'  => new CategoryParam($folder),
                 'box'  => new Param($boxName, $this->buildParticipantRoute($assessment, $participant->getUser()))
             ])
-            ->setIcon("/portrait?" . build_query(['userId' => $effector->getExternalId(), 'size' => $this->iconSize,]))
+            ->setIcon("/portrait?" . http_build_query(['userId' => $effector->getExternalId(), 'size' => $this->iconSize,]))
             ->setNamespace(NSMapper::NS_DUEWORK)
             ->addTopic("duework.{$box->getId()}.open")
             ->addFilter('roletype', [Role::STUDENT])
