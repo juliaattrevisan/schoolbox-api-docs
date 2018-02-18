@@ -9,6 +9,7 @@
 
 class External_Synergetic_Class implements External_ClassInterface
 {
+
     use External_Synergetic_ClearInvalidValuesTrait;
 
     /**
@@ -34,20 +35,22 @@ class External_Synergetic_Class implements External_ClassInterface
      * Gets the class code part of a query.
      *
      * @param  string $subCode
+     *
      * @return string
      */
     protected function getClassCodeQuery($subCode)
     {
-        $classQuery = '(';
+        $classQuery   = '(';
         $subCodeArray = explode(',', $subCode);
         foreach ($subCodeArray as $code) {
             if (strpos($code, '/') !== false) {
-                $codeArray = explode('/', $code, 2);
+                $codeArray  = explode('/', $code, 2);
                 $classQuery .= "( ClassCode = '{$this->database->quote($codeArray[1])}' AND ClassCampus = '{$this->database->quote($codeArray[0])}' ) OR ";
             } else {
                 $classQuery .= "ClassCode = '{$this->database->quote($code)}' OR ";
             }
         }
+
         return substr($classQuery, 0, -3) . ')';
     }
 
@@ -55,8 +58,9 @@ class External_Synergetic_Class implements External_ClassInterface
      * Returns the details of a class based on its code
      * This function is Synergetic only, not included in the interface and used for attendances
      *
-     * @param string $classCode
+     * @param string          $classCode
      * @param \Schoolbox\User $user
+     *
      * @return mixed
      */
     public function getClass($classCode, \Schoolbox\User $user)
@@ -64,7 +68,7 @@ class External_Synergetic_Class implements External_ClassInterface
         $classQuery   = $this->getClassCodeQuery($classCode);
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($user->getExternalId()));
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($user->getExternalId()));
-        $query = "
+        $query        = "
             SELECT *
             FROM dbo.SubjectClasses
             WHERE $classQuery
@@ -85,24 +89,26 @@ class External_Synergetic_Class implements External_ClassInterface
             return false;
         }
 
-        $classQuery   = $this->getClassCodeQuery($subCode);
+        $classQuery = $this->getClassCodeQuery($subCode);
 
         // TODO: Inject $_SESSION['user'], short term to get this working without arch changes
         /** @var Schoolbox\User $sessionUser */
-        $sessionUser = isset($_SESSION['user']) ? $_SESSION['user'] : null;
+        $sessionUser    = isset($_SESSION['user']) ? $_SESSION['user'] : null;
         $userExternalId = $sessionUser instanceof \Schoolbox\User ? $sessionUser->getExternalId() : null;
-        $fileSemester = $this->getDatabase()->quote($this->getExternalUser()->getCurrentSemester($userExternalId));
-        $fileYear = $this->getDatabase()->quote($this->getExternalUser()->getCurrentYear($userExternalId));
+        $fileSemester   = $this->getDatabase()->quote($this->getExternalUser()->getCurrentSemester($userExternalId));
+        $fileYear       = $this->getDatabase()->quote($this->getExternalUser()->getCurrentYear($userExternalId));
 
         $query = "
-        SELECT DISTINCT StudentClasses.StudentSurname as lastname, StudentClasses.StudentPreferred as firstname,
+        SELECT DISTINCT StudentClasses.StudentSurname as lastname, 
+                        StudentClasses.StudentPreferred as firstname,
                         StudentClasses.StudentYearLevelDescription as yearlevel,
                         StudentClasses.StudentHouseDescription as house,
                         vStudents.StudentMedicalAlert, 
                         vStudents.StudentSpecialNeedsFlag,
                         vStudents.StudentTutorDescription,
-                        StudentClasses.StudentID as synergy_id, StudentClasses.ClassCampus
-        FROM    dbo.vStudentClasses StudentClasses
+                        StudentClasses.StudentID as synergy_id,
+                        StudentClasses.ClassCampus
+        FROM            dbo.vStudentClasses StudentClasses
         JOIN dbo.vStudents vStudents ON (
             vStudents.FileYear = StudentClasses.FileYear AND
             vStudents.FileSemester = StudentClasses.FileSemester AND
@@ -124,15 +130,15 @@ class External_Synergetic_Class implements External_ClassInterface
      */
     public function getTeacherName($subCode)
     {
-        $teachers = array();
-        $classQuery   = $this->getClassCodeQuery($subCode);
+        $teachers   = [];
+        $classQuery = $this->getClassCodeQuery($subCode);
 
         // TODO: Inject $_SESSION['user'], short term to get this working without arch changes
         /** @var Schoolbox\User $sessionUser */
-        $sessionUser = isset($_SESSION['user']) ? $_SESSION['user'] : null;
+        $sessionUser    = isset($_SESSION['user']) ? $_SESSION['user'] : null;
         $userExternalId = $sessionUser instanceof \Schoolbox\User ? $sessionUser->getExternalId() : null;
-        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($userExternalId));
-        $fileYear = $this->database->quote($this->externalUser->getCurrentYear($userExternalId));
+        $fileSemester   = $this->database->quote($this->externalUser->getCurrentSemester($userExternalId));
+        $fileYear       = $this->database->quote($this->externalUser->getCurrentYear($userExternalId));
 
         $msQuery = "SELECT DISTINCT StaffID, StaffSeq FROM vSubjectClassesStaff
                     WHERE $classQuery
@@ -163,6 +169,7 @@ class External_Synergetic_Class implements External_ClassInterface
             FROM dbo.luFileType
             WHERE Code != ''
         ";
+
         return $this->getDatabase()->getAll($query);
     }
 
@@ -177,11 +184,11 @@ class External_Synergetic_Class implements External_ClassInterface
     public function findSubjectsWithFiletype($filetype, $timetableCode)
     {
         $database = $this->getDatabase();
-        $params   = array(
+        $params   = [
             ':type'     => "'" . $database->quote($filetype) . "'",
             ':year'     => "'" . $database->quote($this->externalUser->getCurrentYear()) . "'",
             ':semester' => "'" . $database->quote($this->externalUser->getCurrentSemester()) . "'",
-        );
+        ];
         if (empty($timetableCode)) {
             $query = "
                 SELECT ClassCode
@@ -215,6 +222,7 @@ class External_Synergetic_Class implements External_ClassInterface
             );
         }
         $query = strtr($query, $params);
+
         return $this->getDatabase()->getAll($query);
     }
 
