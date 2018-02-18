@@ -121,8 +121,8 @@ class Controller extends Base
                     && $feedback->getId() != $mostRecentFeedback->getId()
                 ) {
                     $this->rubricMapper->copySelections($mostRecentFeedback->getId(), $feedback->getId());
-                } else {
-                    //We have deselected a rubric, and want to save empty
+                } else if ($post['inlineGrader']) {
+                    //We are at the inline grader and we have deselected a rubric - save empty
                     $this->rubricMapper->saveForFeedback([], $feedback->getId());
                 }
             }

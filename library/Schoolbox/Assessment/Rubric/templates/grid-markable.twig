@@ -47,6 +47,8 @@
 
         <th class="rb-criterion-name">{{ crit.name }}</th>
 
+        <input name="inlineGrader" value="true" class="hide"/>
+
             {% for levelIndex, level in rubric.levels %}
 
                 {% set descriptor = rubric.descriptors[crit.id][levelIndex] %}
