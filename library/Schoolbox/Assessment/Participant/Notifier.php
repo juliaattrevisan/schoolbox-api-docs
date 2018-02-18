@@ -114,7 +114,7 @@ class Notifier extends AbstractModuleNotifier
      * @throws \InvalidArgumentException If a required property was not set
      * @return Envelope
      */
-    public function notifyStudentOpen(Model $participant, User $effector)
+    public function notifyStudentOpen(Model $participant, User $effector): Envelope
     {
         $envelope = new Envelope();
         $bob      = new Builder();
