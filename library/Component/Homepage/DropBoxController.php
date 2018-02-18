@@ -80,7 +80,6 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
                         'DROPBOX_ID'          => $file->getId(),
                         'DROP_SUBMITTED_BY'   => $link,
                         'DROP_SUBMITTED_TIME' => $file->getCreatedAt()->getShort(),
-                        'ON_OFF'              => ++$j % 2 ? '' : 'dark',
                     ];
                     $this->setVar($output);
                     $this->parse("drop_file_block", "drop_file", true);
