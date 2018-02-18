@@ -60,7 +60,9 @@ class External_Pcschools_Class implements External_ClassInterface
                     AND tf.TIME_PERIOD = su.PERIOD_ID
                 INNER JOIN SUBJECT s  ON tf.SUBJECT = s.NO
                 INNER JOIN STUDENT st ON su.STUDKEY = st.STUDKEY
-                WHERE $query;
+                WHERE 
+                    st.CURRENT_YEAR <> 99 AND
+                    {$query};
             ")
         );
     }
