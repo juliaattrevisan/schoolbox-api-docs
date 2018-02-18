@@ -53,27 +53,17 @@ then
         exit 1;
 fi
 
-if [ ! -f ../browscap-cache/"$branch"-browscap-cache.php.gz ];
+if [ ! -f ../browscap-cache/"$branch"-browscap-cache.tar.gz ];
 then
 	echo "Unable to locate browscap cache artifact: ../browscap-cache/"$branch"-browscap-cache.php.gz";
 	exit 1;
 fi
 
-echo "Unpacking browscap cache file";
-gzip -d ../browscap-cache/"$branch"-browscap-cache.php.gz;
+echo "Unpacking browscap cache";
+tar xzf ../browscap-cache/"$branch"-browscap-cache.tar.gz;
 if [ $? -ne 0 ];
 then
-	echo "Unable to extract browscap cache file";
-	exit 1;
-fi
-
-echo "Configuring browscap cache";
-mkdir -vp tools/browscap;
-touch tools/browscap/browscap.ini;
-cp -vf ../browscap-cache/"$branch"-browscap-cache.php tools/browscap/cache.php;
-if [ $? -ne 0 ];
-then
-	echo "Unable to copy browscap cache file";
+	echo "Unable to extract browscap cache";
 	exit 1;
 fi
 
