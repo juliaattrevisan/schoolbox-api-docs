@@ -28,7 +28,7 @@ use Schoolbox\User;
  */
 class Notifier extends AbstractModuleNotifier
 {
-    private const TRIGGER_DUEWORK_OPEN = 'dueworkOpen';
+    private const TRIGGER_DUEWORK_OPEN = 'dueWorkOpen';
 
     /**
      * @var UserAccessMapper
@@ -109,7 +109,7 @@ class Notifier extends AbstractModuleNotifier
      * @throws \InvalidArgumentException If a required property was not set
      * @return Envelope
      */
-    public function notifyStudentOpen(Model $plan, User $effector): Envelope
+    public function notifyStudentDueWorkOpen(Model $plan, User $effector): Envelope
     {
         $envelope = new Envelope();
         $bob      = new Builder();

@@ -27,13 +27,13 @@ use Schoolbox\User;
  */
 class Notifier extends AbstractModuleNotifier
 {
-    private const TRIGGER_DUEWORK_OPEN        = 'dueworkOpen';
-    private const TRIGGER_DUEWORK_UPDATED     = 'dueworkUpdated';
-    private const TRIGGER_DUEWORK_UPCOMING    = 'dueworkUpcoming';
-    private const TRIGGER_DUEWORK_OVERDUE     = 'dueworkOverdue';
-    private const TRIGGER_DUEWORK_CLOSED      = 'dueworkClosed';
-    private const TRIGGER_DUEWORK_DATECHANGED = 'dueworkDatechanged';
-    private const TRIGGER_DUEWORK_RENAMED     = 'dueworkRenamed';
+    private const TRIGGER_DUEWORK_OPEN        = 'dueWorkOpen';
+    private const TRIGGER_DUEWORK_UPDATED     = 'dueWorkUpdated';
+    private const TRIGGER_DUEWORK_UPCOMING    = 'dueWorkUpcoming';
+    private const TRIGGER_DUEWORK_OVERDUE     = 'dueWorkOverdue';
+    private const TRIGGER_DUEWORK_CLOSED      = 'dueWorkClosed';
+    private const TRIGGER_DUEWORK_DATECHANGED = 'dueWorkDatechanged';
+    private const TRIGGER_DUEWORK_RENAMED     = 'dueWorkRenamed';
 
     private const DUEWORK_UPCOMING_WINDOW = 2;
 
@@ -114,7 +114,7 @@ class Notifier extends AbstractModuleNotifier
      * @throws \InvalidArgumentException If a required property was not set
      * @return Envelope
      */
-    public function notifyStudentOpen(Model $participant, User $effector): Envelope
+    public function notifyStudentDueWorkOpen(Model $participant, User $effector): Envelope
     {
         $envelope = new Envelope();
         $bob      = new Builder();
