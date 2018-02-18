@@ -319,6 +319,14 @@
         var $participantRow = $(defaults.participants).find('li[data-participant=' + studentID + ']');
         var $participantCard = $participantRow.find('div.card');
 
+        var studentsWithInteractions = getParticipantsWithInteractions();
+        
+        var dialogText = 'The following student(s) have submissions and/or feedback for this assessment.<ul>';
+        $(studentsWithInteractions).each(function() {
+            dialogText += $(this);
+        })
+        dialogText += "</ul>Exclusion from this assessment will remove access to these submissions and/or feedback.";
+
         if (include) {
             $participantCard.removeClass('participant-excluded');
             status = '(no customisations)';
@@ -328,7 +336,8 @@
             if ($participantCard.is("[data-has-interaction]")) {
 
                 $(self).confirmDialog({
-                    text: 'There is a student submission and/or teacher feedback attached to this item. Excluding the student will remove all access to the submission and/or feedback. Proceed?',
+                    text: dialogText,
+                    format: 'html',
                     confirmEvent: function() {
                         $participantCard.addClass('participant-excluded');
                         status = '(excluded)';
@@ -368,6 +377,20 @@
                 .attr('data-participant-status', statusValue)
                 .text(status);
         }
+    }
+
+    function getParticipantsWithInteractions() {
+        var studentsWithInteractions = [];
+        var participants = $(defaults.participants).find("li");
+
+        $(participants).each(function() {
+            var $participantCard = $(this).find('div.card');
+            if ($participantCard.is("[data-has-interaction]")) {
+                studentsWithInteractions.push($participantCard);
+            }
+        });
+
+        return studentsWithInteractions;
     }
 
 
