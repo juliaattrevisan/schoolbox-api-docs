@@ -11,7 +11,12 @@
 								<img src="/portrait.php?userId={USER_SEARCH_SYNERGY_ID}&size=square64" />
 								<h3>{USER_SEARCH_NAME}</h3>
 							</a>
+							<!-- BEGIN position_title -->
+							<p class="meta">{USER_POSITION_TITLE}</p>
+							<!-- END position_title -->
+							<!-- BEGIN normal_title -->
 							<p class="meta">{USER_SEARCH_YEAR} {USER_SEARCH_CAMPUS} {USER_SEARCH_GROUP}</p>
+							<!-- END normal_title -->
 						</div>
 					</div>
 					<nav>
@@ -19,8 +24,18 @@
 					</nav>
 					<!-- Dropdown -->
 					<ul class="f-dropdown" data-dropdown-content="" id="overflowUser-{CURRENT_TAB}-{USER_SEARCH_ID}">
+
 						<!-- BEGIN modify -->
-						<li><a href="/adminv2/user/{USER_SEARCH_ID}/modify" class="icon-modify" title="Modify User">Modify</a></li>
+							<li><a href="/adminv2/user/{USER_SEARCH_ID}/modify" class="icon-modify" title="Modify User">Modify</a></li>
+
+							<!-- BEGIN modify_enabled -->
+								<li><a href="/user/switch/{USER_SEARCH_ID}" class="icon-staff-students" title="Log in as user">Impersonate</a></li>
+							<!-- END modify_enabled -->
+
+							<!-- BEGIN modify_disabled -->
+							<li><a class="icon-staff-students menu_disabled" title="Account disabled">Impersonate</a></li>
+							<!-- END modify_disabled -->
+
 						<!-- END modify -->
 
 						<!-- BEGIN boarder_leave -->
@@ -30,6 +45,10 @@
 						<!-- BEGIN timetable -->
 						<li><a href="/timetable/{USER_SEARCH_ID}" class="icon-timetable">Timetable</a></li>
 						<!-- END timetable -->
+
+						<!-- BEGIN pastoral -->
+						<li><a href="/pastoral/student/{USER_SEARCH_ID}" class="icon-pastoral">{TPL_LOCAL_PASTORALCARE_PC}</a></li>
+						<!-- END pastoral -->
 
 						<!-- BEGIN user_calendar -->
 						<li><a href='/calendar/full/{USER_CALENDAR_CURRENTDATE}/{USER_SEARCH_ID}' class="icon-calendar">{TPL_LOCAL_CALENDAR_PC}</a></li>
