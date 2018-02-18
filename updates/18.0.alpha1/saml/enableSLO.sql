@@ -1,6 +1,6 @@
 INSERT INTO `lu_config_type` (`type`) VALUES ('SAML');
 
-UPDATE config SET type_id = (SELECT id FROM lu_config_type WHERE type = 'SAML') WHERE name LIKE 'saml%'
+UPDATE config SET type_id = (SELECT id FROM lu_config_type WHERE type = 'SAML') WHERE name LIKE 'saml%';
 
 -- Add a feature flag to enable SLO support in Schoolbox
 INSERT INTO config (
