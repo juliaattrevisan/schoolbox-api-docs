@@ -352,7 +352,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
     public function canLearnerCreateResponse(User $learner)
     {
         // Not open ?
-        if(!$this->isOpen()){
+        if(!$this->isOpen($learner)){
             return false;
         }
 

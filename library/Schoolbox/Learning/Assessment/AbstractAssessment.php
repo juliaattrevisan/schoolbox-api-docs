@@ -332,7 +332,9 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function isOpen(User $student = null, Alaress_Date_Format $now = null)
     {
-        $participant = $this->getParticipantIfExtant($student);
+        if ($student != null) {
+            $participant = $this->getParticipantIfExtant($student);
+        }
 
         if ($participant) {
             $openDate = $participant->getOpenDate();
