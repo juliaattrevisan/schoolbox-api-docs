@@ -462,6 +462,14 @@ class ListController extends Web\Controller\Base
 
             if ($planId > 0) {
                 // existing plan updates
+                if (!isset($planData['open_date'])) {
+                    $planData['open_date'] = $planData['publish_date'];
+                }
+
+                if (!isset($planData['close_date'])) {
+                    $planData['close_date'] = $planData['due_date'];
+                }
+
                 $plans[$planId] = $planMap
                     ->createModel($planId)
                     ->setName($planData['name'])
