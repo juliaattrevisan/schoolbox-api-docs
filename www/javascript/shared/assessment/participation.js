@@ -123,6 +123,7 @@
             var action = $(this).attr('data-participant-change');
 
             // Reflect the change in the UI
+            // TODO move everything up here later
             var $studentsSelected = $participants.find(':checked');
             $studentsSelected.each(function () {
                 var $participantRow = $(this).closest('li');
@@ -319,11 +320,16 @@
         var $participantRow = $(defaults.participants).find('li[data-participant=' + studentID + ']');
         var $participantCard = $participantRow.find('div.card');
 
-        var studentsWithInteractions = getParticipantsWithInteractions();
+        var studentsWithInteractions = getCheckedParticipantsWithInteractions();
         
         var dialogText = 'The following student(s) have submissions and/or feedback for this assessment.<ul>';
         $(studentsWithInteractions).each(function() {
-            dialogText += $(this);
+            dialogText += "<li>";
+            var studentIcon = $(this).find("img").html();
+            var studentName = $(this).find("p").html();
+            dialogText += studentIcon;
+            dialogText += studentName;
+            dialogText += "</li>";
         })
         dialogText += "</ul>Exclusion from this assessment will remove access to these submissions and/or feedback.";
 
@@ -379,18 +385,18 @@
         }
     }
 
-    function getParticipantsWithInteractions() {
-        var studentsWithInteractions = [];
+    function getCheckedParticipantsWithInteractions() {
+        var checkedWithInteractions = [];
         var participants = $(defaults.participants).find("li");
 
         $(participants).each(function() {
             var $participantCard = $(this).find('div.card');
-            if ($participantCard.is("[data-has-interaction]")) {
-                studentsWithInteractions.push($participantCard);
+            if ($(this).find("input").is(":checked") && $participantCard.is("[data-has-interaction]")) {
+                checkedWithInteractions.push($participantCard);
             }
         });
 
-        return studentsWithInteractions;
+        return checkedWithInteractions;
     }
 
 
