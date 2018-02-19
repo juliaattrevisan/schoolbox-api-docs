@@ -17,7 +17,8 @@
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Participant;
 use Schoolbox\Error;
-use Schoolbox\Learning\Quiz\ValidUserViewsAssessment;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Quiz\ValidUserCanInteractWithAssessment;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
@@ -29,8 +30,7 @@ $attemptHandler  = new Assess_Attempt();
 $responseHandler = new Assess_Response();
 $groupHandler    = new Group();
 
-
-$getAttempt = function ($attemptId) use ($attemptHandler, $assessHandler, $groupHandler) {
+$getAttempt = function ($attemptId) use ($assessmentDataSource, $attemptHandler, $assessHandler, $groupHandler) {
     if (!is_numeric($attemptId)) {
         throw \Schoolbox\Error\Mapper::getInstance()->generateException(Schoolbox\Error\Mapper::ERROR_PERM_ATTEMPT_DELETE);
     }
@@ -65,9 +65,9 @@ $getAttempt = function ($attemptId) use ($attemptHandler, $assessHandler, $group
 
     /* Non-participants are sent to a 404 screen
      */
-    $canViewAssessment = new ValidUserViewsAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
+    $canInteract = new ValidUserCanInteractWithAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
 
-    if (!$canViewAssessment->isSatisfiedBy($user, $folder, $assess['assessment_id'])) {
+    if (!$canInteract->isSatisfiedBy($_SESSION['user'], $folder, $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], $attempt['user_id']))) {
         $this->pageNotFound();
     }
 

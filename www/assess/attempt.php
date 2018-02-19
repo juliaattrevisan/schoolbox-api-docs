@@ -76,9 +76,9 @@ $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], $a
 
 /* Non-participants are sent to a 404 screen
  */
-$canViewAssessment = new ValidUserCanInteractWithAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
+$canInteract = new ValidUserCanInteractWithAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
 
-if (!$canViewAssessment->isSatisfiedBy($_SESSION['user'], $folder, $assessment)) {
+if (!$canInteract->isSatisfiedBy($_SESSION['user'], $folder, $assessment)) {
     $this->pageNotFound();
 }
 
