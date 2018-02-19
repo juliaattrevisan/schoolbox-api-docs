@@ -69,7 +69,7 @@ catch (Mapper\Exception $e) {
 $assessment       = $assessmentDataSource->findByQuizId($assess['assess_id'], $_SESSION['user']);
 $assessmentFolder = $assessment->getBaseContext()->getFolder();
 $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], $assessmentFolder->getId());
-$readOnly         = false;
+$readOnly         = true;
 
 /* Special case: participation isn't guaranteed at this point
  * so we can't get a Plan in all cases e.g. visiting from Course Import as an instructor
@@ -97,16 +97,6 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
     // I can't attempt a spec assessment
     if ($assessment->isSpecification()) {
         error(19);
-    }
-
-    // I can't attempt this if it has expired
-    if (\Alaress_Date_Format::now()->gt($plan['close'])) {
-        error(120);
-    }
-
-    // I can't attempt this if it isn't open
-    if (\Alaress_Date_Format::now()->lt($plan['start'])) {
-        error(143);
     }
 
     /* Non-participating learners are sent to a 404 screen
@@ -149,8 +139,8 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
             error(146);
         }
     }
-} else {
-    /* Non-participating instructors have the call-to-action hidden instead of 404
+
+    /* Non-participators have the call-to-action hidden instead of 404
      */
     $interactSatisfaction = (new ValidUserCanInteractWithAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance()))
         ->isSatisfiedBy($_SESSION['user'], $folder, $assessment);
@@ -158,6 +148,9 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
     if (!$interactSatisfaction) {
         $readOnly = true;
     }
+}
+else {
+    $readOnly = false;
 }
 
 /* Continue once you get past checks
