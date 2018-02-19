@@ -131,9 +131,6 @@
                     text: "<p>The following student(s) have submissions and/or feedback for this assessment:</p><ul class=\"information-list\">" +
                     getStudentListHTMLString($studentsSelected) + "</ul><br/><p>Exclusion from this assessment will remove access to these submissions and/or feedback. Proceed?</p>",
                     format: 'html',
-                    cancelEvent: function() {
-                        //do nothing??
-                    },
                     confirmEvent: function () {
                         $studentsSelected.each(function() {
                             var studentID = $(this).attr('data-participant');
