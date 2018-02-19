@@ -12,6 +12,7 @@ use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -29,6 +30,11 @@ use Schoolbox\User;
 class Notifier extends AbstractModuleNotifier
 {
     private const TRIGGER_DUEWORK_OPEN = 'dueWorkOpen';
+
+    /**
+     * @var AssessmentMapper
+     */
+    private $assessmentMapper;
 
     /**
      * @var UserAccessMapper
@@ -56,7 +62,10 @@ class Notifier extends AbstractModuleNotifier
         if (empty($dependencies['userAccessMapper'])) {
             $dependencies['userAccessMapper'] = UserAccessMapper::getInstance();
         }
-        parent::loadDependencies();
+        if (empty($dependencies['assessmentMapper'])) {
+            $dependencies['assessmentMapper'] = AssessmentMapper::getInstance();
+        }
+        parent::loadDependencies($dependencies);
     }
 
     /**
@@ -132,13 +141,15 @@ class Notifier extends AbstractModuleNotifier
         $envelope = new Envelope();
         $bob      = new Builder();
 
-        // Only do this for dynamic plans; all others have participants assigned manually
-        if (!$plan->isDynamic()) {
-            return $envelope;
-        }
+//        // Only do this for dynamic plans; all others have participants assigned manually
+//        if (!$plan->isDynamic()) {
+//            return $envelope;
+//        }
 
         // Hopefully I don't have to hydrate this myself
-        $assessment  = $plan->getAssessment();
+        // (Looks like I do)
+        // (I probably have to hydrate participation manually too -_-)
+        $assessment  = $this->assessmentMapper->findById($plan->getAssessment()->getId());
         $folder      = $assessment->getAssessmentContext()->getFolder();
         $box         = $assessment->getDueWork();
         if (!$box) {
@@ -171,13 +182,17 @@ class Notifier extends AbstractModuleNotifier
             ->setByline("Due {$dueDate->getCalendarDateTime()}")
             ->setSeverity(Logger::NOTICE);
 
-        // Hydrate folder to ensure presence of folders codes
-        foreach ($this->userAccessMapper->findStudentsInCategory($folder) as $student) {
-            $href = $this->buildParticipantRoute($assessment, $student);
+        // Send to every participant in the plan
+        // TODO figure out how dynamic participants are hydrated
+        foreach ($plan->getParticipants() as $participant) {
+            if ($participant->isExcluded()) {
+                continue;
+            }
+            $href = $this->buildParticipantRoute($assessment, $participant->getUser());
             $bob
                 ->setHref($href)
                 ->setParam('box', new Param($boxName, $href));
-            $envelope->targetToUser($student, $bob->build());
+            $envelope->targetToUser($participant->getUser(), $bob->build());
         }
 
         return $envelope;
