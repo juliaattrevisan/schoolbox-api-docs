@@ -2,55 +2,55 @@
 <script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
 <script type="text/javascript" src="/subject/classList/javascript/emailSelected.js"></script>
 <script type="text/javascript">
-$(function() {
-	var form = $('#contact-table-form');
+    $(function () {
+        var form = $('#contact-table-form');
 
-	// Validators for if no student or parent emails were found
-	$.validator.addMethod(
-		'remote.noStudentEmails',
-		function() {
-			return !(form.data('noStudentEmails'));
-		},
-		'No email addresses were found for the selected students.'
-	);
-    $.validator.addMethod(
-        'remote.noParentEmails',
-        function() {
-            return !(form.data('noParentEmails'));
-        },
-        'No email addresses were found for the parents of the selected students.'
-    );
-    $.validator.addMethod(
-        'remote.noHousemasterEmails',
-        function() {
-            return !(form.data('noHousemasterEmails'));
-        },
-        'No email addresses were found for the housemasters of the selected students.'
-    )   ; 
+        // Validators for if no student or parent emails were found
+        $.validator.addMethod(
+            'remote.noStudentEmails',
+            function () {
+                return !(form.data('noStudentEmails'));
+            },
+            'No email addresses were found for the selected students.'
+        );
+        $.validator.addMethod(
+            'remote.noParentEmails',
+            function () {
+                return !(form.data('noParentEmails'));
+            },
+            'No email addresses were found for the parents of the selected students.'
+        );
+        $.validator.addMethod(
+            'remote.noHousemasterEmails',
+            function () {
+                return !(form.data('noHousemasterEmails'));
+            },
+            'No email addresses were found for the housemasters of the selected students.'
+        );
 
-	/* Validate checkbox selections
-	 */
-	form.alaressValidate({
-		rules: {
-			"selected[]": {
-				required: true,
-				minlength: 1,
-				'remote.noStudentEmails': true,
-                'remote.noParentEmails': true,
-                'remote.noHousemasterEmails': true
-			}
-		},
-		messages: {
-			"selected[]": {
-				required: "Please select at least one student before sending email",
-				minlength: "Please select at least one student before sending email"
-			}
-		},
-		errorPlacement: function(error, element) {
-			$('#errors').html(error);
-		}
-	});
-});
+        /* Validate checkbox selections
+         */
+        form.alaressValidate({
+            rules: {
+                "selected[]": {
+                    required: true,
+                    minlength: 1,
+                    'remote.noStudentEmails': true,
+                    'remote.noParentEmails': true,
+                    'remote.noHousemasterEmails': true
+                }
+            },
+            messages: {
+                "selected[]": {
+                    required: "Please select at least one student before sending email",
+                    minlength: "Please select at least one student before sending email"
+                }
+            },
+            errorPlacement: function (error, element) {
+                $('#errors').html(error);
+            }
+        });
+    });
 </script>
 <!-- END custom_head -->
 
@@ -62,27 +62,27 @@ $(function() {
         <form id="contact-table-form" class="no-margin">
             <table id="contact-table">
                 <thead>
-                    <tr>
-                        <th>
-                            <!-- BEGIN select_all -->
-                            <input type="checkbox" id="select-all" data-select-all data-select-all-for-group="students" value="" />
-                            <label for="select-all" class="checkbox-label"></label>
-                            <!-- END select_all -->
-                        </th>
-                        <th></th>
-                        <th>Name</th>
-                        <th class="show-for-large-up">Year Level</th>
-                        <th class="show-for-medium-up">House</th>
-                        <th class="show-for-medium-up">Last Visited</th>
-                        <th></th>
-                    </tr>
+                <tr>
+                    <th>
+                        <!-- BEGIN select_all -->
+                        <input type="checkbox" id="select-all" data-select-all data-select-all-for-group="students" value=""/>
+                        <label for="select-all" class="checkbox-label"></label>
+                        <!-- END select_all -->
+                    </th>
+                    <th></th>
+                    <th>Name</th>
+                    <th class="show-for-large-up">Year Level</th>
+                    <th class="show-for-medium-up">House</th>
+                    <th class="show-for-medium-up">Last Visited</th>
+                    <th></th>
+                </tr>
                 </thead>
                 <tbody>
                 <!-- BEGIN student_list -->
                 <tr>
                     <td>
                         <!-- BEGIN select_student -->
-                        <input type="checkbox" name="selected[]" id='id-{SYNERGYID}' value="{SYNERGYID}" data-select-all-group="students" />
+                        <input type="checkbox" name="selected[]" id='id-{SYNERGYID}' value="{SYNERGYID}" data-select-all-group="students"/>
                         <label for="id-{SYNERGYID}" class="checkbox-label"></label>
                         <!-- END select_student -->
                     </td>
@@ -152,33 +152,33 @@ $(function() {
 
         <div class="content">
             <script type="text/javascript">
-                $(function() {
+                $(function () {
                     function resetValidation(form) {
                         form.data('noStudentEmails', false)
                             .data('noParentEmails', false)
                             .data('noHousemasterEmails', false);
                     }
 
-                    $('#email-selected-students').click(function(event) {
+                    $('#email-selected-students').click(function (event) {
                         event.preventDefault();
                         var form = $('#contact-table-form');
                         resetValidation(form);
                         if (form.valid()) {
                             $('#email-selected-students')
-                                    .emailSelected({
-                                        source: $('#contact-table'),
-                                        url: '/subject/classList/ajax/emailStudentsById.php',
-                                        classCode: '{CLASS_CODE}',
-                                        target: $(this).find('input[name=bcc]')
-                                    })
-                                    .on('emailSelected.noEmail', function() {
-                                        // Trigger the no student email error
-                                        form.data('noStudentEmails', true).valid();
-                                    })
+                                .emailSelected({
+                                    source: $('#contact-table'),/scc/class/classList.html
+                                    url: '/subject/classList/ajax/emailStudentsById.php',
+                                    classCode: '{CLASS_CODE}',
+                                    target: $(this).find('input[name=bcc]')
+                                })
+                                .on('emailSelected.noEmail', function () {
+                                    // Trigger the no student email error
+                                    form.data('noStudentEmails', true).valid();
+                                })
                         }
                     });
 
-                    $('#email-selected-parents').click(function(event) {
+                    $('#email-selected-parents').click(function (event) {
                         event.preventDefault();
                         var form = $('#contact-table-form');
                         resetValidation(form);
@@ -190,14 +190,14 @@ $(function() {
                                     classCode: '{CLASS_CODE}',
                                     target: $(this).find('input[name=bcc]')
                                 })
-                                .on('emailSelected.noEmail', function() {
+                                .on('emailSelected.noEmail', function () {
                                     // Trigger the no parent email error
                                     form.data('noParentEmails', true).valid();
                                 })
                         }
                     });
 
-                    $('#email-selected-housemasters').click(function(event) {
+                    $('#email-selected-housemasters').click(function (event) {
                         event.preventDefault();
                         var form = $('#contact-table-form');
                         resetValidation(form);
@@ -209,12 +209,12 @@ $(function() {
                                     classCode: '{CLASS_CODE}',
                                     target: $(this).find('input[name=bcc]')
                                 })
-                                .on('emailSelected.noEmail', function() {
+                                .on('emailSelected.noEmail', function () {
                                     // Trigger the no housemaster email error
                                     form.data('noHousemasterEmails', true).valid();
                                 })
                         }
-                    });                    
+                    });
                 });
             </script>
             <ul class="inline-list no-margin">
@@ -232,7 +232,7 @@ $(function() {
                 <li class="no-margin">
                     <form id="email-selected-parents" action="/mail/createMail.php" method="post" class="no-margin">
                         <input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLYTO}&gt;"/>
-                        <input type="hidden" name="bcc" value="" />
+                        <input type="hidden" name="bcc" value=""/>
                         &nbsp;<button type="submit" class="button icon-email">Email Parents of Selected Students</button>
                     </form>
                 </li>
@@ -242,7 +242,7 @@ $(function() {
                 <li class="no-margin">
                     <form id="email-selected-housemasters" action="/mail/createMail.php" method="post" class="no-margin">
                         <input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLYTO}&gt;"/>
-                        <input type="hidden" name="bcc" value="" />
+                        <input type="hidden" name="bcc" value=""/>
                         &nbsp;<button type="submit" class="button icon-email">Email Housemasters of Selected Students</button>
                     </form>
                 </li>
