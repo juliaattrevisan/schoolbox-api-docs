@@ -190,7 +190,8 @@ class Model extends AbstractAssessment implements ISelfAssessable
         /* Allow draft responses in single submission assessments
          */
         if ($this->isAcceptSingle()) {
-            $this->assertNoPublishedResponses($participant->getAllResponses());
+            $allResponses = $participant ? $participant->getAllResponses() : new Collection();
+            $this->assertNoPublishedResponses($allResponses);
         }
     }
 
@@ -207,8 +208,8 @@ class Model extends AbstractAssessment implements ISelfAssessable
     {
         $this->assertOpen($participant);
 
-        $responses = $participant->getAllResponses();
-        $this->assertNoPublishedResponses($responses);
+        $allResponses = $participant ? $participant->getAllResponses() : new Collection();
+        $this->assertNoPublishedResponses($allResponses);
     }
 
     /**
