@@ -70,6 +70,10 @@ catch (Mapper\Exception $e) {
 }
 
 /* Non-participants are sent to a 404 screen
+ *
+ * TODO: This will cause problems mow that the spec patterns include the plan dates
+ * This spec pattern only checks whether you can interact with a quiz -now-. It does not check whether you
+ * could have interacted with it historically.
  */
 $canInteract = new ValidUserCanInteractWithAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
 

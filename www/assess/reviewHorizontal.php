@@ -20,6 +20,7 @@ use Schoolbox\Breadcrumbs;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+use Schoolbox\Learning\Quiz\ValidUserCanInteractWithAssessment;
 use Schoolbox\Learning\Quiz\ValidUserViewsAssessment;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
@@ -205,7 +206,7 @@ else {
 
 	$readonly = !$term->isMarkableBy($_SESSION['user']);
 
-    $canViewAssessment = new ValidUserViewsAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
+    $canInteract = new ValidUserCanInteractWithAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
 
 	/* Load all the questions for this section.
 	 * Note: only show the randomly-selected ones
@@ -225,8 +226,12 @@ else {
             }
 
             /* Non-participants are ignored
+             *
+             * TODO: This will cause problems mow that the spec patterns include the plan dates
+             * This spec pattern only checks whether you can interact with a quiz -now-. It does not check whether you
+             * could have interacted with it historically.
              */
-            if (!$canViewAssessment->isSatisfiedBy($user, $folder, $assess['assessment_id'])) {
+            if (!$canInteract->isSatisfiedBy($user, $folder, $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], $user))) {
                 continue;
             }
 
