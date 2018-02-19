@@ -182,7 +182,7 @@ class Notifier extends AbstractModuleNotifier
         /** @var MapperProxy $assessmentDataSource */
         /** @var IAssessable $assessmentDomainObject */
         $assessmentDataSource   = $this->mapper::getDi()->get('assessmentDataSource');
-        $assessmentDomainObject = $assessmentDataSource->findByIdForReview($plan->getAssessment()->getId(), true);
+        $assessmentDomainObject = $assessmentDataSource->findByIdForReview($plan->getAssessment()->getId());
 
 
         // This notifier only gets triggered for due works.
