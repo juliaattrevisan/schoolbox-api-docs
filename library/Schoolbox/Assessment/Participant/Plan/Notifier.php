@@ -21,6 +21,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
+use Schoolbox\Realtime\Notification\Parameter\ChildParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
@@ -290,15 +291,21 @@ class Notifier extends AbstractModuleNotifier
 
                 $href = $this->buildParticipantRoute($assessmentDomainObject, $participant->getUser());
                 $when = $participant->getDueDate()->getRelativeTime(Alaress_Date_Format::now()->addMinutes(-5), true);
+
+                // build for student
                 $bob->setTitle(":boxname is due $when from now in :catname")
                     ->setHref($href)
                     ->setBody($participant->getDescription())
-                    ->setByline("Due {$participant->getDueDate()->getCalendarDateTime()}")
                     ->setParam('box', new Param($assessmentDomainObject->getTitle(), $href));
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
+                // build for parent
+                $bob->setTitle(":child has not yet submitted work for :boxname, which is due $when from now in :catname")
+                    ->setParam('child', new ChildParam($participant->getUser(), ParameterInterface::STACKING_REPLACE));
+                $envelope->targetToParent($participant->getUser(), $bob->build());
 
-                // Also send to this kid's parents
+                // Clear out the child param, as user doesn't have it
+                $bob->unsetParam('child');
             }
         }
 
