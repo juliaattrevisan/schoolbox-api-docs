@@ -95,14 +95,15 @@ interface IAssessable extends ISoftDeletable
 
 
     /**
-     * Is the assessment between its open and close dates ?
+     * Is the assessment between its open and close dates (for a particular student)?
      *
      * Note this includes the overdue period.
      *
-     * @param null|Alaress_Date_Format $now  Optional value of now for testing
+     * @param User|null                $student
+     * @param null|Alaress_Date_Format $now Optional value of now for testing
      * @return bool
      */
-    public function isOpen(Alaress_Date_Format $now = null);
+    public function isOpen(User $student = null, Alaress_Date_Format $now = null);
 
 
     /**
