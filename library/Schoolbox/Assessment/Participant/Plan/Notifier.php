@@ -134,6 +134,7 @@ class Notifier extends AbstractModuleNotifier
                 // Bundle triggers
 
                 // Open is now always bundled, not just on create
+                // TODO figure out if it should trigger if participant is in past
                 $openDate = $this->coalesceDates($plan->getOpenDate(), $assessment->getOpenDate());
                 if ($openDate) {
                     $bundle->attach(self::TRIGGER_DUEWORK_OPEN, $openDate->getUnixTimeStamp());
@@ -153,10 +154,10 @@ class Notifier extends AbstractModuleNotifier
                     $bundle->attach(self::TRIGGER_DUEWORK_CLOSED, $closeDate->getUnixTimeStamp());
                 }
 
-//                // Generic updated trigger
-//                if ($bundle->getMethod() === Mapper::METHOD_UPDATE) {
-//                    $bundle->attach(self::TRIGGER_DUEWORK_UPDATED, self::IMMEDIATELY);
-//                }
+                // Generic updated trigger
+                if ($bundle->getMethod() === Mapper::METHOD_UPDATE) {
+                    $bundle->attach(self::TRIGGER_DUEWORK_UPDATED, self::IMMEDIATELY);
+                }
             }
             return;
         }
@@ -456,6 +457,75 @@ class Notifier extends AbstractModuleNotifier
                 $envelope->broadcastToCategory($folder, UserAccess::ACCESS_WRITE, $bob->build());
             }
         }
+
+        return $envelope;
+    }
+
+
+    /**
+     * Students and parents get notified when a due work is updated.
+     *
+     * The actual notification depends on what the diff is.
+     *
+     * @param Model      $plan
+     * @param User       $effector
+     * @param array|null $diff
+     * @return Envelope
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function notifyDueWorkUpdated(Model $plan, User $effector, array $diff = null): Envelope
+    {
+        $envelope = new Envelope();
+//        $bob      = new Builder();
+//        $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
+//
+//        // This notifier only gets triggered for due works.
+//        $folder = $assessmentDomainObject->getBaseContext()->getFolder();
+//        if (!$assessmentDomainObject instanceof DueWork) {
+//            return $envelope;
+//        }
+//
+//        // Still need the submission box's ID for generating the topic
+//        $assessment = $this->retrieveAssessmentDataModel($plan);
+//        if (!$assessment->getDueWork()) {
+//            return $envelope;
+//        }
+//        $boxId = $assessment->getDueWork()->getId();
+//
+//        // Doesn't accept online? return
+//        if ($assessmentDomainObject->isAcceptNone()) {
+//            return $envelope;
+//        }
+//
+//        // Try triggering for every student; maybe they will stack
+//        $bob->setTitle(":box in :cat has closed and :student did not submit work")
+//            ->setParam('box', new Param($assessmentDomainObject->getTitle(), $this->buildAssessmentRoute($assessmentDomainObject)))
+//            ->setParam('cat', new CategoryParam($folder))
+//            ->setIcon("/images/icon.php?" . http_build_query(['size' => $this->iconSize, 'icon' => 'work']))
+//            ->setNamespace(NSMapper::NS_DUEWORK)
+//            ->setSeverity(Logger::ERROR)
+//            ->addTopic("duework.$boxId.closed");
+//
+//        // Customise and send to every participant in this plan only
+//        foreach ($assessmentDomainObject->getPlans() as $assessmentPlan) {
+//            if ($assessmentPlan->getId() !== $plan->getId()) {
+//                continue;
+//            }
+//            foreach ($assessmentPlan->getParticipants() as $participant) {
+//                if ($participant->isExcluded()) {
+//                    continue;
+//                }
+//
+//                // Has participant already submitted?
+//                if (!$participant->isResponseRequired()) {
+//                    continue;
+//                }
+//
+//                // build for staff
+//                $bob->setParam('student', new UserParam($participant->getUser()));
+//                $envelope->broadcastToCategory($folder, UserAccess::ACCESS_WRITE, $bob->build());
+//            }
+//        }
 
         return $envelope;
     }
