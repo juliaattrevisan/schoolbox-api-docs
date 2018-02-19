@@ -87,8 +87,7 @@ class Module extends BaseModule
     {
         // preloaders to use
         $preloadContext                = function ($params) { return $this->preloadContext($params); };
-        $preloadAssessment             = function ($params) { return $this->preloadAssessment($params, false); };
-        $preloadAssessmentWithExcluded = function ($params) { return $this->preloadAssessment($params, true); };
+        $preloadAssessment             = function ($params) { return $this->preloadAssessment($params); };
         $preloadParticipant            = function ($params) { return $this->preloadParticipant($params); };
 
         // rules in use
@@ -134,7 +133,7 @@ class Module extends BaseModule
         $this->register('GET',   "$assRoute",                        'getAssessment',            $loggedIn,         $preloadAssessment);
         $this->register('POST',  "$assRoute",                        'postUpdateAssessment',     $canWrite,         $preloadAssessment); // a || c
         $this->register('PATCH', "$assRoute",                        'patchUpdateAssessment',    $canWrite,         $preloadAssessment); // a || c
-        $this->register('GET',   "$assRoute/modify",                 'getUpdateAssessmentForm',  $canModify,        $preloadAssessmentWithExcluded); // a || c
+        $this->register('GET',   "$assRoute/modify",                 'getUpdateAssessmentForm',  $canModify,        $preloadAssessment); // a || c
         $this->register('POST',  "$assRoute/delete",                 'postDeleteAssessment',     $canDelete,        $preloadAssessment); // a || c
         $this->register('GET',   "$assRoute/status",                 'getStatus',                $canViewStatus,    $preloadAssessment); // a || c
         $this->register('GET',   "$assRoute/overview",               'getOverview',              $canWrite,         $preloadAssessment); // a || c
@@ -191,7 +190,7 @@ class Module extends BaseModule
         try {
             // obtain the assessment from our other preload
             $student     = $this->getUserMapper()->findById($params['studentId']);
-            $assessment  = $this->preloadAssessment($params, false, $student)['assessment'];
+            $assessment  = $this->preloadAssessment($params, $student)['assessment'];
 
             $access = $this->getAccess()->getFolderAccess($student, $assessment->getContext()->getFolder()->getId());
 
@@ -274,7 +273,6 @@ class Module extends BaseModule
      * Convert route params into an assessment object
      *
      * @param array     $params
-     * @param bool      $includeExcluded Should we load excluded participations?
      * @param null|User $student If provided, only load this student's participation
      * @return array
      * @throws Mapper\DefinitionException If a specified join mapper is not found
@@ -284,10 +282,10 @@ class Module extends BaseModule
      * @throws LogicException If cyclic graph detected
      * @throws ApplicationException\Exception If assessment is not found
      */
-    protected function preloadAssessment(array $params, bool $includeExcluded, User $student = null)
+    protected function preloadAssessment(array $params, User $student = null)
     {
         try {
-            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], $includeExcluded, $student);
+            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], $student);
         } catch (MapperException\Deleted $e){
             $assessment = $e->getDeletedObject();
         }

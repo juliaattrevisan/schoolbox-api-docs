@@ -152,7 +152,7 @@ class Exporter
         });
 
         // Load participation
-        $classAssessments = $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($classAssessments, false);
+        $classAssessments = $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($classAssessments);
 
         // Filter out assessments without results
         $filteredAssessments = $classAssessments->filter(function (IAssessable $assessment) {

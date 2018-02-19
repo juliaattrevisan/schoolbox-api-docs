@@ -245,7 +245,7 @@ class Module extends BaseModule
     protected function preloadAssessableWithStudentParticipation($assessmentId, User $student)
     {
         $assessable = $this->preloadAssessable($assessmentId);
-        return $this->getParticipantDataSource()->loadParticipationIntoAssessment($assessable, false, $student);
+        return $this->getParticipantDataSource()->loadParticipationIntoAssessment($assessable, $student);
     }
 
     /**

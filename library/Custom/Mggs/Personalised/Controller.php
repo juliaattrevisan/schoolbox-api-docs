@@ -272,7 +272,7 @@ class Controller extends Base
     {
         $post = $this->getRequest()->post;
         try {
-            $assessment = $this->assessmentDataSource->findByIdForReview($post->get('assessmentId'), false, $student);
+            $assessment = $this->assessmentDataSource->findByIdForReview($post->get('assessmentId'), $student);
 
             if (!$assessment->isParticipant($student)) {
                 $this->buildJsonResponse('Student is not a participant', 403);

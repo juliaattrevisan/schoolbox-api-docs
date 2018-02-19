@@ -18,7 +18,7 @@
     {% import _self as dueDate %}
     {# Is the nominated user a participant ? #}
     {% set participant = assessable.participantIfExtant(user) %}
-    {% if participant %}
+    {% if participant and not participant.isExcluded %}
         {{ dueDate.participant(participant) }}
     {% else %}
         {# Is the user a parent? Check if any of their children are participants #}

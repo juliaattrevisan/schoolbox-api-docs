@@ -125,18 +125,16 @@ class DataSource
      *       as it is more efficient when loading responses and feedbacks.
      *
      * @param IAssessable $assessment
-     * @param bool        $includeExcluded Should we include explicitly excluded participants in graph?
      * @param null|User   $user            If specified, only load this user's interactions
      * @return IAssessable $assessment, with participation loaded.
      * @throws UnexpectedValueException If unable to derive project participant collection
      * @throws DomainException If user has interaction but not participant record
      * @throws DefinitionException If unable to locate a specified mapper join
      */
-    public function loadParticipationIntoAssessment(IAssessable $assessment, bool $includeExcluded, User $user = null): IAssessable
+    public function loadParticipationIntoAssessment(IAssessable $assessment, User $user = null): IAssessable
     {
         $collection = $this->loadParticipationIntoAssessmentCollection(
             new GenericCollection(IAssessable::class, [$assessment]),
-            $includeExcluded,
             $user
         );
         return $collection->first();
@@ -149,21 +147,20 @@ class DataSource
      * This includes records for responses and feedbacks for every participant in each assessment.
      *
      * @param Collection|IAssessable[] $assessments
-     * @param bool                     $includeExcluded Should we include explicitly excluded participants in graph?
      * @param User|null                $user            If specified, only load this user's interactions
      * @return Collection|IAssessable[] $assessments, with participation loaded.
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws DomainException If user has interaction but not participant record
      * @throws UnexpectedValueException If unable to derive project participant collection
      */
-    public function loadParticipationIntoAssessmentCollection(Collection $assessments, bool $includeExcluded, User $user = null): Collection
+    public function loadParticipationIntoAssessmentCollection(Collection $assessments, User $user = null): Collection
     {
         /** @var Collection|IAssessable[] $assessableWithDescendants */
         $assessableWithDescendants = new GenericCollection(IAssessable::class);
         $this->mergeSubAssessments($assessableWithDescendants, $assessments);
 
         // Load participants for all assessments, plus activities in projects
-        $this->findForAssessmentCollection($assessableWithDescendants, $includeExcluded, $user);
+        $this->findForAssessmentCollection($assessableWithDescendants, $user);
 
         // Insert project participant objects into any project
         foreach ($assessableWithDescendants as $assessable) {
@@ -187,13 +184,12 @@ class DataSource
      * This method sets the participants into each $assessment
      *
      * @param IAssessable[]|GenericCollection $assessments     Indexed by assessment.id
-     * @param bool                            $includeExcluded Should we include explicitly excluded participants in graph?
      * @param null|User                       $user            If specified, only load this user's interactions
      * @throws UnexpectedValueException If unable to merge student collections
      * @throws DomainException If user has interaction but not participant record
      * @throws DefinitionException If unable to locate a specified mapper join
      */
-    protected function findForAssessmentCollection(GenericCollection $assessments, bool $includeExcluded, User $user = null): void
+    protected function findForAssessmentCollection(GenericCollection $assessments, User $user = null): void
     {
         $this->loadPlansAndParticipants($assessments);
 
@@ -224,30 +220,6 @@ class DataSource
             $assessments,
             $this->feedbackDataSource->findForAssessmentCollection($assessments, $user)
         );
-
-        if (!$includeExcluded) {
-            // But we may wish to then remove these participants so they are not present in the domain graph
-            $this->removeExcludedParticipants($assessments);
-        }
-    }
-
-
-    /**
-     * Strips any excluded participants from assessment plans so that they are not present in domain graph.
-     *
-     * @param GenericCollection|IAssessable[] $assessables
-     */
-    private function removeExcludedParticipants(GenericCollection $assessables): void
-    {
-        foreach ($assessables as $assessable) {
-            foreach ($assessable->getPlans() as $plan) {
-                foreach ($plan->getParticipants() as $idx => $participant) {
-                    if ($participant->isExcluded()) {
-                        $plan->getParticipants()->offsetUnset($idx);
-                    }
-                }
-            }
-        }
     }
 
 
@@ -300,7 +272,10 @@ class DataSource
                     );
                     throw new DomainException($msg);
                 }
-                $participantUser->getAllResponses()[$response->getId()] = $response;
+                if (!$participantUser->isExcluded()) {
+                    // Don't load interactions for excluded participants.
+                    $participantUser->getAllResponses()[$response->getId()] = $response;
+                }
             }
         }
     }
@@ -322,9 +297,9 @@ class DataSource
 
                 //Ensure response user is fully hydrated
                 $feedbackUser    = $this->userMapper->findByIdWithFallback($feedback->getReviewee()->getId());
-                $participantUser = $assessment->getParticipantIfExtant($feedbackUser);
+                $participant = $assessment->getParticipantIfExtant($feedbackUser);
 
-                if (!$participantUser) {
+                if (!$participant) {
                     $msg = sprintf(
                         'User (id: %s) has a feedback (id: %s) for assessment (id: %s) but no participant record',
                         $feedbackUser->getId(),
@@ -333,7 +308,11 @@ class DataSource
                     );
                     throw new DomainException($msg);
                 }
-                $participantUser->getAllFeedbacks()->add($feedback);
+                if ($participant->isExcluded()) {
+                    // Don't load interactions for excluded participants.
+                    continue;
+                }
+                $participant->getAllFeedbacks()->add($feedback);
 
                 // Feedbacks may have a stub response.
                 // If so, use it to find the actual response, and associate them together.
@@ -342,7 +321,7 @@ class DataSource
                 if ($stubResponse && $stubResponse->getId()) {
                     $stubResponseId = $stubResponse->getId();
 
-                    foreach ($participantUser->getAllResponses() as $response) {
+                    foreach ($participant->getAllResponses() as $response) {
                         // For now assume that the types of response and feedback match
                         if ($stubResponseId == $response->getId()) {
                             $response->getAllFeedback()->add($feedback);
