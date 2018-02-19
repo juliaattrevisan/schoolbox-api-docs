@@ -167,23 +167,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
         return $latestSubmittedResponse->getSubmittedAt() > $latestPublishedFeedback->getPublishedAt();
     }
 
-
-    /**
-     * The friendly, uninformative version of assertAcceptSubmissions.
-     *
-     * @param Collection $responses
-     * @return bool
-     */
-    public function isAcceptingSubmissions(\Schoolbox\Collection $responses)
-    {
-        try {
-            $this->assertAcceptSubmission($responses);
-            return true;
-        } catch (DomainException $e) {
-            return false;
-        }
-    }
-
     /**
      * Work out if we are going to accept responses
      *
@@ -194,12 +177,11 @@ class Model extends AbstractAssessment implements ISelfAssessable
      *      - If the assessment only accepts single, and a submitted response already exists for this participant
      *      - You're not a student of this assessment's class (folder)
      *
-     * @param Collection|IResponse[] $responses
-     * @throws DomainException
+     * @param Participant $participant
      */
-    public function assertAcceptSubmission(Collection $responses)
+    public function assertAcceptSubmission(Participant $participant)
     {
-        $this->assertOpen();
+        $this->assertOpen($participant);
 
         if ($this->isAcceptNone()) {
             throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NO_ONLINE_RESPONSE);
@@ -208,9 +190,11 @@ class Model extends AbstractAssessment implements ISelfAssessable
         /* Allow draft responses in single submission assessments
          */
         if ($this->isAcceptSingle()) {
-            $this->assertNoPublishedResponses($responses);
+            $allResponses = $participant ? $participant->getAllResponses() : new Collection();
+            $this->assertNoPublishedResponses($allResponses);
         }
     }
+
 
     /**
      * Can a participant create an acknowledgement response?
@@ -218,13 +202,14 @@ class Model extends AbstractAssessment implements ISelfAssessable
      * This action is only available to open due works that the participant has
      * not yet responded to.
      *
-     * @param Collection|IResponse[] $responses
-     * @throws DomainException
+     * @param Participant $participant
      */
-    public function assertAcceptAcknowledgement(Collection $responses)
+    public function assertAcceptAcknowledgement(Participant $participant)
     {
-        $this->assertOpen();
-        $this->assertNoPublishedResponses($responses);
+        $this->assertOpen($participant);
+
+        $allResponses = $participant ? $participant->getAllResponses() : new Collection();
+        $this->assertNoPublishedResponses($allResponses);
     }
 
     /**
@@ -232,13 +217,21 @@ class Model extends AbstractAssessment implements ISelfAssessable
      *
      * @throws DomainException
      */
-    private function assertOpen()
+    private function assertOpen(Participant $participant = null)
     {
-        if ($this->getOpenAt()->gt(\Alaress_Date_Format::now())) {
+        if ($participant != null) {
+            $openDate = $participant->getOpenDate();
+            $closeDate = $participant->getCloseDate();
+        } else {
+            $openDate = $this->getOpenAt();
+            $closeDate = $this->getCloseAt();
+        }
+
+        if ($openDate->gt(\Alaress_Date_Format::now())) {
             throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NOT_YET_OPEN);
         }
 
-        if (\Alaress_Date_Format::now()->gt($this->getCloseAt())) {
+        if (\Alaress_Date_Format::now()->gt($closeDate)) {
             throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_CLOSED);
         }
     }
@@ -352,7 +345,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
     public function canLearnerCreateResponse(User $learner)
     {
         // Not open ?
-        if(!$this->isOpen()){
+        if(!$this->isOpen($learner)){
             return false;
         }
 

@@ -251,9 +251,6 @@ class Controller extends Assessment\Controller
          * Order them by submitted time to find the most recent, and use that
          */
 
-        /** @var SubmissionFile $submission */
-        $allResponses = $participant ? $participant->getAllResponses() : new Collection();
-
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'  => $assessment,
@@ -276,11 +273,11 @@ class Controller extends Assessment\Controller
         $twigData['submissionsBlocked']    = false;
         $twigData['acknowlegementBlocked'] = false;
         try {
-            $assessment->assertAcceptSubmission($allResponses);
+            $assessment->assertAcceptSubmission($participant);
         } catch (DomainException $e) {
             $twigData['submissionsBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
             try {
-                $assessment->assertAcceptAcknowledgement($allResponses);
+                $assessment->assertAcceptAcknowledgement($participant);
             } catch (DomainException $e) {
                 $twigData['acknowlegementBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
             }

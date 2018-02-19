@@ -11,7 +11,7 @@ use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\User;
 use Schoolbox\Error;
 
-class IsAssessmentOpen extends AbstractAssessableRule
+class IsAssessmentOpen extends AbstractParticipationRule
 {
 
     /**
@@ -22,7 +22,9 @@ class IsAssessmentOpen extends AbstractAssessableRule
     public function authorize(array $params = [], User $user = null)
     {
         $assessment = $this->findAssessable($params);
-        if (!$assessment->isOpen()) {
+        $student = $this->findStudent($params);
+        
+        if (!$assessment->isOpen($student)) {
             throw new Unauthorized(Error\Mapper::ERROR_ASSESSMENT_CLOSED);
         }
     }
