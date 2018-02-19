@@ -14,6 +14,7 @@ use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Alaress_Date_Format;
 use Monolog\Logger;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -169,8 +170,8 @@ class Notifier extends AbstractModuleNotifier
      * @param Model $plan
      * @param User  $effector
      *
-     * @throws \OutOfBoundsException     If severity is not set
-     * @throws \InvalidArgumentException If a required property was not set
+     * @throws \Aura\Di\Exception\ServiceNotFound if for whatever reason I couldn't find the data source?
+     *                                            Should never happen.
      * @return Envelope
      */
     public function notifyDueWorkOpen(Model $plan, User $effector): Envelope
@@ -178,35 +179,7 @@ class Notifier extends AbstractModuleNotifier
         $envelope = new Envelope();
         $bob      = new Builder();
 
-        //                             ,-.
-        //        ___,---.__          /'|`\          __,---,___
-        //     ,-'    \`    `-.____,-'  |  `-.____,-'    //    `-.
-        //   ,'        |           ~'\     /`~           |        `.
-        //  /      ___//              `. ,'          ,  , \___      \
-        // |    ,-'   `-.__   _         |        ,    __,-'   `-.    |
-        // |   /          /\_  `   .    |    ,      _/\          \   |
-        // \  |           \ \`-.___ \   |   / ___,-'/ /           |  /
-        //  \  \           | `._   `\\  |  //'   _,' |           /  /
-        //   `-.\         /'  _ `---'' , . ``---' _  `\         /,-'
-        //      ``       /     \    ,='/ \`=.    /     \       ''
-        //              |__   /|\_,--.,-.--,--._/|\   __|
-        //              /  `./  \\`\ |  |  | /,//' \,'  \
-        //             /   /     ||--+--|--+-/-|     \   \
-        //            |   |     /'\_\_\ | /_/_/`\     |   |
-        //             \   \__, \_     `~'     _/ .__/   /
-        //              `-._,-'   `-._______,-'   `-._,-'
-        //
-        //          +--------------------------------------+
-        //          |       \Schoolbox\Mapper::getDi       |
-        //          | Under pain of death DO NOT USE THIS! |
-        //          +--------------------------------------+
-        //
-        // ... hold my beer
-        /** @var MapperProxy $assessmentDataSource */
-        /** @var IAssessable $assessmentDomainObject */
-        $assessmentDataSource   = $this->mapper::getDi()->get('assessmentDataSource');
-        $assessmentDomainObject = $assessmentDataSource->findByIdForReview($plan->getAssessment()->getId());
-
+        $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
 
         // This notifier only gets triggered for due works.
         $folder = $assessmentDomainObject->getBaseContext()->getFolder();
@@ -215,7 +188,7 @@ class Notifier extends AbstractModuleNotifier
         }
 
         // Still need the submission box's ID for generating the topic
-        $assessment = $this->assessmentMapper->findById($plan->getAssessment()->getId());
+        $assessment = $this->retrieveAssessmentDataModel($plan);
         if (!$assessment->getDueWork()) {
             return $envelope;
         }
@@ -301,5 +274,54 @@ class Notifier extends AbstractModuleNotifier
             }
         }
         return null;
+    }
+
+    /**
+     * Fetches the assessment domain model for this plan.
+     *
+     * @param Model $plan
+     * @return IAssessable
+     * @throws \Aura\Di\Exception\ServiceNotFound if for whatever reason I couldn't find the data source?
+     *                                            Should never happen.
+     */
+    private function retrieveAssessmentDomainModel(Model $plan): IAssessable
+    {
+        //                             ,-.
+        //        ___,---.__          /'|`\          __,---,___
+        //     ,-'    \`    `-.____,-'  |  `-.____,-'    //    `-.
+        //   ,'        |           ~'\     /`~           |        `.
+        //  /      ___//              `. ,'          ,  , \___      \
+        // |    ,-'   `-.__   _         |        ,    __,-'   `-.    |
+        // |   /          /\_  `   .    |    ,      _/\          \   |
+        // \  |           \ \`-.___ \   |   / ___,-'/ /           |  /
+        //  \  \           | `._   `\\  |  //'   _,' |           /  /
+        //   `-.\         /'  _ `---'' , . ``---' _  `\         /,-'
+        //      ``       /     \    ,='/ \`=.    /     \       ''
+        //              |__   /|\_,--.,-.--,--._/|\   __|
+        //              /  `./  \\`\ |  |  | /,//' \,'  \
+        //             /   /     ||--+--|--+-/-|     \   \
+        //            |   |     /'\_\_\ | /_/_/`\     |   |
+        //             \   \__, \_     `~'     _/ .__/   /
+        //              `-._,-'   `-._______,-'   `-._,-'
+        //
+        //          +--------------------------------------+
+        //          |       \Schoolbox\Mapper::getDi       |
+        //          | Under pain of death DO NOT USE THIS! |
+        //          +--------------------------------------+
+        //
+        // ... hold my beer
+        $assessmentDataSource = $this->mapper::getDi()->get('assessmentDataSource');
+        return $assessmentDataSource->findByIdForReview($plan->getAssessment()->getId());
+    }
+
+    /**
+     * Fetches the assessment data model for this plan.
+     *
+     * @param Model $plan
+     * @return AssessmentModel
+     */
+    private function retrieveAssessmentDataModel(Model $plan): AssessmentModel
+    {
+        return $this->assessmentMapper->findById($plan->getAssessment()->getId());
     }
 }
