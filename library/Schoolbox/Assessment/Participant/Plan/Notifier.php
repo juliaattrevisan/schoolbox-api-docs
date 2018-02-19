@@ -143,7 +143,7 @@ class Notifier extends AbstractModuleNotifier
                 if ($dueDate) {
                     $upcomingDate = (clone $dueDate)->addDays(-self::DUEWORK_UPCOMING_WINDOW);
                     $bundle->attach(self::TRIGGER_DUEWORK_UPCOMING, $upcomingDate->getUnixTimeStamp());
-//                    $bundle->attach(self::TRIGGER_DUEWORK_OVERDUE, $dueDate->getUnixTimeStamp());
+                    $bundle->attach(self::TRIGGER_DUEWORK_OVERDUE, $dueDate->getUnixTimeStamp());
                 }
 
 //                // Close: always bundled
@@ -314,6 +314,77 @@ class Notifier extends AbstractModuleNotifier
 
         return $envelope;
     }
+
+    public function notifyDueWorkOverdue(Model $plan): Envelope
+    {
+        $envelope = new Envelope();
+        $bob      = new Builder();
+        $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
+
+        // This notifier only gets triggered for due works.
+        $folder = $assessmentDomainObject->getBaseContext()->getFolder();
+        if (!$assessmentDomainObject instanceof DueWork) {
+            return $envelope;
+        }
+
+        // Still need the submission box's ID for generating the topic
+        $assessment = $this->retrieveAssessmentDataModel($plan);
+        if (!$assessment->getDueWork()) {
+            return $envelope;
+        }
+        $boxId = $assessment->getDueWork()->getId();
+
+        // Doesn't accept online? return
+        if ($assessmentDomainObject->isAcceptNone()) {
+            return $envelope;
+        }
+
+        $bob->setParam('cat', new CategoryParam($folder))
+            ->setIcon("/images/icon.php?" . http_build_query(['size' => $this->iconSize, 'icon' => 'work']))
+            ->setNamespace(NSMapper::NS_DUEWORK)
+            ->setSeverity(Logger::ERROR)
+            ->addTopic("duework.$boxId.overdue");
+
+        // Customise and send to every participant in this plan only
+        foreach ($assessmentDomainObject->getPlans() as $assessmentPlan) {
+            if ($assessmentPlan->getId() !== $plan->getId()) {
+                continue;
+            }
+            foreach ($assessmentPlan->getParticipants() as $participant) {
+                if ($participant->isExcluded()) {
+                    continue;
+                }
+
+                // Has participant already submitted?
+                if (!$participant->isResponseRequired()) {
+                    continue;
+                }
+
+                $href = $this->buildParticipantRoute($assessmentDomainObject, $participant->getUser());
+
+                // build for student
+                $bob->setTitle(":box is now overdue in :cat")
+                    ->setHref($href)
+                    ->setBody($participant->getDescription())
+                    ->setParam('box', new Param($assessmentDomainObject->getTitle(), $href));
+                $envelope->targetToUser($participant->getUser(), $bob->build());
+
+                // build for parent, only if they're allowed
+                if ($this->conf->get('restrict_student_submissions')) {
+                    continue;
+                }
+                $bob->setTitle(':child did not submit work for :box in :cat')
+                    ->setParam('child', new ChildParam($participant->getUser(), ParameterInterface::STACKING_REPLACE));
+                $envelope->targetToParent($participant->getUser(), $bob->build());
+
+                // Clear out the child param, as user doesn't have it
+                $bob->unsetParam('child');
+            }
+        }
+
+        return $envelope;
+    }
+
 
     /**
      * Convenience helper to build a route to the Participant Summary page
