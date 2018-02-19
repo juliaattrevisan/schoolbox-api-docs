@@ -14,7 +14,6 @@ use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
-use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -33,6 +32,20 @@ use Schoolbox\User;
 class Notifier extends AbstractModuleNotifier
 {
     private const TRIGGER_DUEWORK_OPEN = 'dueWorkOpen';
+//    private const TRIGGER_DUEWORK_UPDATED     = 'dueWorkUpdated';
+//    private const TRIGGER_DUEWORK_UPCOMING    = 'dueWorkUpcoming';
+//    private const TRIGGER_DUEWORK_OVERDUE     = 'dueWorkOverdue';
+//    private const TRIGGER_DUEWORK_CLOSED      = 'dueWorkClosed';
+//    private const TRIGGER_DUEWORK_DATECHANGED = 'dueWorkDatechanged';
+//    private const TRIGGER_DUEWORK_RENAMED     = 'dueWorkRenamed';
+//
+//    private const DUEWORK_UPCOMING_WINDOW = 2;
+//
+//    private const TRIGGER_QUIZ_CLOSED   = 'quizClosed';
+//    private const TRIGGER_QUIZ_OPEN     = 'quizOpen';
+//    private const TRIGGER_QUIZ_OVERDUE  = 'quizOverdue';
+//    private const TRIGGER_QUIZ_UPCOMING = 'quizUpcoming';
+//    private const TRIGGER_QUIZ_UPDATED  = 'quizUpdated';
 
     /**
      * @var AssessmentMapper
