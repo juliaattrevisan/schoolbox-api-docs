@@ -863,9 +863,8 @@ class Controller extends Assessment\Controller
      */
     public function postStatusAcknowledge(IAssessable $assessment, User $student)
     {
-        $participant = $assessment->getParticipant($student);
         try {
-            $response = $this->persistAcknowledgementResponse($participant, Alaress_Date_Format::now());
+            $response = $this->persistAcknowledgementResponse($assessment, $student, Alaress_Date_Format::now());
             $data = [
                 'success'       => true,
                 'id'            => $response->getId(),
@@ -909,8 +908,8 @@ class Controller extends Assessment\Controller
      */
     public function postSelfAcknowledge(IAssessable $assessment, User $student)
     {
-        $participant = $assessment->getParticipant($student);
-        $selfReview = $assessment instanceof Model && $assessment->isSelfAssessable();
+        $participant = $assessment->getParticipantIfExtant($student);
+        $selfReview  = $assessment instanceof Model && $assessment->isSelfAssessable();
 
         // Route and arguments for location to redirect to once acknowledged.
         $route      = 'learningAssessment.getSummary';
@@ -923,9 +922,9 @@ class Controller extends Assessment\Controller
 
         try {
             if ($selfReview) {
-                $response = $participant->findMostRecentDraftResponse();
+                $response = $participant ? $participant->findMostRecentDraftResponse() : null;
                 if (!$response) {
-                    $response = $this->persistAcknowledgementResponse($participant, null);
+                    $response = $this->persistAcknowledgementResponse($assessment, $student, null);
                 }
 
                 $route                = 'learningDueWorkResponse.getParticularResponseForSelfReflection';
@@ -933,7 +932,7 @@ class Controller extends Assessment\Controller
                 $params['responseId'] = $response->getId();
 
             } else {
-                $response = $this->persistAcknowledgementResponse($participant, Alaress_Date_Format::now());
+                $response = $this->persistAcknowledgementResponse($assessment, $student, Alaress_Date_Format::now());
             }
 
             $data = [
@@ -990,23 +989,31 @@ class Controller extends Assessment\Controller
     /**
      * Common logic for 'dueWork status' and 'pending assessments' pages 'acknowledgement of submission receipt'.
      *
-     * @param Participant              $participant
+     * @param Model                    $dueWork
+     * @param User                     $student
      * @param Alaress_Date_Format|null $submittedDate Date this was submitted at, null if draft
      * @return Submission
      * @throws \PDOException If something went wrong in the save process
      */
-    private function persistAcknowledgementResponse(Participant $participant, ?Alaress_Date_Format $submittedDate)
+    private function persistAcknowledgementResponse(Model $dueWork, User $student, ?Alaress_Date_Format $submittedDate): Response\Model
     {
-        $assessment = $participant->getAssessable();
-        $response   = $this->dueWorkResponseMapper->createModel()
-            ->setAssessable($assessment)
+        $response = $this->dueWorkResponseMapper->createModel()
+            ->setAssessable($dueWork)
             ->setSubmittedBy($this->getUser())
-            ->setSubmittedOnBehalfOf($participant->getUser())
+            ->setSubmittedOnBehalfOf($student)
             ->setSubmittedAt($submittedDate)
             ->setCreatedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now());
 
         $this->dueWorkResponseMapper->save($response);
+
+        $participant = $dueWork->getParticipantIfExtant($student);
+        if (!$participant) {
+            $dynamicPlan = $dueWork->getDynamicPlan();
+            $participant = new Participant($student, $dynamicPlan);
+            /** @noinspection NullPointerExceptionInspection */
+            $dynamicPlan->getParticipants()[$student->getId()] = $participant;
+        }
         $participant->getAllResponses()[$response->getId()] = $response;
 
         return $response;
