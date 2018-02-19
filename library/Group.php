@@ -191,7 +191,8 @@ class Group extends DeprecatedModel
 				  LEFT JOIN userAccess ON cid = sid AND service = " . HOMEPAGE_SERVICE . " AND uid = '" . $_SESSION['id'] . "'
 				  WHERE cid = id
 				  AND folder.deleted_at IS NULL
-				  AND userGroups.type = '$type'";
+				  AND userGroups.type = '$type'
+				  ORDER BY name";
         return $this->db->getAll($query);
     }
 
