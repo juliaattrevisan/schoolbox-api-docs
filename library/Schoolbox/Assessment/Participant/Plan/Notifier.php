@@ -9,10 +9,14 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Participant\Plan;
 
 use Alaress\Async\Notification\Instance\Builder;
+use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Alaress_Date_Format;
 use Monolog\Logger;
+use Schoolbox\Collection;
+use Schoolbox\Feed\FeedableMapperInterface;
+use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
@@ -26,12 +30,13 @@ use Schoolbox\Realtime\Notification\Parameter\ChildParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
+use Schoolbox\Role;
 use Schoolbox\User;
 
 /**
  * Class Notifier
  */
-class Notifier extends AbstractModuleNotifier
+class Notifier extends AbstractModuleNotifier implements SourceInterface
 {
     private const TRIGGER_DUEWORK_OPEN     = 'dueWorkOpen';
     private const TRIGGER_DUEWORK_UPDATED  = 'dueWorkUpdated';
@@ -161,6 +166,44 @@ class Notifier extends AbstractModuleNotifier
             }
             return;
         }
+    }
+
+
+    /**
+     * Generate n Instances, from the perspective of casual observation (rather than targeted at a particular user).
+     *
+     * @param int    $context  - most likely a category ID or ignored
+     * @param string $roletype - the roletype of the user for whom this feed is being retrieved
+     * @param int    $limit    - how many messages to retrieve
+     * @param int    $offset   - by default, most recent
+     * @throws \OutOfBoundsException     If severity is not set
+     * @throws \InvalidArgumentException If a required property was not set
+     * @return Collection|Instance[]
+     */
+    public function getFeed($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0)
+    {
+        $c = new Collection();
+
+        // if parents aren't allowed to see due work, return an empty collection
+        if ($roletype === Role::PARENT && $this->conf->get('restrict_parent_duework_access')) {
+            return $c;
+        }
+
+        // be sure the target method exists
+        // TODO implement FMI on participant or assessment
+        if (!$this->getMapper() instanceof FeedableMapperInterface) {
+            return $c;
+        }
+
+        $boxes = $this->getMapper()->findForFeed($context, $limit, $offset);
+
+        foreach ($boxes as $box) {
+            $c = $c
+                ->merge(new Collection($this->notifyStudentOpen($box, $box->getOwner())->getAll($box->getOpenDate()->getUnixTimeStamp())))
+                ->merge(new Collection($this->notifyFeedClosed($box, $box->getOwner())->getAll($box->getDueDate()->getUnixTimeStamp())));
+        }
+
+        return $c;
     }
 
 
@@ -587,8 +630,9 @@ class Notifier extends AbstractModuleNotifier
      *
      * @param Model $plan
      * @return IAssessable
-     * @throws \Aura\Di\Exception\ServiceNotFound if for whatever reason I couldn't find the data source?
-     *                                            Should never happen.
+     * @throws \Aura\Di\Exception\ServiceNotFound  if for whatever reason I couldn't find the data source?
+     *                                             Should never happen.
+     * @throws \Schoolbox\Mapper\Exception\Deleted if item I'm getting notifs for is deleted
      */
     private function retrieveAssessmentDomainModel(Model $plan): IAssessable
     {
@@ -616,6 +660,7 @@ class Notifier extends AbstractModuleNotifier
         //          +--------------------------------------+
         //
         // ... hold my beer
+        /** @var MapperProxy $assessmentDataSource */
         $assessmentDataSource = $this->mapper::getDi()->get('assessmentDataSource');
         return $assessmentDataSource->findByIdForReview($plan->getAssessment()->getId());
     }
