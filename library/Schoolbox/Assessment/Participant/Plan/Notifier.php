@@ -22,7 +22,7 @@ use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
-use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
+use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\User;
 
 /**
@@ -95,7 +95,7 @@ class Notifier extends AbstractModuleNotifier
     /**
      * If created, raise a notification. No conditions, no other functions. That's it.
      *
-     * @param TriggerBundle $bundle
+     * @param TriggerBundleInterface $bundle
      */
     public function bundleTriggers($bundle): void
     {
