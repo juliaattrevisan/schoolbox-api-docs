@@ -77,6 +77,17 @@
     {{ parent() }}
 {% endblock %}
 
+{# Comment box #}
+{% block comment %}
+    <div class="small-12 column">
+        {% include '@learningAssessment/dueWork/comment.twig' with {
+        tabIndex: 2,
+        readonly: readonly,
+        selfReflection: true
+        } only %}
+    </div>
+{% endblock %}
+
 {# Action Bar #}
 {% block actionButtons %}
     {% spaceless %}
