@@ -18,28 +18,40 @@ $componentCollection = $componentFactory->buildComponentList($groupID);
 $occupiedPositionList = array();
 
 foreach ($componentCollection as $component) {
-    /** @var Component_Dashboard_ControllerAbstract $component */
-    $instance = $component->getInstance();
-    $templateTarget = "component_position_{$instance->getPosition()}";
-    $templateHandle = "component_{$instance->getId()}";
+    try {
+        /** @var Component_Dashboard_ControllerAbstract $component */
+        $instance = $component->getInstance();
+        $templateTarget = "component_position_{$instance->getPosition()}";
+        $templateHandle = "component_{$instance->getId()}";
 
-    $component->setup();
+        $component->setup();
 
-    if ($component->execute()) {
-        $component->parseConfig();
+        if ($component->execute()) {
+            $component->parseConfig();
 
-        if ($component->renderTemplate($templateHandle) !== false) {
-            if (!in_array($instance->getPosition(), $occupiedPositionList)) {
-                $occupiedPositionList[] = $instance->getPosition();
+            if ($component->renderTemplate($templateHandle) !== false) {
+                if (!in_array($instance->getPosition(), $occupiedPositionList)) {
+                    $occupiedPositionList[] = $instance->getPosition();
+                }
+
+                /* Admin configuration and index.php both use the same template.
+                 * The former uses the template to configure; but the latter doesn't
+                 * even display the title bar (which is now part of wrappers).
+                 */
+                $this->setVar('CONFIGURATION', '');
+                $this->parse($templateTarget, $templateHandle, true);
             }
-
-            /* Admin configuration and index.php both use the same template.
-             * The former uses the template to configure; but the latter doesn't
-             * even display the title bar (which is now part of wrappers).
-             */
-            $this->setVar('CONFIGURATION', '');
-            $this->parse($templateTarget, $templateHandle, true);
         }
+    } catch (\Throwable $e) {
+        // if a component explodes for any reason, we only want it to explode the page if we're in debug mode
+        if (Cfg::get('debug_mode')) {
+            throw $e;
+        }
+
+        /** @var Raven_Client $sentry */
+        $sentry = $this->getDi()->get('sentry');
+
+        $sentry->captureException($e);
     }
 }
 

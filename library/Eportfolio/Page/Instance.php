@@ -273,18 +273,30 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
 
         /** @var Component_ControllerAbstract $component */
         foreach ($this->getComponentCollection() as $component) {
-            $templateTarget = "component_position_{$component->getInstance()->getPosition()}";
-            $templateHandle = "component_{$component->getInstance()->getId()}";
+            try {
+                $templateTarget = "component_position_{$component->getInstance()->getPosition()}";
+                $templateHandle = "component_{$component->getInstance()->getId()}";
 
-            $component->setup($this);
-            if ($component->execute() !== false) {
-                if ($component->renderTemplate($templateHandle) !== false) {
-                    if (!in_array($component->getInstance()->getPosition(), $occupiedPositionList)) {
-                        $occupiedPositionList[] = $component->getInstance()->getPosition();
+                $component->setup($this);
+                if ($component->execute() !== false) {
+                    if ($component->renderTemplate($templateHandle) !== false) {
+                        if (!in_array($component->getInstance()->getPosition(), $occupiedPositionList)) {
+                            $occupiedPositionList[] = $component->getInstance()->getPosition();
+                        }
+
+                        $this->getPage()->parse($templateTarget, $templateHandle, true);
                     }
-
-                    $this->getPage()->parse($templateTarget, $templateHandle, true);
                 }
+            } catch (\Throwable $e) {
+                // if a component explodes for any reason, we only want it to explode the page if we're in debug mode
+                if (Cfg::get('debug_mode')) {
+                    throw $e;
+                }
+
+                /** @var Raven_Client $sentry */
+                $sentry = $this->getPage()->getDi()->get('sentry');
+
+                $sentry->captureException($e);
             }
         }
 
