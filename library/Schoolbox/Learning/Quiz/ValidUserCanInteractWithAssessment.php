@@ -63,10 +63,38 @@ class ValidUserCanInteractWithAssessment
      * @param Folder\Model $folder
      * @return bool
      */
-    protected function instructorCheck(User $user, Folder\Model $folder): bool
+    protected function isInstructor(User $user, Folder\Model $folder): bool
     {
         return Access::getInstance()->isInstructor($user, $folder);
     }
+
+    /**
+     * Does a dynamic plan exist?
+     *
+     * @param $assessmentId
+     * @return bool
+     * @throws Mapper\DefinitionException
+     */
+    protected function hasDynamicPlan($assessmentId): bool
+    {
+        $plans = $this->planMapper->findPlansAndParticipantsForAssessments([ $assessmentId ]);
+
+        /* If plans existed, investigate each
+         *
+         * While investigating, if you found a dynamic plan, let them in
+         * Otherwise deny access
+         */
+
+        /** @var Plan\Model $plan */
+        foreach ($plans as $plan) {
+            if ($plan->isDynamic()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 
     /**
      * 1. Only included (non-excluded) people can do this quiz
@@ -78,6 +106,7 @@ class ValidUserCanInteractWithAssessment
      * @param Folder\Model $folder
      * @param Quiz\Model   $assessment
      * @return bool
+     * @throws Mapper\DefinitionException
      * @throws Mapper\Exception
      * @throws \UnexpectedValueException
      */
@@ -89,37 +118,56 @@ class ValidUserCanInteractWithAssessment
             $user
         );
 
-        if ($participant && $this->isIncluded($participant)) {
+        /* If user is a participant, and they're included in the assessment,
+         * check the dates to see if they can get in
+         *
+         * Otherwise, if they've been excluded, they definitely get kicked out
+         * A user had to be a participant in order to be excluded
+         */
+        if ($participant) {
+            if ($this->isIncluded($participant)) {
 
-            /* Looks like everyone has a Plan in some way, regardless if it's custom or default?
-             */
-            $participant = $assessment->getParticipant($user);
+                /* Looks like everyone has a Plan in some way, regardless if it's custom or default?
+                 */
+                $participantDetails = $assessment->getParticipant($user);
 
-            /* Is currently open - allow
-             */
-            if (\Alaress_Date_Format::now()->lt($participant->getCloseDate())) {
-                return true;
-            }
-            else {
-                // TODO: Error out?
-            }
-
-            /* Has opened - allow
-             */
-            if (\Alaress_Date_Format::now()->gt($participant->getOpenDate())) {
-                return true;
-            }
-            else {
-                // TODO: Error out?
+                /* Is open and hasn't closed yet - allow
+                 */
+                if (\Alaress_Date_Format::now()->gt($participantDetails->getOpenDate())) {
+                    if (\Alaress_Date_Format::now()->lt($participantDetails->getCloseDate())) {
+                        return true;
+                    }
+                    else {
+                        // TODO: error(143) ?
+                    }
+                } else {
+                    // TODO: error(120) ?
+                }
             }
 
-            /* Included instructors can get in
+            /* You were excluded. You cannot be here.
              */
-            return $this->instructorCheck($user, $folder);
+            return false;
         }
 
-        /* You can't get in under any other circumstance
+        /* Instructors can always preview it initially
+         *
+         * They won't be included in the class list, so they won't have a dynamic plan,
+         * but they should be able to get in
          */
-        return false;
+        if ($this->isInstructor($user, $folder)) {
+            return true;
+        }
+
+        /* This occurs when you don't have a participation record
+         * Such a record spawns upon first interaction (apparently)
+         *
+         * If you're just a regular schmoe (i.e. not an instructor) you are beholden to the class list as defined
+         * by the SIS. If you're in it, you can get in (you "have a dynamic plan")
+         *
+         * Otherwise, you cannot be here because you weren't in the class list, and you aren't an instructor of
+         * any kind, so you're not meant to get in
+         */
+        return $this->hasDynamicPlan($assessment->getId());
     }
 }
