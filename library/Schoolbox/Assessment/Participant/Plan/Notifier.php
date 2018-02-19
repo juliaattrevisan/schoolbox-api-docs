@@ -13,6 +13,7 @@ use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -141,10 +142,20 @@ class Notifier extends AbstractModuleNotifier
         $envelope = new Envelope();
         $bob      = new Builder();
 
+//        // SOMEHOW: I need the swamp here!
+//        // It's the only reliable method for fetching assessment participants
+//        // GUESS WHAT I'M GOING TO DO UNDER PAIN OF DEATH
+//        /** @var MapperProxy $assessmentDataSource */
+//        $assessmentDataSource   = $this->mapper::getDi()->get('assessmentDataSource');
+//        $assessmentDomainObject = $assessmentDataSource->findByIdForReview($plan->getAssessment()->getId(), true);
+
 //        // Only do this for dynamic plans; all others have participants assigned manually
 //        if (!$plan->isDynamic()) {
 //            return $envelope;
 //        }
+
+//        // FFFFFFFUUUUUUUUUUUUUUUUUUU~~~~~~~~~
+//        $plan = $this->mapper->findById($plan->getId());
 
         // Hopefully I don't have to hydrate this myself
         // (Looks like I do)
@@ -152,6 +163,7 @@ class Notifier extends AbstractModuleNotifier
         $assessment  = $this->assessmentMapper->findById($plan->getAssessment()->getId());
         $folder      = $assessment->getAssessmentContext()->getFolder();
         $box         = $assessment->getDueWork();
+//        $this->log->warning(isset($box) ? get_class($box) : "null");
         if (!$box) {
             // I'm in the wrong place
             return $envelope;
@@ -184,6 +196,9 @@ class Notifier extends AbstractModuleNotifier
 
         // Send to every participant in the plan
         // TODO figure out how dynamic participants are hydrated
+        // Answer: that's down in the swamp. Need to get them out somehow
+//        $this->log->warning(json_encode($plan->getParticipants()));
+
         foreach ($plan->getParticipants() as $participant) {
             if ($participant->isExcluded()) {
                 continue;
@@ -208,5 +223,25 @@ class Notifier extends AbstractModuleNotifier
     private function buildParticipantRoute(AssessmentModel $assessment, User $student)
     {
         return sprintf('/learning/assessments/%s/%s', $assessment->getId(), $student->getId());
+    }
+
+    /**
+     * @param AssessmentMapper $assessmentMapper
+     * @return static
+     */
+    protected function setAssessmentMapper(AssessmentMapper $assessmentMapper): self
+    {
+        $this->assessmentMapper = $assessmentMapper;
+        return $this;
+    }
+
+    /**
+     * @param UserAccessMapper $userAccessMapper
+     * @return static
+     */
+    protected function setUserAccessMapper(UserAccessMapper $userAccessMapper): self
+    {
+        $this->userAccessMapper = $userAccessMapper;
+        return $this;
     }
 }
