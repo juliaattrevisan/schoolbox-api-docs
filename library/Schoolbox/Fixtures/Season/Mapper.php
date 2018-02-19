@@ -52,7 +52,7 @@ class Mapper extends BaseMapper
      */
     public function deleteDivisions(Season $season)
     {
-        $allDivisions = DivisionMapper::getInstance()->findByColumn('season_id', $season->getId());
+        $allDivisions = DivisionMapper::getInstance()->findByColumn('season_id', $season->getId(), ['cache' => false]);
 
         foreach ($allDivisions as $currentDivision) {
             DivisionMapper::getInstance()->delete($currentDivision);
