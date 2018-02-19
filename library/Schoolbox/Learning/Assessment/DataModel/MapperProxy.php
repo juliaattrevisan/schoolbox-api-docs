@@ -840,6 +840,9 @@ class MapperProxy
         if (!$isCreate) {
             $this->baseMapper->save($dataModel);
         }
+
+        // TODO If at all possible, trigger the assessment notifier here so that it contains all assessment information
+        // Will need to move participant persistence here before that can happen though.
     }
 
     /**
