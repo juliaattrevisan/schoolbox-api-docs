@@ -268,7 +268,7 @@ class Notifier extends AbstractModuleNotifier
             return $envelope;
         }
 
-        $bob->setParam('catname', new CategoryParam($folder))
+        $bob->setParam('cat', new CategoryParam($folder))
             ->setIcon("/images/icon.php?" . http_build_query(['size' => $this->iconSize, 'icon' => 'work']))
             ->setNamespace(NSMapper::NS_DUEWORK)
             ->setSeverity(Logger::WARNING)
@@ -293,14 +293,14 @@ class Notifier extends AbstractModuleNotifier
                 $when = $participant->getDueDate()->getRelativeTime(Alaress_Date_Format::now()->addMinutes(-5), true);
 
                 // build for student
-                $bob->setTitle(":boxname is due $when from now in :catname")
+                $bob->setTitle(":box is due $when from now in :cat")
                     ->setHref($href)
                     ->setBody($participant->getDescription())
                     ->setParam('box', new Param($assessmentDomainObject->getTitle(), $href));
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // build for parent
-                $bob->setTitle(":child has not yet submitted work for :boxname, which is due $when from now in :catname")
+                $bob->setTitle(":child has not yet submitted work for :box, which is due $when from now in :cat")
                     ->setParam('child', new ChildParam($participant->getUser(), ParameterInterface::STACKING_REPLACE));
                 $envelope->targetToParent($participant->getUser(), $bob->build());
 
