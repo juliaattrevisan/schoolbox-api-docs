@@ -95,9 +95,9 @@ class Mapper extends BaseMapper
      * Any notifications related to assessment participations must be deferred
      * until all participations are saved.
      *
-     * @param object $object
-     * @param string $verb
-     * @param null   $previous
+     * @param object      $object
+     * @param string      $verb
+     * @param object|null $previous
      * @return bool
      */
     protected function raiseNotification($object, $verb, $previous = null)
