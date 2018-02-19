@@ -206,10 +206,6 @@ class Notifier extends AbstractModuleNotifier
             in_array(strtolower($boxType[0]), ['a', 'e', 'i', 'o', 'u'], true) ? 'an' : 'a'
             : '';
 
-        // Pull from plan in preference to assessment where the settings can be customised per plan
-        $dueDate     = $plan->getDueDate()     ?? $assessmentDomainObject->getCloseAt();
-        $description = $plan->getDescription() ?? $assessmentDomainObject->getDescription();
-
         $bob->setTitle(":user opened $indefArticle $boxType :box in :cat")
             ->setParams([
                 'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
@@ -221,8 +217,6 @@ class Notifier extends AbstractModuleNotifier
             ->setNamespace(NSMapper::NS_DUEWORK)
             ->addTopic("duework.{$boxId}.open")
             ->addFilter('roletype', [Role::STUDENT])
-            ->setBody($description)
-            ->setByline("Due {$dueDate->getCalendarDateTime()}")
             ->setSeverity(Logger::NOTICE);
 
 
@@ -237,6 +231,8 @@ class Notifier extends AbstractModuleNotifier
                 }
                 $href = $this->buildParticipantRoute($assessmentDomainObject, $participant->getUser());
                 $bob->setHref($href)
+                    ->setBody($participant->getDescription())
+                    ->setByline("Due {$participant->getDueDate()->getCalendarDateTime()}")
                     ->setParam('box', new Param($assessmentDomainObject->getTitle(), $href));
                 $envelope->targetToUser($participant->getUser(), $bob->build());
             }
