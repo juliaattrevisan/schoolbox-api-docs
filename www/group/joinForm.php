@@ -1,4 +1,5 @@
 <?php
+
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
@@ -18,89 +19,91 @@ $uaMapper = UserAccessMapper::getInstance();
 // handle both ajax and form submissions
 $groupsSelected = [];
 if (!empty($_POST['group'])) {
-	$groupsSelected = $_POST['group'];
+    $groupsSelected = $_POST['group'];
 } elseif (is_numeric($_GET['join'])) {
-	$groupsSelected[$_GET['join']] = true;
+    $groupsSelected[$_GET['join']] = true;
 } elseif (is_numeric($_GET['leave'])) {
-	$groupsSelected[$_GET['leave']] = false;
+    $groupsSelected[$_GET['leave']] = false;
 }
 
 /** @var Schoolbox\User $user */
 $user = $_SESSION['user'];
 foreach ($groupsSelected as $groupId => $isJoining) {
-	if ($isJoining) {
-		$group = $groupHandler->getByID($groupId);
+    if ($isJoining) {
+        $group = $groupHandler->getByID($groupId);
 
-		try {
-			$ua = $uaMapper->findOneByColumnList([
-				'uid' => $user->getId(),
-				'service' => UserAccess::SERVICE_HOMEPAGE,
-				'sid'     => $groupId,
-			]);
-		} catch (Mapper\Exception $e) {
-			$ua = new UserAccess();
-			$ua->setUser($user)
-				->setAccessLevel(UserAccess::ACCESS_DENY)
-				->setService(UserAccess::SERVICE_HOMEPAGE)
-				->setServiceIdentifier($groupId);
-		}
+        try {
+            $ua = $uaMapper->findOneByColumnList(
+                [
+                    'uid'     => $user->getId(),
+                    'service' => UserAccess::SERVICE_HOMEPAGE,
+                    'sid'     => $groupId,
+                ]
+            );
+        } catch (Mapper\Exception $e) {
+            $ua = new UserAccess();
+            $ua->setUser($user)
+                ->setAccessLevel(UserAccess::ACCESS_DENY)
+                ->setService(UserAccess::SERVICE_HOMEPAGE)
+                ->setServiceIdentifier($groupId);
+        }
 
-		if ($group['type'] == GROUP_TYPE_FREE) {
-			// allow read access immediately for a free group
-            if($ua->getAccessLevel() < UserAccess::ACCESS_READ) {
+        if ($group['type'] == GROUP_TYPE_FREE) {
+            // allow read access immediately for a free group
+            if ($ua->getAccessLevel() < UserAccess::ACCESS_READ) {
                 $ua->setAccessLevel(UserAccess::ACCESS_READ);
                 $uaMapper->save($ua);
                 $response = 'joined';
             }
-		}
-		else if ($group['type'] == GROUP_TYPE_MODERATED) {
-			// insert the user into the perms table, but deny them access (pending state)
-			// If they already have access, keep it as is.
-			$uaMapper->save($ua);
-			$response = 'pending';
-		}
+        } else if ($group['type'] == GROUP_TYPE_MODERATED) {
+            // insert the user into the perms table, but deny them access (pending state)
+            // If they already have access, keep it as is.
+            $uaMapper->save($ua);
+            $response = 'pending';
+        }
 
-	} else {
-		// delete the record that matches the given params
-		$count = $uaMapper->deleteByColumnList(array(
-			'service' => UserAccess::SERVICE_HOMEPAGE,
-			'uid'     => $user->getId(),
-			'sid'     => $groupId
-		));
+    } else {
+        // delete the record that matches the given params
+        $count = $uaMapper->deleteByColumnList(
+            array(
+                'service' => UserAccess::SERVICE_HOMEPAGE,
+                'uid'     => $user->getId(),
+                'sid'     => $groupId
+            )
+        );
 
-		if($count) {
-			$response = 'left';
+        if ($count) {
+            $response = 'left';
 
-			// we need to manually raise a DELETE notification
-			// since the Mapper can't automagically do it for this Model
-			$model = new UserAccess();
-			$model->setUser($user)
-				->setAccessLevel(UserAccess::ACCESS_DENY)
-				->setService(UserAccess::SERVICE_HOMEPAGE)
-				->setServiceIdentifier($groupId);
+            // we need to manually raise a DELETE notification
+            // since the Mapper can't automagically do it for this Model
+            $model = new UserAccess();
+            $model->setUser($user)
+                ->setAccessLevel(UserAccess::ACCESS_DENY)
+                ->setService(UserAccess::SERVICE_HOMEPAGE)
+                ->setServiceIdentifier($groupId);
 
-			$event = new Event($user, Mapper::METHOD_DELETE, $model, $uaMapper);
-			$notif = Notifactory::create(Notif::TOPIC_APPLICATION);
-			$notif->notice(serialize($event));
-		}
-	}
+            $event = new Event($user, Mapper::METHOD_DELETE, $model, $uaMapper);
+            $notif = Notifactory::create(Notif::TOPIC_APPLICATION);
+            $notif->notice(serialize($event));
+        }
+    }
 }
 
 // if there is an ajax flag, return a json response
 if ($page->detectAjax()) {
-	http_response_code(202);
-	header('Content-Type: application/json');
-	die(json_encode(array('status' => $response)));
+    http_response_code(202);
+    header('Content-Type: application/json');
+    die(json_encode(array('status' => $response)));
 }
 
 /* If the Return parameter is set, go back to the referring page.
  * Otherwise redirect to the generic group/join page
  */
 if ($_GET['return']) {
-	$page->backToTheFuture(1);
-}
-else {
-	SitePage::localRedir('/group/join');
+    $page->backToTheFuture(1);
+} else {
+    SitePage::localRedir('/group/join');
 }
 
 exit();
