@@ -231,6 +231,7 @@ class Controller extends Assessment\Controller
             'authoritativeFeedback' => $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null,
         ];
 
+        // TODO SA-6125 - this duplicates module route auth logic. Need to find a way to define this logic in one place only.
         $twigData['submissionsBlocked']    = false;
         $twigData['acknowlegementBlocked'] = false;
 
