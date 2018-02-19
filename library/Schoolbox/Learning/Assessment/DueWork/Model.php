@@ -177,9 +177,9 @@ class Model extends AbstractAssessment implements ISelfAssessable
      *      - If the assessment only accepts single, and a submitted response already exists for this participant
      *      - You're not a student of this assessment's class (folder)
      *
-     * @param Participant $participant
+     * @param null|Participant $participant
      */
-    public function assertAcceptSubmission(Participant $participant)
+    public function assertAcceptSubmission(?Participant $participant)
     {
         $this->assertOpen($participant);
 
@@ -202,9 +202,9 @@ class Model extends AbstractAssessment implements ISelfAssessable
      * This action is only available to open due works that the participant has
      * not yet responded to.
      *
-     * @param Participant $participant
+     * @param null|Participant $participant
      */
-    public function assertAcceptAcknowledgement(Participant $participant)
+    public function assertAcceptAcknowledgement(?Participant $participant)
     {
         $this->assertOpen($participant);
 
