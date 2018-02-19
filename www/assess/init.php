@@ -12,6 +12,7 @@ use Schoolbox\Assessment\Participant;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Quiz;
+use Schoolbox\Learning\Quiz\ValidUserCanInteractWithAssessment;
 use Schoolbox\Learning\Quiz\ValidUserViewsAssessment;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
@@ -59,14 +60,6 @@ catch (Mapper\Exception $e) {
     error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
 }
 
-/* Non-participants are sent to a 404 screen
- */
-$canViewAssessment = new ValidUserViewsAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
-
-if (!$canViewAssessment->isSatisfiedBy($_SESSION['user'], $folder, $assess['assessment_id'])) {
-    $this->pageNotFound();
-}
-
 /* Check if you are in this category, so you can't submit other category's
  * online assessments unless you are a part of that category.
  */
@@ -83,23 +76,19 @@ catch (\UnexpectedValueException $e) {
     error(Error\Mapper::ERROR_NONPARTICIPANT);
 }
 
+/* Non-participants are sent to a 404 screen
+ */
+$canInteract = new ValidUserCanInteractWithAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
+
+if (!$canInteract->isSatisfiedBy($_SESSION['user'], $folder, $assessment)) {
+    $this->pageNotFound();
+}
 
 if ($accessLevel < UserAccess::ACCESS_WRITE) {
     // I can't attempt a spec assessment
     if ($assessment->isSpecification()) {
         error(19);
     }
-
-    // I can't attempt this if it has expired
-    if (\Alaress_Date_Format::now()->gt($participant->getCloseDate())) {
-        error(120);
-    }
-
-    // I can't attempt this if it isn't open
-    if (\Alaress_Date_Format::now()->lt($participant->getOpenDate())) {
-        error(143);
-    }
-
 } else {
     // I can do whatever I want
 }
