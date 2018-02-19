@@ -16,7 +16,7 @@
 
         {# TODO skip this if not displaying counts, eg to teacher #}
         {# count students which have completed this #}
-        {% for participant in assessment.allParticipants %}
+        {% for participant in assessment.allParticipants if not participant.isExcluded %}
             {% if not participant.responseRequired %}
                 {% set completionCount = completionCount + 1 %}
             {% endif %}
