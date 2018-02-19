@@ -241,15 +241,30 @@
                 var oldPlanId = $customiseModal.find('#plan-id').val();
                 var newPlanId = -1 * self.newPlanCount;
 
-                var planDetails = {
-                    'id': newPlan ? newPlanId : oldPlanId,
-                    'name': $customiseModal.find('#plan-name').val(),
-                    'description': CKEDITOR.instances['plan-desc'].getData(),
-                    'publishDate': $customiseModal.find('#plan-publish-date').val(),
-                    'openDate': $customiseModal.find('#plan-open-date').val(),
-                    'dueDate': $customiseModal.find('#plan-due-date').val(),
-                    'closeDate': $customiseModal.find('#plan-close-date').val()
-                };
+                var planDetails = {};
+                var assessmentType = $('[name=assessmentType]').val();
+
+                if (assessmentType !== 'task') {
+                    planDetails = {
+                        'id': newPlan ? newPlanId : oldPlanId,
+                        'name': $customiseModal.find('#plan-name').val(),
+                        'description': CKEDITOR.instances['plan-desc'].getData(),
+                        'publishDate': $customiseModal.find('#plan-publish-date').val(),
+                        'openDate': $customiseModal.find('#plan-open-date').val(),
+                        'dueDate': $customiseModal.find('#plan-due-date').val(),
+                        'closeDate': $customiseModal.find('#plan-close-date').val()
+                    };
+                } else {
+                    planDetails = {
+                        'id': newPlan ? newPlanId : oldPlanId,
+                        'name': $customiseModal.find('#plan-name').val(),
+                        'description': CKEDITOR.instances['plan-desc'].getData(),
+                        'publishDate': $customiseModal.find('#plan-publish-date').val(),
+                        'openDate': null,
+                        'dueDate': $customiseModal.find('#plan-due-date').val(),
+                        'closeDate': null
+                    };
+                }
 
                 newPlan ? addPlanData(planDetails) : updatePlanData(planDetails);
 

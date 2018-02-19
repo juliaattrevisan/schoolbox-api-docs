@@ -460,16 +460,17 @@ class ListController extends Web\Controller\Base
         foreach ($postPlans as $planId => $planData) {
             // if planId == 0, it's either the dyna-plan or invalid data, but ignorable either way
 
+            //Handle tasks, which do not post this data
+            if (!isset($planData['open_date']) || $planData['open_date'] == "") {
+                $planData['open_date'] = $planData['publish_date'];
+            }
+
+            if (!isset($planData['close_date']) || $planData['close_date'] == "") {
+                $planData['close_date'] = $planData['due_date'];
+            }
+
             if ($planId > 0) {
                 // existing plan updates
-                if (!isset($planData['open_date'])) {
-                    $planData['open_date'] = $planData['publish_date'];
-                }
-
-                if (!isset($planData['close_date'])) {
-                    $planData['close_date'] = $planData['due_date'];
-                }
-
                 $plans[$planId] = $planMap
                     ->createModel($planId)
                     ->setName($planData['name'])
