@@ -181,13 +181,14 @@ class Notifier extends AbstractModuleNotifier
         // (Looks like I do)
         // (I probably have to hydrate participation manually too -_-)
         $folder      = $assessmentDomainObject->getBaseContext()->getFolder();
-//        $this->log->warning(isset($box) ? get_class($box) : "null");
+//        $this->log->warning(get_class($assessmentDomainObject));
         if (!$assessmentDomainObject instanceof DueWork) {
             // I'm in the wrong place
             return $envelope;
         }
 
-        $assessment  = $this->assessmentMapper->findById($plan->getAssessment()->getId());
+        $assessment = $this->assessmentMapper->findById($plan->getAssessment()->getId());
+//        $this->log->warning(get_class($assessment->getDueWork()));
         if (!$assessment->getDueWork()) {
             // I'm in the wrong place
             return $envelope;
@@ -223,17 +224,21 @@ class Notifier extends AbstractModuleNotifier
         // Send to every participant in the plan
         // TODO figure out how dynamic participants are hydrated
         // Answer: that's down in the swamp. Need to get them out somehow
-//        $this->log->warning(json_encode($plan->getParticipants()));
-
-        foreach ($plan->getParticipants() as $participant) {
-            if ($participant->isExcluded()) {
+        foreach ($assessmentDomainObject->getPlans() as $assessmentPlan) {
+            if ($assessmentPlan->getId() != $plan->getId()) {
                 continue;
             }
-            $href = $this->buildParticipantRoute($assessmentDomainObject, $participant->getUser());
-            $bob
-                ->setHref($href)
-                ->setParam('box', new Param($boxName, $href));
-            $envelope->targetToUser($participant->getUser(), $bob->build());
+//            $this->log->warning(json_encode($assessmentPlan->getParticipants()));
+            foreach ($assessmentPlan->getParticipants() as $participant) {
+                if ($participant->isExcluded()) {
+                    continue;
+                }
+                $href = $this->buildParticipantRoute($assessmentDomainObject, $participant->getUser());
+                $bob
+                    ->setHref($href)
+                    ->setParam('box', new Param($boxName, $href));
+                $envelope->targetToUser($participant->getUser(), $bob->build());
+            }
         }
 
         return $envelope;
