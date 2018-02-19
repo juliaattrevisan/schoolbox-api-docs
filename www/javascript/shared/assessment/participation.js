@@ -320,18 +320,18 @@
         var $participantRow = $(defaults.participants).find('li[data-participant=' + studentID + ']');
         var $participantCard = $participantRow.find('div.card');
 
-        var studentsWithInteractions = getCheckedParticipantsWithInteractions();
+        var selectedStudentsWithInteractions = getCheckedParticipantsWithInteractions();
         
-        var dialogText = 'The following student(s) have submissions and/or feedback for this assessment.<ul>';
-        $(studentsWithInteractions).each(function() {
-            dialogText += "<li>";
-            var studentIcon = $(this).find("img").html();
-            var studentName = $(this).find("p").html();
-            dialogText += studentIcon;
-            dialogText += studentName;
-            dialogText += "</li>";
+        var dialogText = '<p>The following student(s) have submissions and/or feedback for this assessment:</p><ul class="information-list">';
+        $(selectedStudentsWithInteractions).each(function() {
+            dialogText += "<li><div class='row'><div class='small-12 list-item compact card'>";
+
+            var studentInfo = $(this).html();
+            dialogText += studentInfo;
+
+            dialogText += "</div></div></li>";
         })
-        dialogText += "</ul>Exclusion from this assessment will remove access to these submissions and/or feedback.";
+        dialogText += "</ul><br/><p>Exclusion from this assessment will remove access to these submissions and/or feedback. Proceed?</p>";
 
         if (include) {
             $participantCard.removeClass('participant-excluded');
