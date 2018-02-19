@@ -333,6 +333,9 @@ class ListController extends Web\Controller\Base
          * Controller must return early for that to happen
          */
         try {
+            // What kind of action is happening?
+            $planMapper = $this->participantDataSource->getPlanMapper();
+            $action     = $assessment ? $planMapper::METHOD_CREATE : $planMapper::METHOD_UPDATE;
 
             /* Figure out what kind of assessment was chosen
              * and spawn a new instance of it to manipulate
@@ -357,11 +360,10 @@ class ListController extends Web\Controller\Base
             // Participant object has little idea of whether assessment was created or updated,
             // so just show updated.
             // Will need to rework actual notifs so they're verb-agnostic (besides delete)
-            $planMapper = $this->participantDataSource->getPlanMapper();
             foreach ($plans as $plan) {
                 $planMapper->getEventPropagator()->propagate(
                     $this->getUser(),
-                    $planMapper::METHOD_UPDATE,
+                    $action,
                     $plan,
                     $planMapper,
                     [] // ¯\_(ツ)_/¯
