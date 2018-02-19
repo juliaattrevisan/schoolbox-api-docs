@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Participant\Plan;
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
+use Alaress_Date_Format;
 use Monolog\Logger;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
@@ -121,10 +122,10 @@ class Notifier extends AbstractModuleNotifier
         }
 
         if ($assessment->getDueWork()) {
-            $bundle->attach(
-                self::TRIGGER_DUEWORK_OPEN,
-                ($plan->getOpenDate() ?? $assessment->getOpenDate())->getUnixTimeStamp()
-            );
+            $openDate = $this->coalesceDates($plan->getOpenDate(), $assessment->getOpenDate());
+            if ($openDate) {
+                $bundle->attach(self::TRIGGER_DUEWORK_OPEN, $openDate->getUnixTimeStamp());
+            }
 //            $bundle->attachEach([
 //                self::TRIGGER_DUEWORK_OPEN     => ($participant->getPlan()->getOpenDate() ?? $assessment->getOpenDate())->getUnixTimeStamp(),
 //                self::TRIGGER_DUEWORK_OVERDUE  => $participant->getPlan()->getDueDate(),
@@ -274,5 +275,23 @@ class Notifier extends AbstractModuleNotifier
     {
         $this->userAccessMapper = $userAccessMapper;
         return $this;
+    }
+
+    /**
+     * Get the first non-null date in `$dates`, or null otherwise.
+     *
+     * Currently only needed for triggering a bundle for a plan.
+     *
+     * @param Alaress_Date_Format[]|null[] ...$dates
+     * @return Alaress_Date_Format|null
+     */
+    private function coalesceDates(?Alaress_Date_Format... $dates): ?Alaress_Date_Format
+    {
+        foreach ($dates as $date) {
+            if ($date instanceof Alaress_Date_Format && !$date->isNull()) {
+                return $date;
+            }
+        }
+        return null;
     }
 }
