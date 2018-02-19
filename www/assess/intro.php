@@ -15,6 +15,8 @@ use Schoolbox\Breadcrumbs;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Quiz\ValidUserCanInteractWithAssessment;
+use Schoolbox\Learning\Quiz\ValidUserCanViewAssessment;
 use Schoolbox\Learning\Quiz\ValidUserViewsAssessment;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -60,9 +62,6 @@ try {
 catch (Mapper\Exception $e) {
     error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
 }
-
-$canViewAssessment = new ValidUserViewsAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
-$satisfaction = $canViewAssessment->isSatisfiedBy($_SESSION['user'], $folder, $assess['assessment_id']);
 
 /* Check if you are in this category, so you can't submit other category's
  * online assessments unless you are a part of that category.
@@ -112,7 +111,10 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
 
     /* Non-participating learners are sent to a 404 screen
      */
-    if (!$satisfaction) {
+    $viewSatisfaction = (new ValidUserCanViewAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance()))
+        ->isSatisfiedBy($_SESSION['user'], $folder, $assessment);
+
+    if (!$viewSatisfaction) {
         $this->pageNotFound();
     }
 
@@ -150,7 +152,10 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
 } else {
     /* Non-participating instructors have the call-to-action hidden instead of 404
      */
-    if (!$satisfaction) {
+    $interactSatisfaction = (new ValidUserCanInteractWithAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance()))
+        ->isSatisfiedBy($_SESSION['user'], $folder, $assessment);
+
+    if (!$interactSatisfaction) {
         $readOnly = true;
     }
 }
