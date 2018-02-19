@@ -344,6 +344,7 @@ class ListController extends Web\Controller\Base
             $assessmentId = $assessment->getId();
 
             // assessment is saved; persist plans
+            // TODO: move this to the swamp or some other reusable place; there is more than one way to save an assess
 
             // Note: in the returned collection
             //    - any plans CREATED by this method will be NEGATIVELY INDEXED (the object has a real ID though)
@@ -351,6 +352,21 @@ class ListController extends Web\Controller\Base
             $plans = $this->savePlanData($assessment, $postData['plans'] ?? []);
 
             $this->saveParticipationData($plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
+
+            // Now, trigger notifiers
+            // Participant object has little idea of whether assessment was created or updated,
+            // so just show updated.
+            // Will need to rework actual notifs so they're verb-agnostic (besides delete)
+            $planMapper = $this->participantDataSource->getPlanMapper();
+            foreach ($plans as $plan) {
+                $planMapper->getEventPropagator()->propagate(
+                    $this->getUser(),
+                    $planMapper::METHOD_UPDATE,
+                    $plan,
+                    $planMapper,
+                    [] // ¯\_(ツ)_/¯
+                );
+            }
         }
         catch (RangeException|InvalidArgumentException|UnexpectedValueException|PDOException $e) {
             // cast
