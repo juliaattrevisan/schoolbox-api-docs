@@ -62,7 +62,7 @@ class Mapper extends BaseMapper
      */
     public function deleteMatches(Season $season)
     {
-        MatchMapper::getInstance()->deleteByColumn('season_id', $season->getId());
+        MatchMapper::getInstance()->deleteByColumn('season_id', $season->getId(), ['cache' => false]);
     }
 
     /**
