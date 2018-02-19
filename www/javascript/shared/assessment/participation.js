@@ -147,10 +147,14 @@
                             format: 'html',
                             cancelEvent: function() {
                                 return false; // Break out of the loop entirely if user said no
+                            },
+                            confirmEvent: function () {
+                                updateStudentStatus(studentID, false, self);
                             }
                         });
+                    } else {
+                        updateStudentStatus(studentID, false, self);
                     }
-                    updateStudentStatus(studentID, false, self);
                 }
             });
 
