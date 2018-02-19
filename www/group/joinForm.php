@@ -47,9 +47,11 @@ foreach ($groupsSelected as $groupId => $isJoining) {
 
 		if ($group['type'] == GROUP_TYPE_FREE) {
 			// allow read access immediately for a free group
-			$ua->setAccessLevel(UserAccess::ACCESS_READ);
-			$uaMapper->save($ua);
-			$response = 'joined';
+            if($ua->getAccessLevel() < UserAccess::ACCESS_READ) {
+                $ua->setAccessLevel(UserAccess::ACCESS_READ);
+                $uaMapper->save($ua);
+                $response = 'joined';
+            }
 		}
 		else if ($group['type'] == GROUP_TYPE_MODERATED) {
 			// insert the user into the perms table, but deny them access (pending state)
