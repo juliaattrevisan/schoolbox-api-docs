@@ -10,7 +10,6 @@ namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Web;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\User;
 

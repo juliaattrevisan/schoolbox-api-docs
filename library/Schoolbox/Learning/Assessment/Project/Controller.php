@@ -10,7 +10,6 @@ namespace Schoolbox\Learning\Assessment\Project;
 
 use Alaress_Date_Format;
 use Aura\Di\Exception\ServiceNotFound;
-use Schoolbox\Application\Exception as Application;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment;
@@ -18,9 +17,6 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Learning\Assessment\Task\Model as Task;
-use Schoolbox\Error;
 use Schoolbox\User;
 
 class Controller extends Assessment\Controller

@@ -13,7 +13,6 @@ use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use DueWork_ErrorMapper;
-use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\GenericCollection;
@@ -45,7 +44,6 @@ use Schoolbox\UserMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Assessment\Rubric\Descriptor as RubricDescriptor;
 use Schoolbox\Assessment\Term;
-use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Learning\InlineGrader\Kami;
 
 class Controller extends Assessment\Controller
