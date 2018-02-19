@@ -124,26 +124,12 @@
             // Reflect the change in the UI
             var $studentsSelected = $participants.find(':checked').closest('li');
 
-            // Used to output list of students in interaction warning dialog
-            var studentListHtmlString = "";
-
-            // TODO probably factor this out
-            $studentsSelected.each(function() {
-                // Hack together a list of selected students with interactions that can be rendered in the confirm dialog
-
-                if ($(this).find('.card').is('[data-has-interaction]')) {
-                    studentListHtmlString += "<li><div class='row'><div class='small-12 list-item compact card'>";
-                    studentListHtmlString += $(this).find('div.card').html();
-                    studentListHtmlString += "</div></div></li>";
-                }
-            })
-
             // If we're excluding students and any of them have interactions, warn the user
             if (action === 'exclude' && anyHaveInteractions($studentsSelected)) {
 
                 $(self).confirmDialog({
                     text: "<p>The following student(s) have submissions and/or feedback for this assessment:</p><ul class=\"information-list\">" +
-                    studentListHtmlString + "</ul><br/><p>Exclusion from this assessment will remove access to these submissions and/or feedback. Proceed?</p>",
+                    getStudentListHTMLString($studentsSelected) + "</ul><br/><p>Exclusion from this assessment will remove access to these submissions and/or feedback. Proceed?</p>",
                     format: 'html',
                     cancelEvent: function() {
                         //do nothing??
@@ -186,6 +172,7 @@
          * Return a boolean representing whether any of the students in the given list have feedbacks and/or responses.
          *
          * @param {Object}       $participants        jQuery object containing a list of participant DOM elements
+         * @returns {boolean}
          */
         function anyHaveInteractions($participants) {
             var anyInteractions = false;
@@ -196,6 +183,25 @@
                 }
             });
             return anyInteractions;
+        }
+
+        /**
+         * Hack together a list of students with interactions that can be rendered in the confirm dialog
+         * @param {Object}      $participants       jQuery object containing a list of participant DOM elements
+         * @returns {string}
+         */
+        function getStudentListHTMLString($participants) {
+            var studentListHtmlString = "";
+
+            $participants.each(function() {
+                if ($(this).find('.card').is('[data-has-interaction]')) {
+                    studentListHtmlString += "<li><div class='row'><div class='small-12 list-item compact card'>";
+                    studentListHtmlString += $(this).find('div.card').html();
+                    studentListHtmlString += "</div></div></li>";
+                }
+            });
+
+            return studentListHtmlString;
         }
 
 
