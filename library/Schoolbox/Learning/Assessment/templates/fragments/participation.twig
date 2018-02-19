@@ -91,6 +91,8 @@
                                 <div class="small-12 column">
                                     <div class="row">
                                         <label for="participant-{{ user.id }}" class="checkbox-label">
+                                            {# TODO remove this after testing #}
+                                            {{ hasInteraction }}
                                             <div class="small-12 medium-6 columns compact card{{ userInclude ? '' : ' participant-excluded' }}" {% if hasInteraction %}data-has-interaction{% endif %}>
                                                 <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square32">
                                                 <p>{{ user.fullName }}</p>

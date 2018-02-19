@@ -113,7 +113,6 @@
             reinitCKE();
         });
 
-
         /**
          *  Including/excluding students
          */
@@ -142,8 +141,7 @@
                 if ((action === 'include' && isExcluded) || action === 'default') {
                     updateStudentStatus(studentID, true, self);
                 } else if (action === 'exclude') {
-                    if (anyHaveInteractions($studentsSelected)) {
-                        console.log("There are interactions somewhere");
+                    if (anyHaveInteractions($participants.find("li"))) {
                         $(self).confirmDialog({
                             text: "<p>The following student(s) have submissions and/or feedback for this assessment:</p><ul class=\"information-list\">" + studentListHtmlString + "</ul><br/><p>Exclusion from this assessment will remove access to these submissions and/or feedback. Proceed?</p>",
                             format: 'html',
@@ -152,7 +150,6 @@
                             }
                         });
                     }
-                    console.log("No interactions");
                     updateStudentStatus(studentID, false, self);
                 }
             });
@@ -375,16 +372,14 @@
         }
     }
 
-    function anyHaveInteractions(participants) {
-        var anyInteractions = false;
-
-        $(participants).each(function() {
-            var $participantCard = $(this).find('div.card');
+    function anyHaveInteractions($participants) {
+        anyInteractions = false;
+        $participants.each(function() {
+            var $participantCard = $(this).find('.card');
             if ($participantCard.is("[data-has-interaction]")) {
                 anyInteractions = true;
             }
         });
-
         return anyInteractions;
     }
 
