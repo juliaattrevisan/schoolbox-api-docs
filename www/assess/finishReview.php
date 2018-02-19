@@ -15,6 +15,7 @@ use Schoolbox\Learning\Quiz\Model as Quiz;
 
 use Schoolbox\Assessment\Participant;
 use Schoolbox\Error;
+use Schoolbox\Learning\Quiz\ValidUserCanInteractWithAssessment;
 use Schoolbox\Learning\Quiz\ValidUserViewsAssessment;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
@@ -84,9 +85,9 @@ catch (Mapper\Exception $e) {
 
 /* Non-participants are sent to a 404 screen
  */
-$canViewAssessment = new ValidUserViewsAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
+$canInteract = new ValidUserCanInteractWithAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
 
-if (!$canViewAssessment->isSatisfiedBy($user, $folder, $assess['assessment_id'])) {
+if (!$canInteract->isSatisfiedBy($_SESSION['user'], $folder, $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], $_SESSION['user']))) {
     $this->pageNotFound();
 }
 
