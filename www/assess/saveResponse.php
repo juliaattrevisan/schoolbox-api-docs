@@ -11,6 +11,7 @@
 use Schoolbox\Assessment\Participant;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Quiz\ValidUserCanInteractWithAssessment;
 use Schoolbox\Learning\Quiz\ValidUserViewsAssessment;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -49,9 +50,9 @@ $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], $a
 
 /* Non-participants are sent to a 404 screen
  */
-$canViewAssessment = new ValidUserViewsAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
+$canInteract = new ValidUserCanInteractWithAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
 
-if (!$canViewAssessment->isSatisfiedBy($_SESSION['user'], $assessmentFolder, $assess['assessment_id'])) {
+if (!$canInteract->isSatisfiedBy($_SESSION['user'], $folder, $assessment)) {
     $this->pageNotFound();
 }
 
@@ -70,17 +71,6 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
     if ($assessment->isSpecification()) {
         error(19);
     }
-
-    // I can't attempt this if it has expired
-    if (\Alaress_Date_Format::now()->gt($participant->getCloseDate())) {
-        error(120);
-    }
-
-    // I can't attempt this if it isn't open
-    if (\Alaress_Date_Format::now()->lt($participant->getOpenDate())) {
-        error(143);
-    }
-
 } else {
     // I can do whatever I want
 }
