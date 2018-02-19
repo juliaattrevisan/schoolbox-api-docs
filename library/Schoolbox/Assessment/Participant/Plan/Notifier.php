@@ -143,19 +143,19 @@ class Notifier extends AbstractModuleNotifier
                 if ($dueDate) {
                     $upcomingDate = (clone $dueDate)->addDays(-self::DUEWORK_UPCOMING_WINDOW);
                     $bundle->attach(self::TRIGGER_DUEWORK_UPCOMING, $upcomingDate->getUnixTimeStamp());
-                    $bundle->attach(self::TRIGGER_DUEWORK_OVERDUE, $dueDate->getUnixTimeStamp());
+//                    $bundle->attach(self::TRIGGER_DUEWORK_OVERDUE, $dueDate->getUnixTimeStamp());
                 }
 
-                // Close: always bundled
-                $closeDate = $this->coalesceDates($plan->getCloseDate(), $assessment->getCloseDate());
-                if ($closeDate) {
-                    $bundle->attach(self::TRIGGER_DUEWORK_CLOSED, $closeDate->getUnixTimeStamp());
-                }
-
-                // Generic updated trigger
-                if ($bundle->getMethod() === Mapper::METHOD_UPDATE) {
-                    $bundle->attach(self::TRIGGER_DUEWORK_UPDATED, self::IMMEDIATELY);
-                }
+//                // Close: always bundled
+//                $closeDate = $this->coalesceDates($plan->getCloseDate(), $assessment->getCloseDate());
+//                if ($closeDate) {
+//                    $bundle->attach(self::TRIGGER_DUEWORK_CLOSED, $closeDate->getUnixTimeStamp());
+//                }
+//
+//                // Generic updated trigger
+//                if ($bundle->getMethod() === Mapper::METHOD_UPDATE) {
+//                    $bundle->attach(self::TRIGGER_DUEWORK_UPDATED, self::IMMEDIATELY);
+//                }
             }
             return;
         }
