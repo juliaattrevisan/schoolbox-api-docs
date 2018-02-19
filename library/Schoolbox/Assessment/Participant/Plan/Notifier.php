@@ -96,11 +96,11 @@ class Notifier extends AbstractModuleNotifier
      */
     public function bundleTriggers($bundle): void
     {
-        // What kind of object was saved?
-        /** @var Model $participant */
-        $participant = $bundle->getEvent()->getObject();
+        /** @var Model $plan */
+        $plan = $bundle->getEvent()->getObject();
 
-        $assessment  = $participant->getAssessment();
+        // Trigger different notifs depending on what assessment type was saved
+        $assessment = $plan->getAssessment();
         if ($assessment->getQuiz()) {
             // Proc quiz notifs to this participant and parents
             // May need to bundle these together with notifs to teachers that things are overdue
@@ -108,12 +108,9 @@ class Notifier extends AbstractModuleNotifier
         }
 
         if ($assessment->getDueWork()) {
-            // Is this a dynamic participation?
-            // Trigger notifs to all except excluded or otherwise included
-            // TODO figure out where the base due date's at
             $bundle->attach(
                 self::TRIGGER_DUEWORK_OPEN,
-                $assessment->getOpenDate()->getUnixTimeStamp()
+                ($plan->getOpenDate() ?? $assessment->getOpenDate())->getUnixTimeStamp()
             );
 //            $bundle->attachEach([
 //                self::TRIGGER_DUEWORK_OPEN     => ($participant->getPlan()->getOpenDate() ?? $assessment->getOpenDate())->getUnixTimeStamp(),
@@ -144,9 +141,6 @@ class Notifier extends AbstractModuleNotifier
         $envelope = new Envelope();
         $bob      = new Builder();
 
-        // SOMEHOW: I need the swamp here!
-        // It's the only reliable method for fetching assessment participants
-        // GUESS WHAT I'M GOING TO DO UNDER PAIN OF DEATH
         //                             ,-.
         //        ___,---.__          /'|`\          __,---,___
         //     ,-'    \`    `-.____,-'  |  `-.____,-'    //    `-.
@@ -164,56 +158,52 @@ class Notifier extends AbstractModuleNotifier
         //            |   |     /'\_\_\ | /_/_/`\     |   |
         //             \   \__, \_     `~'     _/ .__/   /
         //              `-._,-'   `-._______,-'   `-._,-'
+        //
+        //          +--------------------------------------+
+        //          |       \Schoolbox\Mapper::getDi       |
+        //          | Under pain of death DO NOT USE THIS! |
+        //          +--------------------------------------+
+        //
+        // ... hold my beer
         /** @var MapperProxy $assessmentDataSource */
         /** @var IAssessable $assessmentDomainObject */
         $assessmentDataSource   = $this->mapper::getDi()->get('assessmentDataSource');
         $assessmentDomainObject = $assessmentDataSource->findByIdForReview($plan->getAssessment()->getId(), true);
 
-//        // Only do this for dynamic plans; all others have participants assigned manually
-//        if (!$plan->isDynamic()) {
-//            return $envelope;
-//        }
 
-//        // FFFFFFFUUUUUUUUUUUUUUUUUUU~~~~~~~~~
-//        $plan = $this->mapper->findById($plan->getId());
-
-        // Hopefully I don't have to hydrate this myself
-        // (Looks like I do)
-        // (I probably have to hydrate participation manually too -_-)
-        $folder      = $assessmentDomainObject->getBaseContext()->getFolder();
-//        $this->log->warning(get_class($assessmentDomainObject));
+        // This notifier only gets triggered for due works.
+        $folder = $assessmentDomainObject->getBaseContext()->getFolder();
         if (!$assessmentDomainObject instanceof DueWork) {
-            // I'm in the wrong place
             return $envelope;
         }
 
+        // Still need the submission box's ID for generating the topic
         $assessment = $this->assessmentMapper->findById($plan->getAssessment()->getId());
-//        $this->log->warning(get_class($assessment->getDueWork()));
         if (!$assessment->getDueWork()) {
-            // I'm in the wrong place
             return $envelope;
         }
         $boxId = $assessment->getDueWork()->getId();
 
 
-        $workType = $assessmentDomainObject->getWorkType();
-        $boxType  = mb_strtolower($workType ? $workType->getName() : '');
-
-        // Pull from plan in preference to assessment
-        $boxName  = $plan->getName() ?? $assessmentDomainObject->getTitle();
-        $dueDate  = $plan->getDueDate() ?? $assessmentDomainObject->getCloseAt();
-        $description = $plan->getDescription() ?? $assessmentDomainObject->getDescription();
-
+        // Build generic builder
+        $workType     = $assessmentDomainObject->getWorkType();
+        $boxType      = mb_strtolower($workType ? $workType->getName() : '');
         $indefArticle = $boxType ?
             in_array(strtolower($boxType[0]), ['a', 'e', 'i', 'o', 'u'], true) ? 'an' : 'a'
             : '';
+
+        // Pull from plan in preference to assessment where the settings can be customised per plan
+        $dueDate     = $plan->getDueDate()     ?? $assessmentDomainObject->getCloseAt();
+        $description = $plan->getDescription() ?? $assessmentDomainObject->getDescription();
 
         $bob->setTitle(":user opened $indefArticle $boxType :box in :cat")
             ->setParams([
                 'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
                 'cat'  => new CategoryParam($folder),
             ])
-            ->setIcon("/portrait?" . http_build_query(['userId' => $effector->getExternalId(), 'size' => $this->iconSize,]))
+            ->setIcon(
+                "/portrait?" . http_build_query(['userId' => $effector->getExternalId(), 'size' => $this->iconSize,])
+            )
             ->setNamespace(NSMapper::NS_DUEWORK)
             ->addTopic("duework.{$boxId}.open")
             ->addFilter('roletype', [Role::STUDENT])
@@ -221,22 +211,19 @@ class Notifier extends AbstractModuleNotifier
             ->setByline("Due {$dueDate->getCalendarDateTime()}")
             ->setSeverity(Logger::NOTICE);
 
-        // Send to every participant in the plan
-        // TODO figure out how dynamic participants are hydrated
-        // Answer: that's down in the swamp. Need to get them out somehow
+
+        // Customise and send to every participant in this plan only
         foreach ($assessmentDomainObject->getPlans() as $assessmentPlan) {
             if ($assessmentPlan->getId() != $plan->getId()) {
                 continue;
             }
-//            $this->log->warning(json_encode($assessmentPlan->getParticipants()));
             foreach ($assessmentPlan->getParticipants() as $participant) {
                 if ($participant->isExcluded()) {
                     continue;
                 }
                 $href = $this->buildParticipantRoute($assessmentDomainObject, $participant->getUser());
-                $bob
-                    ->setHref($href)
-                    ->setParam('box', new Param($boxName, $href));
+                $bob->setHref($href)
+                    ->setParam('box', new Param($assessmentDomainObject->getTitle(), $href));
                 $envelope->targetToUser($participant->getUser(), $bob->build());
             }
         }
