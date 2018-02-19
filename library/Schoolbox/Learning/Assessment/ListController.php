@@ -361,6 +361,8 @@ class ListController extends Web\Controller\Base
             // so just show updated.
             // Will need to rework actual notifs so they're verb-agnostic (besides delete)
             foreach ($plans as $plan) {
+                // I have NFI how I'm going to generate a diff for this item.
+                // Maybe I just need to keep the old sub box notifier around.
                 $planMapper->getEventPropagator()->propagate(
                     $this->getUser(),
                     $action,
