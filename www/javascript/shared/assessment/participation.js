@@ -125,15 +125,34 @@
             // Reflect the change in the UI
             // TODO move everything up here later
             var $studentsSelected = $participants.find(':checked');
+
+            var studentListHtmlString = "";
+
             $studentsSelected.each(function () {
                 var $participantRow = $(this).closest('li');
                 var studentID = $participantRow.attr('data-participant');
                 var isExcluded = $participantRow.find('div[data-participant-status = excluded]').length;
 
+                // Stuff for the warning dialog
+                studentListHtmlString += "<li><div class='row'><div class='small-12 list-item compact card'>";
+                studentListHtmlString += $participantRow.find('div.card').html();
+                studentListHtmlString += "</div></div></li>";
+
                 // Set student back to default if user pressed 'include' they were excluded, or if user pressed 'remove customisations'
                 if ((action === 'include' && isExcluded) || action === 'default') {
                     updateStudentStatus(studentID, true, self);
                 } else if (action === 'exclude') {
+                    if (anyHaveInteractions($studentsSelected)) {
+                        console.log("There are interactions somewhere");
+                        $(self).confirmDialog({
+                            text: "<p>The following student(s) have submissions and/or feedback for this assessment:</p><ul class=\"information-list\">" + studentListHtmlString + "</ul><br/><p>Exclusion from this assessment will remove access to these submissions and/or feedback. Proceed?</p>",
+                            format: 'html',
+                            cancelEvent: function() {
+                                return false; // Break out of the loop entirely if user said no
+                            }
+                        });
+                    }
+                    console.log("No interactions");
                     updateStudentStatus(studentID, false, self);
                 }
             });
@@ -320,44 +339,15 @@
         var $participantRow = $(defaults.participants).find('li[data-participant=' + studentID + ']');
         var $participantCard = $participantRow.find('div.card');
 
-        var selectedStudentsWithInteractions = getCheckedParticipantsWithInteractions();
-        
-        var dialogText = '<p>The following student(s) have submissions and/or feedback for this assessment:</p><ul class="information-list">';
-        $(selectedStudentsWithInteractions).each(function() {
-            dialogText += "<li><div class='row'><div class='small-12 list-item compact card'>";
-
-            var studentInfo = $(this).html();
-            dialogText += studentInfo;
-
-            dialogText += "</div></div></li>";
-        })
-        dialogText += "</ul><br/><p>Exclusion from this assessment will remove access to these submissions and/or feedback. Proceed?</p>";
-
         if (include) {
             $participantCard.removeClass('participant-excluded');
             status = '(no customisations)';
             statusValue = 'included';
         } else {
-            // Neat solution from https://stackoverflow.com/a/4661989
-            if ($participantCard.is("[data-has-interaction]")) {
+            $participantCard.addClass('participant-excluded');
+            status = '(excluded)';
+            statusValue = 'excluded';
 
-                $(self).confirmDialog({
-                    text: dialogText,
-                    format: 'html',
-                    confirmEvent: function() {
-                        $participantCard.addClass('participant-excluded');
-                        status = '(excluded)';
-                        statusValue = 'excluded';
-
-                        updateStatus(status, statusValue, $participantRow);
-                    }
-                });
-
-            } else {
-                $participantCard.addClass('participant-excluded');
-                status = '(excluded)';
-                statusValue = 'excluded';
-            }
         }
 
 
@@ -385,18 +375,17 @@
         }
     }
 
-    function getCheckedParticipantsWithInteractions() {
-        var checkedWithInteractions = [];
-        var participants = $(defaults.participants).find("li");
+    function anyHaveInteractions(participants) {
+        var anyInteractions = false;
 
         $(participants).each(function() {
             var $participantCard = $(this).find('div.card');
-            if ($(this).find("input").is(":checked") && $participantCard.is("[data-has-interaction]")) {
-                checkedWithInteractions.push($participantCard);
+            if ($participantCard.is("[data-has-interaction]")) {
+                anyInteractions = true;
             }
         });
 
-        return checkedWithInteractions;
+        return anyInteractions;
     }
 
 
