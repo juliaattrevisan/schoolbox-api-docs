@@ -441,10 +441,11 @@ foreach ($componentCollection as $component) {
             throw $e;
         }
 
-        /** @var Raven_Client $sentry */
-        $sentry = $this->getDi()->get('sentry');
-
-        $sentry->captureException($e);
+        try {
+            $this->getDi()->get('sentry')->captureException($e);
+        } catch (\Aura\Di\Exception $e) {
+            // ¯\_(ツ)_/¯
+        }
     }
 }
 
