@@ -12,7 +12,7 @@
 use Schoolbox\Assessment\Participant;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\Learning\Quiz\ValidUserViewsAssessment;
+use Schoolbox\Learning\Quiz\ValidUserCanInteractWithAssessment;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -67,20 +67,20 @@ catch (Mapper\Exception $e) {
     error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
 }
 
-/* Non-participants are sent to a 404 screen
- */
-$canViewAssessment = new ValidUserViewsAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
-
-if (!$canViewAssessment->isSatisfiedBy($_SESSION['user'], $folder, $assess['assessment_id'])) {
-    $this->pageNotFound();
-}
-
 /* Check if you are in this category, so you can't submit other category's
  * online assessments unless you are a part of that category.
  */
 $assessment       = $assessmentDataSource->findByQuizId($assess['assess_id'], $_SESSION['user']);
 $assessmentFolder = $assessment->getBaseContext()->getFolder();
 $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], $assessmentFolder->getId());
+
+/* Non-participants are sent to a 404 screen
+ */
+$canViewAssessment = new ValidUserCanInteractWithAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
+
+if (!$canViewAssessment->isSatisfiedBy($_SESSION['user'], $folder, $assessment)) {
+    $this->pageNotFound();
+}
 
 /* Looks like everyone has a Plan in some way, regardless if it's custom or default?
  */
