@@ -607,4 +607,18 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         //noop
         return true;
     }
+
+    /**
+     * Any notifications related to assessments must be deferred until all
+     * its plans and constituent participation records are saved.
+     *
+     * @param object $object
+     * @param string $verb
+     * @param null   $previous
+     * @return bool
+     */
+    protected function raiseNotification($object, $verb, $previous = null)
+    {
+        return true;
+    }
 }
