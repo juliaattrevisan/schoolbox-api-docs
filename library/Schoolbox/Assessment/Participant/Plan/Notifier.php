@@ -238,7 +238,7 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * Participant gets notified when a due work is upcoming.
+     * Participant and parents get notified when a due work is upcoming.
      *
      * @param Model $plan
      * @return Envelope
@@ -315,6 +315,13 @@ class Notifier extends AbstractModuleNotifier
         return $envelope;
     }
 
+    /**
+     * Participant and parents get notified when a due work is overdue.
+     *
+     * @param Model $plan
+     * @return Envelope
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
     public function notifyDueWorkOverdue(Model $plan): Envelope
     {
         $envelope = new Envelope();
