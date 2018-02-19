@@ -216,7 +216,6 @@ class Notifier extends AbstractModuleNotifier
             )
             ->setNamespace(NSMapper::NS_DUEWORK)
             ->addTopic("duework.{$boxId}.open")
-            ->addFilter('roletype', [Role::STUDENT])
             ->setSeverity(Logger::NOTICE);
 
 
