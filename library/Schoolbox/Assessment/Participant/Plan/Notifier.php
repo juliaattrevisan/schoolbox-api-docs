@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
@@ -146,12 +147,12 @@ class Notifier extends AbstractModuleNotifier
                     $bundle->attach(self::TRIGGER_DUEWORK_OVERDUE, $dueDate->getUnixTimeStamp());
                 }
 
-//                // Close: always bundled
-//                $closeDate = $this->coalesceDates($plan->getCloseDate(), $assessment->getCloseDate());
-//                if ($closeDate) {
-//                    $bundle->attach(self::TRIGGER_DUEWORK_CLOSED, $closeDate->getUnixTimeStamp());
-//                }
-//
+                // Close: always bundled
+                $closeDate = $this->coalesceDates($plan->getCloseDate(), $assessment->getCloseDate());
+                if ($closeDate) {
+                    $bundle->attach(self::TRIGGER_DUEWORK_CLOSED, $closeDate->getUnixTimeStamp());
+                }
+
 //                // Generic updated trigger
 //                if ($bundle->getMethod() === Mapper::METHOD_UPDATE) {
 //                    $bundle->attach(self::TRIGGER_DUEWORK_UPDATED, self::IMMEDIATELY);
@@ -237,6 +238,7 @@ class Notifier extends AbstractModuleNotifier
         return $envelope;
     }
 
+
     /**
      * Participant and parents get notified when a due work is upcoming.
      *
@@ -314,6 +316,7 @@ class Notifier extends AbstractModuleNotifier
 
         return $envelope;
     }
+
 
     /**
      * Participant and parents get notified when a due work is overdue.
@@ -394,7 +397,83 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
-     * Convenience helper to build a route to the Participant Summary page
+     * Staff get notified when a due work closes and one or more students didn't submit.
+     *
+     * @param Model $plan
+     * @return Envelope
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function notifyDueWorkClosed(Model $plan): Envelope
+    {
+        $envelope = new Envelope();
+        $bob      = new Builder();
+        $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
+
+        // This notifier only gets triggered for due works.
+        $folder = $assessmentDomainObject->getBaseContext()->getFolder();
+        if (!$assessmentDomainObject instanceof DueWork) {
+            return $envelope;
+        }
+
+        // Still need the submission box's ID for generating the topic
+        $assessment = $this->retrieveAssessmentDataModel($plan);
+        if (!$assessment->getDueWork()) {
+            return $envelope;
+        }
+        $boxId = $assessment->getDueWork()->getId();
+
+        // Doesn't accept online? return
+        if ($assessmentDomainObject->isAcceptNone()) {
+            return $envelope;
+        }
+
+        // Try triggering for every student; maybe they will stack
+        $bob->setTitle(":box in :cat has closed and :student did not submit work")
+            ->setParam('box', new Param($assessmentDomainObject->getTitle(), $this->buildAssessmentRoute($assessmentDomainObject)))
+            ->setParam('cat', new CategoryParam($folder))
+            ->setIcon("/images/icon.php?" . http_build_query(['size' => $this->iconSize, 'icon' => 'work']))
+            ->setNamespace(NSMapper::NS_DUEWORK)
+            ->setSeverity(Logger::ERROR)
+            ->addTopic("duework.$boxId.closed");
+
+        // Customise and send to every participant in this plan only
+        foreach ($assessmentDomainObject->getPlans() as $assessmentPlan) {
+            if ($assessmentPlan->getId() !== $plan->getId()) {
+                continue;
+            }
+            foreach ($assessmentPlan->getParticipants() as $participant) {
+                if ($participant->isExcluded()) {
+                    continue;
+                }
+
+                // Has participant already submitted?
+                if (!$participant->isResponseRequired()) {
+                    continue;
+                }
+
+                // build for staff
+                $bob->setParam('student', new UserParam($participant->getUser()));
+                $envelope->broadcastToCategory($folder, UserAccess::ACCESS_WRITE, $bob->build());
+            }
+        }
+
+        return $envelope;
+    }
+
+
+    /**
+     * Convenience helper to build a route to the status page.
+     *
+     * @param IAssessable $assessment
+     * @return string
+     */
+    private function buildAssessmentRoute(IAssessable $assessment)
+    {
+        return sprintf('/learning/assessments/%s/status', $assessment->getId());
+    }
+
+    /**
+     * Convenience helper to build a route to the participant's summary page.
      *
      * @param IAssessable $assessment
      * @param User        $student
