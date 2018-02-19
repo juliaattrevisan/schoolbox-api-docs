@@ -299,7 +299,10 @@ class Notifier extends AbstractModuleNotifier
                     ->setParam('box', new Param($assessmentDomainObject->getTitle(), $href));
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
-                // build for parent
+                // build for parent, only if they're allowed
+                if ($this->conf->get('restrict_student_submissions')) {
+                    continue;
+                }
                 $bob->setTitle(":child has not yet submitted work for :box, which is due $when from now in :cat")
                     ->setParam('child', new ChildParam($participant->getUser(), ParameterInterface::STACKING_REPLACE));
                 $envelope->targetToParent($participant->getUser(), $bob->build());
