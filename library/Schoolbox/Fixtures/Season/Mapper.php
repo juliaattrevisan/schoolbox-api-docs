@@ -52,11 +52,7 @@ class Mapper extends BaseMapper
      */
     public function deleteDivisions(Season $season)
     {
-        $allDivisions = DivisionMapper::getInstance()->findByColumn('season_id', $season->getId(), ['cache' => false]);
-
-        foreach ($allDivisions as $currentDivision) {
-            DivisionMapper::getInstance()->delete($currentDivision);
-        }
+        DivisionMapper::getInstance()->deleteByColumn('season_id', $season->getId(), ['cache' => false]);
     }
 
     /**
@@ -66,11 +62,7 @@ class Mapper extends BaseMapper
      */
     public function deleteMatches(Season $season)
     {
-        $allMatches = MatchMapper::getInstance()->findByColumn('season_id', $season->getId());
-
-        foreach ($allMatches as $currentMatch) {
-            MatchMapper::getInstance()->delete($currentMatch);
-        }
+        MatchMapper::getInstance()->deleteByColumn('season_id', $season->getId());
     }
 
     /**
