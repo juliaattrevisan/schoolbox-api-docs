@@ -17,14 +17,12 @@ use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
-use Schoolbox\Role;
 use Schoolbox\User;
 
 /**
@@ -54,11 +52,6 @@ class Notifier extends AbstractModuleNotifier
     private $assessmentMapper;
 
     /**
-     * @var UserAccessMapper
-     */
-    private $userAccessMapper;
-
-    /**
      * Irrelevant as this could notify about different things, but must exist.
      *
      * @return string
@@ -75,10 +68,6 @@ class Notifier extends AbstractModuleNotifier
      */
     public function loadDependencies($dependencies = null): void
     {
-        // Dunno what dependencies this has yet
-        if (empty($dependencies['userAccessMapper'])) {
-            $dependencies['userAccessMapper'] = UserAccessMapper::getInstance();
-        }
         if (empty($dependencies['assessmentMapper'])) {
             $dependencies['assessmentMapper'] = AssessmentMapper::getInstance();
         }
@@ -259,16 +248,6 @@ class Notifier extends AbstractModuleNotifier
     protected function setAssessmentMapper(AssessmentMapper $assessmentMapper): self
     {
         $this->assessmentMapper = $assessmentMapper;
-        return $this;
-    }
-
-    /**
-     * @param UserAccessMapper $userAccessMapper
-     * @return static
-     */
-    protected function setUserAccessMapper(UserAccessMapper $userAccessMapper): self
-    {
-        $this->userAccessMapper = $userAccessMapper;
         return $this;
     }
 
