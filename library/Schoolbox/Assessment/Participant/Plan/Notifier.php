@@ -15,6 +15,8 @@ use Monolog\Logger;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -142,12 +144,30 @@ class Notifier extends AbstractModuleNotifier
         $envelope = new Envelope();
         $bob      = new Builder();
 
-//        // SOMEHOW: I need the swamp here!
-//        // It's the only reliable method for fetching assessment participants
-//        // GUESS WHAT I'M GOING TO DO UNDER PAIN OF DEATH
-//        /** @var MapperProxy $assessmentDataSource */
-//        $assessmentDataSource   = $this->mapper::getDi()->get('assessmentDataSource');
-//        $assessmentDomainObject = $assessmentDataSource->findByIdForReview($plan->getAssessment()->getId(), true);
+        // SOMEHOW: I need the swamp here!
+        // It's the only reliable method for fetching assessment participants
+        // GUESS WHAT I'M GOING TO DO UNDER PAIN OF DEATH
+        //                             ,-.
+        //        ___,---.__          /'|`\          __,---,___
+        //     ,-'    \`    `-.____,-'  |  `-.____,-'    //    `-.
+        //   ,'        |           ~'\     /`~           |        `.
+        //  /      ___//              `. ,'          ,  , \___      \
+        // |    ,-'   `-.__   _         |        ,    __,-'   `-.    |
+        // |   /          /\_  `   .    |    ,      _/\          \   |
+        // \  |           \ \`-.___ \   |   / ___,-'/ /           |  /
+        //  \  \           | `._   `\\  |  //'   _,' |           /  /
+        //   `-.\         /'  _ `---'' , . ``---' _  `\         /,-'
+        //      ``       /     \    ,='/ \`=.    /     \       ''
+        //              |__   /|\_,--.,-.--,--._/|\   __|
+        //              /  `./  \\`\ |  |  | /,//' \,'  \
+        //             /   /     ||--+--|--+-/-|     \   \
+        //            |   |     /'\_\_\ | /_/_/`\     |   |
+        //             \   \__, \_     `~'     _/ .__/   /
+        //              `-._,-'   `-._______,-'   `-._,-'
+        /** @var MapperProxy $assessmentDataSource */
+        /** @var IAssessable $assessmentDomainObject */
+        $assessmentDataSource   = $this->mapper::getDi()->get('assessmentDataSource');
+        $assessmentDomainObject = $assessmentDataSource->findByIdForReview($plan->getAssessment()->getId(), true);
 
 //        // Only do this for dynamic plans; all others have participants assigned manually
 //        if (!$plan->isDynamic()) {
@@ -160,22 +180,28 @@ class Notifier extends AbstractModuleNotifier
         // Hopefully I don't have to hydrate this myself
         // (Looks like I do)
         // (I probably have to hydrate participation manually too -_-)
-        $assessment  = $this->assessmentMapper->findById($plan->getAssessment()->getId());
-        $folder      = $assessment->getAssessmentContext()->getFolder();
-        $box         = $assessment->getDueWork();
+        $folder      = $assessmentDomainObject->getBaseContext()->getFolder();
 //        $this->log->warning(isset($box) ? get_class($box) : "null");
-        if (!$box) {
+        if (!$assessmentDomainObject instanceof DueWork) {
             // I'm in the wrong place
             return $envelope;
         }
 
-        $workType = $assessment->getWorkType();
+        $assessment  = $this->assessmentMapper->findById($plan->getAssessment()->getId());
+        if (!$assessment->getDueWork()) {
+            // I'm in the wrong place
+            return $envelope;
+        }
+        $boxId = $assessment->getDueWork()->getId();
+
+
+        $workType = $assessmentDomainObject->getWorkType();
         $boxType  = mb_strtolower($workType ? $workType->getName() : '');
 
         // Pull from plan in preference to assessment
-        $boxName  = $plan->getName() ?? $assessment->getTitle();
-        $dueDate  = $plan->getDueDate() ?? $assessment->getDueDate();
-        $description = $plan->getDescription() ?? $assessment->getDescription();
+        $boxName  = $plan->getName() ?? $assessmentDomainObject->getTitle();
+        $dueDate  = $plan->getDueDate() ?? $assessmentDomainObject->getCloseAt();
+        $description = $plan->getDescription() ?? $assessmentDomainObject->getDescription();
 
         $indefArticle = $boxType ?
             in_array(strtolower($boxType[0]), ['a', 'e', 'i', 'o', 'u'], true) ? 'an' : 'a'
@@ -188,7 +214,7 @@ class Notifier extends AbstractModuleNotifier
             ])
             ->setIcon("/portrait?" . http_build_query(['userId' => $effector->getExternalId(), 'size' => $this->iconSize,]))
             ->setNamespace(NSMapper::NS_DUEWORK)
-            ->addTopic("duework.{$box->getId()}.open")
+            ->addTopic("duework.{$boxId}.open")
             ->addFilter('roletype', [Role::STUDENT])
             ->setBody($description)
             ->setByline("Due {$dueDate->getCalendarDateTime()}")
@@ -203,7 +229,7 @@ class Notifier extends AbstractModuleNotifier
             if ($participant->isExcluded()) {
                 continue;
             }
-            $href = $this->buildParticipantRoute($assessment, $participant->getUser());
+            $href = $this->buildParticipantRoute($assessmentDomainObject, $participant->getUser());
             $bob
                 ->setHref($href)
                 ->setParam('box', new Param($boxName, $href));
@@ -216,11 +242,11 @@ class Notifier extends AbstractModuleNotifier
     /**
      * Convenience helper to build a route to the Participant Summary page
      *
-     * @param AssessmentModel $assessment
-     * @param User            $student
+     * @param IAssessable $assessment
+     * @param User        $student
      * @return string
      */
-    private function buildParticipantRoute(AssessmentModel $assessment, User $student)
+    private function buildParticipantRoute(IAssessable $assessment, User $student)
     {
         return sprintf('/learning/assessments/%s/%s', $assessment->getId(), $student->getId());
     }
