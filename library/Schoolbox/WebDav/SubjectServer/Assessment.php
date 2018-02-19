@@ -135,11 +135,9 @@ class Assessment extends DAV\Collection
         if ($this->assessment instanceof DueWork) {
             $participant = $this->assessment->getParticipantIfExtant($this->user);
             if ($participant instanceof Participant) {
-                $allResponses = $participant->getAllResponses();
-
                 // This could error out, that's intentional
                 try {
-                    $this->assessment->assertAcceptSubmission($allResponses);
+                    $this->assessment->assertAcceptSubmission($participant);
                 } catch (\DomainException $e) {
                     throw new DAV\Exception\Forbidden(
                         $this->errorMapper->getMessageById($e->getCode()),
