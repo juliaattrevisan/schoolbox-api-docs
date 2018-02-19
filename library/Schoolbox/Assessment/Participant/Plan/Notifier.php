@@ -217,7 +217,7 @@ class Notifier extends AbstractModuleNotifier
 
         // Customise and send to every participant in this plan only
         foreach ($assessmentDomainObject->getPlans() as $assessmentPlan) {
-            if ($assessmentPlan->getId() != $plan->getId()) {
+            if ($assessmentPlan->getId() !== $plan->getId()) {
                 continue;
             }
             foreach ($assessmentPlan->getParticipants() as $participant) {
@@ -230,6 +230,75 @@ class Notifier extends AbstractModuleNotifier
                     ->setByline("Due {$participant->getDueDate()->getCalendarDateTime()}")
                     ->setParam('box', new Param($assessmentDomainObject->getTitle(), $href));
                 $envelope->targetToUser($participant->getUser(), $bob->build());
+            }
+        }
+
+        return $envelope;
+    }
+
+    /**
+     * Participant gets notified when a due work is upcoming.
+     *
+     * @param Model $plan
+     * @return Envelope
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function notifyDueWorkUpcoming(Model $plan): Envelope
+    {
+        $envelope = new Envelope();
+        $bob      = new Builder();
+        $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
+
+        // This notifier only gets triggered for due works.
+        $folder = $assessmentDomainObject->getBaseContext()->getFolder();
+        if (!$assessmentDomainObject instanceof DueWork) {
+            return $envelope;
+        }
+
+        // Still need the submission box's ID for generating the topic
+        $assessment = $this->retrieveAssessmentDataModel($plan);
+        if (!$assessment->getDueWork()) {
+            return $envelope;
+        }
+        $boxId = $assessment->getDueWork()->getId();
+
+        // Doesn't accept online? return
+        if ($assessmentDomainObject->isAcceptNone()) {
+            return $envelope;
+        }
+
+        $bob->setParam('catname', new CategoryParam($folder))
+            ->setIcon("/images/icon.php?" . http_build_query(['size' => $this->iconSize, 'icon' => 'work']))
+            ->setNamespace(NSMapper::NS_DUEWORK)
+            ->setSeverity(Logger::WARNING)
+            ->addTopic("duework.$boxId.upcoming");
+
+        // Customise and send to every participant in this plan only
+        foreach ($assessmentDomainObject->getPlans() as $assessmentPlan) {
+            if ($assessmentPlan->getId() !== $plan->getId()) {
+                continue;
+            }
+            foreach ($assessmentPlan->getParticipants() as $participant) {
+                if ($participant->isExcluded()) {
+                    continue;
+                }
+
+                // Has participant already submitted?
+                if (!$participant->isResponseRequired()) {
+                    continue;
+                }
+
+                $href = $this->buildParticipantRoute($assessmentDomainObject, $participant->getUser());
+                $when = $participant->getDueDate()->getRelativeTime(Alaress_Date_Format::now()->addMinutes(-5), true);
+                $bob->setTitle(":boxname is due $when from now in :catname")
+                    ->setHref($href)
+                    ->setBody($participant->getDescription())
+                    ->setByline("Due {$participant->getDueDate()->getCalendarDateTime()}")
+                    ->setParam('box', new Param($assessmentDomainObject->getTitle(), $href));
+                $envelope->targetToUser($participant->getUser(), $bob->build());
+
+
+                // Also send to this kid's parents
             }
         }
 
