@@ -106,4 +106,34 @@ class Dehydrator
 
         return $dehydrated;
     }
+
+    /**
+     * Generates a diff that is (somewhat) compatible with mapper diffs.
+     *
+     * This has to be done recursively
+     *
+     * @param array $before
+     * @param array $after
+     * @return array
+     */
+    public function diff(array $before, array $after): array
+    {
+        $diff = [];
+        // Only the same type of object may be diffed
+        if ($before['type'] !== $after['type']) {
+            return $diff;
+        }
+
+        // We can assume all the same keys exist in $before and $after
+        // (except project activities, but those are recursed)
+        foreach ($before as $key => $beforeValue) {
+            $afterValue = $after[$key] ?? null;
+
+            // Is this scalar? Diff it now, otherwise recurse
+            if ($beforeValue !== $afterValue) {
+                $diff[$key] = [$beforeValue, $afterValue];
+            }
+        }
+        return $diff;
+    }
 }
