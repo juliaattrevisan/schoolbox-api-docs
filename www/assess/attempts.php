@@ -75,9 +75,10 @@ catch (Mapper\Exception $e) {
  * This spec pattern only checks whether you can interact with a quiz -now-. It does not check whether you
  * could have interacted with it historically.
  */
-$canInteract = new ValidUserCanInteractWithAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
+$assessment = $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], $_SESSION['user']);
+$canInteract = new ValidUserCanInteractWithAssessment(Alaress_Date_Format::now(), $assessment, Access::getInstance());
 
-if (!$canInteract->isSatisfiedBy($_SESSION['user'], $folder, $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], $_SESSION['user']))) {
+if (!$canInteract->isSatisfiedBy($_SESSION['user'])) {
     $this->pageNotFound();
 }
 

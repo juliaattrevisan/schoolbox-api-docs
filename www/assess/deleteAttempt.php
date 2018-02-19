@@ -63,11 +63,13 @@ $getAttempt = function ($attemptId) use ($assessmentDataSource, $attemptHandler,
         error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
     }
 
+    $assessment = $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], $attempt['user_id']);
+
     /* Non-participants are sent to a 404 screen
      */
-    $canInteract = new ValidUserCanInteractWithAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
+    $canInteract = new ValidUserCanInteractWithAssessment(Alaress_Date_Format::now(), $assessment, \Schoolbox\Permission\Access\Access::getInstance());
 
-    if (!$canInteract->isSatisfiedBy($_SESSION['user'], $folder, $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], $attempt['user_id']))) {
+    if (!$canInteract->isSatisfiedBy($_SESSION['user'])) {
         $this->pageNotFound();
     }
 

@@ -9,86 +9,70 @@
 
 namespace Schoolbox\Learning\Quiz;
 
-use Schoolbox\Learning\Assessment\DataModel as Assessment;
-use Schoolbox\Learning\Assessment\Quiz;
-use Schoolbox\Mapper;
-use Schoolbox\Resource\Folder;
+use Alaress_Date_Format;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 
-class ValidUserCanViewAssessment extends ValidUserCanInteractWithAssessment
+class ValidUserCanViewAssessment
 {
+    /** @var Alaress_Date_Format */
+    private $now;
+    /** @var IAssessable */
+    private $assessable;
+    /** @var Access */
+    private $accessHelper;
+
+
     /**
-     * 1. Only included (non-excluded) people can do this quiz
-     * 2. User might be an Instructor; Instructors can do the quiz for testing
-     * 3. Try a dynamic plan
-     * 4. Deny access
-     *
-     * @param User         $user
-     * @param Folder\Model $folder
-     * @param Quiz\Model   $assessment
+     * @param Alaress_Date_Format $now
+     * @param IAssessable         $assessable
+     * @param Access              $accessHelper
+     */
+    public function __construct(Alaress_Date_Format $now, IAssessable $assessable, Access $accessHelper)
+    {
+        $this->now = $now;
+        $this->assessable = $assessable;
+        $this->accessHelper = $accessHelper;
+    }
+
+
+    /**
+     * @param User $user
      * @return bool
-     * @throws Mapper\DefinitionException
-     * @throws Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function isSatisfiedBy(User $user, Folder\Model $folder, Quiz\Model $assessment): bool
+    public function isSatisfiedBy(User $user): bool
     {
-        // Check user can participate
-        $participant = $this->participantMapper->findForAssessmentAndUser(
-            Assessment\Mapper::getInstance()->createModel($assessment->getId()),
-            $user
-        );
-
-        /* If user is a participant, and they're included in the assessment,
-         * check the dates to see if they can get in
-         *
-         * Otherwise, if they've been excluded, they definitely get kicked out
-         * A user had to be a participant in order to be excluded
-         */
-        if ($participant) {
-            if ($this->isIncluded($participant)) {
-
-                /* Looks like everyone has a Plan in some way, regardless if it's custom or default?
-                 */
-                $participantDetails = $assessment->getParticipant($user);
-
-                /* Is published and hasn't closed yet - allow
-                 */
-                if (\Alaress_Date_Format::now()->gt($participantDetails->getPublishDate())) {
-                    if (\Alaress_Date_Format::now()->lt($participantDetails->getCloseDate())) {
-                        return true;
-                    }
-                    else {
-                        // TODO: error(143) ?
-                    }
-                } else {
-                    // TODO: error(120) ?
+        /**
+            If you are an active (included) participant {
+                If within plan date range {
+                    return true;
                 }
+
+                return false;
             }
 
-            /* You were excluded. You cannot be here.
-             */
+            // Not a participant, but you have write access to the page
+            If (access >= write) {
+                return true;
+            }
+
             return false;
+         */
+
+        if ($this->assessable->isParticipant($user) && !$this->assessable->getParticipant($user)->isExcluded()) {
+            $plan = $this->assessable->getParticipant($user)->getPlan();
+
+            $publishDate = $plan->getPublishDate() ?? $this->assessable->getPublishAt();
+
+            return $publishDate->gte($this->now);
         }
 
-        /* Instructors can always preview it initially
-         *
-         * They won't be included in the class list, so they won't have a dynamic plan,
-         * but they should be able to get in
-         */
-        if ($this->isInstructor($user, $folder)) {
+        if ($this->accessHelper->isInstructor($user, $this->assessable->getContext()->getFolder())) {
             return true;
         }
 
-        /* This occurs when you don't have a participation record
-         * Such a record spawns upon first interaction (apparently)
-         *
-         * If you're just a regular schmoe (i.e. not an instructor) you are beholden to the class list as defined
-         * by the SIS. If you're in it, you can get in (you "have a dynamic plan")
-         *
-         * Otherwise, you cannot be here because you weren't in the class list, and you aren't an instructor of
-         * any kind, so you're not meant to get in
-         */
-        return $this->hasDynamicPlan($assessment->getId());
+        return false;
     }
 }

@@ -50,14 +50,6 @@ catch (Mapper\Exception $e) {
     error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
 }
 
-/* Non-participants are sent to a 404 screen
- */
-$canInteract = new ValidUserCanInteractWithAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
-
-if (!$canInteract->isSatisfiedBy($_SESSION['user'], $folder, $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], $_SESSION['user']))) {
-    $this->pageNotFound();
-}
-
 $factory = new Assess_Factory();
 $answerHandler = $factory->createAnswerModel($question['type_id']);
 

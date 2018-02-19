@@ -206,8 +206,6 @@ else {
 
 	$readonly = !$term->isMarkableBy($_SESSION['user']);
 
-    $canInteract = new ValidUserCanInteractWithAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
-
 	/* Load all the questions for this section.
 	 * Note: only show the randomly-selected ones
 	 */
@@ -222,16 +220,6 @@ else {
                 $user = UserMapper::getInstance()->findById($currentAttempt['user_id']);
             }
             catch (Mapper\Exception $e) {
-                continue;
-            }
-
-            /* Non-participants are ignored
-             *
-             * TODO: This will cause problems mow that the spec patterns include the plan dates
-             * This spec pattern only checks whether you can interact with a quiz -now-. It does not check whether you
-             * could have interacted with it historically.
-             */
-            if (!$canInteract->isSatisfiedBy($user, $folder, $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], $user))) {
                 continue;
             }
 

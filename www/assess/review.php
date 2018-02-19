@@ -99,18 +99,6 @@ catch (Mapper\Exception $e) {
     error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
 }
 
-/* Non-participants are sent to a 404 screen
- *
- * TODO: This will cause problems mow that the spec patterns include the plan dates
- * This spec pattern only checks whether you can interact with a quiz -now-. It does not check whether you
- * could have interacted with it historically.
- */
-$canInteract = new ValidUserCanInteractWithAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
-
-if (!$canInteract->isSatisfiedBy($user, $folder, $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], $user))) {
-    $this->pageNotFound();
-}
-
 /* Find out whether the attempt has been previously finalised
  */
 if ($attempt['reviewed_at'] != '') {

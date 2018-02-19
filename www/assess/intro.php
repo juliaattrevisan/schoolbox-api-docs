@@ -99,10 +99,13 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
         error(19);
     }
 
-    /* Non-participating learners are sent to a 404 screen
+    /* Non-participating learners are sent to a 404 scree
+     *
+     * At this point in time, $assessment has been fully populated with participation, both static and dynamic.
+     * No further DB calls are necessary to determine membership, the domain model can be interacted with as-is.
      */
-    $viewSatisfaction = (new ValidUserCanViewAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance()))
-        ->isSatisfiedBy($_SESSION['user'], $folder, $assessment);
+    $viewSatisfaction = (new ValidUserCanViewAssessment(Alaress_Date_Format::now(), $assessment, Access::getInstance()))
+        ->isSatisfiedBy($_SESSION['user']);
 
     if (!$viewSatisfaction) {
         $this->pageNotFound();
