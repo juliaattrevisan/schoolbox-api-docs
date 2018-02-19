@@ -30,16 +30,23 @@ use Schoolbox\User;
  */
 class Notifier extends AbstractModuleNotifier
 {
-    private const TRIGGER_DUEWORK_OPEN = 'dueWorkOpen';
-//    private const TRIGGER_DUEWORK_UPDATED     = 'dueWorkUpdated';
-//    private const TRIGGER_DUEWORK_UPCOMING    = 'dueWorkUpcoming';
-//    private const TRIGGER_DUEWORK_OVERDUE     = 'dueWorkOverdue';
-//    private const TRIGGER_DUEWORK_CLOSED      = 'dueWorkClosed';
+    private const TRIGGER_DUEWORK_OPEN     = 'dueWorkOpen';
+    private const TRIGGER_DUEWORK_UPDATED  = 'dueWorkUpdated';
+    private const TRIGGER_DUEWORK_UPCOMING = 'dueWorkUpcoming';
+    private const TRIGGER_DUEWORK_OVERDUE  = 'dueWorkOverdue';
+    private const TRIGGER_DUEWORK_CLOSED   = 'dueWorkClosed';
+
+    // Don't think these are even used
 //    private const TRIGGER_DUEWORK_DATECHANGED = 'dueWorkDatechanged';
 //    private const TRIGGER_DUEWORK_RENAMED     = 'dueWorkRenamed';
-//
-//    private const DUEWORK_UPCOMING_WINDOW = 2;
-//
+
+    /**
+     * Days in advance to inform a user that due work is upcoming.
+     *
+     * TODO make this configurable
+     */
+    private const DUEWORK_UPCOMING_WINDOW = 2;
+
 //    private const TRIGGER_QUIZ_CLOSED   = 'quizClosed';
 //    private const TRIGGER_QUIZ_OPEN     = 'quizOpen';
 //    private const TRIGGER_QUIZ_OVERDUE  = 'quizOverdue';
@@ -111,16 +118,43 @@ class Notifier extends AbstractModuleNotifier
         }
 
         if ($assessment->getDueWork()) {
-            $openDate = $this->coalesceDates($plan->getOpenDate(), $assessment->getOpenDate());
-            if ($openDate) {
-                $bundle->attach(self::TRIGGER_DUEWORK_OPEN, $openDate->getUnixTimeStamp());
+            if ($bundle->getMethod() === Mapper::METHOD_DELETE) {
+                $bundle->detachEach([
+                    self::TRIGGER_DUEWORK_OPEN,
+                    self::TRIGGER_DUEWORK_UPCOMING,
+                    self::TRIGGER_DUEWORK_UPDATED,
+                    self::TRIGGER_DUEWORK_OVERDUE,
+                    self::TRIGGER_DUEWORK_CLOSED,
+                ]);
+
+            } else {
+                // Bundle triggers
+
+                // Open is now always bundled, not just on create
+                $openDate = $this->coalesceDates($plan->getOpenDate(), $assessment->getOpenDate());
+                if ($openDate) {
+                    $bundle->attach(self::TRIGGER_DUEWORK_OPEN, $openDate->getUnixTimeStamp());
+                }
+
+                // Due and upcoming: always bundled
+                $dueDate = $this->coalesceDates($plan->getDueDate(), $assessment->getDueDate());
+                if ($dueDate) {
+                    $upcomingDate = (clone $dueDate)->addDays(-self::DUEWORK_UPCOMING_WINDOW);
+                    $bundle->attach(self::TRIGGER_DUEWORK_UPCOMING, $upcomingDate->getUnixTimeStamp());
+                    $bundle->attach(self::TRIGGER_DUEWORK_OVERDUE, $dueDate->getUnixTimeStamp());
+                }
+
+                // Close: always bundled
+                $closeDate = $this->coalesceDates($plan->getCloseDate(), $assessment->getCloseDate());
+                if ($closeDate) {
+                    $bundle->attach(self::TRIGGER_DUEWORK_CLOSED, $closeDate->getUnixTimeStamp());
+                }
+
+                // Generic updated trigger
+                if ($bundle->getMethod() === Mapper::METHOD_UPDATE) {
+                    $bundle->attach(self::TRIGGER_DUEWORK_UPDATED, self::IMMEDIATELY);
+                }
             }
-//            $bundle->attachEach([
-//                self::TRIGGER_DUEWORK_OPEN     => ($participant->getPlan()->getOpenDate() ?? $assessment->getOpenDate())->getUnixTimeStamp(),
-//                self::TRIGGER_DUEWORK_OVERDUE  => $participant->getPlan()->getDueDate(),
-//                self::TRIGGER_DUEWORK_UPCOMING => $participant->getPlan()->getDueDate()->addDays(-self::DUEWORK_UPCOMING_WINDOW),
-//                self::TRIGGER_DUEWORK_CLOSED   => $participant->getPlan()->getCloseDate(),
-//            ]);
             return;
         }
     }
@@ -263,7 +297,7 @@ class Notifier extends AbstractModuleNotifier
     {
         foreach ($dates as $date) {
             if ($date instanceof Alaress_Date_Format && !$date->isNull()) {
-                return $date;
+                return clone $date;
             }
         }
         return null;
