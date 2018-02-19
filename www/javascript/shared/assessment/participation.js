@@ -122,9 +122,9 @@
             var action = $(this).attr('data-participant-change');
 
             // Reflect the change in the UI
-            // TODO move everything up here later
             var $studentsSelected = $participants.find(':checked');
 
+            // Used to output list of students in interaction warning dialog
             var studentListHtmlString = "";
 
             $studentsSelected.each(function () {
@@ -143,7 +143,8 @@
                 } else if (action === 'exclude') {
                     if (anyHaveInteractions($participants.find("li"))) {
                         $(self).confirmDialog({
-                            text: "<p>The following student(s) have submissions and/or feedback for this assessment:</p><ul class=\"information-list\">" + studentListHtmlString + "</ul><br/><p>Exclusion from this assessment will remove access to these submissions and/or feedback. Proceed?</p>",
+                            text: "<p>The following student(s) have submissions and/or feedback for this assessment:</p><ul class=\"information-list\">" +
+                                studentListHtmlString + "</ul><br/><p>Exclusion from this assessment will remove access to these submissions and/or feedback. Proceed?</p>",
                             format: 'html',
                             cancelEvent: function() {
                                 return false; // Break out of the loop entirely if user said no
@@ -161,6 +162,23 @@
             // Reset the checkboxes and buttons
             resetActions();
         });
+
+
+        /**
+         * Return a boolean representing whether any of the students in the given list have feedbacks and/or responses.
+         *
+         * @param {Object}       $participants        jQuery object containing a list of participant DOM elements
+         */
+        function anyHaveInteractions($participants) {
+            var anyInteractions = false;
+            $participants.each(function() {
+                var $participantCard = $(this).find('.card');
+                if ($participantCard.is("[data-has-interaction]")) {
+                    anyInteractions = true;
+                }
+            });
+            return anyInteractions;
+        }
 
 
         // Validate plan form
@@ -351,40 +369,16 @@
 
         }
 
-
-        updateStatus(status, statusValue, $participantRow);
+        $participantRow
+            .find('div[data-participant-status]')
+            .attr('data-participant-status', statusValue)
+            .text(status);
 
         // Adjust the hidden value for include
         $('#participant-include-' + studentID).val(include ? 1 : 0);
 
         // Reset plan back to 0
         $participantRow.find('#participant-plan-' + studentID).val(0);
-
-
-        /**
-         * Update the UI and DOM with the new status for a participant
-         *
-         * @param {string}      status              Customisation status for the participant, displayed to the user
-         * @param {string}      statusValue         Customisation status for the participant, used as a data attribute
-         * @param {Object}      $participant        DOM element for the participant
-         */
-        function updateStatus(status, statusValue, $participant) {
-            $participant
-                .find('div[data-participant-status]')
-                .attr('data-participant-status', statusValue)
-                .text(status);
-        }
-    }
-
-    function anyHaveInteractions($participants) {
-        anyInteractions = false;
-        $participants.each(function() {
-            var $participantCard = $(this).find('.card');
-            if ($participantCard.is("[data-has-interaction]")) {
-                anyInteractions = true;
-            }
-        });
-        return anyInteractions;
     }
 
 
