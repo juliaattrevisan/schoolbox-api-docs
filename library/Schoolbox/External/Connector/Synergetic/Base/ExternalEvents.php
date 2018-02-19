@@ -80,8 +80,6 @@ class ExternalEvents extends Base implements IExternalEvents
               {$where}
               ORDER BY ss.StaffScheduleSeq ASC";
 
-        $iterator = $this->databaseExternal->getQueryIterator($query);
-        $iterator->execute();
-        return $iterator;
+        return $this->databaseExternal->getQueryIterator($query);
     }
  }
