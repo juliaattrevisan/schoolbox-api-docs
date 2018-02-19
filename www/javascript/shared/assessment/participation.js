@@ -560,6 +560,7 @@
         var $planOpenDate = $customiseModal.find('#plan-open-date');
         var $planDueDate = $customiseModal.find('#plan-due-date');
         var $planCloseDate = $customiseModal.find('#plan-close-date');
+        var $assessmentType = $('[name=assessmentType]').val();
 
         var participantArray = $(defaults.participants).find('[data-participant-select]').map(function(){
             var obj = {id: $(this).data('userId'), name: $(this).data('userName')};
@@ -586,12 +587,16 @@
         reinitCKE();
 
         // Disable dates if assessment doesn't accept online submissions
-        if (!$('#acceptOnline').length || $('#acceptOnline').val() === '0') {
+        if ($assessmentType === 'task') {
             $('#plan-open-date').closest('[data-plan-date-container]').addClass('hide');
+            $('#plan-open-date').prop('disabled', true);
             $('#plan-close-date').closest('[data-plan-date-container]').addClass('hide');
+            $('#plan-close-date').prop('disabled', true);
         } else {
             $('#plan-open-date').closest('[data-plan-date-container]').removeClass('hide');
+            $('#plan-open-date').prop('disabled', false);
             $('#plan-close-date').closest('[data-plan-date-container]').removeClass('hide');
+            $('#plan-close-date').prop('disabled', false);
         }
 
         // Fill the selectize with the checked students
