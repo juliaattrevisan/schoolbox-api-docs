@@ -157,17 +157,17 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                       ->getObject();
 
         // check for detachment
-        if ($bundle->getMethod() === Mapper::METHOD_DELETE) {
-            $bundle->detachEach(
-                   array(
-                       self::TRIGGER_OPEN,
-                       self::TRIGGER_OVERDUE,
-                       self::TRIGGER_UPCOMING,
-                       self::TRIGGER_CLOSED
-                   )
-            );
-            return;
-        }
+//        if ($bundle->getMethod() === Mapper::METHOD_DELETE) {
+//            $bundle->detachEach(
+//                   array(
+//                       self::TRIGGER_OPEN,
+//                       self::TRIGGER_OVERDUE,
+//                       self::TRIGGER_UPCOMING,
+//                       self::TRIGGER_CLOSED
+//                   )
+//            );
+//            return;
+//        }
 
         // can't work with nonexistent dates
         if (!($box->getOpenDate() && $box->getDueDate() && $box->getLateDate())) {
@@ -176,44 +176,45 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         // ok, we're clear to attach some triggers now
 
-        $open     = $box->getOpenDate()->getUnixTimeStamp();
-        $closed   = $box->getDueDate()->getUnixTimeStamp();
-        $upcoming = $closed - (self::UPCOMING_WINDOW * 3600);
-        $late     = $box->getLateDate()->getUnixTimeStamp();
-
-        if ($upcoming < $open) {
-            // if the upcoming date is before the open date, push upcoming to 1 minute after open, rounded to the nearest 5 minutes
-            $upcoming = floor(($open + 60) / 12) * 12;
-        }
+//        $open     = $box->getOpenDate()->getUnixTimeStamp();
+//        $closed   = $box->getDueDate()->getUnixTimeStamp();
+//        $upcoming = $closed - (self::UPCOMING_WINDOW * 3600);
+//        $late     = $box->getLateDate()->getUnixTimeStamp();
+//
+//        if ($upcoming < $open) {
+//            // if the upcoming date is before the open date, push upcoming to 1 minute after open, rounded to the nearest 5 minutes
+//            $upcoming = floor(($open + 60) / 12) * 12;
+//        }
 
         switch ($bundle->getMethod()) {
             case Mapper::METHOD_UPDATE:
 
-                // don't spawn/replace an open-on-replace if it's in the past
-                if ($box->getOpenDate()->getUnixTimeStamp() > time()) {
-                    $bundle->attach(self::TRIGGER_OPEN, $open);
-                }
-
-                $bundle->attachEach(
-                       array(
-                           self::TRIGGER_UPDATED  => self::IMMEDIATELY,
-                           self::TRIGGER_OVERDUE  => $closed,
-                           self::TRIGGER_UPCOMING => $upcoming,
-                           self::TRIGGER_CLOSED   => $late
-                       )
-                );
+                $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
+//                // don't spawn/replace an open-on-replace if it's in the past
+//                if ($box->getOpenDate()->getUnixTimeStamp() > time()) {
+//                    $bundle->attach(self::TRIGGER_OPEN, $open);
+//                }
+//
+//                $bundle->attachEach(
+//                       array(
+//                           self::TRIGGER_UPDATED  => self::IMMEDIATELY,
+//                           self::TRIGGER_OVERDUE  => $closed,
+//                           self::TRIGGER_UPCOMING => $upcoming,
+//                           self::TRIGGER_CLOSED   => $late
+//                       )
+//                );
                 break;
 
-            case Mapper::METHOD_CREATE:
-                $bundle->attachEach(
-                       array(
-                           self::TRIGGER_OPEN     => $open,
-                           self::TRIGGER_OVERDUE  => $closed,
-                           self::TRIGGER_UPCOMING => $upcoming,
-                           self::TRIGGER_CLOSED   => $late
-                       )
-                );
-                break;
+//            case Mapper::METHOD_CREATE:
+//                $bundle->attachEach(
+//                       array(
+//                           self::TRIGGER_OPEN     => $open,
+//                           self::TRIGGER_OVERDUE  => $closed,
+//                           self::TRIGGER_UPCOMING => $upcoming,
+//                           self::TRIGGER_CLOSED   => $late
+//                       )
+//                );
+//                break;
         }
 
     }
