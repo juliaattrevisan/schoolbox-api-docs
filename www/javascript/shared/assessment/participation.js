@@ -122,51 +122,62 @@
             var action = $(this).attr('data-participant-change');
 
             // Reflect the change in the UI
-            var $studentsSelected = $participants.find(':checked');
+            var $studentsSelected = $participants.find(':checked').closest('li');
 
             // Used to output list of students in interaction warning dialog
             var studentListHtmlString = "";
 
-            $studentsSelected.each(function () {
-                var $participantRow = $(this).closest('li');
-                var studentID = $participantRow.attr('data-participant');
-                var isExcluded = $participantRow.find('div[data-participant-status = excluded]').length;
+            // TODO probably factor this out
+            $studentsSelected.each(function() {
+                // Hack together a list of selected students with interactions that can be rendered in the confirm dialog
 
-                // Stuff for the warning dialog
-                studentListHtmlString += "<li><div class='row'><div class='small-12 list-item compact card'>";
-                studentListHtmlString += $participantRow.find('div.card').html();
-                studentListHtmlString += "</div></div></li>";
+                if ($(this).find('.card').is('[data-has-interaction]')) {
+                    studentListHtmlString += "<li><div class='row'><div class='small-12 list-item compact card'>";
+                    studentListHtmlString += $(this).find('div.card').html();
+                    studentListHtmlString += "</div></div></li>";
+                }
+            })
 
-                // Set student back to default if user pressed 'include' they were excluded, or if user pressed 'remove customisations'
-                if ((action === 'include' && isExcluded) || action === 'default') {
-                    updateStudentStatus(studentID, true, self);
+            // If we're excluding students and any of them have interactions, warn the user
+            if (action === 'exclude' && anyHaveInteractions($studentsSelected)) {
 
-                    // Reset the checkboxes and buttons
-                    resetActions();
-                } else if (action === 'exclude') {
-                    if (anyHaveInteractions($participants.find("li"))) {
-                        $(self).confirmDialog({
-                            text: "<p>The following student(s) have submissions and/or feedback for this assessment:</p><ul class=\"information-list\">" +
-                                studentListHtmlString + "</ul><br/><p>Exclusion from this assessment will remove access to these submissions and/or feedback. Proceed?</p>",
-                            format: 'html',
-                            cancelEvent: function() {
-                                return false; // Break out of the loop entirely if user said no
-                            },
-                            confirmEvent: function () {
-                                updateStudentStatus(studentID, false, self);
-
-                                // Reset the checkboxes and buttons
-                                resetActions();
-                            }
-                        });
-                    } else {
-                        updateStudentStatus(studentID, false, self);
-
+                $(self).confirmDialog({
+                    text: "<p>The following student(s) have submissions and/or feedback for this assessment:</p><ul class=\"information-list\">" +
+                    studentListHtmlString + "</ul><br/><p>Exclusion from this assessment will remove access to these submissions and/or feedback. Proceed?</p>",
+                    format: 'html',
+                    cancelEvent: function() {
+                        //do nothing??
+                    },
+                    confirmEvent: function () {
+                        $studentsSelected.each(function() {
+                            var studentID = $(this).attr('data-participant');
+                            updateStudentStatus(studentID, false, self);
+                        })
                         // Reset the checkboxes and buttons
                         resetActions();
                     }
-                }
-            });
+                });
+
+            } else {
+
+                $studentsSelected.each(function () {
+                    var $participantRow = $(this);
+                    var studentID = $participantRow.attr('data-participant');
+                    var isExcluded = $participantRow.find('div[data-participant-status = excluded]').length;
+
+                    // Set student back to default if user pressed 'include' they were excluded, or if user pressed 'remove customisations'
+                    if ((action === 'include' && isExcluded) || action === 'default') {
+                        updateStudentStatus(studentID, true, self);
+
+                        // Reset the checkboxes and buttons
+                        resetActions();
+                    } else if (action === 'exclude') {
+                        updateStudentStatus(studentID, false, self);
+                        // Reset the checkboxes and buttons
+                        resetActions();
+                    }
+                });
+            }
 
         });
 
