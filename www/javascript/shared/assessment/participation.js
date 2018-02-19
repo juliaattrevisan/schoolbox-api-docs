@@ -140,6 +140,9 @@
                 // Set student back to default if user pressed 'include' they were excluded, or if user pressed 'remove customisations'
                 if ((action === 'include' && isExcluded) || action === 'default') {
                     updateStudentStatus(studentID, true, self);
+
+                    // Reset the checkboxes and buttons
+                    resetActions();
                 } else if (action === 'exclude') {
                     if (anyHaveInteractions($participants.find("li"))) {
                         $(self).confirmDialog({
@@ -151,16 +154,20 @@
                             },
                             confirmEvent: function () {
                                 updateStudentStatus(studentID, false, self);
+
+                                // Reset the checkboxes and buttons
+                                resetActions();
                             }
                         });
                     } else {
                         updateStudentStatus(studentID, false, self);
+
+                        // Reset the checkboxes and buttons
+                        resetActions();
                     }
                 }
             });
 
-            // Reset the checkboxes and buttons
-            resetActions();
         });
 
 
