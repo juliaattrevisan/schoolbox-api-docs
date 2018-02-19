@@ -33,6 +33,7 @@ class Dehydrator
         // This, or something else, needs to know how to dehydrate each IAssessable type.
         $dehydrated = [
             'id'             => $assessment->getId(),
+            'type'           => $assessment->getFamilyName(),
             'title'          => $assessment->getTitle(),
             'weight'         => $assessment->getWeight(),
             'markVisibility' => $assessment->getMarkVisibility(),
@@ -47,7 +48,7 @@ class Dehydrator
         // Due-work specific
         // TODO would be more polite to put in its own helper, but ram it in here for now
         if ($assessment instanceof DueWorkModel) {
-            $dehydrated['dueWork'] = [
+            $dehydrated += [
                 'acceptOnline'      => $assessment->getAcceptOnline(),
                 'selfReviewability' => $assessment->getSelfReviewability(),
             ];
@@ -56,7 +57,7 @@ class Dehydrator
         // Quiz-specific
         // TODO figure out what's actually needed here
         if ($assessment instanceof QuizModel) {
-            $dehydrated['quiz'] = [
+            $dehydrated += [
                 'duration'    => $assessment->getDuration(),
                 'maxAttempts' => $assessment->getMaxAttempts(),
             ];
@@ -64,7 +65,7 @@ class Dehydrator
 
         // Task-specific
         if ($assessment instanceof TaskModel) {
-            $dehydrated['task'] = [
+            $dehydrated += [
                 'selfAssessable' => $assessment->getIsSelfAssessable(),
             ];
         }
@@ -75,7 +76,7 @@ class Dehydrator
             foreach ($assessment->getAssessables() as $activity) {
                 $activities[$activity->getId()] = $this->dehydrateForDiff($activity);
             }
-            $dehydrated['project'] = [
+            $dehydrated += [
                 'activities' => $activities,
             ];
         }
