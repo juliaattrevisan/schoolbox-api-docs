@@ -16,7 +16,7 @@ use Schoolbox\Breadcrumbs;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Learning\Quiz\ValidUserViewsAssessment;
+use Schoolbox\Learning\Quiz\ValidUserCanInteractWithAssessment;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -71,9 +71,13 @@ catch (Mapper\Exception $e) {
 
 /* Non-participants are sent to a 404 screen
  */
-$canViewAssessment = new ValidUserViewsAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
+$assessment = $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], $_SESSION['user']);
 
-if (!$canViewAssessment->isSatisfiedBy($user, $folder, $assess['assessment_id'])) {
+/* Non-participants are sent to a 404 screen
+ */
+$canViewAssessment = new ValidUserCanInteractWithAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance());
+
+if (!$canViewAssessment->isSatisfiedBy($_SESSION['user'], $folder, $assessment)) {
     $this->pageNotFound();
 }
 
