@@ -416,22 +416,35 @@ $this->setVar($listColor);
 /* PARSE COMPONENTRY */
 $occupiedPositionList = array();
 foreach ($componentCollection as $component) {
-    /** @var Component_Homepage_ControllerAbstract $component */
-    $instance       = $component->getInstance();
-    $templateTarget = "component_position_{$instance->getPosition()}";
-    $templateHandle = "component_{$instance->getId()}";
+    try {
+        /** @var Component_Homepage_ControllerAbstract $component */
+        $instance       = $component->getInstance();
+        $templateTarget = "component_position_{$instance->getPosition()}";
+        $templateHandle = "component_{$instance->getId()}";
 
 
-    $component->setup($folder);
+        $component->setup($folder);
 
 
-    if ($component->execute()) {
-        if ($component->renderTemplate($templateHandle) !== false) {
-            if (!in_array($instance->getPosition(), $occupiedPositionList)) {
-                $occupiedPositionList[] = $instance->getPosition();
+        if ($component->execute()) {
+            if ($component->renderTemplate($templateHandle) !== false) {
+                if (!in_array($instance->getPosition(), $occupiedPositionList)) {
+                    $occupiedPositionList[] = $instance->getPosition();
+                }
+
+                $this->parse($templateTarget, $templateHandle, true);
             }
+        }
+    } catch (\Throwable $e) {
+        // if a component explodes for any reason, we only want it to explode the page if we're in debug mode
+        if (Cfg::get('debug_mode')) {
+            throw $e;
+        }
 
-            $this->parse($templateTarget, $templateHandle, true);
+        try {
+            $this->getDi()->get('sentry')->captureException($e);
+        } catch (\Aura\Di\Exception $e) {
+            // ¯\_(ツ)_/¯
         }
     }
 }
