@@ -18,7 +18,7 @@ switch($to)
 
     case "worldbook":
         $form="loginForm";
-        $action="http://www.worldbookonline.com/wb/products?ed=all";
+        $action="https://www.worldbookonline.com/wb/products?ed=all";
         $method="POST";
         $formArray['subacct']='AU04114';
         $formArray['uid']="melbggs";
@@ -29,13 +29,13 @@ switch($to)
 
     case "worldbook-kids":
         $form="loginForm";
-        $action="http://www.worldbookonline.com/wb/products?ed=all";
+        $action="https://www.worldbookonline.com/wb/products?ed=all";
         $method="POST";
         $formArray['subacct']='AU04114';
         $formArray['uid']="melbggs";
         $formArray['pwd']="melbourne";
         $formArray['auth']="UidPassword";
-        $formArray['tu']='http://worldbookonline.com/kids/home';
+        $formArray['tu']='https://worldbookonline.com/kids/home';
     break;
 
 
