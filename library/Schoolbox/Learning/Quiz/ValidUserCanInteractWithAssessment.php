@@ -81,7 +81,7 @@ class ValidUserCanInteractWithAssessment
                 $close = $this->assessable->getOpenAt();
             }
 
-            return $open->gte($this->now) && $close->lt($this->now);
+            return $this->now->gte($open) && $this->now->lt($close);
         }
 
         if ($this->accessHelper->isInstructor($user, $this->assessable->getContext()->getFolder())) {
