@@ -10,18 +10,18 @@ $this->setTab('resources');
 
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 
-// Fetch the logged in user's groups to exlude from the lists.
-$userGroups    = $groupHandler->involvedInCategoryList($_SESSION['user']->getId(), false);
-$userGroupsIds = [];
-foreach ($userGroups as $userGroup) {
-    $userGroupsIds[] = $userGroup['id'];
+// Fetch the logged in user's write access groups to exclude from the lists.
+$userWriteGroups = $groupHandler->involvedInCategoryList($_SESSION['user']->getId(), false, WRITE_ACCESS);
+$userWriteGroupIds = [];
+foreach ($userWriteGroups as $userGroup) {
+    $userWriteGroupIds[] = $userGroup['id'];
 }
 
 // output free access groups
 $freeList = $groupHandler->getAllByType(GROUP_TYPE_FREE);
 if (is_array($freeList)) {
     foreach ($freeList as $free) {
-        if (!in_array($free['id'], $userGroupsIds)) {
+        if (!in_array($free['id'], $userWriteGroupIds)) {
             $output = [
                 'GROUP_ID'      => $free['id'],
                 'GROUP_NAME'    => Scrub::text($free['name']),
@@ -41,7 +41,7 @@ if (is_array($freeList)) {
 $moderatedList = $groupHandler->getAllByType(GROUP_TYPE_MODERATED);
 if (is_array($moderatedList)) {
     foreach ($moderatedList as $moderated) {
-        if (!in_array($moderated['id'], $userGroupsIds)) {
+        if (!in_array($moderated['id'], $userWriteGroupIds)) {
             $output = [
                 'GROUP_ID'      => $moderated['id'],
                 'GROUP_NAME'    => Scrub::text($moderated['name']),
