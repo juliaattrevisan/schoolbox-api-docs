@@ -13,7 +13,9 @@ use Alaress\Image;
 use Alaress\Image\Implementation\Imagine;
 use Schoolbox\Resource\Storage;
 
-require_once __DIR__ . '/../../library/Bootstrap.php';
+require_once __DIR__ . '/../../conf/core/require.php';
+spl_autoload_call('Schoolbox\\Application\\BasicRequest');
+$kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
 $postId = $_GET['id'];
 $size = $_GET['size'];
