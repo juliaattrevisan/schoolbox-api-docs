@@ -23,10 +23,12 @@
             </select>
         </label>
 
-        <input type="radio" name="linkedEntities" value="delete" id="linkedEntitiesDelete"><label for="linkedEntitiesDelete">Delete divisions and matches</label>
+        <input type="radio" name="linkedEntities" value="delete" id="linkedEntitiesDelete"><label for="linkedEntitiesDelete">Delete divisions and
+            matches</label>
     </fieldset>
 
-    <p class="alert-box warning icon-warning hide" data="alert-delete">Are you sure you really want to delete all divisions and matches linked to <strong><span data="season-name"></span></strong>, as well as all subsidiary entities? This cannot be undone</p>
+    <p class="alert-box warning icon-warning hide" data="alert-delete">Are you sure you really want to delete all divisions and matches linked to <strong><span
+                    data="season-name"></span></strong>, as well as all subsidiary entities? This cannot be undone</p>
 
     <ul class="flex-list buttons">
         <li><a href="#" class="button submit" data-action="confirm-delete" data-post-action="">Delete Season</a></li>
@@ -37,49 +39,49 @@
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript">
-    $(function() {
+    $(function () {
 
         // Setup vars
-        var $allSeasons   = $('#allSeasons'),
-            $deleteModal  = $('#deleteModal'),
-            $alertDelete  = $deleteModal.find('[data=alert-delete]'),
-            $radioMove    = $deleteModal.find('#linkedEntitiesMove'),
-            $radioDelete  = $deleteModal.find('#linkedEntitiesDelete'),
-            $selectMove   = $deleteModal.find('[data=seasons]'),
+        var $allSeasons = $('#allSeasons'),
+            $deleteModal = $('#deleteModal'),
+            $alertDelete = $deleteModal.find('[data=alert-delete]'),
+            $radioMove = $deleteModal.find('#linkedEntitiesMove'),
+            $radioDelete = $deleteModal.find('#linkedEntitiesDelete'),
+            $selectMove = $deleteModal.find('[data=seasons]'),
             $buttonDelete = $deleteModal.find('[data-action=confirm-delete]');
 
         // Did user change delete cascade strategy ?
-        $radioMove.add($radioDelete).on('change', function(){
-            if($radioMove.prop('checked')){
+        $radioMove.add($radioDelete).on('change', function () {
+            if ($radioMove.prop('checked')) {
                 $alertDelete.addClass('hide');
-                $buttonDelete.attr('disabled', $selectMove[0].selectedIndex < 1 );
+                $buttonDelete.attr('disabled', $selectMove[0].selectedIndex < 1);
             } else {
                 $alertDelete.removeClass('hide');
                 $buttonDelete.attr('disabled', false);
             }
-            $selectMove.prop('disabled',!$radioMove.prop('checked'));
+            $selectMove.prop('disabled', !$radioMove.prop('checked'));
         });
 
         // Did user select a season from the dropdown to move divisions/matches to ?
-        $selectMove.on('change', function(){
+        $selectMove.on('change', function () {
             $buttonDelete.attr('disabled', $selectMove[0].selectedIndex < 1);
         });
 
         // Did user click an action button on the delete modal ?
-        $deleteModal.on('click', 'a[data-action]', function(event) {
+        $deleteModal.on('click', 'a[data-action]', function (event) {
             event.preventDefault();
             $deleteModal.foundation('reveal', 'close');
 
             var $button = $(this),
-                action  = $button.data('action'),
-                $season = $('[data-season='+$deleteModal.find('[data-delete-season]').val()+']'),
-                data    = {};
+                action = $button.data('action'),
+                $season = $('[data-season=' + $deleteModal.find('[data-delete-season]').val() + ']'),
+                data = {};
 
-            switch(action){
+            switch (action) {
                 case 'cancel':
                     return;
                 case 'confirm-delete':
-                    if($radioMove.prop('checked')){
+                    if ($radioMove.prop('checked')) {
                         data['cascade'] = 'move';
                         data['move'] = $selectMove.val();
                     } else {
@@ -89,96 +91,95 @@
             }
 
             $.post($button.attr('data-post-action'), data)
-                    .done(function() {
-                        switch (action) {
-                            case 'confirm-delete':
-                                // If move, transfer division/match counts to other season
-                                if('move' == data['cascade']){
-                                    var $otherSeason = $('[data-season='+data['move']+']');
-                                    $otherSeason.attr('data-division-count', parseInt($otherSeason.attr('data-division-count')) + parseInt($season.attr('data-division-count')));
-                                    $otherSeason.attr('data-match-count', parseInt($otherSeason.attr('data-match-count')) + parseInt($season.attr('data-match-count')));
-                                }
+                .done(function () {
+                    switch (action) {
+                        case 'confirm-delete':
+                            // If move, transfer division/match counts to other season
+                            if ('move' == data['cascade']) {
+                                var $otherSeason = $('[data-season=' + data['move'] + ']');
+                                $otherSeason.attr('data-division-count', parseInt($otherSeason.attr('data-division-count')) + parseInt($season.attr('data-division-count')));
+                                $otherSeason.attr('data-match-count', parseInt($otherSeason.attr('data-match-count')) + parseInt($season.attr('data-match-count')));
+                            }
 
-                                var killMe = function(){
-                                    $season.remove();
-                                    resetDeleteModal($season);
-                                };
-                                $season.fadeOut({ done: killMe });
+                            var killMe = function () {
+                                $season.remove();
+                                resetDeleteModal($season);
+                            };
+                            $season.fadeOut({done: killMe});
 
-                                // Was this the last season ?
-                                checkEmptyState();
-                                break;
-                        }
-                    })
-                    .fail(function() {
-                        $('#errorModal').foundation('reveal', 'open');
-                    });
+                            // Was this the last season ?
+                            checkEmptyState();
+                            break;
+                    }
+                })
+                .fail(function () {
+                    $('#errorModal').foundation('reveal', 'open');
+                });
         });
 
         // Archive / Restore / Delete AJAX actions
-        $allSeasons.on('click', 'a[data-action]', function(event) {
+        $allSeasons.on('click', 'a[data-action]', function (event) {
             event.preventDefault();
-            var $button       = $(this),
-                action        = $button.data('action'),
-                $season       = $button.closest('[data-season]'),
+            var $button = $(this),
+                action = $button.data('action'),
+                $season = $button.closest('[data-season]'),
                 divisionCount = $season.attr('data-division-count'),
                 divisionClass = divisionCount ? 'gradient-1' : 'gradient-10',
-                matchCount    = $season.attr('data-match-count'),
-                matchClass    = matchCount ? 'gradient-1' : 'gradient-10',
-                tenseClause   = action == 'restore' ? 'that were' : 'currently';
+                matchCount = $season.attr('data-match-count'),
+                matchClass = matchCount ? 'gradient-1' : 'gradient-10',
+                tenseClause = action == 'restore' ? 'that were' : 'currently';
 
             // Special case for deleting a season with divisions and/or matches currently linked to it
-            if('delete' == action && (divisionCount > 0 || matchCount > 0)){
+            if ('delete' == action && (divisionCount > 0 || matchCount > 0)) {
                 $deleteModal.foundation('reveal', 'open');
                 resetDeleteModal($season);
                 return;
             }
 
             // Generate modal text
-            var text = 'Are you sure you want to <strong>'+action+'</strong> this season?<br>';
-            if(divisionCount > 0 || matchCount > 0){
-                text += 'This will <strong>'+action+'</strong> <span class="'+divisionClass+'">'+divisionCount+'</span> divisions and <span class="'+matchClass+'">'
-                        +matchCount+'</span> matches '+tenseClause+' linked to this season, along with all their subsidiary entities';
+            var text = 'Are you sure you want to <strong>' + action + '</strong> this season?<br>';
+            if (divisionCount > 0 || matchCount > 0) {
+                text += 'This will <strong>' + action + '</strong> <span class="' + divisionClass + '">' + divisionCount + '</span> divisions and <span class="' + matchClass + '">'
+                    + matchCount + '</span> matches ' + tenseClause + ' linked to this season, along with all their subsidiary entities';
             } else {
                 text += 'There are no divisions or matches currently linked to this season.';
             }
 
 
-
             $button.confirmDialog({
                 text: text,
                 format: 'html',
-                confirmEvent: function(el) {
+                confirmEvent: function (el) {
                     // AJAX, then update DOM
                     // Archive/restore: refresh list item
                     // Delete: remove completely
                     console.log(el.data('postAction'));
                     $.post(el.data('postAction'))
-                            .done(function(data) {
-                                switch (action) {
-                                    case 'delete':
-                                        var killMe = function(){
-                                            $season.remove();
-                                            resetDeleteModal($season);
-                                        };
-                                        $season.fadeOut({ done: killMe });
-                                        checkEmptyState();
-                                        break;
-                                    case 'archive':
-                                    case 'restore':
-                                    default:
-                                        var $newDom  = $(data);
-                                        // Replace whole list item
-                                        $season.replaceWith($newDom);
+                        .done(function (data) {
+                            switch (action) {
+                                case 'delete':
+                                    var killMe = function () {
+                                        $season.remove();
+                                        resetDeleteModal($season);
+                                    };
+                                    $season.fadeOut({done: killMe});
+                                    checkEmptyState();
+                                    break;
+                                case 'archive':
+                                case 'restore':
+                                default:
+                                    var $newDom = $(data);
+                                    // Replace whole list item
+                                    $season.replaceWith($newDom);
 
-                                        // Force reset of destination season dropdown next time it is shown
-                                        $deleteModal.find('[data-delete-season]').val('');
-                                        break;
-                                }
-                            })
-                            .fail(function() {
-                                $('#errorModal').foundation('reveal', 'open');
-                            });
+                                    // Force reset of destination season dropdown next time it is shown
+                                    $deleteModal.find('[data-delete-season]').val('');
+                                    break;
+                            }
+                        })
+                        .fail(function () {
+                            $('#errorModal').foundation('reveal', 'open');
+                        });
                 }
             })
         });
@@ -188,9 +189,9 @@
          *
          * @param $season jQuery object for season selected for deletion
          */
-        function resetDeleteModal($season){
+        function resetDeleteModal($season) {
             // Does modal need to be reset?
-            if($deleteModal.find('[data-delete-season]').val() != $season.data('season') ) {
+            if ($deleteModal.find('[data-delete-season]').val() != $season.data('season')) {
 
                 // Populate fields and labels
                 $deleteModal.find('[data-delete-season]').val($season.data('season'));
@@ -227,9 +228,9 @@
         /**
          * Checks how many seasons are in list, if 0, display the empty-state message
          */
-        function checkEmptyState(){
+        function checkEmptyState() {
             var $emptyState = $('[data-empty-state]');
-            if($allSeasons.find('[data-season]').length){
+            if ($allSeasons.find('[data-season]').length) {
                 $emptyState.addClass('hide');
             } else {
                 $emptyState.removeClass('hide');
@@ -268,8 +269,9 @@
 
         <div class="empty-state {% if allSeasons|length %}hide{% endif %}" data-empty-state>
             <i class="icon-season"></i>
-            <p>There are currently no seasons available. You must create a season before divisions can be created.<br />
-                Start by <a href="{{ routeLookup('sportsfixturesSeason.getCreateForm', {context: match.id}) }}" title="Add a Season">adding a new season</a> now.</p>
+            <p>There are currently no seasons available. You must create a season before divisions can be created.<br/>
+                Start by <a href="{{ routeLookup('sportsfixturesSeason.getCreateForm', {context: match.id}) }}" title="Add a Season">adding a new season</a>
+                now.</p>
         </div>
     </div>
 </div>
