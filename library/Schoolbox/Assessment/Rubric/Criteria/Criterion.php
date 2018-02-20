@@ -30,7 +30,7 @@ class Criterion extends DescriptorList
         $total = 0;
 
         foreach ($this->descriptors as $descriptor) {
-            if(!is_numeric($descriptor->getTotal())) {
+            if(is_numeric($descriptor->getTotal())) {
                 $total = max($total, $descriptor->getTotal());
             }
         }
