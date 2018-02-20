@@ -13,7 +13,9 @@ use Alaress\Image\Implementation\Imagine;
 use Alaress\Image\Processor\Freeform;
 use Alaress\Image\Transformation;
 
-require_once __DIR__.'/../../library/Bootstrap.php';
+require_once __DIR__ . '/../../conf/core/require.php';
+spl_autoload_call('Schoolbox\\Application\\BasicRequest');
+$kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
 $placeholders = array(
     'skin_logo_login' => '/core/logo.png',
@@ -76,7 +78,11 @@ try {
 catch (Exception $e) {
     $placeHolderFile = __DIR__ .$placeholders[$logo];
     if (is_readable($placeHolderFile)) {
+        header('Cache-Control: max-age=10800, private');
+        header('Expires: ' . date(DATE_RFC822, strtotime(' 2 day')));
         header('Content-type: image/png');
+        header('Pragma: private');
+
         readfile($placeHolderFile);
         exit;
 
