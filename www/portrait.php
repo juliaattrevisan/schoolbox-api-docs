@@ -15,11 +15,15 @@ tideways_enable(TIDEWAYS_FLAGS_CPU + TIDEWAYS_FLAGS_MEMORY);
 use Alaress\Image;
 use Alaress\Image\Implementation\Imagine;
 
-require_once '../library/Bootstrap.php';
+require_once __DIR__ . '/../conf/core/require.php';
+spl_autoload_call('Schoolbox\\Application\\BasicRequest');
+$kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
 //
 // Alaress_Image_Cache_Portrait needs to know if someone is logged in.
 session_start();
+
+
 
 /* If current user is not available return permission denied */
 if(! ($_SESSION['user'] instanceof Schoolbox\User)) {
@@ -33,7 +37,11 @@ try {
         new Imagine\Filetype\Factory(),
         new Imagine\Processor\Strategy\Factory()
     );
+    $profiler_namespace = 'schoolbox';
+    $xhprof_data = tideways_disable();
 
+    $xhprof_runs = new XHProfRuns_Default();
+    $run_id = $xhprof_runs->save_run($xhprof_data, $profiler_namespace);
     $image->load()->stream();
 }
 /* When you cannot access the requested image (access denied)
@@ -58,8 +66,3 @@ catch (Exception $e) {
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 500);
 }
 
-$profiler_namespace = 'schoolbox';
-$xhprof_data = tideways_disable();
-
-$xhprof_runs = new XHProfRuns_Default();
-$run_id = $xhprof_runs->save_run($xhprof_data, $profiler_namespace);
