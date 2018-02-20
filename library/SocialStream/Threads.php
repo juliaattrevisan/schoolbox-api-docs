@@ -320,6 +320,7 @@ class Threads
                     'SOCIALSTREAM_POST_POST_ID'          => Scrub::text($currentPost->getPostId()),
                     'SOCIALSTREAM_POST_BODY'             => nl2br(Scrub::text($currentPost->getBody())),
                     'SOCIALSTREAM_POST_CREATED_AT'       => Scrub::text($currentPost->getCreatedAt()->getRelativeTime()),
+                    'SOCIALSTREAM_POST_CREATED_AT_LONG'  => Scrub::text($currentPost->getCreatedAt()->getLong()),
                     'SOCIALSTREAM_POST_USER_ID'          => Scrub::text($currentPost->getOwner()->getId()),
                     'SOCIALSTREAM_POST_USER_EXTERNAL_ID' => Scrub::text($currentPost->getOwner()->getExternalId()),
                     'SOCIALSTREAM_POST_USER_FULLNAME'    => Scrub::text($currentPost->getOwner()->getFullname()),

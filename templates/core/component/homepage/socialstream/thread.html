@@ -7,13 +7,13 @@
             <a href="/search/user/{SOCIALSTREAM_POST_USER_ID}" title="View Profile">
                 <img src="/portrait.php?userId={SOCIALSTREAM_POST_USER_EXTERNAL_ID}&size=square64" alt="{SOCIALSTREAM_POST_USER_FULLNAME}">
                 <p>{SOCIALSTREAM_POST_USER_FULLNAME}</p>
-                <p class="meta">Posted {SOCIALSTREAM_POST_CREATED_AT}</p>
+                <p class="meta" title="{SOCIALSTREAM_POST_CREATED_AT_LONG}">Posted {SOCIALSTREAM_POST_CREATED_AT}</p>
             </a>
             <!-- END owner_exists -->
             <!-- BEGIN owner_deleted -->
                 <img src="/portrait.php?userId={SOCIALSTREAM_POST_USER_EXTERNAL_ID}&size=square64" alt="{SOCIALSTREAM_POST_USER_FULLNAME}">
                 <p>{SOCIALSTREAM_POST_USER_FULLNAME}</p>
-                <p class="meta">Posted {SOCIALSTREAM_POST_CREATED_AT}</p>
+                <p class="meta" title="{SOCIALSTREAM_POST_CREATED_AT_LONG}">Posted {SOCIALSTREAM_POST_CREATED_AT}</p>
             <!-- END owner_deleted -->
 
         </div>
