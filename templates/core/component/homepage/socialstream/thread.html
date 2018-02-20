@@ -106,8 +106,11 @@
                     <!-- BEGIN commenter_exists -->
                     <a href="/search/user/{SOCIALSTREAM_COMMENT_USER_ID}" title="View Profile">
                         <img src="/portrait.php?userId={SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID}&size=square32" alt="{SOCIALSTREAM_COMMENT_USER_FULLNAME}">
-                        <p>{SOCIALSTREAM_COMMENT_USER_FULLNAME}<span class="pipe meta">Replied {SOCIALSTREAM_COMMENT_CREATED_AT}</span></p>
                     </a>
+                    <p>
+                        <a href="/search/user/{SOCIALSTREAM_COMMENT_USER_ID}" title="View Profile">{SOCIALSTREAM_COMMENT_USER_FULLNAME}</a>
+                        <span class="pipe meta" title="{SOCIALSTREAM_COMMENT_CREATED_AT_LONG}">Replied {SOCIALSTREAM_COMMENT_CREATED_AT}</span>
+                    </p>
                     <!-- END commenter_exists -->
                     <!-- BEGIN commenter_deleted -->
                     <img src="/portrait.php?userId={SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID}&size=square32" alt="{SOCIALSTREAM_COMMENT_USER_FULLNAME}">

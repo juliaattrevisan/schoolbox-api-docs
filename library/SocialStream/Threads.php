@@ -394,6 +394,7 @@ class Threads
                         'SOCIALSTREAM_COMMENT_POST_ID'          => Scrub::text($currentComment->getPostId()),
                         'SOCIALSTREAM_COMMENT_BODY'             => nl2br(Scrub::text($currentComment->getBody())),
                         'SOCIALSTREAM_COMMENT_CREATED_AT'       => Scrub::text($currentComment->getCreatedAt()->getRelativeTime()),
+                        'SOCIALSTREAM_COMMENT_CREATED_AT_LONG'  => Scrub::text($currentComment->getCreatedAt()->getLong()),
                         'SOCIALSTREAM_COMMENT_USER_ID'          => Scrub::text($currentComment->getOwner()->getId()),
                         'SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID' => Scrub::text($currentComment->getOwner()->getExternalId()),
                         'SOCIALSTREAM_COMMENT_USER_FULLNAME'    => Scrub::text($currentComment->getOwner()->getFullname()),
