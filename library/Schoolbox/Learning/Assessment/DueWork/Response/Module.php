@@ -271,10 +271,12 @@ class Module extends BaseModule
         }
 
         return [
-            'assessment' => $assessment,
-            'response'   => $response,
-            'plagscan'   => $plagscanDocument->setHtml($html), /* restore cached HTML value */
-            'student'    => $participant->getUser(),
+            'assessment'  => $assessment,
+            'response'    => $response,
+            'plagscan'    => $plagscanDocument->setHtml($html), /* restore cached HTML value */
+            'student'     => $participant->getUser(),
+            'studentId'   => $participant->getUser()->getId(),
+            'participant' => $participant,
         ];
     }
 
