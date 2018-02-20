@@ -78,7 +78,7 @@ class ValidUserCanInteractWithAssessment
             }
 
             if ($plan->getCloseDate()->isNull()) {
-                $close = $this->assessable->getOpenAt();
+                $close = $this->assessable->getCloseAt();
             }
 
             return $this->now->gte($open) && $this->now->lt($close);

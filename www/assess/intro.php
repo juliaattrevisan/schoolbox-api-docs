@@ -145,7 +145,7 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
 
     /* Non-participators have the call-to-action hidden instead of 404
      */
-    $interactSatisfaction = (new ValidUserCanInteractWithAssessment(Participant\Plan\Mapper::getInstance(), Participant\Mapper::getInstance()))
+    $interactSatisfaction = (new ValidUserCanInteractWithAssessment(Alaress_Date_Format::now(), $assessment, Access::getInstance()))
         ->isSatisfiedBy($_SESSION['user'], $folder, $assessment);
 
     if (!$interactSatisfaction) {

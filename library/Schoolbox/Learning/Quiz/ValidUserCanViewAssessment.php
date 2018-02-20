@@ -64,9 +64,21 @@ class ValidUserCanViewAssessment
         if ($this->assessable->isParticipant($user) && !$this->assessable->getParticipant($user)->isExcluded()) {
             $plan = $this->assessable->getParticipant($user)->getPlan();
 
-            $publishDate = $plan->getPublishDate() ?? $this->assessable->getPublishAt();
+            /* When a user doesn't have a customised plan, these dates are null
+             * Use default assessment dates in that case
+             */
+            $publish = $plan->getPublishDate();
+            $close = $plan->getCloseDate();
 
-            return $publishDate->gte($this->now);
+            if ($plan->getPublishDate()->isNull()) {
+                $publish = $this->assessable->getPublishAt();
+            }
+
+            if ($plan->getCloseDate()->isNull()) {
+                $close = $this->assessable->getCloseAt();
+            }
+
+            return $this->now->gte($publish) && $this->now->lt($close);
         }
 
         if ($this->accessHelper->isInstructor($user, $this->assessable->getContext()->getFolder())) {
