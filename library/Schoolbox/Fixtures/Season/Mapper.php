@@ -41,8 +41,8 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteDivisions'));
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteMatches'));
+        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, array($this, 'deleteDivisions'));
+        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, array($this, 'deleteMatches'));
     }
 
     /**
@@ -52,11 +52,7 @@ class Mapper extends BaseMapper
      */
     public function deleteDivisions(Season $season)
     {
-        $allDivisions = DivisionMapper::getInstance()->findByColumn('season_id', $season->getId());
-
-        foreach ($allDivisions as $currentDivision) {
-            DivisionMapper::getInstance()->delete($currentDivision);
-        }
+        DivisionMapper::getInstance()->deleteByColumn('season_id', $season->getId(), ['cache' => false]);
     }
 
     /**
@@ -66,11 +62,7 @@ class Mapper extends BaseMapper
      */
     public function deleteMatches(Season $season)
     {
-        $allMatches = MatchMapper::getInstance()->findByColumn('season_id', $season->getId());
-
-        foreach ($allMatches as $currentMatch) {
-            MatchMapper::getInstance()->delete($currentMatch);
-        }
+        MatchMapper::getInstance()->deleteByColumn('season_id', $season->getId(), ['cache' => false]);
     }
 
     /**

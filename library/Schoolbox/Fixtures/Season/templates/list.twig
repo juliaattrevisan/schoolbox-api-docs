@@ -138,6 +138,8 @@
                 text += 'There are no divisions or matches currently linked to this season.';
             }
 
+
+
             $button.confirmDialog({
                 text: text,
                 format: 'html',
@@ -145,6 +147,7 @@
                     // AJAX, then update DOM
                     // Archive/restore: refresh list item
                     // Delete: remove completely
+                    console.log(el.data('postAction'));
                     $.post(el.data('postAction'))
                             .done(function(data) {
                                 switch (action) {
