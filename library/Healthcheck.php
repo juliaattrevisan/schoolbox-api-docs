@@ -471,7 +471,8 @@ class Healthcheck
             'TEACHER',
             'FAMILY',
             'SYSFILE',
-            'IDENTITY'
+            'IDENTITY',
+            'TTABLE'
         ];
 
         $tables = array_merge($tables, $this->customUPSTest());
