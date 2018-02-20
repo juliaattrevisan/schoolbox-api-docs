@@ -148,8 +148,8 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
     $interactSatisfaction = (new ValidUserCanInteractWithAssessment(Alaress_Date_Format::now(), $assessment, Access::getInstance()))
         ->isSatisfiedBy($_SESSION['user'], $folder, $assessment);
 
-    if (!$interactSatisfaction) {
-        $readOnly = true;
+    if ($interactSatisfaction) {
+        $readOnly = false;
     }
 }
 else {
