@@ -164,7 +164,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         $catId = $cat->getId();
         $catName = $cat->getName();
 
-        $icon = "/portrait?userId=$teacherExtId&size={$this->iconSize}";
+        $icon = "/portrait.php?userId=$teacherExtId&size={$this->iconSize}";
         $href = "/learning/assessments/{$box->getAssessmentId()}/$studentId";
 
         // if student, 2nd-person language

@@ -10,6 +10,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+tideways_enable(TIDEWAYS_FLAGS_CPU + TIDEWAYS_FLAGS_MEMORY);
 
 use Alaress\Image;
 use Alaress\Image\Implementation\Imagine;
@@ -56,3 +57,9 @@ catch (\DomainException $e) {
 catch (Exception $e) {
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 500);
 }
+
+$profiler_namespace = 'schoolbox';
+$xhprof_data = tideways_disable();
+
+$xhprof_runs = new XHProfRuns_Default();
+$run_id = $xhprof_runs->save_run($xhprof_data, $profiler_namespace);
