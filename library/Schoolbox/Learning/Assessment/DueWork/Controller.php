@@ -1001,11 +1001,12 @@ class Controller extends Assessment\Controller
 
         $this->dueWorkResponseMapper->save($response);
 
+        // Ensure we update our domain graph so callers to this method can rely on the graph being accurate
         $participant = $dueWork->getParticipantIfExtant($student);
         if (!$participant) {
             $dynamicPlan = $dueWork->getDynamicPlan();
             $participant = new Participant($student, $dynamicPlan);
-            /** @noinspection NullPointerExceptionInspection */
+            /** @noinspection NullPointerExceptionInspection (because we can't have no participant without a dynamic plan) */
             $dynamicPlan->getParticipants()[$student->getId()] = $participant;
         }
         $participant->getAllResponses()[$response->getId()] = $response;
