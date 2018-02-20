@@ -373,7 +373,7 @@
      * @param {boolean}     include               Whether to set to default, or set to excluded
      * @param {Object}      self
      */
-    function updateStudentStatus(studentID, include, self) {
+    function updateStudentStatus(studentID, include) {
         var statusValue;
         var status;
         var $participantRow = $(defaults.participants).find('li[data-participant=' + studentID + ']');
