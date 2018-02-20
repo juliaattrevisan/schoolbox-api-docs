@@ -709,6 +709,7 @@ class DemoData
         $feedbackD = (new TaskFeedback())
             ->setResponse($responseD);
         $participantD->getAllFeedbacks()->add($feedbackD);
+        $responseD->getAllFeedback()->add($feedbackD);
 
 
         // User E - teacher-assessed as complete
@@ -728,6 +729,7 @@ class DemoData
         $feedbackE = (new TaskFeedback())
             ->setResponse($responseE);
         $participantE->getAllFeedbacks()->add($feedbackE);
+        $responseE->getAllFeedback()->add($feedbackE);
 
 
         // User F - self-assessed as complete, then teacher-assessed as incomplete
@@ -758,6 +760,7 @@ class DemoData
         $feedbackF2 = (new TaskFeedback())
             ->setResponse($responseF2);
         $participantF->getAllFeedbacks()->add($feedbackF2);
+        $responseF2->getAllFeedback()->add($feedbackF2);
 
 
         // User G - self-assessed as incomplete, then teacher-assessed as complete
@@ -788,6 +791,7 @@ class DemoData
         $feedbackG2 = (new TaskFeedback())
             ->setResponse($responseG2);
         $participantG->getAllFeedbacks()->add($feedbackG2);
+        $responseG2->getAllFeedback()->add($feedbackG2);
 
         // User H - teacher-assessed as complete, then teacher-assessed as incomplete
         $participantH = $linker->createAndLinkParticipant(self::getDemoStudent('H'), $taskPlan);
@@ -806,6 +810,7 @@ class DemoData
         $feedbackH1 = (new TaskFeedback())
             ->setResponse($responseH1);
         $participantH->getAllFeedbacks()->add($feedbackH1);
+        $responseH1->getAllFeedback()->add($feedbackH1);
 
         $responseH2 = (new TaskResponse())
             ->setId(82)
@@ -821,6 +826,7 @@ class DemoData
         $feedbackH2 = (new TaskFeedback())
             ->setResponse($responseH2);
         $participantH->getAllFeedbacks()->add($feedbackH2);
+        $responseH2->getAllFeedback()->add($feedbackH2);
 
 
         // User I - teacher-assessed as incomplete, then student-assessed as complete
@@ -840,6 +846,7 @@ class DemoData
         $feedbackI1 = (new TaskFeedback())
             ->setResponse($responseI1);
         $participantI->getAllFeedbacks()->add($feedbackI1);
+        $responseH2->getAllFeedback()->add($feedbackI1);
 
         $responseI2 = (new TaskResponse())
             ->setId(9)
@@ -906,6 +913,7 @@ class DemoData
         $feedbackB = (new TaskFeedback())
             ->setResponse($responseB);
         $participantB->getAllFeedbacks()->add($feedbackB);
+        $responseB->getAllFeedback()->add($feedbackB);
 
         // User C - teacher-assessed as complete
         $participantC = $linker->createAndLinkParticipant(self::getDemoStudent('C'), $taskPlan);
@@ -924,6 +932,7 @@ class DemoData
         $feedbackC = (new TaskFeedback())
             ->setResponse($responseC);
         $participantC->getAllFeedbacks()->add($feedbackC);
+        $responseC->getAllFeedback()->add($feedbackC);
 
 
         // User D - teacher-assessed as complete, then teacher-assessed as incomplete
@@ -943,6 +952,7 @@ class DemoData
         $feedbackD1 = (new TaskFeedback())
             ->setResponse($responseD1);
         $participantD->getAllFeedbacks()->add($feedbackD1);
+        $responseD1->getAllFeedback()->add($feedbackD1);
 
         $responseD2 = (new TaskResponse())
             ->setId(42)
@@ -958,6 +968,7 @@ class DemoData
         $feedbackD2 = (new TaskFeedback())
             ->setResponse($responseD2);
         $participantD->getAllFeedbacks()->add($feedbackD2);
+        $responseD2->getAllFeedback()->add($feedbackD2);
 
         // User E - teacher-assessed as incomplete, then teacher-assessed as complete
         $participantE = $linker->createAndLinkParticipant(self::getDemoStudent('E'), $taskPlan);
@@ -976,6 +987,7 @@ class DemoData
         $feedbackE1 = (new TaskFeedback())
             ->setResponse($responseE1);
         $participantE->getAllFeedbacks()->add($feedbackE1);
+        $responseE1->getAllFeedback()->add($feedbackE1);
 
         $responseE2 = (new TaskResponse())
             ->setId(52)
@@ -991,6 +1003,7 @@ class DemoData
         $feedbackE2 = (new TaskFeedback())
             ->setResponse($responseE2);
         $participantE->getAllFeedbacks()->add($feedbackE2);
+        $responseE2->getAllFeedback()->add($feedbackE2);
 
         return $task;
     }

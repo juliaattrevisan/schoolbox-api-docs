@@ -30,9 +30,9 @@
     {% set isPublished  = latestFeedback.published %}
     {% set canPublish   = latestFeedback and not isPublished %}
 
-    {% set pStatusClass = not latestResponse.markedComplete ? statusIncomplete : (latestResponse.selfAssessed ? statusPending : statusReviewed) %}
-    {% set pTooltip     = not latestResponse.markedComplete ? labelIncomplete : (latestResponse.selfAssessed ? labelPending : labelReviewed) %}
-    {% set pStatusText = pTooltip %}
+    {% set pStatusClass = participant.responseRequired ? statusIncomplete : (participant.feedbackRequired ? statusPending : statusReviewed) %}
+    {% set pTooltip     = participant.responseRequired ? labelIncomplete : (participant.feedbackRequired ? labelPending : labelReviewed) %}
+    {% set pStatusText  = pTooltip %}
 
     <li data-status="{{ pStatusClass }}" data-participant-name="{{ participant.user.fullName }}">
         <div>
@@ -48,8 +48,7 @@
             <div class="small-1">
                 {% include '@learningAssessment/fragments/progressTick.twig' with {
                     assessment:  participant.assessable,
-                    participant: participant,
-                    writable:    writable
+                    student: participant.user
                 } only %}
             </div>
         </div>

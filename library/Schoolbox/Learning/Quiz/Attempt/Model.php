@@ -17,6 +17,7 @@ use Schoolbox\User;
 use \Alaress_Date_Format;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Model as QuizAnswer;
 use \DomainException;
+use Alaress_Date_NullDate;
 
 class Model implements ISoftDeletable
 {
@@ -125,6 +126,18 @@ class Model implements ISoftDeletable
     {
         return $this->finish;
     }
+
+
+    /**
+     * Returns whether the attempt has been finished.
+     *
+     * @return bool
+     */
+    public function isFinished(): bool
+    {
+        return !(null === $this->finish || $this->finish instanceof Alaress_Date_NullDate);
+    }
+
 
     /**
      * @param  Alaress_Date_Format $reviewed

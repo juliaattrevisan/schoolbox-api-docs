@@ -10,7 +10,6 @@ namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Web;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\User;
 
@@ -105,16 +104,6 @@ interface IAssessmentController
      * @return void
      */
     public function getStatus(IAssessable $assessment);
-
-    /**
-     * @api   GET /learning/assessments/:assessmentId/preview
-     * @level 165
-     *
-     * @param IAssessable $assessment
-     * @return void
-     */
-    public function getPreview(IAssessable $assessment);
-
 
     /**
      * @api   GET /learning/assessments/:assessmentId/:studentId

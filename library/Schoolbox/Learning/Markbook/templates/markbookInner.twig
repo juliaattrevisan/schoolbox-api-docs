@@ -121,8 +121,7 @@
                                     {% if studentCount < functionDegradeLimit %}
                                    {% include '@learningAssessment/fragments/progressTick.twig' with {
                                         assessment: assessment,
-                                        participant: participant,
-                                        writable: writable[assessment.id]
+                                        student: participant.user
                                     } only %}
                                     {% else %}
                                         {% if participant.isResponseRequired %}

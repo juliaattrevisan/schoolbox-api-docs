@@ -14,6 +14,7 @@ use Schoolbox\Assessment\Participant;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use PDO;
+use Schoolbox\UserMapper;
 
 /**
  * @method Model hydrate(array $row, $alias = '', $callback = null)
@@ -68,9 +69,11 @@ class Mapper extends BaseMapper
     {
         $query = "
             SELECT {$this->getColumnString()},
-                   {$this->getJoinColumnString('participants', 'p')}
+                   {$this->getJoinColumnString('participants', 'p')},
+                   {$this->getJoinColumnString('participants.user', 'u')}
             FROM   {$this->getTable()}
-            LEFT JOIN  {$this->getJoinSql('participants', '', 'p')}";
+            LEFT JOIN  {$this->getJoinSql('participants', '', 'p')}
+            LEFT JOIN  {$this->getJoinSql('participants.user', 'p', 'u')}";
 
         $args = [];
         if ($pb && $pb->count()) {
@@ -106,8 +109,12 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
-        /** @var Participant\Mapper $participantMapper */
+        /**
+         * @var Participant\Mapper $participantMapper
+         * @var UserMapper $userMapper
+         */
         $participantMapper = $this->getJoinMapper('participants');
+        $userMapper        = $participantMapper->getJoinMapper('user');
         $plans             = $this->createCollection();
 
         /** @noinspection PhpAssignmentInConditionInspection */
@@ -120,6 +127,9 @@ class Mapper extends BaseMapper
                 if ($participant) {
                     // Indexed by user.id to optimise participant traversals
                     $plan->getParticipants()[$participant->getUser()->getId()] = $participant;
+                    if (array_key_exists('u.id', $row)) {
+                        $participant->setUser($userMapper->hydrate($row, 'u'));
+                    }
                 }
             }
             $plans[$plan->getId()] = $plan;

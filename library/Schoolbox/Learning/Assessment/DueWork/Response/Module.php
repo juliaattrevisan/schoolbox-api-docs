@@ -26,7 +26,6 @@ use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
-use Schoolbox\Learning\Authorizer\Rule\IsParticipant;
 use Schoolbox\Learning\Authorizer\Rule\ParentCanViewFeedback;
 use Schoolbox\Learning\Authorizer\Rule\StudentCanViewFeedback;
 use Schoolbox\Learning\InlineGrader\Kami;
@@ -71,7 +70,7 @@ class Module extends BaseModule
         $hasPlagscanAccess = new Rule\Any(
             $hasWriteAccess,
             new Rule\All(
-                new IsParticipant(),
+                new Rule\IsUser('studentId'),
                 new Rule\IsConfigOn('plagscan_allow_students_report_access', $this->getConfigLoader())
             )
         );

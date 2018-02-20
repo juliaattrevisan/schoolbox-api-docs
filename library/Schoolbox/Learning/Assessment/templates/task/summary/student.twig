@@ -1,3 +1,12 @@
+{#
+Data:
+    breadcrumbs Collection|string[][]
+    assessment  Task\Model
+    student     User
+    preview     array
+    returnUrl   string
+#}
+
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 <script type="text/javascript" src="/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>
@@ -14,28 +23,30 @@
             }
         });
     });
-
-
-
 </script>
 
 <div class="row">
     <div class="small-12 columns">
         <h1>{{ assessment.title }}</h1>
-        {% include '@learningAssessment/meta.twig' with {assessment: assessment, user: USER, student: participant.user, icon: 'icon-task'} %}
+        {% include '@learningAssessment/meta.twig' with {assessment: assessment, user: USER, student: student, icon: 'icon-task'} %}
     </div>
 </div>
 
 <div class="row">
     <div class="small-12 island">
-        {% include '@learningAssessment/task/summary/description.twig' with {assessment: assessment, preview: preview, participant: participant} only %}
+        {% include '@learningAssessment/task/summary/description.twig' with {
+            assessment: assessment,
+            preview: preview,
+            student: student
+        } only %}
     </div>
 </div>
 
 
 {# student submit form #}
+{% set participant         = assessment.getParticipantIfExtant(student) %}
 {% set mostRecentResponse  = participant.findMostRecentSubmittedResponse %}
-{% set isViewingOwnSummary = participant.user.id == USER.id %}
+{% set isViewingOwnSummary = student.id == USER.id %}
 {% set reviewer            = mostRecentResponse.submittedBy %}
 {% set reviewerName        = reviewer.id == USER.id ? 'You' : reviewer.fullName %}
 {% set COMPLETION_STATUS_INCOMPLETE              = 1 %}
@@ -51,44 +62,44 @@
                     <div class="actions-small-1">
                         <div class="list-item">
                             <div class="card small-12">
-                                <a href="/search/user/{{ participant.user.id }}" title="View Profile">
-                                    <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64"
-                                         alt="{{ participant.user.formatName }}"
+                                <a href="/search/user/{{ student.id }}" title="View Profile">
+                                    <img src="/portrait.php?userId={{ student.externalId }}&amp;size=square64"
+                                         alt="{{ student.formatName }}"
                                          class="hide-for-small-only">
-                                    <p>{{ participant.user.formatName }}</p>
+                                    <p>{{ student.formatName }}</p>
 
-                                    <p class="meta">
-                                        {# Are there no responses for this participant ? #}
-                                        {% if not mostRecentResponse %}
+                                    {% if assessment.isImplementation %}
+                                        <p class="meta">
+                                            {# Are there no responses for this participant ? #}
+                                            {% if not mostRecentResponse %}
 
-                                            {# Is this task self-assessable ? #}
-                                            {% if assessment.isSelfAssessable %}
-                                                {% if isViewingOwnSummary %}
-                                                    You {% if assessment.isPastClose %}did not complete{% else %}have not completed{% endif %} this task.
+                                                {# Is this task self-assessable ? #}
+                                                {% if assessment.isSelfAssessable %}
+                                                    {% if isViewingOwnSummary %}
+                                                        You {% if assessment.isPastClose %}did not complete{% else %}have not completed{% endif %} this task.
+                                                    {% else %}
+                                                        {% if assessment.isPastClose %}did not complete{% else %}has not completed{% endif %} this task.
+                                                    {% endif %}
                                                 {% else %}
-                                                    {% if assessment.isPastClose %}did not complete{% else %}has not completed{% endif %} this task.
+                                                    {% if isViewingOwnSummary %}
+                                                        Your teacher {% if assessment.isPastClose %}did not verify{% else %}has not verified{% endif %} that you have completed this task.
+                                                    {% else %}
+                                                        {% if assessment.isPastClose %}was not{% else %}has not been{% endif %} verified as having completed this task.
+                                                    {% endif %}
                                                 {% endif %}
                                             {% else %}
-                                                {% if isViewingOwnSummary %}
-                                                    Your teacher {% if assessment.isPastClose %}did not verify{% else %}has not verified{% endif %} that you have completed this task.
-                                                {% else %}
-                                                    {% if assessment.isPastClose %}was not{% else %}has not been{% endif %} verified as having completed this task.
-                                                {% endif %}
+                                            {% if isViewingOwnSummary %}You were{% else %}was{% endif %} marked as
+                                            {% if mostRecentResponse.isMarkedComplete %}complete{% else %}incomplete{% endif %} on {{ mostRecentResponse.submittedAt.short }}.
                                             {% endif %}
-                                        {% else %}
-                                        {% if isViewingOwnSummary %}You were{% else %}was{% endif %} marked as
-                                        {% if mostRecentResponse.isMarkedComplete %}complete{% else %}incomplete{% endif %} on {{ mostRecentResponse.submittedAt.short }}.
-                                        {% endif %}
-                                    </p>
-
+                                        </p>
+                                    {% endif %}
                                 </a>
                             </div>
                         </div>
                         <nav>
                             {% include '@learningAssessment/fragments/progressTick.twig' with {
                             assessment: assessment,
-                            participant: participant,
-                            writable: true
+                            student: student
                             } only %}
                         </nav>
                     </div>
@@ -117,6 +128,6 @@
                 </li>
             </ul>
         </section>
-        <a href="{{ returnUrl }}" class="submit button full-width" value="Return">Return</a>
+        <a href="{{ returnUrl }}" class="submit button full-width">Return</a>
     </div>
 </div>

@@ -7,7 +7,7 @@ Data:
     participant ?Participant - optional. If supplied override real assessment values
 #}
 <section>
-    {% set description = participant ? participant.description : assessment.description  %}
+    {% set description = (participant and not participant.isExcluded) ? participant.description : assessment.description  %}
     {% if description|length %}
         <article class="content">
             {{ description | purify }}

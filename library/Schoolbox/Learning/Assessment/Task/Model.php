@@ -243,9 +243,10 @@ class Model extends AbstractAssessment
 
         /** @var TaskResponse $latestSubmittedResponse */
         $latestSubmittedResponse = $participant->findMostRecentSubmittedResponse();
-        return $latestSubmittedResponse
-            && $latestSubmittedResponse->isSelfAssessed()
-            && $latestSubmittedResponse->getMarkedComplete();
+        $result =  $latestSubmittedResponse
+            && $latestSubmittedResponse->getMarkedComplete()
+            && !$latestSubmittedResponse->hasFeedback();
+        return $result;
     }
 
     /**
@@ -259,7 +260,7 @@ class Model extends AbstractAssessment
         $latestSubmittedResponse = $participant->findMostRecentSubmittedResponse();
         return $latestSubmittedResponse
             && $latestSubmittedResponse->getMarkedComplete()
-            && !$latestSubmittedResponse->isSelfAssessed();
+            && $latestSubmittedResponse->hasFeedback();
     }
 
     /**

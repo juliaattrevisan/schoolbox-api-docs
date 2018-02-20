@@ -16,7 +16,7 @@
 
         {# TODO skip this if not displaying counts, eg to teacher #}
         {# count students which have completed this #}
-        {% for participant in assessment.allParticipants %}
+        {% for participant in assessment.allParticipants if not participant.isExcluded %}
             {% if not participant.responseRequired %}
                 {% set completionCount = completionCount + 1 %}
             {% endif %}
@@ -67,14 +67,6 @@
                             {% endfor %}
                         {% endif %}
 
-                        {# TODO SA-5769 this should not be necessary #}
-                        {% if not viewRoute %}
-                            {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getPreview', {
-                                assessmentId: assessment.id,
-                                assessment: assessment
-                            }) %}
-                        {% endif %}
-
                         {# Don't render a link if you are unable to view the details #}
                         {% if viewRoute %}
                             <a title="{{ title }}" href="{{ viewRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}">
@@ -112,7 +104,7 @@
                             {# TODO known bug SA-5984. Participant progress icon renders incorrectly if part of multiple actions. #}
                             {% include '@learningAssessment/fragments/progressTick.twig' with {
                                 assessment: assessment,
-                                participant: assessment.getParticipant(USER)
+                                student: USER
                             } only %}
                         {% endif %}
                         {% if isActionRoutes %}

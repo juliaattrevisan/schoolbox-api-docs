@@ -461,10 +461,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * Returns a redirect route, or throw an exception.
      *
      * Order of preference:
-     * * A spec?          => Preview (must be able to simulate participation, but not create interactions)
+     * * A spec?          => Summary (must be able to simulate participation, but not create interactions)
      * * Status viewable? => Status
      * * A participant?   => Summary
-     * * Write access?    => Preview (so they may become a participant if desired)
      *
      * @param IAssessable $assessment
      * @return string
@@ -473,17 +472,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     private function determineGetAssessmentRedirect(IAssessable $assessment): string
     {
-        // Specs should only be previewed
-        $previewRoute = $this->getRouteIfAuthorized('learningAssessment.getPreview', [
-            'assessment'   => $assessment,
-            'assessmentId' => $assessment->getId(),
-        ], $this->getUser());
-        if ($previewRoute && $assessment->isSpecification()) {
-            // Preview assessment in specification context
-            return $previewRoute;
-        }
-
-
         // Is status page viewable?
         $statusRoute = $this->getRouteIfAuthorized('learningAssessment.getStatus', [
             'assessment'   => $assessment,
@@ -520,11 +508,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
             if ($childSummaryRoute) {
                 return $childSummaryRoute;
             }
-        }
-
-        // Does user have permission to view the preview route?
-        if ($previewRoute) {
-            return $previewRoute;
         }
 
         throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);

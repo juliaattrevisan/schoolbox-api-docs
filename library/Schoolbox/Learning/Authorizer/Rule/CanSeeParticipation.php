@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Authorizer\Rule;
 use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Failure\Unauthorized;
 use InvalidArgumentException;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
@@ -22,7 +23,7 @@ use Schoolbox\User;
  *      - participation fully hydration
  * - a 'student' or 'participant'
  *
- * The rules are:
+ * The rules in order of preference:
  *  - In all cases, if the specified participant user is not a participant, FALSE
  *  - if you have WRITE access to the folder TRUE
  *  - else
@@ -62,27 +63,22 @@ class CanSeeParticipation extends AbstractParticipationRule
      */
     public function authorize(array $params = [], User $user = null)
     {
-        $assessable  = $this->findAssessable($params);
-        $student     = $this->findStudent($params);
-        $participant = $assessable->getParticipantIfExtant($student);
-
-        // Is student not a participant?
-        if (!$participant) {
-            // Then this route does not exist.
-            throw new InvalidPath();
-        }
-
-        $folderId   = $assessable->getBaseContext()->getFolder()->getId();
-        if (!$folderId) {
-            throw new InvalidArgumentException("Cannot check auth, activity does not have folder hydrated");
-        }
         if (null === $user) {
             throw new InvalidArgumentException("Cannot check auth, user not provided");
         }
 
-        $access = $this->access->getFolderAccess($user, $folderId);
+        $assessable  = $this->findAssessable($params);
+        $student     = $this->findStudent($params);
+        $participant = $assessable->getParticipantIfExtant($student);
+        $accessLevel = $this->calculateAccessLevel($assessable, $user);
 
-        if ($access >= UserAccess::ACCESS_WRITE) {
+        // All other exclusions mean this page does not exist
+        if (!$participant || $participant->isExcluded()) {
+            // Then this route does not exist.
+            throw new InvalidPath();
+        }
+
+        if ($accessLevel >= UserAccess::ACCESS_WRITE) {
             // Instructors can always see participants' summary pages
             return true;
         }
@@ -109,7 +105,7 @@ class CanSeeParticipation extends AbstractParticipationRule
         }
 
         // if we got passed a participant there's one last check we can do...
-        if ($access >= UserAccess::ACCESS_READ) {
+        if ($accessLevel >= UserAccess::ACCESS_READ) {
             // ...after we magically hit an external database
             $student->loadParents();
             if ($user->isParentOf($student)) {
@@ -118,5 +114,23 @@ class CanSeeParticipation extends AbstractParticipationRule
         }
 
         throw new Unauthorized();
+    }
+
+
+    /**
+     * Returns the user's access level to the assessments base context's folder
+     *
+     * @param IAssessable $assessable
+     * @param User        $user
+     * @return int
+     * @throws InvalidArgumentException
+     */
+    private function calculateAccessLevel(IAssessable $assessable, User $user)
+    {
+        $folderId = $assessable->getBaseContext()->getFolder()->getId();
+        if (!$folderId) {
+            throw new InvalidArgumentException("Cannot check auth, activity does not have folder hydrated");
+        }
+        return $this->access->getFolderAccess($user, $folderId);
     }
 }

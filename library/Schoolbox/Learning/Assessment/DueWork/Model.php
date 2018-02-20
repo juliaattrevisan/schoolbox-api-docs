@@ -171,16 +171,20 @@ class Model extends AbstractAssessment implements ISelfAssessable
      * Work out if we are going to accept responses
      *
      * It's not accepting submissions if:
+     *      - It's a spec
      *      - If it's not open
      *      - If the close date has passed
      *      - If the assessment is set to Accept None
      *      - If the assessment only accepts single, and a submitted response already exists for this participant
      *      - You're not a student of this assessment's class (folder)
      *
-     * @param Participant $participant
+     * @param null|Participant $participant
      */
-    public function assertAcceptSubmission(Participant $participant)
+    public function assertAcceptSubmission(?Participant $participant)
     {
+        if ($this->isSpecification()) {
+            throw new DomainException(null, ErrorMapper::ERROR_NO_COURSE_SPEC_INTERACTIONS);
+        }
         $this->assertOpen($participant);
 
         if ($this->isAcceptNone()) {
@@ -202,10 +206,14 @@ class Model extends AbstractAssessment implements ISelfAssessable
      * This action is only available to open due works that the participant has
      * not yet responded to.
      *
-     * @param Participant $participant
+     * @param null|Participant $participant
+     * @throws DomainException If this due work does not accept submission acknowledgment
      */
-    public function assertAcceptAcknowledgement(Participant $participant)
+    public function assertAcceptAcknowledgement(?Participant $participant)
     {
+        if ($this->isSpecification()) {
+            throw new DomainException(null, ErrorMapper::ERROR_NO_COURSE_SPEC_INTERACTIONS);
+        }
         $this->assertOpen($participant);
 
         $allResponses = $participant ? $participant->getAllResponses() : new Collection();
@@ -381,12 +389,9 @@ class Model extends AbstractAssessment implements ISelfAssessable
     {
         // Specified student not a participant ?
         $participant = $this->getParticipantIfExtant($learner);
-        if (!$participant) {
-            return false;
-        }
 
         // Instructors are not constrained by the submission limit, or the open duration
-        return true;
+        return !(!$participant || $participant->isExcluded());
     }
 
     /* Getters/Setters

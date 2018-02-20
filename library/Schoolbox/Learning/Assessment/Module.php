@@ -13,6 +13,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use OutOfBoundsException;
 use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
+use Schoolbox\Learning\Authorizer\Rule\CanPreview;
 use Schoolbox\Learning\Authorizer\Rule\CanRespondToAssessment;
 use Schoolbox\Learning\Authorizer\Rule\CanSeeParticipation;
 use Schoolbox\Learning\Authorizer\Rule\IsAssessmentOpen;
@@ -21,7 +22,6 @@ use Schoolbox\Learning\Authorizer\Rule\IsDeletionUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsImplementation;
 use Schoolbox\Learning\Authorizer\Rule\IsModifyUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
-use Schoolbox\Learning\Authorizer\Rule\IsParticipant;
 use Schoolbox\Learning\Authorizer\Rule\ParticipantHasNoInteractions;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -88,7 +88,7 @@ class Module extends BaseModule
         // preloaders to use
         $preloadContext                = function ($params) { return $this->preloadContext($params); };
         $preloadAssessment             = function ($params) { return $this->preloadAssessment($params); };
-        $preloadParticipant            = function ($params) { return $this->preloadParticipant($params); };
+        $preloadParticipant            = function ($params) { return $this->preloadAssessmentAndStudent($params); };
 
         // rules in use
         $isSuper                  = $this->getAuthRule('isSuperuser');
@@ -141,7 +141,6 @@ class Module extends BaseModule
         $this->register('GET',   "$assRoute/submissions/download",   'downloadSubmissions',      $canWrite,         $preloadAssessment); // a || c
 
         $this->register('GET',   "$assRoute/$studentParam",          'getSummary',               $canViewSummary,   $preloadParticipant); // s || p
-        $this->register('GET',   "$assRoute/preview",                'getPreview',               $canWrite,         $preloadAssessment);  // s || p
         $this->register('GET',   "$assRoute/$studentParam/submit",   'getCreateResponseForm',    $canSubmit,        $preloadParticipant); // p
         $this->register('POST',  "$assRoute/$studentParam/submit",   'postCreateResponse',       $canSubmit,        $preloadParticipant); // p
         $this->register('POST',  "$assRoute/$studentParam/received", 'postStatusAcknowledge',    $canAckSubmission, $preloadParticipant); // p
@@ -185,44 +184,12 @@ class Module extends BaseModule
      * @throws NotFound
      * @throws InvalidPath
      */
-    protected function preloadParticipant(array $params)
+    protected function preloadAssessmentAndStudent(array $params): array
     {
         try {
             // obtain the assessment from our other preload
             $student     = $this->getUserMapper()->findById($params['studentId']);
             $assessment  = $this->preloadAssessment($params, $student)['assessment'];
-
-            $access = $this->getAccess()->getFolderAccess($student, $assessment->getContext()->getFolder()->getId());
-
-            /* Allow the currently logged in user to access the student's Assessment Summary
-             *
-             * This allows write-accessors to view a typically read-access page ie. when a teacher
-             * wants to preview a task's summary screen (see SA-2193)
-             *
-             * This pretends the teacher is a participant
-             */
-            if ($access >= UserAccess::ACCESS_WRITE) {
-                $plan = (new Plan($assessment))->setIsDynamic(true); // TODO this is just a temp hack. Fix properly in SA-5769
-                $assessment->getPlans()->add($plan);
-                $participant = new Participant($student, $plan);
-                $plan->getParticipants()[$student->getId()] = $participant;
-
-                /* Suck down all the responses from $assessment and put them into $participant
-                 */
-                /** @var Participant $currentParticipant */
-                foreach ($assessment->getAllParticipants() as $currentParticipant) {
-                    if ($currentParticipant->getUser()->getId() == $student->getId()) {
-
-                        $participant->setAllResponses($currentParticipant->getAllResponses());
-
-                        break;
-                    }
-                }
-            }
-            else {
-                /** @var IAssessable $assessment */
-                $participant = $assessment->getParticipant($student);
-            }
         } catch (UnexpectedValueException $e) {
             // Student isn't a participant
             throw new InvalidPath();
@@ -237,7 +204,7 @@ class Module extends BaseModule
 
         return [
             'assessment'  => $assessment,
-            'student'     => $participant->getUser() //IsParentOfStudent accesses this
+            'student'     => $student, //IsParentOfStudent accesses this
         ];
     }
 
@@ -509,17 +476,24 @@ class Module extends BaseModule
     {
         return new Rule\Any(
             new Rule\All(
-                new Rule\IsSuperuser(),
-                new CanRespondToAssessment($this->getAccess())
-            ),
-            new Rule\All(
-                $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
-                new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
-                new CanRespondToAssessment($this->getAccess())
+                new Rule\Any(
+                    // (Superuser + impl) or (instructor + !interaction-locked)
+                    new Rule\All(
+                        new Rule\IsSuperuser(),
+                        new IsImplementation()
+                    ),
+                    new Rule\All(
+                        $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
+                        new IsInteractionUnLocked(new LockedChecker($this->getTermMapper()))
+                    )
+                ),
+                new Rule\Any(
+                    new CanRespondToAssessment($this->getAccess()), // SOBO
+                    new CanPreview($this->getAccess())              // Preview
+                )
             ),
             new Rule\All(
                 new Rule\IsUser('studentId'),
-                new IsParticipant(),
                 new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
                 new IsAssessmentOpen(),
                 new CanRespondToAssessment($this->getAccess())
@@ -552,7 +526,6 @@ class Module extends BaseModule
                 // Participants may now acknowledge their own submissions.
                 new Rule\All(
                     new Rule\IsUser('studentId'),
-                    new IsParticipant(),
                     new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
                     new IsAssessmentOpen(),
                     new ParticipantHasNoInteractions()
@@ -578,7 +551,10 @@ class Module extends BaseModule
                 $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
                 new Rule\HasRole(Role::STAFF)
             ),
-            new IsImplementation()
+            new Rule\Any(
+                new IsImplementation(),
+                new ValidAssessmentType([AssessmentType::TYPE_PROJECT])
+            )
         );
     }
 
@@ -610,27 +586,34 @@ class Module extends BaseModule
         );
     }
 
-
+    // will throw invalid arg if route params incorrect
+    /** @noinspection PhpDocRedundantThrowsInspection */
     /**
      * To view a summary page requires:
      * - assessment not soft-deleted
-     * - current user is superuser or can see assessment, and
-     * - assessment is not an assessment specification
+     * - current user is staff|instructor or can see participation,
      *
      * @return Rule\IAuthorizationRule
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException If required route param not found
      * @throws InvalidPath If URL does not exist for this user
+     * @throws NotFound
      */
-    private function buildAuthRuleCanViewSummary()
+    private function buildAuthRuleCanViewSummary(): Rule\IAuthorizationRule
     {
         return new Rule\All(
             new AssessmentNotDeleted(),
-            new IsImplementation(),
             new Rule\Any(
-                new Rule\IsSuperuser(),
-                new CanSeeParticipation($this->getAccess(), $this->getConfig()->get('restrict_student_submissions'))
+                // Normal participants (whether explicit or dynamic participants)
+                new CanSeeParticipation($this->getAccess(), $this->getConfig()->get('restrict_student_submissions')),
+                // Instructor/staff viewing assessment details, on their own summary page
+                new Rule\All(
+                    new Rule\Any(
+                        $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
+                        new Rule\HasRole(Role::STAFF)
+                    ),
+                    new Rule\IsUser('studentId')
+                )
             )
         );
     }
-
 }

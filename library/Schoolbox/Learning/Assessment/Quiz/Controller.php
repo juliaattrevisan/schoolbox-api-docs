@@ -126,20 +126,57 @@ class Controller extends Assessment\Controller
         );
     }
 
+
     /**
-     * In cases where no Participant is available a User will get an intro of a quiz with no Begin Quiz button
+     * Returns the URL that a user should be redirected to when visiting a Quiz summary page.
+     * Options include:
+     * - Continue in-progress attempt                    /assess/attempt/{quizId}/{firstSectionId}
+     * - View list of attempts                           /assess/attempts/{quizId}/{userId}
+     * - View quiz details. Optional 'Begin Quiz' button /assess/intro/{quizId}
      *
-     * @api GET /learning/assessment/:assessmentId/preview
-     * @level 165
-     * @param IAssessable $assessment
+     * @param Model $assessment
+     * @param User  $student
+     * @return string
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Schoolbox\Application\Exception\Exception
      */
-    public function getPreview(IAssessable $assessment)
+    private function determineSummaryRedirect(Model $assessment, User $student): string
     {
-        $returnUrlSuffix = $this->getRequest()->query->get('returnUrl') ? "?returnUrl=". $this->getRequest()->query->get('returnUrl') : '';
-        // TODO: remove buttons from intro.html if the user is not participant
-        $this->getResponse()->redirect->afterPost(
-            $this->getRouteIfAuthorized('learningQuiz.getQuizIntro', [ 'assessmentId' => $assessment->getId() ]) . $returnUrlSuffix
-        );
+        // Is this a spec?
+        if ($assessment->getBaseContext()->isSpecificationContext()) {
+            // Go to intro page (where you can see details of the quiz, but cannot 'Begin Quiz')
+            return $this->getRouter()->generate('learningQuiz.getQuizIntro', ['assessmentId' => $assessment->getId()]);
+        }
+
+        // Not a participant? But you still had access to this page?
+        $participant = $assessment->getParticipantIfExtant($student);
+        if (!$participant || $participant->isExcluded()) {
+            // Go to intro page (you may or may not see a 'Begin Quiz' button
+            return $this->getRouter()->generate('learningQuiz.getQuizIntro', ['assessmentId' => $assessment->getId()]);
+        }
+
+        // User is a participant and quiz is not a spec. Have they attempted the quiz yet?
+        $latestResponse = $participant->findMostRecentResponse();
+        $latestAttempt  = $latestResponse ? $this->quizAttemptMapper->findById($latestResponse->getId()) : null;
+
+        // Is there an attempt in progress? And user is looking at themself?
+        if ($latestAttempt && !$latestAttempt->isFinished() && $this->getUser()->getId() == $student->getId()) {
+            // redirect to a place where they can continue the attempt
+            $quiz         = $latestAttempt->getQuiz();
+            $firstSection = $this->findFirstQuizSection($quiz);
+            return "/assess/attempt/{$quiz->getId()}/{$firstSection->getId()}";
+        }
+
+        // Is session user an instructor?
+        $access = $this->getAccess()->getFolderAccess($this->getUser(), $assessment->getContext()->getFolder()->getId());
+        if ($latestAttempt && $access >= UserAccess::ACCESS_WRITE) {
+            // Note that if an instructor is looking at their own summary, and has attempt/s, and wishes to re-attempt,
+            // that action is available from attempts-list page.
+            $quiz = $latestAttempt ? $latestAttempt->getQuiz() : $this->getQuizForAssessmentId($assessment->getId());
+            return "/assess/attempts/{$quiz->getId()}/{$student->getId()}";
+        }
+
+        return $this->getRouter()->generate('learningQuiz.getQuizIntro', [ 'assessmentId' => $assessment->getId() ]);
     }
 
 
@@ -155,91 +192,18 @@ class Controller extends Assessment\Controller
      *
      * @api   GET /learning/assessments/:assessmentId/:userId
      * @level 165
-     * @param IAssessable $assessment
-     * @param User        $student
+     * @param IAssessable|Model $assessment
+     * @param User              $student
      * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
-        $participant = $assessment->getParticipantIfExtant($student);
+        $returnUrl       = $this->getRequest()->query->get(Redirect::RETURN_URL);
+        $returnUrlSuffix = $returnUrl ? '?' . Redirect::RETURN_URL . "={$returnUrl}" : '';
+        $redirect        = $this->determineSummaryRedirect($assessment, $student);
 
-        // Has user not yet attempted the quiz
-        if (!$participant || !$participant->getAllResponses()->count()) {
-            $this->redirectToSummaryOrIntro($this->getUser(), $participant->getUser(), $assessment);
-            return;
-        }
-
-        // Get latest attempt's finish date.
-        $latestResponse = $participant ? $participant->findMostRecentResponse() : null;
-        $latestAttempt  = $latestResponse ? $this->quizAttemptMapper->findById($latestResponse->getId()) : null;
-        $finishDate     = $latestAttempt ? $latestAttempt->getFinish() : null;
-
-        // Is the attempt in progress ?
-        if (is_null($finishDate) || $finishDate instanceof \Alaress_Date_NullDate) {
-
-            // Is the current session user the specified participant?
-            if ($this->getUser()->getId() == $student->getId()){
-                // redirect to a place where they can continue the attempt
-                $quiz     = $this->getQuizForAssessmentId($assessment->getId());
-                $sections = $this->quizSectionMapper->findByColumn('assess_id', $quiz->getId());
-
-                /** @var QuizSection $firstSection */
-                $firstSection = null;
-
-                foreach ($sections as $section) {
-                    if (is_null($firstSection) || $section->getSequence() < $firstSection->getSequence()) {
-                        $firstSection = $section;
-                    }
-                }
-
-                $this->getResponse()->redirect->to("/assess/attempt/{$quiz->getId()}/{$firstSection->getId()}");
-                return;
-            }
-        }
-
-        // Not in progress (or you're a teacher - this redirect eventually
-        // shunts you off to the Attempts List for a particular student)
-        $this->redirectToSummaryOrIntro($this->getUser(), $student, $assessment);
-    }
-
-
-    /**
-     * @param User        $sessionUser
-     * @param User        $participantUser
-     * @param IAssessable $assessment
-     */
-    protected function redirectToSummaryOrIntro(User $sessionUser, User $participantUser, IAssessable $assessment)
-    {
-        $returnUrlSuffix = $this->getRequest()->query->get('returnUrl') ? "?returnUrl=". $this->getRequest()->query->get('returnUrl') : '';
-
-        /* Attempts List for this user
-         */
-        $quiz = $this->getQuizForAssessmentId($assessment->getId());
-        $attemptsListUrl = "/assess/attempts/{$quiz->getId()}/{$participantUser->getId()}" . $returnUrlSuffix;
-
-        /* If you're a teacher viewing the summary screen for your own attempts
-         * you should end up at the attempts list rather than be magically prompted
-         * to attempt the quiz
-         */
-        $access = $this->getAccess()->getFolderAccess($sessionUser, $assessment->getContext()->getFolder()->getId());
-
-        if ($access >= UserAccess::ACCESS_WRITE) {
-            $this->getResponse()->redirect->to($attemptsListUrl);
-        }
-        elseif ($sessionUser->getId() == $participantUser->getId() && $assessment->isOpen()) {
-
-            /* If you're a participant, and the quiz is available for attemptation
-             * go to the intro screen so you can begin
-             */
-
-            // this is the special case: redirect to intro
-            $this->getResponse()->redirect->afterPost(
-                $this->getRouteIfAuthorized('learningQuiz.getQuizIntro', [ 'assessmentId' => $assessment->getId() ]) . $returnUrlSuffix
-            );
-            return;
-        }
-
-        $this->getResponse()->redirect->to($attemptsListUrl);
+        $this->getResponse()->redirect->to($redirect . $returnUrlSuffix);
     }
 
 
@@ -325,4 +289,24 @@ class Controller extends Assessment\Controller
         return $quiz;
     }
 
+
+    /**
+     * Returns a quiz's first section
+     *
+     * @param Quiz $quiz
+     * @return QuizSection
+     */
+    private function findFirstQuizSection(Quiz $quiz): QuizSection
+    {
+        $sections = $this->quizSectionMapper->findByColumn('assess_id', $quiz->getId());
+
+        /** @var QuizSection $firstSection */
+        $firstSection = null;
+        foreach ($sections as $section) {
+            if (null === $firstSection || $section->getSequence() < $firstSection->getSequence()) {
+                $firstSection = $section;
+            }
+        }
+        return $firstSection;
+    }
 }

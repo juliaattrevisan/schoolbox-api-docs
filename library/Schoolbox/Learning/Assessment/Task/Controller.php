@@ -101,69 +101,6 @@ class Controller extends Assessment\Controller
         );
     }
 
-    public function getPreview(IAssessable $assessment)
-    {
-        /** @var Task $task */
-        $task = $assessment;
-        $previewFragment = [];
-
-        /* If there was a specified url, it could be to some external location
-         * or even to a storage file on this server - use the PreviewFactory to
-         * decide which one it is
-         */
-        if ($task->getUrl()) {
-            $previewFragment = (new PreviewFactory($this->getRouter()))->urlFragment($task->getUrl(), $this->getUser());
-
-            if ($previewFragment['type'] == 'redirect' && !$task->getDescription()) {
-
-                /* Just forward if we only have a URL
-                 */
-                $this->getResponse()->redirect->temporaryRedirect($task->getUrl());
-                return;
-            }
-            elseif ($previewFragment['type'] == 'image') {
-
-                /* The specified url is actually an image
-                 *
-                 * This actually has the same url structure as any other regular file
-                 * so we need to check for image-ness first
-                 *
-                 * In this case $previewFragment['fragment'] already contains the url
-                 * and we don't need to do anything more
-                 */
-
-            }
-            elseif ($foundHash = preg_match('/hash=([a-zA-Z0-9]+)/', $task->getUrl(), $matches)) {
-
-                /* Other regular files
-                 *
-                 * Download them as some kind of attachment
-                 */
-                $previewFragment['type'] = 'file';
-                $previewFragment['file'] = StorageMapper::getInstance()->findByHash($matches[1]);
-            }
-            elseif ($previewFragment['type'] == 'inline') {
-
-                /* Embedded content like youtube videos etc
-                 */
-                $previewFragment['fragment'] = $this->buildUnthemedHtmlOutput($previewFragment['twig']['template'], $previewFragment['twig']['data'])->getAsString();
-            }
-        }
-
-        $twigData = [
-            'breadcrumbs'  => $this->getBakery()->produceFromAssessment($task, $this->getUser())->add([ $task->getTitle(), '' ]),
-            'assessment'   => $task,
-            'hasWritePerm' => $this->getAccess()->isInstructor($this->getUser(), $task->getBaseContext()->getFolder()),
-            'preview'      => $previewFragment,
-        ];
-
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                "@learningAssessment/task/summary/preview.twig",
-                $twigData
-            )
-        );
-    }
 
 
     /**
@@ -179,7 +116,6 @@ class Controller extends Assessment\Controller
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
-        $participant = $assessment->getParticipantIfExtant($student);
         $previewFragment = [];
 
         /* If there was a specified url, it could be to some external location
@@ -225,7 +161,7 @@ class Controller extends Assessment\Controller
                     $previewFragment['file'] = StorageMapper::getInstance()->findByHash($matches[1]);
                 }
                 catch (\Schoolbox\Mapper\Exception $e) {
-                    unset($previewFragment);
+                    $previewFragment = [];
                 }
             }
 
@@ -240,9 +176,8 @@ class Controller extends Assessment\Controller
         $twigData = [
             'breadcrumbs'  => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'   => $assessment,
-            'hasWritePerm' => $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder()),
+            'student'      => $student,
             'preview'      => $previewFragment,
-            'participant'  => $participant,
             'returnUrl'    => $returnUrl,
         ];
 
@@ -288,7 +223,8 @@ class Controller extends Assessment\Controller
     public function postCreateResponse(IAssessable $assessment, User $student): void
     {
         // Did user mark (regardless of who they are) the task as incomplete ?
-        $isMarkedComplete = $this->getRequest()->post->getInt('status') != TaskCompletion::STATUS_INCOMPLETE;
+        $completionStatus = $this->getRequest()->post->getInt('status');
+        $isMarkedComplete = $completionStatus != TaskCompletion::STATUS_INCOMPLETE;
 
         $response = (new TaskResponse())
             ->setAssessable($assessment)
@@ -297,6 +233,12 @@ class Controller extends Assessment\Controller
             // TODO figure out whether to set create time as now, or set it as a created timestamp in mapper
             ->setCreatedAt(\Alaress_Date_Format::now())
             ->setMarkedComplete($isMarkedComplete);
+
+        if (TaskCompletion::STATUS_TEACHER_ASSESSED_COMPLETE == $completionStatus) {
+            $feedback = (new Feedback\Model())
+                ->setResponse($response);
+            $response->getAllFeedback()->add($feedback);
+        }
 
         try{
             $participant = $assessment->getParticipantIfExtant($student);
@@ -324,7 +266,7 @@ class Controller extends Assessment\Controller
             $result['success'] = true;
             $result['message'] = 'OK';
             $result['id']      = $response->getId();
-            $result['status']  = $response->getCompletionStatus();
+            $result['status']  = $completionStatus;
             $this->getResponse()->status->setCode(200);
             $this->getResponse()->content->set($this->buildJsonOutput($result));
 
@@ -378,7 +320,10 @@ class Controller extends Assessment\Controller
         // Does the most recent response for the student already have the proposed status?
         if (empty($response->getId())) {
             $mostRecentResponse = $participant->findMostRecentResponse();
-            if ($mostRecentResponse instanceof TaskResponse && $mostRecentResponse->getCompletionStatus() == $response->getCompletionStatus()) {
+            if ($mostRecentResponse instanceof TaskResponse
+                && $mostRecentResponse->getCompletionStatus() == $response->getCompletionStatus()
+                && $mostRecentResponse->hasFeedback() === $response->hasFeedback()
+            ) {
                 throw new \UnexpectedValueException("{$submittedFor->getFullName()} already has status ({$mostRecentResponse->getCompletionStatus()}) for this task");
             }
         }

@@ -61,9 +61,9 @@ class Model extends AbstractResponse
             return Completion::STATUS_INCOMPLETE;
         }
 
-        return $this->isSelfAssessed()
-            ? Completion::STATUS_SELF_ASSESSED_COMPLETE
-            : Completion::STATUS_TEACHER_ASSESSED_COMPLETE;
+        return $this->hasFeedback()
+            ? Completion::STATUS_TEACHER_ASSESSED_COMPLETE
+            : Completion::STATUS_SELF_ASSESSED_COMPLETE;
     }
 
 

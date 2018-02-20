@@ -11,6 +11,7 @@
 namespace Schoolbox\Learning\Assessment;
 
 use \Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Feedback\InstructorGivenFilter;
 use Schoolbox\Learning\Assessment\Feedback\PublishedFilter;
 use Schoolbox\Learning\Assessment\Feedback\SelfAssessmentFilter;
@@ -64,7 +65,7 @@ abstract class AbstractResponse implements IResponse
      */
     public function __construct()
     {
-        $this->setAllFeedback(new Collection());
+        $this->allFeedback = new GenericCollection(IFeedback::class);
     }
 
     /**
@@ -128,9 +129,9 @@ abstract class AbstractResponse implements IResponse
      * @param Collection|IFeedback[] $allFeedback
      * @return $this
      */
-    public function setAllFeedback($allFeedback)
+    public function setAllFeedback(Collection $allFeedback)
     {
-        $this->allFeedback = $allFeedback;
+        $this->allFeedback->replaceWith($allFeedback);
         return $this;
     }
 

@@ -13,7 +13,6 @@ use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use DueWork_ErrorMapper;
-use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\GenericCollection;
@@ -45,7 +44,6 @@ use Schoolbox\UserMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Assessment\Rubric\Descriptor as RubricDescriptor;
 use Schoolbox\Assessment\Term;
-use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Learning\InlineGrader\Kami;
 
 class Controller extends Assessment\Controller
@@ -180,47 +178,6 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * Display appropriate landing page based on role
-     *
-     * @api      GET /learning/assessments/:assessmentId/:userId
-     * @level    165
-     *
-     * @param IAssessable $assessment
-     * @throws ServiceNotFound
-     * @internal param Participant $participant
-     */
-    public function getPreview(IAssessable $assessment)
-    {
-
-        if($assessment->getUseRubric()){
-            $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
-        }
-
-        /* Find all the records spawned by $participant
-         *
-         * Order them by submitted time to find the most recent, and use that
-         */
-
-        $twigData = [
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
-
-            /* Rubrics data
-             */
-            'rubricContext' => (new RubricContext($this->rubricMapper))->generateBasic($assessment, $this->getUser()),
-            'assessment'   => $assessment,
-
-        ];
-
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                "@learningAssessment/dueWork/summary/preview.twig",
-                $twigData, "{$assessment->getTitle()}", 'submission'
-            )
-        );
-    }
-
-
-    /**
      * @api   GET /learning/assessments/:assessmentId/:userId
      * @level 165
      *
@@ -237,14 +194,18 @@ class Controller extends Assessment\Controller
         }
 
         // Generate rubric context for every feedback
-        $rubricContext          = new RubricContext($this->rubricMapper);
-        $timeline               = (new FullTimeline($participant))->getForUser($this->getUser());
-        $feedbackRubricContexts = $rubricContext->generateSeriesForTimeline(
-            $timeline,
-            $this->getUser(),
-            $this->getAccess(),
-            false
-        );
+        $rubricContext = new RubricContext($this->rubricMapper);
+        $timeline      = $feedbackRubricContexts = null;
+        if ($participant) {
+            $timeline               = (new FullTimeline($participant))->getForUser($this->getUser());
+            $feedbackRubricContexts = $rubricContext->generateSeriesForTimeline(
+                $timeline,
+                $this->getUser(),
+                $this->getAccess(),
+                false
+            );
+        }
+
 
         /* Find all the records spawned by $participant
          *
@@ -270,6 +231,7 @@ class Controller extends Assessment\Controller
             'authoritativeFeedback' => $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null,
         ];
 
+        // TODO SA-6125 - this duplicates module route auth logic. Need to find a way to define this logic in one place only.
         $twigData['submissionsBlocked']    = false;
         $twigData['acknowlegementBlocked'] = false;
         try {
@@ -895,9 +857,8 @@ class Controller extends Assessment\Controller
      */
     public function postStatusAcknowledge(IAssessable $assessment, User $student)
     {
-        $participant = $assessment->getParticipant($student);
         try {
-            $response = $this->persistAcknowledgementResponse($participant, Alaress_Date_Format::now());
+            $response = $this->persistAcknowledgementResponse($assessment, $student, Alaress_Date_Format::now());
             $data = [
                 'success'       => true,
                 'id'            => $response->getId(),
@@ -941,8 +902,8 @@ class Controller extends Assessment\Controller
      */
     public function postSelfAcknowledge(IAssessable $assessment, User $student)
     {
-        $participant = $assessment->getParticipant($student);
-        $selfReview = $assessment instanceof Model && $assessment->isSelfAssessable();
+        $participant = $assessment->getParticipantIfExtant($student);
+        $selfReview  = $assessment instanceof Model && $assessment->isSelfAssessable();
 
         // Route and arguments for location to redirect to once acknowledged.
         $route      = 'learningAssessment.getSummary';
@@ -955,9 +916,9 @@ class Controller extends Assessment\Controller
 
         try {
             if ($selfReview) {
-                $response = $participant->findMostRecentDraftResponse();
+                $response = $participant ? $participant->findMostRecentDraftResponse() : null;
                 if (!$response) {
-                    $response = $this->persistAcknowledgementResponse($participant, null);
+                    $response = $this->persistAcknowledgementResponse($assessment, $student, null);
                 }
 
                 $route                = 'learningDueWorkResponse.getParticularResponseForSelfReflection';
@@ -965,7 +926,7 @@ class Controller extends Assessment\Controller
                 $params['responseId'] = $response->getId();
 
             } else {
-                $response = $this->persistAcknowledgementResponse($participant, Alaress_Date_Format::now());
+                $response = $this->persistAcknowledgementResponse($assessment, $student, Alaress_Date_Format::now());
             }
 
             $data = [
@@ -1000,9 +961,9 @@ class Controller extends Assessment\Controller
      */
     public function postPendingAcknowledge(IAssessable $assessment, User $student)
     {
-        $participant = $assessment->getParticipant($student);
         try {
-            $this->persistAcknowledgementResponse($participant, Alaress_Date_Format::now());
+            $this->persistAcknowledgementResponse($assessment, $student, Alaress_Date_Format::now());
+            $participant = $assessment->getParticipant($student);
             $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learning/fragments/toMarkParticipant.twig', [
                 'participant' => $participant,
                 'assessment'  => $participant->getAssessable(),
@@ -1022,23 +983,32 @@ class Controller extends Assessment\Controller
     /**
      * Common logic for 'dueWork status' and 'pending assessments' pages 'acknowledgement of submission receipt'.
      *
-     * @param Participant              $participant
+     * @param Model                    $dueWork
+     * @param User                     $student
      * @param Alaress_Date_Format|null $submittedDate Date this was submitted at, null if draft
      * @return Submission
      * @throws \PDOException If something went wrong in the save process
      */
-    private function persistAcknowledgementResponse(Participant $participant, ?Alaress_Date_Format $submittedDate)
+    private function persistAcknowledgementResponse(Model $dueWork, User $student, ?Alaress_Date_Format $submittedDate): Response\Model
     {
-        $assessment = $participant->getAssessable();
-        $response   = $this->dueWorkResponseMapper->createModel()
-            ->setAssessable($assessment)
+        $response = $this->dueWorkResponseMapper->createModel()
+            ->setAssessable($dueWork)
             ->setSubmittedBy($this->getUser())
-            ->setSubmittedOnBehalfOf($participant->getUser())
+            ->setSubmittedOnBehalfOf($student)
             ->setSubmittedAt($submittedDate)
             ->setCreatedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now());
 
         $this->dueWorkResponseMapper->save($response);
+
+        // Ensure we update our domain graph so callers to this method can rely on the graph being accurate
+        $participant = $dueWork->getParticipantIfExtant($student);
+        if (!$participant) {
+            $dynamicPlan = $dueWork->getDynamicPlan();
+            $participant = new Participant($student, $dynamicPlan);
+            /** @noinspection NullPointerExceptionInspection (because we can't have no participant without a dynamic plan) */
+            $dynamicPlan->getParticipants()[$student->getId()] = $participant;
+        }
         $participant->getAllResponses()[$response->getId()] = $response;
 
         return $response;
