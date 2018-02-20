@@ -22,7 +22,6 @@ use Schoolbox\Learning\Authorizer\Rule\IsDeletionUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsImplementation;
 use Schoolbox\Learning\Authorizer\Rule\IsModifyUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
-use Schoolbox\Learning\Authorizer\Rule\IsParticipant;
 use Schoolbox\Learning\Authorizer\Rule\ParticipantHasNoInteractions;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -495,7 +494,6 @@ class Module extends BaseModule
             ),
             new Rule\All(
                 new Rule\IsUser('studentId'),
-                new IsParticipant(),
                 new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
                 new IsAssessmentOpen(),
                 new CanRespondToAssessment($this->getAccess())
@@ -528,7 +526,6 @@ class Module extends BaseModule
                 // Participants may now acknowledge their own submissions.
                 new Rule\All(
                     new Rule\IsUser('studentId'),
-                    new IsParticipant(),
                     new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
                     new IsAssessmentOpen(),
                     new ParticipantHasNoInteractions()
@@ -614,7 +611,7 @@ class Module extends BaseModule
                         $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
                         new Rule\HasRole(Role::STAFF)
                     ),
-                    new IsParticipant()
+                    new Rule\IsUser('studentId')
                 )
             )
         );
