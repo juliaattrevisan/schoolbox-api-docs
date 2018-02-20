@@ -67,8 +67,19 @@ class ValidUserCanInteractWithAssessment
         if ($this->assessable->isParticipant($user) && !$this->assessable->getParticipant($user)->isExcluded()) {
             $plan = $this->assessable->getParticipant($user)->getPlan();
 
-            $open = $plan->getOpenDate() ?? $this->assessable->getOpenAt();
-            $close = $plan->getCloseDate() ?? $this->assessable->getCloseAt();
+            /* When a user doesn't have a customised plan, these dates are null
+             * Use default assessment dates in that case
+             */
+            $open = $plan->getOpenDate();
+            $close = $plan->getCloseDate();
+
+            if ($plan->getOpenDate()->isNull()) {
+                $open = $this->assessable->getOpenAt();
+            }
+
+            if ($plan->getCloseDate()->isNull()) {
+                $close = $this->assessable->getOpenAt();
+            }
 
             return $open->gte($this->now) && $close->lt($this->now);
         }
