@@ -88,16 +88,6 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
         error(19);
     }
 
-    // I can't attempt this if it has expired
-    if (\Alaress_Date_Format::now()->gt($participant->getCloseDate())) {
-        error(120);
-    }
-
-    // I can't attempt this if it isn't open
-    if (\Alaress_Date_Format::now()->lt($participant->getOpenDate())) {
-        error(143);
-    }
-
 } else {
     // I can do whatever I want
 }
