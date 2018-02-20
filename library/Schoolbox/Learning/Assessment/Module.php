@@ -89,7 +89,7 @@ class Module extends BaseModule
         // preloaders to use
         $preloadContext                = function ($params) { return $this->preloadContext($params); };
         $preloadAssessment             = function ($params) { return $this->preloadAssessment($params); };
-        $preloadParticipant            = function ($params) { return $this->preloadParticipant($params); };
+        $preloadParticipant            = function ($params) { return $this->preloadAssessmentAndStudent($params); };
 
         // rules in use
         $isSuper                  = $this->getAuthRule('isSuperuser');
@@ -185,7 +185,7 @@ class Module extends BaseModule
      * @throws NotFound
      * @throws InvalidPath
      */
-    protected function preloadParticipant(array $params)
+    protected function preloadAssessmentAndStudent(array $params): array
     {
         try {
             // obtain the assessment from our other preload
