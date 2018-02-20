@@ -74,7 +74,44 @@
     {% set showRubricTotal = true %}
     {% set self = 'selfAssessment' %}
 
-    {{ parent() }}
+    {% if assessment.useRubric and rubricContext %}
+        <fieldset class="content">
+            {% set rubricTemplate = readonly
+                ? 'grid.twig'
+                : 'grid-markable.twig'
+            %}
+            {% include '@rubric/' ~ rubricTemplate with {
+                rubric: rubricContext.rubric,
+                learnerRubric: learnerRubricContext.rubric,
+                learner: participant.user,
+                markType: rubricContext.markType,
+                markVisibility: participant.assessable.isFeedbackVisibleToUser(USER),
+                showDescriptorValue: showDescriptorValue,
+                showGroupTotal: showGroupTotal,
+                showRubricTotal: showRubricTotal,
+                latestSelfReflectedFeedback: latestSelfReflectedFeedback,
+                self: self,
+                studentView: true
+            } only %}
+        </fieldset>
+    {% endif %}
+{% endblock %}
+
+{% block gradeValue %}
+  {% if 'none' != markSchemeName | lower %}
+      <div class="small-12 medium-3 column">
+          <label>{{ locale.grades.proper }}
+              {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
+                  participant: participant,
+                  feedback: latestFeedback,
+                  markScheme: assessment.markScheme,
+                  tabIndex: 1,
+                  errors: errors,
+                  readonly: readonly
+              } only %}
+          </label>
+      </div>
+  {% endif %}
 {% endblock %}
 
 {# Action Bar #}

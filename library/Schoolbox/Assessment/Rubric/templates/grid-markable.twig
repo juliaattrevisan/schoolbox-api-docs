@@ -73,7 +73,7 @@
                                 {{- descriptor.text|nl2br -}}
                             </span>
 
-                            {% if descriptor.value is not null and showDescriptorValue %}
+                            {% if descriptor.value is not null and showDescriptorValue and not (not config.rubric_show_points and studentView) %}
                                 <span class="rb-value">
                                     {{- descriptor.value -}}
                                 </span>

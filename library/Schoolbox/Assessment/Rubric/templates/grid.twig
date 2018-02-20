@@ -39,7 +39,7 @@
                     {# Self-Assessment #}
                     {% set learnerSelected = learnerRubric.descriptors[crit.id][levelIndex]['selected'] %}
 
-                    <td {% if descriptor.selected  and markVisibility %}class="rb-selected"{% endif %}>
+                    <td {% if descriptor.selected and markVisibility %}class="rb-selected"{% endif %}>
                         <div>
                             <p>
                                 {{- descriptor.text|nl2br -}}
