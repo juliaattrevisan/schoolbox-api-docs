@@ -67,15 +67,6 @@ $assessment       = $assessmentDataSource->findByQuizId($assess['assess_id'], $_
 $assessmentFolder = $assessment->getBaseContext()->getFolder();
 $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], $assessmentFolder->getId());
 
-/* Looks like everyone has a Plan in some way, regardless if it's custom or default?
- */
-try {
-    $participant = $assessment->getParticipant($_SESSION['user']);
-}
-catch (\UnexpectedValueException $e) {
-    error(Error\Mapper::ERROR_NONPARTICIPANT);
-}
-
 /* Non-participants are sent to a 404 screen
  */
 $canInteract = new ValidUserCanInteractWithAssessment(Alaress_Date_Format::now(), $assessment, \Schoolbox\Permission\Access\Access::getInstance());
