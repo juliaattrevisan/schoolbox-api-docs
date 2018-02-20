@@ -11,18 +11,28 @@ $this->setTab('resources');
 
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 
+// Fetch the logged in user's groups to exlude from the lists.
+$userGroups = $groupHandler->involvedInCategoryList($_SESSION['user']->getId(), false);
+$userGroupsIds = [];
+foreach ($userGroups as $userGroup) {
+    $userGroupsIds[] = $userGroup['id'];
+}
+
 // output free access groups
 $freeList = $groupHandler->getAllByType(GROUP_TYPE_FREE);
 if (is_array($freeList)) {
 	foreach ($freeList as $free) {
-		$output = array('GROUP_ID'		=> $free['id'],
-						'GROUP_NAME'	=> Scrub::text($free['name']),
-                        'GROUP_CHECKED' => is_numeric($free['accessType']) ? 'checked=\'checked\'' : '',
-						);
-		$this->setVar($output);
+	    if (!in_array($free['id'], $userGroupsIds)) {
+            $output = [
+                'GROUP_ID'      => $free['id'],
+                'GROUP_NAME'    => Scrub::text($free['name']),
+                'GROUP_CHECKED' => is_numeric($free['accessType']) ? 'checked=\'checked\'' : '',
+            ];
+            $this->setVar($output);
 
-		$this->parse('free_list_block', 'free_list', true);
-	}
+            $this->parse('free_list_block', 'free_list', true);
+        }
+    }
 } else
 	$this->setVar('free_list_block', '');
 
@@ -31,17 +41,19 @@ if (is_array($freeList)) {
 $moderatedList = $groupHandler->getAllByType(GROUP_TYPE_MODERATED);
 if (is_array($moderatedList)) {
 	foreach ($moderatedList as $moderated) {
-		$output = array('GROUP_ID'		=> $moderated['id'],
-						'GROUP_NAME'	=> Scrub::text($moderated['name']),
-                        'GROUP_CHECKED' => is_numeric($moderated['accessType']) ? 'checked=\'checked\'' : '',
-						);
-		$this->setVar($output);
+        if (!in_array($moderated['id'], $userGroupsIds)) {
+            $output = array('GROUP_ID'		=> $moderated['id'],
+                            'GROUP_NAME'	=> Scrub::text($moderated['name']),
+                            'GROUP_CHECKED' => is_numeric($moderated['accessType']) ? 'checked=\'checked\'' : '',
+                            );
+            $this->setVar($output);
 
-		$this->setVar('waiting_block', '');
-		if (is_numeric($moderated['accessType']) && $moderated['accessType'] == DENY_ACCESS)
-			$this->parse('waiting_block', 'waiting');
+            $this->setVar('waiting_block', '');
+            if (is_numeric($moderated['accessType']) && $moderated['accessType'] == DENY_ACCESS)
+                $this->parse('waiting_block', 'waiting');
 
-		$this->parse('moderated_list_block', 'moderated_list', true);
+            $this->parse('moderated_list_block', 'moderated_list', true);
+        }
 	}
 } else
 	$this->setVar('moderated_list_block', '');
