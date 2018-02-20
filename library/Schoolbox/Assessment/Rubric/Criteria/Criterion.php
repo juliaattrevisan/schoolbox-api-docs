@@ -10,7 +10,6 @@
 namespace Schoolbox\Assessment\Rubric\Criteria;
 
 
-use function GuzzleHttp\is_host_in_noproxy;
 use Schoolbox\Assessment\Rubric\DescriptorList;
 
 class Criterion extends DescriptorList
