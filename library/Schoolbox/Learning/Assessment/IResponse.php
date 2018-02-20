@@ -86,7 +86,7 @@ interface IResponse
      * @param Collection|IFeedback[] $allFeedback
      * @return $this
      */
-    public function setAllFeedback($allFeedback);
+    public function setAllFeedback(Collection $allFeedback);
 
     /**
      * Get the person who created this IResponse (typically a student)
