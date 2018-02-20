@@ -206,12 +206,16 @@
                             <!-- BEGIN replier_exists -->
                             <a href="/search/user/{SOCIALSTREAM_REPLY_USER_ID}" title="View Profile">
                                 <img src="/portrait.php?userId={SOCIALSTREAM_REPLY_USER_EXTERNAL_ID}&size=square32" alt="{SOCIALSTREAM_REPLY_USER_FULLNAME}">
-                                <p>{SOCIALSTREAM_REPLY_USER_FULLNAME}<span class="pipe meta">Replied {SOCIALSTREAM_REPLY_CREATED_AT}</span></p>
                             </a>
+                            <p>
+                                <a href="/search/user/{SOCIALSTREAM_REPLY_USER_ID}" title="View Profile">{SOCIALSTREAM_REPLY_USER_FULLNAME}</a>
+                                <span class="pipe meta" title="{SOCIALSTREAM_REPLY_CREATED_AT_LONG}">Replied {SOCIALSTREAM_REPLY_CREATED_AT}</span>
+                            </p>
+
                             <!-- END replier_exists -->
                             <!-- BEGIN replier_deleted -->
                             <img src="/portrait.php?userId={SOCIALSTREAM_REPLY_USER_EXTERNAL_ID}&size=square32" alt="{SOCIALSTREAM_REPLY_USER_FULLNAME}">
-                            <p>{SOCIALSTREAM_REPLY_USER_FULLNAME} | <span class="meta">Replied {SOCIALSTREAM_REPLY_CREATED_AT}</span></p>
+                            <p>{SOCIALSTREAM_REPLY_USER_FULLNAME} | <span class="meta" title="{SOCIALSTREAM_REPLY_CREATED_AT_LONG}">Replied {SOCIALSTREAM_REPLY_CREATED_AT}</span></p>
                             <!-- END replier_deleted -->
 
                         </div>

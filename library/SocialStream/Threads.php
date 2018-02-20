@@ -467,6 +467,7 @@ class Threads
                             'SOCIALSTREAM_REPLY_POST_ID'          => Scrub::text($currentReply->getPostId()),
                             'SOCIALSTREAM_REPLY_BODY'             => nl2br(Scrub::text($currentReply->getBody())),
                             'SOCIALSTREAM_REPLY_CREATED_AT'       => Scrub::text($currentReply->getCreatedAt()->getRelativeTime()),
+                            'SOCIALSTREAM_REPLY_CREATED_AT_LONG'  => Scrub::text($currentReply->getCreatedAt()->getLong()),
                             'SOCIALSTREAM_REPLY_USER_ID'          => Scrub::text($currentReply->getOwner()->getId()),
                             'SOCIALSTREAM_REPLY_USER_EXTERNAL_ID' => Scrub::text($currentReply->getOwner()->getExternalId()),
                             'SOCIALSTREAM_REPLY_USER_FULLNAME'    => Scrub::text($currentReply->getOwner()->getFullname()),
