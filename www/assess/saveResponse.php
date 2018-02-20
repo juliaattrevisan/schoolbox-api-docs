@@ -56,16 +56,6 @@ if (!$canInteract->isSatisfiedBy($_SESSION['user'])) {
     $this->pageNotFound();
 }
 
-/* Looks like everyone has a Plan in some way, regardless if it's custom or default?
- */
-try {
-    $participant = $assessment->getParticipant($_SESSION['user']);
-}
-catch (\UnexpectedValueException $e) {
-    error(Error\Mapper::ERROR_NONPARTICIPANT);
-}
-
-
 if ($accessLevel < UserAccess::ACCESS_WRITE) {
     // I can't attempt a spec assessment
     if ($assessment->isSpecification()) {
