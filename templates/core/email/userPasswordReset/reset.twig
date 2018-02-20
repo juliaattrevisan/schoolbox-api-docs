@@ -30,12 +30,16 @@
         {% if user.getEnabled() %}
             <tr>{{ fn.spacer(config.fqdn, 8, 0) }}</tr>
             <tr>
-                <td width="640">
-                    {% if config.forgotten_password == '0' %}
-                        <p>Username: {{ user.getUsername() }}</p>
-                    {% endif %}
-                    <p>Reset Link: <a href="http://{{ config.fqdn }}/passwordReset/{{ reset.getToken() }}">http://{{ config.fqdn }}/passwordReset/{{ reset.getToken() }}</a></p>
-                </td>
+            <td width="640">
+            {% if config.forgotten_password == '0' %}
+                <p>Username: {{ user.getUsername() }}</p>
+            {% endif %}
+            <p>Reset Link:
+<a href="http://{{ config.fqdn }}/passwordReset/{{ reset.getToken() }}">
+http://{{ config.fqdn }}/passwordReset/{{ reset.getToken() }}
+</a>
+            </p>
+            </td>
             </tr>
             <tr>{{ fn.spacer(config.fqdn, 8, 0) }}</tr>
             <tr>
