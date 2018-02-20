@@ -88,14 +88,6 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
     if ($assessment->isSpecification()) {
         error(19);
     }
-
-    // I can end this quiz if it has expired
-
-    // I can't attempt this if it isn't open
-    if (\Alaress_Date_Format::now()->lt($participant->getOpenDate())) {
-        error(143);
-    }
-
 } else {
     // I can do whatever I want
 }
