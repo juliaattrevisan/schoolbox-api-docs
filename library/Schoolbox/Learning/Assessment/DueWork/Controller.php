@@ -967,9 +967,9 @@ class Controller extends Assessment\Controller
      */
     public function postPendingAcknowledge(IAssessable $assessment, User $student)
     {
-        $participant = $assessment->getParticipant($student);
         try {
-            $this->persistAcknowledgementResponse($participant, Alaress_Date_Format::now());
+            $this->persistAcknowledgementResponse($assessment, $student, Alaress_Date_Format::now());
+            $participant = $assessment->getParticipant($student);
             $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learning/fragments/toMarkParticipant.twig', [
                 'participant' => $participant,
                 'assessment'  => $participant->getAssessable(),
