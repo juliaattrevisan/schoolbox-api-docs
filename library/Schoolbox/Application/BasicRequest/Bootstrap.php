@@ -286,48 +286,6 @@ class Bootstrap extends AbstractBootstrap {
      */
     public function runMiddleware()
     {
-        // Ghetto CSRF middleware. Reject request if:
-        // * It's not a GET or HEAD request
-        // ** Disregard X-Http-Method-Override, as that can be set by client
-        // * It's not a deliberately allowed request, API endpoint or vhost
-        // ** In general: any request that authenticates via token instead of
-        //    via session should be allowed
-        // * Its headers don't match
-        // Accept request if it somehow doesn't have a REQUEST_METHOD at all;
-        // AFAIK this isn't fakeable, and this gets called by some CLI scripts
-        // despite it being the WebRequest bootstrap. (Go figure.)
-
-        $scriptWhitelist = [ '*/dav/index.php' ];
-        foreach ($scriptWhitelist as $path) {
-            if (fnmatch($path, $_SERVER['SCRIPT_FILENAME'])) {
-                return;
-            }
-        }
-
-        if (isset($_SERVER['REQUEST_METHOD']) && !\in_array($_SERVER['REQUEST_METHOD'], ['GET', 'HEAD'], true)) {
-
-            // Check against whitelist first
-            $whitelist = ['/saml/consume.php*', '/api/register/*', '/loginForm.php*', '/liss/liss.php' ];
-            foreach ($whitelist as $path) {
-                if (fnmatch($path, $_SERVER['REQUEST_URI'])) {
-                    return;
-                }
-            }
-
-            // Then verify request origin
-            /** @var IConfigLoader $config */
-            $di        = $this->getKernel()->getDependencyInjector();
-            $config    = $di->get('config');
-            $fqdn      = trim($config->get('site_hostname').".".$config->get('site_domain'), ';.');
-            $csrfCheck = new HeaderCheck($_SERVER, $fqdn);
-            if (!$csrfCheck->verifyRequestOrigin()) {
-                // Let's just say 403 Forbidden for now
-                // TODO replace the call to Sitepage::error() method
-                /** @var \SitePage $page */
-                $page = $di->get('layoutEngine');
-                $page->error(ErrorMapper::ERROR_FORM_SUBMIT, 'Invalid Request Origin', 403);
-            }
-        }
     }
 
 
