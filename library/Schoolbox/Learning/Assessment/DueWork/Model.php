@@ -171,6 +171,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
      * Work out if we are going to accept responses
      *
      * It's not accepting submissions if:
+     *      - It's a spec
      *      - If it's not open
      *      - If the close date has passed
      *      - If the assessment is set to Accept None
@@ -181,6 +182,9 @@ class Model extends AbstractAssessment implements ISelfAssessable
      */
     public function assertAcceptSubmission(?Participant $participant)
     {
+        if ($this->isSpecification()) {
+            throw new DomainException(null, ErrorMapper::ERROR_NO_COURSE_SPEC_INTERACTIONS);
+        }
         $this->assertOpen($participant);
 
         if ($this->isAcceptNone()) {
@@ -203,9 +207,13 @@ class Model extends AbstractAssessment implements ISelfAssessable
      * not yet responded to.
      *
      * @param null|Participant $participant
+     * @throws DomainException If this due work does not accept submission acknowledgment
      */
     public function assertAcceptAcknowledgement(?Participant $participant)
     {
+        if ($this->isSpecification()) {
+            throw new DomainException(null, ErrorMapper::ERROR_NO_COURSE_SPEC_INTERACTIONS);
+        }
         $this->assertOpen($participant);
 
         $allResponses = $participant ? $participant->getAllResponses() : new Collection();

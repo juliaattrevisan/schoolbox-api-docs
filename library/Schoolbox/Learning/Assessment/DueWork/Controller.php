@@ -234,20 +234,14 @@ class Controller extends Assessment\Controller
         // TODO SA-6125 - this duplicates module route auth logic. Need to find a way to define this logic in one place only.
         $twigData['submissionsBlocked']    = false;
         $twigData['acknowlegementBlocked'] = false;
-
-        if ($assessment->isSpecification()) {
-            $twigData['submissionsBlocked']    = 'Cannot submit to course assessments';
-            $twigData['acknowlegementBlocked'] = 'Cannot submit to course assessments';
-        } else {
+        try {
+            $assessment->assertAcceptSubmission($participant);
+        } catch (DomainException $e) {
+            $twigData['submissionsBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
             try {
-                $assessment->assertAcceptSubmission($participant);
+                $assessment->assertAcceptAcknowledgement($participant);
             } catch (DomainException $e) {
-                $twigData['submissionsBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
-                try {
-                    $assessment->assertAcceptAcknowledgement($participant);
-                } catch (DomainException $e) {
-                    $twigData['acknowlegementBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
-                }
+                $twigData['acknowlegementBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
             }
         }
 
