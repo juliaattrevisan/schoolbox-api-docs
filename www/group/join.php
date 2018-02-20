@@ -1,5 +1,8 @@
 <?php
 
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
+
 $this->setFile(TEMPLATE_content, 'group/join.html');
 $this->setBlock(TEMPLATE_content, 'free_list', 'free_list_block');
 $this->setBlock(TEMPLATE_content, 'moderated_list', 'moderated_list_block');
@@ -9,15 +12,26 @@ $this->setTitle('Manage Groups');
 $this->setTab('resources');
 
 $groupHandler = new Group(HOMEPAGE_SERVICE);
+$accessMapper = UserAccessMapper::getInstance();
 
 // Fetch the logged in user's write access groups to exclude from the lists.
-$userWriteGroups = $groupHandler->involvedInCategoryList($_SESSION['user']->getId(), false, WRITE_ACCESS);
 $userWriteGroupIds = [];
+$userGroups = $accessMapper->findAllForUser($_SESSION['user']);
+$userWriteGroups = $userGroups->filter(function($element) {
+    /** @var $element UserAccess */
+    if ($element->getAccessLevel() >= UserAccess::ACCESS_WRITE) {
+        return true;
+    }
+    return false;
+});
 foreach ($userWriteGroups as $userGroup) {
-    $userWriteGroupIds[] = $userGroup['id'];
+    /** @var $userGroup UserAccess */
+    $userWriteGroupIds[] = $userGroup->getServiceIdentifier();
 }
 
+
 // output free access groups
+$this->setVar('free_list_block', '');
 $freeList = $groupHandler->getAllByType(GROUP_TYPE_FREE);
 if (is_array($freeList)) {
     foreach ($freeList as $free) {
@@ -32,12 +46,11 @@ if (is_array($freeList)) {
             $this->parse('free_list_block', 'free_list', true);
         }
     }
-} else {
-    $this->setVar('free_list_block', '');
 }
 
 
 // output moderated groups
+$this->setVar('moderated_list_block', '');
 $moderatedList = $groupHandler->getAllByType(GROUP_TYPE_MODERATED);
 if (is_array($moderatedList)) {
     foreach ($moderatedList as $moderated) {
@@ -57,6 +70,4 @@ if (is_array($moderatedList)) {
             $this->parse('moderated_list_block', 'moderated_list', true);
         }
     }
-} else {
-    $this->setVar('moderated_list_block', '');
 }
