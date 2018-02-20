@@ -63,13 +63,13 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         $day = 1;
 
         $sql = "
-            SELECT DISTINCT   CONCAT(DAY, '.', TIMEOFDAY) AS NUMBER, 
-                              HEADING, 
-                              TIME_START, 
-                              TIME_END 
-            FROM              TIMEPDHD 
-            WHERE             SORT_ORDER > 0 AND TYPE <> 'Y' AND DAY = {$day} 
-            ORDER BY          TIME_START
+            SELECT DISTINCT   CONCAT(DAY, '.', TIMEOFDAY) AS NUMBER,
+                              HEADING,
+                              TIME_START,
+                              TIME_END
+            FROM              TIMEPDHD
+            WHERE             TYPE <> 'Y' AND DAY = {$day}
+            ORDER BY          TIME_START ASC
         ";
 
         $timetableDays = $this->getDatabase()->getAll($sql);
