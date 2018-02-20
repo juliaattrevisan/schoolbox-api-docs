@@ -12,7 +12,7 @@ INSERT INTO config (
   required
 ) VALUES (
   'destructive_activity_export_enabled',
-  '0',
+  '1',
   'Enable destructive course activity export',
   'If enabled, exporting a course activity to classes already containing the activity will cause the class activity to be deleted and re-imported. Any student submissions or teacher feedback will be deleted.',
   (SELECT id FROM lu_config_field WHERE field = 'boolean'),
@@ -22,4 +22,3 @@ INSERT INTO config (
   'false',
   'true'
 );
-
