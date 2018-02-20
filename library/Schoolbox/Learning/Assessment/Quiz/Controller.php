@@ -143,16 +143,16 @@ class Controller extends Assessment\Controller
     private function determineSummaryRedirect(Model $assessment, User $student): string
     {
         // Is this a spec?
-        if($assessment->getBaseContext()->isSpecificationContext()){
+        if ($assessment->getBaseContext()->isSpecificationContext()) {
             // Go to intro page (where you can see details of the quiz, but cannot 'Begin Quiz')
-            return $this->getRouter()->generate('learningQuiz.getQuizIntro', [ 'assessmentId' => $assessment->getId() ]);
+            return $this->getRouter()->generate('learningQuiz.getQuizIntro', ['assessmentId' => $assessment->getId()]);
         }
 
         // Not a participant? But you still had access to this page?
         $participant = $assessment->getParticipantIfExtant($student);
-        if(!$participant || $participant->isExcluded()){
+        if (!$participant || $participant->isExcluded()) {
             // Go to intro page (you may or may not see a 'Begin Quiz' button
-            return $this->getRouter()->generate('learningQuiz.getQuizIntro', [ 'assessmentId' => $assessment->getId() ]);
+            return $this->getRouter()->generate('learningQuiz.getQuizIntro', ['assessmentId' => $assessment->getId()]);
         }
 
         // User is a participant and quiz is not a spec. Have they attempted the quiz yet?

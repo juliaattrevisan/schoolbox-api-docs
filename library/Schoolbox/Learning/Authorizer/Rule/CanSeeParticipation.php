@@ -73,7 +73,7 @@ class CanSeeParticipation extends AbstractParticipationRule
         $accessLevel = $this->calculateAccessLevel($assessable, $user);
 
         // All other exclusions mean this page does not exist
-        if(!$participant || $participant->isExcluded()){
+        if (!$participant || $participant->isExcluded()) {
             // Then this route does not exist.
             throw new InvalidPath();
         }
@@ -115,6 +115,7 @@ class CanSeeParticipation extends AbstractParticipationRule
 
         throw new Unauthorized();
     }
+
 
     /**
      * Returns the user's access level to the assessments base context's folder

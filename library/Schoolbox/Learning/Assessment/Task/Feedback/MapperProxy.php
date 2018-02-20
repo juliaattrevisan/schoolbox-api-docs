@@ -114,7 +114,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         foreach($mapperModels as $completion){
 
             // Exclude completions that are self-assessed, these are not considered IFeedbacks
-            if(Completion::STATUS_TEACHER_ASSESSED_COMPLETE !== $completion->getCompletionStatus()){
+            if (Completion::STATUS_TEACHER_ASSESSED_COMPLETE !== $completion->getCompletionStatus()) {
                 continue;
             }
 
