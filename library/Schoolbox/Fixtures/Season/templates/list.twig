@@ -98,7 +98,12 @@
                                     $otherSeason.attr('data-division-count', parseInt($otherSeason.attr('data-division-count')) + parseInt($season.attr('data-division-count')));
                                     $otherSeason.attr('data-match-count', parseInt($otherSeason.attr('data-match-count')) + parseInt($season.attr('data-match-count')));
                                 }
-                                $season.fadeOut({ done: $season.remove });
+
+                                var killMe = function(){
+                                    $season.remove();
+                                    resetDeleteModal($season);
+                                };
+                                $season.fadeOut({ done: killMe });
 
                                 // Was this the last season ?
                                 checkEmptyState();
@@ -124,8 +129,8 @@
 
             // Special case for deleting a season with divisions and/or matches currently linked to it
             if('delete' == action && (divisionCount > 0 || matchCount > 0)){
-                resetDeleteModal($season);
                 $deleteModal.foundation('reveal', 'open');
+                resetDeleteModal($season);
                 return;
             }
 
@@ -152,7 +157,11 @@
                             .done(function(data) {
                                 switch (action) {
                                     case 'delete':
-                                        $season.fadeOut({ done: $season.remove });
+                                        var killMe = function(){
+                                            $season.remove();
+                                            resetDeleteModal($season);
+                                        };
+                                        $season.fadeOut({ done: killMe });
                                         checkEmptyState();
                                         break;
                                     case 'archive':
@@ -180,9 +189,8 @@
          * @param $season jQuery object for season selected for deletion
          */
         function resetDeleteModal($season){
-
             // Does modal need to be reset?
-            if($deleteModal.find('[data-delete-season]').val() != $season.data('season') ){
+            if($deleteModal.find('[data-delete-season]').val() != $season.data('season') ) {
 
                 // Populate fields and labels
                 $deleteModal.find('[data-delete-season]').val($season.data('season'));
@@ -190,24 +198,24 @@
                 $buttonDelete.attr('data-post-action', $season.find('[data-action=delete]').data('post-action'));
 
                 var divisionCount = $season.data('division-count');
-                var divisionText = '<span class="gradient-'+(divisionCount > 0 ? '1' : '10') +'">'+divisionCount+'</span>';
+                var divisionText = '<span class="gradient-' + (divisionCount > 0 ? '1' : '10') + '">' + divisionCount + '</span>';
                 $deleteModal.find('[data=division-count]').html(divisionText);
 
                 var matchCount = $season.data('match-count');
-                var matchText = '<span class="gradient-'+(matchCount > 0 ? '1' : '10') +'">'+matchCount+'</span>';
+                var matchText = '<span class="gradient-' + (matchCount > 0 ? '1' : '10') + '">' + matchCount + '</span>';
                 $deleteModal.find('[data=match-count]').html(matchText);
 
                 // Populate dropdown
                 $selectMove.find('option:not(:first-child)').remove();
-                $.each($allSeasons.find('[data-season]'), function(idx, elem){
+                $.each($allSeasons.find('[data-season]'), function (idx, elem) {
                     var $elem = $(elem);
                     // Filter out this season, and archived seasons
-                    if($season.data('season') == $elem.data('season') || $elem.data('archived')){
+                    if ($season.data('season') == $elem.data('season') || $elem.data('archived')) {
                         // skip season
                     } else {
                         $selectMove.append($('<option>', {
                             value: $elem.data('season'),
-                            text : $elem.data('name')
+                            text: $elem.data('name')
                         }));
                     }
                 });
