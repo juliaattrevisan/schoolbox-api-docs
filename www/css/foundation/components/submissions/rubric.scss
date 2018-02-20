@@ -182,8 +182,8 @@ table.rb {
     line-height: 2.875rem;
 }
 .rb-selected {
-    background-color: $input-focus-border-color !important;
-    color: calc-text-color($input-focus-border-color);
+    background-color: $content-ui-selected!important;
+    color: calc-text-color($content-ui-selected);
 }
 .rb-blank {
     background-color: #FFEFEB !important;

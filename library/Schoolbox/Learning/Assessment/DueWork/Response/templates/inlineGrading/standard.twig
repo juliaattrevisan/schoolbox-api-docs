@@ -137,7 +137,7 @@ Usage:
 
 {# Grading logic and structure #}
 <div class="row mark-scheme" id="assessment-status" data-participant>
-    <fieldset class="small-12 island">
+    <div class="small-12 island">
         <form method="post" data-feedback-form action="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postResponseFeedback', {
             assessmentId: assessment.id,
             studentId:    participant.user.id,
@@ -185,34 +185,38 @@ Usage:
                     {% if latestSelfReflectedFeedback %}
                         {% import '@learning/macro/urgency.twig' as urgency %}
                         <fieldset class="content">
-                            <legend>
-                                {% spaceless %}
-                                    {% if latestSelfReflectedFeedback.isSelfGrading %}
-                                        {{ locale.selfAssessment.proper }}
-                                    {% else %}
-                                        {{ locale.selfReflection.proper }}
-                                    {% endif %}
-                                {% endspaceless %}
-                            </legend>
-                            <div class="content flex-grade">
-                                <ul class="information-list threaded sibling">
-                                    <li>
-                                        <ul class="information-list reply">
+                            <div class="small-12 columns">
+                                <fieldset>
+                                    <legend>
+                                        {% spaceless %}
+                                            {% if latestSelfReflectedFeedback.isSelfGrading %}
+                                                {{ locale.selfAssessment.proper }}
+                                            {% else %}
+                                                {{ locale.selfReflection.proper }}
+                                            {% endif %}
+                                        {% endspaceless %}
+                                    </legend>
+                                    <div class="flex-grade">
+                                        <ul class="information-list threaded sibling">
                                             <li>
-                                                <div class="card small-12">
-                                                    <a href="/search/user/{{ participant.user.id }}">
-                                                        <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square32" title="{{ participant.user.fullname }}" />
-                                                        <p>{{ participant.user.fullname }}<span class="pipe meta">{{ latestSelfReflectedFeedback.publishedAt.short }}</span></p>
-                                                    </a>
-                                                </div>
-                                                <article>{{ latestSelfReflectedFeedback.comment|nl2br }}</article>
+                                                <ul class="information-list reply">
+                                                    <li>
+                                                        <div class="card small-12">
+                                                            <a href="/search/user/{{ participant.user.id }}">
+                                                                <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square32" title="{{ participant.user.fullname }}" />
+                                                                <p>{{ participant.user.fullname }}<span class="pipe meta">{{ latestSelfReflectedFeedback.publishedAt.short }}</span></p>
+                                                            </a>
+                                                        </div>
+                                                        <article>{{ latestSelfReflectedFeedback.comment|nl2br }}</article>
+                                                    </li>
+                                                </ul>
                                             </li>
                                         </ul>
-                                    </li>
-                                </ul>
-                                <div class="grade {{ urgency.marks(latestSelfReflectedFeedback.normalisedMark) }}-bg">
-                                    <span>{{ latestSelfReflectedFeedback.humanReadableMark }}</span>
-                                </div>
+                                        <div class="grade {{ urgency.marks(latestSelfReflectedFeedback.normalisedMark) }}-bg">
+                                            <span>{{ latestSelfReflectedFeedback.humanReadableMark }}</span>
+                                        </div>
+                                    </div>
+                                </fieldset>
                             </div>
                         </fieldset>
                     {% endif %}
