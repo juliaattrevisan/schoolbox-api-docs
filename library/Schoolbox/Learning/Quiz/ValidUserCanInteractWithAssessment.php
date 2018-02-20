@@ -64,31 +64,36 @@ class ValidUserCanInteractWithAssessment
             return false;
          */
 
-        if ($this->assessable->isParticipant($user) && !$this->assessable->getParticipant($user)->isExcluded()) {
-            $plan = $this->assessable->getParticipant($user)->getPlan();
+        /* If you were a participant but you got excluded
+         * you can't get in, no matter who you are
+         */
+        if ($this->assessable->isParticipant($user)) {
+            if (!$this->assessable->getParticipant($user)->isExcluded()) {
+                $plan = $this->assessable->getParticipant($user)->getPlan();
 
-            /* When a user doesn't have a customised plan, these dates are null
-             * Use default assessment dates in that case
-             */
-            $open = $plan->getOpenDate();
-            $close = $plan->getCloseDate();
+                /* When a user doesn't have a customised plan, these dates are null
+                 * Use default assessment dates in that case
+                 */
+                $open = $plan->getOpenDate();
+                $close = $plan->getCloseDate();
 
-            if ($plan->getOpenDate()->isNull()) {
-                $open = $this->assessable->getOpenAt();
+                if ($plan->getOpenDate()->isNull()) {
+                    $open = $this->assessable->getOpenAt();
+                }
+
+                if ($plan->getCloseDate()->isNull()) {
+                    $close = $this->assessable->getCloseAt();
+                }
+
+                return $this->now->gte($open) && $this->now->lt($close);
             }
 
-            if ($plan->getCloseDate()->isNull()) {
-                $close = $this->assessable->getCloseAt();
-            }
-
-            return $this->now->gte($open) && $this->now->lt($close);
+            return false;
         }
 
+        /* If you aren't a participant but you're an instructor that hasn't been excluded, you can get in
+         */
         if ($this->accessHelper->isInstructor($user, $this->assessable->getContext()->getFolder())) {
-            if ($this->assessable->isParticipant($user) && $this->assessable->getParticipant($user)->isExcluded()) {
-                return false;
-            }
-
             return true;
         }
 
