@@ -61,7 +61,7 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
             [$this->getSource()->getId()],
             [
                 'filter' => ['image'],
-                'size' => $this->getConfig('size')
+                'size' => $this->getConfig('sizeNoAll')
             ]
         );
 
