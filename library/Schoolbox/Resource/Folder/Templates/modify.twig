@@ -151,19 +151,15 @@
             console.log(allCodes);
             console.log(explodeCodes);
 
-            var codeTooLong = false;
+            var shortEnough = true;
 
             explodeCodes.forEach(function(element){
                 if($.trim(element).length > 20) {
-                    codeTooLong = true;
+                    shortEnough = false;
                 }
             });
 
-            if (codeTooLong) {
-                return false;
-            } else {
-                return true;
-            }
+            return shortEnough;
 
         }, 'Class codes may not exceed 20 characters.');
 
