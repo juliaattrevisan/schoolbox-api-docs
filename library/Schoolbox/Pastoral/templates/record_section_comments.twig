@@ -27,11 +27,21 @@
                                     <li class="actions-small-1">
                                         <div class="list-item">
                                             <div class="small-12 card wrap-down">
-                                                <a href="{{ profile.link(comment.owner) }}" title="View Profile">{{ profile.imageSquare64(comment.owner) }}</a>
-                                                <p class="meta">
-                                                    Posted by <a href="{{ profile.link(comment.owner) }}">{{ comment.owner.fullName }}</a>
-                                                    <span title="{{ comment.createdAt.short }}">{{ comment.createdAt.relativeDay }}</span>
-                                                </p>
+                                                {% if comment.owner.isDeleted() %}
+                                                    {{ profile.imageSquare64(comment.owner) }}
+                                                    <p class="meta">
+                                                        Posted by {{ comment.owner.fullName }}
+                                                        <span title="{{ comment.createdAt.short }}">{{ comment.createdAt.relativeDay }}</span>
+                                                    </p>
+                                                {% else %}
+                                                    <a href="{{ profile.link(comment.owner) }}" title="View Profile">
+                                                    {{ profile.imageSquare64(comment.owner) }}</a>
+                                                    <p class="meta">
+                                                        Posted by <a href="{{ profile.link(comment.owner) }}">{{ comment.owner.fullName }}</a>
+                                                        <span title="{{ comment.createdAt.short }}">{{ comment.createdAt.relativeDay }}</span>
+                                                    </p>
+                                                {%  endif %}
+
                                                 <p>{{ comment.body | e('html') | nl2br }}</p>
                                             </div>
                                         </div>

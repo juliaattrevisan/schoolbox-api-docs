@@ -13,14 +13,24 @@
 
             <li>
                 <div class="small-12 card wrap-down">
-                    <a href="{{ profile.link(record.owner) }}">
-                        {{ profile.imageSquare64(record.owner) }}
-                        <span class="neutral label right">Author</span>
-                        <p>
-                            {{ record.owner.firstname }} {{ record.owner.lastname }}
-                        </p>
-                    </a>
-                    <p class="meta">Author</p>
+                    {% if record.owner.isDeleted() %}
+                            {{ profile.imageSquare64(record.owner) }}
+                            <span class="neutral label right">Author</span>
+                            <p>
+                                {{ record.owner.firstname }} {{ record.owner.lastname }}
+                            </p>
+                        </a>
+                        <p class="meta">Author</p>
+                    {% else %}
+                        <a href="{{ profile.link(record.owner) }}">
+                            {{ profile.imageSquare64(record.owner) }}
+                            <span class="neutral label right">Author</span>
+                            <p>
+                                {{ record.owner.firstname }} {{ record.owner.lastname }}
+                            </p>
+                        </a>
+                        <p class="meta">Author</p>
+                    {% endif %}
                 </div>
             </li>
 
@@ -57,8 +67,13 @@
 
                                 <p class="meta">
                                     {% for member in access.group.members %}
-                                        <a href="{{ profile.link(member.user) }}">{{ member.user.fullName }}</a>
-                                        ({{ member.user.role.name }})<br>
+                                        {% if member.user.isDeleted() %}
+                                            {{ member.user.fullName }}
+                                            ({{ member.user.role.name }})<br>
+                                        {% else %}
+                                            <a href="{{ profile.link(member.user) }}">{{ member.user.fullName }}</a>
+                                            ({{ member.user.role.name }})<br>
+                                        {% endif %}
                                     {% endfor %}
                                 </p>
 
@@ -74,7 +89,11 @@
                                 <p>{{ access.role.name }}</p>
                                 {% if access.role.isParent %}
                                     {% for parent in record.student.parents %}
-                                        <a href="{{ profile.link(access.user) }}">{{ parent.fullName }}</a><br>
+                                        {%  if access.user.isDeleted %}
+                                            <a href="{{ profile.link(access.user) }}">{{ parent.fullName }}</a><br>
+                                        {% else %}
+                                            {{ parent.fullName }}<br>
+                                        {% endif %}
                                     {% endfor %}
                                 {% else %}
                                     <p class="meta">User Role</p>
@@ -86,7 +105,7 @@
 
                         <li>
                             <div class="small-12 card wrap-down">
-                                <a href="{{ profile.link(access.user) }}">
+                                {% if access.user.isDeleted() %}
                                     {{ profile.imageSquare64(access.user) }}
                                     <span class="neutral label right">{{ locale.pastoralPrivate.proper }} Content Visible</span>
                                     <p>
@@ -95,7 +114,18 @@
                                     <p class="meta">
                                         {{ access.user.role.name }}
                                     </p>
-                                </a>
+                                {% else %}
+                                    <a href="{{ profile.link(access.user) }}">
+                                        {{ profile.imageSquare64(access.user) }}
+                                        <span class="neutral label right">{{ locale.pastoralPrivate.proper }} Content Visible</span>
+                                        <p>
+                                            {{ access.user.firstname }} {{ access.user.lastname }}
+                                        </p>
+                                        <p class="meta">
+                                            {{ access.user.role.name }}
+                                        </p>
+                                    </a>
+                                {% endif %}
                             </div>
                         </li>
                     {% endif %}
@@ -131,7 +161,11 @@
 
                             <p class="meta">
                                 {% for member in access.group.members %}
-                                    <a href="{{ profile.link(member.user) }}">{{ member.user.fullName }}</a><br>
+                                    {% if member.user.isDeleted() %}
+                                        {{ member.user.fullName }}<br>
+                                    {% else %}
+                                        <a href="{{ profile.link(member.user) }}">{{ member.user.fullName }}</a><br>
+                                    {% endif %}
                                 {% endfor %}
                             </p>
 
@@ -147,7 +181,11 @@
                             <p>{{ access.role.name }}</p>
                             {% if access.role.isParent %}
                                 {% for parent in record.student.parents %}
-                                    <a href="{{ profile.link(access.user) }}">{{ parent.fullName }}</a><br>
+                                        {% if access.user.isDeleted() %}
+                                            {{ parent.fullName }}<br>
+                                        {% else %}
+                                            <a href="{{ profile.link(access.user) }}">{{ parent.fullName }}</a><br>
+                                        {% endif %}
                                 {% endfor %}
                             {% else %}
                                 <p class="meta">User Role</p>
@@ -160,7 +198,7 @@
 
                     <li>
                         <div class="small-12 card wrap-down">
-                            <a href="{{ profile.link(access.user) }}">
+                            {% if access.user.isDeleted() %}
                                 {{ profile.imageSquare64(access.user) }}
                                 <p>
                                     {{ access.user.firstname }} {{ access.user.lastname }}
@@ -168,7 +206,17 @@
                                 <p class="meta">
                                     {{ access.user.role.name }}
                                 </p>
-                            </a>
+                            {% else %}
+                                <a href="{{ profile.link(access.user) }}">
+                                    {{ profile.imageSquare64(access.user) }}
+                                    <p>
+                                        {{ access.user.firstname }} {{ access.user.lastname }}
+                                    </p>
+                                    <p class="meta">
+                                        {{ access.user.role.name }}
+                                    </p>
+                                </a>
+                            {% endif %}
                         </div>
                     </li>
                 {% endif %}
@@ -204,7 +252,11 @@
 
                             <p class="meta">
                                 {% for member in access.group.members %}
-                                    <a href="{{ profile.link(member.user) }}">{{ member.user.fullName }}</a><br>
+                                    {% if member.user.isDeleted() %}
+                                        {{ member.user.fullName }}<br>
+                                    {% else %}
+                                        <a href="{{ profile.link(member.user) }}">{{ member.user.fullName }}</a><br>
+                                    {% endif %}
                                 {% endfor %}
                             </p>
 
@@ -221,7 +273,11 @@
                             <p>{{ access.role.name }}</p>
                             {% if access.role.isParent %}
                                 {% for parent in record.student.parents %}
-                                    <a href="{{ profile.link(access.user) }}">{{ parent.fullName }}</a><br>
+                                    {% if access.user.isDeleted() %}
+                                        {{ parent.fullName }}<br>
+                                    {% else %}
+                                        <a href="{{ profile.link(access.user) }}">{{ parent.fullName }}</a><br>
+                                    {% endif %}
                                 {% endfor %}
                             {% else %}
                                 <p class="meta">User Role</p>
@@ -235,7 +291,7 @@
 
                     <li>
                         <div class="small-12 card wrap-down">
-                            <a href="{{ profile.link(access.user) }}">
+                            {% if access.user.isDeleted() %}
                                 {{ profile.imageSquare64(access.user) }}
                                 <span class="alert label right">Denied Access</span>
                                 <p>
@@ -244,7 +300,18 @@
                                 <p class="meta">
                                     {{ access.user.role.name }}
                                 </p>
-                            </a>
+                            {% else %}
+                                <a href="{{ profile.link(access.user) }}">
+                                    {{ profile.imageSquare64(access.user) }}
+                                    <span class="alert label right">Denied Access</span>
+                                    <p>
+                                        {{ access.user.firstname }} {{ access.user.lastname }}
+                                    </p>
+                                    <p class="meta">
+                                        {{ access.user.role.name }}
+                                    </p>
+                                </a>
+                            {% endif %}
                         </div>
                     </li>
                 {% endif %}
