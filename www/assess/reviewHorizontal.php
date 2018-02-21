@@ -18,8 +18,10 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
 
@@ -211,12 +213,22 @@ else {
     $this->setVar('attempt_block', '');
 
 	if ($allAttempts) {
-		$j = 1;
+		$j = 0;
+
+        $assessment = $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], null);
+        $actionValidator = new ActionValidator(\Alaress_Date_Format::now(), Access::getInstance());
+
 		foreach ($allAttempts as $currentAttempt) {
             try {
                 $user = UserMapper::getInstance()->findById($currentAttempt['user_id']);
             }
             catch (Mapper\Exception $e) {
+                continue;
+            }
+
+            /* Excluded participants are ignored
+             */
+            if (!$actionValidator->canReviewAttempts($_SESSION['user'], $user, $assessment)) {
                 continue;
             }
 
@@ -273,6 +285,11 @@ else {
 
 			$this->setVar('answerFormFragment', '');
 			$this->setVar('answerInputs_block', '');
+
+			/* increment count of number of attempts
+			 * some attempts might have been skipped
+			 */
+			$j++;
 		}
 	}
 
