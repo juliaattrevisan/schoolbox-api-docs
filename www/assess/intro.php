@@ -72,29 +72,18 @@ $readOnly         = true;
  */
 $plan = [];
 
-/* Looks like everyone has a Plan in some way, regardless if it's custom or default?
- */
-try {
-    $participant = $assessment->getParticipant($_SESSION['user']);
-
-    $plan['description'] = trim($participant->getDescription());
-    $plan['start'] = $participant->getOpenDate();
-    $plan['finish'] = $participant->getDueDate();
-    $plan['close'] = $participant->getCloseDate();
-}
-catch (\UnexpectedValueException $e) {
-    $plan['description'] = trim($assessment->getDescription());
-    $plan['start'] = $assessment->getOpenAt();
-    $plan['finish'] = $assessment->getDueAt();
-    $plan['close'] = $assessment->getCloseAt();
-}
-
 // Check the current session user is permitted to visit this page
 $actionValidator = new ActionValidator(Alaress_Date_Format::now(), $assessment, Access::getInstance());
 if (!$actionValidator->canSeeQuiz($_SESSION['user'])) {
     $this->pageNotFound();
 }
 
+// Does session user have a participation? If so, use CAP details.
+$participant         = $assessment->getParticipantIfExtant($_SESSION['user']);
+$plan['description'] = trim($participant ? $participant->getDescription() : $assessment->getDescription());
+$plan['start']       = $participant ? $participant->getOpenDate() : $assessment->getOpenAt();
+$plan['finish']      = $participant ? $participant->getDueDate() : $assessment->getDueAt();
+$plan['close']       = $participant ? $participant->getCloseDate() : $assessment->getCloseAt();
 
 if ($accessLevel < UserAccess::ACCESS_WRITE) {
     // I can't attempt a spec assessment
