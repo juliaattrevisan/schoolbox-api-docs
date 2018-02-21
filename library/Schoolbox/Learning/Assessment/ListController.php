@@ -339,7 +339,7 @@ class ListController extends Web\Controller\Base
             // What kind of action is happening?
             $planMapper = $this->participantDataSource->getPlanMapper();
             $action     = $assessment ? $planMapper::METHOD_CREATE : $planMapper::METHOD_UPDATE;
-            $before     = $assessment ? $dehydrator->dehydrateAssessment($assessment) : [];
+            $before     = $assessment ? $dehydrator->dehydrateAssessmentIntoPlans($assessment) : [];
 
             /* Figure out what kind of assessment was chosen
              * and spawn a new instance of it to manipulate
@@ -363,7 +363,7 @@ class ListController extends Web\Controller\Base
             // I don't think plans got added to the assessment? Reload it.
             // TODO add participants to swamp?
             $assessment = $this->assessmentMapper->findByIdForReview($assessment->getId());
-            $after = $dehydrator->dehydrateAssessment($assessment);
+            $after = $dehydrator->dehydrateAssessmentIntoPlans($assessment);
 
             // Now, trigger notifiers
             // Participant object has little idea of whether assessment was created or updated,
@@ -372,12 +372,14 @@ class ListController extends Web\Controller\Base
             foreach ($plans as $plan) {
                 // I have NFI how I'm going to generate a diff for this item.
                 // Maybe I just need to keep the old sub box notifier around.
+                $beforePlan = $before[$plan->getId()] ?? [];
+                $afterPlan  = $after[$plan->getId()]  ?? [];
                 $planMapper->getEventPropagator()->propagate(
                     $this->getUser(),
                     $action,
                     $plan,
                     $planMapper,
-                    $differ->diff($before, $after)
+                    $differ->diff($beforePlan, $afterPlan)
                 );
             }
         }
