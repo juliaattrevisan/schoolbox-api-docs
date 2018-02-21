@@ -1085,6 +1085,17 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
+     * Returns whether this assessment has a dynamic plan
+     *
+     * @return bool
+     */
+    public function hasDynamicPlan(): bool
+    {
+        return (bool)$this->getDynamicPlan();
+    }
+
+
+    /**
      * @inheritdoc
      */
     public function getResponseClass()

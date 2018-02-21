@@ -136,13 +136,14 @@ interface IAssessable extends ISoftDeletable
 
 
     /**
-     * Can the specified instructor (a user with WRITE+ perms) create a submission-on-behalf-of response ?
+     * Can the specified instructor (a user with WRITE+ perms) create a response for themself,
+     * or a submission-on-behalf-of for another user ?
      *
-     * @param User $instructor A user with WRITE+ perm to this assessment's folder context
-     * @param User $learner    The user who the response will be created for
+     * @param User $instructor          A user with WRITE+ perm to this assessment's folder context
+     * @param User $submittedOnBehalfOf The user who the response will be created for
      * @return bool
      */
-    public function canInstructorCreateResponse(User $instructor, User $learner);
+    public function canInstructorCreateResponse(User $instructor, User $submittedOnBehalfOf);
 
 
     /**
@@ -711,6 +712,14 @@ interface IAssessable extends ISoftDeletable
      * @return null|Plan
      */
     public function getDynamicPlan(): ?Plan;
+
+
+    /**
+     * Returns whether this assessment has a dynamic plan
+     *
+     * @return bool
+     */
+    public function hasDynamicPlan(): bool;
 
 
     /**
