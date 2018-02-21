@@ -115,19 +115,55 @@ class Dehydrator
      * @param array $before
      * @param array $after
      * @return array
+     * @throws \InvalidArgumentException if somewhere in the process an array
+     *                                   gets diffed with a non-null scalar
      */
     public function diff(array $before, array $after): array
     {
+        return $this->diffInternal($before, $after, '');
+    }
+
+    /**
+     * Internal diff generation: it tracks the path that is being diffed.
+     *
+     * @param array  $before
+     * @param array  $after
+     * @param string $path
+     * @return array
+     * @throws \InvalidArgumentException if somewhere in the process an array
+     *                                   gets diffed with a non-null scalar
+     */
+    private function diffInternal(array $before, array $after, string $path): array
+    {
         $diff = [];
+
+        // Ensure all the same keys exist in $before and $after
+        foreach (array_diff_key($before, $after) as $key => $_) {
+            $after[$key] = \is_array($before[$key]) ? [] : null;
+        }
+        foreach (array_diff_key($after, $before) as $key => $_) {
+            $before[$key] = \is_array($after[$key]) ? [] : null;
+        }
 
         // We can assume all the same keys exist in $before and $after
         // (except project activities, but those are recursed)
         foreach ($before as $key => $beforeValue) {
-            $afterValue = $after[$key] ?? null;
+            $afterValue = $after[$key];
+            $thisPath   = $path . $key;
+
+            // Both beforeValue and afterValue must be arrays, or neither may be.
+            // If one is and another isn't: that's an error
+            $isBeforeArray = \is_array($beforeValue);
+            $isAfterArray  = \is_array($afterValue);
+            if ($isBeforeArray xor $isAfterArray) {
+                throw new \InvalidArgumentException(
+                    sprintf('Cannot diff array with a non-array in key "%s"', $thisPath)
+                );
+            }
 
             // Is this scalar? Diff it now, otherwise recurse
             if (\is_array($beforeValue) && \is_array($afterValue)) {
-                $recursedDiff = $this->diff($beforeValue, $afterValue);
+                $recursedDiff = $this->diffInternal($beforeValue, $afterValue, $thisPath . '.');
                 if (!empty($recursedDiff)) {
                     $diff[$key] = $recursedDiff;
                 }
