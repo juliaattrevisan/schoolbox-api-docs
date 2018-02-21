@@ -91,7 +91,7 @@
          */
         $participantSettings.on('click', '#participant-customise', function (event) {
             event.preventDefault();
-            openPlanModal();
+            openPlanModal(undefined, self.options);
             newPlan = true;
         });
 
@@ -104,7 +104,7 @@
             var planId = $(this).attr('data-plan-modify');
             var planData = getPlanData(planId);
             newPlan = false;
-            openPlanModal(planData);
+            openPlanModal(planData, self.options);
         });
 
 
@@ -556,7 +556,7 @@
         }
     }
 
-    function openPlanModal(planData) {
+    function openPlanModal(planData, options) {
 
         var $planParticipants = $('#plan-participants');
         var $customiseModal = $(defaults.customiseModal);
@@ -570,7 +570,6 @@
         var $planDueDate = $customiseModal.find('#plan-due-date');
         var $planCloseDate = $customiseModal.find('#plan-close-date');
 
-        var options = $.extend(true, {}, defaults, options);
         var dates = options.getAvailableDateFields();
 
         var participantArray = $(defaults.participants).find('[data-participant-select]').map(function(){
