@@ -28,10 +28,12 @@
 {% else %}
     <iframe class="fullscreen scroll-wrapper" src="{{ routeLookupIfAuthorized('learningDueWorkResponse.getPlagscanReportContents', {
         assessmentId: assessment.id,
-        assessment: assessment,
-        responseId: response.id,
-        participant: participant,
-        plagscanId: plagscan.plagscanId})
+        assessment:   assessment,
+        responseId:   response.id,
+        response:     response,
+        studentId:    participant.user.id,
+        student:      participant.user,
+        plagscanId:   plagscan.plagscanId})
     }}"></iframe>
 {% endif %}
 

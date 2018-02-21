@@ -5,5 +5,13 @@
  # participant  a Participant instance
  #}
 {% if plagscan.isComplete %}
-<a href="{{ routeLookupIfAuthorized('learningDueWorkResponse.getPlagscanReport', {assessmentId: assessment.id, assessment: assessment, responseId: response.id, plagscanId: plagscan.plagscanId, participant: participant }) }}" class="icon-report" title="Plagscan Report"></a>
+<a href="{{ routeLookupIfAuthorized('learningDueWorkResponse.getPlagscanReport', {
+    assessmentId: assessment.id,
+    assessment:   assessment,
+    responseId:   response.id,
+    response:     response,
+    studentId:    participant.user.id,
+    student:      participant.user,
+    plagscanId:   plagscan.plagscanId }) }}"
+   class="icon-report" title="Plagscan Report"></a>
 {% endif %}
