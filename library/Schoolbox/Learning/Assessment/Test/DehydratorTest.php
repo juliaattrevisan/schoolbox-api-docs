@@ -13,6 +13,7 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Learning\Assessment\Dehydrator;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\User;
@@ -150,38 +151,97 @@ class DehydratorTest extends TestCase
         $this->assertEquals($expected, array_diff_key($actual, $this->commonFields));
     }
 
-//    /**
-//     * Test dehydration of project-specific fields
-//     */
-//    public function testDehydrateProject(): void
-//    {
-//        // Create everything
-//        $dueWork = (new DueWork())
-//            ->setId(3)
-//            ->setMaxMark(20)
-//            ->setSelfReviewability(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
-//            ->setTitle('Test Due Work')
-//            ->setMarkVisibility(DueWork::MARK_VISIBILITY_PARENT_STUDENT)
-//            // TODO move/copy this const to DueWork
-//            ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE);
-//
-//        // Don't bother testing the default fields, as they all match
-//        // I'm more interested in testing participants
-//        $expected = [
-//            'id'                => $dueWork->getId(),
-//            'type'              => $dueWork->getFamilyName(),
-//            'title'             => $dueWork->getTitle(),
-//            'weight'            => $dueWork->getWeight(),
-//            'markVisibility'    => $dueWork->getMarkVisibility(),
-//            'workType'          => null,
-//            'acceptOnline'      => $dueWork->getAcceptOnline(),
-//            'selfReviewability' => $dueWork->getSelfReviewability(),
-//            'participants'      => [],
-//        ];
-//
-//        $actual = $this->dehydrator->dehydrate($dueWork);
-//        $this->assertEquals($expected, $actual);
-//    }
+    /**
+     * Test dehydration of project-specific fields
+     */
+    public function testDehydrateProject(): void
+    {
+        // Create everything
+        $project = (new Project())
+            ->setId(1)
+            ->setTitle('Project')
+            ->setDescription('Test Project description')
+            ->setPublishAt(new \Alaress_Date_Format('2018-01-01 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setOpenAt(new \Alaress_Date_Format('2018-01-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setDueAt(new \Alaress_Date_Format('2018-01-03 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCloseAt(new \Alaress_Date_Format('2018-01-04 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
+        $task    = (new Task())
+            ->setId(11)
+            ->setTitle('Task')
+            ->setDescription('Test Task description')
+            ->setPublishAt(new \Alaress_Date_Format('2018-02-01 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setOpenAt(new \Alaress_Date_Format('2018-02-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setDueAt(new \Alaress_Date_Format('2018-02-03 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCloseAt(new \Alaress_Date_Format('2018-02-04 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
+        $quiz    = (new Quiz())
+            ->setId(12)
+            ->setTitle('Quiz')
+            ->setDescription('Test Quiz description')
+            ->setPublishAt(new \Alaress_Date_Format('2018-03-01 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setOpenAt(new \Alaress_Date_Format('2018-03-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setDueAt(new \Alaress_Date_Format('2018-03-03 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCloseAt(new \Alaress_Date_Format('2018-03-04 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
+        $dueWork = (new DueWork())
+            ->setId(13)
+            ->setTitle('Due Work')
+            ->setDescription('Test Due Work description')
+            ->setPublishAt(new \Alaress_Date_Format('2018-04-01 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setOpenAt(new \Alaress_Date_Format('2018-04-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setDueAt(new \Alaress_Date_Format('2018-04-03 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCloseAt(new \Alaress_Date_Format('2018-04-04 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        // Set up participation?
+        $userA = (new User())
+            ->setId(1)
+            ->setFirstname('Aaron')
+            ->setLastname('Aaronson');
+        $userB = (new User())
+            ->setId(2)
+            ->setFirstname('Barry')
+            ->setLastname('Barryson');
+        $userC = (new User())
+            ->setId(3)
+            ->setFirstname('Carl')
+            ->setLastname('Carlson');
+
+        $taskPlan = $this->linker->createAndLinkPlan($task, true);
+        $this->linker->createAndLinkParticipant($userA, $taskPlan);
+        $this->linker->createAndLinkParticipant($userB, $taskPlan);
+
+        $dueWorkPlan = $this->linker->createAndLinkPlan($dueWork, true);
+        $this->linker->createAndLinkParticipant($userA, $dueWorkPlan);
+        $this->linker->createAndLinkParticipant($userC, $dueWorkPlan);
+
+        $quizPlan = $this->linker->createAndLinkPlan($quiz, true);
+        $this->linker->createAndLinkParticipant($userB, $quizPlan);
+        $this->linker->createAndLinkParticipant($userC, $quizPlan);
+
+        $project->getAssessables()
+            ->add($task)
+            ->add($dueWork)
+            ->add($quiz);
+
+        $actual = $this->dehydrator->dehydrate($project);
+
+        // Test activity titles
+        $this->assertEquals($task->getTitle(), $actual['activities'][$task->getId()]['title']);
+        $this->assertEquals($dueWork->getTitle(), $actual['activities'][$dueWork->getId()]['title']);
+        $this->assertEquals($quiz->getTitle(), $actual['activities'][$quiz->getId()]['title']);
+
+        // Test activity participation
+        $this->assertArrayHasKey($userA->getId(), $actual['activities'][$task->getId()]['participants']);
+        $this->assertArrayHasKey($userB->getId(), $actual['activities'][$task->getId()]['participants']);
+        $this->assertArrayNotHasKey($userC->getId(), $actual['activities'][$task->getId()]['participants']);
+
+        $this->assertArrayHasKey($userA->getId(), $actual['activities'][$dueWork->getId()]['participants']);
+        $this->assertArrayNotHasKey($userB->getId(), $actual['activities'][$dueWork->getId()]['participants']);
+        $this->assertArrayHasKey($userC->getId(), $actual['activities'][$dueWork->getId()]['participants']);
+
+        $this->assertArrayNotHasKey($userA->getId(), $actual['activities'][$quiz->getId()]['participants']);
+        $this->assertArrayHasKey($userB->getId(), $actual['activities'][$quiz->getId()]['participants']);
+        $this->assertArrayHasKey($userC->getId(), $actual['activities'][$quiz->getId()]['participants']);
+
+    }
 
     /**
      * Test dehydration of participant-specific fields
@@ -204,6 +264,8 @@ class DehydratorTest extends TestCase
                 ->setLastname('Aaronson'),
             $dynamicPlan
         );
+
+        // Boot out Barry
         $participantB = $this->linker->createAndLinkParticipant(
             (new User())
                 ->setId(2)
@@ -211,6 +273,7 @@ class DehydratorTest extends TestCase
                 ->setLastname('Barryson'),
             $dynamicPlan
         );
+        $participantB->setExcludedAt(\Alaress_Date_Format::now());
 
         $customPlan = $this->linker->createAndLinkPlan($dueWork, false)
                                    ->setName('Custom Plan')
