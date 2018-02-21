@@ -29,7 +29,40 @@ class Dehydrator
      */
     public function dehydrate(IAssessable $assessment): array
     {
-        // This, or something else, needs to know how to dehydrate each IAssessable type.
+        $dehydrated = $this->dehydrateAssessment($assessment);
+
+        // Project: recursively dehydrate each activity
+        if ($assessment instanceof Project) {
+            $activities = [];
+            foreach ($assessment->getAssessables() as $activity) {
+                $activities[$activity->getId()] = $this->dehydrate($activity);
+            }
+            $dehydrated += [
+                'activities' => $activities,
+            ];
+        }
+
+        // Dehydrate participants too
+        foreach ($assessment->getAllParticipants() as $participant) {
+            $dehydratedParticipant = $this->dehydrateParticipant($participant);
+            $dehydratedParticipant['plan'] = $this->dehydratePlan($participant->getPlan());
+            $dehydratedParticipant['user'] = $this->dehydrateUser($participant->getUser());
+            $dehydrated['participants'][$participant->getUser()->getId()] = $dehydratedParticipant;
+        }
+
+        return $dehydrated;
+    }
+
+
+    /**
+     * Helper for dehydrating an assessment.
+     *
+     * @param IAssessable $assessment
+     * @return array
+     */
+    private function dehydrateAssessment(IAssessable $assessment): array
+    {
+        // Generic fields
         $dehydrated = [
             'id'             => $assessment->getId(),
             'type'           => $assessment->getFamilyName(),
@@ -68,25 +101,6 @@ class Dehydrator
             $dehydrated += [
                 'selfAssessable' => $assessment->getIsSelfAssessable(),
             ];
-        }
-
-        // Project-specific
-        if ($assessment instanceof Project) {
-            $activities = [];
-            foreach ($assessment->getAssessables() as $activity) {
-                $activities[$activity->getId()] = $this->dehydrate($activity);
-            }
-            $dehydrated += [
-                'activities' => $activities,
-            ];
-        }
-
-        // Dehydrate participants too
-        foreach ($assessment->getAllParticipants() as $participant) {
-            $dehydratedParticipant = $this->dehydrateParticipant($participant);
-            $dehydratedParticipant['plan'] = $this->dehydratePlan($participant->getPlan());
-            $dehydratedParticipant['user'] = $this->dehydrateUser($participant->getUser());
-            $dehydrated['participants'][$participant->getUser()->getId()] = $dehydratedParticipant;
         }
 
         return $dehydrated;
