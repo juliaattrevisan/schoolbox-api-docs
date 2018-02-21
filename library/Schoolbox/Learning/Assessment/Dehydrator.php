@@ -41,6 +41,7 @@ class Dehydrator
                     'name' => $assessment->getWorkType()->getName(),
                 ]
                 : null,
+            'participants'   => [],
         ];
 
         // Due-work specific
