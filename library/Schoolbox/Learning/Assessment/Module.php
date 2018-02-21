@@ -514,7 +514,8 @@ class Module extends BaseModule
             new Rule\Any(
                 new Rule\All(
                     new Rule\IsSuperuser(),
-                    new ParticipantHasNoInteractions()
+                    new ParticipantHasNoInteractions(),
+                    new CanRespondToAssessment($this->getAccess())
                 ),
                 new Rule\All(
                     new Rule\HasRole(Role::STAFF),
@@ -528,6 +529,7 @@ class Module extends BaseModule
                     new Rule\IsUser('studentId'),
                     new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
                     new IsAssessmentOpen(),
+                    new CanRespondToAssessment($this->getAccess()),
                     new ParticipantHasNoInteractions()
                 )
             )

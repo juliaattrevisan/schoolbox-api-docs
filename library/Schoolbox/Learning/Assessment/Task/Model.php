@@ -216,10 +216,22 @@ class Model extends AbstractAssessment
     /**
      * @inheritdoc
      */
-    public function canInstructorCreateResponse(User $instructor, User $learner)
+    public function canInstructorCreateResponse(User $instructor, User $submittedOnBehalfOf)
     {
+        // Specified student not a participant ?
+        $participant = $this->getParticipantIfExtant($submittedOnBehalfOf);
+
+        // Is instructor wishing to create response for themself?
+        if ($instructor->getId() == $submittedOnBehalfOf->getId()) {
+            // Cannot be excluded, and if no participation, must be a dynamic plan available
+            if ($participant) {
+                return !$participant->isExcluded();
+            }
+            return $this->hasDynamicPlan();
+        }
+
         // Instructor can mark the task as long as the learner is a participant
-        return $this->isParticipant($learner);
+        return $participant && !$participant->isExcluded();
     }
 
     /**

@@ -259,8 +259,21 @@ class Model extends AbstractAssessment
     /**
      * @inheritdoc
      */
-    public function canInstructorCreateResponse(User $instructor, User $learner)
+    public function canInstructorCreateResponse(User $instructor, User $submittedOnBehalfOf)
     {
+        // Specified student not a participant ?
+        $participant = $this->getParticipantIfExtant($submittedOnBehalfOf);
+
+        // Is instructor wishing to create response for themself?
+        if ($instructor->getId() == $submittedOnBehalfOf->getId()) {
+            // Cannot be excluded, and if no participation, must be a dynamic plan available
+            if ($participant) {
+                return !$participant->isExcluded();
+            }
+            return $this->hasDynamicPlan();
+        }
+
+        // Can instructor SOBO for the learner?
         // Quiz does not currently support submission-on-behalf-of
         return false;
     }
