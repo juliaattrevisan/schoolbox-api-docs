@@ -29,7 +29,7 @@ class Dehydrator
      */
     public function dehydrate(IAssessable $assessment): array
     {
-        $dehydrated = $this->dehydrateAssessment($assessment);
+        $dehydrated = $this->internalDehydrateAssessment($assessment);
 
         // Project: recursively dehydrate each activity
         if ($assessment instanceof Project) {
@@ -44,9 +44,9 @@ class Dehydrator
 
         // Dehydrate participants too
         foreach ($assessment->getAllParticipants() as $participant) {
-            $dehydratedParticipant = $this->dehydrateParticipant($participant);
-            $dehydratedParticipant['plan'] = $this->dehydratePlan($participant->getPlan());
-            $dehydratedParticipant['user'] = $this->dehydrateUser($participant->getUser());
+            $dehydratedParticipant         = $this->internalDehydrateParticipant($participant);
+            $dehydratedParticipant['plan'] = $this->internalDehydratePlan($participant->getPlan());
+            $dehydratedParticipant['user'] = $this->internalDehydrateUser($participant->getUser());
             $dehydrated['participants'][$participant->getUser()->getId()] = $dehydratedParticipant;
         }
 
@@ -60,7 +60,7 @@ class Dehydrator
      * @param IAssessable $assessment
      * @return array
      */
-    private function dehydrateAssessment(IAssessable $assessment): array
+    private function internalDehydrateAssessment(IAssessable $assessment): array
     {
         // Generic fields
         $dehydrated = [
@@ -113,7 +113,7 @@ class Dehydrator
      * @param Participant $participant
      * @return array
      */
-    private function dehydrateParticipant(Participant $participant): array
+    private function internalDehydrateParticipant(Participant $participant): array
     {
         return [
             'description' => $participant->getDescription(),
@@ -132,7 +132,7 @@ class Dehydrator
      * @param Plan $plan
      * @return array
      */
-    private function dehydratePlan(Plan $plan): array
+    private function internalDehydratePlan(Plan $plan): array
     {
         return [
             'id'      => $plan->getId(),
@@ -148,7 +148,7 @@ class Dehydrator
      * @param User $user
      * @return array
      */
-    private function dehydrateUser(User $user): array
+    private function internalDehydrateUser(User $user): array
     {
         return [
             'id'        => $user->getId(),
