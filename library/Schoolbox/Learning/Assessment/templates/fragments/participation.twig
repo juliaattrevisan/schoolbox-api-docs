@@ -68,6 +68,7 @@
                 <ul class="information-list card-selectable" id="participants">
                     {% for participant in assessment.allParticipants %}
                         {% set user = participant.user %}
+                        {% set hasInteraction = (participant.allResponses|length) > 0 or (participant.allFeedbacks|length) > 0 %}
                         {% set userInclude = (not participant.excludedAt) or participant.excludedAt.null %}
                         {% set userPlanName = userInclude ? (participant.plan.name ?: '(no customisations)') : '(excluded)' %}
                         {% set userStatus = userInclude ? (participant.plan.name ? 'custom' : 'included') : 'excluded' %}
@@ -90,7 +91,7 @@
                                 <div class="small-12 column">
                                     <div class="row">
                                         <label for="participant-{{ user.id }}" class="checkbox-label">
-                                            <div class="small-12 medium-6 columns compact card{{ userInclude ? '' : ' participant-excluded' }}">
+                                            <div class="small-12 medium-6 columns compact card{{ userInclude ? '' : ' participant-excluded' }}" {% if hasInteraction %}data-has-interaction{% endif %}>
                                                 <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square32">
                                                 <p>{{ user.fullName }}</p>
                                             </div>
