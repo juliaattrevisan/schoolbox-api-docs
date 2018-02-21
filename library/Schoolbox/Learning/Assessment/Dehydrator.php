@@ -13,22 +13,20 @@ use Schoolbox\Learning\Assessment\Quiz\Model as QuizModel;
 use Schoolbox\Learning\Assessment\Task\Model as TaskModel;
 
 /**
- * Strategy for sorting assessments.
- *
- * This orders them by their due date (either base or participant's),
- * then by their sequence, then by their title.
- *
- * Usage: `$assessmentCollection->sortByCallback(new DueDateSortStrategy($student));`
+ * Dehydrator for IAssessable objects.
  */
 class Dehydrator
 {
     /**
      * Dehydrates assessment, for purpose of generating a diff.
      *
+     * Expected general usage is to call this on `$assessment` before and
+     * after it gets saved, and then use that diff in a notifier.
+     *
      * @param IAssessable $assessment
      * @return array
      */
-    public function dehydrateForDiff(IAssessable $assessment): array
+    public function dehydrate(IAssessable $assessment): array
     {
         // This, or something else, needs to know how to dehydrate each IAssessable type.
         $dehydrated = [
@@ -74,7 +72,7 @@ class Dehydrator
         if ($assessment instanceof Project) {
             $activities = [];
             foreach ($assessment->getAssessables() as $activity) {
-                $activities[$activity->getId()] = $this->dehydrateForDiff($activity);
+                $activities[$activity->getId()] = $this->dehydrate($activity);
             }
             $dehydrated += [
                 'activities' => $activities,
@@ -101,7 +99,7 @@ class Dehydrator
                     'id'      => $user->getId(),
                     'name'    => $user->formatName(),
                 ]
-            ];;
+            ];
         }
 
         return $dehydrated;
