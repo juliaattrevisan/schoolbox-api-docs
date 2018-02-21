@@ -1044,7 +1044,7 @@ class User implements JsonSerializable, ISoftDeletable
                     {
                         try {
                             $teacherCollection->add(
-                                UserMapper::getInstance()->findByExternalId($teacher)
+                                UserMapper::getInstance()->findByExternalId($teacher, Role::STAFF)
                             );
 
                             $found[$teacher] = 1;
@@ -1067,24 +1067,15 @@ class User implements JsonSerializable, ISoftDeletable
     public function loadParents()
     {
         $this->parent_collection = new Collection();
-        // TODO remove handler dependency
         $DEPRECATED_EXTERNAL_USER = new \External_User();
         $allParents               = $DEPRECATED_EXTERNAL_USER->getStudentContactList($this->externalId);
-        $parentRoles              = RoleMapper::getInstance()->findByColumn(
-            'group_type',
-            Role::PARENT
-        )->getColumnValues('id');
+
         if (is_array($allParents)) {
             foreach ($allParents as $currentParent) {
                 /* Add parent
                  */
                 if (!empty($currentParent['StudentContactID'])) {
-                    $parentCollection = UserMapper::getInstance()->findByColumnList(
-                        array(
-                            'synergy_id' => $currentParent['StudentContactID'],
-                            'group_id'   => $parentRoles
-                        )
-                    );
+                    $parentCollection = UserMapper::getInstance()->findByExternalId($currentParent['StudentContactID'], Role::PARENT);
                     foreach ($parentCollection as $parent) {
                         $this->parent_collection->add($parent);
                     }
@@ -1092,12 +1083,7 @@ class User implements JsonSerializable, ISoftDeletable
                 /* Add speece
                  */
                 if (!empty($currentParent['StudentContactSpouseID'])) {
-                    $spouseCollection = UserMapper::getInstance()->findByColumnList(
-                        array(
-                            'synergy_id' => $currentParent['StudentContactSpouseID'],
-                            'group_id'   => $parentRoles
-                        )
-                    );
+                    $spouseCollection = UserMapper::getInstance()->findByExternalId($currentParent['StudentContactSpouseID'], Role::PARENT);
                     if ($spouseCollection->count()) {
                         $this->parent_collection->add($spouseCollection->first());
                     }
