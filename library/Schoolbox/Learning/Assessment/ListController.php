@@ -380,7 +380,7 @@ class ListController extends Web\Controller\Base
                     $action,
                     $plan,
                     $planMapper,
-                    $differ->diff($beforePlan, $afterPlan)
+                    $differ->diff($afterPlan, $beforePlan)
                 );
             }
         }
