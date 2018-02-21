@@ -11,7 +11,6 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-use Schoolbox\Assessment\Participant;
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;

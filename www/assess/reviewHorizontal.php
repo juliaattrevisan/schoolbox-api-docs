@@ -14,14 +14,11 @@
  * @version     SVN: $Id$
  */
 
-use Schoolbox\Assessment\Participant;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\Learning\Quiz\ValidUserCanInteractWithAssessment;
-use Schoolbox\Learning\Quiz\ValidUserViewsAssessment;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;

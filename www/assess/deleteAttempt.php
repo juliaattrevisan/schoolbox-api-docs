@@ -15,7 +15,6 @@
 /* Check that you can delete these attempts first
  */
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Assessment\Participant;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Quiz\ValidUserCanInteractWithAssessment;

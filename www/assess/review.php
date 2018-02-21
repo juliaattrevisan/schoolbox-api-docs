@@ -14,11 +14,8 @@
  * @version     SVN: $Id$
  */
 
-use Schoolbox\Assessment\Participant;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Quiz\ValidUserCanInteractWithAssessment;
-use Schoolbox\Learning\Quiz\ValidUserViewsAssessment;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
