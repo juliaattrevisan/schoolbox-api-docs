@@ -81,6 +81,24 @@ class Dehydrator
 
 
     /**
+     * Dehydrates assessment into a set of plans.
+     *
+     * @param IAssessable $assessment
+     * @return array
+     */
+    public function dehydrateAssessmentIntoPlans(IAssessable $assessment): array
+    {
+        $dehydrated = [];
+        foreach ($assessment->getPlans() as $plan) {
+            // Is this plan persisted yet?
+            // Ignore it for the purpose of dehydration?
+            $dehydrated[$plan->getId()] = $this->dehydratePlan($plan);
+        }
+        return $dehydrated;
+    }
+
+
+    /**
      * Helper for dehydrating an assessment.
      *
      * @param IAssessable $assessment
