@@ -51,9 +51,6 @@ class CanRespondToAssessment extends AbstractParticipationRule
             return true;
         }
 
-        $a = $this->access->isLearner($user, $folder);
-        $b = $assessment->canLearnerCreateResponse($student);
-
         if ($this->access->isLearner($user, $folder) && $assessment->canLearnerCreateResponse($student)) {
             return true;
         }
