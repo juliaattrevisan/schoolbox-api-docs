@@ -22,6 +22,8 @@ use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Plan;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -674,5 +676,27 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private function retrieveAssessmentDataModel(Model $plan): AssessmentModel
     {
         return $this->assessmentMapper->findById($plan->getAssessment()->getId());
+    }
+
+    /**
+     * Retrieves an iterable over the participants in this plan.
+     *
+     * This requires the assessment's cooperation, as it stores the actual
+     * participants.
+     *
+     * @param IAssessable $assessment
+     * @param Plan        $plan
+     * @return \Generator|Participant[]
+     */
+    private function retrieveParticipantsFromPlan(Plan $plan, IAssessable $assessment)
+    {
+        foreach ($assessment->getPlans() as $assessmentPlan) {
+            if ($assessmentPlan->getId() !== $plan->getId()) {
+                continue;
+            }
+            foreach ($assessmentPlan->getParticipants() as $participant) {
+                yield $participant;
+            }
+        }
     }
 }
