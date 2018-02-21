@@ -12,7 +12,6 @@
 
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Error;
-use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Quiz\ValidUserCanInteractWithAssessment;
 use Schoolbox\Learning\Quiz\ValidUserCanViewAssessment;
