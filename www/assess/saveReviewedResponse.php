@@ -10,13 +10,18 @@
  */
 
 use Schoolbox\Error;
+use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
+use Schoolbox\UserMapper;
 
 $assessHandler = new Assess_Main();
 $questionHandler = new Assess_Question();
 $sectionHandler = new Assess_Section();
 $groupHandler = new Group();
+$attemptHandler = new Assess_Attempt();
+$responseHandler = new Assess_Response();
 
 $question = $questionHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($question['section_id']);
@@ -45,6 +50,24 @@ try {
 }
 catch (Mapper\Exception $e) {
     error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
+}
+
+$response = $responseHandler->getByID($this->arg[1]);
+$attempt = $attemptHandler->getByID($response['attempt_id']);
+
+try {
+    $user = UserMapper::getInstance()->findById($attempt['user_id']);
+}
+catch (Mapper\Exception $e) {
+    error(Error\Mapper::ERROR_USER_NOT_FOUND);
+}
+
+/* Excluded participants 404
+ */
+$actionValidator = new ActionValidator(\Alaress_Date_Format::now(), Access::getInstance());
+
+if (!$actionValidator->canReviewAttempts($_SESSION['user'], $user, $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], $user))) {
+    $this->pageNotFound();
 }
 
 $factory = new Assess_Factory();
