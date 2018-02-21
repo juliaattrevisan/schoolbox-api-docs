@@ -503,7 +503,7 @@ class Controller extends BaseController
 
             foreach ($classCodeArray as $code) {
                 if (strlen(trim($code)) > 20) {
-                    throw new Exception("Class code exceeds 20 charachters");
+                    throw new Exception("Class code exceeds 20 characters");
                 }
             }
 

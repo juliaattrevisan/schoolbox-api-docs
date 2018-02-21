@@ -116,7 +116,7 @@ class Bulk_Folder
                                 'id' => '',
                                 'name' => $row[1],
                                 'status' => 'Skipped',
-                                'error' => "Subject code exceeds 20 charachters ({$subjectCode})",
+                                'error' => "Subject code exceeds 20 characters ({$subjectCode})",
                             ];
 
                             break;
