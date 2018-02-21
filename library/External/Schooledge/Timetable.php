@@ -639,7 +639,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 'staffTitle'     => $timetabledClass['BaseStaffTitle'],
             ];
         }
-        if ($timetabledClass['UseReplacementStaff']) {
+        elseif ($timetabledClass['UseReplacementStaff']) {
             $parts[$classCode.'-'.$timetabledClass['ReplacementStaffID']] = $basePart + [
                 'staffID'        => $timetabledClass['ReplacementStaffID'],
                 'staffFirstname' => $timetabledClass['ReplacementStaffPreferredName'],
