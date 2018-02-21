@@ -68,9 +68,9 @@ $getAttempt = function ($attemptId) use ($assessmentMapperProxy, $attemptHandler
     }
 
     // It appears this controller can be called with unrelated attemptIds, so need to load each attempt's quiz.
-    $assessment      = $assessmentMapperProxy->findByQuizId($assess['assess_id'], $user);
-    $actionValidator = new ActionValidator(Alaress_Date_Format::now(), $assessment, Access::getInstance());
-    if (!$actionValidator->canDeleteAttempts($_SESSION['user'], $user)) {
+    $quiz            = $assessmentMapperProxy->findByQuizId($assess['assess_id'], $user);
+    $actionValidator = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
+    if (!$actionValidator->canDeleteAttempts($_SESSION['user'], $user, $quiz)) {
         $this->pageNotFound();
     }
 

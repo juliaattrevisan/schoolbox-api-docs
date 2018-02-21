@@ -73,8 +73,8 @@ $readOnly         = true;
 $plan = [];
 
 // Check the current session user is permitted to visit this page
-$actionValidator = new ActionValidator(Alaress_Date_Format::now(), $assessment, Access::getInstance());
-if (!$actionValidator->canSeeQuiz($_SESSION['user'])) {
+$actionValidator = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
+if (!$actionValidator->canSeeQuiz($_SESSION['user'], $assessment)) {
     $this->pageNotFound();
 }
 
@@ -131,7 +131,7 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
 }
 
 // Hide the CTA if session user is not permitted to attempt
-$readOnly = !$actionValidator->canAttemptQuiz($_SESSION['user']);
+$readOnly = !$actionValidator->canAttemptQuiz($_SESSION['user'], $assessment);
 
 
 /* Continue once you get past checks

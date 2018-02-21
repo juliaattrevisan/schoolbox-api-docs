@@ -87,8 +87,8 @@ catch (Mapper\Exception $e) {
 /** @var Assessment\MapperProxy $assessmentMapperProxy */
 $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 $quiz                  = $assessmentMapperProxy->findByQuizId($assess->getId());
-$actionValidator       = new ActionValidator(Alaress_Date_Format::now(), $quiz, Access::getInstance());
-if ($actionValidator->canReviewAttempts($sessionUser, $user)) {
+$actionValidator       = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
+if ($actionValidator->canReviewAttempts($sessionUser, $user, $quiz)) {
     $this->pageNotFound();
 }
 

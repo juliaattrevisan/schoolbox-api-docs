@@ -29,21 +29,18 @@ class ActionValidator
 
     /** @var \Alaress_Date_Format */
     private $now;
-    /** @var Quiz\Model */
-    private $quiz;
+
     /** @var Access */
     private $accessHelper;
 
 
     /**
      * @param Alaress_Date_Format $now
-     * @param Quiz\Model          $quiz
      * @param Access              $accessHelper
      */
-    public function __construct(Alaress_Date_Format $now, Quiz\Model $quiz, Access $accessHelper)
+    public function __construct(Alaress_Date_Format $now, Access $accessHelper)
     {
         $this->now          = $now;
-        $this->quiz         = $quiz;
         $this->accessHelper = $accessHelper;
     }
 
@@ -51,12 +48,13 @@ class ActionValidator
     /**
      * Returns whether the specified user can see that this quiz exists.
      *
-     * @param User $user
+     * @param User       $user
+     * @param Quiz\Model $quiz
      * @return bool
      */
-    public function canSeeQuiz(User $user): bool
+    public function canSeeQuiz(User $user, Quiz\Model $quiz): bool
     {
-        $isInstructor = $this->accessHelper->isInstructor($user, $this->quiz->getContext()->getFolder());
+        $isInstructor = $this->accessHelper->isInstructor($user, $quiz->getContext()->getFolder());
         $isStaff      = $user->getRole()->isStaff();
 
         // Instructors/Staff can always view the assessment (regardless of whether they can interact with it)
@@ -65,7 +63,7 @@ class ActionValidator
         }
 
         // Does user have a participation record?
-        $participant = $this->quiz->getParticipantIfExtant($user);
+        $participant = $quiz->getParticipantIfExtant($user);
         if ($participant) {
             // Excluded Learners can never see the quiz
             if ($participant->isExcluded()) {
@@ -83,13 +81,14 @@ class ActionValidator
     /**
      * Returns whether the specified user is permitted to attempt the quiz.
      *
-     * @param User $user
+     * @param User       $user
+     * @param Quiz\Model $quiz
      * @return bool
      */
-    public function canAttemptQuiz(User $user): bool
+    public function canAttemptQuiz(User $user, Quiz\Model $quiz): bool
     {
-        $isInstructor = $this->accessHelper->isInstructor($user, $this->quiz->getContext()->getFolder());
-        $participant  = $this->quiz->getParticipantIfExtant($user);
+        $isInstructor = $this->accessHelper->isInstructor($user, $quiz->getContext()->getFolder());
+        $participant  = $quiz->getParticipantIfExtant($user);
 
         // Does user have a participation for this assessment?
         if ($participant) {
@@ -102,21 +101,22 @@ class ActionValidator
         }
 
         // Users with no participation can attempt they are instructors, and a dynamic plan is available
-        return $isInstructor && $this->quiz->getDynamicPlan();
+        return $isInstructor && $quiz->getDynamicPlan();
     }
 
 
     /**
      * Returns whether a user can review another users' attempts for this quiz
      *
-     * @param User $reviewer
-     * @param User $reviewee
+     * @param User       $reviewer
+     * @param User       $reviewee
+     * @param Quiz\Model $quiz
      * @return bool
      */
-    public function canReviewAttempts(User $reviewer, User $reviewee): bool
+    public function canReviewAttempts(User $reviewer, User $reviewee, Quiz\Model $quiz): bool
     {
-        $isInstructor  = $this->accessHelper->isInstructor($reviewer, $this->quiz->getContext()->getFolder());
-        $isParticipant = $this->quiz->isParticipant($reviewee);
+        $isInstructor  = $this->accessHelper->isInstructor($reviewer, $quiz->getContext()->getFolder());
+        $isParticipant = $quiz->isParticipant($reviewee);
 
         // Only instructors can review, and reviewee cannot be excluded.
         return $isInstructor && $isParticipant;
@@ -126,14 +126,15 @@ class ActionValidator
     /**
      * Returns whether the specified user is permitted to delete attempts for this quiz
      *
-     * @param User $deleter
-     * @param User $participantUser
+     * @param User       $deleter
+     * @param User       $participantUser
+     * @param Quiz\Model $quiz
      * @return bool
      */
-    public function canDeleteAttempts(User $deleter, User $participantUser): bool
+    public function canDeleteAttempts(User $deleter, User $participantUser, Quiz\Model $quiz): bool
     {
-        $isInstructor  = $this->accessHelper->isInstructor($deleter, $this->quiz->getContext()->getFolder());
-        $isParticipant = $this->quiz->isParticipant($participantUser);
+        $isInstructor  = $this->accessHelper->isInstructor($deleter, $quiz->getContext()->getFolder());
+        $isParticipant = $quiz->isParticipant($participantUser);
 
         // Only instructors can delete, and participant cannot be excluded.
         return $isInstructor && $isParticipant;

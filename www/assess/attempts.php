@@ -20,6 +20,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
 $groupHandler = new Group();
 $assessHandler = new Assess_Main();
@@ -28,7 +29,11 @@ $attemptHandler = new Assess_Attempt();
 $responseHandler = new Assess_Response();
 [$quizId, $userId] = $this->arg;
 $assess = $assessHandler->getByID($quizId);
-
+/**
+ * @var SitePage $this
+ * @var Assessment\MapperProxy $assessmentMapperProxy
+ */
+$assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
 if (!$assess) {
     error(112);
@@ -73,8 +78,9 @@ catch (Mapper\Exception $e) {
  * This spec pattern only checks whether you can interact with a quiz -now-. It does not check whether you
  * could have interacted with it historically.
  */
-$actionValidator = new ActionValidator(Alaress_Date_Format::now(), $assessment, Access::getInstance());
-if (!$actionValidator->canSeeQuiz($_SESSION['user'])) {
+$quiz            = $assessmentMapperProxy->findByQuizId($assess['assess_id'], $user);
+$actionValidator = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
+if (!$actionValidator->canSeeQuiz($_SESSION['user'], $quiz)) {
     $this->pageNotFound();
 }
 
@@ -106,7 +112,7 @@ $this->setVar([
     'has_preview_link_block' => '',
 ]);
 
-$canDeleteAttempt = $actionValidator->canDeleteAttempts($_SESSION['user'], $user);
+$canDeleteAttempt = $actionValidator->canDeleteAttempts($_SESSION['user'], $user, $quiz);
 
 $perm = Access::getInstance()->getFolderAccess($_SESSION['user'], $assess['category_id']);
 

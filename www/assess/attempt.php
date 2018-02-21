@@ -74,8 +74,8 @@ $assessmentFolder = $assessment->getBaseContext()->getFolder();
 $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], $assessmentFolder->getId());
 
 // Ensure session user is permitted to attempt this quiz
-$actionValidator = new ActionValidator(Alaress_Date_Format::now(), $assessment, Access::getInstance());
-if (!$actionValidator->canAttemptQuiz($_SESSION['user'])) {
+$actionValidator = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
+if (!$actionValidator->canAttemptQuiz($_SESSION['user'], $assessment)) {
     $this->pageNotFound();
 }
 
