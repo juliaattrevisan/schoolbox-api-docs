@@ -264,21 +264,16 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
 
         // Customise and send to every participant in this plan only
-        foreach ($assessmentDomainObject->getPlans() as $assessmentPlan) {
-            if ($assessmentPlan->getId() !== $plan->getId()) {
+        foreach ($this->retrieveParticipantsFromPlan($plan, $assessmentDomainObject) as $participant) {
+            if ($participant->isExcluded()) {
                 continue;
             }
-            foreach ($assessmentPlan->getParticipants() as $participant) {
-                if ($participant->isExcluded()) {
-                    continue;
-                }
-                $href = $this->buildParticipantRoute($assessmentDomainObject, $participant->getUser());
-                $bob->setHref($href)
-                    ->setBody($participant->getDescription())
-                    ->setByline("Due {$participant->getDueDate()->getCalendarDateTime()}")
-                    ->setParam('box', new Param($assessmentDomainObject->getTitle(), $href));
-                $envelope->targetToUser($participant->getUser(), $bob->build());
-            }
+            $href = $this->buildParticipantRoute($assessmentDomainObject, $participant->getUser());
+            $bob->setHref($href)
+                ->setBody($participant->getDescription())
+                ->setByline("Due {$participant->getDueDate()->getCalendarDateTime()}")
+                ->setParam('box', new Param($assessmentDomainObject->getTitle(), $href));
+            $envelope->targetToUser($participant->getUser(), $bob->build());
         }
 
         return $envelope;
@@ -323,41 +318,36 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             ->addTopic("duework.$boxId.upcoming");
 
         // Customise and send to every participant in this plan only
-        foreach ($assessmentDomainObject->getPlans() as $assessmentPlan) {
-            if ($assessmentPlan->getId() !== $plan->getId()) {
+        foreach ($this->retrieveParticipantsFromPlan($plan, $assessmentDomainObject) as $participant) {
+            if ($participant->isExcluded()) {
                 continue;
             }
-            foreach ($assessmentPlan->getParticipants() as $participant) {
-                if ($participant->isExcluded()) {
-                    continue;
-                }
 
-                // Has participant already submitted?
-                if (!$participant->isResponseRequired()) {
-                    continue;
-                }
-
-                $href = $this->buildParticipantRoute($assessmentDomainObject, $participant->getUser());
-                $when = $participant->getDueDate()->getRelativeTime(Alaress_Date_Format::now()->addMinutes(-5), true);
-
-                // build for student
-                $bob->setTitle(":box is due $when from now in :cat")
-                    ->setHref($href)
-                    ->setBody($participant->getDescription())
-                    ->setParam('box', new Param($assessmentDomainObject->getTitle(), $href));
-                $envelope->targetToUser($participant->getUser(), $bob->build());
-
-                // build for parent, only if they're allowed
-                if ($this->conf->get('restrict_student_submissions')) {
-                    continue;
-                }
-                $bob->setTitle(":child has not yet submitted work for :box, which is due $when from now in :cat")
-                    ->setParam('child', new ChildParam($participant->getUser(), ParameterInterface::STACKING_REPLACE));
-                $envelope->targetToParent($participant->getUser(), $bob->build());
-
-                // Clear out the child param, as user doesn't have it
-                $bob->unsetParam('child');
+            // Has participant already submitted?
+            if (!$participant->isResponseRequired()) {
+                continue;
             }
+
+            $href = $this->buildParticipantRoute($assessmentDomainObject, $participant->getUser());
+            $when = $participant->getDueDate()->getRelativeTime(Alaress_Date_Format::now()->addMinutes(-5), true);
+
+            // build for student
+            $bob->setTitle(":box is due $when from now in :cat")
+                ->setHref($href)
+                ->setBody($participant->getDescription())
+                ->setParam('box', new Param($assessmentDomainObject->getTitle(), $href));
+            $envelope->targetToUser($participant->getUser(), $bob->build());
+
+            // build for parent, only if they're allowed
+            if ($this->conf->get('restrict_student_submissions')) {
+                continue;
+            }
+            $bob->setTitle(":child has not yet submitted work for :box, which is due $when from now in :cat")
+                ->setParam('child', new ChildParam($participant->getUser(), ParameterInterface::STACKING_REPLACE));
+            $envelope->targetToParent($participant->getUser(), $bob->build());
+
+            // Clear out the child param, as user doesn't have it
+            $bob->unsetParam('child');
         }
 
         return $envelope;
@@ -402,40 +392,35 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             ->addTopic("duework.$boxId.overdue");
 
         // Customise and send to every participant in this plan only
-        foreach ($assessmentDomainObject->getPlans() as $assessmentPlan) {
-            if ($assessmentPlan->getId() !== $plan->getId()) {
+        foreach ($this->retrieveParticipantsFromPlan($plan, $assessmentDomainObject) as $participant) {
+            if ($participant->isExcluded()) {
                 continue;
             }
-            foreach ($assessmentPlan->getParticipants() as $participant) {
-                if ($participant->isExcluded()) {
-                    continue;
-                }
 
-                // Has participant already submitted?
-                if (!$participant->isResponseRequired()) {
-                    continue;
-                }
-
-                $href = $this->buildParticipantRoute($assessmentDomainObject, $participant->getUser());
-
-                // build for student
-                $bob->setTitle(":box is now overdue in :cat")
-                    ->setHref($href)
-                    ->setBody($participant->getDescription())
-                    ->setParam('box', new Param($assessmentDomainObject->getTitle(), $href));
-                $envelope->targetToUser($participant->getUser(), $bob->build());
-
-                // build for parent, only if they're allowed
-                if ($this->conf->get('restrict_student_submissions')) {
-                    continue;
-                }
-                $bob->setTitle(':child did not submit work for :box in :cat')
-                    ->setParam('child', new ChildParam($participant->getUser(), ParameterInterface::STACKING_REPLACE));
-                $envelope->targetToParent($participant->getUser(), $bob->build());
-
-                // Clear out the child param, as user doesn't have it
-                $bob->unsetParam('child');
+            // Has participant already submitted?
+            if (!$participant->isResponseRequired()) {
+                continue;
             }
+
+            $href = $this->buildParticipantRoute($assessmentDomainObject, $participant->getUser());
+
+            // build for student
+            $bob->setTitle(":box is now overdue in :cat")
+                ->setHref($href)
+                ->setBody($participant->getDescription())
+                ->setParam('box', new Param($assessmentDomainObject->getTitle(), $href));
+            $envelope->targetToUser($participant->getUser(), $bob->build());
+
+            // build for parent, only if they're allowed
+            if ($this->conf->get('restrict_student_submissions')) {
+                continue;
+            }
+            $bob->setTitle(':child did not submit work for :box in :cat')
+                ->setParam('child', new ChildParam($participant->getUser(), ParameterInterface::STACKING_REPLACE));
+            $envelope->targetToParent($participant->getUser(), $bob->build());
+
+            // Clear out the child param, as user doesn't have it
+            $bob->unsetParam('child');
         }
 
         return $envelope;
@@ -483,24 +468,19 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             ->addTopic("duework.$boxId.closed");
 
         // Customise and send to every participant in this plan only
-        foreach ($assessmentDomainObject->getPlans() as $assessmentPlan) {
-            if ($assessmentPlan->getId() !== $plan->getId()) {
+        foreach ($this->retrieveParticipantsFromPlan($plan, $assessmentDomainObject) as $participant) {
+            if ($participant->isExcluded()) {
                 continue;
             }
-            foreach ($assessmentPlan->getParticipants() as $participant) {
-                if ($participant->isExcluded()) {
-                    continue;
-                }
 
-                // Has participant already submitted?
-                if (!$participant->isResponseRequired()) {
-                    continue;
-                }
-
-                // build for staff
-                $bob->setParam('student', new UserParam($participant->getUser()));
-                $envelope->broadcastToCategory($folder, UserAccess::ACCESS_WRITE, $bob->build());
+            // Has participant already submitted?
+            if (!$participant->isResponseRequired()) {
+                continue;
             }
+
+            // build for staff
+            $bob->setParam('student', new UserParam($participant->getUser()));
+            $envelope->broadcastToCategory($folder, UserAccess::ACCESS_WRITE, $bob->build());
         }
 
         return $envelope;
@@ -685,10 +665,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * participants.
      *
      * @param IAssessable $assessment
-     * @param Plan        $plan
+     * @param Model       $plan
      * @return \Generator|Participant[]
      */
-    private function retrieveParticipantsFromPlan(Plan $plan, IAssessable $assessment)
+    private function retrieveParticipantsFromPlan(Model $plan, IAssessable $assessment)
     {
         foreach ($assessment->getPlans() as $assessmentPlan) {
             if ($assessmentPlan->getId() !== $plan->getId()) {
