@@ -13,7 +13,8 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Learning\Assessment\Dehydrator;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\User;
 
 /**
@@ -31,6 +32,22 @@ class DehydratorTest extends TestCase
      */
     private $linker;
 
+    /**
+     * These fields are common to dehydrations of all assessables.
+     */
+    private $commonFields = [
+        'id'             => true,
+        'type'           => true,
+        'title'          => true,
+        'weight'         => true,
+        'markVisibility' => true,
+        'workType'       => true,
+        'participants'   => true,
+    ];
+
+    /**
+     * Setup stuff
+     */
     public function setUp()
     {
         $this->dehydrator = new Dehydrator();
@@ -38,38 +55,133 @@ class DehydratorTest extends TestCase
     }
 
     /**
-     * Test dehydration of due-work specific fields
+     * Test dehydration of common fields
      */
-    public function testDehydrateDueWork(): void
+    public function testDehydrateCommonFields(): void
     {
         // Create everything
         $dueWork = (new DueWork())
             ->setId(3)
-            ->setMaxMark(20)
+            ->setWeight(66)
             ->setSelfReviewability(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setTitle('Test Due Work')
             ->setMarkVisibility(DueWork::MARK_VISIBILITY_PARENT_STUDENT)
             // TODO move/copy this const to DueWork
             ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE);
 
+        // I'm only interested in the common fields for all assessment types,
+        // as defined in $this->commonFields.
+        $expected = [
+            'id'             => $dueWork->getId(),
+            'type'           => $dueWork->getFamilyName(),
+            'title'          => $dueWork->getTitle(),
+            'weight'         => $dueWork->getWeight(),
+            'markVisibility' => $dueWork->getMarkVisibility(),
+            'workType'       => null,
+            'participants'   => [],
+        ];
+        $actual = $this->dehydrator->dehydrate($dueWork);
+        $this->assertEquals($expected, array_intersect_key($actual, $this->commonFields));
+    }
+
+    /**
+     * Test dehydration of due-work-specific fields
+     */
+    public function testDehydrateDueWork(): void
+    {
+        // Create everything
+        $dueWork = (new DueWork())
+            ->setId(3)
+            ->setMarkVisibility(DueWork::MARK_VISIBILITY_PARENT_STUDENT)
+            // TODO move/copy this const to DueWork
+            ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE);
+
+        // I'm only interested in the specific fields for this assessment type.
+        $expected = [
+            'acceptOnline'      => $dueWork->getAcceptOnline(),
+            'selfReviewability' => $dueWork->getSelfReviewability(),
+        ];
+        $actual = $this->dehydrator->dehydrate($dueWork);
+        $this->assertEquals($expected, array_diff_key($actual, $this->commonFields));
+    }
+
+    /**
+     * Test dehydration of quiz-specific fields
+     */
+    public function testDehydrateQuiz(): void
+    {
+        // Create everything
+        $quiz = (new Quiz())
+            ->setId(3)
+            ->setWeight(66)
+            ->setTitle('Test Quiz')
+            ->setMarkVisibility(DueWork::MARK_VISIBILITY_PARENT_STUDENT)
+            ->setDuration(120)
+            ->setMaxAttempts(5);
+
+        // I'm only interested in the specific fields for this assessment type.
+        $expected = [
+            'duration'    => $quiz->getDuration(),
+            'maxAttempts' => $quiz->getMaxAttempts(),
+        ];
+        $actual = $this->dehydrator->dehydrate($quiz);
+        $this->assertEquals($expected, array_diff_key($actual, $this->commonFields));
+    }
+
+    /**
+     * Test dehydration of task-specific fields
+     */
+    public function testDehydrateTask(): void
+    {
+        // Create everything
+        $task = (new Task())
+            ->setId(3)
+            ->setTitle('Test Task')
+            ->setIsSelfAssessable(true)
+        ;
+
         // Don't bother testing the default fields, as they all match
         // I'm more interested in testing participants
         $expected = [
-            'id'                => $dueWork->getId(),
-            'type'              => $dueWork->getFamilyName(),
-            'title'             => $dueWork->getTitle(),
-            'weight'            => $dueWork->getWeight(),
-            'markVisibility'    => $dueWork->getMarkVisibility(),
-            'workType'          => null,
-            'acceptOnline'      => $dueWork->getAcceptOnline(),
-            'selfReviewability' => $dueWork->getSelfReviewability(),
-            'participants'      => [],
+            'selfAssessable' => $task->getIsSelfAssessable(),
         ];
 
-        $actual = $this->dehydrator->dehydrate($dueWork);
-        $this->assertEquals($expected, $actual);
+        $actual = $this->dehydrator->dehydrate($task);
+        $this->assertEquals($expected, array_diff_key($actual, $this->commonFields));
     }
 
+//    /**
+//     * Test dehydration of project-specific fields
+//     */
+//    public function testDehydrateProject(): void
+//    {
+//        // Create everything
+//        $dueWork = (new DueWork())
+//            ->setId(3)
+//            ->setMaxMark(20)
+//            ->setSelfReviewability(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+//            ->setTitle('Test Due Work')
+//            ->setMarkVisibility(DueWork::MARK_VISIBILITY_PARENT_STUDENT)
+//            // TODO move/copy this const to DueWork
+//            ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE);
+//
+//        // Don't bother testing the default fields, as they all match
+//        // I'm more interested in testing participants
+//        $expected = [
+//            'id'                => $dueWork->getId(),
+//            'type'              => $dueWork->getFamilyName(),
+//            'title'             => $dueWork->getTitle(),
+//            'weight'            => $dueWork->getWeight(),
+//            'markVisibility'    => $dueWork->getMarkVisibility(),
+//            'workType'          => null,
+//            'acceptOnline'      => $dueWork->getAcceptOnline(),
+//            'selfReviewability' => $dueWork->getSelfReviewability(),
+//            'participants'      => [],
+//        ];
+//
+//        $actual = $this->dehydrator->dehydrate($dueWork);
+//        $this->assertEquals($expected, $actual);
+//    }
 
     /**
      * Test dehydration of participant-specific fields
