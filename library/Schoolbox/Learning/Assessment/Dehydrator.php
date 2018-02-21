@@ -119,10 +119,6 @@ class Dehydrator
     public function diff(array $before, array $after): array
     {
         $diff = [];
-        // Only the same type of object may be diffed
-        if ($before['type'] !== $after['type']) {
-            return $diff;
-        }
 
         // We can assume all the same keys exist in $before and $after
         // (except project activities, but those are recursed)
