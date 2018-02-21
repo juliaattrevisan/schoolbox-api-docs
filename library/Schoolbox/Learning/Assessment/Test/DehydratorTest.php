@@ -58,7 +58,7 @@ class DehydratorTest extends TestCase
     /**
      * Test dehydration of common fields
      */
-    public function testDehydrateCommonFields(): void
+    public function testDehydrateAssessmentCommonFields(): void
     {
         // Create everything
         $dueWork = (new DueWork())
@@ -88,7 +88,7 @@ class DehydratorTest extends TestCase
     /**
      * Test dehydration of due-work-specific fields
      */
-    public function testDehydrateDueWork(): void
+    public function testDehydrateAssessmentDueWorkFields(): void
     {
         // Create everything
         $dueWork = (new DueWork())
@@ -109,7 +109,7 @@ class DehydratorTest extends TestCase
     /**
      * Test dehydration of quiz-specific fields
      */
-    public function testDehydrateQuiz(): void
+    public function testDehydrateAssessmentQuizFields(): void
     {
         // Create everything
         $quiz = (new Quiz())
@@ -132,7 +132,7 @@ class DehydratorTest extends TestCase
     /**
      * Test dehydration of task-specific fields
      */
-    public function testDehydrateTask(): void
+    public function testDehydrateAssessmentTaskFields(): void
     {
         // Create everything
         $task = (new Task())
@@ -154,7 +154,7 @@ class DehydratorTest extends TestCase
     /**
      * Test dehydration of project-specific fields
      */
-    public function testDehydrateProject(): void
+    public function testDehydrateAssessmentProjectFields(): void
     {
         // Create everything
         $project = (new Project())
@@ -246,7 +246,7 @@ class DehydratorTest extends TestCase
     /**
      * Test dehydration of participant-specific fields
      */
-    public function testDehydrateParticipants(): void
+    public function testDehydrateAssessmentParticipantFields(): void
     {
         $dueWork = (new DueWork())
             ->setDescription('This is a description of a test due work')
