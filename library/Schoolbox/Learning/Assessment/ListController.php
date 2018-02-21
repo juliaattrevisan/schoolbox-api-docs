@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Alaress\Diff\Differ;
 use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
 use DomainException;
@@ -332,10 +333,13 @@ class ListController extends Web\Controller\Base
          *
          * Controller must return early for that to happen
          */
+        $dehydrator = new Dehydrator();
+        $differ     = new Differ();
         try {
             // What kind of action is happening?
             $planMapper = $this->participantDataSource->getPlanMapper();
             $action     = $assessment ? $planMapper::METHOD_CREATE : $planMapper::METHOD_UPDATE;
+            $before     = $assessment ? $dehydrator->dehydrate($assessment) : [];
 
             /* Figure out what kind of assessment was chosen
              * and spawn a new instance of it to manipulate
@@ -356,6 +360,11 @@ class ListController extends Web\Controller\Base
 
             $this->saveParticipationData($plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
 
+            // I don't think plans got added to the assessment? Reload it.
+            // TODO add participants to swamp?
+            $assessment = $this->assessmentMapper->findByIdForReview($assessment->getId());
+            $after = $dehydrator->dehydrate($assessment);
+
             // Now, trigger notifiers
             // Participant object has little idea of whether assessment was created or updated,
             // so just show updated.
@@ -368,7 +377,7 @@ class ListController extends Web\Controller\Base
                     $action,
                     $plan,
                     $planMapper,
-                    [] // ¯\_(ツ)_/¯
+                    $differ->diff($before, $after)
                 );
             }
         }
