@@ -29,7 +29,7 @@
             <li class="icon-sport" title="{{ matchHeading.generate(match) }}">{{ match.name }}</li>
             {% endspaceless %}{% endif %}
             <li class="icon-calendar" title="{{ match.startAt.local }}">{{ match.startAt.long }} ({{ match.startAt.relativeTime }})</li>
-            <li class="icon-location">{{ match.venue.name }}</li>
+            <li class="icon-location">{{ match.venue.name }} {% if match.venue.address %}<a href="https://www.google.com/maps/place/{{ match.venue.address|url_encode }}" target="_blank">{{ match.venue.address }}{% endif %}</a></li>
 
             {% if forecast.hasResults %}
             <li class="{{ forecast.icon }}" title="{{ forecast.condition }}">{{ forecast.condition }}, {{ forecast.temp }}&deg;C</li>
