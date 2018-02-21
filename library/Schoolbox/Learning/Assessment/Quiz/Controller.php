@@ -148,8 +148,17 @@ class Controller extends Assessment\Controller
             return $this->getRouter()->generate('learningQuiz.getQuizIntro', ['assessmentId' => $assessment->getId()]);
         }
 
-        // Not a participant? But you still had access to this page?
+        $access = $this->getAccess()->getFolderAccess($this->getUser(), $assessment->getContext()->getFolder()->getId());
         $participant = $assessment->getParticipantIfExtant($student);
+        $now = \Alaress_Date_Format::now();
+
+        // A participant, but not staff or instructor, and we're past the close date?
+        if ($participant && $access <= UserAccess::ACCESS_WRITE && !$student->getRole()->isStaff() && $now->gt($participant->getCloseDate())) {
+            $quiz = $this->getQuizForAssessmentId($assessment->getId());
+            return "/assess/attempts/{$quiz->getId()}/{$student->getId()}";
+        }
+
+        // Not a participant? But you still had access to this page?
         if (!$participant || $participant->isExcluded()) {
             // Go to intro page (you may or may not see a 'Begin Quiz' button
             return $this->getRouter()->generate('learningQuiz.getQuizIntro', ['assessmentId' => $assessment->getId()]);
@@ -168,7 +177,7 @@ class Controller extends Assessment\Controller
         }
 
         // Is session user an instructor?
-        $access = $this->getAccess()->getFolderAccess($this->getUser(), $assessment->getContext()->getFolder()->getId());
+
         if ($latestAttempt && $access >= UserAccess::ACCESS_WRITE) {
             // Note that if an instructor is looking at their own summary, and has attempt/s, and wishes to re-attempt,
             // that action is available from attempts-list page.
