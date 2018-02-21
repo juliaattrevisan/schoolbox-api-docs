@@ -362,6 +362,7 @@ class ListController extends Web\Controller\Base
 
             // I don't think plans got added to the assessment? Reload it.
             // TODO add participants to swamp?
+            // TODO figure out why a user moved from dynamic to non-dynamic plan temporarily exists in both plans
             $assessment = $this->assessmentMapper->findByIdForReview($assessment->getId());
             $after = $dehydrator->dehydrateAssessmentIntoPlans($assessment);
 
@@ -369,7 +370,7 @@ class ListController extends Web\Controller\Base
             // Participant object has little idea of whether assessment was created or updated,
             // so just show updated.
             // Will need to rework actual notifs so they're verb-agnostic (besides delete)
-            foreach ($plans as $plan) {
+            foreach ($assessment->getPlans() as $plan) {
                 // I have NFI how I'm going to generate a diff for this item.
                 // Maybe I just need to keep the old sub box notifier around.
                 $beforePlan = $before[$plan->getId()] ?? [];
