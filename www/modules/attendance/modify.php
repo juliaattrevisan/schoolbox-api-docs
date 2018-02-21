@@ -114,7 +114,7 @@ try {
     /** @var Campus $selectedCampus */
     $selectedCampus = \Schoolbox\CampusMapper::getInstance()->findOneByColumn('ext_timetable_code', $this->arg[4]);
 } catch (MapperException $e) {
-    error(ErrorMapper::ERROR_DATE_FORMAT);
+    error(ErrorMapper::ERROR_CAMPUS_CODE);
 }
 
 // Get timetable definition
@@ -169,7 +169,7 @@ if ($class) {
         $allStudents = $attendanceHandler->findAttendanceRecords();
 
     } catch (ExternalException $e) {
-        error(ErrorMapper::ERROR_DATE_FORMAT);
+        error(ErrorMapper::ERROR_ATTENDANCE_LIST);
     } catch (SchoolboxException $e) {
         error(ErrorMapper::ERROR_ATTENDANCE_SEQUENCE);
     }
@@ -271,6 +271,5 @@ if ($class) {
     $this->setVar('ATTENDANCE_TOTAL', $attendanceTotal);
 
 } else {
-
-    error(ErrorMapper::ERROR_DATE_FORMAT);
+    error(ErrorMapper::ERROR_CLASS_CODE_NOT_FOUND);
 }
