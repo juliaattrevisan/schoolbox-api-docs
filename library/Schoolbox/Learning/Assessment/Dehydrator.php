@@ -130,7 +130,12 @@ class Dehydrator
             $afterValue = $after[$key] ?? null;
 
             // Is this scalar? Diff it now, otherwise recurse
-            if ($beforeValue !== $afterValue) {
+            if (\is_array($beforeValue) && \is_array($afterValue)) {
+                $recursedDiff = $this->diff($beforeValue, $afterValue);
+                if (!empty($recursedDiff)) {
+                    $diff[$key] = $recursedDiff;
+                }
+            } elseif ($beforeValue !== $afterValue) {
                 $diff[$key] = [$beforeValue, $afterValue];
             }
         }
