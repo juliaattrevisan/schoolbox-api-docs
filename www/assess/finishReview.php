@@ -36,11 +36,11 @@ $groupHandler = new Group();
 $sessionUser = $_SESSION['user'];
 
 if (!is_numeric($this->arg[0])) {
-    error(112);
+    error(Error\Mapper::ERROR_QUIZ_NOT_FOUND);
 }
 
 if (!is_numeric($this->arg[1])) {
-    error(118);
+    error(Error\Mapper::ERROR_ATTEMPT_NOT_FOUND);
 }
 
 if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
@@ -55,7 +55,7 @@ try {
 	$assess = $assessMapper->findById($this->arg[0]);
 }
 catch(\Schoolbox\Mapper\Exception $e) {
-	error(112);
+	error(Error\Mapper::ERROR_QUIZ_NOT_FOUND);
 	exit;
 }
 
@@ -64,37 +64,21 @@ try {
 	$attempt = $attemptMapper->findById($this->arg[1]);
 }
 catch(\Schoolbox\Mapper\Exception $e) {
-	error(118);
+	error(Error\Mapper::ERROR_ATTEMPT_NOT_FOUND);
 	exit;
-}
-
-try {
-    $user = UserMapper::getInstance()->findById($attempt['user_id']);
-}
-catch (Mapper\Exception $e) {
-    error(Error\Mapper::ERROR_USER_NOT_FOUND);
-}
-
-/* Check the folder exists meaningfully
- */
-try {
-    $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
-}
-catch (Mapper\Exception $e) {
-    error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
 }
 
 /** @var Assessment\MapperProxy $assessmentMapperProxy */
 $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 $quiz                  = $assessmentMapperProxy->findByQuizId($assess->getId());
 $actionValidator       = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
-if ($actionValidator->canReviewAttempts($sessionUser, $user, $quiz)) {
+if ($actionValidator->canReviewAttempts($sessionUser, $attempt->getUser(), $quiz)) {
     $this->pageNotFound();
 }
 
 
 if($assess->getUser()->getId() != $sessionUser->getId() && $groupHandler->getPermission($assess->getCategory()->getId()) < WRITE_ACCESS) {
-	error(127);
+	error(Error\Mapper::ERROR_PERM_TEST_REVIEW);
 }
 
 $attempt->setReviewed(Alaress_Date_Format::now());
