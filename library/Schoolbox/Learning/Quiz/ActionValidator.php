@@ -19,6 +19,10 @@ use Schoolbox\Learning\Assessment\Quiz;
  *
  * Implements the route perm responsibilities for the old quiz sub-system that are typically
  * handled by route auth rules in the new Aura system.
+ *
+ * Typically, you'd use any given test in two places:
+ * 1. To determine if a link should be shown, and
+ * 2. The same test should be repeated on the linked page and a 404 displayed if the test fails
  */
 class ActionValidator
 {
