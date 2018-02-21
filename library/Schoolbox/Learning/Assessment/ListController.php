@@ -339,7 +339,7 @@ class ListController extends Web\Controller\Base
             // What kind of action is happening?
             $planMapper = $this->participantDataSource->getPlanMapper();
             $action     = $assessment ? $planMapper::METHOD_CREATE : $planMapper::METHOD_UPDATE;
-            $before     = $assessment ? $dehydrator->dehydrate($assessment) : [];
+            $before     = $assessment ? $dehydrator->dehydrateAssessment($assessment) : [];
 
             /* Figure out what kind of assessment was chosen
              * and spawn a new instance of it to manipulate
@@ -363,7 +363,7 @@ class ListController extends Web\Controller\Base
             // I don't think plans got added to the assessment? Reload it.
             // TODO add participants to swamp?
             $assessment = $this->assessmentMapper->findByIdForReview($assessment->getId());
-            $after = $dehydrator->dehydrate($assessment);
+            $after = $dehydrator->dehydrateAssessment($assessment);
 
             // Now, trigger notifiers
             // Participant object has little idea of whether assessment was created or updated,

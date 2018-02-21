@@ -27,7 +27,7 @@ class Dehydrator
      * @param IAssessable $assessment
      * @return array
      */
-    public function dehydrate(IAssessable $assessment): array
+    public function dehydrateAssessment(IAssessable $assessment): array
     {
         $dehydrated = $this->internalDehydrateAssessment($assessment);
 
@@ -35,7 +35,7 @@ class Dehydrator
         if ($assessment instanceof Project) {
             $activities = [];
             foreach ($assessment->getAssessables() as $activity) {
-                $activities[$activity->getId()] = $this->dehydrate($activity);
+                $activities[$activity->getId()] = $this->dehydrateAssessment($activity);
             }
             $dehydrated += [
                 'activities' => $activities,

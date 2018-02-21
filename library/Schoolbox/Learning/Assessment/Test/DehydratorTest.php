@@ -81,7 +81,7 @@ class DehydratorTest extends TestCase
             'workType'       => null,
             'participants'   => [],
         ];
-        $actual = $this->dehydrator->dehydrate($dueWork);
+        $actual = $this->dehydrator->dehydrateAssessment($dueWork);
         $this->assertEquals($expected, array_intersect_key($actual, $this->commonFields));
     }
 
@@ -102,7 +102,7 @@ class DehydratorTest extends TestCase
             'acceptOnline'      => $dueWork->getAcceptOnline(),
             'selfReviewability' => $dueWork->getSelfReviewability(),
         ];
-        $actual = $this->dehydrator->dehydrate($dueWork);
+        $actual = $this->dehydrator->dehydrateAssessment($dueWork);
         $this->assertEquals($expected, array_diff_key($actual, $this->commonFields));
     }
 
@@ -125,7 +125,7 @@ class DehydratorTest extends TestCase
             'duration'    => $quiz->getDuration(),
             'maxAttempts' => $quiz->getMaxAttempts(),
         ];
-        $actual = $this->dehydrator->dehydrate($quiz);
+        $actual = $this->dehydrator->dehydrateAssessment($quiz);
         $this->assertEquals($expected, array_diff_key($actual, $this->commonFields));
     }
 
@@ -147,7 +147,7 @@ class DehydratorTest extends TestCase
             'selfAssessable' => $task->getIsSelfAssessable(),
         ];
 
-        $actual = $this->dehydrator->dehydrate($task);
+        $actual = $this->dehydrator->dehydrateAssessment($task);
         $this->assertEquals($expected, array_diff_key($actual, $this->commonFields));
     }
 
@@ -221,7 +221,7 @@ class DehydratorTest extends TestCase
             ->add($dueWork)
             ->add($quiz);
 
-        $actual = $this->dehydrator->dehydrate($project);
+        $actual = $this->dehydrator->dehydrateAssessment($project);
 
         // Test activity titles
         $this->assertEquals($task->getTitle(), $actual['activities'][$task->getId()]['title']);
@@ -353,7 +353,7 @@ class DehydratorTest extends TestCase
             ],
         ];
 
-        $actual = $this->dehydrator->dehydrate($dueWork);
+        $actual = $this->dehydrator->dehydrateAssessment($dueWork);
         $this->assertEquals(
             $expected['participants'][$participantA->getUser()->getId()],
             $actual['participants'][$participantA->getUser()->getId()]
