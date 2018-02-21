@@ -348,7 +348,7 @@ class ListController extends Web\Controller\Base
             // Note: in the returned collection
             //    - any plans CREATED by this method will be NEGATIVELY INDEXED (the object has a real ID though)
             //    - any plans UPDATED by this method will be ID INDEXED
-            $plans = $this->savePlanData($assessmentId, $postData['plans'] ?? []);
+            $plans = $this->savePlanData($assessment, $postData['plans'] ?? []);
 
             $this->saveParticipationData($plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
         }
@@ -438,15 +438,17 @@ class ListController extends Web\Controller\Base
      * and the new plans specified by $postPlans. New plans will be persisted to the database (and thus have a real
      * ID), but in the returned collection, they will be NEGATIVELY INDEXED, as given in $postPlans.
      *
-     * @param int         $assessmentId
+     * @param IAssessable $assessment
      * @param array       $postPlans
      * @return GenericCollection|ParticipantModels\Plan\Model[]
      * @throws UnexpectedValueException
      * @throws PDOException
      * @throws Mapper\Exception
      */
-    private function savePlanData(int $assessmentId, array $postPlans = [])
+    private function savePlanData(IAssessable $assessment, array $postPlans = [])
     {
+
+        $assessmentId = $assessment->getId();
         $dateFields = [ 'publish_date',  'open_date', 'due_date', 'close_date', 'created_at', 'updated_at' ];
 
         $planMap = $this->participantDataSource->getPlanMapper();
@@ -460,12 +462,11 @@ class ListController extends Web\Controller\Base
         foreach ($postPlans as $planId => $planData) {
             // if planId == 0, it's either the dyna-plan or invalid data, but ignorable either way
 
-            //Handle tasks, which do not post this data
-            if (empty($planData['open_date'])) {
-                $planData['open_date'] = $planData['publish_date'];
-            }
 
-            if (empty($planData['close_date'])) {
+            //Handle assessments that do no accept submissions:
+            if (($assessment->getTypeName() == "Due Work" && $assessment->getAcceptOnline() == 0) ||
+                $assessment->getTypeName() == "Task"  ) {
+                $planData['open_date'] = $planData['publish_date'];
                 $planData['close_date'] = $planData['due_date'];
             }
 

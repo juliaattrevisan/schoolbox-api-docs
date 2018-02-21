@@ -209,8 +209,6 @@
             console.log("HALP");
         }
 
-        var dates = this.options.getAvailableDateFields();
-
         // Validate plan form
         $('#participation-plan-form').alaressValidate({
             rules: {
@@ -254,10 +252,10 @@
                     'id': newPlan ? newPlanId : oldPlanId,
                     'name': $customiseModal.find('#plan-name').val(),
                     'description': CKEDITOR.instances['plan-desc'].getData(),
-                    'publishDate':  $.inArray('publish', dates) != -1 ? $customiseModal.find('#plan-publish-date').val() : null,
-                    'openDate': $.inArray('open', dates) != -1 ? $customiseModal.find('#plan-open-date').val() : null,
-                    'dueDate': $.inArray('due', dates) != -1 ? $customiseModal.find('#plan-due-date').val() : null,
-                    'closeDate': $.inArray('close', dates) != -1 ? $customiseModal.find('#plan-close-date').val() : null
+                    'publishDate': $customiseModal.find('#plan-publish-date').val(),
+                    'openDate': $customiseModal.find('#plan-open-date').val(),
+                    'dueDate': $customiseModal.find('#plan-due-date').val(),
+                    'closeDate': $customiseModal.find('#plan-close-date').val()
                 };
 
                 newPlan ? addPlanData(planDetails) : updatePlanData(planDetails);
