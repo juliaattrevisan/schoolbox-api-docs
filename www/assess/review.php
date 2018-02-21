@@ -16,7 +16,9 @@
 
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
 
@@ -94,6 +96,14 @@ try {
 }
 catch (Mapper\Exception $e) {
     error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
+}
+
+/* Excluded participants 404
+ */
+$actionValidator = new ActionValidator(\Alaress_Date_Format::now(), Access::getInstance());
+
+if (!$actionValidator->canReviewAttempts($_SESSION['user'], $user, $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], $user))) {
+    $this->pageNotFound();
 }
 
 /* Find out whether the attempt has been previously finalised
