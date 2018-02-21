@@ -62,9 +62,11 @@ catch (Mapper\Exception $e) {
 /* Check if you are in this category, so you can't submit other category's
  * online assessments unless you are a part of that category.
  */
-$assessment       = $assessmentDataSource->findByQuizId($assess['assess_id'], $_SESSION['user']);
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser      =  $_SESSION['user'];
+$assessment       = $assessmentDataSource->findByQuizId($assess['assess_id'], $sessionUser);
 $assessmentFolder = $assessment->getBaseContext()->getFolder();
-$accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], $assessmentFolder->getId());
+$accessLevel      = Access::getInstance()->getFolderAccess($sessionUser, $assessmentFolder->getId());
 $readOnly         = true;
 
 /* Special case: participation isn't guaranteed at this point
@@ -74,12 +76,12 @@ $plan = [];
 
 // Check the current session user is permitted to visit this page
 $actionValidator = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
-if (!$actionValidator->canSeeQuiz($_SESSION['user'], $assessment)) {
+if (!$actionValidator->canSeeQuiz($sessionUser, $assessment)) {
     $this->pageNotFound();
 }
 
 // Does session user have a participation? If so, use CAP details.
-$participant         = $assessment->getParticipantIfExtant($_SESSION['user']);
+$participant         = $assessment->getParticipantIfExtant($sessionUser);
 $plan['description'] = trim($participant ? $participant->getDescription() : $assessment->getDescription());
 $plan['start']       = $participant ? $participant->getOpenDate() : $assessment->getOpenAt();
 $plan['finish']      = $participant ? $participant->getDueDate() : $assessment->getDueAt();
@@ -92,7 +94,7 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
     }
 
     // If we are here, either user is learner staff, or a learner participant
-    if (!$user->getRole()->isStaff() && (!$participant || Alaress_Date_Format::now()->gt($participant->getCloseDate()))) {
+    if (!$sessionUser->getRole()->isStaff() && (!$participant || Alaress_Date_Format::now()->gt($participant->getCloseDate()))) {
         // In addition to being able to see the existence of the assessment, non-staff Learners cannot visit this page after their close date
         $this->pageNotFound();
     }
@@ -131,7 +133,7 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
 }
 
 // Hide the CTA if session user is not permitted to attempt
-$readOnly = !$actionValidator->canAttemptQuiz($_SESSION['user'], $assessment);
+$readOnly = !$actionValidator->canAttemptQuiz($sessionUser, $assessment);
 
 
 /* Continue once you get past checks
