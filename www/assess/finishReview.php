@@ -72,7 +72,7 @@ catch(\Schoolbox\Mapper\Exception $e) {
 $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 $quiz                  = $assessmentMapperProxy->findByQuizId($assess->getId());
 $actionValidator       = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
-if ($actionValidator->canReviewAttempts($sessionUser, $attempt->getUser(), $quiz)) {
+if (!$actionValidator->canReviewAttempts($sessionUser, $attempt->getUser(), $quiz)) {
     $this->pageNotFound();
 }
 
