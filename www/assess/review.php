@@ -14,8 +14,13 @@
  * @version     SVN: $Id$
  */
 
-use \Schoolbox\Learning\Assessment\AbstractAssessment;
+use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Quiz\ActionValidator;
+use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Folder;
+use Schoolbox\UserMapper;
 
 $factory = new Assess_Factory();
 $assessHandler = new Assess_Main();
@@ -74,6 +79,33 @@ if (is_numeric($this->arg[2])) {
     error(114);
 }
 
+try {
+    $user = UserMapper::getInstance()->findById($attempt['user_id']);
+}
+catch (Mapper\Exception $e) {
+    error(Error\Mapper::ERROR_USER_NOT_FOUND);
+}
+
+/* Show current Section's data, and other mandatory tokens needed to complete
+ * the Assessment.
+ */
+/* Check the folder exists meaningfully
+ */
+try {
+    $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
+}
+catch (Mapper\Exception $e) {
+    error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
+}
+
+/* Excluded participants 404
+ */
+$actionValidator = new ActionValidator(\Alaress_Date_Format::now(), Access::getInstance());
+
+if (!$actionValidator->canReviewAttempts($_SESSION['user'], $user, $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], $user))) {
+    $this->pageNotFound();
+}
+
 /* Find out whether the attempt has been previously finalised
  */
 if ($attempt['reviewed_at'] != '') {
@@ -81,8 +113,6 @@ if ($attempt['reviewed_at'] != '') {
 } else {
     $reviewedAt = 'false';
 }
-
-$user = $userHandler->getByID($attempt['user_id']);
 
 /* Set up template
  */
@@ -103,15 +133,6 @@ $this->setBlock('endAssess', 'writable_finalise', 'writable_finalise_block');
 $this->setBlock('endAssess', 'writable_resubmit', 'writable_resubmit_block');
 $this->setTitle('Assessment: ' . Scrub::text($assess['title']));
 
-/* Show current Section's data, and other mandatory tokens needed to complete
- * the Assessment.
- */
-try {
-    $folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assess['category_id']);
-} catch (Schoolbox\Mapper\Exception $e) {
-    error(112);
-    exit;
-}
 $openDate = new Alaress_Date_Format($assess['start'], Alaress_Date_Format::DATABASE_FORMAT);
 $dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 $attemptDate = new Alaress_Date_Format($attempt['start'], Alaress_Date_Format::DATABASE_FORMAT);
@@ -141,7 +162,7 @@ $this->setVar(
         'SECTION_TITLE' => Scrub::text($section['title']),
         'SECTION_DESCRIPTION' => Scrub::html($section['description']),
         'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
-        'RESPONDENT_NAME' => $userHandler->formatName($user),
+        'RESPONDENT_NAME' => $user->formatName(),
         'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),
         'ASSESS_CATEGORY_ID' => $folder->getId(),
         'ASSESS_DUEWORK_TERM' => $term->getCode(),

@@ -12,8 +12,12 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-use \Schoolbox\Permission\Access\Access;
-use \Schoolbox\Permission\Access\UserAccess;
+
+use Schoolbox\Error;
+use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder;
 
 $factory         = new Assess_Factory();
 $assessHandler   = new Assess_Main();
@@ -50,6 +54,15 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 
 if (!$section) {
     error(115);
+}
+
+/* Check the folder exists meaningfully
+ */
+try {
+    $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
+}
+catch (Mapper\Exception $e) {
+    error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
 }
 
 if (!$attempt) {

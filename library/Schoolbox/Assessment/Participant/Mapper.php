@@ -11,8 +11,10 @@ use PDO;
 use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Participant\Plan;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
 /**
  * @method Model hydrate(array $row, $alias = '', $callback = null)
@@ -32,6 +34,21 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('excluded_at', self::TYPE_DATETIME);
+    }
+
+
+    /**
+     * @param Assessment\Model $assessment
+     * @param User             $user
+     * @return Model|null
+     * @throws BaseMapper\Exception
+     */
+    public function findForAssessmentAndUser(Assessment\Model $assessment, User $user): ?Model
+    {
+        return $this->findByColumnList([
+            'pp.assessment_id' => $assessment->getId(),
+            'user_id'          => $user->getId(),
+        ])->first();
     }
 
 

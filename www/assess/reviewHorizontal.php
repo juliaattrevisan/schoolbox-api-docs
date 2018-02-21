@@ -13,12 +13,17 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Breadcrumbs;
-use Schoolbox\Mapper\Exception as MapperException;
+
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Breadcrumbs;
+use Schoolbox\Error;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Folder;
+use Schoolbox\UserMapper;
 
 $factory = new Assess_Factory();
 $assessHandler = new Assess_Main();
@@ -44,23 +49,17 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 	error(112);
 }
 
-try {
-	$category = FolderMapper::getInstance()->findById($assess['category_id']);
-} catch (MapperException $e) {
-	error(112);
-	exit;
-}
-
 if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
 	error(127);
 }
 
+/* Check the folder exists meaningfully
+ */
 try {
-    $folderMapper = new FolderMapper();
-    $folder = $folderMapper->findById($assess['category_id']);
+    $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
 }
-catch (MapperException $e) {
-    error(117);
+catch (Mapper\Exception $e) {
+    error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
 }
 
 $dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
@@ -184,8 +183,8 @@ else {
 		'ASSESS_FINISH' => $dueDate->getShort(),
 		'SECTION_TITLE' => Scrub::text($section['title']),
 		'QUESTION_TITLE' => Scrub::html($question['question']),
-		'ASSESS_CATEGORY_ID' => $category->getId(),
-		'ASSESS_CATEGORY_NAME' => Scrub::text($category->getName()),
+		'ASSESS_CATEGORY_ID' => $folder->getId(),
+		'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),
 		'visible_staff_block'                  => '',
 		'visible_staff_students_block'         => '',
 		'visible_staff_students_parents_block' => '',
@@ -211,12 +210,30 @@ else {
 	 */
 	$allAttempts = $attemptHandler->getAllAttemptsForQuestion($question['question_id']);
 
-	if ($allAttempts) {
-		$j = 1;
-		foreach ($allAttempts as $currentAttempt) {
+    $this->setVar('attempt_block', '');
 
-			/* Load answer template into answerOption block
-			 */
+	if ($allAttempts) {
+		$j = 0;
+
+        $assessment = $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], null);
+        $actionValidator = new ActionValidator(\Alaress_Date_Format::now(), Access::getInstance());
+
+		foreach ($allAttempts as $currentAttempt) {
+            try {
+                $user = UserMapper::getInstance()->findById($currentAttempt['user_id']);
+            }
+            catch (Mapper\Exception $e) {
+                continue;
+            }
+
+            /* Excluded participants are ignored
+             */
+            if (!$actionValidator->canReviewAttempts($_SESSION['user'], $user, $assessment)) {
+                continue;
+            }
+
+            /* Load answer template into answerOption block
+             */
 			$this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($currentAttempt['type_id']) . '/reviewBottom.html');
 			$this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 
@@ -268,10 +285,12 @@ else {
 
 			$this->setVar('answerFormFragment', '');
 			$this->setVar('answerInputs_block', '');
+
+			/* increment count of number of attempts
+			 * some attempts might have been skipped
+			 */
+			$j++;
 		}
-	}
-	else {
-		$this->setVar('attempt_block', '');
 	}
 
 	/* Navigation tools

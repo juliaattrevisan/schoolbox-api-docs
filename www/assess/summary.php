@@ -10,8 +10,6 @@
 
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Learning\Authorizer\Rule\IsModifyUnLocked;
-use Schoolbox\Learning\Assessment\LockedChecker;
 
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();

@@ -12,54 +12,76 @@
  * @version     SVN: $Id$
  */
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Learning\Quiz\ActionValidator;
+use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
-use \Schoolbox\Permission\Access\Access;
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
 $groupHandler = new Group();
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
 $attemptHandler = new Assess_Attempt();
 $responseHandler = new Assess_Response();
-
-$assess = $assessHandler->getByID($this->arg[0]);
+[$quizId, $userId] = $this->arg;
+$assess = $assessHandler->getByID($quizId);
+/**
+ * @var SitePage $this
+ * @var Assessment\MapperProxy $assessmentMapperProxy
+ */
+$assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
 if (!$assess) {
     error(112);
 }
 
-if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
+if (!$assessHandler->isValidUrlAccess($quizId)) {
     $this->pageNotFound();
 }
 
-if ($assessHandler->isDeleted($this->arg[0])) {
+if ($assessHandler->isDeleted($quizId)) {
     error(112);
 }
 
-if (!is_numeric($this->arg[1])) {
+if (!is_numeric($userId)) {
 	error(19);
 }
 
-if ($groupHandler->isStudent() && ($_SESSION['user']->getId() != $this->arg[1])) {
+if ($groupHandler->isStudent() && ($_SESSION['user']->getId() != $userId)) {
 	error(19);
 }
 
 try {
     $userMapper = UserMapper::getInstance();
-    $user = $userMapper->findById($this->arg[1]);
+    $user = $userMapper->findById($userId);
 } catch (Schoolbox\Mapper\Exception $e) {
     error(19);
     exit;
 }
 
+/* Check the folder exists meaningfully
+ */
 try {
-    $folderMapper = new FolderMapper();
-    $folder = $folderMapper->findById($assess['category_id']);
+    $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
 }
-catch (\Exception $e) {
-    error(117);
+catch (Mapper\Exception $e) {
+    error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
+}
+
+/* Non-participants are sent to a 404 screen
+ *
+ * TODO: This will cause problems now that the spec patterns include the plan dates
+ * This spec pattern only checks whether you can interact with a quiz -now-. It does not check whether you
+ * could have interacted with it historically.
+ */
+$quiz            = $assessmentMapperProxy->findByQuizId($assess['assess_id'], $user);
+$actionValidator = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
+if (!$actionValidator->canSeeQuiz($_SESSION['user'], $quiz)) {
+    $this->pageNotFound();
 }
 
 $this->setFile(TEMPLATE_content, 'assess/attempts.html');
@@ -90,14 +112,11 @@ $this->setVar([
     'has_preview_link_block' => '',
 ]);
 
-/* Only Instructors can delete attempts
- */
-$canDeleteAttempt = false;
+$canDeleteAttempt = $actionValidator->canDeleteAttempts($_SESSION['user'], $user, $quiz);
 
 $perm = Access::getInstance()->getFolderAccess($_SESSION['user'], $assess['category_id']);
 
 if ($perm >= UserAccess::ACCESS_WRITE) {
-    $canDeleteAttempt = true;
 
     $this->setVar([
         'ASSESS_ID' => $assess['assess_id']
@@ -109,7 +128,7 @@ if ($perm >= UserAccess::ACCESS_WRITE) {
 
 /* Iterate
  */
-$allAttempts = $attemptHandler->getListForUser($this->arg[0], $this->arg[1]);
+$allAttempts = $attemptHandler->getListForUser($quizId, $userId);
 
 if (is_array($allAttempts) && count($allAttempts)) {
     $i = 0;
@@ -126,10 +145,10 @@ if (is_array($allAttempts) && count($allAttempts)) {
         $canStudentReview = false;
         $reviewUrl = 'studentReview';
 
-        $firstSection = $sectionHandler->getFirst($this->arg[0]);
+        $firstSection = $sectionHandler->getFirst($quizId);
 
         $this->setVar(array(
-            'ATTEMPT_ASSESS_ID' => $this->arg[0],
+            'ATTEMPT_ASSESS_ID' => $quizId,
             'ATTEMPT_SECTION_ID' => $firstSection['section_id'],
             'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
         ));
@@ -175,7 +194,7 @@ if (is_array($allAttempts) && count($allAttempts)) {
                     $canReview = true;
                     $reviewUrl = 'review';
                 }
-                elseif ($groupHandler->isStudent() || $groupHandler->isParentOfChild($this->arg[1])) {
+                elseif ($groupHandler->isStudent() || $groupHandler->isParentOfChild($userId)) {
                     $canStudentReview = true;
                 }
 			}

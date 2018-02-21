@@ -257,6 +257,8 @@ interface IAssessable extends ISoftDeletable
      *
      * Returns null rather than throwing exception if $user is not a participant
      *
+     * Includes excluded participation objects
+     *
      * @param User $user
      * @return Participant|null
      */

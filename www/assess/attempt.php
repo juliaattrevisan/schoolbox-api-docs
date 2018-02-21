@@ -9,10 +9,13 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\Quiz\ActionValidator;
+use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder;
 
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
@@ -54,6 +57,15 @@ if (!$section) {
     error(115);
 }
 
+/* Check the folder exists meaningfully
+ */
+try {
+    $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
+}
+catch (Mapper\Exception $e) {
+    error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
+}
+
 /* Check if you are in this category, so you can't submit other category's
  * online assessments unless you are a part of that category.
  */
@@ -61,25 +73,16 @@ $assessment       = $assessmentDataSource->findByQuizId($assess['assess_id'], $_
 $assessmentFolder = $assessment->getBaseContext()->getFolder();
 $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], $assessmentFolder->getId());
 
+// Ensure session user is permitted to attempt this quiz
+$actionValidator = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
+if (!$actionValidator->canAttemptQuiz($_SESSION['user'], $assessment)) {
+    $this->pageNotFound();
+}
+
 if ($accessLevel < UserAccess::ACCESS_WRITE) {
     // I can't attempt a spec assessment
     if ($assessment->isSpecification()) {
         error(19);
-    }
-
-    // I can't do this if not a participant
-    if (!$assessment->isParticipant($_SESSION['user'])) {
-        error(19);
-    }
-
-    // I can't attempt this if it has expired
-    if ($assessHandler->isExpired($assess['assess_id'])) {
-        error(120);
-    }
-
-    // I can't attempt this if it isn't open
-    if (!$assessHandler->isOpen($assess)) {
-        error(143);
     }
 
 } else {

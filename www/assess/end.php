@@ -8,15 +8,17 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Breadcrumbs;
+use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\Learning\Assessment\Visibility;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Breadcrumbs;
-use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Resource\Folder;
 
 $assessHandler   = new Assess_Main();
 $attemptHandler  = new Assess_Attempt();
@@ -44,6 +46,15 @@ if (!($attempt['user_id'] == $_SESSION['user']->getId() && $attempt['assess_id']
     error(123);
 }
 
+/* Check the folder exists meaningfully
+ */
+try {
+    $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
+}
+catch (Mapper\Exception $e) {
+    error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
+}
+
 /* Disabled: doing so will allow teachers to give their test a "dry run" and
  * they can delete their attempts afterwards
 
@@ -62,24 +73,17 @@ $assessment       = $assessmentDataSource->findByQuizId($assess['assess_id'], $_
 $assessmentFolder = $assessment->getBaseContext()->getFolder();
 $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], $assessmentFolder->getId());
 
+$actionValidator = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
+if (!$actionValidator->canAttemptQuiz($_SESSION['user'], $assessment)) {
+    $this->pageNotFound();
+}
+
+
 if ($accessLevel < UserAccess::ACCESS_WRITE) {
     // I can't attempt a spec assessment
     if ($assessment->isSpecification()) {
         error(19);
     }
-
-    // I can't do this if not a participant
-    if (!$assessment->isParticipant($_SESSION['user'])) {
-        error(19);
-    }
-
-    // I can end this quiz if it has expired
-
-    // I can't attempt this if it isn't open
-    if (!$assessHandler->isOpen($assess)) {
-        error(143);
-    }
-
 } else {
     // I can do whatever I want
 }
