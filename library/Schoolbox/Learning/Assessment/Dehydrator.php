@@ -43,6 +43,7 @@ class Dehydrator
         }
 
         // Dehydrate participants too
+        $dehydrated['participants'] = [];
         foreach ($assessment->getAllParticipants() as $participant) {
             $dehydratedParticipant         = $this->internalDehydrateParticipant($participant);
             $dehydratedParticipant['plan'] = $this->internalDehydratePlan($participant->getPlan());
@@ -75,7 +76,6 @@ class Dehydrator
                     'name' => $assessment->getWorkType()->getName(),
                 ]
                 : null,
-            'participants'   => [],
         ];
 
         // Due-work specific
