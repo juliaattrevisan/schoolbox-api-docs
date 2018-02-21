@@ -461,11 +461,11 @@ class ListController extends Web\Controller\Base
             // if planId == 0, it's either the dyna-plan or invalid data, but ignorable either way
 
             //Handle tasks, which do not post this data
-            if (!isset($planData['open_date']) || $planData['open_date'] == "") {
+            if (empty($planData['open_date'])) {
                 $planData['open_date'] = $planData['publish_date'];
             }
 
-            if (!isset($planData['close_date']) || $planData['close_date'] == "") {
+            if (empty($planData['close_date'])) {
                 $planData['close_date'] = $planData['due_date'];
             }
 
