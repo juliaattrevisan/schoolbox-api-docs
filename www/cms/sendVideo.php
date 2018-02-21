@@ -9,7 +9,9 @@
 
 use Schoolbox\Resource\LogMapper;
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php';
+require_once __DIR__ . '/../../conf/core/require.php';
+spl_autoload_call('Schoolbox\\Application\\BasicRequest');
+$kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
 $type = $_GET['type'];
 $id   = $_GET['id'];

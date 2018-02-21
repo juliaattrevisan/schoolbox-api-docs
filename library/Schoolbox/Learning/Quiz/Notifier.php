@@ -233,7 +233,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
         $quizName = $quiz->getTitle();
 
-        $icon = "/portrait?userId={$owner->getExternalId()}&size={$this->iconSize}";
+        $icon = "/portrait.php?userId={$owner->getExternalId()}&size={$this->iconSize}";
         $href = "/assess/intro/$quizId";
 
         $indefArticle = in_array(strtolower($quizType[0]), ['a', 'e', 'i', 'o', 'u']) ? 'an' : 'a';

@@ -356,7 +356,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                 'user' => new UserParam($user, ParameterInterface::STACKING_REPLACE),
                 'cat'  => new CategoryParam($folder),
             ])
-            ->setIcon("/portrait?userId=$authorExtId&size={$this->iconSize}")
+            ->setIcon("/portrait.php?userId=$authorExtId&size={$this->iconSize}")
             ->setNamespace($this->getSlug())
             ->addTopic("duework.$boxId.open")
             ->addFilter('roletype', array(Role::STUDENT))
@@ -431,7 +431,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             return $envelope;
         }
 
-        $bob->setIcon("/portrait?userId={$user->getExternalId()}&size=square64")
+        $bob->setIcon("/portrait.php?userId={$user->getExternalId()}&size=square64")
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
             ->addFilter('roletype', [Role::STUDENT]);
@@ -679,7 +679,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         foreach ($unsubmittedStudents as $student) {
             $href    = $this->buildParticipantRoute($submissionBox, $student);
             // target the parents of this particular student
-            $bob->setIcon('/portrait?size=square64&userId=' . $student->getExternalId())
+            $bob->setIcon('/portrait.php?size=square64&userId=' . $student->getExternalId())
                 ->setHref($href)
                 ->setParam('child', new UserParam($student, ParameterInterface::STACKING_REPLACE, '{firstname}'))
                 ->setParam('boxname', new Param($submissionBox->getName(), $href));
@@ -732,7 +732,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             return $envelope;
         }
 
-        $bob->setIcon("/portrait?userId={$user->getExternalId()}&size=square64")
+        $bob->setIcon("/portrait.php?userId={$user->getExternalId()}&size=square64")
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
             ->addFilter('roletype', [Role::PARENT]);

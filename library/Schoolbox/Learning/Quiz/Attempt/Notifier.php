@@ -161,7 +161,7 @@ class Notifier extends AbstractModuleNotifier {
 			))
 			->setNamespace($this->getSlug())
 			->setSeverity(Logger::NOTICE)
-			->setIcon("/portrait?size={$this->iconSize}&userId=".$student->getExternalId())
+			->setIcon("/portrait.php?size={$this->iconSize}&userId=".$student->getExternalId())
 			->setHref($href)
 			->addTopic("assess.$assessId.attempted")
 			->setFilter([
@@ -205,7 +205,7 @@ class Notifier extends AbstractModuleNotifier {
 		$bob->setSeverity(Logger::NOTICE)
 			->setNamespace($this->getSlug())
 			->setHref($href)
-			->setIcon("/portrait?size={$this->iconSize}&userId=".$teacher->getExternalId())
+			->setIcon("/portrait.php?size={$this->iconSize}&userId=".$teacher->getExternalId())
 			->setTitle(":staff has marked your attempt of :quiz in :cat")
 			->setParams(array(
 				'staff' => new UserParam($teacher),
@@ -251,7 +251,7 @@ class Notifier extends AbstractModuleNotifier {
 		$bob->setSeverity(Logger::NOTICE)
 		    ->setNamespace($this->getSlug())
 		    ->setHref($href)
-		    ->setIcon("/portrait?size={$this->iconSize}&userId=".$teacher->getExternalId())
+		    ->setIcon("/portrait.php?size={$this->iconSize}&userId=".$teacher->getExternalId())
 		    ->setTitle(":staff has marked :child's attempt of :quiz in :cat")
 		    ->setParams(array(
 			    'staff' => new UserParam($teacher),
