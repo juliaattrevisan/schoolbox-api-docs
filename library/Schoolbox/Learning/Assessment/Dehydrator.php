@@ -95,9 +95,11 @@ class Dehydrator
                     'name'    => $plan->getName(),
                     'dynamic' => $plan->getIsDynamic(),
                 ],
-                'user'        => [
-                    'id'      => $user->getId(),
-                    'name'    => $user->formatName(),
+                'user'          => [
+                    'id'        => $user->getId(),
+                    'title'     => $user->getTitle(),
+                    'firstname' => $user->getFirstname(),
+                    'lastname'  => $user->getLastname(),
                 ]
             ];
         }
