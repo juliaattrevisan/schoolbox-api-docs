@@ -112,63 +112,63 @@ class Dehydrator
      *
      * This has to be done recursively
      *
-     * @param array $before
-     * @param array $after
+     * @param array $a
+     * @param array $b
      * @return array
      * @throws \InvalidArgumentException if somewhere in the process an array
      *                                   gets diffed with a non-null scalar
      */
-    public function diff(array $before, array $after): array
+    public function diff(array $a, array $b): array
     {
-        return $this->diffInternal($before, $after, '');
+        return $this->diffInternal($a, $b, '');
     }
 
     /**
-     * Internal diff generation: it tracks the path that is being diffed.
+     * Internal diff generation: it tracks the path that is being diffed, so
+     * that if an `\InvalidARgumentExcpoetionc
      *
-     * @param array  $before
-     * @param array  $after
+     * @param array  $a
+     * @param array  $b
      * @param string $path
      * @return array
      * @throws \InvalidArgumentException if somewhere in the process an array
      *                                   gets diffed with a non-null scalar
      */
-    private function diffInternal(array $before, array $after, string $path): array
+    private function diffInternal(array $a, array $b, string $path): array
     {
         $diff = [];
 
-        // Ensure all the same keys exist in $before and $after
-        foreach (array_diff_key($before, $after) as $key => $_) {
-            $after[$key] = \is_array($before[$key]) ? [] : null;
+        // Ensure all the same keys exist in $a and $b
+        foreach (array_diff_key($a, $b) as $key => $_) {
+            $b[$key] = \is_array($a[$key]) ? [] : null;
         }
-        foreach (array_diff_key($after, $before) as $key => $_) {
-            $before[$key] = \is_array($after[$key]) ? [] : null;
+        foreach (array_diff_key($b, $a) as $key => $_) {
+            $a[$key] = \is_array($b[$key]) ? [] : null;
         }
 
-        // We can assume all the same keys exist in $before and $after
-        // (except project activities, but those are recursed)
-        foreach ($before as $key => $beforeValue) {
-            $afterValue = $after[$key];
-            $thisPath   = $path . $key;
+        // Check each value
+        foreach ($a as $key => $aValue) {
+            $bValue   = $b[$key];
+            $thisPath = $path . $key;
 
-            // Both beforeValue and afterValue must be arrays, or neither may be.
+            // Both $aValue and $bValue must be arrays, or neither may be.
             // If one is and another isn't: that's an error
-            $isBeforeArray = \is_array($beforeValue);
-            $isAfterArray  = \is_array($afterValue);
-            if ($isBeforeArray xor $isAfterArray) {
+            $aIsArray = \is_array($aValue);
+            $bIsArray = \is_array($bValue);
+            if ($aIsArray xor $bIsArray) {
                 throw new \InvalidArgumentException(
                     sprintf('Cannot diff array with a non-array in key "%s"', $thisPath)
                 );
             }
 
             // Is this scalar? Diff it now, otherwise recurse
-            if (\is_array($beforeValue) && \is_array($afterValue)) {
-                $recursedDiff = $this->diffInternal($beforeValue, $afterValue, $thisPath . '.');
+            if ($aIsArray && $bIsArray) {
+                $recursedDiff = $this->diffInternal($aValue, $bValue, $thisPath . '.');
                 if (!empty($recursedDiff)) {
                     $diff[$key] = $recursedDiff;
                 }
-            } elseif ($beforeValue !== $afterValue) {
-                $diff[$key] = [$beforeValue, $afterValue];
+            } elseif ($aValue !== $bValue) {
+                $diff[$key] = [$aValue, $bValue];
             }
         }
         return $diff;
