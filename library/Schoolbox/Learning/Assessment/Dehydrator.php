@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizModel;
 use Schoolbox\Learning\Assessment\Task\Model as TaskModel;
+use Schoolbox\User;
 
 /**
  * Dehydrator for IAssessable objects.
@@ -82,29 +83,64 @@ class Dehydrator
 
         // Dehydrate participants too
         foreach ($assessment->getAllParticipants() as $participant) {
-            $user = $participant->getUser();
-            $plan = $participant->getPlan();
-            $dehydrated['participants'][$participant->getUser()->getId()] = [
-                'description' => $participant->getDescription(),
-                'publishDate' => $participant->getPublishDate()->getDatabase(),
-                'openDate'    => $participant->getOpenDate()->getDatabase(),
-                'dueDate'     => $participant->getDueDate()->getDatabase(),
-                'closeDate'   => $participant->getCloseDate()->getDatabase(),
-                'excluded'    => $participant->isExcluded(),
-                'plan'        => [
-                    'id'      => $plan->getId(),
-                    'name'    => $plan->getName(),
-                    'dynamic' => $plan->getIsDynamic(),
-                ],
-                'user'          => [
-                    'id'        => $user->getId(),
-                    'title'     => $user->getTitle(),
-                    'firstname' => $user->getFirstname(),
-                    'lastname'  => $user->getLastname(),
-                ]
-            ];
+            $dehydratedParticipant = $this->dehydrateParticipant($participant);
+            $dehydratedParticipant['plan'] = $this->dehydratePlan($participant->getPlan());
+            $dehydratedParticipant['user'] = $this->dehydrateUser($participant->getUser());
+            $dehydrated['participants'][$participant->getUser()->getId()] = $dehydratedParticipant;
         }
 
         return $dehydrated;
+    }
+
+
+    /**
+     * Helper for dehydrating a participant.
+     *
+     * @param Participant $participant
+     * @return array
+     */
+    private function dehydrateParticipant(Participant $participant): array
+    {
+        return [
+            'description' => $participant->getDescription(),
+            'publishDate' => $participant->getPublishDate()->getDatabase(),
+            'openDate'    => $participant->getOpenDate()->getDatabase(),
+            'dueDate'     => $participant->getDueDate()->getDatabase(),
+            'closeDate'   => $participant->getCloseDate()->getDatabase(),
+            'excluded'    => $participant->isExcluded(),
+        ];
+    }
+
+
+    /**
+     * Helper for dehydrating a plan.
+     *
+     * @param Plan $plan
+     * @return array
+     */
+    private function dehydratePlan(Plan $plan): array
+    {
+        return [
+            'id'      => $plan->getId(),
+            'name'    => $plan->getName(),
+            'dynamic' => $plan->getIsDynamic(),
+        ];
+    }
+
+
+    /**
+     * Helper for dehydrating a user.
+     *
+     * @param User $user
+     * @return array
+     */
+    private function dehydrateUser(User $user): array
+    {
+        return [
+            'id'        => $user->getId(),
+            'title'     => $user->getTitle(),
+            'firstname' => $user->getFirstname(),
+            'lastname'  => $user->getLastname(),
+        ];
     }
 }
