@@ -56,6 +56,31 @@ class Dehydrator
 
 
     /**
+     * Dehydrates participation plan, for purpose of generating a diff.
+     *
+     * Expected general usage is to call this on each plan in an assessment
+     * before and after it gets saved, and then use that diff in a notifier.
+     *
+     * @param Plan $plan
+     * @return array
+     */
+    public function dehydratePlan(Plan $plan): array
+    {
+        $dehydrated               = $this->internalDehydratePlan($plan);
+        $dehydrated['assessment'] = $this->internalDehydrateAssessment($plan->getAssessable());
+
+        // Dehydrate participants too
+        foreach ($plan->getParticipants() as $participant) {
+            $dehydratedParticipant         = $this->internalDehydrateParticipant($participant);
+            $dehydratedParticipant['user'] = $this->internalDehydrateUser($participant->getUser());
+            $dehydrated['participants'][$participant->getUser()->getId()] = $dehydratedParticipant;
+        }
+
+        return $dehydrated;
+    }
+
+
+    /**
      * Helper for dehydrating an assessment.
      *
      * @param IAssessable $assessment

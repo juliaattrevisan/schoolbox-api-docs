@@ -367,4 +367,86 @@ class DehydratorTest extends TestCase
             $actual['participants'][$participantC->getUser()->getId()]
         );
     }
+
+
+    /**
+     * Test dehydration of plan
+     */
+    public function testDehydratePlan(): void
+    {
+        $dueWork = (new DueWork())
+            ->setDescription('This is a description of a test due work')
+            ->setPublishAt(new \Alaress_Date_Format('2018-01-01 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setOpenAt(new \Alaress_Date_Format('2018-01-02 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setDueAt(new \Alaress_Date_Format('2018-01-03 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCloseAt(new \Alaress_Date_Format('2018-01-04 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $plan = $this->linker->createAndLinkPlan($dueWork, true)
+                             ->setName('Plan');
+        $participantA = $this->linker->createAndLinkParticipant(
+            (new User())
+                ->setId(1)
+                ->setFirstname('Aaron')
+                ->setLastname('Aaronson'),
+            $plan
+        );
+
+        // Boot out Barry
+        $participantB = $this->linker->createAndLinkParticipant(
+            (new User())
+                ->setId(2)
+                ->setFirstname('Barry')
+                ->setLastname('Barryson'),
+            $plan
+        );
+        $participantB->setExcludedAt(\Alaress_Date_Format::now());
+
+        $expected = [
+            'id'           => $plan->getId(),
+            'name'         => $plan->getName(),
+            'dynamic'      => $plan->getIsDynamic(),
+            'participants' => [
+                $participantA->getUser()->getId() => [
+                    'description' => $participantA->getDescription(),
+                    'publishDate' => $participantA->getPublishDate()->getDatabase(),
+                    'openDate'    => $participantA->getOpenDate()->getDatabase(),
+                    'dueDate'     => $participantA->getDueDate()->getDatabase(),
+                    'closeDate'   => $participantA->getCloseDate()->getDatabase(),
+                    'excluded'    => $participantA->isExcluded(),
+                    'user'          => [
+                        'id'        => $participantA->getUser()->getId(),
+                        'title'     => $participantA->getUser()->getTitle(),
+                        'firstname' => $participantA->getUser()->getFirstname(),
+                        'lastname'  => $participantA->getUser()->getLastname(),
+                    ]
+                ],
+                $participantB->getUser()->getId() => [
+                    'description' => $participantB->getDescription(),
+                    'publishDate' => $participantB->getPublishDate()->getDatabase(),
+                    'openDate'    => $participantB->getOpenDate()->getDatabase(),
+                    'dueDate'     => $participantB->getDueDate()->getDatabase(),
+                    'closeDate'   => $participantB->getCloseDate()->getDatabase(),
+                    'excluded'    => $participantB->isExcluded(),
+                    'user'          => [
+                        'id'        => $participantB->getUser()->getId(),
+                        'title'     => $participantB->getUser()->getTitle(),
+                        'firstname' => $participantB->getUser()->getFirstname(),
+                        'lastname'  => $participantB->getUser()->getLastname(),
+                    ]
+                ],
+            ],
+            'assessment' => [
+                'id'                => $dueWork->getId(),
+                'type'              => $dueWork->getFamilyName(),
+                'title'             => $dueWork->getTitle(),
+                'weight'            => $dueWork->getWeight(),
+                'markVisibility'    => $dueWork->getMarkVisibility(),
+                'workType'          => null,
+                'acceptOnline'      => $dueWork->getAcceptOnline(),
+                'selfReviewability' => $dueWork->getSelfReviewability(),
+            ],
+        ];
+
+        $this->assertEquals($expected, $this->dehydrator->dehydratePlan($plan));
+    }
 }
