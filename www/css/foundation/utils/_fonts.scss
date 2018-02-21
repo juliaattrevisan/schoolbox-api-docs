@@ -245,7 +245,8 @@
 }
 
 .icon-due-work:before,
-.icon-submissions:before {
+.icon-submissions:before,
+.icon-import:before {
     content: '\e622';
     font-family: $font-family-icon;
 }
@@ -592,6 +593,8 @@
     font-family: $font-family-icon;
     display: inline-block;
     transform: rotateY(180deg);
+    padding-left: 10px;
+    padding-right: 0;
 }
 
 .icon-resource-booking:before {

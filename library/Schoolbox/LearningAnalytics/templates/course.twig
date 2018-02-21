@@ -268,9 +268,9 @@
         <a class="icon-more" title="Filter Options" data-dropdown="result-filter-options"></a>
     </nav>
     <ul id="result-filter-options" class="f-dropdown" data-dropdown-content>
-        <li><a href="{{ routeLookup('learningAnalytics.'~route~'WithTerm', routeArgs) }}" class="icon-due-work" title="All">All</a></li>
+        <li><a href="{{ routeLookup('learningAnalytics.'~route~'WithTerm', routeArgs) }}" title="All">All</a></li>
         {% for submissionType in submissionTypes %}
-        <li><a href="{{ routeLookup('learningAnalytics.'~route~'WithSubmissionTypeAndTerm', routeArgs|merge({submissionTypeId: submissionType.id})) }}" class='icon-due-work' title="{{ submissionType.name }}">{{ submissionType.name }}</a></li>
+        <li><a href="{{ routeLookup('learningAnalytics.'~route~'WithSubmissionTypeAndTerm', routeArgs|merge({submissionTypeId: submissionType.id})) }}" title="{{ submissionType.name }}">{{ submissionType.name }}</a></li>
         {% endfor %}
     </ul>
 </div>
