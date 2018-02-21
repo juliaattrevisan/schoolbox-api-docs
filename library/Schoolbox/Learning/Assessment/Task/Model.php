@@ -190,28 +190,27 @@ class Model extends AbstractAssessment
         // Not a participant ?
         if(!$this->isParticipant($learner)){
             return false;
-        } else {
-            // Not open ?
-            if(!$this->isOpen($learner)){
-                return false;
-            }
-
-            // Must be self-assessable
-            if(!$this->isSelfAssessable()){
-                return false;
-            }
-
-            // If teacher has marked as complete, then student cannot alter back to 'incomplete'
-            /** @var TaskResponse $latestResponse */
-            $latestResponse = $this->getParticipant($learner)->findMostRecentSubmittedResponse();
-            if ($latestResponse && !$latestResponse->isSelfAssessed() && $latestResponse->getMarkedComplete()) {
-                return false;
-            }
-
-            // Task is open, self-assessable, and not yet marked by the teacher as 'complete'
-            return true;
         }
 
+        // Not open ?
+        if(!$this->isOpen($learner)){
+            return false;
+        }
+
+        // Must be self-assessable
+        if(!$this->isSelfAssessable()){
+            return false;
+        }
+
+        // If teacher has marked as complete, then student cannot alter back to 'incomplete'
+        /** @var TaskResponse $latestResponse */
+        $latestResponse = $this->getParticipant($learner)->findMostRecentSubmittedResponse();
+        if ($latestResponse && !$latestResponse->isSelfAssessed() && $latestResponse->getMarkedComplete()) {
+            return false;
+        }
+
+        // Task is open, self-assessable, and not yet marked by the teacher as 'complete'
+        return true;
     }
 
     /**
