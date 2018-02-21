@@ -190,7 +190,7 @@ class MapperProxy
      *
      * @param int  $quizId
      * @param User $student If provided, load only this student's participation
-     * @return IAssessable
+     * @return IAssessable|\Schoolbox\Learning\Assessment\Quiz\Model
      * @throws MapperException\Deleted if the quiz is deleted
      * @throws DomainException If user has interaction but not participant record
      * @throws DefinitionException If unable to locate a specified mapper join

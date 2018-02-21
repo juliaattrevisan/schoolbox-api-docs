@@ -17,19 +17,23 @@
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
-use Schoolbox\Learning\Quiz\ValidUserCanInteractWithAssessment;
+use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
 
 $attemptsToDelete = [];
 
+/** @var Assessment\MapperProxy $assessmentMapperProxy */
+$assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 $assessHandler   = new Assess_Main();
 $attemptHandler  = new Assess_Attempt();
 $responseHandler = new Assess_Response();
 $groupHandler    = new Group();
 
-$getAttempt = function ($attemptId) use ($assessmentDataSource, $attemptHandler, $assessHandler, $groupHandler) {
+
+$getAttempt = function ($attemptId) use ($assessmentMapperProxy, $attemptHandler, $assessHandler, $groupHandler) {
     if (!is_numeric($attemptId)) {
         throw \Schoolbox\Error\Mapper::getInstance()->generateException(Schoolbox\Error\Mapper::ERROR_PERM_ATTEMPT_DELETE);
     }
@@ -51,24 +55,22 @@ $getAttempt = function ($attemptId) use ($assessmentDataSource, $attemptHandler,
     }
     catch (Mapper\Exception $e) {
         error(Error\Mapper::ERROR_USER_NOT_FOUND);
+        die();
     }
 
     /* Check the folder exists meaningfully
      */
     try {
-        $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
+        Folder\Mapper::getInstance()->findById($assess['category_id']);
     }
     catch (Mapper\Exception $e) {
         error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
     }
 
-    $assessment = $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], $attempt['user_id']);
-
-    /* Non-participants are sent to a 404 screen
-     */
-    $canInteract = new ValidUserCanInteractWithAssessment(Alaress_Date_Format::now(), $assessment, \Schoolbox\Permission\Access\Access::getInstance());
-
-    if (!$canInteract->isSatisfiedBy($_SESSION['user'])) {
+    // It appears this controller can be called with unrelated attemptIds, so need to load each attempt's quiz.
+    $assessment      = $assessmentMapperProxy->findByQuizId($assess['assess_id'], $user);
+    $actionValidator = new ActionValidator(Alaress_Date_Format::now(), $assessment, Access::getInstance());
+    if (!$actionValidator->canDeleteAttempts($_SESSION['user'], $user)) {
         $this->pageNotFound();
     }
 

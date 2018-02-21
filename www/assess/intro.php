@@ -13,8 +13,7 @@
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\Learning\Quiz\ValidUserCanInteractWithAssessment;
-use Schoolbox\Learning\Quiz\ValidUserCanViewAssessment;
+use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\Access;
@@ -90,21 +89,22 @@ catch (\UnexpectedValueException $e) {
     $plan['close'] = $assessment->getCloseAt();
 }
 
+// Check the current session user is permitted to visit this page
+$actionValidator = new ActionValidator(Alaress_Date_Format::now(), $assessment, Access::getInstance());
+if (!$actionValidator->canSeeQuiz($_SESSION['user'])) {
+    $this->pageNotFound();
+}
+
+
 if ($accessLevel < UserAccess::ACCESS_WRITE) {
     // I can't attempt a spec assessment
     if ($assessment->isSpecification()) {
         error(19);
     }
 
-    /* Non-participating learners are sent to a 404 scree
-     *
-     * At this point in time, $assessment has been fully populated with participation, both static and dynamic.
-     * No further DB calls are necessary to determine membership, the domain model can be interacted with as-is.
-     */
-    $viewSatisfaction = (new ValidUserCanViewAssessment(Alaress_Date_Format::now(), $assessment, Access::getInstance()))
-        ->isSatisfiedBy($_SESSION['user']);
-
-    if (!$viewSatisfaction) {
+    // If we are here, either user is learner staff, or a learner participant
+    if (!$user->getRole()->isStaff() && (!$participant || Alaress_Date_Format::now()->gt($participant->getCloseDate()))) {
+        // In addition to being able to see the existence of the assessment, non-staff Learners cannot visit this page after their close date
         $this->pageNotFound();
     }
 
@@ -139,19 +139,11 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
             error(146);
         }
     }
-
-    /* Non-participators have the call-to-action hidden instead of 404
-     */
-    $interactSatisfaction = (new ValidUserCanInteractWithAssessment(Alaress_Date_Format::now(), $assessment, Access::getInstance()))
-        ->isSatisfiedBy($_SESSION['user'], $folder, $assessment);
-
-    if ($interactSatisfaction) {
-        $readOnly = false;
-    }
 }
-else {
-    $readOnly = false;
-}
+
+// Hide the CTA if session user is not permitted to attempt
+$readOnly = !$actionValidator->canAttemptQuiz($_SESSION['user']);
+
 
 /* Continue once you get past checks
  */

@@ -12,9 +12,9 @@ use Schoolbox\Breadcrumbs;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\Learning\Quiz\ValidUserCanInteractWithAssessment;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -73,13 +73,11 @@ $assessment       = $assessmentDataSource->findByQuizId($assess['assess_id'], $_
 $assessmentFolder = $assessment->getBaseContext()->getFolder();
 $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], $assessmentFolder->getId());
 
-/* Non-participants are sent to a 404 screen
- */
-$canInteract = new ValidUserCanInteractWithAssessment(Alaress_Date_Format::now(), $assessment, \Schoolbox\Permission\Access\Access::getInstance());
-
-if (!$canInteract->isSatisfiedBy($_SESSION['user'])) {
+$actionValidator = new ActionValidator(Alaress_Date_Format::now(), $assessment, Access::getInstance());
+if (!$actionValidator->canAttemptQuiz($_SESSION['user'])) {
     $this->pageNotFound();
 }
+
 
 if ($accessLevel < UserAccess::ACCESS_WRITE) {
     // I can't attempt a spec assessment

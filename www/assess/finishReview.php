@@ -1,4 +1,6 @@
 <?php
+
+use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
@@ -15,8 +17,10 @@ use Schoolbox\Learning\Quiz\Model as Quiz;
 
 use Schoolbox\Error;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
 /**
  * u r in a sitepage
@@ -79,6 +83,15 @@ try {
 catch (Mapper\Exception $e) {
     error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
 }
+
+/** @var Assessment\MapperProxy $assessmentMapperProxy */
+$assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+$quiz                  = $assessmentMapperProxy->findByQuizId($assess->getId());
+$actionValidator       = new ActionValidator(Alaress_Date_Format::now(), $quiz, Access::getInstance());
+if ($actionValidator->canReviewAttempts($sessionUser, $user)) {
+    $this->pageNotFound();
+}
+
 
 if($assess->getUser()->getId() != $sessionUser->getId() && $groupHandler->getPermission($assess->getCategory()->getId()) < WRITE_ACCESS) {
 	error(127);

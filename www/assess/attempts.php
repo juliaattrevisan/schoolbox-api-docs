@@ -13,9 +13,8 @@
  */
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Error;
-use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Learning\Quiz\ValidUserCanInteractWithAssessment;
+use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -70,14 +69,12 @@ catch (Mapper\Exception $e) {
 
 /* Non-participants are sent to a 404 screen
  *
- * TODO: This will cause problems mow that the spec patterns include the plan dates
+ * TODO: This will cause problems now that the spec patterns include the plan dates
  * This spec pattern only checks whether you can interact with a quiz -now-. It does not check whether you
  * could have interacted with it historically.
  */
-$assessment = $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], $_SESSION['user']);
-$canInteract = new ValidUserCanInteractWithAssessment(Alaress_Date_Format::now(), $assessment, Access::getInstance());
-
-if (!$canInteract->isSatisfiedBy($_SESSION['user'])) {
+$actionValidator = new ActionValidator(Alaress_Date_Format::now(), $assessment, Access::getInstance());
+if (!$actionValidator->canSeeQuiz($_SESSION['user'])) {
     $this->pageNotFound();
 }
 
@@ -109,14 +106,11 @@ $this->setVar([
     'has_preview_link_block' => '',
 ]);
 
-/* Only Instructors can delete attempts
- */
-$canDeleteAttempt = false;
+$canDeleteAttempt = $actionValidator->canDeleteAttempts($_SESSION['user'], $user);
 
 $perm = Access::getInstance()->getFolderAccess($_SESSION['user'], $assess['category_id']);
 
 if ($perm >= UserAccess::ACCESS_WRITE) {
-    $canDeleteAttempt = true;
 
     $this->setVar([
         'ASSESS_ID' => $assess['assess_id']

@@ -11,7 +11,6 @@
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Quiz;
-use Schoolbox\Learning\Quiz\ValidUserCanInteractWithAssessment;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -67,9 +66,8 @@ $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], $a
 
 /* Non-participants are sent to a 404 screen
  */
-$canInteract = new ValidUserCanInteractWithAssessment(Alaress_Date_Format::now(), $assessment, \Schoolbox\Permission\Access\Access::getInstance());
-
-if (!$canInteract->isSatisfiedBy($_SESSION['user'])) {
+$actionValidator = new Quiz\ActionValidator(Alaress_Date_Format::now(), $assessment, Access::getInstance());
+if (!$actionValidator->canAttemptQuiz($_SESSION['user'])) {
     $this->pageNotFound();
 }
 
