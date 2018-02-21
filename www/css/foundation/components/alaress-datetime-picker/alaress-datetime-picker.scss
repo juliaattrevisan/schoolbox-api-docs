@@ -50,11 +50,10 @@ input.datepicker-input {
      */
     .flatpickr-calendar {
         border-radius: 0;
-        margin-top: 1rem;
+        margin: 1rem auto;
         border: $pickr-border;
         box-shadow: none;
         position: static;
-        width: auto;
 
         &.arrowTop:before,
         &.arrowTop:after {
@@ -101,10 +100,6 @@ input.datepicker-input {
         span.cur-month:hover {
             background: transparent;
         }
-    }
-
-    .flatpickr-days {
-        width: auto;
     }
 
     .flatpickr-day {
@@ -212,10 +207,13 @@ input.datepicker-input {
     /**
      * Timetable picker
      */
+    [data-adtp-tt-picker] > div {
+        margin-bottom: .75rem;
+    }
+
     .adtp-tt-container {
         border: $pickr-border;
         padding: 0.75rem;
-        margin-bottom: .25rem;
 
         .day-picker {
             width: 100%;
@@ -322,19 +320,17 @@ input.datepicker-input {
 
     // Medium up
     @media #{$medium-up} {
-
         .adtp-response {
             margin-top: 0;
         }
     }
-
 
     /**
      * Submit button
      */
     a.picker-submit,
     a.timetable-submit {
-        margin-top: 1.25rem;
+        margin-top: .75rem;
     }
 
 }
