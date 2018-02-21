@@ -15,7 +15,10 @@
         planData: '#plan-data',
         participants: '#participants',
         participantSettings: '#participation-settings',
-        customiseModal: '#participant-customise-modal'
+        customiseModal: '#participant-customise-modal',
+        getAvailableDateFields: function() {
+            return ['publish', 'open', 'due', 'close'];
+        }
     };
 
     /**
@@ -202,6 +205,12 @@
         }
 
 
+        if (undefined === this.options.getAvailableDateFields) {
+            console.log("HALP");
+        }
+
+        var dates = this.options.getAvailableDateFields();
+
         // Validate plan form
         $('#participation-plan-form').alaressValidate({
             rules: {
@@ -241,30 +250,15 @@
                 var oldPlanId = $customiseModal.find('#plan-id').val();
                 var newPlanId = -1 * self.newPlanCount;
 
-                var planDetails = {};
-                var assessmentType = $('[name=assessmentType]').val();
-
-                if (assessmentType !== 'task') {
-                    planDetails = {
-                        'id': newPlan ? newPlanId : oldPlanId,
-                        'name': $customiseModal.find('#plan-name').val(),
-                        'description': CKEDITOR.instances['plan-desc'].getData(),
-                        'publishDate': $customiseModal.find('#plan-publish-date').val(),
-                        'openDate': $customiseModal.find('#plan-open-date').val(),
-                        'dueDate': $customiseModal.find('#plan-due-date').val(),
-                        'closeDate': $customiseModal.find('#plan-close-date').val()
-                    };
-                } else {
-                    planDetails = {
-                        'id': newPlan ? newPlanId : oldPlanId,
-                        'name': $customiseModal.find('#plan-name').val(),
-                        'description': CKEDITOR.instances['plan-desc'].getData(),
-                        'publishDate': $customiseModal.find('#plan-publish-date').val(),
-                        'openDate': null,
-                        'dueDate': $customiseModal.find('#plan-due-date').val(),
-                        'closeDate': null
-                    };
-                }
+                var planDetails = {
+                    'id': newPlan ? newPlanId : oldPlanId,
+                    'name': $customiseModal.find('#plan-name').val(),
+                    'description': CKEDITOR.instances['plan-desc'].getData(),
+                    'publishDate':  $.inArray('publish', dates) != -1 ? $customiseModal.find('#plan-publish-date').val() : null,
+                    'openDate': $.inArray('open', dates) != -1 ? $customiseModal.find('#plan-open-date').val() : null,
+                    'dueDate': $.inArray('due', dates) != -1 ? $customiseModal.find('#plan-due-date').val() : null,
+                    'closeDate': $.inArray('close', dates) != -1 ? $customiseModal.find('#plan-close-date').val() : null
+                };
 
                 newPlan ? addPlanData(planDetails) : updatePlanData(planDetails);
 
@@ -575,7 +569,9 @@
         var $planOpenDate = $customiseModal.find('#plan-open-date');
         var $planDueDate = $customiseModal.find('#plan-due-date');
         var $planCloseDate = $customiseModal.find('#plan-close-date');
-        var $assessmentType = $('[name=assessmentType]').val();
+
+        var options = $.extend(true, {}, defaults, options);
+        var dates = options.getAvailableDateFields();
 
         var participantArray = $(defaults.participants).find('[data-participant-select]').map(function(){
             var obj = {id: $(this).data('userId'), name: $(this).data('userName')};
@@ -601,17 +597,31 @@
         // Destroy and reinit CKEditor
         reinitCKE();
 
-        // Disable dates if assessment doesn't accept online submissions
-        if ($assessmentType === 'task') {
+        // Disable/hide dates if they aren't in the config
+        if ($.inArray('publish', dates) == -1) {
+            $('#plan-publish-date').closest('[data-plan-date-container]').addClass('hide');
+        } else {
+            $('#plan-publish-date').closest('[data-plan-date-container]').removeClass('hide');
+        }
+
+        if ($.inArray('open', dates) == -1) {
+        // Disable/hi
             $('#plan-open-date').closest('[data-plan-date-container]').addClass('hide');
-            $('#plan-open-date').prop('disabled', true);
-            $('#plan-close-date').closest('[data-plan-date-container]').addClass('hide');
-            $('#plan-close-date').prop('disabled', true);
         } else {
             $('#plan-open-date').closest('[data-plan-date-container]').removeClass('hide');
-            $('#plan-open-date').prop('disabled', false);
+        }
+
+        if ($.inArray('due', dates) == -1) {
+            $('#plan-due-date').closest('[data-plan-date-container]').addClass('hide');
+        } else {
+            $('#plan-due-date').closest('[data-plan-date-container]').removeClass('hide');
+        // Disable/hi
+        }
+
+        if ($.inArray('close', dates) == -1) {
+            $('#plan-close-date').closest('[data-plan-date-container]').addClass('hide');
+        } else {
             $('#plan-close-date').closest('[data-plan-date-container]').removeClass('hide');
-            $('#plan-close-date').prop('disabled', false);
         }
 
         // Fill the selectize with the checked students
