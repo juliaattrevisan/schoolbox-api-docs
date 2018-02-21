@@ -25,7 +25,7 @@ Data:
                 responseId: responseId,
                 response: currentFeedback.response,
                 assessment: assessment,
-                student: student
+                student: currentFeedback.response.submittedOnBehalfOf,
             }) %}
             {% set tooltip = 'Resume ' ~ locale.selfAssessment.proper %}
         {% elseif currentFeedback.isSelfReflectionOnly %}
@@ -35,7 +35,7 @@ Data:
                 responseId: responseId,
                 response: currentFeedback.response,
                 assessment: assessment,
-                student: student
+                student: currentFeedback.response.submittedOnBehalfOf,
             }) %}
             {% set tooltip = 'Resume ' ~ locale.selfReflection.proper %}
         {% else %}
@@ -45,7 +45,7 @@ Data:
                 responseId: responseId,
                 response: currentFeedback.response,
                 assessment: assessment,
-                student: student
+                student: currentFeedback.response.submittedOnBehalfOf,
             }) %}
             {% set tooltip = 'Resume Inline ' ~ locale.grading.proper %}
         {% endif %}
