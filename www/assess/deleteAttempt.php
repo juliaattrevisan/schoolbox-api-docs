@@ -25,15 +25,15 @@ use Schoolbox\UserMapper;
 
 $attemptsToDelete = [];
 
-/** @var Assessment\MapperProxy $assessmentMapperProxy */
-$assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+/** @var Assessment\MapperProxy $assessmentDataSource */
+$assessmentDataSource = $this->getDi()->get('assessmentDataSource');
 $assessHandler   = new Assess_Main();
 $attemptHandler  = new Assess_Attempt();
 $responseHandler = new Assess_Response();
 $groupHandler    = new Group();
 
 
-$getAttempt = function ($attemptId) use ($assessmentMapperProxy, $attemptHandler, $assessHandler, $groupHandler) {
+$getAttempt = function ($attemptId) use ($assessmentDataSource, $attemptHandler, $assessHandler, $groupHandler) {
     if (!is_numeric($attemptId)) {
         throw \Schoolbox\Error\Mapper::getInstance()->generateException(Schoolbox\Error\Mapper::ERROR_PERM_ATTEMPT_DELETE);
     }
@@ -68,7 +68,7 @@ $getAttempt = function ($attemptId) use ($assessmentMapperProxy, $attemptHandler
     }
 
     // It appears this controller can be called with unrelated attemptIds, so need to load each attempt's quiz.
-    $quiz            = $assessmentMapperProxy->findByQuizId($assess['assess_id'], $user);
+    $quiz            = $assessmentDataSource->findByQuizId($assess['assess_id'], $user);
     $actionValidator = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
     if (!$actionValidator->canDeleteAttempts($_SESSION['user'], $user, $quiz)) {
         $this->pageNotFound();
