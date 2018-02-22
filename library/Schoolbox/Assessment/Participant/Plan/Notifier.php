@@ -46,10 +46,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private const TRIGGER_DUEWORK_OVERDUE  = 'dueWorkOverdue';
     private const TRIGGER_DUEWORK_CLOSED   = 'dueWorkClosed';
 
-    // Don't think these are even used
-//    private const TRIGGER_DUEWORK_DATECHANGED = 'dueWorkDatechanged';
-//    private const TRIGGER_DUEWORK_RENAMED     = 'dueWorkRenamed';
-
     /**
      * Days in advance to inform a user that due work is upcoming.
      *
@@ -57,11 +53,11 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     private const DUEWORK_UPCOMING_WINDOW = 2;
 
-//    private const TRIGGER_QUIZ_CLOSED   = 'quizClosed';
-//    private const TRIGGER_QUIZ_OPEN     = 'quizOpen';
-//    private const TRIGGER_QUIZ_OVERDUE  = 'quizOverdue';
-//    private const TRIGGER_QUIZ_UPCOMING = 'quizUpcoming';
-//    private const TRIGGER_QUIZ_UPDATED  = 'quizUpdated';
+    private const TRIGGER_QUIZ_CLOSED   = 'quizClosed';
+    private const TRIGGER_QUIZ_OPEN     = 'quizOpen';
+    private const TRIGGER_QUIZ_OVERDUE  = 'quizOverdue';
+    private const TRIGGER_QUIZ_UPCOMING = 'quizUpcoming';
+    private const TRIGGER_QUIZ_UPDATED  = 'quizUpdated';
 
     /**
      * @var AssessmentMapper
@@ -136,54 +132,56 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         $method = $bundle->getMethod();
-        if ($assessment->getDueWork()) {
-            if ($method === Mapper::METHOD_DELETE) {
-                $bundle->detachEach([
-                    self::TRIGGER_DUEWORK_OPEN,
-                    self::TRIGGER_DUEWORK_UPCOMING,
-                    self::TRIGGER_DUEWORK_UPDATED,
-                    self::TRIGGER_DUEWORK_OVERDUE,
-                    self::TRIGGER_DUEWORK_CLOSED,
-                ]);
+        if ($method === Mapper::METHOD_DELETE) {
+            $bundle->detachEach([
+                self::TRIGGER_DUEWORK_OPEN,
+                self::TRIGGER_DUEWORK_UPCOMING,
+                self::TRIGGER_DUEWORK_UPDATED,
+                self::TRIGGER_DUEWORK_OVERDUE,
+                self::TRIGGER_DUEWORK_CLOSED,
+                self::TRIGGER_QUIZ_OPEN,
+                self::TRIGGER_QUIZ_UPCOMING,
+                self::TRIGGER_QUIZ_UPDATED,
+                self::TRIGGER_QUIZ_OVERDUE,
+                self::TRIGGER_QUIZ_CLOSED,
+            ]);
 
-            } else {
-                // Bundle triggers
+        } else {
+            // Bundle triggers
 
-                // I need a close date to determine if I should trigger anything:
-                // if it's in the past, trigger nothing except update.
-                $closeDate = $this->coalesceDates($plan->getCloseDate(), $assessment->getCloseDate());
-                if ($closeDate && $closeDate->isFuture()) {
+            // I need a close date to determine if I should trigger anything:
+            // if it's in the past, trigger nothing except update.
+            $closeDate = $this->coalesceDates($plan->getCloseDate(), $assessment->getCloseDate());
+            if ($closeDate && $closeDate->isFuture()) {
 
-                    // Open is now always bundled, as long as it is set
-                    // However, if its open date is in the past don't bundle if this is an update
-                    $openDate = $this->coalesceDates($plan->getOpenDate(), $assessment->getOpenDate());
-                    if ($openDate && ($method === Mapper::METHOD_CREATE || $openDate->isFuture())) {
-                        $bundle->attach(self::TRIGGER_DUEWORK_OPEN, $openDate->getUnixTimeStamp());
-                    }
-
-                    // Due and upcoming: always bundled as long as due date is set
-                    $dueDate = $this->coalesceDates($plan->getDueDate(), $assessment->getDueDate());
-                    if ($dueDate) {
-                        $upcomingDate = (clone $dueDate)->addDays(-self::DUEWORK_UPCOMING_WINDOW);
-                        // if the upcoming date is before the open date, push upcoming to 1 minute after open,
-                        // rounded to the nearest 5 minutes?
-                        if ($upcomingDate->lt($openDate)) {
-                            $upcomingDate = (clone $openDate)->addMinutes(1);
-                        }
-                        $bundle->attach(self::TRIGGER_DUEWORK_UPCOMING, $upcomingDate->getUnixTimeStamp());
-                        $bundle->attach(self::TRIGGER_DUEWORK_OVERDUE, $dueDate->getUnixTimeStamp());
-                    }
-
-                    // Close: always bundled
-                    $bundle->attach(self::TRIGGER_DUEWORK_CLOSED, $closeDate->getUnixTimeStamp());
+                // Open is now always bundled, as long as it is set
+                // However, if its open date is in the past don't bundle if this is an update
+                $openDate = $this->coalesceDates($plan->getOpenDate(), $assessment->getOpenDate());
+                if ($openDate && ($method === Mapper::METHOD_CREATE || $openDate->isFuture())) {
+                    $bundle->attach(self::TRIGGER_DUEWORK_OPEN, $openDate->getUnixTimeStamp());
                 }
 
-                // Generic updated trigger
-                if ($method === Mapper::METHOD_UPDATE) {
-                    $bundle->attach(self::TRIGGER_DUEWORK_UPDATED, self::IMMEDIATELY);
+                // Due and upcoming: always bundled as long as due date is set
+                $dueDate = $this->coalesceDates($plan->getDueDate(), $assessment->getDueDate());
+                if ($dueDate) {
+                    $upcomingDate = (clone $dueDate)->addDays(-self::DUEWORK_UPCOMING_WINDOW);
+                    // if the upcoming date is before the open date, push upcoming to 1 minute after open,
+                    // rounded to the nearest 5 minutes?
+                    if ($upcomingDate->lt($openDate)) {
+                        $upcomingDate = (clone $openDate)->addMinutes(1);
+                    }
+                    $bundle->attach(self::TRIGGER_DUEWORK_UPCOMING, $upcomingDate->getUnixTimeStamp());
+                    $bundle->attach(self::TRIGGER_DUEWORK_OVERDUE, $dueDate->getUnixTimeStamp());
                 }
+
+                // Close: always bundled
+                $bundle->attach(self::TRIGGER_DUEWORK_CLOSED, $closeDate->getUnixTimeStamp());
             }
-            return;
+
+            // Generic updated trigger
+            if ($method === Mapper::METHOD_UPDATE) {
+                $bundle->attach(self::TRIGGER_DUEWORK_UPDATED, self::IMMEDIATELY);
+            }
         }
     }
 
