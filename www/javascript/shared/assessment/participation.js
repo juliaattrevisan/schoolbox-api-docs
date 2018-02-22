@@ -203,7 +203,7 @@
 
             return studentListHtmlString;
         }
-        
+
         // Validate plan form
         $('#participation-plan-form').alaressValidate({
             rules: {

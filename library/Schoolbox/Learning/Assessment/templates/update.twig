@@ -13,7 +13,7 @@
         $('#participation-container').participationSettings({
             getAvailableDateFields: function () {
 
-                dateArray = [];
+                var dateArray = [];
 
                 if($('#publishDate').length != 0 && $('#publishDate').is(":visible")) {
                     dateArray.push('publish');
