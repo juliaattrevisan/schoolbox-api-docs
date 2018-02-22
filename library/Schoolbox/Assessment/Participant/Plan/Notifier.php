@@ -229,42 +229,42 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     public function notifyOpen(Model $plan, User $effector): Envelope
     {
-        $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
-        $envelope               = new Envelope();
-        if ($assessmentDomainObject instanceof DueWork) {
+        $assessment = $this->retrieveAssessmentDomainModel($plan);
+        $envelope   = new Envelope();
+        if ($assessment instanceof DueWork) {
             $topicSuffix = "open";
-        } elseif ($assessmentDomainObject instanceof Quiz) {
+        } elseif ($assessment instanceof Quiz) {
             $topicSuffix = "upcoming";
         }  else {
             return $envelope;
         }
 
-        $topicStub = $this->retrieveAssessmentTopicStub($assessmentDomainObject);
+        $topicStub = $this->retrieveAssessmentTopicStub($assessment);
         if (!$topicStub) {
             return $envelope;
         }
 
         // Build generic builder
-        $workType     = $assessmentDomainObject->getWorkType();
+        $workType     = $assessment->getWorkType();
         $boxType      = mb_strtolower($workType ? $workType->getName() : '');
         $indefArticle = $boxType ?
             in_array(strtolower($boxType[0]), ['a', 'e', 'i', 'o', 'u'], true) ? 'an' : 'a'
             : '';
 
-        $bob = $this->buildGenericBuilder($assessmentDomainObject, $effector)
+        $bob = $this->buildGenericBuilder($assessment, $effector)
                     ->setTitle(":author opened $indefArticle $boxType :assessment in :cat")
                     ->setParam('author', new UserParam($effector, ParameterInterface::STACKING_REPLACE))
                     ->addTopic("$topicStub.$topicSuffix")
                     ->setSeverity(Logger::NOTICE);
 
         // Customise and send to every participant in this plan only
-        foreach ($this->retrieveParticipantsFromPlan($plan, $assessmentDomainObject) as $participant) {
+        foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
             if ($participant->isExcluded()) {
                 continue;
             }
 
             // build for student
-            $bob = $this->targetBuilderToStudent($bob, $assessmentDomainObject, $participant)
+            $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
                         ->setBody($participant->getDescription())
                         ->setByline("Due {$participant->getDueDate()->getCalendarDateTime()}");
             $envelope->targetToUser($participant->getUser(), $bob->build());
