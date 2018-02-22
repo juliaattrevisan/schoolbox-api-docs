@@ -370,7 +370,7 @@ class ListController extends Web\Controller\Base
             // Participant object has little idea of whether assessment was created or updated,
             // so just show updated.
             // Will need to rework actual notifs so they're verb-agnostic (besides delete)
-            foreach ($assessment->getPlans() as $plan) {
+            foreach ($plans as $plan) {
                 // I have NFI how I'm going to generate a diff for this item.
                 // Maybe I just need to keep the old sub box notifier around.
                 $beforePlan = $before[$plan->getId()] ?? [];
