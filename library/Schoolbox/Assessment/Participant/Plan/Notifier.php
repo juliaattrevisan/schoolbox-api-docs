@@ -24,6 +24,7 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizFeedbackMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -71,6 +72,11 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private $dueWorkFeedbackMapper;
 
     /**
+     * @var QuizFeedbackMapper
+     */
+    private $quizFeedbackMapper;
+
+    /**
      * Irrelevant as this could notify about different things, but must exist.
      *
      * @return string
@@ -90,8 +96,15 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         if (empty($dependencies['assessmentMapper'])) {
             $dependencies['assessmentMapper'] = AssessmentMapper::getInstance();
         }
+
+        // Quiz and duework feedback mapper:
+        // required for triggering notifs on feedback given when marks are made
+        // visible.
         if (empty($dependencies['dueWorkFeedbackMapper'])) {
             $dependencies['dueWorkFeedbackMapper'] = DueWorkFeedbackMapper::getInstance();
+        }
+        if (empty($dependencies['quizFeedbackMapper'])) {
+            $dependencies['quizFeedbackMapper'] = QuizFeedbackMapper::getInstance();
         }
         parent::loadDependencies($dependencies);
     }
@@ -514,6 +527,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 if ($new > $old) {
                     // Trigger notification about this item
                     $authoritativeFeedback = $assessment->getAuthoritativeFeedback($participant, true);
+                    // handle quiz and duework feedback
                     if ($authoritativeFeedback) {
                         $dueWorkFeedback = $this->dueWorkFeedbackMapper->findById($authoritativeFeedback->getId());
                         $this->raiseNotification(
@@ -641,7 +655,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * @param IAssessable $assessment
      * @return string
      */
-    private function buildAssessmentRoute(IAssessable $assessment)
+    private function buildAssessmentRoute(IAssessable $assessment): string
     {
         return sprintf('/learning/assessments/%s/status', $assessment->getId());
     }
@@ -653,7 +667,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * @param User        $student
      * @return string
      */
-    private function buildParticipantRoute(IAssessable $assessment, User $student)
+    private function buildParticipantRoute(IAssessable $assessment, User $student) :string
     {
         return sprintf('/learning/assessments/%s/%s', $assessment->getId(), $student->getId());
     }
@@ -672,9 +686,19 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * @param DueWorkFeedbackMapper $dueWorkFeedbackMapper
      * @return static
      */
-    protected function setDueWorkFeedbackMapper(DueWorkFeedbackMapper $dueWorkFeedbackMapper)
+    protected function setDueWorkFeedbackMapper(DueWorkFeedbackMapper $dueWorkFeedbackMapper): self
     {
         $this->dueWorkFeedbackMapper = $dueWorkFeedbackMapper;
+        return $this;
+    }
+
+    /**
+     * @param QuizFeedbackMapper $quizFeedbackMapper
+     * @return static
+     */
+    protected function setQuizFeedbackMapper(QuizFeedbackMapper $quizFeedbackMapper): self
+    {
+        $this->quizFeedbackMapper = $quizFeedbackMapper;
         return $this;
     }
 
