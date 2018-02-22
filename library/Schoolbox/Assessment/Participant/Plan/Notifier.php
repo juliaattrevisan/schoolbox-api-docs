@@ -369,6 +369,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         // Doesn't accept online? return
+        // TODO consider moving this logic to helper class
         if ($assessment instanceof DueWork && $assessment->isAcceptNone()) {
             return $envelope;
         }
@@ -430,12 +431,12 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     public function notifyClosed(Model $plan): Envelope
     {
-        $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
-        if ($assessmentDomainObject instanceof DueWork) {
-            return $this->notifyDueWorkClosed($assessmentDomainObject, $plan);
+        $assessment = $this->retrieveAssessmentDomainModel($plan);
+        if ($assessment instanceof DueWork) {
+            return $this->notifyDueWorkClosed($assessment, $plan);
         }
-        if ($assessmentDomainObject instanceof Quiz) {
-            return $this->notifyQuizClosed($assessmentDomainObject, $plan);
+        if ($assessment instanceof Quiz) {
+            return $this->notifyQuizClosed($assessment, $plan);
         }
 
         return new Envelope();
@@ -445,35 +446,35 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     /**
      * Staff get notified when a due work closes and one or more students didn't submit.
      *
-     * @param DueWork $dueWork
+     * @param DueWork $assessment
      * @param Model   $plan
      * @return Envelope
      */
-    private function notifyDueWorkClosed(DueWork $dueWork, Model $plan): Envelope
+    private function notifyDueWorkClosed(DueWork $assessment, Model $plan): Envelope
     {
         $envelope  = new Envelope();
-        $topicStub = $this->retrieveAssessmentTopicStub($dueWork);
+        $topicStub = $this->retrieveAssessmentTopicStub($assessment);
         if (!$topicStub) {
             return $envelope;
         }
 
         // Doesn't accept online? return
-        if ($dueWork->isAcceptNone()) {
+        if ($assessment instanceof DueWork && $assessment->isAcceptNone()) {
             return $envelope;
         }
 
         // Send a single notification for total # students not submitted
-        $href = $this->buildAssessmentRoute($dueWork);
-        $bob  = $this->buildGenericBuilder($dueWork)
+        $href = $this->buildAssessmentRoute($assessment);
+        $bob  = $this->buildGenericBuilder($assessment)
                      ->setTitle(":assessment in :cat has closed and :number did not submit work")
                      ->setHref($href)
-                     ->setParam('box', new Param($dueWork->getTitle(), $href))
+                     ->setParam('box', new Param($assessment->getTitle(), $href))
                      ->setSeverity(Logger::ERROR)
                      ->addTopic("$topicStub.closed");
 
         // Figure out how many need to submit
         $totalUnsubmitted = 0;
-        foreach ($this->retrieveParticipantsFromPlan($plan, $dueWork) as $participant) {
+        foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
             if ($participant->isExcluded()) {
                 continue;
             }
@@ -488,7 +489,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 new Param(sprintf('%s student%s', $totalUnsubmitted, $totalUnsubmitted === 1 ? '' : 's'))
             );
             $envelope->broadcastToCategory(
-                $dueWork->getBaseContext()->getFolder(),
+                $assessment->getBaseContext()->getFolder(),
                 UserAccess::ACCESS_WRITE,
                 $bob->build()
             );
@@ -501,30 +502,30 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     /**
      * Staff get notified when a due work closes and one or more students didn't submit.
      *
-     * @param Quiz  $quiz
+     * @param Quiz  $assessment
      * @param Model $plan
      * @return Envelope
      */
-    private function notifyQuizClosed(Quiz $quiz, Model $plan): Envelope
+    private function notifyQuizClosed(Quiz $assessment, Model $plan): Envelope
     {
         $envelope  = new Envelope();
-        $topicStub = $this->retrieveAssessmentTopicStub($quiz);
+        $topicStub = $this->retrieveAssessmentTopicStub($assessment);
         if (!$topicStub) {
             return $envelope;
         }
 
         // Send a single notification for total # students not submitted
-        $href = $this->buildAssessmentRoute($quiz);
-        $bob  = $this->buildGenericBuilder($quiz)
+        $href = $this->buildAssessmentRoute($assessment);
+        $bob  = $this->buildGenericBuilder($assessment)
                      ->setTitle(":assessment in :cat has closed and :number did not submit work")
                      ->setHref($href)
-                     ->setParam('box', new Param($quiz->getTitle(), $href))
+                     ->setParam('box', new Param($assessment->getTitle(), $href))
                      ->setSeverity(Logger::ERROR)
                      ->addTopic("$topicStub.closed");
 
         // Figure out how many need to submit
         $totalUnsubmitted = 0;
-        foreach ($this->retrieveParticipantsFromPlan($plan, $quiz) as $participant) {
+        foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
             if ($participant->isExcluded()) {
                 continue;
             }
@@ -539,7 +540,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 new Param(sprintf('%s student%s', $totalUnsubmitted, $totalUnsubmitted === 1 ? '' : 's'))
             );
             $envelope->broadcastToCategory(
-                $quiz->getBaseContext()->getFolder(),
+                $assessment->getBaseContext()->getFolder(),
                 UserAccess::ACCESS_WRITE,
                 $bob->build()
             );
