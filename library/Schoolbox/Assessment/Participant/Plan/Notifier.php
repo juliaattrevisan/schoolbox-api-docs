@@ -155,6 +155,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 // Due and upcoming: always bundled as long as due date is set
                 $dueDate = $this->coalesceDates($plan->getDueDate(), $assessment->getDueDate());
                 if ($dueDate) {
+                    // Quiz and Due Work have different logic for when notification happens
+                    // Quiz: 1 hour before
+                    // Due Work: 2 days before
                     $upcomingDate = (clone $dueDate)->addDays(-self::DUEWORK_UPCOMING_WINDOW);
                     // if the upcoming date is before the open date, push upcoming to 1 minute after open,
                     // rounded to the nearest 5 minutes?
@@ -366,6 +369,11 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $envelope  = new Envelope();
         $topicStub = $this->retrieveAssessmentTopicStub($assessment);
         if (!$topicStub) {
+            return $envelope;
+        }
+
+        // Doesn't accept online? return
+        if ($assessment instanceof DueWork && $assessment->isAcceptNone()) {
             return $envelope;
         }
 
