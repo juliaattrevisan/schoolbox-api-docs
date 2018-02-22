@@ -257,10 +257,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             : '';
 
         $bob = $this->buildGenericBuilder($dueWork, $effector)
-            ->setTitle(":author opened $indefArticle $boxType :box in :cat")
-            ->setParam('author', new UserParam($effector, ParameterInterface::STACKING_REPLACE))
-            ->addTopic("{$topicStub}.open")
-            ->setSeverity(Logger::NOTICE);
+                    ->setTitle(":author opened $indefArticle $boxType :box in :cat")
+                    ->setParam('author', new UserParam($effector, ParameterInterface::STACKING_REPLACE))
+                    ->addTopic("{$topicStub}.open")
+                    ->setSeverity(Logger::NOTICE);
 
         // Customise and send to every participant in this plan only
         foreach ($this->retrieveParticipantsFromPlan($plan, $dueWork) as $participant) {
@@ -307,7 +307,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $bob = $this->buildGenericBuilder($quiz, $effector)
                     ->setTitle(":author opened $indefArticle $boxType :box in :cat")
                     ->setParam('author', new UserParam($effector, ParameterInterface::STACKING_REPLACE))
-                    ->addTopic("$topicStub.open")
+                    ->addTopic("$topicStub.upcoming")
                     ->setSeverity(Logger::NOTICE);
 
         // Customise and send to every participant in this plan only
