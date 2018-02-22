@@ -234,12 +234,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     public function notifyDueWorkOpen(Model $plan, User $effector): Envelope
     {
         $envelope = new Envelope();
-        $bob      = new Builder();
 
         $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
 
         // This notifier only gets triggered for due works.
-        $folder = $assessmentDomainObject->getBaseContext()->getFolder();
         if (!$assessmentDomainObject instanceof DueWork) {
             return $envelope;
         }
@@ -257,18 +255,11 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             in_array(strtolower($boxType[0]), ['a', 'e', 'i', 'o', 'u'], true) ? 'an' : 'a'
             : '';
 
-        $bob->setTitle(":user opened $indefArticle $boxType :box in :cat")
-            ->setParams([
-                'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
-                'cat'  => new CategoryParam($folder),
-            ])
-            ->setIcon(
-                "/portrait?" . http_build_query(['userId' => $effector->getExternalId(), 'size' => $this->iconSize,])
-            )
-            ->setNamespace(NSMapper::NS_DUEWORK)
+        $bob = $this->buildGenericDueWorkBuilder($assessmentDomainObject, $effector)
+            ->setTitle(":author opened $indefArticle $boxType :box in :cat")
+            ->setParam('author', new UserParam($effector, ParameterInterface::STACKING_REPLACE))
             ->addTopic("duework.{$boxId}.open")
             ->setSeverity(Logger::NOTICE);
-
 
         // Customise and send to every participant in this plan only
         foreach ($this->retrieveParticipantsFromPlan($plan, $assessmentDomainObject) as $participant) {
@@ -297,11 +288,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     public function notifyDueWorkUpcoming(Model $plan): Envelope
     {
         $envelope = new Envelope();
-        $bob      = new Builder();
         $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
 
         // This notifier only gets triggered for due works.
-        $folder = $assessmentDomainObject->getBaseContext()->getFolder();
         if (!$assessmentDomainObject instanceof DueWork) {
             return $envelope;
         }
@@ -317,11 +306,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             return $envelope;
         }
 
-        $bob->setParam('cat', new CategoryParam($folder))
-            ->setIcon("/images/icon.php?" . http_build_query(['size' => $this->iconSize, 'icon' => 'work']))
-            ->setNamespace(NSMapper::NS_DUEWORK)
-            ->setSeverity(Logger::WARNING)
-            ->addTopic("duework.$boxId.upcoming");
+        $bob = $this->buildGenericDueWorkBuilder($assessmentDomainObject)
+                    ->setSeverity(Logger::WARNING)
+                    ->addTopic("duework.$boxId.upcoming");
 
         // Customise and send to every participant in this plan only
         foreach ($this->retrieveParticipantsFromPlan($plan, $assessmentDomainObject) as $participant) {
@@ -370,7 +357,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     public function notifyDueWorkOverdue(Model $plan): Envelope
     {
         $envelope = new Envelope();
-        $bob      = new Builder();
         $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
 
         // This notifier only gets triggered for due works.
@@ -390,11 +376,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             return $envelope;
         }
 
-        $bob->setParam('cat', new CategoryParam($folder))
-            ->setIcon("/images/icon.php?" . http_build_query(['size' => $this->iconSize, 'icon' => 'work']))
-            ->setNamespace(NSMapper::NS_DUEWORK)
-            ->setSeverity(Logger::ERROR)
-            ->addTopic("duework.$boxId.overdue");
+        $bob = $this->buildGenericDueWorkBuilder($assessmentDomainObject)
+                    ->setSeverity(Logger::ERROR)
+                    ->addTopic("duework.$boxId.overdue");
 
         // Customise and send to every participant in this plan only
         foreach ($this->retrieveParticipantsFromPlan($plan, $assessmentDomainObject) as $participant) {
@@ -442,7 +426,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     public function notifyDueWorkClosed(Model $plan): Envelope
     {
         $envelope = new Envelope();
-        $bob      = new Builder();
         $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
 
         // This notifier only gets triggered for due works.
@@ -463,11 +446,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         // Try triggering for every student; maybe they will stack
-        $bob->setTitle(":box in :cat has closed and :student did not submit work")
+        $bob = $this->buildGenericDueWorkBuilder($assessmentDomainObject)
+            ->setTitle(":box in :cat has closed and :student did not submit work")
             ->setParam('box', new Param($assessmentDomainObject->getTitle(), $this->buildAssessmentRoute($assessmentDomainObject)))
             ->setParam('cat', new CategoryParam($folder))
-            ->setIcon("/images/icon.php?" . http_build_query(['size' => $this->iconSize, 'icon' => 'work']))
-            ->setNamespace(NSMapper::NS_DUEWORK)
             ->setSeverity(Logger::ERROR)
             ->addTopic("duework.$boxId.closed");
 
@@ -799,4 +781,61 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             }
         }
     }
+
+    /**
+     * Builds a builder with generic parameters set.
+     *
+     * @param IAssessable $assessment The assessment to build a builder for.
+     * @param null|User   $effector   The user whose portrait to show as the icon, or null for a generic icon
+     * @return Builder
+     */
+    private function buildGenericDueWorkBuilder(IAssessable $assessment, ?User $effector = null): Builder
+    {
+        $bob    = new Builder();
+        $folder = $assessment->getBaseContext()->getFolder();
+        // Icon: could be the effector, or a generic icon
+        $icon   = $effector
+            ? "/portrait?" . http_build_query(['userId' => $effector->getExternalId(), 'size' => $this->iconSize,])
+            : "/images/icon?" . http_build_query(['size' => $this->iconSize, 'icon' => 'work']);
+        $bob->setParam('cat', new CategoryParam($folder))
+            ->setIcon($icon)
+            ->setNamespace(NSMapper::NS_DUEWORK);
+        return $bob;
+    }
+
+    /**
+     * Targets $bob toward the student.
+     *
+     * @param Builder     $bob
+     * @param IAssessable $assessment
+     * @param Participant $participant
+     * @return Builder
+     */
+    private function targetDueWorkBuilderToStudent(Builder $bob, IAssessable $assessment, Participant $participant): Builder
+    {
+        $href = $this->buildParticipantRoute($assessment, $participant->getUser());
+        return $bob
+            ->setParam('box', new Param($assessment->getTitle(), $href))
+            ->unsetParam('child')
+            ->setHref($href);
+    }
+
+    /**
+     * Targets $bob toward the parents of the student.
+     *
+     * @param Builder     $bob
+     * @param IAssessable $assessment
+     * @param Participant $participant
+     * @return Builder
+     */
+    private function targetDueWorkBuilderToParents(Builder $bob, IAssessable $assessment, Participant $participant): Builder
+    {
+        $href = $this->buildParticipantRoute($assessment, $participant->getUser());
+        return $bob
+            ->setParam('box', new Param($assessment->getTitle(), $href))
+            ->setParam('child', new ChildParam($participant->getUser(), Param::STACKING_REPLACE))
+            ->setHref($href);
+    }
+
+
 }
