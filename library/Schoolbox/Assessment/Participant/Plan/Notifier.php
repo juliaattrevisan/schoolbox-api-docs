@@ -289,6 +289,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     /**
      * Participant gets notified when a quiz opens.
      *
+     * TODO merge this into duework type
+     *
      * @param Quiz  $quiz
      * @param Model $plan
      * @param User  $effector
@@ -311,20 +313,20 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             in_array(strtolower($boxType[0]), ['a', 'e', 'i', 'o', 'u'], true) ? 'an' : 'a'
             : '';
 
-        $bob = $this->buildGenericBuilder($dueWork, $effector)
+        $bob = $this->buildGenericBuilder($quiz, $effector)
                     ->setTitle(":author opened $indefArticle $boxType :box in :cat")
                     ->setParam('author', new UserParam($effector, ParameterInterface::STACKING_REPLACE))
                     ->addTopic("assess.{$assessId}.open")
                     ->setSeverity(Logger::NOTICE);
 
         // Customise and send to every participant in this plan only
-        foreach ($this->retrieveParticipantsFromPlan($plan, $dueWork) as $participant) {
+        foreach ($this->retrieveParticipantsFromPlan($plan, $quiz) as $participant) {
             if ($participant->isExcluded()) {
                 continue;
             }
 
             // build for student
-            $bob = $this->targetDueWorkBuilderToStudent($bob, $dueWork, $participant)
+            $bob = $this->targetDueWorkBuilderToStudent($bob, $quiz, $participant)
                         ->setBody($participant->getDescription())
                         ->setByline("Due {$participant->getDueDate()->getCalendarDateTime()}");
             $envelope->targetToUser($participant->getUser(), $bob->build());
