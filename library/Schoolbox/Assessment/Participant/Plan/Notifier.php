@@ -511,9 +511,25 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
 
         // This notifier only gets triggered for due works.
+        $folder = $assessmentDomainObject->getBaseContext()->getFolder();
         if (!$assessmentDomainObject instanceof DueWork) {
             return $envelope;
         }
+
+        // Still need the submission box's ID for generating the topic
+        $boxId = $this->retrieveAssessmentDueWorkId($plan);
+        if (!$boxId) {
+            return $envelope;
+        }
+
+        // Build a box type
+        $workType = $assessmentDomainObject->getWorkType();
+        $boxType  = mb_strtolower($workType ? $workType->getName() : '');
+
+        // All updated notifs have the same icon, namespace, severity
+        $bob->setIcon("/portrait?" . http_build_query(['userId' => $effector->getExternalId(), 'size' => $this->iconSize,]))
+            ->setNamespace(NSMapper::NS_DUEWORK)
+            ->setSeverity(Logger::ERROR);
 
         // Figure out who's actually targeted
         foreach ($this->retrieveParticipantsFromPlan($plan, $assessmentDomainObject) as $participant) {
@@ -550,15 +566,28 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 continue;
             }
 
+            $route = $this->buildParticipantRoute($assessmentDomainObject, $participant->getUser());
+
             // renamed
             if (!empty($diff['assessment']['name'])) {
-                // target to student, parent
-//                    foreach($students as $student){
-//                        $bob = $this
-//                            ->setForNotifyRenamed($bob, $submissionBox, $diff, $user, $student)
-//                            ->setHref($this->buildParticipantRoute($submissionBox, $student));
-//                        $envelope->targetToUser($student, $bob->build());
-//                    }
+                [$newName, $oldName] = $diff['assessment']['name'];
+
+                // Students
+                $bob->setTitle(':author renamed :oldname to :newname in :cat')
+                    ->setParam('author', new UserParam($effector))
+                    ->setParam('oldname', new Param($oldName))
+                    ->setParam('newname', new Param($newName, $route))
+                    ->setParam('cat', new CategoryParam($folder))
+                    ->addTopic("duework.{$boxId}.renamed")
+                    ->setHref($route);
+                $envelope->targetToUser($participant->getUser(), $bob->build());
+
+                // Parents
+                $bob->setTitle(":child's $boxType was renamed from :oldname to :newname in :catname")
+                    ->unsetParam('author')
+                    ->setParam('child', new ChildParam($participant->getUser(), Param::STACKING_REPLACE))
+                ;
+                $envelope->targetToParent($participant->getUser(), $bob->build());
             }
 
             // due date change
