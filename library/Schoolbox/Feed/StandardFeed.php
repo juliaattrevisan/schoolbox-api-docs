@@ -18,14 +18,14 @@ class StandardFeed extends Feed
     /**
      * @param Schoolbox\IConfigLoader $conf
      * @param int                     $context
-     * @param string                  $roleType
+     * @param Schoolbox\User          $user
      * @param int                     $limit
      * @param int                     $offset
      */
     public function __construct(
         Schoolbox\IConfigLoader $conf,
         $context,
-        $roleType,
+        Schoolbox\User $user,
         $limit = SourceInterface::HARD_LIMIT,
         $offset = 0
     ) {
@@ -49,7 +49,7 @@ class StandardFeed extends Feed
                 new Schoolbox\Forum\PostNotifier($conf),
             ],
             $context,
-            $roleType,
+            $user->getRole()->getType(),
             $limit,
             $offset
         );
