@@ -244,7 +244,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private function notifyDueWorkOpen(DueWork $dueWork, Model $plan, User $effector): Envelope
     {
         $envelope  = new Envelope();
-        $topicStub = $this->retrieveAssessmentTopicStub($plan);
+        $topicStub = $this->retrieveAssessmentTopicStub($dueWork);
         if (!$topicStub) {
             return $envelope;
         }
@@ -292,7 +292,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private function notifyQuizOpen(Quiz $quiz, Model $plan, User $effector): Envelope
     {
         $envelope  = new Envelope();
-        $topicStub = $this->retrieveAssessmentTopicStub($plan);
+        $topicStub = $this->retrieveAssessmentTopicStub($quiz);
         if (!$topicStub) {
             return $envelope;
         }
@@ -358,7 +358,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private function notifyDueWorkUpcoming(DueWork $dueWork, Model $plan): Envelope
     {
         $envelope  = new Envelope();
-        $topicStub = $this->retrieveAssessmentTopicStub($plan);
+        $topicStub = $this->retrieveAssessmentTopicStub($dueWork);
         if (!$topicStub) {
             return $envelope;
         }
@@ -435,7 +435,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private function notifyDueWorkOverdue(DueWork $dueWork, Model $plan): Envelope
     {
         $envelope  = new Envelope();
-        $topicStub = $this->retrieveAssessmentTopicStub($plan);
+        $topicStub = $this->retrieveAssessmentTopicStub($dueWork);
         if (!$topicStub) {
             return $envelope;
         }
@@ -510,7 +510,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private function notifyDueWorkClosed(DueWork $dueWork, Model $plan): Envelope
     {
         $envelope  = new Envelope();
-        $topicStub = $this->retrieveAssessmentTopicStub($plan);
+        $topicStub = $this->retrieveAssessmentTopicStub($dueWork);
         if (!$topicStub) {
             return $envelope;
         }
@@ -593,7 +593,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private function notifyDueWorkUpdated(DueWork $dueWork, Model $plan, User $effector, array $diff = null): Envelope
     {
         $envelope  = new Envelope();
-        $topicStub = $this->retrieveAssessmentTopicStub($plan);
+        $topicStub = $this->retrieveAssessmentTopicStub($dueWork);
         if (!$topicStub) {
             return $envelope;
         }
@@ -841,31 +841,22 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     }
 
     /**
-     * Fetches the assessment data model for this plan.
+     * Fetches the topic stub for this assessment; this is required for
+     * targeting notifications to the assessment's mailbox.
      *
-     * @param Model $plan
-     * @return AssessmentModel
-     */
-    private function retrieveAssessmentDataModel(Model $plan): AssessmentModel
-    {
-        return $this->assessmentMapper->findById($plan->getAssessment()->getId());
-    }
-
-    /**
-     * Fetches the topic stub for this plan; this is required for targeting
-     * notifications to the assessment's mailbox.
+     * This action requires access to the assessment data-level mapper.
      *
-     * @param Model $plan
+     * @param IAssessable $assessment
      * @return string|null
      */
-    private function retrieveAssessmentTopicStub(Model $plan): ?string
+    private function retrieveAssessmentTopicStub(IAssessable $assessment): ?string
     {
-        $assessment = $this->retrieveAssessmentDataModel($plan);
-        if ($assessment->getDueWork()) {
-            return "duework." . $assessment->getDueWork()->getId();
+        $dataModel = $this->assessmentMapper->findById($assessment->getId());
+        if ($dataModel->getDueWork()) {
+            return "duework." . $dataModel->getDueWork()->getId();
         }
-        if ($assessment->getQuiz()) {
-            return "assess." . $assessment->getQuiz()->getId();
+        if ($dataModel->getQuiz()) {
+            return "assess." . $dataModel->getQuiz()->getId();
         }
         return null;
     }
