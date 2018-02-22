@@ -498,9 +498,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $boxType  = mb_strtolower($workType ? $workType->getName() : '');
 
         // All updated notifs have the same icon, namespace, severity
-        $bob->setIcon("/portrait?" . http_build_query(['userId' => $effector->getExternalId(), 'size' => $this->iconSize,]))
-            ->setNamespace(NSMapper::NS_DUEWORK)
-            ->setSeverity(Logger::ERROR);
+        $bob = $this->buildGenericDueWorkBuilder($assessmentDomainObject, $effector)
+                    ->setSeverity(Logger::ERROR);
 
         // Figure out who's actually targeted
         foreach ($this->retrieveParticipantsFromPlan($plan, $assessmentDomainObject) as $participant) {
@@ -544,20 +543,19 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 [$newName, $oldName] = $diff['assessment']['name'];
 
                 // Students
-                // TODO iterate particiapnts and students separately
-                $bob->setHref($route)
-                    ->setTitle(':author renamed :oldname to :newname in :cat')
-                    ->setParam('author', new UserParam($effector))
-                    ->setParam('oldname', new Param($oldName))
-                    ->setParam('newname', new Param($newName, $route))
-                    ->setParam('cat', new CategoryParam($folder))
-                    ->setTopics(["duework.{$boxId}.renamed"]);
+                // TODO iterate particiapnts and students separately?
+                $bob = $this->targetDueWorkBuilderToStudent($bob, $assessmentDomainObject, $participant)
+                            ->setTitle(':author renamed :oldname to :newname in :cat')
+                            ->setParam('author', new UserParam($effector))
+                            ->setParam('oldname', new Param($oldName))
+                            ->setParam('newname', new Param($newName, $route))
+                            ->setTopics(["duework.{$boxId}.renamed"]);
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
-                $bob->setTitle(":child's $boxType was renamed from :oldname to :newname in :cat")
-                    ->unsetParam('author')
-                    ->setParam('child', new ChildParam($participant->getUser(), Param::STACKING_REPLACE));
+                $bob = $this->targetDueWorkBuilderToParents($bob, $assessmentDomainObject, $participant)
+                            ->setTitle(":child's $boxType was renamed from :oldname to :newname in :cat")
+                            ->unsetParam('author');
                 $envelope->targetToParent($participant->getUser(), $bob->build());
             }
 
@@ -573,19 +571,17 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 }
 
                 // Students
-                $bob->setTitle(":author $verb :box to :date in :cat")
-                    ->setParam('author', new UserParam($effector))
-                    ->setParam('box', new Param($assessmentDomainObject->getTitle(), $route))
-                    ->setParam('date', new Param($dateformat))
-                    ->setParam('cat', new CategoryParam($folder))
-                    ->setTopics(["duework.{$boxId}.datechanged"]);
+                $bob = $this->targetDueWorkBuilderToStudent($bob, $assessmentDomainObject, $participant)
+                            ->setTitle(":author $verb :box to :date in :cat")
+                            ->setParam('author', new UserParam($effector))
+                            ->setParam('date', new Param($dateformat))
+                            ->setTopics(["duework.{$boxId}.datechanged"]);
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
-                $bob->setHref($route)
-                    ->setTitle(":child's $boxType :box closing date was $verb to :date in :cat")
-                    ->unsetParam('author')
-                    ->setParam('child', new ChildParam($participant->getUser(), Param::STACKING_REPLACE));
+                $bob = $this->targetDueWorkBuilderToParents($bob, $assessmentDomainObject, $participant)
+                            ->setTitle(":child's $boxType :box closing date was $verb to :date in :cat")
+                            ->unsetParam('author');
                 $envelope->targetToParent($participant->getUser(), $bob->build());
             }
 
@@ -595,18 +591,17 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 $m = $assessmentDomainObject->isAcceptNone()
                     ? 'You no longer need to submit online for :box in :cat'
                     : 'You now need to submit online for :box in :cat';
-                $bob->setTitle($m)
-                    ->setParam('box', new Param($assessmentDomainObject->getTitle(), $route))
-                    ->setParam('cat', new CategoryParam($folder))
-                    ->setTopics(["duework.{$boxId}.updated"]);
+                $bob = $this->targetDueWorkBuilderToStudent($bob, $assessmentDomainObject, $participant)
+                            ->setTitle($m)
+                            ->setTopics(["duework.{$boxId}.updated"]);
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
                 $m = $assessmentDomainObject->isAcceptNone()
                     ? ':child no longer need to submit online for :box in :cat'
                     : ':child needs to submit online for :box in :cat';
-                $bob->setTitle($m)
-                    ->setParam('child', new ChildParam($participant->getUser(), Param::STACKING_REPLACE));
+                $bob = $this->targetDueWorkBuilderToParents($bob, $assessmentDomainObject, $participant)
+                            ->setTitle($m);
                 $envelope->targetToParent($participant->getUser(), $bob->build());
             }
 
@@ -614,16 +609,14 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             // Not sure if there's any point to this notif, but raise it anyway
 
             // Students
-            $bob->setHref($route)
-                ->setTitle(':author updated :box in :cat')
-                ->setParam('box', new Param($assessmentDomainObject->getTitle(), $route))
-                ->setParam('cat', new CategoryParam($folder));
+            $bob = $this->targetDueWorkBuilderToStudent($bob, $assessmentDomainObject, $participant)
+                        ->setTitle(':author updated :box in :cat');
             $envelope->targetToUser($participant->getUser(), $bob->build());
 
             // Parents
-            $bob->setTitle(":child's $boxType :box was updated in :cat")
-                ->unsetParam('author')
-                ->setParam('child', new ChildParam($participant->getUser(), Param::STACKING_REPLACE));
+            $bob = $this->targetDueWorkBuilderToParents($bob, $assessmentDomainObject, $participant)
+                        ->setTitle(":child's $boxType :box was updated in :cat")
+                        ->unsetParam('author');
             $envelope->targetToParent($participant->getUser(), $bob->build());
         }
 
