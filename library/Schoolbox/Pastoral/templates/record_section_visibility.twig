@@ -90,9 +90,9 @@
                                 {% if access.role.isParent %}
                                     {% for parent in record.student.parents %}
                                         {%  if access.user.isDeleted %}
-                                            <a href="{{ profile.link(access.user) }}">{{ parent.fullName }}</a><br>
-                                        {% else %}
                                             {{ parent.fullName }}<br>
+                                        {% else %}
+                                            <a href="{{ profile.link(access.user) }}">{{ parent.fullName }}</a><br>
                                         {% endif %}
                                     {% endfor %}
                                 {% else %}
