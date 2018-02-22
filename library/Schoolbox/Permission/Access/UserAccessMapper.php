@@ -354,6 +354,9 @@ class UserAccessMapper extends Mapper
             $query .= ' AND ur.group_type = :roleType ';
             $params['roleType'] = $roleType;
         }
+
+        $query .= ' ORDER BY ua.type DESC,lastname,firstname';
+
         $stmt = $this->database->prepare($query);
         $stmt->execute($params);
         $userCollection = $this->getJoinMapper('user')->createCollection();
