@@ -11,11 +11,9 @@ namespace Schoolbox\Assessment\Component;
 
 use PDO;
 use Schoolbox;
-use Schoolbox\Assessment\Activity;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Collection;
-use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Storage;
@@ -35,7 +33,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
  * @method Collection|SubmissionBox[] findByColumnList($columnList, $options = [])
  * @method SubmissionBox findOneByColumn($columnName, $columnValue, $order = [], $options = [])
  */
-class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInterface
+class SubmissionBoxMapper extends Schoolbox\Mapper
 {
 
     /**
@@ -476,57 +474,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 
     }
 
-
-    /**
-    * @param int $categoryId
-    * @param int $limit
-    * @param int $offset
-    * @param int $time
-    * @return Collection|SubmissionBox[]
-    */
-    public function findForFeed($categoryId, $limit, $offset = 0, $time = 0)
-    {
-        $time = date('Y-m-d H:i:s', $time ?: time());
-        $limit = (int)$limit;
-        $offset = (int)$offset;
-
-        $stmt = $this->database->prepare(
-            "
-            SELECT
-                {$this->getColumnString('sb')},
-                {$this->getJoinColumnString('category', 'c')},
-                {$this->getJoinColumnString('owner', 'u')}
-            FROM
-                `{$this->getTable()}` `sb`
-                LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
-                INNER JOIN {$this->getJoinSql('owner', 'sb', 'u', true)}
-                INNER JOIN {$this->getJoinSql('assessmentModel', 'sb', 'a')}
-            WHERE
-                `sb`.`category` = :cat_id
-                AND ( `sb`.`open_date` < :time OR `sb`.`date` < :time )
-                AND `a`.`deleted_at` IS NOT NULL
-            ORDER BY `sb`.`open_date` DESC, `sb`.`date` DESC
-            LIMIT $offset, $limit
-        "
-        );
-
-        $stmt->execute(array(
-            'cat_id' => $categoryId,
-            'time'   => $time
-        ));
-
-        $c = $this->createCollection();
-
-        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            /** @var SubmissionBox $box */
-            $box = $this->hydrate($r, 'sb');
-            $box->setCategory($this->hydrateJoin($r, 'category', 'c'));
-            $box->setOwner($this->hydrateJoin($r, 'owner', 'u'));
-            $c->add($box);
-        }
-
-        return $c;
-    }
 
     /**
      * Port of SubmissionStudent handler's securityCheck() method.
