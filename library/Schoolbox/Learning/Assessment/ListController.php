@@ -338,7 +338,7 @@ class ListController extends Web\Controller\Base
         try {
             // What kind of action is happening?
             $planMapper = $this->participantDataSource->getPlanMapper();
-            $action     = $assessment ? $planMapper::METHOD_CREATE : $planMapper::METHOD_UPDATE;
+            $action     = $assessment ? $planMapper::METHOD_UPDATE : $planMapper::METHOD_CREATE;
             $before     = $assessment ? $dehydrator->dehydrateAssessmentIntoPlans($assessment) : [];
 
             /* Figure out what kind of assessment was chosen
