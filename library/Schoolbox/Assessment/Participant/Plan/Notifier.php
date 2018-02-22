@@ -592,7 +592,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
             // due date change
             if (!empty($diff['participants'][$participant->getUser()->getId()]['dueDate'])) {
-
                 $oldDate = strtotime($diff['participants'][$participant->getUser()->getId()]['dueDate'][1]);
                 $newDate = strtotime($diff['participants'][$participant->getUser()->getId()]['dueDate'][0]);
                 $verb = $newDate > $oldDate ? 'extended' : 'changed';
@@ -603,9 +602,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 }
 
                 // Students
-                $bob->setTitle(":author $verb :boxname to :date in :cat")
+                $bob->setTitle(":author $verb :box to :date in :cat")
                     ->setParam('author', new UserParam($effector))
-                    ->setParam('boxname', new Param($assessmentDomainObject->getTitle(), $route))
+                    ->setParam('box', new Param($assessmentDomainObject->getTitle(), $route))
                     ->setParam('date', new Param($dateformat))
                     ->setParam('cat', new CategoryParam($folder))
                     ->setTopics(["duework.{$boxId}.datechanged"]);
@@ -613,7 +612,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
                 // Parents
                 $bob->setHref($route)
-                    ->setTitle(":child's $boxType :boxname closing date was $verb to :date in :cat")
+                    ->setTitle(":child's $boxType :box closing date was $verb to :date in :cat")
                     ->unsetParam('author')
                     ->setParam('child', new ChildParam($participant->getUser(), Param::STACKING_REPLACE));
                 $envelope->targetToParent($participant->getUser(), $bob->build());
@@ -621,16 +620,27 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
             // accept online
             if (!empty($diff['assessment']['acceptOnline'])) {
-//                    foreach($students as $student){
-//                        $bob = $this
-//                            ->setForNotifyAcceptOnlineChanged($bob, $submissionBox, $student)
-//                            ->setHref($this->buildParticipantRoute($submissionBox, $student));
-//                        $envelope->targetToUser($student, $bob->build());
-//                    }
+                // Students
+                $m = $assessmentDomainObject->isAcceptNone()
+                    ? 'You no longer need to submit online for :box in :cat'
+                    : 'You now need to submit online for :box in :cat';
+                $bob->setTitle($m)
+                    ->setParam('box', new Param($assessmentDomainObject->getTitle(), $route))
+                    ->setParam('cat', new CategoryParam($folder))
+                    ->setTopics(["duework.{$boxId}.updated"]);
+                $envelope->targetToUser($participant->getUser(), $bob->build());
+
+                // Parents
+                $m = $assessmentDomainObject->isAcceptNone()
+                    ? ':child no longer need to submit online for :box in :cat'
+                    : ':child needs to submit online for :box in :cat';
+                $bob->setTitle($m)
+                    ->setParam('child', new ChildParam($participant->getUser(), Param::STACKING_REPLACE));
+                $envelope->targetToParent($participant->getUser(), $bob->build());
             }
 
             // generic: only if no others raised
-            // Not sure if there's any point to this notif
+            // Not sure if there's any point to this notif, but raise it anyway
         }
 
         return $envelope;
