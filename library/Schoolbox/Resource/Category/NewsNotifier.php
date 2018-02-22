@@ -88,15 +88,9 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 
 
 	/**
-	 * Generate n Instances, from the perspective of casual observation (rather than targeted at a particular user).
-	 *
-	 * @param int $context     - most likely a category ID or ignored
-	 * @param string $roletype - the roletype of the user for whom this feed is being retrieved
-	 * @param int $limit       - how many messages to retrieve
-	 * @param int $offset      - by default, most recent
-	 * @return Collection|Instance[]
+	 * @inheritdoc
 	 */
-	public function getFeed($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0) {
+	public function getFeed($context, User $user, $limit = self::HARD_LIMIT, $offset = 0) {
 		$c = new Collection();
 
 		if(!$this->mapper instanceof FeedableMapperInterface) {
@@ -107,7 +101,7 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 		$articles = $this->mapper->findForFeed($context, $limit, $offset);
 
 		foreach($articles as $news) {
-			$c = $c->merge(new Collection($this->generateNotification($roletype, $news, $news->getOwner())->getAll($news->getPostDate()->getUnixTimeStamp())));
+			$c = $c->merge(new Collection($this->generateNotification($user->getRole()->getType(), $news, $news->getOwner())->getAll($news->getPostDate()->getUnixTimeStamp())));
 		}
 
 		return $c;
