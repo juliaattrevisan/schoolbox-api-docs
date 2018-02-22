@@ -33,8 +33,7 @@ class StandardFeed extends Feed
 
         $this->aggregate(
             [
-//                new Schoolbox\Assessment\Component\SubmissionBoxNotifier($conf),
-//                new Schoolbox\Learning\Quiz\Notifier($conf),
+                new Schoolbox\Assessment\Participant\Plan\Notifier($conf),
                 new Schoolbox\Resource\Category\NewsNotifier($conf),
                 new Schoolbox\Blog\Homepage\Post\Notifier($conf),
                 new Schoolbox\Blog\Homepage\Comment\Notifier($conf),
