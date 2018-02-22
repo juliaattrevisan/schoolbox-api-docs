@@ -464,8 +464,8 @@ class ListController extends Web\Controller\Base
 
 
             //Handle assessments that do no accept submissions:
-            if (($assessment->getTypeName() == "Due Work" && $assessment->getAcceptOnline() == 0) ||
-                $assessment->getTypeName() == "Task"  ) {
+            if (($assessment instanceof DueWork\Model && $assessment->getAcceptOnline() == 0) ||
+                $assessment instanceof Task\Model ) {
                 $planData['open_date'] = $planData['publish_date'];
                 $planData['close_date'] = $planData['due_date'];
             }
