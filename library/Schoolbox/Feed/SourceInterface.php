@@ -12,20 +12,21 @@ namespace Schoolbox\Feed;
 
 use Alaress\Async\Notification\Instance\Instance;
 use Schoolbox\Collection;
+use Schoolbox\User;
 
 interface SourceInterface {
 
-	const HARD_LIMIT = 50;
+	public const HARD_LIMIT = 50;
 
 	/**
 	 * Generate n Instances, from the perspective of casual observation (rather than targeted at a particular user).
 	 *
 	 * @param int $context     - most likely a category ID or ignored
-	 * @param string $roletype - the roletype of the user for whom this feed is being retrieved
+	 * @param User $user - the user for whom this feed is being retrieved
 	 * @param int $limit       - how many messages to retrieve
 	 * @param int $offset      - by default, most recent
 	 * @return Collection|Instance[]
 	 */
-	public function getFeed($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0);
+	public function getFeed($context, User $user, $limit = self::HARD_LIMIT, $offset = 0);
 
 }

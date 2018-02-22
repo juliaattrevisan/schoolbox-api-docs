@@ -39,14 +39,7 @@ class Feed extends Decorator
                  * the most up-to-date data. As such, there is an inherent (unavoidable?) performance hit, since
                  * the maximum number of items that might be retrieved can be up to count($sources) times the $limit
                  */
-                $this->appendInstances(
-                    $channel->getFeed(
-                        $context,
-                        $user->getRole()->getType(),
-                        $limit,
-                        $offset
-                    )->getAll()
-                );
+                $this->appendInstances($channel->getFeed($context, $user, $limit, $offset)->getAll());
             }
         }
 
