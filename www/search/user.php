@@ -6,6 +6,7 @@ use Schoolbox\Permission\Access\Access as Access;
 use Schoolbox\ProfessionalDevelopment\Mapper as ProfessionalDevelopmentMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
+use Schoolbox\Role;
 
 //require_once 'include/permission.php';
 
@@ -28,9 +29,14 @@ function renderParent(
 ) {
 
     $externalUser = $synUserHandler->getParent($user['synergy_id']);
-    try {
-        $spouse = $userMapper->findByExternalId($externalUser['SpouseID']);
-    } catch (\Schoolbox\Mapper\Exception $e) {
+    if(isset($externalUser['SpouseID'])) {
+        try {
+            $spouse = $userMapper->findByExternalId($externalUser['SpouseID'], Role::PARENT);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $spouse = null;
+        }
+    }
+    else {
         $spouse = null;
     }
 
@@ -190,7 +196,7 @@ function renderStudent(
     if ($externalUser['StudentFormStaffName']) {
         if ($externalUser['TeacherFormID']) {
             try {
-                $formTeacher = $userMapper->findByExternalId($externalUser['TeacherFormID']);
+                $formTeacher = $userMapper->findByExternalId($externalUser['TeacherFormID'], Role::STAFF);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $formTeacher = new \Schoolbox\User();
                 $formTeacher->setLastname($externalUser['StudentFormStaffName']);
@@ -208,7 +214,7 @@ function renderStudent(
     if ($externalUser['StudentTutorName']) {
         if ($externalUser['TeacherTutorID']) {
             try {
-                $tutorTeacher = $userMapper->findByExternalId($externalUser['TeacherTutorID']);
+                $tutorTeacher = $userMapper->findByExternalId($externalUser['TeacherTutorID'], Role::STAFF);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $tutorTeacher = new \Schoolbox\User();
                 $tutorTeacher->setLastname($externalUser['StudentTutorName']);
@@ -224,7 +230,7 @@ function renderStudent(
     if ($externalUser['StudentHeadOfHouse']) {
         if ($externalUser['HeadOfHouseID']) {
             try {
-                $hohTeacher = $userMapper->findByExternalId($externalUser['HeadOfHouseID']);
+                $hohTeacher = $userMapper->findByExternalId($externalUser['HeadOfHouseID'], Role::STAFF);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $hohTeacher = new \Schoolbox\User();
                 $hohTeacher->setLastname($externalUser['StudentHeadOfHouse']);
@@ -242,7 +248,7 @@ function renderStudent(
     if ($externalUser['StudentYearLevelCoordinator']) {
         if ($externalUser['YearLevelCoordID']) {
             try {
-                $coordTeacher = $userMapper->findByExternalId($externalUser['YearLevelCoordID']);
+                $coordTeacher = $userMapper->findByExternalId($externalUser['YearLevelCoordID'], Role::STAFF);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $coordTeacher = new \Schoolbox\User();
                 $coordTeacher->setLastname($externalUser['StudentYearLevelCoordinator']);
@@ -276,13 +282,13 @@ function renderStudent(
         foreach ($contactList as $contact) {
             $main = null;
             try {
-                $main = $userMapper->findByExternalId($contact['StudentContactID']);
+                $main = $userMapper->findByExternalId($contact['StudentContactID'], Role::PARENT);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 // noop
             }
             $spouse = null;
             try {
-                $spouse = $userMapper->findByExternalId($contact['StudentContactSpouseID']);
+                $spouse = $userMapper->findByExternalId($contact['StudentContactSpouseID'], Role::PARENT);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 // noop
             }
