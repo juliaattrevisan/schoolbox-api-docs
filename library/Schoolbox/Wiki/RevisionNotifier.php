@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -11,7 +11,6 @@ namespace Schoolbox\Wiki;
 
 
 use Alaress\Async\Notification\Instance\Builder;
-use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Monolog\Logger;
 use Schoolbox\Collection;
@@ -29,109 +28,122 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 
-class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface {
+class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
+{
 
-	const TRIGGER_REVISED = 'revised';
+    const TRIGGER_REVISED = 'revised';
 
-	/** @var WikiMapper */
-	protected $wikiMapper;
+    /** @var WikiMapper */
+    protected $wikiMapper;
 
-	/** @var FolderMapper */
-	protected $catMapper;
+    /** @var FolderMapper */
+    protected $catMapper;
 
-	/**
-	 * Instantiate all your dependencies within yourself.
-	 *
-	 * @param mixed $dependencies
-	 * @return void
-	 */
-	public function loadDependencies($dependencies = null) {
-		$this->wikiMapper = WikiMapper::getInstance();
-		$this->catMapper = FolderMapper::getInstance();
-		parent::loadDependencies($dependencies);
-	}
+    /**
+     * Instantiate all your dependencies within yourself.
+     *
+     * @param mixed $dependencies
+     * @return void
+     */
+    public function loadDependencies($dependencies = null)
+    {
+        $this->wikiMapper = WikiMapper::getInstance();
+        $this->catMapper  = FolderMapper::getInstance();
+        parent::loadDependencies($dependencies);
+    }
 
-	/**
-	 * @return string
-	 */
-	protected function getSlug() {
-		return NSMapper::NS_WIKI;
-	}
-
-
-	/**
-	 * @param TriggerBundle $bundle
-	 * @return void
-	 */
-	public function bundleTriggers($bundle) {
-		// we only care about creation
-		if($bundle->getMethod() == Mapper::METHOD_CREATE) {
-			/** @var Revision $revision */
-			$revision = $bundle->getEvent()->getObject();
-			$bundle->attach(self::TRIGGER_REVISED, $revision->getCreated()->getUnixTimeStamp());
-		}
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function getFeed($context, User $user, $limit = self::HARD_LIMIT, $offset = 0) {
-		$c = new Collection();
-
-		// be sure the target method exists
-		if(!$this->mapper instanceof FeedableMapperInterface) {
-			return $c;
-		}
-
-		/** @var Collection|Revision[] $revisions */
-		$revisions = $this->mapper->findForFeed($context, $limit, $offset);
-
-		$c = new Collection();
-		foreach($revisions as $revision) {
-			$c = $c->merge(
-				new Collection($this->notifyRevised($user->getRole()->getType(), $revision, $revision->getUser())->getAll($revision->getCreated()->getUnixTimeStamp()))
-			);
-		}
-		return $c;
-	}
-
-	/**
-	 * Returns the metadata pertaining to this source.
-	 * Useful to RSS
-	 *
-	 * @return mixed
-	 */
-	public function getChannelMetadata() {
-		return null;
-	}
+    /**
+     * @return string
+     */
+    protected function getSlug()
+    {
+        return NSMapper::NS_WIKI;
+    }
 
 
-	/* ASYNC NOTIFY METHODS */
+    /**
+     * @param TriggerBundle $bundle
+     * @return void
+     */
+    public function bundleTriggers($bundle)
+    {
+        // we only care about creation
+        if ($bundle->getMethod() == Mapper::METHOD_CREATE) {
+            /** @var Revision $revision */
+            $revision = $bundle->getEvent()->getObject();
+            $bundle->attach(self::TRIGGER_REVISED, $revision->getCreated()->getUnixTimeStamp());
+        }
+    }
 
-	/**
-	 * @param string $roleType
-	 * @param Revision $revision
-	 * @param User $author
-	 * @return Envelope
-	 */
-	public function notifyRevised($roleType, $revision, $author) {
+    /**
+     * @inheritdoc
+     */
+    public function getFeed($context, User $user, $limit = self::HARD_LIMIT, $offset = 0)
+    {
+        $c = new Collection();
 
-		/** @var Revision $revision */
-		$revision     = $this->mapper->findById($revision->getId());
-		$revisionId   = $revision->getId();
+        // be sure the target method exists
+        if (!$this->mapper instanceof FeedableMapperInterface) {
+            return $c;
+        }
 
-		$wiki         = $revision->getWiki();
-		$wikiId       = $wiki->getId();
+        /** @var Collection|Revision[] $revisions */
+        $revisions = $this->mapper->findForFeed($context, $limit, $offset);
 
-		$cat          = $wiki->getCategory();
-		$categoryId   = $cat->getId();
+        $c = new Collection();
+        foreach ($revisions as $revision) {
+            $c = $c->merge(
+                new Collection(
+                    $this->notifyRevised(
+                        $user->getRole()->getType(),
+                        $revision,
+                        $revision->getUser()
+                    )->getAll($revision->getCreated()->getUnixTimeStamp())
+                )
+            );
+        }
+        return $c;
+    }
 
-		$authorExtId  = $author->getExternalId();
+    /**
+     * Returns the metadata pertaining to this source.
+     * Useful to RSS
+     *
+     * @return mixed
+     */
+    public function getChannelMetadata()
+    {
+        return null;
+    }
 
-		$href = "/wiki/revision/$wikiId/$revisionId";
+
+    /* ASYNC NOTIFY METHODS */
+
+    /**
+     * @param string   $roleType
+     * @param Revision $revision
+     * @param User     $author
+     * @return Envelope
+     */
+    public function notifyRevised($roleType, $revision, $author)
+    {
+
+        /** @var Revision $revision */
+        $revision   = $this->mapper->findById($revision->getId());
+        $revisionId = $revision->getId();
+
+        $wiki   = $revision->getWiki();
+        $wikiId = $wiki->getId();
+
+        $cat        = $wiki->getCategory();
+        $categoryId = $cat->getId();
+
+        $authorExtId = $author->getExternalId();
+
+        $href = "/wiki/revision/$wikiId/$revisionId";
 
         $envelope = new Envelope();
-        $bob = new Builder();
+        $bob      = new Builder();
 
         $bob->setTitle(':author revised the wiki :title in :folder')
             ->setHref($href)
@@ -142,45 +154,48 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
             ->setParams([
                 'author' => new UserParam($author),
                 'title'  => new Param($revision->getHeading(), $href),
-                'folder' => new CategoryParam($cat)
+                'folder' => new CategoryParam($cat),
             ])
             ->setFilter([
-                'roletype' => $roleType
+                'roletype' => $roleType,
             ]);
 
         $envelope->broadcastToCategory($categoryId, UserAccess::ACCESS_READ, $bob->build());
 
-		return $envelope;
-	}
+        return $envelope;
+    }
 
-	/**
-	 * @param Revision $revision
-	 * @param User $author
-	 * @param array $diff
-	 * @return Envelope
-	 */
-	public function notifyStudentRevised($revision, $author, $diff = array()) {
-		return $this->notifyRevised(Role::STUDENT, $revision, $author);
-	}
+    /**
+     * @param Revision $revision
+     * @param User     $author
+     * @param array    $diff
+     * @return Envelope
+     */
+    public function notifyStudentRevised($revision, $author, $diff = [])
+    {
+        return $this->notifyRevised(Role::STUDENT, $revision, $author);
+    }
 
-	/**
-	 * @param Revision $revision
-	 * @param User $author
-	 * @param array $diff
-	 * @return Envelope
-	 */
-	public function notifyStaffRevised($revision, $author, $diff = array()) {
-		return $this->notifyRevised(Role::STAFF, $revision, $author);
-	}
+    /**
+     * @param Revision $revision
+     * @param User     $author
+     * @param array    $diff
+     * @return Envelope
+     */
+    public function notifyStaffRevised($revision, $author, $diff = [])
+    {
+        return $this->notifyRevised(Role::STAFF, $revision, $author);
+    }
 
-	/**
-	 * @param Revision $revision
-	 * @param User $author
-	 * @param array $diff
-	 * @return Envelope
-	 */
-	public function notifyParentRevised($revision, $author, $diff = array()) {
-		return $this->notifyRevised(Role::PARENT, $revision, $author);
-	}
+    /**
+     * @param Revision $revision
+     * @param User     $author
+     * @param array    $diff
+     * @return Envelope
+     */
+    public function notifyParentRevised($revision, $author, $diff = [])
+    {
+        return $this->notifyRevised(Role::PARENT, $revision, $author);
+    }
 
 } 
