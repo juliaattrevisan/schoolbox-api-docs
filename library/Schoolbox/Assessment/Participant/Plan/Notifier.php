@@ -641,6 +641,19 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
             // generic: only if no others raised
             // Not sure if there's any point to this notif, but raise it anyway
+
+            // Students
+            $bob->setHref($route)
+                ->setTitle(':author updated :box in :cat')
+                ->setParam('box', new Param($assessmentDomainObject->getTitle(), $route))
+                ->setParam('cat', new CategoryParam($folder));
+            $envelope->targetToUser($participant->getUser(), $bob->build());
+
+            // Parents
+            $bob->setTitle(":child's $boxType :box was updated in :cat")
+                ->unsetParam('author')
+                ->setParam('child', new ChildParam($participant->getUser(), Param::STACKING_REPLACE));
+            $envelope->targetToParent($participant->getUser(), $bob->build());
         }
 
         return $envelope;
