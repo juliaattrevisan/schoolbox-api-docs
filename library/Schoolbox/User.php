@@ -1075,17 +1075,22 @@ class User implements JsonSerializable, ISoftDeletable
                 /* Add parent
                  */
                 if (!empty($currentParent['StudentContactID'])) {
-                    $parentCollection = UserMapper::getInstance()->findByExternalId($currentParent['StudentContactID'], Role::PARENT);
-                    foreach ($parentCollection as $parent) {
+                    try {
+                        $parent = UserMapper::getInstance()->findByExternalId($currentParent['StudentContactID'], Role::PARENT);
                         $this->parent_collection->add($parent);
+                    } catch (Mapper\Exception $e ) {
+                        //noop
                     }
                 }
                 /* Add speece
                  */
                 if (!empty($currentParent['StudentContactSpouseID'])) {
-                    $spouseCollection = UserMapper::getInstance()->findByExternalId($currentParent['StudentContactSpouseID'], Role::PARENT);
-                    if ($spouseCollection->count()) {
-                        $this->parent_collection->add($spouseCollection->first());
+
+                    try {
+                        $spouse = UserMapper::getInstance()->findByExternalId($currentParent['StudentContactSpouseID'], Role::PARENT);
+                        $this->parent_collection->add($spouse);
+                    } catch (Mapper\Exception $e ) {
+                        //noop
                     }
                 }
             }

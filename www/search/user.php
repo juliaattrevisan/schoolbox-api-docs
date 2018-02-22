@@ -6,6 +6,7 @@ use Schoolbox\Permission\Access\Access as Access;
 use Schoolbox\ProfessionalDevelopment\Mapper as ProfessionalDevelopmentMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
+use Schoolbox\Role;
 
 //require_once 'include/permission.php';
 
