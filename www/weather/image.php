@@ -16,7 +16,7 @@ $real_url = 'http://icons-ak.wxug.com/';
 $cache_path = Cfg::get('weather_dir');
 $file_path = urldecode($_GET['path']);
 
-if (is_string($file_path)) {
+if (is_string($file_path) && !stristr($file_path, '/.gif') ) {
     $file_name = basename($file_path);
     if (file_exists($cache_path . '/' . $file_name)) {
         $file_contents = file_get_contents($cache_path . '/' . $file_name);
