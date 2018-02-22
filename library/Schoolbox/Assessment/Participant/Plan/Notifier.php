@@ -679,6 +679,16 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     }
 
     /**
+     * @param DueWorkFeedbackMapper $dueWorkFeedbackMapper
+     * @return static
+     */
+    protected function setDueWorkFeedbackMapper(DueWorkFeedbackMapper $dueWorkFeedbackMapper)
+    {
+        $this->dueWorkFeedbackMapper = $dueWorkFeedbackMapper;
+        return $this;
+    }
+
+    /**
      * Get the first non-null date in `$dates`, or null otherwise.
      *
      * Currently only needed for triggering a bundle for a plan.
