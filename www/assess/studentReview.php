@@ -14,6 +14,7 @@
  */
 
 use Schoolbox\Error;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -25,6 +26,12 @@ $attemptHandler  = new Assess_Attempt();
 $responseHandler = new Assess_Response();
 $sectionHandler  = new Assess_Section();
 $groupHandler    = new Group;
+
+/**
+ * @var SitePage $this
+ * @var AssessmentDataSource $assessmentDataSource
+ */
+$assessmentDataSource = $this->getDi()->get('assessmentDataSource');
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -140,8 +147,16 @@ try {
 /* Show current Section's data, and other mandatory tokens needed to complete
  * the Assessment.
  */
-$openDate      = new Alaress_Date_Format($assess['start'], Alaress_Date_Format::DATABASE_FORMAT);
-$dueDate       = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
+
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+$assessment = $assessmentDataSource->findByQuizId($assess['assess_id'], $sessionUser);
+
+// Does session user have a participation? If so, use CAP details.
+$participant = $assessment->getParticipantIfExtant($sessionUser);
+$plan['start'] = $participant ? $participant->getOpenDate() : $assessment->getOpenAt();
+$plan['finish'] = $participant ? $participant->getDueDate() : $assessment->getDueAt();
+
 $attemptDate   = new Alaress_Date_Format($attempt['start'], Alaress_Date_Format::DATABASE_FORMAT);
 $attemptFinish = new Alaress_Date_Format($attempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 
@@ -152,8 +167,8 @@ $this->setVar(
         'RETURN_URL_SUFFIX'             => $returnUrlSuffix,
         'ASSESS_ASSESS_ID'              => $assess['assess_id'],
         'ASSESS_TITLE'                  => Scrub::text($assess['title']),
-        'ASSESS_START'                  => $openDate->getShort(),
-        'ASSESS_FINISH'                 => $dueDate->getShort(),
+        'ASSESS_START'                  => $plan['start']->getShort(),
+        'ASSESS_FINISH'                 => $plan['finish']->getShort(),
         'ATTEMPT_ATTEMPT_ID'            => $attemptId,
         'ATTEMPT_START'                 => $attemptDate->getShort(),
         'ATTEMPT_FINISH'                => $attemptFinish->getShort(),
