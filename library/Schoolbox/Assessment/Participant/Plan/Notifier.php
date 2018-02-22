@@ -433,29 +433,32 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             return $envelope;
         }
 
-        // Try triggering for every student; maybe they will stack
+        // Send a single notification for total # students not submitted
         $href = $this->buildAssessmentRoute($assessmentDomainObject);
         $bob  = $this->buildGenericDueWorkBuilder($assessmentDomainObject)
-                     ->setTitle(":box in :cat has closed and :student did not submit work")
+                     ->setTitle(":box in :cat has closed and :number did not submit work")
                      ->setHref($href)
                      ->setParam('box', new Param($assessmentDomainObject->getTitle(), $href))
                      ->setParam('cat', new CategoryParam($folder))
                      ->setSeverity(Logger::ERROR)
                      ->addTopic("duework.$boxId.closed");
 
-        // Customise and send to every participant in this plan only
+        // Figure out how many need to submit
+        $totalUnsubmitted = 0;
         foreach ($this->retrieveParticipantsFromPlan($plan, $assessmentDomainObject) as $participant) {
             if ($participant->isExcluded()) {
                 continue;
             }
-
-            // Has participant already submitted?
             if (!$participant->isResponseRequired()) {
                 continue;
             }
-
-            // build for staff
-            $bob->setParam('student', new UserParam($participant->getUser()));
+            $totalUnsubmitted++;
+        }
+        if ($totalUnsubmitted > 0) {
+            $bob->setParam(
+                'number',
+                new Param(sprintf('%s student%s', $totalUnsubmitted, $totalUnsubmitted === 1 ? '' : 's'))
+            );
             $envelope->broadcastToCategory($folder, UserAccess::ACCESS_WRITE, $bob->build());
         }
 
@@ -477,7 +480,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     public function notifyDueWorkUpdated(Model $plan, User $effector, array $diff = null): Envelope
     {
         $envelope = new Envelope();
-        $bob      = new Builder();
 
         // TODO extract all the box fetching, plan iteration into a generator
         $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
