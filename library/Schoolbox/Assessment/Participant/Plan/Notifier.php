@@ -25,6 +25,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizFeedbackMapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -525,18 +526,29 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             if (isset($diff['assessment']['markVisibility'])) {
                 [$new, $old] = $diff['assessment']['markVisibility'];
                 if ($new > $old) {
+
                     // Trigger notification about this item
                     $authoritativeFeedback = $assessment->getAuthoritativeFeedback($participant, true);
-                    // handle quiz and duework feedback
                     if ($authoritativeFeedback) {
-                        $dueWorkFeedback = $this->dueWorkFeedbackMapper->findById($authoritativeFeedback->getId());
-                        $this->raiseNotification(
-                            $authoritativeFeedback->getReviewer(),
-                            \Schoolbox\Mapper::METHOD_CREATE,
-                            $dueWorkFeedback,
-                            $this->dueWorkFeedbackMapper
-                        );
-                        $notificationRaisedForParticipant = true;
+
+                        // Figure out which mapper to use
+                        $feedbackMapper = null;
+                        if ($assessment instanceof DueWork) {
+                            $feedbackMapper = $this->dueWorkFeedbackMapper;
+                        } elseif ($assessment instanceof Quiz) {
+                            $feedbackMapper = $this->quizFeedbackMapper;
+                        }
+
+                        // and raise a notification against it
+                        if ($feedbackMapper instanceof BaseMapper) {
+                            $this->raiseNotification(
+                                $authoritativeFeedback->getReviewer(),
+                                BaseMapper::METHOD_CREATE,
+                                $feedbackMapper->findById($authoritativeFeedback->getId()),
+                                $feedbackMapper
+                            );
+                            $notificationRaisedForParticipant = true;
+                        }
                     }
                 }
             }
