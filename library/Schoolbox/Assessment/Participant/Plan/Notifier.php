@@ -135,8 +135,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             return;
         }
 
+        $method = $bundle->getMethod();
         if ($assessment->getDueWork()) {
-            if ($bundle->getMethod() === Mapper::METHOD_DELETE) {
+            if ($method === Mapper::METHOD_DELETE) {
                 $bundle->detachEach([
                     self::TRIGGER_DUEWORK_OPEN,
                     self::TRIGGER_DUEWORK_UPCOMING,
@@ -148,34 +149,37 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             } else {
                 // Bundle triggers
 
-                // Open is now always bundled, not just on create
-                // TODO figure out if it should trigger if participant is in past
-                $openDate = $this->coalesceDates($plan->getOpenDate(), $assessment->getOpenDate());
-                if ($openDate) {
-                    $bundle->attach(self::TRIGGER_DUEWORK_OPEN, $openDate->getUnixTimeStamp());
-                }
-
-                // Due and upcoming: always bundled
-                $dueDate = $this->coalesceDates($plan->getDueDate(), $assessment->getDueDate());
-                if ($dueDate) {
-                    $upcomingDate = (clone $dueDate)->addDays(-self::DUEWORK_UPCOMING_WINDOW);
-                    // if the upcoming date is before the open date, push upcoming to 1 minute after open,
-                    // rounded to the nearest 5 minutes?
-                    if ($upcomingDate->lt($openDate)) {
-                        $upcomingDate = (clone $openDate)->addMinutes(1);
-                    }
-                    $bundle->attach(self::TRIGGER_DUEWORK_UPCOMING, $upcomingDate->getUnixTimeStamp());
-                    $bundle->attach(self::TRIGGER_DUEWORK_OVERDUE, $dueDate->getUnixTimeStamp());
-                }
-
-                // Close: always bundled
+                // I need a close date to determine if I should trigger anything:
+                // if it's in the past, trigger nothing except update.
                 $closeDate = $this->coalesceDates($plan->getCloseDate(), $assessment->getCloseDate());
-                if ($closeDate) {
+                if ($closeDate && $closeDate->isFuture()) {
+
+                    // Open is now always bundled, as long as it is set
+                    // However, if its open date is in the past don't bundle if this is an update
+                    $openDate = $this->coalesceDates($plan->getOpenDate(), $assessment->getOpenDate());
+                    if ($openDate && ($method === Mapper::METHOD_CREATE || $openDate->isFuture())) {
+                        $bundle->attach(self::TRIGGER_DUEWORK_OPEN, $openDate->getUnixTimeStamp());
+                    }
+
+                    // Due and upcoming: always bundled as long as due date is set
+                    $dueDate = $this->coalesceDates($plan->getDueDate(), $assessment->getDueDate());
+                    if ($dueDate) {
+                        $upcomingDate = (clone $dueDate)->addDays(-self::DUEWORK_UPCOMING_WINDOW);
+                        // if the upcoming date is before the open date, push upcoming to 1 minute after open,
+                        // rounded to the nearest 5 minutes?
+                        if ($upcomingDate->lt($openDate)) {
+                            $upcomingDate = (clone $openDate)->addMinutes(1);
+                        }
+                        $bundle->attach(self::TRIGGER_DUEWORK_UPCOMING, $upcomingDate->getUnixTimeStamp());
+                        $bundle->attach(self::TRIGGER_DUEWORK_OVERDUE, $dueDate->getUnixTimeStamp());
+                    }
+
+                    // Close: always bundled
                     $bundle->attach(self::TRIGGER_DUEWORK_CLOSED, $closeDate->getUnixTimeStamp());
                 }
 
                 // Generic updated trigger
-                if ($bundle->getMethod() === Mapper::METHOD_UPDATE) {
+                if ($method === Mapper::METHOD_UPDATE) {
                     $bundle->attach(self::TRIGGER_DUEWORK_UPDATED, self::IMMEDIATELY);
                 }
             }
