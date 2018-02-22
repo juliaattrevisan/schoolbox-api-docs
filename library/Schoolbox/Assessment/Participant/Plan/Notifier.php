@@ -24,6 +24,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -263,7 +264,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             in_array(strtolower($boxType[0]), ['a', 'e', 'i', 'o', 'u'], true) ? 'an' : 'a'
             : '';
 
-        $bob = $this->buildGenericDueWorkBuilder($dueWork, $effector)
+        $bob = $this->buildGenericBuilder($dueWork, $effector)
             ->setTitle(":author opened $indefArticle $boxType :box in :cat")
             ->setParam('author', new UserParam($effector, ParameterInterface::STACKING_REPLACE))
             ->addTopic("duework.{$boxId}.open")
@@ -329,7 +330,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             return $envelope;
         }
 
-        $bob = $this->buildGenericDueWorkBuilder($dueWork)
+        $bob = $this->buildGenericBuilder($dueWork)
                     ->setSeverity(Logger::WARNING)
                     ->addTopic("duework.$boxId.upcoming");
 
@@ -408,7 +409,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             return $envelope;
         }
 
-        $bob = $this->buildGenericDueWorkBuilder($dueWork)
+        $bob = $this->buildGenericBuilder($dueWork)
                     ->setSeverity(Logger::ERROR)
                     ->addTopic("duework.$boxId.overdue");
 
@@ -487,7 +488,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
         // Send a single notification for total # students not submitted
         $href = $this->buildAssessmentRoute($dueWork);
-        $bob  = $this->buildGenericDueWorkBuilder($dueWork)
+        $bob  = $this->buildGenericBuilder($dueWork)
                      ->setTitle(":box in :cat has closed and :number did not submit work")
                      ->setHref($href)
                      ->setParam('box', new Param($dueWork->getTitle(), $href))
@@ -570,7 +571,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $boxType  = mb_strtolower($workType ? $workType->getName() : '');
 
         // All updated notifs have the same icon, namespace, severity
-        $bob = $this->buildGenericDueWorkBuilder($dueWork, $effector)
+        $bob = $this->buildGenericBuilder($dueWork, $effector)
                     ->setSeverity(Logger::ERROR);
 
         // Figure out who's actually targeted
@@ -863,17 +864,25 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * @param null|User   $effector   The user whose portrait to show as the icon, or null for a generic icon
      * @return Builder
      */
-    private function buildGenericDueWorkBuilder(IAssessable $assessment, ?User $effector = null): Builder
+    private function buildGenericBuilder(IAssessable $assessment, ?User $effector = null): Builder
     {
         $bob    = new Builder();
         $folder = $assessment->getBaseContext()->getFolder();
-        // Icon: could be the effector, or a generic icon
         $icon   = $effector
             ? "/portrait?" . http_build_query(['userId' => $effector->getExternalId(), 'size' => $this->iconSize,])
             : "/images/icon?" . http_build_query(['size' => $this->iconSize, 'icon' => 'work']);
+
+        // Namespace depends on kind of assessment
+        $namespace = null;
+        if ($assessment instanceof DueWork) {
+            $namespace = NSMapper::NS_DUEWORK;
+        } elseif ($assessment instanceof Quiz) {
+            $namespace = NSMapper::NS_ONLINE_ASSESS;
+        }
+
         $bob->setParam('cat', new CategoryParam($folder))
             ->setIcon($icon)
-            ->setNamespace(NSMapper::NS_DUEWORK);
+            ->setNamespace($namespace);
         return $bob;
     }
 
