@@ -247,7 +247,7 @@ class Model extends AbstractAssessment
             /* Check whether the most recent response is officially submitted
              * You should be allowed to resume the draft/in-progress attempt
              */
-            if (!$mostRecentResponse->isSubmitted()) {
+            if ($mostRecentResponse && !$mostRecentResponse->isSubmitted()) {
                 return true;
             }
         }
