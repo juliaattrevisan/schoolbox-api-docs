@@ -14,6 +14,7 @@ use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Alaress_Date_Format;
 use Monolog\Logger;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as DueWorkFeedbackMapper;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
@@ -69,6 +70,11 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private $assessmentMapper;
 
     /**
+     * @var DueWorkFeedbackMapper
+     */
+    private $dueWorkFeedbackMapper;
+
+    /**
      * Irrelevant as this could notify about different things, but must exist.
      *
      * @return string
@@ -87,6 +93,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     {
         if (empty($dependencies['assessmentMapper'])) {
             $dependencies['assessmentMapper'] = AssessmentMapper::getInstance();
+        }
+        if (empty($dependencies['dueWorkFeedbackMapper'])) {
+            $dependencies['dueWorkFeedbackMapper'] = DueWorkFeedbackMapper::getInstance();
         }
         parent::loadDependencies($dependencies);
     }
@@ -496,56 +505,84 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     public function notifyDueWorkUpdated(Model $plan, User $effector, array $diff = null): Envelope
     {
         $envelope = new Envelope();
-//        $bob      = new Builder();
-//        $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
-//
-//        // This notifier only gets triggered for due works.
-//        $folder = $assessmentDomainObject->getBaseContext()->getFolder();
-//        if (!$assessmentDomainObject instanceof DueWork) {
-//            return $envelope;
-//        }
-//
-//        // Still need the submission box's ID for generating the topic
-//        $assessment = $this->retrieveAssessmentDataModel($plan);
-//        if (!$assessment->getDueWork()) {
-//            return $envelope;
-//        }
-//        $boxId = $assessment->getDueWork()->getId();
-//
-//        // Doesn't accept online? return
-//        if ($assessmentDomainObject->isAcceptNone()) {
-//            return $envelope;
-//        }
-//
-//        // Try triggering for every student; maybe they will stack
-//        $bob->setTitle(":box in :cat has closed and :student did not submit work")
-//            ->setParam('box', new Param($assessmentDomainObject->getTitle(), $this->buildAssessmentRoute($assessmentDomainObject)))
-//            ->setParam('cat', new CategoryParam($folder))
-//            ->setIcon("/images/icon.php?" . http_build_query(['size' => $this->iconSize, 'icon' => 'work']))
-//            ->setNamespace(NSMapper::NS_DUEWORK)
-//            ->setSeverity(Logger::ERROR)
-//            ->addTopic("duework.$boxId.closed");
-//
-//        // Customise and send to every participant in this plan only
-//        foreach ($assessmentDomainObject->getPlans() as $assessmentPlan) {
-//            if ($assessmentPlan->getId() !== $plan->getId()) {
-//                continue;
-//            }
-//            foreach ($assessmentPlan->getParticipants() as $participant) {
-//                if ($participant->isExcluded()) {
-//                    continue;
-//                }
-//
-//                // Has participant already submitted?
-//                if (!$participant->isResponseRequired()) {
-//                    continue;
-//                }
-//
-//                // build for staff
-//                $bob->setParam('student', new UserParam($participant->getUser()));
-//                $envelope->broadcastToCategory($folder, UserAccess::ACCESS_WRITE, $bob->build());
-//            }
-//        }
+        $bob      = new Builder();
+
+        // TODO extract all the box fetching, plan iteration into a generator
+        $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
+
+        // This notifier only gets triggered for due works.
+        if (!$assessmentDomainObject instanceof DueWork) {
+            return $envelope;
+        }
+
+        // Figure out who's actually targeted
+        foreach ($this->retrieveParticipantsFromPlan($plan, $assessmentDomainObject) as $participant) {
+            if ($participant->isExcluded()) {
+                continue;
+            }
+
+            // Is this open for this student yet?
+            if ($participant->getOpenDate()->isFuture()) {
+                continue;
+            }
+
+            // INCREASE in mark visibility (box can be closed in this instance)
+            // doesn't actually create messages, just triggers for others to be created
+            if (isset($diff['assessment']['markVisibility'])) {
+                [$new, $old] = $diff['assessment']['markVisibility'];
+                if ($new > $old) {
+                    // Trigger notification about this item
+                    $authoritativeFeedback = $assessmentDomainObject->getAuthoritativeFeedback($participant, true);
+                    if ($authoritativeFeedback) {
+                        $dueWorkFeedback = $this->dueWorkFeedbackMapper->findById($authoritativeFeedback->getId());
+                        $this->raiseNotification(
+                            $authoritativeFeedback->getReviewer(),
+                            \Schoolbox\Mapper::METHOD_CREATE,
+                            $dueWorkFeedback,
+                            $this->dueWorkFeedbackMapper
+                        );
+                    }
+                }
+            }
+
+            // Due date is passed: trigger no more
+            if ($participant->getDueDate()->isPast()) {
+                continue;
+            }
+
+            // renamed
+            if (!empty($diff['assessment']['name'])) {
+                // target to student, parent
+//                    foreach($students as $student){
+//                        $bob = $this
+//                            ->setForNotifyRenamed($bob, $submissionBox, $diff, $user, $student)
+//                            ->setHref($this->buildParticipantRoute($submissionBox, $student));
+//                        $envelope->targetToUser($student, $bob->build());
+//                    }
+            }
+
+            // due date change
+            if (!empty($diff['participants'][$participant->getUser()->getId()]['dueDate'])) {
+                // target this to student, parent
+//                    $bob = $this
+//                        ->setForNotifyDueDateChanged($bob, $submissionBox, $diff, $user, $student)
+//                        ->setHref($this->buildParticipantRoute($submissionBox, $student));
+//                    $envelope->targetToUser($student, $bob->build());
+            }
+
+            // accept online
+            if (!empty($diff['assessment']['acceptOnline'])) {
+//                    foreach($students as $student){
+//                        $bob = $this
+//                            ->setForNotifyAcceptOnlineChanged($bob, $submissionBox, $student)
+//                            ->setHref($this->buildParticipantRoute($submissionBox, $student));
+//                        $envelope->targetToUser($student, $bob->build());
+//                    }
+            }
+
+            // generic: only if no others raised
+            // Not sure if there's any point to this notif
+        }
 
         return $envelope;
     }
