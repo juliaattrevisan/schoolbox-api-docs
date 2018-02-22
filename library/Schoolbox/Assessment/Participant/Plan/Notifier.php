@@ -231,8 +231,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
         foreach ($boxes as $box) {
             $c = $c
-                ->merge(new Collection($this->notifyStudentOpen($box, $box->getOwner())->getAll($box->getOpenDate()->getUnixTimeStamp())))
-                ->merge(new Collection($this->notifyFeedClosed($box, $box->getOwner())->getAll($box->getDueDate()->getUnixTimeStamp())));
+                ->merge(new Collection($this->notifyOpen($box, $box->getOwner())->getAll($box->getOpenDate()->getUnixTimeStamp())))
+                ->merge(new Collection($this->notifyClosed($box, $box->getOwner())->getAll($box->getDueDate()->getUnixTimeStamp())));
         }
 
         return $c;
