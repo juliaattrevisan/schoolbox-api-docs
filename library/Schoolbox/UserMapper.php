@@ -39,6 +39,8 @@ class UserMapper extends Mapper
      * If we save, delete, soft-delete, or restore a user, we must update the
      * cache via callbacks to ensure integrity.
      *
+     * Keys are all lowercase, hence 'UserName' === 'username' to mirror MySQL case-insensitivity
+     *
      * @var array|null $usernameCache Maps 'username' => 'id'.
      */
     protected $usernameCache;
@@ -625,6 +627,7 @@ class UserMapper extends Mapper
         return $statement->fetchColumn();
     }
 
+
     /**
      * Pre-save callback for verifying whether a user's name is unique.
      *
@@ -638,22 +641,24 @@ class UserMapper extends Mapper
     public function verifyUniqueUsername(User $user)
     {
         // Load cache on first invocation
-        if(!is_array($this->usernameCache)){
+        if(!\is_array($this->usernameCache)){
             $this->usernameCache = [];
             $query = $this->selectScalarByColumnList("{$this->getTable()}.id, {$this->getTable()}.username", []);
             $query->execute();
+            /** @noinspection PhpAssignmentInConditionInspection */
             while($row = $query->fetch(\PDO::FETCH_ASSOC)){
-                $this->usernameCache[$row['username']] = $row['id'];
+                $this->usernameCache[\strtolower($row['username'])] = $row['id'];
             }
         }
 
         // Check cache
-        if(array_key_exists($user->getUsername(), $this->usernameCache)) {
-            if($this->usernameCache[$user->getUsername()] != $user->getId()){
+        $usernameLowerCase = \strtolower($user->getUsername());
+        if(array_key_exists($usernameLowerCase, $this->usernameCache)) {
+            if($this->usernameCache[$usernameLowerCase] != $user->getId()){
                 throw new UnexpectedValueException(
                     sprintf('A user with username "%s" already exists. Existing user id: "%s"',
                         $user->getUsername(),
-                        $this->usernameCache[$user->getUsername()]
+                        $this->usernameCache[$usernameLowerCase]
                     )
                 );
             }
@@ -670,8 +675,8 @@ class UserMapper extends Mapper
      */
     public function addUsernameToCache(User $user){
         // Is cache in use?
-        if(is_array($this->usernameCache)){
-            $this->usernameCache[$user->getUsername()] = $user->getId();
+        if(\is_array($this->usernameCache)){
+            $this->usernameCache[strtolower($user->getUsername())] = $user->getId();
         }
     }
 
@@ -680,14 +685,16 @@ class UserMapper extends Mapper
      *
      * @param User $user
      */
-    public function removeUsernameFromCache(User $user){
+    public function removeUsernameFromCache(User $user)
+    {
         // Is cache in use?
-        if(is_array($this->usernameCache)){
+        if (\is_array($this->usernameCache)) {
             // Is username in cache?
-            if(isset($this->usernameCache[$user->getUsername()])){
+            $usernameLowerCase = \strtolower($user->getUsername());
+            if (isset($this->usernameCache[$usernameLowerCase])) {
                 // Does cache record belong to this user?
-                if($this->usernameCache[$user->getUsername()] == $user->getId()){
-                    unset($this->usernameCache[$user->getUsername()]);
+                if ($this->usernameCache[$usernameLowerCase] == $user->getId()) {
+                    unset($this->usernameCache[$usernameLowerCase]);
                 }
             }
         }
