@@ -73,15 +73,9 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 	}
 
 	/**
-	 * Generate n Instances, from the perspective of casual observation (rather than targeted at a particular user).
-	 *
-	 * @param int $context     - most likely a category ID or ignored
-	 * @param string $roletype - the roletype of the user for whom this feed is being retrieved
-	 * @param int $limit       - how many messages to retrieve
-	 * @param int $offset      - by default, most recent
-	 * @return Collection|Instance[]
+	 * @inheritdoc
 	 */
-	public function getFeed($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0) {
+	public function getFeed($context, User $user, $limit = self::HARD_LIMIT, $offset = 0) {
 		$c = new Collection();
 
 		// be sure the target method exists
@@ -95,7 +89,7 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 		$c = new Collection();
 		foreach($revisions as $revision) {
 			$c = $c->merge(
-				new Collection($this->notifyRevised($roletype, $revision, $revision->getUser())->getAll($revision->getCreated()->getUnixTimeStamp()))
+				new Collection($this->notifyRevised($user->getRole()->getType(), $revision, $revision->getUser())->getAll($revision->getCreated()->getUnixTimeStamp()))
 			);
 		}
 		return $c;
