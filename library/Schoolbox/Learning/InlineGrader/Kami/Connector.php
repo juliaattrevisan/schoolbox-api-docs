@@ -288,7 +288,7 @@ class Connector implements IConnector
                 'document_identifier' => $documentId,
                 'user'                => [
                     'name'    => "{$user->getFirstname()} {$user->getLastname()}",
-                    'user_id' => $user->getId(),
+                    'user_id' => $this->config->get('site_school_code').'-'.$user->getId(),
                 ],
                 'expires_at'          => $expires->getUsingFormat(Alaress_Date_Format::FORMAT_DATETIME_UTC),
                 'viewer_options'      => [
