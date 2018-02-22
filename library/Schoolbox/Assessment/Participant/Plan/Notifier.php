@@ -19,7 +19,6 @@ use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -246,7 +245,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             : '';
 
         $bob = $this->buildGenericBuilder($assessmentDomainObject, $effector)
-                    ->setTitle(":author opened $indefArticle $boxType :box in :cat")
+                    ->setTitle(":author opened $indefArticle $boxType :assessment in :cat")
                     ->setParam('author', new UserParam($effector, ParameterInterface::STACKING_REPLACE))
                     ->addTopic("$topicStub.$topicSuffix")
                     ->setSeverity(Logger::NOTICE);
@@ -328,7 +327,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
             // build for student
             $bob = $this->targetBuilderToStudent($bob, $dueWork, $participant)
-                        ->setTitle(":box is due $when from now in :cat")
+                        ->setTitle(":assessment is due $when from now in :cat")
                         ->setBody($participant->getDescription());
             $envelope->targetToUser($participant->getUser(), $bob->build());
 
@@ -337,7 +336,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 continue;
             }
             $bob = $this->targetBuilderToParents($bob, $dueWork, $participant)
-                        ->setTitle(":child has not yet submitted work for :box, which is due $when from now in :cat");
+                        ->setTitle(":child has not yet submitted work for :assessment, which is due $when from now in :cat");
             $envelope->targetToParent($participant->getUser(), $bob->build());
         }
 
@@ -403,7 +402,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
             // build for student
             $bob = $this->targetBuilderToStudent($bob, $dueWork, $participant)
-                        ->setTitle(":box is now overdue in :cat")
+                        ->setTitle(":assessment is now overdue in :cat")
                         ->setBody($participant->getDescription());
             $envelope->targetToUser($participant->getUser(), $bob->build());
 
@@ -412,7 +411,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 continue;
             }
             $bob = $this->targetBuilderToParents($bob, $dueWork, $participant)
-                        ->setTitle(':child did not submit work for :box in :cat');
+                        ->setTitle(':child did not submit work for :assessment in :cat');
             $envelope->targetToParent($participant->getUser(), $bob->build());
         }
 
@@ -464,7 +463,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         // Send a single notification for total # students not submitted
         $href = $this->buildAssessmentRoute($dueWork);
         $bob  = $this->buildGenericBuilder($dueWork)
-                     ->setTitle(":box in :cat has closed and :number did not submit work")
+                     ->setTitle(":assessment in :cat has closed and :number did not submit work")
                      ->setHref($href)
                      ->setParam('box', new Param($dueWork->getTitle(), $href))
                      ->setSeverity(Logger::ERROR)
@@ -593,7 +592,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 // Students
                 // TODO iterate particiapnts and students separately?
                 $bob = $this->targetBuilderToStudent($bob, $dueWork, $participant)
-                            ->setTitle(':author renamed :oldname to :box in :cat')
+                            ->setTitle(':author renamed :oldname to :assessment in :cat')
                             ->setParam('author', new UserParam($effector))
                             ->setParam('oldname', new Param($oldName))
                             ->setTopics(["$topicStub.renamed"]);
@@ -601,7 +600,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
                 // Parents
                 $bob = $this->targetBuilderToParents($bob, $dueWork, $participant)
-                            ->setTitle(":child's $boxType was renamed from :oldname to :box in :cat")
+                            ->setTitle(":child's $boxType was renamed from :oldname to :assessment in :cat")
                             ->unsetParam('author');
                 $envelope->targetToParent($participant->getUser(), $bob->build());
 
@@ -621,7 +620,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
                 // Students
                 $bob = $this->targetBuilderToStudent($bob, $dueWork, $participant)
-                            ->setTitle(":author $verb :box to :date in :cat")
+                            ->setTitle(":author $verb :assessment to :date in :cat")
                             ->setParam('author', new UserParam($effector))
                             ->setParam('date', new Param($dateformat))
                             ->setTopics(["$topicStub.datechanged"]);
@@ -629,7 +628,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
                 // Parents
                 $bob = $this->targetBuilderToParents($bob, $dueWork, $participant)
-                            ->setTitle(":child's $boxType :box closing date was $verb to :date in :cat")
+                            ->setTitle(":child's $boxType :assessment closing date was $verb to :date in :cat")
                             ->unsetParam('author');
                 $envelope->targetToParent($participant->getUser(), $bob->build());
 
@@ -640,8 +639,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             if (!empty($diff['assessment']['acceptOnline'])) {
                 // Students
                 $m = $dueWork->isAcceptNone()
-                    ? 'You no longer need to submit online for :box in :cat'
-                    : 'You now need to submit online for :box in :cat';
+                    ? 'You no longer need to submit online for :assessment in :cat'
+                    : 'You now need to submit online for :assessment in :cat';
                 $bob = $this->targetBuilderToStudent($bob, $dueWork, $participant)
                             ->setTitle($m)
                             ->setTopics(["$topicStub.updated"]);
@@ -649,8 +648,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
                 // Parents
                 $m = $dueWork->isAcceptNone()
-                    ? ':child no longer need to submit online for :box in :cat'
-                    : ':child needs to submit online for :box in :cat';
+                    ? ':child no longer need to submit online for :assessment in :cat'
+                    : ':child needs to submit online for :assessment in :cat';
                 $bob = $this->targetBuilderToParents($bob, $dueWork, $participant)
                             ->setTitle($m);
                 $envelope->targetToParent($participant->getUser(), $bob->build());
@@ -663,14 +662,14 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             if (!$notificationRaisedForParticipant) {
                 // Students
                 $bob = $this->targetBuilderToStudent($bob, $dueWork, $participant)
-                            ->setTitle(':author updated :box in :cat')
+                            ->setTitle(':author updated :assessment in :cat')
                             ->setParam('author', new UserParam($effector))
                             ->setTopics(["$topicStub.updated"]);
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
                 $bob = $this->targetBuilderToParents($bob, $dueWork, $participant)
-                            ->setTitle(":child's $boxType :box was updated in :cat")
+                            ->setTitle(":child's $boxType :assessment was updated in :cat")
                             ->unsetParam('author');
                 $envelope->targetToParent($participant->getUser(), $bob->build());
             }
@@ -865,7 +864,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     {
         $href = $this->buildParticipantRoute($assessment, $participant->getUser());
         return $bob
-            ->setParam('box', new Param($assessment->getTitle(), $href))
+            ->setParam('assessment', new Param($assessment->getTitle(), $href))
             ->unsetParam('child')
             ->setHref($href);
     }
@@ -882,7 +881,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     {
         $href = $this->buildParticipantRoute($assessment, $participant->getUser());
         return $bob
-            ->setParam('box', new Param($assessment->getTitle(), $href))
+            ->setParam('assessment', new Param($assessment->getTitle(), $href))
             ->setParam('child', new ChildParam($participant->getUser(), Param::STACKING_REPLACE))
             ->setHref($href);
     }
