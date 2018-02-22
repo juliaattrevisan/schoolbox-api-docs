@@ -219,15 +219,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
 
     /**
-     * Generate n Instances, from the perspective of casual observation (rather than targeted at a particular user).
-     *
-     * @param int  $context  - most likely a category ID or ignored
-     * @param User $user     - the roletype of the user for whom this feed is being retrieved
-     * @param int  $limit    - how many messages to retrieve
-     * @param int  $offset   - by default, most recent
-     * @throws \OutOfBoundsException     If severity is not set
-     * @throws \InvalidArgumentException If a required property was not set
-     * @return Collection|Instance[]
+     * @inheritdoc
      */
     public function getFeed($context, User $user, $limit = self::HARD_LIMIT, $offset = 0)
     {
