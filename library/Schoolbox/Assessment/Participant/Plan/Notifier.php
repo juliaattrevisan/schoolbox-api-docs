@@ -552,23 +552,21 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
 
             // renamed
-            if (!empty($diff['assessment']['name'])) {
-                [$newName, $oldName] = $diff['assessment']['name'];
+            if (!empty($diff['assessment']['title'])) {
+                [, $oldName] = $diff['assessment']['title'];
 
                 // Students
                 // TODO iterate particiapnts and students separately?
-                $route = $this->buildParticipantRoute($assessmentDomainObject, $participant->getUser());
                 $bob = $this->targetDueWorkBuilderToStudent($bob, $assessmentDomainObject, $participant)
-                            ->setTitle(':author renamed :oldname to :newname in :cat')
+                            ->setTitle(':author renamed :oldname to :box in :cat')
                             ->setParam('author', new UserParam($effector))
                             ->setParam('oldname', new Param($oldName))
-                            ->setParam('newname', new Param($newName, $route))
                             ->setTopics(["duework.{$boxId}.renamed"]);
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
                 $bob = $this->targetDueWorkBuilderToParents($bob, $assessmentDomainObject, $participant)
-                            ->setTitle(":child's $boxType was renamed from :oldname to :newname in :cat")
+                            ->setTitle(":child's $boxType was renamed from :oldname to :box in :cat")
                             ->unsetParam('author');
                 $envelope->targetToParent($participant->getUser(), $bob->build());
 
@@ -630,7 +628,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             if (!$notificationRaisedForParticipant) {
                 // Students
                 $bob = $this->targetDueWorkBuilderToStudent($bob, $assessmentDomainObject, $participant)
-                            ->setTitle(':author updated :box in :cat');
+                            ->setTitle(':author updated :box in :cat')
+                            ->setParam('author', new UserParam($effector))
+                            ->setTopics(["duework.{$boxId}.updated"]);
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
