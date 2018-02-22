@@ -432,85 +432,14 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     public function notifyClosed(Model $plan): Envelope
     {
         $assessment = $this->retrieveAssessmentDomainModel($plan);
-        if ($assessment instanceof DueWork) {
-            return $this->notifyDueWorkClosed($assessment, $plan);
-        }
-        if ($assessment instanceof Quiz) {
-            return $this->notifyQuizClosed($assessment, $plan);
-        }
-
-        return new Envelope();
-    }
-
-
-    /**
-     * Staff get notified when a due work closes and one or more students didn't submit.
-     *
-     * @param DueWork $assessment
-     * @param Model   $plan
-     * @return Envelope
-     */
-    private function notifyDueWorkClosed(DueWork $assessment, Model $plan): Envelope
-    {
-        $envelope  = new Envelope();
-        $topicStub = $this->retrieveAssessmentTopicStub($assessment);
+        $envelope   = new Envelope();
+        $topicStub  = $this->retrieveAssessmentTopicStub($assessment);
         if (!$topicStub) {
             return $envelope;
         }
 
         // Doesn't accept online? return
         if ($assessment instanceof DueWork && $assessment->isAcceptNone()) {
-            return $envelope;
-        }
-
-        // Send a single notification for total # students not submitted
-        $href = $this->buildAssessmentRoute($assessment);
-        $bob  = $this->buildGenericBuilder($assessment)
-                     ->setTitle(":assessment in :cat has closed and :number did not submit work")
-                     ->setHref($href)
-                     ->setParam('box', new Param($assessment->getTitle(), $href))
-                     ->setSeverity(Logger::ERROR)
-                     ->addTopic("$topicStub.closed");
-
-        // Figure out how many need to submit
-        $totalUnsubmitted = 0;
-        foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
-            if ($participant->isExcluded()) {
-                continue;
-            }
-            if (!$participant->isResponseRequired()) {
-                continue;
-            }
-            $totalUnsubmitted++;
-        }
-        if ($totalUnsubmitted > 0) {
-            $bob->setParam(
-                'number',
-                new Param(sprintf('%s student%s', $totalUnsubmitted, $totalUnsubmitted === 1 ? '' : 's'))
-            );
-            $envelope->broadcastToCategory(
-                $assessment->getBaseContext()->getFolder(),
-                UserAccess::ACCESS_WRITE,
-                $bob->build()
-            );
-        }
-
-        return $envelope;
-    }
-
-
-    /**
-     * Staff get notified when a due work closes and one or more students didn't submit.
-     *
-     * @param Quiz  $assessment
-     * @param Model $plan
-     * @return Envelope
-     */
-    private function notifyQuizClosed(Quiz $assessment, Model $plan): Envelope
-    {
-        $envelope  = new Envelope();
-        $topicStub = $this->retrieveAssessmentTopicStub($assessment);
-        if (!$topicStub) {
             return $envelope;
         }
 
