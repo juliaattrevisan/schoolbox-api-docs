@@ -243,11 +243,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     private function notifyDueWorkOpen(DueWork $dueWork, Model $plan, User $effector): Envelope
     {
-        $envelope = new Envelope();
-
-        // Still need the submission box's ID for generating the topic
-        $boxId = $this->retrieveAssessmentDueWorkId($plan);
-        if (!$boxId) {
+        $envelope  = new Envelope();
+        $topicStub = $this->retrieveAssessmentTopicStub($plan);
+        if (!$topicStub) {
             return $envelope;
         }
 
@@ -261,7 +259,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $bob = $this->buildGenericBuilder($dueWork, $effector)
             ->setTitle(":author opened $indefArticle $boxType :box in :cat")
             ->setParam('author', new UserParam($effector, ParameterInterface::STACKING_REPLACE))
-            ->addTopic("duework.{$boxId}.open")
+            ->addTopic("{$topicStub}.open")
             ->setSeverity(Logger::NOTICE);
 
         // Customise and send to every participant in this plan only
@@ -293,11 +291,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     private function notifyQuizOpen(Quiz $quiz, Model $plan, User $effector): Envelope
     {
-        $envelope = new Envelope();
-
-        // Still need the quiz's ID for generating the topic
-        $assessId = $this->retrieveAssessmentQuizId($plan);
-        if (!$assessId) {
+        $envelope  = new Envelope();
+        $topicStub = $this->retrieveAssessmentTopicStub($plan);
+        if (!$topicStub) {
             return $envelope;
         }
 
@@ -311,7 +307,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $bob = $this->buildGenericBuilder($quiz, $effector)
                     ->setTitle(":author opened $indefArticle $boxType :box in :cat")
                     ->setParam('author', new UserParam($effector, ParameterInterface::STACKING_REPLACE))
-                    ->addTopic("assess.{$assessId}.open")
+                    ->addTopic("$topicStub.open")
                     ->setSeverity(Logger::NOTICE);
 
         // Customise and send to every participant in this plan only
@@ -361,11 +357,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     private function notifyDueWorkUpcoming(DueWork $dueWork, Model $plan): Envelope
     {
-        $envelope = new Envelope();
-
-        // Still need the submission box's ID for generating the topic
-        $boxId = $this->retrieveAssessmentDueWorkId($plan);
-        if (!$boxId) {
+        $envelope  = new Envelope();
+        $topicStub = $this->retrieveAssessmentTopicStub($plan);
+        if (!$topicStub) {
             return $envelope;
         }
 
@@ -376,7 +370,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
         $bob = $this->buildGenericBuilder($dueWork)
                     ->setSeverity(Logger::WARNING)
-                    ->addTopic("duework.$boxId.upcoming");
+                    ->addTopic("$topicStub.upcoming");
 
         // Customise and send to every participant in this plan only
         foreach ($this->retrieveParticipantsFromPlan($plan, $dueWork) as $participant) {
@@ -440,11 +434,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     private function notifyDueWorkOverdue(DueWork $dueWork, Model $plan): Envelope
     {
-        $envelope = new Envelope();
-
-        // Still need the submission box's ID for generating the topic
-        $boxId = $this->retrieveAssessmentDueWorkId($plan);
-        if (!$boxId) {
+        $envelope  = new Envelope();
+        $topicStub = $this->retrieveAssessmentTopicStub($plan);
+        if (!$topicStub) {
             return $envelope;
         }
 
@@ -455,7 +447,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
         $bob = $this->buildGenericBuilder($dueWork)
                     ->setSeverity(Logger::ERROR)
-                    ->addTopic("duework.$boxId.overdue");
+                    ->addTopic("$topicStub.overdue");
 
         // Customise and send to every participant in this plan only
         foreach ($this->retrieveParticipantsFromPlan($plan, $dueWork) as $participant) {
@@ -517,11 +509,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     private function notifyDueWorkClosed(DueWork $dueWork, Model $plan): Envelope
     {
-        $envelope = new Envelope();
-
-        // Still need the submission box's ID for generating the topic
-        $boxId = $this->retrieveAssessmentDueWorkId($plan);
-        if (!$boxId) {
+        $envelope  = new Envelope();
+        $topicStub = $this->retrieveAssessmentTopicStub($plan);
+        if (!$topicStub) {
             return $envelope;
         }
 
@@ -537,7 +527,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                      ->setHref($href)
                      ->setParam('box', new Param($dueWork->getTitle(), $href))
                      ->setSeverity(Logger::ERROR)
-                     ->addTopic("duework.$boxId.closed");
+                     ->addTopic("$topicStub.closed");
 
         // Figure out how many need to submit
         $totalUnsubmitted = 0;
@@ -602,11 +592,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     private function notifyDueWorkUpdated(DueWork $dueWork, Model $plan, User $effector, array $diff = null): Envelope
     {
-        $envelope = new Envelope();
-
-        // Still need the submission box's ID for generating the topic
-        $boxId = $this->retrieveAssessmentDueWorkId($plan);
-        if (!$boxId) {
+        $envelope  = new Envelope();
+        $topicStub = $this->retrieveAssessmentTopicStub($plan);
+        if (!$topicStub) {
             return $envelope;
         }
 
@@ -667,7 +655,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                             ->setTitle(':author renamed :oldname to :box in :cat')
                             ->setParam('author', new UserParam($effector))
                             ->setParam('oldname', new Param($oldName))
-                            ->setTopics(["duework.{$boxId}.renamed"]);
+                            ->setTopics(["$topicStub.renamed"]);
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
@@ -695,7 +683,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                             ->setTitle(":author $verb :box to :date in :cat")
                             ->setParam('author', new UserParam($effector))
                             ->setParam('date', new Param($dateformat))
-                            ->setTopics(["duework.{$boxId}.datechanged"]);
+                            ->setTopics(["$topicStub.datechanged"]);
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
@@ -715,7 +703,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                     : 'You now need to submit online for :box in :cat';
                 $bob = $this->targetDueWorkBuilderToStudent($bob, $dueWork, $participant)
                             ->setTitle($m)
-                            ->setTopics(["duework.{$boxId}.updated"]);
+                            ->setTopics(["$topicStub.updated"]);
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
@@ -736,7 +724,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 $bob = $this->targetDueWorkBuilderToStudent($bob, $dueWork, $participant)
                             ->setTitle(':author updated :box in :cat')
                             ->setParam('author', new UserParam($effector))
-                            ->setTopics(["duework.{$boxId}.updated"]);
+                            ->setTopics(["$topicStub.updated"]);
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
@@ -864,35 +852,22 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     }
 
     /**
-     * Fetches the due work ID for this plan; this is required for targeting
-     * notifications to the due work's mailbox.
+     * Fetches the topic stub for this plan; this is required for targeting
+     * notifications to the assessment's mailbox.
      *
      * @param Model $plan
-     * @return int|null
+     * @return string|null
      */
-    private function retrieveAssessmentDueWorkId(Model $plan): ?int
+    private function retrieveAssessmentTopicStub(Model $plan): ?string
     {
         $assessment = $this->retrieveAssessmentDataModel($plan);
-        if (!$assessment->getDueWork()) {
-            return null;
+        if ($assessment->getDueWork()) {
+            return "duework." . $assessment->getDueWork()->getId();
         }
-        return $assessment->getDueWork()->getId();
-    }
-
-    /**
-     * Fetches the quiz ID for this plan; this is required for targeting
-     * notifications to the quiz's mailbox.
-     *
-     * @param Model $plan
-     * @return int|null
-     */
-    private function retrieveAssessmentQuizId(Model $plan): ?int
-    {
-        $assessment = $this->retrieveAssessmentDataModel($plan);
-        if (!$assessment->getQuiz()) {
-            return null;
+        if ($assessment->getQuiz()) {
+            return "assess." . $assessment->getQuiz()->getId();
         }
-        return $assessment->getQuiz()->getId();
+        return null;
     }
 
     /**
