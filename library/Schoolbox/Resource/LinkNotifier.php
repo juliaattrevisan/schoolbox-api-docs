@@ -21,16 +21,10 @@ class LinkNotifier extends ResourceNotifier {
 
 
 	/**
-	 * Generate n Instances, from the perspective of casual observation (rather than targeted at a particular user).
-	 *
-	 * @param int $context     - most likely a category ID or ignored
-	 * @param string $roletype - the roletype of the user for whom this feed is being retrieved
-	 * @param int $limit       - how many messages to retrieve
-	 * @param int $offset      - by default, most recent
-	 * @return Collection|Instance[]
+	 * @inheritdoc
 	 */
-	public function getFeed($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0) {
-		return $this->getFeedInternal($context, $roletype, $limit, $offset, LogMapper::KIND_LINK);
+	public function getFeed($context, User $user, $limit = self::HARD_LIMIT, $offset = 0) {
+		return $this->getFeedInternal($context, $user->getRole()->getType(), $limit, $offset, LogMapper::KIND_LINK);
 	}
 
 
