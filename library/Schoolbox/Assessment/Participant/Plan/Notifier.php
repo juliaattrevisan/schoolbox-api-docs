@@ -376,29 +376,29 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     /**
      * Participant and parents get notified when a due work is overdue.
      *
-     * @param DueWork $dueWork
+     * @param DueWork $assessment
      * @param Model   $plan
      * @return Envelope
      */
-    private function notifyDueWorkOverdue(DueWork $dueWork, Model $plan): Envelope
+    private function notifyDueWorkOverdue(DueWork $assessment, Model $plan): Envelope
     {
         $envelope  = new Envelope();
-        $topicStub = $this->retrieveAssessmentTopicStub($dueWork);
+        $topicStub = $this->retrieveAssessmentTopicStub($assessment);
         if (!$topicStub) {
             return $envelope;
         }
 
         // Doesn't accept online? return
-        if ($dueWork->isAcceptNone()) {
+        if ($assessment instanceof DueWork && $assessment->isAcceptNone()) {
             return $envelope;
         }
 
-        $bob = $this->buildGenericBuilder($dueWork)
+        $bob = $this->buildGenericBuilder($assessment)
                     ->setSeverity(Logger::ERROR)
                     ->addTopic("$topicStub.overdue");
 
         // Customise and send to every participant in this plan only
-        foreach ($this->retrieveParticipantsFromPlan($plan, $dueWork) as $participant) {
+        foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
             if ($participant->isExcluded()) {
                 continue;
             }
@@ -409,7 +409,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             }
 
             // build for student
-            $bob = $this->targetBuilderToStudent($bob, $dueWork, $participant)
+            $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
                         ->setTitle(":assessment is now overdue in :cat")
                         ->setBody($participant->getDescription());
             $envelope->targetToUser($participant->getUser(), $bob->build());
@@ -418,7 +418,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             if (!$this->isParentTargetable()) {
                 continue;
             }
-            $bob = $this->targetBuilderToParents($bob, $dueWork, $participant)
+            $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
                         ->setTitle(':child did not submit work for :assessment in :cat');
             $envelope->targetToParent($participant->getUser(), $bob->build());
         }
@@ -430,24 +430,29 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     /**
      * Participant and parents get notified when a quiz is overdue.
      *
-     * @param Quiz  $quiz
+     * @param Quiz  $assessment
      * @param Model $plan
      * @return Envelope
      */
-    private function notifyQuizOverdue(Quiz $quiz, Model $plan): Envelope
+    private function notifyQuizOverdue(Quiz $assessment, Model $plan): Envelope
     {
         $envelope  = new Envelope();
-        $topicStub = $this->retrieveAssessmentTopicStub($quiz);
+        $topicStub = $this->retrieveAssessmentTopicStub($assessment);
         if (!$topicStub) {
             return $envelope;
         }
 
-        $bob = $this->buildGenericBuilder($quiz)
+        // Doesn't accept online? return
+        if ($assessment instanceof DueWork && $assessment->isAcceptNone()) {
+            return $envelope;
+        }
+
+        $bob = $this->buildGenericBuilder($assessment)
                     ->setSeverity(Logger::ERROR)
                     ->addTopic("$topicStub.overdue");
 
         // Customise and send to every participant in this plan only
-        foreach ($this->retrieveParticipantsFromPlan($plan, $quiz) as $participant) {
+        foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
             if ($participant->isExcluded()) {
                 continue;
             }
@@ -458,7 +463,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             }
 
             // build for student
-            $bob = $this->targetBuilderToStudent($bob, $quiz, $participant)
+            $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
                         ->setTitle(":assessment has closed in :cat")
                         ->setBody($participant->getDescription());
             $envelope->targetToUser($participant->getUser(), $bob->build());
@@ -467,7 +472,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             if ($this->conf->get('restrict_student_submissions')) {
                 continue;
             }
-            $bob = $this->targetBuilderToParents($bob, $quiz, $participant)
+            $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
                         ->setTitle(':child did not attempt :assessment in :cat');
             $envelope->targetToParent($participant->getUser(), $bob->build());
         }
