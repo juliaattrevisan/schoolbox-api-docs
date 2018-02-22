@@ -109,6 +109,13 @@
                   errors: errors,
                   readonly: readonly
               } only %}
+
+              {% if assessment.useRubric and rubricContext and not readonly and config.rubric_show_points %}
+                  {% include '@learningDueWorkResponse/inlineGrading/fragments/assignFromRubricButton.twig' with {
+                      locale: locale,
+                      rubricContext: rubricContext
+                  } only %}
+              {% endif %}
           </label>
       </div>
   {% endif %}
