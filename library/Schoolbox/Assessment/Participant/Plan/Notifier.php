@@ -231,16 +231,15 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         if ($assessmentDomainObject instanceof DueWork) {
             return $this->notifyDueWorkOpen($assessmentDomainObject, $plan, $effector);
         }
-
+        if ($assessmentDomainObject instanceof Quiz) {
+            return $this->notifyQuizOpen($assessmentDomainObject, $plan, $effector);
+        }
         return new Envelope();
     }
 
 
     /**
      * Participant gets notified when a due work opens.
-     *
-     * Returns an array where the keys are the messages to send, and the values
-     * are arrays of topic on which those messages are to be published.
      *
      * @param DueWork $dueWork
      * @param Model   $plan
@@ -269,6 +268,54 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             ->setParam('author', new UserParam($effector, ParameterInterface::STACKING_REPLACE))
             ->addTopic("duework.{$boxId}.open")
             ->setSeverity(Logger::NOTICE);
+
+        // Customise and send to every participant in this plan only
+        foreach ($this->retrieveParticipantsFromPlan($plan, $dueWork) as $participant) {
+            if ($participant->isExcluded()) {
+                continue;
+            }
+
+            // build for student
+            $bob = $this->targetDueWorkBuilderToStudent($bob, $dueWork, $participant)
+                        ->setBody($participant->getDescription())
+                        ->setByline("Due {$participant->getDueDate()->getCalendarDateTime()}");
+            $envelope->targetToUser($participant->getUser(), $bob->build());
+        }
+
+        return $envelope;
+    }
+
+
+    /**
+     * Participant gets notified when a quiz opens.
+     *
+     * @param Quiz  $quiz
+     * @param Model $plan
+     * @param User  $effector
+     * @return Envelope
+     */
+    private function notifyQuizOpen(Quiz $quiz, Model $plan, User $effector): Envelope
+    {
+        $envelope = new Envelope();
+
+        // Still need the quiz's ID for generating the topic
+        $assessId = $this->retrieveAssessmentQuizId($plan);
+        if (!$assessId) {
+            return $envelope;
+        }
+
+        // Build generic builder
+        $workType     = $quiz->getWorkType();
+        $boxType      = mb_strtolower($workType ? $workType->getName() : '');
+        $indefArticle = $boxType ?
+            in_array(strtolower($boxType[0]), ['a', 'e', 'i', 'o', 'u'], true) ? 'an' : 'a'
+            : '';
+
+        $bob = $this->buildGenericBuilder($dueWork, $effector)
+                    ->setTitle(":author opened $indefArticle $boxType :box in :cat")
+                    ->setParam('author', new UserParam($effector, ParameterInterface::STACKING_REPLACE))
+                    ->addTopic("assess.{$assessId}.open")
+                    ->setSeverity(Logger::NOTICE);
 
         // Customise and send to every participant in this plan only
         foreach ($this->retrieveParticipantsFromPlan($plan, $dueWork) as $participant) {
@@ -833,6 +880,22 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             return null;
         }
         return $assessment->getDueWork()->getId();
+    }
+
+    /**
+     * Fetches the quiz ID for this plan; this is required for targeting
+     * notifications to the quiz's mailbox.
+     *
+     * @param Model $plan
+     * @return int|null
+     */
+    private function retrieveAssessmentQuizId(Model $plan): ?int
+    {
+        $assessment = $this->retrieveAssessmentDataModel($plan);
+        if (!$assessment->getQuiz()) {
+            return null;
+        }
+        return $assessment->getQuiz()->getId();
     }
 
     /**
