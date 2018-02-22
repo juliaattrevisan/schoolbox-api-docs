@@ -121,8 +121,12 @@ class Controller extends Base
                     && $mostRecentFeedback instanceof DueWork\Feedback\Model
                     && $assessment instanceof DueWork\Model
                     && $assessment->getUseRubric()
+                    && $feedback->getId() != $mostRecentFeedback->getId()
                 ) {
                     $this->rubricMapper->copySelections($mostRecentFeedback->getId(), $feedback->getId());
+                } else if ($post['saveEmpty'] == true) {
+                    //We are at the inline grader and we have deselected a rubric - save empty
+                    $this->rubricMapper->saveForFeedback([], $feedback->getId());
                 }
             }
         }
