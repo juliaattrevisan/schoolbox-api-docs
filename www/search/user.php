@@ -28,9 +28,14 @@ function renderParent(
 ) {
 
     $externalUser = $synUserHandler->getParent($user['synergy_id']);
-    try {
-        $spouse = $userMapper->findByExternalId($externalUser['SpouseID'], Role::PARENT);
-    } catch (\Schoolbox\Mapper\Exception $e) {
+    if(isset($externalUser['SpouseID'])) {
+        try {
+            $spouse = $userMapper->findByExternalId($externalUser['SpouseID'], Role::PARENT);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $spouse = null;
+        }
+    }
+    else {
         $spouse = null;
     }
 
