@@ -3,6 +3,7 @@ Data:
     breadcrumbs:    Collection|string[][]
     assessment:     DueWork/Model
     student:        User
+    participant:    null|Participant/Model       NULL if student does not yet have a participation record
     attachzone:     mixed[]
     response:       null|DueWork\Response\Model  NULL if not a draft
     editorContents: string                       WYSIWYG content
@@ -237,9 +238,10 @@ Data:
             {% include '@learning/fragments/meta/workType.twig' %}
         </ul>
 
-        {% if assessment.description | length %}
+        {% set description = participant ? participant.description : assessment.description %}
+        {% if description | length %}
         <section class="content">
-            {{ assessment.description|purify }}
+            {{ description | purify }}
         </section>
         {% endif %}
         <h2 class="subheader">Submit Response</h2>
