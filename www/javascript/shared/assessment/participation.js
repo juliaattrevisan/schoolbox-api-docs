@@ -203,12 +203,7 @@
 
             return studentListHtmlString;
         }
-
-
-        if (undefined === this.options.getAvailableDateFields) {
-            console.log("HALP");
-        }
-
+        
         // Validate plan form
         $('#participation-plan-form').alaressValidate({
             rules: {
