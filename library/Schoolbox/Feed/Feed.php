@@ -11,6 +11,7 @@ namespace Schoolbox\Feed;
 
 
 use Schoolbox\Realtime\Notification\Decorator;
+use Schoolbox\User;
 
 class Feed extends Decorator {
 
@@ -19,11 +20,11 @@ class Feed extends Decorator {
 	 *
 	 * @param SourceInterface[] $sources
 	 * @param int $context
-	 * @param string $roleType
+	 * @param User $user
 	 * @param int $limit
 	 * @param int $offset
 	 */
-	public function aggregate($sources, $context, $roleType, $limit = SourceInterface::HARD_LIMIT, $offset = 0) {
+	public function aggregate($sources, $context, User $user, $limit = SourceInterface::HARD_LIMIT, $offset = 0) {
 		if ($limit <= 0 || $limit > SourceInterface::HARD_LIMIT) {
 			$limit = SourceInterface::HARD_LIMIT;
 		}
@@ -36,7 +37,7 @@ class Feed extends Decorator {
 				 * the most up-to-date data. As such, there is an inherent (unavoidable?) performance hit, since
 				 * the maximum number of items that might be retrieved can be up to count($sources) times the $limit
 				 */
-				$this->appendInstances($channel->getFeed($context, $roleType, $limit, $offset)->getAll());
+				$this->appendInstances($channel->getFeed($context, $user->getRole()->getType(), $limit, $offset)->getAll());
 			}
 		}
 
@@ -62,4 +63,4 @@ class Feed extends Decorator {
 		return $context;
 	}
 
-} 
+}

@@ -49,7 +49,7 @@ class StandardFeed extends Feed
                 new Schoolbox\Forum\PostNotifier($conf),
             ],
             $context,
-            $user->getRole()->getType(),
+            $user,
             $limit,
             $offset
         );
