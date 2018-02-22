@@ -630,6 +630,7 @@ class Controller extends Assessment\Controller
             'breadcrumbs'    => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(['Create Response for ' . $assessment->getTitle(), '']),
             'assessment'     => $assessment,
             'student'        => $student,
+            'participant'    => $participant,
             'attachzone'     => $dangerZone ? $dangerZone->getTwigContext() : null,
             'response'       => $latestResponse,
             'editorContents' => $editorContents,
