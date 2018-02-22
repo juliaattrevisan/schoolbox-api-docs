@@ -246,7 +246,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * @param User    $effector
      * @return Envelope
      */
-    public function notifyDueWorkOpen(DueWork $dueWork, Model $plan, User $effector): Envelope
+    private function notifyDueWorkOpen(DueWork $dueWork, Model $plan, User $effector): Envelope
     {
         $envelope = new Envelope();
 
@@ -314,7 +314,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * @param Model   $plan
      * @return Envelope
      */
-    public function notifyDueWorkUpcoming(DueWork $dueWork, Model $plan): Envelope
+    private function notifyDueWorkUpcoming(DueWork $dueWork, Model $plan): Envelope
     {
         $envelope = new Envelope();
 
@@ -393,7 +393,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * @param Model   $plan
      * @return Envelope
      */
-    public function notifyDueWorkOverdue(DueWork $dueWork, Model $plan): Envelope
+    private function notifyDueWorkOverdue(DueWork $dueWork, Model $plan): Envelope
     {
         $envelope = new Envelope();
 
@@ -470,7 +470,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * @param Model   $plan
      * @return Envelope
      */
-    public function notifyDueWorkClosed(DueWork $dueWork, Model $plan): Envelope
+    private function notifyDueWorkClosed(DueWork $dueWork, Model $plan): Envelope
     {
         $envelope = new Envelope();
 
@@ -555,7 +555,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyDueWorkUpdated(DueWork $dueWork, Model $plan, User $effector, array $diff = null): Envelope
+    private function notifyDueWorkUpdated(DueWork $dueWork, Model $plan, User $effector, array $diff = null): Envelope
     {
         $envelope = new Envelope();
 
