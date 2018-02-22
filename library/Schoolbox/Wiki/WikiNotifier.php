@@ -116,15 +116,9 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
 	}
 
 	/**
-	 * Generate n Instances, from the perspective of casual observation (rather than targeted at a particular user).
-	 *
-	 * @param int $context     - most likely a category ID or ignored
-	 * @param string $roletype - the roletype of the user for whom this feed is being retrieved
-	 * @param int $limit       - how many messages to retrieve
-	 * @param int $offset      - by default, most recent
-	 * @return Collection|Instance[]
+	 * @inheritdoc
 	 */
-	public function getFeed($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0) {
+	public function getFeed($context, User $user, $limit = self::HARD_LIMIT, $offset = 0) {
 		$c = new Collection();
 
 		// be sure the target method exists
@@ -139,9 +133,9 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
             // Wiki creator is the author of first (not latest) revision
             try {
                 $first = $this->revisionMapper->findOneByColumn('wikiID', $wiki->getId(), [ 'created' => 'asc' ]);
-                $user = $first->getUser();
+                $author = $first->getUser();
                 $c = $c->merge(
-                    new Collection($this->notifyCreated($roletype, $wiki, $user)->getAll($wiki->getCreated()->getUnixTimeStamp()))
+                    new Collection($this->notifyCreated($user->getRole()->getType(), $wiki, $author)->getAll($wiki->getCreated()->getUnixTimeStamp()))
                 );
             } catch (\Schoolbox\Mapper\Exception $e) {
                 //noop 
