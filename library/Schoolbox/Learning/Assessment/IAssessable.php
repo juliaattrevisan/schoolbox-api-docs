@@ -99,11 +99,11 @@ interface IAssessable extends ISoftDeletable
      *
      * Note this includes the overdue period.
      *
-     * @param User|null                $student
+     * @param User                     $student
      * @param null|Alaress_Date_Format $now Optional value of now for testing
      * @return bool
      */
-    public function isOpen(User $student = null, Alaress_Date_Format $now = null);
+    public function isOpen(User $student, Alaress_Date_Format $now = null): bool;
 
 
     /**

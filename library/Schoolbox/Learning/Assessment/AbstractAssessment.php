@@ -330,11 +330,9 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @inheritdoc
      */
-    public function isOpen(User $student = null, Alaress_Date_Format $now = null)
+    public function isOpen(User $student, Alaress_Date_Format $now = null): bool
     {
-        $participant = $student !== null
-            ? $participant = $this->getParticipantIfExtant($student)
-            : null;
+        $participant = $this->getParticipantIfExtant($student);
 
         if ($participant) {
             $openDate = $participant->getOpenDate();
@@ -348,7 +346,6 @@ abstract class AbstractAssessment implements IAssessable
             $now = Alaress_Date_Format::now();
         }
 
-        // Intentionally calls getter rather than direct access to enable assessment-specific date acrobatics
         return $now->gte($openDate) && $now->lt($closeDate);
     }
 
