@@ -212,7 +212,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     /**
      * Participant gets notified when an assessment opens.
      *
-     * Proxies to `notify{$type}Open`.
+     * This encapsulates both quiz and duework open notifier, as they're
+     * identical apart from topic.
      *
      * @param Model $plan
      * @param User  $effector
@@ -223,101 +224,41 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     public function notifyOpen(Model $plan, User $effector): Envelope
     {
         $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
+        $envelope               = new Envelope();
         if ($assessmentDomainObject instanceof DueWork) {
-            return $this->notifyDueWorkOpen($assessmentDomainObject, $plan, $effector);
+            $topicSuffix = "open";
+        } elseif ($assessmentDomainObject instanceof Quiz) {
+            $topicSuffix = "upcoming";
+        }  else {
+            return $envelope;
         }
-        if ($assessmentDomainObject instanceof Quiz) {
-            return $this->notifyQuizOpen($assessmentDomainObject, $plan, $effector);
-        }
-        return new Envelope();
-    }
 
-
-    /**
-     * Participant gets notified when a due work opens.
-     *
-     * @param DueWork $dueWork
-     * @param Model   $plan
-     * @param User    $effector
-     * @return Envelope
-     */
-    private function notifyDueWorkOpen(DueWork $dueWork, Model $plan, User $effector): Envelope
-    {
-        $envelope  = new Envelope();
-        $topicStub = $this->retrieveAssessmentTopicStub($dueWork);
+        $topicStub = $this->retrieveAssessmentTopicStub($assessmentDomainObject);
         if (!$topicStub) {
             return $envelope;
         }
 
         // Build generic builder
-        $workType     = $dueWork->getWorkType();
+        $workType     = $assessmentDomainObject->getWorkType();
         $boxType      = mb_strtolower($workType ? $workType->getName() : '');
         $indefArticle = $boxType ?
             in_array(strtolower($boxType[0]), ['a', 'e', 'i', 'o', 'u'], true) ? 'an' : 'a'
             : '';
 
-        $bob = $this->buildGenericBuilder($dueWork, $effector)
+        $bob = $this->buildGenericBuilder($assessmentDomainObject, $effector)
                     ->setTitle(":author opened $indefArticle $boxType :box in :cat")
                     ->setParam('author', new UserParam($effector, ParameterInterface::STACKING_REPLACE))
-                    ->addTopic("{$topicStub}.open")
+                    ->addTopic("$topicStub.$topicSuffix")
                     ->setSeverity(Logger::NOTICE);
 
         // Customise and send to every participant in this plan only
-        foreach ($this->retrieveParticipantsFromPlan($plan, $dueWork) as $participant) {
+        foreach ($this->retrieveParticipantsFromPlan($plan, $assessmentDomainObject) as $participant) {
             if ($participant->isExcluded()) {
                 continue;
             }
 
             // build for student
-            $bob = $this->targetDueWorkBuilderToStudent($bob, $dueWork, $participant)
-                        ->setBody($participant->getDescription())
-                        ->setByline("Due {$participant->getDueDate()->getCalendarDateTime()}");
-            $envelope->targetToUser($participant->getUser(), $bob->build());
-        }
-
-        return $envelope;
-    }
-
-
-    /**
-     * Participant gets notified when a quiz opens.
-     *
-     * TODO merge this into duework type
-     *
-     * @param Quiz  $quiz
-     * @param Model $plan
-     * @param User  $effector
-     * @return Envelope
-     */
-    private function notifyQuizOpen(Quiz $quiz, Model $plan, User $effector): Envelope
-    {
-        $envelope  = new Envelope();
-        $topicStub = $this->retrieveAssessmentTopicStub($quiz);
-        if (!$topicStub) {
-            return $envelope;
-        }
-
-        // Build generic builder
-        $workType     = $quiz->getWorkType();
-        $boxType      = mb_strtolower($workType ? $workType->getName() : '');
-        $indefArticle = $boxType ?
-            in_array(strtolower($boxType[0]), ['a', 'e', 'i', 'o', 'u'], true) ? 'an' : 'a'
-            : '';
-
-        $bob = $this->buildGenericBuilder($quiz, $effector)
-                    ->setTitle(":author opened $indefArticle $boxType :box in :cat")
-                    ->setParam('author', new UserParam($effector, ParameterInterface::STACKING_REPLACE))
-                    ->addTopic("$topicStub.upcoming")
-                    ->setSeverity(Logger::NOTICE);
-
-        // Customise and send to every participant in this plan only
-        foreach ($this->retrieveParticipantsFromPlan($plan, $quiz) as $participant) {
-            if ($participant->isExcluded()) {
-                continue;
-            }
-
-            // build for student
-            $bob = $this->targetDueWorkBuilderToStudent($bob, $quiz, $participant)
+            $bob = $this->targetDueWorkBuilderToStudent($bob, $assessmentDomainObject, $participant)
                         ->setBody($participant->getDescription())
                         ->setByline("Due {$participant->getDueDate()->getCalendarDateTime()}");
             $envelope->targetToUser($participant->getUser(), $bob->build());
