@@ -253,6 +253,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         if (!$topicStub) {
             return $envelope;
         }
+        if (!$this->isNotifiableAtAll($assessment, self::TRIGGER_OPEN)) {
+            return $envelope;
+        }
 
         // Build generic builder
         $workType     = $assessment->getWorkType();
@@ -302,9 +305,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         if (!$topicStub) {
             return $envelope;
         }
-
-        // Doesn't accept online? return
-        if ($assessment instanceof DueWork && $assessment->isAcceptNone()) {
+        if (!$this->isNotifiableAtAll($assessment, self::TRIGGER_UPCOMING)) {
             return $envelope;
         }
 
@@ -374,10 +375,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         if (!$topicStub) {
             return $envelope;
         }
-
-        // Doesn't accept online? return
-        // TODO consider moving this logic to helper class
-        if ($assessment instanceof DueWork && $assessment->isAcceptNone()) {
+        if (!$this->isNotifiableAtAll($assessment, self::TRIGGER_OVERDUE)) {
             return $envelope;
         }
 
@@ -444,9 +442,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         if (!$topicStub) {
             return $envelope;
         }
-
-        // Doesn't accept online? return
-        if ($assessment instanceof DueWork && $assessment->isAcceptNone()) {
+        if (!$this->isNotifiableAtAll($assessment, self::TRIGGER_CLOSED)) {
             return $envelope;
         }
 
@@ -502,6 +498,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $envelope   = new Envelope();
         $topicStub  = $this->retrieveAssessmentTopicStub($assessment);
         if (!$topicStub) {
+            return $envelope;
+        }
+        if (!$this->isNotifiableAtAll($assessment, self::TRIGGER_UPDATED)) {
             return $envelope;
         }
 
@@ -859,6 +858,31 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             ->setParam('assessment', new Param($assessment->getTitle(), $href))
             ->setParam('child', new ChildParam($participant->getUser(), Param::STACKING_REPLACE))
             ->setHref($href);
+    }
+
+
+    /**
+     * Does this assessment send notifications for the given label at all?
+     *
+     * @param IAssessable $assessment
+     * @param string      $label
+     * @return bool
+     */
+    private function isNotifiableAtAll(IAssessable $assessment, string $label): bool
+    {
+        switch ($label) {
+            case self::TRIGGER_OPEN:
+            case self::TRIGGER_UPDATED:
+                // Open and updated notifs are always sent
+                return true;
+
+            default:
+                // All other notifs are not sent for due works that don't
+                // accept online, because action isn't necessary for them.
+                // It is possible, but not mandatory, for students to
+                // acknowledge response, though.
+                return !($assessment instanceof DueWork && $assessment->isAcceptNone());
+        }
     }
 
     /**
