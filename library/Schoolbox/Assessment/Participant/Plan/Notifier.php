@@ -40,11 +40,11 @@ use Schoolbox\User;
  */
 class Notifier extends AbstractModuleNotifier implements SourceInterface
 {
-    private const TRIGGER_DUEWORK_OPEN     = 'dueWorkOpen';
-    private const TRIGGER_DUEWORK_UPDATED  = 'dueWorkUpdated';
-    private const TRIGGER_DUEWORK_UPCOMING = 'dueWorkUpcoming';
-    private const TRIGGER_DUEWORK_OVERDUE  = 'dueWorkOverdue';
-    private const TRIGGER_DUEWORK_CLOSED   = 'dueWorkClosed';
+    private const TRIGGER_OPEN     = 'open';
+    private const TRIGGER_UPDATED  = 'updated';
+    private const TRIGGER_UPCOMING = 'upcoming';
+    private const TRIGGER_OVERDUE  = 'overdue';
+    private const TRIGGER_CLOSED   = 'closed';
 
     /**
      * Days in advance to inform a user that due work is upcoming.
@@ -52,12 +52,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * TODO make this configurable
      */
     private const DUEWORK_UPCOMING_WINDOW = 2;
-
-    private const TRIGGER_QUIZ_CLOSED   = 'quizClosed';
-    private const TRIGGER_QUIZ_OPEN     = 'quizOpen';
-    private const TRIGGER_QUIZ_OVERDUE  = 'quizOverdue';
-    private const TRIGGER_QUIZ_UPCOMING = 'quizUpcoming';
-    private const TRIGGER_QUIZ_UPDATED  = 'quizUpdated';
 
     /**
      * @var AssessmentMapper
@@ -134,16 +128,11 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $method = $bundle->getMethod();
         if ($method === Mapper::METHOD_DELETE) {
             $bundle->detachEach([
-                self::TRIGGER_DUEWORK_OPEN,
-                self::TRIGGER_DUEWORK_UPCOMING,
-                self::TRIGGER_DUEWORK_UPDATED,
-                self::TRIGGER_DUEWORK_OVERDUE,
-                self::TRIGGER_DUEWORK_CLOSED,
-                self::TRIGGER_QUIZ_OPEN,
-                self::TRIGGER_QUIZ_UPCOMING,
-                self::TRIGGER_QUIZ_UPDATED,
-                self::TRIGGER_QUIZ_OVERDUE,
-                self::TRIGGER_QUIZ_CLOSED,
+                self::TRIGGER_OPEN,
+                self::TRIGGER_UPCOMING,
+                self::TRIGGER_UPDATED,
+                self::TRIGGER_OVERDUE,
+                self::TRIGGER_CLOSED,
             ]);
 
         } else {
@@ -158,7 +147,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 // However, if its open date is in the past don't bundle if this is an update
                 $openDate = $this->coalesceDates($plan->getOpenDate(), $assessment->getOpenDate());
                 if ($openDate && ($method === Mapper::METHOD_CREATE || $openDate->isFuture())) {
-                    $bundle->attach(self::TRIGGER_DUEWORK_OPEN, $openDate->getUnixTimeStamp());
+                    $bundle->attach(self::TRIGGER_OPEN, $openDate->getUnixTimeStamp());
                 }
 
                 // Due and upcoming: always bundled as long as due date is set
@@ -170,17 +159,17 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                     if ($upcomingDate->lt($openDate)) {
                         $upcomingDate = (clone $openDate)->addMinutes(1);
                     }
-                    $bundle->attach(self::TRIGGER_DUEWORK_UPCOMING, $upcomingDate->getUnixTimeStamp());
-                    $bundle->attach(self::TRIGGER_DUEWORK_OVERDUE, $dueDate->getUnixTimeStamp());
+                    $bundle->attach(self::TRIGGER_UPCOMING, $upcomingDate->getUnixTimeStamp());
+                    $bundle->attach(self::TRIGGER_OVERDUE, $dueDate->getUnixTimeStamp());
                 }
 
                 // Close: always bundled
-                $bundle->attach(self::TRIGGER_DUEWORK_CLOSED, $closeDate->getUnixTimeStamp());
+                $bundle->attach(self::TRIGGER_CLOSED, $closeDate->getUnixTimeStamp());
             }
 
             // Generic updated trigger
             if ($method === Mapper::METHOD_UPDATE) {
-                $bundle->attach(self::TRIGGER_DUEWORK_UPDATED, self::IMMEDIATELY);
+                $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
             }
         }
     }
@@ -225,28 +214,41 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
 
     /**
+     * Participant gets notified when an assessment opens.
+     *
+     * Proxies to `notify{$type}Open`.
+     *
+     * @param Model $plan
+     * @param User  $effector
+     * @return Envelope
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    public function notifyOpen(Model $plan, User $effector): Envelope
+    {
+        $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
+        if ($assessmentDomainObject instanceof DueWork) {
+            return $this->notifyDueWorkOpen($assessmentDomainObject, $plan, $effector);
+        }
+
+        return new Envelope();
+    }
+
+
+    /**
      * Participant gets notified when a due work opens.
      *
      * Returns an array where the keys are the messages to send, and the values
      * are arrays of topic on which those messages are to be published.
      *
-     * @param Model $plan
-     * @param User  $effector
-     *
-     * @throws \Aura\Di\Exception\ServiceNotFound if for whatever reason I couldn't find the data source?
-     *                                            Should never happen.
+     * @param DueWork $dueWork
+     * @param Model   $plan
+     * @param User    $effector
      * @return Envelope
      */
-    public function notifyDueWorkOpen(Model $plan, User $effector): Envelope
+    public function notifyDueWorkOpen(DueWork $dueWork, Model $plan, User $effector): Envelope
     {
         $envelope = new Envelope();
-
-        $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
-
-        // This notifier only gets triggered for due works.
-        if (!$assessmentDomainObject instanceof DueWork) {
-            return $envelope;
-        }
 
         // Still need the submission box's ID for generating the topic
         $boxId = $this->retrieveAssessmentDueWorkId($plan);
@@ -255,26 +257,26 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         // Build generic builder
-        $workType     = $assessmentDomainObject->getWorkType();
+        $workType     = $dueWork->getWorkType();
         $boxType      = mb_strtolower($workType ? $workType->getName() : '');
         $indefArticle = $boxType ?
             in_array(strtolower($boxType[0]), ['a', 'e', 'i', 'o', 'u'], true) ? 'an' : 'a'
             : '';
 
-        $bob = $this->buildGenericDueWorkBuilder($assessmentDomainObject, $effector)
+        $bob = $this->buildGenericDueWorkBuilder($dueWork, $effector)
             ->setTitle(":author opened $indefArticle $boxType :box in :cat")
             ->setParam('author', new UserParam($effector, ParameterInterface::STACKING_REPLACE))
             ->addTopic("duework.{$boxId}.open")
             ->setSeverity(Logger::NOTICE);
 
         // Customise and send to every participant in this plan only
-        foreach ($this->retrieveParticipantsFromPlan($plan, $assessmentDomainObject) as $participant) {
+        foreach ($this->retrieveParticipantsFromPlan($plan, $dueWork) as $participant) {
             if ($participant->isExcluded()) {
                 continue;
             }
 
             // build for student
-            $bob = $this->targetDueWorkBuilderToStudent($bob, $assessmentDomainObject, $participant)
+            $bob = $this->targetDueWorkBuilderToStudent($bob, $dueWork, $participant)
                         ->setBody($participant->getDescription())
                         ->setByline("Due {$participant->getDueDate()->getCalendarDateTime()}");
             $envelope->targetToUser($participant->getUser(), $bob->build());
@@ -285,21 +287,36 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
 
     /**
-     * Participant and parents get notified when a due work is upcoming.
+     * Participant gets notified when an assessment is upcoming.
+     *
+     * Proxies to `notify{$type}Upcoming`.
      *
      * @param Model $plan
      * @return Envelope
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function notifyDueWorkUpcoming(Model $plan): Envelope
+    public function notifyUpcoming(Model $plan): Envelope
+    {
+        $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
+        if ($assessmentDomainObject instanceof DueWork) {
+            return $this->notifyDueWorkUpcoming($assessmentDomainObject, $plan);
+        }
+
+        return new Envelope();
+    }
+
+
+    /**
+     * Participant and parents get notified when a due work is upcoming.
+     *
+     * @param DueWork $dueWork
+     * @param Model   $plan
+     * @return Envelope
+     */
+    public function notifyDueWorkUpcoming(DueWork $dueWork, Model $plan): Envelope
     {
         $envelope = new Envelope();
-        $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
-
-        // This notifier only gets triggered for due works.
-        if (!$assessmentDomainObject instanceof DueWork) {
-            return $envelope;
-        }
 
         // Still need the submission box's ID for generating the topic
         $boxId = $this->retrieveAssessmentDueWorkId($plan);
@@ -308,16 +325,16 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         // Doesn't accept online? return
-        if ($assessmentDomainObject->isAcceptNone()) {
+        if ($dueWork->isAcceptNone()) {
             return $envelope;
         }
 
-        $bob = $this->buildGenericDueWorkBuilder($assessmentDomainObject)
+        $bob = $this->buildGenericDueWorkBuilder($dueWork)
                     ->setSeverity(Logger::WARNING)
                     ->addTopic("duework.$boxId.upcoming");
 
         // Customise and send to every participant in this plan only
-        foreach ($this->retrieveParticipantsFromPlan($plan, $assessmentDomainObject) as $participant) {
+        foreach ($this->retrieveParticipantsFromPlan($plan, $dueWork) as $participant) {
             if ($participant->isExcluded()) {
                 continue;
             }
@@ -330,7 +347,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             $when = $participant->getDueDate()->getRelativeTime(Alaress_Date_Format::now()->addMinutes(-5), true);
 
             // build for student
-            $bob = $this->targetDueWorkBuilderToStudent($bob, $assessmentDomainObject, $participant)
+            $bob = $this->targetDueWorkBuilderToStudent($bob, $dueWork, $participant)
                         ->setTitle(":box is due $when from now in :cat")
                         ->setBody($participant->getDescription());
             $envelope->targetToUser($participant->getUser(), $bob->build());
@@ -339,7 +356,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             if ($this->conf->get('restrict_student_submissions')) {
                 continue;
             }
-            $bob = $this->targetDueWorkBuilderToParents($bob, $assessmentDomainObject, $participant)
+            $bob = $this->targetDueWorkBuilderToParents($bob, $dueWork, $participant)
                         ->setTitle(":child has not yet submitted work for :box, which is due $when from now in :cat");
             $envelope->targetToParent($participant->getUser(), $bob->build());
         }
@@ -349,22 +366,36 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
 
     /**
-     * Participant and parents get notified when a due work is overdue.
+     * Participant gets notified when an assessment is overdue.
+     *
+     * Proxies to `notify{$type}Overdue`.
      *
      * @param Model $plan
      * @return Envelope
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function notifyDueWorkOverdue(Model $plan): Envelope
+    public function notifyOverdue(Model $plan): Envelope
+    {
+        $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
+        if ($assessmentDomainObject instanceof DueWork) {
+            return $this->notifyDueWorkOverdue($assessmentDomainObject, $plan);
+        }
+
+        return new Envelope();
+    }
+
+
+    /**
+     * Participant and parents get notified when a due work is overdue.
+     *
+     * @param DueWork $dueWork
+     * @param Model   $plan
+     * @return Envelope
+     */
+    public function notifyDueWorkOverdue(DueWork $dueWork, Model $plan): Envelope
     {
         $envelope = new Envelope();
-        $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
-
-        // This notifier only gets triggered for due works.
-        $folder = $assessmentDomainObject->getBaseContext()->getFolder();
-        if (!$assessmentDomainObject instanceof DueWork) {
-            return $envelope;
-        }
 
         // Still need the submission box's ID for generating the topic
         $boxId = $this->retrieveAssessmentDueWorkId($plan);
@@ -373,16 +404,16 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         // Doesn't accept online? return
-        if ($assessmentDomainObject->isAcceptNone()) {
+        if ($dueWork->isAcceptNone()) {
             return $envelope;
         }
 
-        $bob = $this->buildGenericDueWorkBuilder($assessmentDomainObject)
+        $bob = $this->buildGenericDueWorkBuilder($dueWork)
                     ->setSeverity(Logger::ERROR)
                     ->addTopic("duework.$boxId.overdue");
 
         // Customise and send to every participant in this plan only
-        foreach ($this->retrieveParticipantsFromPlan($plan, $assessmentDomainObject) as $participant) {
+        foreach ($this->retrieveParticipantsFromPlan($plan, $dueWork) as $participant) {
             if ($participant->isExcluded()) {
                 continue;
             }
@@ -393,7 +424,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             }
 
             // build for student
-            $bob = $this->targetDueWorkBuilderToStudent($bob, $assessmentDomainObject, $participant)
+            $bob = $this->targetDueWorkBuilderToStudent($bob, $dueWork, $participant)
                         ->setTitle(":box is now overdue in :cat")
                         ->setBody($participant->getDescription());
             $envelope->targetToUser($participant->getUser(), $bob->build());
@@ -402,7 +433,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             if ($this->conf->get('restrict_student_submissions')) {
                 continue;
             }
-            $bob = $this->targetDueWorkBuilderToParents($bob, $assessmentDomainObject, $participant)
+            $bob = $this->targetDueWorkBuilderToParents($bob, $dueWork, $participant)
                         ->setTitle(':child did not submit work for :box in :cat');
             $envelope->targetToParent($participant->getUser(), $bob->build());
         }
@@ -412,22 +443,36 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
 
     /**
-     * Staff get notified when a due work closes and one or more students didn't submit.
+     * Participant gets notified when an assessment closes.
+     *
+     * Proxies to `notify{$type}Closed`.
      *
      * @param Model $plan
      * @return Envelope
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function notifyDueWorkClosed(Model $plan): Envelope
+    public function notifyClosed(Model $plan): Envelope
+    {
+        $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
+        if ($assessmentDomainObject instanceof DueWork) {
+            return $this->notifyDueWorkClosed($assessmentDomainObject, $plan);
+        }
+
+        return new Envelope();
+    }
+
+
+    /**
+     * Staff get notified when a due work closes and one or more students didn't submit.
+     *
+     * @param DueWork $dueWork
+     * @param Model   $plan
+     * @return Envelope
+     */
+    public function notifyDueWorkClosed(DueWork $dueWork, Model $plan): Envelope
     {
         $envelope = new Envelope();
-        $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
-
-        // This notifier only gets triggered for due works.
-        $folder = $assessmentDomainObject->getBaseContext()->getFolder();
-        if (!$assessmentDomainObject instanceof DueWork) {
-            return $envelope;
-        }
 
         // Still need the submission box's ID for generating the topic
         $boxId = $this->retrieveAssessmentDueWorkId($plan);
@@ -436,23 +481,22 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         // Doesn't accept online? return
-        if ($assessmentDomainObject->isAcceptNone()) {
+        if ($dueWork->isAcceptNone()) {
             return $envelope;
         }
 
         // Send a single notification for total # students not submitted
-        $href = $this->buildAssessmentRoute($assessmentDomainObject);
-        $bob  = $this->buildGenericDueWorkBuilder($assessmentDomainObject)
+        $href = $this->buildAssessmentRoute($dueWork);
+        $bob  = $this->buildGenericDueWorkBuilder($dueWork)
                      ->setTitle(":box in :cat has closed and :number did not submit work")
                      ->setHref($href)
-                     ->setParam('box', new Param($assessmentDomainObject->getTitle(), $href))
-                     ->setParam('cat', new CategoryParam($folder))
+                     ->setParam('box', new Param($dueWork->getTitle(), $href))
                      ->setSeverity(Logger::ERROR)
                      ->addTopic("duework.$boxId.closed");
 
         // Figure out how many need to submit
         $totalUnsubmitted = 0;
-        foreach ($this->retrieveParticipantsFromPlan($plan, $assessmentDomainObject) as $participant) {
+        foreach ($this->retrieveParticipantsFromPlan($plan, $dueWork) as $participant) {
             if ($participant->isExcluded()) {
                 continue;
             }
@@ -466,10 +510,37 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 'number',
                 new Param(sprintf('%s student%s', $totalUnsubmitted, $totalUnsubmitted === 1 ? '' : 's'))
             );
-            $envelope->broadcastToCategory($folder, UserAccess::ACCESS_WRITE, $bob->build());
+            $envelope->broadcastToCategory(
+                $dueWork->getBaseContext()->getFolder(),
+                UserAccess::ACCESS_WRITE,
+                $bob->build()
+            );
         }
 
         return $envelope;
+    }
+
+
+    /**
+     * Participant gets notified when an assessment is updated.
+     *
+     * Proxies to `notify{$type}Updated`.
+     *
+     * @param Model      $plan
+     * @param User       $effector
+     * @param array|null $diff
+     * @return Envelope
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    public function notifyUpdated(Model $plan, User $effector, array $diff = null): Envelope
+    {
+        $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
+        if ($assessmentDomainObject instanceof DueWork) {
+            return $this->notifyDueWorkUpdated($assessmentDomainObject, $plan, $effector, $diff);
+        }
+
+        return new Envelope();
     }
 
 
@@ -478,23 +549,15 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      *
      * The actual notification depends on what the diff is.
      *
+     * @param DueWork    $dueWork
      * @param Model      $plan
      * @param User       $effector
      * @param array|null $diff
      * @return Envelope
-     * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function notifyDueWorkUpdated(Model $plan, User $effector, array $diff = null): Envelope
+    public function notifyDueWorkUpdated(DueWork $dueWork, Model $plan, User $effector, array $diff = null): Envelope
     {
         $envelope = new Envelope();
-
-        // TODO extract all the box fetching, plan iteration into a generator
-        $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
-
-        // This notifier only gets triggered for due works.
-        if (!$assessmentDomainObject instanceof DueWork) {
-            return $envelope;
-        }
 
         // Still need the submission box's ID for generating the topic
         $boxId = $this->retrieveAssessmentDueWorkId($plan);
@@ -503,15 +566,15 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         // Build a box type
-        $workType = $assessmentDomainObject->getWorkType();
+        $workType = $dueWork->getWorkType();
         $boxType  = mb_strtolower($workType ? $workType->getName() : '');
 
         // All updated notifs have the same icon, namespace, severity
-        $bob = $this->buildGenericDueWorkBuilder($assessmentDomainObject, $effector)
+        $bob = $this->buildGenericDueWorkBuilder($dueWork, $effector)
                     ->setSeverity(Logger::ERROR);
 
         // Figure out who's actually targeted
-        foreach ($this->retrieveParticipantsFromPlan($plan, $assessmentDomainObject) as $participant) {
+        foreach ($this->retrieveParticipantsFromPlan($plan, $dueWork) as $participant) {
             if ($participant->isExcluded()) {
                 continue;
             }
@@ -529,7 +592,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 [$new, $old] = $diff['assessment']['markVisibility'];
                 if ($new > $old) {
                     // Trigger notification about this item
-                    $authoritativeFeedback = $assessmentDomainObject->getAuthoritativeFeedback($participant, true);
+                    $authoritativeFeedback = $dueWork->getAuthoritativeFeedback($participant, true);
                     if ($authoritativeFeedback) {
                         $dueWorkFeedback = $this->dueWorkFeedbackMapper->findById($authoritativeFeedback->getId());
                         $this->raiseNotification(
@@ -555,7 +618,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
                 // Students
                 // TODO iterate particiapnts and students separately?
-                $bob = $this->targetDueWorkBuilderToStudent($bob, $assessmentDomainObject, $participant)
+                $bob = $this->targetDueWorkBuilderToStudent($bob, $dueWork, $participant)
                             ->setTitle(':author renamed :oldname to :box in :cat')
                             ->setParam('author', new UserParam($effector))
                             ->setParam('oldname', new Param($oldName))
@@ -563,7 +626,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
-                $bob = $this->targetDueWorkBuilderToParents($bob, $assessmentDomainObject, $participant)
+                $bob = $this->targetDueWorkBuilderToParents($bob, $dueWork, $participant)
                             ->setTitle(":child's $boxType was renamed from :oldname to :box in :cat")
                             ->unsetParam('author');
                 $envelope->targetToParent($participant->getUser(), $bob->build());
@@ -583,7 +646,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 }
 
                 // Students
-                $bob = $this->targetDueWorkBuilderToStudent($bob, $assessmentDomainObject, $participant)
+                $bob = $this->targetDueWorkBuilderToStudent($bob, $dueWork, $participant)
                             ->setTitle(":author $verb :box to :date in :cat")
                             ->setParam('author', new UserParam($effector))
                             ->setParam('date', new Param($dateformat))
@@ -591,7 +654,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
-                $bob = $this->targetDueWorkBuilderToParents($bob, $assessmentDomainObject, $participant)
+                $bob = $this->targetDueWorkBuilderToParents($bob, $dueWork, $participant)
                             ->setTitle(":child's $boxType :box closing date was $verb to :date in :cat")
                             ->unsetParam('author');
                 $envelope->targetToParent($participant->getUser(), $bob->build());
@@ -602,19 +665,19 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             // accept online
             if (!empty($diff['assessment']['acceptOnline'])) {
                 // Students
-                $m = $assessmentDomainObject->isAcceptNone()
+                $m = $dueWork->isAcceptNone()
                     ? 'You no longer need to submit online for :box in :cat'
                     : 'You now need to submit online for :box in :cat';
-                $bob = $this->targetDueWorkBuilderToStudent($bob, $assessmentDomainObject, $participant)
+                $bob = $this->targetDueWorkBuilderToStudent($bob, $dueWork, $participant)
                             ->setTitle($m)
                             ->setTopics(["duework.{$boxId}.updated"]);
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
-                $m = $assessmentDomainObject->isAcceptNone()
+                $m = $dueWork->isAcceptNone()
                     ? ':child no longer need to submit online for :box in :cat'
                     : ':child needs to submit online for :box in :cat';
-                $bob = $this->targetDueWorkBuilderToParents($bob, $assessmentDomainObject, $participant)
+                $bob = $this->targetDueWorkBuilderToParents($bob, $dueWork, $participant)
                             ->setTitle($m);
                 $envelope->targetToParent($participant->getUser(), $bob->build());
 
@@ -625,14 +688,14 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             // Not sure if there's any point to this notif, but raise it anyway
             if (!$notificationRaisedForParticipant) {
                 // Students
-                $bob = $this->targetDueWorkBuilderToStudent($bob, $assessmentDomainObject, $participant)
+                $bob = $this->targetDueWorkBuilderToStudent($bob, $dueWork, $participant)
                             ->setTitle(':author updated :box in :cat')
                             ->setParam('author', new UserParam($effector))
                             ->setTopics(["duework.{$boxId}.updated"]);
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
-                $bob = $this->targetDueWorkBuilderToParents($bob, $assessmentDomainObject, $participant)
+                $bob = $this->targetDueWorkBuilderToParents($bob, $dueWork, $participant)
                             ->setTitle(":child's $boxType :box was updated in :cat")
                             ->unsetParam('author');
                 $envelope->targetToParent($participant->getUser(), $bob->build());
