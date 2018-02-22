@@ -482,7 +482,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
 
         // This notifier only gets triggered for due works.
-        $folder = $assessmentDomainObject->getBaseContext()->getFolder();
         if (!$assessmentDomainObject instanceof DueWork) {
             return $envelope;
         }
@@ -512,6 +511,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 continue;
             }
 
+            $notificationRaisedForParticipant = false;
+
             // INCREASE in mark visibility (box can be closed in this instance)
             // doesn't actually create messages, just triggers for others to be created
             if (isset($diff['assessment']['markVisibility'])) {
@@ -527,6 +528,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                             $dueWorkFeedback,
                             $this->dueWorkFeedbackMapper
                         );
+                        $notificationRaisedForParticipant = true;
                     }
                 }
             }
@@ -536,7 +538,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 continue;
             }
 
-            $route = $this->buildParticipantRoute($assessmentDomainObject, $participant->getUser());
 
             // renamed
             if (!empty($diff['assessment']['name'])) {
@@ -544,6 +545,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
                 // Students
                 // TODO iterate particiapnts and students separately?
+                $route = $this->buildParticipantRoute($assessmentDomainObject, $participant->getUser());
                 $bob = $this->targetDueWorkBuilderToStudent($bob, $assessmentDomainObject, $participant)
                             ->setTitle(':author renamed :oldname to :newname in :cat')
                             ->setParam('author', new UserParam($effector))
@@ -557,6 +559,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                             ->setTitle(":child's $boxType was renamed from :oldname to :newname in :cat")
                             ->unsetParam('author');
                 $envelope->targetToParent($participant->getUser(), $bob->build());
+
+                $notificationRaisedForParticipant = true;
             }
 
             // due date change
@@ -583,6 +587,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                             ->setTitle(":child's $boxType :box closing date was $verb to :date in :cat")
                             ->unsetParam('author');
                 $envelope->targetToParent($participant->getUser(), $bob->build());
+
+                $notificationRaisedForParticipant = true;
             }
 
             // accept online
@@ -603,21 +609,24 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 $bob = $this->targetDueWorkBuilderToParents($bob, $assessmentDomainObject, $participant)
                             ->setTitle($m);
                 $envelope->targetToParent($participant->getUser(), $bob->build());
+
+                $notificationRaisedForParticipant = true;
             }
 
             // generic: only if no others raised
             // Not sure if there's any point to this notif, but raise it anyway
+            if (!$notificationRaisedForParticipant) {
+                // Students
+                $bob = $this->targetDueWorkBuilderToStudent($bob, $assessmentDomainObject, $participant)
+                            ->setTitle(':author updated :box in :cat');
+                $envelope->targetToUser($participant->getUser(), $bob->build());
 
-            // Students
-            $bob = $this->targetDueWorkBuilderToStudent($bob, $assessmentDomainObject, $participant)
-                        ->setTitle(':author updated :box in :cat');
-            $envelope->targetToUser($participant->getUser(), $bob->build());
-
-            // Parents
-            $bob = $this->targetDueWorkBuilderToParents($bob, $assessmentDomainObject, $participant)
-                        ->setTitle(":child's $boxType :box was updated in :cat")
-                        ->unsetParam('author');
-            $envelope->targetToParent($participant->getUser(), $bob->build());
+                // Parents
+                $bob = $this->targetDueWorkBuilderToParents($bob, $assessmentDomainObject, $participant)
+                            ->setTitle(":child's $boxType :box was updated in :cat")
+                            ->unsetParam('author');
+                $envelope->targetToParent($participant->getUser(), $bob->build());
+            }
         }
 
         return $envelope;
