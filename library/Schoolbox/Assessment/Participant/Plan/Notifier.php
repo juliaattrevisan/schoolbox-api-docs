@@ -666,8 +666,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     /**
      * Participant gets notified when an assessment is updated.
      *
-     * Proxies to `notify{$type}Updated`.
-     *
      * @param Model      $plan
      * @param User       $effector
      * @param array|null $diff
@@ -677,44 +675,23 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     public function notifyUpdated(Model $plan, User $effector, array $diff = null): Envelope
     {
-        $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
-        if ($assessmentDomainObject instanceof DueWork) {
-            return $this->notifyDueWorkUpdated($assessmentDomainObject, $plan, $effector, $diff);
-        }
-
-        return new Envelope();
-    }
-
-
-    /**
-     * Students and parents get notified when a due work is updated.
-     *
-     * The actual notification depends on what the diff is.
-     *
-     * @param DueWork    $dueWork
-     * @param Model      $plan
-     * @param User       $effector
-     * @param array|null $diff
-     * @return Envelope
-     */
-    private function notifyDueWorkUpdated(DueWork $dueWork, Model $plan, User $effector, array $diff = null): Envelope
-    {
-        $envelope  = new Envelope();
-        $topicStub = $this->retrieveAssessmentTopicStub($dueWork);
+        $assessment = $this->retrieveAssessmentDomainModel($plan);
+        $envelope   = new Envelope();
+        $topicStub  = $this->retrieveAssessmentTopicStub($assessment);
         if (!$topicStub) {
             return $envelope;
         }
 
         // Build a box type
-        $workType = $dueWork->getWorkType();
+        $workType = $assessment->getWorkType();
         $boxType  = mb_strtolower($workType ? $workType->getName() : '');
 
         // All updated notifs have the same icon, namespace, severity
-        $bob = $this->buildGenericBuilder($dueWork, $effector)
+        $bob = $this->buildGenericBuilder($assessment, $effector)
                     ->setSeverity(Logger::ERROR);
 
         // Figure out who's actually targeted
-        foreach ($this->retrieveParticipantsFromPlan($plan, $dueWork) as $participant) {
+        foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
             if ($participant->isExcluded()) {
                 continue;
             }
@@ -732,7 +709,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 [$new, $old] = $diff['assessment']['markVisibility'];
                 if ($new > $old) {
                     // Trigger notification about this item
-                    $authoritativeFeedback = $dueWork->getAuthoritativeFeedback($participant, true);
+                    $authoritativeFeedback = $assessment->getAuthoritativeFeedback($participant, true);
                     if ($authoritativeFeedback) {
                         $dueWorkFeedback = $this->dueWorkFeedbackMapper->findById($authoritativeFeedback->getId());
                         $this->raiseNotification(
@@ -758,7 +735,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
                 // Students
                 // TODO iterate particiapnts and students separately?
-                $bob = $this->targetBuilderToStudent($bob, $dueWork, $participant)
+                $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
                             ->setTitle(':author renamed :oldname to :assessment in :cat')
                             ->setParam('author', new UserParam($effector))
                             ->setParam('oldname', new Param($oldName))
@@ -766,7 +743,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
-                $bob = $this->targetBuilderToParents($bob, $dueWork, $participant)
+                $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
                             ->setTitle(":child's $boxType was renamed from :oldname to :assessment in :cat")
                             ->unsetParam('author');
                 $envelope->targetToParent($participant->getUser(), $bob->build());
@@ -786,7 +763,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 }
 
                 // Students
-                $bob = $this->targetBuilderToStudent($bob, $dueWork, $participant)
+                $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
                             ->setTitle(":author $verb :assessment to :date in :cat")
                             ->setParam('author', new UserParam($effector))
                             ->setParam('date', new Param($dateformat))
@@ -794,7 +771,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
-                $bob = $this->targetBuilderToParents($bob, $dueWork, $participant)
+                $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
                             ->setTitle(":child's $boxType :assessment closing date was $verb to :date in :cat")
                             ->unsetParam('author');
                 $envelope->targetToParent($participant->getUser(), $bob->build());
@@ -803,21 +780,21 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             }
 
             // accept online
-            if (!empty($diff['assessment']['acceptOnline'])) {
+            if ($assessment instanceof DueWork && !empty($diff['assessment']['acceptOnline'])) {
                 // Students
-                $m = $dueWork->isAcceptNone()
+                $m = $assessment->isAcceptNone()
                     ? 'You no longer need to submit online for :assessment in :cat'
                     : 'You now need to submit online for :assessment in :cat';
-                $bob = $this->targetBuilderToStudent($bob, $dueWork, $participant)
+                $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
                             ->setTitle($m)
                             ->setTopics(["$topicStub.updated"]);
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
-                $m = $dueWork->isAcceptNone()
+                $m = $assessment->isAcceptNone()
                     ? ':child no longer need to submit online for :assessment in :cat'
                     : ':child needs to submit online for :assessment in :cat';
-                $bob = $this->targetBuilderToParents($bob, $dueWork, $participant)
+                $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
                             ->setTitle($m);
                 $envelope->targetToParent($participant->getUser(), $bob->build());
 
@@ -828,14 +805,14 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             // Not sure if there's any point to this notif, but raise it anyway
             if (!$notificationRaisedForParticipant) {
                 // Students
-                $bob = $this->targetBuilderToStudent($bob, $dueWork, $participant)
+                $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
                             ->setTitle(':author updated :assessment in :cat')
                             ->setParam('author', new UserParam($effector))
                             ->setTopics(["$topicStub.updated"]);
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
-                $bob = $this->targetBuilderToParents($bob, $dueWork, $participant)
+                $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
                             ->setTitle(":child's $boxType :assessment was updated in :cat")
                             ->unsetParam('author');
                 $envelope->targetToParent($participant->getUser(), $bob->build());
