@@ -45,6 +45,11 @@
         };
 
         form.alaressValidate({
+            rules: {
+                'code': {
+                    checkCodes: true
+                },
+            },
             submitHandler: function(form) {
                 var hasDefaultPerms = $("input[name='group[{{ user.getRole().getId() }}]']:checked").val();
                 var individualPerms = $('input[name=groupcheck]').is(':checked');
@@ -138,6 +143,26 @@
             $("input[name^='group']").removeClass('required');
         }
 
+
+        $.validator.addMethod('checkCodes', function(value, element) {
+            var allCodes = $(element).val();
+            var explodeCodes = allCodes.split(',');
+
+            console.log(allCodes);
+            console.log(explodeCodes);
+
+            var shortEnough = true;
+
+            explodeCodes.forEach(function(element){
+                if($.trim(element).length > 20) {
+                    shortEnough = false;
+                }
+            });
+
+            return shortEnough;
+
+        }, 'Class codes may not exceed 20 characters.');
+
         $("#inherit").change(function() {
             showHideClassCodeWarning();
         });
@@ -155,7 +180,6 @@
                 $("[data-alert]").addClass("hide");
             }
         }
-
     });
 </script>
 

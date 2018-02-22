@@ -181,6 +181,8 @@ class Mapper extends BaseMapper implements IExceptionGenerator
     public const ERROR_NO_COURSE_SPEC_INTERACTIONS = 207;
     public const ERROR_NONPARTICIPANT = 208;
 
+    const ERROR_CODE_TOO_LONG = 208;
+
     /**
      * Setup mapping
      */

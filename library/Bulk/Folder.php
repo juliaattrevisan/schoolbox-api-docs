@@ -100,14 +100,29 @@ class Bulk_Folder
                         continue;
                     }
 
-                    /* Check if subject code already exists
-					 */
+                    /* Check codes */
+
                     $codes = [];
                     $skip = false;
 
                     for ($i=2; $row[$i]; $i++) {
                         $subjectCode = trim($row[$i]);
 
+                        /* Check if code too looong */
+                        if(strlen($subjectCode) > 20) {
+                            $skip = true;
+
+                            $output[] = [
+                                'id' => '',
+                                'name' => $row[1],
+                                'status' => 'Skipped',
+                                'error' => "Subject code exceeds 20 characters ({$subjectCode})",
+                            ];
+
+                            break;
+                        }
+
+                        /* Check if subject code already exists*/
                         try {
                             $folder = $folderMapper->findByCode($subjectCode);
 
@@ -119,6 +134,8 @@ class Bulk_Folder
                                 'status' => 'Skipped',
                                 'error' => "Subject code already exists ({$subjectCode})",
                             ];
+
+                            break;
                         } catch (MapperException $e) {
                             /* noop - folder doesn't exist
                              */
