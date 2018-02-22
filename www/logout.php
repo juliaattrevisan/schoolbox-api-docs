@@ -3,6 +3,12 @@
 
 require_once('../library/Bootstrap.php');
 
+if (Cfg::get('saml_enabled') && Cfg::get('saml_slo_enabled')) {
+    // Initiate SLO
+    header('Location: /saml/logout.php');
+    exit;
+}
+
 session_start();
 session_regenerate_id(true);
 session_destroy();
@@ -17,12 +23,7 @@ $samlLogoutUrl = trim(Cfg::get('saml_logout_url'));
 // Replace some dynamic variables in the logout URL if set
 $samlLogoutUrl = str_replace('{SCHOOLBOX_ADDRESS}',$_SERVER['SERVER_NAME'],$samlLogoutUrl);
 
-if (Cfg::get('saml_enabled') && Cfg::get('saml_slo_enabled')) {
-    // Initiate SLO
-    header('Location: /saml/logout.php');
-    exit;
-}
-else if (Cfg::get('saml_enabled') && strlen($samlLogoutUrl) > 0) {
+if (Cfg::get('saml_enabled') && strlen($samlLogoutUrl) > 0) {
     // Redirect to logout location
     header('Location: ' . $samlLogoutUrl);
     exit;
