@@ -51,8 +51,8 @@ Data:
         {% endif %}
     {% else %}
         {% set url = routeLookupIfAuthorized('learningAssessment.getStatus', {
-            assessmentId: currentFeedback.assessable.id,
-            assessment: currentFeedback.assessable
+        assessmentId: currentFeedback.assessable.id,
+        assessment: currentFeedback.assessable
         }) %}
         {% set tooltip = 'Resume Quickmark' %}
     {% endif %}
@@ -67,10 +67,10 @@ Data:
 <ul class="information-list reply">
     <li class="actions-small-2">
         <div class="list-item flex-grade">
-            <div class="card small-12">
+            <div class="card small-12 sibling">
                 {% if url %}
                 <a href="{{ url }}" title="{{ tooltip }}">
-                {% endif %}
+                    {% endif %}
                     <img src="/portrait.php?userId={{ currentFeedback.reviewer.externalId }}&amp;size=square64" alt="">
                     <p>
                         {% if not currentFeedback.published %}
@@ -98,18 +98,18 @@ Data:
                 </a>
                 {% endif %}
             </div>
-            <div class="grade">
-                <span class="{{ urgency.marks(currentFeedback.normalisedMark) }}">{{ currentFeedback.humanReadableMark }}</span>
+            <div class="grade {{ urgency.marks(currentFeedback.normalisedMark) }}-bg">
+                <span>{{ currentFeedback.humanReadableMark }}</span>
             </div>
         </div>
         {% set deleteRoute = routeLookupIfAuthorized(
-            'learningDueWorkFeedback.deleteAssessmentFeedback',
-            {
-                assessmentId: participant.assessable.id,
-                assessment: participant.assessable,
-                feedbackId: currentFeedback.id,
-                feedback: currentFeedback,
-            }
+        'learningDueWorkFeedback.deleteAssessmentFeedback',
+        {
+        assessmentId: participant.assessable.id,
+        assessment: participant.assessable,
+        feedbackId: currentFeedback.id,
+        feedback: currentFeedback,
+        }
         ) %}
         <nav>
             {% if hasCollapser %}
@@ -150,51 +150,51 @@ Data:
                 data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
                 data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}">
                 {% for currentFile in currentFeedback.allFiles %}
-                {# Only show published feedback and therefore also
-                 # only list files that are involved with a Published Feedback
-                 #}
-                <li class="actions-small-1">
-                    <div class="list-item">
-                        <div class="card attachment small-12">
-                            {% set kamiViewRoute = currentFile.kami
+                    {# Only show published feedback and therefore also
+                     # only list files that are involved with a Published Feedback
+                     #}
+                    <li class="actions-small-1">
+                        <div class="list-item">
+                            <div class="card attachment small-12">
+                                {% set kamiViewRoute = currentFile.kami
                                 ? routeLookupIfAuthorized('learningDueWorkResponse.getKamiView', {
-                                    kamiId:       currentFile.kami.id,
-                                    assessment:   assessment,
-                                    participant:  participant,
-                                    feedback:     currentFeedback,
-                                })
-                                : null
-                            %}
-                            {% if currentFile.kami and kamiViewRoute %}
-                                <a href="{{ kamiViewRoute }}" title="{{ currentFile.filename }}">
-                                    <img src="/ajax/mime/{{ currentFile.mime }}" alt="View Annotated Document" />
-                                    <p>{{ currentFile.filename }} </p>
-                                </a>
-                            {% else %}
-                                <a href="/storage/fetch.php?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}" data-plugin="preview">
-                                    <img src="/ajax/mime/{{ currentFile.mime }}" alt="Download" />
-                                    <p>{{ currentFile.filename }} </p>
-                                </a>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <nav>
-                        {% set kamiExportRoute = currentFile.kami
-                            ? routeLookupIfAuthorized('learningDueWorkResponse.getKamiExport', {
                                 kamiId:       currentFile.kami.id,
                                 assessment:   assessment,
                                 participant:  participant,
                                 feedback:     currentFeedback,
+                                })
+                                : null
+                                %}
+                                {% if currentFile.kami and kamiViewRoute %}
+                                    <a href="{{ kamiViewRoute }}" title="{{ currentFile.filename }}">
+                                        <img src="/ajax/mime/{{ currentFile.mime }}" alt="View Annotated Document" />
+                                        <p>{{ currentFile.filename }} </p>
+                                    </a>
+                                {% else %}
+                                    <a href="/storage/fetch.php?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}" data-plugin="preview">
+                                        <img src="/ajax/mime/{{ currentFile.mime }}" alt="Download" />
+                                        <p>{{ currentFile.filename }} </p>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <nav>
+                            {% set kamiExportRoute = currentFile.kami
+                            ? routeLookupIfAuthorized('learningDueWorkResponse.getKamiExport', {
+                            kamiId:       currentFile.kami.id,
+                            assessment:   assessment,
+                            participant:  participant,
+                            feedback:     currentFeedback,
                             })
                             : null
-                        %}
-                        {% if kamiExportRoute %}
-                            <a href="{{ kamiExportRoute }}" data-kami-export class="icon-download" title="Download annotated document"></a>
-                        {% else %}
-                            <a href="/storage/fetch.php?hash={{ currentFile.hash }}&save=1" class="icon-download" title="Download"></a>
-                        {% endif %}
-                    </nav>
-                </li>
+                            %}
+                            {% if kamiExportRoute %}
+                                <a href="{{ kamiExportRoute }}" data-kami-export class="icon-download" title="Download annotated document"></a>
+                            {% else %}
+                                <a href="/storage/fetch.php?hash={{ currentFile.hash }}&save=1" class="icon-download" title="Download"></a>
+                            {% endif %}
+                        </nav>
+                    </li>
                 {% endfor %}
             </ul>
         {% endif %}

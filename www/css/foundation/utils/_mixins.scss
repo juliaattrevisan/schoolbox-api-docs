@@ -260,8 +260,7 @@
 		}
 		.#{$prefix}-#{$i}-bg {
 			background-color: $derived;
-			color: calc-text-color($derived, $light, $dark);
-
+			color: $white;
 		}
 	}
 }

@@ -1117,6 +1117,7 @@ $selector-width: 2.25rem;
 
 .grade{
     font-size: rem-calc(($base-font-size - 4));
+    padding: 1rem;
     span {
         display: block;
         white-space: nowrap;
@@ -1125,12 +1126,39 @@ $selector-width: 2.25rem;
         font-size: rem-calc(($base-font-size + 8));
         line-height: 2rem;
     }
+    &[class*="-bg"] span {
+        text-shadow: 0px 1px 0px rgba(0, 0, 0, .5);
+    }
     a:hover{
         background-color: transparent;
     }
     .meta {
         text-transform: lowercase;
         font-variant: small-caps;
+    }
+}
+
+// Grades that sit along side of other elements
+.flex-grade {
+    display: flex;
+
+    .sibling {
+        flex: 1 1 auto;
+    }
+    .grade {
+        align-items: center;
+        display: flex;
+        flex: 0 1 auto;
+        justify-content: center;
+        margin-left: .75rem;
+    }
+    @media #{$small-only} {
+        flex-wrap: wrap;
+
+        .grade {
+            flex: 1 1 auto;
+            margin-left: 0;
+        }
     }
 }
 
@@ -1223,15 +1251,15 @@ $selector-width: 2.25rem;
         border-left: 6px solid $base;
         padding-left: 1rem;
 
+        @media #{$small-only} {
+            padding-left: 0.5rem;
+        }
+
         .card{
             margin-left: 1rem;
             img{
                 width: 2rem;
             }
-        }
-
-        @media #{$small-only} {
-            padding-left: 0.5rem;
         }
 
         .reply {
@@ -1292,13 +1320,13 @@ tr:hover{
         }
     }
 
-	.checklist {
-		overflow-y: auto;
-	}
+    .checklist {
+        overflow-y: auto;
+    }
 
-	.close-reveal-modal {
-		right: $reveal-close-right;
-	}
+    .close-reveal-modal {
+        right: $reveal-close-right;
+    }
 
     // Fix spacing for forms inside modals that have columns
     form.has-columns {
@@ -1317,44 +1345,44 @@ tr:hover{
 }
 
 .reveal-action {
-	section {
-		margin: 0;
-		text-align: right;
-	}
+    section {
+        margin: 0;
+        text-align: right;
+    }
 
-	.button, button, input {
-		background-color: transparent;
-		margin: 0;
-		text-transform: uppercase;
-		font-size: rem-calc($base-font-size - 2);
-		vertical-align: top;
-		font-weight: $font-weight-semibold;
-		color: $body-font-color;
-		padding: 0.5rem 0.75rem;
+    .button, button, input {
+        background-color: transparent;
+        margin: 0;
+        text-transform: uppercase;
+        font-size: rem-calc($base-font-size - 2);
+        vertical-align: top;
+        font-weight: $font-weight-semibold;
+        color: $body-font-color;
+        padding: 0.5rem 0.75rem;
 
-		&:hover {
-			background-color: transparent;
-		}
+        &:hover {
+            background-color: transparent;
+        }
 
-		&.submit {
-			background-color: transparent;
-			color: $content-ui-submit-background;
-			width: auto;
-		}
-	}
+        &.submit {
+            background-color: transparent;
+            color: $content-ui-submit-background;
+            width: auto;
+        }
+    }
 
-	.close-reveal-modal {
-		top: auto;
-		right: auto;
-		position: relative;
-		line-height: 1.375rem;
-		font-weight: $font-weight-semibold;
-		color: $body-font-color;
-	}
+    .close-reveal-modal {
+        top: auto;
+        right: auto;
+        position: relative;
+        line-height: 1.375rem;
+        font-weight: $font-weight-semibold;
+        color: $body-font-color;
+    }
 }
 
 .reveal-modal.no-pad .reveal-action section {
-	padding: 0.75rem 1.25rem;
+    padding: 0.75rem 1.25rem;
 }
 
 
