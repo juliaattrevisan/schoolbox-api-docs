@@ -434,12 +434,14 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         // Try triggering for every student; maybe they will stack
-        $bob = $this->buildGenericDueWorkBuilder($assessmentDomainObject)
-            ->setTitle(":box in :cat has closed and :student did not submit work")
-            ->setParam('box', new Param($assessmentDomainObject->getTitle(), $this->buildAssessmentRoute($assessmentDomainObject)))
-            ->setParam('cat', new CategoryParam($folder))
-            ->setSeverity(Logger::ERROR)
-            ->addTopic("duework.$boxId.closed");
+        $href = $this->buildAssessmentRoute($assessmentDomainObject);
+        $bob  = $this->buildGenericDueWorkBuilder($assessmentDomainObject)
+                     ->setTitle(":box in :cat has closed and :student did not submit work")
+                     ->setHref($href)
+                     ->setParam('box', new Param($assessmentDomainObject->getTitle(), $href))
+                     ->setParam('cat', new CategoryParam($folder))
+                     ->setSeverity(Logger::ERROR)
+                     ->addTopic("duework.$boxId.closed");
 
         // Customise and send to every participant in this plan only
         foreach ($this->retrieveParticipantsFromPlan($plan, $assessmentDomainObject) as $participant) {
