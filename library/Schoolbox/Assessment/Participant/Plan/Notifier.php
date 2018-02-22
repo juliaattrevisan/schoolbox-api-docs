@@ -548,6 +548,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         if ($assessmentDomainObject instanceof DueWork) {
             return $this->notifyDueWorkClosed($assessmentDomainObject, $plan);
         }
+        if ($assessmentDomainObject instanceof Quiz) {
+            return $this->notifyQuizClosed($assessmentDomainObject, $plan);
+        }
 
         return new Envelope();
     }
@@ -600,6 +603,57 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             );
             $envelope->broadcastToCategory(
                 $dueWork->getBaseContext()->getFolder(),
+                UserAccess::ACCESS_WRITE,
+                $bob->build()
+            );
+        }
+
+        return $envelope;
+    }
+
+
+    /**
+     * Staff get notified when a due work closes and one or more students didn't submit.
+     *
+     * @param Quiz  $quiz
+     * @param Model $plan
+     * @return Envelope
+     */
+    private function notifyQuizClosed(Quiz $quiz, Model $plan): Envelope
+    {
+        $envelope  = new Envelope();
+        $topicStub = $this->retrieveAssessmentTopicStub($quiz);
+        if (!$topicStub) {
+            return $envelope;
+        }
+
+        // Send a single notification for total # students not submitted
+        $href = $this->buildAssessmentRoute($quiz);
+        $bob  = $this->buildGenericBuilder($quiz)
+                     ->setTitle(":assessment in :cat has closed and :number did not submit work")
+                     ->setHref($href)
+                     ->setParam('box', new Param($quiz->getTitle(), $href))
+                     ->setSeverity(Logger::ERROR)
+                     ->addTopic("$topicStub.closed");
+
+        // Figure out how many need to submit
+        $totalUnsubmitted = 0;
+        foreach ($this->retrieveParticipantsFromPlan($plan, $quiz) as $participant) {
+            if ($participant->isExcluded()) {
+                continue;
+            }
+            if (!$participant->isResponseRequired()) {
+                continue;
+            }
+            $totalUnsubmitted++;
+        }
+        if ($totalUnsubmitted > 0) {
+            $bob->setParam(
+                'number',
+                new Param(sprintf('%s student%s', $totalUnsubmitted, $totalUnsubmitted === 1 ? '' : 's'))
+            );
+            $envelope->broadcastToCategory(
+                $quiz->getBaseContext()->getFolder(),
                 UserAccess::ACCESS_WRITE,
                 $bob->build()
             );
