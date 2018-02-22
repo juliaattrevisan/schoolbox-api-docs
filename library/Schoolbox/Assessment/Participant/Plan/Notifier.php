@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Participant\Plan;
 
 use Alaress\Async\Notification\Instance\Builder;
-use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress_Date_Format;
 use Monolog\Logger;
@@ -18,7 +17,7 @@ use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
@@ -32,7 +31,6 @@ use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\ChildParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
-use Schoolbox\Role;
 use Schoolbox\User;
 
 /**
@@ -75,6 +73,11 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private $assessmentMapper;
 
     /**
+     * @var AssessmentDataSource
+     */
+    private $assessmentDataSource;
+
+    /**
      * @var DueWorkFeedbackMapper
      */
     private $dueWorkFeedbackMapper;
@@ -98,11 +101,43 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * Instantiate all your dependencies within yourself.
      *
      * @param mixed $dependencies
+     * @throws \Aura\Di\Exception\ServiceNotFound if somehow my assessment data
+     *                                            source wasn't found
      */
     public function loadDependencies($dependencies = null): void
     {
         if (empty($dependencies['assessmentMapper'])) {
             $dependencies['assessmentMapper'] = AssessmentMapper::getInstance();
+        }
+        if (empty($dependencies['assessmentDataSource'])) {
+            // Remember that thing that under pain of death we're not to use?
+            //
+            //                             ,-.
+            //        ___,---.__          /'|`\          __,---,___
+            //     ,-'    \`    `-.____,-'  |  `-.____,-'    //    `-.
+            //   ,'        |           ~'\     /`~           |        `.
+            //  /      ___//              `. ,'          ,  , \___      \
+            // |    ,-'   `-.__   _         |        ,    __,-'   `-.    |
+            // |   /          /\_  `   .    |    ,      _/\          \   |
+            // \  |           \ \`-.___ \   |   / ___,-'/ /           |  /
+            //  \  \           | `._   `\\  |  //'   _,' |           /  /
+            //   `-.\         /'  _ `---'' , . ``---' _  `\         /,-'
+            //      ``       /     \    ,='/ \`=.    /     \       ''
+            //              |__   /|\_,--.,-.--,--._/|\   __|
+            //              /  `./  \\`\ |  |  | /,//' \,'  \
+            //             /   /     ||--+--|--+-/-|     \   \
+            //            |   |     /'\_\_\ | /_/_/`\     |   |
+            //             \   \__, \_     `~'     _/ .__/   /
+            //              `-._,-'   `-._______,-'   `-._,-'
+            //
+            //          +--------------------------------------+
+            //          |       \Schoolbox\Mapper::getDi       |
+            //          | Under pain of death DO NOT USE THIS! |
+            //          +--------------------------------------+
+            //
+            // ... hold my beer
+            $dependencies['assessmentDataSource'] =
+                $dependencies['assessmentMapper']::getDi()->get('assessmentDataSource');
         }
 
         // Quiz and duework feedback mapper:
@@ -730,6 +765,16 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     }
 
     /**
+     * @param AssessmentDataSource $assessmentDataSource
+     * @return static
+     */
+    protected function setAssessmentDataSource(AssessmentDataSource $assessmentDataSource)
+    {
+        $this->assessmentDataSource = $assessmentDataSource;
+        return $this;
+    }
+
+    /**
      * @param DueWorkFeedbackMapper $dueWorkFeedbackMapper
      * @return static
      */
@@ -778,33 +823,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     private function retrieveAssessmentDomainModel(Model $plan): IAssessable
     {
-        //                             ,-.
-        //        ___,---.__          /'|`\          __,---,___
-        //     ,-'    \`    `-.____,-'  |  `-.____,-'    //    `-.
-        //   ,'        |           ~'\     /`~           |        `.
-        //  /      ___//              `. ,'          ,  , \___      \
-        // |    ,-'   `-.__   _         |        ,    __,-'   `-.    |
-        // |   /          /\_  `   .    |    ,      _/\          \   |
-        // \  |           \ \`-.___ \   |   / ___,-'/ /           |  /
-        //  \  \           | `._   `\\  |  //'   _,' |           /  /
-        //   `-.\         /'  _ `---'' , . ``---' _  `\         /,-'
-        //      ``       /     \    ,='/ \`=.    /     \       ''
-        //              |__   /|\_,--.,-.--,--._/|\   __|
-        //              /  `./  \\`\ |  |  | /,//' \,'  \
-        //             /   /     ||--+--|--+-/-|     \   \
-        //            |   |     /'\_\_\ | /_/_/`\     |   |
-        //             \   \__, \_     `~'     _/ .__/   /
-        //              `-._,-'   `-._______,-'   `-._,-'
-        //
-        //          +--------------------------------------+
-        //          |       \Schoolbox\Mapper::getDi       |
-        //          | Under pain of death DO NOT USE THIS! |
-        //          +--------------------------------------+
-        //
-        // ... hold my beer
-        /** @var MapperProxy $assessmentDataSource */
-        $assessmentDataSource = $this->mapper::getDi()->get('assessmentDataSource');
-        return $assessmentDataSource->findByIdForReview($plan->getAssessment()->getId());
+        return $this->assessmentDataSource->findByIdForReview($plan->getAssessment()->getId());
     }
 
     /**
