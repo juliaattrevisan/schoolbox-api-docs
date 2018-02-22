@@ -147,14 +147,10 @@
         $.validator.addMethod('checkCodes', function(value, element) {
             var allCodes = $(element).val();
             var explodeCodes = allCodes.split(',');
-
-            console.log(allCodes);
-            console.log(explodeCodes);
-
             var shortEnough = true;
 
-            explodeCodes.forEach(function(element){
-                if($.trim(element).length > 20) {
+            explodeCodes.forEach(function(code){
+                if($.trim(code).length > 20) {
                     shortEnough = false;
                 }
             });
