@@ -146,10 +146,29 @@ class UserAccessNotifier extends AbstractModuleNotifier
     protected function notifyJoined($userAccess, $user)
     {
         if ($userAccess->getUser()->getId() == $user->getId()) {
-            return $this->notifyAdmin(':user joined :groupname', self::TRIGGER_JOINED, $userAccess);
+            $envelope = $this->notifyAdmin(':user joined :groupname', self::TRIGGER_JOINED, $userAccess);
         } else {
-            return $this->notifyAdmin(':effector added :user to :groupname', self::TRIGGER_JOINED, $userAccess, $user);
+            $envelope = $this->notifyAdmin(':effector added :user to :groupname', self::TRIGGER_JOINED, $userAccess, $user);
         }
+
+        $bob = new Builder();
+        $cat = FolderMapper::getInstance()->findById($userAccess->getServiceIdentifier());
+
+        $bob->setTitle(':moderator has added you to :groupname')
+            ->setSeverity(Logger::NOTICE)
+            ->setHref('/')
+            ->setIcon("/portrait.php?size={$this->iconSize}&userId={$user->getExternalId()}")
+            ->setNamespace($this->getSlug())
+            ->setParams([
+                'moderator' => new UserParam($user),
+                'groupname' => new CategoryParam($cat, Param::STACKING_REPLACE)
+            ])
+            ->addTopic("group.{$cat->getId()}.".self::TRIGGER_APPROVED)
+        ;
+
+        $envelope->targetToUser($userAccess->getUser(), $bob->build());
+
+        return $envelope;
     }
 
 
@@ -306,8 +325,11 @@ class UserAccessNotifier extends AbstractModuleNotifier
      */
     protected function notifyApproved($userAccess, $user, $diff = null)
     {
-        $envelope = new Envelope();
-        $bob = new Builder();
+        if ($userAccess->getUser()->getId() == $user->getId()) {
+            $envelope = $this->notifyAdmin(':user joined :groupname', self::TRIGGER_JOINED, $userAccess);
+        } else {
+            $envelope = $this->notifyAdmin(':effector added :user to :groupname', self::TRIGGER_JOINED, $userAccess, $user);
+        }
 
         // TODO uncomment these bits of the method to make it more informative once the Mapper can handle composite IDs
 //		// no diff in access level, this isn't something we're interested in
@@ -341,6 +363,8 @@ class UserAccessNotifier extends AbstractModuleNotifier
                 return $envelope;
         }
 
+        $bob = new Builder();
+        
         $bob->setTitle($messageText)
             ->setSeverity(Logger::NOTICE)
             ->setHref("/homepage/{$cat->getId()}")
