@@ -266,11 +266,11 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             if ($participant->isExcluded()) {
                 continue;
             }
-            $href = $this->buildParticipantRoute($assessmentDomainObject, $participant->getUser());
-            $bob->setHref($href)
-                ->setBody($participant->getDescription())
-                ->setByline("Due {$participant->getDueDate()->getCalendarDateTime()}")
-                ->setParam('box', new Param($assessmentDomainObject->getTitle(), $href));
+
+            // build for student
+            $bob = $this->targetDueWorkBuilderToStudent($bob, $assessmentDomainObject, $participant)
+                        ->setBody($participant->getDescription())
+                        ->setByline("Due {$participant->getDueDate()->getCalendarDateTime()}");
             $envelope->targetToUser($participant->getUser(), $bob->build());
         }
 
@@ -321,26 +321,21 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 continue;
             }
 
-            $href = $this->buildParticipantRoute($assessmentDomainObject, $participant->getUser());
             $when = $participant->getDueDate()->getRelativeTime(Alaress_Date_Format::now()->addMinutes(-5), true);
 
             // build for student
-            $bob->setTitle(":box is due $when from now in :cat")
-                ->setHref($href)
-                ->setBody($participant->getDescription())
-                ->setParam('box', new Param($assessmentDomainObject->getTitle(), $href));
+            $bob = $this->targetDueWorkBuilderToStudent($bob, $assessmentDomainObject, $participant)
+                        ->setTitle(":box is due $when from now in :cat")
+                        ->setBody($participant->getDescription());
             $envelope->targetToUser($participant->getUser(), $bob->build());
 
             // build for parent, only if they're allowed
             if ($this->conf->get('restrict_student_submissions')) {
                 continue;
             }
-            $bob->setTitle(":child has not yet submitted work for :box, which is due $when from now in :cat")
-                ->setParam('child', new ChildParam($participant->getUser(), ParameterInterface::STACKING_REPLACE));
+            $bob = $this->targetDueWorkBuilderToParents($bob, $assessmentDomainObject, $participant)
+                        ->setTitle(":child has not yet submitted work for :box, which is due $when from now in :cat");
             $envelope->targetToParent($participant->getUser(), $bob->build());
-
-            // Clear out the child param, as user doesn't have it
-            $bob->unsetParam('child');
         }
 
         return $envelope;
@@ -391,25 +386,19 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 continue;
             }
 
-            $href = $this->buildParticipantRoute($assessmentDomainObject, $participant->getUser());
-
             // build for student
-            $bob->setTitle(":box is now overdue in :cat")
-                ->setHref($href)
-                ->setBody($participant->getDescription())
-                ->setParam('box', new Param($assessmentDomainObject->getTitle(), $href));
+            $bob = $this->targetDueWorkBuilderToStudent($bob, $assessmentDomainObject, $participant)
+                        ->setTitle(":box is now overdue in :cat")
+                        ->setBody($participant->getDescription());
             $envelope->targetToUser($participant->getUser(), $bob->build());
 
             // build for parent, only if they're allowed
             if ($this->conf->get('restrict_student_submissions')) {
                 continue;
             }
-            $bob->setTitle(':child did not submit work for :box in :cat')
-                ->setParam('child', new ChildParam($participant->getUser(), ParameterInterface::STACKING_REPLACE));
+            $bob = $this->targetDueWorkBuilderToParents($bob, $assessmentDomainObject, $participant)
+                        ->setTitle(':child did not submit work for :box in :cat');
             $envelope->targetToParent($participant->getUser(), $bob->build());
-
-            // Clear out the child param, as user doesn't have it
-            $bob->unsetParam('child');
         }
 
         return $envelope;
