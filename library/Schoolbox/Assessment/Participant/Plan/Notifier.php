@@ -361,29 +361,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     public function notifyOverdue(Model $plan): Envelope
     {
-        $assessmentDomainObject = $this->retrieveAssessmentDomainModel($plan);
-        if ($assessmentDomainObject instanceof DueWork) {
-            return $this->notifyDueWorkOverdue($assessmentDomainObject, $plan);
-        }
-        if ($assessmentDomainObject instanceof Quiz) {
-            return $this->notifyQuizOverdue($assessmentDomainObject, $plan);
-        }
-
-        return new Envelope();
-    }
-
-
-    /**
-     * Participant and parents get notified when a due work is overdue.
-     *
-     * @param DueWork $assessment
-     * @param Model   $plan
-     * @return Envelope
-     */
-    private function notifyDueWorkOverdue(DueWork $assessment, Model $plan): Envelope
-    {
-        $envelope  = new Envelope();
-        $topicStub = $this->retrieveAssessmentTopicStub($assessment);
+        $assessment = $this->retrieveAssessmentDomainModel($plan);
+        $envelope   = new Envelope();
+        $topicStub  = $this->retrieveAssessmentTopicStub($assessment);
         if (!$topicStub) {
             return $envelope;
         }
@@ -408,9 +388,20 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 continue;
             }
 
+            // TODO figure out if overdue should really be different for quiz and duework
+            if ($assessment instanceof DueWork) {
+                $studentTitle = ":assessment is now overdue in :cat";
+                $parentTitle  = ":child did not submit work for :assessment in :cat";
+            } elseif ($assessment instanceof Quiz) {
+                $studentTitle = ":assessment has closed in :cat";
+                $parentTitle  = ":child did not attempt :assessment in :cat";
+            } else {
+                continue;
+            }
+
             // build for student
             $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
-                        ->setTitle(":assessment is now overdue in :cat")
+                        ->setTitle($studentTitle)
                         ->setBody($participant->getDescription());
             $envelope->targetToUser($participant->getUser(), $bob->build());
 
@@ -419,61 +410,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 continue;
             }
             $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
-                        ->setTitle(':child did not submit work for :assessment in :cat');
-            $envelope->targetToParent($participant->getUser(), $bob->build());
-        }
-
-        return $envelope;
-    }
-
-
-    /**
-     * Participant and parents get notified when a quiz is overdue.
-     *
-     * @param Quiz  $assessment
-     * @param Model $plan
-     * @return Envelope
-     */
-    private function notifyQuizOverdue(Quiz $assessment, Model $plan): Envelope
-    {
-        $envelope  = new Envelope();
-        $topicStub = $this->retrieveAssessmentTopicStub($assessment);
-        if (!$topicStub) {
-            return $envelope;
-        }
-
-        // Doesn't accept online? return
-        if ($assessment instanceof DueWork && $assessment->isAcceptNone()) {
-            return $envelope;
-        }
-
-        $bob = $this->buildGenericBuilder($assessment)
-                    ->setSeverity(Logger::ERROR)
-                    ->addTopic("$topicStub.overdue");
-
-        // Customise and send to every participant in this plan only
-        foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
-            if ($participant->isExcluded()) {
-                continue;
-            }
-
-            // Has participant already submitted?
-            if (!$participant->isResponseRequired()) {
-                continue;
-            }
-
-            // build for student
-            $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
-                        ->setTitle(":assessment has closed in :cat")
-                        ->setBody($participant->getDescription());
-            $envelope->targetToUser($participant->getUser(), $bob->build());
-
-            // build for parent, only if they're allowed
-            if ($this->conf->get('restrict_student_submissions')) {
-                continue;
-            }
-            $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
-                        ->setTitle(':child did not attempt :assessment in :cat');
+                        ->setTitle($parentTitle);
             $envelope->targetToParent($participant->getUser(), $bob->build());
         }
 
