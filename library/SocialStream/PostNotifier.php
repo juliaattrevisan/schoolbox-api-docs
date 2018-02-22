@@ -330,7 +330,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
 
         foreach ($posts as $post) {
             $owner= $post->getOwner();
-            $c = $c->merge(new Collection($this->notifyPosted(Role::STUDENT, $post, $owner)->getAll($post->getCreatedAt()->getUnixTimestamp())));
+            $c = $c->merge(new Collection($this->notifyPosted($user->getRole()->getType(), $post, $owner)->getAll($post->getCreatedAt()->getUnixTimestamp())));
         }
         return $c;
     }
