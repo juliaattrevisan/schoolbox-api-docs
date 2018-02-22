@@ -272,7 +272,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
         // Customise and send to every participant in this plan only
         foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
-            if ($participant->isExcluded()) {
+            if (!$this->isParticipantNotifiable($participant, self::TRIGGER_OPEN)) {
                 continue;
             }
 
@@ -315,12 +315,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
         // Customise and send to every participant in this plan only
         foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
-            if ($participant->isExcluded()) {
-                continue;
-            }
-
-            // Has participant already submitted?
-            if (!$participant->isResponseRequired()) {
+            if (!$this->isParticipantNotifiable($participant, self::TRIGGER_UPCOMING)) {
                 continue;
             }
 
@@ -385,12 +380,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
         // Customise and send to every participant in this plan only
         foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
-            if ($participant->isExcluded()) {
-                continue;
-            }
-
-            // Has participant already submitted?
-            if (!$participant->isResponseRequired()) {
+            if (!$this->isParticipantNotifiable($participant, self::TRIGGER_OVERDUE)) {
                 continue;
             }
 
@@ -458,10 +448,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         // Figure out how many need to submit
         $totalUnsubmitted = 0;
         foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
-            if ($participant->isExcluded()) {
-                continue;
-            }
-            if (!$participant->isResponseRequired()) {
+            if (!$this->isParticipantNotifiable($participant, self::TRIGGER_CLOSED)) {
                 continue;
             }
             $totalUnsubmitted++;
@@ -514,12 +501,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
         // Figure out who's actually targeted
         foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
-            if ($participant->isExcluded()) {
-                continue;
-            }
-
-            // Is this open for this student yet?
-            if ($participant->getOpenDate()->isFuture()) {
+            if (!$this->isParticipantNotifiable($participant, self::TRIGGER_UPDATED)) {
                 continue;
             }
 
@@ -876,12 +858,36 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 // Open and updated notifs are always sent
                 return true;
 
+            case self::TRIGGER_UPCOMING:
+            case self::TRIGGER_OVERDUE:
+            case self::TRIGGER_CLOSED:
             default:
                 // All other notifs are not sent for due works that don't
                 // accept online, because action isn't necessary for them.
                 // It is possible, but not mandatory, for students to
                 // acknowledge response, though.
                 return !($assessment instanceof DueWork && $assessment->isAcceptNone());
+        }
+    }
+
+    private function isParticipantNotifiable(Participant $participant, string $label): bool
+    {
+        switch ($label) {
+            case self::TRIGGER_OPEN:
+                // Open notifs are always sent to non-excluded
+                return !$participant->isExcluded();
+
+            case self::TRIGGER_UPDATED:
+                // Updated: send if not excluded and isn't open yet
+                return !$participant->isExcluded() && !$participant->getOpenDate()->isFuture();
+
+            case self::TRIGGER_UPCOMING:
+            case self::TRIGGER_OVERDUE:
+            case self::TRIGGER_CLOSED:
+            default:
+                // All other notifs:
+                // participant is included, and still needs to respond
+                return !$participant->isExcluded() && $participant->isResponseRequired();
         }
     }
 
