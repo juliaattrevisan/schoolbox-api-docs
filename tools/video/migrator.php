@@ -1,0 +1,374 @@
+#!/usr/bin/php
+<?php
+/**
+ * Script to migrate existing thumbnails, posters and transcodes across to OTFS storage
+ *
+ * @author      Damian Sloane <damian.sloane@alaress.com.au>
+ * @copyright   2017 Alaress Pty Ltd
+ * @link        http://www.alaress.com.au
+ */
+
+use Aura\Di\Container as Injector;
+use Aura\Di\Exception\ServiceNotFound as ServiceNotFound;
+use Psr\Log\LoggerInterface;
+use React\EventLoop\LoopInterface;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\MapperFactory;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\Model as Storage;
+use Schoolbox\Video\Mapper as VideoMapper;
+use Schoolbox\Video\Model as Video;
+
+require_once __DIR__ . '/../../conf/core/require.php';
+
+spl_autoload_call('\\Schoolbox\\Application\\Daemon');
+
+$kernel = new Schoolbox\Application\Daemon\Kernel('Media Migrator', [
+    'verbose' => [false, false, false],
+]);
+
+try {
+    $kernel->run(function ($di, $loop, $log, $opts) {
+        /**
+         * @var Injector        $di
+         * @var LoopInterface   $loop
+         * @var LoggerInterface $log
+         * @var array           $opts
+         */
+
+        // ------------------------------------------------------------------------------------------------------------
+        // Get mappers
+        // ------------------------------------------------------------------------------------------------------------
+
+        try {
+            /** @var IConfigLoader $configLoader */
+            $configLoader = $di->get('config');
+
+            /** @var MapperFactory $mapperFactory */
+            $mapperFactory = $di->get('mapperFactory');
+        } catch (ServiceNotFound $e) {
+            $log->critical("Unknown service requested");
+            exit;
+        }
+
+        /** @var VideoMapper $videoMapper */
+        $videoMapper = $mapperFactory->get(VideoMapper::class);
+
+        /** @var ConfigMapper $configMapper */
+        $configMapper = $mapperFactory->get(ConfigMapper::class);
+
+        /** @var StorageMapper $storageMapper */
+        $storageMapper = $mapperFactory->get(StorageMapper::class);
+
+        // ------------------------------------------------------------------------------------------------------------
+        // Let kernel decide how to handle dead child processes
+        // ------------------------------------------------------------------------------------------------------------
+
+        pcntl_signal(SIGCHLD, SIG_DFL);
+
+        // ------------------------------------------------------------------------------------------------------------
+        // Allow only a single migration at a time
+        // ------------------------------------------------------------------------------------------------------------
+
+        $lock = new Alaress_Lock($configLoader->get('video_dir') . '/.migration.lock');
+
+        if (!$lock->acquire()) {
+            $log->warning("Media migration already running, checking timeout...");
+            exit;
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        // Get transcoded files from local storage that we need to move
+        // ------------------------------------------------------------------------------------------------------------
+
+        $globVideos = "{$configMapper->get("video_dir")}/*.mp4";
+        $log->info("Scanning '{$globVideos}'...");
+        $videos = glob($globVideos);
+
+        $globPosters = "{$configMapper->get("video_dir")}/*-poster.jpg";
+        $log->info("Scanning '{$globPosters}'...");
+        $posters = glob($globPosters);
+
+        $globThumbnails = "{$configMapper->get("video_dir")}/*-64.jpg";
+        $log->info("Scanning '{$globThumbnails}/*-64.jpg'...");
+        $thumbnails = glob($globThumbnails);
+
+        $log->info("");
+
+        // Tally up the booty
+
+        $countVideos     = count($videos);
+        $countPosters    = count($posters);
+        $countThumbnails = count($thumbnails);
+
+        $countTotal = $countVideos + $countPosters + $countThumbnails;
+
+        // Shortcut if nothing left to migrate
+
+        if ($countTotal == 0) {
+            $log->info("Nothing to migrate");
+            $lock->release();
+            exit;
+        }
+
+        // Track results of migration
+
+        $failed  = 0;
+        $success = 0;
+
+        $log->info("Found {$countVideos} videos, {$countPosters} posters, {$countThumbnails} thumbnails");
+        $log->info("");
+
+        // ------------------------------------------------------------------------------------------------------------
+        // Migrate videos
+        // ------------------------------------------------------------------------------------------------------------
+
+        // Videos need to be migrated first so that the thumbnails/posters have something to be associated with
+
+        $log->info("Processing videos...");
+        $results = uploadArrayToStorage($log, $videos, $storageMapper, $videoMapper, VideoMapper::TYPE_VIDEO);
+
+        $success += $results["success"];
+        $failed  += $results["failed"];
+
+        // ------------------------------------------------------------------------------------------------------------
+        // Migrate posters
+        // ------------------------------------------------------------------------------------------------------------
+
+        $log->info("Processing posters...");
+        $results = uploadArrayToStorage($log, $posters, $storageMapper, $videoMapper, VideoMapper::TYPE_POSTER);
+
+        $success += $results["success"];
+        $failed  += $results["failed"];
+
+        // ------------------------------------------------------------------------------------------------------------
+        // Migrate thumbnails
+        // ------------------------------------------------------------------------------------------------------------
+
+        $log->info("Processing thumbnails...");
+        $results = uploadArrayToStorage($log, $thumbnails, $storageMapper, $videoMapper, VideoMapper::TYPE_THUMBNAIL);
+
+        $success += $results["success"];
+        $failed  += $results["failed"];
+
+        // ------------------------------------------------------------------------------------------------------------
+        // Display results
+        // ------------------------------------------------------------------------------------------------------------
+
+        if ($failed > 0) {
+            $log->info("Processing completed with errors: {$success} succeeded, {$failed} failed");
+        } else {
+            $log->info("Processing completed: {$success} media items processed successfully");
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+        // Release lock
+        // ------------------------------------------------------------------------------------------------------------
+
+        $lock->release();
+    });
+} catch (Exception $e) {
+    // Don't actually know where this exception is coming from- but PhpStorm complains if I don't do a catch all here
+
+    $log->critical("Unhandled exception error: {$e->getMessage()}", [$e]);
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+// Helper functions
+// --------------------------------------------------------------------------------------------------------------------
+
+/**
+ * Iterate over the array of files and migrate appropriate
+ *
+ * @param LoggerInterface $log
+ * @param array           $filenames
+ * @param StorageMapper   $storageMapper
+ * @param VideoMapper     $videoMapper
+ * @param string          $type
+ *
+ * @return array
+ */
+function uploadArrayToStorage(LoggerInterface $log, array $filenames, StorageMapper $storageMapper, VideoMapper $videoMapper, $type)
+{
+    $log->info("");
+
+    $success      = 0;
+    $failed       = 0;
+    $countCurrent = 1;
+    $countQueue   = count($filenames);
+
+    /** @var string $filename */
+    foreach ($filenames as $filename) {
+        $log->info("    - Migrating:              {$countCurrent}/{$countQueue}");
+        $log->info("    - Migration Type:         " . ucfirst($type));
+        $log->info("    - Source File:            {$filename}");
+        $log->info(getDisplayFileSize($filename));
+
+        if (uploadToStorage($log, $filename, $storageMapper, $videoMapper, $type)) {
+            $success++;
+        } else {
+            $log->error("    - Failed:                 {$filename}");
+            $failed++;
+        }
+
+        $log->info("");
+
+        $countCurrent++;
+    }
+
+    return [
+        'success' => $success,
+        'failed'  => $failed,
+    ];
+}
+
+/**
+ * Upload a single thumbnail to storage and amend corresponding video record
+ *
+ * @param LoggerInterface $log
+ * @param string          $filename
+ * @param StorageMapper   $storageMapper
+ * @param VideoMapper     $videoMapper
+ * @param string          $type
+ *
+ * @return bool
+ */
+function uploadToStorage(LoggerInterface $log, $filename, StorageMapper $storageMapper, VideoMapper $videoMapper, $type)
+{
+    // ----------------------------------------------------------------------------------------------------------------
+    // Retrieve existing video storage object
+    // ----------------------------------------------------------------------------------------------------------------
+
+    // Extract the hash from the filename
+
+    try {
+        if ($type == VideoMapper::TYPE_VIDEO) {
+            $filenameArray = explode(".mp4", $filename);
+        } else {
+            $filenameArray = explode("-", $filename);
+        }
+
+        $hash = end(explode("/", $filenameArray[0]));
+
+        $videoStorage = $storageMapper->findByHash($hash);
+
+        $log->info("    - Storage Filename:       {$videoStorage->getFilename()}.{$videoStorage->getExtension()}");
+    } catch (MapperException $e) {
+        $log->error("    - Failed:                 Unable to locate corresponding storage object");
+
+        return false;
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // Upload the file to storage
+    // ----------------------------------------------------------------------------------------------------------------
+
+    try {
+        // Sadly the storage system requires that any file uploaded fakes a PHP file upload and thus is located in the
+        // system temp folder- so we have to move the file there for no good reason
+
+        if ($type == VideoMapper::TYPE_VIDEO) {
+            $filenameTemp = getTempFilename(basename($filename), "mp4");
+        } else {
+            $filenameTemp = getTempFilename(basename($filename), "jpg");
+        }
+
+        rename($filename, $filenameTemp);
+
+        if ($type == VideoMapper::TYPE_VIDEO) {
+            // If the file doesn't exist in storage, create it- and update the size in the corresponding storage row
+
+            if (!$videoStorage->getFilesystem()->has($videoStorage->getPath())) {
+                $videoStorage->getFilesystem()->write($videoStorage->getPath(), file_get_contents($filenameTemp));
+                $videoStorage->setSize(filesize($filenameTemp));
+                $storageMapper->save($videoStorage);
+            }
+        } else {
+            // Thumbnails and posters can just be uploaded as per normal because they have never been stored
+            // inside the storage architecture before
+
+            $storageObject = $storageMapper->accept("{$videoStorage->getFilename()}-{$type}.jpg", $filenameTemp);
+        }
+    } catch (MapperException $e) {
+        $log->error("    - Failed:                 Unable to upload to storage");
+
+        return false;
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // Create/update video record that links the video to its thumbnail/poster
+    // ----------------------------------------------------------------------------------------------------------------
+
+    // Try to retrieve existing video record
+
+    try {
+        /** @var Video $video */
+        $video = $videoMapper->findOneByColumn('video_hash', $hash);
+    } catch (MapperException $e) {
+        // There was no existing video record, we need to create a new one
+
+        try {
+            $video = $videoMapper->createModel();
+            $video->setVideo($videoStorage);
+        } catch (MapperException $e) {
+            $log->error("    - Failed:                 Unable to create new video record");
+
+            return false;
+        }
+    }
+
+    if (isset($storageObject) && $storageObject instanceof Storage) {
+        switch ($type) {
+            case VideoMapper::TYPE_POSTER:
+                $video->setPoster($storageObject);
+                break;
+
+            case VideoMapper::TYPE_THUMBNAIL:
+                $video->setThumbnail($storageObject);
+                break;
+
+            default:
+                $log->error("    - Failed:                 Unknown migration type specified ({$type})");
+
+                return false;
+        }
+    }
+
+    $videoMapper->save($video);
+
+    return true;
+}
+
+/**
+ * Create a unique filename without creating the file like tempnam() does
+ *
+ * @param string $filename
+ * @param string $extension
+ *
+ * @return string
+ */
+function getTempFilename($filename, $extension)
+{
+    return sys_get_temp_dir() . "/migrator-{$filename}-" . date("YmdHis") . ".{$extension}";
+}
+
+/**
+ * Get pretty file size for display
+ *
+ * @param string $filename
+ *
+ * @return string
+ */
+function getDisplayFileSize($filename)
+{
+    clearstatcache();
+
+    $fileSize = filesize($filename);
+
+    $alaressByteFormat = new Alaress_Byte_Format();
+    $alaressByteFormat->bytesToString($fileSize);
+
+    return "    - Source File Size:       {$fileSize}";
+}

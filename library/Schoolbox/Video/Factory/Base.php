@@ -12,6 +12,7 @@
 
 namespace Schoolbox\Video\Factory;
 
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use \Schoolbox\Video\QueueMapper;
 use Schoolbox\Video\ResourceVideo;
@@ -58,7 +59,7 @@ abstract class Base {
 	 * Spawn a video object
 	 *
 	 * @return ResourceVideo
-	 * @throws \Exception
+	 * @throws MapperException
 	 */
 	public function produce() {
 		$videoMapper = new ResourceVideoMapper();
@@ -86,7 +87,7 @@ abstract class Base {
                 return $videoMapper->findByStorageHash($file->getHash());
 		}
 
-        throw new \Schoolbox\Mapper\Exception('Instance of object not found');
+        throw new MapperException('Instance of object not found');
 	}
 
 	/**

@@ -9,69 +9,44 @@ namespace Schoolbox\Resource\Storage;
 
 use Alaress\Database\Predicate\Builder;
 use Alaress_Byte_Format;
+use League\Flysystem\FileNotFoundException;
 use PDO;
 use PDOStatement;
 use Schoolbox;
 use Schoolbox\Collection;
-use Schoolbox\File;
+use Schoolbox\File\Exception as FileException;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
-use Schoolbox\Video\Queue;
-use Schoolbox\Video\QueueMapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-
+use Schoolbox\Resource\FilesystemFactory;
+use Schoolbox\User;
+use Schoolbox\Video\QueueMapper;
 
 /**
  * Class Mapper
- *
  * Storage Mapper. Maps storage table to Schoolbox storage objects
  *
  * @package Schoolbox\Resource\Storage
  */
-class Mapper extends Schoolbox\Mapper implements Receiver
+class Mapper extends BaseMapper implements Receiver
 {
-
     /**
      * Lazy-loaded on first use.
-     *
      * We cannot instantiate during a construct setup hook as it has a dependency on the config loader which will
      * blow up if getInstance() is called on this class from a php unit test context.
-     ** @var Manager
-    */
-    private $mgr;
+     *
+     * @var Manager
+     */
+    private $manager;
 
     /** @var bool */
     private $checkPrevious;
 
     /**
-     * @return Manager
-     */
-    public function getManager()
-    {
-        // TODO this does not belong here, but where does it go
-
-        if(null === $this->mgr){
-            $factory = new Schoolbox\Resource\FilesystemFactory();
-            $this->mgr = new Manager($factory->build($this->config_loader->get('storage_dir')), new Alaress_Byte_Format());
-        }
-        return $this->mgr;
-    }
-
-
-    /**
-     * @param Manager $mgr
-     * @return self
-     */
-    public function setManager($mgr)
-    {
-        $this->mgr = $mgr;
-        return $this;
-    }
-
-
-    /**
      * @param int $idValue
-     * @throws \Schoolbox\Mapper\Exception
+     *
+     * @throws MapperException
      * @return Model
      */
     public function createModel($idValue = null)
@@ -79,11 +54,13 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         /** @var Model $model */
         $model = parent::createModel($idValue);
         $model->setFilesystem($this->getManager()->getFilesystem(Manager::FS_STORAGE));
+
         return $model;
     }
 
     /**
      * @return void
+     * @throws MapperException
      */
     protected function mapping()
     {
@@ -98,14 +75,15 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         $this->uses('public', self::TYPE_BOOLEAN);
         $this->uses('ext', self::TYPE_STRING, null, 'extension');
 
-        // derived field; mimetype automatically joined via the extension
+        // Derived field: Mime type automatically joined via the extension
+
         $this->joinsVia('allowedFileExtension', MimetypeMapper::class, 'fileTypeID', 'fileTypeID', 'extension', 'ext', self::TYPE_MODEL, self::COLUMN_JOIN_READONLY, 'mimetype');
 
         $requireSafety = true;
 
         if (isset($this->sessionData['user'])) {
             $user = $this->sessionData['user'];
-            if ($user instanceof Schoolbox\User) {
+            if ($user instanceof User) {
                 $requireSafety = $user->isSuperuser() == false;
             }
         }
@@ -116,30 +94,31 @@ class Mapper extends Schoolbox\Mapper implements Receiver
             $this->registerCallback(self::CALLBACK_PRESAVE, function ($model) {
                 /** @var Model $model */
                 if (!$model->getMimetype() instanceof Mimetype) {
-                    // for super users only, we allow this
+                    // For super users only, we allow this
                     $model->setMimetype(MimetypeMapper::getInstance()->getUnknownMime());
                 }
             });
         }
 
-        $this->registerCallback(self::CALLBACK_POSTSAVE,   [ $this, self::CALLBACK_POSTSAVE ]);
-        $this->registerCallback(self::CALLBACK_POSTDELETE, [ $this, 'deleteStorage' ]);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, self::CALLBACK_POSTSAVE]);
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'deleteStorage']);
     }
-
 
     /**
      * Pre-save callback
      *
      * @param Model $storage
+     *
+     * @throws FileException
+     * @throws FileNotFoundException
      */
     public function safetyCheck(Model $storage)
     {
         $this->getManager()->safetyCheck($storage);
     }
 
-
     /**
-     * Post-deletecallback
+     * Post-delete callback
      *
      * @param Model $storage
      */
@@ -149,7 +128,8 @@ class Mapper extends Schoolbox\Mapper implements Receiver
     }
 
     /**
-     * Call back hook to clear postsave queue
+     * Clear callback hooks
+     *
      * @deprecated
      */
     public function dePostSave()
@@ -161,17 +141,19 @@ class Mapper extends Schoolbox\Mapper implements Receiver
     /**
      * @param Model $storage
      * @param Model $previous
+     *
      * @return bool
+     * @throws FileException
      */
     protected function postSave(Model $storage, Model $previous = null)
     {
         if ($previous) {
-            // not the first time we've seen this file? no copying to take place
+            // Not the first time we've seen this file? no copying to take place
             return true;
         }
 
-        /* Ram media files into Video Queue table for transcoding
-         */
+        // Ram media files into Video Queue table for transcoding
+
         $saveResult = $this->getManager()->save($storage);
 
         if ($storage->getMimetype()->isVideo() || $storage->getMimetype()->isAudio()) {
@@ -188,12 +170,15 @@ class Mapper extends Schoolbox\Mapper implements Receiver
 
     /**
      * @param string $hash
+     *
      * @return Model
+     * @throws MapperException
      */
     public function findByHash($hash)
     {
         /** @var Model $model */
         $model = $this->findOneByColumn('hash', $hash);
+
         return $model;
     }
 
@@ -216,29 +201,32 @@ class Mapper extends Schoolbox\Mapper implements Receiver
 
     /**
      * Ensures that path is always calculated on all hydrated objects.
-     *
      * This used to be in `$this->hydrateSelect` - however, that method doesn't
      * get called if this object is hydrated through a join from another mapper.
      *
-     * @param array $row
-     * @param string $alias
+     * @param array         $row
+     * @param string        $alias
      * @param callable|null $callback
      *
      * @return null|Model
+     * @throws MapperException
      */
     public function hydrate(array $row, $alias = '', $callback = null)
     {
         /** @var null|Model $storage */
         $storage = parent::hydrate($row, $alias, $callback);
-        if($storage instanceof Model){
+        if ($storage instanceof Model) {
             $storage->setPath($this->getManager()->calcPath($storage));
         }
+
         return $storage;
     }
 
     /**
      * @param PDOStatement $statement
+     *
      * @return Collection
+     * @throws MapperException
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
@@ -262,6 +250,7 @@ class Mapper extends Schoolbox\Mapper implements Receiver
      * @param Builder $predicate
      * @param array   $columnList
      * @param array   $options
+     *
      * @return array
      */
     protected function buildWherePart(Builder $predicate, $columnList, $options)
@@ -277,8 +266,9 @@ class Mapper extends Schoolbox\Mapper implements Receiver
 
     /**
      * @param Model $object
+     *
      * @return bool
-     * @throws Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     public function delete($object)
     {
@@ -286,31 +276,36 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         $args = func_get_args();
 
         if (count($args) < 2 || $args[1] !== true) {
-            throw new Schoolbox\Mapper\Exception("Attempt to delete Storage file denied");
+            throw new MapperException("Attempt to delete Storage file denied");
         }
 
         try {
             // postDelete will throw a file exception if the file can't be deleted
             return parent::delete($object);
-        } catch (File\Exception $e) {
-            throw new Schoolbox\Mapper\Exception("Could not delete Storage file", 0, $e);
+        } catch (MapperException $e) {
+            throw new MapperException("Could not delete Storage file", 0, $e);
         }
     }
 
     /**
-     * Accept a datastream (or string file contents) upload
+     * Accept a resource stream (or string file contents) upload
      *
-     * @param string $filename
+     * @param string          $filename
      * @param resource|string $fp
-     * @param bool $public
+     * @param bool            $public
+     *
      * @return Model
+     * @throws MapperException
      */
     public function acceptStream($filename, $fp, $public = false)
     {
-        // this might seem hacky, but to ensure all the safety checks pass, this data needs to be a tempfile (just like an upload)
+        // This might seem hacky, but to ensure all the safety checks pass, this data needs to be a tempfile
+        // (just like an upload)
+
         $tempLocation = sb_tempnam('otfs');
 
-        // dump the stream into our tempfile
+        // Dump the stream into our tempfile
+
         file_put_contents($tempLocation, $fp);
 
         return $this->accept($filename, $tempLocation, $public);
@@ -319,55 +314,91 @@ class Mapper extends Schoolbox\Mapper implements Receiver
     /**
      * Accept a new file upload
      *
-     * @param string $basename
-     * @param string $tempLocation
-     * @param bool $public
-     * @throws File\Exception
+     * @param string      $basename
+     * @param string      $tempLocation
+     * @param bool        $public
+     *
      * @return Model
+     * @throws MapperException
      */
     public function accept($basename, $tempLocation, $public = true)
     {
         /** @var MimetypeMapper $mtm */
         $mtm = $this->getJoinMapper('allowedFileExtension');
 
-        // clear hash so it will be recalculated
+        // Create storage object with no hash so that it is automatically created
+
         $storage = $this->createModel()->setHash(null);
 
-        // explicitly use temporary upload filesystem
+        // Explicitly use temporary upload filesystem
+
         $storage->setFilesystem($this->getManager()->getFilesystem(Manager::FS_TEMP));
 
-        // TODO find a way to remove the need for this truncation
-        $tempLocation = str_replace(sys_get_temp_dir(), '', $tempLocation);
-        $storage->setPath($tempLocation);
+        // TODO: Find a way to remove the need for this truncation
 
-        // set filetype metadata
+        $storage->setPath(str_replace(sys_get_temp_dir(), '', $tempLocation));
+
+        // Set file type metadata
+
         $storage->setFilename(mb_pathinfo($basename, PATHINFO_FILENAME));
         $storage->setExtension(mb_pathinfo($basename, PATHINFO_EXTENSION));
+
         try {
             $storage->setMimetype($mtm->getByFilename($basename));
-        } catch (File\Exception $e) {
-            // noop. we are going to allow the mime to remain NULL, which will shortly be caught in the safetyCheck
+        } catch (FileException $e) {
+            // We are going to allow the mime to remain NULL, which will shortly be caught in the safetyCheck
         }
 
-        // by default, files uploaded this way are public
+        // By default files uploaded this way are public
+
         $storage->setPublic($public);
 
-        // aaaaaand save. file won't be re-saved if it already exists in storage
         $this->save($storage);
 
         return $storage;
     }
 
-
-
-
     /**
      * @param bool $bool
+     *
      * @return self
      */
     public function checkPrevious($bool)
     {
         $this->checkPrevious = $bool;
+
+        return $this;
+    }
+
+    // Getters & Setters
+
+    // TODO: This does not belong here, but where does it go
+
+    /**
+     * @return Manager
+     */
+    public function getManager()
+    {
+        if ($this->manager === null) {
+            $factory       = new FilesystemFactory();
+            $this->manager = new Manager(
+                $factory->build($this->config_loader->get('storage_dir')),
+                new Alaress_Byte_Format()
+            );
+        }
+
+        return $this->manager;
+    }
+
+    /**
+     * @param Manager $manager
+     *
+     * @return self
+     */
+    public function setManager($manager)
+    {
+        $this->manager = $manager;
+
         return $this;
     }
 }

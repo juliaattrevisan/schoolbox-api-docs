@@ -119,7 +119,7 @@ function score2pascal($score, $delim = '_') {
  *
  * @param string $filepath
  * @param int    $options
- * @return array
+ * @return array|string
  */
 function mb_pathinfo($filepath, $options = null) {
     $regexp = <<<REGEXP
