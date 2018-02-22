@@ -127,7 +127,10 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
     } else {
         // Am I already out of attempts?
         if (($assess['max_attempts'] > 0) && ($numAttempts >= $assess['max_attempts'])) {
-            error(146);
+
+            /* Redirect to the Attempts List screen
+             */
+            $this->localRedir("/assess/attempts/{$assess['assess_id']}/{$_SESSION['user']->getId()}");
         }
     }
 }
