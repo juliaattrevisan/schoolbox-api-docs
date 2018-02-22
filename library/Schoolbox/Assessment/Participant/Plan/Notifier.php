@@ -120,11 +120,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
         // Trigger different notifs depending on what assessment type was saved
         $assessment = $plan->getAssessment();
-        if ($assessment->getQuiz()) {
-            // Proc quiz notifs to this participant and parents
-            // May need to bundle these together with notifs to teachers that things are overdue
-            return;
-        }
 
         $method = $bundle->getMethod();
         if ($method === Mapper::METHOD_DELETE) {
