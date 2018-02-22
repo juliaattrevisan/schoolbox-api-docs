@@ -573,30 +573,50 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 [$newName, $oldName] = $diff['assessment']['name'];
 
                 // Students
-                $bob->setTitle(':author renamed :oldname to :newname in :cat')
+                // TODO iterate particiapnts and students separately
+                $bob->setHref($route)
+                    ->setTitle(':author renamed :oldname to :newname in :cat')
                     ->setParam('author', new UserParam($effector))
                     ->setParam('oldname', new Param($oldName))
                     ->setParam('newname', new Param($newName, $route))
                     ->setParam('cat', new CategoryParam($folder))
-                    ->addTopic("duework.{$boxId}.renamed")
-                    ->setHref($route);
+                    ->setTopics(["duework.{$boxId}.renamed"]);
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
-                $bob->setTitle(":child's $boxType was renamed from :oldname to :newname in :catname")
+                $bob->setTitle(":child's $boxType was renamed from :oldname to :newname in :cat")
                     ->unsetParam('author')
-                    ->setParam('child', new ChildParam($participant->getUser(), Param::STACKING_REPLACE))
-                ;
+                    ->setParam('child', new ChildParam($participant->getUser(), Param::STACKING_REPLACE));
                 $envelope->targetToParent($participant->getUser(), $bob->build());
             }
 
             // due date change
             if (!empty($diff['participants'][$participant->getUser()->getId()]['dueDate'])) {
-                // target this to student, parent
-//                    $bob = $this
-//                        ->setForNotifyDueDateChanged($bob, $submissionBox, $diff, $user, $student)
-//                        ->setHref($this->buildParticipantRoute($submissionBox, $student));
-//                    $envelope->targetToUser($student, $bob->build());
+
+                $oldDate = strtotime($diff['participants'][$participant->getUser()->getId()]['dueDate'][1]);
+                $newDate = strtotime($diff['participants'][$participant->getUser()->getId()]['dueDate'][0]);
+                $verb = $newDate > $oldDate ? 'extended' : 'changed';
+
+                $dateformat = $participant->getDueDate()->getLongDateOnly();
+                if (!$participant->getDueDate()->isAtEndOfDay()) {
+                    $dateformat = $participant->getDueDate()->getTimeOnly() .' on '. $dateformat;
+                }
+
+                // Students
+                $bob->setTitle(":author $verb :boxname to :date in :cat")
+                    ->setParam('author', new UserParam($effector))
+                    ->setParam('boxname', new Param($assessmentDomainObject->getTitle(), $route))
+                    ->setParam('date', new Param($dateformat))
+                    ->setParam('cat', new CategoryParam($folder))
+                    ->setTopics(["duework.{$boxId}.datechanged"]);
+                $envelope->targetToUser($participant->getUser(), $bob->build());
+
+                // Parents
+                $bob->setHref($route)
+                    ->setTitle(":child's $boxType :boxname closing date was $verb to :date in :cat")
+                    ->unsetParam('author')
+                    ->setParam('child', new ChildParam($participant->getUser(), Param::STACKING_REPLACE));
+                $envelope->targetToParent($participant->getUser(), $bob->build());
             }
 
             // accept online
