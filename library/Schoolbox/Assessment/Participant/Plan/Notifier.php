@@ -236,12 +236,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         // Still need the submission box's ID for generating the topic
-        $assessment = $this->retrieveAssessmentDataModel($plan);
-        if (!$assessment->getDueWork()) {
+        $boxId = $this->retrieveAssessmentDueWorkId($plan);
+        if (!$boxId) {
             return $envelope;
         }
-        $boxId = $assessment->getDueWork()->getId();
-
 
         // Build generic builder
         $workType     = $assessmentDomainObject->getWorkType();
@@ -300,11 +298,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         // Still need the submission box's ID for generating the topic
-        $assessment = $this->retrieveAssessmentDataModel($plan);
-        if (!$assessment->getDueWork()) {
+        $boxId = $this->retrieveAssessmentDueWorkId($plan);
+        if (!$boxId) {
             return $envelope;
         }
-        $boxId = $assessment->getDueWork()->getId();
 
         // Doesn't accept online? return
         if ($assessmentDomainObject->isAcceptNone()) {
@@ -374,11 +371,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         // Still need the submission box's ID for generating the topic
-        $assessment = $this->retrieveAssessmentDataModel($plan);
-        if (!$assessment->getDueWork()) {
+        $boxId = $this->retrieveAssessmentDueWorkId($plan);
+        if (!$boxId) {
             return $envelope;
         }
-        $boxId = $assessment->getDueWork()->getId();
 
         // Doesn't accept online? return
         if ($assessmentDomainObject->isAcceptNone()) {
@@ -447,11 +443,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         // Still need the submission box's ID for generating the topic
-        $assessment = $this->retrieveAssessmentDataModel($plan);
-        if (!$assessment->getDueWork()) {
+        $boxId = $this->retrieveAssessmentDueWorkId($plan);
+        if (!$boxId) {
             return $envelope;
         }
-        $boxId = $assessment->getDueWork()->getId();
 
         // Doesn't accept online? return
         if ($assessmentDomainObject->isAcceptNone()) {
@@ -656,6 +651,22 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private function retrieveAssessmentDataModel(Model $plan): AssessmentModel
     {
         return $this->assessmentMapper->findById($plan->getAssessment()->getId());
+    }
+
+    /**
+     * Fetches the due work ID for this plan; this is required for targeting
+     * notifications to the due work's mailbox.
+     *
+     * @param Model $plan
+     * @return int|null
+     */
+    private function retrieveAssessmentDueWorkId(Model $plan): ?int
+    {
+        $assessment = $this->retrieveAssessmentDataModel($plan);
+        if (!$assessment->getDueWork()) {
+            return null;
+        }
+        return $assessment->getDueWork()->getId();
     }
 
     /**
