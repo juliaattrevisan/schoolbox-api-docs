@@ -82,15 +82,9 @@ class ThreadNotifier extends AbstractModuleNotifier implements SourceInterface {
 
 
     /**
-     * Generate n Instances, from the perspective of casual observation (rather than targeted at a particular user).
-     *
-     * @param int    $context  - most likely a category ID or ignored
-     * @param string $roletype - the roletype of the user for whom this feed is being retrieved
-     * @param int    $limit    - how many messages to retrieve
-     * @param int    $offset   - by default, most recent
-     * @return Collection|Instance[]
+     * @inheritdoc
      */
-    public function getFeed($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0)
+    public function getFeed($context, User $user, $limit = self::HARD_LIMIT, $offset = 0)
     {
         $c = new Collection();
 
@@ -102,7 +96,15 @@ class ThreadNotifier extends AbstractModuleNotifier implements SourceInterface {
         $threads = $this->mapper->findForFeed($context, $limit, $offset);
 
         foreach ($threads as $thread) {
-            $c = $c->merge(new Collection($this->notifyFollowed($roletype, $thread, $thread->getUser())->getAll($thread->getDate()->getUnixTimeStamp())));
+            $c = $c->merge(
+                new Collection(
+                    $this->notifyFollowed(
+                        $user->getRole()->getType(),
+                        $thread,
+                        $thread->getUser()
+                    )->getAll($thread->getDate()->getUnixTimeStamp())
+                )
+            );
         }
 
         return $c;
