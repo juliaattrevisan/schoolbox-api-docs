@@ -48,7 +48,7 @@ if (strlen($userKey)) {
     findForFolder() automatically filters out articles that have expired.
      */
     $newsMapper = NewsMapper::getInstance();
-    $allNews = $newsMapper->findForFolder($folder->getId(), new Schoolbox\User());
+    $allNews = $newsMapper->findForFolder($folder->getId(), $user);
 
     /* Render all this stuff
      */
