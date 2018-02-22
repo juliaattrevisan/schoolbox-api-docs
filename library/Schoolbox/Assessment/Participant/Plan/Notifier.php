@@ -54,6 +54,13 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private const DUEWORK_UPCOMING_WINDOW = 2;
 
     /**
+     * *Hours* in advance to inform a user that quiz is upcoming.
+     *
+     * TODO make this configurable separately from DUEWORK_UPCOMING_WINDOW
+     */
+    private const QUIZ_UPCOMING_WINDOW = 2;
+
+    /**
      * @var AssessmentMapper
      */
     private $assessmentMapper;
@@ -283,6 +290,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         if ($assessmentDomainObject instanceof DueWork) {
             return $this->notifyDueWorkUpcoming($assessmentDomainObject, $plan);
         }
+        if ($assessmentDomainObject instanceof Quiz) {
+            return $this->notifyQuizUpcoming($assessmentDomainObject, $plan);
+        }
 
         return new Envelope();
     }
@@ -337,6 +347,57 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             }
             $bob = $this->targetBuilderToParents($bob, $dueWork, $participant)
                         ->setTitle(":child has not yet submitted work for :assessment, which is due $when from now in :cat");
+            $envelope->targetToParent($participant->getUser(), $bob->build());
+        }
+
+        return $envelope;
+    }
+
+
+    /**
+     * Participant and parents get notified when a quiz is upcoming.
+     *
+     * @param Quiz  $quiz
+     * @param Model $plan
+     * @return Envelope
+     */
+    private function notifyQuizUpcoming(Quiz $quiz, Model $plan): Envelope
+    {
+        $envelope  = new Envelope();
+        $topicStub = $this->retrieveAssessmentTopicStub($quiz);
+        if (!$topicStub) {
+            return $envelope;
+        }
+
+        $bob = $this->buildGenericBuilder($quiz)
+                    ->setSeverity(Logger::WARNING)
+                    ->addTopic("$topicStub.upcoming");
+
+        // Customise and send to every participant in this plan only
+        foreach ($this->retrieveParticipantsFromPlan($plan, $quiz) as $participant) {
+            if ($participant->isExcluded()) {
+                continue;
+            }
+
+            // Has participant already submitted?
+            if (!$participant->isResponseRequired()) {
+                continue;
+            }
+
+            $when = self::QUIZ_UPCOMING_WINDOW . " hour" . (self::QUIZ_UPCOMING_WINDOW === 1 ? '' : 's');
+
+            // build for student
+            $bob = $this->targetBuilderToStudent($bob, $quiz, $participant)
+                        ->setTitle(":assessment is due in $when in :cat")
+                        ->setBody($participant->getDescription());
+            $envelope->targetToUser($participant->getUser(), $bob->build());
+
+            // build for parent, only if they're allowed
+            if ($this->conf->get('restrict_student_submissions')) {
+                continue;
+            }
+            $bob = $this->targetBuilderToParents($bob, $quiz, $participant)
+                        ->setTitle(":child has not yet attempted :assessment in :cat");
             $envelope->targetToParent($participant->getUser(), $bob->build());
         }
 
