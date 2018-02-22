@@ -312,9 +312,16 @@ else {
 }
 
 /* If you can still attempt the quiz and number of attempts is less than maximum allowed, allow attempts to occur
+ *
+ * Note that the user check ensures that the ui illustrates that you attempt the quiz as yourself, rather than
+ * someone else (this occurs when instructors view learners' attempts screens)
  */
 if ($i < $assess['max_attempts']) {
-    $this->parse('can_attempt_block', 'can_attempt');
+    if ((int)$_SESSION['user']->getId() === (int)$userId) {
+        if ($actionValidator->canAttemptQuiz($_SESSION['user'], $quiz)) {
+            $this->parse('can_attempt_block', 'can_attempt');
+        }
+    }
 }
 
 /** @var Schoolbox\User $user */
