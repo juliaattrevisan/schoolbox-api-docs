@@ -86,7 +86,7 @@ class ComponentDelegate
     {
         $historical = '';
         if (!$includeHistorical) {
-            $historical = "AND DATE(sportsfixtures_match.start_at) > DATE(NOW())";
+            $historical = "AND DATE(sportsfixtures_match.start_at) >= DATE(NOW())";
         }
 
         $placeholders = Builder::getArrayPlaceholders($userIds, 'userId');
