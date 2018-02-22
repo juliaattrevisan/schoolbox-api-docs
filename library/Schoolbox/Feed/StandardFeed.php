@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -22,14 +22,19 @@ class StandardFeed extends Feed
      * @param int                     $limit
      * @param int                     $offset
      */
-    function __construct(Schoolbox\IConfigLoader $conf, $context, $roleType, $limit = SourceInterface::HARD_LIMIT, $offset = 0)
-    {
+    public function __construct(
+        Schoolbox\IConfigLoader $conf,
+        $context,
+        $roleType,
+        $limit = SourceInterface::HARD_LIMIT,
+        $offset = 0
+    ) {
         parent::__construct();
 
         $this->aggregate(
-             array(
-                new Schoolbox\Assessment\Component\SubmissionBoxNotifier($conf),
-                new Schoolbox\Learning\Quiz\Notifier($conf),
+            [
+//                new Schoolbox\Assessment\Component\SubmissionBoxNotifier($conf),
+//                new Schoolbox\Learning\Quiz\Notifier($conf),
                 new Schoolbox\Resource\Category\NewsNotifier($conf),
                 new Schoolbox\Blog\Homepage\Post\Notifier($conf),
                 new Schoolbox\Blog\Homepage\Comment\Notifier($conf),
@@ -41,12 +46,12 @@ class StandardFeed extends Feed
                 new Schoolbox\Resource\Textbox\Notifier($conf),
                 new SocialStream\PostNotifier($conf),
                 new Schoolbox\Forum\ThreadNotifier($conf),
-                new Schoolbox\Forum\PostNotifier($conf)
-            ),
-            $context, $roleType, $limit, $offset
+                new Schoolbox\Forum\PostNotifier($conf),
+            ],
+            $context,
+            $roleType,
+            $limit,
+            $offset
         );
     }
-
-
-
 }
