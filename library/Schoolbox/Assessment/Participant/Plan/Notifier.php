@@ -193,7 +193,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $c = new Collection();
 
         // if parents aren't allowed to see due work, return an empty collection
-        if ($roletype === Role::PARENT && $this->conf->get('restrict_parent_duework_access')) {
+        if ($roletype === Role::PARENT && !$this->isParentTargetable()) {
             return $c;
         }
 
@@ -342,7 +342,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             $envelope->targetToUser($participant->getUser(), $bob->build());
 
             // build for parent, only if they're allowed
-            if ($this->conf->get('restrict_student_submissions')) {
+            if (!$this->isParentTargetable()) {
                 continue;
             }
             $bob = $this->targetBuilderToParents($bob, $dueWork, $participant)
@@ -393,7 +393,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             $envelope->targetToUser($participant->getUser(), $bob->build());
 
             // build for parent, only if they're allowed
-            if ($this->conf->get('restrict_student_submissions')) {
+            if (!$this->isParentTargetable()) {
                 continue;
             }
             $bob = $this->targetBuilderToParents($bob, $quiz, $participant)
@@ -471,7 +471,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             $envelope->targetToUser($participant->getUser(), $bob->build());
 
             // build for parent, only if they're allowed
-            if ($this->conf->get('restrict_student_submissions')) {
+            if (!$this->isParentTargetable()) {
                 continue;
             }
             $bob = $this->targetBuilderToParents($bob, $dueWork, $participant)
@@ -743,10 +743,12 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
-                $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
-                            ->setTitle(":child's $boxType was renamed from :oldname to :assessment in :cat")
-                            ->unsetParam('author');
-                $envelope->targetToParent($participant->getUser(), $bob->build());
+                if ($this->isParentTargetable()) {
+                    $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
+                                ->setTitle(":child's $boxType was renamed from :oldname to :assessment in :cat")
+                                ->unsetParam('author');
+                    $envelope->targetToParent($participant->getUser(), $bob->build());
+                }
 
                 $notificationRaisedForParticipant = true;
             }
@@ -771,10 +773,12 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
-                $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
-                            ->setTitle(":child's $boxType :assessment closing date was $verb to :date in :cat")
-                            ->unsetParam('author');
-                $envelope->targetToParent($participant->getUser(), $bob->build());
+                if ($this->isParentTargetable()) {
+                    $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
+                                ->setTitle(":child's $boxType :assessment closing date was $verb to :date in :cat")
+                                ->unsetParam('author');
+                    $envelope->targetToParent($participant->getUser(), $bob->build());
+                }
 
                 $notificationRaisedForParticipant = true;
             }
@@ -791,12 +795,14 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
-                $m = $assessment->isAcceptNone()
-                    ? ':child no longer need to submit online for :assessment in :cat'
-                    : ':child needs to submit online for :assessment in :cat';
-                $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
-                            ->setTitle($m);
-                $envelope->targetToParent($participant->getUser(), $bob->build());
+                if ($this->isParentTargetable()) {
+                    $m   = $assessment->isAcceptNone()
+                        ? ':child no longer need to submit online for :assessment in :cat'
+                        : ':child needs to submit online for :assessment in :cat';
+                    $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
+                                ->setTitle($m);
+                    $envelope->targetToParent($participant->getUser(), $bob->build());
+                }
 
                 $notificationRaisedForParticipant = true;
             }
@@ -812,10 +818,12 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
-                $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
-                            ->setTitle(":child's $boxType :assessment was updated in :cat")
-                            ->unsetParam('author');
-                $envelope->targetToParent($participant->getUser(), $bob->build());
+                if ($this->isParentTargetable()) {
+                    $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
+                                ->setTitle(":child's $boxType :assessment was updated in :cat")
+                                ->unsetParam('author');
+                    $envelope->targetToParent($participant->getUser(), $bob->build());
+                }
             }
         }
 
@@ -1030,5 +1038,18 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             ->setHref($href);
     }
 
-
+    /**
+     * Are notifications targetable to parents?
+     *
+     * The rules are nebulous, but I'm going to assume no if either of the
+     * below configs are on:
+     * * `config.restrict_student_submissions`
+     * * `config.restrict_parent_duework_access`
+     *
+     * @return bool
+     */
+    private function isParentTargetable(): bool
+    {
+        return !($this->conf->get('restrict_student_submissions') || $this->conf->get('restrict_parent_duework_access'));
+    }
 }
