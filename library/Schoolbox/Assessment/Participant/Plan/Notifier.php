@@ -156,15 +156,22 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 $dueDate = $this->coalesceDates($plan->getDueDate(), $assessment->getDueDate());
                 if ($dueDate) {
                     // Quiz and Due Work have different logic for when notification happens
-                    // Quiz: 1 hour before
+                    // Quiz: 2 hours before
                     // Due Work: 2 days before
-                    $upcomingDate = (clone $dueDate)->addDays(-self::DUEWORK_UPCOMING_WINDOW);
+                    $upcomingDate = null;
+                    if ($assessment->getQuiz()) {
+                        $upcomingDate = (clone $dueDate)->addHours(-self::QUIZ_UPCOMING_WINDOW);
+                    } elseif ($assessment->getDueWork()) {
+                        $upcomingDate = (clone $dueDate)->addDays(-self::DUEWORK_UPCOMING_WINDOW);
+                    }
                     // if the upcoming date is before the open date, push upcoming to 1 minute after open,
                     // rounded to the nearest 5 minutes?
-                    if ($upcomingDate->lt($openDate)) {
-                        $upcomingDate = (clone $openDate)->addMinutes(1);
+                    if ($upcomingDate) {
+                        if ($upcomingDate->lt($openDate)) {
+                            $upcomingDate = (clone $openDate)->addMinutes(1);
+                        }
+                        $bundle->attach(self::TRIGGER_UPCOMING, $upcomingDate->getUnixTimeStamp());
                     }
-                    $bundle->attach(self::TRIGGER_UPCOMING, $upcomingDate->getUnixTimeStamp());
                     $bundle->attach(self::TRIGGER_OVERDUE, $dueDate->getUnixTimeStamp());
                 }
 
