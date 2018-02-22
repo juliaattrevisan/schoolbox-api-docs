@@ -20,6 +20,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Learning\InlineGrader\Kami\Exception\EmptySiteSchoolCode;
 use Schoolbox\Resource\Storage\IStorage;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
@@ -262,6 +263,8 @@ class Connector implements IConnector
      * @param bool                     $showMenu  Hides the menu button
      * @return Session
      * @throws Exception\ResponseDecodeException If unable to decode a server response
+     * @throws EmptySiteSchoolCode If 'site_school_code' is empty
+     * @throws Exception\ApiException If API response is unable to be processed by us
      * @throws Exception\EmptyApiKeyException If API key not configured
      * @throws \InvalidArgumentException If cannot convert the request or response to a string
      * @throws Exception\NotFound If document does not exist in Kami
@@ -282,13 +285,17 @@ class Connector implements IConnector
         if (!$expires) {
             $expires = Alaress_Date_Format::now()->addHours(self::DEFAULT_SESSION_EXPIRY_HOURS);
         }
+        $siteSchoolCode = trim($this->config->get('site_school_code'));
+        if (empty($siteSchoolCode)) {
+            throw new EmptySiteSchoolCode("'site_school_code' cannot be empty");
+        }
         $options  = [
             RequestOptions::HEADERS => ['Content-Type' => 'application/json'],
             RequestOptions::BODY    => \GuzzleHttp\json_encode([
                 'document_identifier' => $documentId,
                 'user'                => [
                     'name'    => "{$user->getFirstname()} {$user->getLastname()}",
-                    'user_id' => $this->config->get('site_school_code').'-'.$user->getId(),
+                    'user_id' => "{$siteSchoolCode}-{$user->getId()}",
                 ],
                 'expires_at'          => $expires->getUsingFormat(Alaress_Date_Format::FORMAT_DATETIME_UTC),
                 'viewer_options'      => [

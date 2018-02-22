@@ -349,6 +349,7 @@ class Controller extends Base
      * @throws \LogicException
      * @throws \PDOException
      * @throws \UnexpectedValueException
+     * @throws Kami\Exception\EmptySiteSchoolCode
      */
     public function getKamiView(Kami\Model $kami, Model $response): void
     {
