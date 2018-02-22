@@ -11,7 +11,7 @@
 #}
 
 {% if selfReflection %}
-    {% set placeholder = 'Self reflection on my work' %}
+    {% set placeholder = locale.selfReflection | capitalize ~ ' on my work' %}
 {% elseif readonly %}
     {% set placeholder = '(no comment given)' %}
 {% else %}
