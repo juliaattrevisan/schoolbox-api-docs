@@ -15,7 +15,16 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
 
 /**
- * Class NotifierProxy
+ * Proxy class for manually triggering notifications of assessments.
+ *
+ * Usage:
+ * ```
+ * $assessment = new IAssessable();
+ * $notifier   = new NotifierProxy($assessmentDataSource, $planMapper);
+ * $before     = $notifier->dehydrate($assessment);
+ * $assessmentDataSource->save($assessment);
+ * $notifier->notify($assessment, $currentUser, $before);
+ * ```
  */
 class NotifierProxy
 {
@@ -74,35 +83,39 @@ class NotifierProxy
     }
 
     /**
-     * Notify the
+     * Send notifications for this assessment.
      *
      * @param IAssessable $assessment
-     * @param User        $effector
-     * @param array       $before
+     * @param User        $effector   Who triggered the action
+     * @param array       $before     What was the state of `$assessment`
+     *                                before it was saved?
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     public function notify(IAssessable $assessment, User $effector, array $before): void
     {
-        // Retrieve assessment, as I need the assessment's participations
+        // Retrieve assessment, as I need the assessment's participation
         $assessment = $this->assessmentDataSource->findByIdForReview($assessment->getId());
         $action     = empty($before) ? PlanMapper::METHOD_CREATE : PlanMapper::METHOD_UPDATE;
         $after      = $this->dehydrate($assessment);
-
-        // Plans must come from the plan mapper
 
         // Now, trigger notifiers
         // Participant object has little idea of whether assessment was created or updated,
         // so just show updated.
         // Will need to rework actual notifs so they're verb-agnostic (besides delete)
+        $assessmentModel = $this->assessmentDataSource->translateToDataModel($assessment);
+
         foreach ($assessment->getPlans() as $plan) {
-            // I have NFI how I'm going to generate a diff for this item.
-            // Maybe I just need to keep the old sub box notifier around.
             $beforePlan = $before[$plan->getId()] ?? [];
             $afterPlan  = $after[$plan->getId()]  ?? [];
+
+            // Finagle together a plan model with the minimum amount of info I
+            // can get away with
+            $planModel  = $this->planMapper->createModel($plan->getId())
+                                           ->setAssessment($assessmentModel);
             $this->planMapper->getEventPropagator()->propagate(
                 $effector,
                 $action,
-                $plan,
+                $planModel,
                 $this->planMapper,
                 $this->differ->diff($afterPlan, $beforePlan)
             );
