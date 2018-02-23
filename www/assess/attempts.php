@@ -88,6 +88,7 @@ $this->setFile(TEMPLATE_content, 'assess/attempts.html');
 $this->setBlock(TEMPLATE_content, 'has_preview_action', 'has_preview_action_block');
 $this->setBlock(TEMPLATE_content, 'has_preview_link', 'has_preview_link_block');
 $this->setBlock(TEMPLATE_content, 'has_attempts', 'has_attempts_block');
+$this->setBlock(TEMPLATE_content, 'can_attempt', 'can_attempt_block');
 $this->setBlock('has_attempts', 'attempt', 'attempt_block');
 $this->setBlock('attempt', 'attempt_review', 'attempt_review_block');
 $this->setBlock('attempt', 'attempt_resume', 'attempt_resume_block');
@@ -96,20 +97,22 @@ $this->setBlock('attempt', 'attempt_delete', 'attempt_delete_block');
 /* Generic details
  */
 $this->setVar(array(
+    'ASSESS_ID' => $assess['assess_id'],
     'ASSESS_NAME' => Scrub::text($assess['title']),
     'CID' => $assess['category_id'],
     'ATTEMPT_USER_ID' => $user->getId(),
-    'ATTEMPT_USER_NAME' => $user->formatName()
+    'ATTEMPT_USER_NAME' => $user->formatName(),
+    'CURRENT_USER' => $user->getFullName(),
 ));
 
 /* Default
  */
 $this->setVar([
-    'CURRENT_USER' => $user->getFullName(),
     'attempt_block' => '',
     'has_attempts_block' => '',
     'has_preview_action_block' => '',
     'has_preview_link_block' => '',
+    'can_attempt_block' => '',
 ]);
 
 $canDeleteAttempt = $actionValidator->canDeleteAttempts($_SESSION['user'], $user, $quiz);
@@ -117,11 +120,6 @@ $canDeleteAttempt = $actionValidator->canDeleteAttempts($_SESSION['user'], $user
 $perm = Access::getInstance()->getFolderAccess($_SESSION['user'], $assess['category_id']);
 
 if ($perm >= UserAccess::ACCESS_WRITE) {
-
-    $this->setVar([
-        'ASSESS_ID' => $assess['assess_id']
-    ]);
-
     $this->parse('has_preview_action_block', 'has_preview_action');
     $this->parse('has_preview_link_block', 'has_preview_link');
 }
@@ -134,7 +132,6 @@ if (is_array($allAttempts) && count($allAttempts)) {
     $i = 0;
 
     foreach ($allAttempts as $currentAttempt) {
-        $i++;
         $finishDateValue = null;
         $timeTaken = null;
 
@@ -294,6 +291,8 @@ if (is_array($allAttempts) && count($allAttempts)) {
 			'attempt_resume_block' => '',
             'attempt_delete_block' => '',
 		));
+
+        $i++;
     }
 
     $this->parse('has_attempts_block', 'has_attempts');
@@ -306,6 +305,19 @@ else {
     $this->setVar([
         'EMPTY_STATE_CSS' => ''
     ]);
+}
+
+/* If you can still attempt the quiz and number of attempts is less than maximum allowed, allow attempts to occur
+ *
+ * Note that the user check ensures that the ui illustrates that you attempt the quiz as yourself, rather than
+ * someone else (this occurs when instructors view learners' attempts screens)
+ */
+if ($i < $assess['max_attempts']) {
+    if ((int)$_SESSION['user']->getId() === (int)$userId) {
+        if ($actionValidator->canAttemptQuiz($_SESSION['user'], $quiz)) {
+            $this->parse('can_attempt_block', 'can_attempt');
+        }
+    }
 }
 
 /** @var Schoolbox\User $user */
