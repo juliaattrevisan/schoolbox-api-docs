@@ -187,18 +187,18 @@ class Model extends AbstractAssessment
      */
     public function canLearnerCreateResponse(User $learner)
     {
+        // Not a participant ?
+        if(!$this->isParticipant($learner)){
+            return false;
+        }
+
         // Not open ?
-        if(!$this->isOpen()){
+        if(!$this->isOpen($learner)){
             return false;
         }
 
         // Must be self-assessable
         if(!$this->isSelfAssessable()){
-            return false;
-        }
-
-        // Not a participant ?
-        if(!$this->isParticipant($learner)){
             return false;
         }
 

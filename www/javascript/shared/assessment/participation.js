@@ -15,7 +15,10 @@
         planData: '#plan-data',
         participants: '#participants',
         participantSettings: '#participation-settings',
-        customiseModal: '#participant-customise-modal'
+        customiseModal: '#participant-customise-modal',
+        getAvailableDateFields: function() {
+            return ['publish', 'open', 'due', 'close'];
+        }
     };
 
     /**
@@ -88,7 +91,7 @@
          */
         $participantSettings.on('click', '#participant-customise', function (event) {
             event.preventDefault();
-            openPlanModal();
+            openPlanModal(undefined, self.options);
             newPlan = true;
         });
 
@@ -101,7 +104,7 @@
             var planId = $(this).attr('data-plan-modify');
             var planData = getPlanData(planId);
             newPlan = false;
-            openPlanModal(planData);
+            openPlanModal(planData, self.options);
         });
 
 
@@ -200,7 +203,6 @@
 
             return studentListHtmlString;
         }
-
 
         // Validate plan form
         $('#participation-plan-form').alaressValidate({
@@ -547,7 +549,7 @@
         }
     }
 
-    function openPlanModal(planData) {
+    function openPlanModal(planData, options) {
 
         var $planParticipants = $('#plan-participants');
         var $customiseModal = $(defaults.customiseModal);
@@ -560,6 +562,8 @@
         var $planOpenDate = $customiseModal.find('#plan-open-date');
         var $planDueDate = $customiseModal.find('#plan-due-date');
         var $planCloseDate = $customiseModal.find('#plan-close-date');
+
+        var dates = options.getAvailableDateFields();
 
         var participantArray = $(defaults.participants).find('[data-participant-select]').map(function(){
             var obj = {id: $(this).data('userId'), name: $(this).data('userName')};
@@ -585,12 +589,30 @@
         // Destroy and reinit CKEditor
         reinitCKE();
 
-        // Disable dates if assessment doesn't accept online submissions
-        if (!$('#acceptOnline').length || $('#acceptOnline').val() === '0') {
+        // Disable/hide dates if they aren't in the config
+        if ($.inArray('publish', dates) == -1) {
+            $('#plan-publish-date').closest('[data-plan-date-container]').addClass('hide');
+        } else {
+            $('#plan-publish-date').closest('[data-plan-date-container]').removeClass('hide');
+        }
+
+        if ($.inArray('open', dates) == -1) {
+        // Disable/hi
             $('#plan-open-date').closest('[data-plan-date-container]').addClass('hide');
-            $('#plan-close-date').closest('[data-plan-date-container]').addClass('hide');
         } else {
             $('#plan-open-date').closest('[data-plan-date-container]').removeClass('hide');
+        }
+
+        if ($.inArray('due', dates) == -1) {
+            $('#plan-due-date').closest('[data-plan-date-container]').addClass('hide');
+        } else {
+            $('#plan-due-date').closest('[data-plan-date-container]').removeClass('hide');
+        // Disable/hi
+        }
+
+        if ($.inArray('close', dates) == -1) {
+            $('#plan-close-date').closest('[data-plan-date-container]').addClass('hide');
+        } else {
             $('#plan-close-date').closest('[data-plan-date-container]').removeClass('hide');
         }
 
