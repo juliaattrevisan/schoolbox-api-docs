@@ -455,7 +455,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $bob  = $this->buildGenericBuilder($assessment)
                      ->setTitle(":assessment in :cat has closed and :number did not submit work")
                      ->setHref($href)
-                     ->setParam('box', new Param($assessment->getTitle(), $href))
+                     ->setParam('assessment', new Param($assessment->getTitle(), $href))
                      ->setSeverity(Logger::ERROR)
                      ->addTopic("$topicStub.closed");
 
