@@ -8,10 +8,9 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use Schoolbox\Learning\Assessment\DataModel\NotifierProxy;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Mapper;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
@@ -83,10 +82,7 @@ class Replicator
             $newAssessment->setSequence($sequence);
         }
 
-        $notifier = new NotifierProxy($this->assessmentMapperProxy, PlanMapper::getInstance());
-        $before   = $notifier->dehydrate($newAssessment);
         $this->assessmentMapperProxy->save($newAssessment);
-        $notifier->notify($newAssessment, $newOwner, $before);
         $destination->getAssessables()->add($newAssessment);
 
         // Copy DueWork Rubrics

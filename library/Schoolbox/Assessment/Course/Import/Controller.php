@@ -12,6 +12,7 @@ use Alaress\Web\Controller as Base;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Component_Instance;
 use Schoolbox\Assessment\Course\Import\Destinations;
+use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -675,14 +676,18 @@ class Controller extends Base\Base
         // Apply dates regardless of whether it is a Spec or Impl. (If Spec, they will be cloned to the Impl)
         $assessment = $this->applyDates($assessment, $dateData);
 
+        $notifier = new Assessment\NotifierProxy($this->assessmentMapperProxy, PlanMapper::getInstance());
         if (!$implId) {
             // INSERT - Create Impl from Spec
+            $before        = [];
             $newAssessment = $this->replicator->replicateInNewContext($assessment, $context, $this->getUser());
         } else {
             // UPDATE
             $newAssessment = null;
+            $before        = $notifier->dehydrate($assessment);
             $this->assessmentMapperProxy->save($assessment);
         }
+        $notifier->notify($newAssessment, $this->getUser(), $before);
 
         // Recursive case
         if ($subData) {
