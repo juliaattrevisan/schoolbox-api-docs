@@ -13,8 +13,8 @@ use Alaress\Async\Notification\Parameter\Param;
 use Alaress_Date_Format;
 use Monolog\Logger;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as DueWorkFeedbackMapper;
+use Schoolbox\Assessment\Participant\Mapper as ParticipantMapper;
 use Schoolbox\Collection;
-use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
@@ -22,8 +22,10 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizFeedbackMapper;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -265,18 +267,52 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             return $c;
         }
 
-        // be sure the target method exists
-        // TODO implement FMI on participant or assessment
-        if (!$this->getMapper() instanceof FeedableMapperInterface) {
-            return $c;
-        }
+        // Forgive my usage of getInstance, or don't;
+        // it's going to happen regardless.
+        $access  = Access::getInstance();
+        $mutator = new Participant\AssessmentListMutator($user, new Visibility($access), Alaress_Date_Format::now(), true);
 
-        $boxes = $this->getMapper()->findForFeed($context, $limit, $offset);
+        /** @var IAssessable[] $assessments */
+        $assessments = $this->assessmentDataSource->findAllByFolderIdForReview($context, $user)
+            ->map([$mutator, 'map'])
+            ->filter([$mutator, 'filter'])
+            ->slice($offset, $limit);
 
-        foreach ($boxes as $box) {
-            $c = $c
-                ->merge(new Collection($this->notifyOpen($box, $box->getOwner())->getAll($box->getOpenDate()->getUnixTimeStamp())))
-                ->merge(new Collection($this->notifyClosed($box, $box->getOwner())->getAll($box->getDueDate()->getUnixTimeStamp())));
+        foreach ($assessments as $assessment) {
+            // Go thru each plan and raise in THAT context
+            foreach ($assessment->getPlans() as $domainModelPlan) {
+                $openDate = $domainModelPlan->getOpenDate() ?? $assessment->getOpenAt();
+                $dueDate  = $domainModelPlan->getDueDate()  ?? $assessment->getDueAt();
+
+                // Finagle the domain-object plan to a model-object plan,
+                // so it can be used in notifiers
+                /** @var Model $dataModelPlan */
+                $dataModelPlan = $this->mapper->createModel($domainModelPlan->getId());
+                $dataModelPlan
+                    ->setName($domainModelPlan->getName())
+                    ->setDescription($domainModelPlan->getDescription())
+                    ->setIsDynamic($domainModelPlan->getIsDynamic())
+                    ->setPublishDate($domainModelPlan->getPublishDate())
+                    ->setOpenDate($domainModelPlan->getOpenDate())
+                    ->setDueDate($domainModelPlan->getDueDate())
+                    ->setCloseDate($domainModelPlan->getDueDate());
+
+                // Finagle participants too
+                foreach ($domainModelPlan->getParticipants() as $participant) {
+                    $dataModelParticipant = ParticipantMapper::getInstance()->createModel($participant->getId());
+                    $dataModelParticipant
+                        ->setUser($participant->getUser())
+                        ->setExcludedAt($participant->getExcludedAt())
+                    ;
+                    $dataModelPlan->getParticipants()->setOffset($participant->getUser()->getId(), $dataModelParticipant);
+                }
+
+                $c = $c
+                    ->merge(new Collection($this->internalNotifyOpen($assessment, $dataModelPlan, $assessment->getCreator())
+                                                ->getAll($openDate)))
+                    ->merge(new Collection($this->internalNotifyClosed($assessment, $dataModelPlan)
+                                                ->getAll($dueDate)));
+            }
         }
 
         return $c;
