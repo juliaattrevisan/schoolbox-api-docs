@@ -76,7 +76,7 @@ try {
     );
 
 } catch (ExternalException $e) {
-    error(ErrorMapper::ERROR_ATTENDANCE_SEQUENCE);
+    error(ErrorMapper::ERROR_ATTENDANCE_LIST);
 }
 
 // Create everyone's attendance initially

@@ -179,9 +179,9 @@ class Mapper extends BaseMapper implements IExceptionGenerator
     const ERROR_FOLDER_DELETED = 206;
     public const ERROR_NO_COURSE_SPEC_INTERACTIONS = 207;
     public const ERROR_NONPARTICIPANT = 208;
-    const ERROR_CAMPUS_CODE = 209;
-    const ERROR_ATTENDANCE_LIST = 210;
-    const ERROR_ATTENDANCE_SAVE = 211;
+    public const ERROR_CAMPUS_CODE = 209;
+    public const ERROR_ATTENDANCE_LIST = 210;
+    public const ERROR_ATTENDANCE_SAVE = 211;
 
     /**
      * Setup mapping
