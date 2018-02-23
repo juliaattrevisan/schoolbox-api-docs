@@ -76,7 +76,7 @@ try {
     );
 
 } catch (ExternalException $e) {
-    error(ErrorMapper::ERROR_DATE_FORMAT);
+    error(ErrorMapper::ERROR_ATTENDANCE_LIST);
 }
 
 // Create everyone's attendance initially
@@ -122,7 +122,7 @@ if (is_array($_POST['studentID'])) {
     }
 
     if (!$attendanceHandler->getAttendanceMaster()->save()) {
-        error(ErrorMapper::ERROR_DATE_FORMAT);
+        error(ErrorMapper::ERROR_ATTENDANCE_SAVE);
     }
 }
 
