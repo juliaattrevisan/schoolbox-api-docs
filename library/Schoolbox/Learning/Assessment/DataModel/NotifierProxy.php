@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DataModel;
 
 use Alaress\Diff\Differ;
+use Schoolbox\Assessment\Participant\Model as ParticipantModel;
 use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
 use Schoolbox\Learning\Assessment\Dehydrator;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -110,8 +111,25 @@ class NotifierProxy
 
             // Finagle together a plan model with the minimum amount of info I
             // can get away with
-            $planModel  = $this->planMapper->createModel($plan->getId())
-                                           ->setAssessment($assessmentModel);
+            // TODO consider a translation layer
+            $planModel = $this->planMapper->createModel($plan->getId());
+            $planModel->setName($plan->getName())
+                      ->setDescription($plan->getDescription())
+                      ->setIsDynamic($plan->getIsDynamic())
+                      ->setPublishDate($plan->getPublishDate())
+                      ->setOpenDate($plan->getOpenDate())
+                      ->setDueDate($plan->getDueDate())
+                      ->setCloseDate($plan->getDueDate())
+                      ->setAssessment($assessmentModel);
+            // Set participants too
+            foreach ($plan->getParticipants() as $participant) {
+                $participantModel = (new ParticipantModel())
+                    ->setId($participant->getId())
+                    ->setUser($participant->getUser())
+                    ->setExcludedAt($participant->getExcludedAt());
+                $planModel->getParticipants()->setOffset($participant->getUser()->getId(), $participantModel);
+            }
+
             $this->planMapper->getEventPropagator()->propagate(
                 $effector,
                 $action,
