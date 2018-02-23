@@ -19,6 +19,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\DataModel\NotifierProxy;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
@@ -333,13 +334,10 @@ class ListController extends Web\Controller\Base
          *
          * Controller must return early for that to happen
          */
-        $dehydrator = new Dehydrator();
-        $differ     = new Differ();
         try {
-            // What kind of action is happening?
-            $planMapper = $this->participantDataSource->getPlanMapper();
-            $action     = $assessment ? $planMapper::METHOD_UPDATE : $planMapper::METHOD_CREATE;
-            $before     = $assessment ? $dehydrator->dehydrateAssessmentIntoPlans($assessment) : [];
+            // Create a notifier proxy so that I may notify about assessment changes
+            $notifier = new NotifierProxy($this->assessmentMapper, $this->participantDataSource->getPlanMapper());
+            $before   = $notifier->dehydrate($assessment);
 
             /* Figure out what kind of assessment was chosen
              * and spawn a new instance of it to manipulate
@@ -351,7 +349,6 @@ class ListController extends Web\Controller\Base
             $assessmentId = $assessment->getId();
 
             // assessment is saved; persist plans
-            // TODO: move this to the swamp or some other reusable place; there is more than one way to save an assess
 
             // Note: in the returned collection
             //    - any plans CREATED by this method will be NEGATIVELY INDEXED (the object has a real ID though)
@@ -360,29 +357,8 @@ class ListController extends Web\Controller\Base
 
             $this->saveParticipationData($plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
 
-            // I don't think plans got added to the assessment? Reload it.
-            // TODO add participants to swamp?
-            // TODO figure out why a user moved from dynamic to non-dynamic plan temporarily exists in both plans
-            $assessment = $this->assessmentMapper->findByIdForReview($assessment->getId());
-            $after = $dehydrator->dehydrateAssessmentIntoPlans($assessment);
-
-            // Now, trigger notifiers
-            // Participant object has little idea of whether assessment was created or updated,
-            // so just show updated.
-            // Will need to rework actual notifs so they're verb-agnostic (besides delete)
-            foreach ($plans as $plan) {
-                // I have NFI how I'm going to generate a diff for this item.
-                // Maybe I just need to keep the old sub box notifier around.
-                $beforePlan = $before[$plan->getId()] ?? [];
-                $afterPlan  = $after[$plan->getId()]  ?? [];
-                $planMapper->getEventPropagator()->propagate(
-                    $this->getUser(),
-                    $action,
-                    $plan,
-                    $planMapper,
-                    $differ->diff($afterPlan, $beforePlan)
-                );
-            }
+            // And send notifications
+            $notifier->notify($assessment, $this->getUser(), $before);
         }
         catch (RangeException|InvalidArgumentException|UnexpectedValueException|PDOException $e) {
             // cast
