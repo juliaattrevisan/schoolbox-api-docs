@@ -8,6 +8,8 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
+use Schoolbox\Learning\Assessment\DataModel\NotifierProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Quiz\Model as Quiz;
@@ -167,6 +169,11 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
             ->setMarkVisibility($parser->getMarkVisibility());
 
         $this->assessmentMapperProxy->save($quizAssessable);
+
+        // Notify about what was just made
+        $notifier = new NotifierProxy($this->assessmentMapperProxy, PlanMapper::getInstance());
+        $notifier->notify($quizAssessable, $_SESSION['user'], []);
+
         $this->quiz = $quizAssessable;
         $this->assess_id = QuizMapper::getInstance()->findIdsByColumn('assessment_id', $this->quiz->getId())[0];
         return $this->assess_id;
