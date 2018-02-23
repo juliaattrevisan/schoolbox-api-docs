@@ -312,6 +312,11 @@
         var toggleCreateButtonState = function(event) {
             toggleFormState($(this).closest('form'));
         };
+        var disableSubmitButton = function(event) {
+            // Find the submit button for the form that triggered this event
+            $(this).find("input[type='submit']").prop('disabled', true);
+        }
+
         c.getForm('createEvent').find('input[name="title"]')
             .on('change', toggleCreateButtonState)
             .on('keyup', toggleCreateButtonState)
@@ -320,6 +325,13 @@
             .on('change', toggleCreateButtonState)
             .on('keyup', toggleCreateButtonState)
         ;
+
+        // Prevent multiple form submissions
+        c.getForm('createEvent').on('submit', disableSubmitButton);
+        c.getForm('editEvent').on('submit', disableSubmitButton);
+        c.getForm('createTask').on('submit', disableSubmitButton);
+        c.getForm('editTask').on('submit', disableSubmitButton);
+
 
         /* When you switch panels, preserve some data
          */
