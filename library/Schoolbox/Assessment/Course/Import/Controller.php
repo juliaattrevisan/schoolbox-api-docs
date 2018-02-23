@@ -679,15 +679,15 @@ class Controller extends Base\Base
         $notifier = new Assessment\NotifierProxy($this->assessmentMapperProxy, PlanMapper::getInstance());
         if (!$implId) {
             // INSERT - Create Impl from Spec
-            $before        = [];
             $newAssessment = $this->replicator->replicateInNewContext($assessment, $context, $this->getUser());
+            $notifier->notify($newAssessment, $this->getUser(), []);
         } else {
             // UPDATE
             $newAssessment = null;
             $before        = $notifier->dehydrate($assessment);
             $this->assessmentMapperProxy->save($assessment);
+            $notifier->notify($assessment, $this->getUser(), $before);
         }
-        $notifier->notify($newAssessment, $this->getUser(), $before);
 
         // Recursive case
         if ($subData) {
