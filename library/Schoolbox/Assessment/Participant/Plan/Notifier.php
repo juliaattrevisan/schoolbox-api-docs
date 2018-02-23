@@ -296,8 +296,22 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     public function notifyOpen(Model $plan): Envelope
     {
-        $assessment = $this->retrieveAssessmentDomainModel($plan);
-        $envelope   = new Envelope();
+        return $this->internalNotifyOpen($this->retrieveAssessmentDomainModel($plan), $plan, $effector);
+    }
+
+
+    /**
+     * Internal method for notifying on open, implemented so that feed can use
+     * it too.
+     *
+     * @param IAssessable $assessment
+     * @param Model       $plan
+     * @param User        $effector
+     * @return Envelope
+     */
+    private function internalNotifyOpen(IAssessable $assessment, Model $plan, User $effector): Envelope
+    {
+        $envelope = new Envelope();
         $topicStub  = $this->retrieveAssessmentTopicStub($assessment);
         if (!$topicStub) {
             return $envelope;
@@ -488,9 +502,22 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     public function notifyClosed(Model $plan): Envelope
     {
-        $assessment = $this->retrieveAssessmentDomainModel($plan);
-        $envelope   = new Envelope();
-        $topicStub  = $this->retrieveAssessmentTopicStub($assessment);
+        return $this->internalNotifyClosed($this->retrieveAssessmentDomainModel($plan), $plan);
+    }
+
+
+    /**
+     * Internal method for notifying on close, implemented so that feed can use
+     * it too.
+     *
+     * @param IAssessable $assessment
+     * @param Model       $plan
+     * @return Envelope
+     */
+    private function internalNotifyClosed(IAssessable $assessment, Model $plan): Envelope
+    {
+        $envelope  = new Envelope();
+        $topicStub = $this->retrieveAssessmentTopicStub($assessment);
         if (!$topicStub) {
             return $envelope;
         }
