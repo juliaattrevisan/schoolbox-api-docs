@@ -97,16 +97,17 @@ $this->setBlock('attempt', 'attempt_delete', 'attempt_delete_block');
 /* Generic details
  */
 $this->setVar(array(
+    'ASSESS_ID' => $assess['assess_id'],
     'ASSESS_NAME' => Scrub::text($assess['title']),
     'CID' => $assess['category_id'],
     'ATTEMPT_USER_ID' => $user->getId(),
-    'ATTEMPT_USER_NAME' => $user->formatName()
+    'ATTEMPT_USER_NAME' => $user->formatName(),
+    'CURRENT_USER' => $user->getFullName(),
 ));
 
 /* Default
  */
 $this->setVar([
-    'CURRENT_USER' => $user->getFullName(),
     'attempt_block' => '',
     'has_attempts_block' => '',
     'has_preview_action_block' => '',
@@ -119,11 +120,6 @@ $canDeleteAttempt = $actionValidator->canDeleteAttempts($_SESSION['user'], $user
 $perm = Access::getInstance()->getFolderAccess($_SESSION['user'], $assess['category_id']);
 
 if ($perm >= UserAccess::ACCESS_WRITE) {
-
-    $this->setVar([
-        'ASSESS_ID' => $assess['assess_id']
-    ]);
-
     $this->parse('has_preview_action_block', 'has_preview_action');
     $this->parse('has_preview_link_block', 'has_preview_link');
 }
