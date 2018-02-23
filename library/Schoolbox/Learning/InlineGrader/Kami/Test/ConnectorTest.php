@@ -16,12 +16,32 @@ use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Schoolbox\Learning\InlineGrader\Kami\Connector;
+use Schoolbox\Learning\InlineGrader\Kami\Exception\EmptySiteSchoolCode;
 use Schoolbox\Learning\InlineGrader\Kami\MockConnector;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
 class ConnectorTest extends TestCase
 {
+
+    /**
+     * @dataProvider providerInvalidSiteSchoolCode
+     * @param null|string $siteSchoolCode
+     * @throws EmptySiteSchoolCode
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException
+     * @throws \Schoolbox\Learning\InlineGrader\Kami\Exception\EmptyApiKeyException
+     * @throws \Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound
+     * @throws \Schoolbox\Learning\InlineGrader\Kami\Exception\ResponseDecodeException
+     */
+    public function testInvalidSiteSchoolCode(?string $siteSchoolCode): void
+    {
+        // This method must not hit Kami API
+        $connector = new Connector($this->getMockClientWithConnectException(), 'TEST_API_KEY', $siteSchoolCode);
+        $this->setExpectedException(EmptySiteSchoolCode::class);
+        $connector->viewSession('kamiDocId', new User());
+    }
+
 
     /**
      * @dataProvider providerDisabledConnector
@@ -638,6 +658,21 @@ class ConnectorTest extends TestCase
         return [
             [null],
             [''],
+        ];
+    }
+
+
+    /**
+     * @return string[]|null[]
+     */
+    public function providerInvalidSiteSchoolCode(): array
+    {
+        return [
+            [''],
+            [' '],
+            ["\n"],
+            ["\t"],
+            [null],
         ];
     }
 
