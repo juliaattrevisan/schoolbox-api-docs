@@ -29,7 +29,6 @@ $log             = $kernel->logger();
 $attemptMapper   = QuizAttemptMapper::getInstance();
 $responseHandler = new Assess_Response();
 
-$taskMapper      = new Task\CompletionMapper();
 $expiredAttempts = $attemptMapper->findUnfinishedExpiredAttempts();
 $updatedAttempts = [];
 
